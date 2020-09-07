@@ -1,0 +1,94 @@
+/*
+ * Copyright 2020 Zeppelin Bend Pty Ltd
+ * This file is part of evolve-sdk-jvm.
+ *
+ * evolve-sdk-jvm is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evolve-sdk-jvm is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.zepben.cimbend.database.sqlite.writers
+
+import com.zepben.cimbend.cim.iec61968.assetinfo.CableInfo
+import com.zepben.cimbend.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.cimbend.cim.iec61968.assets.AssetOwner
+import com.zepben.cimbend.cim.iec61968.assets.Pole
+import com.zepben.cimbend.cim.iec61968.assets.Streetlight
+import com.zepben.cimbend.cim.iec61968.common.Location
+import com.zepben.cimbend.cim.iec61968.common.Organisation
+import com.zepben.cimbend.cim.iec61968.metering.Meter
+import com.zepben.cimbend.cim.iec61968.metering.UsagePoint
+import com.zepben.cimbend.cim.iec61968.operations.OperationalRestriction
+import com.zepben.cimbend.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.cimbend.cim.iec61970.base.core.*
+import com.zepben.cimbend.cim.iec61970.base.meas.Accumulator
+import com.zepben.cimbend.cim.iec61970.base.meas.Analog
+import com.zepben.cimbend.cim.iec61970.base.meas.Control
+import com.zepben.cimbend.cim.iec61970.base.meas.Discrete
+import com.zepben.cimbend.cim.iec61970.base.scada.RemoteControl
+import com.zepben.cimbend.cim.iec61970.base.scada.RemoteSource
+import com.zepben.cimbend.cim.iec61970.base.wires.*
+import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.cimbend.network.NetworkService
+
+class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) : BaseServiceWriter<NetworkService, NetworkCIMWriter>(hasCommon, addCommon) {
+
+    override fun save(service: NetworkService, writer: NetworkCIMWriter): Boolean {
+        var status = true
+
+        service.sequenceOf<CableInfo>().forEach { status = status and validateSave(it, writer::save, "cable info") }
+        service.sequenceOf<OverheadWireInfo>().forEach { status = status and validateSave(it, writer::save, "overhead wire info") }
+        service.sequenceOf<AssetOwner>().forEach { status = status and validateSave(it, writer::save, "asset owner") }
+        service.sequenceOf<Pole>().forEach { status = status and validateSave(it, writer::save, "pole") }
+        service.sequenceOf<Streetlight>().forEach { status = status and validateSave(it, writer::save, "streetlight") }
+        service.sequenceOf<Location>().forEach { status = status and validateSave(it, writer::save, "location") }
+        service.sequenceOf<Organisation>().forEach { status = status and trySaveCommon(writer::save, it) }
+        service.sequenceOf<Meter>().forEach { status = status and validateSave(it, writer::save, "meter") }
+        service.sequenceOf<UsagePoint>().forEach { status = status and validateSave(it, writer::save, "usage point") }
+        service.sequenceOf<OperationalRestriction>().forEach { status = status and validateSave(it, writer::save, "operational restriction") }
+        service.sequenceOf<FaultIndicator>().forEach { status = status and validateSave(it, writer::save, "fault indicator") }
+        service.sequenceOf<BaseVoltage>().forEach { status = status and validateSave(it, writer::save, "base voltage") }
+        service.sequenceOf<ConnectivityNode>().forEach { status = status and validateSave(it, writer::save, "connectivity node") }
+        service.sequenceOf<Feeder>().forEach { status = status and validateSave(it, writer::save, "feeder") }
+        service.sequenceOf<GeographicalRegion>().forEach { status = status and validateSave(it, writer::save, "geographical region") }
+        service.sequenceOf<Site>().forEach { status = status and validateSave(it, writer::save, "site") }
+        service.sequenceOf<SubGeographicalRegion>().forEach { status = status and validateSave(it, writer::save, "sub-geographical region") }
+        service.sequenceOf<Substation>().forEach { status = status and validateSave(it, writer::save, "substation") }
+        service.sequenceOf<Terminal>().forEach { status = status and validateSave(it, writer::save, "terminal") }
+        service.sequenceOf<AcLineSegment>().forEach { status = status and validateSave(it, writer::save, "AC line segment") }
+        service.sequenceOf<Breaker>().forEach { status = status and validateSave(it, writer::save, "breaker") }
+        service.sequenceOf<Disconnector>().forEach { status = status and validateSave(it, writer::save, "disconnector") }
+        service.sequenceOf<EnergyConsumer>().forEach { status = status and validateSave(it, writer::save, "energy consumer") }
+        service.sequenceOf<EnergyConsumerPhase>().forEach { status = status and validateSave(it, writer::save, "energy consumer phase") }
+        service.sequenceOf<EnergySource>().forEach { status = status and validateSave(it, writer::save, "energy source") }
+        service.sequenceOf<EnergySourcePhase>().forEach { status = status and validateSave(it, writer::save, "energy source phase") }
+        service.sequenceOf<Fuse>().forEach { status = status and validateSave(it, writer::save, "fuse") }
+        service.sequenceOf<Jumper>().forEach { status = status and validateSave(it, writer::save, "jumper") }
+        service.sequenceOf<Junction>().forEach { status = status and validateSave(it, writer::save, "junction") }
+        service.sequenceOf<LinearShuntCompensator>().forEach { status = status and validateSave(it, writer::save, "linear shunt compensator") }
+        service.sequenceOf<PerLengthSequenceImpedance>().forEach { status = status and validateSave(it, writer::save, "per length sequence impedance") }
+        service.sequenceOf<PowerTransformer>().forEach { status = status and validateSave(it, writer::save, "power transformer") }
+        service.sequenceOf<PowerTransformerEnd>().forEach { status = status and validateSave(it, writer::save, "power transformer end") }
+        service.sequenceOf<RatioTapChanger>().forEach { status = status and validateSave(it, writer::save, "ratio tap changer") }
+        service.sequenceOf<Recloser>().forEach { status = status and validateSave(it, writer::save, "recloser") }
+        service.sequenceOf<Circuit>().forEach { status = status and validateSave(it, writer::save, "circuit") }
+        service.sequenceOf<Loop>().forEach { status = status and validateSave(it, writer::save, "loop") }
+        service.sequenceOf<Analog>().forEach { status = status and validateSave(it, writer::save, "loop") }
+        service.sequenceOf<Accumulator>().forEach { status = status and validateSave(it, writer::save, "loop") }
+        service.sequenceOf<Discrete>().forEach { status = status and validateSave(it, writer::save, "loop") }
+        service.sequenceOf<Control>().forEach { status = status and validateSave(it, writer::save, "control") }
+        service.sequenceOf<RemoteControl>().forEach { status = status and validateSave(it, writer::save, "remote control") }
+        service.sequenceOf<RemoteSource>().forEach { status = status and validateSave(it, writer::save, "remote source") }
+
+        return status
+    }
+}

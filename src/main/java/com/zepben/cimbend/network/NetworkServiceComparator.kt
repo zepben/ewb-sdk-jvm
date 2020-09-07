@@ -1,0 +1,536 @@
+/*
+ * Copyright 2020 Zeppelin Bend Pty Ltd
+ * This file is part of evolve-sdk-jvm.
+ *
+ * evolve-sdk-jvm is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evolve-sdk-jvm is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.zepben.cimbend.network
+
+import com.zepben.cimbend.cim.iec61968.assetinfo.CableInfo
+import com.zepben.cimbend.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.cimbend.cim.iec61968.assetinfo.WireInfo
+import com.zepben.cimbend.cim.iec61968.assets.*
+import com.zepben.cimbend.cim.iec61968.common.Location
+import com.zepben.cimbend.cim.iec61968.metering.EndDevice
+import com.zepben.cimbend.cim.iec61968.metering.Meter
+import com.zepben.cimbend.cim.iec61968.metering.UsagePoint
+import com.zepben.cimbend.cim.iec61968.operations.OperationalRestriction
+import com.zepben.cimbend.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
+import com.zepben.cimbend.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.cimbend.cim.iec61970.base.core.*
+import com.zepben.cimbend.cim.iec61970.base.meas.*
+import com.zepben.cimbend.cim.iec61970.base.scada.RemoteControl
+import com.zepben.cimbend.cim.iec61970.base.scada.RemotePoint
+import com.zepben.cimbend.cim.iec61970.base.scada.RemoteSource
+import com.zepben.cimbend.cim.iec61970.base.wires.*
+import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.cimbend.common.BaseServiceComparator
+import com.zepben.cimbend.common.ObjectDifference
+import com.zepben.cimbend.common.ValueDifference
+
+/**
+ * @param options Indicates which optional checks to perform
+ */
+//
+// NOTE: Unused functions have been suppressed for this class as they are access by reflection rather than directly. This
+//       means they are always flagged as unused. By suppressing the warning it also means you might not be testing every
+//       function, so make sure you check the code coverage
+//
+@Suppress("unused")
+class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all()) :
+    BaseServiceComparator() {
+
+    private fun compareCableInfo(source: CableInfo, target: CableInfo): ObjectDifference<CableInfo> =
+        ObjectDifference(source, target).apply { compareWireInfo() }
+
+    private fun compareOverheadWireInfo(source: OverheadWireInfo, target: OverheadWireInfo): ObjectDifference<OverheadWireInfo> =
+        ObjectDifference(source, target).apply { compareWireInfo() }
+
+    private fun ObjectDifference<out WireInfo>.compareWireInfo(): ObjectDifference<out WireInfo> =
+        apply {
+            compareAssetInfo()
+            compareValues(WireInfo::ratedCurrent, WireInfo::material)
+        }
+
+    private fun ObjectDifference<out Asset>.compareAsset(): ObjectDifference<out Asset> =
+        apply {
+            compareIdentifiedObject()
+
+            compareIdReferences(Asset::location)
+            compareIdReferenceCollections(Asset::organisationRoles)
+        }
+
+    private fun ObjectDifference<out AssetContainer>.compareAssetContainer(): ObjectDifference<out AssetContainer> =
+        apply { compareAsset() }
+
+    private fun ObjectDifference<out AssetInfo>.compareAssetInfo(): ObjectDifference<out AssetInfo> =
+        apply { compareIdentifiedObject() }
+
+    private fun ObjectDifference<out AssetOrganisationRole>.compareAssetOrganisationRole(): ObjectDifference<out AssetOrganisationRole> =
+        apply { compareOrganisationRole() }
+
+    private fun compareAssetOwner(source: AssetOwner, target: AssetOwner): ObjectDifference<AssetOwner> =
+        ObjectDifference(source, target).apply { compareAssetOrganisationRole() }
+
+    private fun ObjectDifference<out Structure>.compareStructure(): ObjectDifference<out Structure> =
+        apply { compareAssetContainer() }
+
+    private fun comparePole(source: Pole, target: Pole): ObjectDifference<Pole> =
+        ObjectDifference(source, target).apply {
+            compareStructure()
+            compareValues(Pole::classification)
+            compareIdReferenceCollections(Pole::streetlights)
+        }
+
+    private fun compareStreetlight(source: Streetlight, target: Streetlight): ObjectDifference<Streetlight> =
+        ObjectDifference(source, target).apply {
+            compareAsset()
+
+            compareValues(Streetlight::lightRating)
+            compareValues(Streetlight::lampKind)
+            compareIdReferences(Streetlight::pole)
+        }
+
+    private fun compareLocation(source: Location, target: Location): ObjectDifference<Location> =
+        ObjectDifference(source, target).apply {
+            compareIdentifiedObject()
+
+            compareValues(Location::mainAddress)
+            compareIndexedValueCollections(Location::points)
+        }
+
+    private fun ObjectDifference<out EndDevice>.compareEndDevice(): ObjectDifference<out EndDevice> =
+        apply {
+            compareAssetContainer()
+
+            if (options.compareLvSimplification)
+                compareIdReferenceCollections(EndDevice::usagePoints)
+
+            compareValues(EndDevice::customerMRID)
+            compareIdReferences(EndDevice::serviceLocation)
+        }
+
+    private fun compareMeter(source: Meter, target: Meter): ObjectDifference<Meter> =
+        ObjectDifference(source, target).apply { compareEndDevice() }
+
+    private fun compareUsagePoint(source: UsagePoint, target: UsagePoint): ObjectDifference<UsagePoint> =
+        ObjectDifference(source, target).apply {
+            compareIdentifiedObject()
+
+            compareIdReferences(UsagePoint::usagePointLocation)
+            if (options.compareLvSimplification)
+                compareIdReferenceCollections(UsagePoint::equipment)
+
+            if (options.compareLvSimplification)
+                compareIdReferenceCollections(UsagePoint::endDevices)
+        }
+
+    private fun compareOperationalRestriction(source: OperationalRestriction, target: OperationalRestriction): ObjectDifference<OperationalRestriction> =
+        ObjectDifference(source, target).apply {
+            compareDocument()
+
+            compareIdReferenceCollections(OperationalRestriction::equipment)
+        }
+
+    private fun ObjectDifference<out AuxiliaryEquipment>.compareAuxiliaryEquipment(): ObjectDifference<out AuxiliaryEquipment> =
+        apply {
+            compareEquipment()
+
+            if (options.compareTerminals)
+                compareIdReferences(AuxiliaryEquipment::terminal)
+        }
+
+    private fun compareFaultIndicator(source: FaultIndicator, target: FaultIndicator): ObjectDifference<FaultIndicator> =
+        ObjectDifference(source, target).apply { compareAuxiliaryEquipment() }
+
+    private fun ObjectDifference<out AcDcTerminal>.compareAcDcTerminal(): ObjectDifference<out AcDcTerminal> =
+        apply { compareIdentifiedObject() }
+
+    private fun compareBaseVoltage(source: BaseVoltage, target: BaseVoltage): ObjectDifference<BaseVoltage> =
+        ObjectDifference(source, target).apply {
+            compareIdentifiedObject()
+
+            compareValues(BaseVoltage::nominalVoltage)
+        }
+
+    private fun ObjectDifference<out ConductingEquipment>.compareConductingEquipment(): ObjectDifference<out ConductingEquipment> =
+        apply {
+            compareEquipment()
+
+            compareIdReferences(ConductingEquipment::baseVoltage)
+            if (options.compareTerminals)
+                compareIndexedIdReferenceCollections(ConductingEquipment::terminals)
+        }
+
+    private fun compareConnectivityNode(source: ConnectivityNode, target: ConnectivityNode): ObjectDifference<ConnectivityNode> =
+        ObjectDifference(source, target).apply {
+            compareIdentifiedObject()
+
+            compareIdReferenceCollections(ConnectivityNode::terminals)
+        }
+
+    private fun ObjectDifference<out ConnectivityNodeContainer>.compareConnectivityNodeContainer(): ObjectDifference<out ConnectivityNodeContainer> =
+        apply { comparePowerSystemResource() }
+
+    private fun ObjectDifference<out Equipment>.compareEquipment(): ObjectDifference<out Equipment> =
+        apply {
+            comparePowerSystemResource()
+
+            compareValues(Equipment::inService, Equipment::normallyInService)
+
+            if (options.compareEquipmentContainers)
+                compareIdReferenceCollections(Equipment::containers)
+
+            if (options.compareLvSimplification)
+                compareIdReferenceCollections(Equipment::usagePoints)
+
+            compareIdReferenceCollections(Equipment::operationalRestrictions)
+
+            if (options.compareEquipmentContainers)
+                compareIdReferenceCollections(Equipment::currentFeeders)
+        }
+
+    private fun ObjectDifference<out EquipmentContainer>.compareEquipmentContainer(): ObjectDifference<out EquipmentContainer> =
+        apply {
+            compareConnectivityNodeContainer()
+
+            compareIdReferenceCollections(EquipmentContainer::equipment)
+        }
+
+    private fun compareFeeder(source: Feeder, target: Feeder): ObjectDifference<Feeder> =
+        ObjectDifference(source, target).apply {
+            compareEquipmentContainer()
+
+            compareIdReferences(Feeder::normalHeadTerminal, Feeder::normalEnergizingSubstation)
+            if (options.compareFeederEquipment)
+                compareIdReferenceCollections(Feeder::currentEquipment)
+        }
+
+    private fun compareGeographicalRegion(source: GeographicalRegion, target: GeographicalRegion): ObjectDifference<GeographicalRegion> =
+        ObjectDifference(source, target).apply {
+            compareIdentifiedObject()
+
+            compareIdReferenceCollections(GeographicalRegion::subGeographicalRegions)
+        }
+
+    private fun ObjectDifference<out PowerSystemResource>.comparePowerSystemResource(): ObjectDifference<out PowerSystemResource> =
+        apply {
+            compareIdentifiedObject()
+
+            compareIdReferences(PowerSystemResource::assetInfo, PowerSystemResource::location)
+            compareValues(PowerSystemResource::numControls)
+        }
+
+    private fun compareSite(source: Site, target: Site): ObjectDifference<Site> =
+        ObjectDifference(source, target).apply {
+            if (options.compareEquipmentContainers) {
+                compareEquipmentContainer()
+            }
+        }
+
+    private fun compareSubGeographicalRegion(source: SubGeographicalRegion, target: SubGeographicalRegion): ObjectDifference<SubGeographicalRegion> =
+        ObjectDifference(source, target).apply {
+            compareIdentifiedObject()
+
+            compareIdReferences(SubGeographicalRegion::geographicalRegion)
+            compareIdReferenceCollections(SubGeographicalRegion::substations)
+        }
+
+    private fun compareSubstation(source: Substation, target: Substation): ObjectDifference<Substation> =
+        ObjectDifference(source, target).apply {
+            compareEquipmentContainer()
+
+            compareIdReferences(Substation::subGeographicalRegion)
+            compareIdReferenceCollections(Substation::feeders)
+        }
+
+    private fun compareTerminal(source: Terminal, target: Terminal): ObjectDifference<Terminal> =
+        ObjectDifference(source, target).apply {
+            compareAcDcTerminal()
+
+            compareIdReferences(Terminal::conductingEquipment, Terminal::connectivityNode)
+            compareValues(Terminal::phases, Terminal::tracedPhases, Terminal::sequenceNumber)
+        }
+
+    private fun compareAcLineSegment(source: AcLineSegment, target: AcLineSegment): ObjectDifference<AcLineSegment> =
+        ObjectDifference(source, target).apply {
+            compareConductor()
+
+            compareIdReferences(AcLineSegment::perLengthSequenceImpedance)
+        }
+
+    private fun compareBreaker(source: Breaker, target: Breaker): ObjectDifference<Breaker> =
+        ObjectDifference(source, target).apply { compareProtectedSwitch() }
+
+    private fun ObjectDifference<out Conductor>.compareConductor(): ObjectDifference<out Conductor> =
+        apply {
+            compareConductingEquipment()
+
+            compareDoubles(Conductor::length)
+        }
+
+    private fun ObjectDifference<out Connector>.compareConnector(): ObjectDifference<out Connector> =
+        apply { compareConductingEquipment() }
+
+    private fun compareDisconnector(source: Disconnector, target: Disconnector): ObjectDifference<Disconnector> =
+        ObjectDifference(source, target).apply { compareSwitch() }
+
+    private fun ObjectDifference<out EnergyConnection>.compareEnergyConnection(): ObjectDifference<out EnergyConnection> =
+        apply { compareConductingEquipment() }
+
+    private fun compareEnergyConsumer(source: EnergyConsumer, target: EnergyConsumer): ObjectDifference<EnergyConsumer> =
+        ObjectDifference(source, target).apply {
+            compareEnergyConnection()
+
+            compareIdReferenceCollections(EnergyConsumer::phases)
+            compareValues(
+                EnergyConsumer::customerCount, EnergyConsumer::grounded, EnergyConsumer::p, EnergyConsumer::pFixed,
+                EnergyConsumer::phaseConnection, EnergyConsumer::q, EnergyConsumer::qFixed
+            )
+        }
+
+    private fun compareEnergyConsumerPhase(source: EnergyConsumerPhase, target: EnergyConsumerPhase): ObjectDifference<EnergyConsumerPhase> =
+        ObjectDifference(source, target).apply {
+            comparePowerSystemResource()
+
+            compareIdReferences(EnergyConsumerPhase::energyConsumer)
+            compareValues(
+                EnergyConsumerPhase::phase, EnergyConsumerPhase::p, EnergyConsumerPhase::pFixed,
+                EnergyConsumerPhase::q, EnergyConsumerPhase::qFixed
+            )
+        }
+
+    private fun compareEnergySource(source: EnergySource, target: EnergySource): ObjectDifference<EnergySource> =
+        ObjectDifference(source, target).apply {
+            compareEnergyConnection()
+
+            compareIdReferenceCollections(EnergySource::phases)
+            compareValues(
+                EnergySource::activePower, EnergySource::reactivePower,
+                EnergySource::voltageAngle, EnergySource::voltageMagnitude,
+                EnergySource::pMax, EnergySource::pMin,
+                EnergySource::r, EnergySource::r0, EnergySource::rn,
+                EnergySource::x, EnergySource::x0, EnergySource::xn
+            )
+        }
+
+    private fun compareEnergySourcePhase(source: EnergySourcePhase, target: EnergySourcePhase): ObjectDifference<EnergySourcePhase> =
+        ObjectDifference(source, target).apply {
+            comparePowerSystemResource()
+
+            compareIdReferences(EnergySourcePhase::energySource)
+            compareValues(EnergySourcePhase::phase)
+        }
+
+    private fun compareFuse(source: Fuse, target: Fuse): ObjectDifference<Fuse> =
+        ObjectDifference(source, target).apply { compareSwitch() }
+
+    private fun compareJumper(source: Jumper, target: Jumper): ObjectDifference<Jumper> =
+        ObjectDifference(source, target).apply { compareSwitch() }
+
+    private fun compareJunction(source: Junction, target: Junction): ObjectDifference<Junction> =
+        ObjectDifference(source, target).apply { compareConnector() }
+
+    private fun ObjectDifference<out Line>.compareLine(): ObjectDifference<out Line> =
+        apply {
+            compareEquipmentContainer()
+        }
+
+    private fun compareLinearShuntCompensator(source: LinearShuntCompensator, target: LinearShuntCompensator): ObjectDifference<LinearShuntCompensator> =
+        ObjectDifference(source, target).apply {
+            compareShuntCompensator()
+
+            compareValues(
+                LinearShuntCompensator::b0PerSection, LinearShuntCompensator::bPerSection,
+                LinearShuntCompensator::g0PerSection, LinearShuntCompensator::gPerSection
+            )
+        }
+
+    private fun ObjectDifference<out PerLengthImpedance>.comparePerLengthImpedance(): ObjectDifference<out PerLengthImpedance> =
+        apply { comparePerLengthLineParameter() }
+
+    private fun ObjectDifference<out PerLengthLineParameter>.comparePerLengthLineParameter(): ObjectDifference<out PerLengthLineParameter> =
+        apply { compareIdentifiedObject() }
+
+    private fun comparePerLengthSequenceImpedance(
+        source: PerLengthSequenceImpedance,
+        target: PerLengthSequenceImpedance
+    ): ObjectDifference<PerLengthSequenceImpedance> =
+        ObjectDifference(source, target).apply {
+            comparePerLengthImpedance()
+
+            compareValues(
+                PerLengthSequenceImpedance::r, PerLengthSequenceImpedance::x, PerLengthSequenceImpedance::bch,
+                PerLengthSequenceImpedance::gch, PerLengthSequenceImpedance::r0, PerLengthSequenceImpedance::x0,
+                PerLengthSequenceImpedance::b0ch, PerLengthSequenceImpedance::g0ch
+            )
+        }
+
+    private fun comparePowerTransformer(source: PowerTransformer, target: PowerTransformer): ObjectDifference<PowerTransformer> =
+        ObjectDifference(source, target).apply {
+            compareConductingEquipment()
+
+            compareIndexedIdReferenceCollections(PowerTransformer::ends)
+            compareValues(PowerTransformer::vectorGroup)
+        }
+
+    private fun comparePowerTransformerEnd(source: PowerTransformerEnd, target: PowerTransformerEnd): ObjectDifference<PowerTransformerEnd> =
+        ObjectDifference(source, target).apply {
+            compareTransformerEnd()
+
+            compareIdReferences(PowerTransformerEnd::powerTransformer)
+            compareValues(
+                PowerTransformerEnd::connectionKind, PowerTransformerEnd::phaseAngleClock,
+                PowerTransformerEnd::b, PowerTransformerEnd::b0,
+                PowerTransformerEnd::g, PowerTransformerEnd::g0,
+                PowerTransformerEnd::r, PowerTransformerEnd::r0,
+                PowerTransformerEnd::x, PowerTransformerEnd::x0,
+                PowerTransformerEnd::ratedS, PowerTransformerEnd::ratedU
+            )
+        }
+
+    private fun ObjectDifference<out ProtectedSwitch>.compareProtectedSwitch(): ObjectDifference<out ProtectedSwitch> =
+        apply { compareSwitch() }
+
+    private fun compareRatioTapChanger(source: RatioTapChanger, target: RatioTapChanger): ObjectDifference<RatioTapChanger> =
+        ObjectDifference(source, target).apply {
+            compareTapChanger()
+
+            compareIdReferences(RatioTapChanger::transformerEnd)
+            compareValues(RatioTapChanger::stepVoltageIncrement)
+        }
+
+    private fun compareRecloser(source: Recloser, target: Recloser): ObjectDifference<Recloser> =
+        ObjectDifference(source, target).apply { compareProtectedSwitch() }
+
+    private fun ObjectDifference<out RegulatingCondEq>.compareRegulatingCondEq(): ObjectDifference<out RegulatingCondEq> =
+        apply {
+            compareEnergyConnection()
+
+            compareValues(RegulatingCondEq::controlEnabled)
+        }
+
+    private fun ObjectDifference<out ShuntCompensator>.compareShuntCompensator(): ObjectDifference<out ShuntCompensator> =
+        apply {
+            compareRegulatingCondEq()
+
+            compareValues(ShuntCompensator::grounded, ShuntCompensator::nomU, ShuntCompensator::phaseConnection, ShuntCompensator::sections)
+        }
+
+    private fun ObjectDifference<out Switch>.compareSwitch(): ObjectDifference<out Switch> =
+        apply {
+            compareConductingEquipment()
+
+            addIfDifferent("isNormallyOpen", compareOpenStatus(source, target, Switch::isNormallyOpen))
+            addIfDifferent("isOpen", compareOpenStatus(source, target, Switch::isOpen))
+        }
+
+    private fun ObjectDifference<out TapChanger>.compareTapChanger(): ObjectDifference<out TapChanger> =
+        apply {
+            comparePowerSystemResource()
+
+            compareValues(
+                TapChanger::controlEnabled, TapChanger::neutralU,
+                TapChanger::highStep, TapChanger::lowStep, TapChanger::neutralStep, TapChanger::normalStep, TapChanger::step
+            )
+        }
+
+    private fun ObjectDifference<out TransformerEnd>.compareTransformerEnd(): ObjectDifference<out TransformerEnd> =
+        apply {
+            compareIdentifiedObject()
+
+            compareValues(TransformerEnd::grounded, TransformerEnd::rGround, TransformerEnd::xGround, TransformerEnd::endNumber)
+            compareIdReferences(TransformerEnd::baseVoltage, TransformerEnd::ratioTapChanger, TransformerEnd::terminal)
+        }
+
+    private fun compareCircuit(source: Circuit, target: Circuit): ObjectDifference<Circuit> =
+        ObjectDifference(source, target).apply {
+            compareLine()
+
+            compareIdReferences(Circuit::loop)
+            compareIdReferenceCollections(Circuit::endTerminals)
+            compareIdReferenceCollections(Circuit::endSubstations)
+        }
+
+    private fun compareLoop(source: Loop, target: Loop): ObjectDifference<Loop> =
+        ObjectDifference(source, target).apply {
+            compareIdentifiedObject()
+
+            compareIdReferenceCollections(Loop::circuits)
+            compareIdReferenceCollections(Loop::substations)
+            compareIdReferenceCollections(Loop::energizingSubstations)
+        }
+
+    private fun compareOpenStatus(source: Switch, target: Switch, openTest: (Switch, SinglePhaseKind) -> Boolean): ValueDifference? {
+        val sourceStatus = PhaseCode.ABCN.singlePhases().associateWith { openTest(source, it) }
+        val targetStatus = PhaseCode.ABCN.singlePhases().associateWith { openTest(target, it) }
+
+        return if (sourceStatus != targetStatus) {
+            ValueDifference(sourceStatus, targetStatus)
+        } else {
+            null
+        }
+    }
+
+    private fun compareControl(source: Control, target: Control): ObjectDifference<Control> =
+        ObjectDifference(source, target).apply {
+            compareIoPoint()
+
+            compareValues(Control::powerSystemResourceMRID)
+            compareIdReferences(Control::remoteControl)
+        }
+
+    private fun ObjectDifference<out IoPoint>.compareIoPoint(): ObjectDifference<out IoPoint> =
+        apply { compareIdentifiedObject() }
+
+    protected fun ObjectDifference<out Measurement>.compareMeasurement(): ObjectDifference<out Measurement> = apply {
+        compareIdentifiedObject()
+        compareValues(Measurement::powerSystemResourceMRID, Measurement::unitSymbol, Measurement::phases, Measurement::terminalMRID)
+        compareIdReferences(Measurement::remoteSource)
+    }
+
+    private fun compareAnalog(source: Analog, target: Analog): ObjectDifference<Analog> =
+        ObjectDifference(source, target).apply {
+            compareMeasurement()
+            compareValues(Analog::positiveFlowIn)
+        }
+
+    private fun compareAccumulator(source: Accumulator, target: Accumulator): ObjectDifference<Accumulator> =
+        ObjectDifference(source, target).apply {
+            compareMeasurement()
+        }
+
+    private fun compareDiscrete(source: Discrete, target: Discrete): ObjectDifference<Discrete> =
+        ObjectDifference(source, target).apply {
+            compareMeasurement()
+        }
+
+    private fun compareRemoteControl(source: RemoteControl, target: RemoteControl): ObjectDifference<RemoteControl> =
+        ObjectDifference(source, target).apply {
+            compareRemotePoint()
+
+            compareIdReferences(RemoteControl::control)
+        }
+
+    private fun ObjectDifference<out RemotePoint>.compareRemotePoint(): ObjectDifference<out RemotePoint> =
+        apply { compareIdentifiedObject() }
+
+    private fun compareRemoteSource(source: RemoteSource, target: RemoteSource): ObjectDifference<RemoteSource> =
+        ObjectDifference(source, target).apply {
+            compareRemotePoint()
+
+            compareIdReferences(RemoteSource::measurement)
+        }
+}

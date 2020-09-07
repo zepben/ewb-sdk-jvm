@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package com.zepben.cimbend.put
 
 /**

@@ -16,18 +16,22 @@
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.zepben.cimbendput.grpc
+package com.zepben.cimbend.put
 
-import com.zepben.cimbendput.ConnectionConfig
-import org.junit.jupiter.api.Test
+/**
+ * Interface that allows you to react to RPC errors when sending items using a [CimProducerClient].
+ *
+ * The [handles] function must return true for any [Throwable] the implementation can handle such that it will be passed to [onError].
+ */
+interface RpcErrorHandler {
+    /**
+     * Handle the given [t]
+     */
+    fun onError(t: Throwable)
 
-internal class GrpcChannelFactoryTest {
-
-    @Test
-    fun createsChannel() {
-        // TODO How do we actually test the channel is configured correctly?
-        val config = ConnectionConfig("localhost", 80)
-        val channel = GrpcChannelFactory.create(config)
-        channel.shutdownNow()
-    }
+    /**
+     * Returns true if this should handle [t].
+     */
+    fun handles(t: Throwable): Boolean
 }
+

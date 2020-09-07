@@ -16,13 +16,13 @@
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.zepben.cimbendput
+package com.zepben.cimbend.put
 
 import com.zepben.cimbend.cim.iec61968.assetinfo.CableInfo
 import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.diagram.DiagramService
 import com.zepben.cimbend.network.NetworkService
-import com.zepben.cimbendput.grpc.GrpcChannelFactory
+import com.zepben.cimbend.put.grpc.GrpcChannelFactory
 import org.junit.Ignore
 import org.junit.Test
 import java.util.concurrent.TimeUnit

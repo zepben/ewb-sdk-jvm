@@ -16,7 +16,7 @@
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.zepben.cimbendput
+package com.zepben.cimbend.put
 
 import com.zepben.test.util.junit.SystemLogExtension
 import org.hamcrest.Matchers.containsString

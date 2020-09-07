@@ -16,7 +16,7 @@
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.zepben.cimbendput
+package com.zepben.cimbend.put
 
 import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.cimbend.diagram.DiagramService

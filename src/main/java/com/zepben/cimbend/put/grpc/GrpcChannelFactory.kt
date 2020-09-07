@@ -16,9 +16,9 @@
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.zepben.cimbendput.grpc
+package com.zepben.cimbend.put.grpc
 
-import com.zepben.cimbendput.ConnectionConfig
+import com.zepben.cimbend.put.ConnectionConfig
 import io.grpc.ManagedChannel
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder

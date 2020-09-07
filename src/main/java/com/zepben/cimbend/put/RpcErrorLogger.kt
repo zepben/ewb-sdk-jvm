@@ -16,20 +16,26 @@
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.zepben.cimbendput
+package com.zepben.cimbend.put
+
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
- * Configuration for connecting to a gRPC Producer server.
- *
- * @property host The host of the producer server
- * @property port The port the producer server is listening on
- * @property certChainFilePath
- * @property privateKeyFilePath
- * @property trustCertCollectionFilePath
+ * Implementation of [RpcErrorHandler] that logs the passed in throwable on the provided [logger].
  */
-data class ConnectionConfig(
-    val host: String,
-    val port: Int,
-    val certChainFilePath: String? = null,
-    val privateKeyFilePath: String? = null,
-    val trustCertCollectionFilePath: String? = null)
+class RpcErrorLogger(
+    private val typesToHandle: Set<Class<out Throwable>>,
+    private val logger: Logger = LoggerFactory.getLogger(RpcErrorLogger::class.java)
+) : RpcErrorHandler {
+
+    constructor(typesToHandle: Class<out Throwable>) : this(setOf(typesToHandle))
+
+    override fun onError(t: Throwable) {
+        logger.error("RPC error: {}", t.toString(), t)
+    }
+
+    override fun handles(t: Throwable): Boolean {
+        return typesToHandle.contains(t::class.java)
+    }
+}

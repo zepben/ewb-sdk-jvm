@@ -16,26 +16,15 @@
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.zepben.cimbendput
+package com.zepben.cimbend.put
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-/**
- * Implementation of [RpcErrorHandler] that logs the passed in throwable on the provided [logger].
- */
-class RpcErrorLogger(
-    private val typesToHandle: Set<Class<out Throwable>>,
-    private val logger: Logger = LoggerFactory.getLogger(RpcErrorLogger::class.java)
-) : RpcErrorHandler {
-
-    constructor(typesToHandle: Class<out Throwable>) : this(setOf(typesToHandle))
+class CaptureLastRpcErrorHandler : RpcErrorHandler {
+    var lastError: Throwable? = null
 
     override fun onError(t: Throwable) {
-        logger.error("RPC error: {}", t.toString(), t)
+        lastError = t
     }
 
-    override fun handles(t: Throwable): Boolean {
-        return typesToHandle.contains(t::class.java)
-    }
+    override fun handles(t: Throwable): Boolean = true
+
 }

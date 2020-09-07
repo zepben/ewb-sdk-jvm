@@ -16,15 +16,18 @@
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.zepben.cimbendput
+package com.zepben.cimbend.put.grpc
 
-class CaptureLastRpcErrorHandler : RpcErrorHandler {
-    var lastError: Throwable? = null
+import com.zepben.cimbend.put.ConnectionConfig
+import org.junit.jupiter.api.Test
 
-    override fun onError(t: Throwable) {
-        lastError = t
+internal class GrpcChannelFactoryTest {
+
+    @Test
+    fun createsChannel() {
+        // TODO How do we actually test the channel is configured correctly?
+        val config = ConnectionConfig("localhost", 80)
+        val channel = GrpcChannelFactory.create(config)
+        channel.shutdownNow()
     }
-
-    override fun handles(t: Throwable): Boolean = true
-
 }

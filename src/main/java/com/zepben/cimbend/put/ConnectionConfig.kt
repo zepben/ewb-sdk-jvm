@@ -16,22 +16,20 @@
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.zepben.cimbendput
+package com.zepben.cimbend.put
 
 /**
- * Interface that allows you to react to RPC errors when sending items using a [CimProducerClient].
+ * Configuration for connecting to a gRPC Producer server.
  *
- * The [handles] function must return true for any [Throwable] the implementation can handle such that it will be passed to [onError].
+ * @property host The host of the producer server
+ * @property port The port the producer server is listening on
+ * @property certChainFilePath
+ * @property privateKeyFilePath
+ * @property trustCertCollectionFilePath
  */
-interface RpcErrorHandler {
-    /**
-     * Handle the given [t]
-     */
-    fun onError(t: Throwable)
-
-    /**
-     * Returns true if this should handle [t].
-     */
-    fun handles(t: Throwable): Boolean
-}
-
+data class ConnectionConfig(
+    val host: String,
+    val port: Int,
+    val certChainFilePath: String? = null,
+    val privateKeyFilePath: String? = null,
+    val trustCertCollectionFilePath: String? = null)

@@ -23,8 +23,8 @@ import com.zepben.cimbend.cim.iec61970.base.core.Terminal;
 import com.zepben.cimbend.cim.iec61970.base.wires.SinglePhaseKind;
 import com.zepben.cimbend.network.model.NominalPhasePath;
 
-import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Stores the connectivity between two terminals, including the mapping between the nominal phases.
@@ -35,18 +35,15 @@ public class ConnectivityResult {
 
     private final Terminal fromTerminal;
     private final Terminal toTerminal;
-    private final List<SinglePhaseKind> fromNominalPhases = new ArrayList<>();
-    private final List<SinglePhaseKind> toNominalPhases = new ArrayList<>();
-    @Nullable private List<NominalPhasePath> nominalPhasePaths;
-    private boolean isSorted = false;
+    private final List<NominalPhasePath> nominalPhasePaths;
 
     /**
      * @param fromTerminal The terminal for which the connectivity was requested.
      * @param toTerminal   The terminal which is connected to the requested terminal.
      * @return The ConnectivityResult Builder to use to construct the result.
      */
-    public static ConnectivityResult between(Terminal fromTerminal, Terminal toTerminal) {
-        return new ConnectivityResult(fromTerminal, toTerminal);
+    public static ConnectivityResult between(Terminal fromTerminal, Terminal toTerminal, Collection<NominalPhasePath> nominalPhasePaths) {
+        return new ConnectivityResult(fromTerminal, toTerminal, nominalPhasePaths);
     }
 
     /**
@@ -81,39 +78,21 @@ public class ConnectivityResult {
      * @return The nominal phases that are connected in the fromTerminal.
      */
     public List<SinglePhaseKind> fromNominalPhases() {
-        return fromNominalPhases;
+        return nominalPhasePaths.stream().map(NominalPhasePath::from).collect(Collectors.toList());
     }
 
     /**
      * @return The nominal phases that are connected in the toTerminal.
      */
     public List<SinglePhaseKind> toNominalPhases() {
-        return toNominalPhases;
+        return nominalPhasePaths.stream().map(NominalPhasePath::to).collect(Collectors.toList());
     }
 
     /**
      * @return The mapping of nominal phase paths between the from and to terminals.
      */
     public List<NominalPhasePath> nominalPhasePaths() {
-        if (nominalPhasePaths == null)
-            populateNominalPhasePaths();
-
         return nominalPhasePaths;
-    }
-
-    /**
-     * @param from The nominal phase on the fromTerminal.
-     * @param to   The connected nominal phase on the toTerminal.
-     * @return a reference to this class to allow for fluent usage.
-     */
-    public ConnectivityResult addNominalPhasePath(SinglePhaseKind from, SinglePhaseKind to) {
-        if (nominalPhasePaths != null)
-            throw new IllegalStateException("You can not add paths after the result has been used.");
-
-        fromNominalPhases.add(from);
-        toNominalPhases.add(to);
-
-        return this;
     }
 
     @Override
@@ -123,12 +102,12 @@ public class ConnectivityResult {
         ConnectivityResult that = (ConnectivityResult) o;
         return fromTerminal.equals(that.fromTerminal) &&
             toTerminal.equals(that.toTerminal) &&
-            sortedNominalPhasePaths().equals(that.sortedNominalPhasePaths());
+            nominalPhasePaths.equals(that.nominalPhasePaths);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fromTerminal, toTerminal, sortedNominalPhasePaths());
+        return Objects.hash(fromTerminal, toTerminal, nominalPhasePaths);
     }
 
     @Override
@@ -136,34 +115,16 @@ public class ConnectivityResult {
         return "ConnectivityResult{" +
             "fromTerminal=" + fromTerminal.getMRID() +
             ", toTerminal=" + toTerminal.getMRID() +
-            ", nominalPhasePaths=" + sortedNominalPhasePaths() +
+            ", nominalPhasePaths=" + nominalPhasePaths +
             '}';
     }
 
-    private List<NominalPhasePath> sortedNominalPhasePaths() {
-        if (nominalPhasePaths == null)
-            populateNominalPhasePaths();
-
-        if (!isSorted) {
-            nominalPhasePaths.sort(Comparator.comparing(NominalPhasePath::from).thenComparing(NominalPhasePath::to));
-            isSorted = true;
-        }
-
-        return nominalPhasePaths;
-    }
-
-    private void populateNominalPhasePaths() {
-        nominalPhasePaths = new ArrayList<>(fromNominalPhases.size());
-
-        Iterator<SinglePhaseKind> fromIterator = fromNominalPhases.iterator();
-        Iterator<SinglePhaseKind> toIterator = toNominalPhases.iterator();
-        while (fromIterator.hasNext())
-            nominalPhasePaths.add(NominalPhasePath.between(fromIterator.next(), toIterator.next()));
-    }
-
-    private ConnectivityResult(Terminal fromTerminal, Terminal toTerminal) {
+    private ConnectivityResult(Terminal fromTerminal, Terminal toTerminal, Collection<NominalPhasePath> nominalPhasePaths) {
         this.fromTerminal = fromTerminal;
         this.toTerminal = toTerminal;
+        this.nominalPhasePaths = new ArrayList<>(nominalPhasePaths);
+
+        this.nominalPhasePaths.sort(Comparator.comparing(NominalPhasePath::from).thenComparing(NominalPhasePath::to));
     }
 
 }

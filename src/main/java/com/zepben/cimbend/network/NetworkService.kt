@@ -36,6 +36,7 @@ import com.zepben.cimbend.cim.iec61970.base.wires.*
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.cimbend.common.BaseService
+import com.zepben.cimbend.network.model.NominalPhasePath
 import com.zepben.cimbend.network.tracing.ConnectivityResult
 
 /**
@@ -258,7 +259,7 @@ class NetworkService : BaseService("network") {
         var connectivityNode = terminal.connectivityNode
         if (connectivityNode != null) return connectivityNodeId == connectivityNode.mRID
 
-        connectivityNode = _connectivityNodes.computeIfAbsent(connectivityNodeId!!) { mRID: String -> createConnectivityNode(mRID) }
+        connectivityNode = _connectivityNodes.computeIfAbsent(connectivityNodeId) { mRID: String -> createConnectivityNode(mRID) }
         connect(terminal, connectivityNode)
         return true
     }
@@ -360,13 +361,13 @@ class NetworkService : BaseService("network") {
         }
 
         private fun terminalConnectivity(terminal: Terminal, connectedTerminal: Terminal, phases: Set<SinglePhaseKind>): ConnectivityResult {
-            val connectivityResult = ConnectivityResult.between(terminal, connectedTerminal)
+            val nominalPhasePaths = mutableListOf<NominalPhasePath>()
             phases
                 .asSequence()
                 .filter { connectedTerminal.phases.singlePhases().contains(it) }
-                .forEach { connectivityResult.addNominalPhasePath(it, it) }
+                .forEach { nominalPhasePaths.add(NominalPhasePath.between(it, it)) }
 
-            if (connectivityResult.fromNominalPhases().isEmpty()) {
+            if (nominalPhasePaths.isEmpty()) {
                 val xyPhases = phases
                     .asSequence()
                     .filter { (it == SinglePhaseKind.X) || (it == SinglePhaseKind.Y) }
@@ -383,11 +384,11 @@ class NetworkService : BaseService("network") {
                     phases,
                     xyPhases,
                     connectedXyPhases,
-                    connectivityResult
+                    nominalPhasePaths
                 )
             }
 
-            return connectivityResult
+            return ConnectivityResult.between(terminal, connectedTerminal, nominalPhasePaths)
         }
 
         private fun tryProcessXyPhases(
@@ -396,7 +397,7 @@ class NetworkService : BaseService("network") {
             phases: Set<SinglePhaseKind>,
             xyPhases: Set<SinglePhaseKind>,
             connectedXyPhases: Set<SinglePhaseKind>,
-            connectivityResult: ConnectivityResult
+            nominalPhasePaths: MutableList<NominalPhasePath>
         ) {
             if ((xyPhases.isEmpty() && connectedXyPhases.isEmpty()) || (xyPhases.isNotEmpty() && connectedXyPhases.isNotEmpty()))
                 return
@@ -404,7 +405,7 @@ class NetworkService : BaseService("network") {
             xyPhases.forEach {
                 val index = terminal.phases.singlePhases().indexOf(it)
                 if (index < connectedTerminal.phases.singlePhases().size)
-                    connectivityResult.addNominalPhasePath(it, connectedTerminal.phases.singlePhases()[index])
+                    nominalPhasePaths.add(NominalPhasePath.between(it, connectedTerminal.phases.singlePhases()[index]))
             }
 
             connectedXyPhases.forEach {
@@ -412,7 +413,7 @@ class NetworkService : BaseService("network") {
                 if (index < terminal.phases.singlePhases().size) {
                     val phase = terminal.phases.singlePhases()[index]
                     if (phases.contains(phase))
-                        connectivityResult.addNominalPhasePath(phase, it)
+                        nominalPhasePaths.add(NominalPhasePath.between(phase, it))
                 }
             }
         }

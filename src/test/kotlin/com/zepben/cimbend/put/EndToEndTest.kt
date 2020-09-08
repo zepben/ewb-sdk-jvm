@@ -22,11 +22,11 @@ import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.diagram.DiagramService
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.put.grpc.GrpcChannelFactory
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
 
-@Ignore
+@Disabled
 internal class EndToEndTest {
 
     val channel = GrpcChannelFactory.create(ConnectionConfig("localhost", 50051))

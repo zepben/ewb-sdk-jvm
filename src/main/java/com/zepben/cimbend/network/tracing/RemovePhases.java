@@ -22,11 +22,13 @@ import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment;
 import com.zepben.cimbend.cim.iec61970.base.core.Terminal;
 import com.zepben.cimbend.cim.iec61970.base.wires.SinglePhaseKind;
 import com.zepben.cimbend.network.NetworkService;
+import com.zepben.cimbend.network.model.NominalPhasePath;
 import com.zepben.cimbend.network.model.PhaseDirection;
 import com.zepben.traversals.BasicTracker;
 import com.zepben.traversals.BranchRecursiveTraversal;
 import com.zepben.traversals.WeightedPriorityQueue;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -101,8 +103,8 @@ public class RemovePhases {
         if (connectedTerminals.isEmpty())
             return;
 
-        Map<SinglePhaseKind, Set<Terminal>> terminalsByPhase = new HashMap<>();
-        Map<SinglePhaseKind, Set<Terminal>> otherFeedsByPhase = new HashMap<>();
+        Map<SinglePhaseKind, Set<ConnectivityResult>> terminalsByPhase = new HashMap<>();
+        Map<SinglePhaseKind, Set<ConnectivityResult>> otherFeedsByPhase = new HashMap<>();
         sortTerminalsByPhase(connectedTerminals, terminalsByPhase, otherFeedsByPhase, phaseSelector);
 
         //
@@ -116,7 +118,7 @@ public class RemovePhases {
         Map<Terminal, Set<SinglePhaseKind>> phasesByTerminalsToEbbAndQueue = new HashMap<>();
         processedNominalPhases.forEach(phase -> {
             // Check if any of the connected terminals are also feeding the connectivity node.
-            Set<Terminal> feedTerminals = otherFeedsByPhase.getOrDefault(phase, Collections.emptySet());
+            Set<ConnectivityResult> feedTerminals = otherFeedsByPhase.getOrDefault(phase, Collections.emptySet());
             if (feedTerminals.isEmpty())
                 addTerminalPhases(terminalsByPhase.get(phase), phase, phasesByTerminalsToEbbAndQueue);
             else if (feedTerminals.size() == 1)
@@ -126,7 +128,7 @@ public class RemovePhases {
         phasesByTerminalsToEbbAndQueue.forEach((terminal, phases) -> {
             Set<SinglePhaseKind> hadInPhases = ebbPhases(terminal, phases, PhaseDirection.IN, phaseSelector);
 
-            terminal.getConductingEquipment().getTerminals().forEach(t -> {
+            Objects.requireNonNull(terminal.getConductingEquipment()).getTerminals().forEach(t -> {
                 if (t != terminal)
                     traversal.queue().add(new EbbPhases(t, hadInPhases));
             });
@@ -144,20 +146,33 @@ public class RemovePhases {
     }
 
     private void sortTerminalsByPhase(List<ConnectivityResult> connectedTerminals,
-                                      Map<SinglePhaseKind, Set<Terminal>> terminalsByPhase,
-                                      Map<SinglePhaseKind, Set<Terminal>> otherFeedsByPhase,
+                                      Map<SinglePhaseKind, Set<ConnectivityResult>> terminalsByPhase,
+                                      Map<SinglePhaseKind, Set<ConnectivityResult>> otherFeedsByPhase,
                                       PhaseSelector phaseSelector) {
-        connectedTerminals.forEach(cr -> cr.toNominalPhases()
-            .forEach(phase -> {
-                terminalsByPhase.computeIfAbsent(phase, k -> new HashSet<>()).add(cr.toTerminal());
-                if (phaseSelector.status(cr.toTerminal(), phase).direction().has(PhaseDirection.BOTH))
-                    otherFeedsByPhase.computeIfAbsent(phase, k -> new HashSet<>()).add(cr.toTerminal());
-            })
+        connectedTerminals.forEach(cr ->
+            cr.nominalPhasePaths()
+                .forEach(nominalPhasePath -> {
+                    terminalsByPhase.computeIfAbsent(nominalPhasePath.from(), k -> new HashSet<>()).add(cr);
+                    if (phaseSelector.status(cr.toTerminal(), nominalPhasePath.to()).direction().has(PhaseDirection.BOTH))
+                        otherFeedsByPhase.computeIfAbsent(nominalPhasePath.from(), k -> new HashSet<>()).add(cr);
+                })
         );
     }
 
-    private void addTerminalPhases(Set<Terminal> terminals, SinglePhaseKind phase, Map<Terminal, Set<SinglePhaseKind>> phasesByTerminalsToEbbAndQueue) {
-        terminals.forEach(terminal -> phasesByTerminalsToEbbAndQueue.computeIfAbsent(terminal, k -> new HashSet<>()).add(phase));
+    private void addTerminalPhases(@Nullable Set<ConnectivityResult> terminals, SinglePhaseKind phase, Map<Terminal, Set<SinglePhaseKind>> phasesByTerminalsToEbbAndQueue) {
+        if (terminals == null)
+            return;
+
+        terminals.forEach(terminal ->
+            phasesByTerminalsToEbbAndQueue.computeIfAbsent(terminal.toTerminal(), k -> new HashSet<>())
+                .add(terminal.nominalPhasePaths()
+                    .stream()
+                    .filter(nominalPhasePath -> nominalPhasePath.from() == phase)
+                    .map(NominalPhasePath::to)
+                    .findFirst()
+                    .orElse(SinglePhaseKind.NONE)
+                )
+        );
     }
 
     private static class EbbPhases {

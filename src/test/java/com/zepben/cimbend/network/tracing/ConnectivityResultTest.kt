@@ -55,8 +55,10 @@ class ConnectivityResultTest {
     internal fun accessors() {
         val expectedPhaseMap =
             setOf(NominalPhasePath.between(SinglePhaseKind.A, SinglePhaseKind.A), NominalPhasePath.between(SinglePhaseKind.B, SinglePhaseKind.X))
-        val cr = ConnectivityResult.between(terminal11, terminal21).addNominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.A)
-            .addNominalPhasePath(SinglePhaseKind.B, SinglePhaseKind.X)
+        val cr = ConnectivityResult.between(terminal11,
+            terminal21,
+            expectedPhaseMap
+        )
 
         assertThat(cr.from(), equalTo(asset1))
         assertThat(cr.fromTerminal(), equalTo(terminal11))
@@ -69,15 +71,14 @@ class ConnectivityResultTest {
 
     @Test
     internal fun coverage() {
-        val cr1 = ConnectivityResult.between(terminal11, terminal21).addNominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.A)
-        val cr1Dup = ConnectivityResult.between(terminal11, terminal21).addNominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.A)
-        val cr2 = ConnectivityResult.between(terminal11, terminal21).addNominalPhasePath(SinglePhaseKind.B, SinglePhaseKind.B)
-        val cr3 = ConnectivityResult.between(terminal11, terminal12).addNominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.A)
-        val cr4 = ConnectivityResult.between(terminal21, terminal11).addNominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.A)
+        val cr1 = ConnectivityResult.between(terminal11, terminal21, listOf(NominalPhasePath.between(SinglePhaseKind.A, SinglePhaseKind.A)))
+        val cr1Dup = ConnectivityResult.between(terminal11, terminal21, listOf(NominalPhasePath.between(SinglePhaseKind.A, SinglePhaseKind.A)))
+        val cr2 = ConnectivityResult.between(terminal11, terminal21, listOf(NominalPhasePath.between(SinglePhaseKind.B, SinglePhaseKind.B)))
+        val cr3 = ConnectivityResult.between(terminal11, terminal12, listOf(NominalPhasePath.between(SinglePhaseKind.A, SinglePhaseKind.A)))
+        val cr4 = ConnectivityResult.between(terminal21, terminal11, listOf(NominalPhasePath.between(SinglePhaseKind.A, SinglePhaseKind.A)))
 
         assertThat(cr1, equalTo(cr1))
         assertThat(cr1, equalTo(cr1Dup))
-        assertThat(cr1, equalTo(ConnectivityResult.between(terminal11, terminal21).addNominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.A)))
         assertThat(cr1, not(equalTo<ConnectivityResult?>(null)))
         assertThat(cr1, not(equalTo(cr2)))
         assertThat(cr1, not(equalTo(cr3)))

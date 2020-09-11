@@ -19,18 +19,12 @@ package com.zepben.cimbend.put
 
 /**
  * Interface that allows you to react to RPC errors when sending items using a [CimProducerClient].
- *
- * The [handles] function must return true for any [Throwable] the implementation can handle such that it will be passed to [onError].
  */
 interface RpcErrorHandler {
     /**
-     * Handle the given [t]
+     * Handle the given [t]. This should return true if the error was handled, otherwise false.
      */
-    fun onError(t: Throwable)
+    fun onError(t: Throwable): Boolean
 
-    /**
-     * Returns true if this should handle [t].
-     */
-    fun handles(t: Throwable): Boolean
 }
 

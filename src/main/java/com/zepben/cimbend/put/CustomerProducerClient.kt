@@ -24,21 +24,17 @@ import com.zepben.cimbend.customer.translator.toPb
 import com.zepben.cimbend.customer.whenCustomerServiceObject
 import com.zepben.protobuf.cp.*
 import io.grpc.Channel
-import io.grpc.StatusException
 
 /**
  * Producer client for a [CustomerService].
  *
  * @property stub The gRPC stub to be used to communicate with the server
  */
-class CustomerProducerClient @JvmOverloads constructor(
+class CustomerProducerClient(
     private val stub: CustomerProducerGrpc.CustomerProducerBlockingStub,
-    onRpcError: RpcErrorHandler = RpcErrorLogger(StatusException::class.java)
-) : CimProducerClient<CustomerService>(onRpcError) {
+) : CimProducerClient<CustomerService>() {
 
-    @JvmOverloads
-    constructor(channel: Channel, onRpcError: RpcErrorHandler = RpcErrorLogger(StatusException::class.java))
-        : this(CustomerProducerGrpc.newBlockingStub(channel), onRpcError)
+    constructor(channel: Channel) : this(CustomerProducerGrpc.newBlockingStub(channel))
 
     override fun send(service: CustomerService) {
         tryRpc { stub.createCustomerService(CreateCustomerServiceRequest.newBuilder().build()) }

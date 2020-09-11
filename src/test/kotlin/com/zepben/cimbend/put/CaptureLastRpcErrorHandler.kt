@@ -20,10 +20,9 @@ package com.zepben.cimbend.put
 class CaptureLastRpcErrorHandler : RpcErrorHandler {
     var lastError: Throwable? = null
 
-    override fun onError(t: Throwable) {
+    override fun onError(t: Throwable): Boolean {
         lastError = t
+        return true
     }
-
-    override fun handles(t: Throwable): Boolean = true
 
 }

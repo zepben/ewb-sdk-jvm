@@ -24,21 +24,17 @@ import com.zepben.cimbend.network.model.toPb
 import com.zepben.cimbend.network.whenNetworkServiceObject
 import com.zepben.protobuf.np.*
 import io.grpc.Channel
-import io.grpc.StatusException
 
 /**
  * Producer client for a [NetworkService].
  *
  * @property stub The gRPC stub to be used to communicate with the server
  */
-class NetworkProducerClient @JvmOverloads constructor(
-    private val stub: NetworkProducerGrpc.NetworkProducerBlockingStub,
-    onRpcError: RpcErrorHandler = RpcErrorLogger(StatusException::class.java)
-) : CimProducerClient<NetworkService>(onRpcError) {
+class NetworkProducerClient(
+    private val stub: NetworkProducerGrpc.NetworkProducerBlockingStub
+) : CimProducerClient<NetworkService>() {
 
-    @JvmOverloads
-    constructor(channel: Channel, onRpcError: RpcErrorHandler = RpcErrorLogger(StatusException::class.java))
-        : this(NetworkProducerGrpc.newBlockingStub(channel), onRpcError)
+    constructor(channel: Channel) : this(NetworkProducerGrpc.newBlockingStub(channel))
 
     override fun send(service: NetworkService) {
         tryRpc { stub.createNetwork(CreateNetworkRequest.newBuilder().build()) }

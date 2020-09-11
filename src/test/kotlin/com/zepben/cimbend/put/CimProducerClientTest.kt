@@ -26,24 +26,14 @@ import org.junit.jupiter.api.Test
 internal class CimProducerClientTest {
 
     @Test
-    internal fun `onRpcError Coverage`() {
-        val handler = CaptureLastRpcErrorHandler()
-        val client = object : CimProducerClient<BaseService>(handler) {
-            override fun send(service: BaseService) {}
-        }
-
-        assertThat(client.onRpcError, equalTo(handler))
-    }
-
-    @Test
     internal fun `tryRpc handles exceptions`() {
         val handler = CaptureLastRpcErrorHandler()
         val ex = RuntimeException()
-        val client = object : CimProducerClient<BaseService>(handler) {
+        val client = object : CimProducerClient<BaseService>() {
             override fun send(service: BaseService) {
                 tryRpc { throw ex }
             }
-        }
+        }.apply { addErrorHandler(handler) }
 
         client.send(object: BaseService("test") {})
 
@@ -53,15 +43,14 @@ internal class CimProducerClientTest {
     @Test
     internal fun `tryRpc throw unhandled exception`() {
         val handler = object : RpcErrorHandler {
-            override fun onError(t: Throwable) {}
-            override fun handles(t: Throwable): Boolean = false
+            override fun onError(t: Throwable) = false
         }
 
-        val client = object : CimProducerClient<BaseService>(handler) {
+        val client = object : CimProducerClient<BaseService>() {
             override fun send(service: BaseService) {
                 tryRpc { throw RuntimeException() }
             }
-        }
+        }.apply { addErrorHandler(handler) }
 
         expect { client.send(object: BaseService("test") {}) }
             .toThrow(RuntimeException::class.java)

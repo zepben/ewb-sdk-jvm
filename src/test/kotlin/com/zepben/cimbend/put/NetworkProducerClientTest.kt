@@ -36,11 +36,9 @@ import com.zepben.cimbend.common.translator.toPb
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.model.toPb
 import com.zepben.protobuf.np.*
-import io.grpc.Channel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.instanceOf
 import org.junit.Assert.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
@@ -49,14 +47,8 @@ internal class NetworkProducerClientTest {
 
     private val stub = mock(NetworkProducerGrpc.NetworkProducerBlockingStub::class.java)
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val producerClient: NetworkProducerClient = NetworkProducerClient(stub, onErrorHandler)
+    private val producerClient: NetworkProducerClient = NetworkProducerClient(stub).apply { addErrorHandler(onErrorHandler) }
     private val service: NetworkService = NetworkService()
-
-    @Test
-    internal fun `onRpcError defaults to logging handler`() {
-        val client = NetworkProducerClient(mock(Channel::class.java))
-        assertThat(client.onRpcError, instanceOf(RpcErrorLogger::class.java))
-    }
 
     @Test
     internal fun `sends CableInfo`() {

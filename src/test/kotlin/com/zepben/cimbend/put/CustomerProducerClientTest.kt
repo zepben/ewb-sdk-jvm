@@ -26,11 +26,9 @@ import com.zepben.cimbend.common.translator.toPb
 import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.customer.translator.toPb
 import com.zepben.protobuf.cp.*
-import io.grpc.Channel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.instanceOf
 import org.junit.Assert.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
@@ -39,14 +37,8 @@ internal class CustomerProducerClientTest {
 
     private val stub = mock(CustomerProducerGrpc.CustomerProducerBlockingStub::class.java)
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val producerClient: CustomerProducerClient = CustomerProducerClient(stub, onErrorHandler)
+    private val producerClient: CustomerProducerClient = CustomerProducerClient(stub).apply { addErrorHandler(onErrorHandler) }
     private val service: CustomerService = CustomerService()
-
-    @Test
-    internal fun `onRpcError defaults to logging handler`() {
-        val client = CustomerProducerClient(mock(Channel::class.java))
-        assertThat(client.onRpcError, instanceOf(RpcErrorLogger::class.java))
-    }
 
     @Test
     internal fun `sends Customer`() {

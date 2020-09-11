@@ -22,11 +22,9 @@ import com.zepben.cimbend.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.cimbend.diagram.DiagramService
 import com.zepben.cimbend.diagram.toPb
 import com.zepben.protobuf.dp.*
-import io.grpc.Channel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.instanceOf
 import org.junit.Assert.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
@@ -35,14 +33,8 @@ internal class DiagramProducerClientTest {
 
     private val stub = mock(DiagramProducerGrpc.DiagramProducerBlockingStub::class.java)
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val producerClient: DiagramProducerClient = DiagramProducerClient(stub, onErrorHandler)
+    private val producerClient: DiagramProducerClient = DiagramProducerClient(stub).apply { addErrorHandler(onErrorHandler) }
     private val service: DiagramService = DiagramService()
-
-    @Test
-    internal fun `onRpcError defaults to logging handler`() {
-        val client = DiagramProducerClient(mock(Channel::class.java))
-        assertThat(client.onRpcError, instanceOf(RpcErrorLogger::class.java))
-    }
 
     @Test
     internal fun `sends Diagram`() {

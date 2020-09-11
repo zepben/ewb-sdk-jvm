@@ -18,41 +18,50 @@
 package com.zepben.cimbend.put
 
 import com.zepben.cimbend.common.BaseService
-import io.grpc.StatusRuntimeException
 
 /**
  * Base class that defines some helpful functions when producer clients are sending to the server.
  *
- * The property [onRpcError] can be used to get a callback anytime GRPc throws a [StatusRuntimeException] as long as
- * gRPC calls are made within the [tryRpc] function. E.g.
- * ```
- * tryRpc {
- *     stub.sendToServer(...)
- * }
- * ```
- *
  * @property T The base service to send objects from.
  */
-abstract class CimProducerClient<T : BaseService>(
-    internal val onRpcError: RpcErrorHandler
-) {
+abstract class CimProducerClient<T : BaseService> {
+
+    private val errorHandlers: MutableList<RpcErrorHandler> = mutableListOf()
+
     /**
      * Sends objects within the given [service] to the producer server.
+     *
+     * Exceptions that occur during sending will be caught and passed to all error handlers that have been registered by
+     * [addErrorHandler]. If none of the registered error handlers return true to indicate the error has been handled,
+     * the exception will be rethrown.
      */
     abstract fun send(service: T)
 
     /**
-     * Allows a safe RPC call to be made to the server by wrapping [rpcCall] in a try/catch block. Any [Throwable] caught will check if
-     * [onRpcError].handles returns true and passes it into the onError method if so. Otherwise rethrows the exception.
+     * Registers an error handler that will be called if any exception are thrown when sending a service.
+     */
+    fun addErrorHandler(handler: RpcErrorHandler) {
+        errorHandlers.add(handler)
+    }
+
+    /**
+     * Use to pass the throwable to all registered error handlers. Returns true if and error handler returns true.
+     */
+    protected fun tryHandleError(t: Throwable): Boolean =
+        errorHandlers.fold(false) { handled, handler -> handler.onError(t) or handled }
+
+    /**
+     * Allows a safe RPC call to be made to the server by wrapping [rpcCall] in a try/catch block. Any [Throwable] caught will
+     * be passed to all registered error handlers. If no handler returns true to indicate it has been handled the exception
+     * will be rethrown.
      */
     protected fun tryRpc(rpcCall: () -> Unit) {
         try {
             rpcCall()
         } catch (t: Throwable) {
-            if (onRpcError.handles(t))
-                onRpcError.onError(t)
-            else
+            if (!tryHandleError(t)) {
                 throw t
+            }
         }
     }
 }

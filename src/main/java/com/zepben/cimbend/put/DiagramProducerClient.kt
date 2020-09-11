@@ -23,21 +23,17 @@ import com.zepben.cimbend.diagram.toPb
 import com.zepben.cimbend.diagram.whenDiagramServiceObject
 import com.zepben.protobuf.dp.*
 import io.grpc.Channel
-import io.grpc.StatusException
 
 /**
  * Producer client for a [DiagramService].
  *
  * @property stub The gRPC stub to be used to communicate with the server
  */
-class DiagramProducerClient @JvmOverloads constructor(
-    private val stub: DiagramProducerGrpc.DiagramProducerBlockingStub,
-    onRpcError: RpcErrorHandler = RpcErrorLogger(StatusException::class.java)
-) : CimProducerClient<DiagramService>(onRpcError) {
+class DiagramProducerClient(
+    private val stub: DiagramProducerGrpc.DiagramProducerBlockingStub
+) : CimProducerClient<DiagramService>() {
 
-    @JvmOverloads
-    constructor(channel: Channel, onRpcError: RpcErrorHandler = RpcErrorLogger(StatusException::class.java))
-        : this(DiagramProducerGrpc.newBlockingStub(channel), onRpcError)
+    constructor(channel: Channel) : this(DiagramProducerGrpc.newBlockingStub(channel))
 
     override fun send(service: DiagramService) {
         tryRpc { stub.createDiagramService(CreateDiagramServiceRequest.newBuilder().build()) }

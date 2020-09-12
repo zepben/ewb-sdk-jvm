@@ -67,21 +67,8 @@ class UpgradeRunner constructor(
             .getOrElse { throw UpgradeException(it.message, it) }
 
         return try {
-            val statement = getStatement(connection)
-
-            val databaseVersion = getVersion(statement) ?: throw UpgradeException("No version number found in database.")
-            when {
-                databaseVersion < 14 -> throw UpgradeException("Upgrading a database before v14 is unsupported. Please generate a new database from the source system.")
-                databaseVersion > tableVersion.SUPPORTED_VERSION -> throw SQLException("Selected database is a newer version [v$databaseVersion] than the supported version [${tableVersion.SUPPORTED_VERSION}].")
-                databaseVersion < tableVersion.SUPPORTED_VERSION -> {
-                    logger.info("Upgrading database '{}' from v{} to v{}", databaseFile, databaseVersion, changeSets.last().number)
-                    createBackup(databaseFile, createBackupName(databaseFile, databaseVersion), StandardCopyOption.REPLACE_EXISTING)
-
-                    val versionUpdateStatement = getPreparedStatement(connection, tableVersion.preparedUpdateSql())
-                    changeSets.asSequence()
-                        .filter { databaseVersion < it.number }
-                        .forEach { runUpgrade(it, statement, versionUpdateStatement) }
-                }
+            getStatement(connection).use { statement ->
+                upgrade(databaseFile, statement, connection)
             }
 
             ConnectionResult(connection, tableVersion.SUPPORTED_VERSION)
@@ -99,6 +86,45 @@ class UpgradeRunner constructor(
     }
 
     @Throws(SQLException::class, IOException::class, SecurityException::class)
+    private fun upgrade(databaseFile: Path, statement: Statement, connection: Connection) {
+        var backupCreated = false
+        fun doBackup(databaseVersion: Int) {
+            if (backupCreated)
+                return
+
+            logger.info("Upgrading database '{}' from v{} to v{}", databaseFile, databaseVersion, changeSets.last().number)
+            createBackup(databaseFile, createBackupName(databaseFile, databaseVersion), StandardCopyOption.REPLACE_EXISTING)
+            backupCreated = true
+        }
+
+        val versionResult = getVersion(statement)
+        val databaseVersion = when {
+            versionResult.versionNumber != null -> versionResult.versionNumber
+            versionResult.requiresVersionTableUpgrdae -> {
+                val version = getVersionOldSchema(statement) ?: throw UpgradeException("No version number found in database.")
+                doBackup(version)
+                upgradeVersionTable(statement, version)
+                version
+            }
+            else -> throw UpgradeException("No version number found in database.")
+        }
+
+        when {
+            databaseVersion < 14 -> throw UpgradeException("Upgrading a database before v14 is unsupported. Please generate a new database from the source system.")
+            databaseVersion > tableVersion.SUPPORTED_VERSION -> throw SQLException("Selected database is a newer version [v$databaseVersion] than the supported version [${tableVersion.SUPPORTED_VERSION}].")
+            databaseVersion < tableVersion.SUPPORTED_VERSION -> {
+                doBackup(databaseVersion)
+
+                getPreparedStatement(connection, tableVersion.preparedUpdateSql()).use { versionUpdateStatement ->
+                    changeSets.asSequence()
+                        .filter { databaseVersion < it.number }
+                        .forEach { runUpgrade(it, statement, versionUpdateStatement) }
+                }
+            }
+        }
+    }
+
+    @Throws(SQLException::class, SecurityException::class)
     private fun runUpgrade(
         changeSet: ChangeSet,
         statement: Statement,
@@ -139,27 +165,38 @@ class UpgradeRunner constructor(
     }
 
     @Throws(SQLException::class)
-    private fun getVersion(statement: Statement): Int? {
-        try {
-            val results: ResultSet = statement.executeConfiguredQuery(tableVersion.selectSql())
-            return if (results.next())
-                results.getInt(tableVersion.VERSION.queryIndex())
+    private fun getVersion(statement: Statement): VersionResult {
+        return try {
+            statement.executeConfiguredQuery(tableVersion.selectSql()).use { results ->
+                if (results.next())
+                    VersionResult(results.getInt(tableVersion.VERSION.queryIndex()))
+                else
+                    VersionResult(null)
+            }
+        } catch (e: SQLException) {
+            VersionResult(null, true)
+        }
+    }
+
+    @Throws(SQLException::class)
+    private fun getVersionOldSchema(statement: Statement): Int? {
+        return statement.executeQuery("SELECT major FROM version").use { results ->
+            if (results.next())
+                results.getInt(1)
             else
                 null
-        } catch (e: SQLException) {
-            val results = statement.executeQuery("SELECT major FROM version")
-            if (!results.next())
-                return null
-
-            val version = results.getInt(1)
-            statement.execute("DROP TABLE version")
-            statement.execute(tableVersion.createTableSql())
-            statement.executeUpdate("INSERT into ${tableVersion.VERSION.name()} VALUES ($version)")
-
-            return version
         }
+    }
+
+    @Throws(SQLException::class)
+    private fun upgradeVersionTable(statement: Statement, version: Int) {
+        statement.execute("DROP TABLE version")
+        statement.execute(tableVersion.createTableSql())
+        statement.executeUpdate("INSERT into ${tableVersion.VERSION.name()} VALUES ($version)")
     }
 
     class ConnectionResult(val connection: Connection, val version: Int)
     class UpgradeException(message: String?, cause: Throwable? = null) : Exception(message, cause)
+
+    private data class VersionResult(val versionNumber: Int?, val requiresVersionTableUpgrdae: Boolean = false)
 }

@@ -55,4 +55,26 @@ internal class CimProducerClientTest {
         expect { client.send(object: BaseService("test") {}) }
             .toThrow(RuntimeException::class.java)
     }
+
+    @Test
+    internal fun `can remove error handler`() {
+        val handler = object : RpcErrorHandler {
+            var count = 0
+            override fun onError(t: Throwable): Boolean {
+                ++count
+                return true
+            }
+        }
+
+        val client = object : CimProducerClient<BaseService>() {
+            override fun send(service: BaseService) {
+                tryRpc { throw RuntimeException() }
+            }
+        }.apply { addErrorHandler(handler) }
+
+        client.send(object: BaseService("test") {})
+        client.removeErrorHandler(handler)
+
+        assertThat(handler.count, equalTo(1))
+    }
 }

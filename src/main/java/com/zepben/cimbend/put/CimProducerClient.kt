@@ -45,6 +45,13 @@ abstract class CimProducerClient<T : BaseService> {
     }
 
     /**
+     * Removes the handler if registered.
+     */
+    fun removeErrorHandler(handler: RpcErrorHandler) {
+        errorHandlers.remove(handler)
+    }
+
+    /**
      * Use to pass the throwable to all registered error handlers. Returns true if and error handler returns true.
      */
     protected fun tryHandleError(t: Throwable): Boolean =

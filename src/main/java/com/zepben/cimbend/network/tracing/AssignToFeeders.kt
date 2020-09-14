@@ -17,7 +17,6 @@
  */
 package com.zepben.cimbend.network.tracing
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
 import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.cimbend.cim.iec61970.base.core.Feeder
 import com.zepben.cimbend.cim.iec61970.base.core.Terminal
@@ -31,7 +30,6 @@ import com.zepben.traversals.BasicTraversal
  * Requires that a Feeder have a normalHeadTerminal with associated ConductingEquipment.
  * This class is backed by a [BasicTraversal].
  */
-@EverythingIsNonnullByDefault
 class AssignToFeeders {
 
     private val normalTraversal: BasicTraversal<PhaseStep> = PhaseTrace.newNormalTrace()

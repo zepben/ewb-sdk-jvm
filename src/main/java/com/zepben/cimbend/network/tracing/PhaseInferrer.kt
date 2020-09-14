@@ -17,7 +17,6 @@
  */
 package com.zepben.cimbend.network.tracing
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
 import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.cimbend.cim.iec61970.base.core.PhaseCode
 import com.zepben.cimbend.cim.iec61970.base.core.Terminal
@@ -28,7 +27,6 @@ import com.zepben.cimbend.network.NetworkService.Companion.connectedTerminals
 import com.zepben.cimbend.network.model.PhaseDirection
 import org.slf4j.LoggerFactory
 
-@EverythingIsNonnullByDefault
 class PhaseInferrer {
 
     private var tracking = mutableMapOf<ConductingEquipment, Boolean>()

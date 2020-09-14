@@ -17,7 +17,6 @@
  */
 package com.zepben.cimbend.network.model
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
 import com.zepben.cimbend.cim.iec61970.base.core.PhaseCode
 import com.zepben.cimbend.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.cimbend.network.model.PhaseDirection
@@ -31,7 +30,6 @@ import com.zepben.cimbend.network.model.TracedPhasesBitManipulation.Companion.se
  * Class that holds the traced phase statuses for the current and normal state of the network.
  * See [TracedPhasesBitManipulation] for details on bit representation.
  */
-@EverythingIsNonnullByDefault
 data class TracedPhases(
     private var normalStatus: Int = 0,
     private var currentStatus: Int = 0

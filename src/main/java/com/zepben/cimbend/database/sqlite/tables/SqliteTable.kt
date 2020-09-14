@@ -17,7 +17,6 @@
  */
 package com.zepben.cimbend.database.sqlite.tables
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
 import com.zepben.cimbend.database.Column
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -27,7 +26,6 @@ import kotlin.reflect.jvm.kotlinProperty
 /**
  * Represents a table in an Sqlite Database
  */
-@EverythingIsNonnullByDefault
 abstract class SqliteTable {
     @JvmField
     protected var columnIndex = 0
@@ -78,7 +76,7 @@ abstract class SqliteTable {
                     logger.debug("Trying to retrieve field " + field.name.toString() + "as Kotlin property.")
                     try {
                         val prop = field.kotlinProperty as? KProperty1<Any, Column>
-                        if (prop == null){
+                        if (prop == null) {
                             logger.error("INTERNAL ERROR: The field ${field.name} in the SQL table class ${clazz.name} couldn't be casted as a KProp as its kotlinProperty was null. It will be missing from the database.")
                             continue
                         }

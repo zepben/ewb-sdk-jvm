@@ -20,8 +20,8 @@ package com.zepben.cimbend.measurement
 import com.zepben.cimbend.cim.iec61970.base.meas.AccumulatorValue
 import com.zepben.cimbend.cim.iec61970.base.meas.AnalogValue
 import com.zepben.cimbend.cim.iec61970.base.meas.DiscreteValue
-import com.zepben.test.util.ExpectException.expect
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 
@@ -48,5 +48,26 @@ class MeasurementServiceTest {
         val measurement = DiscreteValue()
         assertThat(service.add(measurement), equalTo(true))
         assertThat(service.remove(measurement), equalTo(true))
+    }
+
+    @Test
+    internal fun num() {
+        service.add(AnalogValue())
+
+        assertThat(service.num(), equalTo(1))
+    }
+
+    @Test
+    internal fun listOf() {
+        val av = AnalogValue()
+        val acv = AccumulatorValue()
+        val dv = DiscreteValue()
+        service.add(av)
+        service.add(acv)
+        service.add(dv)
+
+        assertThat(service.listOf(AnalogValue::class), contains(av))
+        assertThat(service.listOf(AccumulatorValue::class), contains(acv))
+        assertThat(service.listOf(DiscreteValue::class), contains(dv))
     }
 }

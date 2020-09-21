@@ -21,6 +21,8 @@ import com.zepben.cimbend.cim.iec61970.base.meas.AccumulatorValue
 import com.zepben.cimbend.cim.iec61970.base.meas.AnalogValue
 import com.zepben.cimbend.cim.iec61970.base.meas.DiscreteValue
 import com.zepben.cimbend.cim.iec61970.base.meas.MeasurementValue
+import kotlin.reflect.KClass
+import kotlin.reflect.full.isSuperclassOf
 
 /*
  * Maintains an in-memory model of measurements.
@@ -35,6 +37,9 @@ class MeasurementService {
     fun remove(analogValue: AnalogValue): Boolean = _measurements.remove(analogValue)
 
     fun add(discreteValue: DiscreteValue): Boolean = _measurements.add(discreteValue)
-    fun remove(discreteValue: DiscreteValue): Boolean =_measurements.remove(discreteValue)
+    fun remove(discreteValue: DiscreteValue): Boolean = _measurements.remove(discreteValue)
 
+    fun num(): Int = _measurements.size
+    fun <T : MeasurementValue> listOf(clazz: KClass<T>): List<T> =
+            _measurements.filter { clazz.isSuperclassOf(it::class) }.map { it as T }
 }

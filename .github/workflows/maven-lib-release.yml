@@ -1,0 +1,134 @@
+# Note: default release notes file is docs/release.md.
+name: Release and deploy to Central
+
+on: workflow_dispatch
+
+jobs:
+  release-checks:
+    runs-on: ubuntu-latest
+    container: zepben/pipeline-basic:5.0.0
+    env:
+      NEXUS_MAVEN_REPO: ${{ secrets.NEXUS_MAVEN_REPO }}
+      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      NEXUS_MAVEN_SNAPSHOT: ${{ secrets.NEXUS_MAVEN_SNAPSHOT }}
+      NEXUS_MAVEN_RELEASE: ${{ secrets.NEXUS_MAVEN_RELEASE }}
+      SLACK_NOTIFICATION: YES
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Release checks and update version for release
+        run: |
+          /scripts/release-checks.sh --java --maven pom.xml
+          FILE=docs/release.md
+          if [ -f "$FILE" ]; then
+            export release_date=$(date +'%d %B %Y')
+            /scripts/finalize-version.sh --java --maven pom.xml $FILE 'sed -i -e "s/TBD/$release_date/g"'
+          else
+            /scripts/finalize-version.sh --java --maven pom.xml
+          fi
+        shell: bash
+  deploy-central:
+    needs: release-checks
+    runs-on: ubuntu-latest
+    container: zepben/pipeline-java
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache maven deps
+        uses: actions/cache@v2
+        with:
+          path: /maven
+          key: maven
+
+      - name: Checkout release branch
+        run: |
+          git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+          git fetch --all
+          git checkout release
+        shell: bash
+
+      - name: Maven deploy to Central
+        id: build
+        uses: zepben/maven-deploy-central-action@main
+        with:
+          ZEPBEN_GPG_KEY: ${{ secrets.ZEPBEN_GPG_KEY_B64 }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
+        continue-on-error: true
+
+      - name: Merge and Tag
+        if: steps.build.outcome == 'success'
+        id: merge
+        run: | 
+          git checkout ${GITHUB_REF/refs\/heads\//}
+          git merge release
+          git push origin ${GITHUB_REF/refs\/heads\//}
+          artifactId=$(xmlstarlet pyx pom.xml | grep -v ^A | xmlstarlet p2x | xmlstarlet sel -t -v "/project/artifactId")
+          version=$(xmlstarlet pyx pom.xml | grep -v ^A | xmlstarlet p2x | xmlstarlet sel -t -v "/project/version")
+          artifact="${artifactId}-${version}.jar"
+          git tag "v$version"
+          git push --tags
+          echo "::set-output name=tag::$(echo v$version)"
+          echo "::set-output name=artifact::$(echo $artifact)"
+          echo "::set-output name=artifact-path::$(echo target/$artifact)"
+        shell: bash
+
+      - name: Create Release
+        if: steps.build.outcome == 'success'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.merge.outputs.tag }}
+          release_name: ${{ steps.merge.outputs.tag }}
+          body_path: docs/release.md
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        if: steps.build.outcome == 'success'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.merge.outputs.artifact-path }}
+          asset_name: ${{ steps.merge.outputs.artifact }}
+          asset_content_type: application/zip
+
+      - name: Fail build
+        if: steps.build.outcome == 'failure'
+        run: | 
+          git push origin -d release
+          echo "There was an error in the mvn deploy command above."
+          exit 1
+        shell: bash
+
+  update-version:
+    needs: deploy-central
+    runs-on: ubuntu-latest
+    container: zepben/pipeline-basic:5.0.0
+    env:
+      NEXUS_MAVEN_REPO: ${{ secrets.NEXUS_MAVEN_REPO }}
+      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      NEXUS_MAVEN_SNAPSHOT: ${{ secrets.NEXUS_MAVEN_SNAPSHOT }}
+      NEXUS_MAVEN_RELEASE: ${{ secrets.NEXUS_MAVEN_RELEASE }}
+      SLACK_NOTIFICATION: YES
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Update to next minor version
+        run: |
+          FILE=docs/release.md
+          if [ -f "$FILE" ]; then
+            export ln=$(cat $FILE | grep -n "### v[0-9]\+.[0-9]\+.[0-9]\+" | head -1 | cut -d':' -f1)
+            /scripts/update-version.sh --java --maven --release pom.xml $FILE 'next_release_version=${version//-SNAPSHOT/} && sed -i "${ln}i \#\#\# v${version//-SNAPSHOT/}\n\n\#\#\#\#\# Breaking Changes\n\* None.\n\n\#\#\#\#\# New Features\n\* None.\n\n\#\#\#\#\# Enhancements\n\* None.\n\n\#\#\#\#\# Fixes\n\* None.\n\n\#\#\#\#\# Notes\n\* None.\n\n\-\-\-\n" $changelog && sed -i "5i \|\[${next_release_version}\]\(\#v${next_release_version//\./}\)\| \`TBD\` \|"'
+          else
+            /scripts/update-version.sh --java --maven --release pom.xml
+          fi
+        shell: bash

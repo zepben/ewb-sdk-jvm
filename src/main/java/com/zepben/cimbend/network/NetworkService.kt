@@ -38,6 +38,7 @@ import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.cimbend.common.BaseService
 import com.zepben.cimbend.network.model.NominalPhasePath
 import com.zepben.cimbend.network.tracing.ConnectivityResult
+import kotlin.reflect.KClass
 
 /**
  * Maintains an in-memory model of the network.
@@ -176,8 +177,55 @@ class NetworkService : BaseService("network") {
     fun add(remoteSource: RemoteSource): Boolean = super.add(remoteSource)
     fun remove(remoteSource: RemoteSource): Boolean = super.remove(remoteSource)
 
+    fun add(analog: Analog): Boolean = indexMeasurement(analog) && super.add(analog)
+
+    fun remove(analog: Analog): Boolean {
+        removeMeasurementIndex(analog)
+        return super.remove(analog)
+    }
+
+    fun add(accumulator: Accumulator): Boolean = indexMeasurement(accumulator) && super.add(accumulator)
+
+    fun remove(accumulator: Accumulator): Boolean {
+        removeMeasurementIndex(accumulator)
+        return super.remove(accumulator)
+    }
+
+    fun add(discrete: Discrete): Boolean = indexMeasurement(discrete) && super.add(discrete)
+
+    fun remove(discrete: Discrete): Boolean {
+        removeMeasurementIndex(discrete)
+        return super.remove(discrete)
+    }
+
+    /**
+     * Get all measurements of type [T] associated with the given [mRID].
+     *
+     * The [mRID] should be either a [PowerSystemResource] or a [Terminal] MRID that is assigned to the corresponding
+     * fields on the measurements.
+     */
+    inline fun <reified T : Measurement> getMeasurements(mRID: String): List<T> = getMeasurements(mRID, T::class)
+
+    /**
+     * Get all measurements of type [measurementClass] associated with the given [mRID].
+     *
+     * The [mRID] should be either a [PowerSystemResource] or a [Terminal] MRID that is assigned to the corresponding
+     * fields on the measurements.
+     */
+    fun <T : Measurement> getMeasurements(mRID: String, measurementClass: KClass<T>): List<T> =
+        getMeasurements(mRID, measurementClass.java)
+
+    /**
+     * Get all measurements of type [measurementClass] associated with the given [mRID].
+     *
+     * The [mRID] should be either a [PowerSystemResource] or a [Terminal] MRID that is assigned to the corresponding
+     * fields on the measurements.
+     */
+    fun <T : Measurement> getMeasurements(mRID: String, measurementClass: Class<T>): List<T> =
+        _measurements[mRID]?.filterIsInstance(measurementClass) ?: emptyList()
+
     private fun indexMeasurement(measurement: Measurement, mRID: String?): Boolean {
-        if (mRID == null || mRID.isEmpty())
+        if (mRID.isNullOrEmpty())
             return true
 
         _measurements[mRID]?.let { measurements ->
@@ -195,42 +243,10 @@ class NetworkService : BaseService("network") {
 
     private fun indexMeasurement(measurement: Measurement) = indexMeasurement(measurement, measurement.terminalMRID) && indexMeasurement(measurement, measurement.powerSystemResourceMRID)
 
-    private fun removeMeasurementIndex(measurement: Measurement): Set<Measurement>? {
-        val termMeas = _measurements.remove(measurement.terminalMRID)
-        val psrMeas = _measurements.remove(measurement.powerSystemResourceMRID)
-        termMeas?.let {
-            if (psrMeas != null)
-                return it.union(psrMeas)
-            return it.toSet()
-        } ?: return psrMeas?.toSet()
+    private fun removeMeasurementIndex(measurement: Measurement) {
+        _measurements[measurement.terminalMRID]?.remove(measurement)
+        _measurements[measurement.powerSystemResourceMRID]?.remove(measurement)
     }
-
-    fun add(analog: Analog): Boolean = indexMeasurement(analog) && super.add(analog)
-
-    fun remove(analog: Analog): Boolean {
-        removeMeasurementIndex(analog)
-        return super.remove(analog)
-    }
-
-    fun getAnalog(mRID: String?): List<Analog>? = _measurements[mRID]?.filterIsInstance<Analog>()
-
-    fun add(accumulator: Accumulator): Boolean = indexMeasurement(accumulator) && super.add(accumulator)
-
-    fun remove(accumulator: Accumulator): Boolean {
-        removeMeasurementIndex(accumulator)
-        return super.remove(accumulator)
-    }
-
-    fun getAccumulator(mRID: String?): List<Accumulator>? = _measurements[mRID]?.filterIsInstance<Accumulator>()
-
-    fun add(discrete: Discrete): Boolean = indexMeasurement(discrete) && super.add(discrete)
-
-    fun remove(discrete: Discrete): Boolean {
-        removeMeasurementIndex(discrete)
-        return super.remove(discrete)
-    }
-
-    fun getDiscrete(mRID: String?): List<Discrete>? = _measurements[mRID]?.filterIsInstance<Discrete>()
 
     /**
      * Get a connectivityNode by its mRID, or create it if it doesn't already exist in the network.

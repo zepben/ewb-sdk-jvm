@@ -29,10 +29,7 @@ import com.zepben.cimbend.cim.iec61968.metering.UsagePoint
 import com.zepben.cimbend.cim.iec61968.operations.OperationalRestriction
 import com.zepben.cimbend.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.cimbend.cim.iec61970.base.core.*
-import com.zepben.cimbend.cim.iec61970.base.meas.Accumulator
-import com.zepben.cimbend.cim.iec61970.base.meas.Analog
-import com.zepben.cimbend.cim.iec61970.base.meas.Control
-import com.zepben.cimbend.cim.iec61970.base.meas.Discrete
+import com.zepben.cimbend.cim.iec61970.base.meas.*
 import com.zepben.cimbend.cim.iec61970.base.scada.RemoteControl
 import com.zepben.cimbend.cim.iec61970.base.scada.RemoteSource
 import com.zepben.cimbend.cim.iec61970.base.wires.*
@@ -343,41 +340,73 @@ internal class NetworkServiceTest {
 
     @Test
     internal fun supportsAnalog() {
-        val measurement = Analog().apply {
-            terminalMRID = "terminal1"
-            powerSystemResourceMRID = "psr1"
-        }
+        val measurement = Analog()
+
         assertThat(service.add(measurement), equalTo(true))
-        assertThat(service.add(measurement), equalTo(false))
-        assertThat(service.getAnalog("terminal1"), contains(measurement))
-        assertThat(service.getAnalog("psr1"), contains(measurement))
+        assertThat(service.get(measurement.mRID), equalTo(measurement))
         assertThat(service.remove(measurement), equalTo(true))
     }
 
     @Test
     internal fun supportsAccumulator() {
-        val measurement = Accumulator().apply {
-            terminalMRID = "terminal1"
-            powerSystemResourceMRID = "psr1"
-        }
+        val measurement = Accumulator()
+
         assertThat(service.add(measurement), equalTo(true))
-        assertThat(service.add(measurement), equalTo(false))
-        assertThat(service.getAccumulator("terminal1"), contains(measurement))
-        assertThat(service.getAccumulator("psr1"), contains(measurement))
+        assertThat(service.get(measurement.mRID), equalTo(measurement))
         assertThat(service.remove(measurement), equalTo(true))
     }
 
     @Test
     internal fun supportsDiscrete() {
-        val measurement = Discrete().apply {
-            terminalMRID = "terminal1"
-            powerSystemResourceMRID = "psr1"
-        }
+        val measurement = Discrete()
+
         assertThat(service.add(measurement), equalTo(true))
-        assertThat(service.add(measurement), equalTo(false))
-        assertThat(service.getDiscrete("terminal1"), contains(measurement))
-        assertThat(service.getDiscrete("psr1"), contains(measurement))
+        assertThat(service.get(measurement.mRID), equalTo(measurement))
         assertThat(service.remove(measurement), equalTo(true))
+    }
+
+    @Test
+    internal fun `indexes measurements on terminal`() {
+        assertThat(service.getMeasurements<Measurement>("t1"), empty())
+
+        val discrete = Discrete().apply { terminalMRID = "t1" }
+        val accumulator = Accumulator().apply { terminalMRID = "t2" }
+        val analog1 = Analog().apply { terminalMRID = "t1" }
+        val analog2 = Analog().apply { terminalMRID = "t1" }
+
+        service.add(discrete)
+        service.add(accumulator)
+        service.add(analog1)
+        service.add(analog2)
+
+        assertThat(service.getMeasurements("t1"), containsInAnyOrder(discrete, analog1, analog2))
+        assertThat(service.getMeasurements("t2"), containsInAnyOrder(accumulator))
+
+        assertThat(service.getMeasurements("t1", Analog::class), containsInAnyOrder(analog1, analog2))
+        service.remove(analog1)
+        assertThat(service.getMeasurements("t1", Analog::class), containsInAnyOrder(analog2))
+    }
+
+    @Test
+    internal fun `indexes measurements on power system resource`() {
+        assertThat(service.getMeasurements<Measurement>("psr1"), empty())
+
+        val discrete = Discrete().apply { powerSystemResourceMRID = "psr1" }
+        val accumulator = Accumulator().apply { powerSystemResourceMRID = "psr2" }
+        val analog1 = Analog().apply { powerSystemResourceMRID = "psr1" }
+        val analog2 = Analog().apply { powerSystemResourceMRID = "psr1" }
+
+        service.add(discrete)
+        service.add(accumulator)
+        service.add(analog1)
+        service.add(analog2)
+
+        assertThat(service.getMeasurements("psr1"), containsInAnyOrder(discrete, analog1, analog2))
+        assertThat(service.getMeasurements("psr2"), containsInAnyOrder(accumulator))
+
+        assertThat(service.getMeasurements("psr1", Analog::class), containsInAnyOrder(analog1, analog2))
+        service.remove(analog1)
+        assertThat(service.getMeasurements("psr1", Analog::class), containsInAnyOrder(analog2))
     }
 
     @Test

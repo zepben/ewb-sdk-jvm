@@ -1,0 +1,33 @@
+name: Build
+
+on: 
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    container: zepben/pipeline-java
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache licence-check
+        uses: actions/cache@v2
+        with:
+          path: /lc
+          key: lcc
+          
+      - name: Check licence
+        uses: zepben/licence-check-action@main
+        with:
+          LC_URL: ${{ secrets.LC_URL }}
+
+      - name: Cache maven deps
+        uses: actions/cache@v2
+        with:
+          path: /maven
+          key: maven
+
+      - name: Maven build and test
+        run: mvn clean test -f pom.xml
+        shell: bash

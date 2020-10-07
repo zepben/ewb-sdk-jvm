@@ -15,14 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.zepben.cimbend.put
 
-class CaptureLastRpcErrorHandler : RpcErrorHandler {
-    var lastError: Throwable? = null
+package com.zepben.cimbend.get.hierarchy
 
-    override fun onError(t: Throwable): Boolean {
-        lastError = t
-        return true
-    }
-
-}
+/**
+ * A simplified representation of a substation for requesting the network hierarchy.
+ */
+class NetworkHierarchySubstation(
+    mRID: String,
+    name: String,
+    val feeders: Map<String, NetworkHierarchyFeeder>,
+    var subGeographicalRegion: NetworkHierarchySubGeographicalRegion? = null
+) : NetworkHierarchyIdentifiedObject(mRID, name)

@@ -25,6 +25,7 @@ import com.zepben.cimbend.cim.iec61968.customers.Tariff
 import com.zepben.cimbend.common.translator.toPb
 import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.customer.translator.toPb
+import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
 import com.zepben.protobuf.cp.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException

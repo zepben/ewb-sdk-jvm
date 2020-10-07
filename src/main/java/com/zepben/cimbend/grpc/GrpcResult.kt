@@ -15,19 +15,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.zepben.cimbend.put.grpc
 
-import com.zepben.cimbend.grpc.ConnectionConfig
-import com.zepben.cimbend.grpc.GrpcChannelFactory
-import org.junit.jupiter.api.Test
+package com.zepben.cimbend.grpc
 
-internal class GrpcChannelFactoryTest {
+/**
+ * The result of a gRPC call.
+ * @property wasSuccessful Indicates how the call was resolved without error
+ * @property result The result of the call if [wasSuccessful] is true, otherwise null.
+ * @property thrown Positive sequence shunt (charging) conductance per section
+ */
+data class GrpcResult<T>(
+    val wasSuccessful: Boolean,
+    val result: T?,
+    val thrown: Throwable?
+) {
 
-    @Test
-    fun createsChannel() {
-        // TODO How do we actually test the channel is configured correctly?
-        val config = ConnectionConfig("localhost", 80)
-        val channel = GrpcChannelFactory.create(config)
-        channel.shutdownNow()
+    companion object {
+
+        @JvmStatic
+        fun <T> of(result: T?): GrpcResult<T> {
+            return GrpcResult(true, result, null)
+        }
+
+        @JvmStatic
+        fun <T> ofError(thrown: Throwable): GrpcResult<T> {
+            return GrpcResult(false, null, thrown)
+        }
+
     }
+
 }

@@ -83,14 +83,10 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
 
     private val singlePhases: List<SinglePhaseKind> = Collections.unmodifiableList(Stream.of(*singlePhases).collect(Collectors.toList()))
 
-    // todo: PhaseCode.singlePhases().size() to .numPhases()
     fun numPhases(): Int {
         return when (this) {
-            ABCN -> 4
-            A, B, C, N, X, Y -> 1
-            ABC, ABN, ACN, BCN, XYN -> 3
-            AB, AC, BC, AN, BN, CN, XN, XY, YN -> 2
             NONE -> 0
+            else -> singlePhases.size
         }
     }
 

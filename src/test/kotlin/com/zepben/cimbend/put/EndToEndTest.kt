@@ -20,8 +20,9 @@ package com.zepben.cimbend.put
 import com.zepben.cimbend.cim.iec61968.assetinfo.CableInfo
 import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.diagram.DiagramService
+import com.zepben.cimbend.grpc.ConnectionConfig
+import com.zepben.cimbend.grpc.GrpcChannelFactory
 import com.zepben.cimbend.network.NetworkService
-import com.zepben.cimbend.put.grpc.GrpcChannelFactory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit

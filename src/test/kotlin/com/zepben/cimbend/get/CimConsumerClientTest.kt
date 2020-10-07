@@ -15,28 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.zepben.cimbend.put
+package com.zepben.cimbend.get
 
+import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.cimbend.common.BaseService
 import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
+import com.zepben.cimbend.grpc.GrpcResult
+import com.zepben.cimbend.put.RpcErrorHandler
 import com.zepben.test.util.ExpectException.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 
-internal class CimProducerClientTest {
+internal class CimConsumerClientTest {
 
     @Test
     internal fun `tryRpc handles exceptions`() {
         val handler = CaptureLastRpcErrorHandler()
         val ex = RuntimeException()
-        val client = object : CimProducerClient<BaseService>() {
-            override fun send(service: BaseService) {
-                tryRpc { throw ex }
-            }
-        }.apply { addErrorHandler(handler) }
+        val client = ThrowingCimConsumerClient(ex).apply { addErrorHandler(handler) }
 
-        client.send(object : BaseService("test") {})
+        client.throwViaTryRpc()
 
         assertThat(handler.lastError, equalTo(ex))
     }
@@ -47,13 +46,9 @@ internal class CimProducerClientTest {
             override fun onError(t: Throwable) = false
         }
 
-        val client = object : CimProducerClient<BaseService>() {
-            override fun send(service: BaseService) {
-                tryRpc { throw RuntimeException() }
-            }
-        }.apply { addErrorHandler(handler) }
+        val client = ThrowingCimConsumerClient().apply { addErrorHandler(handler) }
 
-        expect { client.send(object : BaseService("test") {}) }
+        expect { client.throwViaTryRpc() }
             .toThrow(RuntimeException::class.java)
     }
 
@@ -67,18 +62,33 @@ internal class CimProducerClientTest {
             }
         }
 
-        val client = object : CimProducerClient<BaseService>() {
-            override fun send(service: BaseService) {
-                tryRpc { throw RuntimeException() }
-            }
-        }.apply { addErrorHandler(handler) }
+        val client = ThrowingCimConsumerClient()
 
-        client.send(object : BaseService("test") {})
+        client.apply { addErrorHandler(handler) }
+
+        client.throwViaTryRpc()
         client.removeErrorHandler(handler)
 
-        expect { client.send(object : BaseService("test") {}) }
+        expect { client.throwViaTryRpc() }
             .toThrow(RuntimeException::class.java)
 
         assertThat(handler.count, equalTo(1))
     }
+
+    private class ThrowingCimConsumerClient(private val ex: Throwable = RuntimeException()) : CimConsumerClient<BaseService>() {
+
+        override fun getIdentifiedObject(service: BaseService, mRID: String): GrpcResult<IdentifiedObject> {
+            return tryRpc { throw ex }
+        }
+
+        override fun getIdentifiedObjects(service: BaseService, mRIDs: Iterable<String>): GrpcResult<Map<String, IdentifiedObject>> {
+            return tryRpc { throw ex }
+        }
+
+        fun throwViaTryRpc(): GrpcResult<Unit> {
+            return tryRpc { throw ex }
+        }
+
+    }
+
 }

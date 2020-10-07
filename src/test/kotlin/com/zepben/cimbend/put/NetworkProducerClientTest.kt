@@ -33,6 +33,7 @@ import com.zepben.cimbend.cim.iec61970.base.wires.*
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.cimbend.common.translator.toPb
+import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.model.toPb
 import com.zepben.protobuf.np.*

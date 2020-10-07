@@ -15,19 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.zepben.cimbend.put.grpc
 
-import com.zepben.cimbend.grpc.ConnectionConfig
-import com.zepben.cimbend.grpc.GrpcChannelFactory
-import org.junit.jupiter.api.Test
+package com.zepben.cimbend.get.hierarchy
 
-internal class GrpcChannelFactoryTest {
-
-    @Test
-    fun createsChannel() {
-        // TODO How do we actually test the channel is configured correctly?
-        val config = ConnectionConfig("localhost", 80)
-        val channel = GrpcChannelFactory.create(config)
-        channel.shutdownNow()
-    }
-}
+/**
+ * A simplified representation of a sub geographical region for requesting the network hierarchy.
+ */
+class NetworkHierarchySubGeographicalRegion(
+    mRID: String,
+    name: String,
+    val substations: Map<String, NetworkHierarchySubstation>,
+    var geographicalRegion: NetworkHierarchyGeographicalRegion? = null
+) : NetworkHierarchyIdentifiedObject(mRID, name)

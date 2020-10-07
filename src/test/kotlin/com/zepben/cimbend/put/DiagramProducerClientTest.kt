@@ -21,6 +21,7 @@ import com.zepben.cimbend.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.cimbend.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.cimbend.diagram.DiagramService
 import com.zepben.cimbend.diagram.toPb
+import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
 import com.zepben.protobuf.dp.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException

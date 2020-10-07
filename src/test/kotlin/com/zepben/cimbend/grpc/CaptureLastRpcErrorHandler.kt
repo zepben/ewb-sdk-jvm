@@ -15,20 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.zepben.cimbend.put
+package com.zepben.cimbend.grpc
 
-/**
- * Configuration for connecting to a gRPC Producer server.
- *
- * @property host The host of the producer server
- * @property port The port the producer server is listening on
- * @property certChainFilePath
- * @property privateKeyFilePath
- * @property trustCertCollectionFilePath
- */
-data class ConnectionConfig(
-    val host: String,
-    val port: Int,
-    val certChainFilePath: String? = null,
-    val privateKeyFilePath: String? = null,
-    val trustCertCollectionFilePath: String? = null)
+import com.zepben.cimbend.put.RpcErrorHandler
+
+class CaptureLastRpcErrorHandler : RpcErrorHandler {
+    var lastError: Throwable? = null
+
+    override fun onError(t: Throwable): Boolean {
+        lastError = t
+        return true
+    }
+
+}

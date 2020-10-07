@@ -15,19 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.zepben.cimbend.put.grpc
+package com.zepben.cimbend.grpc
 
-import com.zepben.cimbend.grpc.ConnectionConfig
-import com.zepben.cimbend.grpc.GrpcChannelFactory
-import org.junit.jupiter.api.Test
-
-internal class GrpcChannelFactoryTest {
-
-    @Test
-    fun createsChannel() {
-        // TODO How do we actually test the channel is configured correctly?
-        val config = ConnectionConfig("localhost", 80)
-        val channel = GrpcChannelFactory.create(config)
-        channel.shutdownNow()
-    }
-}
+/**
+ * Configuration for connecting to a gRPC Producer server.
+ *
+ * @property host The host of the producer server
+ * @property port The port the producer server is listening on
+ * @property certChainFilePath
+ * @property privateKeyFilePath
+ * @property trustCertCollectionFilePath
+ * @property disableTls Indicates if TLS should be disabled for the connection [default: false].
+ */
+data class ConnectionConfig(
+    val host: String,
+    val port: Int,
+    val certChainFilePath: String? = null,
+    val privateKeyFilePath: String? = null,
+    val trustCertCollectionFilePath: String? = null,
+    val enableTls: Boolean = false
+)

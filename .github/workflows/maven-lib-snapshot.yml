@@ -1,0 +1,29 @@
+name: Deploy Snapshot
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy-central:
+    runs-on: ubuntu-latest
+    container: zepben/pipeline-java
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache maven deps
+        uses: actions/cache@v2
+        with:
+          path: /maven
+          key: maven
+
+      - name: Maven deploy to Central
+        uses: zepben/maven-deploy-central-action@main
+        with:
+          ZEPBEN_GPG_KEY: ${{ secrets.ZEPBEN_GPG_KEY_B64 }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}

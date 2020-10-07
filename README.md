@@ -1,10 +1,20 @@
 # Evolve SDK #
 
-## Requirements  ##
+The Evolve SDK contains everything necessary to communicate with a [Zepben EWB Server](TODO). See the [architecture](docs/architecture.md) documentation for more details.
+
+## Requirements ##
+
+- Java 11
 
 ## Building ##
 
-## Development Set up ##
+Requirements to build
 
-### Contribution guidelines ###
+- JDK11 (tested with Amazon Corretto)
+- Maven
+
+To build:
+
+    mvn package
+
 

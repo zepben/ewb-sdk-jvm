@@ -22,7 +22,7 @@ import com.zepben.cimbend.common.BaseService
 import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
 import com.zepben.cimbend.grpc.GrpcResult
 import com.zepben.cimbend.put.RpcErrorHandler
-import com.zepben.test.util.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test

@@ -18,7 +18,7 @@
 
 package com.zepben.cimbend.grpc
 
-import com.zepben.test.util.junit.SystemLogExtension
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue

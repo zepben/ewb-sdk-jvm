@@ -26,8 +26,8 @@ import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger
 import com.zepben.protobuf.nc.*
-import com.zepben.test.util.ExpectException.expect
-import com.zepben.test.util.junit.SystemLogExtension
+import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import org.hamcrest.MatcherAssert.assertThat

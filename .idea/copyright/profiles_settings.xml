@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
-  <settings>
+  <settings default="Zepben-MPL-2.0">
     <module2copyright>
-      <element module="Project Files" copyright="Zepben-AGPL-v3.0" />
+      <element module="Project Files" copyright="Zepben-MPL-2.0" />
     </module2copyright>
     <LanguageOptions name="Python">
       <option name="fileTypeOverride" value="3" />

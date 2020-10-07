@@ -5,7 +5,7 @@ Contributions are always welcome, however at a minimum must meet the following c
 1. All new classes should be written in Kotlin. Java code will only be accepted if it's a minor addition to an existing
 java file. Conversion of java code to Kotlin is welcome, but will only be accepted if its relevant to the change being made.
 1. All changes must follow the code style. For Intellij this can be imported from [here](TODO)
-1. AGPL headers must be added to all new code files.
+1. MPL headers must be added to all new code files.
 1. All patches must have tests.
 1. All tests must pass.
 

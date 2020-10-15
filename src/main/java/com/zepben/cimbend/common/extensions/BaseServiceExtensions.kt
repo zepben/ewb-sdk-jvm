@@ -44,5 +44,5 @@ inline fun <reified T : IdentifiedObject> BaseService.ensureGet(mRID: String?, t
     return if (mRID.isNullOrBlank())
         null
     else
-        getOrThrow<T>(mRID!!, typeNameAndMRID)
+        getOrThrow<T>(mRID, typeNameAndMRID)
 }

@@ -30,6 +30,8 @@ class MeasurementService {
     fun remove(discreteValue: DiscreteValue): Boolean = _measurements.remove(discreteValue)
 
     fun num(): Int = _measurements.size
+
+    @Suppress("UNCHECKED_CAST")
     fun <T : MeasurementValue> listOf(clazz: KClass<T>): List<T> =
-            _measurements.filter { clazz.isSuperclassOf(it::class) }.map { it as T }
+        _measurements.filter { clazz.isSuperclassOf(it::class) }.map { it as T }
 }

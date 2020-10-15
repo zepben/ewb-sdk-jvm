@@ -17,7 +17,13 @@
  */
 package com.zepben.cimbend.get
 
+import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.cimbend.cim.iec61970.base.core.Feeder
 import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.cimbend.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.cimbend.cim.iec61970.base.wires.Conductor
+import com.zepben.cimbend.common.Resolvers
+import com.zepben.cimbend.common.extensions.typeNameAndMRID
 import com.zepben.cimbend.get.hierarchy.*
 import com.zepben.cimbend.grpc.GrpcResult
 import com.zepben.cimbend.network.NetworkService
@@ -25,6 +31,7 @@ import com.zepben.cimbend.network.model.NetworkProtoToCim
 import com.zepben.protobuf.nc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.nc.GetNetworkHierarchyRequest
 import com.zepben.protobuf.nc.NetworkConsumerGrpc
+import com.zepben.protobuf.nc.NetworkIdentifiedObject
 import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import io.grpc.Channel
 
@@ -96,58 +103,115 @@ class NetworkConsumerClient(
         }
     }
 
+    /***
+     * Retrieve the feeder network for the specified [mRID] and store the results in the [service].
+     *
+     * This is a convenience method that will fetch the feeder object, all of the equipment referenced by the feeder (normal state),
+     * the terminals of all elements, the connectivity between terminals, the locations of all elements, the ends of all transformers
+     * and the wire info for all conductors.
+     *
+     * @return The [Feeder], or null if it was nto found.
+     */
+    fun getFeeder(service: NetworkService, mRID: String): GrpcResult<Feeder> {
+        return tryRpc {
+            val feederResponse = getIdentifiedObject(service, mRID)
+            val feeder = feederResponse.result
+
+            if (!feederResponse.wasSuccessful)
+                throw feederResponse.thrown!!
+            else if (feeder == null)
+                return@tryRpc GrpcResult.of(null)
+            else if (feeder !is Feeder)
+                throw ClassCastException("Unable to extract feeder network from ${feeder.typeNameAndMRID()}.")
+
+            validateRpcCall(getIdentifiedObjects(service, service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder))))
+
+            val mRIDs = mutableSetOf(*service.getUnresolvedReferenceMrids(Resolvers.normalEnergizingSubstation(feeder)).toTypedArray())
+
+            feeder.equipment.forEach {
+                if (it is ConductingEquipment) {
+                    it.terminals.forEach { terminal ->
+                        mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.connectivityNode(terminal)))
+                    }
+                }
+
+                if (it is Conductor) {
+                    if (it is AcLineSegment)
+                        mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.perLengthSequenceImpedance(it)))
+                    mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.assetInfo(it)))
+                }
+
+                mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.location(it)))
+            }
+
+            validateRpcCall(getIdentifiedObjects(service, mRIDs))
+
+            GrpcResult.of(feeder)
+        }
+    }
+
+    private fun <T> validateRpcCall(response: GrpcResult<T>) {
+        if (!response.wasSuccessful)
+            throw response.thrown!!
+    }
+
     private fun processIdentifiedObjects(service: NetworkService, request: GetIdentifiedObjectsRequest): Sequence<IdentifiedObject?> {
         return stub.getIdentifiedObjects(request)
             .asSequence()
-            .map { it.objectGroup.identifiedObject }
-            .map {
-                when (it.identifiedObjectCase) {
-                    CABLEINFO -> protoToCimProvider(service).addFromPb(it.cableInfo)
-                    OVERHEADWIREINFO -> protoToCimProvider(service).addFromPb(it.overheadWireInfo)
-                    ASSETOWNER -> protoToCimProvider(service).addFromPb(it.assetOwner)
-                    ORGANISATION -> protoToCimProvider(service).addFromPb(it.organisation)
-                    LOCATION -> protoToCimProvider(service).addFromPb(it.location)
-                    METER -> protoToCimProvider(service).addFromPb(it.meter)
-                    USAGEPOINT -> protoToCimProvider(service).addFromPb(it.usagePoint)
-                    OPERATIONALRESTRICTION -> protoToCimProvider(service).addFromPb(it.operationalRestriction)
-                    FAULTINDICATOR -> protoToCimProvider(service).addFromPb(it.faultIndicator)
-                    BASEVOLTAGE -> protoToCimProvider(service).addFromPb(it.baseVoltage)
-                    CONNECTIVITYNODE -> protoToCimProvider(service).addFromPb(it.connectivityNode)
-                    FEEDER -> protoToCimProvider(service).addFromPb(it.feeder)
-                    GEOGRAPHICALREGION -> protoToCimProvider(service).addFromPb(it.geographicalRegion)
-                    SITE -> protoToCimProvider(service).addFromPb(it.site)
-                    SUBGEOGRAPHICALREGION -> protoToCimProvider(service).addFromPb(it.subGeographicalRegion)
-                    SUBSTATION -> protoToCimProvider(service).addFromPb(it.substation)
-                    TERMINAL -> protoToCimProvider(service).addFromPb(it.terminal)
-                    ACLINESEGMENT -> protoToCimProvider(service).addFromPb(it.acLineSegment)
-                    BREAKER -> protoToCimProvider(service).addFromPb(it.breaker)
-                    DISCONNECTOR -> protoToCimProvider(service).addFromPb(it.disconnector)
-                    ENERGYCONSUMER -> protoToCimProvider(service).addFromPb(it.energyConsumer)
-                    ENERGYCONSUMERPHASE -> protoToCimProvider(service).addFromPb(it.energyConsumerPhase)
-                    ENERGYSOURCE -> protoToCimProvider(service).addFromPb(it.energySource)
-                    ENERGYSOURCEPHASE -> protoToCimProvider(service).addFromPb(it.energySourcePhase)
-                    FUSE -> protoToCimProvider(service).addFromPb(it.fuse)
-                    JUMPER -> protoToCimProvider(service).addFromPb(it.jumper)
-                    JUNCTION -> protoToCimProvider(service).addFromPb(it.junction)
-                    LINEARSHUNTCOMPENSATOR -> protoToCimProvider(service).addFromPb(it.linearShuntCompensator)
-                    PERLENGTHSEQUENCEIMPEDANCE -> protoToCimProvider(service).addFromPb(it.perLengthSequenceImpedance)
-                    POWERTRANSFORMER -> protoToCimProvider(service).addFromPb(it.powerTransformer)
-                    POWERTRANSFORMEREND -> protoToCimProvider(service).addFromPb(it.powerTransformerEnd)
-                    RATIOTAPCHANGER -> protoToCimProvider(service).addFromPb(it.ratioTapChanger)
-                    RECLOSER -> protoToCimProvider(service).addFromPb(it.recloser)
-                    CIRCUIT -> protoToCimProvider(service).addFromPb(it.circuit)
-                    LOOP -> protoToCimProvider(service).addFromPb(it.loop)
-                    POLE -> protoToCimProvider(service).addFromPb(it.pole)
-                    STREETLIGHT -> protoToCimProvider(service).addFromPb(it.streetlight)
-                    ACCUMULATOR -> protoToCimProvider(service).addFromPb(it.accumulator)
-                    ANALOG -> protoToCimProvider(service).addFromPb(it.analog)
-                    DISCRETE -> protoToCimProvider(service).addFromPb(it.discrete)
-                    CONTROL -> protoToCimProvider(service).addFromPb(it.control)
-                    REMOTECONTROL -> protoToCimProvider(service).addFromPb(it.remoteControl)
-                    REMOTESOURCE -> protoToCimProvider(service).addFromPb(it.remoteSource)
-                    OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${it.identifiedObjectCase} is not supported by the network service")
-                }
+            .map { it.objectGroup }
+            .flatMap {
+                sequenceOf(extractIdentifiedObject(service, it.identifiedObject)) +
+                    it.ownedIdentifiedObjectList.map { owned -> extractIdentifiedObject(service, owned) }
             }
+    }
+
+    private fun extractIdentifiedObject(service: NetworkService, it: NetworkIdentifiedObject): IdentifiedObject {
+        return when (it.identifiedObjectCase) {
+            CABLEINFO -> protoToCimProvider(service).addFromPb(it.cableInfo)
+            OVERHEADWIREINFO -> protoToCimProvider(service).addFromPb(it.overheadWireInfo)
+            ASSETOWNER -> protoToCimProvider(service).addFromPb(it.assetOwner)
+            ORGANISATION -> protoToCimProvider(service).addFromPb(it.organisation)
+            LOCATION -> protoToCimProvider(service).addFromPb(it.location)
+            METER -> protoToCimProvider(service).addFromPb(it.meter)
+            USAGEPOINT -> protoToCimProvider(service).addFromPb(it.usagePoint)
+            OPERATIONALRESTRICTION -> protoToCimProvider(service).addFromPb(it.operationalRestriction)
+            FAULTINDICATOR -> protoToCimProvider(service).addFromPb(it.faultIndicator)
+            BASEVOLTAGE -> protoToCimProvider(service).addFromPb(it.baseVoltage)
+            CONNECTIVITYNODE -> protoToCimProvider(service).addFromPb(it.connectivityNode)
+            FEEDER -> protoToCimProvider(service).addFromPb(it.feeder)
+            GEOGRAPHICALREGION -> protoToCimProvider(service).addFromPb(it.geographicalRegion)
+            SITE -> protoToCimProvider(service).addFromPb(it.site)
+            SUBGEOGRAPHICALREGION -> protoToCimProvider(service).addFromPb(it.subGeographicalRegion)
+            SUBSTATION -> protoToCimProvider(service).addFromPb(it.substation)
+            TERMINAL -> protoToCimProvider(service).addFromPb(it.terminal)
+            ACLINESEGMENT -> protoToCimProvider(service).addFromPb(it.acLineSegment)
+            BREAKER -> protoToCimProvider(service).addFromPb(it.breaker)
+            DISCONNECTOR -> protoToCimProvider(service).addFromPb(it.disconnector)
+            ENERGYCONSUMER -> protoToCimProvider(service).addFromPb(it.energyConsumer)
+            ENERGYCONSUMERPHASE -> protoToCimProvider(service).addFromPb(it.energyConsumerPhase)
+            ENERGYSOURCE -> protoToCimProvider(service).addFromPb(it.energySource)
+            ENERGYSOURCEPHASE -> protoToCimProvider(service).addFromPb(it.energySourcePhase)
+            FUSE -> protoToCimProvider(service).addFromPb(it.fuse)
+            JUMPER -> protoToCimProvider(service).addFromPb(it.jumper)
+            JUNCTION -> protoToCimProvider(service).addFromPb(it.junction)
+            LINEARSHUNTCOMPENSATOR -> protoToCimProvider(service).addFromPb(it.linearShuntCompensator)
+            PERLENGTHSEQUENCEIMPEDANCE -> protoToCimProvider(service).addFromPb(it.perLengthSequenceImpedance)
+            POWERTRANSFORMER -> protoToCimProvider(service).addFromPb(it.powerTransformer)
+            POWERTRANSFORMEREND -> protoToCimProvider(service).addFromPb(it.powerTransformerEnd)
+            RATIOTAPCHANGER -> protoToCimProvider(service).addFromPb(it.ratioTapChanger)
+            RECLOSER -> protoToCimProvider(service).addFromPb(it.recloser)
+            CIRCUIT -> protoToCimProvider(service).addFromPb(it.circuit)
+            LOOP -> protoToCimProvider(service).addFromPb(it.loop)
+            POLE -> protoToCimProvider(service).addFromPb(it.pole)
+            STREETLIGHT -> protoToCimProvider(service).addFromPb(it.streetlight)
+            ACCUMULATOR -> protoToCimProvider(service).addFromPb(it.accumulator)
+            ANALOG -> protoToCimProvider(service).addFromPb(it.analog)
+            DISCRETE -> protoToCimProvider(service).addFromPb(it.discrete)
+            CONTROL -> protoToCimProvider(service).addFromPb(it.control)
+            REMOTECONTROL -> protoToCimProvider(service).addFromPb(it.remoteControl)
+            REMOTESOURCE -> protoToCimProvider(service).addFromPb(it.remoteSource)
+            OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${it.identifiedObjectCase} is not supported by the network service")
+        }
     }
 
     private fun <T, U : NetworkHierarchyIdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U): Map<String, U> = objects

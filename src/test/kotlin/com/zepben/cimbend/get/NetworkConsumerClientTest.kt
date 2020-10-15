@@ -17,13 +17,21 @@
  */
 package com.zepben.cimbend.get
 
-import com.zepben.cimbend.cim.iec61970.base.wires.AcLineSegment
-import com.zepben.cimbend.cim.iec61970.base.wires.Breaker
+import com.zepben.cimbend.cim.iec61968.assetinfo.CableInfo
+import com.zepben.cimbend.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.cimbend.cim.iec61968.assetinfo.WireInfo
+import com.zepben.cimbend.cim.iec61968.common.Location
+import com.zepben.cimbend.cim.iec61970.base.core.*
+import com.zepben.cimbend.cim.iec61970.base.wires.*
+import com.zepben.cimbend.common.extensions.typeNameAndMRID
 import com.zepben.cimbend.get.hierarchy.NetworkHierarchy
 import com.zepben.cimbend.get.hierarchy.NetworkHierarchyIdentifiedObject
+import com.zepben.cimbend.get.testdata.FeederNetwork
 import com.zepben.cimbend.get.testdata.NetworkHierarchyAllTypes
 import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
 import com.zepben.cimbend.network.NetworkService
+import com.zepben.cimbend.network.NetworkServiceComparator
+import com.zepben.cimbend.network.model.toPb
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger
 import com.zepben.protobuf.nc.*
 import com.zepben.testutils.exception.ExpectException.expect
@@ -195,6 +203,242 @@ internal class NetworkConsumerClientTest {
         verify(stub).getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
     }
 
+    @Test
+    internal fun `can get feeder`() {
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService)
+
+        val mRID = "f001"
+        val result = consumerClient.getFeeder(service, mRID)
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.result!!.mRID, equalTo(mRID))
+
+        validateFeederNetwork(service, expectedService)
+    }
+
+    @Test
+    internal fun `handles missing feeder`() {
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService)
+
+        val mRID = "f002"
+        val result = consumerClient.getFeeder(service, mRID)
+
+        verify(stub, times(1)).getIdentifiedObjects(any())
+
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.result, nullValue())
+
+        validateFeederNetwork(service, NetworkService())
+    }
+
+    @Test
+    internal fun `calls error handler when getting the feeder throws`() {
+        val expectedService = FeederNetwork.create()
+        val mRID = "f001"
+        configureFeederResponses(expectedService, validFeeder = false)
+
+        val result = consumerClient.getFeeder(service, mRID)
+
+        verify(stub, times(1)).getIdentifiedObjects(any())
+
+        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat(result.thrown!!.message, equalTo("validFeeder"))
+    }
+
+    @Test
+    internal fun `throws unhandled exceptions when getting the feeder throws`() {
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService, validFeeder = false)
+
+        consumerClient.removeErrorHandler(onErrorHandler)
+
+        val mRID = "f001"
+        expect { consumerClient.getFeeder(service, mRID) }
+            .toThrow(java.lang.Exception::class.java)
+            .withMessage("validFeeder")
+
+        verify(stub, times(1)).getIdentifiedObjects(any())
+    }
+
+    @Test
+    internal fun `calls error handler when getting the feeder equipment throws`() {
+        val expectedService = FeederNetwork.create()
+        val mRID = "f001"
+        configureFeederResponses(expectedService, validEquipment = false)
+
+        val result = consumerClient.getFeeder(service, mRID)
+
+        verify(stub, times(2)).getIdentifiedObjects(any())
+
+        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat(result.thrown!!.message, equalTo("validEquipment"))
+    }
+
+    @Test
+    internal fun `throws unhandled exceptions when getting the feeder equipment throws`() {
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService, validEquipment = false)
+
+        consumerClient.removeErrorHandler(onErrorHandler)
+
+        val mRID = "f001"
+        expect { consumerClient.getFeeder(service, mRID) }
+            .toThrow(java.lang.Exception::class.java)
+            .withMessage("validEquipment")
+
+        verify(stub, times(2)).getIdentifiedObjects(any())
+    }
+
+
+    @Test
+    internal fun `calls error handler when getting the feeder substation throws`() {
+        val expectedService = FeederNetwork.create()
+        val mRID = "f001"
+        configureFeederResponses(expectedService, validSubstation = false)
+
+        val result = consumerClient.getFeeder(service, mRID)
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+
+        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat(result.thrown!!.message, equalTo("validSubstation"))
+    }
+
+    @Test
+    internal fun `throws unhandled exceptions when getting the feeder substation throws`() {
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService, validSubstation = false)
+
+        consumerClient.removeErrorHandler(onErrorHandler)
+
+        val mRID = "f001"
+        expect { consumerClient.getFeeder(service, mRID) }
+            .toThrow(java.lang.Exception::class.java)
+            .withMessage("validSubstation")
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+    }
+
+    @Test
+    internal fun `calls error handler when getting the feeder equipment connectivity throws`() {
+        val expectedService = FeederNetwork.create()
+        val mRID = "f001"
+        configureFeederResponses(expectedService, validConnectivityNode = false)
+
+        val result = consumerClient.getFeeder(service, mRID)
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+
+        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat(result.thrown!!.message, equalTo("validConnectivityNode"))
+    }
+
+    @Test
+    internal fun `throws unhandled exceptions when getting the feeder equipment connectivity throws`() {
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService, validConnectivityNode = false)
+
+        consumerClient.removeErrorHandler(onErrorHandler)
+
+        val mRID = "f001"
+        expect { consumerClient.getFeeder(service, mRID) }
+            .toThrow(java.lang.Exception::class.java)
+            .withMessage("validConnectivityNode")
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+    }
+
+    @Test
+    internal fun `calls error handler when getting the feeder equipment location throws`() {
+        val expectedService = FeederNetwork.create()
+        val mRID = "f001"
+        configureFeederResponses(expectedService, validLocation = false)
+
+        val result = consumerClient.getFeeder(service, mRID)
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+
+        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat(result.thrown!!.message, equalTo("validLocation"))
+    }
+
+    @Test
+    internal fun `throws unhandled exceptions when getting the feeder equipment location throws`() {
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService, validLocation = false)
+
+        consumerClient.removeErrorHandler(onErrorHandler)
+
+        val mRID = "f001"
+        expect { consumerClient.getFeeder(service, mRID) }
+            .toThrow(java.lang.Exception::class.java)
+            .withMessage("validLocation")
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+    }
+
+    @Test
+    internal fun `calls error handler when getting the feeder equipment wire info throws`() {
+        val expectedService = FeederNetwork.create()
+        val mRID = "f001"
+        configureFeederResponses(expectedService, validWireInfo = false)
+
+        val result = consumerClient.getFeeder(service, mRID)
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+
+        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat(result.thrown!!.message, equalTo("validWireInfo"))
+    }
+
+    @Test
+    internal fun `throws unhandled exceptions when getting the feeder equipment wire info throws`() {
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService, validWireInfo = false)
+
+        consumerClient.removeErrorHandler(onErrorHandler)
+
+        val mRID = "f001"
+        expect { consumerClient.getFeeder(service, mRID) }
+            .toThrow(java.lang.Exception::class.java)
+            .withMessage("validWireInfo")
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+    }
+
+    @Test
+    internal fun `calls error handler when getting the feeder equipment sequence info throws`() {
+        val expectedService = FeederNetwork.create()
+        val mRID = "f001"
+        configureFeederResponses(expectedService, validPerLengthSequenceInformation = false)
+
+        val result = consumerClient.getFeeder(service, mRID)
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+
+        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat(result.thrown!!.message, equalTo("validPerLengthSequenceInformation"))
+    }
+
+    @Test
+    internal fun `throws unhandled exceptions when getting the feeder equipment sequence info throws`() {
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService, validPerLengthSequenceInformation = false)
+
+        consumerClient.removeErrorHandler(onErrorHandler)
+
+        val mRID = "f001"
+        expect { consumerClient.getFeeder(service, mRID) }
+            .toThrow(java.lang.Exception::class.java)
+            .withMessage("validPerLengthSequenceInformation")
+
+        verify(stub, times(3)).getIdentifiedObjects(any())
+    }
+
     private fun forEachBuilder(obj: Any, action: (Any) -> Unit) {
         obj::class.declaredMemberFunctions
             .asSequence()
@@ -283,6 +527,111 @@ internal class NetworkConsumerClientTest {
 
             comparator(it, expected!!)
         }
+    }
+
+    private fun configureFeederResponses(
+        expectedService: NetworkService,
+        validFeeder: Boolean = true,
+        validSubstation: Boolean = true,
+        validEquipment: Boolean = true,
+        validConnectivityNode: Boolean = true,
+        validLocation: Boolean = true,
+        validWireInfo: Boolean = true,
+        validPerLengthSequenceInformation: Boolean = true
+    ) {
+        doAnswer {
+            val request = it.getArgument<GetIdentifiedObjectsRequest>(0)
+            val objects = mutableListOf<IdentifiedObject>()
+            request.mridsList.forEach { mRID ->
+                expectedService.get<IdentifiedObject>(mRID)?.let { identifiedObject ->
+                    if ((identifiedObject is Feeder) && !validFeeder)
+                        throw throw Exception("validFeeder")
+                    else if ((identifiedObject is Substation) && !validSubstation)
+                        throw throw Exception("validSubstation")
+                    else if ((identifiedObject is Equipment) && !validEquipment)
+                        throw throw Exception("validEquipment")
+                    else if ((identifiedObject is ConnectivityNode) && !validConnectivityNode)
+                        throw throw Exception("validConnectivityNode")
+                    else if ((identifiedObject is Location) && !validLocation)
+                        throw throw Exception("validLocation")
+                    else if ((identifiedObject is WireInfo) && !validWireInfo)
+                        throw throw Exception("validWireInfo")
+                    else if ((identifiedObject is PerLengthSequenceImpedance) && !validPerLengthSequenceInformation)
+                        throw throw Exception("validPerLengthSequenceInformation")
+                    else
+                        objects.add(identifiedObject)
+                }
+            }
+            responseOf(objects)
+        }
+            .`when`(stub)
+            .getIdentifiedObjects(any())
+    }
+
+    private fun responseOf(objects: List<IdentifiedObject>): MutableIterator<GetIdentifiedObjectsResponse> {
+        val responses = mutableListOf<GetIdentifiedObjectsResponse>()
+        objects.forEach {
+            val response = GetIdentifiedObjectsResponse.newBuilder()
+            val objectGroupBuilder = response.objectGroupBuilder
+            val identifiedObjectBuilder = objectGroupBuilder.identifiedObjectBuilder
+
+            when (it) {
+                is CableInfo -> identifiedObjectBuilder.cableInfo = it.toPb()
+                is ConductingEquipment -> {
+                    it.terminals.forEach { terminal ->
+                        val terminalBuilder = NetworkIdentifiedObject.newBuilder()
+                        terminalBuilder.terminal = terminal.toPb()
+                        objectGroupBuilder.addOwnedIdentifiedObject(terminalBuilder)
+                    }
+
+                    when (it) {
+                        is AcLineSegment -> identifiedObjectBuilder.acLineSegment = it.toPb()
+                        is Breaker -> identifiedObjectBuilder.breaker = it.toPb()
+                        is EnergySource -> {
+                            it.phases.forEach { phase ->
+                                val phaseBuilder = NetworkIdentifiedObject.newBuilder()
+                                phaseBuilder.energySourcePhase = phase.toPb()
+                                objectGroupBuilder.addOwnedIdentifiedObject(phaseBuilder)
+                            }
+                            identifiedObjectBuilder.energySource = it.toPb()
+                        }
+                        is Junction -> identifiedObjectBuilder.junction = it.toPb()
+                        is PowerTransformer -> {
+                            it.ends.forEach { end ->
+                                val endBuilder = NetworkIdentifiedObject.newBuilder()
+                                endBuilder.powerTransformerEnd = end.toPb()
+                                objectGroupBuilder.addOwnedIdentifiedObject(endBuilder)
+                            }
+                            identifiedObjectBuilder.powerTransformer = it.toPb()
+                        }
+                        else -> throw Exception("Missing class in create response: ${it.typeNameAndMRID()}")
+                    }
+                }
+                is ConnectivityNode -> identifiedObjectBuilder.connectivityNode = it.toPb()
+                is Feeder -> identifiedObjectBuilder.feeder = it.toPb()
+                is Location -> identifiedObjectBuilder.location = it.toPb()
+                is OverheadWireInfo -> identifiedObjectBuilder.overheadWireInfo = it.toPb()
+                is PerLengthSequenceImpedance -> identifiedObjectBuilder.perLengthSequenceImpedance = it.toPb()
+                is Substation -> identifiedObjectBuilder.substation = it.toPb()
+                else -> throw Exception("Missing class in create response: ${it.typeNameAndMRID()}")
+            }
+
+            identifiedObjectBuilder.build()
+            objectGroupBuilder.build()
+            responses.add(response.build())
+        }
+        return responses.iterator()
+    }
+
+    private fun validateFeederNetwork(actual: NetworkService?, expectedService: NetworkService) {
+        assertThat(actual, notNullValue())
+        val differences = NetworkServiceComparator().compare(actual!!, expectedService)
+
+        println(differences)
+
+        assertThat("missing from source", differences.missingFromSource(), empty())
+        assertThat("missing from target", differences.missingFromTarget(), empty())
+        assertThat("has differences", differences.modifications().entries, empty())
     }
 
 }

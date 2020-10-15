@@ -112,7 +112,7 @@ object PowerTransformersWithEndsNetwork {
         networkService.connect(c4.getTerminal(2)!!, tx.getTerminal(1)!!)
         networkService.connect(c5.getTerminal(1)!!, tx.getTerminal(2)!!)
 
-        createFeeder(networkService, substation, "f", "f", fsp)
+        createFeeder(networkService, "f", "f", substation, fsp)
         return networkService
     }
 }

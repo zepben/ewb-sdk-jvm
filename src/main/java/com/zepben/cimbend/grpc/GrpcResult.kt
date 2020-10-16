@@ -20,9 +20,9 @@ package com.zepben.cimbend.grpc
 
 /**
  * The result of a gRPC call.
- * @property wasSuccessful Indicates how the call was resolved without error
- * @property result The result of the call if [wasSuccessful] is true, otherwise null.
- * @property thrown Positive sequence shunt (charging) conductance per section
+ * @property wasSuccessful Indicates if the call was resolved without error
+ * @property result The result of the call if [wasSuccessful] is true, otherwise null. The result may still be null even if successful.
+ * @property thrown The exception that was caught if [wasSuccessful] is false, otherwise null.
  */
 data class GrpcResult<T>(
     val wasSuccessful: Boolean,

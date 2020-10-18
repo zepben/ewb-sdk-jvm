@@ -49,6 +49,10 @@ TODO
 
 ## Network Hierarchy
 
+The network can be built with a hierarchy as discussed earlier [here](datamodel.mdx#network-hierarchy). This allows you
+to easily identify and request smaller chunks of the network so you can focus on areas of concern. Here is an example
+of how to request the network hierarchy and print it out as a tree to the console.
+
 <Tabs
     groupId="code-example"
     defaultValue="java"
@@ -60,21 +64,62 @@ TODO
 <TabItem value="java">
 
 ```java
-TODO
+void printNetworkHierarchy(NetworkConsumerClient client) {
+    NetworkHierarchy hierarchy = client.getNetworkHierarchy().getResult();
+    if (hierarchy == null)
+        return;
+
+    hierarchy.getGeographicalRegions().values().forEach(region -> {
+        System.out.println(String.format("- %s [%s]", region.getName(), region.getMRID()));
+        region.getSubGeographicalRegions().values().forEach(subRegion -> {
+            System.out.println(String.format("  |- %s [%s]", subRegion.getName(), subRegion.getMRID()));
+            subRegion.getSubstations().values().forEach(substation -> {
+                System.out.println(String.format("    |- %s [%s]", substation.getName(), substation.getMRID()));
+                substation.getFeeders().values().forEach(feeder -> {}
+                    System.out.println(String.format("      |- %s [%s]", feeder.getName(), feeder.getMRID()));
+                });
+            });
+        });
+    });
+}
 ```
 
 </TabItem>
 <TabItem  value="kotlin">
 
 ```kotlin
-TODO
+fun printNetworkHierarchy(client: NetworkConsumerClient) {
+    val hierarchy: NetworkHierarchy = client.getNetworkHierarchy().result ?: return
+    hierarchy.geographicalRegions.values.forEach { region ->
+        println("- ${region.name} [${region.mRID}]")
+        region.subGeographicalRegions.values.forEach { subRegion ->
+            println("  |- ${subRegion.name} [${subRegion.mRID}]")
+            subRegion.substations.values.forEach { substation ->
+                println("    |- ${substation.name} [${substation.mRID}]")
+                substation.feeders.values.forEach { feeder ->
+                    println("      |- ${feeder.name} [${feeder.mRID}]")
+                }
+            }
+        }
+    }
+}
 ```
 
 </TabItem>
 </Tabs>
 
+Each item from the hierarchy result contains an identified object MRID and it's name. This simplified data structure
+enables you to do things like easily build a suitable UI component allowing a user to select a portion of the network
+they wish to use, without needing to pull back large amount of full object data.
 
 ## Requesting Identififed Objects
+
+Identified objects can be requested to build a model client side. When identified objects are loaded, any referenced 
+objects that have not been previously requested need to be requested explicitly. The exception to this is terminals 
+are always sent with their conducting equipment and transformer ends are always sent with transformers.
+
+To find the MRIDs of any references that need to be requested you can use the [deferred reference](services.mdx#deferred-references) 
+functions on the service provided when requesting identified objects.
 
 <Tabs
     groupId="code-example"
@@ -87,14 +132,32 @@ TODO
 <TabItem value="java">
 
 ```java
-TODO
+void getWithBaseVoltage(NetworkService service, NetworkConsumerClient client, String mrid) {
+    IdentifiedObject equipment = client.getIdentifiedObject(service, mrid).getResult();
+    if (equipment == null || !(equipment instanceof ConductingEquipment)) {
+        return;
+    }
+    
+    Set<String> mrids = service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(equipment));
+    if (!mrids.isEmpty()) {
+        client.getIdentifiedObject(service, mrids.iterator().next());
+    }
+}
 ```
 
 </TabItem>
 <TabItem  value="kotlin">
 
 ```kotlin
-TODO
+fun getWithBaseVoltage(service: NetworkService, client: NetworkConsumerClient, mrid: String) {
+    val equipment = client.getIdentifiedObject(service, mrid).result
+    if (equipment == null || equipment !is ConductingEquipment) {
+        return
+    }
+
+    service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(equipment)).firstOrNull()
+        ?.let { client.getIdentifiedObject(service, it) }
+}
 ```
 
 </TabItem>

@@ -344,7 +344,7 @@ function. This function will:
 - If the reference MRID is not added to the service, the request to resolve the reference is chached. When an object 
   with the referenced MRID is eventually added to the service, the reference is resolved at this time. 
 
-Let's see with a simple example:
+Unresolved references can also be queried back out of the service. Let's see all with a simple example:
 
 <Tabs
     groupId="code-example"
@@ -374,9 +374,11 @@ Junction junction = new Junction();
 service.resolveOrDeferReference(Resolvers.equipment(feeder), junction.getMRID());
 System.out.println(feeder.getEquipment().contains(junction)); // false
 
+// We can query the unresolved reference MRIDs back out of the service
+System.out.println(service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder))); // [junction]
+
 // When the object with the deferred MRID is added, the reference gets resolved
 service.add(junction)
-service.resolveOrDeferReference(Resolvers.equipment(feeder), junction.getMRID());
 System.out.println(feeder.getEquipment().contains(junction)) // true
 ```
 
@@ -401,9 +403,11 @@ val junction = Junction()
 service.resolveOrDeferReference(Resolvers.equipment(feeder), junction.mRID)
 println(feeder.equipment.contains(junction)) // false
 
+// We can query the unresolved reference MRIDs back out of the service
+println(service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder))) // [junction]
+
 // When the object with the deferred MRID is added, the reference gets resolved
 service.add(junction)
-service.resolveOrDeferReference(Resolvers.equipment(feeder), junction.mRID)
 println(feeder.equipment.contains(junction)) // true
 ```
 

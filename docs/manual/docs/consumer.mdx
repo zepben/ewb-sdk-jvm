@@ -1,0 +1,101 @@
+---
+id: sdk-consumer
+title: Requesting Models
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+:::warning
+The API for consuming data from the Evolve data server is currently in alpha and very likely to experience breaking changes 
+in the future. Please provide any feedback about this API to [Zepben](www.zepben.com).
+:::
+
+The SDK provides a client to request models to a remote data server via [gRPC](https://grpc.io/). The service and proto 
+definitions for this API can be found [here](https://github.com/zepben/evolve-grpc). An implementation of the consumer 
+server is provided with the Evolve platform data services.
+
+When working with models, it is often impractical to load a whole model to a client due to the size of the data. This 
+is generally not a problem however, as most use cases only operate on a small subsection of the model at a time. So, the 
+consumer API provides the ability to request smaller portions of the model quickly and easily. The other benefit to this
+is you can set up many clients in parallel operating on different chunks of the model to reduce the amount of time to
+run any analytics you may wish to perform across the whole model.
+
+## Connecting to a server
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+TODO
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+TODO
+```
+
+</TabItem>
+</Tabs>
+
+## Network Hierarchy
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+TODO
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+TODO
+```
+
+</TabItem>
+</Tabs>
+
+
+## Requesting Identififed Objects
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+TODO
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+TODO
+```
+
+</TabItem>
+</Tabs>

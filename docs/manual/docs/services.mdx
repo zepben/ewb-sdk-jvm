@@ -1,0 +1,433 @@
+---
+id: sdk-services
+title: CIM Services
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Now that you are able to create a data model, you need something to manage the objects.
+This is where we provide a set of classes, which we call services, to do this.
+
+The services basically act as a container for your model. However, they provide some features which make it much nicer
+to use than a typical map / dictionary type data container to store your identified objects. The SDK provides the
+following services
+
+* NetworkService
+* CustomerService
+* DiagramService
+
+Each of these services manage a specific subset of identified objects. This subset will hopefully be somewhat obvious
+based on the name of each service. If you would like to know why there a multiple services for different objects types
+you can read more about it [here](#why-multiple-services).
+
+## Common Service functionality
+
+Because services work with [identified objects](https://zepben.bitbucket.io/cim/cim100/iec61970/base/core/identifiedobject/)
+they can provide some common level of functionality. This functionality can be found in the base class `BaseService`.
+
+### Adding and Removing Objects
+
+As the different services support different subsets of identified objects, you can only add objects directly to a concrete
+service reference. However, sometimes you wish to write some code that works with a set of different objects that are all supported
+by the one service. For example you might have some code that works only on `ConductingEquipment` and you want add or remove
+these objects. Instead of having to cast to their derived type just to add/remove, `tryAdd` and `tryRemove` functions
+are provided that accept any identified object. These functions will do the grunt work and call the appropriate concrete
+add/remove functions on the service. If the service does not support the provided identified object an exception is thrown.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+NetworkService service = new NetworkService();
+
+Breaker breaker = new Breaker();
+service.add(breaker);
+
+// If you don't have a reference to a leaf type, you can use the tryAdd function.
+// However this will throw if the service doesn't support the object type.
+IdentifiedObject idObjRef = new Junction();
+service.tryAdd(idObjRef);
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val service = NetworkService()
+
+val breaker = Breaker()
+service.add(breaker)
+
+// If you don't have a reference to a leaf type, you can use the tryAdd function.
+// However this will throw if the service doesn't support the object type.
+val idObjRef: IdentifiedObject = Junction()
+service.tryAdd(idObjRef)
+```
+
+</TabItem>
+</Tabs>
+
+### Object Retrieval
+
+There are a few ways we provide to get objects back out of a service. The most obvious one is by MRID:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+NetworkService service = NetworkService();
+service.add(new Breaker("breaker1"));
+Breaker breaker = service.get("breaker1", Breaker.class)
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val service = NetworkService()
+service.add(Breaker("breaker1"))
+val breaker = service.get<Breaker>("breaker1")
+```
+
+</TabItem>
+</Tabs>
+
+You can also get collections of objects back out of the service. The power here is you can get objects from anywhere
+in the CIM class hierarchy. Due to the internal data structures used by the services, using these functions is more
+efficient than looping over all objects in the service and checking if they are of the required type.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+NetworkService service = new NetworkService()
+
+service.add(new Breaker())
+service.add(new Junction())
+
+// All the following will contain both the breaker and the junction added to the service.
+service.sequenceOf(ConductingEquipment.class)
+service.listOf(ConductingEquipment.class)
+service.setOf(ConductingEquipment.class)
+
+// This creates a map of MRID to the Identified Object
+service.mapOf(ConductingEquipment.class)
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val service = NetworkService()
+
+service.add(Breaker())
+service.add(Junction())
+
+// All the following will contain both the breaker and the junction added to the service.
+service.sequenceOf<ConductingEquipment>()
+service.listOf<ConductingEquipment>()
+service.setOf<ConductingEquipment>()
+
+// This creates a map of MRID to the Identified Object
+service.mapOf<ConductingEquipment>()
+```
+
+</TabItem>
+</Tabs>
+
+## Network Service
+
+The network service works with objects related to the physical asset model. That means all
+[PowerSystemResource](https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/powersystemresource/) types, but also
+data related types such as [AssetInfo](https://zepben.bitbucket.io/cim/evolve/iec61968/assets/assetinfo/) and
+[Location](https://zepben.bitbucket.io/cim/evolve/iec61968/common/location/).
+
+The network service also generates an index between power system resources and terminals and their corresponding
+measurements. When you add a [Measurement](https://zepben.bitbucket.io/cim/evolve/iec61970/base/meas/measurement/)
+to the service, it indexes it against the `powerSystemResourceMRID` or the `terminalMRID` associated with the measurement.
+You can then get all measurements associated with a power system resource or a terminal via its MRID via the lookup on
+the service:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+NetworkService service = NetworkService();
+
+Analog amps = new Analog();
+amps.setPowerSystemResourceMRID("ASWITCH");
+
+Accumulator count = Accumulator();
+count.setPowerSystemResourceMRID("ASWITCH");
+
+service.add(amps);
+service.add(count);
+
+// Gets both the analog and the accumulator
+service.getMeasurements("ASWITCH", Measurement.class);
+
+// Will get just the analog
+service.getMeasurements("ASWITCH", Analog.class);
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val service = NetworkService()
+
+val amps = Analog().apply { powerSystemResourceMRID = "ASWITCH" }
+val count = Accumulator().apply { powerSystemResourceMRID = "ASWITCH" }
+
+service.add(amps)
+service.add(count)
+
+// Gets both the analog and the accumulator
+service.getMeasurements<Measurement>("ASWITCH")
+
+// Will get just the analog
+service.getMeasurements<Analog>("ASWITCH")
+```
+
+</TabItem>
+</Tabs>
+
+Note if you change the `powerSystemResourceMRID` or `terminalMRID` set on the measurement after it has been added to the
+service, it is not re-indexed automatically. Currently you need to to remove the measurement and re-add it to the service.
+However this should rarely be an issue as a measurement is unlikely to ever change the device it is measuring, so as long
+as the association is set before adding to the service it is unlikely to be a problem.
+
+## Customer Service
+
+The customer service work with objects related to customers and their agreements they may have with actors in the
+network. At this point in time it provides no further specialised functionality.
+
+## Diagram Service
+
+The diagram service work with objects related to diagrams associated with identified objects.
+It also provides a lookup to be able to get the
+[DiagramObjects](https://zepben.bitbucket.io/cim/evolve/iec61970/base/diagramlayout/diagramobject/) associated with any
+identified object. Specifically:
+- If the MRID is a diagram object, a list with just the diagram object is returned.
+- If the MRID is a [Digram](https://zepben.bitbucket.io/cim/evolve/iec61970/base/diagramlayout/diagram/) all diagram
+  objects belonging to that diagram are returned.
+- If the MRID is any other identified object, the diagram objects for that identified objects are returned.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+DiagramService service = new DiagramService();
+
+Diagram aDiagram = new Diagram();
+
+DiagramObject do1 = DiagramObject();
+do1.setDiagram(aDiagram);
+do1.identifiedObjectMRID = "aSwitch";
+aDiagram.addDiagramObject(this);
+
+DiagramObject do2 = DiagramObject();
+do2.setDiagram(aDiagram);
+do2.identifiedObjectMRID = "aSwitch";
+aDiagram.addDiagramObject(this);
+
+DiagramObject do3 = DiagramObject();
+do3.setDiagram(aDiagram);
+do3.identifiedObjectMRID = "aSwitch";
+aDiagram.addDiagramObject(this);
+
+service.add(do1)
+service.add(do2)
+service.add(do3)
+
+// Contains [do1]
+service.getDiagramObjects(do1.mRID)
+
+// Contains [do1, do2, do3]
+service.getDiagramObjects(aDiagram.mRID)
+
+// Contains [do1, do2]
+service.getDiagramObjects("aSwitch")
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val service = DiagramService()
+
+val aDiagram = Diagram()
+
+val do1 = DiagramObject().apply {
+    diagram = aDiagram
+    identifiedObjectMRID = "aSwitch"
+    aDiagram.addDiagramObject(this)
+}
+
+val do2 = DiagramObject().apply {
+    diagram = aDiagram
+    identifiedObjectMRID = "aSwitch"
+    aDiagram.addDiagramObject(this)
+}
+
+val do3 = DiagramObject().apply {
+    diagram = aDiagram
+    aDiagram.addDiagramObject(this)
+}
+
+service.add(do1)
+service.add(do2)
+service.add(do3)
+
+// Contains [do1]
+service.getDiagramObjects(do1.mRID)
+
+// Contains [do1, do2, do3]
+service.getDiagramObjects(aDiagram.mRID)
+
+// Contains [do1, do2]
+service.getDiagramObjects("aSwitch")
+```
+
+</TabItem>
+</Tabs>
+
+This works by indexing the `identifiedObjectMRID` when the diagram object is added to the service. Note however,
+that setting the `identifiedObjectMRID` after the diagram object is added will not cause it to be re-indexed automatically.
+Currently you need to to remove the diagram object and re-add it to the service.
+This should rarely be an issue however, as a diagram object is unlikely to ever change the identified object it is
+representing, so as long as it is set before adding it to the service it is unlikely to be a problem.
+
+## Deferred References
+
+When creating an object to include in the model, you will often not have all referenced objects constructed, not have
+all the information to construct a reference immediately, or not have a reference handy to use. However, you will 
+generally have the MRID of any referenced objects. To deal with this, the services provide a `resolveOrDeferReference` 
+function. This function will:
+- Resolve a reference immediately (in both direcitons is applicable) if the reference MRID object is already added to the service. 
+- If the reference MRID is not added to the service, the request to resolve the reference is chached. When an object 
+  with the referenced MRID is eventually added to the service, the reference is resolved at this time. 
+
+Let's see with a simple example:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+NetworkService service = new NetworkService();
+
+Feeder feeder = new Feeder();
+service.add(feeder)
+
+Breaker switch = new Breaker();
+service.add(switch);
+
+// As the switch is already added to the service, this will be resolved immediately.
+service.resolveOrDeferReference(Resolvers.equipment(feeder), switch.getMRID());
+System.out.println(feeder.getEquipment().contains(switch)); // true
+
+// Now if we try and resolve something not added it will be deferred
+Junction junction = new Junction();
+service.resolveOrDeferReference(Resolvers.equipment(feeder), junction.getMRID());
+System.out.println(feeder.getEquipment().contains(junction)); // false
+
+// When the object with the deferred MRID is added, the reference gets resolved
+service.add(junction)
+service.resolveOrDeferReference(Resolvers.equipment(feeder), junction.getMRID());
+System.out.println(feeder.getEquipment().contains(junction)) // true
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val service = NetworkService()
+
+val feeder = Feeder()
+service.add(feeder)
+
+val switch = Breaker()
+service.add(switch)
+
+// As the switch is already added to the service, this will be resolved immediately.
+service.resolveOrDeferReference(Resolvers.equipment(feeder), switch.mRID)
+println(feeder.equipment.contains(switch)) // true
+
+// Now if we try and resolve something not added it will be deferred
+val junction = Junction()
+service.resolveOrDeferReference(Resolvers.equipment(feeder), junction.mRID)
+println(feeder.equipment.contains(junction)) // false
+
+// When the object with the deferred MRID is added, the reference gets resolved
+service.add(junction)
+service.resolveOrDeferReference(Resolvers.equipment(feeder), junction.mRID)
+println(feeder.equipment.contains(junction)) // true
+```
+
+</TabItem>
+</Tabs>
+
+
+----
+
+#### Why multiple services?
+
+You might be asking "Why not just one service for all identified objects?". Admittedly, just having one would be easier
+to work with. However, as models can become large, having every object in a single service (and thus process) will mean
+you need an ever increasing amount of RAM in your system. What we have done is separated out parts of the
+data model into separate concerns, at what we feel are sensible boundary points. That is:
+
+* The network service deals with models of the physical electricity network.
+* The customer service deals with customers and their agreements with electricity providers
+(e.g their [Tariff](https://zepben.bitbucket.io/cim/evolve/iec61968/customers/tariff/)).
+* The diagram service deals with things related to representing networks as diagrams
+(see [Diagram](https://zepben.bitbucket.io/cim/evolve/iec61970/base/diagramlayout/diagram/) and
+ [DiagramObject](https://zepben.bitbucket.io/cim/evolve/iec61970/base/diagramlayout/diagramobject/)).
+* Once the platform supports measurement values, these values will be retreived via a separate service rather than
+  directly from measurement objects.
+
+Ultimately there is a tradeoff between developer usability and model size feasibility. Hopefully you will find this
+is a reasonable trade off when working with large systems.

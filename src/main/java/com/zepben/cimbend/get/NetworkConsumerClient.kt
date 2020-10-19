@@ -126,7 +126,7 @@ class NetworkConsumerClient(
 
             validateRpcCall(getIdentifiedObjects(service, service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder))))
 
-            val mRIDs = mutableSetOf(*service.getUnresolvedReferenceMrids(Resolvers.normalEnergizingSubstation(feeder)).toTypedArray())
+            val mRIDs = service.getUnresolvedReferenceMrids(Resolvers.normalEnergizingSubstation(feeder)).toMutableSet()
 
             feeder.equipment.forEach {
                 if (it is ConductingEquipment) {

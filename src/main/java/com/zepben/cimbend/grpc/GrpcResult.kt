@@ -25,21 +25,32 @@ package com.zepben.cimbend.grpc
  * @property thrown The exception that was caught if [wasSuccessful] is false, otherwise null.
  */
 data class GrpcResult<T>(
-    val wasSuccessful: Boolean,
     val result: T?,
     val thrown: Throwable?
 ) {
+    val wasSuccessful: Boolean get() = thrown == null
+
+    inline fun onSuccess(handler: (result: T?) -> Unit): GrpcResult<T> {
+        if (wasSuccessful)
+            handler.invoke(result)
+        return this
+    }
+
+    inline fun onError(handler: (thrown: Throwable) -> Unit): GrpcResult<T> {
+        thrown?.let(handler)
+        return this
+    }
 
     companion object {
 
         @JvmStatic
         fun <T> of(result: T?): GrpcResult<T> {
-            return GrpcResult(true, result, null)
+            return GrpcResult(result, null)
         }
 
         @JvmStatic
         fun <T> ofError(thrown: Throwable): GrpcResult<T> {
-            return GrpcResult(false, null, thrown)
+            return GrpcResult(null, thrown)
         }
 
     }

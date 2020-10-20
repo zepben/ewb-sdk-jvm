@@ -110,49 +110,44 @@ class NetworkConsumerClient(
      * the terminals of all elements, the connectivity between terminals, the locations of all elements, the ends of all transformers
      * and the wire info for all conductors.
      *
-     * @return The [Feeder], or null if it was nto found.
+     * @return The [Feeder], or null if it was not found.
      */
     fun getFeeder(service: NetworkService, mRID: String): GrpcResult<Feeder> {
-        return tryRpc {
-            val feederResponse = getIdentifiedObject(service, mRID)
-            val feeder = feederResponse.result
+        val feederResponse = getIdentifiedObject(service, mRID)
+        val feeder = feederResponse
+            .onError { return@getFeeder GrpcResult.ofError(it) }
+            .result
 
-            if (!feederResponse.wasSuccessful)
-                throw feederResponse.thrown!!
-            else if (feeder == null)
-                return@tryRpc GrpcResult.of(null)
-            else if (feeder !is Feeder)
-                throw ClassCastException("Unable to extract feeder network from ${feeder.typeNameAndMRID()}.")
+        if (feeder == null)
+            return GrpcResult.of(null)
+        else if (feeder !is Feeder)
+            return GrpcResult.ofError(ClassCastException("Unable to extract feeder network from ${feeder.typeNameAndMRID()}."))
 
-            validateRpcCall(getIdentifiedObjects(service, service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder))))
+        getIdentifiedObjects(service, service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder)))
+            .onError { return@getFeeder GrpcResult.ofError(it) }
 
-            val mRIDs = service.getUnresolvedReferenceMrids(Resolvers.normalEnergizingSubstation(feeder)).toMutableSet()
+        val mRIDs = service.getUnresolvedReferenceMrids(Resolvers.normalEnergizingSubstation(feeder)).toMutableSet()
 
-            feeder.equipment.forEach {
-                if (it is ConductingEquipment) {
-                    it.terminals.forEach { terminal ->
-                        mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.connectivityNode(terminal)))
-                    }
+        feeder.equipment.forEach {
+            if (it is ConductingEquipment) {
+                it.terminals.forEach { terminal ->
+                    mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.connectivityNode(terminal)))
                 }
-
-                if (it is Conductor) {
-                    if (it is AcLineSegment)
-                        mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.perLengthSequenceImpedance(it)))
-                    mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.assetInfo(it)))
-                }
-
-                mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.location(it)))
             }
 
-            validateRpcCall(getIdentifiedObjects(service, mRIDs))
+            if (it is Conductor) {
+                if (it is AcLineSegment)
+                    mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.perLengthSequenceImpedance(it)))
+                mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.assetInfo(it)))
+            }
 
-            GrpcResult.of(feeder)
+            mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.location(it)))
         }
-    }
 
-    private fun <T> validateRpcCall(response: GrpcResult<T>) {
-        if (!response.wasSuccessful)
-            throw response.thrown!!
+        getIdentifiedObjects(service, mRIDs)
+            .onError { return@getFeeder GrpcResult.ofError(it) }
+
+        return GrpcResult.of(feeder)
     }
 
     private fun processIdentifiedObjects(service: NetworkService, request: GetIdentifiedObjectsRequest): Sequence<IdentifiedObject?> {

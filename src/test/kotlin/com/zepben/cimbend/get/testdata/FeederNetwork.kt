@@ -1,0 +1,79 @@
+/*
+ * Copyright 2020 Zeppelin Bend Pty Ltd
+ * This file is part of evolve-sdk-jvm.
+ *
+ * evolve-sdk-jvm is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evolve-sdk-jvm is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with evolve-sdk-jvm.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.zepben.cimbend.get.testdata
+
+import com.zepben.cimbend.cim.iec61968.common.Location
+import com.zepben.cimbend.cim.iec61968.common.PositionPoint
+import com.zepben.cimbend.cim.iec61970.base.core.PhaseCode
+import com.zepben.cimbend.cim.iec61970.base.core.PowerSystemResource
+import com.zepben.cimbend.network.NetworkService
+import com.zepben.cimbend.network.tracing.Tracing
+import com.zepben.cimbend.testdata.TestDataCreators.*
+
+object FeederNetwork {
+    //             c1       c2
+    // source-fcb------fsp------tx
+    //
+    fun create(): NetworkService {
+        val networkService = NetworkService()
+
+        val source = createSourceForConnecting(networkService, "source", 1, PhaseCode.AB)
+        val fcb = createSwitchForConnecting(networkService, "fcb", 2, PhaseCode.AB)
+        val fsp = createNodeForConnecting(networkService, "fsp", 2, PhaseCode.AB)
+        val tx = createPowerTransformerForConnecting(networkService, "tx", 2, PhaseCode.AB, 0, 0)
+
+        val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.AB)
+        val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.AB)
+
+        val substation = createSubstation(networkService, "f", "f", null)
+        createFeeder(networkService, "f001", "f001", substation, fsp)
+
+        createEnd(networkService, tx, 22000, 1)
+        createEnd(networkService, tx, 415, 2)
+
+        addLocation(networkService, source, listOf(1.0, 1.0))
+        addLocation(networkService, fcb, listOf(1.0, 1.0))
+        addLocation(networkService, fsp, listOf(5.0, 1.0))
+        addLocation(networkService, tx, listOf(10.0, 2.0))
+        addLocation(networkService, c1, listOf(1.0, 1.0, 5.0, 1.0))
+        addLocation(networkService, c2, listOf(5.0, 1.0, 10.0, 2.0))
+
+        networkService.connect(source.getTerminal(1)!!, fcb.getTerminal(1)!!)
+        networkService.connect(fcb.getTerminal(2)!!, c1.getTerminal(1)!!)
+        networkService.connect(c1.getTerminal(2)!!, fsp.getTerminal(1)!!)
+        networkService.connect(fsp.getTerminal(2)!!, c2.getTerminal(1)!!)
+        networkService.connect(c2.getTerminal(2)!!, tx.getTerminal(1)!!)
+
+        Tracing.setPhases().run(networkService)
+        Tracing.assignEquipmentContainersToFeeders().run(networkService)
+
+        return networkService
+    }
+
+    private fun addLocation(networkService: NetworkService, psr: PowerSystemResource, coords: List<Double>) {
+        Location().apply {
+            for (i in coords.indices step 2)
+                addPoint(PositionPoint(coords[i], coords[i + 1]))
+        }.also {
+            psr.location = it
+            networkService.add(it)
+        }
+    }
+
+}

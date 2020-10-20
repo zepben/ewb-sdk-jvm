@@ -7,12 +7,10 @@
  */
 package com.zepben.cimbend.common
 
-import java.util.*
 import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.cimbend.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.cimbend.common.extensions.nameAndMRID
-import com.zepben.cimbend.common.extensions.typeNameAndMRID
-import com.zepben.cimbend.common.interop.JavaClass.toKClass
+import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Stream
 import kotlin.reflect.KClass
@@ -286,6 +284,16 @@ abstract class BaseService(
             throw IllegalStateException("$toMrid didn't match the expected class ${resolver.toClass.simpleName}. Did you re-use an mRID?: ${ex.localizedMessage}", ex)
         }
     }
+
+    /**
+     * Gets a set of MRIDs that are unresolved references via the [referenceResolver].
+     */
+    fun <T : IdentifiedObject, R : IdentifiedObject> getUnresolvedReferenceMrids(referenceResolver: ReferenceResolver<T, R>): Set<String> =
+        unresolvedReferences.values.asSequence()
+            .flatMap { it.asSequence() }
+            .filter { it.resolver == referenceResolver }
+            .map { it.toMrid }
+            .toSet()
 
     /**
      * Gets a set of MRIDs that are referenced by the [T] held by [boundResolver] that are unresolved.

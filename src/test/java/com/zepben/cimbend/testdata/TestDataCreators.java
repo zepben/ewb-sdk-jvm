@@ -209,32 +209,61 @@ public class TestDataCreators {
         return terminal;
     }
 
-    public static Substation createSubstation(NetworkService networkService, SubGeographicalRegion subGeographicalRegion, String mRID, String name) {
+    public static GeographicalRegion createGeographicalRegion(NetworkService networkService, String mRID, String name) {
+        GeographicalRegion geographicalRegion = new GeographicalRegion(mRID);
+        geographicalRegion.setName(name);
+
+        networkService.add(geographicalRegion);
+
+        return geographicalRegion;
+    }
+
+    public static SubGeographicalRegion createSubGeographicalRegion(NetworkService networkService, String mRID, String name, @Nullable GeographicalRegion geographicalRegion) {
+        SubGeographicalRegion subGeographicalRegion = new SubGeographicalRegion(mRID);
+        subGeographicalRegion.setName(name);
+
+        if (geographicalRegion != null) {
+            subGeographicalRegion.setGeographicalRegion(geographicalRegion);
+            geographicalRegion.addSubGeographicalRegion(subGeographicalRegion);
+        }
+
+        networkService.add(subGeographicalRegion);
+
+        return subGeographicalRegion;
+    }
+
+    public static Substation createSubstation(NetworkService networkService, String mRID, String name, @Nullable SubGeographicalRegion subGeographicalRegion) {
         Substation substation = new Substation(mRID);
         substation.setName(name);
-        substation.setSubGeographicalRegion(subGeographicalRegion);
 
-        subGeographicalRegion.addSubstation(substation);
+        if (subGeographicalRegion != null) {
+            substation.setSubGeographicalRegion(subGeographicalRegion);
+            subGeographicalRegion.addSubstation(substation);
+        }
+
         networkService.add(substation);
 
         return substation;
     }
 
-    public static Feeder createFeeder(NetworkService networkService, Substation substation, String mRID, String name, @Nullable ConductingEquipment feederStartPoint) {
+    public static Feeder createFeeder(NetworkService networkService, String mRID, String name, @Nullable Substation substation, @Nullable ConductingEquipment feederStartPoint) {
         Feeder feeder = new Feeder(mRID);
         feeder.setName(name);
         if (feederStartPoint != null)
             feeder.setNormalHeadTerminal(feederStartPoint.getTerminal(1));
-        feeder.setNormalEnergizingSubstation(substation);
 
-        substation.addFeeder(feeder);
+        if (substation != null) {
+            feeder.setNormalEnergizingSubstation(substation);
+            substation.addFeeder(feeder);
+        }
+
         networkService.add(feeder);
 
         return feeder;
     }
 
-    public static void createFeeder(NetworkService networkService, Substation substation, String mRID, String name, String... equipmentMRIDs) {
-        Feeder feeder = createFeeder(networkService, substation, mRID, name, networkService.get(ConductingEquipment.class, equipmentMRIDs[0]));
+    public static void createFeeder(NetworkService networkService, String mRID, String name, @Nullable Substation substation, String... equipmentMRIDs) {
+        Feeder feeder = createFeeder(networkService, mRID, name, substation, networkService.get(ConductingEquipment.class, equipmentMRIDs[0]));
 
         for (String equipmentMRID : equipmentMRIDs) {
             ConductingEquipment conductingEquipment = networkService.get(ConductingEquipment.class, equipmentMRID);

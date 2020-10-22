@@ -25,13 +25,19 @@ module.exports = {
       },
       items: [
         {
-          to: "/",
-          label: "Home",
-          position: "left"
-        },
-        {
           type: "docsVersionDropdown",
           position: "right",
+        },
+        {
+          to: "https://zepben.github.io/evolve/docs",
+          label: "Home",
+          position: "left",
+        },
+        {
+          to: "/",
+          activeBasePath: "docs",
+          label: "Docs",
+          position: "left",
         },
         {
           href: "https://github.com/zepben/evolve-sdk-jvm/",

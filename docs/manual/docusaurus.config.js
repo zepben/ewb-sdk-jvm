@@ -53,7 +53,7 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Zeppelin Bend Pty. Ltd.`,
     },
     googleAnalytics: {
-      trackingID: "TRACKING_ID",
+      trackingID: "UA-81287323-1",
       anonymizeIP: false,
     },
     algolia: {

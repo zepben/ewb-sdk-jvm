@@ -5,8 +5,8 @@ module.exports = {
   title: "Evolve SDK (JVM)",
   tagline: "",
   url: "https://zepben.github.io/evolve/sdk-jvm/",
-  baseUrl: "/evolve/sdk/",
-  onBrokenLinks: "throw",
+  baseUrl: "/evolve/docs/evolve-sdk-jvm/",
+  onBrokenLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "zepben",
   projectName: "evolve-sdk-jvm",
@@ -25,14 +25,13 @@ module.exports = {
       },
       items: [
         {
-          type: "docsVersionDropdown",
-          position: "right",
+          to: "/",
+          label: "Home",
+          position: "left"
         },
         {
-          to: "/",
-          activeBasePath: "docs",
-          label: "Docs",
-          position: "left",
+          type: "docsVersionDropdown",
+          position: "right",
         },
         {
           href: "https://github.com/zepben/evolve-sdk-jvm/",

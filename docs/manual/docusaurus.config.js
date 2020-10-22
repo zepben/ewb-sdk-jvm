@@ -57,9 +57,9 @@ module.exports = {
       anonymizeIP: false,
     },
     algolia: {
-      apiKey: "API_KEY",
-      indexName: "INDEX_NAME",
-      searchParameters: {},
+      apiKey: "bd9b85d42d37ebf66b352f07513f4d6a",
+      indexName: "evolve-docs",
+      appId: "IU0L20J0JX"
     },
     prism: {
       additionalLanguages: ['kotlin'],

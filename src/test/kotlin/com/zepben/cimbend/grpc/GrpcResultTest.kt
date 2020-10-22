@@ -28,6 +28,7 @@ internal class GrpcResultTest {
         assertThat(result.wasSuccessful, equalTo(true))
         assertThat(result.result, equalTo(1))
         assertThat(result.thrown, nullValue())
+        assertThat(result.wasHandled, equalTo(false))
     }
 
     @Test
@@ -37,16 +38,29 @@ internal class GrpcResultTest {
         assertThat(result.wasSuccessful, equalTo(true))
         assertThat(result.result, nullValue())
         assertThat(result.thrown, nullValue())
+        assertThat(result.wasHandled, equalTo(false))
     }
 
     @Test
-    internal fun canCreateErrorResult() {
+    internal fun canCreateHandledErrorResult() {
         val exception = RuntimeException()
-        val result: GrpcResult<Int> = GrpcResult.ofError(exception)
+        val result: GrpcResult<Int> = GrpcResult.ofError(exception, true)
 
         assertThat(result.wasSuccessful, equalTo(false))
         assertThat(result.result, nullValue())
         assertThat(result.thrown, equalTo(exception))
+        assertThat(result.wasHandled, equalTo(true))
+    }
+
+    @Test
+    internal fun canCreateUnhandledErrorResult() {
+        val exception = RuntimeException()
+        val result: GrpcResult<Int> = GrpcResult.ofError(exception, false)
+
+        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat(result.result, nullValue())
+        assertThat(result.thrown, equalTo(exception))
+        assertThat(result.wasHandled, equalTo(false))
     }
 
 }

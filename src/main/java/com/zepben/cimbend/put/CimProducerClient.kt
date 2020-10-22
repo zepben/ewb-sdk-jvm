@@ -8,15 +8,14 @@
 package com.zepben.cimbend.put
 
 import com.zepben.cimbend.common.BaseService
+import com.zepben.cimbend.grpc.GrpcClient
 
 /**
  * Base class that defines some helpful functions when producer clients are sending to the server.
  *
  * @property T The base service to send objects from.
  */
-abstract class CimProducerClient<T : BaseService> {
-
-    private val errorHandlers: MutableList<RpcErrorHandler> = mutableListOf()
+abstract class CimProducerClient<T : BaseService> : GrpcClient() {
 
     /**
      * Sends objects within the given [service] to the producer server.
@@ -27,38 +26,4 @@ abstract class CimProducerClient<T : BaseService> {
      */
     abstract fun send(service: T)
 
-    /**
-     * Registers an error handler that will be called if any exception are thrown when sending a service.
-     */
-    fun addErrorHandler(handler: RpcErrorHandler) {
-        errorHandlers.add(handler)
-    }
-
-    /**
-     * Removes the handler if registered.
-     */
-    fun removeErrorHandler(handler: RpcErrorHandler) {
-        errorHandlers.remove(handler)
-    }
-
-    /**
-     * Use to pass the throwable to all registered error handlers. Returns true if and error handler returns true.
-     */
-    protected fun tryHandleError(t: Throwable): Boolean =
-        errorHandlers.fold(false) { handled, handler -> handler.onError(t) or handled }
-
-    /**
-     * Allows a safe RPC call to be made to the server by wrapping [rpcCall] in a try/catch block. Any [Throwable] caught will
-     * be passed to all registered error handlers. If no handler returns true to indicate it has been handled the exception
-     * will be rethrown.
-     */
-    protected fun tryRpc(rpcCall: () -> Unit) {
-        try {
-            rpcCall()
-        } catch (t: Throwable) {
-            if (!tryHandleError(t)) {
-                throw t
-            }
-        }
-    }
 }

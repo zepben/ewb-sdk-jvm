@@ -16,7 +16,8 @@ package com.zepben.cimbend.grpc
  */
 data class GrpcResult<T>(
     val result: T?,
-    val thrown: Throwable?
+    val thrown: Throwable?,
+    val wasHandled: Boolean
 ) {
     val wasSuccessful: Boolean get() = thrown == null
 
@@ -26,8 +27,8 @@ data class GrpcResult<T>(
         return this
     }
 
-    inline fun onError(handler: (thrown: Throwable) -> Unit): GrpcResult<T> {
-        thrown?.let(handler)
+    inline fun onError(handler: (thrown: Throwable, wasHandled: Boolean) -> Unit): GrpcResult<T> {
+        thrown?.let { handler(it, wasHandled) }
         return this
     }
 
@@ -35,12 +36,12 @@ data class GrpcResult<T>(
 
         @JvmStatic
         fun <T> of(result: T?): GrpcResult<T> {
-            return GrpcResult(result, null)
+            return GrpcResult(result, null, false)
         }
 
         @JvmStatic
-        fun <T> ofError(thrown: Throwable): GrpcResult<T> {
-            return GrpcResult(null, thrown)
+        fun <T> ofError(thrown: Throwable, wasHandled: Boolean): GrpcResult<T> {
+            return GrpcResult(null, thrown, wasHandled)
         }
 
     }

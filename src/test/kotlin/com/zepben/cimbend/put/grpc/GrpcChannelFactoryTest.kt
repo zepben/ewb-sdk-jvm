@@ -7,8 +7,10 @@
  */
 package com.zepben.cimbend.put.grpc
 
+import com.zepben.cimbend.grpc.BadConfigException
 import com.zepben.cimbend.grpc.ConnectionConfig
 import com.zepben.cimbend.grpc.GrpcChannelFactory
+import com.zepben.testutils.exception.ExpectException.expect
 import org.junit.jupiter.api.Test
 
 internal class GrpcChannelFactoryTest {
@@ -20,4 +22,20 @@ internal class GrpcChannelFactoryTest {
         val channel = GrpcChannelFactory.create(config)
         channel.shutdownNow()
     }
+
+    @Test
+    internal fun requiresKeyAndCertForAuth() {
+        val config = ConnectionConfig("localhost", 80, enableTls = true, authCertPath = "someFile")
+        expect { GrpcChannelFactory.create(config) }
+            .toThrow(BadConfigException::class.java)
+            .withMessage("If TLS auth is enabled you must specify a key and cert")
+    }
+
+    @Test
+    fun onlyRequiresKeyAndCertForAuthWithTls() {
+        val config = ConnectionConfig("localhost", 80, enableTls = false, authCertPath = "someFile")
+        val channel = GrpcChannelFactory.create(config)
+        channel.shutdownNow()
+    }
+
 }

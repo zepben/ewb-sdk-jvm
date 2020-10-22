@@ -12,7 +12,7 @@ import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import java.io.File
 
-data class BadConfigException(val msg: String): Exception(msg)
+data class BadConfigException(val msg: String) : Exception(msg)
 
 object GrpcChannelFactory {
 
@@ -25,20 +25,19 @@ object GrpcChannelFactory {
         val channelBuilder = NettyChannelBuilder.forAddress(config.host, config.port)
 
         if (config.enableTls) {
-            if (!config.privateKeyFilePath.isNullOrBlank() && !config.certChainFilePath.isNullOrBlank()) {
-                val sslContextBuilder = GrpcSslContexts.forClient()
+            val sslContextBuilder = GrpcSslContexts.forClient()
 
-                sslContextBuilder.keyManager(File(config.certChainFilePath), File(config.privateKeyFilePath))
+            if (!config.trustCertPath.isNullOrBlank())
+                sslContextBuilder.trustManager(File(config.trustCertPath))
 
-                if (!config.trustCertCollectionFilePath.isNullOrBlank()) {
-                    sslContextBuilder.trustManager(File(config.trustCertCollectionFilePath))
-                }
-
-                val sslContext = GrpcSslContexts.configure(sslContextBuilder).build()
-                channelBuilder.sslContext(sslContext)
-            } else {
-               throw BadConfigException("If TLS is enabled you must specify at least a key and cert")
+            if (!config.authCertPath.isNullOrBlank()) {
+                if (!config.authKeyPath.isNullOrBlank())
+                    sslContextBuilder.keyManager(File(config.authCertPath), File(config.authKeyPath))
+                else
+                    throw BadConfigException("If TLS auth is enabled you must specify a key and cert")
             }
+
+            channelBuilder.sslContext(GrpcSslContexts.configure(sslContextBuilder).build())
         } else
             channelBuilder.usePlaintext()
 

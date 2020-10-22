@@ -25,7 +25,7 @@ internal class GrpcChannelFactoryTest {
 
     @Test
     internal fun requiresKeyAndCertForAuth() {
-        val config = ConnectionConfig("localhost", 80, authCertPath = "someFile")
+        val config = ConnectionConfig("localhost", 80, enableTls = true, authCertPath = "someFile")
         expect { GrpcChannelFactory.create(config) }
             .toThrow(BadConfigException::class.java)
             .withMessage("If TLS auth is enabled you must specify a key and cert")

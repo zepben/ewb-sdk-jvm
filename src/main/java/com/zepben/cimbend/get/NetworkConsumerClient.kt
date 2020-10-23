@@ -46,12 +46,10 @@ class NetworkConsumerClient(
      *
      * @return The item if found, otherwise null.
      */
-    override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject> {
+    override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject?> {
         return tryRpc {
-            GrpcResult.of(
-                processIdentifiedObjects(service, GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
-                    .firstOrNull()
-            )
+            processIdentifiedObjects(service, GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
+                .firstOrNull()
         }
     }
 
@@ -66,11 +64,9 @@ class NetworkConsumerClient(
      */
     override fun getIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): GrpcResult<Map<String, IdentifiedObject>> {
         return tryRpc {
-            GrpcResult.of(
-                processIdentifiedObjects(service, GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-                    .filterNotNull()
-                    .associateBy({ it.mRID }, { it })
-            )
+            processIdentifiedObjects(service, GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
+                .filterNotNull()
+                .associateBy({ it.mRID }, { it })
         }
     }
 
@@ -89,7 +85,7 @@ class NetworkConsumerClient(
             val geographicalRegions = toMap(response.geographicalRegionsList) { NetworkHierarchyGeographicalRegion(it.mrid, it.name, lookup(it.subGeographicalRegionMridsList, subGeographicalRegions)) }
 
             finaliseLinks(geographicalRegions, subGeographicalRegions, substations)
-            GrpcResult.of(NetworkHierarchy(geographicalRegions, subGeographicalRegions, substations, feeders))
+            NetworkHierarchy(geographicalRegions, subGeographicalRegions, substations, feeders)
         }
     }
 
@@ -105,16 +101,16 @@ class NetworkConsumerClient(
     fun getFeeder(service: NetworkService, mRID: String): GrpcResult<Feeder> {
         val feederResponse = getIdentifiedObject(service, mRID)
         val feeder = feederResponse
-            .onError { return@getFeeder GrpcResult.ofError(it) }
-            .result
+            .onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }
+            .value
 
         if (feeder == null)
             return GrpcResult.of(null)
         else if (feeder !is Feeder)
-            return GrpcResult.ofError(ClassCastException("Unable to extract feeder network from ${feeder.typeNameAndMRID()}."))
+            return GrpcResult.ofError(ClassCastException("Unable to extract feeder network from ${feeder.typeNameAndMRID()}."), false)
 
         getIdentifiedObjects(service, service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder)))
-            .onError { return@getFeeder GrpcResult.ofError(it) }
+            .onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }
 
         val mRIDs = service.getUnresolvedReferenceMrids(Resolvers.normalEnergizingSubstation(feeder)).toMutableSet()
 
@@ -135,7 +131,7 @@ class NetworkConsumerClient(
         }
 
         getIdentifiedObjects(service, mRIDs)
-            .onError { return@getFeeder GrpcResult.ofError(it) }
+            .onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }
 
         return GrpcResult.of(feeder)
     }

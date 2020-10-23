@@ -28,7 +28,7 @@ abstract class CimConsumerClient<T : BaseService> : GrpcClient() {
      *
      * @return The item if found, otherwise null.
      */
-    abstract fun getIdentifiedObject(service: T, mRID: String): GrpcResult<IdentifiedObject>
+    abstract fun getIdentifiedObject(service: T, mRID: String): GrpcResult<IdentifiedObject?>
 
     /**
      * Retrieve the objects with the given [mRIDs] and store the results in the [service].

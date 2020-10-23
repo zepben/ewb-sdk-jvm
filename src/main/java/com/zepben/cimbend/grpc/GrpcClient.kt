@@ -38,17 +38,13 @@ abstract class GrpcClient {
 
     /**
      * Allows a safe RPC call to be made to the server by wrapping [rpcCall] in a try/catch block. Any [Throwable] caught will
-     * be passed to all registered error handlers. If no handler returns true to indicate it has been handled the exception
-     * will be rethrown.
+     * be passed to all registered error handlers.
      */
-    protected fun <T> tryRpc(rpcCall: () -> GrpcResult<T>): GrpcResult<T> {
+    protected fun <T> tryRpc(rpcCall: () -> T): GrpcResult<T> {
         return try {
-            rpcCall()
+            GrpcResult.of(rpcCall())
         } catch (t: Throwable) {
-            if (!tryHandleError(t)) {
-                throw t
-            }
-            GrpcResult.ofError(t)
+            GrpcResult.ofError(t, tryHandleError(t))
         }
     }
 

@@ -28,10 +28,12 @@ class CustomerProducerClient(
 
     override fun send(service: CustomerService) {
         tryRpc { stub.createCustomerService(CreateCustomerServiceRequest.newBuilder().build()) }
+            .throwOnUnhandledError()
 
         service.sequenceOf<IdentifiedObject>().forEach { sendToServer(it) }
 
         tryRpc { stub.completeCustomerService(CompleteCustomerServiceRequest.newBuilder().build()) }
+            .throwOnUnhandledError()
     }
 
     private fun sendToServer(identifiedObject: IdentifiedObject) = tryRpc {
@@ -59,4 +61,6 @@ class CustomerProducerClient(
             }
         )
     }
+        .throwOnUnhandledError()
+
 }

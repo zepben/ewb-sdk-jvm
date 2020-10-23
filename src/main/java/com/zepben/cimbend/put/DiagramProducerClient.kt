@@ -27,10 +27,12 @@ class DiagramProducerClient(
 
     override fun send(service: DiagramService) {
         tryRpc { stub.createDiagramService(CreateDiagramServiceRequest.newBuilder().build()) }
+            .throwOnUnhandledError()
 
         service.sequenceOf<IdentifiedObject>().forEach { sendToServer(it) }
 
         tryRpc { stub.completeDiagramService(CompleteDiagramServiceRequest.newBuilder().build()) }
+            .throwOnUnhandledError()
     }
 
     private fun sendToServer(identifiedObject: IdentifiedObject) = tryRpc {
@@ -46,4 +48,6 @@ class DiagramProducerClient(
             }
         )
     }
+        .throwOnUnhandledError()
+
 }

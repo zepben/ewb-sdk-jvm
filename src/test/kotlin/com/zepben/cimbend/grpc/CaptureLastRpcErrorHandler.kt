@@ -8,13 +8,21 @@
 package com.zepben.cimbend.grpc
 
 import com.zepben.cimbend.put.RpcErrorHandler
+import kotlin.reflect.KClass
 
-class CaptureLastRpcErrorHandler : RpcErrorHandler {
+/**
+ * @property filter Only capture exceptions that are subclasses of the specified class.
+ */
+class CaptureLastRpcErrorHandler(val filter: KClass<out Throwable> = Throwable::class) : RpcErrorHandler {
     var lastError: Throwable? = null
+    var count = 0
 
     override fun onError(t: Throwable): Boolean {
-        lastError = t
-        return true
+        ++count
+        if (filter.isInstance(t))
+            lastError = t
+
+        return lastError != null
     }
 
 }

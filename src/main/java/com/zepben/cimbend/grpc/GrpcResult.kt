@@ -11,36 +11,106 @@ package com.zepben.cimbend.grpc
 /**
  * The result of a gRPC call.
  * @property wasSuccessful Indicates if the call was resolved without error
- * @property result The result of the call if [wasSuccessful] is true, otherwise null. The result may still be null even if successful.
- * @property thrown The exception that was caught if [wasSuccessful] is false, otherwise null.
+ * @property value The value of the call if [wasSuccessful] is true, otherwise throws [ClassCastException].
+ * @property thrown The exception that was caught if [wasSuccessful] is false, otherwise throws [ClassCastException].
+ * @property wasErrorHandled Indicates if the error has already been handled
  */
 data class GrpcResult<T>(
-    val result: T?,
-    val thrown: Throwable?
+    private val result: Any?,
+    val wasErrorHandled: Boolean
 ) {
-    val wasSuccessful: Boolean get() = thrown == null
+    val wasSuccessful: Boolean get() = result !is Throwable
+    val wasFailure: Boolean get() = result is Throwable
+    val wasErrorUnhandled: Boolean get() = !wasErrorHandled
 
-    inline fun onSuccess(handler: (result: T?) -> Unit): GrpcResult<T> {
+    @Suppress("UNCHECKED_CAST")
+    val value: T
+        get() = result as T
+
+    val thrown: Throwable
+        get() = result as Throwable
+
+    /**
+     * Calls the [handler] with the [value] if [wasSuccessful].
+     */
+    inline fun onSuccess(handler: (value: T) -> Unit): GrpcResult<T> {
         if (wasSuccessful)
-            handler.invoke(result)
+            handler.invoke(value)
         return this
     }
 
-    inline fun onError(handler: (thrown: Throwable) -> Unit): GrpcResult<T> {
-        thrown?.let(handler)
+    /**
+     * Calls the [handler] with the [thrown] exception and [wasErrorHandled] if [wasFailure].
+     */
+    inline fun onError(handler: (thrown: Throwable, wasErrorHandled: Boolean) -> Unit): GrpcResult<T> {
+        if (wasFailure)
+            handler.invoke(thrown, wasErrorHandled)
         return this
+    }
+
+    /**
+     * Calls the [handler] with the [thrown] exception if [wasFailure] only if [wasErrorHandled].
+     */
+    inline fun onHandledError(handler: (thrown: Throwable) -> Unit): GrpcResult<T> {
+        if (wasFailure && wasErrorHandled)
+            handler.invoke(thrown)
+        return this
+    }
+
+    /**
+     * Calls the [handler] with the [thrown] exception if [wasFailure] only if [wasErrorUnhandled].
+     */
+    inline fun onUnhandledError(handler: (thrown: Throwable) -> Unit): GrpcResult<T> {
+        if (wasFailure && wasErrorUnhandled)
+            handler.invoke(thrown)
+        return this
+    }
+
+    /**
+     * Throws the [thrown] exception and if [wasFailure].
+     */
+    fun throwOnError(): GrpcResult<T> {
+        if (wasFailure)
+            throw thrown
+        return this
+    }
+
+    /**
+     * Throws the [thrown] exception and if [wasFailure] only if [wasErrorUnhandled].
+     */
+    fun throwOnUnhandledError(): GrpcResult<T> {
+        if (wasFailure && wasErrorUnhandled)
+            throw thrown
+        return this
+    }
+
+    /**
+     * Returns a new [GrpcResult] with the result of the [transform] function if [wasSuccessful] or
+     * the original [thrown] exception and [wasErrorHandled] if [wasFailure].
+     */
+    fun <R> map(transform: (T) -> R): GrpcResult<R> {
+        return if (wasSuccessful)
+            of(transform(value))
+        else
+            ofError(thrown, wasErrorHandled)
     }
 
     companion object {
 
+        /**
+         * Create a new successful [GrpcResult].
+         */
         @JvmStatic
         fun <T> of(result: T?): GrpcResult<T> {
-            return GrpcResult(result, null)
+            return GrpcResult(result, false)
         }
 
+        /**
+         * Create a new failed [GrpcResult].
+         */
         @JvmStatic
-        fun <T> ofError(thrown: Throwable): GrpcResult<T> {
-            return GrpcResult(null, thrown)
+        fun <T> ofError(thrown: Throwable, wasErrorHandled: Boolean): GrpcResult<T> {
+            return GrpcResult(thrown, wasErrorHandled)
         }
 
     }

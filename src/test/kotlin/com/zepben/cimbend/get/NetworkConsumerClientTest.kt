@@ -19,12 +19,12 @@ import com.zepben.cimbend.get.hierarchy.NetworkHierarchyIdentifiedObject
 import com.zepben.cimbend.get.testdata.FeederNetwork
 import com.zepben.cimbend.get.testdata.NetworkHierarchyAllTypes
 import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
+import com.zepben.cimbend.grpc.GrpcResult
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.NetworkServiceComparator
 import com.zepben.cimbend.network.model.toPb
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger
 import com.zepben.protobuf.nc.*
-import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -63,11 +63,11 @@ internal class NetworkConsumerClientTest {
             val type = response.objectGroup.identifiedObject.identifiedObjectCase
             if (isSupported(type)) {
                 assertThat(result.wasSuccessful, equalTo(true))
-                assertThat(result.result!!.mRID, equalTo(mRID))
+                assertThat(result.value?.mRID, equalTo(mRID))
             } else {
-                assertThat(result.wasSuccessful, equalTo(false))
+                assertThat(result.wasFailure, equalTo(true))
                 assertThat(result.thrown, instanceOf(UnsupportedOperationException::class.java))
-                assertThat(result.thrown!!.message, equalTo("Identified object type $type is not supported by the network service"))
+                assertThat(result.thrown.message, equalTo("Identified object type $type is not supported by the network service"))
                 assertThat(result.thrown, equalTo(onErrorHandler.lastError))
             }
 
@@ -85,24 +85,21 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObject(service, mRID)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown, equalTo(expectedEx))
-        assertThat(onErrorHandler.lastError, equalTo(expectedEx))
+        validateFailure(result, expectedEx, true)
     }
 
     @Test
-    internal fun `throws unhandled exceptions when getting an IdentifiedObject throws`() {
+    internal fun `captures unhandled exceptions when getting an IdentifiedObject throws`() {
         val mRID = "1234"
         val expectedEx = StatusRuntimeException(Status.UNAVAILABLE)
         doAnswer { throw expectedEx }.`when`(stub).getIdentifiedObjects(any())
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        expect { consumerClient.getIdentifiedObject(service, mRID) }
-            .toThrow(StatusRuntimeException::class.java)
-            .withMessage(expectedEx.message!!)
+        val result = consumerClient.getIdentifiedObject(service, mRID)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
+        validateFailure(result, expectedEx, false)
     }
 
     @Test
@@ -117,10 +114,10 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.result!!.size, equalTo(3))
-        assertThat(result.result!![mRIDs[0]], instanceOf(AcLineSegment::class.java))
-        assertThat(result.result!![mRIDs[1]], instanceOf(AcLineSegment::class.java))
-        assertThat(result.result!![mRIDs[2]], instanceOf(Breaker::class.java))
+        assertThat(result.value.size, equalTo(3))
+        assertThat(result.value[mRIDs[0]], instanceOf(AcLineSegment::class.java))
+        assertThat(result.value[mRIDs[1]], instanceOf(AcLineSegment::class.java))
+        assertThat(result.value[mRIDs[2]], instanceOf(Breaker::class.java))
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
         clearInvocations(stub)
@@ -135,24 +132,21 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown, equalTo(expectedEx))
-        assertThat(onErrorHandler.lastError, equalTo(expectedEx))
+        validateFailure(result, expectedEx, true)
     }
 
     @Test
-    internal fun `throws unhandled exceptions when getting multiple IdentifiedObject throws`() {
+    internal fun `captures unhandled exceptions when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
         val expectedEx = StatusRuntimeException(Status.UNAVAILABLE)
         doAnswer { throw expectedEx }.`when`(stub).getIdentifiedObjects(any())
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        expect { consumerClient.getIdentifiedObjects(service, mRIDs) }
-            .toThrow(StatusRuntimeException::class.java)
-            .withMessage(expectedEx.message!!)
+        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
+        validateFailure(result, expectedEx, false)
     }
 
     @Test
@@ -163,7 +157,7 @@ internal class NetworkConsumerClientTest {
 
         verify(stub).getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
         assertThat(result.wasSuccessful, equalTo(true))
-        validateNetworkHierarchy(result.result, NetworkHierarchyAllTypes.createNetworkHierarchy())
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy())
     }
 
     @Test
@@ -174,23 +168,20 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getNetworkHierarchy()
 
         verify(stub).getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown, equalTo(expectedEx))
-        assertThat(onErrorHandler.lastError, equalTo(expectedEx))
+        validateFailure(result, expectedEx, true)
     }
 
     @Test
-    internal fun `throws unhandled exceptions when getting the network hierarchy throws`() {
+    internal fun `captures unhandled exceptions when getting the network hierarchy throws`() {
         val expectedEx = StatusRuntimeException(Status.UNAVAILABLE)
         doAnswer { throw expectedEx }.`when`(stub).getNetworkHierarchy(any())
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        expect { consumerClient.getNetworkHierarchy() }
-            .toThrow(StatusRuntimeException::class.java)
-            .withMessage(expectedEx.message!!)
+        val result = consumerClient.getNetworkHierarchy()
 
         verify(stub).getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
+        validateFailure(result, expectedEx, false)
     }
 
     @Test
@@ -204,7 +195,7 @@ internal class NetworkConsumerClientTest {
         verify(stub, times(3)).getIdentifiedObjects(any())
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.result!!.mRID, equalTo(mRID))
+        assertThat(result.value.mRID, equalTo(mRID))
 
         validateFeederNetwork(service, expectedService)
     }
@@ -214,13 +205,12 @@ internal class NetworkConsumerClientTest {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService)
 
-        val mRID = "f002"
-        val result = consumerClient.getFeeder(service, mRID)
+        val result = consumerClient.getFeeder(service, "f002")
 
         verify(stub, times(1)).getIdentifiedObjects(any())
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.result, nullValue())
+        assertThat(result.value, nullValue())
 
         validateFeederNetwork(service, NetworkService())
     }
@@ -228,205 +218,170 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `calls error handler when getting the feeder throws`() {
         val expectedService = FeederNetwork.create()
-        val mRID = "f001"
         configureFeederResponses(expectedService, validFeeder = false)
 
-        val result = consumerClient.getFeeder(service, mRID)
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(1)).getIdentifiedObjects(any())
-
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown!!.message, equalTo("validFeeder"))
+        validateNestedFailure(result, "validFeeder", true)
     }
 
     @Test
-    internal fun `throws unhandled exceptions when getting the feeder throws`() {
+    internal fun `captures unhandled exceptions when getting the feeder throws`() {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validFeeder = false)
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val mRID = "f001"
-        expect { consumerClient.getFeeder(service, mRID) }
-            .toThrow(java.lang.Exception::class.java)
-            .withMessage("validFeeder")
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(1)).getIdentifiedObjects(any())
+        validateNestedFailure(result, "validFeeder", false)
     }
 
     @Test
     internal fun `calls error handler when getting the feeder equipment throws`() {
         val expectedService = FeederNetwork.create()
-        val mRID = "f001"
         configureFeederResponses(expectedService, validEquipment = false)
 
-        val result = consumerClient.getFeeder(service, mRID)
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(2)).getIdentifiedObjects(any())
-
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown!!.message, equalTo("validEquipment"))
+        validateNestedFailure(result, "validEquipment", true)
     }
 
     @Test
-    internal fun `throws unhandled exceptions when getting the feeder equipment throws`() {
+    internal fun `captures unhandled exceptions when getting the feeder equipment throws`() {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validEquipment = false)
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val mRID = "f001"
-        expect { consumerClient.getFeeder(service, mRID) }
-            .toThrow(java.lang.Exception::class.java)
-            .withMessage("validEquipment")
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(2)).getIdentifiedObjects(any())
+        validateNestedFailure(result, "validEquipment", false)
     }
 
 
     @Test
     internal fun `calls error handler when getting the feeder substation throws`() {
         val expectedService = FeederNetwork.create()
-        val mRID = "f001"
         configureFeederResponses(expectedService, validSubstation = false)
 
-        val result = consumerClient.getFeeder(service, mRID)
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
-
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown!!.message, equalTo("validSubstation"))
+        validateNestedFailure(result, "validSubstation", true)
     }
 
     @Test
-    internal fun `throws unhandled exceptions when getting the feeder substation throws`() {
+    internal fun `captures unhandled exceptions when getting the feeder substation throws`() {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validSubstation = false)
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val mRID = "f001"
-        expect { consumerClient.getFeeder(service, mRID) }
-            .toThrow(java.lang.Exception::class.java)
-            .withMessage("validSubstation")
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
+        validateNestedFailure(result, "validSubstation", false)
     }
 
     @Test
     internal fun `calls error handler when getting the feeder equipment connectivity throws`() {
         val expectedService = FeederNetwork.create()
-        val mRID = "f001"
         configureFeederResponses(expectedService, validConnectivityNode = false)
 
-        val result = consumerClient.getFeeder(service, mRID)
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
-
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown!!.message, equalTo("validConnectivityNode"))
+        validateNestedFailure(result, "validConnectivityNode", true)
     }
 
     @Test
-    internal fun `throws unhandled exceptions when getting the feeder equipment connectivity throws`() {
+    internal fun `captures unhandled exceptions when getting the feeder equipment connectivity throws`() {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validConnectivityNode = false)
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val mRID = "f001"
-        expect { consumerClient.getFeeder(service, mRID) }
-            .toThrow(java.lang.Exception::class.java)
-            .withMessage("validConnectivityNode")
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
+        validateNestedFailure(result, "validConnectivityNode", false)
     }
 
     @Test
     internal fun `calls error handler when getting the feeder equipment location throws`() {
         val expectedService = FeederNetwork.create()
-        val mRID = "f001"
         configureFeederResponses(expectedService, validLocation = false)
 
-        val result = consumerClient.getFeeder(service, mRID)
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
-
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown!!.message, equalTo("validLocation"))
+        validateNestedFailure(result, "validLocation", true)
     }
 
     @Test
-    internal fun `throws unhandled exceptions when getting the feeder equipment location throws`() {
+    internal fun `captures unhandled exceptions when getting the feeder equipment location throws`() {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validLocation = false)
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val mRID = "f001"
-        expect { consumerClient.getFeeder(service, mRID) }
-            .toThrow(java.lang.Exception::class.java)
-            .withMessage("validLocation")
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
+        validateNestedFailure(result, "validLocation", false)
     }
 
     @Test
     internal fun `calls error handler when getting the feeder equipment wire info throws`() {
         val expectedService = FeederNetwork.create()
-        val mRID = "f001"
         configureFeederResponses(expectedService, validWireInfo = false)
 
-        val result = consumerClient.getFeeder(service, mRID)
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
-
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown!!.message, equalTo("validWireInfo"))
+        validateNestedFailure(result, "validWireInfo", true)
     }
 
     @Test
-    internal fun `throws unhandled exceptions when getting the feeder equipment wire info throws`() {
+    internal fun `captures unhandled exceptions when getting the feeder equipment wire info throws`() {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validWireInfo = false)
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val mRID = "f001"
-        expect { consumerClient.getFeeder(service, mRID) }
-            .toThrow(java.lang.Exception::class.java)
-            .withMessage("validWireInfo")
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
+        validateNestedFailure(result, "validWireInfo", false)
     }
 
     @Test
     internal fun `calls error handler when getting the feeder equipment sequence info throws`() {
         val expectedService = FeederNetwork.create()
-        val mRID = "f001"
         configureFeederResponses(expectedService, validPerLengthSequenceInformation = false)
 
-        val result = consumerClient.getFeeder(service, mRID)
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
-
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown!!.message, equalTo("validPerLengthSequenceInformation"))
+        validateNestedFailure(result, "validPerLengthSequenceInformation", true)
     }
 
     @Test
-    internal fun `throws unhandled exceptions when getting the feeder equipment sequence info throws`() {
+    internal fun `captures unhandled exceptions when getting the feeder equipment sequence info throws`() {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validPerLengthSequenceInformation = false)
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val mRID = "f001"
-        expect { consumerClient.getFeeder(service, mRID) }
-            .toThrow(java.lang.Exception::class.java)
-            .withMessage("validPerLengthSequenceInformation")
+        val result = consumerClient.getFeeder(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
+        validateNestedFailure(result, "validPerLengthSequenceInformation", false)
     }
 
     private fun forEachBuilder(obj: Any, action: (Any) -> Unit) {
@@ -622,6 +577,20 @@ internal class NetworkConsumerClientTest {
         assertThat("missing from source", differences.missingFromSource(), empty())
         assertThat("missing from target", differences.missingFromTarget(), empty())
         assertThat("has differences", differences.modifications().entries, empty())
+    }
+
+    private fun validateFailure(result: GrpcResult<*>, expectedEx: Throwable, expectHandled: Boolean) {
+        assertThat(result.wasFailure, equalTo(true))
+        assertThat(result.thrown, equalTo(expectedEx))
+        assertThat(result.wasErrorHandled, equalTo(expectHandled))
+        assertThat(onErrorHandler.lastError, if (expectHandled) equalTo(expectedEx) else nullValue())
+    }
+
+    private fun validateNestedFailure(result: GrpcResult<*>, expectedMessage: String, expectHandled: Boolean) {
+        assertThat(result.wasFailure, equalTo(true))
+        assertThat(result.thrown.message, equalTo(expectedMessage))
+        assertThat(result.wasErrorHandled, equalTo(expectHandled))
+        assertThat(onErrorHandler.lastError, if (expectHandled) notNullValue() else nullValue())
     }
 
 }

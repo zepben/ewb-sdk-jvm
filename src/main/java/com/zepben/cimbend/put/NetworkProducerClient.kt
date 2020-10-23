@@ -28,10 +28,12 @@ class NetworkProducerClient(
 
     override fun send(service: NetworkService) {
         tryRpc { stub.createNetwork(CreateNetworkRequest.newBuilder().build()) }
+            .throwOnUnhandledError()
 
         service.sequenceOf<IdentifiedObject>().forEach { sendToServer(it) }
 
         tryRpc { stub.completeNetwork(CompleteNetworkRequest.newBuilder().build()) }
+            .throwOnUnhandledError()
     }
 
     private fun sendToServer(identifiedObject: IdentifiedObject) = tryRpc {
@@ -193,5 +195,5 @@ class NetworkProducerClient(
             isRemoteControl = {},
             isRemoteSource = {}
         )
-    }
+    }.throwOnUnhandledError()
 }

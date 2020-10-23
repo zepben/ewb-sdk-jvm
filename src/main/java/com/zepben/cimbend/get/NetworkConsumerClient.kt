@@ -46,12 +46,10 @@ class NetworkConsumerClient(
      *
      * @return The item if found, otherwise null.
      */
-    override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject> {
-        return safeTryRpc {
-            GrpcResult.of(
-                processIdentifiedObjects(service, GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
-                    .firstOrNull()
-            )
+    override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject?> {
+        return tryRpc {
+            processIdentifiedObjects(service, GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
+                .firstOrNull()
         }
     }
 
@@ -65,12 +63,10 @@ class NetworkConsumerClient(
      * @return A [Map] containing the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
      */
     override fun getIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): GrpcResult<Map<String, IdentifiedObject>> {
-        return safeTryRpc {
-            GrpcResult.of(
-                processIdentifiedObjects(service, GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-                    .filterNotNull()
-                    .associateBy({ it.mRID }, { it })
-            )
+        return tryRpc {
+            processIdentifiedObjects(service, GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
+                .filterNotNull()
+                .associateBy({ it.mRID }, { it })
         }
     }
 
@@ -80,7 +76,7 @@ class NetworkConsumerClient(
      * @return A simplified version of the network hierarchy that can be used to make further in-depth requests.
      */
     fun getNetworkHierarchy(): GrpcResult<NetworkHierarchy> {
-        return safeTryRpc {
+        return tryRpc {
             val response = stub.getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
 
             val feeders = toMap(response.feedersList) { NetworkHierarchyFeeder(it.mrid, it.name) }
@@ -89,7 +85,7 @@ class NetworkConsumerClient(
             val geographicalRegions = toMap(response.geographicalRegionsList) { NetworkHierarchyGeographicalRegion(it.mrid, it.name, lookup(it.subGeographicalRegionMridsList, subGeographicalRegions)) }
 
             finaliseLinks(geographicalRegions, subGeographicalRegions, substations)
-            GrpcResult.of(NetworkHierarchy(geographicalRegions, subGeographicalRegions, substations, feeders))
+            NetworkHierarchy(geographicalRegions, subGeographicalRegions, substations, feeders)
         }
     }
 
@@ -106,7 +102,7 @@ class NetworkConsumerClient(
         val feederResponse = getIdentifiedObject(service, mRID)
         val feeder = feederResponse
             .onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }
-            .result
+            .value
 
         if (feeder == null)
             return GrpcResult.of(null)

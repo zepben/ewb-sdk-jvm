@@ -8,7 +8,6 @@
 
 package com.zepben.cimbend.grpc
 
-import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -60,42 +59,6 @@ internal class GrpcClientTest {
     }
 
     @Test
-    internal fun `tryRpc calls all handlers`() {
-        val handler1 = CaptureLastRpcErrorHandler()
-        val handler2 = CaptureLastRpcErrorHandler()
-        client.apply {
-            addErrorHandler(handler1)
-            addErrorHandler(handler2)
-        }
-
-        client.throwViaTryRpc()
-
-        assertThat(handler1.lastError, equalTo(client.ex))
-        assertThat(handler2.lastError, equalTo(client.ex))
-    }
-
-    @Test
-    internal fun `tryRpc calls all handlers even if unhandled`() {
-        val handler1 = CaptureLastRpcErrorHandler(IllegalArgumentException::class)
-        val handler2 = CaptureLastRpcErrorHandler(RuntimeException::class)
-        client.apply {
-            addErrorHandler(handler1)
-            addErrorHandler(handler2)
-        }
-
-        client.throwViaTryRpc()
-
-        assertThat(handler1.lastError, nullValue())
-        assertThat(handler2.lastError, equalTo(client.ex))
-    }
-
-    @Test
-    internal fun `tryRpc propagates unhandled exception`() {
-        expect { client.throwViaTryRpc() }
-            .toThrow(RuntimeException::class.java)
-    }
-
-    @Test
     internal fun `can remove error handler`() {
         val handler = CaptureLastRpcErrorHandler()
 
@@ -113,9 +76,9 @@ internal class GrpcClientTest {
     private fun validateFailure(expectHandled: Boolean) {
         val result = client.throwViaSafeTryRpc()
 
-        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat(result.wasFailure, equalTo(true))
         assertThat(result.thrown, equalTo(client.ex))
-        assertThat(result.wasHandled, equalTo(expectHandled))
+        assertThat(result.wasErrorHandled, equalTo(expectHandled))
     }
 
 }

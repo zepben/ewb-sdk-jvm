@@ -63,11 +63,11 @@ internal class NetworkConsumerClientTest {
             val type = response.objectGroup.identifiedObject.identifiedObjectCase
             if (isSupported(type)) {
                 assertThat(result.wasSuccessful, equalTo(true))
-                assertThat(result.result!!.mRID, equalTo(mRID))
+                assertThat(result.value?.mRID, equalTo(mRID))
             } else {
-                assertThat(result.wasSuccessful, equalTo(false))
+                assertThat(result.wasFailure, equalTo(true))
                 assertThat(result.thrown, instanceOf(UnsupportedOperationException::class.java))
-                assertThat(result.thrown!!.message, equalTo("Identified object type $type is not supported by the network service"))
+                assertThat(result.thrown.message, equalTo("Identified object type $type is not supported by the network service"))
                 assertThat(result.thrown, equalTo(onErrorHandler.lastError))
             }
 
@@ -114,10 +114,10 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.result!!.size, equalTo(3))
-        assertThat(result.result!![mRIDs[0]], instanceOf(AcLineSegment::class.java))
-        assertThat(result.result!![mRIDs[1]], instanceOf(AcLineSegment::class.java))
-        assertThat(result.result!![mRIDs[2]], instanceOf(Breaker::class.java))
+        assertThat(result.value.size, equalTo(3))
+        assertThat(result.value[mRIDs[0]], instanceOf(AcLineSegment::class.java))
+        assertThat(result.value[mRIDs[1]], instanceOf(AcLineSegment::class.java))
+        assertThat(result.value[mRIDs[2]], instanceOf(Breaker::class.java))
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
         clearInvocations(stub)
@@ -157,7 +157,7 @@ internal class NetworkConsumerClientTest {
 
         verify(stub).getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
         assertThat(result.wasSuccessful, equalTo(true))
-        validateNetworkHierarchy(result.result, NetworkHierarchyAllTypes.createNetworkHierarchy())
+        validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy())
     }
 
     @Test
@@ -195,7 +195,7 @@ internal class NetworkConsumerClientTest {
         verify(stub, times(3)).getIdentifiedObjects(any())
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.result!!.mRID, equalTo(mRID))
+        assertThat(result.value.mRID, equalTo(mRID))
 
         validateFeederNetwork(service, expectedService)
     }
@@ -210,7 +210,7 @@ internal class NetworkConsumerClientTest {
         verify(stub, times(1)).getIdentifiedObjects(any())
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.result, nullValue())
+        assertThat(result.value, nullValue())
 
         validateFeederNetwork(service, NetworkService())
     }
@@ -580,16 +580,16 @@ internal class NetworkConsumerClientTest {
     }
 
     private fun validateFailure(result: GrpcResult<*>, expectedEx: Throwable, expectHandled: Boolean) {
-        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat(result.wasFailure, equalTo(true))
         assertThat(result.thrown, equalTo(expectedEx))
-        assertThat(result.wasHandled, equalTo(expectHandled))
+        assertThat(result.wasErrorHandled, equalTo(expectHandled))
         assertThat(onErrorHandler.lastError, if (expectHandled) equalTo(expectedEx) else nullValue())
     }
 
     private fun validateNestedFailure(result: GrpcResult<*>, expectedMessage: String, expectHandled: Boolean) {
-        assertThat(result.wasSuccessful, equalTo(false))
-        assertThat(result.thrown!!.message, equalTo(expectedMessage))
-        assertThat(result.wasHandled, equalTo(expectHandled))
+        assertThat(result.wasFailure, equalTo(true))
+        assertThat(result.thrown.message, equalTo(expectedMessage))
+        assertThat(result.wasErrorHandled, equalTo(expectHandled))
         assertThat(onErrorHandler.lastError, if (expectHandled) notNullValue() else nullValue())
     }
 

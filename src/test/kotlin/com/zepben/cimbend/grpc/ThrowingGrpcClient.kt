@@ -11,11 +11,7 @@ package com.zepben.cimbend.grpc
 class ThrowingGrpcClient(val ex: Throwable = RuntimeException()) : GrpcClient() {
 
     fun throwViaSafeTryRpc(): GrpcResult<Unit> {
-        return safeTryRpc { throw ex }
-    }
-
-    fun throwViaTryRpc() {
-        tryRpc { throw ex }
+        return tryRpc { throw ex }
     }
 
 }

@@ -56,7 +56,9 @@ class AssignToFeeders {
         traversal.queue().add(PhaseStep.startAt(headEquipment, headTerminal.phases))
 
         NetworkService.connectedTerminals(headTerminal).forEach {
-            traversal.queue().add(PhaseStep.startAt(it.to(), headTerminal.phases))
+            it.to()?.let { to ->
+                traversal.queue().add(PhaseStep.startAt(to, headTerminal.phases))
+            }
         }
 
         traversal.run()

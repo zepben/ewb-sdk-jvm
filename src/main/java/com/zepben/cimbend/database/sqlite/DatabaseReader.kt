@@ -7,6 +7,7 @@
  */
 package com.zepben.cimbend.database.sqlite
 
+import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.cimbend.cim.iec61970.base.core.Feeder
 import com.zepben.cimbend.cim.iec61970.base.wires.EnergySource
 import com.zepben.cimbend.common.extensions.nameAndMRID
@@ -52,7 +53,6 @@ import com.zepben.cimbend.database.sqlite.tables.iec61970.infiec61970.feeder.Tab
 import com.zepben.cimbend.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.cimbend.database.sqlite.upgrade.UpgradeRunner
 import com.zepben.cimbend.diagram.DiagramService
-import com.zepben.cimbend.measurement.MeasurementService
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.tracing.ConnectivityResult
 import com.zepben.cimbend.network.tracing.Tracing
@@ -61,7 +61,6 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Paths
 import java.sql.*
 import java.util.*
-
 
 
 /**
@@ -314,7 +313,8 @@ class DatabaseReader @JvmOverloads constructor(
                 && energySource.isOnFeeder()
                 && Collections.disjoint(feederStartPoints,
                 NetworkService.connectedEquipment(energySource)
-                    .map { cr: ConnectivityResult -> cr.to().mRID }
+                    .mapNotNull(ConnectivityResult::to)
+                    .map(ConductingEquipment::mRID)
                     .toSet())
         }
 

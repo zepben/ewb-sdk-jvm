@@ -5,116 +5,116 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.network.tracing;
+package com.zepben.cimbend.network.tracing
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment;
-import com.zepben.cimbend.cim.iec61970.base.core.Terminal;
-import com.zepben.cimbend.cim.iec61970.base.wires.SinglePhaseKind;
-import com.zepben.cimbend.network.model.NominalPhasePath;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.cimbend.cim.iec61970.base.core.Terminal
+import com.zepben.cimbend.cim.iec61970.base.wires.SinglePhaseKind
+import com.zepben.cimbend.network.model.NominalPhasePath
+import java.util.*
+import java.util.stream.Collectors
 
 /**
  * Stores the connectivity between two terminals, including the mapping between the nominal phases.
  */
-@EverythingIsNonnullByDefault
-@SuppressWarnings("WeakerAccess")
-public class ConnectivityResult {
-
-    private final Terminal fromTerminal;
-    private final Terminal toTerminal;
-    private final List<NominalPhasePath> nominalPhasePaths;
-
-    /**
-     * @param fromTerminal The terminal for which the connectivity was requested.
-     * @param toTerminal   The terminal which is connected to the requested terminal.
-     * @return The ConnectivityResult Builder to use to construct the result.
-     */
-    public static ConnectivityResult between(Terminal fromTerminal, Terminal toTerminal, Collection<NominalPhasePath> nominalPhasePaths) {
-        return new ConnectivityResult(fromTerminal, toTerminal, nominalPhasePaths);
-    }
+class ConnectivityResult private constructor(
+    private val fromTerminal: Terminal,
+    private val toTerminal: Terminal,
+    nominalPhasePaths: Collection<NominalPhasePath>
+) {
+    private val nominalPhasePaths: List<NominalPhasePath>
 
     /**
      * @return Convenience method for getting the conducting equipment that owns the fromTerminal.
      */
-    public ConductingEquipment from() {
-        return fromTerminal.getConductingEquipment();
+    fun from(): ConductingEquipment? {
+        return fromTerminal.conductingEquipment
     }
 
     /**
      * @return The terminal from which the connectivity was requested.
      */
-    public Terminal fromTerminal() {
-        return fromTerminal;
+    fun fromTerminal(): Terminal {
+        return fromTerminal
     }
 
     /**
      * @return Convenience method for getting the conducting equipment that owns the toTerminal.
      */
-    public ConductingEquipment to() {
-        return toTerminal.getConductingEquipment();
+    fun to(): ConductingEquipment? {
+        return toTerminal.conductingEquipment
     }
 
     /**
      * @return The terminal which is connected to the requested terminal.
      */
-    public Terminal toTerminal() {
-        return toTerminal;
+    fun toTerminal(): Terminal {
+        return toTerminal
     }
 
     /**
      * @return The nominal phases that are connected in the fromTerminal.
      */
-    public List<SinglePhaseKind> fromNominalPhases() {
-        return nominalPhasePaths.stream().map(NominalPhasePath::from).collect(Collectors.toList());
+    fun fromNominalPhases(): List<SinglePhaseKind> {
+        return nominalPhasePaths.stream().map { obj: NominalPhasePath -> obj.from() }.collect(Collectors.toList())
     }
 
     /**
      * @return The nominal phases that are connected in the toTerminal.
      */
-    public List<SinglePhaseKind> toNominalPhases() {
-        return nominalPhasePaths.stream().map(NominalPhasePath::to).collect(Collectors.toList());
+    fun toNominalPhases(): List<SinglePhaseKind> {
+        return nominalPhasePaths.stream().map { obj: NominalPhasePath -> obj.to() }.collect(Collectors.toList())
     }
 
     /**
      * @return The mapping of nominal phase paths between the from and to terminals.
      */
-    public List<NominalPhasePath> nominalPhasePaths() {
-        return nominalPhasePaths;
+    fun nominalPhasePaths(): List<NominalPhasePath> {
+        return nominalPhasePaths
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ConnectivityResult)) return false;
-        ConnectivityResult that = (ConnectivityResult) o;
-        return fromTerminal.equals(that.fromTerminal) &&
-            toTerminal.equals(that.toTerminal) &&
-            nominalPhasePaths.equals(that.nominalPhasePaths);
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ConnectivityResult
+
+        if (fromTerminal != other.fromTerminal) return false
+        if (toTerminal != other.toTerminal) return false
+        if (nominalPhasePaths != other.nominalPhasePaths) return false
+
+        return true
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(fromTerminal, toTerminal, nominalPhasePaths);
+    override fun hashCode(): Int {
+        var result = fromTerminal.hashCode()
+        result = 31 * result + toTerminal.hashCode()
+        result = 31 * result + nominalPhasePaths.hashCode()
+        return result
     }
 
-    @Override
-    public String toString() {
+    override fun toString(): String {
         return "ConnectivityResult{" +
-            "fromTerminal=" + fromTerminal.getMRID() +
-            ", toTerminal=" + toTerminal.getMRID() +
-            ", nominalPhasePaths=" + nominalPhasePaths +
-            '}';
+            "fromTerminal=${fromTerminal.mRID}" +
+            ", toTerminal=${toTerminal.mRID}" +
+            ", nominalPhasePaths=$nominalPhasePaths" +
+            '}'
     }
 
-    private ConnectivityResult(Terminal fromTerminal, Terminal toTerminal, Collection<NominalPhasePath> nominalPhasePaths) {
-        this.fromTerminal = fromTerminal;
-        this.toTerminal = toTerminal;
-        this.nominalPhasePaths = new ArrayList<>(nominalPhasePaths);
+    companion object {
+        /**
+         * @param fromTerminal The terminal for which the connectivity was requested.
+         * @param toTerminal   The terminal which is connected to the requested terminal.
+         * @return The ConnectivityResult Builder to use to construct the result.
+         */
+        fun between(fromTerminal: Terminal, toTerminal: Terminal, nominalPhasePaths: Collection<NominalPhasePath>): ConnectivityResult {
+            return ConnectivityResult(fromTerminal, toTerminal, nominalPhasePaths)
+        }
+    }
 
-        this.nominalPhasePaths.sort(Comparator.comparing(NominalPhasePath::from).thenComparing(NominalPhasePath::to));
+    init {
+        this.nominalPhasePaths = ArrayList(nominalPhasePaths)
+        this.nominalPhasePaths.sortWith(Comparator.comparing { obj: NominalPhasePath -> obj.from() }.thenComparing { obj: NominalPhasePath -> obj.to() })
     }
 
 }

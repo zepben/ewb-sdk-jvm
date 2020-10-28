@@ -16,16 +16,17 @@ a 1.0.0 release.
 ### v0.3.0
 
 ##### Breaking Changes
-* None.
+* `tryGrpc` no longer throws. Helper methods have been added to `GrpcResult` providing convenient
+  ways of maintaining the previous functionality.
 
 ##### New Features
-* None.
+* Added `getFeeder` helper to the `NetworkConsumerClient`.
 
 ##### Enhancements
-* None.
+* The gRPC consumer and producer clients now share a common base class.
 
 ##### Fixes
-* None.
+* Fixed null annotations on `ConnectivityResult`.
 
 ##### Notes
 * None.

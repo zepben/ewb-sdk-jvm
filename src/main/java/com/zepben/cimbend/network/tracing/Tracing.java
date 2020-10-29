@@ -38,13 +38,7 @@ public class Tracing {
      * @return The new traversal instance.
      */
     public static BasicTraversal<ConductingEquipment> connectedEquipmentTrace() {
-        return createBasicDepthTrace(
-            (conductingEquipment, traversal) -> {
-                if (conductingEquipment != null) {
-                    List<ConnectivityResult> connectivityResults = NetworkService.connectedEquipment(conductingEquipment);
-                    connectivityResults.forEach(cr -> traversal.queue().add(cr.to()));
-                }
-            });
+        return createBasicDepthTrace(createConductingEquipmentQueueNext());
     }
 
     /**
@@ -54,13 +48,7 @@ public class Tracing {
      * @return The new traversal instance.
      */
     public static BasicTraversal<ConductingEquipment> connectedEquipmentBreadthTrace() {
-        return createBasicBreadthTrace(
-            (conductingEquipment, traversal) -> {
-                if (conductingEquipment != null) {
-                    List<ConnectivityResult> connectivityResults = NetworkService.connectedEquipment(conductingEquipment);
-                    connectivityResults.forEach(cr -> traversal.queue().add(cr.to()));
-                }
-            });
+        return createBasicBreadthTrace(createConductingEquipmentQueueNext());
     }
 
     /**
@@ -194,6 +182,19 @@ public class Tracing {
      */
     public static FindWithUsagePoints findWithUsagePoints() {
         return new FindWithUsagePoints();
+    }
+
+    private static BasicTraversal.QueueNext<ConductingEquipment> createConductingEquipmentQueueNext() {
+        return (conductingEquipment, traversal) -> {
+            if (conductingEquipment != null) {
+                List<ConnectivityResult> connectivityResults = NetworkService.connectedEquipment(conductingEquipment);
+                connectivityResults.forEach(cr -> {
+                    ConductingEquipment to = cr.getTo();
+                    if (to != null)
+                        traversal.queue().add(to);
+                });
+            }
+        };
     }
 
     // Should not be able to instantiate this class.

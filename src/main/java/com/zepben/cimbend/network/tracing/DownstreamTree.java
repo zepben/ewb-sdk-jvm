@@ -162,26 +162,32 @@ public class DownstreamTree {
         TreeNode previousNode = current.parent();
         if (previousNode != null) {
             for (ConnectivityResult cr : inTerminals) {
-                if (cr.to() == previousNode.conductingEquipment())
+                if (cr.getTo() == previousNode.conductingEquipment())
                     return;
             }
         }
 
         if (inTerminals.size() > 1 || Objects.requireNonNull(outTerminal.getConductingEquipment()).numTerminals() > 2) {
             for (ConnectivityResult cr : inTerminals) {
-                TreeNode next = new TreeNode(cr.to());
+                ConductingEquipment to = cr.getTo();
+                if (to != null) {
+                    TreeNode next = new TreeNode(to);
 
-                // Only branch to the next item if we have not already been there.
-                if (!traversal.hasVisited(next))
-                    traversal.branchQueue().add(traversal.branchSupplier().get().setStart(next.setParent(current)));
+                    // Only branch to the next item if we have not already been there.
+                    if (!traversal.hasVisited(next))
+                        traversal.branchQueue().add(traversal.branchSupplier().get().setStart(next.setParent(current)));
+                }
             }
         } else {
             for (ConnectivityResult cr : inTerminals) {
-                TreeNode next = new TreeNode(cr.to());
+                ConductingEquipment to = cr.getTo();
+                if (to != null) {
+                    TreeNode next = new TreeNode(to);
 
-                // Only queue up the next item if we have not already been there.
-                if (!traversal.hasVisited(next))
-                    traversal.queue().add(next.setParent(current));
+                    // Only queue up the next item if we have not already been there.
+                    if (!traversal.hasVisited(next))
+                        traversal.queue().add(next.setParent(current));
+                }
             }
         }
     }

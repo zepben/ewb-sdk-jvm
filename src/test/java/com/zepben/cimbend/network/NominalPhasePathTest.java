@@ -21,32 +21,32 @@ public class NominalPhasePathTest {
 
     @JvmField
     @RegisterExtension
-    public SystemLogExtension systemOutRule = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess();
+    public SystemLogExtension systemOutRule = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess();
 
-    private final NominalPhasePath nominalPhasePath1 = NominalPhasePath.between(SinglePhaseKind.A, SinglePhaseKind.B);
-    private final NominalPhasePath nominalPhasePath2 = NominalPhasePath.between(SinglePhaseKind.C, SinglePhaseKind.N);
+    private final NominalPhasePath nominalPhasePath1 = new NominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.B);
+    private final NominalPhasePath nominalPhasePath2 = new NominalPhasePath(SinglePhaseKind.C, SinglePhaseKind.N);
 
     @Test
     public void accessors() {
-        assertThat(nominalPhasePath1.from(), equalTo(SinglePhaseKind.A));
-        assertThat(nominalPhasePath1.to(), equalTo(SinglePhaseKind.B));
-        assertThat(nominalPhasePath2.from(), equalTo(SinglePhaseKind.C));
-        assertThat(nominalPhasePath2.to(), equalTo(SinglePhaseKind.N));
+        assertThat(nominalPhasePath1.getFrom(), equalTo(SinglePhaseKind.A));
+        assertThat(nominalPhasePath1.getTo(), equalTo(SinglePhaseKind.B));
+        assertThat(nominalPhasePath2.getFrom(), equalTo(SinglePhaseKind.C));
+        assertThat(nominalPhasePath2.getTo(), equalTo(SinglePhaseKind.N));
     }
 
     @Test
     public void coverage() {
         assertThat(nominalPhasePath1, equalTo(nominalPhasePath1));
-        assertThat(nominalPhasePath1, equalTo(NominalPhasePath.between(SinglePhaseKind.A, SinglePhaseKind.B)));
+        assertThat(nominalPhasePath1, equalTo(new NominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.B)));
         assertThat(nominalPhasePath1, not(equalTo(nominalPhasePath2)));
         assertThat(nominalPhasePath1, not(equalTo(null)));
         assertThat(nominalPhasePath1, not(equalTo("test")));
-        assertThat(nominalPhasePath1, not(equalTo(NominalPhasePath.between(SinglePhaseKind.A, SinglePhaseKind.C))));
-        assertThat(nominalPhasePath1, not(equalTo(NominalPhasePath.between(SinglePhaseKind.B, SinglePhaseKind.B))));
+        assertThat(nominalPhasePath1, not(equalTo(new NominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.C))));
+        assertThat(nominalPhasePath1, not(equalTo(new NominalPhasePath(SinglePhaseKind.B, SinglePhaseKind.B))));
 
         assertThat(nominalPhasePath1.toString(), not(is(emptyString())));
 
-        assertThat(nominalPhasePath1.hashCode(), not(equalTo(NominalPhasePath.between(SinglePhaseKind.B, SinglePhaseKind.A))));
+        assertThat(nominalPhasePath1.hashCode(), not(equalTo(new NominalPhasePath(SinglePhaseKind.B, SinglePhaseKind.A))));
     }
 
 }

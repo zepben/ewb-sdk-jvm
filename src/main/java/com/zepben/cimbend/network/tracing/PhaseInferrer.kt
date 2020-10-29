@@ -79,9 +79,8 @@ class PhaseInferrer {
             && hasMorePhasesThanConnected(terminal)
     }
 
-    private fun hasMorePhasesThanConnected(terminal: Terminal) = connectedTerminals(terminal)
-        .asSequence()
-        .any { it.toTerminal().phases.singlePhases().size < terminal.phases.singlePhases().size }
+    private fun hasMorePhasesThanConnected(terminal: Terminal): Boolean = connectedTerminals(terminal)
+        .any { it.toTerminal.phases.singlePhases().size < terminal.phases.singlePhases().size }
 
     private fun inferPhases(network: NetworkService, terminal: Terminal, phaseSelector: PhaseSelector, maxMissingPhases: Int) {
         val none = mutableListOf<PhaseStatus>()

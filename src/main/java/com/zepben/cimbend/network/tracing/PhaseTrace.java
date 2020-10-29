@@ -16,10 +16,7 @@ import com.zepben.cimbend.network.model.PhaseDirection;
 import com.zepben.traversals.BasicTraversal;
 import com.zepben.traversals.WeightedPriorityQueue;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -109,10 +106,7 @@ class PhaseTrace {
                     }
                 }
 
-                if (!outPhases.isEmpty()) {
-                    List<ConnectivityResult> inTerminals = NetworkService.connectedTerminals(terminal, outPhases);
-                    inTerminals.forEach(cr -> traversal.queue().add(PhaseStep.continueAt(cr.to(), cr.toNominalPhases(), cr.from())));
-                }
+                queueConnected(traversal, terminal, outPhases);
             });
         };
     }
@@ -128,12 +122,17 @@ class PhaseTrace {
                 outPhases.clear();
                 getPhasesWithDirection(openTest, activePhases, terminal, phaseStep.phases(), PhaseDirection.OUT, outPhases);
 
-                if (!outPhases.isEmpty()) {
-                    List<ConnectivityResult> inTerminals = NetworkService.connectedTerminals(terminal, outPhases);
-                    inTerminals.forEach(cr -> traversal.queue().add(PhaseStep.continueAt(cr.to(), cr.toNominalPhases(), cr.from())));
-                }
+                queueConnected(traversal, terminal, outPhases);
             });
         };
+    }
+
+    private static void queueConnected(BasicTraversal<PhaseStep> traversal, Terminal terminal, Set<SinglePhaseKind> outPhases) {
+        if (!outPhases.isEmpty()) {
+            NetworkService.connectedTerminals(terminal, outPhases).forEach(
+                cr -> tryQueue(traversal, cr, cr.getToNominalPhases())
+            );
+        }
     }
 
     private static BasicTraversal.QueueNext<PhaseStep> queueNextUpstream(final OpenTest openTest,
@@ -151,18 +150,24 @@ class PhaseTrace {
                     List<ConnectivityResult> inTerminals = NetworkService.connectedTerminals(terminal, inPhases);
                     inTerminals.forEach(cr -> {
                         // When going upstream, we only want to traverse to connected terminals that have an out direction
-                        Set<SinglePhaseKind> outPhases = cr.toNominalPhases()
+                        Set<SinglePhaseKind> outPhases = cr.getToNominalPhases()
                             .stream()
-                            .filter(phase -> activePhases.status(cr.toTerminal(), phase).direction().has(PhaseDirection.OUT))
+                            .filter(phase -> activePhases.status(cr.getToTerminal(), phase).direction().has(PhaseDirection.OUT))
                             .collect(Collectors.toSet());
 
                         if (!outPhases.isEmpty()) {
-                            traversal.queue().add(PhaseStep.continueAt(cr.to(), outPhases, cr.from()));
+                            tryQueue(traversal, cr, outPhases);
                         }
                     });
                 }
             });
         };
+    }
+
+    private static void tryQueue(BasicTraversal<PhaseStep> traversal, ConnectivityResult cr, Collection<SinglePhaseKind> outPhases) {
+        ConductingEquipment to = cr.getTo();
+        if (to != null)
+            traversal.queue().add(PhaseStep.continueAt(to, outPhases, cr.getFrom()));
     }
 
     private static void getPhasesWithDirection(OpenTest openTest,

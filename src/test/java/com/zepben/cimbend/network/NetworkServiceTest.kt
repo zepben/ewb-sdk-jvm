@@ -791,7 +791,7 @@ internal class NetworkServiceTest {
     private class PhasePathSet private constructor(private val fromPhases: PhaseCode) {
         fun to(toPhases: PhaseCode): Set<NominalPhasePath> {
             return IntStream.range(0, fromPhases.singlePhases().size)
-                .mapToObj { i: Int -> NominalPhasePath.between(fromPhases.singlePhases()[i], toPhases.singlePhases()[i]) }
+                .mapToObj { i: Int -> NominalPhasePath(fromPhases.singlePhases()[i], toPhases.singlePhases()[i]) }
                 .collect(Collectors.toSet())
         }
 
@@ -802,7 +802,7 @@ internal class NetworkServiceTest {
 
             fun implicit(phases: PhaseCode) = phases.singlePhases()
                 .asSequence()
-                .map { NominalPhasePath.between(it, it) }
+                .map { NominalPhasePath(it, it) }
                 .toSet()
         }
     }

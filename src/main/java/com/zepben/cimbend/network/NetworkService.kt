@@ -359,7 +359,7 @@ class NetworkService : BaseService("network") {
             connectivityNode.terminals.forEach { connectedTerminal ->
                 if (connectedTerminal != terminal) {
                     val cr = terminalConnectivity(terminal, connectedTerminal, tracePhases)
-                    if (cr.nominalPhasePaths().isNotEmpty())
+                    if (cr.nominalPhasePaths.isNotEmpty())
                         results.add(cr)
                 }
             }
@@ -371,7 +371,7 @@ class NetworkService : BaseService("network") {
             phases
                 .asSequence()
                 .filter { connectedTerminal.phases.singlePhases().contains(it) }
-                .forEach { nominalPhasePaths.add(NominalPhasePath.between(it, it)) }
+                .forEach { nominalPhasePaths.add(NominalPhasePath(it, it)) }
 
             if (nominalPhasePaths.isEmpty()) {
                 val xyPhases = phases
@@ -411,7 +411,7 @@ class NetworkService : BaseService("network") {
             xyPhases.forEach {
                 val index = terminal.phases.singlePhases().indexOf(it)
                 if (index < connectedTerminal.phases.singlePhases().size)
-                    nominalPhasePaths.add(NominalPhasePath.between(it, connectedTerminal.phases.singlePhases()[index]))
+                    nominalPhasePaths.add(NominalPhasePath(it, connectedTerminal.phases.singlePhases()[index]))
             }
 
             connectedXyPhases.forEach {
@@ -419,7 +419,7 @@ class NetworkService : BaseService("network") {
                 if (index < terminal.phases.singlePhases().size) {
                     val phase = terminal.phases.singlePhases()[index]
                     if (phases.contains(phase))
-                        nominalPhasePaths.add(NominalPhasePath.between(phase, it))
+                        nominalPhasePaths.add(NominalPhasePath(phase, it))
                 }
             }
         }

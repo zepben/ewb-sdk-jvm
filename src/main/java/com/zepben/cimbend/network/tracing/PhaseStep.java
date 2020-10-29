@@ -38,7 +38,7 @@ public class PhaseStep {
         return startAt(conductingEquipment, phaseCode.singlePhases());
     }
 
-    public static PhaseStep continueAt(ConductingEquipment conductingEquipment, Collection<SinglePhaseKind> phases, ConductingEquipment previous) {
+    public static PhaseStep continueAt(ConductingEquipment conductingEquipment, Collection<SinglePhaseKind> phases, @Nullable ConductingEquipment previous) {
         return new PhaseStep(conductingEquipment, phases, previous);
     }
 

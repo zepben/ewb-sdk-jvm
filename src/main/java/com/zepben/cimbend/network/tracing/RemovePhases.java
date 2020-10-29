@@ -140,11 +140,11 @@ public class RemovePhases {
                                       Map<SinglePhaseKind, Set<ConnectivityResult>> otherFeedsByPhase,
                                       PhaseSelector phaseSelector) {
         connectedTerminals.forEach(cr ->
-            cr.nominalPhasePaths()
+            cr.getNominalPhasePaths()
                 .forEach(nominalPhasePath -> {
-                    terminalsByPhase.computeIfAbsent(nominalPhasePath.from(), k -> new HashSet<>()).add(cr);
-                    if (phaseSelector.status(cr.toTerminal(), nominalPhasePath.to()).direction().has(PhaseDirection.BOTH))
-                        otherFeedsByPhase.computeIfAbsent(nominalPhasePath.from(), k -> new HashSet<>()).add(cr);
+                    terminalsByPhase.computeIfAbsent(nominalPhasePath.getFrom(), k -> new HashSet<>()).add(cr);
+                    if (phaseSelector.status(cr.getToTerminal(), nominalPhasePath.getTo()).direction().has(PhaseDirection.BOTH))
+                        otherFeedsByPhase.computeIfAbsent(nominalPhasePath.getFrom(), k -> new HashSet<>()).add(cr);
                 })
         );
     }
@@ -154,11 +154,11 @@ public class RemovePhases {
             return;
 
         terminals.forEach(terminal ->
-            phasesByTerminalsToEbbAndQueue.computeIfAbsent(terminal.toTerminal(), k -> new HashSet<>())
-                .add(terminal.nominalPhasePaths()
+            phasesByTerminalsToEbbAndQueue.computeIfAbsent(terminal.getToTerminal(), k -> new HashSet<>())
+                .add(terminal.getNominalPhasePaths()
                     .stream()
-                    .filter(nominalPhasePath -> nominalPhasePath.from() == phase)
-                    .map(NominalPhasePath::to)
+                    .filter(nominalPhasePath -> nominalPhasePath.getFrom() == phase)
+                    .map(NominalPhasePath::getTo)
                     .findFirst()
                     .orElse(SinglePhaseKind.NONE)
                 )

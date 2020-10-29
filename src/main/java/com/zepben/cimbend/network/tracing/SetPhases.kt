@@ -284,18 +284,18 @@ class SetPhases {
         // Get all the connected terminals to the nominal phases with phases going out
         val connectivityResults = connectedTerminals(outTerminal, phasesToFlow)
         for (connectivityResult in connectivityResults) {
-            val inTerminal = connectivityResult.toTerminal()
+            val inTerminal = connectivityResult.toTerminal
             var hasAdded = false
 
-            for (oi in connectivityResult.nominalPhasePaths()) {
+            for (oi in connectivityResult.nominalPhasePaths) {
                 try {
-                    if (phaseSelector.status(inTerminal, oi.to()).add(phaseSelector.status(outTerminal, oi.from()).phase(), PhaseDirection.IN))
+                    if (phaseSelector.status(inTerminal, oi.to).add(phaseSelector.status(outTerminal, oi.from).phase(), PhaseDirection.IN))
                         hasAdded = true
                 } catch (ex: UnsupportedOperationException) {
                     throw IllegalStateException(
-                        "Attempted to apply more than one phase to ${inTerminal.conductingEquipment?.mRID ?: inTerminal.mRID} on nominal phase ${oi.to()}. " +
-                            "Attempted to apply phase ${phaseSelector.status(outTerminal, oi.from()).phase()} " +
-                            "to ${phaseSelector.status(inTerminal, oi.to()).phase()}."
+                        "Attempted to apply more than one phase to ${inTerminal.conductingEquipment?.mRID ?: inTerminal.mRID} on nominal phase ${oi.to}. " +
+                            "Attempted to apply phase ${phaseSelector.status(outTerminal, oi.from).phase()} " +
+                            "to ${phaseSelector.status(inTerminal, oi.to).phase()}."
                     )
                 }
             }

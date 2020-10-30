@@ -64,3 +64,4 @@ site.7z
 
 **/node_modules/
 **/.docusaurus/
+docs/build

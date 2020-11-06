@@ -14,6 +14,9 @@ import com.zepben.cimbend.cim.iec61968.common.Location
 import com.zepben.cimbend.cim.iec61970.base.core.*
 import com.zepben.cimbend.cim.iec61970.base.wires.*
 import com.zepben.cimbend.common.extensions.typeNameAndMRID
+import com.zepben.cimbend.get.ConsumerUtils.buildFromBuilder
+import com.zepben.cimbend.get.ConsumerUtils.forEachBuilder
+import com.zepben.cimbend.get.ConsumerUtils.validateFailure
 import com.zepben.cimbend.get.hierarchy.NetworkHierarchy
 import com.zepben.cimbend.get.hierarchy.NetworkHierarchyIdentifiedObject
 import com.zepben.cimbend.get.testdata.FeederNetwork
@@ -23,7 +26,6 @@ import com.zepben.cimbend.grpc.GrpcResult
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.NetworkServiceComparator
 import com.zepben.cimbend.network.model.toPb
-import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger
 import com.zepben.protobuf.nc.*
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
@@ -34,7 +36,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
-import kotlin.reflect.full.declaredMemberFunctions
 
 internal class NetworkConsumerClientTest {
 
@@ -44,7 +45,8 @@ internal class NetworkConsumerClientTest {
 
     private val stub = mock(NetworkConsumerGrpc.NetworkConsumerBlockingStub::class.java)
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val consumerClient: NetworkConsumerClient = NetworkConsumerClient(stub).apply { addErrorHandler(onErrorHandler) }
+    private val consumerClient: NetworkConsumerClient =
+        NetworkConsumerClient(stub).apply { addErrorHandler(onErrorHandler) }
     private val service: NetworkService = NetworkService()
 
     @Test
@@ -67,7 +69,10 @@ internal class NetworkConsumerClientTest {
             } else {
                 assertThat(result.wasFailure, equalTo(true))
                 assertThat(result.thrown, instanceOf(UnsupportedOperationException::class.java))
-                assertThat(result.thrown.message, equalTo("Identified object type $type is not supported by the network service"))
+                assertThat(
+                    result.thrown.message,
+                    equalTo("Identified object type $type is not supported by the network service")
+                )
                 assertThat(result.thrown, equalTo(onErrorHandler.lastError))
             }
 
@@ -85,7 +90,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObject(service, mRID)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
-        validateFailure(result, expectedEx, true)
+        validateFailure(onErrorHandler, result, expectedEx, true)
     }
 
     @Test
@@ -99,15 +104,27 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObject(service, mRID)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
-        validateFailure(result, expectedEx, false)
+        validateFailure(onErrorHandler, result, expectedEx, false)
     }
 
     @Test
     internal fun `can get multiple identified objects in single call`() {
         val mRIDs = listOf("id1", "id2", "id3")
-        val response1 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, mRIDs[0])
-        val response2 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, mRIDs[1])
-        val response3 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getBreakerBuilder, mRIDs[2])
+        val response1 = createResponse(
+            NetworkIdentifiedObject.newBuilder(),
+            NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder,
+            mRIDs[0]
+        )
+        val response2 = createResponse(
+            NetworkIdentifiedObject.newBuilder(),
+            NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder,
+            mRIDs[1]
+        )
+        val response3 = createResponse(
+            NetworkIdentifiedObject.newBuilder(),
+            NetworkIdentifiedObject.Builder::getBreakerBuilder,
+            mRIDs[2]
+        )
 
         doReturn(listOf(response1, response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
 
@@ -132,7 +149,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-        validateFailure(result, expectedEx, true)
+        validateFailure(onErrorHandler, result, expectedEx, true)
     }
 
     @Test
@@ -146,7 +163,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-        validateFailure(result, expectedEx, false)
+        validateFailure(onErrorHandler, result, expectedEx, false)
     }
 
     @Test
@@ -168,7 +185,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getNetworkHierarchy()
 
         verify(stub).getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
-        validateFailure(result, expectedEx, true)
+        validateFailure(onErrorHandler, result, expectedEx, true)
     }
 
     @Test
@@ -181,7 +198,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getNetworkHierarchy()
 
         verify(stub).getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
-        validateFailure(result, expectedEx, false)
+        validateFailure(onErrorHandler, result, expectedEx, false)
     }
 
     @Test
@@ -384,18 +401,6 @@ internal class NetworkConsumerClientTest {
         validateNestedFailure(result, "validPerLengthSequenceInformation", false)
     }
 
-    private fun forEachBuilder(obj: Any, action: (Any) -> Unit) {
-        obj::class.declaredMemberFunctions
-            .asSequence()
-            .filter { it.parameters.size == 1 }
-            .filter { it.name.startsWith("get") }
-            .filter { it.name.endsWith("Builder") }
-            .filter { !it.name.endsWith("FieldBuilder") }
-            .filter { !it.name.endsWith("OrBuilder") || it.name == "getOrBuilder" }
-            .mapNotNull { it.call(obj) }
-            .forEach(action)
-    }
-
     private fun createResponse(
         identifiedObjectBuilder: NetworkIdentifiedObject.Builder,
         subClassBuilder: (NetworkIdentifiedObject.Builder) -> Any,
@@ -404,7 +409,11 @@ internal class NetworkConsumerClientTest {
         return createResponse(identifiedObjectBuilder, subClassBuilder(identifiedObjectBuilder), mRID)
     }
 
-    private fun createResponse(identifiedObjectBuilder: NetworkIdentifiedObject.Builder, subClassBuilder: Any, mRID: String): GetIdentifiedObjectsResponse {
+    private fun createResponse(
+        identifiedObjectBuilder: NetworkIdentifiedObject.Builder,
+        subClassBuilder: Any,
+        mRID: String
+    ): GetIdentifiedObjectsResponse {
         buildFromBuilder(subClassBuilder, mRID)
         println(identifiedObjectBuilder)
 
@@ -415,19 +424,6 @@ internal class NetworkConsumerClientTest {
         objectGroupBuilder.build()
 
         return responseBuilder.build()
-    }
-
-    private fun buildFromBuilder(builder: Any, mRID: String): Any {
-        println("-> ${builder::class.java.enclosingClass.simpleName}.${builder::class.simpleName}")
-        builder::class.declaredMemberFunctions.find { it.name == "setMRID" }?.call(builder, mRID)
-
-        // Add any customisations required to build the object at a bare minimum
-        if (builder is TapChanger.Builder)
-            builder.highStep = 1
-
-        forEachBuilder(builder) { buildFromBuilder(it, mRID) }
-
-        return builder::class.declaredMemberFunctions.single { it.name == "build" }.call(builder)!!
     }
 
     private fun isSupported(type: NetworkIdentifiedObject.IdentifiedObjectCase): Boolean =
@@ -463,7 +459,11 @@ internal class NetworkConsumerClientTest {
         }
     }
 
-    private fun <T : NetworkHierarchyIdentifiedObject> validateMap(actualMap: Map<String, T>, expectedMap: Map<String, T>, comparator: (T, T) -> Unit) {
+    private fun <T : NetworkHierarchyIdentifiedObject> validateMap(
+        actualMap: Map<String, T>,
+        expectedMap: Map<String, T>,
+        comparator: (T, T) -> Unit
+    ) {
         assertThat(actualMap.size, equalTo(expectedMap.size))
 
         actualMap.forEach { (mRID, it) ->
@@ -577,13 +577,6 @@ internal class NetworkConsumerClientTest {
         assertThat("missing from source", differences.missingFromSource(), empty())
         assertThat("missing from target", differences.missingFromTarget(), empty())
         assertThat("has differences", differences.modifications().entries, empty())
-    }
-
-    private fun validateFailure(result: GrpcResult<*>, expectedEx: Throwable, expectHandled: Boolean) {
-        assertThat(result.wasFailure, equalTo(true))
-        assertThat(result.thrown, equalTo(expectedEx))
-        assertThat(result.wasErrorHandled, equalTo(expectHandled))
-        assertThat(onErrorHandler.lastError, if (expectHandled) equalTo(expectedEx) else nullValue())
     }
 
     private fun validateNestedFailure(result: GrpcResult<*>, expectedMessage: String, expectHandled: Boolean) {

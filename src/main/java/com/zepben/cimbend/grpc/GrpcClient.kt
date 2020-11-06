@@ -7,8 +7,6 @@
  */
 package com.zepben.cimbend.grpc
 
-import com.zepben.cimbend.put.RpcErrorHandler
-
 /**
  * Base class that defines some helpful functions for gRPC clients to communicate with the server.
  */

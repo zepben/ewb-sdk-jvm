@@ -5,52 +5,40 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.associations;
+package com.zepben.cimbend.database.sqlite.tables.associations
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.SqliteTable;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
+import com.zepben.cimbend.database.sqlite.tables.SqliteTable
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+@Suppress("PropertyName")
+class TableEquipmentUsagePoints : SqliteTable() {
 
-import static com.zepben.cimbend.database.Column.Nullable.NOT_NULL;
+    val EQUIPMENT_MRID = Column(++columnIndex, "equipment_mrid", "TEXT", NOT_NULL)
+    val USAGE_POINT_MRID = Column(++columnIndex, "usage_point_mrid", "TEXT", NOT_NULL)
 
-@EverythingIsNonnullByDefault
-public class TableEquipmentUsagePoints extends SqliteTable {
-
-    public final Column EQUIPMENT_MRID = new Column(++columnIndex, "equipment_mrid", "TEXT", NOT_NULL);
-    public final Column USAGE_POINT_MRID = new Column(++columnIndex, "usage_point_mrid", "TEXT", NOT_NULL);
-
-    @Override
-    public String name() {
-        return "equipment_usage_points";
+    override fun name(): String {
+        return "equipment_usage_points"
     }
 
-    @Override
-    public List<List<Column>> uniqueIndexColumns() {
-        List<List<Column>> cols = super.uniqueIndexColumns();
-        cols.add(Arrays.asList(EQUIPMENT_MRID, USAGE_POINT_MRID));
-        return cols;
+    override fun uniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.uniqueIndexColumns()
+
+        cols.add(listOf(EQUIPMENT_MRID, USAGE_POINT_MRID))
+
+        return cols
     }
 
-    @Override
-    public List<List<Column>> nonUniqueIndexColumns() {
-        List<List<Column>> cols = super.nonUniqueIndexColumns();
-        cols.add(Collections.singletonList(EQUIPMENT_MRID));
-        cols.add(Collections.singletonList(USAGE_POINT_MRID));
-        return cols;
+    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.nonUniqueIndexColumns()
+
+        cols.add(listOf(EQUIPMENT_MRID))
+        cols.add(listOf(USAGE_POINT_MRID))
+
+        return cols
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableEquipmentUsagePoints.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

@@ -5,15 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61968.assets;
+package com.zepben.cimbend.database.sqlite.tables.iec61968.assets
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NULL
+import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects
 
-import static com.zepben.cimbend.database.Column.Nullable.NULL;
+@Suppress("PropertyName")
+abstract class TableAssets : TableIdentifiedObjects() {
 
-@EverythingIsNonnullByDefault
-public abstract class TableAssets extends TableIdentifiedObjects {
-    public final Column LOCATION_MRID = new Column(++columnIndex, "location_mrid", "TEXT", NULL);
+    val LOCATION_MRID = Column(++columnIndex, "location_mrid", "TEXT", NULL)
+
 }

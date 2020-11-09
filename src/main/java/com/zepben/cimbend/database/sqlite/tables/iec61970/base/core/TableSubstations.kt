@@ -5,41 +5,30 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.core;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.core
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NULL
 
-import java.util.Collections;
-import java.util.List;
+@Suppress("PropertyName")
+class TableSubstations : TableEquipmentContainers() {
 
-import static com.zepben.cimbend.database.Column.Nullable.NULL;
+    val SUB_GEOGRAPHICAL_REGION_MRID =
+        Column(++columnIndex, "sub_geographical_region_mrid", "TEXT", NULL)
 
-@EverythingIsNonnullByDefault
-public class TableSubstations extends TableEquipmentContainers {
-
-    public final Column SUB_GEOGRAPHICAL_REGION_MRID = new Column(++columnIndex, "sub_geographical_region_mrid", "TEXT", NULL);
-
-    @Override
-    public String name() {
-        return "substations";
+    override fun name(): String {
+        return "substations"
     }
 
-    @Override
-    public List<List<Column>> nonUniqueIndexColumns() {
-        List<List<Column>> cols = super.nonUniqueIndexColumns();
-        cols.add(Collections.singletonList(SUB_GEOGRAPHICAL_REGION_MRID));
-        return cols;
+    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.nonUniqueIndexColumns()
+
+        cols.add(listOf(SUB_GEOGRAPHICAL_REGION_MRID))
+
+        return cols
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableSubstations.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

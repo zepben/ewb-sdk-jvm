@@ -5,34 +5,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NULL
 
-import static com.zepben.cimbend.database.Column.Nullable.NULL;
+@Suppress("PropertyName")
+class TableAcLineSegments : TableConductors() {
 
-/**
- * Represents the AC line segments table
- */
-@EverythingIsNonnullByDefault
-public class TableAcLineSegments extends TableConductors {
+    val PER_LENGTH_SEQUENCE_IMPEDANCE_MRID =
+        Column(++columnIndex, "per_length_sequence_impedance_mrid", "TEXT", NULL)
 
-    public final Column PER_LENGTH_SEQUENCE_IMPEDANCE_MRID = new Column(++columnIndex, "per_length_sequence_impedance_mrid", "TEXT", NULL);
-
-    @Override
-    public String name() {
-        return "ac_line_segments";
+    override fun name(): String {
+        return "ac_line_segments"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableAcLineSegments.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

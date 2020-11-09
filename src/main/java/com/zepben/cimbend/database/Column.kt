@@ -5,64 +5,31 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database;
+package com.zepben.cimbend.database
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
+import com.zepben.annotations.EverythingIsNonnullByDefault
 
 /**
  * Represents a column in a database table.
  */
 @EverythingIsNonnullByDefault
-public class Column {
+class Column @JvmOverloads constructor(
+    val queryIndex: Int,
+    val name: String,
+    val type: String,
+    val nullable: Nullable = Nullable.NONE
+) {
 
-    public enum Nullable {
+    enum class Nullable {
         NONE, NOT_NULL, NULL;
 
-        public String sqlString() {
-            if (this == NULL) return "NULL";
-            else if (this == NOT_NULL) return "NOT NULL";
-            else return "";
-        }
+        fun sqlString(): String = if (this == NULL) "NULL" else if (this == NOT_NULL) "NOT NULL" else ""
     }
 
-    private final int queryIndex;
-    private final String name;
-    private final String type;
-    private final Nullable nullable;
+    fun sqlString(): String = (name + " " + type + " " + nullable.sqlString()).trim { it <= ' ' }
 
-    public Column(int queryIndex, String name, String type) {
-        this(queryIndex, name, type, Nullable.NONE);
-    }
-
-    public Column(int queryIndex, String name, String type, Nullable nullable) {
-
-        if (queryIndex < 0)
-            throw new IllegalArgumentException("You cannot use a negative query indexes.");
-
-        this.queryIndex = queryIndex;
-        this.name = name;
-        this.type = type;
-        this.nullable = nullable;
-    }
-
-    public int queryIndex() {
-        return queryIndex;
-    }
-
-    public String name() {
-        return name;
-    }
-
-    public String type() {
-        return type;
-    }
-
-    public Nullable nullable() {
-        return nullable;
-    }
-
-    public String sqlString() {
-        return (name + " " + type + " " + nullable.sqlString()).trim();
+    init {
+        require(queryIndex >= 0) { "You cannot use a negative query indexes." }
     }
 
 }

@@ -5,26 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61968.metering;
+package com.zepben.cimbend.database.sqlite.tables.iec61968.metering
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
+class TableMeters : TableEndDevices() {
 
-@EverythingIsNonnullByDefault
-public class TableMeters extends TableEndDevices {
-
-    @Override
-    public String name() {
-        return "meters";
+    override fun name(): String {
+        return "meters"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableMeters.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

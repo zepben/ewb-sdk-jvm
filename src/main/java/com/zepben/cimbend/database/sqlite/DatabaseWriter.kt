@@ -14,7 +14,6 @@ import com.zepben.cimbend.database.sqlite.extensions.configureBatch
 import com.zepben.cimbend.database.sqlite.tables.TableVersion
 import com.zepben.cimbend.database.sqlite.writers.*
 import com.zepben.cimbend.diagram.DiagramService
-import com.zepben.cimbend.measurement.MeasurementService
 import com.zepben.cimbend.network.NetworkService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -22,7 +21,6 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.sql.*
-
 
 
 /**
@@ -75,9 +73,18 @@ class DatabaseWriter @JvmOverloads constructor(
         services.forEach {
             status = status and try {
                 when (it) {
-                    is NetworkService -> NetworkServiceWriter(::hasCommon, ::addCommon).save(it, NetworkCIMWriter(databaseTables))
-                    is CustomerService -> CustomerServiceWriter(::hasCommon, ::addCommon).save(it, CustomerCIMWriter(databaseTables))
-                    is DiagramService -> DiagramServiceWriter(::hasCommon, ::addCommon).save(it, DiagramCIMWriter(databaseTables))
+                    is NetworkService -> NetworkServiceWriter(::hasCommon, ::addCommon).save(
+                        it,
+                        NetworkCIMWriter(databaseTables)
+                    )
+                    is CustomerService -> CustomerServiceWriter(::hasCommon, ::addCommon).save(
+                        it,
+                        CustomerCIMWriter(databaseTables)
+                    )
+                    is DiagramService -> DiagramServiceWriter(::hasCommon, ::addCommon).save(
+                        it,
+                        DiagramCIMWriter(databaseTables)
+                    )
                     else -> run { logger.error("Unsupported service of type ${it.javaClass.simpleName} couldn't be saved."); false }
                 }
             } catch (e: MissingTableConfigException) {
@@ -94,9 +101,9 @@ class DatabaseWriter @JvmOverloads constructor(
 
     private fun preSave(): Boolean {
         return removeExisting()
-            && connect()
-            && create()
-            && prepareInsertStatements()
+                && connect()
+                && create()
+                && prepareInsertStatements()
     }
 
     private fun removeExisting(): Boolean {

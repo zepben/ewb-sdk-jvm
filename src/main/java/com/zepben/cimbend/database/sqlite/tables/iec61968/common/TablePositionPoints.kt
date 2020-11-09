@@ -5,45 +5,33 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61968.common;
+package com.zepben.cimbend.database.sqlite.tables.iec61968.common
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.SqliteTable;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
+import com.zepben.cimbend.database.sqlite.tables.SqliteTable
 
-import java.util.Arrays;
-import java.util.List;
+@Suppress("PropertyName")
+class TablePositionPoints : SqliteTable() {
 
-import static com.zepben.cimbend.database.Column.Nullable.NOT_NULL;
+    val LOCATION_MRID = Column(++columnIndex, "location_mrid", "TEXT", NOT_NULL)
+    val SEQUENCE_NUMBER = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
+    val X_POSITION = Column(++columnIndex, "x_position", "NUMBER", NOT_NULL)
+    val Y_POSITION = Column(++columnIndex, "y_position", "NUMBER", NOT_NULL)
 
-@EverythingIsNonnullByDefault
-public class TablePositionPoints extends SqliteTable {
-
-    public final Column LOCATION_MRID = new Column(++columnIndex, "location_mrid", "TEXT", NOT_NULL);
-    public final Column SEQUENCE_NUMBER = new Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL);
-    public final Column X_POSITION = new Column(++columnIndex, "x_position", "NUMBER", NOT_NULL);
-    public final Column Y_POSITION = new Column(++columnIndex, "y_position", "NUMBER", NOT_NULL);
-
-    @Override
-    public String name() {
-        return "position_points";
+    override fun name(): String {
+        return "position_points"
     }
 
-    @Override
-    public List<List<Column>> uniqueIndexColumns() {
-        List<List<Column>> cols = super.uniqueIndexColumns();
-        cols.add(Arrays.asList(LOCATION_MRID, SEQUENCE_NUMBER));
-        return cols;
+    override fun uniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.uniqueIndexColumns()
+
+        cols.add(listOf(LOCATION_MRID, SEQUENCE_NUMBER))
+
+        return cols
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TablePositionPoints.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

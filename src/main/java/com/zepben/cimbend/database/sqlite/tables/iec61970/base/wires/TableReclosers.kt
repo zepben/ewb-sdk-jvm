@@ -5,29 +5,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-
-/**
- * Represents the reclosers table.
- */
-@EverythingIsNonnullByDefault
-public class TableReclosers extends TableProtectedSwitches {
-
-    @Override
-    public String name() {
-        return "reclosers";
+class TableReclosers : TableProtectedSwitches() {
+    override fun name(): String {
+        return "reclosers"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableReclosers.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

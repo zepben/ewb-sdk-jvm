@@ -5,29 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61968.assetinfo;
+package com.zepben.cimbend.database.sqlite.tables.iec61968.assetinfo
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
+class TableCableInfo : TableWireInfo() {
 
-/**
- * Represents the cable info table
- */
-@EverythingIsNonnullByDefault
-public class TableCableInfo extends TableWireInfo {
-
-    @Override
-    public String name() {
-        return "cable_info";
+    override fun name(): String {
+        return "cable_info"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableCableInfo.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

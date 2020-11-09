@@ -5,18 +5,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61968.assetinfo;
+package com.zepben.cimbend.database.sqlite.tables.iec61968.assetinfo
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.iec61968.assets.TableAssetInfo;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
+import com.zepben.cimbend.database.sqlite.tables.iec61968.assets.TableAssetInfo
 
-import static com.zepben.cimbend.database.Column.Nullable.NOT_NULL;
+@Suppress("PropertyName")
+abstract class TableWireInfo : TableAssetInfo() {
 
-@EverythingIsNonnullByDefault
-public abstract class TableWireInfo extends TableAssetInfo {
-
-    public final Column RATED_CURRENT = new Column(++columnIndex, "rated_current", "NUMBER", NOT_NULL);
-    public final Column MATERIAL = new Column(++columnIndex, "material", "TEXT", NOT_NULL);
+    val RATED_CURRENT = Column(++columnIndex, "rated_current", "NUMBER", NOT_NULL)
+    val MATERIAL = Column(++columnIndex, "material", "TEXT", NOT_NULL)
 
 }

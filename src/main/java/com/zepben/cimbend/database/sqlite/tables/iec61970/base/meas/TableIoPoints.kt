@@ -5,12 +5,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.meas;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.meas
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects;
+import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects
 
-@EverythingIsNonnullByDefault
-public abstract class TableIoPoints extends TableIdentifiedObjects {
-
-}
+abstract class TableIoPoints : TableIdentifiedObjects()

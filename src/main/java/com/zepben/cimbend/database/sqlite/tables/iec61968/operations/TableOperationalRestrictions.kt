@@ -5,27 +5,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61968.operations;
+package com.zepben.cimbend.database.sqlite.tables.iec61968.operations
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.sqlite.tables.iec61968.common.TableDocuments;
+import com.zepben.cimbend.database.sqlite.tables.iec61968.common.TableDocuments
 
-@EverythingIsNonnullByDefault
-public class TableOperationalRestrictions extends TableDocuments {
+class TableOperationalRestrictions : TableDocuments() {
 
-    @Override
-    public String name() {
-        return "operational_restrictions";
+    override fun name(): String {
+        return "operational_restrictions"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableOperationalRestrictions.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

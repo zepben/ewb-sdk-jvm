@@ -5,15 +5,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableConductingEquipment;
+import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableConductingEquipment
 
-/**
- * Represents the energy consumers table.
- */
-@EverythingIsNonnullByDefault
-public abstract class TableEnergyConnections extends TableConductingEquipment {
-
-}
+abstract class TableEnergyConnections : TableConductingEquipment()

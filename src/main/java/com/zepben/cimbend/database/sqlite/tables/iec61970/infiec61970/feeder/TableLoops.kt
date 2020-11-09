@@ -5,30 +5,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.infiec61970.feeder;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.infiec61970.feeder
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects;
+import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects
 
-/**
- * Represents the loops table.
- */
-@EverythingIsNonnullByDefault
-public class TableLoops extends TableIdentifiedObjects {
+class TableLoops : TableIdentifiedObjects() {
 
-    @Override
-    public String name() {
-        return "loops";
+    override fun name(): String {
+        return "loops"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableLoops.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

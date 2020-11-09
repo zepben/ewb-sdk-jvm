@@ -19,14 +19,17 @@ import kotlin.reflect.jvm.kotlinProperty
 abstract class SqliteTable {
     @JvmField
     protected var columnIndex = 0
+
     private var columnSet: SortedSet<Column>? = null
     private var createTableSql: String? = null
     private var preparedInsertSql: String? = null
     private var preparedUpdateSql: String? = null
     private var createIndexesSql: Collection<String>? = null
     private var selectSql: String? = null
+
     abstract fun name(): String
-    open fun uniqueIndexColumns(): List<List<Column>> {
+
+    open fun uniqueIndexColumns(): MutableList<List<Column>> {
         return ArrayList()
     }
 
@@ -46,8 +49,8 @@ abstract class SqliteTable {
 
     fun preparedUpdateSql(): String = preparedUpdateSql ?: buildPreparedUpdateSql()
 
-    protected abstract val tableClass: Class<*>
-    protected abstract val tableClassInstance: Any
+    protected abstract val tableClass: Class<out SqliteTable>
+    protected abstract val tableClassInstance: SqliteTable
 
     @Suppress("UNCHECKED_CAST")
     private fun createColumnSet(clazz: Class<*>, instance: Any): SortedSet<Column> {
@@ -154,4 +157,5 @@ abstract class SqliteTable {
     companion object {
         private val logger = LoggerFactory.getLogger(SqliteTable::class.java)
     }
+
 }

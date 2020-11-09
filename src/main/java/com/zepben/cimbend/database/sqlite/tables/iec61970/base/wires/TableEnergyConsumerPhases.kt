@@ -5,50 +5,35 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TablePowerSystemResources;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
+import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TablePowerSystemResources
 
-import java.util.Collections;
-import java.util.List;
+@Suppress("PropertyName")
+class TableEnergyConsumerPhases : TablePowerSystemResources() {
 
-import static com.zepben.cimbend.database.Column.Nullable.NOT_NULL;
+    val ENERGY_CONSUMER_MRID = Column(++columnIndex, "ENERGY_CONSUMER_MRID", "TEXT", NOT_NULL)
+    val PHASE = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
+    val P = Column(++columnIndex, "p", "NUMBER", NOT_NULL)
+    val Q = Column(++columnIndex, "q", "NUMBER", NOT_NULL)
+    val P_FIXED = Column(++columnIndex, "p_fixed", "NUMBER", NOT_NULL)
+    val Q_FIXED = Column(++columnIndex, "q_fixed", "NUMBER", NOT_NULL)
 
-/**
- * Represents the energy consumers table.
- */
-@EverythingIsNonnullByDefault
-public class TableEnergyConsumerPhases extends TablePowerSystemResources {
-
-    public final Column ENERGY_CONSUMER_MRID = new Column(++columnIndex, "ENERGY_CONSUMER_MRID", "TEXT", NOT_NULL);
-    public final Column PHASE = new Column(++columnIndex, "phase", "TEXT", NOT_NULL);
-    public final Column P = new Column(++columnIndex, "p", "NUMBER", NOT_NULL);
-    public final Column Q = new Column(++columnIndex, "q", "NUMBER", NOT_NULL);
-    public final Column P_FIXED = new Column(++columnIndex, "p_fixed", "NUMBER", NOT_NULL);
-    public final Column Q_FIXED = new Column(++columnIndex, "q_fixed", "NUMBER", NOT_NULL);
-
-    @Override
-    public String name() {
-        return "energy_consumer_phases";
+    override fun name(): String {
+        return "energy_consumer_phases"
     }
 
-    @Override
-    public List<List<Column>> nonUniqueIndexColumns() {
-        List<List<Column>> cols = super.nonUniqueIndexColumns();
-        cols.add(Collections.singletonList(ENERGY_CONSUMER_MRID));
-        return cols;
+    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.nonUniqueIndexColumns()
+
+        cols.add(listOf(ENERGY_CONSUMER_MRID))
+
+        return cols
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableEnergyConsumerPhases.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

@@ -5,11 +5,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.core;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.core
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-
-@EverythingIsNonnullByDefault
-public abstract class TableConnectivityNodeContainers extends TablePowerSystemResources {
-
-}
+abstract class TableConnectivityNodeContainers : TablePowerSystemResources()

@@ -5,31 +5,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61968.assets;
+package com.zepben.cimbend.database.sqlite.tables.iec61968.assets
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
 
-import static com.zepben.cimbend.database.Column.Nullable.NOT_NULL;
+@Suppress("PropertyName")
+class TablePoles : TableStructures() {
 
-@EverythingIsNonnullByDefault
-public class TablePoles extends TableStructures {
+    var CLASSIFICATION = Column(++columnIndex, "classification", "TEXT", NOT_NULL)
 
-    public Column CLASSIFICATION = new Column(++columnIndex, "classification", "TEXT", NOT_NULL);
-
-    @Override
-    public String name() {
-        return "poles";
+    override fun name(): String {
+        return "poles"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TablePoles.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

@@ -5,31 +5,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.meas;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.meas
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NULL
 
-import static com.zepben.cimbend.database.Column.Nullable.NULL;
+@Suppress("PropertyName")
+class TableControls : TableIoPoints() {
 
-@EverythingIsNonnullByDefault
-public class TableControls extends TableIoPoints {
+    val POWER_SYSTEM_RESOURCE_MRID = Column(++columnIndex, "power_system_resource_mrid", "TEXT", NULL)
 
-    public final Column POWER_SYSTEM_RESOURCE_MRID = new Column(++columnIndex, "power_system_resource_mrid", "TEXT", NULL);
-
-    @Override
-    public String name() {
-        return "controls";
+    override fun name(): String {
+        return "controls"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableControls.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

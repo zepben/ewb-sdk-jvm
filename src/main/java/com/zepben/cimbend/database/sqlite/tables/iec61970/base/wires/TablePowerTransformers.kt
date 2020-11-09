@@ -5,35 +5,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableConductingEquipment;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
+import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableConductingEquipment
 
-import static com.zepben.cimbend.database.Column.Nullable.NOT_NULL;
+@Suppress("PropertyName")
+class TablePowerTransformers : TableConductingEquipment() {
 
-/**
- * Represents the power transformers table.
- */
-@EverythingIsNonnullByDefault
-public class TablePowerTransformers extends TableConductingEquipment {
+    val VECTOR_GROUP = Column(++columnIndex, "vector_group", "TEXT", NOT_NULL)
 
-    public final Column VECTOR_GROUP = new Column(++columnIndex, "vector_group", "TEXT", NOT_NULL);
-
-    @Override
-    public String name() {
-        return "power_transformers";
+    override fun name(): String {
+        return "power_transformers"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TablePowerTransformers.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

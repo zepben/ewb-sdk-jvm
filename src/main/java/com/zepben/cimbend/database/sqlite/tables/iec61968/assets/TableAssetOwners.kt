@@ -5,26 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61968.assets;
+package com.zepben.cimbend.database.sqlite.tables.iec61968.assets
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
+class TableAssetOwners : TableAssetOrganisationRoles() {
 
-@EverythingIsNonnullByDefault
-public class TableAssetOwners extends TableAssetOrganisationRoles {
-
-    @Override
-    public String name() {
-        return "asset_owners";
+    override fun name(): String {
+        return "asset_owners"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableAssetOwners.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

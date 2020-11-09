@@ -5,46 +5,31 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
+import com.zepben.cimbend.database.Column.Nullable.NULL
 
-import java.util.Collections;
-import java.util.List;
+@Suppress("PropertyName")
+class TableRatioTapChangers : TableTapChangers() {
 
-import static com.zepben.cimbend.database.Column.Nullable.NOT_NULL;
-import static com.zepben.cimbend.database.Column.Nullable.NULL;
+    val TRANSFORMER_END_MRID = Column(++columnIndex, "transformer_end_mrid", "TEXT", NULL)
+    val STEP_VOLTAGE_INCREMENT = Column(++columnIndex, "step_voltage_increment", "NUMBER", NOT_NULL)
 
-/**
- * Represents the ratio tap changers table.
- */
-@EverythingIsNonnullByDefault
-public class TableRatioTapChangers extends TableTapChangers {
-
-    public final Column TRANSFORMER_END_MRID = new Column(++columnIndex, "transformer_end_mrid", "TEXT", NULL);
-    public final Column STEP_VOLTAGE_INCREMENT = new Column(++columnIndex, "step_voltage_increment", "NUMBER", NOT_NULL);
-
-    @Override
-    public String name() {
-        return "ratio_tap_changers";
+    override fun name(): String {
+        return "ratio_tap_changers"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableRatioTapChangers.class;
+    override fun uniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.uniqueIndexColumns()
+
+        cols.add(listOf(TRANSFORMER_END_MRID))
+
+        return cols
     }
 
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
-
-    @Override
-    public List<List<Column>> uniqueIndexColumns() {
-        List<List<Column>> cols = super.uniqueIndexColumns();
-        cols.add(Collections.singletonList(TRANSFORMER_END_MRID));
-        return cols;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

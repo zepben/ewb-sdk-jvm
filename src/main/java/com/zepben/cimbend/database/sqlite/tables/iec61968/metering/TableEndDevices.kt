@@ -5,18 +5,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61968.metering;
+package com.zepben.cimbend.database.sqlite.tables.iec61968.metering
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.iec61968.assets.TableAssetContainers;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NULL
+import com.zepben.cimbend.database.sqlite.tables.iec61968.assets.TableAssetContainers
 
-import static com.zepben.cimbend.database.Column.Nullable.NULL;
+@Suppress("PropertyName")
+abstract class TableEndDevices : TableAssetContainers() {
 
-@EverythingIsNonnullByDefault
-public abstract class TableEndDevices extends TableAssetContainers {
-
-    public final Column CUSTOMER_MRID = new Column(++columnIndex, "customer_mrid", "TEXT", NULL);
-    public final Column SERVICE_LOCATION_MRID = new Column(++columnIndex, "service_location_mrid", "TEXT", NULL);
+    val CUSTOMER_MRID = Column(++columnIndex, "customer_mrid", "TEXT", NULL)
+    val SERVICE_LOCATION_MRID = Column(++columnIndex, "service_location_mrid", "TEXT", NULL)
 
 }

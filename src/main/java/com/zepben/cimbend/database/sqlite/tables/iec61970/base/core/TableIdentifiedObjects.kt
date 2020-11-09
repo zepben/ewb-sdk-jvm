@@ -5,41 +5,35 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.core;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.core
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.SqliteTable;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
+import com.zepben.cimbend.database.sqlite.tables.SqliteTable
+import java.util.*
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+@Suppress("PropertyName")
+abstract class TableIdentifiedObjects : SqliteTable() {
 
-import static com.zepben.cimbend.database.Column.Nullable.NOT_NULL;
+    val MRID = Column(++columnIndex, "mrid", "TEXT", NOT_NULL)
+    val NAME = Column(++columnIndex, "name", "TEXT", NOT_NULL)
+    val DESCRIPTION = Column(++columnIndex, "description", "TEXT", NOT_NULL)
+    val NUM_DIAGRAM_OBJECTS = Column(++columnIndex, "num_diagram_objects", "INTEGER", NOT_NULL)
 
-/**
- * Represents the identified objects table
- */
-@EverythingIsNonnullByDefault
-public abstract class TableIdentifiedObjects extends SqliteTable {
+    override fun uniqueIndexColumns(): MutableList<List<Column>> {
+        val cols: MutableList<List<Column>> = ArrayList()
 
-    public final Column MRID = new Column(++columnIndex, "mrid", "TEXT", NOT_NULL);
-    public final Column NAME = new Column(++columnIndex, "name", "TEXT", NOT_NULL);
-    public final Column DESCRIPTION = new Column(++columnIndex, "description", "TEXT", NOT_NULL);
-    public final Column NUM_DIAGRAM_OBJECTS = new Column(++columnIndex, "num_diagram_objects", "INTEGER", NOT_NULL);
+        cols.add(listOf(MRID))
 
-    @Override
-    public List<List<Column>> uniqueIndexColumns() {
-        List<List<Column>> cols = new ArrayList<>();
-        cols.add(Collections.singletonList(MRID));
-        return cols;
+        return cols
     }
 
-    @Override
-    public List<List<Column>> nonUniqueIndexColumns() {
-        List<List<Column>> cols = super.nonUniqueIndexColumns();
-        cols.add(Collections.singletonList(NAME));
-        return cols;
+    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.nonUniqueIndexColumns()
+
+        cols.add(listOf(NAME))
+
+        return cols
     }
 
 }

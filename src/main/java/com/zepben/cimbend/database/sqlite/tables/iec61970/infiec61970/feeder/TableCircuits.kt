@@ -5,45 +5,30 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.infiec61970.feeder;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.infiec61970.feeder
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires.TableLines;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NULL
+import com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires.TableLines
 
-import java.util.Collections;
-import java.util.List;
+@Suppress("PropertyName")
+class TableCircuits : TableLines() {
 
-import static com.zepben.cimbend.database.Column.Nullable.NULL;
+    val LOOP_MRID = Column(++columnIndex, "loop_mrid", "TEXT", NULL)
 
-/**
- * Represents the circuits table.
- */
-@EverythingIsNonnullByDefault
-public class TableCircuits extends TableLines {
-
-    public final Column LOOP_MRID = new Column(++columnIndex, "loop_mrid", "TEXT", NULL);
-
-    @Override
-    public String name() {
-        return "circuits";
+    override fun name(): String {
+        return "circuits"
     }
 
-    @Override
-    public List<List<Column>> nonUniqueIndexColumns() {
-        List<List<Column>> cols = super.nonUniqueIndexColumns();
-        cols.add(Collections.singletonList(LOOP_MRID));
-        return cols;
+    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.nonUniqueIndexColumns()
+
+        cols.add(listOf(LOOP_MRID))
+
+        return cols
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableCircuits.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

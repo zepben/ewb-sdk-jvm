@@ -5,36 +5,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.diagramlayout;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.diagramlayout
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
+import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects
 
-import static com.zepben.cimbend.database.Column.Nullable.NOT_NULL;
+@Suppress("PropertyName")
+class TableDiagrams : TableIdentifiedObjects() {
 
-/**
- * Represents the conductor graphics table
- */
-@EverythingIsNonnullByDefault
-public class TableDiagrams extends TableIdentifiedObjects {
+    val DIAGRAM_STYLE = Column(++columnIndex, "diagram_style", "TEXT", NOT_NULL)
+    val ORIENTATION_KIND = Column(++columnIndex, "orientation_kind", "TEXT", NOT_NULL)
 
-    public final Column DIAGRAM_STYLE = new Column(++columnIndex, "diagram_style", "TEXT", NOT_NULL);
-    public final Column ORIENTATION_KIND = new Column(++columnIndex, "orientation_kind", "TEXT", NOT_NULL);
-
-    @Override
-    public String name() {
-        return "diagrams";
+    override fun name(): String {
+        return "diagrams"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableDiagrams.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

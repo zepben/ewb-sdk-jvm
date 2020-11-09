@@ -5,17 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61968.common;
+package com.zepben.cimbend.database.sqlite.tables.iec61968.common
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.Column;
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects;
+import com.zepben.cimbend.database.Column
+import com.zepben.cimbend.database.Column.Nullable.NULL
+import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects
 
-import static com.zepben.cimbend.database.Column.Nullable.NULL;
+@Suppress("PropertyName")
+abstract class TableOrganisationRoles : TableIdentifiedObjects() {
 
-@EverythingIsNonnullByDefault
-public abstract class TableOrganisationRoles extends TableIdentifiedObjects {
-
-    public final Column ORGANISATION_MRID = new Column(++columnIndex, "organisation_mrid", "TEXT", NULL);
+    val ORGANISATION_MRID = Column(++columnIndex, "organisation_mrid", "TEXT", NULL)
 
 }

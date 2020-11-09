@@ -5,29 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
+class TableBreakers : TableProtectedSwitches() {
 
-/**
- * Represents the breakers table.
- */
-@EverythingIsNonnullByDefault
-public class TableBreakers extends TableProtectedSwitches {
-
-    @Override
-    public String name() {
-        return "breakers";
+    override fun name(): String {
+        return "breakers"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableBreakers.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

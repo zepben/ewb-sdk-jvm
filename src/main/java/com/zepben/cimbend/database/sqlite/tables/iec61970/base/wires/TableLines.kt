@@ -5,15 +5,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.wires
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableEquipmentContainers;
+import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableEquipmentContainers
 
-/**
- * Represents the lines table.
- */
-@EverythingIsNonnullByDefault
-public abstract class TableLines extends TableEquipmentContainers {
-
-}
+abstract class TableLines : TableEquipmentContainers()

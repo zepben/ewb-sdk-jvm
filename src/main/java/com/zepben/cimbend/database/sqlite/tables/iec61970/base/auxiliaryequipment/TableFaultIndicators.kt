@@ -5,29 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.tables.iec61970.base.auxiliaryequipment;
+package com.zepben.cimbend.database.sqlite.tables.iec61970.base.auxiliaryequipment
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
+class TableFaultIndicators : TableAuxiliaryEquipment() {
 
-/**
- * Represents the fault indicators table.
- */
-@EverythingIsNonnullByDefault
-public class TableFaultIndicators extends TableAuxiliaryEquipment {
-
-    @Override
-    public String name() {
-        return "fault_indicators";
+    override fun name(): String {
+        return "fault_indicators"
     }
 
-    @Override
-    protected Class<?> getTableClass() {
-        return TableFaultIndicators.class;
-    }
-
-    @Override
-    protected Object getTableClassInstance() {
-        return this;
-    }
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
 
 }

@@ -5,73 +5,68 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+package com.zepben.cimbend.database.sqlite
 
-package com.zepben.cimbend.database.sqlite;
-
-import com.zepben.cimbend.cim.iec61968.common.PositionPoint;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import com.zepben.cimbend.cim.iec61968.common.PositionPoint
+import com.zepben.cimbend.database.sqlite.PositionPointParser.toPath
+import com.zepben.cimbend.database.sqlite.PositionPointParser.toSingle
+import com.zepben.cimbend.database.sqlite.PositionPointParser.toString
+import org.hamcrest.Matchers
+import org.junit.Assert
+import org.junit.jupiter.api.Test
+import java.util.*
 
 /**
  * Created by robertocomp on 4/01/2017.
- * <p>
- * Tests the {@link PositionPointParserTest} methods.
- * </p>
+ *
+ * Tests the [PositionPointParserTest] methods.
  */
-@SuppressWarnings("ConstantConditions")
-public class PositionPointParserTest {
+class PositionPointParserTest {
 
     @Test
-    public void parseTest() {
+    fun parseTest() {
+        val testPath = ArrayList<PositionPoint>()
+        val pathLength = 10
 
-        ArrayList<PositionPoint> testPath = new ArrayList<>();
-        int pathLength = 10;
-
-        for (int i = 0; i < pathLength; i++) {
-            testPath.add(new PositionPoint(i, (pathLength - i)));
+        for (i in 0 until pathLength) {
+            testPath.add(PositionPoint(i.toDouble(), (pathLength - i).toDouble()))
         }
 
-        String testingString = PositionPointParser.toString(testPath);
-        List<PositionPoint> parsedPath = new ArrayList<>(PositionPointParser.toPath(testingString));
+        val testingString = toString(testPath)
+        var parsedPath: List<PositionPoint>? = toPath(testingString)
 
         // Testing parsing a List<PositionPoint>
-        assertThat(parsedPath.size(), equalTo(testPath.size()));
-        for (int i = 0; i < pathLength; i++) {
-            assertThat(parsedPath.get(i).getXPosition(), closeTo(testPath.get(i).getXPosition(), 0.00001));
-            assertThat(parsedPath.get(i).getYPosition(), closeTo(testPath.get(i).getYPosition(), 0.00001));
+        Assert.assertThat(parsedPath!!.size, Matchers.equalTo(testPath.size))
+        for (i in 0 until pathLength) {
+            Assert.assertThat(parsedPath[i].xPosition, Matchers.closeTo(testPath[i].xPosition, 0.00001))
+            Assert.assertThat(parsedPath[i].yPosition, Matchers.closeTo(testPath[i].yPosition, 0.00001))
         }
 
         // Testing emptyLists
-        assertThat(PositionPointParser.toString(new ArrayList<>()), equalTo(null));
+        Assert.assertThat(toString(ArrayList()), Matchers.equalTo(null))
 
         // Testing parsing PositionPoint
-        PositionPoint positionPoint = new PositionPoint(1.0, 0.1);
-        String lngLatString;
-        lngLatString = PositionPointParser.toString(Collections.singletonList(positionPoint));
+        val positionPoint = PositionPoint(1.0, 0.1)
+        val lngLatString: String?
+        lngLatString = toString(listOf(positionPoint))
 
-        assertThat(lngLatString, equalTo("1.0,0.1;"));
-        parsedPath = PositionPointParser.toSingle(lngLatString);
-        assertThat(parsedPath.size(), equalTo(1));
-        assertThat(parsedPath.get(0).getXPosition(), closeTo(positionPoint.getXPosition(), 0.00001));
-        assertThat(parsedPath.get(0).getYPosition(), closeTo(positionPoint.getYPosition(), 0.00001));
+        Assert.assertThat(lngLatString, Matchers.equalTo("1.0,0.1;"))
+        parsedPath = toSingle(lngLatString)
+        Assert.assertThat(parsedPath!!.size, Matchers.equalTo(1))
+        Assert.assertThat(parsedPath[0].xPosition, Matchers.closeTo(positionPoint.xPosition, 0.00001))
+        Assert.assertThat(parsedPath[0].yPosition, Matchers.closeTo(positionPoint.yPosition, 0.00001))
 
         // Testing input of unparsable strings.
-        assertThat(PositionPointParser.toPath("1,2,7;3,4;5,6;"), nullValue());
-        assertThat(PositionPointParser.toPath("1,2,7;3,4;5;"), nullValue());
-        assertThat(PositionPointParser.toPath("1.0,2.0;3.3,5.6;A,7.7;"), nullValue());
-        assertThat(PositionPointParser.toSingle("1,2,3"), nullValue());
-        assertThat(PositionPointParser.toSingle("1"), nullValue());
-        assertThat(PositionPointParser.toSingle("1,A"), nullValue());
+        Assert.assertThat(toPath("1,2,7;3,4;5,6;"), Matchers.nullValue())
+        Assert.assertThat(toPath("1,2,7;3,4;5;"), Matchers.nullValue())
+        Assert.assertThat(toPath("1.0,2.0;3.3,5.6;A,7.7;"), Matchers.nullValue())
+        Assert.assertThat(toSingle("1,2,3"), Matchers.nullValue())
+        Assert.assertThat(toSingle("1"), Matchers.nullValue())
+        Assert.assertThat(toSingle("1,A"), Matchers.nullValue())
 
         // Testing black strings
-        assertThat(PositionPointParser.toPath(""), empty());
-        assertThat(PositionPointParser.toSingle(""), empty());
+        Assert.assertThat(toPath(""), Matchers.empty())
+        Assert.assertThat(toSingle(""), Matchers.empty())
     }
 
 }

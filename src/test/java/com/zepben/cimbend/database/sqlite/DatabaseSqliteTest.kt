@@ -20,7 +20,6 @@ import com.zepben.cimbend.customer.CustomerServiceComparator
 import com.zepben.cimbend.database.sqlite.tables.TableVersion
 import com.zepben.cimbend.diagram.DiagramService
 import com.zepben.cimbend.diagram.DiagramServiceComparator
-import com.zepben.cimbend.measurement.MeasurementService
 import com.zepben.cimbend.network.NetworkModelTestUtil
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.NetworkServiceComparator
@@ -146,11 +145,14 @@ class DatabaseSqliteTest {
         testDuplicateMridError(writeServices, readServices, readServices.networkService, junction)
     }
 
-    private fun testDuplicateMridError(writeServices: NetworkModelTestUtil.Services,
-                                       readServices: NetworkModelTestUtil.Services,
-                                       serviceWithDuplicate: BaseService,
-                                       duplicate: IdentifiedObject) {
-        val expectedError = "Failed to load ${duplicate.typeNameAndMRID()}. Unable to add to service '${serviceWithDuplicate.name}': duplicate MRID"
+    private fun testDuplicateMridError(
+        writeServices: NetworkModelTestUtil.Services,
+        readServices: NetworkModelTestUtil.Services,
+        serviceWithDuplicate: BaseService,
+        duplicate: IdentifiedObject
+    ) {
+        val expectedError =
+            "Failed to load ${duplicate.typeNameAndMRID()}. Unable to add to service '${serviceWithDuplicate.name}': duplicate MRID"
 
         testWriteRead(
             writeServices,
@@ -186,7 +188,10 @@ class DatabaseSqliteTest {
         val diagramService = DiagramService()
         val customerService = CustomerService()
 
-        assertThat(DatabaseReader(SCHEMA_TEST_FILE).load(networkService, diagramService, customerService), equalTo(true))
+        assertThat(
+            DatabaseReader(SCHEMA_TEST_FILE).load(networkService, diagramService, customerService),
+            equalTo(true)
+        )
 
         validateService(networkService, expectedNetworkService) { NetworkServiceComparator() }
         validateService(diagramService, expectedDiagramService) { DiagramServiceComparator() }
@@ -212,7 +217,8 @@ class DatabaseSqliteTest {
                     writeDiagramService,
                     writeCustomerService
                 )
-            ))
+            )
+        )
 
         if (!Files.exists(Paths.get(SCHEMA_TEST_FILE)))
             return
@@ -223,10 +229,15 @@ class DatabaseSqliteTest {
                 readNetworkService,
                 readDiagramService,
                 readCustomerService
-            ))
+            )
+        )
     }
 
-    private fun validateService(service: BaseService, expectedService: BaseService, getComparator: () -> BaseServiceComparator) {
+    private fun validateService(
+        service: BaseService,
+        expectedService: BaseService,
+        getComparator: () -> BaseServiceComparator
+    ) {
         val differences = getComparator().compare(service, expectedService)
 
         System.err.println(differences.toString())

@@ -31,12 +31,12 @@ abstract class BaseCIMWriter(protected val databaseTables: DatabaseTables) {
     /************ IEC61968 COMMON ************/
     @Throws(SQLException::class)
     protected fun saveDocument(table: TableDocuments, insert: PreparedStatement, document: Document, description: String): Boolean {
-        insert.setNullableString(table.TITLE.queryIndex(), document.title)
-        insert.setInstant(table.CREATED_DATE_TIME.queryIndex(), document.createdDateTime)
-        insert.setNullableString(table.AUTHOR_NAME.queryIndex(), document.authorName)
-        insert.setNullableString(table.TYPE.queryIndex(), document.type)
-        insert.setNullableString(table.STATUS.queryIndex(), document.status)
-        insert.setNullableString(table.COMMENT.queryIndex(), document.comment)
+        insert.setNullableString(table.TITLE.queryIndex, document.title)
+        insert.setInstant(table.CREATED_DATE_TIME.queryIndex, document.createdDateTime)
+        insert.setNullableString(table.AUTHOR_NAME.queryIndex, document.authorName)
+        insert.setNullableString(table.TYPE.queryIndex, document.type)
+        insert.setNullableString(table.STATUS.queryIndex, document.status)
+        insert.setNullableString(table.COMMENT.queryIndex, document.comment)
 
         return saveIdentifiedObject(table, insert, document, description)
     }
@@ -55,7 +55,7 @@ abstract class BaseCIMWriter(protected val databaseTables: DatabaseTables) {
         organisationRole: OrganisationRole,
         description: String
     ): Boolean {
-        insert.setNullableString(table.ORGANISATION_MRID.queryIndex(), organisationRole.organisation?.mRID)
+        insert.setNullableString(table.ORGANISATION_MRID.queryIndex, organisationRole.organisation?.mRID)
 
         return saveIdentifiedObject(table, insert, organisationRole, description)
     }
@@ -68,10 +68,10 @@ abstract class BaseCIMWriter(protected val databaseTables: DatabaseTables) {
         identifiedObject: IdentifiedObject,
         description: String
     ): Boolean {
-        insert.setString(table.MRID.queryIndex(), identifiedObject.mRID)
-        insert.setString(table.NAME.queryIndex(), identifiedObject.name)
-        insert.setString(table.DESCRIPTION.queryIndex(), identifiedObject.description)
-        insert.setInt(table.NUM_DIAGRAM_OBJECTS.queryIndex(), identifiedObject.numDiagramObjects)
+        insert.setString(table.MRID.queryIndex, identifiedObject.mRID)
+        insert.setString(table.NAME.queryIndex, identifiedObject.name)
+        insert.setString(table.DESCRIPTION.queryIndex, identifiedObject.description)
+        insert.setInt(table.NUM_DIAGRAM_OBJECTS.queryIndex, identifiedObject.numDiagramObjects)
 
         return tryExecuteSingleUpdate(insert, identifiedObject.mRID, "Failed to save $description.")
     }

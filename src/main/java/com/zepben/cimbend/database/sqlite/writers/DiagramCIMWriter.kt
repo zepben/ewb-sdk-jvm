@@ -24,8 +24,8 @@ class DiagramCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableDiagrams::class.java)
         val insert = databaseTables.getInsert(TableDiagrams::class.java)
 
-        insert.setNullableString(table.DIAGRAM_STYLE.queryIndex(), diagram.diagramStyle.name)
-        insert.setNullableString(table.ORIENTATION_KIND.queryIndex(), diagram.orientationKind.name)
+        insert.setNullableString(table.DIAGRAM_STYLE.queryIndex, diagram.diagramStyle.name)
+        insert.setNullableString(table.ORIENTATION_KIND.queryIndex, diagram.orientationKind.name)
 
         return saveIdentifiedObject(table, insert, diagram, "diagram")
     }
@@ -35,12 +35,14 @@ class DiagramCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val insert = databaseTables.getInsert(TableDiagramObjects::class.java)
 
         var status = true
-        diagramObject.points.forEachIndexed { sequence, point -> status = status and saveDiagramObjectPoint(diagramObject, point, sequence) }
+        diagramObject.points.forEachIndexed { sequence, point ->
+            status = status and saveDiagramObjectPoint(diagramObject, point, sequence)
+        }
 
-        insert.setNullableString(table.IDENTIFIED_OBJECT_MRID.queryIndex(), diagramObject.identifiedObjectMRID)
-        insert.setNullableString(table.DIAGRAM_MRID.queryIndex(), diagramObject.diagram?.mRID)
-        insert.setNullableString(table.STYLE.queryIndex(), diagramObject.style.name)
-        insert.setDouble(table.ROTATION.queryIndex(), diagramObject.rotation)
+        insert.setNullableString(table.IDENTIFIED_OBJECT_MRID.queryIndex, diagramObject.identifiedObjectMRID)
+        insert.setNullableString(table.DIAGRAM_MRID.queryIndex, diagramObject.diagram?.mRID)
+        insert.setNullableString(table.STYLE.queryIndex, diagramObject.style.name)
+        insert.setDouble(table.ROTATION.queryIndex, diagramObject.rotation)
 
         return status and saveIdentifiedObject(table, insert, diagramObject, "diagram object")
     }
@@ -49,10 +51,10 @@ class DiagramCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableDiagramObjectPoints::class.java)
         val insert = databaseTables.getInsert(TableDiagramObjectPoints::class.java)
 
-        insert.setNullableString(table.DIAGRAM_OBJECT_MRID.queryIndex(), diagramObject.mRID)
-        insert.setInt(table.SEQUENCE_NUMBER.queryIndex(), sequenceNumber)
-        insert.setDouble(table.X_POSITION.queryIndex(), diagramObjectPoint.xPosition)
-        insert.setDouble(table.Y_POSITION.queryIndex(), diagramObjectPoint.yPosition)
+        insert.setNullableString(table.DIAGRAM_OBJECT_MRID.queryIndex, diagramObject.mRID)
+        insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
+        insert.setDouble(table.X_POSITION.queryIndex, diagramObjectPoint.xPosition)
+        insert.setDouble(table.Y_POSITION.queryIndex, diagramObjectPoint.yPosition)
 
         return tryExecuteSingleUpdate(
             insert,

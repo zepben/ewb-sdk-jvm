@@ -150,7 +150,7 @@ class DatabaseWriter @JvmOverloads constructor(
 
                 // Add the version number to the database.
                 getPreparedStatement(saveConnection, versionTable.preparedInsertSql()).use { insert ->
-                    insert.setInt(versionTable.VERSION.queryIndex(), versionTable.SUPPORTED_VERSION)
+                    insert.setInt(versionTable.VERSION.queryIndex, versionTable.SUPPORTED_VERSION)
                     insert.executeUpdate()
                 }
 

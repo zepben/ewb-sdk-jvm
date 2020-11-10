@@ -17,6 +17,7 @@ import java.io.IOException
 import java.nio.file.*
 import java.sql.*
 
+@Suppress("SqlResolve")
 class UpgradeRunner constructor(
     private val getConnection: (String) -> Connection = DriverManager::getConnection,
     private val getStatement: (Connection) -> Statement = Connection::createStatement,
@@ -150,7 +151,7 @@ class UpgradeRunner constructor(
 
     @Throws(SQLException::class)
     private fun updateVersion(versionUpdateStatement: PreparedStatement, version: Int) {
-        versionUpdateStatement.setInt(tableVersion.VERSION.queryIndex(), version)
+        versionUpdateStatement.setInt(tableVersion.VERSION.queryIndex, version)
         versionUpdateStatement.executeUpdate()
     }
 
@@ -159,7 +160,7 @@ class UpgradeRunner constructor(
         return try {
             statement.executeConfiguredQuery(tableVersion.selectSql()).use { results ->
                 if (results.next())
-                    VersionResult(results.getInt(tableVersion.VERSION.queryIndex()))
+                    VersionResult(results.getInt(tableVersion.VERSION.queryIndex))
                 else
                     VersionResult(null)
             }
@@ -182,7 +183,7 @@ class UpgradeRunner constructor(
     private fun upgradeVersionTable(statement: Statement, version: Int) {
         statement.execute("DROP TABLE version")
         statement.execute(tableVersion.createTableSql())
-        statement.executeUpdate("INSERT into ${tableVersion.VERSION.name()} VALUES ($version)")
+        statement.executeUpdate("INSERT into ${tableVersion.VERSION.name} VALUES ($version)")
     }
 
     class ConnectionResult(val connection: Connection, val version: Int)

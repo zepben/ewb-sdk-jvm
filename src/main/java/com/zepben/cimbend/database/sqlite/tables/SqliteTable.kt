@@ -55,7 +55,7 @@ abstract class SqliteTable {
     @Suppress("UNCHECKED_CAST")
     private fun createColumnSet(clazz: Class<*>, instance: Any): SortedSet<Column> {
         // We sort by the queryIndex so insert and select statements can be addressed by a number
-        val cols: SortedSet<Column> = TreeSet(Comparator.comparing { obj: Column -> obj.queryIndex() })
+        val cols: SortedSet<Column> = TreeSet(Comparator.comparing { obj: Column -> obj.queryIndex })
         var repeatedField: Boolean
         if (clazz.superclass != null) cols.addAll(createColumnSet(clazz.superclass, instance))
         for (field in clazz.declaredFields) {
@@ -106,7 +106,7 @@ abstract class SqliteTable {
         val cols = StringJoiner(", ")
         val places = StringJoiner(", ")
         for (c in columnSet()) {
-            cols.add(c.name())
+            cols.add(c.name)
             places.add("?")
         }
         sb.append(cols.toString()).append(") VALUES (").append(places.toString()).append(")")
@@ -118,7 +118,7 @@ abstract class SqliteTable {
         val joiner = StringJoiner(", ")
         sb.append("SELECT ")
         for (c in columnSet()) {
-            joiner.add(c.name())
+            joiner.add(c.name)
         }
         sb.append(joiner.toString()).append(" FROM ").append(name())
         return sb.toString()
@@ -129,7 +129,7 @@ abstract class SqliteTable {
         val joiner = StringJoiner(", ")
         sb.append("UPDATE ").append(name()).append(" SET ")
         for (c in columnSet()) {
-            joiner.add(c.name() + " = ?")
+            joiner.add(c.name + " = ?")
         }
         sb.append(joiner.toString())
         return sb.toString()
@@ -146,8 +146,8 @@ abstract class SqliteTable {
         val colJoiner = StringJoiner(", ")
         val idJoiner = StringJoiner("_")
         for (c in columns) {
-            colJoiner.add(c.name())
-            idJoiner.add(c.name())
+            colJoiner.add(c.name)
+            idJoiner.add(c.name)
         }
         val idString = name() + "_" + idJoiner.toString()
         val colString = colJoiner.toString()

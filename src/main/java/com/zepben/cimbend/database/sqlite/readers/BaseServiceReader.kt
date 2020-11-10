@@ -38,19 +38,19 @@ abstract class BaseServiceReader(private val baseService: BaseService) {
     @Throws(SQLException::class)
     protected fun loadDocument(document: Document, table: TableDocuments, resultSet: ResultSet): Boolean {
         document.apply {
-            title = resultSet.getString(table.TITLE.queryIndex()).emptyIfNull().internEmpty()
-            createdDateTime = resultSet.getInstant(table.CREATED_DATE_TIME.queryIndex())
-            authorName = resultSet.getString(table.AUTHOR_NAME.queryIndex()).emptyIfNull().internEmpty()
-            type = resultSet.getString(table.TYPE.queryIndex()).emptyIfNull().internEmpty()
-            status = resultSet.getString(table.STATUS.queryIndex()).emptyIfNull().internEmpty()
-            comment = resultSet.getString(table.COMMENT.queryIndex()).emptyIfNull().internEmpty()
+            title = resultSet.getString(table.TITLE.queryIndex).emptyIfNull().internEmpty()
+            createdDateTime = resultSet.getInstant(table.CREATED_DATE_TIME.queryIndex)
+            authorName = resultSet.getString(table.AUTHOR_NAME.queryIndex).emptyIfNull().internEmpty()
+            type = resultSet.getString(table.TYPE.queryIndex).emptyIfNull().internEmpty()
+            status = resultSet.getString(table.STATUS.queryIndex).emptyIfNull().internEmpty()
+            comment = resultSet.getString(table.COMMENT.queryIndex).emptyIfNull().internEmpty()
         }
 
         return loadIdentifiedObject(document, table, resultSet)
     }
 
     fun load(table: TableOrganisations, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val organisation = Organisation(setLastMRID(resultSet.getString(table.MRID.queryIndex())))
+        val organisation = Organisation(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadIdentifiedObject(organisation, table, resultSet) && baseService.addOrThrow(organisation)
     }
@@ -62,7 +62,10 @@ abstract class BaseServiceReader(private val baseService: BaseService) {
         resultSet: ResultSet
     ): Boolean {
         organisationRole.apply {
-            organisation = baseService.ensureGet(resultSet.getNullableString(table.ORGANISATION_MRID.queryIndex()), typeNameAndMRID())
+            organisation = baseService.ensureGet(
+                resultSet.getNullableString(table.ORGANISATION_MRID.queryIndex),
+                typeNameAndMRID()
+            )
         }
 
         return loadIdentifiedObject(organisationRole, table, resultSet)
@@ -76,9 +79,9 @@ abstract class BaseServiceReader(private val baseService: BaseService) {
         resultSet: ResultSet
     ): Boolean {
         identifiedObject.apply {
-            name = resultSet.getString(table.NAME.queryIndex()).emptyIfNull().internEmpty()
-            description = resultSet.getString(table.DESCRIPTION.queryIndex()).emptyIfNull().internEmpty()
-            numDiagramObjects = resultSet.getInt(table.NUM_DIAGRAM_OBJECTS.queryIndex())
+            name = resultSet.getString(table.NAME.queryIndex).emptyIfNull().internEmpty()
+            description = resultSet.getString(table.DESCRIPTION.queryIndex).emptyIfNull().internEmpty()
+            numDiagramObjects = resultSet.getInt(table.NUM_DIAGRAM_OBJECTS.queryIndex)
         }
 
         return true

@@ -31,18 +31,18 @@ class CustomerServiceReader(private val customerService: CustomerService) : Base
 
     /************ IEC61968 CUSTOMERS ************/
     fun load(table: TableCustomers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val customer = Customer(setLastMRID(resultSet.getString(table.MRID.queryIndex()))).apply {
-            kind = CustomerKind.valueOf(resultSet.getString(table.KIND.queryIndex()))
-            numEndDevices = resultSet.getInt(table.NUM_END_DEVICES.queryIndex())
+        val customer = Customer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            kind = CustomerKind.valueOf(resultSet.getString(table.KIND.queryIndex))
+            numEndDevices = resultSet.getInt(table.NUM_END_DEVICES.queryIndex)
         }
 
         return loadOrganisationRole(customer, table, resultSet) && customerService.addOrThrow(customer)
     }
 
     fun load(table: TableCustomerAgreements, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val mRID = setLastMRID(resultSet.getString(table.MRID.queryIndex()))
+        val mRID = setLastMRID(resultSet.getString(table.MRID.queryIndex))
         val customerAgreement = CustomerAgreement(mRID).apply {
-            customer = customerService.ensureGet(resultSet.getString(table.CUSTOMER_MRID.queryIndex()), typeNameAndMRID())
+            customer = customerService.ensureGet(resultSet.getString(table.CUSTOMER_MRID.queryIndex), typeNameAndMRID())
             customer?.addAgreement(this)
         }
 
@@ -50,26 +50,26 @@ class CustomerServiceReader(private val customerService: CustomerService) : Base
     }
 
     fun load(table: TablePricingStructures, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val pricingStructure = PricingStructure(setLastMRID(resultSet.getString(table.MRID.queryIndex())))
+        val pricingStructure = PricingStructure(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadDocument(pricingStructure, table, resultSet) && customerService.addOrThrow(pricingStructure)
     }
 
     fun load(table: TableTariffs, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val tariff = Tariff(setLastMRID(resultSet.getString(table.MRID.queryIndex())))
+        val tariff = Tariff(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadDocument(tariff, table, resultSet) && customerService.addOrThrow(tariff)
     }
 
     /************ ASSOCIATIONS ************/
     fun load(table: TableCustomerAgreementsPricingStructures, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val customerAgreementMRID = setLastMRID(resultSet.getString(table.CUSTOMER_AGREEMENT_MRID.queryIndex()))
+        val customerAgreementMRID = setLastMRID(resultSet.getString(table.CUSTOMER_AGREEMENT_MRID.queryIndex))
         setLastMRID("${customerAgreementMRID}-to-UNKNOWN")
 
-        val pricingStructureMRID = resultSet.getString(table.PRICING_STRUCTURE_MRID.queryIndex())
+        val pricingStructureMRID = resultSet.getString(table.PRICING_STRUCTURE_MRID.queryIndex)
         val id = setLastMRID("${customerAgreementMRID}-to-${pricingStructureMRID}")
 
-        val typeNameAndMRID = "customer agreement to pricing structure association $id";
+        val typeNameAndMRID = "customer agreement to pricing structure association $id"
         val customerAgreement = customerService.ensureGet<CustomerAgreement>(customerAgreementMRID, typeNameAndMRID)
         val pricingStructure = customerService.ensureGet<PricingStructure>(pricingStructureMRID, typeNameAndMRID)
 
@@ -79,13 +79,13 @@ class CustomerServiceReader(private val customerService: CustomerService) : Base
     }
 
     fun load(table: TablePricingStructuresTariffs, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val pricingStructureMRID = setLastMRID(resultSet.getString(table.PRICING_STRUCTURE_MRID.queryIndex()))
+        val pricingStructureMRID = setLastMRID(resultSet.getString(table.PRICING_STRUCTURE_MRID.queryIndex))
         setLastMRID("${pricingStructureMRID}-to-UNKNOWN")
 
-        val tariffMRID = resultSet.getString(table.TARIFF_MRID.queryIndex())
+        val tariffMRID = resultSet.getString(table.TARIFF_MRID.queryIndex)
         val id = setLastMRID("${pricingStructureMRID}-to-${tariffMRID}")
 
-        val typeNameAndMRID = "pricing structure to tariff association $id";
+        val typeNameAndMRID = "pricing structure to tariff association $id"
         val pricingStructure = customerService.ensureGet<PricingStructure>(pricingStructureMRID, typeNameAndMRID)
         val tariff = customerService.ensureGet<Tariff>(tariffMRID, typeNameAndMRID)
 

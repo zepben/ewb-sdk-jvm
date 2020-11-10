@@ -22,38 +22,41 @@ class DiagramServiceReader(private val diagramService: DiagramService) : BaseSer
 
     /************ IEC61970 DIAGRAM LAYOUT ************/
     fun load(table: TableDiagrams, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val diagram = Diagram(setLastMRID(resultSet.getString(table.MRID.queryIndex()))).apply {
-            diagramStyle = DiagramStyle.valueOf(resultSet.getString(table.DIAGRAM_STYLE.queryIndex()))
-            orientationKind = OrientationKind.valueOf(resultSet.getString(table.ORIENTATION_KIND.queryIndex()))
+        val diagram = Diagram(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            diagramStyle = DiagramStyle.valueOf(resultSet.getString(table.DIAGRAM_STYLE.queryIndex))
+            orientationKind = OrientationKind.valueOf(resultSet.getString(table.ORIENTATION_KIND.queryIndex))
         }
 
         return loadIdentifiedObject(diagram, table, resultSet) && diagramService.addOrThrow(diagram)
     }
 
     fun load(table: TableDiagramObjects, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val mRID = setLastMRID(resultSet.getString(table.MRID.queryIndex()))
+        val mRID = setLastMRID(resultSet.getString(table.MRID.queryIndex))
 
         val diagramObject = DiagramObject(mRID).apply {
-            diagram = diagramService.ensureGet(resultSet.getString(table.DIAGRAM_MRID.queryIndex()), typeNameAndMRID())
+            diagram = diagramService.ensureGet(resultSet.getString(table.DIAGRAM_MRID.queryIndex), typeNameAndMRID())
             diagram?.addDiagramObject(this)
 
-            identifiedObjectMRID = resultSet.getNullableString(table.IDENTIFIED_OBJECT_MRID.queryIndex())
-            style = DiagramObjectStyle.valueOf(resultSet.getString(table.STYLE.queryIndex()))
-            rotation = resultSet.getDouble(table.ROTATION.queryIndex())
+            identifiedObjectMRID = resultSet.getNullableString(table.IDENTIFIED_OBJECT_MRID.queryIndex)
+            style = DiagramObjectStyle.valueOf(resultSet.getString(table.STYLE.queryIndex))
+            rotation = resultSet.getDouble(table.ROTATION.queryIndex)
         }
 
         return loadIdentifiedObject(diagramObject, table, resultSet) && diagramService.addOrThrow(diagramObject)
     }
 
     fun load(table: TableDiagramObjectPoints, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val diagramObjectMRID = setLastMRID(resultSet.getString(table.DIAGRAM_OBJECT_MRID.queryIndex()))
-        val sequenceNumber = resultSet.getInt(table.SEQUENCE_NUMBER.queryIndex())
+        val diagramObjectMRID = setLastMRID(resultSet.getString(table.DIAGRAM_OBJECT_MRID.queryIndex))
+        val sequenceNumber = resultSet.getInt(table.SEQUENCE_NUMBER.queryIndex)
 
         setLastMRID("$diagramObjectMRID-point$sequenceNumber")
 
         diagramService.getOrThrow<DiagramObject>(diagramObjectMRID, "DiagramObjectPoint $sequenceNumber")
             .addPoint(
-                DiagramObjectPoint(resultSet.getDouble(table.X_POSITION.queryIndex()), resultSet.getDouble(table.Y_POSITION.queryIndex())),
+                DiagramObjectPoint(
+                    resultSet.getDouble(table.X_POSITION.queryIndex),
+                    resultSet.getDouble(table.Y_POSITION.queryIndex)
+                ),
                 sequenceNumber
             )
 

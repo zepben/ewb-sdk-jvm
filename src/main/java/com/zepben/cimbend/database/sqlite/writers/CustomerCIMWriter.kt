@@ -37,8 +37,8 @@ class CustomerCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(database
         val table = databaseTables.getTable(TableCustomers::class.java)
         val insert = databaseTables.getInsert(TableCustomers::class.java)
 
-        insert.setNullableString(table.KIND.queryIndex(), customer.kind.name)
-        insert.setInt(table.NUM_END_DEVICES.queryIndex(), customer.numEndDevices)
+        insert.setNullableString(table.KIND.queryIndex, customer.kind.name)
+        insert.setInt(table.NUM_END_DEVICES.queryIndex, customer.numEndDevices)
 
         return saveOrganisationRole(table, insert, customer, "customer")
     }
@@ -50,7 +50,7 @@ class CustomerCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(database
         var status = true
         customerAgreement.pricingStructures.forEach { status = status and saveAssociation(customerAgreement, it) }
 
-        insert.setNullableString(table.CUSTOMER_MRID.queryIndex(), customerAgreement.customer?.mRID)
+        insert.setNullableString(table.CUSTOMER_MRID.queryIndex, customerAgreement.customer?.mRID)
 
         return status and saveAgreement(table, insert, customerAgreement, "customer agreement")
     }
@@ -77,8 +77,8 @@ class CustomerCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(database
         val table = databaseTables.getTable(TableCustomerAgreementsPricingStructures::class.java)
         val insert = databaseTables.getInsert(TableCustomerAgreementsPricingStructures::class.java)
 
-        insert.setNullableString(table.CUSTOMER_AGREEMENT_MRID.queryIndex(), customerAgreement.mRID)
-        insert.setNullableString(table.PRICING_STRUCTURE_MRID.queryIndex(), pricingStructure.mRID)
+        insert.setNullableString(table.CUSTOMER_AGREEMENT_MRID.queryIndex, customerAgreement.mRID)
+        insert.setNullableString(table.PRICING_STRUCTURE_MRID.queryIndex, pricingStructure.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
@@ -91,8 +91,8 @@ class CustomerCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(database
         val table = databaseTables.getTable(TablePricingStructuresTariffs::class.java)
         val insert = databaseTables.getInsert(TablePricingStructuresTariffs::class.java)
 
-        insert.setNullableString(table.PRICING_STRUCTURE_MRID.queryIndex(), pricingStructure.mRID)
-        insert.setNullableString(table.TARIFF_MRID.queryIndex(), tariff.mRID)
+        insert.setNullableString(table.PRICING_STRUCTURE_MRID.queryIndex, pricingStructure.mRID)
+        insert.setNullableString(table.TARIFF_MRID.queryIndex, tariff.mRID)
 
         return tryExecuteSingleUpdate(
             insert,

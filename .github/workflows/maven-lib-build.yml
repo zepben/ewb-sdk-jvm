@@ -29,5 +29,5 @@ jobs:
           key: maven
 
       - name: Maven build and test
-        run: mvn clean test -f pom.xml
+        run: mvn clean test -P '!zepben-maven' -f pom.xml
         shell: bash

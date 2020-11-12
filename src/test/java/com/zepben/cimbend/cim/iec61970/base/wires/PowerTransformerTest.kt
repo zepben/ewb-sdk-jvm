@@ -7,6 +7,7 @@
  */
 package com.zepben.cimbend.cim.iec61970.base.wires
 
+import com.zepben.cimbend.cim.iec61970.base.core.BaseVoltage
 import com.zepben.cimbend.common.extensions.typeNameAndMRID
 import com.zepben.cimbend.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException
@@ -47,10 +48,10 @@ internal class PowerTransformerTest {
     internal fun powerTransformerEnds() {
         PrivateCollectionValidator.validate(
             { PowerTransformer() },
-            { id, pt, en -> PowerTransformerEnd(id).apply { powerTransformer = pt ; en?.let { endNumber = it }} },
+            { id, pt, en -> PowerTransformerEnd(id).apply { powerTransformer = pt; en?.let { endNumber = it } } },
             PowerTransformer::numEnds,
             { pt, mRID -> pt.getEnd(mRID) },
-            { pt, endNum-> pt.getEnd(endNum) },
+            { pt, endNum -> pt.getEnd(endNum) },
             PowerTransformer::ends,
             PowerTransformer::addEnd,
             PowerTransformer::removeEnd,
@@ -59,7 +60,7 @@ internal class PowerTransformerTest {
     }
 
     @Test
-    internal fun `test addEnd`(){
+    internal fun `test addEnd`() {
         val pt = PowerTransformer()
         val e1 = PowerTransformerEnd()
         val e2 = PowerTransformerEnd().apply {
@@ -94,6 +95,33 @@ internal class PowerTransformerTest {
             pt.addEnd(duplicatePowerTransformerEnd)
         }.toThrow(IllegalArgumentException::class.java)
             .withMessage("Unable to add ${duplicatePowerTransformerEnd.typeNameAndMRID()} to ${pt.typeNameAndMRID()}. A ${e1.typeNameAndMRID()} already exists with endNumber 1.")
+    }
+
+    @Test
+    internal fun `test primaryVoltage`() {
+        val pt = PowerTransformer()
+        val e1 = PowerTransformerEnd().apply{
+            powerTransformer = pt
+        }
+        val e2 = PowerTransformerEnd().apply {
+            powerTransformer = pt
+            baseVoltage = BaseVoltage().apply { nominalVoltage = 20 }
+            ratedU = 25
+        }
+
+        assertThat(pt.primaryVoltage, equalTo(0))
+
+        pt.baseVoltage = BaseVoltage().apply { nominalVoltage = 5 }
+        assertThat(pt.primaryVoltage, equalTo(5))
+
+        pt.addEnd(e1).addEnd(e2)
+        assertThat(pt.primaryVoltage, equalTo(0))
+
+        e1.ratedU = 15
+        assertThat(pt.primaryVoltage, equalTo(15))
+
+        e1.baseVoltage = BaseVoltage().apply { nominalVoltage = 10 }
+        assertThat(pt.primaryVoltage, equalTo(10))
     }
 
 }

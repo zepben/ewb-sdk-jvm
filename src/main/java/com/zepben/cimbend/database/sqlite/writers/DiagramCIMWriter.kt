@@ -59,7 +59,7 @@ class DiagramCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(
             insert,
             "${diagramObject.mRID}-point$sequenceNumber",
-            "Failed to save diagram object point."
+            "diagram object point"
         )
     }
 }

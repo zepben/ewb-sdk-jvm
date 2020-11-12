@@ -16,8 +16,8 @@ class DiagramServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
     override fun save(service: DiagramService, writer: DiagramCIMWriter): Boolean {
         var status = true
 
-        service.sequenceOf<DiagramObject>().forEach { status = status and validateSave(it, writer::save, "diagram object") }
-        service.sequenceOf<Diagram>().forEach { status = status and validateSave(it, writer::save, "diagram") }
+        service.sequenceOf<DiagramObject>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<Diagram>().forEach { status = status and validateSave(it, writer::save) }
 
         return status
     }

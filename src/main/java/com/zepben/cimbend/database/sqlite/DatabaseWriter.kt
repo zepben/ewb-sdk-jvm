@@ -8,6 +8,7 @@
 package com.zepben.cimbend.database.sqlite
 
 import com.zepben.cimbend.common.BaseService
+import com.zepben.cimbend.common.meta.MetadataCollection
 import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.database.MissingTableConfigException
 import com.zepben.cimbend.database.sqlite.extensions.configureBatch
@@ -52,7 +53,7 @@ class DatabaseWriter @JvmOverloads constructor(
      * and MeasurementService. Multiple of each type can be passed and will be merged in the database. This is not
      * well supported however, and not recommended. Merge services prior to calling save (for the moment :))
      */
-    fun save(services: List<BaseService>): Boolean {
+    fun save(metadataCollection: MetadataCollection, services: List<BaseService>): Boolean {
         if (services.isEmpty()) {
             logger.warn("No services were provided, therefore there is nothing to save")
             return false
@@ -69,7 +70,7 @@ class DatabaseWriter @JvmOverloads constructor(
             return false
         }
 
-        var status = true
+        var status = MetadataCollectionWriter().save(metadataCollection, MetaDataEntryWriter(databaseTables))
         services.forEach {
             status = status and try {
                 when (it) {

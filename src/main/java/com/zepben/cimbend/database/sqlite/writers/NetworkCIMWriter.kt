@@ -185,7 +185,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(
             insert,
             "${location.mRID}-point$sequenceNumber",
-            "Failed to save position point."
+            "position point"
         )
     }
 
@@ -205,7 +205,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableString(table.TOWN_NAME.queryIndex, townDetail?.name)
         insert.setNullableString(table.STATE_OR_PROVINCE.queryIndex, townDetail?.stateOrProvince)
 
-        return tryExecuteSingleUpdate(insert, id, "Failed to save $description}.")
+        return tryExecuteSingleUpdate(insert, id, description)
     }
 
     /************ IEC61968 METERING ************/
@@ -802,7 +802,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(
             insert,
             "${assetOrganisationRole.mRID}-to-${asset.mRID}",
-            "Failed to save asset organisation role to asset association."
+            "asset organisation role to asset association"
         )
     }
 
@@ -816,7 +816,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(
             insert,
             "${usagePoint.mRID}-to-${endDevice.mRID}",
-            "Failed to save usage point to end device association."
+            "usage point to end device association"
         )
     }
 
@@ -830,7 +830,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(
             insert,
             "${equipment.mRID}-to-${usagePoint.mRID}",
-            "Failed to save equipment to usage point association."
+            "equipment to usage point association"
         )
     }
 
@@ -844,7 +844,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(
             insert,
             "${equipment.mRID}-to-${operationalRestriction.mRID}",
-            "Failed to save equipment to operational restriction association."
+            "equipment to operational restriction association"
         )
     }
 
@@ -858,7 +858,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(
             insert,
             "${equipment.mRID}-to-${equipmentContainer.mRID}",
-            "Failed to save equipment to equipment container association."
+            "equipment to equipment container association"
         )
     }
 
@@ -872,7 +872,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(
             insert,
             "${circuit.mRID}-to-${substation.mRID}",
-            "Failed to save circuit to substation association."
+            "circuit to substation association"
         )
     }
 
@@ -886,7 +886,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(
             insert,
             "${circuit.mRID}-to-${terminal.mRID}",
-            "Failed to save circuit to terminal association."
+            "circuit to terminal association"
         )
     }
 
@@ -901,7 +901,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(
             insert,
             "${loop.mRID}-to-${substation.mRID}",
-            "Failed to save loop to substation association."
+            "loop to substation association"
         )
     }
 }

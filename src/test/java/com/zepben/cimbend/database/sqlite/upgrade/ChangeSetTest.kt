@@ -6,33 +6,39 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 package com.zepben.cimbend.database.sqlite.upgrade
+
 import com.zepben.cimbend.cim.iec61970.base.core.Terminal
 import com.zepben.cimbend.cim.iec61970.base.meas.Analog
 import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformerEnd
+import com.zepben.cimbend.common.meta.MetadataCollection
 import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.database.sqlite.DatabaseReader
 import com.zepben.cimbend.diagram.DiagramService
-import com.zepben.cimbend.measurement.MeasurementService
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.junit.jupiter.api.fail
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
-import java.sql.DriverManager
 
+@Suppress("SqlResolve")
 class ChangeSetTest {
-
 
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
+    @Test
+    @Throws(Exception::class)
+    fun `can upgrade to latest`(@TempDir tempDir: Path) {
+        val dbFile = File("src/test/data/changeset20.sqlite").copyTo(Path.of(tempDir.toString(), "changeset20.sqlite").toFile()).toPath()
+        val runner = UpgradeRunner()
+        val cr = runner.connectAndUpgrade("jdbc:sqlite:$dbFile", dbFile)
+        cr.connection.close()
+    }
 
     @Test
     @Throws(Exception::class)
@@ -44,7 +50,7 @@ class ChangeSetTest {
         // Ensure index was recreated, as changeset drops it to update numbers
         cr.connection.use { connection ->
             connection.createStatement().use { statement ->
-                statement.executeQuery("pragma index_info('power_transformer_ends_power_transformer_mrid_end_number')").use {rs ->
+                statement.executeQuery("pragma index_info('power_transformer_ends_power_transformer_mrid_end_number')").use { rs ->
                     assertThat(rs.next(), equalTo(true))
                 }
             }
@@ -52,7 +58,7 @@ class ChangeSetTest {
 
         val reader = DatabaseReader(dbFile.toString())
         val network = NetworkService()
-        reader.load(network, DiagramService(), CustomerService())
+        reader.load(MetadataCollection(), network, DiagramService(), CustomerService())
 
         assertThat(network.get<Terminal>("t1")!!.sequenceNumber, equalTo(1))
         assertThat(network.get<Terminal>("t2")!!.sequenceNumber, equalTo(2))
@@ -74,25 +80,25 @@ class ChangeSetTest {
 
         val reader = DatabaseReader(dbFile.toString())
         val network = NetworkService()
-        reader.load(network, DiagramService(), CustomerService())
+        reader.load(MetadataCollection(), network, DiagramService(), CustomerService())
 
-        var meas1 = network.get<Analog>("meas1")
-        assertThat(meas1?.name, `is`("meas1"))
-        assertThat(meas1?.description, `is`("meas1"))
-        assertThat(meas1?.numDiagramObjects, `is`(1))
-        assertThat(meas1?.powerSystemResourceMRID, `is`("psr1"))
-        var meas2 = network.get<Analog>("meas2")
-        assertThat(meas2?.name, `is`("meas2"))
-        assertThat(meas2?.description, `is`("meas2"))
-        assertThat(meas2?.numDiagramObjects, `is`(2))
-        assertThat(meas2?.powerSystemResourceMRID, `is`("psr2"))
-        var meas3 = network.get<Analog>("meas3")
-        assertThat(meas3?.name, `is`("meas3"))
-        assertThat(meas3?.description, `is`("meas3"))
-        assertThat(meas3?.numDiagramObjects, `is`(3))
-        assertThat(meas3?.powerSystemResourceMRID, `is`("psr3"))
+        val meas1 = network.get<Analog>("meas1")
+        assertThat(meas1?.name, equalTo("meas1"))
+        assertThat(meas1?.description, equalTo("meas1"))
+        assertThat(meas1?.numDiagramObjects, equalTo(1))
+        assertThat(meas1?.powerSystemResourceMRID, equalTo("psr1"))
 
+        val meas2 = network.get<Analog>("meas2")
+        assertThat(meas2?.name, equalTo("meas2"))
+        assertThat(meas2?.description, equalTo("meas2"))
+        assertThat(meas2?.numDiagramObjects, equalTo(2))
+        assertThat(meas2?.powerSystemResourceMRID, equalTo("psr2"))
 
+        val meas3 = network.get<Analog>("meas3")
+        assertThat(meas3?.name, equalTo("meas3"))
+        assertThat(meas3?.description, equalTo("meas3"))
+        assertThat(meas3?.numDiagramObjects, equalTo(3))
+        assertThat(meas3?.powerSystemResourceMRID, equalTo("psr3"))
     }
 
 }

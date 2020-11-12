@@ -83,7 +83,7 @@ class CustomerCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(database
         return tryExecuteSingleUpdate(
             insert,
             "${customerAgreement.mRID}-to-${pricingStructure.mRID}",
-            "Failed to save customer agreement to pricing structure association."
+            "customer agreement to pricing structure association"
         )
     }
 
@@ -97,7 +97,7 @@ class CustomerCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(database
         return tryExecuteSingleUpdate(
             insert,
             "${pricingStructure.mRID}-to-${tariff.mRID}",
-            "Failed to save pricing structure to tariff association."
+            "pricing structure to tariff association"
         )
     }
 }

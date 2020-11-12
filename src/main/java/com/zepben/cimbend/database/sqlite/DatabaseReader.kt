@@ -12,6 +12,7 @@ import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.cimbend.cim.iec61970.base.core.Feeder
 import com.zepben.cimbend.cim.iec61970.base.wires.EnergySource
 import com.zepben.cimbend.common.extensions.nameAndMRID
+import com.zepben.cimbend.common.meta.MetadataCollection
 import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.database.MissingTableConfigException
 import com.zepben.cimbend.database.sqlite.readers.*
@@ -50,6 +51,7 @@ class DatabaseReader @JvmOverloads constructor(
     private var hasBeenUsed: Boolean = false
 
     fun load(
+        metadataCollection: MetadataCollection,
         networkService: NetworkService,
         diagramService: DiagramService,
         customerService: CustomerService
@@ -60,6 +62,7 @@ class DatabaseReader @JvmOverloads constructor(
         }
         hasBeenUsed = true
 
+        val metadataReader = MetadataEntryReader(metadataCollection)
         val networkServiceReader = NetworkCIMReader(networkService)
         val diagramServiceReader = DiagramCIMReader(diagramService)
         val customerServiceReader = CustomerCIMReader(customerService)
@@ -72,9 +75,10 @@ class DatabaseReader @JvmOverloads constructor(
 
         logger.info("Loading from database version v$databaseVersion")
         val status = try {
-            NetworkServiceReader { getStatement(loadConnection) }.load(networkServiceReader)
-                    && DiagramServiceReader { getStatement(loadConnection) }.load(diagramServiceReader)
-                    && CustomerServiceReader { getStatement(loadConnection) }.load(customerServiceReader)
+            MetadataCollectionReader { getStatement(loadConnection) }.load(metadataReader)
+                && NetworkServiceReader { getStatement(loadConnection) }.load(networkServiceReader)
+                && DiagramServiceReader { getStatement(loadConnection) }.load(diagramServiceReader)
+                && CustomerServiceReader { getStatement(loadConnection) }.load(customerServiceReader)
         } catch (e: MissingTableConfigException) {
             logger.error("Unable to load database: " + e.message)
             closeConnection()
@@ -132,8 +136,8 @@ class DatabaseReader @JvmOverloads constructor(
 
         val hasBeenAssignedToFeeder = { energySource: EnergySource ->
             (energySource.numPhases() > 0)
-                    && energySource.isOnFeeder()
-                    && Collections.disjoint(
+                && energySource.isOnFeeder()
+                && Collections.disjoint(
                 feederStartPoints,
                 NetworkService.connectedEquipment(energySource)
                     .mapNotNull(ConnectivityResult::to)
@@ -147,7 +151,7 @@ class DatabaseReader @JvmOverloads constructor(
             .forEach { es ->
                 logger.warn(
                     "Primary source ${es.nameAndMRID()} has been assigned to the following feeders: normal [${es.normalFeeders.joinToString { it.mRID }}], " +
-                            "current [${es.currentFeeders.joinToString { it.mRID }}]"
+                        "current [${es.currentFeeders.joinToString { it.mRID }}]"
                 )
             }
     }

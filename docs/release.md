@@ -22,6 +22,7 @@ a 1.0.0 release.
 ##### New Features
 * Added `getFeeder` helper to the `NetworkConsumerClient`.
 * Added `customer` and `diagram` consumer clients.
+* Added `MetadataCollection` allowing you to specify `DataSource` information.
 
 ##### Enhancements
 * The gRPC consumer and producer clients now share a common base class.

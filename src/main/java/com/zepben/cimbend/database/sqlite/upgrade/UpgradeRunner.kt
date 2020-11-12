@@ -34,7 +34,8 @@ class UpgradeRunner constructor(
         changeSet18(),
         changeSet19(),
         changeSet20(),
-        changeSet21()
+        changeSet21(),
+        changeSet22()
     ).asUnmodifiable()
 
     private val tableVersion = TableVersion()
@@ -48,7 +49,10 @@ class UpgradeRunner constructor(
         }
 
         require(changeSets.last().number == tableVersion.SUPPORTED_VERSION) {
-            "The last registered change set does not match the supported version. Did you forget to bump the supported version number?"
+            if (changeSets.last().number > tableVersion.SUPPORTED_VERSION)
+                "The last registered change set is newer than the supported version. Did you forget to bump the supported version number?"
+            else
+                "The last registered change set is older than the supported version. Did you forget to register a change set?"
         }
     }
 

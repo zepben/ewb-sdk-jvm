@@ -12,7 +12,8 @@ import com.zepben.cimbend.cim.iec61968.common.Organisation
 import com.zepben.cimbend.cim.iec61968.common.OrganisationRole
 import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.cimbend.database.sqlite.DatabaseTables
-import com.zepben.cimbend.database.sqlite.extensions.*
+import com.zepben.cimbend.database.sqlite.extensions.setInstant
+import com.zepben.cimbend.database.sqlite.extensions.setNullableString
 import com.zepben.cimbend.database.sqlite.tables.iec61968.common.TableDocuments
 import com.zepben.cimbend.database.sqlite.tables.iec61968.common.TableOrganisationRoles
 import com.zepben.cimbend.database.sqlite.tables.iec61968.common.TableOrganisations
@@ -73,22 +74,15 @@ abstract class BaseCIMWriter(protected val databaseTables: DatabaseTables) {
         insert.setString(table.DESCRIPTION.queryIndex, identifiedObject.description)
         insert.setInt(table.NUM_DIAGRAM_OBJECTS.queryIndex, identifiedObject.numDiagramObjects)
 
-        return tryExecuteSingleUpdate(insert, identifiedObject.mRID, "Failed to save $description.")
+        return tryExecuteSingleUpdate(insert, identifiedObject.mRID, description)
     }
 
     /************ HELPERS ************/
     @Throws(SQLException::class)
-    protected fun tryExecuteSingleUpdate(query: PreparedStatement, id: String, errorMessage: String): Boolean {
-        if (query.executeSingleUpdate())
-            return true
+    protected fun tryExecuteSingleUpdate(query: PreparedStatement, id: String, description: String): Boolean =
+        WriteValidator.tryExecuteSingleUpdate(query) {
+            failedIds.add(id)
+            WriteValidator.logFailure(logger, query, description)
+        }
 
-        failedIds.add(id)
-        logger.warn(
-            "$errorMessage\n" +
-                "SQL: ${query.sql()}\n" +
-                "Fields: ${query.parameters()}"
-        )
-
-        return false
-    }
 }

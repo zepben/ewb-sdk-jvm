@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
 package com.zepben.cimbend.database.sqlite.tables
 
 import com.zepben.annotations.EverythingIsNonnullByDefault
@@ -13,14 +14,14 @@ import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
 
 @Suppress("PropertyName")
 @EverythingIsNonnullByDefault
-class TableVersion : SqliteTable() {
+class TableMetadataDataSources : SqliteTable() {
 
-    val SUPPORTED_VERSION = 22
-
+    val SOURCE = Column(++columnIndex, "source", "TEXT", NOT_NULL)
     val VERSION = Column(++columnIndex, "version", "TEXT", NOT_NULL)
+    val TIMESTAMP = Column(++columnIndex, "timestamp", "TEXT", NOT_NULL)
 
     override fun name(): String {
-        return "version"
+        return "metadata_data_sources"
     }
 
     override val tableClass = this.javaClass

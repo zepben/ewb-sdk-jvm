@@ -46,6 +46,7 @@ a 1.0.0 release.
 
 ##### Enhancements
 * The gRPC consumer and producer clients now share a common base class.
+* Added primaryVoltage property to PowerTransformer for convenience.
 
 ##### Fixes
 * Fixed null annotations on `ConnectivityResult`.

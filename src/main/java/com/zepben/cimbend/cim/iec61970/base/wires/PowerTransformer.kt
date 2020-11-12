@@ -41,8 +41,13 @@ import com.zepben.cimbend.common.extensions.*
  *                       neutral point(real or imaginary) and the corresponding terminals of two windings, a positive sequence voltage system
  *                       being applied to the high-voltage terminals, following each other in alphabetical sequence if they are lettered, or in
  *                       numerical sequence if they are numbered: the phasors are assumed to rotate in a counter-clockwise sense.
+ *
+ * @property primaryVoltage Holds the primary voltage value for a transformer.
  */
 class PowerTransformer @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
+
+    val primaryVoltage: Int
+        get() = if (ends.isEmpty()) baseVoltageValue else ends[0].baseVoltage?.nominalVoltage ?: ends[0].ratedU
 
     private var _powerTransformerEnds: MutableList<PowerTransformerEnd>? = null
     var vectorGroup: VectorGroup = VectorGroup.UNKNOWN

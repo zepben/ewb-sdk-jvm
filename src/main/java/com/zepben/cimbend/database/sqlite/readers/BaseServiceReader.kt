@@ -5,92 +5,81 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
 package com.zepben.cimbend.database.sqlite.readers
 
-import com.zepben.cimbend.cim.iec61968.common.Document
-import com.zepben.cimbend.cim.iec61968.common.Organisation
-import com.zepben.cimbend.cim.iec61968.common.OrganisationRole
-import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.cimbend.common.BaseService
-import com.zepben.cimbend.common.extensions.emptyIfNull
-import com.zepben.cimbend.common.extensions.ensureGet
-import com.zepben.cimbend.common.extensions.internEmpty
-import com.zepben.cimbend.common.extensions.typeNameAndMRID
 import com.zepben.cimbend.database.DuplicateMRIDException
-import com.zepben.cimbend.database.sqlite.extensions.getInstant
-import com.zepben.cimbend.database.sqlite.extensions.getNullableString
-import com.zepben.cimbend.database.sqlite.tables.iec61968.common.TableDocuments
-import com.zepben.cimbend.database.sqlite.tables.iec61968.common.TableOrganisationRoles
-import com.zepben.cimbend.database.sqlite.tables.iec61968.common.TableOrganisations
-import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects
+import com.zepben.cimbend.database.MRIDLookupException
+import com.zepben.cimbend.database.executeConfiguredQuery
+import com.zepben.cimbend.database.sqlite.DatabaseTables
+import com.zepben.cimbend.database.sqlite.tables.SqliteTable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.sql.Statement
 
-
-abstract class BaseServiceReader(private val baseService: BaseService) {
+/**
+ * Base class for reading a service from the database.
+ *
+ * @property getStatement provider of statements for the connection.
+ */
+open class BaseServiceReader constructor(protected val getStatement: () -> Statement) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val failedIds: MutableSet<String> = mutableSetOf()
+    protected val databaseTables = DatabaseTables()
 
-    /************ IEC61968 COMMON ************/
-    @Throws(SQLException::class)
-    protected fun loadDocument(document: Document, table: TableDocuments, resultSet: ResultSet): Boolean {
-        document.apply {
-            title = resultSet.getString(table.TITLE.queryIndex()).emptyIfNull().internEmpty()
-            createdDateTime = resultSet.getInstant(table.CREATED_DATE_TIME.queryIndex())
-            authorName = resultSet.getString(table.AUTHOR_NAME.queryIndex()).emptyIfNull().internEmpty()
-            type = resultSet.getString(table.TYPE.queryIndex()).emptyIfNull().internEmpty()
-            status = resultSet.getString(table.STATUS.queryIndex()).emptyIfNull().internEmpty()
-            comment = resultSet.getString(table.COMMENT.queryIndex()).emptyIfNull().internEmpty()
-        }
-
-        return loadIdentifiedObject(document, table, resultSet)
-    }
-
-    fun load(table: TableOrganisations, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val organisation = Organisation(setLastMRID(resultSet.getString(table.MRID.queryIndex())))
-
-        return loadIdentifiedObject(organisation, table, resultSet) && baseService.addOrThrow(organisation)
-    }
-
-    @Throws(SQLException::class)
-    protected fun loadOrganisationRole(
-        organisationRole: OrganisationRole,
-        table: TableOrganisationRoles,
-        resultSet: ResultSet
+    protected inline fun <reified T : SqliteTable> loadEach(
+        description: String,
+        crossinline processRow: (T, ResultSet, (String) -> String) -> Boolean
     ): Boolean {
-        organisationRole.apply {
-            organisation = baseService.ensureGet(resultSet.getNullableString(table.ORGANISATION_MRID.queryIndex()), typeNameAndMRID())
-        }
+        return loadTable<T>(description) { table, results ->
+            var lastMRID: String? = null
+            val setLastMRID = { mrid: String -> lastMRID = mrid; mrid }
 
-        return loadIdentifiedObject(organisationRole, table, resultSet)
+            try {
+                var count = 0
+                while (results.next()) {
+                    if (processRow(table, results, setLastMRID)) {
+                        ++count
+                    }
+                }
+
+                return@loadTable count
+            } catch (e: SQLException) {
+                logger.error("Failed to load '" + lastMRID + "' from '" + table.name() + "': " + e.message)
+                throw e
+            }
+        }
     }
 
-    /************ IEC61970 CORE ************/
-    @Throws(SQLException::class)
-    protected fun loadIdentifiedObject(
-        identifiedObject: IdentifiedObject,
-        table: TableIdentifiedObjects,
-        resultSet: ResultSet
+    protected inline fun <reified T : SqliteTable> loadTable(
+        description: String,
+        processRows: (T, ResultSet) -> Int
     ): Boolean {
-        identifiedObject.apply {
-            name = resultSet.getString(table.NAME.queryIndex()).emptyIfNull().internEmpty()
-            description = resultSet.getString(table.DESCRIPTION.queryIndex()).emptyIfNull().internEmpty()
-            numDiagramObjects = resultSet.getInt(table.NUM_DIAGRAM_OBJECTS.queryIndex())
+        logger.info("Loading $description...")
+
+        val table = databaseTables.getTable(T::class.java)
+        val thrown = try {
+            val count = getStatement().use { statement ->
+                statement.executeConfiguredQuery(table.selectSql()).use { results ->
+                    processRows(table, results)
+                }
+            }
+            logger.info("Successfully loaded $count $description.")
+            return true
+        } catch (t: Throwable) {
+            when (t) {
+                is SQLException,
+                is IllegalArgumentException,
+                is MRIDLookupException,
+                is DuplicateMRIDException -> t
+                else -> throw t
+            }
         }
 
-        return true
+        logger.error("Failed to read the $description from '${table.name()}': ${thrown.message}", thrown)
+        return false
     }
 
-    protected fun BaseService.addOrThrow(identifiedObject: IdentifiedObject): Boolean {
-        return if (tryAdd(identifiedObject)) {
-            true
-        } else {
-            val duplicate = get<IdentifiedObject>(identifiedObject.mRID)
-            throw DuplicateMRIDException("Failed to load ${identifiedObject.typeNameAndMRID()}. " +
-                "Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})")
-        }
-    }
 }

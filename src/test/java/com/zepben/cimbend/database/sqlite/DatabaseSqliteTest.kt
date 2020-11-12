@@ -15,16 +15,17 @@ import com.zepben.cimbend.cim.iec61970.base.wires.Junction
 import com.zepben.cimbend.common.BaseService
 import com.zepben.cimbend.common.BaseServiceComparator
 import com.zepben.cimbend.common.extensions.typeNameAndMRID
+import com.zepben.cimbend.common.meta.MetadataCollection
 import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.customer.CustomerServiceComparator
 import com.zepben.cimbend.database.sqlite.tables.TableVersion
 import com.zepben.cimbend.diagram.DiagramService
 import com.zepben.cimbend.diagram.DiagramServiceComparator
-import com.zepben.cimbend.measurement.MeasurementService
 import com.zepben.cimbend.network.NetworkModelTestUtil
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.NetworkServiceComparator
-import com.zepben.cimbend.network.SchemaTestNetwork
+import com.zepben.cimbend.testdata.SchemaTestNetwork
+import com.zepben.cimbend.testdata.StupidlyLargeNetwork
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -62,12 +63,13 @@ class DatabaseSqliteTest {
 
         assertThat(Files.exists(Paths.get(databaseFileName)), equalTo(true))
 
+        val metadataCollection = MetadataCollection()
         val networkLoaded = NetworkService()
         val diagramLoaded = DiagramService()
         val customerService = CustomerService()
 
         assertThat(
-            DatabaseReader(databaseFileName).load(networkLoaded, diagramLoaded, customerService),
+            DatabaseReader(databaseFileName).load(metadataCollection, networkLoaded, diagramLoaded, customerService),
             equalTo(true)
         )
 
@@ -81,7 +83,7 @@ class DatabaseSqliteTest {
 
     @Test
     fun testStupidlyLargeSchema() {
-        validateSchema(SchemaTestNetwork.createStupidlyLargeServices())
+        validateSchema(StupidlyLargeNetwork.create())
 
         assertThat(
             systemErr.log,
@@ -93,7 +95,6 @@ class DatabaseSqliteTest {
     fun `test Pole Schema`() {
         validateSchema(SchemaTestNetwork.createPoleTestServices())
     }
-
 
     @Test
     fun `test Streetlight Schema`() {
@@ -108,6 +109,11 @@ class DatabaseSqliteTest {
     @Test
     fun testLoopSchema() {
         validateSchema(SchemaTestNetwork.createLoopTestServices())
+    }
+
+    @Test
+    fun testMetadataDataSourceSchema() {
+        validateSchema(SchemaTestNetwork.createDataSourceTestServices())
     }
 
     @Test
@@ -146,11 +152,14 @@ class DatabaseSqliteTest {
         testDuplicateMridError(writeServices, readServices, readServices.networkService, junction)
     }
 
-    private fun testDuplicateMridError(writeServices: NetworkModelTestUtil.Services,
-                                       readServices: NetworkModelTestUtil.Services,
-                                       serviceWithDuplicate: BaseService,
-                                       duplicate: IdentifiedObject) {
-        val expectedError = "Failed to load ${duplicate.typeNameAndMRID()}. Unable to add to service '${serviceWithDuplicate.name}': duplicate MRID"
+    private fun testDuplicateMridError(
+        writeServices: NetworkModelTestUtil.Services,
+        readServices: NetworkModelTestUtil.Services,
+        serviceWithDuplicate: BaseService,
+        duplicate: IdentifiedObject
+    ) {
+        val expectedError =
+            "Failed to load ${duplicate.typeNameAndMRID()}. Unable to add to service '${serviceWithDuplicate.name}': duplicate MRID"
 
         testWriteRead(
             writeServices,
@@ -166,10 +175,11 @@ class DatabaseSqliteTest {
     private fun validateSchema(services: NetworkModelTestUtil.Services) {
         assertThat(systemErr.logLines.size, equalTo(0))
 
-        val (expectedNetworkService, expectedDiagramService, expectedCustomerService) = services
+        val (expectedMetadata, expectedNetworkService, expectedDiagramService, expectedCustomerService) = services
 
         assertThat(
             DatabaseWriter(SCHEMA_TEST_FILE).save(
+                expectedMetadata,
                 mutableListOf(
                     expectedNetworkService,
                     expectedDiagramService,
@@ -182,12 +192,17 @@ class DatabaseSqliteTest {
         assertThat(systemErr.log, containsString("Creating database schema v${TableVersion().SUPPORTED_VERSION}"))
         assertThat(Files.exists(Paths.get(SCHEMA_TEST_FILE)), equalTo(true))
 
+        val metadataCollection = MetadataCollection()
         val networkService = NetworkService()
         val diagramService = DiagramService()
         val customerService = CustomerService()
 
-        assertThat(DatabaseReader(SCHEMA_TEST_FILE).load(networkService, diagramService, customerService), equalTo(true))
+        assertThat(
+            DatabaseReader(SCHEMA_TEST_FILE).load(metadataCollection, networkService, diagramService, customerService),
+            equalTo(true)
+        )
 
+        validateMetadata(metadataCollection, expectedMetadata)
         validateService(networkService, expectedNetworkService) { NetworkServiceComparator() }
         validateService(diagramService, expectedDiagramService) { DiagramServiceComparator() }
         validateService(customerService, expectedCustomerService) { CustomerServiceComparator() }
@@ -203,30 +218,42 @@ class DatabaseSqliteTest {
         validateRead: (Boolean) -> Unit
     ) {
         assertThat(systemErr.logLines.size, equalTo(0))
-        val (writeNetworkService, writeDiagramService, writeCustomerService) = writeServices
+        val (writeMetadata, writeNetworkService, writeDiagramService, writeCustomerService) = writeServices
 
         validateWrite(
             DatabaseWriter(SCHEMA_TEST_FILE).save(
+                writeMetadata,
                 mutableListOf(
                     writeNetworkService,
                     writeDiagramService,
                     writeCustomerService
                 )
-            ))
+            )
+        )
 
         if (!Files.exists(Paths.get(SCHEMA_TEST_FILE)))
             return
 
-        val (readNetworkService, readDiagramService, readCustomerService) = readServices
+        val (readMetadata, readNetworkService, readDiagramService, readCustomerService) = readServices
         validateRead(
             DatabaseReader(SCHEMA_TEST_FILE).load(
+                readMetadata,
                 readNetworkService,
                 readDiagramService,
                 readCustomerService
-            ))
+            )
+        )
     }
 
-    private fun validateService(service: BaseService, expectedService: BaseService, getComparator: () -> BaseServiceComparator) {
+    private fun validateMetadata(metadataCollection: MetadataCollection, expectedMetadataCollection: MetadataCollection) {
+        assertThat(metadataCollection.dataSources, containsInAnyOrder(*expectedMetadataCollection.dataSources.toTypedArray()))
+    }
+
+    private fun validateService(
+        service: BaseService,
+        expectedService: BaseService,
+        getComparator: () -> BaseServiceComparator
+    ) {
         val differences = getComparator().compare(service, expectedService)
 
         System.err.println(differences.toString())

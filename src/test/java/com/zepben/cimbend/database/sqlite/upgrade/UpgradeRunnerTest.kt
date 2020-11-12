@@ -63,7 +63,7 @@ class UpgradeRunnerTest {
         verify(statement, times(expectedChangeSets.size)).executeUpdate("BEGIN TRANSACTION")
         verify(statement, times(expectedChangeSets.size)).executeUpdate("PRAGMA foreign_keys=ON")
 
-        verify(preparedStatement, times(expectedChangeSets.size)).setInt(eq(tableVersion.VERSION.queryIndex()), anyInt())
+        verify(preparedStatement, times(expectedChangeSets.size)).setInt(eq(tableVersion.VERSION.queryIndex), anyInt())
         verify(preparedStatement, times(expectedChangeSets.size)).executeUpdate()
 
         assertThat(
@@ -155,7 +155,7 @@ class UpgradeRunnerTest {
     @Throws(SQLException::class)
     private fun configureDatabaseVersion(version: Int) {
         doReturn(true).`when`(resultSet).next()
-        doReturn(version).`when`(resultSet).getInt(tableVersion.VERSION.queryIndex())
+        doReturn(version).`when`(resultSet).getInt(tableVersion.VERSION.queryIndex)
     }
 
     @Throws(SQLException::class)

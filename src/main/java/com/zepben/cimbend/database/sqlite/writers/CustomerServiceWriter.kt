@@ -20,10 +20,10 @@ class CustomerServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) 
         var status = true
 
         service.sequenceOf<Organisation>().forEach { status = status and trySaveCommon(writer::save, it) }
-        service.sequenceOf<Customer>().forEach { status = status and validateSave(it, writer::save, "customer") }
-        service.sequenceOf<CustomerAgreement>().forEach { status = status and validateSave(it, writer::save, "customer agreement") }
-        service.sequenceOf<PricingStructure>().forEach { status = status and validateSave(it, writer::save, "pricing structure") }
-        service.sequenceOf<Tariff>().forEach { status = status and validateSave(it, writer::save, "tariff") }
+        service.sequenceOf<Customer>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<CustomerAgreement>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<PricingStructure>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<Tariff>().forEach { status = status and validateSave(it, writer::save) }
 
         return status
     }

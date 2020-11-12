@@ -7,16 +7,13 @@
  */
 package com.zepben.cimbend.database.sqlite.tables.iec61970.base.meas
 
-/**
- * Represents the discretes table
- */
 class TableDiscretes : TableMeasurements() {
+
     override fun name(): String {
         return "discretes"
     }
 
-    override val tableClass: Class<*>
-        get() = TableDiscretes::class.java
-    override val tableClassInstance: Any
-        get() = this
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
+
 }

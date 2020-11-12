@@ -75,8 +75,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     private fun saveWireInfo(table: TableWireInfo, insert: PreparedStatement, wireInfo: WireInfo, description: String): Boolean {
-        insert.setInt(table.RATED_CURRENT.queryIndex(), wireInfo.ratedCurrent)
-        insert.setNullableString(table.MATERIAL.queryIndex(), wireInfo.material.name)
+        insert.setInt(table.RATED_CURRENT.queryIndex, wireInfo.ratedCurrent)
+        insert.setNullableString(table.MATERIAL.queryIndex, wireInfo.material.name)
 
         return saveAssetInfo(table, insert, wireInfo, description)
     }
@@ -85,7 +85,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     private fun saveAsset(table: TableAssets, insert: PreparedStatement, asset: Asset, description: String): Boolean {
         var status = true
 
-        insert.setNullableString(table.LOCATION_MRID.queryIndex(), asset.location?.mRID)
+        insert.setNullableString(table.LOCATION_MRID.queryIndex, asset.location?.mRID)
         asset.organisationRoles.forEach { status = status and saveAssociation(it, asset) }
 
         return status and saveIdentifiedObject(table, insert, asset, description)
@@ -123,7 +123,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TablePoles::class.java)
         val insert = databaseTables.getInsert(TablePoles::class.java)
 
-        insert.setString(table.CLASSIFICATION.queryIndex(), pole.classification)
+        insert.setString(table.CLASSIFICATION.queryIndex, pole.classification)
 
         return saveStructure(table, insert, pole, "pole")
     }
@@ -132,9 +132,9 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableStreetlights::class.java)
         val insert = databaseTables.getInsert(TableStreetlights::class.java)
 
-        insert.setNullableString(table.POLE_MRID.queryIndex(), streetlight.pole?.mRID)
-        insert.setInt(table.LIGHT_RATING.queryIndex(), streetlight.lightRating)
-        insert.setString(table.LAMP_KIND.queryIndex(), streetlight.lampKind.name)
+        insert.setNullableString(table.POLE_MRID.queryIndex, streetlight.pole?.mRID)
+        insert.setInt(table.LIGHT_RATING.queryIndex, streetlight.lightRating)
+        insert.setString(table.LAMP_KIND.queryIndex, streetlight.lampKind.name)
         return saveAsset(table, insert, streetlight, "streetlight")
     }
 
@@ -161,8 +161,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableLocationStreetAddresses::class.java)
         val insert = databaseTables.getInsert(TableLocationStreetAddresses::class.java)
 
-        insert.setNullableString(table.LOCATION_MRID.queryIndex(), location.mRID)
-        insert.setNullableString(table.ADDRESS_FIELD.queryIndex(), field.name)
+        insert.setNullableString(table.LOCATION_MRID.queryIndex, location.mRID)
+        insert.setNullableString(table.ADDRESS_FIELD.queryIndex, field.name)
 
         return saveStreetAddress(
             table,
@@ -177,15 +177,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TablePositionPoints::class.java)
         val insert = databaseTables.getInsert(TablePositionPoints::class.java)
 
-        insert.setNullableString(table.LOCATION_MRID.queryIndex(), location.mRID)
-        insert.setInt(table.SEQUENCE_NUMBER.queryIndex(), sequenceNumber)
-        insert.setDouble(table.X_POSITION.queryIndex(), positionPoint.xPosition)
-        insert.setDouble(table.Y_POSITION.queryIndex(), positionPoint.yPosition)
+        insert.setNullableString(table.LOCATION_MRID.queryIndex, location.mRID)
+        insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
+        insert.setDouble(table.X_POSITION.queryIndex, positionPoint.xPosition)
+        insert.setDouble(table.Y_POSITION.queryIndex, positionPoint.yPosition)
 
         return tryExecuteSingleUpdate(
             insert,
             "${location.mRID}-point$sequenceNumber",
-            "Failed to save position point."
+            "position point"
         )
     }
 
@@ -196,22 +196,22 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         id: String,
         description: String
     ): Boolean {
-        insert.setNullableString(table.POSTAL_CODE.queryIndex(), streetAddress.postalCode)
+        insert.setNullableString(table.POSTAL_CODE.queryIndex, streetAddress.postalCode)
 
         return saveTownDetail(table, insert, streetAddress.townDetail, id, description)
     }
 
     private fun saveTownDetail(table: TableTownDetails, insert: PreparedStatement, townDetail: TownDetail?, id: String, description: String): Boolean {
-        insert.setNullableString(table.TOWN_NAME.queryIndex(), townDetail?.name)
-        insert.setNullableString(table.STATE_OR_PROVINCE.queryIndex(), townDetail?.stateOrProvince)
+        insert.setNullableString(table.TOWN_NAME.queryIndex, townDetail?.name)
+        insert.setNullableString(table.STATE_OR_PROVINCE.queryIndex, townDetail?.stateOrProvince)
 
-        return tryExecuteSingleUpdate(insert, id, "Failed to save $description}.")
+        return tryExecuteSingleUpdate(insert, id, description)
     }
 
     /************ IEC61968 METERING ************/
     private fun saveEndDevice(table: TableEndDevices, insert: PreparedStatement, endDevice: EndDevice, description: String): Boolean {
-        insert.setNullableString(table.CUSTOMER_MRID.queryIndex(), endDevice.customerMRID)
-        insert.setNullableString(table.SERVICE_LOCATION_MRID.queryIndex(), endDevice.serviceLocation?.mRID)
+        insert.setNullableString(table.CUSTOMER_MRID.queryIndex, endDevice.customerMRID)
+        insert.setNullableString(table.SERVICE_LOCATION_MRID.queryIndex, endDevice.serviceLocation?.mRID)
 
         var status = true
         endDevice.usagePoints.forEach { status = status and saveAssociation(it, endDevice) }
@@ -230,7 +230,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableUsagePoints::class.java)
         val insert = databaseTables.getInsert(TableUsagePoints::class.java)
 
-        insert.setNullableString(table.LOCATION_MRID.queryIndex(), usagePoint.usagePointLocation?.mRID)
+        insert.setNullableString(table.LOCATION_MRID.queryIndex, usagePoint.usagePointLocation?.mRID)
 
         var status = true
         usagePoint.equipment.forEach { status = status and saveAssociation(it, usagePoint) }
@@ -256,7 +256,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         auxiliaryEquipment: AuxiliaryEquipment,
         description: String
     ): Boolean {
-        insert.setNullableString(table.TERMINAL_MRID.queryIndex(), auxiliaryEquipment.terminal?.mRID)
+        insert.setNullableString(table.TERMINAL_MRID.queryIndex, auxiliaryEquipment.terminal?.mRID)
 
         return saveEquipment(table, insert, auxiliaryEquipment, description)
     }
@@ -277,7 +277,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableBaseVoltages::class.java)
         val insert = databaseTables.getInsert(TableBaseVoltages::class.java)
 
-        insert.setInt(table.NOMINAL_VOLTAGE.queryIndex(), baseVoltage.nominalVoltage)
+        insert.setInt(table.NOMINAL_VOLTAGE.queryIndex, baseVoltage.nominalVoltage)
 
         return saveIdentifiedObject(table, insert, baseVoltage, "base voltage")
     }
@@ -288,7 +288,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         conductingEquipment: ConductingEquipment,
         description: String
     ): Boolean {
-        insert.setNullableString(table.BASE_VOLTAGE_MRID.queryIndex(), conductingEquipment.baseVoltage?.mRID)
+        insert.setNullableString(table.BASE_VOLTAGE_MRID.queryIndex, conductingEquipment.baseVoltage?.mRID)
 
         return saveEquipment(table, insert, conductingEquipment, description)
     }
@@ -310,8 +310,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     private fun saveEquipment(table: TableEquipment, insert: PreparedStatement, equipment: Equipment, description: String): Boolean {
-        insert.setBoolean(table.NORMALLY_IN_SERVICE.queryIndex(), equipment.normallyInService)
-        insert.setBoolean(table.IN_SERVICE.queryIndex(), equipment.inService)
+        insert.setBoolean(table.NORMALLY_IN_SERVICE.queryIndex, equipment.normallyInService)
+        insert.setBoolean(table.IN_SERVICE.queryIndex, equipment.inService)
 
         var status = true
         equipment.containers.forEach {
@@ -335,8 +335,11 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableFeeders::class.java)
         val insert = databaseTables.getInsert(TableFeeders::class.java)
 
-        insert.setNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex(), feeder.normalHeadTerminal?.mRID)
-        insert.setNullableString(table.NORMAL_ENERGIZING_SUBSTATION_MRID.queryIndex(), feeder.normalEnergizingSubstation?.mRID)
+        insert.setNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex, feeder.normalHeadTerminal?.mRID)
+        insert.setNullableString(
+            table.NORMAL_ENERGIZING_SUBSTATION_MRID.queryIndex,
+            feeder.normalEnergizingSubstation?.mRID
+        )
 
         return saveEquipmentContainer(table, insert, feeder, "feeder")
     }
@@ -354,8 +357,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         powerSystemResource: PowerSystemResource,
         description: String
     ): Boolean {
-        insert.setNullableString(table.LOCATION_MRID.queryIndex(), powerSystemResource.location?.mRID)
-        insert.setInt(table.NUM_CONTROLS.queryIndex(), powerSystemResource.numControls)
+        insert.setNullableString(table.LOCATION_MRID.queryIndex, powerSystemResource.location?.mRID)
+        insert.setInt(table.NUM_CONTROLS.queryIndex, powerSystemResource.numControls)
 
         return saveIdentifiedObject(table, insert, powerSystemResource, description)
     }
@@ -371,7 +374,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableSubGeographicalRegions::class.java)
         val insert = databaseTables.getInsert(TableSubGeographicalRegions::class.java)
 
-        insert.setNullableString(table.GEOGRAPHICAL_REGION_MRID.queryIndex(), subGeographicalRegion.geographicalRegion?.mRID)
+        insert.setNullableString(
+            table.GEOGRAPHICAL_REGION_MRID.queryIndex,
+            subGeographicalRegion.geographicalRegion?.mRID
+        )
 
         return saveIdentifiedObject(table, insert, subGeographicalRegion, "sub-geographical region")
     }
@@ -380,7 +386,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableSubstations::class.java)
         val insert = databaseTables.getInsert(TableSubstations::class.java)
 
-        insert.setNullableString(table.SUB_GEOGRAPHICAL_REGION_MRID.queryIndex(), substation.subGeographicalRegion?.mRID)
+        insert.setNullableString(table.SUB_GEOGRAPHICAL_REGION_MRID.queryIndex, substation.subGeographicalRegion?.mRID)
 
         return saveEquipmentContainer(table, insert, substation, "substation")
     }
@@ -389,10 +395,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableTerminals::class.java)
         val insert = databaseTables.getInsert(TableTerminals::class.java)
 
-        insert.setNullableString(table.CONDUCTING_EQUIPMENT_MRID.queryIndex(), terminal.conductingEquipment?.mRID)
-        insert.setInt(table.SEQUENCE_NUMBER.queryIndex(), terminal.sequenceNumber)
-        insert.setNullableString(table.CONNECTIVITY_NODE_MRID.queryIndex(), terminal.connectivityNodeId())
-        insert.setNullableString(table.PHASES.queryIndex(), terminal.phases.name)
+        insert.setNullableString(table.CONDUCTING_EQUIPMENT_MRID.queryIndex, terminal.conductingEquipment?.mRID)
+        insert.setInt(table.SEQUENCE_NUMBER.queryIndex, terminal.sequenceNumber)
+        insert.setNullableString(table.CONNECTIVITY_NODE_MRID.queryIndex, terminal.connectivityNodeId())
+        insert.setNullableString(table.PHASES.queryIndex, terminal.phases.name)
 
         return saveAcDcTerminal(table, insert, terminal, "terminal")
     }
@@ -402,7 +408,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableAcLineSegments::class.java)
         val insert = databaseTables.getInsert(TableAcLineSegments::class.java)
 
-        insert.setNullableString(table.PER_LENGTH_SEQUENCE_IMPEDANCE_MRID.queryIndex(), acLineSegment.perLengthSequenceImpedance?.mRID)
+        insert.setNullableString(
+            table.PER_LENGTH_SEQUENCE_IMPEDANCE_MRID.queryIndex,
+            acLineSegment.perLengthSequenceImpedance?.mRID
+        )
 
         return saveConductor(table, insert, acLineSegment, "AC line segment")
     }
@@ -415,8 +424,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     private fun saveConductor(table: TableConductors, insert: PreparedStatement, conductor: Conductor, description: String): Boolean {
-        insert.setDouble(table.LENGTH.queryIndex(), conductor.length)
-        insert.setNullableString(table.WIRE_INFO_MRID.queryIndex(), conductor.assetInfo?.mRID)
+        insert.setDouble(table.LENGTH.queryIndex, conductor.length)
+        insert.setNullableString(table.WIRE_INFO_MRID.queryIndex, conductor.assetInfo?.mRID)
 
         return saveConductingEquipment(table, insert, conductor, description)
     }
@@ -445,13 +454,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableEnergyConsumers::class.java)
         val insert = databaseTables.getInsert(TableEnergyConsumers::class.java)
 
-        insert.setInt(table.CUSTOMER_COUNT.queryIndex(), energyConsumer.customerCount)
-        insert.setBoolean(table.GROUNDED.queryIndex(), energyConsumer.grounded)
-        insert.setDouble(table.P.queryIndex(), energyConsumer.p)
-        insert.setDouble(table.Q.queryIndex(), energyConsumer.q)
-        insert.setDouble(table.P_FIXED.queryIndex(), energyConsumer.pFixed)
-        insert.setDouble(table.Q_FIXED.queryIndex(), energyConsumer.qFixed)
-        insert.setNullableString(table.PHASE_CONNECTION.queryIndex(), energyConsumer.phaseConnection.name)
+        insert.setInt(table.CUSTOMER_COUNT.queryIndex, energyConsumer.customerCount)
+        insert.setBoolean(table.GROUNDED.queryIndex, energyConsumer.grounded)
+        insert.setDouble(table.P.queryIndex, energyConsumer.p)
+        insert.setDouble(table.Q.queryIndex, energyConsumer.q)
+        insert.setDouble(table.P_FIXED.queryIndex, energyConsumer.pFixed)
+        insert.setDouble(table.Q_FIXED.queryIndex, energyConsumer.qFixed)
+        insert.setNullableString(table.PHASE_CONNECTION.queryIndex, energyConsumer.phaseConnection.name)
 
         return saveEnergyConnection(table, insert, energyConsumer, "energy consumer")
     }
@@ -460,12 +469,12 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableEnergyConsumerPhases::class.java)
         val insert = databaseTables.getInsert(TableEnergyConsumerPhases::class.java)
 
-        insert.setNullableString(table.ENERGY_CONSUMER_MRID.queryIndex(), energyConsumerPhase.energyConsumer?.mRID)
-        insert.setNullableString(table.PHASE.queryIndex(), energyConsumerPhase.phase.name)
-        insert.setDouble(table.P.queryIndex(), energyConsumerPhase.p)
-        insert.setDouble(table.Q.queryIndex(), energyConsumerPhase.q)
-        insert.setDouble(table.P_FIXED.queryIndex(), energyConsumerPhase.pFixed)
-        insert.setDouble(table.Q_FIXED.queryIndex(), energyConsumerPhase.qFixed)
+        insert.setNullableString(table.ENERGY_CONSUMER_MRID.queryIndex, energyConsumerPhase.energyConsumer?.mRID)
+        insert.setNullableString(table.PHASE.queryIndex, energyConsumerPhase.phase.name)
+        insert.setDouble(table.P.queryIndex, energyConsumerPhase.p)
+        insert.setDouble(table.Q.queryIndex, energyConsumerPhase.q)
+        insert.setDouble(table.P_FIXED.queryIndex, energyConsumerPhase.pFixed)
+        insert.setDouble(table.Q_FIXED.queryIndex, energyConsumerPhase.qFixed)
 
         return savePowerSystemResource(table, insert, energyConsumerPhase, "energy consumer phase")
     }
@@ -474,18 +483,18 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableEnergySources::class.java)
         val insert = databaseTables.getInsert(TableEnergySources::class.java)
 
-        insert.setDouble(table.ACTIVE_POWER.queryIndex(), energySource.activePower)
-        insert.setDouble(table.REACTIVE_POWER.queryIndex(), energySource.reactivePower)
-        insert.setDouble(table.VOLTAGE_ANGLE.queryIndex(), energySource.voltageAngle)
-        insert.setDouble(table.VOLTAGE_MAGNITUDE.queryIndex(), energySource.voltageMagnitude)
-        insert.setDouble(table.P_MAX.queryIndex(), energySource.pMax)
-        insert.setDouble(table.P_MIN.queryIndex(), energySource.pMin)
-        insert.setDouble(table.R.queryIndex(), energySource.r)
-        insert.setDouble(table.R0.queryIndex(), energySource.r0)
-        insert.setDouble(table.RN.queryIndex(), energySource.rn)
-        insert.setDouble(table.X.queryIndex(), energySource.x)
-        insert.setDouble(table.X0.queryIndex(), energySource.x0)
-        insert.setDouble(table.XN.queryIndex(), energySource.xn)
+        insert.setDouble(table.ACTIVE_POWER.queryIndex, energySource.activePower)
+        insert.setDouble(table.REACTIVE_POWER.queryIndex, energySource.reactivePower)
+        insert.setDouble(table.VOLTAGE_ANGLE.queryIndex, energySource.voltageAngle)
+        insert.setDouble(table.VOLTAGE_MAGNITUDE.queryIndex, energySource.voltageMagnitude)
+        insert.setDouble(table.P_MAX.queryIndex, energySource.pMax)
+        insert.setDouble(table.P_MIN.queryIndex, energySource.pMin)
+        insert.setDouble(table.R.queryIndex, energySource.r)
+        insert.setDouble(table.R0.queryIndex, energySource.r0)
+        insert.setDouble(table.RN.queryIndex, energySource.rn)
+        insert.setDouble(table.X.queryIndex, energySource.x)
+        insert.setDouble(table.X0.queryIndex, energySource.x0)
+        insert.setDouble(table.XN.queryIndex, energySource.xn)
 
         return saveEnergyConnection(table, insert, energySource, "energy source")
     }
@@ -494,8 +503,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableEnergySourcePhases::class.java)
         val insert = databaseTables.getInsert(TableEnergySourcePhases::class.java)
 
-        insert.setNullableString(table.ENERGY_SOURCE_MRID.queryIndex(), energySourcePhase.energySource?.mRID)
-        insert.setNullableString(table.PHASE.queryIndex(), energySourcePhase.phase.name)
+        insert.setNullableString(table.ENERGY_SOURCE_MRID.queryIndex, energySourcePhase.energySource?.mRID)
+        insert.setNullableString(table.PHASE.queryIndex, energySourcePhase.phase.name)
 
         return savePowerSystemResource(table, insert, energySourcePhase, "energy source phase")
     }
@@ -529,10 +538,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableLinearShuntCompensators::class.java)
         val insert = databaseTables.getInsert(TableLinearShuntCompensators::class.java)
 
-        insert.setDouble(table.B0_PER_SECTION.queryIndex(), linearShuntCompensator.b0PerSection)
-        insert.setDouble(table.B_PER_SECTION.queryIndex(), linearShuntCompensator.bPerSection)
-        insert.setDouble(table.G0_PER_SECTION.queryIndex(), linearShuntCompensator.g0PerSection)
-        insert.setDouble(table.G_PER_SECTION.queryIndex(), linearShuntCompensator.gPerSection)
+        insert.setDouble(table.B0_PER_SECTION.queryIndex, linearShuntCompensator.b0PerSection)
+        insert.setDouble(table.B_PER_SECTION.queryIndex, linearShuntCompensator.bPerSection)
+        insert.setDouble(table.G0_PER_SECTION.queryIndex, linearShuntCompensator.g0PerSection)
+        insert.setDouble(table.G_PER_SECTION.queryIndex, linearShuntCompensator.gPerSection)
 
         return saveShuntCompensator(table, insert, linearShuntCompensator, "linear shunt compensator")
     }
@@ -559,14 +568,14 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TablePerLengthSequenceImpedances::class.java)
         val insert = databaseTables.getInsert(TablePerLengthSequenceImpedances::class.java)
 
-        insert.setDouble(table.R.queryIndex(), perLengthSequenceImpedance.r)
-        insert.setDouble(table.X.queryIndex(), perLengthSequenceImpedance.x)
-        insert.setDouble(table.R0.queryIndex(), perLengthSequenceImpedance.r0)
-        insert.setDouble(table.X0.queryIndex(), perLengthSequenceImpedance.x0)
-        insert.setDouble(table.BCH.queryIndex(), perLengthSequenceImpedance.bch)
-        insert.setDouble(table.GCH.queryIndex(), perLengthSequenceImpedance.gch)
-        insert.setDouble(table.B0CH.queryIndex(), perLengthSequenceImpedance.b0ch)
-        insert.setDouble(table.G0CH.queryIndex(), perLengthSequenceImpedance.g0ch)
+        insert.setDouble(table.R.queryIndex, perLengthSequenceImpedance.r)
+        insert.setDouble(table.X.queryIndex, perLengthSequenceImpedance.x)
+        insert.setDouble(table.R0.queryIndex, perLengthSequenceImpedance.r0)
+        insert.setDouble(table.X0.queryIndex, perLengthSequenceImpedance.x0)
+        insert.setDouble(table.BCH.queryIndex, perLengthSequenceImpedance.bch)
+        insert.setDouble(table.GCH.queryIndex, perLengthSequenceImpedance.gch)
+        insert.setDouble(table.B0CH.queryIndex, perLengthSequenceImpedance.b0ch)
+        insert.setDouble(table.G0CH.queryIndex, perLengthSequenceImpedance.g0ch)
 
         return savePerLengthImpedance(table, insert, perLengthSequenceImpedance, "per length sequence impedance")
     }
@@ -575,7 +584,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TablePowerTransformers::class.java)
         val insert = databaseTables.getInsert(TablePowerTransformers::class.java)
 
-        insert.setNullableString(table.VECTOR_GROUP.queryIndex(), powerTransformer.vectorGroup.name)
+        insert.setNullableString(table.VECTOR_GROUP.queryIndex, powerTransformer.vectorGroup.name)
 
         return saveConductingEquipment(table, insert, powerTransformer, "power transformer")
     }
@@ -584,19 +593,19 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TablePowerTransformerEnds::class.java)
         val insert = databaseTables.getInsert(TablePowerTransformerEnds::class.java)
 
-        insert.setNullableString(table.POWER_TRANSFORMER_MRID.queryIndex(), powerTransformerEnd.powerTransformer?.mRID)
-        insert.setNullableString(table.CONNECTION_KIND.queryIndex(), powerTransformerEnd.connectionKind.name)
-        insert.setInt(table.PHASE_ANGLE_CLOCK.queryIndex(), powerTransformerEnd.phaseAngleClock)
-        insert.setDouble(table.B.queryIndex(), powerTransformerEnd.b)
-        insert.setDouble(table.B0.queryIndex(), powerTransformerEnd.b0)
-        insert.setDouble(table.G.queryIndex(), powerTransformerEnd.g)
-        insert.setDouble(table.G0.queryIndex(), powerTransformerEnd.g0)
-        insert.setDouble(table.R.queryIndex(), powerTransformerEnd.r)
-        insert.setDouble(table.R0.queryIndex(), powerTransformerEnd.r0)
-        insert.setInt(table.RATED_S.queryIndex(), powerTransformerEnd.ratedS)
-        insert.setInt(table.RATED_U.queryIndex(), powerTransformerEnd.ratedU)
-        insert.setDouble(table.X.queryIndex(), powerTransformerEnd.x)
-        insert.setDouble(table.X0.queryIndex(), powerTransformerEnd.x0)
+        insert.setNullableString(table.POWER_TRANSFORMER_MRID.queryIndex, powerTransformerEnd.powerTransformer?.mRID)
+        insert.setNullableString(table.CONNECTION_KIND.queryIndex, powerTransformerEnd.connectionKind.name)
+        insert.setInt(table.PHASE_ANGLE_CLOCK.queryIndex, powerTransformerEnd.phaseAngleClock)
+        insert.setDouble(table.B.queryIndex, powerTransformerEnd.b)
+        insert.setDouble(table.B0.queryIndex, powerTransformerEnd.b0)
+        insert.setDouble(table.G.queryIndex, powerTransformerEnd.g)
+        insert.setDouble(table.G0.queryIndex, powerTransformerEnd.g0)
+        insert.setDouble(table.R.queryIndex, powerTransformerEnd.r)
+        insert.setDouble(table.R0.queryIndex, powerTransformerEnd.r0)
+        insert.setInt(table.RATED_S.queryIndex, powerTransformerEnd.ratedS)
+        insert.setInt(table.RATED_U.queryIndex, powerTransformerEnd.ratedU)
+        insert.setDouble(table.X.queryIndex, powerTransformerEnd.x)
+        insert.setDouble(table.X0.queryIndex, powerTransformerEnd.x0)
 
         return saveTransformerEnd(table, insert, powerTransformerEnd, "power transformer end")
     }
@@ -609,8 +618,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableRatioTapChangers::class.java)
         val insert = databaseTables.getInsert(TableRatioTapChangers::class.java)
 
-        insert.setNullableString(table.TRANSFORMER_END_MRID.queryIndex(), ratioTapChanger.transformerEnd?.mRID)
-        insert.setDouble(table.STEP_VOLTAGE_INCREMENT.queryIndex(), ratioTapChanger.stepVoltageIncrement)
+        insert.setNullableString(table.TRANSFORMER_END_MRID.queryIndex, ratioTapChanger.transformerEnd?.mRID)
+        insert.setDouble(table.STEP_VOLTAGE_INCREMENT.queryIndex, ratioTapChanger.stepVoltageIncrement)
 
         return saveTapChanger(table, insert, ratioTapChanger, "ratio tap changer")
     }
@@ -628,7 +637,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         regulatingCondEq: RegulatingCondEq,
         description: String
     ): Boolean {
-        insert.setBoolean(table.CONTROL_ENABLED.queryIndex(), regulatingCondEq.controlEnabled)
+        insert.setBoolean(table.CONTROL_ENABLED.queryIndex, regulatingCondEq.controlEnabled)
 
         return saveEnergyConnection(table, insert, regulatingCondEq, description)
     }
@@ -639,29 +648,29 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         shuntCompensator: ShuntCompensator,
         description: String
     ): Boolean {
-        insert.setBoolean(table.GROUNDED.queryIndex(), shuntCompensator.grounded)
-        insert.setInt(table.NOM_U.queryIndex(), shuntCompensator.nomU)
-        insert.setNullableString(table.PHASE_CONNECTION.queryIndex(), shuntCompensator.phaseConnection.name)
-        insert.setDouble(table.SECTIONS.queryIndex(), shuntCompensator.sections)
+        insert.setBoolean(table.GROUNDED.queryIndex, shuntCompensator.grounded)
+        insert.setInt(table.NOM_U.queryIndex, shuntCompensator.nomU)
+        insert.setNullableString(table.PHASE_CONNECTION.queryIndex, shuntCompensator.phaseConnection.name)
+        insert.setDouble(table.SECTIONS.queryIndex, shuntCompensator.sections)
 
         return saveRegulatingCondEq(table, insert, shuntCompensator, description)
     }
 
     private fun saveSwitch(table: TableSwitches, insert: PreparedStatement, switch: Switch, description: String): Boolean {
-        insert.setInt(table.NORMAL_OPEN.queryIndex(), switch.normalOpen)
-        insert.setInt(table.OPEN.queryIndex(), switch.open)
+        insert.setInt(table.NORMAL_OPEN.queryIndex, switch.normalOpen)
+        insert.setInt(table.OPEN.queryIndex, switch.open)
 
         return saveConductingEquipment(table, insert, switch, description)
     }
 
     private fun saveTapChanger(table: TableTapChangers, insert: PreparedStatement, tapChanger: TapChanger, description: String): Boolean {
-        insert.setBoolean(table.CONTROL_ENABLED.queryIndex(), tapChanger.controlEnabled)
-        insert.setInt(table.HIGH_STEP.queryIndex(), tapChanger.highStep)
-        insert.setInt(table.LOW_STEP.queryIndex(), tapChanger.lowStep)
-        insert.setInt(table.NEUTRAL_STEP.queryIndex(), tapChanger.neutralStep)
-        insert.setInt(table.NEUTRAL_U.queryIndex(), tapChanger.neutralU)
-        insert.setInt(table.NORMAL_STEP.queryIndex(), tapChanger.normalStep)
-        insert.setDouble(table.STEP.queryIndex(), tapChanger.step)
+        insert.setBoolean(table.CONTROL_ENABLED.queryIndex, tapChanger.controlEnabled)
+        insert.setInt(table.HIGH_STEP.queryIndex, tapChanger.highStep)
+        insert.setInt(table.LOW_STEP.queryIndex, tapChanger.lowStep)
+        insert.setInt(table.NEUTRAL_STEP.queryIndex, tapChanger.neutralStep)
+        insert.setInt(table.NEUTRAL_U.queryIndex, tapChanger.neutralU)
+        insert.setInt(table.NORMAL_STEP.queryIndex, tapChanger.normalStep)
+        insert.setDouble(table.STEP.queryIndex, tapChanger.step)
 
         return savePowerSystemResource(table, insert, tapChanger, description)
     }
@@ -672,12 +681,12 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         transformerEnd: TransformerEnd,
         description: String
     ): Boolean {
-        insert.setInt(table.END_NUMBER.queryIndex(), transformerEnd.endNumber)
-        insert.setNullableString(table.TERMINAL_MRID.queryIndex(), transformerEnd.terminal?.mRID)
-        insert.setNullableString(table.BASE_VOLTAGE_MRID.queryIndex(), transformerEnd.baseVoltage?.mRID)
-        insert.setBoolean(table.GROUNDED.queryIndex(), transformerEnd.grounded)
-        insert.setDouble(table.R_GROUND.queryIndex(), transformerEnd.rGround)
-        insert.setDouble(table.X_GROUND.queryIndex(), transformerEnd.xGround)
+        insert.setInt(table.END_NUMBER.queryIndex, transformerEnd.endNumber)
+        insert.setNullableString(table.TERMINAL_MRID.queryIndex, transformerEnd.terminal?.mRID)
+        insert.setNullableString(table.BASE_VOLTAGE_MRID.queryIndex, transformerEnd.baseVoltage?.mRID)
+        insert.setBoolean(table.GROUNDED.queryIndex, transformerEnd.grounded)
+        insert.setDouble(table.R_GROUND.queryIndex, transformerEnd.rGround)
+        insert.setDouble(table.X_GROUND.queryIndex, transformerEnd.xGround)
 
         return saveIdentifiedObject(table, insert, transformerEnd, description)
     }
@@ -688,7 +697,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableCircuits::class.java)
         val insert = databaseTables.getInsert(TableCircuits::class.java)
 
-        insert.setNullableString(table.LOOP_MRID.queryIndex(), circuit.loop?.mRID)
+        insert.setNullableString(table.LOOP_MRID.queryIndex, circuit.loop?.mRID)
 
         var status = true
         circuit.endSubstations.forEach { status = status and saveAssociation(circuit, it) }
@@ -715,11 +724,11 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         measurement: Measurement,
         description: String
     ): Boolean {
-        insert.setNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex(), measurement.powerSystemResourceMRID)
-        insert.setNullableString(table.REMOTE_SOURCE_MRID.queryIndex(), measurement.remoteSource?.mRID)
-        insert.setNullableString(table.TERMINAL_MRID.queryIndex(), measurement.terminalMRID)
-        insert.setString(table.PHASES.queryIndex(), measurement.phases.name)
-        insert.setString(table.UNIT_SYMBOL.queryIndex(), measurement.unitSymbol.name)
+        insert.setNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex, measurement.powerSystemResourceMRID)
+        insert.setNullableString(table.REMOTE_SOURCE_MRID.queryIndex, measurement.remoteSource?.mRID)
+        insert.setNullableString(table.TERMINAL_MRID.queryIndex, measurement.terminalMRID)
+        insert.setString(table.PHASES.queryIndex, measurement.phases.name)
+        insert.setString(table.UNIT_SYMBOL.queryIndex, measurement.unitSymbol.name)
         return saveIdentifiedObject(table, insert, measurement, description)
     }
 
@@ -727,7 +736,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableAnalogs::class.java)
         val insert = databaseTables.getInsert(TableAnalogs::class.java)
 
-        insert.setBoolean(table.POSITIVE_FLOW_IN.queryIndex(), analog.positiveFlowIn)
+        insert.setBoolean(table.POSITIVE_FLOW_IN.queryIndex, analog.positiveFlowIn)
 
         return saveMeasurement(table, insert, analog, "analog")
     }
@@ -750,7 +759,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableControls::class.java)
         val insert = databaseTables.getInsert(TableControls::class.java)
 
-        insert.setNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex(), control.powerSystemResourceMRID)
+        insert.setNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex, control.powerSystemResourceMRID)
 
         return saveIoPoint(table, insert, control, "control")
     }
@@ -764,7 +773,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableRemoteControls::class.java)
         val insert = databaseTables.getInsert(TableRemoteControls::class.java)
 
-        insert.setNullableString(table.CONTROL_MRID.queryIndex(), remoteControl.control?.mRID)
+        insert.setNullableString(table.CONTROL_MRID.queryIndex, remoteControl.control?.mRID)
 
         return saveRemotePoint(table, insert, remoteControl, "remote control")
     }
@@ -777,7 +786,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableRemoteSources::class.java)
         val insert = databaseTables.getInsert(TableRemoteSources::class.java)
 
-        insert.setNullableString(table.MEASUREMENT_MRID.queryIndex(), remoteSource.measurement?.mRID)
+        insert.setNullableString(table.MEASUREMENT_MRID.queryIndex, remoteSource.measurement?.mRID)
 
         return saveRemotePoint(table, insert, remoteSource, "remote source")
     }
@@ -787,13 +796,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableAssetOrganisationRolesAssets::class.java)
         val insert = databaseTables.getInsert(TableAssetOrganisationRolesAssets::class.java)
 
-        insert.setNullableString(table.ASSET_ORGANISATION_ROLE_MRID.queryIndex(), assetOrganisationRole.mRID)
-        insert.setNullableString(table.ASSET_MRID.queryIndex(), asset.mRID)
+        insert.setNullableString(table.ASSET_ORGANISATION_ROLE_MRID.queryIndex, assetOrganisationRole.mRID)
+        insert.setNullableString(table.ASSET_MRID.queryIndex, asset.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
             "${assetOrganisationRole.mRID}-to-${asset.mRID}",
-            "Failed to save asset organisation role to asset association."
+            "asset organisation role to asset association"
         )
     }
 
@@ -801,13 +810,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableUsagePointsEndDevices::class.java)
         val insert = databaseTables.getInsert(TableUsagePointsEndDevices::class.java)
 
-        insert.setNullableString(table.USAGE_POINT_MRID.queryIndex(), usagePoint.mRID)
-        insert.setNullableString(table.END_DEVICE_MRID.queryIndex(), endDevice.mRID)
+        insert.setNullableString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
+        insert.setNullableString(table.END_DEVICE_MRID.queryIndex, endDevice.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
             "${usagePoint.mRID}-to-${endDevice.mRID}",
-            "Failed to save usage point to end device association."
+            "usage point to end device association"
         )
     }
 
@@ -815,13 +824,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableEquipmentUsagePoints::class.java)
         val insert = databaseTables.getInsert(TableEquipmentUsagePoints::class.java)
 
-        insert.setNullableString(table.EQUIPMENT_MRID.queryIndex(), equipment.mRID)
-        insert.setNullableString(table.USAGE_POINT_MRID.queryIndex(), usagePoint.mRID)
+        insert.setNullableString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
+        insert.setNullableString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
             "${equipment.mRID}-to-${usagePoint.mRID}",
-            "Failed to save equipment to usage point association."
+            "equipment to usage point association"
         )
     }
 
@@ -829,13 +838,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableEquipmentOperationalRestrictions::class.java)
         val insert = databaseTables.getInsert(TableEquipmentOperationalRestrictions::class.java)
 
-        insert.setNullableString(table.EQUIPMENT_MRID.queryIndex(), equipment.mRID)
-        insert.setNullableString(table.OPERATIONAL_RESTRICTION_MRID.queryIndex(), operationalRestriction.mRID)
+        insert.setNullableString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
+        insert.setNullableString(table.OPERATIONAL_RESTRICTION_MRID.queryIndex, operationalRestriction.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
             "${equipment.mRID}-to-${operationalRestriction.mRID}",
-            "Failed to save equipment to operational restriction association."
+            "equipment to operational restriction association"
         )
     }
 
@@ -843,13 +852,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableEquipmentEquipmentContainers::class.java)
         val insert = databaseTables.getInsert(TableEquipmentEquipmentContainers::class.java)
 
-        insert.setNullableString(table.EQUIPMENT_MRID.queryIndex(), equipment.mRID)
-        insert.setNullableString(table.EQUIPMENT_CONTAINER_MRID.queryIndex(), equipmentContainer.mRID)
+        insert.setNullableString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
+        insert.setNullableString(table.EQUIPMENT_CONTAINER_MRID.queryIndex, equipmentContainer.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
             "${equipment.mRID}-to-${equipmentContainer.mRID}",
-            "Failed to save equipment to equipment container association."
+            "equipment to equipment container association"
         )
     }
 
@@ -857,13 +866,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableCircuitsSubstations::class.java)
         val insert = databaseTables.getInsert(TableCircuitsSubstations::class.java)
 
-        insert.setNullableString(table.CIRCUIT_MRID.queryIndex(), circuit.mRID)
-        insert.setNullableString(table.SUBSTATION_MRID.queryIndex(), substation.mRID)
+        insert.setNullableString(table.CIRCUIT_MRID.queryIndex, circuit.mRID)
+        insert.setNullableString(table.SUBSTATION_MRID.queryIndex, substation.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
             "${circuit.mRID}-to-${substation.mRID}",
-            "Failed to save circuit to substation association."
+            "circuit to substation association"
         )
     }
 
@@ -871,13 +880,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableCircuitsTerminals::class.java)
         val insert = databaseTables.getInsert(TableCircuitsTerminals::class.java)
 
-        insert.setNullableString(table.CIRCUIT_MRID.queryIndex(), circuit.mRID)
-        insert.setNullableString(table.TERMINAL_MRID.queryIndex(), terminal.mRID)
+        insert.setNullableString(table.CIRCUIT_MRID.queryIndex, circuit.mRID)
+        insert.setNullableString(table.TERMINAL_MRID.queryIndex, terminal.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
             "${circuit.mRID}-to-${terminal.mRID}",
-            "Failed to save circuit to terminal association."
+            "circuit to terminal association"
         )
     }
 
@@ -885,14 +894,14 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableLoopsSubstations::class.java)
         val insert = databaseTables.getInsert(TableLoopsSubstations::class.java)
 
-        insert.setNullableString(table.LOOP_MRID.queryIndex(), loop.mRID)
-        insert.setNullableString(table.SUBSTATION_MRID.queryIndex(), substation.mRID)
-        insert.setNullableString(table.RELATIONSHIP.queryIndex(), relationship.name)
+        insert.setNullableString(table.LOOP_MRID.queryIndex, loop.mRID)
+        insert.setNullableString(table.SUBSTATION_MRID.queryIndex, substation.mRID)
+        insert.setNullableString(table.RELATIONSHIP.queryIndex, relationship.name)
 
         return tryExecuteSingleUpdate(
             insert,
             "${loop.mRID}-to-${substation.mRID}",
-            "Failed to save loop to substation association."
+            "loop to substation association"
         )
     }
 }

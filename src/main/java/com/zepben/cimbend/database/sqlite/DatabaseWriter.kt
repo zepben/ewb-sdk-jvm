@@ -8,13 +8,13 @@
 package com.zepben.cimbend.database.sqlite
 
 import com.zepben.cimbend.common.BaseService
+import com.zepben.cimbend.common.meta.MetadataCollection
 import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.database.MissingTableConfigException
 import com.zepben.cimbend.database.sqlite.extensions.configureBatch
 import com.zepben.cimbend.database.sqlite.tables.TableVersion
 import com.zepben.cimbend.database.sqlite.writers.*
 import com.zepben.cimbend.diagram.DiagramService
-import com.zepben.cimbend.measurement.MeasurementService
 import com.zepben.cimbend.network.NetworkService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -22,7 +22,6 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.sql.*
-
 
 
 /**
@@ -54,7 +53,7 @@ class DatabaseWriter @JvmOverloads constructor(
      * and MeasurementService. Multiple of each type can be passed and will be merged in the database. This is not
      * well supported however, and not recommended. Merge services prior to calling save (for the moment :))
      */
-    fun save(services: List<BaseService>): Boolean {
+    fun save(metadataCollection: MetadataCollection, services: List<BaseService>): Boolean {
         if (services.isEmpty()) {
             logger.warn("No services were provided, therefore there is nothing to save")
             return false
@@ -71,13 +70,22 @@ class DatabaseWriter @JvmOverloads constructor(
             return false
         }
 
-        var status = true
+        var status = MetadataCollectionWriter().save(metadataCollection, MetaDataEntryWriter(databaseTables))
         services.forEach {
             status = status and try {
                 when (it) {
-                    is NetworkService -> NetworkServiceWriter(::hasCommon, ::addCommon).save(it, NetworkCIMWriter(databaseTables))
-                    is CustomerService -> CustomerServiceWriter(::hasCommon, ::addCommon).save(it, CustomerCIMWriter(databaseTables))
-                    is DiagramService -> DiagramServiceWriter(::hasCommon, ::addCommon).save(it, DiagramCIMWriter(databaseTables))
+                    is NetworkService -> NetworkServiceWriter(::hasCommon, ::addCommon).save(
+                        it,
+                        NetworkCIMWriter(databaseTables)
+                    )
+                    is CustomerService -> CustomerServiceWriter(::hasCommon, ::addCommon).save(
+                        it,
+                        CustomerCIMWriter(databaseTables)
+                    )
+                    is DiagramService -> DiagramServiceWriter(::hasCommon, ::addCommon).save(
+                        it,
+                        DiagramCIMWriter(databaseTables)
+                    )
                     else -> run { logger.error("Unsupported service of type ${it.javaClass.simpleName} couldn't be saved."); false }
                 }
             } catch (e: MissingTableConfigException) {
@@ -94,9 +102,9 @@ class DatabaseWriter @JvmOverloads constructor(
 
     private fun preSave(): Boolean {
         return removeExisting()
-            && connect()
-            && create()
-            && prepareInsertStatements()
+                && connect()
+                && create()
+                && prepareInsertStatements()
     }
 
     private fun removeExisting(): Boolean {
@@ -143,7 +151,7 @@ class DatabaseWriter @JvmOverloads constructor(
 
                 // Add the version number to the database.
                 getPreparedStatement(saveConnection, versionTable.preparedInsertSql()).use { insert ->
-                    insert.setInt(versionTable.VERSION.queryIndex(), versionTable.SUPPORTED_VERSION)
+                    insert.setInt(versionTable.VERSION.queryIndex, versionTable.SUPPORTED_VERSION)
                     insert.executeUpdate()
                 }
 

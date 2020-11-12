@@ -7,16 +7,12 @@
  */
 package com.zepben.cimbend.database.sqlite.tables.iec61970.base.meas
 
-/**
- * Represents the accumulators table
- */
 class TableAccumulators : TableMeasurements() {
     override fun name(): String {
         return "accumulators"
     }
 
-    override val tableClass: Class<*>
-        get() = TableAccumulators::class.java
-    override val tableClassInstance: Any
-        get() = this
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
+
 }

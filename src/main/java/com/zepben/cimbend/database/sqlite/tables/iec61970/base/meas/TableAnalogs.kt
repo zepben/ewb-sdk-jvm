@@ -10,23 +10,16 @@ package com.zepben.cimbend.database.sqlite.tables.iec61970.base.meas
 import com.zepben.cimbend.database.Column
 import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
 
-/**
- * Represents the analogs table
- */
+@Suppress("PropertyName")
 class TableAnalogs : TableMeasurements() {
-    val POSITIVE_FLOW_IN = Column(
-        ++columnIndex,
-        "positive_flow_in",
-        "BOOLEAN",
-        NOT_NULL
-    )
+
+    val POSITIVE_FLOW_IN = Column(++columnIndex, "positive_flow_in", "BOOLEAN", NOT_NULL)
 
     override fun name(): String {
         return "analogs"
     }
 
-    override val tableClass: Class<*>
-        get() = TableAnalogs::class.java
-    override val tableClassInstance: Any
-        get() = this
+    override val tableClass = this.javaClass
+    override val tableClassInstance = this
+
 }

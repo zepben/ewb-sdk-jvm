@@ -28,6 +28,7 @@ import com.zepben.cimbend.cim.iec61970.base.meas.Discrete
 import com.zepben.cimbend.cim.iec61970.base.meas.Measurement
 import com.zepben.cimbend.cim.iec61970.base.scada.RemoteSource
 import com.zepben.cimbend.cim.iec61970.base.wires.*
+import com.zepben.cimbend.common.meta.MetadataCollection
 import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.diagram.DiagramService
 import com.zepben.cimbend.measurement.MeasurementService
@@ -36,10 +37,11 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.time.Instant
 
-@Suppress("SameParameterValue", "BooleanLiteralArgument")
+@Suppress("SameParameterValue", "BooleanLiteralArgument", "MemberVisibilityCanBePrivate")
 class NetworkModelTestUtil {
 
     data class Services constructor(
+        val metadataCollection: MetadataCollection = MetadataCollection(),
         val networkService: NetworkService = NetworkService(),
         val diagramService: DiagramService = DiagramService(),
         val customerService: CustomerService = CustomerService(),
@@ -311,7 +313,7 @@ class NetworkModelTestUtil {
             psr: PowerSystemResource? = null,
             isRemote: Boolean = false
         ): Analog {
-            var meas = Analog()
+            val meas = Analog()
                 .apply {
                     powerSystemResourceMRID = psr?.mRID
                     terminalMRID = termMRID
@@ -335,7 +337,7 @@ class NetworkModelTestUtil {
             psr: PowerSystemResource? = null,
             isRemote: Boolean = false
         ): Accumulator {
-            var meas = Accumulator()
+            val meas = Accumulator()
                 .apply {
                     powerSystemResourceMRID = psr?.mRID
                     terminalMRID = termMRID
@@ -357,7 +359,7 @@ class NetworkModelTestUtil {
             psr: PowerSystemResource? = null,
             isRemote: Boolean = false
         ): Discrete {
-            var meas = Discrete()
+            val meas = Discrete()
                 .apply {
                     powerSystemResourceMRID = psr?.mRID
                     terminalMRID = termMRID

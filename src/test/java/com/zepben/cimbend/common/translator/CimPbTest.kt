@@ -25,8 +25,10 @@ import com.zepben.cimbend.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.cimbend.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.cimbend.cim.iec61970.base.diagramlayout.DiagramObjectPoint
 import com.zepben.cimbend.cim.iec61970.base.diagramlayout.DiagramObjectStyle
+import com.zepben.cimbend.cim.iec61970.base.meas.Accumulator
+import com.zepben.cimbend.cim.iec61970.base.meas.Analog
 import com.zepben.cimbend.cim.iec61970.base.meas.Control
-import com.zepben.cimbend.cim.iec61970.base.meas.*
+import com.zepben.cimbend.cim.iec61970.base.meas.Discrete
 import com.zepben.cimbend.cim.iec61970.base.scada.RemoteControl
 import com.zepben.cimbend.cim.iec61970.base.scada.RemoteSource
 import com.zepben.cimbend.cim.iec61970.base.wires.*
@@ -40,13 +42,11 @@ import com.zepben.cimbend.diagram.DiagramServiceComparator
 import com.zepben.cimbend.diagram.addFromPb
 import com.zepben.cimbend.diagram.toPb
 import com.zepben.cimbend.measurement.MeasurementService
-import com.zepben.cimbend.measurement.addFromPb
-import com.zepben.cimbend.measurement.toPb
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.NetworkServiceComparator
-import com.zepben.cimbend.network.SchemaTestNetwork
 import com.zepben.cimbend.network.model.addFromPb
 import com.zepben.cimbend.network.model.toPb
+import com.zepben.cimbend.testdata.StupidlyLargeNetwork
 import com.zepben.cimbend.testdata.TestDataCreators.createTerminal
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -62,7 +62,7 @@ class CimPbTest {
 
     @Test
     fun cimToPbToCim() {
-        val (sourceNetworkService, sourceDiagramService, sourceCustomer, sourceMeasurement) = SchemaTestNetwork.createStupidlyLargeServices()
+        val (_, sourceNetworkService, sourceDiagramService, sourceCustomer, sourceMeasurement) = StupidlyLargeNetwork.create()
 
         testNetworkService(sourceNetworkService)
         testDiagramService(sourceDiagramService)
@@ -77,10 +77,13 @@ class CimPbTest {
         val acls= AcLineSegment("acls1")
         val firstTerm = createTerminal(networkService, jc, PhaseCode.ABC, 1)
         val secondTerm= createTerminal(networkService, jc, PhaseCode.ABC, 2)
+
         networkService.add(jc)
         networkService.add(acls)
+
         jc.addTerminal(firstTerm)
         jc.addTerminal(secondTerm)
+
         // Order should be maintained (no differences) regardless of the order they are resolved
         // e.g resolved after ConductingEquipment is added or before.
         var targetNetwork = NetworkService()
@@ -116,6 +119,7 @@ class CimPbTest {
             addPoint(DiagramObjectPoint(1.0, 1.0))
             addPoint(DiagramObjectPoint(2.0, 2.0))
         }
+
         diagram1.addDiagramObject(diagramObject1)
         diagram1.addDiagramObject(diagramObject2)
 

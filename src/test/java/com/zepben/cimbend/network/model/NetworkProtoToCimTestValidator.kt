@@ -348,7 +348,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun validateMeas(pb: PBMeasurement.Builder, fromPb: () -> Measurement): Measurement {
+    inline fun <reified T: Measurement> validate(pb: PBMeasurement.Builder, fromPb: () -> T): T {
         pb.terminalMRID = "terminal1"
         pb.powerSystemResourceMRID = "psr1"
         pb.remoteSourceMRID = "rs1"
@@ -372,32 +372,16 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
     }
 
     inline fun validate(pb: PBAnalog.Builder, fromPb: () -> Analog): Analog {
-        validateMeas(pb.measurementBuilder, fromPb)
         pb.positiveFlowIn = true
-
-        val cim = validate(pb.measurementBuilder.ioBuilder, fromPb)
-
+        val cim = validate(pb.measurementBuilder, fromPb)
         assertThat(cim.positiveFlowIn, `is`(true))
 
         return cim
     }
 
-    inline fun validate(pb: PBAccumulator.Builder, fromPb: () -> Accumulator): Accumulator {
-        validateMeas(pb.measurementBuilder, fromPb)
+    inline fun validate(pb: PBAccumulator.Builder, fromPb: () -> Accumulator): Accumulator = validate(pb.measurementBuilder, fromPb)
 
-        val cim = validate(pb.measurementBuilder.ioBuilder, fromPb)
+    inline fun validate(pb: PBDiscrete.Builder, fromPb: () -> Discrete): Discrete = validate(pb.measurementBuilder.ioBuilder, fromPb)
 
-        return cim
-    }
-
-    inline fun validate(pb: PBDiscrete.Builder, fromPb: () -> Discrete): Discrete {
-        validateMeas(pb.measurementBuilder, fromPb)
-
-        val cim = validate(pb.measurementBuilder.ioBuilder, fromPb)
-
-        return cim
-    }
-
-    inline fun <reified T : Structure> validate(pb: PBStructure.Builder, fromPb: () -> T): T =
-        validate(pb.acBuilder, fromPb)
+    inline fun <reified T : Structure> validate(pb: PBStructure.Builder, fromPb: () -> T): T = validate(pb.acBuilder, fromPb)
 }

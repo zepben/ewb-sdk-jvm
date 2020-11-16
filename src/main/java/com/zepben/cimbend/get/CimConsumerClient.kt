@@ -12,6 +12,15 @@ import com.zepben.cimbend.common.BaseService
 import com.zepben.cimbend.grpc.GrpcClient
 import com.zepben.cimbend.grpc.GrpcResult
 
+
+/**
+ * @property result Map of mRID to its IdentifiedObject.
+ * @property failed The set of mRIDs that failed to be processed.
+ */
+data class MultiObjectResult(val result: Map<String, IdentifiedObject>, val failed: Set<String>)
+
+data class ExtractResult(val identifiedObject: IdentifiedObject?, val mRID: String)
+
 /**
  * Base class that defines some helpful functions when producer clients are sending to the server.
  *
@@ -39,6 +48,6 @@ abstract class CimConsumerClient<T : BaseService> : GrpcClient() {
      *
      * @return A [Map] containing the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
      */
-    abstract fun getIdentifiedObjects(service: T, mRIDs: Iterable<String>): GrpcResult<Map<String, IdentifiedObject>>
+    abstract fun getIdentifiedObjects(service: T, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult>
 
 }

@@ -31,6 +31,7 @@ import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -45,8 +46,7 @@ internal class NetworkConsumerClientTest {
 
     private val stub = mock(NetworkConsumerGrpc.NetworkConsumerBlockingStub::class.java)
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val consumerClient: NetworkConsumerClient =
-        NetworkConsumerClient(stub).apply { addErrorHandler(onErrorHandler) }
+    private val consumerClient: NetworkConsumerClient = NetworkConsumerClient(stub).apply { addErrorHandler(onErrorHandler) }
     private val service: NetworkService = NetworkService()
 
     @Test
@@ -131,10 +131,10 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.size, equalTo(3))
-        assertThat(result.value[mRIDs[0]], instanceOf(AcLineSegment::class.java))
-        assertThat(result.value[mRIDs[1]], instanceOf(AcLineSegment::class.java))
-        assertThat(result.value[mRIDs[2]], instanceOf(Breaker::class.java))
+        assertThat(result.value.result.size, equalTo(3))
+        assertThat(result.value.result[mRIDs[0]], instanceOf(AcLineSegment::class.java))
+        assertThat(result.value.result[mRIDs[1]], instanceOf(AcLineSegment::class.java))
+        assertThat(result.value.result[mRIDs[2]], instanceOf(Breaker::class.java))
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
         clearInvocations(stub)
@@ -212,7 +212,9 @@ internal class NetworkConsumerClientTest {
         verify(stub, times(3)).getIdentifiedObjects(any())
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.mRID, equalTo(mRID))
+        assertThat(result.value.result.containsKey(mRID), equalTo(true))
+        assertThat(result.value.result.size, equalTo(36))
+        assertThat(result.value.failed.size, equalTo(0))
 
         val actualFeeder: Feeder = service[mRID]!!
         val expectedFeeder: Feeder = expectedService[mRID]!!
@@ -402,6 +404,27 @@ internal class NetworkConsumerClientTest {
 
         verify(stub, times(3)).getIdentifiedObjects(any())
         validateNestedFailure(result, "validPerLengthSequenceInformation", false)
+    }
+
+    @Test
+    internal fun `returns failed mRID when duplicate mRID exists in the service`() {
+        val mRIDs = listOf("id1", "id1", "id2")
+        val response1 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, mRIDs[0])
+        val response2 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, mRIDs[1])
+        val response3 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getBreakerBuilder, mRIDs[2])
+
+        doReturn(listOf(response1, response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
+
+        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
+
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.value.result.size, equalTo(2))
+        assertThat(result.value.result[mRIDs[0]], instanceOf(AcLineSegment::class.java))
+        assertThat(result.value.result[mRIDs[2]], instanceOf(Breaker::class.java))
+        assertThat(result.value.failed, Matchers.contains(mRIDs[0]))
+
+        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
+        clearInvocations(stub)
     }
 
     private fun createResponse(

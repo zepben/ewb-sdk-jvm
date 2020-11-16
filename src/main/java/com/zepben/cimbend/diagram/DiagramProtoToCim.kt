@@ -42,14 +42,14 @@ fun toCim(pb: PBDiagramObjectPoint) =
 
 /************ Extensions ************/
 
-fun DiagramService.addFromPb(pb: PBDiagram): Diagram = toCim(pb, this).also { add(it) }
-fun DiagramService.addFromPb(pb: PBDiagramObject): DiagramObject = toCim(pb, this).also { add(it) }
+fun DiagramService.addFromPb(pb: PBDiagram): Diagram? = tryAddOrNull(toCim(pb, this))
+fun DiagramService.addFromPb(pb: PBDiagramObject): DiagramObject? = tryAddOrNull(toCim(pb, this))
 
 /************ Class for Java friendly usage ************/
 
 class DiagramProtoToCim(private val diagramService: DiagramService) : BaseProtoToCim(diagramService) {
 
-    fun addFromPb(pb: PBDiagram) = diagramService.addFromPb(pb)
-    fun addFromPb(pb: PBDiagramObject) = diagramService.addFromPb(pb)
+    fun addFromPb(pb: PBDiagram): Diagram? = diagramService.addFromPb(pb)
+    fun addFromPb(pb: PBDiagramObject): DiagramObject? = diagramService.addFromPb(pb)
 
 }

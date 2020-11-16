@@ -33,48 +33,48 @@ class NetworkProtoToCimTest {
     @Test
     internal fun testFromPbMeter() {
         val pbMeter = PBMeter.newBuilder()
-        validator.validate(pbMeter) { translator.addFromPb(pbMeter.build()) }
+        validator.validate(pbMeter) { translator.addFromPb(pbMeter.build())!! }
     }
 
     @Test
     internal fun testFromPbSubstation() {
         val pbSubstation = PBSubstation.newBuilder()
-        validator.validate(pbSubstation) { translator.addFromPb(pbSubstation.build()) }
+        validator.validate(pbSubstation) { translator.addFromPb(pbSubstation.build())!! }
     }
 
     @Test
     internal fun testFromPbCircuit() {
         val pbCircuit = PBCircuit.newBuilder()
-        validator.validate(pbCircuit) { translator.addFromPb(pbCircuit.build()) }
+        validator.validate(pbCircuit) { translator.addFromPb(pbCircuit.build())!! }
     }
 
     @Test
     internal fun testFromPbLoop() {
         val pbLoop = PBLoop.newBuilder()
-        validator.validate(pbLoop) { translator.addFromPb(pbLoop.build()) }
+        validator.validate(pbLoop) { translator.addFromPb(pbLoop.build())!! }
     }
 
     @Test
     internal fun testFromPbPole() {
         val pbPole = PBPole.newBuilder()
-        validator.validate(pbPole) { translator.addFromPb(pbPole.build()) }
+        validator.validate(pbPole) { translator.addFromPb(pbPole.build())!! }
     }
 
     @Test
     internal fun testFromPbAnalog() {
         val pb = PBAnalog.newBuilder()
-        validator.validate(pb) { translator.addFromPb(pb.build()) }
+        validator.validate(pb) { translator.addFromPb(pb.build())!! }
     }
 
     @Test
     internal fun testFromPbAccumulator() {
         val pb = PBAccumulator.newBuilder()
-        validator.validate(pb) { translator.addFromPb(pb.build()) }
+        validator.validate(pb) { translator.addFromPb(pb.build())!! }
     }
 
     @Test
     internal fun testFromPbDiscrete() {
         val pb = PBDiscrete.newBuilder()
-        validator.validate(pb) { translator.addFromPb(pb.build()) }
+        validator.validate(pb) { translator.addFromPb(pb.build())!! }
     }
 }

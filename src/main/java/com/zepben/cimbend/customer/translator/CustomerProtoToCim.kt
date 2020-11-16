@@ -61,18 +61,18 @@ fun toCim(pb: PBTariff, customerService: CustomerService): Tariff =
 
 /************ Extensions ************/
 
-fun CustomerService.addFromPb(pb: PBOrganisation): Organisation = toCim(pb, this).also { add(it) }
-fun CustomerService.addFromPb(pb: PBCustomer): Customer = toCim(pb, this).also { add(it) }
-fun CustomerService.addFromPb(pb: PBCustomerAgreement): CustomerAgreement = toCim(pb, this).also { add(it) }
-fun CustomerService.addFromPb(pb: PBPricingStructure): PricingStructure = toCim(pb, this).also { add(it) }
-fun CustomerService.addFromPb(pb: PBTariff): Tariff = toCim(pb, this).also { add(it) }
+fun CustomerService.addFromPb(pb: PBOrganisation): Organisation? = tryAddOrNull(toCim(pb, this))
+fun CustomerService.addFromPb(pb: PBCustomer): Customer? = tryAddOrNull(toCim(pb, this))
+fun CustomerService.addFromPb(pb: PBCustomerAgreement): CustomerAgreement? = tryAddOrNull(toCim(pb, this))
+fun CustomerService.addFromPb(pb: PBPricingStructure): PricingStructure? = tryAddOrNull(toCim(pb, this))
+fun CustomerService.addFromPb(pb: PBTariff): Tariff? = tryAddOrNull(toCim(pb, this))
 
 /************ Class for Java friendly usage ************/
 
 class CustomerProtoToCim(private val customerService: CustomerService) : BaseProtoToCim(customerService) {
-    fun addFromPb(pb: PBOrganisation): Organisation = customerService.addFromPb(pb)
-    fun addFromPb(pb: PBCustomer): Customer = customerService.addFromPb(pb)
-    fun addFromPb(pb: PBCustomerAgreement): CustomerAgreement = customerService.addFromPb(pb)
-    fun addFromPb(pb: PBPricingStructure): PricingStructure = customerService.addFromPb(pb)
-    fun addFromPb(pb: PBTariff): Tariff = customerService.addFromPb(pb)
+    fun addFromPb(pb: PBOrganisation): Organisation? = customerService.addFromPb(pb)
+    fun addFromPb(pb: PBCustomer): Customer? = customerService.addFromPb(pb)
+    fun addFromPb(pb: PBCustomerAgreement): CustomerAgreement? = customerService.addFromPb(pb)
+    fun addFromPb(pb: PBPricingStructure): PricingStructure? = customerService.addFromPb(pb)
+    fun addFromPb(pb: PBTariff): Tariff? = customerService.addFromPb(pb)
 }

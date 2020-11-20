@@ -10,7 +10,6 @@ package com.zepben.cimbend.network.tracing
 import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.cimbend.cim.iec61970.base.core.Feeder
 import com.zepben.cimbend.cim.iec61970.base.core.Terminal
-import com.zepben.cimbend.cim.iec61970.base.wires.Breaker
 import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.traversals.BasicTraversal
@@ -27,17 +26,20 @@ class AssignToFeeders {
     private lateinit var activeFeeder: Feeder
 
     init {
-        normalTraversal.addStopCondition(::isFeederCb)
-        normalTraversal.addStopCondition(::notFromTxPrimaryVoltage)
-        normalTraversal.addStepAction { phaseStep, _ -> processNormal(phaseStep) }
-
-        currentTraversal.addStopCondition(::isFeederCb)
-        currentTraversal.addStopCondition(::notFromTxPrimaryVoltage)
-        currentTraversal.addStepAction { phaseStep, _ -> processCurrent(phaseStep) }
+        normalTraversal.addStepAction(::processNormal)
+        currentTraversal.addStepAction(::processCurrent)
     }
 
     fun run(network: NetworkService) {
-        network.sequenceOf<Feeder>().forEach(this::run)
+        val feederStartPoints: Set<ConductingEquipment> = network.sequenceOf(Feeder::class)
+            .mapNotNull { it.normalHeadTerminal }
+            .mapNotNull { it.conductingEquipment }
+            .toSet()
+
+        configureStopConditions(normalTraversal, feederStartPoints)
+        configureStopConditions(currentTraversal, feederStartPoints)
+
+        network.sequenceOf<Feeder>().forEach(::run)
     }
 
     fun run(feeder: Feeder) {
@@ -52,9 +54,6 @@ class AssignToFeeders {
     private fun run(traversal: BasicTraversal<PhaseStep>, headTerminal: Terminal) {
         traversal.reset()
 
-        val headEquipment = headTerminal.conductingEquipment ?: return
-        traversal.queue().add(PhaseStep.startAt(headEquipment, headTerminal.phases))
-
         NetworkService.connectedTerminals(headTerminal).forEach {
             it.to?.let { to ->
                 traversal.queue().add(PhaseStep.startAt(to, headTerminal.phases))
@@ -64,38 +63,34 @@ class AssignToFeeders {
         traversal.run()
     }
 
-    private fun isFeederCb(phaseStep: PhaseStep) = isFeederCb(phaseStep.conductingEquipment())
-    private fun isFeederCb(conductingEquipment: ConductingEquipment) = conductingEquipment is Breaker && conductingEquipment.isSubstationBreaker
-
-    private fun notFromTxPrimaryVoltage(phaseStep: PhaseStep): Boolean {
-        val conductingEquipment = phaseStep.conductingEquipment()
-        if (conductingEquipment !is PowerTransformer) return false
-        val previous = phaseStep.previous() ?: return false
-        return highestTxVoltage(conductingEquipment) != previous.baseVoltage?.nominalVoltage
+    private fun configureStopConditions(traversal: BasicTraversal<PhaseStep>, feederStartPoints: Set<ConductingEquipment>) {
+        traversal.clearStopConditions()
+        traversal.addStopCondition(reachedEquipment(feederStartPoints))
+        traversal.addStopCondition(reachedSubstationTransformer)
     }
 
-    private fun highestTxVoltage(powerTransformer: PowerTransformer): Int? {
-        if (powerTransformer.baseVoltage != null)
-            return powerTransformer.baseVoltageValue
+    private val reachedEquipment: (Set<ConductingEquipment>) -> (PhaseStep) -> Boolean = { { ps: PhaseStep -> it.contains(ps.conductingEquipment()) } }
 
-        var maxValue: Int? = null
-        powerTransformer.ends.forEach { end ->
-            maxValue = maxOf(maxValue ?: 0, end.baseVoltage?.nominalVoltage ?: end.ratedU)
-        }
-        return maxValue
+    private val reachedSubstationTransformer = { ps: PhaseStep ->
+        val ce = ps.conductingEquipment()
+        ce is PowerTransformer && ce.substations.isNotEmpty()
     }
 
-    private fun processNormal(phaseStep: PhaseStep) =
-        process(phaseStep.conductingEquipment(), ConductingEquipment::addContainer, Feeder::addEquipment)
+    private fun processNormal(phaseStep: PhaseStep, isStopping: Boolean) =
+        process(phaseStep.conductingEquipment(), ConductingEquipment::addContainer, Feeder::addEquipment, isStopping)
 
-    private fun processCurrent(phaseStep: PhaseStep) =
-        process(phaseStep.conductingEquipment(), ConductingEquipment::addCurrentFeeder, Feeder::addCurrentEquipment)
+    private fun processCurrent(phaseStep: PhaseStep, isStopping: Boolean) =
+        process(phaseStep.conductingEquipment(), ConductingEquipment::addCurrentFeeder, Feeder::addCurrentEquipment, isStopping)
 
     private fun process(
         conductingEquipment: ConductingEquipment,
         assignFeederToEquipment: (ConductingEquipment, Feeder) -> Unit,
-        assignEquipmentToFeeder: (Feeder, ConductingEquipment) -> Unit
+        assignEquipmentToFeeder: (Feeder, ConductingEquipment) -> Unit,
+        isStopping: Boolean
     ) {
+        if (isStopping && conductingEquipment is PowerTransformer)
+            return
+
         assignFeederToEquipment(conductingEquipment, activeFeeder)
         assignEquipmentToFeeder(activeFeeder, conductingEquipment)
     }

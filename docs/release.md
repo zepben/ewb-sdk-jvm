@@ -17,13 +17,13 @@ a 1.0.0 release.
 ### v0.4.0
 
 ##### Breaking Changes
-* None.
+* The AssignToFeeders functionality was changed to assign all conducting equipment on the headTerminal side (headTerminal conducting equipment included) stopping at open points or head equipment for other feeders.
 
 ##### New Features
 * None.
 
 ##### Enhancements
-* None.
+* Updated Feeder class to allow for updating the normalHeadTerminal field if the feeder has no equipment assigned. 
 
 ##### Fixes
 * None.

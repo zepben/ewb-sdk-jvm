@@ -247,10 +247,19 @@ public class TestDataCreators {
     }
 
     public static Feeder createFeeder(NetworkService networkService, String mRID, String name, @Nullable Substation substation, @Nullable ConductingEquipment feederStartPoint) {
+        return createFeeder(networkService, mRID, name, substation, feederStartPoint, feederStartPoint.getTerminal(1));
+    }
+
+    public static Feeder createFeeder(NetworkService networkService,
+                                      String mRID,
+                                      String name,
+                                      @Nullable Substation substation,
+                                      @Nullable ConductingEquipment feederStartPoint,
+                                      Terminal headTerminal) {
         Feeder feeder = new Feeder(mRID);
         feeder.setName(name);
         if (feederStartPoint != null)
-            feeder.setNormalHeadTerminal(feederStartPoint.getTerminal(1));
+            feeder.setNormalHeadTerminal(headTerminal);
 
         if (substation != null) {
             feeder.setNormalEnergizingSubstation(substation);

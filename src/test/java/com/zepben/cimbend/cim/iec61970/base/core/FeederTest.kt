@@ -8,6 +8,8 @@
 package com.zepben.cimbend.cim.iec61970.base.core
 
 import com.zepben.cimbend.utils.PrivateCollectionValidator
+import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -57,4 +59,40 @@ internal class FeederTest {
             Feeder::clearCurrentEquipment
         )
     }
+
+    @Test
+    internal fun `can set feeder head terminal on feeder without equipment`() {
+        val feeder = Feeder()
+        val terminal = Terminal()
+        feeder.normalHeadTerminal = terminal
+
+        assertThat(feeder.normalHeadTerminal, equalTo(terminal))
+
+        val terminal2 = Terminal()
+        feeder.normalHeadTerminal = terminal2
+
+        assertThat(feeder.normalHeadTerminal, equalTo(terminal2))
+    }
+
+    @Test
+    internal fun `can set feeder head terminal on feeder with equipment but no head terminal`() {
+        val feeder = Feeder()
+        feeder.addEquipment(PowerTransformer())
+        val terminal = Terminal()
+        feeder.normalHeadTerminal = terminal
+
+        assertThat(feeder.normalHeadTerminal, equalTo(terminal))
+    }
+
+    @Test
+    internal fun `cannot set feeder head terminal on feeder with equipment and head terminal assigned`() {
+        val feeder = Feeder()
+        feeder.addEquipment(PowerTransformer())
+        val terminal = Terminal()
+        feeder.normalHeadTerminal = terminal
+
+        expect { feeder.normalHeadTerminal = Terminal() }.toThrow()
+            .withMessage("Feeder ${feeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
+    }
+
 }

@@ -16,8 +16,8 @@ import com.zepben.cimbend.testdata.TestDataCreators.*
 object FeederStartPointToOpenPointNetwork {
 
     /*
-      c1       c2      c3
-     ---- fsp ---- op ----
+         c2      c3
+    fsp ---- op ----
     */
     fun create(): NetworkService {
         val networkService = NetworkService()

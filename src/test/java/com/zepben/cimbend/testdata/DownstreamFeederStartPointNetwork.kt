@@ -15,21 +15,19 @@ import com.zepben.cimbend.testdata.TestDataCreators.*
 
 object DownstreamFeederStartPointNetwork {
     /*
-     c1       c2      c3
-    ---- fsp ---- cb ----
+         c2      c3
+    fsp ---- cb ----
     */
     fun create(): NetworkService {
         val networkService = NetworkService()
 
         val substation = Substation().also { networkService.add(it) }
 
-        val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.A)
         val fsp = createNodeForConnecting(networkService, "fsp", 2)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.A)
         val cb = createSwitchForConnecting(networkService, "cb", 2, PhaseCode.A, false)
         val c3 = createAcLineSegmentForConnecting(networkService, "c3", PhaseCode.A)
 
-        networkService.connect(c1.getTerminal(2)!!, fsp.getTerminal(1)!!)
         networkService.connect(c2.getTerminal(1)!!, fsp.getTerminal(2)!!)
         networkService.connect(c2.getTerminal(2)!!, cb.getTerminal(1)!!)
         networkService.connect(c3.getTerminal(1)!!, cb.getTerminal(2)!!)

@@ -29,16 +29,6 @@ class AssignToFeedersTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    fun stopsAtOpenPoints() {
-        val network = FeederStartPointToOpenPointNetwork.create()
-        Tracing.assignEquipmentContainersToFeeders().run(network)
-        val feeder = network.get(Feeder::class.java, "f")!!
-        val mRIDs: MutableList<String> = ArrayList()
-        feeder.currentEquipment.forEach(Consumer { equipment: Equipment -> mRIDs.add(equipment.mRID) })
-        MatcherAssert.assertThat<List<String>>(mRIDs, Matchers.containsInAnyOrder("fsp", "c2", "op"))
-    }
-
-    @Test
     fun appliesToEquipmentOnHeadTerminalSide() {
         val network = FeederStartPointBetweenConductorsNetwork.create()
         Tracing.assignEquipmentContainersToFeeders().run(network)
@@ -46,6 +36,16 @@ class AssignToFeedersTest {
         val mRIDs: MutableList<String> = ArrayList()
         feeder.currentEquipment.forEach(Consumer { equipment: Equipment -> mRIDs.add(equipment.mRID) })
         MatcherAssert.assertThat<List<String>>(mRIDs, Matchers.containsInAnyOrder("fsp", "c2"))
+    }
+
+    @Test
+    fun stopsAtOpenPoints() {
+        val network = FeederStartPointToOpenPointNetwork.create()
+        Tracing.assignEquipmentContainersToFeeders().run(network)
+        val feeder = network.get(Feeder::class.java, "f")!!
+        val mRIDs: MutableList<String> = ArrayList()
+        feeder.currentEquipment.forEach(Consumer { equipment: Equipment -> mRIDs.add(equipment.mRID) })
+        MatcherAssert.assertThat<List<String>>(mRIDs, Matchers.containsInAnyOrder("fsp", "c2", "op"))
     }
 
     @Test

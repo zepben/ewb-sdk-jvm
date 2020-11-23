@@ -40,6 +40,11 @@ internal class PowerTransformerTest {
         powerTransformer.vectorGroup = VectorGroup.DYN11
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.DYN11))
+
+        assertThat(powerTransformer.transformerUtilisation, equalTo(0.0))
+
+        powerTransformer.transformerUtilisation = 1.0
+        assertThat(powerTransformer.transformerUtilisation, equalTo(1.0))
     }
 
     private var _powerTransformerEnds: MutableList<PowerTransformerEnd>? = null
@@ -100,7 +105,7 @@ internal class PowerTransformerTest {
     @Test
     internal fun `test primaryVoltage`() {
         val pt = PowerTransformer()
-        val e1 = PowerTransformerEnd().apply{
+        val e1 = PowerTransformerEnd().apply {
             powerTransformer = pt
         }
         val e2 = PowerTransformerEnd().apply {

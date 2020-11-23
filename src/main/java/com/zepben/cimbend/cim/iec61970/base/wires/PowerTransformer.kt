@@ -43,6 +43,7 @@ import com.zepben.cimbend.common.extensions.*
  *                       numerical sequence if they are numbered: the phasors are assumed to rotate in a counter-clockwise sense.
  *
  * @property primaryVoltage Holds the primary voltage value for a transformer.
+ * @property transformerUtilisation Holds fraction of the transformer’s normal capacity (nameplate rating) that is in use.
  */
 class PowerTransformer @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
 
@@ -51,6 +52,7 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
 
     private var _powerTransformerEnds: MutableList<PowerTransformerEnd>? = null
     var vectorGroup: VectorGroup = VectorGroup.UNKNOWN
+    var transformerUtilisation: Double = 0.0
 
     /**
      * The PowerTransformerEnd's for this PowerTransformer. The returned collection is read only.

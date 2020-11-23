@@ -23,7 +23,7 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
     var normalHeadTerminal: Terminal? = null
         set(value) {
             field =
-                if (field == null || field === value) value else throw IllegalStateException("normalHeadTerminal has already been set to $field. Cannot set this field again")
+                if ((equipment.isNullOrEmpty() && currentEquipment.isNullOrEmpty()) || normalHeadTerminal == null) value else throw IllegalStateException("Feeder $mRID has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
         }
 
     var normalEnergizingSubstation: Substation? = null

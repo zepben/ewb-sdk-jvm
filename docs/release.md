@@ -17,13 +17,15 @@ a 1.0.0 release.
 ### v0.4.0
 
 ##### Breaking Changes
-* None.
+* The `AssignToFeeders` was changed to assign all `ConductingEquipment` on the `normalHeadTerminal` side
+  (inclusive) stopping at open points, head equipment for other feeders and substation transformers.
+* You can no longer run `AssignToFeeders` directly on a feeder.
 
 ##### New Features
 * None.
 
 ##### Enhancements
-* None.
+* Updated `Feeder` to allow for updating the `normalHeadTerminal` if the feeder has no equipment assigned. 
 
 ##### Fixes
 * None.

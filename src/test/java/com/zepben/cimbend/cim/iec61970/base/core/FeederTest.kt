@@ -7,7 +7,9 @@
  */
 package com.zepben.cimbend.cim.iec61970.base.core
 
+import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.cimbend.utils.PrivateCollectionValidator
+import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -20,6 +22,8 @@ internal class FeederTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
+    private val feeder = Feeder()
+
     @Test
     internal fun constructorCoverage() {
         assertThat(Feeder().mRID, not(equalTo("")))
@@ -28,7 +32,6 @@ internal class FeederTest {
 
     @Test
     internal fun accessorCoverage() {
-        val feeder = Feeder()
         val terminal = Terminal()
         val substation = Substation()
 
@@ -57,4 +60,59 @@ internal class FeederTest {
             Feeder::clearCurrentEquipment
         )
     }
+
+    @Test
+    internal fun `can set feeder head terminal on feeder without equipment`() {
+        val terminal = Terminal()
+        val terminal2 = Terminal()
+
+        feeder.normalHeadTerminal = terminal
+        assertThat(feeder.normalHeadTerminal, equalTo(terminal))
+
+        feeder.normalHeadTerminal = terminal2
+        assertThat(feeder.normalHeadTerminal, equalTo(terminal2))
+    }
+
+    @Test
+    internal fun `can set feeder head terminal on feeder with equipment but no head terminal`() {
+        val terminal = Terminal()
+
+        feeder.addEquipment(PowerTransformer())
+        feeder.normalHeadTerminal = terminal
+
+        assertThat(feeder.normalHeadTerminal, equalTo(terminal))
+    }
+
+    @Test
+    internal fun `can set feeder head terminal on feeder with current equipment but no head terminal`() {
+        val terminal = Terminal()
+
+        feeder.addCurrentEquipment(PowerTransformer())
+        feeder.normalHeadTerminal = terminal
+
+        assertThat(feeder.normalHeadTerminal, equalTo(terminal))
+    }
+
+    @Test
+    internal fun `cannot set feeder head terminal on feeder with equipment and head terminal assigned`() {
+        feeder.apply {
+            normalHeadTerminal = Terminal()
+            addEquipment(PowerTransformer())
+        }
+
+        expect { feeder.normalHeadTerminal = Terminal() }.toThrow()
+            .withMessage("Feeder ${feeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
+    }
+
+    @Test
+    internal fun `cannot set feeder head terminal on feeder with current equipment and head terminal assigned`() {
+        feeder.apply {
+            normalHeadTerminal = Terminal()
+            addCurrentEquipment(PowerTransformer())
+        }
+
+        expect { feeder.normalHeadTerminal = Terminal() }.toThrow()
+            .withMessage("Feeder ${feeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
+    }
+
 }

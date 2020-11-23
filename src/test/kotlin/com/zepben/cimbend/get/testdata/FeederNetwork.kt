@@ -32,7 +32,7 @@ object FeederNetwork {
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.AB)
 
         val substation = createSubstation(networkService, "f", "f", null)
-        createFeeder(networkService, "f001", "f001", substation, fsp)
+        createFeeder(networkService, "f001", "f001", substation, fsp, fsp.getTerminal(2))
 
         createEnd(networkService, tx, 22000, 1)
         createEnd(networkService, tx, 415, 2)

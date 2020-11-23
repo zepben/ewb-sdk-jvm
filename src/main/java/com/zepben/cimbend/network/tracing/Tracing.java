@@ -14,6 +14,7 @@ import com.zepben.traversals.BasicQueue;
 import com.zepben.traversals.BasicTracker;
 import com.zepben.traversals.BasicTraversal;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ public class Tracing {
      * @return The new traversal instance.
      */
     public static BasicTraversal<ConductingEquipment> connectedEquipmentTrace() {
-        return createBasicDepthTrace(createConductingEquipmentQueueNext());
+        return createBasicDepthTrace(Tracing::conductingEquipmentQueueNext);
     }
 
     /**
@@ -48,7 +49,7 @@ public class Tracing {
      * @return The new traversal instance.
      */
     public static BasicTraversal<ConductingEquipment> connectedEquipmentBreadthTrace() {
-        return createBasicBreadthTrace(createConductingEquipmentQueueNext());
+        return createBasicBreadthTrace(Tracing::conductingEquipmentQueueNext);
     }
 
     /**
@@ -184,17 +185,15 @@ public class Tracing {
         return new FindWithUsagePoints();
     }
 
-    private static BasicTraversal.QueueNext<ConductingEquipment> createConductingEquipmentQueueNext() {
-        return (conductingEquipment, traversal) -> {
-            if (conductingEquipment != null) {
-                List<ConnectivityResult> connectivityResults = NetworkService.connectedEquipment(conductingEquipment);
-                connectivityResults.forEach(cr -> {
-                    ConductingEquipment to = cr.getTo();
-                    if (to != null)
-                        traversal.queue().add(to);
-                });
-            }
-        };
+    private static void conductingEquipmentQueueNext(@Nullable ConductingEquipment conductingEquipment, BasicTraversal<ConductingEquipment> traversal) {
+        if (conductingEquipment != null) {
+            List<ConnectivityResult> connectivityResults = NetworkService.connectedEquipment(conductingEquipment);
+            connectivityResults.forEach(cr -> {
+                ConductingEquipment to = cr.getTo();
+                if (to != null)
+                    traversal.queue().add(to);
+            });
+        }
     }
 
     // Should not be able to instantiate this class.

@@ -585,6 +585,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val insert = databaseTables.getInsert(TablePowerTransformers::class.java)
 
         insert.setNullableString(table.VECTOR_GROUP.queryIndex, powerTransformer.vectorGroup.name)
+        insert.setDouble(table.TRANSFORMER_UTILISATION.queryIndex, powerTransformer.transformerUtilisation)
 
         return saveConductingEquipment(table, insert, powerTransformer, "power transformer")
     }

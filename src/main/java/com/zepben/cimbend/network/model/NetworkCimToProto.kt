@@ -477,7 +477,8 @@ fun toPb(cim: PowerTransformer, pb: PBPowerTransformer.Builder): PBPowerTransfor
     pb.apply {
         clearPowerTransformerEndMRIDs()
         cim.ends.forEach { addPowerTransformerEndMRIDs(it.mRID) }
-        vectorGroup = VectorGroup.valueOf(pb.vectorGroup.name)
+        vectorGroup = VectorGroup.valueOf(cim.vectorGroup.name)
+        transformerUtilisation = cim.transformerUtilisation
         toPb(cim, ceBuilder)
     }
 

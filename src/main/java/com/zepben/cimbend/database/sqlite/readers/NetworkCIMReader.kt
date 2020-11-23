@@ -581,6 +581,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TablePowerTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val powerTransformer = PowerTransformer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             vectorGroup = VectorGroup.valueOf(resultSet.getString(table.VECTOR_GROUP.queryIndex))
+            transformerUtilisation = resultSet.getDouble(table.TRANSFORMER_UTILISATION.queryIndex)
         }
 
         return loadConductingEquipment(

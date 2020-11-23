@@ -15,6 +15,7 @@ import com.zepben.cimbend.database.sqlite.tables.iec61970.base.core.TableConduct
 class TablePowerTransformers : TableConductingEquipment() {
 
     val VECTOR_GROUP = Column(++columnIndex, "vector_group", "TEXT", NOT_NULL)
+    val TRANSFORMER_UTILISATION = Column(++columnIndex, "transformer_utilisation", "NUMBER", NOT_NULL)
 
     override fun name(): String {
         return "power_transformers"

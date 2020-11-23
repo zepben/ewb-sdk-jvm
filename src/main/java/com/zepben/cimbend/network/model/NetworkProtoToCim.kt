@@ -565,6 +565,7 @@ fun toCim(pb: PBPowerTransformer, networkService: NetworkService): PowerTransfor
             networkService.resolveOrDeferReference(Resolvers.ends(this), endMRID)
         }
         vectorGroup = VectorGroup.valueOf(pb.vectorGroup.name)
+        transformerUtilisation = pb.transformerUtilisation
         toCim(pb.ce, this, networkService)
     }
 

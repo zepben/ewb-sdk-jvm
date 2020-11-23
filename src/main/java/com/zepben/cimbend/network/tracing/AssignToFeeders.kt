@@ -31,7 +31,7 @@ class AssignToFeeders {
     }
 
     fun run(network: NetworkService) {
-        val feederStartPoints: Set<ConductingEquipment> = network.sequenceOf(Feeder::class)
+        val feederStartPoints = network.sequenceOf(Feeder::class)
             .mapNotNull { it.normalHeadTerminal }
             .mapNotNull { it.conductingEquipment }
             .toSet()
@@ -42,7 +42,7 @@ class AssignToFeeders {
         network.sequenceOf<Feeder>().forEach(::run)
     }
 
-    fun run(feeder: Feeder) {
+    private fun run(feeder: Feeder) {
         activeFeeder = feeder
 
         val headTerminal = feeder.normalHeadTerminal ?: return
@@ -71,15 +71,15 @@ class AssignToFeeders {
 
     private val reachedEquipment: (Set<ConductingEquipment>) -> (PhaseStep) -> Boolean = { { ps: PhaseStep -> it.contains(ps.conductingEquipment()) } }
 
-    private val reachedSubstationTransformer = { ps: PhaseStep ->
+    private val reachedSubstationTransformer: (PhaseStep) -> Boolean = { ps: PhaseStep ->
         val ce = ps.conductingEquipment()
         ce is PowerTransformer && ce.substations.isNotEmpty()
     }
 
-    private fun processNormal(phaseStep: PhaseStep, isStopping: Boolean) =
+    private fun processNormal(phaseStep: PhaseStep, isStopping: Boolean): Unit =
         process(phaseStep.conductingEquipment(), ConductingEquipment::addContainer, Feeder::addEquipment, isStopping)
 
-    private fun processCurrent(phaseStep: PhaseStep, isStopping: Boolean) =
+    private fun processCurrent(phaseStep: PhaseStep, isStopping: Boolean): Unit =
         process(phaseStep.conductingEquipment(), ConductingEquipment::addCurrentFeeder, Feeder::addCurrentEquipment, isStopping)
 
     private fun process(
@@ -94,4 +94,5 @@ class AssignToFeeders {
         assignFeederToEquipment(conductingEquipment, activeFeeder)
         assignEquipmentToFeeder(activeFeeder, conductingEquipment)
     }
+
 }

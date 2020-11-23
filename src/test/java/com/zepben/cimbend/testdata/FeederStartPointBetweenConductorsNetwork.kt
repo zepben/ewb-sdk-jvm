@@ -15,10 +15,10 @@ import com.zepben.cimbend.testdata.TestDataCreators.*
 
 object FeederStartPointBetweenConductorsNetwork {
 
-    /*
-      c1       c2
-     ---- fsp ----
-    */
+    //
+    //  c1       c2
+    // ---- fsp ----
+    //
     fun create(): NetworkService {
         val networkService = NetworkService()
 

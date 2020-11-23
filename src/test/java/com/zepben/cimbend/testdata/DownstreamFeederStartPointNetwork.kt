@@ -14,26 +14,30 @@ import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.testdata.TestDataCreators.*
 
 object DownstreamFeederStartPointNetwork {
-    /*
-         c2      c3
-    fsp ---- cb ----
-    */
-    fun create(): NetworkService {
+
+    //
+    //  c1        c2       c3
+    // ---- fsp1 ---- fsp2 ----
+    //
+    fun create(fsp2Terminal: Int): NetworkService {
         val networkService = NetworkService()
 
         val substation = Substation().also { networkService.add(it) }
 
-        val fsp = createNodeForConnecting(networkService, "fsp", 2)
+        val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.A)
+        val fsp1 = createNodeForConnecting(networkService, "fsp1", 2)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.A)
-        val cb = createSwitchForConnecting(networkService, "cb", 2, PhaseCode.A, false)
+        val fsp2 = createNodeForConnecting(networkService, "fsp2", 2)
         val c3 = createAcLineSegmentForConnecting(networkService, "c3", PhaseCode.A)
 
-        networkService.connect(c2.getTerminal(1)!!, fsp.getTerminal(2)!!)
-        networkService.connect(c2.getTerminal(2)!!, cb.getTerminal(1)!!)
-        networkService.connect(c3.getTerminal(1)!!, cb.getTerminal(2)!!)
+        networkService.connect(c1.getTerminal(2)!!, fsp1.getTerminal(1)!!)
+        networkService.connect(c2.getTerminal(1)!!, fsp1.getTerminal(2)!!)
+        networkService.connect(c2.getTerminal(2)!!, fsp2.getTerminal(1)!!)
+        networkService.connect(c3.getTerminal(1)!!, fsp2.getTerminal(2)!!)
 
-        createFeeder(networkService, "f", "f", substation, fsp, fsp.getTerminal(2))
-        createFeeder(networkService, "f2", "f2", substation, cb, cb.getTerminal(2))
+        createFeeder(networkService, "f1", "f1", substation, fsp1, fsp1.getTerminal(2))
+        createFeeder(networkService, "f2", "f2", substation, fsp2, fsp2.getTerminal(fsp2Terminal))
+
         return networkService
     }
 }

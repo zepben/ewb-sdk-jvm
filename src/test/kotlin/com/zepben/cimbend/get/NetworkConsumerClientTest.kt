@@ -214,8 +214,8 @@ internal class NetworkConsumerClientTest {
         assertThat(result.wasSuccessful, equalTo(true))
         assertThat(result.value.mRID, equalTo(mRID))
 
-        val actualFeeder = service.get(Feeder::class.java, "f001")!!
-        val expectedFeeder = expectedService.get(Feeder::class.java, "f001")!!
+        val actualFeeder: Feeder = service[mRID]!!
+        val expectedFeeder: Feeder = expectedService[mRID]!!
 
         NetworkServiceComparator().compare(actualFeeder, expectedFeeder)
     }

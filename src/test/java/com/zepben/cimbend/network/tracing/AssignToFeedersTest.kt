@@ -15,12 +15,10 @@ import com.zepben.cimbend.testdata.FeederStartPointBetweenConductorsNetwork
 import com.zepben.cimbend.testdata.FeederStartPointToOpenPointNetwork
 import com.zepben.cimbend.testdata.FeederToSubstationTransformerNetwork
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsInAnyOrder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.util.*
-import java.util.function.Consumer
 
 class AssignToFeedersTest {
 
@@ -31,45 +29,71 @@ class AssignToFeedersTest {
     @Test
     fun appliesToEquipmentOnHeadTerminalSide() {
         val network = FeederStartPointBetweenConductorsNetwork.create()
+        val feeder: Feeder = network["f"]!!
+
         Tracing.assignEquipmentContainersToFeeders().run(network)
-        val feeder = network.get(Feeder::class.java, "f")!!
-        val mRIDs: MutableList<String> = ArrayList()
-        feeder.currentEquipment.forEach(Consumer { equipment: Equipment -> mRIDs.add(equipment.mRID) })
-        MatcherAssert.assertThat<List<String>>(mRIDs, Matchers.containsInAnyOrder("fsp", "c2"))
+
+        validateEquipment(feeder.equipment, "fsp", "c2")
     }
 
     @Test
-    fun stopsAtOpenPoints() {
-        val network = FeederStartPointToOpenPointNetwork.create()
+    fun stopsAtNormallyOpenPoints() {
+        val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = true, currentlyOpen = false)
+        val feeder: Feeder = network["f"]!!
+
         Tracing.assignEquipmentContainersToFeeders().run(network)
-        val feeder = network.get(Feeder::class.java, "f")!!
-        val mRIDs: MutableList<String> = ArrayList()
-        feeder.currentEquipment.forEach(Consumer { equipment: Equipment -> mRIDs.add(equipment.mRID) })
-        MatcherAssert.assertThat<List<String>>(mRIDs, Matchers.containsInAnyOrder("fsp", "c2", "op"))
+
+        validateEquipment(feeder.equipment, "fsp", "c1", "op")
+        validateEquipment(feeder.currentEquipment, "fsp", "c1", "op", "c2")
+    }
+
+    @Test
+    fun stopsAtCurrentlyOpenPoints() {
+        val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = false, currentlyOpen = true)
+        val feeder: Feeder = network["f"]!!
+
+        Tracing.assignEquipmentContainersToFeeders().run(network)
+
+        validateEquipment(feeder.equipment, "fsp", "c1", "op", "c2")
+        validateEquipment(feeder.currentEquipment, "fsp", "c1", "op")
     }
 
     @Test
     fun stopsAtSubstationTransformers() {
         val network = FeederToSubstationTransformerNetwork.create()
-        val feeder = network.get(Feeder::class.java, "f")!!
-        val mRIDs: MutableList<String> = ArrayList()
+        val feeder: Feeder = network["f"]!!
 
         Tracing.assignEquipmentContainersToFeeders().run(network)
 
-        feeder.currentEquipment.forEach(Consumer { equipment: Equipment -> mRIDs.add(equipment.mRID) })
-        MatcherAssert.assertThat<List<String>>(mRIDs, Matchers.containsInAnyOrder("fsp", "c2"))
+        validateEquipment(feeder.equipment, "fsp", "c1")
     }
 
     @Test
     fun stopsAtFeederStartPoints() {
-        val network = DownstreamFeederStartPointNetwork.create()
-        val feeder = network.get(Feeder::class.java, "f")!!
-        val mRIDs: MutableList<String> = ArrayList()
+        val network = DownstreamFeederStartPointNetwork.create(1)
+        val feeder1: Feeder = network["f1"]!!
+        val feeder2: Feeder = network["f2"]!!
 
         Tracing.assignEquipmentContainersToFeeders().run(network)
 
-        feeder.currentEquipment.forEach(Consumer { equipment: Equipment -> mRIDs.add(equipment.mRID) })
-        MatcherAssert.assertThat<List<String>>(mRIDs, Matchers.containsInAnyOrder("fsp", "c2", "cb"))
+        validateEquipment(feeder1.equipment, "fsp1", "c2", "fsp2")
+        validateEquipment(feeder2.equipment, "fsp1", "c2", "fsp2")
+    }
+
+    @Test
+    fun stopsAtFeederStartPointsReversedHeadTerminal() {
+        val network = DownstreamFeederStartPointNetwork.create(2)
+        val feeder1: Feeder = network["f1"]!!
+        val feeder2: Feeder = network["f2"]!!
+
+        Tracing.assignEquipmentContainersToFeeders().run(network)
+
+        validateEquipment(feeder1.equipment, "fsp1", "c2", "fsp2")
+        validateEquipment(feeder2.equipment, "fsp2", "c3")
+    }
+
+    private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {
+        assertThat(equipment.map { it.mRID }.toList(), containsInAnyOrder(*expectedMRIDs))
     }
 
 }

@@ -15,27 +15,28 @@ import com.zepben.cimbend.testdata.TestDataCreators.*
 
 object FeederStartPointToOpenPointNetwork {
 
-    /*
-         c2      c3
-    fsp ---- op ----
-    */
-    fun create(): NetworkService {
+    //
+    //      c1      c2
+    // fsp ---- op ----
+    //
+    fun create(normallyOpen: Boolean, currentlyOpen: Boolean): NetworkService {
         val networkService = NetworkService()
 
         val substation = Substation().also { networkService.add(it) }
 
+        val fsp = createNodeForConnecting(networkService, "fsp", 1)
         val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.A)
-        val fsp = createNodeForConnecting(networkService, "fsp", 2)
+        val op = createSwitchForConnecting(networkService, "op", 2, PhaseCode.A)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.A)
-        val op = createSwitchForConnecting(networkService, "op", 2, PhaseCode.A, true)
-        val c3 = createAcLineSegmentForConnecting(networkService, "c3", PhaseCode.A)
 
-        networkService.connect(c1.getTerminal(2)!!, fsp.getTerminal(1)!!)
-        networkService.connect(c2.getTerminal(1)!!, fsp.getTerminal(2)!!)
-        networkService.connect(c2.getTerminal(2)!!, op.getTerminal(1)!!)
-        networkService.connect(c3.getTerminal(1)!!, op.getTerminal(2)!!)
+        op.setNormallyOpen(normallyOpen)
+        op.setOpen(currentlyOpen)
 
-        createFeeder(networkService, "f", "f", substation, fsp, fsp.getTerminal(2))
+        networkService.connect(c1.getTerminal(1)!!, fsp.getTerminal(1)!!)
+        networkService.connect(c1.getTerminal(2)!!, op.getTerminal(1)!!)
+        networkService.connect(c2.getTerminal(1)!!, op.getTerminal(2)!!)
+
+        createFeeder(networkService, "f", "f", substation, fsp, fsp.getTerminal(1))
         return networkService
     }
 

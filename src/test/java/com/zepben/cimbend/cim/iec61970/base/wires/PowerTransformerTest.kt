@@ -47,8 +47,6 @@ internal class PowerTransformerTest {
         assertThat(powerTransformer.transformerUtilisation, equalTo(1.0))
     }
 
-    private var _powerTransformerEnds: MutableList<PowerTransformerEnd>? = null
-
     @Test
     internal fun powerTransformerEnds() {
         PrivateCollectionValidator.validate(

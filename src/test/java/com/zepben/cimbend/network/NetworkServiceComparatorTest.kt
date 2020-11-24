@@ -104,9 +104,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun compareStreetlight() {
         compareAsset { Streetlight(mRID = it) }
 
-        comparatorValidator.validateProperty(Streetlight::lampKind, { Streetlight(it)}, { StreetlightLampKind.HIGH_PRESSURE_SODIUM }, { StreetlightLampKind.MERCURY_VAPOR })
-        comparatorValidator.validateProperty(Streetlight::lightRating, { Streetlight(it)}, { 1 }, { 2 })
-        comparatorValidator.validateProperty(Streetlight::pole, { Streetlight(it)}, { Pole("x") }, { Pole("y") })
+        comparatorValidator.validateProperty(
+            Streetlight::lampKind,
+            { Streetlight(it) },
+            { StreetlightLampKind.HIGH_PRESSURE_SODIUM },
+            { StreetlightLampKind.MERCURY_VAPOR })
+        comparatorValidator.validateProperty(Streetlight::lightRating, { Streetlight(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(Streetlight::pole, { Streetlight(it) }, { Pole("x") }, { Pole("y") })
     }
 
     private fun compareStructure(createStructure: (String) -> Structure) {
@@ -206,7 +210,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { Terminal(mRID = "1").apply { conductingEquipment = it } },
             { Terminal(mRID = "2").apply { conductingEquipment = it } },
             Terminal::conductingEquipment.setter,
-            NetworkServiceCompatatorOptions.all().copy(compareTerminals = false), optionsStopCompare = true)
+            NetworkServiceCompatatorOptions.all().copy(compareTerminals = false), optionsStopCompare = true
+        )
     }
 
     @Test
@@ -554,10 +559,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareConductingEquipment { PowerTransformer(it) }
 
         comparatorValidator.validateProperty(PowerTransformer::vectorGroup, { PowerTransformer(it) }, { VectorGroup.DYN11 }, { VectorGroup.D0 })
+        comparatorValidator.validateProperty(PowerTransformer::transformerUtilisation, { PowerTransformer(it) }, { 0.1 }, { 0.9 })
 
         comparatorValidator.validateIndexedCollection(
             PowerTransformer::ends, PowerTransformer::addEnd, { PowerTransformer(it) },
-            { PowerTransformerEnd(mRID = "pte1") }, { PowerTransformerEnd(mRID = "pte2") }, PowerTransformerEnd::powerTransformer.setter)
+            { PowerTransformerEnd(mRID = "pte1") }, { PowerTransformerEnd(mRID = "pte2") }, PowerTransformerEnd::powerTransformer.setter
+        )
     }
 
     @Test
@@ -715,17 +722,17 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     private fun compareMeasurement(createIdObj: (String) -> Measurement) {
         compareIdentifiedObject { createIdObj(it) }
 
-        comparatorValidator.validateProperty(Measurement::powerSystemResourceMRID, { createIdObj(it) }, { "psr1" }, { "psr2" } )
-        comparatorValidator.validateProperty(Measurement::terminalMRID, { createIdObj(it) }, { "terminal1" }, { "terminal2" } )
-        comparatorValidator.validateProperty(Measurement::remoteSource, { createIdObj(it) }, { RemoteSource("rs1") }, { RemoteSource("rs2") } )
-        comparatorValidator.validateProperty(Measurement::phases, { createIdObj(it) }, { PhaseCode.ABCN }, { PhaseCode.ABC } )
-        comparatorValidator.validateProperty(Measurement::unitSymbol, { createIdObj(it) }, { UnitSymbol.HENRYS }, { UnitSymbol.HOURS } )
+        comparatorValidator.validateProperty(Measurement::powerSystemResourceMRID, { createIdObj(it) }, { "psr1" }, { "psr2" })
+        comparatorValidator.validateProperty(Measurement::terminalMRID, { createIdObj(it) }, { "terminal1" }, { "terminal2" })
+        comparatorValidator.validateProperty(Measurement::remoteSource, { createIdObj(it) }, { RemoteSource("rs1") }, { RemoteSource("rs2") })
+        comparatorValidator.validateProperty(Measurement::phases, { createIdObj(it) }, { PhaseCode.ABCN }, { PhaseCode.ABC })
+        comparatorValidator.validateProperty(Measurement::unitSymbol, { createIdObj(it) }, { UnitSymbol.HENRYS }, { UnitSymbol.HOURS })
     }
 
     @Test
     internal fun compareAnalog() {
         compareMeasurement { Analog(it) }
-        comparatorValidator.validateProperty(Analog::positiveFlowIn, { Analog(it) }, { true }, {false} )
+        comparatorValidator.validateProperty(Analog::positiveFlowIn, { Analog(it) }, { true }, { false })
     }
 
     @Test

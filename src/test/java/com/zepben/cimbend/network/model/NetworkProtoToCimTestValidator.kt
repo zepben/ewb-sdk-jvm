@@ -12,6 +12,7 @@ import com.zepben.cimbend.cim.iec61968.common.Location
 import com.zepben.cimbend.cim.iec61968.metering.EndDevice
 import com.zepben.cimbend.cim.iec61968.metering.Meter
 import com.zepben.cimbend.cim.iec61968.metering.UsagePoint
+import com.zepben.cimbend.cim.iec61968.operations.OperationalRestriction
 import com.zepben.cimbend.cim.iec61970.base.core.*
 import com.zepben.cimbend.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.cimbend.cim.iec61970.base.meas.Accumulator
@@ -21,9 +22,12 @@ import com.zepben.cimbend.cim.iec61970.base.meas.Measurement
 import com.zepben.cimbend.cim.iec61970.base.scada.RemoteSource
 import com.zepben.cimbend.cim.iec61970.base.wires.Breaker
 import com.zepben.cimbend.cim.iec61970.base.wires.Line
+import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.cimbend.network.NetworkService
+import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import com.zepben.protobuf.cim.iec61968.assets.Asset.Builder as PBAssetBuilder
@@ -32,7 +36,9 @@ import com.zepben.protobuf.cim.iec61968.assets.Pole as PBPole
 import com.zepben.protobuf.cim.iec61968.assets.Structure as PBStructure
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice.Builder as PBEndDeviceBuilder
 import com.zepben.protobuf.cim.iec61968.metering.Meter.Builder as PBMeterBuilder
+import com.zepben.protobuf.cim.iec61970.base.core.ConductingEquipment.Builder as PBConductingEquipmentBuilder
 import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNodeContainer.Builder as PBConnectivityNodeContainerBuilder
+import com.zepben.protobuf.cim.iec61970.base.core.Equipment.Builder as PBEquipmentBuilder
 import com.zepben.protobuf.cim.iec61970.base.core.EquipmentContainer.Builder as PBEquipmentContainerBuilder
 import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject.Builder as PBIdentifiedObjectBuilder
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
@@ -44,6 +50,7 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
 import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.wires.Line.Builder as PBLineBuilder
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer.Builder as PBPowerTransformerBuilder
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit.Builder as PBCircuitBuilder
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop.Builder as PBLoopBuilder
 
@@ -142,6 +149,85 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
 
         assertThat(cim.location, equalTo(network["location1"]))
         assertThat(cim.numControls, equalTo(1))
+
+        return cim
+    }
+
+    inline fun <reified T : Equipment> validate(pb: PBEquipmentBuilder, fromPb: () -> T): T {
+        pb.inService = false
+        pb.normallyInService = false
+
+        network.add(Circuit("eqc1"))
+        network.add(Substation("eqc2"))
+        pb.addAllEquipmentContainerMRIDs(listOf("eqc1", "eqc2"))
+
+        network.add(UsagePoint("up1"))
+        network.add(UsagePoint("up2"))
+        pb.addAllUsagePointMRIDs(listOf("up1", "up2"))
+
+        network.add(OperationalRestriction("or1"))
+        network.add(OperationalRestriction("or2"))
+        pb.addAllOperationalRestrictionMRIDs(listOf("or1", "or2"))
+
+        network.add(Feeder("cf1"))
+        network.add(Feeder("cf2"))
+        pb.addAllCurrentFeederMRIDs(listOf("cf1", "cf2"))
+
+        val cim = validate(pb.psrBuilder, fromPb)
+
+        assertThat(cim.inService, equalTo(false))
+        assertThat(cim.normallyInService, equalTo(false))
+
+        assertThat(cim.containers, hasSize(2))
+        assertThat(cim.getContainer("eqc1"), equalTo(network["eqc1"]))
+        assertThat(cim.getContainer("eqc2"), equalTo(network["eqc2"]))
+
+        assertThat(cim.usagePoints, hasSize(2))
+        assertThat(cim.getUsagePoint("up1"), equalTo(network["up1"]))
+        assertThat(cim.getUsagePoint("up2"), equalTo(network["up2"]))
+
+        assertThat(cim.operationalRestrictions, hasSize(2))
+        assertThat(cim.getOperationalRestriction("or1"), equalTo(network["or1"]))
+        assertThat(cim.getOperationalRestriction("or2"), equalTo(network["or2"]))
+
+        assertThat(cim.currentFeeders, hasSize(2))
+        assertThat(cim.getCurrentFeeder("cf1"), equalTo(network["cf1"]))
+        assertThat(cim.getCurrentFeeder("cf2"), equalTo(network["cf2"]))
+
+        return cim
+    }
+
+    inline fun <reified T : ConductingEquipment> validate(pb: PBConductingEquipmentBuilder, fromPb: () -> T): T {
+        network.add(BaseVoltage("bv1"))
+        pb.baseVoltageMRID = "bv1"
+
+        network.add(Terminal("t1"))
+        network.add(Terminal("t2"))
+        pb.addAllTerminalMRIDs(listOf("t1", "t2"))
+
+        val cim = validate(pb.eqBuilder, fromPb)
+
+        assertThat(cim.baseVoltage, equalTo(network["bv1"]))
+        assertThat(cim.getTerminal("t1"), equalTo(network["t1"]))
+        assertThat(cim.getTerminal("t2"), equalTo(network["t2"]))
+
+        return cim
+    }
+
+    inline fun validate(pb: PBPowerTransformerBuilder, fromPb: () -> PowerTransformer): PowerTransformer {
+        pb.vectorGroup = VectorGroup.D0
+        pb.transformerUtilisation = 0.9
+
+        network.add(PowerTransformerEnd("pte1"))
+        network.add(PowerTransformerEnd("pte2"))
+        pb.addAllPowerTransformerEndMRIDs(listOf("pte1", "pte2"))
+
+        val cim = validate(pb.ceBuilder, fromPb)
+
+        assertThat(cim.vectorGroup.name, equalTo(VectorGroup.D0.name))
+        assertThat(cim.transformerUtilisation, equalTo(0.9))
+        assertThat(cim.getEnd("pte1"), equalTo(network["pte1"]))
+        assertThat(cim.getEnd("pte2"), equalTo(network["pte2"]))
 
         return cim
     }

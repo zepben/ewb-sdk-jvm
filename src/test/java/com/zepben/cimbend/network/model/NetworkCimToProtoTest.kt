@@ -11,6 +11,7 @@ import com.zepben.cimbend.cim.iec61968.assets.Pole
 import com.zepben.cimbend.cim.iec61968.metering.Meter
 import com.zepben.cimbend.cim.iec61970.base.core.Substation
 import com.zepben.cimbend.cim.iec61970.base.meas.*
+import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.cimbend.measurement.toPb
@@ -27,6 +28,13 @@ internal class NetworkCimToProtoTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val validator = NetworkCimToProtoTestValidator()
+
+    @Test
+    internal fun convertsPowerTransformer() {
+        val cim = PowerTransformer()
+        validator.validate(cim, cim.toPb())
+        validator.validate(cim.fillFields(NetworkService()), cim.toPb())
+    }
 
     @Test
     internal fun convertsMeters() {

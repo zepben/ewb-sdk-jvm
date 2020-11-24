@@ -8,6 +8,7 @@
 package com.zepben.cimbend.network.model
 
 import com.zepben.cimbend.network.NetworkService
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
 import org.junit.jupiter.api.Test
 import com.zepben.protobuf.cim.iec61968.assets.Pole as PBPole
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
@@ -22,6 +23,12 @@ class NetworkProtoToCimTest {
     private val network = NetworkService()
     private val translator = NetworkProtoToCim(network)
     private val validator = NetworkProtoToCimTestValidator(network)
+
+    @Test
+    internal fun testFromPbPowerTransformer() {
+        val pbPowerTransformer = PBPowerTransformer.newBuilder()
+        validator.validate(pbPowerTransformer) { translator.addFromPb(pbPowerTransformer.build()) }
+    }
 
     @Test
     internal fun testFromPbMeter() {

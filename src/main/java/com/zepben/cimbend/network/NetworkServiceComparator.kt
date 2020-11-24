@@ -374,6 +374,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
 
             compareIndexedIdReferenceCollections(PowerTransformer::ends)
             compareValues(PowerTransformer::vectorGroup)
+            compareValues(PowerTransformer::transformerUtilisation)
         }
 
     private fun comparePowerTransformerEnd(source: PowerTransformerEnd, target: PowerTransformerEnd): ObjectDifference<PowerTransformerEnd> =

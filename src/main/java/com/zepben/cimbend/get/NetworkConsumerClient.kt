@@ -53,7 +53,7 @@ class NetworkConsumerClient(
      */
     override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject?> {
         return tryRpc {
-            processIdentifiedObjects(service, listOf(mRID)).firstOrNull()?.identifiedObject
+            processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
         }
     }
 
@@ -75,7 +75,7 @@ class NetworkConsumerClient(
      */
     override fun getIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> {
         return tryRpc {
-            processIdentifiedObjects(service, mRIDs).let { extracted ->
+            processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
                 val results = mutableMapOf<String, IdentifiedObject>()
                 val failed = mutableSetOf<String>()
                 extracted.forEach {
@@ -153,21 +153,27 @@ class NetworkConsumerClient(
             getIdentifiedObjects(service, mRIDs).onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }.value.let {
                 MultiObjectResult(
                     it.result.toMutableMap().apply { this[feeder.mRID] = feeder; this.putAll(equipmentResults.value.result) },
-                    it.failed.union(equipmentResults.value.failed))
+                    it.failed.union(equipmentResults.value.failed)
+                )
             }
         )
     }
 
-    private fun processIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): Sequence<ExtractResult> =
-        mRIDs.filter { service.get<IdentifiedObject>(it) == null }.let {  // Only process mRIDs not in the service
-            stub.getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-                .asSequence()
-                .map { it.objectGroup }
-                .flatMap {
-                    sequenceOf(extractIdentifiedObject(service, it.identifiedObject)) +
-                        it.ownedIdentifiedObjectList.map { owned -> extractIdentifiedObject(service, owned) }
-                }
+    private fun processIdentifiedObjects(service: NetworkService, mRIDs: Set<String>): Sequence<ExtractResult> {
+        val toFetch = mutableSetOf<String>()
+        val existing = mutableSetOf<ExtractResult>()
+        mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service
+            service.get<IdentifiedObject>(mRID)?.let { existing.add(ExtractResult(it, it.mRID)) } ?: toFetch.add(mRID)
         }
+
+        return stub.getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(toFetch).build())
+            .asSequence()
+            .map { it.objectGroup }
+            .flatMap {
+                sequenceOf(extractIdentifiedObject(service, it.identifiedObject)) +
+                    it.ownedIdentifiedObjectList.map { owned -> extractIdentifiedObject(service, owned) }
+            } + existing
+    }
 
     private fun extractIdentifiedObject(service: NetworkService, it: NetworkIdentifiedObject): ExtractResult {
         return when (it.identifiedObjectCase) {

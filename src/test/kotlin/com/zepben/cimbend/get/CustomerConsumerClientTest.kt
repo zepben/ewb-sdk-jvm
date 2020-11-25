@@ -121,13 +121,13 @@ internal class CustomerConsumerClientTest {
 
         doReturn(listOf(response1, response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
 
-        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
+        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.result.size, equalTo(3))
-        assertThat(result.value.result[mRIDs[0]], instanceOf(Customer::class.java))
-        assertThat(result.value.result[mRIDs[1]], instanceOf(Customer::class.java))
-        assertThat(result.value.result[mRIDs[2]], instanceOf(CustomerAgreement::class.java))
+        assertThat(objects.wasSuccessful, equalTo(true))
+        assertThat(objects.value.result.size, equalTo(3))
+        assertThat(objects.value.result[mRIDs[0]], instanceOf(Customer::class.java))
+        assertThat(objects.value.result[mRIDs[1]], instanceOf(Customer::class.java))
+        assertThat(objects.value.result[mRIDs[2]], instanceOf(CustomerAgreement::class.java))
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
         clearInvocations(stub)
@@ -153,31 +153,46 @@ internal class CustomerConsumerClientTest {
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
+        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-        validateFailure(onErrorHandler, result, expectedEx, false)
+        validateFailure(onErrorHandler, objects, expectedEx, false)
     }
 
     @Test
     internal fun `returns failed mRID when duplicate mRID exists in the service`() {
-        val mRIDs = listOf("id1", "id1", "id3")
+        val mRIDs = listOf("id1", "id1", "id2")
         val response1 = createResponse(CustomerIdentifiedObject.newBuilder(), CustomerIdentifiedObject.Builder::getCustomerBuilder, mRIDs[0])
         val response2 = createResponse(CustomerIdentifiedObject.newBuilder(), CustomerIdentifiedObject.Builder::getCustomerBuilder, mRIDs[1])
         val response3 = createResponse(CustomerIdentifiedObject.newBuilder(), CustomerIdentifiedObject.Builder::getCustomerAgreementBuilder, mRIDs[2])
 
         doReturn(listOf(response1, response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
 
-        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
+        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.result.size, equalTo(2))
-        assertThat(result.value.result[mRIDs[0]], instanceOf(Customer::class.java))
-        assertThat(result.value.result[mRIDs[2]], instanceOf(CustomerAgreement::class.java))
-        assertThat(result.value.failed, Matchers.contains(mRIDs[0]))
+        assertThat(objects.wasSuccessful, equalTo(true))
+        assertThat(objects.value.result.size, equalTo(2))
+        assertThat(objects.value.result[mRIDs[0]], instanceOf(Customer::class.java))
+        assertThat(objects.value.result[mRIDs[2]], instanceOf(CustomerAgreement::class.java))
+        assertThat(objects.value.failed, Matchers.contains(mRIDs[0]))
 
-        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
+        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(listOf("id1", "id2")).build())
         clearInvocations(stub)
+    }
+
+    @Test
+    internal fun `getIdentifiedObjects returns map containing existing entries in the service`() {
+        val mRIDs = listOf("id1", "id2", "id3")
+        val response2 = createResponse(CustomerIdentifiedObject.newBuilder(), CustomerIdentifiedObject.Builder::getCustomerBuilder, mRIDs[1])
+        val response3 = createResponse(CustomerIdentifiedObject.newBuilder(), CustomerIdentifiedObject.Builder::getCustomerAgreementBuilder, mRIDs[2])
+        service.add(Customer(mRIDs[0]))
+
+        doReturn(listOf(response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
+
+        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
+
+        assertThat(objects.value.result, Matchers.hasKey("id1"))
+        assertThat(objects.value.failed, Matchers.empty())
     }
 
     private fun createResponse(

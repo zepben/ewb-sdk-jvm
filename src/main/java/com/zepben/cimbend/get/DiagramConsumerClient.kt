@@ -8,7 +8,6 @@
 package com.zepben.cimbend.get
 
 import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.diagram.DiagramProtoToCim
 import com.zepben.cimbend.diagram.DiagramService
 import com.zepben.cimbend.diagram.mRID
@@ -43,7 +42,7 @@ class DiagramConsumerClient(
      */
     override fun getIdentifiedObject(service: DiagramService, mRID: String): GrpcResult<IdentifiedObject?> {
         return tryRpc {
-            processIdentifiedObjects(service, listOf(mRID)).firstOrNull()?.identifiedObject
+            processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
         }
     }
 
@@ -65,7 +64,7 @@ class DiagramConsumerClient(
      */
     override fun getIdentifiedObjects(service: DiagramService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> {
         return tryRpc {
-            processIdentifiedObjects(service, mRIDs).let { extracted ->
+            processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
                 val results = mutableMapOf<String, IdentifiedObject>()
                 val failed = mutableSetOf<String>()
                 extracted.forEach {
@@ -77,15 +76,20 @@ class DiagramConsumerClient(
     }
 
 
-    private fun processIdentifiedObjects(service: DiagramService, mRIDs: Iterable<String>): Sequence<ExtractResult> =
-        mRIDs.filter { service.get<IdentifiedObject>(it) == null }.let {  // Only process mRIDs not in the service
-            stub.getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-                .asSequence()
-                .flatMap { it.identifiedObjectsList.asSequence() }
-                .map {
-                    extractIdentifiedObject(service, it)
-                }
+    private fun processIdentifiedObjects(service: DiagramService, mRIDs: Set<String>): Sequence<ExtractResult> {
+        val toFetch = mutableSetOf<String>()
+        val existing = mutableSetOf<ExtractResult>()
+        mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service
+            service.get<IdentifiedObject>(mRID)?.let { existing.add(ExtractResult(it, it.mRID)) } ?: toFetch.add(mRID)
         }
+
+        return stub.getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(toFetch).build())
+            .asSequence()
+            .flatMap { it.identifiedObjectsList.asSequence() }
+            .map {
+                extractIdentifiedObject(service, it)
+            } + existing
+    }
 
     private fun extractIdentifiedObject(service: DiagramService, it: DiagramIdentifiedObject): ExtractResult {
         return when (it.identifiedObjectCase) {

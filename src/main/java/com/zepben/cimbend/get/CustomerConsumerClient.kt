@@ -13,7 +13,6 @@ import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.customer.translator.CustomerProtoToCim
 import com.zepben.cimbend.customer.translator.mRID
 import com.zepben.cimbend.grpc.GrpcResult
-import com.zepben.cimbend.network.NetworkService
 import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.cc.CustomerIdentifiedObject
 import com.zepben.protobuf.cc.CustomerIdentifiedObject.IdentifiedObjectCase.*
@@ -44,7 +43,7 @@ class CustomerConsumerClient(
      */
     override fun getIdentifiedObject(service: CustomerService, mRID: String): GrpcResult<IdentifiedObject?> {
         return tryRpc {
-            processIdentifiedObjects(service, listOf(mRID)).firstOrNull()?.identifiedObject
+            processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
         }
     }
 
@@ -66,7 +65,7 @@ class CustomerConsumerClient(
      */
     override fun getIdentifiedObjects(service: CustomerService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> {
         return tryRpc {
-            processIdentifiedObjects(service, mRIDs).let { extracted ->
+            processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
                 val results = mutableMapOf<String, IdentifiedObject>()
                 val failed = mutableSetOf<String>()
                 extracted.forEach {
@@ -77,17 +76,20 @@ class CustomerConsumerClient(
         }
     }
 
-
-    private fun processIdentifiedObjects(service: CustomerService, mRIDs: Iterable<String>): Sequence<ExtractResult> =
-        mRIDs.filter { service.get<IdentifiedObject>(it) == null }.let {  // Only process mRIDs not in the service
-            stub.getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-                .asSequence()
-                .flatMap { it.identifiedObjectsList.asSequence() }
-                .map {
-                    extractIdentifiedObject(service, it)
-                }
+    private fun processIdentifiedObjects(service: CustomerService, mRIDs: Set<String>): Sequence<ExtractResult> {
+        val toFetch = mutableSetOf<String>()
+        val existing = mutableSetOf<ExtractResult>()
+        mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service
+            service.get<IdentifiedObject>(mRID)?.let { existing.add(ExtractResult(it, it.mRID)) } ?: toFetch.add(mRID)
         }
 
+        return stub.getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(toFetch).build())
+            .asSequence()
+            .flatMap { it.identifiedObjectsList.asSequence() }
+            .map {
+                extractIdentifiedObject(service, it)
+            } + existing
+    }
 
     private fun extractIdentifiedObject(service: CustomerService, it: CustomerIdentifiedObject): ExtractResult {
         return when (it.identifiedObjectCase) {

@@ -31,9 +31,20 @@ internal class NetworkCimToProtoTest {
 
     @Test
     internal fun convertsPowerTransformer() {
+        val networkService = NetworkService()
         val cim = PowerTransformer()
         validator.validate(cim, cim.toPb())
-        validator.validate(cim.fillFields(NetworkService()), cim.toPb())
+        validator.validate(
+            cim.fillFields(networkService).apply {
+                for (i in 0..1) {
+                    val container = Circuit()
+                    networkService.add(container)
+                    addContainer(container)
+                    container.addEquipment(this)
+                }
+            },
+            cim.toPb()
+        )
     }
 
     @Test

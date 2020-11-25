@@ -18,20 +18,22 @@ To build:
     mvn package
 
 ## Checklist for model change ##
+
+1. Update `pom.xml` to import the correct version of `evolve-grpc`.
 1. Model updated and tested.
-2. Description copied from CIM and added as doc comment to new changes (on class, property etc)
-3. FillFields.kt updated to populate data for tests.
-4. Database:
-    1. Table class(es) updated. - com.zepben.cimbend.database.sqlite.tables
-    2. Writer updated. - com.zepben.cimbend.database.sqlite.writers
-    3. Reader updated. - com.zepben.cimbend.database.sqlite.readers
-    4. DB version updated. - TableVersion.kt
-    5. Migration written. - com.zepben.cimbend.database.sqlite.upgrade
-    6. Add schema tests - DatabaseSqliteTest.kt
-5. Reference resolver(s) added (if new associations).
-6. Protobuf/gRPC
-    1. CimToProto updated and tested.
-    2. ProtoToCim updated and tested.
-7. ServiceComparator(s) updated and tested.
-8. Exhaustive when functions in *ServiceUtils updated if a new class is added.
-9. Release notes updated.
+1. Descriptions copied from CIM and added as doc comments to new changes (on class, property etc)
+1. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required.
+1. Database:
+    1. Table class(es) updated. - `com.zepben.cimbend.database.sqlite.tables`
+    1. Writer updated. - `com.zepben.cimbend.database.sqlite.writers`
+    1. Reader updated. - `com.zepben.cimbend.database.sqlite.readers`
+    1. DB version updated. - `TableVersion.kt`
+    1. Migration written. - `com.zepben.cimbend.database.sqlite.upgrade`
+    1. Add schema tests - `DatabaseSqliteTest.kt`
+1. Reference resolver(s) added (if new associations).
+1. Protobuf/gRPC
+    1. *CimToProto(s) updated and tested.
+    1. *ProtoToCim(s) updated and tested.
+1. *ServiceComparator(s) updated and tested.
+1. Exhaustive when functions in *ServiceUtils updated if a new class is added.
+1. Release notes updated.

@@ -17,9 +17,7 @@ import com.zepben.cimbend.cim.iec61968.metering.EndDevice
 import com.zepben.cimbend.cim.iec61968.metering.Meter
 import com.zepben.cimbend.cim.iec61970.base.core.*
 import com.zepben.cimbend.cim.iec61970.base.meas.*
-import com.zepben.cimbend.cim.iec61970.base.wires.Line
-import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.cimbend.cim.iec61970.base.wires.VectorGroup
+import com.zepben.cimbend.cim.iec61970.base.wires.*
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.cimbend.common.translator.toTimestamp
@@ -50,6 +48,8 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.meas.MeasurementValue as PBMeasurementValue
 import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformerEnd as PBPowerTransformerEnd
+import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 
@@ -104,6 +104,35 @@ internal class NetworkCimToProtoTestValidator {
         validateMRIDList(cim.ends, pb.powerTransformerEndMRIDsList)
         assertThat(VectorGroup.valueOf(pb.vectorGroup.name), equalTo(cim.vectorGroup))
         assertThat(pb.transformerUtilisation, equalTo(cim.transformerUtilisation))
+    }
+
+    fun validate(cim: TransformerEnd, pb: PBTransformerEnd) {
+        validate(cim, pb.io)
+
+        validateMRID(cim.baseVoltage, pb.baseVoltageMRID)
+        validateMRID(cim.ratioTapChanger, pb.ratioTapChangerMRID)
+        validateMRID(cim.terminal, pb.terminalMRID)
+        assertThat(cim.grounded, equalTo(pb.grounded))
+        assertThat(cim.rGround, equalTo(pb.rGround))
+        assertThat(cim.xGround, equalTo(pb.xGround))
+        assertThat(cim.endNumber, equalTo(pb.endNumber))
+    }
+
+    fun validate(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd) {
+        validate(cim, pb.te)
+
+        assertThat(cim.b, equalTo(pb.b))
+        assertThat(cim.g, equalTo(pb.g))
+        assertThat(cim.b0, equalTo(pb.b0))
+        assertThat(cim.g0, equalTo(pb.g0))
+        assertThat(cim.r, equalTo(pb.r))
+        assertThat(cim.r0, equalTo(pb.r0))
+        assertThat(cim.x, equalTo(pb.x))
+        assertThat(cim.x0, equalTo(pb.x0))
+        assertThat(WindingConnection.valueOf(pb.connectionKind.name), equalTo(cim.connectionKind))
+        assertThat(cim.ratedS, equalTo(pb.ratedS))
+        assertThat(cim.ratedU, equalTo(pb.ratedU))
+        assertThat(cim.phaseAngleClock, equalTo(pb.phaseAngleClock))
     }
 
     fun validate(cim: Substation, pb: PBSubstation) {

@@ -12,6 +12,7 @@ import com.zepben.cimbend.cim.iec61968.metering.Meter
 import com.zepben.cimbend.cim.iec61970.base.core.Substation
 import com.zepben.cimbend.cim.iec61970.base.meas.*
 import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.cimbend.measurement.toPb
@@ -33,6 +34,14 @@ internal class NetworkCimToProtoTest {
     internal fun convertsPowerTransformer() {
         val networkService = NetworkService()
         val cim = PowerTransformer()
+        validator.validate(cim, cim.toPb())
+        validator.validate(cim.fillFields(networkService), cim.toPb())
+    }
+
+    @Test
+    internal fun convertsPowerTransformerEnd() {
+        val networkService = NetworkService()
+        val cim = PowerTransformerEnd()
         validator.validate(cim, cim.toPb())
         validator.validate(cim.fillFields(networkService), cim.toPb())
     }

@@ -36,14 +36,12 @@ internal class PowerTransformerTest {
         val powerTransformer = PowerTransformer()
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.UNKNOWN))
-
-        powerTransformer.vectorGroup = VectorGroup.DYN11
-
-        assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.DYN11))
-
         assertThat(powerTransformer.transformerUtilisation, equalTo(0.0))
 
+        powerTransformer.vectorGroup = VectorGroup.DYN11
         powerTransformer.transformerUtilisation = 1.0
+
+        assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.DYN11))
         assertThat(powerTransformer.transformerUtilisation, equalTo(1.0))
     }
 
@@ -75,7 +73,8 @@ internal class PowerTransformerTest {
         }
 
         // Test throws if missing ConductingEquipment
-        ExpectException.expect { pt.addEnd(e1) }.toThrow(IllegalArgumentException::class.java).withMessage("${e1.typeNameAndMRID()} references another PowerTransformer ${e1.powerTransformer}, expected $pt.")
+        ExpectException.expect { pt.addEnd(e1) }.toThrow(IllegalArgumentException::class.java)
+            .withMessage("${e1.typeNameAndMRID()} references another PowerTransformer ${e1.powerTransformer}, expected $pt.")
 
         e1.apply {
             powerTransformer = pt

@@ -112,6 +112,11 @@ class DatabaseSqliteTest {
     }
 
     @Test
+    fun `test PowerTransformer Schema`() {
+        validateSchema(SchemaTestNetwork.createPowerTransformerTestServices())
+    }
+
+    @Test
     fun testMetadataDataSourceSchema() {
         validateSchema(SchemaTestNetwork.createDataSourceTestServices())
     }

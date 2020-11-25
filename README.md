@@ -22,11 +22,12 @@ To build:
 2. Description copied from CIM and added as doc comment to new changes (on class, property etc)
 3. FillFields.kt updated to populate data for tests.
 4. Database:
-    1. Table class(es) updated.
-    2. Writer updated.
-    3. Reader updated.
-    4. DB version updated.
-    5. Migration written.
+    1. Table class(es) updated. - com.zepben.cimbend.database.sqlite.tables
+    2. Writer updated. - com.zepben.cimbend.database.sqlite.writers
+    3. Reader updated. - com.zepben.cimbend.database.sqlite.readers
+    4. DB version updated. - TableVersion.kt
+    5. Migration written. - com.zepben.cimbend.database.sqlite.upgrade
+    6. Add schema tests - DatabaseSqliteTest.kt
 5. Reference resolver(s) added (if new associations).
 6. Protobuf/gRPC
     1. CimToProto updated and tested.

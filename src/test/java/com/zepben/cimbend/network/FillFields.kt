@@ -121,37 +121,32 @@ fun Equipment.fillFields(networkService: NetworkService) {
 
     for (i in 0..1) {
         val usagePoint = UsagePoint()
+        networkService.add(usagePoint)
         addUsagePoint(usagePoint)
         usagePoint.addEquipment(this)
-        networkService.add(usagePoint)
     }
 
     for (i in 0..1) {
         val operationalRestriction = OperationalRestriction()
+        networkService.add(operationalRestriction)
         addOperationalRestriction(operationalRestriction)
         operationalRestriction.addEquipment(this)
-        networkService.add(operationalRestriction)
     }
 
     for (i in 0..1) {
         val container = Circuit()
+        networkService.add(container)
         addContainer(container)
         container.addEquipment(this)
-        networkService.add(container)
-    }
-
-    for (i in 0..1) {
-        val feeder = Feeder()
-        addCurrentFeeder(feeder)
-        feeder.addEquipment(this)
-        networkService.add(feeder)
     }
 
     (this as PowerSystemResource).fillFields(networkService)
 }
 
 fun ConductingEquipment.fillFields(networkService: NetworkService) {
-    baseVoltage = BaseVoltage()
+    val bv = BaseVoltage()
+    networkService.add(bv)
+    baseVoltage = bv
 
     for (i in 0..1) {
         val terminal = Terminal()

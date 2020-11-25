@@ -36,13 +36,14 @@ internal class PowerTransformerTest {
         val powerTransformer = PowerTransformer()
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.UNKNOWN))
+        assertThat(powerTransformer.transformerUtilisation, equalTo(0.0))
 
         powerTransformer.vectorGroup = VectorGroup.DYN11
+        powerTransformer.transformerUtilisation = 1.0
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.DYN11))
+        assertThat(powerTransformer.transformerUtilisation, equalTo(1.0))
     }
-
-    private var _powerTransformerEnds: MutableList<PowerTransformerEnd>? = null
 
     @Test
     internal fun powerTransformerEnds() {
@@ -72,7 +73,8 @@ internal class PowerTransformerTest {
         }
 
         // Test throws if missing ConductingEquipment
-        ExpectException.expect { pt.addEnd(e1) }.toThrow(IllegalArgumentException::class.java).withMessage("${e1.typeNameAndMRID()} references another PowerTransformer ${e1.powerTransformer}, expected $pt.")
+        ExpectException.expect { pt.addEnd(e1) }.toThrow(IllegalArgumentException::class.java)
+            .withMessage("${e1.typeNameAndMRID()} references another PowerTransformer ${e1.powerTransformer}, expected $pt.")
 
         e1.apply {
             powerTransformer = pt
@@ -100,7 +102,7 @@ internal class PowerTransformerTest {
     @Test
     internal fun `test primaryVoltage`() {
         val pt = PowerTransformer()
-        val e1 = PowerTransformerEnd().apply{
+        val e1 = PowerTransformerEnd().apply {
             powerTransformer = pt
         }
         val e2 = PowerTransformerEnd().apply {

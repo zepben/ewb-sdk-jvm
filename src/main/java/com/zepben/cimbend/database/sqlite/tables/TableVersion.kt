@@ -15,7 +15,7 @@ import com.zepben.cimbend.database.Column.Nullable.NOT_NULL
 @EverythingIsNonnullByDefault
 class TableVersion : SqliteTable() {
 
-    val SUPPORTED_VERSION = 22
+    val SUPPORTED_VERSION = 23
 
     val VERSION = Column(++columnIndex, "version", "TEXT", NOT_NULL)
 

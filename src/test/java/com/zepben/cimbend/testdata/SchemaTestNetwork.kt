@@ -9,6 +9,7 @@ package com.zepben.cimbend.testdata
 
 import com.zepben.cimbend.cim.iec61968.assets.Pole
 import com.zepben.cimbend.cim.iec61968.assets.Streetlight
+import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.cimbend.common.meta.DataSource
@@ -29,6 +30,15 @@ object SchemaTestNetwork {
 
         networkService.add(Pole("pole1"))
         networkService.add(Pole("pole2").fillFields(networkService))
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    }
+
+    fun createPowerTransformerTestServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.add(PowerTransformer())
+        networkService.add(PowerTransformer().fillFields(networkService, includeRuntime = false))
 
         return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
     }

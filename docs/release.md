@@ -26,6 +26,7 @@ a 1.0.0 release.
 
 ##### Enhancements
 * Updated `Feeder` to allow for updating the `normalHeadTerminal` if the feeder has no equipment assigned. 
+* Added transformer utilisation property to PowerTransformer class
 
 ##### Fixes
 * None.

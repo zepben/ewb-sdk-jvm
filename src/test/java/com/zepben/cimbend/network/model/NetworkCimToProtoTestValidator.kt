@@ -18,6 +18,8 @@ import com.zepben.cimbend.cim.iec61968.metering.Meter
 import com.zepben.cimbend.cim.iec61970.base.core.*
 import com.zepben.cimbend.cim.iec61970.base.meas.*
 import com.zepben.cimbend.cim.iec61970.base.wires.Line
+import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.cimbend.cim.iec61970.base.wires.VectorGroup
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.cimbend.common.translator.toTimestamp
@@ -29,24 +31,27 @@ import com.zepben.protobuf.cim.iec61968.assets.Pole as PBPole
 import com.zepben.protobuf.cim.iec61968.assets.Structure as PBStructure
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevive
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
+import com.zepben.protobuf.cim.iec61970.base.core.ConductingEquipment as PBConductingEquipment
 import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNodeContainer as PBConnectivityNodeContainer
+import com.zepben.protobuf.cim.iec61970.base.core.Equipment as PBEquipment
 import com.zepben.protobuf.cim.iec61970.base.core.EquipmentContainer as PBEquipmentContainer
 import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject as PBIdentifiedObject
+import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 import com.zepben.protobuf.cim.iec61970.base.core.PowerSystemResource as PBPowerSystemResource
 import com.zepben.protobuf.cim.iec61970.base.core.Substation as PBSubstation
-import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
-import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
-import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
+import com.zepben.protobuf.cim.iec61970.base.domain.UnitSymbol as PBUnitSymbol
+import com.zepben.protobuf.cim.iec61970.base.meas.Accumulator as PBAccumulator
+import com.zepben.protobuf.cim.iec61970.base.meas.AccumulatorValue as PBAccumulatorValue
 import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
+import com.zepben.protobuf.cim.iec61970.base.meas.AnalogValue as PBAnalogValue
+import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
+import com.zepben.protobuf.cim.iec61970.base.meas.DiscreteValue as PBDiscreteValue
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.meas.MeasurementValue as PBMeasurementValue
-import com.zepben.protobuf.cim.iec61970.base.meas.Accumulator as PBAccumulator
-import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
-import com.zepben.protobuf.cim.iec61970.base.meas.AnalogValue as PBAnalogValue
-import com.zepben.protobuf.cim.iec61970.base.meas.AccumulatorValue as PBAccumulatorValue
-import com.zepben.protobuf.cim.iec61970.base.meas.DiscreteValue as PBDiscreteValue
-import com.zepben.protobuf.cim.iec61970.base.domain.UnitSymbol as PBUnitSymbol
-import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
+import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
+import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
+import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 
 internal class NetworkCimToProtoTestValidator {
 
@@ -73,6 +78,32 @@ internal class NetworkCimToProtoTestValidator {
         validateMRID(cim.assetInfo, pb.assetInfoMRID)
         validateMRID(cim.location, pb.locationMRID)
         assertThat(pb.numControls, equalTo(cim.numControls))
+    }
+
+    fun validate(cim: Equipment, pb: PBEquipment) {
+        validate(cim as PowerSystemResource, pb.psr)
+
+        assertThat(pb.inService, equalTo(cim.inService))
+        assertThat(pb.normallyInService, equalTo(cim.normallyInService))
+        validateMRIDList(cim.containers, pb.equipmentContainerMRIDsList)
+        validateMRIDList(cim.usagePoints, pb.usagePointMRIDsList)
+        validateMRIDList(cim.operationalRestrictions, pb.operationalRestrictionMRIDsList)
+        validateMRIDList(cim.currentFeeders, pb.currentFeederMRIDsList)
+    }
+
+    fun validate(cim: ConductingEquipment, pb: PBConductingEquipment) {
+        validate(cim, pb.eq)
+
+        validateMRID(cim.baseVoltage, pb.baseVoltageMRID)
+        validateMRIDList(cim.terminals, pb.terminalMRIDsList)
+    }
+
+    fun validate(cim: PowerTransformer, pb: PBPowerTransformer) {
+        validate(cim, pb.ce)
+
+        validateMRIDList(cim.ends, pb.powerTransformerEndMRIDsList)
+        assertThat(VectorGroup.valueOf(pb.vectorGroup.name), equalTo(cim.vectorGroup))
+        assertThat(pb.transformerUtilisation, equalTo(cim.transformerUtilisation))
     }
 
     fun validate(cim: Substation, pb: PBSubstation) {
@@ -159,7 +190,7 @@ internal class NetworkCimToProtoTestValidator {
             assertThat(pb, contains(*cim.stream().map { it.mRID }.toArray()))
     }
 
-    private fun validate(cim: PhaseCode, pb: PBPhaseCode){
+    private fun validate(cim: PhaseCode, pb: PBPhaseCode) {
         assertThat(PBPhaseCode.valueOf(cim.name), `is`(pb))
     }
 
@@ -185,23 +216,23 @@ internal class NetworkCimToProtoTestValidator {
         validate(cim as Measurement, pb.measurement)
     }
 
-    fun validate(cim: MeasurementValue, pb: PBMeasurementValue){
+    fun validate(cim: MeasurementValue, pb: PBMeasurementValue) {
         cim.timeStamp?.let { assertThat(pb.timeStamp, equalTo(it.toTimestamp())) } ?: assertThat(pb.timeStamp, equalTo(Timestamp.getDefaultInstance()))
     }
 
-    fun validate(cim: AnalogValue, pb: PBAnalogValue){
+    fun validate(cim: AnalogValue, pb: PBAnalogValue) {
         validateMRID(cim.analogMRID, pb.analogMRID)
         assertThat(cim.value, `is`(pb.value))
         validate(cim as MeasurementValue, pb.mv)
     }
 
-    fun validate(cim: AccumulatorValue, pb: PBAccumulatorValue){
+    fun validate(cim: AccumulatorValue, pb: PBAccumulatorValue) {
         validateMRID(cim.accumulatorMRID, pb.accumulatorMRID)
         assertThat(cim.value.toInt(), `is`(pb.value))
         validate(cim as MeasurementValue, pb.mv)
     }
 
-    fun validate(cim: DiscreteValue, pb: PBDiscreteValue){
+    fun validate(cim: DiscreteValue, pb: PBDiscreteValue) {
         validateMRID(cim.discreteMRID, pb.discreteMRID)
         assertThat(cim.value, `is`(pb.value))
         validate(cim as MeasurementValue, pb.mv)

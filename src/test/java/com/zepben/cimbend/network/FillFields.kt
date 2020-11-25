@@ -248,7 +248,6 @@ fun PowerTransformerEnd.fillFields(networkService: NetworkService, includeRuntim
     phaseAngleClock = 3
     connectionKind = WindingConnection.D
 
-
     (this as TransformerEnd).fillFields(networkService, includeRuntime)
     return this
 }

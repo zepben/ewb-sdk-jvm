@@ -115,7 +115,7 @@ fun PowerSystemResource.fillFields(networkService: NetworkService) {
     (this as IdentifiedObject).fillFields()
 }
 
-fun Equipment.fillFields(networkService: NetworkService) {
+fun Equipment.fillFields(networkService: NetworkService, includeRuntime: Boolean = true) {
     inService = false
     normallyInService = false
 
@@ -140,10 +140,19 @@ fun Equipment.fillFields(networkService: NetworkService) {
         container.addEquipment(this)
     }
 
+    if (includeRuntime) {
+        for (i in 0..1) {
+            val feeder = Feeder()
+            networkService.add(feeder)
+            addCurrentFeeder(feeder)
+            feeder.addEquipment(this)
+        }
+    }
+
     (this as PowerSystemResource).fillFields(networkService)
 }
 
-fun ConductingEquipment.fillFields(networkService: NetworkService) {
+fun ConductingEquipment.fillFields(networkService: NetworkService, includeRuntime: Boolean = true) {
     val bv = BaseVoltage()
     networkService.add(bv)
     baseVoltage = bv
@@ -155,7 +164,7 @@ fun ConductingEquipment.fillFields(networkService: NetworkService) {
         networkService.add(terminal)
     }
 
-    (this as Equipment).fillFields(networkService)
+    (this as Equipment).fillFields(networkService, includeRuntime)
 }
 
 fun Substation.fillFields(networkService: NetworkService): Substation {
@@ -195,11 +204,11 @@ fun Substation.fillFields(networkService: NetworkService): Substation {
 
 fun Line.fillFields(networkService: NetworkService) = (this as EquipmentContainer).fillFields(networkService)
 
-fun PowerTransformer.fillFields(networkService: NetworkService): PowerTransformer {
+fun PowerTransformer.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerTransformer {
     transformerUtilisation = 1.0
     vectorGroup = VectorGroup.DD0
 
-    (this as ConductingEquipment).fillFields(networkService)
+    (this as ConductingEquipment).fillFields(networkService, includeRuntime)
     return this
 }
 

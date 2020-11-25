@@ -38,7 +38,7 @@ object SchemaTestNetwork {
         val networkService = NetworkService()
 
         networkService.add(PowerTransformer())
-        networkService.add(PowerTransformer().fillFields(networkService))
+        networkService.add(PowerTransformer().fillFields(networkService, includeRuntime = false))
 
         return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
     }

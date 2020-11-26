@@ -296,8 +296,7 @@ fun toPb(cim: EquipmentContainer, pb: PBEquipmentContainer.Builder): PBEquipment
 fun toPb(cim: Feeder, pb: PBFeeder.Builder): PBFeeder.Builder =
     pb.apply {
         cim.normalHeadTerminal?.let { normalHeadTerminalMRID = it.mRID } ?: clearNormalHeadTerminalMRID()
-        cim.normalEnergizingSubstation?.let { normalEnergizingSubstationMRID = it.mRID }
-            ?: clearNormalEnergizingSubstationMRID()
+        cim.normalEnergizingSubstation?.let { normalEnergizingSubstationMRID = it.mRID } ?: clearNormalEnergizingSubstationMRID()
 
         clearCurrentEquipmentMRIDs()
         cim.currentEquipment.forEach { addCurrentEquipmentMRIDs(it.mRID) }
@@ -359,8 +358,7 @@ fun toPb(cim: Terminal, pb: PBTerminal.Builder): PBTerminal.Builder =
 /************ IEC61970 WIRES ************/
 fun toPb(cim: AcLineSegment, pb: PBAcLineSegment.Builder): PBAcLineSegment.Builder =
     pb.apply {
-        cim.perLengthSequenceImpedance?.let { perLengthSequenceImpedanceMRID = it.mRID }
-            ?: clearPerLengthSequenceImpedanceMRID()
+        cim.perLengthSequenceImpedance?.let { perLengthSequenceImpedanceMRID = it.mRID } ?: clearPerLengthSequenceImpedanceMRID()
         toPb(cim, cdBuilder)
     }
 
@@ -551,8 +549,8 @@ fun toPb(cim: TapChanger, pb: PBTapChanger.Builder): PBTapChanger.Builder =
 fun toPb(cim: TransformerEnd, pb: PBTransformerEnd.Builder): PBTransformerEnd.Builder =
     pb.apply {
         cim.terminal?.let { terminalMRID = it.mRID } ?: clearTerminalMRID()
-        cim.baseVoltage?.let { baseVoltageMRID = it.mRID } ?: clearTerminalMRID()
-        cim.ratioTapChanger?.let { ratioTapChangerMRID = it.mRID } ?: clearTerminalMRID()
+        cim.baseVoltage?.let { baseVoltageMRID = it.mRID } ?: clearBaseVoltageMRID()
+        cim.ratioTapChanger?.let { ratioTapChangerMRID = it.mRID } ?: clearRatioTapChangerMRID()
         endNumber = cim.endNumber
         grounded = cim.grounded
         rGround = cim.rGround

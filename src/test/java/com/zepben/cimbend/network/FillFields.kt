@@ -16,9 +16,7 @@ import com.zepben.cimbend.cim.iec61968.operations.OperationalRestriction
 import com.zepben.cimbend.cim.iec61970.base.core.*
 import com.zepben.cimbend.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.cimbend.cim.iec61970.base.meas.*
-import com.zepben.cimbend.cim.iec61970.base.wires.Line
-import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.cimbend.cim.iec61970.base.wires.VectorGroup
+import com.zepben.cimbend.cim.iec61970.base.wires.*
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.cimbend.network.NetworkModelTestUtil.Companion.createFeeder
@@ -209,6 +207,48 @@ fun PowerTransformer.fillFields(networkService: NetworkService, includeRuntime: 
     vectorGroup = VectorGroup.DD0
 
     (this as ConductingEquipment).fillFields(networkService, includeRuntime)
+    return this
+}
+
+fun TransformerEnd.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): TransformerEnd {
+    val term = Terminal()
+    val rtc = RatioTapChanger()
+    rtc.transformerEnd = this
+    val bv = BaseVoltage()
+    networkService.add(term)
+    networkService.add(rtc)
+    networkService.add(bv)
+    terminal = term
+    ratioTapChanger = rtc
+    baseVoltage = bv
+    grounded = true
+    rGround = 1.0
+    xGround = 2.0
+    endNumber = 1
+
+    (this as IdentifiedObject).fillFields()
+    return this
+}
+
+fun PowerTransformerEnd.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerTransformerEnd {
+    val pt = PowerTransformer()
+    powerTransformer = pt
+    pt.addEnd(this)
+    networkService.add(pt)
+    b = 1.0
+    b0 = 2.0
+    r = 3.0
+    r0 = 4.0
+    x = 5.0
+    x0 = 6.0
+    g = 7.0
+    g0 = 8.0
+    ratedS = 100
+    ratedU = 4000
+    phaseAngleClock = 3
+    connectionKind = WindingConnection.D
+
+    (this as TransformerEnd).fillFields(networkService, includeRuntime)
     return this
 }
 

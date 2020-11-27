@@ -24,6 +24,9 @@ a 1.0.0 release.
 `failed` which is the set of mRIDs that were not added to the service because another object with the same `mRID` already existed.
 * `getFeeder` in `NetworkConsumerClient` now returns a `GrpcResult` as per `getIdentifiedObjects`
 * `addFromPb` now return nullable types. They will return null when adding to the service returns `false`.
+* `NetworkProtoToCim.toCim(ConnectivityNode)` will no longer update an existing ConnectivityNode if it already exists in the service. This brings the 
+serialisation into line with all other `toCim()` functions, however means that deserialising the same `ConnectivityNode` multiple times will now fail rather
+than merging the `ConnectivityNode`s.
 
 ##### New Features
 * None.

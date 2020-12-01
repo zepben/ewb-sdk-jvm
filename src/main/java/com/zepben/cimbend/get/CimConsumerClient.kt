@@ -9,17 +9,16 @@ package com.zepben.cimbend.get
 
 import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.cimbend.common.BaseService
-import com.zepben.cimbend.customer.CustomerService
 import com.zepben.cimbend.grpc.GrpcClient
 import com.zepben.cimbend.grpc.GrpcResult
 
 
 /**
  * A result to use when multiple objects are requested.
- * @property result A Map of mRID to its IdentifiedObject that were processed.
+ * @property objects A Map of mRID to its IdentifiedObject that were processed.
  * @property failed The set of mRIDs that failed to be processed.
  */
-data class MultiObjectResult(val result: Map<String, IdentifiedObject>, val failed: Set<String>)
+data class MultiObjectResult(val objects: Map<String, IdentifiedObject>, val failed: Set<String>)
 
 /**
  * Represents the result of deserialising a protobuf message and adding it to a service.

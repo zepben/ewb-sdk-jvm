@@ -131,10 +131,10 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.result.size, equalTo(3))
-        assertThat(result.value.result[mRIDs[0]], instanceOf(AcLineSegment::class.java))
-        assertThat(result.value.result[mRIDs[1]], instanceOf(AcLineSegment::class.java))
-        assertThat(result.value.result[mRIDs[2]], instanceOf(Breaker::class.java))
+        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.objects[mRIDs[0]], instanceOf(AcLineSegment::class.java))
+        assertThat(result.value.objects[mRIDs[1]], instanceOf(AcLineSegment::class.java))
+        assertThat(result.value.objects[mRIDs[2]], instanceOf(Breaker::class.java))
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
         clearInvocations(stub)
@@ -207,20 +207,20 @@ internal class NetworkConsumerClientTest {
         configureFeederResponses(expectedService)
 
         val mRID = "f001"
-        val objects = consumerClient.getFeeder(service, mRID)
+        val result = consumerClient.getFeeder(service, mRID)
 
         verify(stub, times(3)).getIdentifiedObjects(any())
 
-        assertThat(objects.wasSuccessful, equalTo(true))
-        assertThat(objects.value.result.containsKey(mRID), equalTo(true))
-        assertThat(objects.value.result.size, equalTo(21))
-        objects.value.result.values.forEach {
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.value.objects.containsKey(mRID), equalTo(true))
+        assertThat(result.value.objects.size, equalTo(21))
+        result.value.objects.values.forEach {
             assertThat(service[it.mRID], equalTo(it))
         }
         service.sequenceOf<IdentifiedObject>().forEach {
-            assertThat(objects.value.result[it.mRID], equalTo(it))
+            assertThat(result.value.objects[it.mRID], equalTo(it))
         }
-        assertThat(objects.value.failed.size, equalTo(0))
+        assertThat(result.value.failed.size, equalTo(0))
 
         val actualFeeder: Feeder = service[mRID]!!
         val expectedFeeder: Feeder = expectedService[mRID]!!
@@ -414,22 +414,19 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `returns failed mRID when duplicate mRID exists in the service`() {
-        val mRIDs = listOf("id1", "id1", "id2")
-        val response1 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, mRIDs[0])
-        val response2 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, mRIDs[1])
-        val response3 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getBreakerBuilder, mRIDs[2])
+        val response = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, "id1")
 
-        doReturn(listOf(response1, response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
+        // We are only testing behaviour of duplicate responses when adding to the service.
+        doReturn(listOf(response, response).iterator()).`when`(stub).getIdentifiedObjects(any())
 
-        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
+        val result = consumerClient.getIdentifiedObjects(service, setOf("id1"))
 
-        assertThat(objects.wasSuccessful, equalTo(true))
-        assertThat(objects.value.result.size, equalTo(2))
-        assertThat(objects.value.result[mRIDs[0]], instanceOf(AcLineSegment::class.java))
-        assertThat(objects.value.result[mRIDs[2]], instanceOf(Breaker::class.java))
-        assertThat(objects.value.failed, Matchers.contains(mRIDs[0]))
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.value.objects.size, equalTo(1))
+        assertThat(result.value.objects["id1"], instanceOf(AcLineSegment::class.java))
+        assertThat(result.value.failed, Matchers.contains("id1"))
 
-        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(listOf("id1", "id2")).build())
+        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(listOf("id1")).build())
         clearInvocations(stub)
     }
 
@@ -438,14 +435,18 @@ internal class NetworkConsumerClientTest {
         val mRIDs = listOf("id1", "id2", "id3")
         val response2 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, mRIDs[1])
         val response3 = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getBreakerBuilder, mRIDs[2])
-        service.add(AcLineSegment(mRIDs[0]))
+        val acls = AcLineSegment(mRIDs[0])
+        service.add(acls)
 
         doReturn(listOf(response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
 
-        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
+        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
-        assertThat(objects.value.result, hasKey("id1"))
-        assertThat(objects.value.failed, empty())
+        assertThat(result.value.objects, hasEntry("id1", acls))
+        assertThat(result.value.objects, hasKey("id2"))
+        assertThat(result.value.objects, hasKey("id3"))
+        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.failed, empty())
     }
 
     private fun createResponse(

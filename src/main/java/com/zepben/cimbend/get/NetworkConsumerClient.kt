@@ -152,7 +152,7 @@ class NetworkConsumerClient(
         return GrpcResult.of(
             getIdentifiedObjects(service, mRIDs).onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }.value.let {
                 MultiObjectResult(
-                    it.result.toMutableMap().apply { this[feeder.mRID] = feeder; this.putAll(equipmentResults.value.result) },
+                    it.objects.toMutableMap().apply { this[feeder.mRID] = feeder; this.putAll(equipmentResults.value.objects) },
                     it.failed.union(equipmentResults.value.failed)
                 )
             }

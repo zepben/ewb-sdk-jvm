@@ -23,8 +23,7 @@ import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.instanceOf
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.ArgumentMatchers.any
@@ -109,13 +108,13 @@ internal class DiagramConsumerClientTest {
 
         doReturn(listOf(response1, response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
 
-        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
+        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
-        assertThat(objects.wasSuccessful, equalTo(true))
-        assertThat(objects.value.result.size, equalTo(3))
-        assertThat(objects.value.result[mRIDs[0]], instanceOf(Diagram::class.java))
-        assertThat(objects.value.result[mRIDs[1]], instanceOf(Diagram::class.java))
-        assertThat(objects.value.result[mRIDs[2]], instanceOf(DiagramObject::class.java))
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.objects[mRIDs[0]], instanceOf(Diagram::class.java))
+        assertThat(result.value.objects[mRIDs[1]], instanceOf(Diagram::class.java))
+        assertThat(result.value.objects[mRIDs[2]], instanceOf(DiagramObject::class.java))
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
         clearInvocations(stub)
@@ -127,10 +126,10 @@ internal class DiagramConsumerClientTest {
         val expectedEx = StatusRuntimeException(Status.UNAVAILABLE)
         doAnswer { throw expectedEx }.`when`(stub).getIdentifiedObjects(any())
 
-        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
+        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-        validateFailure(onErrorHandler, objects, expectedEx, true)
+        validateFailure(onErrorHandler, result, expectedEx, true)
     }
 
     @Test
@@ -141,30 +140,26 @@ internal class DiagramConsumerClientTest {
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
+        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-        validateFailure(onErrorHandler, objects, expectedEx, false)
+        validateFailure(onErrorHandler, result, expectedEx, false)
     }
 
     @Test
     internal fun `returns failed mRID when duplicate mRID exists in the service`() {
-        val mRIDs = listOf("id1", "id1", "id2")
-        val response1 = createResponse(DiagramIdentifiedObject.newBuilder(), DiagramIdentifiedObject.Builder::getDiagramBuilder, mRIDs[0])
-        val response2 = createResponse(DiagramIdentifiedObject.newBuilder(), DiagramIdentifiedObject.Builder::getDiagramBuilder, mRIDs[1])
-        val response3 = createResponse(DiagramIdentifiedObject.newBuilder(), DiagramIdentifiedObject.Builder::getDiagramObjectBuilder, mRIDs[2])
+        val response = createResponse(DiagramIdentifiedObject.newBuilder(), DiagramIdentifiedObject.Builder::getDiagramBuilder, "id1")
+        // We are only testing behaviour of duplicate responses when adding to the service.
+        doReturn(listOf(response, response).iterator()).`when`(stub).getIdentifiedObjects(any())
 
-        doReturn(listOf(response1, response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
+        val result = consumerClient.getIdentifiedObjects(service, setOf("id1"))
 
-        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.value.objects.size, equalTo(1))
+        assertThat(result.value.objects["id1"], instanceOf(Diagram::class.java))
+        assertThat(result.value.failed, Matchers.contains("id1"))
 
-        assertThat(objects.wasSuccessful, equalTo(true))
-        assertThat(objects.value.result.size, equalTo(2))
-        assertThat(objects.value.result[mRIDs[0]], instanceOf(Diagram::class.java))
-        assertThat(objects.value.result[mRIDs[2]], instanceOf(DiagramObject::class.java))
-        assertThat(objects.value.failed, Matchers.contains(mRIDs[0]))
-
-        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(listOf("id1", "id2")).build())
+        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(listOf("id1")).build())
         clearInvocations(stub)
     }
 
@@ -173,14 +168,18 @@ internal class DiagramConsumerClientTest {
         val mRIDs = listOf("id1", "id2", "id3")
         val response2 = createResponse(DiagramIdentifiedObject.newBuilder(), DiagramIdentifiedObject.Builder::getDiagramBuilder, mRIDs[1])
         val response3 = createResponse(DiagramIdentifiedObject.newBuilder(), DiagramIdentifiedObject.Builder::getDiagramObjectBuilder, mRIDs[2])
-        service.add(Diagram(mRIDs[0]))
+        val diagram = Diagram(mRIDs[0])
+        service.add(diagram)
 
         doReturn(listOf(response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
 
-        val objects = consumerClient.getIdentifiedObjects(service, mRIDs)
+        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
-        assertThat(objects.value.result, Matchers.hasKey("id1"))
-        assertThat(objects.value.failed, Matchers.empty())
+        assertThat(result.value.objects, hasEntry("id1", diagram))
+        assertThat(result.value.objects, hasKey("id2"))
+        assertThat(result.value.objects, hasKey("id3"))
+        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.failed, empty())
     }
 
     private fun createResponse(

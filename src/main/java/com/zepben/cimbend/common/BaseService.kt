@@ -10,6 +10,7 @@ package com.zepben.cimbend.common
 import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.cimbend.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.cimbend.common.extensions.nameAndMRID
+import com.zepben.cimbend.common.extensions.typeNameAndMRID
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Stream
@@ -177,6 +178,23 @@ abstract class BaseService(
     }
 
     /**
+     * Add to the service and return [cim] if successful or null if the add failed (typically due to mRID already existing)
+     * @param cim The [IdentifiedObject] to add.
+     *
+     * @return [cim] if successfully added else null.
+     */
+    fun <T : IdentifiedObject> tryAddOrNull(cim: T): T? =
+        try {
+            if (tryAdd(cim))
+                cim
+            else
+                null
+        } catch (ex: UnsupportedIdentifiedObjectException){
+            null
+        }
+
+
+    /**
      * Attempts to remove the [identifiedObject] to the service, if this service instance supports the type of [IdentifiedObject]
      * that is provided.
      *
@@ -206,9 +224,14 @@ abstract class BaseService(
      * @param [identifiedObject] the object to add to this service
      * @throws [UnsupportedIdentifiedObjectException] if the [IdentifiedObject] is not supported by this service.
      * @throws [IllegalStateException] if any unresolved references have an incorrect class type.
-     * @return true if the object is associated with this service.
+     * @throws [IllegalArgumentException] if [identifiedObject] did not have a valid mRID.
+     * @return true if the object is associated with this service, false if an object already exists in the service with
+     * the same mRID.
      */
     protected fun add(identifiedObject: IdentifiedObject): Boolean {
+        if (identifiedObject.mRID.isEmpty())
+            throw IllegalArgumentException("Object [${identifiedObject.typeNameAndMRID()}] must have an mRID set to be added to the service.")
+
         if (!supportedKClasses.contains(identifiedObject::class)) {
             throw UnsupportedIdentifiedObjectException("Unsupported IdentifiedObject type: ${identifiedObject::class}")
         }

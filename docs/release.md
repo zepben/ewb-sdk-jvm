@@ -20,6 +20,13 @@ a 1.0.0 release.
 * The `AssignToFeeders` was changed to assign all `ConductingEquipment` on the `normalHeadTerminal` side
   (inclusive) stopping at open points, head equipment for other feeders and substation transformers.
 * You can no longer run `AssignToFeeders` directly on a feeder.
+* `getIdentifiedObjects` in the consumer clients now returns a `GrpcResult` of a `MultiObjectResult`, which includes the map of objects added plus a new field
+`failed` which is the set of mRIDs that were not added to the service because another object with the same `mRID` already existed.
+* `getFeeder` in `NetworkConsumerClient` now returns a `GrpcResult` as per `getIdentifiedObjects`
+* `addFromPb` now return nullable types. They will return null when adding to the service returns `false`.
+* `NetworkProtoToCim.toCim(ConnectivityNode)` will no longer update an existing ConnectivityNode if it already exists in the service. This brings the 
+serialisation into line with all other `toCim()` functions, however means that deserialising the same `ConnectivityNode` multiple times will now fail rather
+than merging the `ConnectivityNode`s.
 
 ##### New Features
 * None.

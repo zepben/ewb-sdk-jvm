@@ -22,8 +22,8 @@ import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.instanceOf
+import org.hamcrest.Matchers
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.ArgumentMatchers.any
@@ -123,10 +123,10 @@ internal class CustomerConsumerClientTest {
         val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.size, equalTo(3))
-        assertThat(result.value[mRIDs[0]], instanceOf(Customer::class.java))
-        assertThat(result.value[mRIDs[1]], instanceOf(Customer::class.java))
-        assertThat(result.value[mRIDs[2]], instanceOf(CustomerAgreement::class.java))
+        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.objects[mRIDs[0]], instanceOf(Customer::class.java))
+        assertThat(result.value.objects[mRIDs[1]], instanceOf(Customer::class.java))
+        assertThat(result.value.objects[mRIDs[2]], instanceOf(CustomerAgreement::class.java))
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
         clearInvocations(stub)
@@ -156,6 +156,43 @@ internal class CustomerConsumerClientTest {
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
         validateFailure(onErrorHandler, result, expectedEx, false)
+    }
+
+    @Test
+    internal fun `getIdentifiedObjects returns failed mRID when duplicate mRIDs are returned`() {
+        val response = createResponse(CustomerIdentifiedObject.newBuilder(), CustomerIdentifiedObject.Builder::getCustomerBuilder, "id1")
+
+        // We are only testing behaviour of duplicate responses when adding to the service.
+        doReturn(listOf(response, response).iterator()).`when`(stub).getIdentifiedObjects(any())
+
+        val result = consumerClient.getIdentifiedObjects(service, setOf("id1"))
+
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.value.objects.size, equalTo(1))
+        assertThat(result.value.objects["id1"], instanceOf(Customer::class.java))
+        assertThat(result.value.failed, Matchers.contains("id1"))
+
+        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(listOf("id1")).build())
+        clearInvocations(stub)
+    }
+
+    @Test
+    internal fun `getIdentifiedObjects returns map containing existing entries in the service`() {
+        val mRIDs = listOf("id1", "id2", "id3")
+        val response2 = createResponse(CustomerIdentifiedObject.newBuilder(), CustomerIdentifiedObject.Builder::getCustomerBuilder, mRIDs[1])
+        val response3 = createResponse(CustomerIdentifiedObject.newBuilder(), CustomerIdentifiedObject.Builder::getCustomerAgreementBuilder, mRIDs[2])
+        val customer = Customer(mRIDs[0])
+        service.add(customer)
+
+        doReturn(listOf(response2, response3).iterator()).`when`(stub).getIdentifiedObjects(any())
+
+        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
+
+        assertThat(result.value.objects, hasEntry("id1", customer))
+        assertThat(result.value.objects, hasKey("id2"))
+        assertThat(result.value.objects, hasKey("id3"))
+        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.failed, empty())
     }
 
     private fun createResponse(

@@ -8,7 +8,6 @@
 package com.zepben.cimbend.network.model
 
 import com.zepben.cimbend.network.NetworkService
-import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
 import org.junit.jupiter.api.Test
 import com.zepben.protobuf.cim.iec61968.assets.Pole as PBPole
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
@@ -16,6 +15,7 @@ import com.zepben.protobuf.cim.iec61970.base.core.Substation as PBSubstation
 import com.zepben.protobuf.cim.iec61970.base.meas.Accumulator as PBAccumulator
 import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
 import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 
@@ -27,54 +27,54 @@ class NetworkProtoToCimTest {
     @Test
     internal fun testFromPbPowerTransformer() {
         val pbPowerTransformer = PBPowerTransformer.newBuilder()
-        validator.validate(pbPowerTransformer) { translator.addFromPb(pbPowerTransformer.build()) }
+        validator.validate(pbPowerTransformer) { translator.addFromPb(pbPowerTransformer.build())!! }
     }
 
     @Test
     internal fun testFromPbMeter() {
         val pbMeter = PBMeter.newBuilder()
-        validator.validate(pbMeter) { translator.addFromPb(pbMeter.build()) }
+        validator.validate(pbMeter) { translator.addFromPb(pbMeter.build())!! }
     }
 
     @Test
     internal fun testFromPbSubstation() {
         val pbSubstation = PBSubstation.newBuilder()
-        validator.validate(pbSubstation) { translator.addFromPb(pbSubstation.build()) }
+        validator.validate(pbSubstation) { translator.addFromPb(pbSubstation.build())!! }
     }
 
     @Test
     internal fun testFromPbCircuit() {
         val pbCircuit = PBCircuit.newBuilder()
-        validator.validate(pbCircuit) { translator.addFromPb(pbCircuit.build()) }
+        validator.validate(pbCircuit) { translator.addFromPb(pbCircuit.build())!! }
     }
 
     @Test
     internal fun testFromPbLoop() {
         val pbLoop = PBLoop.newBuilder()
-        validator.validate(pbLoop) { translator.addFromPb(pbLoop.build()) }
+        validator.validate(pbLoop) { translator.addFromPb(pbLoop.build())!! }
     }
 
     @Test
     internal fun testFromPbPole() {
         val pbPole = PBPole.newBuilder()
-        validator.validate(pbPole) { translator.addFromPb(pbPole.build()) }
+        validator.validate(pbPole) { translator.addFromPb(pbPole.build())!! }
     }
 
     @Test
     internal fun testFromPbAnalog() {
         val pb = PBAnalog.newBuilder()
-        validator.validate(pb) { translator.addFromPb(pb.build()) }
+        validator.validate(pb) { translator.addFromPb(pb.build())!! }
     }
 
     @Test
     internal fun testFromPbAccumulator() {
         val pb = PBAccumulator.newBuilder()
-        validator.validate(pb) { translator.addFromPb(pb.build()) }
+        validator.validate(pb) { translator.addFromPb(pb.build())!! }
     }
 
     @Test
     internal fun testFromPbDiscrete() {
         val pb = PBDiscrete.newBuilder()
-        validator.validate(pb) { translator.addFromPb(pb.build()) }
+        validator.validate(pb) { translator.addFromPb(pb.build())!! }
     }
 }

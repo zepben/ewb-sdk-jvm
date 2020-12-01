@@ -29,7 +29,7 @@ abstract class GrpcClient {
     }
 
     /**
-     * Use to pass the throwable to all registered error handlers. Returns true if and error handler returns true.
+     * Use to pass the throwable to all registered error handlers. Returns true if an error handler returns true.
      */
     protected fun tryHandleError(t: Throwable): Boolean =
         errorHandlers.fold(false) { handled, handler -> handler.onError(t) or handled }

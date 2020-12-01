@@ -14,16 +14,20 @@ import com.zepben.cimbend.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.cimbend.cim.iec61970.base.wires.Conductor
 import com.zepben.cimbend.common.Resolvers
 import com.zepben.cimbend.common.extensions.typeNameAndMRID
+import com.zepben.cimbend.common.translator.mRID
 import com.zepben.cimbend.get.hierarchy.*
 import com.zepben.cimbend.grpc.GrpcResult
+import com.zepben.cimbend.measurement.mRID
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.model.NetworkProtoToCim
+import com.zepben.cimbend.network.translator.mRID
 import com.zepben.protobuf.nc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.nc.GetNetworkHierarchyRequest
 import com.zepben.protobuf.nc.NetworkConsumerGrpc
 import com.zepben.protobuf.nc.NetworkIdentifiedObject
 import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import io.grpc.Channel
+
 
 /**
  * Consumer client for a [NetworkService].
@@ -40,33 +44,45 @@ class NetworkConsumerClient(
     /**
      * Retrieve the object with the given [mRID] and store the result in the [service].
      *
-     * Exceptions that occur during sending will be caught and passed to all error handlers that have been registered by
-     * [addErrorHandler]. If none of the registered error handlers return true to indicate the error has been handled,
-     * the exception will be rethrown.
+     * Exceptions that occur during sending will be caught and passed to all error handlers that have been registered by [addErrorHandler].
      *
-     * @return The item if found, otherwise null.
+     * @return A [GrpcResult] with a result of one of the following:
+     * - The item if found
+     * - null if an object could not be found or it was found but not added to [service] (see [com.zepben.cimbend.common.BaseService.add]).
+     * - A [Throwable] if an error occurred while retrieving or processing the object, in which case, [GrpcResult.wasSuccessful] will return false.
      */
     override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject?> {
         return tryRpc {
-            processIdentifiedObjects(service, GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
-                .firstOrNull()
+            processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
         }
     }
 
     /**
      * Retrieve the objects with the given [mRIDs] and store the results in the [service].
      *
-     * Exceptions that occur during sending will be caught and passed to all error handlers that have been registered by
-     * [addErrorHandler]. If none of the registered error handlers return true to indicate the error has been handled,
-     * the exception will be rethrown.
+     * Exceptions that occur during processing will be caught and passed to all error handlers that have been registered by [addErrorHandler].
      *
-     * @return A [Map] containing the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
+     * WARNING: This operation is not atomic upon [service], and thus if processing fails partway through [mRIDs], any previously successful mRID will have been
+     * added to the service, and thus you may have an incomplete [NetworkService]. Also note that adding to the [service] may not occur for an object if another
+     * object with the same mRID is already present in [service]. [MultiObjectResult.failed] can be used to check for mRIDs that were retrieved but not
+     * added to [service].
+     *
+     * @return A [GrpcResult] with a result of one of the following:
+     * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
+     * If an item couldn't be added to [service], its mRID will be present in [MultiObjectResult.failed] (see [com.zepben.cimbend.common.BaseService.add]).
+     * - A [Throwable] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
+     * Note the warning above in this case.
      */
-    override fun getIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): GrpcResult<Map<String, IdentifiedObject>> {
+    override fun getIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> {
         return tryRpc {
-            processIdentifiedObjects(service, GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
-                .filterNotNull()
-                .associateBy({ it.mRID }, { it })
+            processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
+                val results = mutableMapOf<String, IdentifiedObject>()
+                val failed = mutableSetOf<String>()
+                extracted.forEach {
+                    if (it.identifiedObject == null) failed.add(it.mRID) else results[it.identifiedObject.mRID] = it.identifiedObject
+                }
+                MultiObjectResult(results, failed)
+            }
         }
     }
 
@@ -81,8 +97,12 @@ class NetworkConsumerClient(
 
             val feeders = toMap(response.feedersList) { NetworkHierarchyFeeder(it.mrid, it.name) }
             val substations = toMap(response.substationsList) { NetworkHierarchySubstation(it.mrid, it.name, lookup(it.feederMridsList, feeders)) }
-            val subGeographicalRegions = toMap(response.subGeographicalRegionsList) { NetworkHierarchySubGeographicalRegion(it.mrid, it.name, lookup(it.substationMridsList, substations)) }
-            val geographicalRegions = toMap(response.geographicalRegionsList) { NetworkHierarchyGeographicalRegion(it.mrid, it.name, lookup(it.subGeographicalRegionMridsList, subGeographicalRegions)) }
+            val subGeographicalRegions = toMap(response.subGeographicalRegionsList) {
+                NetworkHierarchySubGeographicalRegion(it.mrid, it.name, lookup(it.substationMridsList, substations))
+            }
+            val geographicalRegions = toMap(response.geographicalRegionsList) {
+                NetworkHierarchyGeographicalRegion(it.mrid, it.name, lookup(it.subGeographicalRegionMridsList, subGeographicalRegions))
+            }
 
             finaliseLinks(geographicalRegions, subGeographicalRegions, substations)
             NetworkHierarchy(geographicalRegions, subGeographicalRegions, substations, feeders)
@@ -96,20 +116,19 @@ class NetworkConsumerClient(
      * the terminals of all elements, the connectivity between terminals, the locations of all elements, the ends of all transformers
      * and the wire info for all conductors.
      *
-     * @return The [Feeder], or null if it was not found.
+     * @return A GrpcResult of a [MultiObjectResult], containing a map keyed by mRID of all the objects retrieved as part of retrieving the [Feeder] and the
+     * [Feeder] itself. If an item couldn't be added to [service], its mRID will be present in [MultiObjectResult.failed].
      */
-    fun getFeeder(service: NetworkService, mRID: String): GrpcResult<Feeder> {
+    fun getFeeder(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> {
         val feederResponse = getIdentifiedObject(service, mRID)
-        val feeder = feederResponse
-            .onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }
-            .value
+        val feeder = feederResponse.onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }.value
 
         if (feeder == null)
             return GrpcResult.of(null)
         else if (feeder !is Feeder)
             return GrpcResult.ofError(ClassCastException("Unable to extract feeder network from ${feeder.typeNameAndMRID()}."), false)
 
-        getIdentifiedObjects(service, service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder)))
+        val equipmentResults = getIdentifiedObjects(service, service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder)))
             .onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }
 
         val mRIDs = service.getUnresolvedReferenceMrids(Resolvers.normalEnergizingSubstation(feeder)).toMutableSet()
@@ -130,67 +149,80 @@ class NetworkConsumerClient(
             mRIDs.addAll(service.getUnresolvedReferenceMrids(Resolvers.location(it)))
         }
 
-        getIdentifiedObjects(service, mRIDs)
-            .onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }
-
-        return GrpcResult.of(feeder)
+        return GrpcResult.of(
+            getIdentifiedObjects(service, mRIDs).onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }.value.let {
+                MultiObjectResult(
+                    it.objects.toMutableMap().apply { this[feeder.mRID] = feeder; this.putAll(equipmentResults.value.objects) },
+                    it.failed.union(equipmentResults.value.failed)
+                )
+            }
+        )
     }
 
-    private fun processIdentifiedObjects(service: NetworkService, request: GetIdentifiedObjectsRequest): Sequence<IdentifiedObject?> {
-        return stub.getIdentifiedObjects(request)
+    private fun processIdentifiedObjects(service: NetworkService, mRIDs: Set<String>): Sequence<ExtractResult> {
+        val toFetch = mutableSetOf<String>()
+        val existing = mutableSetOf<ExtractResult>()
+        mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service
+            service.get<IdentifiedObject>(mRID)?.let { existing.add(ExtractResult(it, it.mRID)) } ?: toFetch.add(mRID)
+        }
+
+        return stub.getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(toFetch).build())
             .asSequence()
             .map { it.objectGroup }
             .flatMap {
                 sequenceOf(extractIdentifiedObject(service, it.identifiedObject)) +
                     it.ownedIdentifiedObjectList.map { owned -> extractIdentifiedObject(service, owned) }
-            }
+            } + existing
     }
 
-    private fun extractIdentifiedObject(service: NetworkService, it: NetworkIdentifiedObject): IdentifiedObject {
+    private fun extractIdentifiedObject(service: NetworkService, it: NetworkIdentifiedObject): ExtractResult {
         return when (it.identifiedObjectCase) {
-            CABLEINFO -> protoToCimProvider(service).addFromPb(it.cableInfo)
-            OVERHEADWIREINFO -> protoToCimProvider(service).addFromPb(it.overheadWireInfo)
-            ASSETOWNER -> protoToCimProvider(service).addFromPb(it.assetOwner)
-            ORGANISATION -> protoToCimProvider(service).addFromPb(it.organisation)
-            LOCATION -> protoToCimProvider(service).addFromPb(it.location)
-            METER -> protoToCimProvider(service).addFromPb(it.meter)
-            USAGEPOINT -> protoToCimProvider(service).addFromPb(it.usagePoint)
-            OPERATIONALRESTRICTION -> protoToCimProvider(service).addFromPb(it.operationalRestriction)
-            FAULTINDICATOR -> protoToCimProvider(service).addFromPb(it.faultIndicator)
-            BASEVOLTAGE -> protoToCimProvider(service).addFromPb(it.baseVoltage)
-            CONNECTIVITYNODE -> protoToCimProvider(service).addFromPb(it.connectivityNode)
-            FEEDER -> protoToCimProvider(service).addFromPb(it.feeder)
-            GEOGRAPHICALREGION -> protoToCimProvider(service).addFromPb(it.geographicalRegion)
-            SITE -> protoToCimProvider(service).addFromPb(it.site)
-            SUBGEOGRAPHICALREGION -> protoToCimProvider(service).addFromPb(it.subGeographicalRegion)
-            SUBSTATION -> protoToCimProvider(service).addFromPb(it.substation)
-            TERMINAL -> protoToCimProvider(service).addFromPb(it.terminal)
-            ACLINESEGMENT -> protoToCimProvider(service).addFromPb(it.acLineSegment)
-            BREAKER -> protoToCimProvider(service).addFromPb(it.breaker)
-            DISCONNECTOR -> protoToCimProvider(service).addFromPb(it.disconnector)
-            ENERGYCONSUMER -> protoToCimProvider(service).addFromPb(it.energyConsumer)
-            ENERGYCONSUMERPHASE -> protoToCimProvider(service).addFromPb(it.energyConsumerPhase)
-            ENERGYSOURCE -> protoToCimProvider(service).addFromPb(it.energySource)
-            ENERGYSOURCEPHASE -> protoToCimProvider(service).addFromPb(it.energySourcePhase)
-            FUSE -> protoToCimProvider(service).addFromPb(it.fuse)
-            JUMPER -> protoToCimProvider(service).addFromPb(it.jumper)
-            JUNCTION -> protoToCimProvider(service).addFromPb(it.junction)
-            LINEARSHUNTCOMPENSATOR -> protoToCimProvider(service).addFromPb(it.linearShuntCompensator)
-            PERLENGTHSEQUENCEIMPEDANCE -> protoToCimProvider(service).addFromPb(it.perLengthSequenceImpedance)
-            POWERTRANSFORMER -> protoToCimProvider(service).addFromPb(it.powerTransformer)
-            POWERTRANSFORMEREND -> protoToCimProvider(service).addFromPb(it.powerTransformerEnd)
-            RATIOTAPCHANGER -> protoToCimProvider(service).addFromPb(it.ratioTapChanger)
-            RECLOSER -> protoToCimProvider(service).addFromPb(it.recloser)
-            CIRCUIT -> protoToCimProvider(service).addFromPb(it.circuit)
-            LOOP -> protoToCimProvider(service).addFromPb(it.loop)
-            POLE -> protoToCimProvider(service).addFromPb(it.pole)
-            STREETLIGHT -> protoToCimProvider(service).addFromPb(it.streetlight)
-            ACCUMULATOR -> protoToCimProvider(service).addFromPb(it.accumulator)
-            ANALOG -> protoToCimProvider(service).addFromPb(it.analog)
-            DISCRETE -> protoToCimProvider(service).addFromPb(it.discrete)
-            CONTROL -> protoToCimProvider(service).addFromPb(it.control)
-            REMOTECONTROL -> protoToCimProvider(service).addFromPb(it.remoteControl)
-            REMOTESOURCE -> protoToCimProvider(service).addFromPb(it.remoteSource)
+            CABLEINFO -> ExtractResult(protoToCimProvider(service).addFromPb(it.cableInfo), it.cableInfo.mRID())
+            OVERHEADWIREINFO -> ExtractResult(protoToCimProvider(service).addFromPb(it.overheadWireInfo), it.overheadWireInfo.mRID())
+            ASSETOWNER -> ExtractResult(protoToCimProvider(service).addFromPb(it.assetOwner), it.assetOwner.mRID())
+            ORGANISATION -> ExtractResult(protoToCimProvider(service).addFromPb(it.organisation), it.organisation.mRID())
+            LOCATION -> ExtractResult(protoToCimProvider(service).addFromPb(it.location), it.location.mRID())
+            METER -> ExtractResult(protoToCimProvider(service).addFromPb(it.meter), it.meter.mRID())
+            USAGEPOINT -> ExtractResult(protoToCimProvider(service).addFromPb(it.usagePoint), it.usagePoint.mRID())
+            OPERATIONALRESTRICTION -> ExtractResult(protoToCimProvider(service).addFromPb(it.operationalRestriction), it.operationalRestriction.mRID())
+            FAULTINDICATOR -> ExtractResult(protoToCimProvider(service).addFromPb(it.faultIndicator), it.faultIndicator.mRID())
+            BASEVOLTAGE -> ExtractResult(protoToCimProvider(service).addFromPb(it.baseVoltage), it.baseVoltage.mRID())
+            CONNECTIVITYNODE -> ExtractResult(protoToCimProvider(service).addFromPb(it.connectivityNode), it.connectivityNode.mRID())
+            FEEDER -> ExtractResult(protoToCimProvider(service).addFromPb(it.feeder), it.feeder.mRID())
+            GEOGRAPHICALREGION -> ExtractResult(protoToCimProvider(service).addFromPb(it.geographicalRegion), it.geographicalRegion.mRID())
+            SITE -> ExtractResult(protoToCimProvider(service).addFromPb(it.site), it.site.mRID())
+            SUBGEOGRAPHICALREGION -> ExtractResult(protoToCimProvider(service).addFromPb(it.subGeographicalRegion), it.subGeographicalRegion.mRID())
+            SUBSTATION -> ExtractResult(protoToCimProvider(service).addFromPb(it.substation), it.substation.mRID())
+            TERMINAL -> ExtractResult(protoToCimProvider(service).addFromPb(it.terminal), it.terminal.mRID())
+            ACLINESEGMENT -> ExtractResult(protoToCimProvider(service).addFromPb(it.acLineSegment), it.acLineSegment.mRID())
+            BREAKER -> ExtractResult(protoToCimProvider(service).addFromPb(it.breaker), it.breaker.mRID())
+            DISCONNECTOR -> ExtractResult(protoToCimProvider(service).addFromPb(it.disconnector), it.disconnector.mRID())
+            ENERGYCONSUMER -> ExtractResult(protoToCimProvider(service).addFromPb(it.energyConsumer), it.energyConsumer.mRID())
+            ENERGYCONSUMERPHASE -> ExtractResult(protoToCimProvider(service).addFromPb(it.energyConsumerPhase), it.energyConsumerPhase.mRID())
+            ENERGYSOURCE -> ExtractResult(protoToCimProvider(service).addFromPb(it.energySource), it.energySource.mRID())
+            ENERGYSOURCEPHASE -> ExtractResult(protoToCimProvider(service).addFromPb(it.energySourcePhase), it.energySourcePhase.mRID())
+            FUSE -> ExtractResult(protoToCimProvider(service).addFromPb(it.fuse), it.fuse.mRID())
+            JUMPER -> ExtractResult(protoToCimProvider(service).addFromPb(it.jumper), it.jumper.mRID())
+            JUNCTION -> ExtractResult(protoToCimProvider(service).addFromPb(it.junction), it.junction.mRID())
+            LINEARSHUNTCOMPENSATOR -> ExtractResult(protoToCimProvider(service).addFromPb(it.linearShuntCompensator), it.linearShuntCompensator.mRID())
+            PERLENGTHSEQUENCEIMPEDANCE -> ExtractResult(
+                protoToCimProvider(service).addFromPb(it.perLengthSequenceImpedance),
+                it.perLengthSequenceImpedance.mRID()
+            )
+            POWERTRANSFORMER -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerTransformer), it.powerTransformer.mRID())
+            POWERTRANSFORMEREND -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerTransformerEnd), it.powerTransformerEnd.mRID())
+            RATIOTAPCHANGER -> ExtractResult(protoToCimProvider(service).addFromPb(it.ratioTapChanger), it.ratioTapChanger.mRID())
+            RECLOSER -> ExtractResult(protoToCimProvider(service).addFromPb(it.recloser), it.recloser.mRID())
+            CIRCUIT -> ExtractResult(protoToCimProvider(service).addFromPb(it.circuit), it.circuit.mRID())
+            LOOP -> ExtractResult(protoToCimProvider(service).addFromPb(it.loop), it.loop.mRID())
+            POLE -> ExtractResult(protoToCimProvider(service).addFromPb(it.pole), it.pole.mRID())
+            STREETLIGHT -> ExtractResult(protoToCimProvider(service).addFromPb(it.streetlight), it.streetlight.mRID())
+            ACCUMULATOR -> ExtractResult(protoToCimProvider(service).addFromPb(it.accumulator), it.accumulator.measurement.mRID())
+            ANALOG -> ExtractResult(protoToCimProvider(service).addFromPb(it.analog), it.analog.measurement.mRID())
+            DISCRETE -> ExtractResult(protoToCimProvider(service).addFromPb(it.discrete), it.discrete.measurement.mRID())
+            CONTROL -> ExtractResult(protoToCimProvider(service).addFromPb(it.control), it.control.mRID())
+            REMOTECONTROL -> ExtractResult(protoToCimProvider(service).addFromPb(it.remoteControl), it.remoteControl.mRID())
+            REMOTESOURCE -> ExtractResult(protoToCimProvider(service).addFromPb(it.remoteSource), it.remoteSource.mRID())
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${it.identifiedObjectCase} is not supported by the network service")
         }
     }

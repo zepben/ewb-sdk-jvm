@@ -11,7 +11,6 @@ import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.cimbend.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.cimbend.common.extensions.nameAndMRID
 import com.zepben.cimbend.common.extensions.typeNameAndMRID
-import com.zepben.cimbend.network.NetworkService
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Stream

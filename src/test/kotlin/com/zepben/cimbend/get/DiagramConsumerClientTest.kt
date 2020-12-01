@@ -147,8 +147,9 @@ internal class DiagramConsumerClientTest {
     }
 
     @Test
-    internal fun `returns failed mRID when duplicate mRID exists in the service`() {
+    internal fun `getIdentifiedObjects returns failed mRID when duplicate mRIDs are returned`() {
         val response = createResponse(DiagramIdentifiedObject.newBuilder(), DiagramIdentifiedObject.Builder::getDiagramBuilder, "id1")
+
         // We are only testing behaviour of duplicate responses when adding to the service.
         doReturn(listOf(response, response).iterator()).`when`(stub).getIdentifiedObjects(any())
 

@@ -413,7 +413,7 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
-    internal fun `returns failed mRID when duplicate mRID exists in the service`() {
+    internal fun `getIdentifiedObjects returns failed mRID when duplicate mRIDs are returned`() {
         val response = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, "id1")
 
         // We are only testing behaviour of duplicate responses when adding to the service.

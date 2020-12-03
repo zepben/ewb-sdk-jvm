@@ -45,16 +45,19 @@ class PhaseInferrer {
     }
 
     private fun inferMissingPhases(network: NetworkService, phaseSelector: PhaseSelector) {
-        var terminals = findTerminalAtStartOfMissingPhases(network.sequenceOf<Terminal>().toList(), phaseSelector)
+        val breakers = network.listOf<Breaker>()
+        var terminals = findTerminalAtStartOfMissingPhases(network.listOf(Terminal::class.java), phaseSelector)
+
+        terminals = setMissingToNominal(breakers, terminals, phaseSelector)
 
         var previousCount = 0
         while (previousCount != terminals.size) {
             previousCount = terminals.size
-            terminals.forEach { inferPhases(network, it, phaseSelector, 1) }
+            terminals.forEach { inferPhases(breakers, it, phaseSelector, 1) }
             terminals = findTerminalAtStartOfMissingPhases(terminals, phaseSelector)
         }
 
-        terminals.forEach { inferPhases(network, it, phaseSelector, 4) }
+        terminals.forEach { inferPhases(breakers, it, phaseSelector, 4) }
     }
 
     private fun findTerminalAtStartOfMissingPhases(terminals: Collection<Terminal>, phaseSelector: PhaseSelector): List<Terminal> {
@@ -82,7 +85,37 @@ class PhaseInferrer {
     private fun hasMorePhasesThanConnected(terminal: Terminal): Boolean = connectedTerminals(terminal)
         .any { it.toTerminal.phases.singlePhases().size < terminal.phases.singlePhases().size }
 
-    private fun inferPhases(network: NetworkService, terminal: Terminal, phaseSelector: PhaseSelector, maxMissingPhases: Int) {
+    private fun setMissingToNominal(breakers: List<Breaker>, terminals: List<Terminal>, phaseSelector: PhaseSelector): MutableList<Terminal> {
+        val xyTerminals = mutableListOf<Terminal>()
+        terminals.forEach { terminal ->
+            var runSetPhases = false
+            var hasXY = false
+            terminal.phases.singlePhases().forEach { nominalPhase ->
+                val status = phaseSelector.status(terminal, nominalPhase)
+                if (status.direction() === PhaseDirection.NONE) {
+                    if (nominalPhase != SinglePhaseKind.X || nominalPhase != SinglePhaseKind.Y) {
+                        status.add(nominalPhase, PhaseDirection.IN)
+                        runSetPhases = true
+                    } else
+                        hasXY = true
+                }
+            }
+
+            if (runSetPhases) {
+                terminal.conductingEquipment?.let {
+                    Tracing.setPhases().run(it, breakers)
+                    tracking.putIfAbsent(it, false)
+                }
+            }
+
+            if (hasXY)
+                xyTerminals.add(terminal)
+        }
+
+        return xyTerminals
+    }
+
+    private fun inferPhases(breakers: Collection<Breaker>, terminal: Terminal, phaseSelector: PhaseSelector, maxMissingPhases: Int) {
         val none = mutableListOf<PhaseStatus>()
         val usedPhases = mutableSetOf<SinglePhaseKind>()
 
@@ -99,10 +132,7 @@ class PhaseInferrer {
         if (none.isEmpty() || (none.size >= maxMissingPhases))
             return
 
-        if ((none.size == 1) && (terminal.phases === PhaseCode.ABC))
-            tracking.putIfAbsent(conductingEquipment, false)
-        else
-            tracking[conductingEquipment] = true
+        tracking[conductingEquipment] = true
 
         for (status in none) {
             if (!usedPhases.contains(SinglePhaseKind.A))
@@ -117,11 +147,11 @@ class PhaseInferrer {
             usedPhases.add(status.phase())
         }
 
-        val breakers = network.listOf<Breaker>()
         Tracing.setPhases().run(conductingEquipment, breakers)
     }
 
     companion object {
         private val logger = LoggerFactory.getLogger(PhaseInferrer::class.java)
     }
+
 }

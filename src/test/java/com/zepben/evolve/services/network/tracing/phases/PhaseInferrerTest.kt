@@ -24,12 +24,60 @@ class PhaseInferrerTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val network = TestNetworks.getNetwork(9)
+    private val network = MissingPhaseNetwork.createMissingXY()
 
     @Test
     internal fun infersMissingPhases() {
         val phaseInferrer = Tracing.phaseInferrer()
+
         systemErr.clearCapturedLog()
+
+        //
+        // nominal
+        // ABC -> N -> ABCN
+        // traced
+        // ABC -> NONE -> NONE NONE NONE NONE
+        //
+        // infer nominal
+        // ABC -> N -> ABCN
+        // (warning with should be correct)
+        //
+
+        //
+        // nominal
+        // ABC -> B -> XYN
+        // traced
+        // ABC -> B -> B NONE NONE
+        //
+        // infer nominal
+        // ABC -> B -> B NONE N
+        // infer xy
+        // ABC -> B -> B A N
+        // (warning with may not be correct)
+        //
+
+        //
+        // nominal
+        // ABC -> A -> XN
+        // traced
+        // ABC -> A -> A NONE
+        //
+        // infer nominal
+        // ABC -> A -> A N
+        // (warning with should be correct)
+        //
+
+        //
+        // nominal
+        // ABCN -> N -> AB -> XY
+        // traced
+        // ABCN -> N -> NONE NONE -> NONE NONE
+        //
+        // infer nominal
+        // ABC -> A -> AB -> AB
+        // (warning with should be correct)
+        //
+
         validatePhases("c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
         validatePhases("c1", SinglePhaseKind.A, SinglePhaseKind.B)
         validatePhases("c2", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.NONE)
@@ -39,7 +87,9 @@ class PhaseInferrerTest {
         validatePhases("c6", SinglePhaseKind.A, SinglePhaseKind.NONE)
         validatePhases("c7", SinglePhaseKind.A)
         validatePhases("c8", SinglePhaseKind.A, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+
         phaseInferrer.run(network)
+
         validatePhases("c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
         validatePhases("c1", SinglePhaseKind.A, SinglePhaseKind.B)
         validatePhases("c2", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
@@ -49,6 +99,7 @@ class PhaseInferrerTest {
         validatePhases("c6", SinglePhaseKind.A, SinglePhaseKind.B)
         validatePhases("c7", SinglePhaseKind.A)
         validatePhases("c8", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+
         assertThat(
             listOf(*systemErr.logLines),
             Matchers.containsInAnyOrder(

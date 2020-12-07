@@ -9,36 +9,42 @@
 
 ---
 
-NOTE: This library is not yet stable, and breaking changes should be expected until
-a 1.0.0 release.
+NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
 
 ---
 
 ### v0.4.0
 
 ##### Breaking Changes
+
 * The `AssignToFeeders` was changed to assign all `ConductingEquipment` on the `normalHeadTerminal` side
   (inclusive) stopping at open points, head equipment for other feeders and substation transformers.
 * You can no longer run `AssignToFeeders` directly on a feeder.
 * `getIdentifiedObjects` in the consumer clients now returns a `GrpcResult` of a `MultiObjectResult`, which includes the map of objects added plus a new field
-`failed` which is the set of mRIDs that were not added to the service because another object with the same `mRID` already existed.
+  `failed` which is the set of mRIDs that were not added to the service because another object with the same `mRID` already existed.
 * `getFeeder` in `NetworkConsumerClient` now returns a `GrpcResult` as per `getIdentifiedObjects`
 * `addFromPb` now return nullable types. They will return null when adding to the service returns `false`.
-* `NetworkProtoToCim.toCim(ConnectivityNode)` will no longer update an existing ConnectivityNode if it already exists in the service. This brings the 
-serialisation into line with all other `toCim()` functions, however means that deserialising the same `ConnectivityNode` multiple times will now fail rather
-than merging the `ConnectivityNode`s.
+* `NetworkProtoToCim.toCim(ConnectivityNode)` will no longer update an existing ConnectivityNode if it already exists in the service. This brings the
+  serialisation into line with all other `toCim()` functions, however means that deserialising the same `ConnectivityNode` multiple times will now fail rather
+  than merging the `ConnectivityNode`s.
+* `Equipment` is now added to a `Feeder` even if the phasing is broken. Side effect of this is un-ganged normal switching will no longer assign feeders
+  correctly.
 
 ##### New Features
+
 * None.
 
 ##### Enhancements
-* Updated `Feeder` to allow for updating the `normalHeadTerminal` if the feeder has no equipment assigned. 
+
+* Updated `Feeder` to allow for updating the `normalHeadTerminal` if the feeder has no equipment assigned.
 * Added transformer utilisation property to PowerTransformer class
 
 ##### Fixes
+
 * None.
 
 ##### Notes
+
 * None.
 
 ---
@@ -46,22 +52,26 @@ than merging the `ConnectivityNode`s.
 ### v0.3.0
 
 ##### Breaking Changes
-* `tryGrpc` no longer throws. Helper methods have been added to `GrpcResult` providing convenient
-  ways of maintaining the previous functionality.
+
+* `tryGrpc` no longer throws. Helper methods have been added to `GrpcResult` providing convenient ways of maintaining the previous functionality.
 
 ##### New Features
+
 * Added `getFeeder` helper to the `NetworkConsumerClient`.
 * Added `customer` and `diagram` consumer clients.
 * Added `MetadataCollection` allowing you to specify `DataSource` information.
 
 ##### Enhancements
+
 * The gRPC consumer and producer clients now share a common base class.
 * Added primaryVoltage property to PowerTransformer for convenience.
 
 ##### Fixes
+
 * Fixed null annotations on `ConnectivityResult`.
 
 ##### Notes
+
 * None.
 
 ---
@@ -69,26 +79,30 @@ than merging the `ConnectivityNode`s.
 ### v0.2.0
 
 ##### Breaking Changes
+
 * `ConnectivityResult` is now immutable.
 
 ##### New Features
+
 * None.
 
 ##### Enhancements
+
 * Tweaked error handling in the `put` package.
 
 ##### Fixes
+
 * Database upgrade now takes its backup before changing the version table to change sets.
 * `RemovePhases` now supports SWER.
 * `FindWithUsagePoints` now supports first terminal sequence numbers greater than one.
 
 ##### Notes
+
 * None.
 
 ---
 
 ### v0.1.0
 
-Initial release containing the Zepben CIM profile, database [de]serialisation,
-protobuf [de]serialisation, network model tracing, and gRPC producer clients.
+Initial release containing the Zepben CIM profile, database [de]serialisation, protobuf [de]serialisation, network model tracing, and gRPC producer clients.
 

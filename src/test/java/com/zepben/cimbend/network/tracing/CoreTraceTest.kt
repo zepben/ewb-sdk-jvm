@@ -13,13 +13,20 @@ import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.model.PhaseDirection
 import com.zepben.cimbend.testdata.TestNetworks
 import com.zepben.collectionutils.CollectionUtils
+import com.zepben.testutils.junit.SystemLogExtension
 import com.zepben.traversals.Traversal
 import org.hamcrest.Matchers
 import org.junit.Assert
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.*
 
 class CoreTraceTest {
+
+    @JvmField
+    @RegisterExtension
+    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+
     @Test
     internal fun traceCores() {
         val n = getNetwork()

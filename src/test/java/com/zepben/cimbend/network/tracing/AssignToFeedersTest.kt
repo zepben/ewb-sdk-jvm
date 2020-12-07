@@ -10,10 +10,7 @@ package com.zepben.cimbend.network.tracing
 
 import com.zepben.cimbend.cim.iec61970.base.core.Equipment
 import com.zepben.cimbend.cim.iec61970.base.core.Feeder
-import com.zepben.cimbend.testdata.DownstreamFeederStartPointNetwork
-import com.zepben.cimbend.testdata.FeederStartPointBetweenConductorsNetwork
-import com.zepben.cimbend.testdata.FeederStartPointToOpenPointNetwork
-import com.zepben.cimbend.testdata.FeederToSubstationTransformerNetwork
+import com.zepben.cimbend.testdata.*
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
@@ -90,6 +87,16 @@ class AssignToFeedersTest {
 
         validateEquipment(feeder1.equipment, "fsp1", "c2", "fsp2")
         validateEquipment(feeder2.equipment, "fsp2", "c3")
+    }
+
+    @Test
+    fun handlesDroppedPhases() {
+        val network = DroppedPhasesNetwork.create()
+        val feeder: Feeder = network["f"]!!
+
+        Tracing.assignEquipmentContainersToFeeders().run(network)
+
+        validateEquipment(feeder.equipment, "fcb", "acls1", "acls2", "acls3", "iso", "acls4", "tx")
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

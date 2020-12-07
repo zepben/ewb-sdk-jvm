@@ -48,8 +48,13 @@ class PhaseInferrer {
         val breakers = network.listOf<Breaker>()
         var terminals = findTerminalAtStartOfMissingPhases(network.listOf(Terminal::class.java), phaseSelector)
 
-        terminals = setMissingToNominal(breakers, terminals, phaseSelector)
+        var didUpdate: Boolean
+        do {
+            didUpdate = setMissingToNominal(breakers, terminals, phaseSelector)
+            terminals = findTerminalAtStartOfMissingPhases(network.listOf(Terminal::class.java), phaseSelector)
+        } while (didUpdate)
 
+        terminals = terminals.filter { t -> hasXYPhases(t) }
         var previousCount = 0
         while (previousCount != terminals.size) {
             previousCount = terminals.size
@@ -60,44 +65,41 @@ class PhaseInferrer {
         terminals.forEach { inferPhases(breakers, it, phaseSelector, 4) }
     }
 
-    private fun findTerminalAtStartOfMissingPhases(terminals: Collection<Terminal>, phaseSelector: PhaseSelector): List<Terminal> {
+    private fun hasXYPhases(terminal: Terminal): Boolean {
+        return terminal.phases.singlePhases().contains(SinglePhaseKind.Y) || terminal.phases.singlePhases().contains(SinglePhaseKind.X)
+    }
+
+    private fun findTerminalAtStartOfMissingPhases(terminals: List<Terminal>, phaseSelector: PhaseSelector): List<Terminal> {
         return terminals
-            .asSequence()
-            .filter { isStartOfMissingPhases(it, phaseSelector) }
-            .toList()
+            .filter { terminal ->
+                hasDirectionOf(PhaseDirection.NONE, terminal, phaseSelector) &&
+                    terminal.connectivityNode?.terminals
+                        ?.filter { other -> other != terminal }
+                        ?.filter { other -> !other.phases.singlePhases().containsAll(terminal.phases.singlePhases()) }
+                        ?.any { other -> hasDirectionOf(PhaseDirection.OUT, other, phaseSelector) }
+                    ?: false
+            }
     }
 
-    private fun isStartOfMissingPhases(terminal: Terminal, phaseSelector: PhaseSelector): Boolean {
-        var numNone = 0
-        var numIn = 0
-
-        for (phase in terminal.phases.singlePhases()) {
-            val direction = phaseSelector.status(terminal, phase).direction()
-            if (direction === PhaseDirection.NONE) ++numNone else if (direction.has(PhaseDirection.IN)) ++numIn
-        }
-
-        return (numNone > 0)
-            && (numNone < terminal.phases.singlePhases().size)
-            && (numIn > 0)
-            && hasMorePhasesThanConnected(terminal)
+    private fun hasDirectionOf(expectedDirection: PhaseDirection, terminal: Terminal, phaseSelector: PhaseSelector): Boolean {
+        return terminal.phases.singlePhases()
+            .any {
+                phaseSelector.status(terminal, it).direction() == expectedDirection
+            }
     }
 
-    private fun hasMorePhasesThanConnected(terminal: Terminal): Boolean = connectedTerminals(terminal)
-        .any { it.toTerminal.phases.singlePhases().size < terminal.phases.singlePhases().size }
-
-    private fun setMissingToNominal(breakers: List<Breaker>, terminals: List<Terminal>, phaseSelector: PhaseSelector): MutableList<Terminal> {
-        val xyTerminals = mutableListOf<Terminal>()
+    private fun setMissingToNominal(breakers: List<Breaker>, terminals: List<Terminal>, phaseSelector: PhaseSelector): Boolean {
+        var didUpdate = false
         terminals.forEach { terminal ->
             var runSetPhases = false
-            var hasXY = false
             terminal.phases.singlePhases().forEach { nominalPhase ->
                 val status = phaseSelector.status(terminal, nominalPhase)
                 if (status.direction() === PhaseDirection.NONE) {
-                    if (nominalPhase != SinglePhaseKind.X || nominalPhase != SinglePhaseKind.Y) {
+                    if (nominalPhase != SinglePhaseKind.X && nominalPhase != SinglePhaseKind.Y) {
                         status.add(nominalPhase, PhaseDirection.IN)
                         runSetPhases = true
-                    } else
-                        hasXY = true
+                        didUpdate = true
+                    }
                 }
             }
 
@@ -107,12 +109,8 @@ class PhaseInferrer {
                     tracking.putIfAbsent(it, false)
                 }
             }
-
-            if (hasXY)
-                xyTerminals.add(terminal)
         }
-
-        return xyTerminals
+        return didUpdate
     }
 
     private fun inferPhases(breakers: Collection<Breaker>, terminal: Terminal, phaseSelector: PhaseSelector, maxMissingPhases: Int) {

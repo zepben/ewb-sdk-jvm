@@ -24,98 +24,197 @@ class PhaseInferrerTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val network = MissingPhaseNetwork.createMissingXY()
-
+    //
+    // nominal
+    // ABC -> N -> ABCN
+    // traced
+    // ABC -> NONE -> NONE NONE NONE NONE
+    //
+    // infer nominal
+    // ABC -> N -> ABCN
+    // (warning with should be correct)
+    //
     @Test
-    internal fun infersMissingPhases() {
+    internal fun testABCtoNtoABCN() {
         val phaseInferrer = Tracing.phaseInferrer()
-
         systemErr.clearCapturedLog()
 
-        //
-        // nominal
-        // ABC -> N -> ABCN
-        // traced
-        // ABC -> NONE -> NONE NONE NONE NONE
-        //
-        // infer nominal
-        // ABC -> N -> ABCN
-        // (warning with should be correct)
-        //
+        val network = PhasesTestNetwork
+            .withSource(PhaseCode.ABC)
+            .connectedTo(PhaseCode.ABC)
+            .connectedTo(PhaseCode.N)
+            .connectedTo(PhaseCode.ABCN)
+            .build()
 
-        //
-        // nominal
-        // ABC -> B -> XYN
-        // traced
-        // ABC -> B -> B NONE NONE
-        //
-        // infer nominal
-        // ABC -> B -> B NONE N
-        // infer xy
-        // ABC -> B -> B A N
-        // (warning with may not be correct)
-        //
-
-        //
-        // nominal
-        // ABC -> A -> XN
-        // traced
-        // ABC -> A -> A NONE
-        //
-        // infer nominal
-        // ABC -> A -> A N
-        // (warning with should be correct)
-        //
-
-        //
-        // nominal
-        // ABCN -> N -> AB -> XY
-        // traced
-        // ABCN -> N -> NONE NONE -> NONE NONE
-        //
-        // infer nominal
-        // ABC -> A -> AB -> AB
-        // (warning with should be correct)
-        //
-
-        validatePhases("c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases("c1", SinglePhaseKind.A, SinglePhaseKind.B)
-        validatePhases("c2", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.NONE)
-        validatePhases("c3", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.NONE)
-        validatePhases("c4", SinglePhaseKind.A, SinglePhaseKind.NONE)
-        validatePhases("c5", SinglePhaseKind.A)
-        validatePhases("c6", SinglePhaseKind.A, SinglePhaseKind.NONE)
-        validatePhases("c7", SinglePhaseKind.A)
-        validatePhases("c8", SinglePhaseKind.A, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", SinglePhaseKind.NONE)
+        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
 
         phaseInferrer.run(network)
 
-        validatePhases("c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases("c1", SinglePhaseKind.A, SinglePhaseKind.B)
-        validatePhases("c2", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases("c3", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases("c4", SinglePhaseKind.A, SinglePhaseKind.C)
-        validatePhases("c5", SinglePhaseKind.A)
-        validatePhases("c6", SinglePhaseKind.A, SinglePhaseKind.B)
-        validatePhases("c7", SinglePhaseKind.A)
-        validatePhases("c8", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", SinglePhaseKind.N)
+        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
 
         assertThat(
             listOf(*systemErr.logLines),
             Matchers.containsInAnyOrder(
-                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-                Matchers.containsString("*** Action Required *** Inferred missing phases for 'c6 name' [c6] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-                Matchers.containsString("*** Action Required *** Inferred missing phases for 'c8 name' [c8] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
+                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c1 name' [c1] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
+                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
             )
         )
     }
 
-    private fun validatePhases(id: String, vararg singlePhaseKinds: SinglePhaseKind) {
+    //
+    // nominal
+    // ABC -> B -> XYN
+    // traced
+    // ABC -> B -> B NONE NONE
+    //
+    // infer nominal
+    // ABC -> B -> B NONE N
+    // infer xy
+    // ABC -> B -> B A N
+    // (warning with may not be correct)
+    //
+    @Test
+    internal fun testABCtoBtoXYN() {
+        val phaseInferrer = Tracing.phaseInferrer()
+        systemErr.clearCapturedLog()
+
+        val network = PhasesTestNetwork
+            .withSource(PhaseCode.ABC)
+            .connectedTo(PhaseCode.ABC)
+            .connectedTo(PhaseCode.B)
+            .connectedTo(PhaseCode.XYN)
+            .build()
+
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", SinglePhaseKind.B)
+        validatePhases(network, "c2", SinglePhaseKind.B, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+
+        phaseInferrer.run(network)
+
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", SinglePhaseKind.B)
+        validatePhases(network, "c2", SinglePhaseKind.B, SinglePhaseKind.A, SinglePhaseKind.N)
+
+        assertThat(
+            listOf(*systemErr.logLines),
+            Matchers.containsInAnyOrder(
+                Matchers.containsString("*** Action Required *** Inferred missing phases for 'c2 name' [c2] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
+            )
+        )
+    }
+
+    //
+    // nominal
+    // ABC -> A -> XN
+    // traced
+    // ABC -> A -> A NONE
+    //
+    // infer nominal
+    // ABC -> A -> AN
+    // (warning with should be correct)
+    //
+    @Test
+    internal fun testABCtoAtoXN() {
+        val phaseInferrer = Tracing.phaseInferrer()
+        systemErr.clearCapturedLog()
+
+        val network = PhasesTestNetwork
+            .withSource(PhaseCode.ABC)
+            .connectedTo(PhaseCode.ABC)
+            .connectedTo(PhaseCode.A)
+            .connectedTo(PhaseCode.XN)
+            .build()
+
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", SinglePhaseKind.A)
+        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.NONE)
+
+        phaseInferrer.run(network)
+
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", SinglePhaseKind.A)
+        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.N)
+
+        assertThat(
+            listOf(*systemErr.logLines),
+            Matchers.containsInAnyOrder(
+                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
+            )
+        )
+    }
+
+    //
+    // nominal
+    // ABCN -> N -> AB -> XY
+    // traced
+    // ABCN -> N -> NONE NONE -> NONE NONE
+    //
+    // infer nominal
+    // ABC -> N -> AB -> AB
+    // (warning with should be correct)
+    //
+    @Test
+    internal fun testABCtoNtoABtoXY() {
+        val phaseInferrer = Tracing.phaseInferrer()
+        systemErr.clearCapturedLog()
+
+        val network = PhasesTestNetwork
+            .withSource(PhaseCode.ABCN)
+            .connectedTo(PhaseCode.ABCN)
+            .connectedTo(PhaseCode.N)
+            .connectedTo(PhaseCode.AB)
+            .connectedTo(PhaseCode.XY)
+            .build()
+
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
+        validatePhases(network, "c1", SinglePhaseKind.N)
+        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+        validatePhases(network, "c3", SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+
+        phaseInferrer.run(network)
+
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", SinglePhaseKind.N)
+        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.B)
+        validatePhases(network, "c3", SinglePhaseKind.A, SinglePhaseKind.B)
+
+        // TODO: Shouldn't this log two times??
+        assertThat(
+            listOf(*systemErr.logLines),
+            Matchers.containsInAnyOrder(
+                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
+                Matchers.containsString("*** Action Required *** Inferred missing phases for 'c3 name' [c3] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
+            )
+        )
+    }
+
+    //
+    // nominal
+    // ABC -> ABC OPEN SWICH -> ABC
+    // traced
+    // ABC -> ABC/NONE NONE NONE -> NONE NONE NONE
+    //
+    // infer nominal
+    // ABC -> ABC/NONE NONE NONE -> NONE NONE NONE
+    //
+    @Test
+    internal fun testABCtoOpenSwitchABC() {
+        // TODO: Create this test
+    }
+
+
+    private fun validatePhases(network: NetworkService, id: String, vararg expectedPhases: SinglePhaseKind) {
         val asset = network.get<ConductingEquipment>(id)!!
-        for (index in singlePhaseKinds.indices) {
+        for (index in expectedPhases.indices) {
             asset.terminals.forEach { terminal ->
-                assertThat(terminal.normalPhases(terminal.phases.singlePhases()[index]).phase(), equalTo(singlePhaseKinds[index]))
+                val nominalPhase = terminal.phases.singlePhases()[index]
+                assertThat(terminal.normalPhases(nominalPhase).phase(), equalTo(expectedPhases[index]))
             }
         }
     }
+
 }

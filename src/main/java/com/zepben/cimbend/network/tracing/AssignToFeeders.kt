@@ -12,6 +12,7 @@ import com.zepben.cimbend.cim.iec61970.base.core.Feeder
 import com.zepben.cimbend.cim.iec61970.base.core.Terminal
 import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.cimbend.network.NetworkService
+import com.zepben.cimbend.network.tracing.invalidphasing.AssociatedTerminalTrace
 import com.zepben.traversals.BasicTraversal
 
 /**
@@ -21,8 +22,8 @@ import com.zepben.traversals.BasicTraversal
  */
 class AssignToFeeders {
 
-    private val normalTraversal: BasicTraversal<PhaseStep> = PhaseTrace.newNormalTrace()
-    private val currentTraversal: BasicTraversal<PhaseStep> = PhaseTrace.newCurrentTrace()
+    private val normalTraversal: BasicTraversal<Terminal> = AssociatedTerminalTrace.newNormalTrace()
+    private val currentTraversal: BasicTraversal<Terminal> = AssociatedTerminalTrace.newCurrentTrace()
     private lateinit var activeFeeder: Feeder
 
     init {
@@ -51,39 +52,37 @@ class AssignToFeeders {
         run(currentTraversal, headTerminal)
     }
 
-    private fun run(traversal: BasicTraversal<PhaseStep>, headTerminal: Terminal) {
+    private fun run(traversal: BasicTraversal<Terminal>, headTerminal: Terminal) {
         traversal.reset()
 
-        NetworkService.connectedTerminals(headTerminal).forEach {
-            it.to?.let { to ->
-                traversal.queue().add(PhaseStep.startAt(to, headTerminal.phases))
-            }
-        }
+        traversal.tracker().visit(headTerminal)
+        traversal.applyStepActions(headTerminal, false)
+        AssociatedTerminalTrace.queueAssociated(traversal, headTerminal)
 
         traversal.run()
     }
 
-    private fun configureStopConditions(traversal: BasicTraversal<PhaseStep>, feederStartPoints: Set<ConductingEquipment>) {
+    private fun configureStopConditions(traversal: BasicTraversal<Terminal>, feederStartPoints: Set<ConductingEquipment>) {
         traversal.clearStopConditions()
         traversal.addStopCondition(reachedEquipment(feederStartPoints))
         traversal.addStopCondition(reachedSubstationTransformer)
     }
 
-    private val reachedEquipment: (Set<ConductingEquipment>) -> (PhaseStep) -> Boolean = { { ps: PhaseStep -> it.contains(ps.conductingEquipment()) } }
+    private val reachedEquipment: (Set<ConductingEquipment>) -> (Terminal) -> Boolean = { { terminal: Terminal -> it.contains(terminal.conductingEquipment) } }
 
-    private val reachedSubstationTransformer: (PhaseStep) -> Boolean = { ps: PhaseStep ->
-        val ce = ps.conductingEquipment()
+    private val reachedSubstationTransformer: (Terminal) -> Boolean = { ps: Terminal ->
+        val ce = ps.conductingEquipment
         ce is PowerTransformer && ce.substations.isNotEmpty()
     }
 
-    private fun processNormal(phaseStep: PhaseStep, isStopping: Boolean): Unit =
-        process(phaseStep.conductingEquipment(), ConductingEquipment::addContainer, Feeder::addEquipment, isStopping)
+    private fun processNormal(terminal: Terminal, isStopping: Boolean): Unit =
+        process(terminal.conductingEquipment, ConductingEquipment::addContainer, Feeder::addEquipment, isStopping)
 
-    private fun processCurrent(phaseStep: PhaseStep, isStopping: Boolean): Unit =
-        process(phaseStep.conductingEquipment(), ConductingEquipment::addCurrentFeeder, Feeder::addCurrentEquipment, isStopping)
+    private fun processCurrent(terminal: Terminal, isStopping: Boolean): Unit =
+        process(terminal.conductingEquipment, ConductingEquipment::addCurrentFeeder, Feeder::addCurrentEquipment, isStopping)
 
     private fun process(
-        conductingEquipment: ConductingEquipment,
+        conductingEquipment: ConductingEquipment?,
         assignFeederToEquipment: (ConductingEquipment, Feeder) -> Unit,
         assignEquipmentToFeeder: (Feeder, ConductingEquipment) -> Unit,
         isStopping: Boolean
@@ -91,8 +90,10 @@ class AssignToFeeders {
         if (isStopping && conductingEquipment is PowerTransformer)
             return
 
-        assignFeederToEquipment(conductingEquipment, activeFeeder)
-        assignEquipmentToFeeder(activeFeeder, conductingEquipment)
+        conductingEquipment?.let {
+            assignFeederToEquipment(it, activeFeeder)
+            assignEquipmentToFeeder(activeFeeder, it)
+        }
     }
 
 }

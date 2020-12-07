@@ -61,3 +61,4 @@ hs_err_pid*
 /site/
 site.zip
 site.7z
+/src/test/data/schemaTest.sqlite

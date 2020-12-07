@@ -11,6 +11,7 @@ package com.zepben.cimbend.testdata
 import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.cimbend.cim.iec61970.base.core.PhaseCode
 import com.zepben.cimbend.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.cimbend.cim.iec61970.base.wires.Breaker
 import com.zepben.cimbend.cim.iec61970.base.wires.EnergySource
 import com.zepben.cimbend.network.NetworkService
 import com.zepben.cimbend.network.tracing.Tracing
@@ -41,6 +42,13 @@ object PhasesTestNetwork {
             val c: AcLineSegment = createAcLineSegmentForConnecting(network, "c" + count++, phases)
             network.connect(current.getTerminal(if (current is EnergySource) 1 else 2)!!, c.getTerminal(1)!!)
             current = c
+            return this
+        }
+
+        fun connectedToSwitch(phases: PhaseCode, isOpen: Boolean): Builder {
+            val s: Breaker = createSwitchForConnecting(network, "s" + count++, 2, phases, isOpen, isOpen, isOpen)
+            network.connect(current.getTerminal(if (current is EnergySource) 1 else 2)!!, s.getTerminal(1)!!)
+            current = s
             return this
         }
 

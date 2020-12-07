@@ -15,6 +15,7 @@ import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -182,12 +183,10 @@ class PhaseInferrerTest {
         validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.B)
         validatePhases(network, "c3", SinglePhaseKind.A, SinglePhaseKind.B)
 
-        // TODO: Shouldn't this log two times??
         assertThat(
             listOf(*systemErr.logLines),
             Matchers.containsInAnyOrder(
                 Matchers.containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-                Matchers.containsString("*** Action Required *** Inferred missing phases for 'c3 name' [c3] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
             )
         )
     }
@@ -203,7 +202,37 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoOpenSwitchABC() {
-        // TODO: Create this test
+        val phaseInferrer = Tracing.phaseInferrer()
+        systemErr.clearCapturedLog()
+
+        val network = PhasesTestNetwork
+            .withSource(PhaseCode.ABC)
+            .connectedTo(PhaseCode.ABC)
+            .connectedToSwitch(PhaseCode.ABC, true)
+            .connectedTo(PhaseCode.ABC)
+            .build()
+
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhasesInTerminals(
+            network,
+            "s1",
+            listOf(SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C),
+            listOf(SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE),
+        )
+        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+
+        phaseInferrer.run(network)
+
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhasesInTerminals(
+            network,
+            "s1",
+            listOf(SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C),
+            listOf(SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE),
+        )
+        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+
+        assertThat(listOf(*systemErr.logLines), hasSize(0))
     }
 
 
@@ -214,6 +243,27 @@ class PhaseInferrerTest {
                 val nominalPhase = terminal.phases.singlePhases()[index]
                 assertThat(terminal.normalPhases(nominalPhase).phase(), equalTo(expectedPhases[index]))
             }
+        }
+    }
+
+    private fun validatePhasesInTerminals(
+        network: NetworkService,
+        @Suppress("SameParameterValue") id: String,
+        expectedPhasesT1: List<SinglePhaseKind>,
+        expectedPhasesT2: List<SinglePhaseKind>
+    ) {
+        val asset = network.get<ConductingEquipment>(id)!!
+        val t1 = asset.terminals[0]
+        val t2 = asset.terminals[1]
+
+        for (index in expectedPhasesT1.indices) {
+            val nominalPhase = t1.phases.singlePhases()[index]
+            assertThat(t1.normalPhases(nominalPhase).phase(), equalTo(expectedPhasesT1[index]))
+        }
+
+        for (index in expectedPhasesT2.indices) {
+            val nominalPhase = t2.phases.singlePhases()[index]
+            assertThat(t2.normalPhases(nominalPhase).phase(), equalTo(expectedPhasesT2[index]))
         }
     }
 

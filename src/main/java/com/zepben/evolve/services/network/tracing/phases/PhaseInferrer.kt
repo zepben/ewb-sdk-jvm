@@ -96,7 +96,11 @@ class PhaseInferrer {
                 val status = phaseSelector.status(terminal, nominalPhase)
                 if (status.direction() === PhaseDirection.NONE) {
                     if (nominalPhase != SinglePhaseKind.X && nominalPhase != SinglePhaseKind.Y) {
-                        status.add(nominalPhase, PhaseDirection.IN)
+                        val otherTerminal = terminal.connectivityNode?.terminals?.first { other -> other != terminal }
+                        val otherDirectionIsBoth =
+                            otherTerminal?.phases?.singlePhases()?.any { phaseSelector.status(otherTerminal, it).direction() == PhaseDirection.BOTH } ?: false
+
+                        status.add(nominalPhase, if (otherDirectionIsBoth) PhaseDirection.BOTH else PhaseDirection.IN)
                         runSetPhases = true
                         didUpdate = true
                     }

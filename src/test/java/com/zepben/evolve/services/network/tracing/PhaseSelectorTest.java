@@ -14,8 +14,9 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind;
 import com.zepben.evolve.services.network.model.PhaseDirection;
 import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class PhaseSelectorTest {
 
@@ -32,83 +33,83 @@ public class PhaseSelectorTest {
         for (SinglePhaseKind phase : PhaseCode.ABCN.singlePhases()) {
             PhaseStatus ps = phaseSelector.status(t, phase);
 
-            assertEquals(SinglePhaseKind.NONE, ps.phase());
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.NONE));
 
             // Can't add a phase with no direction
             ps.add(SinglePhaseKind.A, PhaseDirection.NONE);
-            assertEquals(SinglePhaseKind.NONE, ps.phase());
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.NONE));
 
             // Add an A phase IN
-            assertTrue(ps.add(SinglePhaseKind.A, PhaseDirection.IN));
-            assertFalse(ps.add(SinglePhaseKind.A, PhaseDirection.IN));
-            assertEquals(SinglePhaseKind.A, ps.phase());
-            assertTrue(ps.direction().has(PhaseDirection.IN));
-            assertFalse(ps.direction().has(PhaseDirection.BOTH));
-            assertFalse(ps.direction().has(PhaseDirection.OUT));
+            assertThat(ps.add(SinglePhaseKind.A, PhaseDirection.IN), equalTo(true));
+            assertThat(ps.add(SinglePhaseKind.A, PhaseDirection.IN), equalTo(false));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.A));
+            assertThat(ps.direction().has(PhaseDirection.IN), equalTo(true));
+            assertThat(ps.direction().has(PhaseDirection.BOTH), equalTo(false));
+            assertThat(ps.direction().has(PhaseDirection.OUT), equalTo(false));
 
             // Adding NONE phase returns false
-            assertFalse(ps.add(SinglePhaseKind.NONE, PhaseDirection.NONE));
-            assertEquals(SinglePhaseKind.A, ps.phase());
-            assertTrue(ps.direction().has(PhaseDirection.IN));
-            assertFalse(ps.direction().has(PhaseDirection.BOTH));
-            assertFalse(ps.direction().has(PhaseDirection.OUT));
+            assertThat(ps.add(SinglePhaseKind.NONE, PhaseDirection.NONE), equalTo(false));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.A));
+            assertThat(ps.direction().has(PhaseDirection.IN), equalTo(true));
+            assertThat(ps.direction().has(PhaseDirection.BOTH), equalTo(false));
+            assertThat(ps.direction().has(PhaseDirection.OUT), equalTo(false));
 
             // Add OUT to the A phase
-            assertTrue(ps.add(SinglePhaseKind.A, PhaseDirection.OUT));
-            assertFalse(ps.add(SinglePhaseKind.A, PhaseDirection.OUT));
-            assertEquals(SinglePhaseKind.A, ps.phase());
-            assertTrue(ps.direction().has(PhaseDirection.IN));
-            assertTrue(ps.direction().has(PhaseDirection.BOTH));
-            assertTrue(ps.direction().has(PhaseDirection.OUT));
+            assertThat(ps.add(SinglePhaseKind.A, PhaseDirection.OUT), equalTo(true));
+            assertThat(ps.add(SinglePhaseKind.A, PhaseDirection.OUT), equalTo(false));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.A));
+            assertThat(ps.direction().has(PhaseDirection.IN), equalTo(true));
+            assertThat(ps.direction().has(PhaseDirection.BOTH), equalTo(true));
+            assertThat(ps.direction().has(PhaseDirection.OUT), equalTo(true));
 
             // Remove IN from the A Phase
-            assertTrue(ps.remove(SinglePhaseKind.A, PhaseDirection.IN));
-            assertFalse(ps.remove(SinglePhaseKind.A, PhaseDirection.IN));
-            assertEquals(SinglePhaseKind.A, ps.phase());
-            assertFalse(ps.direction().has(PhaseDirection.IN));
-            assertFalse(ps.direction().has(PhaseDirection.BOTH));
-            assertTrue(ps.direction().has(PhaseDirection.OUT));
+            assertThat(ps.remove(SinglePhaseKind.A, PhaseDirection.IN), equalTo(true));
+            assertThat(ps.remove(SinglePhaseKind.A, PhaseDirection.IN), equalTo(false));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.A));
+            assertThat(ps.direction().has(PhaseDirection.IN), equalTo(false));
+            assertThat(ps.direction().has(PhaseDirection.BOTH), equalTo(false));
+            assertThat(ps.direction().has(PhaseDirection.OUT), equalTo(true));
 
             // Remove A Phase
-            assertTrue(ps.remove(SinglePhaseKind.A));
-            assertFalse(ps.remove(SinglePhaseKind.A));
-            assertEquals(SinglePhaseKind.NONE, ps.phase());
-            assertEquals(PhaseDirection.NONE, ps.direction());
+            assertThat(ps.remove(SinglePhaseKind.A), equalTo(true));
+            assertThat(ps.remove(SinglePhaseKind.A), equalTo(false));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.NONE));
+            assertThat(ps.direction(), equalTo(PhaseDirection.NONE));
 
             // Add a B phase BOTH
-            assertTrue(ps.add(SinglePhaseKind.B, PhaseDirection.BOTH));
-            assertEquals(SinglePhaseKind.B, ps.phase());
-            assertTrue(ps.direction().has(PhaseDirection.IN));
-            assertTrue(ps.direction().has(PhaseDirection.BOTH));
-            assertTrue(ps.direction().has(PhaseDirection.OUT));
+            assertThat(ps.add(SinglePhaseKind.B, PhaseDirection.BOTH), equalTo(true));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.B));
+            assertThat(ps.direction().has(PhaseDirection.IN), equalTo(true));
+            assertThat(ps.direction().has(PhaseDirection.BOTH), equalTo(true));
+            assertThat(ps.direction().has(PhaseDirection.OUT), equalTo(true));
 
             //Set a N phase BOTH
-            assertTrue(ps.set(SinglePhaseKind.N, PhaseDirection.BOTH));
-            assertFalse(ps.set(SinglePhaseKind.N, PhaseDirection.BOTH));
-            assertEquals(SinglePhaseKind.N, ps.phase());
-            assertEquals(PhaseDirection.BOTH, ps.direction());
+            assertThat(ps.set(SinglePhaseKind.N, PhaseDirection.BOTH), equalTo(true));
+            assertThat(ps.set(SinglePhaseKind.N, PhaseDirection.BOTH), equalTo(false));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.N));
+            assertThat(ps.direction(), equalTo(PhaseDirection.BOTH));
 
             // Setting NONE to the direction clears the whole phase
             ps.set(SinglePhaseKind.N, PhaseDirection.NONE);
-            assertEquals(PhaseDirection.NONE, ps.direction());
-            assertEquals(SinglePhaseKind.NONE, ps.phase());
+            assertThat(ps.direction(), equalTo(PhaseDirection.NONE));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.NONE));
 
             //Set a A phase IN
-            assertTrue(ps.set(SinglePhaseKind.A, PhaseDirection.IN));
-            assertFalse(ps.set(SinglePhaseKind.A, PhaseDirection.IN));
-            assertEquals(SinglePhaseKind.A, ps.phase());
-            assertEquals(PhaseDirection.IN, ps.direction());
+            assertThat(ps.set(SinglePhaseKind.A, PhaseDirection.IN), equalTo(true));
+            assertThat(ps.set(SinglePhaseKind.A, PhaseDirection.IN), equalTo(false));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.A));
+            assertThat(ps.direction(), equalTo(PhaseDirection.IN));
 
             // Setting NONE to the phase clears the whole phase
-            assertTrue(ps.set(SinglePhaseKind.NONE, PhaseDirection.BOTH));
-            assertEquals(PhaseDirection.NONE, ps.direction());
-            assertEquals(SinglePhaseKind.NONE, ps.phase());
+            assertThat(ps.set(SinglePhaseKind.NONE, PhaseDirection.BOTH), equalTo(true));
+            assertThat(ps.direction(), equalTo(PhaseDirection.NONE));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.NONE));
 
             //Set a N phase BOTH
-            assertTrue(ps.set(SinglePhaseKind.N, PhaseDirection.OUT));
-            assertFalse(ps.set(SinglePhaseKind.N, PhaseDirection.OUT));
-            assertEquals(SinglePhaseKind.N, ps.phase());
-            assertEquals(PhaseDirection.OUT, ps.direction());
+            assertThat(ps.set(SinglePhaseKind.N, PhaseDirection.OUT), equalTo(true));
+            assertThat(ps.set(SinglePhaseKind.N, PhaseDirection.OUT), equalTo(false));
+            assertThat(ps.phase(), equalTo(SinglePhaseKind.N));
+            assertThat(ps.direction(), equalTo(PhaseDirection.OUT));
 
             try {
                 ps.add(SinglePhaseKind.B, PhaseDirection.BOTH);

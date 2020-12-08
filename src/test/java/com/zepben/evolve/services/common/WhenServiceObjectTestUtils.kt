@@ -7,8 +7,8 @@
  */
 package com.zepben.evolve.services.common
 
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.junit.Assert.assertThat
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 

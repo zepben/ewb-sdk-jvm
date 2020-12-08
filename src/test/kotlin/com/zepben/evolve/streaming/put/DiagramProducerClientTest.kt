@@ -15,8 +15,8 @@ import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.protobuf.dp.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.junit.Assert.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 

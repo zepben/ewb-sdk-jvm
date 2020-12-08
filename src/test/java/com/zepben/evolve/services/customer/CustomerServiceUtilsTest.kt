@@ -18,8 +18,8 @@ import com.zepben.evolve.services.common.InvokedChecker
 import com.zepben.evolve.services.common.NeverInvokedChecker
 import com.zepben.evolve.services.common.verifyWhenServiceObjectFunctionSupportsAllServiceObjectTypes
 import com.zepben.testutils.junit.SystemLogExtension
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.junit.Assert.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 

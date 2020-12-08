@@ -13,8 +13,9 @@ import com.zepben.evolve.services.network.model.TracedPhases;
 import org.junit.jupiter.api.Test;
 
 import static com.zepben.testutils.exception.ExpectException.expect;
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TracedPhasesTest {
 
@@ -41,16 +42,16 @@ public class TracedPhasesTest {
         TracedPhases tracedPhases = newTestPhaseObject();
 
         /* Normal */
-        assertEquals(SinglePhaseKind.A, tracedPhases.phaseNormal(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.B, tracedPhases.phaseNormal(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.C, tracedPhases.phaseNormal(SinglePhaseKind.C));
-        assertEquals(SinglePhaseKind.N, tracedPhases.phaseNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.A), equalTo(SinglePhaseKind.A));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.B), equalTo(SinglePhaseKind.B));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.C), equalTo(SinglePhaseKind.C));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.N), equalTo(SinglePhaseKind.N));
 
         /* Current */
-        assertEquals(SinglePhaseKind.N, tracedPhases.phaseCurrent(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.C, tracedPhases.phaseCurrent(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.B, tracedPhases.phaseCurrent(SinglePhaseKind.C));
-        assertEquals(SinglePhaseKind.A, tracedPhases.phaseCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.A), equalTo(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.B), equalTo(SinglePhaseKind.C));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.C), equalTo(SinglePhaseKind.B));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.N), equalTo(SinglePhaseKind.A));
     }
 
     @Test
@@ -58,16 +59,16 @@ public class TracedPhasesTest {
         TracedPhases tracedPhases = newTestPhaseObject();
 
         /* Normal */
-        assertEquals(PhaseDirection.IN, tracedPhases.directionNormal(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.OUT, tracedPhases.directionNormal(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.A), equalTo(PhaseDirection.IN));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.B), equalTo(PhaseDirection.OUT));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.C), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.N), equalTo(PhaseDirection.BOTH));
 
         /* Current */
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.OUT, tracedPhases.directionCurrent(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.IN, tracedPhases.directionCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.A), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.B), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.C), equalTo(PhaseDirection.OUT));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.N), equalTo(PhaseDirection.IN));
     }
 
     @Test
@@ -76,107 +77,107 @@ public class TracedPhasesTest {
 
         /* -- Setting -- */
         /* Normal */
-        assertTrue(tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.A));
-        assertTrue(tracedPhases.setNormal(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B));
-        assertTrue(tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.C));
-        assertTrue(tracedPhases.setNormal(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.N));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.A), equalTo(true));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B), equalTo(true));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.C), equalTo(true));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.N), equalTo(true));
         // Returns false if no changes were done.
-        assertFalse(tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.A));
-        assertFalse(tracedPhases.setNormal(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B));
-        assertFalse(tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.C));
-        assertFalse(tracedPhases.setNormal(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.N));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.A), equalTo(false));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B), equalTo(false));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.C), equalTo(false));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.N), equalTo(false));
 
         /* Current */
-        assertTrue(tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A));
-        assertTrue(tracedPhases.setCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.B));
-        assertTrue(tracedPhases.setCurrent(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.C));
-        assertTrue(tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.N));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A), equalTo(true));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.B), equalTo(true));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.C), equalTo(true));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.N), equalTo(true));
         // Returns false if no changes were done.
-        assertFalse(tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A));
-        assertFalse(tracedPhases.setCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.B));
-        assertFalse(tracedPhases.setCurrent(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.C));
-        assertFalse(tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.N));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A), equalTo(false));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.B), equalTo(false));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.C), equalTo(false));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.N), equalTo(false));
 
         /* -- Getting Phase-- */
         /* Normal */
-        assertEquals(SinglePhaseKind.N, tracedPhases.phaseNormal(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.C, tracedPhases.phaseNormal(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.B, tracedPhases.phaseNormal(SinglePhaseKind.C));
-        assertEquals(SinglePhaseKind.A, tracedPhases.phaseNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.A), equalTo(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.B), equalTo(SinglePhaseKind.C));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.C), equalTo(SinglePhaseKind.B));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.N), equalTo(SinglePhaseKind.A));
 
         /* Current */
-        assertEquals(SinglePhaseKind.A, tracedPhases.phaseCurrent(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.B, tracedPhases.phaseCurrent(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.C, tracedPhases.phaseCurrent(SinglePhaseKind.C));
-        assertEquals(SinglePhaseKind.N, tracedPhases.phaseCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.A), equalTo(SinglePhaseKind.A));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.B), equalTo(SinglePhaseKind.B));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.C), equalTo(SinglePhaseKind.C));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.N), equalTo(SinglePhaseKind.N));
 
         /* -- Getting Direction-- */
         /* Normal */
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.OUT, tracedPhases.directionNormal(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.IN, tracedPhases.directionNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.A), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.B), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.C), equalTo(PhaseDirection.OUT));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.N), equalTo(PhaseDirection.IN));
 
         /* Current */
-        assertEquals(PhaseDirection.IN, tracedPhases.directionCurrent(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.OUT, tracedPhases.directionCurrent(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.A), equalTo(PhaseDirection.IN));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.B), equalTo(PhaseDirection.OUT));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.C), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.N), equalTo(PhaseDirection.BOTH));
 
         /* -- Setting -- */
         /* Normal */
-        assertTrue(tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.IN, SinglePhaseKind.A));
-        assertTrue(tracedPhases.setNormal(SinglePhaseKind.C, PhaseDirection.OUT, SinglePhaseKind.B));
-        assertTrue(tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.BOTH, SinglePhaseKind.C));
-        assertTrue(tracedPhases.setNormal(SinglePhaseKind.A, PhaseDirection.BOTH, SinglePhaseKind.N));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.IN, SinglePhaseKind.A), equalTo(true));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.C, PhaseDirection.OUT, SinglePhaseKind.B), equalTo(true));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.BOTH, SinglePhaseKind.C), equalTo(true));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.A, PhaseDirection.BOTH, SinglePhaseKind.N), equalTo(true));
 
         /* Current */
-        assertTrue(tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.BOTH, SinglePhaseKind.A));
-        assertTrue(tracedPhases.setCurrent(SinglePhaseKind.B, PhaseDirection.BOTH, SinglePhaseKind.B));
-        assertTrue(tracedPhases.setCurrent(SinglePhaseKind.C, PhaseDirection.OUT, SinglePhaseKind.C));
-        assertTrue(tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.IN, SinglePhaseKind.N));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.BOTH, SinglePhaseKind.A), equalTo(true));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.B, PhaseDirection.BOTH, SinglePhaseKind.B), equalTo(true));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.C, PhaseDirection.OUT, SinglePhaseKind.C), equalTo(true));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.IN, SinglePhaseKind.N), equalTo(true));
 
         /* -- Getting Phase-- */
         /* Normal */
-        assertEquals(SinglePhaseKind.N, tracedPhases.phaseNormal(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.C, tracedPhases.phaseNormal(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.B, tracedPhases.phaseNormal(SinglePhaseKind.C));
-        assertEquals(SinglePhaseKind.A, tracedPhases.phaseNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.A), equalTo(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.B), equalTo(SinglePhaseKind.C));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.C), equalTo(SinglePhaseKind.B));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.N), equalTo(SinglePhaseKind.A));
 
         /* Current */
-        assertEquals(SinglePhaseKind.A, tracedPhases.phaseCurrent(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.B, tracedPhases.phaseCurrent(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.C, tracedPhases.phaseCurrent(SinglePhaseKind.C));
-        assertEquals(SinglePhaseKind.N, tracedPhases.phaseCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.A), equalTo(SinglePhaseKind.A));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.B), equalTo(SinglePhaseKind.B));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.C), equalTo(SinglePhaseKind.C));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.N), equalTo(SinglePhaseKind.N));
 
         /* -- Getting Direction-- */
         /* Normal */
-        assertEquals(PhaseDirection.IN, tracedPhases.directionNormal(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.OUT, tracedPhases.directionNormal(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.A), equalTo(PhaseDirection.IN));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.B), equalTo(PhaseDirection.OUT));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.C), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.N), equalTo(PhaseDirection.BOTH));
 
         /* Current */
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.OUT, tracedPhases.directionCurrent(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.IN, tracedPhases.directionCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.A), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.B), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.C), equalTo(PhaseDirection.OUT));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.N), equalTo(PhaseDirection.IN));
 
         // Setting NONE to the direction clears the whole phase
         tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.NONE, SinglePhaseKind.A);
         tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.NONE, SinglePhaseKind.A);
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionNormal(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionCurrent(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.NONE, tracedPhases.phaseNormal(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.NONE, tracedPhases.phaseCurrent(SinglePhaseKind.A));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.A), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.A), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.A), equalTo(SinglePhaseKind.NONE));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.A), equalTo(SinglePhaseKind.NONE));
 
         // Setting NONE to the phase clears the whole phase
-        assertTrue(tracedPhases.setNormal(SinglePhaseKind.NONE, PhaseDirection.NONE, SinglePhaseKind.B));
-        assertTrue(tracedPhases.setCurrent(SinglePhaseKind.NONE, PhaseDirection.NONE, SinglePhaseKind.B));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionNormal(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionCurrent(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.NONE, tracedPhases.phaseNormal(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.NONE, tracedPhases.phaseCurrent(SinglePhaseKind.B));
+        assertThat(tracedPhases.setNormal(SinglePhaseKind.NONE, PhaseDirection.NONE, SinglePhaseKind.B), equalTo(true));
+        assertThat(tracedPhases.setCurrent(SinglePhaseKind.NONE, PhaseDirection.NONE, SinglePhaseKind.B), equalTo(true));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.B), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.B), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.B), equalTo(SinglePhaseKind.NONE));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.B), equalTo(SinglePhaseKind.NONE));
     }
 
     @Test
@@ -185,94 +186,94 @@ public class TracedPhasesTest {
 
         /* -- Adding -- */
         /* Normal */
-        assertTrue(tracedPhases.addNormal(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.A));
-        assertTrue(tracedPhases.addNormal(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B));
-        assertTrue(tracedPhases.addNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.C));
-        assertTrue(tracedPhases.addNormal(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.N));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.A), equalTo(true));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B), equalTo(true));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.C), equalTo(true));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.N), equalTo(true));
         // Returns false if no changes were done.
-        assertFalse(tracedPhases.addNormal(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.A));
-        assertFalse(tracedPhases.addNormal(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B));
-        assertFalse(tracedPhases.addNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.C));
-        assertFalse(tracedPhases.addNormal(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.N));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.A), equalTo(false));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B), equalTo(false));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.C), equalTo(false));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.N), equalTo(false));
 
         /* Current */
-        assertTrue(tracedPhases.addCurrent(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A));
-        assertTrue(tracedPhases.addCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.B));
-        assertTrue(tracedPhases.addCurrent(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.C));
-        assertTrue(tracedPhases.addCurrent(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.N));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A), equalTo(true));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.B), equalTo(true));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.C), equalTo(true));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.N), equalTo(true));
         // Returns false if no changes were done.
-        assertFalse(tracedPhases.addCurrent(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A));
-        assertFalse(tracedPhases.addCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.B));
-        assertFalse(tracedPhases.addCurrent(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.C));
-        assertFalse(tracedPhases.addCurrent(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.N));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A), equalTo(false));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.B), equalTo(false));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.C), equalTo(false));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.N), equalTo(false));
 
         /* -- Getting Phase-- */
         /* Normal */
-        assertEquals(SinglePhaseKind.N, tracedPhases.phaseNormal(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.C, tracedPhases.phaseNormal(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.B, tracedPhases.phaseNormal(SinglePhaseKind.C));
-        assertEquals(SinglePhaseKind.A, tracedPhases.phaseNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.A), equalTo(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.B), equalTo(SinglePhaseKind.C));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.C), equalTo(SinglePhaseKind.B));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.N), equalTo(SinglePhaseKind.A));
 
         /* Current */
-        assertEquals(SinglePhaseKind.A, tracedPhases.phaseCurrent(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.B, tracedPhases.phaseCurrent(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.C, tracedPhases.phaseCurrent(SinglePhaseKind.C));
-        assertEquals(SinglePhaseKind.N, tracedPhases.phaseCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.A), equalTo(SinglePhaseKind.A));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.B), equalTo(SinglePhaseKind.B));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.C), equalTo(SinglePhaseKind.C));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.N), equalTo(SinglePhaseKind.N));
 
         /* -- Getting Direction-- */
         /* Normal */
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.OUT, tracedPhases.directionNormal(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.IN, tracedPhases.directionNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.A), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.B), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.C), equalTo(PhaseDirection.OUT));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.N), equalTo(PhaseDirection.IN));
 
         /* Current */
-        assertEquals(PhaseDirection.IN, tracedPhases.directionCurrent(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.OUT, tracedPhases.directionCurrent(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.A), equalTo(PhaseDirection.IN));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.B), equalTo(PhaseDirection.OUT));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.C), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.N), equalTo(PhaseDirection.BOTH));
 
         /* -- Adding -- */
         /* Normal */
-        assertFalse(tracedPhases.addNormal(SinglePhaseKind.N, PhaseDirection.NONE, SinglePhaseKind.A));
-        assertFalse(tracedPhases.addNormal(SinglePhaseKind.C, PhaseDirection.IN, SinglePhaseKind.B));
-        assertTrue(tracedPhases.addNormal(SinglePhaseKind.B, PhaseDirection.IN, SinglePhaseKind.C));
-        assertTrue(tracedPhases.addNormal(SinglePhaseKind.A, PhaseDirection.OUT, SinglePhaseKind.N));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.N, PhaseDirection.NONE, SinglePhaseKind.A), equalTo(false));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.C, PhaseDirection.IN, SinglePhaseKind.B), equalTo(false));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.B, PhaseDirection.IN, SinglePhaseKind.C), equalTo(true));
+        assertThat(tracedPhases.addNormal(SinglePhaseKind.A, PhaseDirection.OUT, SinglePhaseKind.N), equalTo(true));
 
         /* Current */
-        assertTrue(tracedPhases.addCurrent(SinglePhaseKind.A, PhaseDirection.OUT, SinglePhaseKind.A));
-        assertTrue(tracedPhases.addCurrent(SinglePhaseKind.B, PhaseDirection.IN, SinglePhaseKind.B));
-        assertFalse(tracedPhases.addCurrent(SinglePhaseKind.C, PhaseDirection.NONE, SinglePhaseKind.C));
-        assertFalse(tracedPhases.addCurrent(SinglePhaseKind.N, PhaseDirection.OUT, SinglePhaseKind.N));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.A, PhaseDirection.OUT, SinglePhaseKind.A), equalTo(true));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.B, PhaseDirection.IN, SinglePhaseKind.B), equalTo(true));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.C, PhaseDirection.NONE, SinglePhaseKind.C), equalTo(false));
+        assertThat(tracedPhases.addCurrent(SinglePhaseKind.N, PhaseDirection.OUT, SinglePhaseKind.N), equalTo(false));
 
         /* -- Getting Phase-- */
         /* Normal */
-        assertEquals(SinglePhaseKind.N, tracedPhases.phaseNormal(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.C, tracedPhases.phaseNormal(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.B, tracedPhases.phaseNormal(SinglePhaseKind.C));
-        assertEquals(SinglePhaseKind.A, tracedPhases.phaseNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.A), equalTo(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.B), equalTo(SinglePhaseKind.C));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.C), equalTo(SinglePhaseKind.B));
+        assertThat(tracedPhases.phaseNormal(SinglePhaseKind.N), equalTo(SinglePhaseKind.A));
 
         /* Current */
-        assertEquals(SinglePhaseKind.A, tracedPhases.phaseCurrent(SinglePhaseKind.A));
-        assertEquals(SinglePhaseKind.B, tracedPhases.phaseCurrent(SinglePhaseKind.B));
-        assertEquals(SinglePhaseKind.C, tracedPhases.phaseCurrent(SinglePhaseKind.C));
-        assertEquals(SinglePhaseKind.N, tracedPhases.phaseCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.A), equalTo(SinglePhaseKind.A));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.B), equalTo(SinglePhaseKind.B));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.C), equalTo(SinglePhaseKind.C));
+        assertThat(tracedPhases.phaseCurrent(SinglePhaseKind.N), equalTo(SinglePhaseKind.N));
 
         /* -- Getting Direction-- */
         /* Normal */
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.A), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.B), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.C), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.N), equalTo(PhaseDirection.BOTH));
 
         /* Current */
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.BOTH, tracedPhases.directionCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.A), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.B), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.C), equalTo(PhaseDirection.BOTH));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.N), equalTo(PhaseDirection.BOTH));
 
         try {
-            assertTrue(tracedPhases.addNormal(SinglePhaseKind.A, PhaseDirection.BOTH, SinglePhaseKind.A));
+            assertThat(tracedPhases.addNormal(SinglePhaseKind.A, PhaseDirection.BOTH, SinglePhaseKind.A), equalTo(true));
             fail();
         } catch (UnsupportedOperationException ignored) {
         }
@@ -298,35 +299,35 @@ public class TracedPhasesTest {
         tracedPhases.removeCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.C);
         tracedPhases.removeCurrent(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.N);
 
-        assertEquals(PhaseDirection.OUT, tracedPhases.directionNormal(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.IN, tracedPhases.directionNormal(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionNormal(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.A), equalTo(PhaseDirection.OUT));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.B), equalTo(PhaseDirection.IN));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.C), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.N), equalTo(PhaseDirection.NONE));
 
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionCurrent(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionCurrent(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.IN, tracedPhases.directionCurrent(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.OUT, tracedPhases.directionCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.A), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.B), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.C), equalTo(PhaseDirection.IN));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.N), equalTo(PhaseDirection.OUT));
 
-        assertTrue(tracedPhases.removeNormal(SinglePhaseKind.A, SinglePhaseKind.A));
-        assertTrue(tracedPhases.removeNormal(SinglePhaseKind.B, SinglePhaseKind.B));
-        assertFalse(tracedPhases.removeNormal(SinglePhaseKind.C, SinglePhaseKind.C));
-        assertFalse(tracedPhases.removeNormal(SinglePhaseKind.N, SinglePhaseKind.N));
+        assertThat(tracedPhases.removeNormal(SinglePhaseKind.A, SinglePhaseKind.A), equalTo(true));
+        assertThat(tracedPhases.removeNormal(SinglePhaseKind.B, SinglePhaseKind.B), equalTo(true));
+        assertThat(tracedPhases.removeNormal(SinglePhaseKind.C, SinglePhaseKind.C), equalTo(false));
+        assertThat(tracedPhases.removeNormal(SinglePhaseKind.N, SinglePhaseKind.N), equalTo(false));
 
-        assertFalse(tracedPhases.removeCurrent(SinglePhaseKind.N, SinglePhaseKind.A));
-        assertFalse(tracedPhases.removeCurrent(SinglePhaseKind.C, SinglePhaseKind.B));
-        assertTrue(tracedPhases.removeCurrent(SinglePhaseKind.B, SinglePhaseKind.C));
-        assertTrue(tracedPhases.removeCurrent(SinglePhaseKind.A, SinglePhaseKind.N));
+        assertThat(tracedPhases.removeCurrent(SinglePhaseKind.N, SinglePhaseKind.A), equalTo(false));
+        assertThat(tracedPhases.removeCurrent(SinglePhaseKind.C, SinglePhaseKind.B), equalTo(false));
+        assertThat(tracedPhases.removeCurrent(SinglePhaseKind.B, SinglePhaseKind.C), equalTo(true));
+        assertThat(tracedPhases.removeCurrent(SinglePhaseKind.A, SinglePhaseKind.N), equalTo(true));
 
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionNormal(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionNormal(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionNormal(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionNormal(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.A), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.B), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.C), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionNormal(SinglePhaseKind.N), equalTo(PhaseDirection.NONE));
 
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionCurrent(SinglePhaseKind.A));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionCurrent(SinglePhaseKind.B));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionCurrent(SinglePhaseKind.C));
-        assertEquals(PhaseDirection.NONE, tracedPhases.directionCurrent(SinglePhaseKind.N));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.A), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.B), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.C), equalTo(PhaseDirection.NONE));
+        assertThat(tracedPhases.directionCurrent(SinglePhaseKind.N), equalTo(PhaseDirection.NONE));
     }
 
     @Test
@@ -356,13 +357,13 @@ public class TracedPhasesTest {
     @Test
     public void removingSomethingNotPresentNormal() {
         TracedPhases tracedPhases = newTestPhaseObject();
-        assertFalse(tracedPhases.removeNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.A));
+        assertThat(tracedPhases.removeNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.A), equalTo(false));
     }
 
     @Test
     public void removingSomethingNotPresentCurrent() {
         TracedPhases tracedPhases = newTestPhaseObject();
-        assertFalse(tracedPhases.removeCurrent(SinglePhaseKind.A, PhaseDirection.OUT, SinglePhaseKind.N));
+        assertThat(tracedPhases.removeCurrent(SinglePhaseKind.A, PhaseDirection.OUT, SinglePhaseKind.N), equalTo(false));
     }
 
 }

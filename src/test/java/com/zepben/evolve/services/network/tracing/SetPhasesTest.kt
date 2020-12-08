@@ -27,7 +27,9 @@ import com.zepben.evolve.services.network.testdata.TestDataCreators.createTermin
 import com.zepben.evolve.services.network.testdata.TestNetworks
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
-import org.junit.Assert.*
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.function.Function
@@ -46,9 +48,9 @@ class SetPhasesTest {
         val n = TestNetworks.getNetwork(1)
 
         val sw = n.get<Breaker>("node6")!!
-        assertNotNull(sw)
-        assertTrue(sw.isOpen(X))
-        assertTrue(sw.isOpen(Y))
+        assertThat(sw, notNullValue())
+        assertThat(sw.isOpen(X), equalTo(true))
+        assertThat(sw.isOpen(Y), equalTo(true))
         doSetPhasesTrace(n)
 
         // Check various points to make sure phases have been applied during the trace.
@@ -77,11 +79,11 @@ class SetPhasesTest {
         val n = TestNetworks.getNetwork(5)
 
         val sw = n.get<Breaker>("node1")!!
-        assertNotNull(sw)
-        assertTrue(sw.isOpen(A))
-        assertFalse(sw.isOpen(B))
-        assertTrue(sw.isOpen(C))
-        assertFalse(sw.isOpen(N))
+        assertThat(sw, notNullValue())
+        assertThat(sw.isOpen(A), equalTo(true))
+        assertThat(sw.isOpen(B), equalTo(false))
+        assertThat(sw.isOpen(C), equalTo(true))
+        assertThat(sw.isOpen(N), equalTo(false))
 
         doSetPhasesTrace(n)
 
@@ -101,8 +103,8 @@ class SetPhasesTest {
         val n = TestNetworks.getNetwork(1)
 
         val sw = n.get<Breaker>("node6")!!
-        assertNotNull(sw)
-        assertTrue(sw.isOpen(X))
+        assertThat(sw, notNullValue())
+        assertThat(sw.isOpen(X), equalTo(true))
         sw.setOpen(false, Y)
 
         expect { doSetPhasesTrace(n) }
@@ -128,16 +130,16 @@ class SetPhasesTest {
         val n4 = Junction("n4").apply { addTerminal(createTerminal(n, this, PhaseCode.A, 1)) }
         n.add(n4)
 
-        assertTrue(n.connect(getT(n, "n0", 1), getT(n, "c0", 1)))
-        assertTrue(n.connect(getT(n, "c0", 2), getT(n, "n1", 1)))
-        assertTrue(n.connect(getT(n, "n1", 2), getT(n, "c1", 1)))
-        assertTrue(n.connect(getT(n, "c1", 2), getT(n, "n2", 1)))
-        assertTrue(n.connect(getT(n, "n2", 2), getT(n, "c2", 1)))
-        assertTrue(n.connect(getT(n, "c2", 2), getT(n, "n3", 1)))
-        assertTrue(n.connect(getT(n, "n3", 2), getT(n, "c3", 1)))
-        assertTrue(n.connect(getT(n, "c3", 2), getT(n, "n1", 2)))
-        assertTrue(n.connect(getT(n, "c4", 1), getT(n, "n3", 2)))
-        assertTrue(n.connect(getT(n, "n4", 1), getT(n, "c4", 2)))
+        assertThat(n.connect(getT(n, "n0", 1), getT(n, "c0", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "c0", 2), getT(n, "n1", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "n1", 2), getT(n, "c1", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "c1", 2), getT(n, "n2", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "n2", 2), getT(n, "c2", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "c2", 2), getT(n, "n3", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "n3", 2), getT(n, "c3", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "c3", 2), getT(n, "n1", 2)), equalTo(true))
+        assertThat(n.connect(getT(n, "c4", 1), getT(n, "n3", 2)), equalTo(true))
+        assertThat(n.connect(getT(n, "n4", 1), getT(n, "c4", 2)), equalTo(true))
 
         n0.terminals.forEach { t ->
             for (phase in t.phases.singlePhases()) {
@@ -183,7 +185,7 @@ class SetPhasesTest {
                 for (i in normallyOpen.indices)
                     setNormallyOpen(normallyOpen[i], PhaseCode.ABCN.singlePhases()[i])
                 addContainer(Substation())
-                assertTrue(this.isSubstationBreaker)
+                assertThat(this.isSubstationBreaker, equalTo(true))
             }
         }
 
@@ -202,16 +204,16 @@ class SetPhasesTest {
             })
         }
 
-        assertTrue(n.connect(getT(n, "n0", 1), getT(n, "c0", 1)))
-        assertTrue(n.connect(getT(n, "c0", 2), getT(n, "f0", 1)))
-        assertTrue(n.connect(getT(n, "f0", 2), getT(n, "c1", 1)))
-        assertTrue(n.connect(getT(n, "c1", 2), getT(n, "f1", 1)))
-        assertTrue(n.connect(getT(n, "f1", 2), getT(n, "c2", 1)))
-        assertTrue(n.connect(getT(n, "c2", 2), getT(n, "f2", 1)))
-        assertTrue(n.connect(getT(n, "f2", 2), getT(n, "c3", 1)))
-        assertTrue(n.connect(getT(n, "c3", 2), getT(n, "f3", 1)))
-        assertTrue(n.connect(getT(n, "f3", 2), getT(n, "c4", 1)))
-        assertTrue(n.connect(getT(n, "c4", 2), getT(n, "n1", 1)))
+        assertThat(n.connect(getT(n, "n0", 1), getT(n, "c0", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "c0", 2), getT(n, "f0", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "f0", 2), getT(n, "c1", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "c1", 2), getT(n, "f1", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "f1", 2), getT(n, "c2", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "c2", 2), getT(n, "f2", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "f2", 2), getT(n, "c3", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "c3", 2), getT(n, "f3", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "f3", 2), getT(n, "c4", 1)), equalTo(true))
+        assertThat(n.connect(getT(n, "c4", 2), getT(n, "n1", 1)), equalTo(true))
 
         doSetPhasesTrace(n)
 
@@ -219,9 +221,27 @@ class SetPhasesTest {
         checkExpectedPhases(getT(n, "c0", 1), arrayOf(A, B, C, N), arrayOf(IN, IN, IN, IN))
         checkExpectedPhases(getT(n, "c0", 2), arrayOf(A, B, C, N), arrayOf(OUT, OUT, OUT, OUT))
         checkExpectedPhases(getT(n, "f0", 1), arrayOf(A, B, C, N), arrayOf(IN, IN, IN, IN))
-        checkExpectedPhases(getT(n, "f0", 2), arrayOf(A, B, C, P_NONE), arrayOf(OUT, IN, OUT, NONE), arrayOf(P_NONE, P_NONE, P_NONE, P_NONE), arrayOf(NONE, NONE, NONE, NONE))
-        checkExpectedPhases(getT(n, "c1", 1), arrayOf(A, B, C, P_NONE), arrayOf(IN, OUT, IN, NONE), arrayOf(P_NONE, P_NONE, P_NONE, P_NONE), arrayOf(NONE, NONE, NONE, NONE))
-        checkExpectedPhases(getT(n, "c1", 2), arrayOf(A, B, C, P_NONE), arrayOf(OUT, IN, OUT, NONE), arrayOf(P_NONE, P_NONE, P_NONE, P_NONE), arrayOf(NONE, NONE, NONE, NONE))
+        checkExpectedPhases(
+            getT(n, "f0", 2),
+            arrayOf(A, B, C, P_NONE),
+            arrayOf(OUT, IN, OUT, NONE),
+            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
+            arrayOf(NONE, NONE, NONE, NONE)
+        )
+        checkExpectedPhases(
+            getT(n, "c1", 1),
+            arrayOf(A, B, C, P_NONE),
+            arrayOf(IN, OUT, IN, NONE),
+            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
+            arrayOf(NONE, NONE, NONE, NONE)
+        )
+        checkExpectedPhases(
+            getT(n, "c1", 2),
+            arrayOf(A, B, C, P_NONE),
+            arrayOf(OUT, IN, OUT, NONE),
+            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
+            arrayOf(NONE, NONE, NONE, NONE)
+        )
         checkExpectedPhases(getT(n, "f1", 1), arrayOf(A, B, C, P_NONE), arrayOf(IN, OUT, IN, NONE), arrayOf(P_NONE, P_NONE, P_NONE, P_NONE), arrayOf(NONE, NONE, NONE, NONE))
         checkExpectedPhases(getT(n, "f1", 2), arrayOf(A, B, C, P_NONE), arrayOf(OUT, IN, BOTH, NONE), arrayOf(P_NONE, P_NONE, P_NONE, P_NONE), arrayOf(NONE, NONE, NONE, NONE))
         checkExpectedPhases(getT(n, "c2", 1), arrayOf(A, B, C, P_NONE), arrayOf(IN, OUT, BOTH, NONE), arrayOf(P_NONE, P_NONE, P_NONE, P_NONE), arrayOf(NONE, NONE, NONE, NONE))
@@ -275,7 +295,7 @@ class SetPhasesTest {
     }
 
     private fun doSetPhasesTrace(start: ConductingEquipment) {
-        assertEquals(1, start.numTerminals())
+        assertThat(start.numTerminals(), equalTo(1))
 
         Tracing.setPhases().run(start.getTerminal(1)!!, emptyList())
         PhaseLogger.trace(start)
@@ -310,13 +330,13 @@ class SetPhasesTest {
         directions: Array<PhaseDirection>,
         phaseStatusSelector: Function<SinglePhaseKind, PhaseStatus>
     ) {
-        assertNotNull(t)
-        assertEquals(singlePhaseKinds.size, directions.size)
-        assertEquals(singlePhaseKinds.size, t!!.phases.singlePhases().size)
+        assertThat(t, notNullValue())
+        assertThat(directions.size, equalTo(singlePhaseKinds.size))
+        assertThat(t!!.phases.singlePhases().size, equalTo(singlePhaseKinds.size))
         for (i in singlePhaseKinds.indices) {
             val ps = phaseStatusSelector.apply(t.phases.singlePhases()[i])
-            assertEquals(singlePhaseKinds[i], ps.phase())
-            assertEquals(directions[i], ps.direction())
+            assertThat(ps.phase(), equalTo(singlePhaseKinds[i]))
+            assertThat(ps.direction(), equalTo(directions[i]))
         }
     }
 

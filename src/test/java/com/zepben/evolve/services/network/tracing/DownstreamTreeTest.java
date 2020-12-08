@@ -15,7 +15,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class DownstreamTreeTest {
 
@@ -27,9 +28,9 @@ public class DownstreamTreeTest {
         for (int i = 0; i < 10; ++i) {
             DownstreamTree.TreeNode node = new DownstreamTree.TreeNode(new Junction("node" + i));
             treeNodes.add(node);
-            assertEquals("node" + i, node.conductingEquipment().getMRID());
-            assertNull(node.parent());
-            assertEquals(0, node.children().size());
+            assertThat(node.conductingEquipment().getMRID(), equalTo("node" + i));
+            assertThat(node.parent(), nullValue());
+            assertThat(node.children().size(), equalTo(0));
         }
 
         treeNodes.get(1).setParent(treeNodes.get(0));
@@ -43,9 +44,9 @@ public class DownstreamTreeTest {
         treeNodes.get(9).setParent(treeNodes.get(8));
 
         List<DownstreamTree.TreeNode> children = treeNodes.get(0).children();
-        assertTrue(children.contains(treeNodes.get(1)));
-        assertTrue(children.contains(treeNodes.get(2)));
-        assertTrue(children.contains(treeNodes.get(3)));
+        assertThat(children.contains(treeNodes.get(1)), equalTo(true));
+        assertThat(children.contains(treeNodes.get(2)), equalTo(true));
+        assertThat(children.contains(treeNodes.get(3)), equalTo(true));
 
         assertChildren(treeNodes, new int[]{3, 0, 0, 2, 0, 1, 1, 1, 1, 0});
         assertParents(treeNodes, new int[]{-1, 0, 0, 0, 3, 3, 5, 6, 7, 8});
@@ -58,10 +59,10 @@ public class DownstreamTreeTest {
         Tracing.setPhases().run(n);
 
         ConductingEquipment start = get("node1");
-        assertNotNull(start);
+        assertThat(start, notNullValue());
         DownstreamTree.TreeNode root = Tracing.normalDownstreamTree().run(start);
 
-        assertNotNull(root);
+        assertThat(root, notNullValue());
         assertTreeAsset(root, get("node1"), null, new ConductingEquipment[]{get("acLineSegment1"), get("acLineSegment3")});
 
         DownstreamTree.TreeNode testNode = root.children().get(0);
@@ -88,101 +89,101 @@ public class DownstreamTreeTest {
         testNode = testNode.children().get(0);
         assertTreeAsset(testNode, get("node4"), get("acLineSegment3"), new ConductingEquipment[]{get("acLineSegment5"), get("acLineSegment6")});
 
-        assertEquals(0, findNodes(root, "node0").size());
-        assertEquals(0, findNodes(root, "acLineSegment0").size());
-        assertEquals(1, findNodes(root, "node1").size());
-        assertEquals(1, findNodes(root, "acLineSegment1").size());
-        assertEquals(1, findNodes(root, "node2").size());
-        assertEquals(1, findNodes(root, "acLineSegment2").size());
-        assertEquals(1, findNodes(root, "node3").size());
-        assertEquals(1, findNodes(root, "acLineSegment3").size());
-        assertEquals(1, findNodes(root, "node4").size());
-        assertEquals(1, findNodes(root, "acLineSegment4").size());
-        assertEquals(1, findNodes(root, "node5").size());
-        assertEquals(1, findNodes(root, "acLineSegment5").size());
-        assertEquals(2, findNodes(root, "node6").size());
-        assertEquals(1, findNodes(root, "acLineSegment6").size());
-        assertEquals(1, findNodes(root, "node7").size());
-        assertEquals(1, findNodes(root, "acLineSegment7").size());
-        assertEquals(1, findNodes(root, "node8").size());
-        assertEquals(1, findNodes(root, "acLineSegment8").size());
-        assertEquals(1, findNodes(root, "node9").size());
-        assertEquals(1, findNodes(root, "acLineSegment9").size());
-        assertEquals(1, findNodes(root, "node10").size());
-        assertEquals(1, findNodes(root, "acLineSegment10").size());
-        assertEquals(3, findNodes(root, "node11").size());
-        assertEquals(3, findNodes(root, "acLineSegment11").size());
-        assertEquals(3, findNodes(root, "node12").size());
-        assertEquals(4, findNodes(root, "acLineSegment12").size());
-        assertEquals(3, findNodes(root, "node13").size());
-        assertEquals(3, findNodes(root, "acLineSegment13").size());
-        assertEquals(4, findNodes(root, "node14").size());
-        assertEquals(3, findNodes(root, "acLineSegment14").size());
-        assertEquals(4, findNodes(root, "acLineSegment15").size());
-        assertEquals(4, findNodes(root, "acLineSegment16").size());
+        assertThat(findNodes(root, "node0").size(), equalTo(0));
+        assertThat(findNodes(root, "acLineSegment0").size(), equalTo(0));
+        assertThat(findNodes(root, "node1").size(), equalTo(1));
+        assertThat(findNodes(root, "acLineSegment1").size(), equalTo(1));
+        assertThat(findNodes(root, "node2").size(), equalTo(1));
+        assertThat(findNodes(root, "acLineSegment2").size(), equalTo(1));
+        assertThat(findNodes(root, "node3").size(), equalTo(1));
+        assertThat(findNodes(root, "acLineSegment3").size(), equalTo(1));
+        assertThat(findNodes(root, "node4").size(), equalTo(1));
+        assertThat(findNodes(root, "acLineSegment4").size(), equalTo(1));
+        assertThat(findNodes(root, "node5").size(), equalTo(1));
+        assertThat(findNodes(root, "acLineSegment5").size(), equalTo(1));
+        assertThat(findNodes(root, "node6").size(), equalTo(2));
+        assertThat(findNodes(root, "acLineSegment6").size(), equalTo(1));
+        assertThat(findNodes(root, "node7").size(), equalTo(1));
+        assertThat(findNodes(root, "acLineSegment7").size(), equalTo(1));
+        assertThat(findNodes(root, "node8").size(), equalTo(1));
+        assertThat(findNodes(root, "acLineSegment8").size(), equalTo(1));
+        assertThat(findNodes(root, "node9").size(), equalTo(1));
+        assertThat(findNodes(root, "acLineSegment9").size(), equalTo(1));
+        assertThat(findNodes(root, "node10").size(), equalTo(1));
+        assertThat(findNodes(root, "acLineSegment10").size(), equalTo(1));
+        assertThat(findNodes(root, "node11").size(), equalTo(3));
+        assertThat(findNodes(root, "acLineSegment11").size(), equalTo(3));
+        assertThat(findNodes(root, "node12").size(), equalTo(3));
+        assertThat(findNodes(root, "acLineSegment12").size(), equalTo(4));
+        assertThat(findNodes(root, "node13").size(), equalTo(3));
+        assertThat(findNodes(root, "acLineSegment13").size(), equalTo(3));
+        assertThat(findNodes(root, "node14").size(), equalTo(4));
+        assertThat(findNodes(root, "acLineSegment14").size(), equalTo(3));
+        assertThat(findNodes(root, "acLineSegment15").size(), equalTo(4));
+        assertThat(findNodes(root, "acLineSegment16").size(), equalTo(4));
 
-        assertEquals(Collections.emptyList(), findNodeDepths(root, "node0"));
-        assertEquals(Collections.emptyList(), findNodeDepths(root, "acLineSegment0"));
-        assertEquals(Collections.singletonList(0), findNodeDepths(root, "node1"));
-        assertEquals(Collections.singletonList(1), findNodeDepths(root, "acLineSegment1"));
-        assertEquals(Collections.singletonList(2), findNodeDepths(root, "node2"));
-        assertEquals(Collections.singletonList(3), findNodeDepths(root, "acLineSegment2"));
-        assertEquals(Collections.singletonList(4), findNodeDepths(root, "node3"));
-        assertEquals(Collections.singletonList(1), findNodeDepths(root, "acLineSegment3"));
-        assertEquals(Collections.singletonList(2), findNodeDepths(root, "node4"));
-        assertEquals(Collections.singletonList(5), findNodeDepths(root, "acLineSegment4"));
-        assertEquals(Collections.singletonList(4), findNodeDepths(root, "node5"));
-        assertEquals(Collections.singletonList(3), findNodeDepths(root, "acLineSegment5"));
-        assertEquals(Arrays.asList(6, 10), findNodeDepths(root, "node6"));
-        assertEquals(Collections.singletonList(3), findNodeDepths(root, "acLineSegment6"));
-        assertEquals(Collections.singletonList(4), findNodeDepths(root, "node7"));
-        assertEquals(Collections.singletonList(9), findNodeDepths(root, "acLineSegment7"));
-        assertEquals(Collections.singletonList(6), findNodeDepths(root, "node8"));
-        assertEquals(Collections.singletonList(5), findNodeDepths(root, "acLineSegment8"));
-        assertEquals(Collections.singletonList(8), findNodeDepths(root, "node9"));
-        assertEquals(Collections.singletonList(7), findNodeDepths(root, "acLineSegment9"));
-        assertEquals(Collections.singletonList(6), findNodeDepths(root, "node10"));
-        assertEquals(Collections.singletonList(5), findNodeDepths(root, "acLineSegment10"));
-        assertEquals(Arrays.asList(8, 10, 12), findNodeDepths(root, "node11"));
-        assertEquals(Arrays.asList(7, 11, 13), findNodeDepths(root, "acLineSegment11"));
-        assertEquals(Arrays.asList(8, 10, 10), findNodeDepths(root, "node12"));
-        assertEquals(Arrays.asList(7, 10, 11, 14), findNodeDepths(root, "acLineSegment12"));
-        assertEquals(Arrays.asList(10, 12, 12), findNodeDepths(root, "node13"));
-        assertEquals(Arrays.asList(9, 9, 11), findNodeDepths(root, "acLineSegment13"));
-        assertEquals(Arrays.asList(8, 9, 12, 13), findNodeDepths(root, "node14"));
-        assertEquals(Arrays.asList(9, 11, 11), findNodeDepths(root, "acLineSegment14"));
-        assertEquals(Arrays.asList(7, 10, 12, 13), findNodeDepths(root, "acLineSegment15"));
-        assertEquals(Arrays.asList(8, 9, 11, 14), findNodeDepths(root, "acLineSegment16"));
+        assertThat(findNodeDepths(root, "node0"), equalTo(Collections.emptyList()));
+        assertThat(findNodeDepths(root, "acLineSegment0"), equalTo(Collections.emptyList()));
+        assertThat(findNodeDepths(root, "node1"), equalTo(Collections.singletonList(0)));
+        assertThat(findNodeDepths(root, "acLineSegment1"), equalTo(Collections.singletonList(1)));
+        assertThat(findNodeDepths(root, "node2"), equalTo(Collections.singletonList(2)));
+        assertThat(findNodeDepths(root, "acLineSegment2"), equalTo(Collections.singletonList(3)));
+        assertThat(findNodeDepths(root, "node3"), equalTo(Collections.singletonList(4)));
+        assertThat(findNodeDepths(root, "acLineSegment3"), equalTo(Collections.singletonList(1)));
+        assertThat(findNodeDepths(root, "node4"), equalTo(Collections.singletonList(2)));
+        assertThat(findNodeDepths(root, "acLineSegment4"), equalTo(Collections.singletonList(5)));
+        assertThat(findNodeDepths(root, "node5"), equalTo(Collections.singletonList(4)));
+        assertThat(findNodeDepths(root, "acLineSegment5"), equalTo(Collections.singletonList(3)));
+        assertThat(findNodeDepths(root, "node6"), equalTo(Arrays.asList(6, 10)));
+        assertThat(findNodeDepths(root, "acLineSegment6"), equalTo(Collections.singletonList(3)));
+        assertThat(findNodeDepths(root, "node7"), equalTo(Collections.singletonList(4)));
+        assertThat(findNodeDepths(root, "acLineSegment7"), equalTo(Collections.singletonList(9)));
+        assertThat(findNodeDepths(root, "node8"), equalTo(Collections.singletonList(6)));
+        assertThat(findNodeDepths(root, "acLineSegment8"), equalTo(Collections.singletonList(5)));
+        assertThat(findNodeDepths(root, "node9"), equalTo(Collections.singletonList(8)));
+        assertThat(findNodeDepths(root, "acLineSegment9"), equalTo(Collections.singletonList(7)));
+        assertThat(findNodeDepths(root, "node10"), equalTo(Collections.singletonList(6)));
+        assertThat(findNodeDepths(root, "acLineSegment10"), equalTo(Collections.singletonList(5)));
+        assertThat(findNodeDepths(root, "node11"), equalTo(Arrays.asList(8, 10, 12)));
+        assertThat(findNodeDepths(root, "acLineSegment11"), equalTo(Arrays.asList(7, 11, 13)));
+        assertThat(findNodeDepths(root, "node12"), equalTo(Arrays.asList(8, 10, 10)));
+        assertThat(findNodeDepths(root, "acLineSegment12"), equalTo(Arrays.asList(7, 10, 11, 14)));
+        assertThat(findNodeDepths(root, "node13"), equalTo(Arrays.asList(10, 12, 12)));
+        assertThat(findNodeDepths(root, "acLineSegment13"), equalTo(Arrays.asList(9, 9, 11)));
+        assertThat(findNodeDepths(root, "node14"), equalTo(Arrays.asList(8, 9, 12, 13)));
+        assertThat(findNodeDepths(root, "acLineSegment14"), equalTo(Arrays.asList(9, 11, 11)));
+        assertThat(findNodeDepths(root, "acLineSegment15"), equalTo(Arrays.asList(7, 10, 12, 13)));
+        assertThat(findNodeDepths(root, "acLineSegment16"), equalTo(Arrays.asList(8, 9, 11, 14)));
     }
 
     private void assertChildren(List<DownstreamTree.TreeNode> treeNodes, int[] childCounts) {
         for (int i = 0; i < treeNodes.size(); ++i)
-            assertEquals(childCounts[i], treeNodes.get(i).children().size());
+            assertThat(treeNodes.get(i).children().size(), equalTo(childCounts[i]));
     }
 
     private void assertParents(List<DownstreamTree.TreeNode> treeNodes, int[] parents) {
         for (int i = 0; i < treeNodes.size(); ++i) {
             int index = parents[i];
             if (index < 0)
-                assertNull(treeNodes.get(i).parent());
+                assertThat(treeNodes.get(i).parent(), nullValue());
             else
-                assertEquals(treeNodes.get(parents[i]), treeNodes.get(i).parent());
+                assertThat(treeNodes.get(i).parent(), equalTo(treeNodes.get(parents[i])));
         }
     }
 
     private void assertTreeAsset(DownstreamTree.TreeNode treeNode, ConductingEquipment asset, ConductingEquipment parent, ConductingEquipment[] children) {
-        assertEquals(asset, treeNode.conductingEquipment());
+        assertThat(treeNode.conductingEquipment(), equalTo(asset));
 
         if (parent != null) {
             DownstreamTree.TreeNode treeParent = treeNode.parent();
-            assertNotNull(treeParent);
-            assertEquals(parent, treeParent.conductingEquipment());
+            assertThat(treeParent, notNullValue());
+            assertThat(treeParent.conductingEquipment(), equalTo(parent));
         } else
-            assertNull(treeNode.parent());
+            assertThat(treeNode.parent(), nullValue());
 
-        assertEquals(children.length, treeNode.children().size());
+        assertThat(treeNode.children().size(), equalTo(children.length));
         for (int i = 0; i < children.length; ++i) {
-            assertEquals(children[i], treeNode.children().get(i).conductingEquipment());
+            assertThat(treeNode.children().get(i).conductingEquipment(), equalTo(children[i]));
         }
     }
 

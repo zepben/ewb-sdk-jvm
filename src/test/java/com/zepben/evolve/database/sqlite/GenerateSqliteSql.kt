@@ -5,10 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite
+package com.zepben.evolve.database.sqlite
 
-import com.zepben.cimbend.common.interop.JavaLambda
-import com.zepben.cimbend.database.sqlite.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.tables.SqliteTable
+import com.zepben.evolve.services.common.interop.JavaLambda
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory

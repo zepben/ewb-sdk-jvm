@@ -5,8 +5,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.upgrade
-import com.zepben.cimbend.database.sqlite.tables.TableVersion
+package com.zepben.evolve.database.sqlite.upgrade
+
+import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import com.zepben.testutils.mockito.DefaultAnswer

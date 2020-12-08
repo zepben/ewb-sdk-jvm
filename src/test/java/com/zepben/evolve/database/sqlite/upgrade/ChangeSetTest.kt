@@ -5,16 +5,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.upgrade
+package com.zepben.evolve.database.sqlite.upgrade
 
-import com.zepben.cimbend.cim.iec61970.base.core.Terminal
-import com.zepben.cimbend.cim.iec61970.base.meas.Analog
-import com.zepben.cimbend.cim.iec61970.base.wires.PowerTransformerEnd
-import com.zepben.cimbend.common.meta.MetadataCollection
-import com.zepben.cimbend.customer.CustomerService
-import com.zepben.cimbend.database.sqlite.DatabaseReader
-import com.zepben.cimbend.diagram.DiagramService
-import com.zepben.cimbend.network.NetworkService
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.meas.Analog
+import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
+import com.zepben.evolve.database.sqlite.DatabaseReader
+import com.zepben.evolve.services.common.meta.MetadataCollection
+import com.zepben.evolve.services.customer.CustomerService
+import com.zepben.evolve.services.diagram.DiagramService
+import com.zepben.evolve.services.network.NetworkService
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

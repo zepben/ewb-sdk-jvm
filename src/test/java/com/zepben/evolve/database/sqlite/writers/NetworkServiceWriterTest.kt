@@ -5,14 +5,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite.writers
+package com.zepben.evolve.database.sqlite.writers
 
-import com.zepben.cimbend.cim.iec61968.assets.Pole
-import com.zepben.cimbend.cim.iec61968.assets.Streetlight
-import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
-import com.zepben.cimbend.network.NetworkService
+import com.zepben.evolve.cim.iec61968.assets.Pole
+import com.zepben.evolve.cim.iec61968.assets.Streetlight
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.services.network.NetworkService
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension

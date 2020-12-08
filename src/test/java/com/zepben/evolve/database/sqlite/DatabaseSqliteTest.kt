@@ -5,27 +5,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.database.sqlite
+package com.zepben.evolve.database.sqlite
 
-import com.zepben.cimbend.cim.iec61968.customers.Customer
-import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.cimbend.cim.iec61970.base.diagramlayout.Diagram
-import com.zepben.cimbend.cim.iec61970.base.diagramlayout.DiagramObject
-import com.zepben.cimbend.cim.iec61970.base.wires.Junction
-import com.zepben.cimbend.common.BaseService
-import com.zepben.cimbend.common.BaseServiceComparator
-import com.zepben.cimbend.common.extensions.typeNameAndMRID
-import com.zepben.cimbend.common.meta.MetadataCollection
-import com.zepben.cimbend.customer.CustomerService
-import com.zepben.cimbend.customer.CustomerServiceComparator
-import com.zepben.cimbend.database.sqlite.tables.TableVersion
-import com.zepben.cimbend.diagram.DiagramService
-import com.zepben.cimbend.diagram.DiagramServiceComparator
-import com.zepben.cimbend.network.NetworkModelTestUtil
-import com.zepben.cimbend.network.NetworkService
-import com.zepben.cimbend.network.NetworkServiceComparator
-import com.zepben.cimbend.testdata.SchemaTestNetwork
-import com.zepben.cimbend.testdata.StupidlyLargeNetwork
+import com.zepben.evolve.cim.iec61968.customers.Customer
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
+import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
+import com.zepben.evolve.database.sqlite.tables.TableVersion
+import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.services.common.BaseServiceComparator
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
+import com.zepben.evolve.services.common.meta.MetadataCollection
+import com.zepben.evolve.services.customer.CustomerService
+import com.zepben.evolve.services.customer.CustomerServiceComparator
+import com.zepben.evolve.services.diagram.DiagramService
+import com.zepben.evolve.services.diagram.DiagramServiceComparator
+import com.zepben.evolve.services.network.NetworkModelTestUtil
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.NetworkServiceComparator
+import com.zepben.evolve.services.network.testdata.SchemaTestNetwork
+import com.zepben.evolve.services.network.testdata.StupidlyLargeNetwork
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*

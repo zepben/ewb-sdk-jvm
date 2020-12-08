@@ -6,9 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.cimbend.get.testdata
+package com.zepben.evolve.streaming.get.testdata
 
-import com.zepben.cimbend.get.hierarchy.*
+import com.zepben.evolve.streaming.get.hierarchy.*
 import com.zepben.protobuf.nc.GetNetworkHierarchyResponse
 
 object NetworkHierarchyAllTypes {

@@ -5,10 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.get
+package com.zepben.evolve.streaming.get
 
-import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
-import com.zepben.cimbend.grpc.GrpcResult
+import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
+import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

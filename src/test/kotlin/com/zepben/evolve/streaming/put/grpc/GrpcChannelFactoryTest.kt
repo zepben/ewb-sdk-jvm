@@ -5,11 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.put.grpc
+package com.zepben.evolve.streaming.put.grpc
 
-import com.zepben.cimbend.grpc.BadConfigException
-import com.zepben.cimbend.grpc.ConnectionConfig
-import com.zepben.cimbend.grpc.GrpcChannelFactory
+import com.zepben.evolve.streaming.grpc.BadConfigException
+import com.zepben.evolve.streaming.grpc.ConnectionConfig
+import com.zepben.evolve.streaming.grpc.GrpcChannelFactory
 import com.zepben.testutils.exception.ExpectException.expect
 import org.junit.jupiter.api.Test
 

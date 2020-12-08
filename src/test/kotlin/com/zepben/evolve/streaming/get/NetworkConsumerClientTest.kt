@@ -5,27 +5,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.get
+package com.zepben.evolve.streaming.get
 
-import com.zepben.cimbend.cim.iec61968.assetinfo.CableInfo
-import com.zepben.cimbend.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.cimbend.cim.iec61968.assetinfo.WireInfo
-import com.zepben.cimbend.cim.iec61968.common.Location
-import com.zepben.cimbend.cim.iec61970.base.core.*
-import com.zepben.cimbend.cim.iec61970.base.wires.*
-import com.zepben.cimbend.common.extensions.typeNameAndMRID
-import com.zepben.cimbend.get.ConsumerUtils.buildFromBuilder
-import com.zepben.cimbend.get.ConsumerUtils.forEachBuilder
-import com.zepben.cimbend.get.ConsumerUtils.validateFailure
-import com.zepben.cimbend.get.hierarchy.NetworkHierarchy
-import com.zepben.cimbend.get.hierarchy.NetworkHierarchyIdentifiedObject
-import com.zepben.cimbend.get.testdata.FeederNetwork
-import com.zepben.cimbend.get.testdata.NetworkHierarchyAllTypes
-import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
-import com.zepben.cimbend.grpc.GrpcResult
-import com.zepben.cimbend.network.NetworkService
-import com.zepben.cimbend.network.NetworkServiceComparator
-import com.zepben.cimbend.network.model.toPb
+import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
+import com.zepben.evolve.cim.iec61968.common.Location
+import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.NetworkServiceComparator
+import com.zepben.evolve.services.network.translator.toPb
+import com.zepben.evolve.streaming.get.ConsumerUtils.buildFromBuilder
+import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
+import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
+import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchy
+import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchyIdentifiedObject
+import com.zepben.evolve.streaming.get.testdata.FeederNetwork
+import com.zepben.evolve.streaming.get.testdata.NetworkHierarchyAllTypes
+import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
+import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.nc.*
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status

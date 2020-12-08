@@ -5,14 +5,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.put
+package com.zepben.evolve.streaming.put
 
-import com.zepben.cimbend.cim.iec61968.assetinfo.CableInfo
-import com.zepben.cimbend.customer.CustomerService
-import com.zepben.cimbend.diagram.DiagramService
-import com.zepben.cimbend.grpc.ConnectionConfig
-import com.zepben.cimbend.grpc.GrpcChannelFactory
-import com.zepben.cimbend.network.NetworkService
+import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
+import com.zepben.evolve.services.customer.CustomerService
+import com.zepben.evolve.services.diagram.DiagramService
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.streaming.grpc.ConnectionConfig
+import com.zepben.evolve.streaming.grpc.GrpcChannelFactory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit

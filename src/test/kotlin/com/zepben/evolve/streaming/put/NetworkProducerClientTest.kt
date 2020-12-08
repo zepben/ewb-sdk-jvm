@@ -5,27 +5,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.put
+package com.zepben.evolve.streaming.put
 
-import com.zepben.cimbend.cim.iec61968.assetinfo.CableInfo
-import com.zepben.cimbend.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.cimbend.cim.iec61968.assets.AssetOwner
-import com.zepben.cimbend.cim.iec61968.assets.Pole
-import com.zepben.cimbend.cim.iec61968.assets.Streetlight
-import com.zepben.cimbend.cim.iec61968.common.Location
-import com.zepben.cimbend.cim.iec61968.common.Organisation
-import com.zepben.cimbend.cim.iec61968.metering.Meter
-import com.zepben.cimbend.cim.iec61968.metering.UsagePoint
-import com.zepben.cimbend.cim.iec61968.operations.OperationalRestriction
-import com.zepben.cimbend.cim.iec61970.base.auxiliaryequipment.FaultIndicator
-import com.zepben.cimbend.cim.iec61970.base.core.*
-import com.zepben.cimbend.cim.iec61970.base.wires.*
-import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.cimbend.cim.iec61970.infiec61970.feeder.Loop
-import com.zepben.cimbend.common.translator.toPb
-import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
-import com.zepben.cimbend.network.NetworkService
-import com.zepben.cimbend.network.model.toPb
+import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assets.AssetOwner
+import com.zepben.evolve.cim.iec61968.assets.Pole
+import com.zepben.evolve.cim.iec61968.assets.Streetlight
+import com.zepben.evolve.cim.iec61968.common.Location
+import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.metering.Meter
+import com.zepben.evolve.cim.iec61968.metering.UsagePoint
+import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.services.common.translator.toPb
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.translator.toPb
+import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.protobuf.np.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -265,7 +265,8 @@ internal class NetworkProducerClientTest {
 
         val stubInOrder = inOrder(stub)
         stubInOrder.verify(stub).createNetwork(CreateNetworkRequest.newBuilder().build())
-        stubInOrder.verify(stub).createOperationalRestriction(CreateOperationalRestrictionRequest.newBuilder().setOperationalRestriction(operationalRestriction.toPb()).build())
+        stubInOrder.verify(stub)
+            .createOperationalRestriction(CreateOperationalRestrictionRequest.newBuilder().setOperationalRestriction(operationalRestriction.toPb()).build())
         stubInOrder.verify(stub).completeNetwork(CompleteNetworkRequest.newBuilder().build())
     }
 
@@ -277,7 +278,9 @@ internal class NetworkProducerClientTest {
         doAnswer { throw expectedEx }.`when`(stub).createOperationalRestriction(any())
         producerClient.send(service)
 
-        verify(stub).createOperationalRestriction(CreateOperationalRestrictionRequest.newBuilder().setOperationalRestriction(operationalRestriction.toPb()).build())
+        verify(stub).createOperationalRestriction(
+            CreateOperationalRestrictionRequest.newBuilder().setOperationalRestriction(operationalRestriction.toPb()).build()
+        )
         assertThat(onErrorHandler.lastError, equalTo(expectedEx))
     }
 
@@ -433,7 +436,8 @@ internal class NetworkProducerClientTest {
 
         val stubInOrder = inOrder(stub)
         stubInOrder.verify(stub).createNetwork(CreateNetworkRequest.newBuilder().build())
-        stubInOrder.verify(stub).createSubGeographicalRegion(CreateSubGeographicalRegionRequest.newBuilder().setSubGeographicalRegion(subGeographicalRegion.toPb()).build())
+        stubInOrder.verify(stub)
+            .createSubGeographicalRegion(CreateSubGeographicalRegionRequest.newBuilder().setSubGeographicalRegion(subGeographicalRegion.toPb()).build())
         stubInOrder.verify(stub).completeNetwork(CompleteNetworkRequest.newBuilder().build())
     }
 
@@ -601,7 +605,8 @@ internal class NetworkProducerClientTest {
 
         val stubInOrder = inOrder(stub)
         stubInOrder.verify(stub).createNetwork(CreateNetworkRequest.newBuilder().build())
-        stubInOrder.verify(stub).createEnergyConsumerPhase(CreateEnergyConsumerPhaseRequest.newBuilder().setEnergyConsumerPhase(energyConsumerPhase.toPb()).build())
+        stubInOrder.verify(stub)
+            .createEnergyConsumerPhase(CreateEnergyConsumerPhaseRequest.newBuilder().setEnergyConsumerPhase(energyConsumerPhase.toPb()).build())
         stubInOrder.verify(stub).completeNetwork(CompleteNetworkRequest.newBuilder().build())
     }
 
@@ -745,7 +750,8 @@ internal class NetworkProducerClientTest {
 
         val stubInOrder = inOrder(stub)
         stubInOrder.verify(stub).createNetwork(CreateNetworkRequest.newBuilder().build())
-        stubInOrder.verify(stub).createLinearShuntCompensator(CreateLinearShuntCompensatorRequest.newBuilder().setLinearShuntCompensator(linearShuntCompensator.toPb()).build())
+        stubInOrder.verify(stub)
+            .createLinearShuntCompensator(CreateLinearShuntCompensatorRequest.newBuilder().setLinearShuntCompensator(linearShuntCompensator.toPb()).build())
         stubInOrder.verify(stub).completeNetwork(CompleteNetworkRequest.newBuilder().build())
     }
 
@@ -757,7 +763,9 @@ internal class NetworkProducerClientTest {
         doAnswer { throw expectedEx }.`when`(stub).createLinearShuntCompensator(any())
         producerClient.send(service)
 
-        verify(stub).createLinearShuntCompensator(CreateLinearShuntCompensatorRequest.newBuilder().setLinearShuntCompensator(linearShuntCompensator.toPb()).build())
+        verify(stub).createLinearShuntCompensator(
+            CreateLinearShuntCompensatorRequest.newBuilder().setLinearShuntCompensator(linearShuntCompensator.toPb()).build()
+        )
         assertThat(onErrorHandler.lastError, equalTo(expectedEx))
     }
 
@@ -769,7 +777,9 @@ internal class NetworkProducerClientTest {
 
         val stubInOrder = inOrder(stub)
         stubInOrder.verify(stub).createNetwork(CreateNetworkRequest.newBuilder().build())
-        stubInOrder.verify(stub).createPerLengthSequenceImpedance(CreatePerLengthSequenceImpedanceRequest.newBuilder().setPerLengthSequenceImpedance(perLengthSequenceImpedance.toPb()).build())
+        stubInOrder.verify(stub).createPerLengthSequenceImpedance(
+            CreatePerLengthSequenceImpedanceRequest.newBuilder().setPerLengthSequenceImpedance(perLengthSequenceImpedance.toPb()).build()
+        )
         stubInOrder.verify(stub).completeNetwork(CompleteNetworkRequest.newBuilder().build())
     }
 
@@ -781,7 +791,9 @@ internal class NetworkProducerClientTest {
         doAnswer { throw expectedEx }.`when`(stub).createPerLengthSequenceImpedance(any())
         producerClient.send(service)
 
-        verify(stub).createPerLengthSequenceImpedance(CreatePerLengthSequenceImpedanceRequest.newBuilder().setPerLengthSequenceImpedance(perLengthSequenceImpedance.toPb()).build())
+        verify(stub).createPerLengthSequenceImpedance(
+            CreatePerLengthSequenceImpedanceRequest.newBuilder().setPerLengthSequenceImpedance(perLengthSequenceImpedance.toPb()).build()
+        )
         assertThat(onErrorHandler.lastError, equalTo(expectedEx))
     }
 
@@ -817,7 +829,8 @@ internal class NetworkProducerClientTest {
 
         val stubInOrder = inOrder(stub)
         stubInOrder.verify(stub).createNetwork(CreateNetworkRequest.newBuilder().build())
-        stubInOrder.verify(stub).createPowerTransformerEnd(CreatePowerTransformerEndRequest.newBuilder().setPowerTransformerEnd(powerTransformerEnd.toPb()).build())
+        stubInOrder.verify(stub)
+            .createPowerTransformerEnd(CreatePowerTransformerEndRequest.newBuilder().setPowerTransformerEnd(powerTransformerEnd.toPb()).build())
         stubInOrder.verify(stub).completeNetwork(CompleteNetworkRequest.newBuilder().build())
     }
 

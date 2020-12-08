@@ -5,15 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.get
+package com.zepben.evolve.streaming.get
 
-import com.zepben.cimbend.cim.iec61968.customers.Customer
-import com.zepben.cimbend.cim.iec61968.customers.CustomerAgreement
-import com.zepben.cimbend.customer.CustomerService
-import com.zepben.cimbend.get.ConsumerUtils.buildFromBuilder
-import com.zepben.cimbend.get.ConsumerUtils.forEachBuilder
-import com.zepben.cimbend.get.ConsumerUtils.validateFailure
-import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
+import com.zepben.evolve.cim.iec61968.customers.Customer
+import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
+import com.zepben.evolve.services.customer.CustomerService
+import com.zepben.evolve.streaming.get.ConsumerUtils.buildFromBuilder
+import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
+import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
+import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.cc.CustomerIdentifiedObject
 import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest

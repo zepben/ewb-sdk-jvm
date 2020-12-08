@@ -5,15 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.get
+package com.zepben.evolve.streaming.get
 
-import com.zepben.cimbend.cim.iec61970.base.diagramlayout.Diagram
-import com.zepben.cimbend.cim.iec61970.base.diagramlayout.DiagramObject
-import com.zepben.cimbend.diagram.DiagramService
-import com.zepben.cimbend.get.ConsumerUtils.buildFromBuilder
-import com.zepben.cimbend.get.ConsumerUtils.forEachBuilder
-import com.zepben.cimbend.get.ConsumerUtils.validateFailure
-import com.zepben.cimbend.grpc.CaptureLastRpcErrorHandler
+import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
+import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
+import com.zepben.evolve.services.diagram.DiagramService
+import com.zepben.evolve.streaming.get.ConsumerUtils.buildFromBuilder
+import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
+import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
+import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.dc.DiagramIdentifiedObject
 import com.zepben.protobuf.dc.GetIdentifiedObjectsRequest

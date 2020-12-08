@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.cimbend.grpc
+package com.zepben.evolve.streaming.grpc
 
 class ThrowingGrpcClient(val ex: Throwable = RuntimeException()) : GrpcClient() {
 

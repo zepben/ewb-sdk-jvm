@@ -7,12 +7,14 @@
  */
 package com.zepben.evolve.services.common
 
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+
 /**
  * This provides a way to resolve a reference relationship between properties on an instance of [T] to an instance of [R]
  * that may not be able to be resolved immediately.
  *
  * Used by the [BaseService] when attempting to resolve relationships between two
- * [com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject]s. Note that two instances of a reference resolver that
+ * [IdentifiedObject]s. Note that two instances of a reference resolver that
  * resolve the same reference relationship should always be equal so that unresolved references for an object can be
  * queried based on their resolver.
  */

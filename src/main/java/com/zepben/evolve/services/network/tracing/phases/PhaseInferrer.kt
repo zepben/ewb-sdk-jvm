@@ -84,7 +84,7 @@ class PhaseInferrer {
     private fun hasDirectionOf(expectedDirection: PhaseDirection, terminal: Terminal, phaseSelector: PhaseSelector): Boolean {
         return terminal.phases.singlePhases()
             .any {
-                phaseSelector.status(terminal, it).direction() == expectedDirection
+                phaseSelector.status(terminal, it).direction().has(expectedDirection)
             }
     }
 

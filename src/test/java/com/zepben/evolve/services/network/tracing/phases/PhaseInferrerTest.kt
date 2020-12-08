@@ -41,10 +41,10 @@ class PhaseInferrerTest {
         systemErr.clearCapturedLog()
 
         val network = PhasesTestNetwork
-            .withSource(PhaseCode.ABC)
-            .connectedTo(PhaseCode.ABC)
-            .connectedTo(PhaseCode.N)
-            .connectedTo(PhaseCode.ABCN)
+            .from(PhaseCode.ABC)
+            .to(PhaseCode.ABC)
+            .to(PhaseCode.N)
+            .to(PhaseCode.ABCN)
             .build()
 
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
@@ -84,10 +84,10 @@ class PhaseInferrerTest {
         systemErr.clearCapturedLog()
 
         val network = PhasesTestNetwork
-            .withSource(PhaseCode.ABC)
-            .connectedTo(PhaseCode.ABC)
-            .connectedTo(PhaseCode.B)
-            .connectedTo(PhaseCode.XYN)
+            .from(PhaseCode.ABC)
+            .to(PhaseCode.ABC)
+            .to(PhaseCode.B)
+            .to(PhaseCode.XYN)
             .build()
 
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
@@ -124,10 +124,10 @@ class PhaseInferrerTest {
         systemErr.clearCapturedLog()
 
         val network = PhasesTestNetwork
-            .withSource(PhaseCode.ABC)
-            .connectedTo(PhaseCode.ABC)
-            .connectedTo(PhaseCode.A)
-            .connectedTo(PhaseCode.XN)
+            .from(PhaseCode.ABC)
+            .to(PhaseCode.ABC)
+            .to(PhaseCode.A)
+            .to(PhaseCode.XN)
             .build()
 
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
@@ -148,6 +148,46 @@ class PhaseInferrerTest {
         )
     }
 
+
+    //
+    // nominal
+    // AN <-> ABCN <-> AN
+    // traced
+    // AN <-> A NONE NONE N <-> AN
+    //
+    // infer nominal
+    // AN <-> ABCN <-> AN
+    // (warning with should be correct)
+    //
+    @Test
+    internal fun testDualFeedANtoABCN() {
+        val phaseInferrer = Tracing.phaseInferrer()
+        systemErr.clearCapturedLog()
+
+        val network = PhasesTestNetwork
+            .from(PhaseCode.AN)
+            .to(PhaseCode.ABCN)
+            .toSource(PhaseCode.AN)
+            .build()
+
+        validatePhases(network, "source", SinglePhaseKind.A, SinglePhaseKind.N)
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.N)
+        validatePhases(network, "source1", SinglePhaseKind.A, SinglePhaseKind.N)
+
+        phaseInferrer.run(network)
+
+        validatePhases(network, "source", SinglePhaseKind.A, SinglePhaseKind.N)
+        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
+        validatePhases(network, "source1", SinglePhaseKind.A, SinglePhaseKind.N)
+
+        assertThat(
+            listOf(*systemErr.logLines),
+            Matchers.containsInAnyOrder(
+                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c0 name' [c0] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
+            )
+        )
+    }
+
     //
     // nominal
     // ABCN -> N -> AB -> XY
@@ -164,11 +204,11 @@ class PhaseInferrerTest {
         systemErr.clearCapturedLog()
 
         val network = PhasesTestNetwork
-            .withSource(PhaseCode.ABCN)
-            .connectedTo(PhaseCode.ABCN)
-            .connectedTo(PhaseCode.N)
-            .connectedTo(PhaseCode.AB)
-            .connectedTo(PhaseCode.XY)
+            .from(PhaseCode.ABCN)
+            .to(PhaseCode.ABCN)
+            .to(PhaseCode.N)
+            .to(PhaseCode.AB)
+            .to(PhaseCode.XY)
             .build()
 
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
@@ -206,10 +246,10 @@ class PhaseInferrerTest {
         systemErr.clearCapturedLog()
 
         val network = PhasesTestNetwork
-            .withSource(PhaseCode.ABC)
-            .connectedTo(PhaseCode.ABC)
-            .connectedToSwitch(PhaseCode.ABC, true)
-            .connectedTo(PhaseCode.ABC)
+            .from(PhaseCode.ABC)
+            .to(PhaseCode.ABC)
+            .toSwitch(PhaseCode.ABC, true)
+            .to(PhaseCode.ABC)
             .build()
 
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)

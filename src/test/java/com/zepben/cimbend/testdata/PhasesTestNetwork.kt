@@ -20,7 +20,7 @@ import com.zepben.cimbend.testdata.TestDataCreators.*
 
 object PhasesTestNetwork {
 
-    fun withSource(phases: PhaseCode): Builder {
+    fun from(phases: PhaseCode): Builder {
         val network = NetworkService()
         val source = createSourceForConnecting(network, "source", 1, phases)
         createTerminals(network, source, 1, phases)
@@ -38,17 +38,25 @@ object PhasesTestNetwork {
             current = source
         }
 
-        fun connectedTo(phases: PhaseCode): Builder {
+        fun to(phases: PhaseCode): Builder {
             val c: AcLineSegment = createAcLineSegmentForConnecting(network, "c" + count++, phases)
             network.connect(current.getTerminal(if (current is EnergySource) 1 else 2)!!, c.getTerminal(1)!!)
             current = c
             return this
         }
 
-        fun connectedToSwitch(phases: PhaseCode, isOpen: Boolean): Builder {
+        fun toSwitch(phases: PhaseCode, isOpen: Boolean): Builder {
             val s: Breaker = createSwitchForConnecting(network, "s" + count++, 2, phases, isOpen, isOpen, isOpen)
             network.connect(current.getTerminal(if (current is EnergySource) 1 else 2)!!, s.getTerminal(1)!!)
             current = s
+            return this
+        }
+
+        fun toSource(phases: PhaseCode): Builder {
+            val source = createSourceForConnecting(network, "source" + count++, 1, phases)
+            createTerminals(network, source, 2, phases)
+            network.connect(current.getTerminal(if (current is EnergySource) 1 else 2)!!, source.getTerminal(1)!!)
+            current = source
             return this
         }
 

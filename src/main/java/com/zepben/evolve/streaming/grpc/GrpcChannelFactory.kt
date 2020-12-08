@@ -5,8 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.grpc
+package com.zepben.evolve.streaming.grpc
 
+import com.zepben.evolve.streaming.get.CimConsumerClient
+import com.zepben.evolve.streaming.put.CimProducerClient
 import io.grpc.ManagedChannel
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
@@ -17,8 +19,8 @@ data class BadConfigException(val msg: String) : Exception(msg)
 object GrpcChannelFactory {
 
     /**
-     * Create a gRPC Channel with the specified [config] that can be passed to a gRPC based [com.zepben.cimbend.put.CimProducerClient] or
-     * [com.zepben.cimbend.get.CimConsumerClient] implementation.
+     * Create a gRPC Channel with the specified [config] that can be passed to a gRPC based [CimProducerClient] or
+     * [CimConsumerClient] implementation.
      */
     @JvmStatic
     fun create(config: ConnectionConfig): ManagedChannel {

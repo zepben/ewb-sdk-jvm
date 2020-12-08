@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.grpc
+package com.zepben.evolve.streaming.grpc
 
 /**
  * Base class that defines some helpful functions for gRPC clients to communicate with the server.

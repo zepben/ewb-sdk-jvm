@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.grpc
+package com.zepben.evolve.streaming.grpc
 
 /**
  * Configuration for connecting to a gRPC Producer server.

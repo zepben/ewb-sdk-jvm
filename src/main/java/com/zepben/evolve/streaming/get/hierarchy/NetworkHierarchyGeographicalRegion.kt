@@ -6,14 +6,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.cimbend.get.hierarchy
+package com.zepben.evolve.streaming.get.hierarchy
 
 /**
- * A simplified representation of a sub geographical region for requesting the network hierarchy.
+ * A simplified representation of a geographical region for requesting the network hierarchy.
  */
-class NetworkHierarchySubGeographicalRegion(
+class NetworkHierarchyGeographicalRegion(
     mRID: String,
     name: String,
-    val substations: Map<String, NetworkHierarchySubstation>,
-    var geographicalRegion: NetworkHierarchyGeographicalRegion? = null
+    val subGeographicalRegions: Map<String, NetworkHierarchySubGeographicalRegion>
 ) : NetworkHierarchyIdentifiedObject(mRID, name)

@@ -5,22 +5,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.get
+package com.zepben.evolve.streaming.get
 
-import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.cimbend.cim.iec61970.base.core.Feeder
-import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.cimbend.cim.iec61970.base.wires.AcLineSegment
-import com.zepben.cimbend.cim.iec61970.base.wires.Conductor
-import com.zepben.cimbend.common.Resolvers
-import com.zepben.cimbend.common.extensions.typeNameAndMRID
-import com.zepben.cimbend.common.translator.mRID
-import com.zepben.cimbend.get.hierarchy.*
-import com.zepben.cimbend.grpc.GrpcResult
-import com.zepben.cimbend.measurement.mRID
-import com.zepben.cimbend.network.NetworkService
-import com.zepben.cimbend.network.model.NetworkProtoToCim
-import com.zepben.cimbend.network.translator.mRID
+import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.evolve.cim.iec61970.base.wires.Conductor
+import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.services.common.Resolvers
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
+import com.zepben.evolve.services.common.translator.mRID
+import com.zepben.evolve.services.measurement.mRID
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.translator.NetworkProtoToCim
+import com.zepben.evolve.services.network.translator.mRID
+import com.zepben.evolve.streaming.get.hierarchy.*
+import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.nc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.nc.GetNetworkHierarchyRequest
 import com.zepben.protobuf.nc.NetworkConsumerGrpc
@@ -48,7 +49,7 @@ class NetworkConsumerClient(
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - The item if found
-     * - null if an object could not be found or it was found but not added to [service] (see [com.zepben.cimbend.common.BaseService.add]).
+     * - null if an object could not be found or it was found but not added to [service] (see [BaseService.add]).
      * - A [Throwable] if an error occurred while retrieving or processing the object, in which case, [GrpcResult.wasSuccessful] will return false.
      */
     override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject?> {
@@ -69,7 +70,7 @@ class NetworkConsumerClient(
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
-     * If an item couldn't be added to [service], its mRID will be present in [MultiObjectResult.failed] (see [com.zepben.cimbend.common.BaseService.add]).
+     * If an item couldn't be added to [service], its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
      * - A [Throwable] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
      * Note the warning above in this case.
      */

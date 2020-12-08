@@ -5,13 +5,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.get
+package com.zepben.evolve.streaming.get
 
-import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.cimbend.diagram.DiagramProtoToCim
-import com.zepben.cimbend.diagram.DiagramService
-import com.zepben.cimbend.diagram.mRID
-import com.zepben.cimbend.grpc.GrpcResult
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.services.diagram.DiagramService
+import com.zepben.evolve.services.diagram.mRID
+import com.zepben.evolve.services.diagram.translator.DiagramProtoToCim
+import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.dc.DiagramIdentifiedObject
 import com.zepben.protobuf.dc.DiagramIdentifiedObject.IdentifiedObjectCase.*
@@ -37,7 +38,7 @@ class DiagramConsumerClient(
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - The item if found
-     * - null if an object could not be found or it was found but not added to [service] (see [com.zepben.cimbend.common.BaseService.add]).
+     * - null if an object could not be found or it was found but not added to [service] (see [BaseService.add]).
      * - A [Throwable] if an error occurred while retrieving or processing the object, in which case, [GrpcResult.wasSuccessful] will return false.
      */
     override fun getIdentifiedObject(service: DiagramService, mRID: String): GrpcResult<IdentifiedObject?> {
@@ -58,7 +59,7 @@ class DiagramConsumerClient(
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
-     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [com.zepben.cimbend.common.BaseService.add]).
+     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
      * - A [Throwable] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
      * Note the warning above in this case.
      */

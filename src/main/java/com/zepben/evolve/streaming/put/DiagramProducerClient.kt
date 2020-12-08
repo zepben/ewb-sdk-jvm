@@ -5,12 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.put
+package com.zepben.evolve.streaming.put
 
-import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.cimbend.diagram.DiagramService
-import com.zepben.cimbend.diagram.toPb
-import com.zepben.cimbend.diagram.whenDiagramServiceObject
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.services.diagram.DiagramService
+import com.zepben.evolve.services.diagram.translator.toPb
+import com.zepben.evolve.services.diagram.whenDiagramServiceObject
 import com.zepben.protobuf.dp.*
 import io.grpc.Channel
 

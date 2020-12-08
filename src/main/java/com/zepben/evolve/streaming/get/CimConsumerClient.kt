@@ -5,12 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.get
+package com.zepben.evolve.streaming.get
 
-import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.cimbend.common.BaseService
-import com.zepben.cimbend.grpc.GrpcClient
-import com.zepben.cimbend.grpc.GrpcResult
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.streaming.grpc.GrpcClient
+import com.zepben.evolve.streaming.grpc.GrpcResult
 
 
 /**

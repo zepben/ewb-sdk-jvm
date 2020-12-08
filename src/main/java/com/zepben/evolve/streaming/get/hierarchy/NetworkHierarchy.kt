@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.cimbend.get.hierarchy
+package com.zepben.evolve.streaming.get.hierarchy
 
 /**
  * Container for simplified network hierarchy objects

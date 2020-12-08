@@ -5,13 +5,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.put
+package com.zepben.evolve.streaming.put
 
-import com.zepben.cimbend.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.cimbend.common.translator.toPb
-import com.zepben.cimbend.customer.CustomerService
-import com.zepben.cimbend.customer.translator.toPb
-import com.zepben.cimbend.customer.whenCustomerServiceObject
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.services.common.translator.toPb
+import com.zepben.evolve.services.customer.CustomerService
+import com.zepben.evolve.services.customer.translator.toPb
+import com.zepben.evolve.services.customer.whenCustomerServiceObject
 import com.zepben.protobuf.cp.*
 import io.grpc.Channel
 

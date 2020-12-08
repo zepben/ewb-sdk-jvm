@@ -5,10 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.cimbend.put
+package com.zepben.evolve.streaming.put
 
-import com.zepben.cimbend.common.BaseService
-import com.zepben.cimbend.grpc.GrpcClient
+import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.streaming.grpc.GrpcClient
 
 /**
  * Base class that defines some helpful functions when producer clients are sending to the server.

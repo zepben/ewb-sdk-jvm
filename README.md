@@ -24,12 +24,12 @@ To build:
 1. Descriptions copied from CIM and added as doc comments to new changes (on class, property etc)
 1. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required.
 1. Database:
-    1. Table class(es) updated. - `com.zepben.cimbend.database.sqlite.tables`
-    1. Writer updated. - `com.zepben.cimbend.database.sqlite.writers`
-    1. Reader updated. - `com.zepben.cimbend.database.sqlite.readers`
-    1. DB version updated. - `TableVersion.kt`
-    1. Migration written. - `com.zepben.cimbend.database.sqlite.upgrade`
-    1. Add schema tests - `DatabaseSqliteTest.kt`
+   1. Table class(es) updated. - `com.zepben.evolve.database.sqlite.tables`
+   1. Writer updated. - `com.zepben.evolve.database.sqlite.writers`
+   1. Reader updated. - `com.zepben.evolve.database.sqlite.readers`
+   1. DB version updated. - `TableVersion.kt`
+   1. Migration written. - `com.zepben.evolve.database.sqlite.upgrade`
+   1. Add schema tests - `DatabaseSqliteTest.kt`
 1. Reference resolver(s) added (if new associations).
 1. Protobuf/gRPC
     1. *CimToProto(s) updated and tested.

@@ -5,10 +5,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.model
+package com.zepben.evolve.services.network.translator
 
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.translator.NetworkProtoToCim
 import org.junit.jupiter.api.Test
 import com.zepben.protobuf.cim.iec61968.assets.Pole as PBPole
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter

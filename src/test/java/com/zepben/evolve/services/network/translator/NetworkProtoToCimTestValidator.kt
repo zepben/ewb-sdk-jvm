@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.model
+package com.zepben.evolve.services.network.translator
 
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
@@ -348,7 +348,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun <reified T: Measurement> validate(pb: PBMeasurement.Builder, fromPb: () -> T): T {
+    inline fun <reified T : Measurement> validate(pb: PBMeasurement.Builder, fromPb: () -> T): T {
         pb.terminalMRID = "terminal1"
         pb.powerSystemResourceMRID = "psr1"
         pb.remoteSourceMRID = "rs1"

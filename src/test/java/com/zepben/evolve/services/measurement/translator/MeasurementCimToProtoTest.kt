@@ -5,13 +5,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.measurement
+package com.zepben.evolve.services.measurement.translator
 
 import com.zepben.evolve.cim.iec61970.base.meas.AccumulatorValue
 import com.zepben.evolve.cim.iec61970.base.meas.AnalogValue
 import com.zepben.evolve.cim.iec61970.base.meas.DiscreteValue
 import com.zepben.evolve.cim.iec61970.base.meas.MeasurementValue
 import com.zepben.evolve.services.common.translator.toTimestamp
+import com.zepben.evolve.services.measurement.MeasurementCimToProto
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.junit.jupiter.api.Test

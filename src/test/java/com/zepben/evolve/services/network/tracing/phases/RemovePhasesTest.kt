@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.tracing
+package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
@@ -14,7 +14,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.SingleLineSinglePhaseNetwork
 import com.zepben.evolve.services.network.testdata.SingleLineSwerNetwork
 import com.zepben.evolve.services.network.testdata.TestNetworks
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
+import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers

@@ -9,7 +9,7 @@
 
 @file:Suppress("PropertyName")
 
-package com.zepben.evolve.services.network.tracing
+package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
@@ -22,10 +22,9 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createSourceForConnecting
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
 import com.zepben.evolve.services.network.testdata.TestNetworks
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
+import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.phases.PhaseDirection.*
 import com.zepben.evolve.services.network.tracing.phases.PhaseDirection.NONE
-import com.zepben.evolve.services.network.tracing.phases.PhaseStatus
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat

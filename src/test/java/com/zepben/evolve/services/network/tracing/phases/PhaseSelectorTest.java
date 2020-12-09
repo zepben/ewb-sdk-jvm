@@ -5,15 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.tracing;
+package com.zepben.evolve.services.network.tracing.phases;
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode;
 import com.zepben.evolve.cim.iec61970.base.core.Terminal;
 import com.zepben.evolve.cim.iec61970.base.wires.Junction;
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind;
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection;
-import com.zepben.evolve.services.network.tracing.phases.PhaseSelector;
-import com.zepben.evolve.services.network.tracing.phases.PhaseStatus;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

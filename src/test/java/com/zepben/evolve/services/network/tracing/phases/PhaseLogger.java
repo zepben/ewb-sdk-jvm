@@ -5,11 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.tracing;
+package com.zepben.evolve.services.network.tracing.phases;
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment;
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind;
-import com.zepben.evolve.services.network.tracing.phases.PhaseStatus;
+import com.zepben.evolve.services.network.tracing.Tracing;
 import com.zepben.evolve.services.network.tracing.traversals.Traversal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

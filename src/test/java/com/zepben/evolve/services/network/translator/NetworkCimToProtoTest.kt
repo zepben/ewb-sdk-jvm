@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.model
+package com.zepben.evolve.services.network.translator
 
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -18,7 +18,6 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.measurement.toPb
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.fillFields
-import com.zepben.evolve.services.network.translator.toPb
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension

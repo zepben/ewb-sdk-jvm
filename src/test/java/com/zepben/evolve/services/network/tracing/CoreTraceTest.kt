@@ -11,8 +11,9 @@ import com.zepben.collectionutils.CollectionUtils
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.model.PhaseDirection
 import com.zepben.evolve.services.network.testdata.TestNetworks
+import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
+import com.zepben.evolve.services.network.tracing.phases.PhaseStep
 import com.zepben.evolve.services.network.tracing.traversals.Traversal
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.Matchers

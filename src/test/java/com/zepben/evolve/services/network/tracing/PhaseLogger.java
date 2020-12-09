@@ -9,6 +9,7 @@ package com.zepben.evolve.services.network.tracing;
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment;
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind;
+import com.zepben.evolve.services.network.tracing.phases.PhaseStatus;
 import com.zepben.evolve.services.network.tracing.traversals.Traversal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

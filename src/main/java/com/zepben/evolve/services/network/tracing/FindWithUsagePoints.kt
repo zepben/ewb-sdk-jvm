@@ -8,6 +8,7 @@
 package com.zepben.evolve.services.network.tracing
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.services.network.tracing.phases.PhaseStep
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 import java.util.*
 import java.util.function.Supplier
@@ -22,7 +23,7 @@ class FindWithUsagePoints {
     }
 
     fun runNormal(froms: List<ConductingEquipment>, tos: List<ConductingEquipment?>): List<Result> {
-        return run(froms, tos) { PhaseTrace.newNormalDownstreamTrace() }
+        return run(froms, tos) { Tracing.normalDownstreamTrace() }
     }
 
     fun runCurrent(from: ConductingEquipment, to: ConductingEquipment?): Result {
@@ -30,7 +31,7 @@ class FindWithUsagePoints {
     }
 
     fun runCurrent(froms: List<ConductingEquipment>, tos: List<ConductingEquipment?>): List<Result> {
-        return run(froms, tos) { PhaseTrace.newCurrentDownstreamTrace() }
+        return run(froms, tos) { Tracing.currentDownstreamTrace() }
     }
 
     private fun run(froms: List<ConductingEquipment>, tos: List<ConductingEquipment?>, traversalSupplier: Supplier<BasicTraversal<PhaseStep>>): List<Result> {

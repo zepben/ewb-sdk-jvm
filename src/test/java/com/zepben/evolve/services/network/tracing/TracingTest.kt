@@ -12,6 +12,11 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.services.network.testdata.TestNetworks
+import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
+import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
+import com.zepben.evolve.services.network.tracing.phases.PhaseStep
+import com.zepben.evolve.services.network.tracing.phases.RemovePhases
+import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers

@@ -8,9 +8,9 @@
 package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.model.TracedPhases
-import com.zepben.evolve.services.network.tracing.PhaseSelector
-import com.zepben.evolve.services.network.tracing.PhaseStatus
+import com.zepben.evolve.services.network.tracing.phases.PhaseSelector
+import com.zepben.evolve.services.network.tracing.phases.PhaseStatus
+import com.zepben.evolve.services.network.tracing.phases.TracedPhases
 import java.lang.ref.WeakReference
 
 /**

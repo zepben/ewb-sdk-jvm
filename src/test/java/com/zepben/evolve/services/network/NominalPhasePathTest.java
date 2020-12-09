@@ -8,7 +8,7 @@
 package com.zepben.evolve.services.network;
 
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind;
-import com.zepben.evolve.services.network.model.NominalPhasePath;
+import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath;
 import com.zepben.testutils.junit.SystemLogExtension;
 import kotlin.jvm.JvmField;
 import org.junit.jupiter.api.Test;

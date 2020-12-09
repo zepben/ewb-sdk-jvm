@@ -5,14 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.tracing;
+package com.zepben.evolve.services.network.tracing.phases;
 
 import com.zepben.annotations.EverythingIsNonnullByDefault;
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment;
 import com.zepben.evolve.cim.iec61970.base.core.Terminal;
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind;
 import com.zepben.evolve.services.network.NetworkService;
-import com.zepben.evolve.services.network.model.PhaseDirection;
+import com.zepben.evolve.services.network.tracing.ConnectivityResult;
+import com.zepben.evolve.services.network.tracing.OpenTest;
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal;
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue;
 
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("WeakerAccess")
 @EverythingIsNonnullByDefault
-class PhaseTrace {
+public class PhaseTrace {
 
     /**
      * @return a traversal that traces along phases in all directions through all open points.

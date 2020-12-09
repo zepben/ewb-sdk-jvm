@@ -27,10 +27,10 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkService.Companion.connectedEquipment
 import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
-import com.zepben.evolve.services.network.model.NominalPhasePath
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createNodeForConnecting
 import com.zepben.evolve.services.network.testdata.TestNetworks
 import com.zepben.evolve.services.network.tracing.ConnectivityResult
+import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*

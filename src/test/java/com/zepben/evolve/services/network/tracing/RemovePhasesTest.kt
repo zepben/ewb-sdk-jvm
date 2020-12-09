@@ -11,10 +11,10 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.model.PhaseDirection
 import com.zepben.evolve.services.network.testdata.SingleLineSinglePhaseNetwork
 import com.zepben.evolve.services.network.testdata.SingleLineSwerNetwork
 import com.zepben.evolve.services.network.testdata.TestNetworks
+import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers

@@ -34,8 +34,8 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseServiceComparatorTest
 import com.zepben.evolve.services.common.ObjectDifference
 import com.zepben.evolve.services.common.ValueDifference
-import com.zepben.evolve.services.network.model.PhaseDirection
-import com.zepben.evolve.services.network.model.TracedPhases
+import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
+import com.zepben.evolve.services.network.tracing.phases.TracedPhases
 import com.zepben.evolve.utils.ServiceComparatorValidator
 import org.junit.jupiter.api.Test
 

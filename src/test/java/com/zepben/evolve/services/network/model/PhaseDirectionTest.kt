@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.services.network.model
 
+import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

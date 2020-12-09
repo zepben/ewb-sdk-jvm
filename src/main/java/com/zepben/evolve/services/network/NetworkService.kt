@@ -26,8 +26,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
-import com.zepben.evolve.services.network.model.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.ConnectivityResult
+import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import kotlin.reflect.KClass
 
 /**

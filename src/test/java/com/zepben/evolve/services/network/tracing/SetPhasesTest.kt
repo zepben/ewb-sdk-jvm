@@ -19,12 +19,13 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.model.PhaseDirection
-import com.zepben.evolve.services.network.model.PhaseDirection.*
-import com.zepben.evolve.services.network.model.PhaseDirection.NONE
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createSourceForConnecting
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
 import com.zepben.evolve.services.network.testdata.TestNetworks
+import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
+import com.zepben.evolve.services.network.tracing.phases.PhaseDirection.*
+import com.zepben.evolve.services.network.tracing.phases.PhaseDirection.NONE
+import com.zepben.evolve.services.network.tracing.phases.PhaseStatus
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat

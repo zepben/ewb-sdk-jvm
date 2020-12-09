@@ -15,8 +15,8 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal;
 import com.zepben.evolve.cim.iec61970.base.wires.Junction;
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind;
 import com.zepben.evolve.services.network.NetworkService;
-import com.zepben.evolve.services.network.model.PhaseDirection;
-import com.zepben.evolve.services.network.tracing.PhaseStatus;
+import com.zepben.evolve.services.network.tracing.phases.PhaseDirection;
+import com.zepben.evolve.services.network.tracing.phases.PhaseStatus;
 
 import java.util.Collections;
 import java.util.List;

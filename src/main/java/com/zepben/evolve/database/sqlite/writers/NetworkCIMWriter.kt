@@ -51,9 +51,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteS
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
-import com.zepben.evolve.database.sqlite.tables.associations.LoopSubstationRelationship
 import java.sql.PreparedStatement
-
 
 
 @Suppress("SameParameterValue")

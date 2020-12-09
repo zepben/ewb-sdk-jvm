@@ -8,8 +8,8 @@
 package com.zepben.evolve.services.network;
 
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind;
-import com.zepben.evolve.services.network.model.PhaseDirection;
-import com.zepben.evolve.services.network.model.TracedPhases;
+import com.zepben.evolve.services.network.tracing.phases.PhaseDirection;
+import com.zepben.evolve.services.network.tracing.phases.TracedPhases;
 import org.junit.jupiter.api.Test;
 
 import static com.zepben.testutils.exception.ExpectException.expect;

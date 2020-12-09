@@ -5,15 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.model
+package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.model.TracedPhasesBitManipulation.Companion.add
-import com.zepben.evolve.services.network.model.TracedPhasesBitManipulation.Companion.direction
-import com.zepben.evolve.services.network.model.TracedPhasesBitManipulation.Companion.phase
-import com.zepben.evolve.services.network.model.TracedPhasesBitManipulation.Companion.remove
-import com.zepben.evolve.services.network.model.TracedPhasesBitManipulation.Companion.set
+import com.zepben.evolve.services.network.tracing.phases.TracedPhasesBitManipulation.Companion.add
+import com.zepben.evolve.services.network.tracing.phases.TracedPhasesBitManipulation.Companion.direction
+import com.zepben.evolve.services.network.tracing.phases.TracedPhasesBitManipulation.Companion.phase
+import com.zepben.evolve.services.network.tracing.phases.TracedPhasesBitManipulation.Companion.remove
+import com.zepben.evolve.services.network.tracing.phases.TracedPhasesBitManipulation.Companion.set
 
 /**
  * Class that holds the traced phase statuses for the current and normal state of the network.

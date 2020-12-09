@@ -89,32 +89,27 @@ class PhaseInferrer {
     }
 
     private fun setMissingToNominal(breakers: List<Breaker>, terminals: List<Terminal>, phaseSelector: PhaseSelector): Boolean {
-        var didUpdate = false
+        val terminalsToTrace = mutableSetOf<Terminal>()
         terminals.forEach { terminal ->
-            var runSetPhases = false
             terminal.phases.singlePhases().forEach { nominalPhase ->
                 val status = phaseSelector.status(terminal, nominalPhase)
                 if (status.direction() === PhaseDirection.NONE) {
                     if (nominalPhase != SinglePhaseKind.X && nominalPhase != SinglePhaseKind.Y) {
-                        val otherTerminal = terminal.connectivityNode?.terminals?.first { other -> other != terminal }
-                        val otherDirectionIsBoth =
-                            otherTerminal?.phases?.singlePhases()?.any { phaseSelector.status(otherTerminal, it).direction() == PhaseDirection.BOTH } ?: false
-
-                        status.add(nominalPhase, if (otherDirectionIsBoth) PhaseDirection.BOTH else PhaseDirection.IN)
-                        runSetPhases = true
-                        didUpdate = true
+                        status.add(nominalPhase, PhaseDirection.IN)
+                        terminalsToTrace.add(terminal)
                     }
                 }
             }
+        }
 
-            if (runSetPhases) {
-                terminal.conductingEquipment?.let {
-                    Tracing.setPhases().run(it, breakers)
-                    tracking.putIfAbsent(it, false)
-                }
+        terminalsToTrace.forEach { terminal ->
+            terminal.conductingEquipment?.let {
+                Tracing.setPhases().run(it, breakers)
+                tracking.putIfAbsent(it, false)
             }
         }
-        return didUpdate
+
+        return terminalsToTrace.isNotEmpty()
     }
 
     private fun inferPhases(breakers: Collection<Breaker>, terminal: Terminal, phaseSelector: PhaseSelector, maxMissingPhases: Int) {

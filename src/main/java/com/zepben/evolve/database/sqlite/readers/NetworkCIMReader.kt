@@ -56,7 +56,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.Tabl
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.services.common.extensions.*
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.model.LoopSubstationRelationship
 import java.sql.ResultSet
 
 @Suppress("SameParameterValue")

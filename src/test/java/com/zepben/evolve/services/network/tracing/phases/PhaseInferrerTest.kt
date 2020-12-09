@@ -13,9 +13,7 @@ import com.zepben.evolve.services.network.testdata.TestNetworks
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.hasSize
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -50,18 +48,54 @@ class PhaseInferrerTest {
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
         validatePhases(network, "c1", SinglePhaseKind.NONE)
         validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c1",
+            listOf(PhaseDirection.NONE),
+            listOf(PhaseDirection.NONE)
+        )
+        validatePhaseDirections(
+            network,
+            "c2",
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE),
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE)
+        )
 
         phaseInferrer.run(network)
 
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
         validatePhases(network, "c1", SinglePhaseKind.N)
         validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c1",
+            listOf(PhaseDirection.IN),
+            listOf(PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c2",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
 
         assertThat(
             listOf(*systemErr.logLines),
-            Matchers.containsInAnyOrder(
-                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c1 name' [c1] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
+            containsInAnyOrder(
+                containsString("*** Action Required *** Inferred missing phase for 'c1 name' [c1] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
+                containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
             )
         )
     }
@@ -93,17 +127,53 @@ class PhaseInferrerTest {
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
         validatePhases(network, "c1", SinglePhaseKind.B)
         validatePhases(network, "c2", SinglePhaseKind.B, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c1",
+            listOf(PhaseDirection.IN),
+            listOf(PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c2",
+            listOf(PhaseDirection.IN, PhaseDirection.NONE, PhaseDirection.NONE),
+            listOf(PhaseDirection.OUT, PhaseDirection.NONE, PhaseDirection.NONE)
+        )
 
         phaseInferrer.run(network)
 
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
         validatePhases(network, "c1", SinglePhaseKind.B)
         validatePhases(network, "c2", SinglePhaseKind.B, SinglePhaseKind.A, SinglePhaseKind.N)
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c1",
+            listOf(PhaseDirection.IN),
+            listOf(PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c2",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
 
         assertThat(
             listOf(*systemErr.logLines),
-            Matchers.containsInAnyOrder(
-                Matchers.containsString("*** Action Required *** Inferred missing phases for 'c2 name' [c2] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
+            containsInAnyOrder(
+                containsString("*** Action Required *** Inferred missing phases for 'c2 name' [c2] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
             )
         )
     }
@@ -133,21 +203,56 @@ class PhaseInferrerTest {
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
         validatePhases(network, "c1", SinglePhaseKind.A)
         validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.NONE)
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c1",
+            listOf(PhaseDirection.IN),
+            listOf(PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c2",
+            listOf(PhaseDirection.IN, PhaseDirection.NONE),
+            listOf(PhaseDirection.OUT, PhaseDirection.NONE)
+        )
 
         phaseInferrer.run(network)
 
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
         validatePhases(network, "c1", SinglePhaseKind.A)
         validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.N)
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c1",
+            listOf(PhaseDirection.IN),
+            listOf(PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c2",
+            listOf(PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT)
+        )
 
         assertThat(
             listOf(*systemErr.logLines),
-            Matchers.containsInAnyOrder(
-                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
+            containsInAnyOrder(
+                containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
             )
         )
     }
-
 
     //
     // nominal
@@ -160,7 +265,7 @@ class PhaseInferrerTest {
     // (warning with should be correct)
     //
     @Test
-    internal fun testDualFeedANtoABCN() {
+    fun testDualFeedANtoABCN() {
         val phaseInferrer = Tracing.phaseInferrer()
         systemErr.clearCapturedLog()
 
@@ -174,16 +279,44 @@ class PhaseInferrerTest {
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.N)
         validatePhases(network, "source1", SinglePhaseKind.A, SinglePhaseKind.N)
 
+        validatePhaseDirections(network, "source", listOf(), listOf(PhaseDirection.OUT, PhaseDirection.OUT))
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.BOTH, PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.BOTH),
+            listOf(PhaseDirection.BOTH, PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.BOTH)
+        )
+        validatePhaseDirections(
+            network,
+            "source1",
+            listOf(PhaseDirection.BOTH, PhaseDirection.BOTH),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+
         phaseInferrer.run(network)
 
         validatePhases(network, "source", SinglePhaseKind.A, SinglePhaseKind.N)
         validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
         validatePhases(network, "source1", SinglePhaseKind.A, SinglePhaseKind.N)
 
+        validatePhaseDirections(network, "source", listOf(), listOf(PhaseDirection.OUT, PhaseDirection.OUT))
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.BOTH, PhaseDirection.BOTH, PhaseDirection.BOTH, PhaseDirection.BOTH),
+            listOf(PhaseDirection.BOTH, PhaseDirection.BOTH, PhaseDirection.BOTH, PhaseDirection.BOTH)
+        )
+        validatePhaseDirections(
+            network,
+            "source1",
+            listOf(PhaseDirection.BOTH, PhaseDirection.BOTH),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+
         assertThat(
             listOf(*systemErr.logLines),
-            Matchers.containsInAnyOrder(
-                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c0 name' [c0] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
+            containsInAnyOrder(
+                containsString("*** Action Required *** Inferred missing phase for 'c0 name' [c0] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
             )
         )
     }
@@ -215,6 +348,30 @@ class PhaseInferrerTest {
         validatePhases(network, "c1", SinglePhaseKind.N)
         validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE)
         validatePhases(network, "c3", SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c1",
+            listOf(PhaseDirection.IN),
+            listOf(PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c2",
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE),
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE)
+        )
+        validatePhaseDirections(
+            network,
+            "c3",
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE),
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE)
+        )
 
         phaseInferrer.run(network)
 
@@ -222,11 +379,35 @@ class PhaseInferrerTest {
         validatePhases(network, "c1", SinglePhaseKind.N)
         validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.B)
         validatePhases(network, "c3", SinglePhaseKind.A, SinglePhaseKind.B)
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c1",
+            listOf(PhaseDirection.IN),
+            listOf(PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c2",
+            listOf(PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "c3",
+            listOf(PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT)
+        )
 
         assertThat(
             listOf(*systemErr.logLines),
-            Matchers.containsInAnyOrder(
-                Matchers.containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
+            containsInAnyOrder(
+                containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
             )
         )
     }
@@ -257,9 +438,27 @@ class PhaseInferrerTest {
             network,
             "s1",
             listOf(SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C),
-            listOf(SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE),
+            listOf(SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
         )
         validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "s1",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE)
+        )
+        validatePhaseDirections(
+            network,
+            "c2",
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE),
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE)
+        )
 
         phaseInferrer.run(network)
 
@@ -271,6 +470,24 @@ class PhaseInferrerTest {
             listOf(SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE),
         )
         validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+        validatePhaseDirections(
+            network,
+            "c0",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
+        )
+        validatePhaseDirections(
+            network,
+            "s1",
+            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE)
+        )
+        validatePhaseDirections(
+            network,
+            "c2",
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE),
+            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE)
+        )
 
         assertThat(listOf(*systemErr.logLines), hasSize(0))
     }
@@ -305,6 +522,32 @@ class PhaseInferrerTest {
             val nominalPhase = t2.phases.singlePhases()[index]
             assertThat(t2.normalPhases(nominalPhase).phase(), equalTo(expectedPhasesT2[index]))
         }
+    }
+
+    private fun validatePhaseDirections(
+        network: NetworkService,
+        id: String,
+        expectedDirectionT1: List<PhaseDirection>,
+        expectedDirectionT2: List<PhaseDirection>
+    ) {
+        val asset = network.get<ConductingEquipment>(id)!!
+        val t1 = if (expectedDirectionT1.isNotEmpty()) asset.terminals[0] else null
+        val t2 = if (expectedDirectionT1.isNotEmpty()) asset.terminals[1] else null
+
+        if (t1 != null) {
+            for (index in expectedDirectionT1.indices) {
+                val nominalPhase = t1.phases.singlePhases()[index]
+                assertThat(t1.normalPhases(nominalPhase).direction(), equalTo(expectedDirectionT1[index]))
+            }
+        }
+
+        if (t2 != null) {
+            for (index in expectedDirectionT2.indices) {
+                val nominalPhase = t2.phases.singlePhases()[index]
+                assertThat(t2.normalPhases(nominalPhase).direction(), equalTo(expectedDirectionT2[index]))
+            }
+        }
+
     }
 
 }

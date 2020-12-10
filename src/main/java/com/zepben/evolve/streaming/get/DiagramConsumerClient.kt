@@ -10,8 +10,8 @@ package com.zepben.evolve.streaming.get
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.diagram.DiagramService
-import com.zepben.evolve.services.diagram.mRID
 import com.zepben.evolve.services.diagram.translator.DiagramProtoToCim
+import com.zepben.evolve.services.diagram.translator.mRID
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.dc.DiagramIdentifiedObject

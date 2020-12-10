@@ -8,7 +8,6 @@
 package com.zepben.evolve.services.network.translator
 
 import com.google.protobuf.ProtocolStringList
-import com.google.protobuf.Timestamp
 import com.zepben.evolve.cim.iec61968.assets.Asset
 import com.zepben.evolve.cim.iec61968.assets.AssetContainer
 import com.zepben.evolve.cim.iec61968.assets.Pole
@@ -16,11 +15,13 @@ import com.zepben.evolve.cim.iec61968.assets.Structure
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61970.base.core.*
-import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
+import com.zepben.evolve.cim.iec61970.base.meas.Analog
+import com.zepben.evolve.cim.iec61970.base.meas.Discrete
+import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
-import com.zepben.evolve.services.common.translator.toTimestamp
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
@@ -39,13 +40,9 @@ import com.zepben.protobuf.cim.iec61970.base.core.PowerSystemResource as PBPower
 import com.zepben.protobuf.cim.iec61970.base.core.Substation as PBSubstation
 import com.zepben.protobuf.cim.iec61970.base.domain.UnitSymbol as PBUnitSymbol
 import com.zepben.protobuf.cim.iec61970.base.meas.Accumulator as PBAccumulator
-import com.zepben.protobuf.cim.iec61970.base.meas.AccumulatorValue as PBAccumulatorValue
 import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
-import com.zepben.protobuf.cim.iec61970.base.meas.AnalogValue as PBAnalogValue
 import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
-import com.zepben.protobuf.cim.iec61970.base.meas.DiscreteValue as PBDiscreteValue
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
-import com.zepben.protobuf.cim.iec61970.base.meas.MeasurementValue as PBMeasurementValue
 import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformerEnd as PBPowerTransformerEnd
@@ -245,25 +242,4 @@ internal class NetworkCimToProtoTestValidator {
         validate(cim as Measurement, pb.measurement)
     }
 
-    fun validate(cim: MeasurementValue, pb: PBMeasurementValue) {
-        cim.timeStamp?.let { assertThat(pb.timeStamp, equalTo(it.toTimestamp())) } ?: assertThat(pb.timeStamp, equalTo(Timestamp.getDefaultInstance()))
-    }
-
-    fun validate(cim: AnalogValue, pb: PBAnalogValue) {
-        validateMRID(cim.analogMRID, pb.analogMRID)
-        assertThat(cim.value, `is`(pb.value))
-        validate(cim as MeasurementValue, pb.mv)
-    }
-
-    fun validate(cim: AccumulatorValue, pb: PBAccumulatorValue) {
-        validateMRID(cim.accumulatorMRID, pb.accumulatorMRID)
-        assertThat(cim.value.toInt(), `is`(pb.value))
-        validate(cim as MeasurementValue, pb.mv)
-    }
-
-    fun validate(cim: DiscreteValue, pb: PBDiscreteValue) {
-        validateMRID(cim.discreteMRID, pb.discreteMRID)
-        assertThat(cim.value, `is`(pb.value))
-        validate(cim as MeasurementValue, pb.mv)
-    }
 }

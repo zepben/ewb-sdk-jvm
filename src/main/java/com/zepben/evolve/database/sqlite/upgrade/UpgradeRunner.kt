@@ -7,8 +7,8 @@
  */
 package com.zepben.evolve.database.sqlite.upgrade
 
-import com.zepben.evolve.database.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
+import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import org.slf4j.Logger

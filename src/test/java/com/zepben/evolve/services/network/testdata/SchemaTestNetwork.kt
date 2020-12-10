@@ -19,7 +19,6 @@ import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.measurement.MeasurementService
 import com.zepben.evolve.services.network.NetworkModelTestUtil
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.fillFields
 import java.time.Instant
 
 @Suppress("SameParameterValue", "BooleanLiteralArgument")

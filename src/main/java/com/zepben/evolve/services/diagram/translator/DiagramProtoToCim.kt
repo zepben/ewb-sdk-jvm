@@ -12,7 +12,6 @@ import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.services.common.translator.toCim
 import com.zepben.evolve.services.diagram.DiagramService
-import com.zepben.evolve.services.diagram.mRID
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.Diagram as PBDiagram
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObject as PBDiagramObject
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObjectPoint as PBDiagramObjectPoint

@@ -5,10 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.measurement
+package com.zepben.evolve.services.measurement.translator
 
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.services.common.translator.toInstant
+import com.zepben.evolve.services.measurement.MeasurementService
 import com.zepben.protobuf.cim.iec61970.base.meas.AccumulatorValue as PBAccumulatorValue
 import com.zepben.protobuf.cim.iec61970.base.meas.AnalogValue as PBAnalogValue
 import com.zepben.protobuf.cim.iec61970.base.meas.DiscreteValue as PBDiscreteValue

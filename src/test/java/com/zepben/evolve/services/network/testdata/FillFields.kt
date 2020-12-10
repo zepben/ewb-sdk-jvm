@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network
+package com.zepben.evolve.services.network.testdata
 
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
@@ -15,7 +15,10 @@ import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
-import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
+import com.zepben.evolve.cim.iec61970.base.meas.Analog
+import com.zepben.evolve.cim.iec61970.base.meas.Discrete
+import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
@@ -24,8 +27,8 @@ import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createJ
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createRemoteSource
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createSubstation
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locationOf
+import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
-import java.time.Instant
 import java.util.*
 
 /************ IEC61968 ASSETS ************/
@@ -210,7 +213,7 @@ fun PowerTransformer.fillFields(networkService: NetworkService, includeRuntime: 
     return this
 }
 
-fun TransformerEnd.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): TransformerEnd {
+fun TransformerEnd.fillFields(networkService: NetworkService): TransformerEnd {
     val term = Terminal()
     val rtc = RatioTapChanger()
     rtc.transformerEnd = this
@@ -230,7 +233,7 @@ fun TransformerEnd.fillFields(networkService: NetworkService, includeRuntime: Bo
     return this
 }
 
-fun PowerTransformerEnd.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerTransformerEnd {
+fun PowerTransformerEnd.fillFields(networkService: NetworkService): PowerTransformerEnd {
     val pt = PowerTransformer()
     powerTransformer = pt
     pt.addEnd(this)
@@ -248,7 +251,7 @@ fun PowerTransformerEnd.fillFields(networkService: NetworkService, includeRuntim
     phaseAngleClock = 3
     connectionKind = WindingConnection.D
 
-    (this as TransformerEnd).fillFields(networkService, includeRuntime)
+    (this as TransformerEnd).fillFields(networkService)
     return this
 }
 
@@ -318,30 +321,5 @@ fun Accumulator.fillFields(networkService: NetworkService): Accumulator {
 
 fun Discrete.fillFields(networkService: NetworkService): Discrete {
     (this as Measurement).fillFields(networkService)
-    return this
-}
-
-private fun MeasurementValue.fillFields() {
-    timeStamp = Instant.now()
-}
-
-fun AnalogValue.fillFields(networkService: NetworkService): AnalogValue {
-    value = 2.3
-    analogMRID = Analog().mRID
-    (this as MeasurementValue).fillFields()
-    return this
-}
-
-fun AccumulatorValue.fillFields(networkService: NetworkService): AccumulatorValue {
-    value = 23u
-    accumulatorMRID = Analog().mRID
-    (this as MeasurementValue).fillFields()
-    return this
-}
-
-fun DiscreteValue.fillFields(networkService: NetworkService): DiscreteValue {
-    value = 23
-    discreteMRID = Analog().mRID
-    (this as MeasurementValue).fillFields()
     return this
 }

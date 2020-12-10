@@ -21,10 +21,15 @@ import com.zepben.protobuf.cim.iec61968.operations.OperationalRestriction
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.protobuf.cim.iec61970.base.core.*
+import com.zepben.protobuf.cim.iec61970.base.meas.Control
+import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint
+import com.zepben.protobuf.cim.iec61970.base.meas.Measurement
+import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl
+import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint
+import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource
 import com.zepben.protobuf.cim.iec61970.base.wires.*
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop
-
 
 fun CableInfo.mRID(): String = wi.mRID()
 fun OverheadWireInfo.mRID(): String = wi.mRID()
@@ -58,6 +63,12 @@ fun Site.mRID(): String = ec.mRID()
 fun SubGeographicalRegion.mRID(): String = io.mrid
 fun Substation.mRID(): String = ec.mRID()
 fun Terminal.mRID(): String = ad.mRID()
+fun Control.mRID(): String = ip.mRID()
+fun IoPoint.mRID(): String = io.mrid
+fun Measurement.mRID(): String = io.mrid
+fun RemoteControl.mRID(): String = rp.mRID()
+fun RemotePoint.mRID(): String = io.mrid
+fun RemoteSource.mRID(): String = rp.mRID()
 fun AcLineSegment.mRID(): String = cd.mRID()
 fun Breaker.mRID(): String = sw.mRID()
 fun Conductor.mRID(): String = ce.mRID()

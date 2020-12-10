@@ -29,7 +29,6 @@ import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.extensions.internEmpty
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.services.common.translator.toCim
-import com.zepben.evolve.services.measurement.mRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverheadWireInfo

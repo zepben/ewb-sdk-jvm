@@ -16,7 +16,6 @@ import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.translator.mRID
-import com.zepben.evolve.services.measurement.mRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.translator.NetworkProtoToCim
 import com.zepben.evolve.services.network.translator.mRID

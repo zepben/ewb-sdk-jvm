@@ -10,14 +10,15 @@ package com.zepben.evolve.services.network.translator
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61970.base.core.Substation
-import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
+import com.zepben.evolve.cim.iec61970.base.meas.Analog
+import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
-import com.zepben.evolve.services.measurement.toPb
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.fillFields
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -102,24 +103,4 @@ internal class NetworkCimToProtoTest {
         validator.validate(cim.fillFields(NetworkService()), cim.toPb())
     }
 
-    @Test
-    internal fun convertsAnalogValue() {
-        val cim = AnalogValue()
-        validator.validate(cim, cim.toPb())
-        validator.validate(cim.fillFields(NetworkService()), cim.toPb())
-    }
-
-    @Test
-    internal fun convertsAccumulatorValue() {
-        val cim = AccumulatorValue()
-        validator.validate(cim, cim.toPb())
-        validator.validate(cim.fillFields(NetworkService()), cim.toPb())
-    }
-
-    @Test
-    internal fun convertsDiscreteValue() {
-        val cim = DiscreteValue()
-        validator.validate(cim, cim.toPb())
-        validator.validate(cim.fillFields(NetworkService()), cim.toPb())
-    }
 }

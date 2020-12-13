@@ -29,6 +29,8 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
   than merging the `ConnectivityNode`s.
 * `Equipment` is now added to a `Feeder` even if the phasing is broken. Side effect of this is un-ganged normal switching will no longer assign feeders
   correctly.
+* Packages have been reworked, you will need to update your imports.
+* Removed obsolete `PositionPointParser`.
 
 ##### New Features
 

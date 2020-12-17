@@ -6,16 +6,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.cimbend.testdata
+package com.zepben.evolve.services.network.testdata
 
-import com.zepben.cimbend.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.cimbend.cim.iec61970.base.core.PhaseCode
-import com.zepben.cimbend.cim.iec61970.base.wires.AcLineSegment
-import com.zepben.cimbend.cim.iec61970.base.wires.Breaker
-import com.zepben.cimbend.cim.iec61970.base.wires.EnergySource
-import com.zepben.cimbend.network.NetworkService
-import com.zepben.cimbend.network.tracing.Tracing
-import com.zepben.cimbend.testdata.TestDataCreators.*
+import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.evolve.cim.iec61970.base.wires.Breaker
+import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.TestDataCreators.*
+import com.zepben.evolve.services.network.tracing.Tracing
 
 
 object PhasesTestNetwork {

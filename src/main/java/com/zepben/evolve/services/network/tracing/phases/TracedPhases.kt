@@ -145,9 +145,9 @@ data class TracedPhases(
 
     /**
      * The underlying implementation value tracking the normal status.
-     * It is primarily used for data serialisation and debugging within official cimbend libraries and utilities.
+     * It is primarily used for data serialisation and debugging within official evolve libraries and utilities.
      *
-     * Note this property should be considered cimbend internal and not for general public use as the underlying
+     * Note this property should be considered evolve internal and not for general public use as the underlying
      * data structure to store the status could change at any time (and thus be a breaking change).
      * Use at your own risk.
      */
@@ -159,9 +159,9 @@ data class TracedPhases(
 
     /**
      * The underlying implementation value tracking the current status.
-     * It is primarily used for data serialisation and debugging within official cimbend libraries and utilities.
+     * It is primarily used for data serialisation and debugging within official evolve libraries and utilities.
      *
-     * Note this property should be considered cimbend internal and not for general public use as the underlying
+     * Note this property should be considered evolve internal and not for general public use as the underlying
      * data structure to store the status could change at any time (and thus be a breaking change).
      * Use at your own risk.
      */

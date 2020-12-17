@@ -31,6 +31,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
   correctly.
 * Packages have been reworked, you will need to update your imports.
 * Removed obsolete `PositionPointParser`.
+* Improved connectivity when using XY phasing.
 
 ##### New Features
 

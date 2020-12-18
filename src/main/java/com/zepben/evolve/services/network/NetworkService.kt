@@ -28,6 +28,8 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.network.tracing.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
+import com.zepben.evolve.services.network.tracing.phases.XyPhaseStep
+import java.util.*
 import kotlin.reflect.KClass
 
 /**
@@ -447,29 +449,40 @@ class NetworkService : BaseService("network") {
         }
 
         private fun getFirstKnownPhases(terminal: Terminal, tracePhaseCode: PhaseCode): PhaseCode? {
-            val withoutNeutral = terminal.phases.withoutNeutral()
-            val continueWith: PhaseCode = when {
-                withoutNeutral == tracePhaseCode -> withoutNeutral
-                tracePhaseCode.singlePhases().containsAll(withoutNeutral.singlePhases()) -> withoutNeutral
-                tracePhaseCode.numPhases() >= withoutNeutral.numPhases() -> return withoutNeutral
-                else -> return null
-            }
+            val queue = LinkedList(listOf(XyPhaseStep(terminal, tracePhaseCode)))
+            val candidatePhases = mutableSetOf<SinglePhaseKind>()
+            val visited = mutableSetOf<XyPhaseStep>()
 
-            val candidates = terminalsOnNextEquipment(terminal)
-                .mapNotNull { getFirstKnownPhases(it, continueWith) }
-                .toSet()
+            while (queue.isNotEmpty())
+                getFirstKnownPhases(queue.poll(), visited, queue, candidatePhases)
 
-            return when {
-                candidates.size == 1 -> candidates.iterator().next()
-                candidates.isEmpty() -> null
-                else -> {
-                    val candidate = PhaseCode.fromSinglePhases(candidates.flatMap { it.singlePhases() }.toSet())
-                    if (withoutNeutral.numPhases() == candidate.numPhases())
-                        candidate
-                    else
-                        null
-                }
+            val candidate = PhaseCode.fromSinglePhases(candidatePhases)
+            return if (tracePhaseCode.numPhases() == candidate.numPhases())
+                candidate
+            else
+                null
+        }
+
+        private fun getFirstKnownPhases(
+            step: XyPhaseStep,
+            visited: MutableSet<XyPhaseStep>,
+            queue: Queue<XyPhaseStep>,
+            candidatePhases: MutableSet<SinglePhaseKind>
+        ) {
+            if (!visited.add(step))
+                return
+
+            val withoutNeutral = step.terminal.phases.withoutNeutral()
+            when {
+                withoutNeutral == step.phaseCode -> queueNext(step, queue, withoutNeutral)
+                step.phaseCode.singlePhases().containsAll(withoutNeutral.singlePhases()) -> queueNext(step, queue, withoutNeutral)
+                step.phaseCode.numPhases() >= withoutNeutral.numPhases() -> candidatePhases.addAll(withoutNeutral.singlePhases())
             }
+        }
+
+        private fun queueNext(step: XyPhaseStep, queue: Queue<XyPhaseStep>, continueWith: PhaseCode) {
+            terminalsOnNextEquipment(step.terminal)
+                .forEach { queue.add(XyPhaseStep(it, continueWith)) }
         }
 
         private fun terminalsOnNextEquipment(terminal: Terminal): List<Terminal> = terminal.conductingEquipment?.terminals?.filter { it != terminal }

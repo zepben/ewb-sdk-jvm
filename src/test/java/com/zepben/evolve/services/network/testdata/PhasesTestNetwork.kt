@@ -22,7 +22,7 @@ object PhasesTestNetwork {
 
     fun from(phases: PhaseCode): Builder {
         val network = NetworkService()
-        val source = createSourceForConnecting(network, "source", 1, phases)
+        val source = createSourceForConnecting(network, "source0", 1, phases)
         createTerminals(network, source, 1, phases)
         return Builder(source, network)
     }
@@ -32,7 +32,7 @@ object PhasesTestNetwork {
         val network: NetworkService
     ) {
         private var current: ConductingEquipment
-        private var count = 0
+        private var count = 1
 
         init {
             current = source
@@ -58,6 +58,11 @@ object PhasesTestNetwork {
             network.connect(current.getTerminal(if (current is EnergySource) 1 else 2)!!, source.getTerminal(1)!!)
             current = source
             return this
+        }
+
+        fun splitFromTo(from: String, phases: PhaseCode): Builder {
+            current = network[from]!!
+            return to(phases)
         }
 
         fun build(): NetworkService {

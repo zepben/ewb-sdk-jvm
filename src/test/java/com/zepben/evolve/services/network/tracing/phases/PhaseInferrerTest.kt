@@ -7,41 +7,40 @@
  */
 package com.zepben.evolve.services.network.tracing.phases
 
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhasesTestNetwork
 import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.tracing.phases.PhaseDirection.*
+import com.zepben.evolve.services.network.tracing.phases.PhaseValidator.validatePhaseDirections
+import com.zepben.evolve.services.network.tracing.phases.PhaseValidator.validatePhases
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
+@Suppress("SameParameterValue")
 class PhaseInferrerTest {
 
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
+    private val phaseInferrer = Tracing.phaseInferrer()
+
     //
     // nominal
     // AB -> BC -> XY -> ABC
     // traced
-    // AB -> B NONE -> B NONE -> NONE B NONE
-    // AB -> B NONE -> B NONE -> B NONE NONE
+    // AB -> B? -> B? -> ?B?
     //
     // infer nominal
-    // AB -> BC -> BC -> BBC
-    // AB -> BC -> BC -> BCC
-    // (warning with should be correct)
+    // AB -> BC -> BC -> ABC
     //
     @Test
-    internal fun test() {
-        val phaseInferrer = Tracing.phaseInferrer()
-        systemErr.clearCapturedLog()
-
+    internal fun testABtoBCtoXYtoABC() {
         val network = PhasesTestNetwork
             .from(PhaseCode.AB)
             .to(PhaseCode.BC)
@@ -49,23 +48,17 @@ class PhaseInferrerTest {
             .to(PhaseCode.ABC)
             .build()
 
-        validatePhases(network, "c0", SinglePhaseKind.B, SinglePhaseKind.NONE)
-        validatePhases(network, "c1", SinglePhaseKind.B, SinglePhaseKind.NONE)
-        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.B, SinglePhaseKind.NONE)
+        validatePhases(network, "c1", SPK.B, SPK.NONE)
+        validatePhases(network, "c2", SPK.B, SPK.NONE)
+        validatePhases(network, "c3", SPK.NONE, SPK.B, SPK.NONE)
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "c0", SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", PhaseCode.BC)
+        validatePhases(network, "c2", PhaseCode.BC)
+        validatePhases(network, "c3", PhaseCode.ABC)
 
-        assertThat(
-            listOf(*systemErr.logLines),
-            containsInAnyOrder(
-                containsString("*** Action Required *** Inferred missing phase for 'c0 name' [c0] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-                containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-            )
-        )
+        validateLog(correct = listOf("c1", "c3"))
     }
 
     //
@@ -76,13 +69,9 @@ class PhaseInferrerTest {
     //
     // infer nominal
     // ABN -> BCN -> BCN -> ABCN
-    // (warning with should be correct)
     //
     @Test
-    internal fun test2() {
-        val phaseInferrer = Tracing.phaseInferrer()
-        systemErr.clearCapturedLog()
-
+    internal fun testABNtoBCNtoXYNtoABCN() {
         val network = PhasesTestNetwork
             .from(PhaseCode.ABN)
             .to(PhaseCode.BCN)
@@ -90,23 +79,17 @@ class PhaseInferrerTest {
             .to(PhaseCode.ABCN)
             .build()
 
-        validatePhases(network, "c0", SinglePhaseKind.B, SinglePhaseKind.NONE, SinglePhaseKind.N)
-        validatePhases(network, "c1", SinglePhaseKind.B, SinglePhaseKind.NONE, SinglePhaseKind.N)
-        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.B, SinglePhaseKind.NONE, SinglePhaseKind.N)
+        validatePhases(network, "c1", SPK.B, SPK.NONE, SPK.N)
+        validatePhases(network, "c2", SPK.B, SPK.NONE, SPK.N)
+        validatePhases(network, "c3", SPK.NONE, SPK.B, SPK.NONE, SPK.N)
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "c0", SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
-        validatePhases(network, "c1", SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
-        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
+        validatePhases(network, "c1", PhaseCode.BCN)
+        validatePhases(network, "c2", PhaseCode.BCN)
+        validatePhases(network, "c3", PhaseCode.ABCN)
 
-        assertThat(
-            listOf(*systemErr.logLines),
-            containsInAnyOrder(
-                containsString("*** Action Required *** Inferred missing phase for 'c0 name' [c0] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-                containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-            )
-        )
+        validateLog(correct = listOf("c1", "c3"))
     }
 
     //
@@ -117,13 +100,9 @@ class PhaseInferrerTest {
     //
     // infer nominal
     // BC -> AC -> AC -> ABC
-    // (warning with should be correct)
     //
     @Test
-    internal fun test3() {
-        val phaseInferrer = Tracing.phaseInferrer()
-        systemErr.clearCapturedLog()
-
+    internal fun testBCtoACtoXYtoABC() {
         val network = PhasesTestNetwork
             .from(PhaseCode.BC)
             .to(PhaseCode.AC)
@@ -131,117 +110,94 @@ class PhaseInferrerTest {
             .to(PhaseCode.ABC)
             .build()
 
-        validatePhases(network, "c0", SinglePhaseKind.NONE, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.NONE, SinglePhaseKind.C)
-        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.C)
+        validatePhases(network, "c1", SPK.NONE, SPK.C)
+        validatePhases(network, "c2", SPK.NONE, SPK.C)
+        validatePhases(network, "c3", SPK.NONE, SPK.NONE, SPK.C)
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.A, SinglePhaseKind.C)
-        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", PhaseCode.AC)
+        validatePhases(network, "c2", PhaseCode.AC)
+        validatePhases(network, "c3", PhaseCode.ABC)
 
-        assertThat(
-            listOf(*systemErr.logLines),
-            containsInAnyOrder(
-                containsString("*** Action Required *** Inferred missing phase for 'c0 name' [c0] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-                containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-            )
-        )
+        validateLog(correct = listOf("c1", "c3"))
     }
-
-    //
-    // nominal
-    // ABC -> XY -> X -> B
-    //           -> Y -> C
-    // traced
-    // ABC -> BC -> B -> B
-    //           -> C -> C
-    //
-
-    //
-    // nominal
-    // ABC -> XY -> B
-    //           -> C
-    // traced
-    // ABC -> BC -> B
-    //           -> C
-    //
 
     //
     // nominal
     // ABC -> XYN -> XY -> BC
     // traced
-    // ABC -> BCN -> BC -> BC
-    //
-
-    //
-    // nominal
-    // ABC -> XY -> XY -> BC
-    //                 -> AB
-    // traced
-    // ABC -> BCN -> BC -> BC
-    //
-
-    //
-    // nominal
-    // ABC -> XY -> XY | -> XY
-    //         ^       v
-    //         | XY <- XY
-    // traced
-    // ABC -> BCN -> BC -> BC
-    //
-
-    //
-    // nominal
-    // ABC -> XY -> XY -> BC
-    // traced
-    // ABC -> BC -> BC -> BC
+    // ABC -> BC? -> BC -> BC
     //
     // infer nominal
-    // ABC -> BC -> BC -> BC
-    // (warning with should be correct)
+    // ABC -> BCN -> BC -> BC
     //
     @Test
-    internal fun test4() {
+    internal fun testABCtoXYNtoXYtoBC() {
         Tracing.normalPhaseTrace()
-        val phaseInferrer = Tracing.phaseInferrer()
-        systemErr.clearCapturedLog()
-
         val network = PhasesTestNetwork
             .from(PhaseCode.ABC)
-            .to(PhaseCode.XY)
+            .to(PhaseCode.XYN)
             .to(PhaseCode.XY)
             .to(PhaseCode.BC)
             .build()
 
-        validatePhases(network, "c0", SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c2", SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", SPK.B, SPK.C, SPK.NONE)
+        validatePhases(network, "c2", PhaseCode.BC)
+        validatePhases(network, "c3", PhaseCode.BC)
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "c0", SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c2", SinglePhaseKind.B, SinglePhaseKind.C)
+        validatePhases(network, "c1", PhaseCode.BCN)
+        validatePhases(network, "c2", PhaseCode.BC)
+        validatePhases(network, "c3", PhaseCode.BC)
 
+        validateLog(correct = listOf("c1"))
     }
 
     //
     // nominal
-    // ABC -> N -> ABCN
+    // ABC -> XY -> XYN -> BC
     // traced
-    // ABC -> NONE -> NONE NONE NONE NONE
+    // ABC -> BC -> BC? -> BC
     //
     // infer nominal
-    // ABC -> N -> ABCN
-    // (warning with should be correct)
+    // ABC -> BC -> BCN -> BC
+    //
+    @Test
+    internal fun testABCtoXYtoXYNtoBC() {
+        Tracing.normalPhaseTrace()
+        val network = PhasesTestNetwork
+            .from(PhaseCode.ABC)
+            .to(PhaseCode.XY)
+            .to(PhaseCode.XYN)
+            .to(PhaseCode.BC)
+            .build()
+
+        validatePhases(network, "c1", PhaseCode.BC)
+        validatePhases(network, "c2", SPK.B, SPK.C, SPK.NONE)
+        validatePhases(network, "c3", PhaseCode.BC)
+
+        phaseInferrer.run(network)
+
+        validatePhases(network, "c1", PhaseCode.BC)
+        validatePhases(network, "c2", PhaseCode.BCN)
+        validatePhases(network, "c3", PhaseCode.BC)
+
+        validateLog(correct = listOf("c2"))
+    }
+
+    //
+    // nominal
+    // ABC -> ABC -> N -> ABCN
+    // traced
+    // ABC -> ABC -> ? -> ????
+    //
+    // infer nominal
+    // ABC -> ABC -> N -> ABCN
     //
     @Test
     internal fun testABCtoNtoABCN() {
-        val phaseInferrer = Tracing.phaseInferrer()
-        systemErr.clearCapturedLog()
-
         val network = PhasesTestNetwork
             .from(PhaseCode.ABC)
             .to(PhaseCode.ABC)
@@ -249,78 +205,33 @@ class PhaseInferrerTest {
             .to(PhaseCode.ABCN)
             .build()
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.NONE)
-        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c1",
-            listOf(PhaseDirection.NONE),
-            listOf(PhaseDirection.NONE)
-        )
-        validatePhaseDirections(
-            network,
-            "c2",
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE),
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE)
-        )
+        validatePhases(network, "c1", PhaseCode.ABC)
+        validatePhases(network, "c2", SPK.NONE)
+        validatePhases(network, "c3", SPK.NONE, SPK.NONE, SPK.NONE, SPK.NONE)
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.N)
-        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c1",
-            listOf(PhaseDirection.IN),
-            listOf(PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c2",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
+        validatePhases(network, "c1", PhaseCode.ABC)
+        validatePhases(network, "c2", PhaseCode.N)
+        validatePhases(network, "c3", PhaseCode.ABCN)
 
-        assertThat(
-            listOf(*systemErr.logLines),
-            containsInAnyOrder(
-                containsString("*** Action Required *** Inferred missing phase for 'c1 name' [c1] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-                containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
-            )
-        )
+        validateLog(correct = listOf("c2", "c3"))
     }
 
     //
     // nominal
-    // ABC -> B -> XYN
+    // ABC -> ABC -> B -> XYN
     // traced
-    // ABC -> B -> B NONE NONE
+    // ABC -> ABC -> B -> B??
     //
     // infer nominal
-    // ABC -> B -> B NONE N
+    // ABC -> ABC -> B -> B?N
     // infer xy
-    // ABC -> B -> B A N
+    // ABC -> ABC -> B -> BAN
     // (warning with may not be correct)
     //
     @Test
     internal fun testABCtoBtoXYN() {
-        val phaseInferrer = Tracing.phaseInferrer()
-        systemErr.clearCapturedLog()
-
         val network = PhasesTestNetwork
             .from(PhaseCode.ABC)
             .to(PhaseCode.ABC)
@@ -328,75 +239,30 @@ class PhaseInferrerTest {
             .to(PhaseCode.XYN)
             .build()
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.B)
-        validatePhases(network, "c2", SinglePhaseKind.B, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c1",
-            listOf(PhaseDirection.IN),
-            listOf(PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c2",
-            listOf(PhaseDirection.IN, PhaseDirection.NONE, PhaseDirection.NONE),
-            listOf(PhaseDirection.OUT, PhaseDirection.NONE, PhaseDirection.NONE)
-        )
+        validatePhases(network, "c1", PhaseCode.ABC)
+        validatePhases(network, "c2", PhaseCode.B)
+        validatePhases(network, "c3", SPK.B, SPK.NONE, SPK.NONE)
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.B)
-        validatePhases(network, "c2", SinglePhaseKind.B, SinglePhaseKind.A, SinglePhaseKind.N)
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c1",
-            listOf(PhaseDirection.IN),
-            listOf(PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c2",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
+        validatePhases(network, "c1", PhaseCode.ABC)
+        validatePhases(network, "c2", PhaseCode.B)
+        validatePhases(network, "c3", SPK.B, SPK.A, SPK.N)
 
-        assertThat(
-            listOf(*systemErr.logLines),
-            containsInAnyOrder(
-                containsString("*** Action Required *** Inferred missing phases for 'c2 name' [c2] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
-            )
-        )
+        validateLog(suspect = listOf("c3"))
     }
 
     //
     // nominal
-    // ABC -> A -> XN
+    // ABC -> ABC -> A -> XN
     // traced
-    // ABC -> A -> A NONE
+    // ABC -> ABC -> A -> A?
     //
     // infer nominal
-    // ABC -> A -> AN
-    // (warning with should be correct)
+    // ABC -> ABC -> A -> AN
     //
     @Test
     internal fun testABCtoAtoXN() {
-        val phaseInferrer = Tracing.phaseInferrer()
-        systemErr.clearCapturedLog()
-
         val network = PhasesTestNetwork
             .from(PhaseCode.ABC)
             .to(PhaseCode.ABC)
@@ -404,142 +270,68 @@ class PhaseInferrerTest {
             .to(PhaseCode.XN)
             .build()
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.A)
-        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.NONE)
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c1",
-            listOf(PhaseDirection.IN),
-            listOf(PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c2",
-            listOf(PhaseDirection.IN, PhaseDirection.NONE),
-            listOf(PhaseDirection.OUT, PhaseDirection.NONE)
-        )
+        validatePhases(network, "c1", PhaseCode.ABC)
+        validatePhases(network, "c2", PhaseCode.A)
+        validatePhases(network, "c3", SPK.A, SPK.NONE)
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.A)
-        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.N)
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c1",
-            listOf(PhaseDirection.IN),
-            listOf(PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c2",
-            listOf(PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT)
-        )
+        validatePhases(network, "c1", PhaseCode.ABC)
+        validatePhases(network, "c2", PhaseCode.A)
+        validatePhases(network, "c3", PhaseCode.AN)
 
-        assertThat(
-            listOf(*systemErr.logLines),
-            containsInAnyOrder(
-                containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
-            )
-        )
+        validateLog(correct = listOf("c3"))
     }
 
     //
     // nominal
     // AN <-> ABCN <-> AN
     // traced
-    // AN <-> A NONE NONE N <-> AN
+    // AN <-> A??N <-> AN
     //
     // infer nominal
     // AN <-> ABCN <-> AN
-    // (warning with should be correct)
     //
     @Test
     fun testDualFeedANtoABCN() {
-        val phaseInferrer = Tracing.phaseInferrer()
-        systemErr.clearCapturedLog()
-
         val network = PhasesTestNetwork
             .from(PhaseCode.AN)
             .to(PhaseCode.ABCN)
             .toSource(PhaseCode.AN)
             .build()
 
-        validatePhases(network, "source", SinglePhaseKind.A, SinglePhaseKind.N)
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.N)
-        validatePhases(network, "source1", SinglePhaseKind.A, SinglePhaseKind.N)
+        validatePhases(network, "source0", PhaseCode.AN)
+        validatePhases(network, "c1", SPK.A, SPK.NONE, SPK.NONE, SPK.N)
+        validatePhases(network, "source2", PhaseCode.AN)
 
-        validatePhaseDirections(network, "source", listOf(), listOf(PhaseDirection.OUT, PhaseDirection.OUT))
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.BOTH, PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.BOTH),
-            listOf(PhaseDirection.BOTH, PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.BOTH)
-        )
-        validatePhaseDirections(
-            network,
-            "source1",
-            listOf(PhaseDirection.BOTH, PhaseDirection.BOTH),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT)
-        )
+        validatePhaseDirections(network, "source0", listOf(BOTH, BOTH))
+        validatePhaseDirections(network, "c1", listOf(BOTH, NONE, NONE, BOTH), listOf(BOTH, NONE, NONE, BOTH))
+        validatePhaseDirections(network, "source2", listOf(BOTH, BOTH), listOf(OUT, OUT))
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "source", SinglePhaseKind.A, SinglePhaseKind.N)
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
-        validatePhases(network, "source1", SinglePhaseKind.A, SinglePhaseKind.N)
+        validatePhases(network, "source0", PhaseCode.AN)
+        validatePhases(network, "c1", PhaseCode.ABCN)
+        validatePhases(network, "source2", PhaseCode.AN)
 
-        validatePhaseDirections(network, "source", listOf(), listOf(PhaseDirection.OUT, PhaseDirection.OUT))
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.BOTH, PhaseDirection.BOTH, PhaseDirection.BOTH, PhaseDirection.BOTH),
-            listOf(PhaseDirection.BOTH, PhaseDirection.BOTH, PhaseDirection.BOTH, PhaseDirection.BOTH)
-        )
-        validatePhaseDirections(
-            network,
-            "source1",
-            listOf(PhaseDirection.BOTH, PhaseDirection.BOTH),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT)
-        )
+        validatePhaseDirections(network, "source0", listOf(BOTH, BOTH))
+        validatePhaseDirections(network, "c1", listOf(BOTH, BOTH, BOTH, BOTH), listOf(BOTH, BOTH, BOTH, BOTH))
+        validatePhaseDirections(network, "source2", listOf(BOTH, BOTH), listOf(OUT, OUT))
 
-        assertThat(
-            listOf(*systemErr.logLines),
-            containsInAnyOrder(
-                containsString("*** Action Required *** Inferred missing phase for 'c0 name' [c0] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.")
-            )
-        )
+        validateLog(correct = listOf("c1"))
     }
 
     //
     // nominal
-    // ABCN -> N -> AB -> XY
+    // ABCN -> ABCN -> N -> AB -> XY
     // traced
-    // ABCN -> N -> NONE NONE -> NONE NONE
+    // ABCN -> ABCN -> N -> ?? -> ??
     //
     // infer nominal
-    // ABC -> N -> AB -> AB
-    // (warning with should be correct)
+    // ABCN -> ABCN -> N -> AB -> AB
     //
     @Test
-    internal fun testABCtoNtoABtoXY() {
-        val phaseInferrer = Tracing.phaseInferrer()
-        systemErr.clearCapturedLog()
-
+    internal fun testABCNtoNtoABtoXY() {
         val network = PhasesTestNetwork
             .from(PhaseCode.ABCN)
             .to(PhaseCode.ABCN)
@@ -548,88 +340,32 @@ class PhaseInferrerTest {
             .to(PhaseCode.XY)
             .build()
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
-        validatePhases(network, "c1", SinglePhaseKind.N)
-        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE)
-        validatePhases(network, "c3", SinglePhaseKind.NONE, SinglePhaseKind.NONE)
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c1",
-            listOf(PhaseDirection.IN),
-            listOf(PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c2",
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE),
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE)
-        )
-        validatePhaseDirections(
-            network,
-            "c3",
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE),
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE)
-        )
+        validatePhases(network, "c1", PhaseCode.ABCN)
+        validatePhases(network, "c2", PhaseCode.N)
+        validatePhases(network, "c3", SPK.NONE, SPK.NONE)
+        validatePhases(network, "c4", SPK.NONE, SPK.NONE)
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhases(network, "c1", SinglePhaseKind.N)
-        validatePhases(network, "c2", SinglePhaseKind.A, SinglePhaseKind.B)
-        validatePhases(network, "c3", SinglePhaseKind.A, SinglePhaseKind.B)
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c1",
-            listOf(PhaseDirection.IN),
-            listOf(PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c2",
-            listOf(PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "c3",
-            listOf(PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT)
-        )
+        validatePhases(network, "c1", PhaseCode.ABCN)
+        validatePhases(network, "c2", PhaseCode.N)
+        validatePhases(network, "c3", PhaseCode.AB)
+        validatePhases(network, "c4", PhaseCode.AB)
 
-        assertThat(
-            listOf(*systemErr.logLines),
-            containsInAnyOrder(
-                containsString("*** Action Required *** Inferred missing phase for 'c2 name' [c2] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."),
-            )
-        )
+        validateLog(correct = listOf("c3"))
     }
 
     //
     // nominal
-    // ABC -> ABC OPEN SWICH -> ABC
+    // ABC -> ABC -> ABC OPEN SWICH -> ABC
     // traced
-    // ABC -> ABC/NONE NONE NONE -> NONE NONE NONE
+    // ABC -> ABC -> ABC/??? -> ???
     //
     // infer nominal
-    // ABC -> ABC/NONE NONE NONE -> NONE NONE NONE
+    // ABC -> ABC -> ABC/??? -> ???
     //
     @Test
-    internal fun testABCtoOpenSwitchABC() {
-        val phaseInferrer = Tracing.phaseInferrer()
-        systemErr.clearCapturedLog()
-
+    internal fun testWithOpenSwitch() {
         val network = PhasesTestNetwork
             .from(PhaseCode.ABC)
             .to(PhaseCode.ABC)
@@ -637,122 +373,35 @@ class PhaseInferrerTest {
             .to(PhaseCode.ABC)
             .build()
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhasesInTerminals(
-            network,
-            "s1",
-            listOf(SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C),
-            listOf(SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
-        )
-        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "s1",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE)
-        )
-        validatePhaseDirections(
-            network,
-            "c2",
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE),
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE)
-        )
+        validatePhases(network, "c1", PhaseCode.ABC)
+        validatePhases(network, "s2", PhaseCode.ABC, PhaseCode.NONE)
+        validatePhases(network, "c3", SPK.NONE, SPK.NONE, SPK.NONE)
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "c0", SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C)
-        validatePhasesInTerminals(
-            network,
-            "s1",
-            listOf(SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C),
-            listOf(SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE),
-        )
-        validatePhases(network, "c2", SinglePhaseKind.NONE, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
-        validatePhaseDirections(
-            network,
-            "c0",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.OUT, PhaseDirection.OUT, PhaseDirection.OUT)
-        )
-        validatePhaseDirections(
-            network,
-            "s1",
-            listOf(PhaseDirection.IN, PhaseDirection.IN, PhaseDirection.IN),
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE)
-        )
-        validatePhaseDirections(
-            network,
-            "c2",
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE),
-            listOf(PhaseDirection.NONE, PhaseDirection.NONE, PhaseDirection.NONE)
-        )
+        validatePhases(network, "c1", PhaseCode.ABC)
+        validatePhases(network, "s2", PhaseCode.ABC, PhaseCode.NONE)
+        validatePhases(network, "c3", SPK.NONE, SPK.NONE, SPK.NONE)
 
-        assertThat(listOf(*systemErr.logLines), hasSize(0))
+        validateLog()
     }
 
-
-    private fun validatePhases(network: NetworkService, id: String, vararg expectedPhases: SinglePhaseKind) {
-        val asset = network.get<ConductingEquipment>(id)!!
-        for (index in expectedPhases.indices) {
-            asset.terminals.forEach { terminal ->
-                val nominalPhase = terminal.phases.singlePhases()[index]
-                val actualPhases = terminal.phases.singlePhases().map { terminal.normalPhases(it).phase() }
-                assertThat(terminal.normalPhases(nominalPhase).phase(), equalTo(expectedPhases[index]))
-            }
-        }
+    private fun validateLog(correct: List<String> = emptyList(), suspect: List<String> = emptyList()) {
+        assertThat(
+            listOf(*systemErr.logLines),
+            containsInAnyOrder(
+                *(correct.map { correctMessage(it) } +
+                    suspect.map { suspectMessage(it) })
+                    .map { containsString(it) }
+                    .toTypedArray()
+            )
+        )
     }
 
-    private fun validatePhasesInTerminals(
-        network: NetworkService,
-        @Suppress("SameParameterValue") id: String,
-        expectedPhasesT1: List<SinglePhaseKind>,
-        expectedPhasesT2: List<SinglePhaseKind>
-    ) {
-        val asset = network.get<ConductingEquipment>(id)!!
-        val t1 = asset.terminals[0]
-        val t2 = asset.terminals[1]
+    private fun correctMessage(id: String) =
+        "*** Action Required *** Inferred missing phase for '$id name' [$id] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
 
-        for (index in expectedPhasesT1.indices) {
-            val nominalPhase = t1.phases.singlePhases()[index]
-            assertThat(t1.normalPhases(nominalPhase).phase(), equalTo(expectedPhasesT1[index]))
-        }
-
-        for (index in expectedPhasesT2.indices) {
-            val nominalPhase = t2.phases.singlePhases()[index]
-            assertThat(t2.normalPhases(nominalPhase).phase(), equalTo(expectedPhasesT2[index]))
-        }
-    }
-
-    private fun validatePhaseDirections(
-        network: NetworkService,
-        id: String,
-        expectedDirectionT1: List<PhaseDirection>,
-        expectedDirectionT2: List<PhaseDirection>
-    ) {
-        val asset = network.get<ConductingEquipment>(id)!!
-        val t1 = if (expectedDirectionT1.isNotEmpty()) asset.terminals[0] else null
-        val t2 = if (expectedDirectionT1.isNotEmpty()) asset.terminals[1] else null
-
-        if (t1 != null) {
-            for (index in expectedDirectionT1.indices) {
-                val nominalPhase = t1.phases.singlePhases()[index]
-                assertThat(t1.normalPhases(nominalPhase).direction(), equalTo(expectedDirectionT1[index]))
-            }
-        }
-
-        if (t2 != null) {
-            for (index in expectedDirectionT2.indices) {
-                val nominalPhase = t2.phases.singlePhases()[index]
-                assertThat(t2.normalPhases(nominalPhase).direction(), equalTo(expectedDirectionT2[index]))
-            }
-        }
-
-    }
+    private fun suspectMessage(id: String) =
+        "*** Action Required *** Inferred missing phases for '$id name' [$id] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
 
 }

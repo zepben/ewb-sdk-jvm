@@ -450,8 +450,8 @@ class NetworkService : BaseService("network") {
             val withoutNeutral = terminal.phases.withoutNeutral()
             val continueWith: PhaseCode = when {
                 withoutNeutral == tracePhaseCode -> withoutNeutral
-                withoutNeutral.numPhases() == tracePhaseCode.numPhases() -> return withoutNeutral
                 tracePhaseCode.singlePhases().containsAll(withoutNeutral.singlePhases()) -> withoutNeutral
+                tracePhaseCode.numPhases() >= withoutNeutral.numPhases() -> return withoutNeutral
                 else -> return null
             }
 
@@ -459,7 +459,17 @@ class NetworkService : BaseService("network") {
                 .mapNotNull { getFirstKnownPhases(it, continueWith) }
                 .toSet()
 
-            return if (candidates.size == 1) candidates.iterator().next() else null
+            return when {
+                candidates.size == 1 -> candidates.iterator().next()
+                candidates.isEmpty() -> null
+                else -> {
+                    val candidate = PhaseCode.fromSinglePhases(candidates.flatMap { it.singlePhases() }.toSet())
+                    if (withoutNeutral.numPhases() == candidate.numPhases())
+                        candidate
+                    else
+                        null
+                }
+            }
         }
 
         private fun terminalsOnNextEquipment(terminal: Terminal): List<Terminal> = terminal.conductingEquipment?.terminals?.filter { it != terminal }

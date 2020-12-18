@@ -19,6 +19,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.PhasesTestNetwork
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createSourceForConnecting
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
 import com.zepben.evolve.services.network.testdata.TestNetworks
@@ -30,6 +31,7 @@ import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.function.Function
@@ -287,6 +289,97 @@ class SetPhasesTest {
         n.add(energySource2)
 
         doSetPhasesTrace(n)
+    }
+
+    //
+    // nominal
+    // ABC -> XY -> XY -> BC
+    // traced
+    // ABC -> BC -> BC -> BC
+    //
+    @Test
+    internal fun tracesXyDownstreamForNominalPhases() {
+        val network = PhasesTestNetwork
+            .from(PhaseCode.ABC)
+            .to(PhaseCode.XY)
+            .to(PhaseCode.XY)
+            .to(PhaseCode.BC)
+            .build()
+
+        PhaseValidator.validatePhases(network, "c1", B, C)
+        PhaseValidator.validatePhases(network, "c2", B, C)
+        PhaseValidator.validatePhases(network, "c3", B, C)
+    }
+
+    //
+    // nominal
+    // ABC -> XY -> X -> B
+    //           -> Y -> C
+    // traced
+    // ABC -> BC -> B -> B
+    //           -> C -> C
+    //
+    @Test
+    internal fun testABCtoXYtoSplitXYtoBC() {
+        val network = PhasesTestNetwork
+            .from(PhaseCode.ABC)
+            .to(PhaseCode.XY)
+            .to(PhaseCode.X)
+            .to(PhaseCode.B)
+            .splitFromTo("c1", PhaseCode.Y)
+            .to(PhaseCode.C)
+            .build()
+
+        PhaseValidator.validatePhases(network, "c1", B, C)
+        PhaseValidator.validatePhases(network, "c2", B)
+        PhaseValidator.validatePhases(network, "c3", B)
+        PhaseValidator.validatePhases(network, "c4", C)
+        PhaseValidator.validatePhases(network, "c5", C)
+    }
+
+    //
+    // nominal
+    // ABC -> XY -> B
+    //           -> C
+    // traced
+    // ABC -> BC -> B
+    //           -> C
+    //
+    @Test
+    internal fun testABCtoXYtoSplitBC() {
+        val network = PhasesTestNetwork
+            .from(PhaseCode.ABC)
+            .to(PhaseCode.XY)
+            .to(PhaseCode.B)
+            .splitFromTo("c1", PhaseCode.C)
+            .build()
+
+        PhaseValidator.validatePhases(network, "c1", B, C)
+        PhaseValidator.validatePhases(network, "c2", B)
+        PhaseValidator.validatePhases(network, "c3", C)
+    }
+
+    //
+    // nominal
+    // ABC -> XY -> AC
+    //           -> BC
+    // traced
+    // ABC -> AB -> AC
+    //           -> BC
+    //
+    @Test
+    @Disabled(value = "Use case not supported")
+    internal fun testABCtoXYtoConflictingACBC() {
+        val network = PhasesTestNetwork
+            .from(PhaseCode.ABC)
+            .to(PhaseCode.XY)
+            .to(PhaseCode.AC)
+            .splitFromTo("c1", PhaseCode.BC)
+            .build()
+
+        PhaseValidator.validatePhases(network, "c1", A, B)
+        PhaseValidator.validatePhases(network, "c2", A, C)
+        PhaseValidator.validatePhases(network, "c3", B, C)
     }
 
     private fun doSetPhasesTrace(n: NetworkService) {

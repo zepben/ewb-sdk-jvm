@@ -56,4 +56,26 @@ internal class PhaseCodeTest {
                 assertThat(singlePhases.containsAll(namePhases), equalTo(true))
             }
     }
+
+    @Test
+    internal fun withoutNeutral() {
+        assertThat(PhaseCode.ABCN.withoutNeutral(), equalTo(PhaseCode.ABC))
+        assertThat(PhaseCode.ABC.withoutNeutral(), equalTo(PhaseCode.ABC))
+        assertThat(PhaseCode.BCN.withoutNeutral(), equalTo(PhaseCode.BC))
+        assertThat(PhaseCode.XYN.withoutNeutral(), equalTo(PhaseCode.XY))
+        assertThat(PhaseCode.NONE.withoutNeutral(), equalTo(PhaseCode.NONE))
+    }
+
+    @Test
+    internal fun fromSinglePhases() {
+        PhaseCode.values()
+            .asSequence()
+            .forEach {
+                assertThat(PhaseCode.fromSinglePhases(it.singlePhases()), equalTo(it))
+            }
+
+        assertThat(PhaseCode.fromSinglePhases(listOf(SinglePhaseKind.A, SinglePhaseKind.B)), equalTo(PhaseCode.AB))
+        assertThat(PhaseCode.fromSinglePhases(setOf(SinglePhaseKind.B, SinglePhaseKind.C)), equalTo(PhaseCode.BC))
+    }
+
 }

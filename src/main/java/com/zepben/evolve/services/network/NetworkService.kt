@@ -28,6 +28,8 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.network.tracing.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
+import com.zepben.evolve.services.network.tracing.phases.XyPhaseStep
+import java.util.*
 import kotlin.reflect.KClass
 
 /**
@@ -231,7 +233,8 @@ class NetworkService : BaseService("network") {
         return false
     }
 
-    private fun indexMeasurement(measurement: Measurement) = indexMeasurement(measurement, measurement.terminalMRID) && indexMeasurement(measurement, measurement.powerSystemResourceMRID)
+    private fun indexMeasurement(measurement: Measurement) =
+        indexMeasurement(measurement, measurement.terminalMRID) && indexMeasurement(measurement, measurement.powerSystemResourceMRID)
 
     private fun removeMeasurementIndex(measurement: Measurement) {
         _measurements[measurement.terminalMRID]?.remove(measurement)
@@ -373,16 +376,16 @@ class NetworkService : BaseService("network") {
                 .filter { connectedTerminal.phases.singlePhases().contains(it) }
                 .forEach { nominalPhasePaths.add(NominalPhasePath(it, it)) }
 
-            if (nominalPhasePaths.isEmpty()) {
-                val xyPhases = phases
+            if (nominalPhasePaths.isEmpty() || (nominalPhasePaths.size == 1 && nominalPhasePaths.all { it.from == SinglePhaseKind.N && it.to == SinglePhaseKind.N })) {
+                val xyPhases = terminal.phases.singlePhases()
                     .asSequence()
                     .filter { (it == SinglePhaseKind.X) || (it == SinglePhaseKind.Y) }
-                    .toSet()
+                    .toList()
 
                 val connectedXyPhases = connectedTerminal.phases.singlePhases()
                     .asSequence()
                     .filter { (it == SinglePhaseKind.X) || (it == SinglePhaseKind.Y) }
-                    .toSet()
+                    .toList()
 
                 tryProcessXyPhases(
                     terminal,
@@ -401,28 +404,91 @@ class NetworkService : BaseService("network") {
             terminal: Terminal,
             connectedTerminal: Terminal,
             phases: Set<SinglePhaseKind>,
-            xyPhases: Set<SinglePhaseKind>,
-            connectedXyPhases: Set<SinglePhaseKind>,
+            xyPhases: List<SinglePhaseKind>,
+            connectedXyPhases: List<SinglePhaseKind>,
             nominalPhasePaths: MutableList<NominalPhasePath>
         ) {
             if ((xyPhases.isEmpty() && connectedXyPhases.isEmpty()) || (xyPhases.isNotEmpty() && connectedXyPhases.isNotEmpty()))
                 return
 
-            xyPhases.forEach {
-                val index = terminal.phases.singlePhases().indexOf(it)
-                if (index < connectedTerminal.phases.singlePhases().size)
-                    nominalPhasePaths.add(NominalPhasePath(it, connectedTerminal.phases.singlePhases()[index]))
-            }
-
-            connectedXyPhases.forEach {
-                val index = connectedTerminal.phases.singlePhases().indexOf(it)
-                if (index < terminal.phases.singlePhases().size) {
-                    val phase = terminal.phases.singlePhases()[index]
-                    if (phases.contains(phase))
-                        nominalPhasePaths.add(NominalPhasePath(phase, it))
+            if (xyPhases.isNotEmpty()) {
+                if (xyPhases.size == connectedTerminal.phases.numPhases()) {
+                    for (index in xyPhases.indices) {
+                        val phase = xyPhases[index]
+                        if (phases.contains(phase))
+                            nominalPhasePaths.add(NominalPhasePath(phase, connectedTerminal.phases.singlePhases()[index]))
+                    }
+                    return
+                } else {
+                    for (index in xyPhases.indices) {
+                        val phase = xyPhases[index]
+                        if (phases.contains(phase)) {
+                            val usePhase = terminal.tracedPhases.phaseNormal(phase).let { if (it == SinglePhaseKind.NONE) phase else it }
+                            nominalPhasePaths.add(NominalPhasePath(phase, usePhase))
+                        }
+                    }
+                    return
+                }
+            } else {
+                if (connectedXyPhases.size == terminal.phases.numPhases()) {
+                    for (index in connectedXyPhases.indices) {
+                        val phase = terminal.phases.singlePhases()[index]
+                        if (phases.contains(phase))
+                            nominalPhasePaths.add(NominalPhasePath(phase, connectedXyPhases[index]))
+                    }
+                    return
+                } else {
+                    val downstreamPhases = getFirstKnownPhases(connectedTerminal, connectedTerminal.phases.withoutNeutral()) ?: terminal.phases.withoutNeutral()
+                    for (index in downstreamPhases.singlePhases().indices) {
+                        val phase = downstreamPhases.singlePhases()[index]
+                        if (phases.contains(phase) && (index < connectedXyPhases.size))
+                            nominalPhasePaths.add(NominalPhasePath(phase, connectedXyPhases[index]))
+                    }
                 }
             }
         }
-    }
-}
 
+        private fun getFirstKnownPhases(terminal: Terminal, tracePhaseCode: PhaseCode): PhaseCode? {
+            val queue = LinkedList(listOf(XyPhaseStep(terminal, tracePhaseCode)))
+            val candidatePhases = mutableSetOf<SinglePhaseKind>()
+            val visited = mutableSetOf<XyPhaseStep>()
+
+            while (queue.isNotEmpty())
+                getFirstKnownPhases(queue.poll(), visited, queue, candidatePhases)
+
+            val candidate = PhaseCode.fromSinglePhases(candidatePhases)
+            return if (tracePhaseCode.numPhases() == candidate.numPhases())
+                candidate
+            else
+                null
+        }
+
+        private fun getFirstKnownPhases(
+            step: XyPhaseStep,
+            visited: MutableSet<XyPhaseStep>,
+            queue: Queue<XyPhaseStep>,
+            candidatePhases: MutableSet<SinglePhaseKind>
+        ) {
+            if (!visited.add(step))
+                return
+
+            val withoutNeutral = step.terminal.phases.withoutNeutral()
+            when {
+                withoutNeutral == step.phaseCode -> queueNext(step, queue, withoutNeutral)
+                step.phaseCode.singlePhases().containsAll(withoutNeutral.singlePhases()) -> queueNext(step, queue, withoutNeutral)
+                step.phaseCode.numPhases() >= withoutNeutral.numPhases() -> candidatePhases.addAll(withoutNeutral.singlePhases())
+            }
+        }
+
+        private fun queueNext(step: XyPhaseStep, queue: Queue<XyPhaseStep>, continueWith: PhaseCode) {
+            terminalsOnNextEquipment(step.terminal)
+                .forEach { queue.add(XyPhaseStep(it, continueWith)) }
+        }
+
+        private fun terminalsOnNextEquipment(terminal: Terminal): List<Terminal> = terminal.conductingEquipment?.terminals?.filter { it != terminal }
+            ?.flatMap { otherTerminal -> otherTerminal.connectivityNode?.terminals?.filter { ter -> ter != otherTerminal } ?: emptyList() }
+            ?: emptyList()
+
+    }
+
+}

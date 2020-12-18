@@ -16,7 +16,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 ### v0.4.0
 
 ##### Breaking Changes
-
+* Updated logic for the PhaseInferrer. When trying to fix missing phases it will first check if it has nominal phase data available and use it before trying to infer the phase.
 * The `AssignToFeeders` was changed to assign all `ConductingEquipment` on the `normalHeadTerminal` side
   (inclusive) stopping at open points, head equipment for other feeders and substation transformers.
 * You can no longer run `AssignToFeeders` directly on a feeder.
@@ -31,15 +31,16 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
   correctly.
 * Packages have been reworked, you will need to update your imports.
 * Removed obsolete `PositionPointParser`.
+* Improved connectivity when using XY phasing.
 
 ##### New Features
 
 * None.
 
 ##### Enhancements
-
 * Updated `Feeder` to allow for updating the `normalHeadTerminal` if the feeder has no equipment assigned.
 * Added transformer utilisation property to PowerTransformer class
+* PhaseInferrer now supports Neutral phase.
 
 ##### Fixes
 

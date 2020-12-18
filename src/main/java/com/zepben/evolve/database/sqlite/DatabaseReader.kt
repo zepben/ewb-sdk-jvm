@@ -94,7 +94,7 @@ class DatabaseReader @JvmOverloads constructor(
                 .also { loadConnection = it.connection }
                 .version
         } catch (e: UpgradeRunner.UpgradeException) {
-            logger.error("Failed to connect to the database for saving: " + e.message, e)
+            logger.error("Failed to connect to the database for reading: " + e.message, e)
             closeConnection()
             null
         }

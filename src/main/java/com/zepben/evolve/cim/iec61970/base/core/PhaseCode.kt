@@ -9,9 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode.*
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import java.util.*
-import java.util.stream.Collectors
-import java.util.stream.Stream
+import com.zepben.evolve.services.common.extensions.asUnmodifiable
 
 /**
  * An unordered enumeration of phase identifiers.  Allows designation of phases for both transmission and distribution equipment,
@@ -71,7 +69,7 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
     Y(SinglePhaseKind.Y),
     YN(SinglePhaseKind.Y, SinglePhaseKind.N);
 
-    private val singlePhases: List<SinglePhaseKind> = Collections.unmodifiableList(Stream.of(*singlePhases).collect(Collectors.toList()))
+    private val singlePhases: List<SinglePhaseKind> = singlePhases.asList().asUnmodifiable()
 
     fun numPhases(): Int {
         return when (this) {
@@ -83,4 +81,29 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
     fun singlePhases(): List<SinglePhaseKind> {
         return singlePhases
     }
+
+    fun withoutNeutral(): PhaseCode {
+        return if (!singlePhases().contains(SinglePhaseKind.N))
+            this
+        else
+            fromSinglePhases(singlePhases().filter { it != SinglePhaseKind.N })
+    }
+
+    init {
+        byPhases[singlePhases().toSet()] = this
+    }
+
+    companion object {
+
+        fun fromSinglePhases(singlePhases: Collection<SinglePhaseKind>): PhaseCode {
+            return if (singlePhases is Set)
+                byPhases[singlePhases] ?: NONE
+            else
+                byPhases[singlePhases.toSet()] ?: NONE
+        }
+
+    }
+
 }
+
+private val byPhases by lazy { mutableMapOf<Set<SinglePhaseKind>, PhaseCode>() }

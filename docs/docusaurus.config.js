@@ -1,16 +1,16 @@
-const path = require("path");
-const versions = require("./versions.json");
+const zepbenDocusaurusPreset = require("@zepben/docusaurus-preset");
 
 module.exports = {
   title: "Evolve SDK (JVM)",
   tagline: "",
-  url: "https://zepben.github.io/evolve/sdk-jvm/",
+  url: "https://zepben.github.io/evolve/docs/sdk-jvm/",
   baseUrl: "/evolve/docs/jvm-sdk/",
   onBrokenLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "zepben",
   projectName: "evolve-sdk-jvm",
   themeConfig: {
+    ...zepbenDocusaurusPreset.defaultThemeConfig,
     colorMode: {
       defaultMode: "light",
       disableSwitch: false,
@@ -58,18 +58,9 @@ module.exports = {
       links: [],
       copyright: `Copyright © ${new Date().getFullYear()} Zeppelin Bend Pty. Ltd.`,
     },
-    googleAnalytics: {
-      trackingID: "UA-81287323-1",
-      anonymizeIP: false,
-    },
-    algolia: {
-      apiKey: "bd9b85d42d37ebf66b352f07513f4d6a",
-      indexName: "evolve-docs",
-      appId: "IU0L20J0JX"
-    },
     prism: {
       additionalLanguages: ['kotlin'],
-    },
+    }
   },
   presets: [
     [

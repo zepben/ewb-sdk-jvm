@@ -15,7 +15,7 @@ build your own solutions from scratch that will be compatible with other things 
 The Evolve platform is composed around a domain model based on the 'Common Information Model' (CIM). The CIM is a very
 large standard that covers a huge amount of use cases. To make things more digestible, Evolve publishes its own CIM
 profile. CIM profiles are subsets of the whole CIM standard that dictates which parts of the model are in use. Evolve
-publishes its model at <https://zepben.bitbucket.io/cim/evolve/>.
+publishes its model at <https://zepben.github.io/evolve/docs/cim/evolve/>.
 
 If the Evolve profile doesn't contain a part of CIM that you require for your use case, you can request or propose a
 change to the model following the instructions at: <https://github.com/zepben/evolve-data-model>
@@ -24,19 +24,19 @@ change to the model following the instructions at: <https://github.com/zepben/ev
 
 :::tip
 All things that have an ID in the CIM model inherit from
-[IdentifiedObject](https://zepben.bitbucket.io/cim/cim100/iec61970/base/core/identifiedobject/). This provides common
-attributes such as MRID (master resource identifier), name, description, etc.
+[IdentifiedObject](https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61970/Base/Core/IdentifiedObject). This provides common
+attributes such as mRID (master resource identifier), name, description, etc.
 :::
 
 Let's get started with the data model by building the following contrived electrical circuit.
 
 ![](./assets/contrived-circuit.png)
 
-Here we simply have an AC energy source ([EnergySource](https://zepben.bitbucket.io/cim/evolve/iec61970/base/wires/energysource/))
-connected to a conductor ([ACLineSegment](https://zepben.bitbucket.io/cim/evolve/iec61970/base/wires/aclinesegment/))
-connected to a circuit breaker ([Breaker](https://zepben.bitbucket.io/cim/evolve/iec61970/base/wires/breaker/)).
+Here we simply have an AC energy source ([EnergySource](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Wires/EnergySource/))
+connected to a conductor ([ACLineSegment](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Wires/ACLineSegment/))
+connected to a circuit breaker ([Breaker](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Wires/Breaker/)).
 In CIM all these things are a subtype of 
-[ConductingEquipment](https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/conductingequipment/).
+[ConductingEquipment](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/ConductingEquipment/).
 
 Let's see how we create them:
 
@@ -84,8 +84,8 @@ val breaker = Breaker().apply { name = "my circuit breaker" }
 
 ## Creating Connectivity
 
-In CIM, all conducting equipment can have any number of [Terminals](https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/terminal/), 
-and terminals connect to other terminals using a [ConnectivityNode](https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/connectivitynode/). 
+In CIM, all conducting equipment can have any number of [Terminals](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Terminal/), 
+and terminals connect to other terminals using a [ConnectivityNode](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/ConnectivityNode/). 
 If we redraw the above diagram with all the required items from CIM it would look like:
 
 ![](./assets/contrived-circuit-cim.png)
@@ -207,8 +207,8 @@ breakerT1.connectivityNode = cn2
 
 ## Normal and Current states
 
-As the network is a dynamic model (that is things like switches can be open and closed) many things in the model support 
-the notion of 'normal' and 'current'. For example a switch has a normally open state and a currently open state. 
+As the network is a dynamic model (that is things like switches can be open and closed), many things in the model support 
+the notion of 'normal' and 'current'. For example, a switch has a normally open state and a currently open state. 
 This allows you to perform analysis on the model considering the normal or current state of the network, and allows you 
 to tell if the network is currently in the normal state or not. This can be important when making decisions based on 
 analytics you may be running when using the model.
@@ -245,8 +245,8 @@ switch.setOpen(false)
 
 ## Phases 
 
-Phases in CIM are set on a [Terminal](https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/terminal/). The `phases`
-property on the terminal should be considered the terminal's 'nominal' phases. The vast mojority of the time, this will
+Phases in CIM are set on a [Terminal](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Terminal). The `phases`
+property on the terminal should be considered as the terminal's 'nominal' phases. The vast majority of the time, this will
 be the actual active phases at that terminal. However, due to the dynamic nature of the network, it's possible that when
 tracing connecitvity that the active phase at the terminal is different. The phase can be tracked using the `tracedPhases`
 property on the terminal. 
@@ -287,20 +287,20 @@ Terminal terminal = Terminal().apply { phases = PhaseCode.ABC };
 In electricity distribution networks, a model is typically made up of groups of equipment that represent different
 sections of the network. For example things like: feeder, zone (substation), transmission line etc. The terminology 
 differs within the industry, however CIM provides types of 
-[EquipmentContainer](https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/equipmentcontainer/) to allow you to
-group equipment into the above types of categories. Refer to the Evolve profile CIM profile for all supported equipment 
+[EquipmentContainer](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/EquipmentContainer) to allow you to
+group equipment into the above types of categories. You can refer to the Evolve CIM profile for all supported equipment 
 container types in the model, however the most common ones are:
 
-- [Line](https://zepben.bitbucket.io/cim/evolve/iec61970/base/wires/line/)
-- [Substation](https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/substation/)
-- [Feeder](https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/feeder/)
+- [Line](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Wires/Line/)
+- [Substation](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Substation/)
+- [Feeder](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Feeder/)
 
 ### Network Hierarchy
 
 When creating a `Substation` you will see that it can belong to a 
-[SubGeographicalRegion](https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/subgeographicalregion/) and a 
+[SubGeographicalRegion](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/SubGeographicalRegion) and a 
 `SubGeogrpahicalRegion` can belong to a 
-[GeographicalRegion](https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/geographicalregion/). 
+[GeographicalRegion](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/GeographicalRegion). 
 
 When using various parts of the Evolve platform, it will refer to the concept of a network hierarchy. This is the 
 mechanism used to chunk up the network and provides an overview of what makes up the model. The network hierarchy looks
@@ -318,7 +318,7 @@ populated as there are assumptions built around the network being structured in 
 
 A feeder is generally a chain of equipment from a nominated starting point in a `Substation` to all open points when 
 tracing along the equipment. The starting point can be defined by setting a 
-[Feeder's]((https://zepben.bitbucket.io/cim/evolve/iec61970/base/core/feeder/)) `normalHeadTerminal`. This means if you
+[Feeder's]((https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Feeder/)) `normalHeadTerminal`. This means if you
 have a correctly connected model, setting the feeder equipment container on any equipment can be calculated dynamically. 
 This has the benefit of making sure that an equipment's feeder is always correct (because it has been set by checking
 connectivity). A function to do this is provided as part of the [tracing](sdk/tracing.mdx#useful-traces) package. 

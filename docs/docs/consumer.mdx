@@ -108,9 +108,9 @@ fun printNetworkHierarchy(client: NetworkConsumerClient) {
 </TabItem>
 </Tabs>
 
-Each item from the hierarchy result contains an identified object MRID and it's name. This simplified data structure
+Each item from the hierarchy result contains an identified object mRID and it's name. This simplified data structure
 enables you to do things like easily build a suitable UI component allowing a user to select a portion of the network
-they wish to use, without needing to pull back large amount of full object data.
+they wish to use, without needing to pull back large amounts of full object data.
 
 ## Requesting Identififed Objects
 
@@ -118,7 +118,7 @@ Identified objects can be requested to build a model client side. When identifie
 objects that have not been previously requested need to be requested explicitly. The exception to this is terminals 
 are always sent with their conducting equipment and transformer ends are always sent with transformers.
 
-To find the MRIDs of any references that need to be requested you can use the [deferred reference](services.mdx#deferred-references) 
+To find the mRIDs of any references that need to be requested you can use the [deferred reference](services.mdx#deferred-references) 
 functions on the service provided when requesting identified objects.
 
 <Tabs

@@ -53,7 +53,7 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
 
     private var _powerTransformerEnds: MutableList<PowerTransformerEnd>? = null
     var vectorGroup: VectorGroup = VectorGroup.UNKNOWN
-    var transformerUtilisation: Double = 0.0
+    var transformerUtilisation: Double = Double.NaN
 
     /**
      * The PowerTransformerEnd's for this PowerTransformer. The returned collection is read only.

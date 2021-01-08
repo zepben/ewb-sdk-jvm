@@ -15,7 +15,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableConducti
 class TablePowerTransformers : TableConductingEquipment() {
 
     val VECTOR_GROUP = Column(++columnIndex, "vector_group", "TEXT", NOT_NULL)
-    val TRANSFORMER_UTILISATION = Column(++columnIndex, "transformer_utilisation", "NUMBER", NOT_NULL)
+    val TRANSFORMER_UTILISATION = Column(++columnIndex, "transformer_utilisation", "NUMBER")
 
     override fun name(): String {
         return "power_transformers"

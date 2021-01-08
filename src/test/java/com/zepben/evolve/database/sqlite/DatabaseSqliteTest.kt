@@ -40,6 +40,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class DatabaseSqliteTest {
+
     @JvmField
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()

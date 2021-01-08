@@ -36,7 +36,7 @@ internal class PowerTransformerTest {
         val powerTransformer = PowerTransformer()
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.UNKNOWN))
-        assertThat(powerTransformer.transformerUtilisation, equalTo(0.0))
+        assertThat(powerTransformer.transformerUtilisation, equalTo(Double.NaN))
 
         powerTransformer.vectorGroup = VectorGroup.DYN11
         powerTransformer.transformerUtilisation = 1.0

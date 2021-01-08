@@ -32,6 +32,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 * Packages have been reworked, you will need to update your imports.
 * Removed obsolete `PositionPointParser`.
 * Improved connectivity when using XY phasing.
+* Default value for transformerUtilisation property in PowerTransformer class was updated from 0.0 to NaN.
 
 ##### New Features
 

@@ -11,8 +11,8 @@
     "serve": "docusaurus serve"
   },
   "dependencies": {
-    "@zepben/docusaurus-preset": "0.3.4",
-    "@zepben/docusaurus-components": "0.1.1",
+    "@zepben/docusaurus-components": "0.2.2",
+    "@zepben/docusaurus-preset": "0.4.1",
     "@mdx-js/react": "1.5.8",
     "clsx": "1.1.1",
     "react": "16.8.4",

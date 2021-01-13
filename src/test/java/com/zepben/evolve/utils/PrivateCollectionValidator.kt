@@ -23,14 +23,14 @@ internal class PrivateCollectionValidator {
          * Validate the internal collection for an associated [IdentifiedObject] that has no order significance.
          */
         internal inline fun <reified T : IdentifiedObject, reified U : IdentifiedObject> validate(
-            crossinline createIt: () -> T,
-            crossinline createOther: (String, T) -> U,
-            crossinline num: (T) -> Int,
-            crossinline get: (T, String) -> U?,
-            crossinline getAll: (T) -> Collection<U>,
+            createIt: () -> T,
+            createOther: (String, T) -> U,
+            num: (T) -> Int,
+            get: (T, String) -> U?,
+            getAll: (T) -> Collection<U>,
             crossinline add: (T, U) -> T,
-            crossinline remove: (T, U?) -> Boolean,
-            crossinline clear: (T) -> T
+            remove: (T, U?) -> Boolean,
+            clear: (T) -> T
         ) {
             val it = createIt()
             val other1 = createOther("1", it)
@@ -60,7 +60,7 @@ internal class PrivateCollectionValidator {
             assertThat(num(it), equalTo(2))
 
             assertThat(get(it, other2.mRID), equalTo(other2))
-            
+
             assertThat(getAll(it), containsInAnyOrder(other2, other3))
 
             clear(it)
@@ -164,7 +164,7 @@ internal class PrivateCollectionValidator {
             num: (T) -> Int,
             get: (T, Int) -> U?,
             forEach: (T, (Int, U) -> Unit) -> Unit,
-            crossinline add: (T, U) -> T,
+            add: (T, U) -> T,
             crossinline addWithIndex: (T, U, Int) -> T,
             remove: (T, U?) -> Boolean,
             clear: (T) -> T

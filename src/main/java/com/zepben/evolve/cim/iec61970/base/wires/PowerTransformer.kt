@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.common.extensions.*
 
@@ -54,6 +55,11 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
     private var _powerTransformerEnds: MutableList<PowerTransformerEnd>? = null
     var vectorGroup: VectorGroup = VectorGroup.UNKNOWN
     var transformerUtilisation: Double = Double.NaN
+
+    /**
+     * Override the [AssetInfo] as [PowerTransformerInfo].
+     */
+    override var assetInfo: PowerTransformerInfo? = null
 
     /**
      * The PowerTransformerEnd's for this PowerTransformer. The returned collection is read only.

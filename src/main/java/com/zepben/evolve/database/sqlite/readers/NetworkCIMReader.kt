@@ -8,10 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.readers
 
-import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.WireMaterialKind
+import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.PositionPoint
@@ -37,6 +34,7 @@ import com.zepben.evolve.database.sqlite.extensions.getNullableString
 import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableCableInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableOverheadWireInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TablePowerTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableWireInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
@@ -82,6 +80,12 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         }
 
         return loadAssetInfo(wireInfo, table, resultSet)
+    }
+
+    fun load(table: TablePowerTransformerInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val powerTransformerInfo = PowerTransformerInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadAssetInfo(powerTransformerInfo, table, resultSet) && networkService.addOrThrow(powerTransformerInfo)
     }
 
     /************ IEC61968 ASSETS ************/
@@ -581,6 +585,10 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         val powerTransformer = PowerTransformer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             vectorGroup = VectorGroup.valueOf(resultSet.getString(table.VECTOR_GROUP.queryIndex))
             transformerUtilisation = resultSet.getNullableDouble(table.TRANSFORMER_UTILISATION.queryIndex)
+            assetInfo = networkService.ensureGet(
+                resultSet.getNullableString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex),
+                typeNameAndMRID()
+            )
         }
 
         return loadConductingEquipment(

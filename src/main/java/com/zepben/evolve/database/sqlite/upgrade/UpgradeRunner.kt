@@ -36,7 +36,8 @@ class UpgradeRunner constructor(
         changeSet20(),
         changeSet21(),
         changeSet22(),
-        changeSet23()
+        changeSet23(),
+        changeSet24()
     ).asUnmodifiable()
 
     private val tableVersion = TableVersion()

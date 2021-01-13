@@ -9,6 +9,7 @@ package com.zepben.evolve.database.sqlite.writers
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
@@ -34,6 +35,7 @@ import com.zepben.evolve.database.sqlite.extensions.setNullableString
 import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableCableInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableOverheadWireInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TablePowerTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableWireInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
@@ -584,8 +586,16 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
         insert.setNullableString(table.VECTOR_GROUP.queryIndex, powerTransformer.vectorGroup.name)
         insert.setDouble(table.TRANSFORMER_UTILISATION.queryIndex, powerTransformer.transformerUtilisation)
+        insert.setString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex, powerTransformer.assetInfo?.mRID)
 
         return saveConductingEquipment(table, insert, powerTransformer, "power transformer")
+    }
+
+    fun save(powerTransformerInfo: PowerTransformerInfo): Boolean {
+        val table = databaseTables.getTable(TablePowerTransformerInfo::class.java)
+        val insert = databaseTables.getInsert(TablePowerTransformerInfo::class.java)
+
+        return saveAssetInfo(table, insert, powerTransformerInfo, "power transformer info")
     }
 
     fun save(powerTransformerEnd: PowerTransformerEnd): Boolean {

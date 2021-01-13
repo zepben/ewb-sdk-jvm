@@ -38,10 +38,10 @@ import com.zepben.evolve.cim.iec61970.base.meas.MeasurementValue
 @JvmOverloads
 inline fun <R> whenMeasurementServiceObject(
     measurementValue: MeasurementValue,
-    crossinline isAnalogValue: (AnalogValue) -> R,
-    crossinline isAccumulatorValue: (AccumulatorValue) -> R,
-    crossinline isDiscreteValue: (DiscreteValue) -> R,
-    crossinline isOther: (MeasurementValue) -> R = { idObj: MeasurementValue ->
+    isAnalogValue: (AnalogValue) -> R,
+    isAccumulatorValue: (AccumulatorValue) -> R,
+    isDiscreteValue: (DiscreteValue) -> R,
+    isOther: (MeasurementValue) -> R = { idObj: MeasurementValue ->
         throw IllegalArgumentException("MeasurementValue object type ${idObj::class} is not supported by the measurement service")
     }
 ): R = when (measurementValue) {

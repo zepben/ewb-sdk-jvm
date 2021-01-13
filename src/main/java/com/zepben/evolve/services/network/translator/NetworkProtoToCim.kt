@@ -32,6 +32,7 @@ import com.zepben.evolve.services.common.translator.toCim
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverheadWireInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PBPowerTransformerInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireInfo as PBWireInfo
 import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
 import com.zepben.protobuf.cim.iec61968.assets.AssetContainer as PBAssetContainer
@@ -115,6 +116,11 @@ fun toCim(pb: PBCableInfo, networkService: NetworkService): CableInfo =
 fun toCim(pb: PBOverheadWireInfo, networkService: NetworkService): OverheadWireInfo =
     OverheadWireInfo(pb.mRID()).apply {
         toCim(pb.wi, this, networkService)
+    }
+
+fun toCim(pb: PBPowerTransformerInfo, networkService: NetworkService): PowerTransformerInfo =
+    PowerTransformerInfo(pb.mRID()).apply {
+        toCim(pb.ai, this, networkService)
     }
 
 fun toCim(pb: PBWireInfo, cim: WireInfo, networkService: NetworkService): WireInfo =
@@ -563,6 +569,7 @@ fun toCim(pb: PBPowerTransformer, networkService: NetworkService): PowerTransfor
         }
         vectorGroup = VectorGroup.valueOf(pb.vectorGroup.name)
         transformerUtilisation = pb.transformerUtilisation
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
         toCim(pb.ce, this, networkService)
     }
 
@@ -679,6 +686,7 @@ fun toCim(pb: PBLoop, networkService: NetworkService): Loop =
 fun NetworkService.addFromPb(pb: PBOrganisation): Organisation? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBCableInfo): CableInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBOverheadWireInfo): OverheadWireInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPowerTransformerInfo): PowerTransformerInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBMeter): Meter? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBAssetOwner): AssetOwner? = tryAddOrNull(toCim(pb, this))
@@ -727,6 +735,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim(net
     fun addFromPb(pb: PBOrganisation): Organisation? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBCableInfo): CableInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBOverheadWireInfo): OverheadWireInfo? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPowerTransformerInfo): PowerTransformerInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBMeter): Meter? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBAssetOwner): AssetOwner? = networkService.addFromPb(pb)

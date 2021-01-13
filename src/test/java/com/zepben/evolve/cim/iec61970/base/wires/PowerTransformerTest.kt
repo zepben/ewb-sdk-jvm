@@ -7,15 +7,16 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -37,12 +38,17 @@ internal class PowerTransformerTest {
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.UNKNOWN))
         assertThat(powerTransformer.transformerUtilisation, equalTo(Double.NaN))
+        assertThat(powerTransformer.assetInfo, nullValue())
 
         powerTransformer.vectorGroup = VectorGroup.DYN11
         powerTransformer.transformerUtilisation = 1.0
 
+        val powerTransformerInfo = PowerTransformerInfo().fillFields()
+        powerTransformer.assetInfo = powerTransformerInfo
+
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.DYN11))
         assertThat(powerTransformer.transformerUtilisation, equalTo(1.0))
+        assertThat(powerTransformer.assetInfo, equalTo(powerTransformerInfo))
     }
 
     @Test
@@ -82,11 +88,11 @@ internal class PowerTransformerTest {
         pt.addEnd(e1)
         pt.addEnd(e2)
         // Test order
-        assertThat(pt.ends, Matchers.containsInRelativeOrder(e1, e2))
+        assertThat(pt.ends, containsInRelativeOrder(e1, e2))
 
         // Test order maintained and sequenceNumber was set appropriately
         pt.addEnd(e3)
-        assertThat(pt.ends, Matchers.containsInRelativeOrder(e1, e2, e3))
+        assertThat(pt.ends, containsInRelativeOrder(e1, e2, e3))
         assertThat(pt.getEnd(1), equalTo(e1))
         assertThat(pt.getEnd(2), equalTo(e2))
         assertThat(pt.getEnd(4), equalTo(e3))

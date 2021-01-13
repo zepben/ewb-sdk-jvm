@@ -155,6 +155,10 @@ class NetworkProducerClient(
                 val builder = CreatePowerTransformerEndRequest.newBuilder().setPowerTransformerEnd(it.toPb()).build()
                 stub.createPowerTransformerEnd(builder)
             },
+            isPowerTransformerInfo = {
+                val builder = CreatePowerTransformerInfoRequest.newBuilder().setPowerTransformerInfo(it.toPb()).build()
+                stub.createPowerTransformerInfo(builder)
+            },
             isRatioTapChanger = {
                 val builder = CreateRatioTapChangerRequest.newBuilder().setRatioTapChanger(it.toPb()).build()
                 stub.createRatioTapChanger(builder)

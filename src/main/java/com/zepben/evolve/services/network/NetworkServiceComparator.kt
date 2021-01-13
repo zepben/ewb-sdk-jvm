@@ -9,6 +9,7 @@ package com.zepben.evolve.services.network
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
@@ -53,6 +54,9 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareAssetInfo()
             compareValues(WireInfo::ratedCurrent, WireInfo::material)
         }
+
+    private fun comparePowerTransformerInfo(source: PowerTransformerInfo, target: PowerTransformerInfo): ObjectDifference<PowerTransformerInfo> =
+        ObjectDifference(source, target).apply { compareAssetInfo() }
 
     private fun ObjectDifference<out Asset>.compareAsset(): ObjectDifference<out Asset> =
         apply {
@@ -371,7 +375,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
     private fun comparePowerTransformer(source: PowerTransformer, target: PowerTransformer): ObjectDifference<PowerTransformer> =
         ObjectDifference(source, target).apply {
             compareConductingEquipment()
-
+            compareIdReferences(PowerTransformer::assetInfo)
             compareIndexedIdReferenceCollections(PowerTransformer::ends)
             compareValues(PowerTransformer::vectorGroup)
             compareValues(PowerTransformer::transformerUtilisation)

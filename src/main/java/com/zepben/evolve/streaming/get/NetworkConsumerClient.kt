@@ -179,6 +179,7 @@ class NetworkConsumerClient(
         return when (it.identifiedObjectCase) {
             CABLEINFO -> ExtractResult(protoToCimProvider(service).addFromPb(it.cableInfo), it.cableInfo.mRID())
             OVERHEADWIREINFO -> ExtractResult(protoToCimProvider(service).addFromPb(it.overheadWireInfo), it.overheadWireInfo.mRID())
+            POWERTRANSFORMERINFO -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerTransformerInfo), it.powerTransformerInfo.mRID())
             ASSETOWNER -> ExtractResult(protoToCimProvider(service).addFromPb(it.assetOwner), it.assetOwner.mRID())
             ORGANISATION -> ExtractResult(protoToCimProvider(service).addFromPb(it.organisation), it.organisation.mRID())
             LOCATION -> ExtractResult(protoToCimProvider(service).addFromPb(it.location), it.location.mRID())

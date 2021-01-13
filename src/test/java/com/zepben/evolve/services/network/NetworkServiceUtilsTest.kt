@@ -9,6 +9,7 @@ package com.zepben.evolve.services.network
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
@@ -79,6 +80,7 @@ internal class NetworkServiceUtilsTest {
         isPole: (Pole) -> String,
         isPowerTransformer: (PowerTransformer) -> String,
         isPowerTransformerEnd: (PowerTransformerEnd) -> String,
+        isPowerTransformerInfo: (PowerTransformerInfo) -> String,
         isRatioTapChanger: (RatioTapChanger) -> String,
         isRecloser: (Recloser) -> String,
         isSite: (Site) -> String,
@@ -125,6 +127,7 @@ internal class NetworkServiceUtilsTest {
         isPole = isPole,
         isPowerTransformer = isPowerTransformer,
         isPowerTransformerEnd = isPowerTransformerEnd,
+        isPowerTransformerInfo = isPowerTransformerInfo,
         isRatioTapChanger = isRatioTapChanger,
         isRecloser = isRecloser,
         isSite = isSite,
@@ -173,6 +176,7 @@ internal class NetworkServiceUtilsTest {
         isPole: InvokeChecker<Pole> = NeverInvokedChecker(),
         isPowerTransformer: InvokeChecker<PowerTransformer> = NeverInvokedChecker(),
         isPowerTransformerEnd: InvokeChecker<PowerTransformerEnd> = NeverInvokedChecker(),
+        isPowerTransformerInfo: InvokeChecker<PowerTransformerInfo> = NeverInvokedChecker(),
         isRatioTapChanger: InvokeChecker<RatioTapChanger> = NeverInvokedChecker(),
         isRecloser: InvokeChecker<Recloser> = NeverInvokedChecker(),
         isSite: InvokeChecker<Site> = NeverInvokedChecker(),
@@ -220,6 +224,7 @@ internal class NetworkServiceUtilsTest {
             isPole = isPole,
             isPowerTransformer = isPowerTransformer,
             isPowerTransformerEnd = isPowerTransformerEnd,
+            isPowerTransformerInfo = isPowerTransformerInfo,
             isRatioTapChanger = isRatioTapChanger,
             isRecloser = isRecloser,
             isSite = isSite,
@@ -267,6 +272,7 @@ internal class NetworkServiceUtilsTest {
         isPole.verifyInvoke()
         isPowerTransformer.verifyInvoke()
         isPowerTransformerEnd.verifyInvoke()
+        isPowerTransformerInfo.verifyInvoke()
         isRatioTapChanger.verifyInvoke()
         isRecloser.verifyInvoke()
         isSite.verifyInvoke()
@@ -320,6 +326,7 @@ internal class NetworkServiceUtilsTest {
         Pole().also { whenNetworkServiceObjectTester(it, isPole = InvokedChecker(it)) }
         PowerTransformer().also { whenNetworkServiceObjectTester(it, isPowerTransformer = InvokedChecker(it)) }
         PowerTransformerEnd().also { whenNetworkServiceObjectTester(it, isPowerTransformerEnd = InvokedChecker(it)) }
+        PowerTransformerInfo().also { whenNetworkServiceObjectTester(it, isPowerTransformerInfo = InvokedChecker(it)) }
         RatioTapChanger().also { whenNetworkServiceObjectTester(it, isRatioTapChanger = InvokedChecker(it)) }
         Recloser().also { whenNetworkServiceObjectTester(it, isRecloser = InvokedChecker(it)) }
         Site().also { whenNetworkServiceObjectTester(it, isSite = InvokedChecker(it)) }

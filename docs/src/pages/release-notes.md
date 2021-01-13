@@ -33,6 +33,8 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 * Removed obsolete `PositionPointParser`.
 * Improved connectivity when using XY phasing.
 * Default value for transformerUtilisation property in PowerTransformer class was updated from 0.0 to NaN.
+* Added PowerTransformerInfo class.
+* Updated PowerTransformer's assetInfo property to hold instance of PowerTransformerInfo class.
 
 ##### New Features
 

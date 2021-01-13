@@ -9,6 +9,7 @@ package com.zepben.evolve.services.network
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
@@ -63,6 +64,9 @@ class NetworkService : BaseService("network") {
 
     fun add(cableInfo: CableInfo): Boolean = super.add(cableInfo)
     fun remove(cableInfo: CableInfo): Boolean = super.remove(cableInfo)
+
+    fun add(powerTransformerInfo: PowerTransformerInfo): Boolean = super.add(powerTransformerInfo)
+    fun remove(powerTransformerInfo: PowerTransformerInfo): Boolean = super.remove(powerTransformerInfo)
 
     fun add(circuit: Circuit): Boolean = super.add(circuit)
     fun remove(circuit: Circuit): Boolean = super.remove(circuit)

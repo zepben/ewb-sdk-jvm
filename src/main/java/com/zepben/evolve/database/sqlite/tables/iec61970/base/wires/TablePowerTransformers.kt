@@ -9,6 +9,7 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableConductingEquipment
 
 @Suppress("PropertyName")
@@ -16,6 +17,7 @@ class TablePowerTransformers : TableConductingEquipment() {
 
     val VECTOR_GROUP = Column(++columnIndex, "vector_group", "TEXT", NOT_NULL)
     val TRANSFORMER_UTILISATION = Column(++columnIndex, "transformer_utilisation", "NUMBER")
+    val POWER_TRANSFORMER_INFO_MRID = Column(++columnIndex, "power_transformer_info_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "power_transformers"

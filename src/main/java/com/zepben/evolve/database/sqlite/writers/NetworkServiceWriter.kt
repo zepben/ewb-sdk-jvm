@@ -9,6 +9,7 @@ package com.zepben.evolve.database.sqlite.writers
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
@@ -30,13 +31,15 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkService
 
-class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) : BaseServiceWriter<NetworkService, NetworkCIMWriter>(hasCommon, addCommon) {
+class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) :
+    BaseServiceWriter<NetworkService, NetworkCIMWriter>(hasCommon, addCommon) {
 
     override fun save(service: NetworkService, writer: NetworkCIMWriter): Boolean {
         var status = true
 
         service.sequenceOf<CableInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<OverheadWireInfo>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<PowerTransformerInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<AssetOwner>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Pole>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Streetlight>().forEach { status = status and validateSave(it, writer::save) }

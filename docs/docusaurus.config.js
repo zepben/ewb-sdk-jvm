@@ -7,6 +7,7 @@
  */
 
 const zepbenDocusaurusPreset = require("@zepben/docusaurus-preset");
+const versions = require("./versions.json");
 
 module.exports = {
   title: "Evolve SDK (JVM)",
@@ -77,7 +78,10 @@ module.exports = {
         docs: {
           routeBasePath: '/',
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/zepben",
+          versions: versions.reduce((acc, curr) => {
+            acc[curr] = {label: curr, path: curr};
+            return acc;
+          }, {})
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),

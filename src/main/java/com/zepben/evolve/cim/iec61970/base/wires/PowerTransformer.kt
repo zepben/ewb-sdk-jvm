@@ -46,6 +46,7 @@ import com.zepben.evolve.services.common.extensions.*
  * @property primaryVoltage Holds the primary voltage value for a transformer.
  * @property transformerUtilisation The fraction of the transformer’s normal capacity (nameplate rating) that is in use. It may be expressed as the
  *                                  result of the calculation S/Sn, where S = Load on Transformer (in VA), Sn = Transformer Nameplate Rating (in VA).
+ *                                  A value of NaN signifies the data is missing/unknown.
  */
 class PowerTransformer @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
 

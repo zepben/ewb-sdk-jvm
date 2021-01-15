@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.services.network.testdata
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -30,6 +31,17 @@ import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locatio
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
 import java.util.*
+
+/************ IEC61968 ASSET INFO ************/
+
+fun PowerTransformerInfo.fillFields(): PowerTransformerInfo {
+    (this as AssetInfo).fillFields()
+    return this
+}
+
+fun AssetInfo.fillFields() {
+    (this as IdentifiedObject).fillFields()
+}
 
 /************ IEC61968 ASSETS ************/
 fun Asset.fillFields(networkService: NetworkService) {
@@ -208,6 +220,7 @@ fun Line.fillFields(networkService: NetworkService) = (this as EquipmentContaine
 fun PowerTransformer.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerTransformer {
     transformerUtilisation = 1.0
     vectorGroup = VectorGroup.DD0
+    assetInfo = PowerTransformerInfo().fillFields().also { networkService.add(it) }
 
     (this as ConductingEquipment).fillFields(networkService, includeRuntime)
     return this

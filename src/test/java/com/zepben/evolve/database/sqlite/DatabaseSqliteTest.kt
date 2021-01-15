@@ -40,6 +40,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class DatabaseSqliteTest {
+
     @JvmField
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
@@ -114,6 +115,11 @@ class DatabaseSqliteTest {
     @Test
     fun `test PowerTransformer Schema`() {
         validateSchema(SchemaTestNetwork.createPowerTransformerTestServices())
+    }
+
+    @Test
+    fun `test PowerTransformerInfo Schema`() {
+        validateSchema(SchemaTestNetwork.createPowerTransformerInfoTestServices())
     }
 
     @Test

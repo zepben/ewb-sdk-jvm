@@ -9,6 +9,7 @@ package com.zepben.evolve.services.network.testdata
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.StreetAddress
 import com.zepben.evolve.cim.iec61968.common.TownDetail
@@ -134,13 +135,19 @@ object StupidlyLargeNetwork {
             this.perLengthSequenceImpedance = perLengthSequenceImpedance2
             this.assetInfo = oh1
         }
+
+        val transformerInfo = PowerTransformerInfo("transformer_info")
+        val isoTransformerInfo1 = PowerTransformerInfo("id_iso_transformer1_info")
+
         val transformer = PowerTransformer("transformer").apply {
             name = "Transformer"
             location = transformerLoc
             baseVoltage = tripleVoltage[0]
+            assetInfo = transformerInfo
         }
         val isoTransformer1 = PowerTransformer("id_iso_transformer1").apply {
             name = "iso_transformer1"
+            assetInfo = isoTransformerInfo1
         }
         val powerTransformer2 = PowerTransformer("id_iso_transformer2").apply {
             name = "iso_transformer2"
@@ -195,6 +202,7 @@ object StupidlyLargeNetwork {
         networkService.add(aSwitch)
         networkService.add(acLineSegment202)
         networkService.add(transformerLoc)
+        networkService.add(transformerInfo)
         networkService.add(transformer)
         networkService.add(acLineSegment303)
         networkService.add(node1)
@@ -202,6 +210,7 @@ object StupidlyLargeNetwork {
         networkService.add(node2)
         networkService.add(node3)
         networkService.add(isoTransformer1)
+        networkService.add(isoTransformerInfo1)
         networkService.add(powerTransformer2)
         networkService.add(powerTransformer3)
 

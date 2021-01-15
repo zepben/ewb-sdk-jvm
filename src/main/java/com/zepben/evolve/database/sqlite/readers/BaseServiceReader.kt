@@ -29,7 +29,7 @@ open class BaseServiceReader constructor(protected val getStatement: () -> State
 
     protected inline fun <reified T : SqliteTable> loadEach(
         description: String,
-        crossinline processRow: (T, ResultSet, (String) -> String) -> Boolean
+        processRow: (T, ResultSet, (String) -> String) -> Boolean
     ): Boolean {
         return loadTable<T>(description) { table, results ->
             var lastMRID: String? = null

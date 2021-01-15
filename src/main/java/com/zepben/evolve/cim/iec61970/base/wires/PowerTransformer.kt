@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.common.extensions.*
 
@@ -45,6 +46,7 @@ import com.zepben.evolve.services.common.extensions.*
  * @property primaryVoltage Holds the primary voltage value for a transformer.
  * @property transformerUtilisation The fraction of the transformer’s normal capacity (nameplate rating) that is in use. It may be expressed as the
  *                                  result of the calculation S/Sn, where S = Load on Transformer (in VA), Sn = Transformer Nameplate Rating (in VA).
+ *                                  A value of NaN signifies the data is missing/unknown.
  */
 class PowerTransformer @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
 
@@ -53,7 +55,12 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
 
     private var _powerTransformerEnds: MutableList<PowerTransformerEnd>? = null
     var vectorGroup: VectorGroup = VectorGroup.UNKNOWN
-    var transformerUtilisation: Double = 0.0
+    var transformerUtilisation: Double = Double.NaN
+
+    /**
+     * Override the [AssetInfo] as [PowerTransformerInfo].
+     */
+    override var assetInfo: PowerTransformerInfo? = null
 
     /**
      * The PowerTransformerEnd's for this PowerTransformer. The returned collection is read only.

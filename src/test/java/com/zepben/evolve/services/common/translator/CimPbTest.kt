@@ -9,6 +9,7 @@ package com.zepben.evolve.services.common.translator
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
@@ -146,6 +147,7 @@ class CimPbTest {
             when (it) {
                 is CableInfo -> targetNetwork.addFromPb(it.toPb())
                 is OverheadWireInfo -> targetNetwork.addFromPb(it.toPb())
+                is PowerTransformerInfo -> targetNetwork.addFromPb(it.toPb())
                 is Meter -> targetNetwork.addFromPb(it.toPb())
                 is OperationalRestriction -> targetNetwork.addFromPb(it.toPb())
                 is AssetOwner -> targetNetwork.addFromPb(it.toPb())

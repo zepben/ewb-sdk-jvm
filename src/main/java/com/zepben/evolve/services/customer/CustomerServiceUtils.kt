@@ -42,12 +42,12 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 @JvmOverloads
 inline fun <R> whenCustomerServiceObject(
     identifiedObject: IdentifiedObject,
-    crossinline isCustomer: (Customer) -> R,
-    crossinline isCustomerAgreement: (CustomerAgreement) -> R,
-    crossinline isOrganisation: (Organisation) -> R,
-    crossinline isPricingStructure: (PricingStructure) -> R,
-    crossinline isTariff: (Tariff) -> R,
-    crossinline isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
+    isCustomer: (Customer) -> R,
+    isCustomerAgreement: (CustomerAgreement) -> R,
+    isOrganisation: (Organisation) -> R,
+    isPricingStructure: (PricingStructure) -> R,
+    isTariff: (Tariff) -> R,
+    isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the customer service")
     }
 ): R = when (identifiedObject) {

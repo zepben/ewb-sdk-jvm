@@ -13,6 +13,7 @@ package com.zepben.evolve.services.network
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
@@ -77,6 +78,7 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isPole Handler when the [identifiedObject] is a [Pole]
  * @param isPowerTransformer Handler when the [identifiedObject] is a [PowerTransformer]
  * @param isPowerTransformerEnd Handler when the [identifiedObject] is a [PowerTransformerEnd]
+ * @param isPowerTransformerInfo Handler when the [identifiedObject] is a [PowerTransformerInfo]
  * @param isRatioTapChanger Handler when the [identifiedObject] is a [RatioTapChanger]
  * @param isRecloser Handler when the [identifiedObject] is a [Recloser]
  * @param isSite Handler when the [identifiedObject] is a [Site]
@@ -96,50 +98,51 @@ import com.zepben.evolve.services.customer.CustomerService
 @JvmOverloads
 inline fun <R> whenNetworkServiceObject(
     identifiedObject: IdentifiedObject,
-    crossinline isAcLineSegment: (AcLineSegment) -> R,
-    crossinline isAssetOwner: (AssetOwner) -> R,
-    crossinline isBaseVoltage: (BaseVoltage) -> R,
-    crossinline isBreaker: (Breaker) -> R,
-    crossinline isCableInfo: (CableInfo) -> R,
-    crossinline isCircuit: (Circuit) -> R,
-    crossinline isConnectivityNode: (ConnectivityNode) -> R,
-    crossinline isDisconnector: (Disconnector) -> R,
-    crossinline isEnergyConsumer: (EnergyConsumer) -> R,
-    crossinline isEnergyConsumerPhase: (EnergyConsumerPhase) -> R,
-    crossinline isEnergySource: (EnergySource) -> R,
-    crossinline isEnergySourcePhase: (EnergySourcePhase) -> R,
-    crossinline isFaultIndicator: (FaultIndicator) -> R,
-    crossinline isFeeder: (Feeder) -> R,
-    crossinline isFuse: (Fuse) -> R,
-    crossinline isGeographicalRegion: (GeographicalRegion) -> R,
-    crossinline isJumper: (Jumper) -> R,
-    crossinline isJunction: (Junction) -> R,
-    crossinline isLinearShuntCompensator: (LinearShuntCompensator) -> R,
-    crossinline isLocation: (Location) -> R,
-    crossinline isLoop: (Loop) -> R,
-    crossinline isMeter: (Meter) -> R,
-    crossinline isOperationalRestriction: (OperationalRestriction) -> R,
-    crossinline isOrganisation: (Organisation) -> R,
-    crossinline isOverheadWireInfo: (OverheadWireInfo) -> R,
-    crossinline isPerLengthSequenceImpedance: (PerLengthSequenceImpedance) -> R,
-    crossinline isPole: (Pole) -> R,
-    crossinline isPowerTransformer: (PowerTransformer) -> R,
-    crossinline isPowerTransformerEnd: (PowerTransformerEnd) -> R,
-    crossinline isRatioTapChanger: (RatioTapChanger) -> R,
-    crossinline isRecloser: (Recloser) -> R,
-    crossinline isSite: (Site) -> R,
-    crossinline isStreetlight: (Streetlight) -> R,
-    crossinline isSubGeographicalRegion: (SubGeographicalRegion) -> R,
-    crossinline isSubstation: (Substation) -> R,
-    crossinline isTerminal: (Terminal) -> R,
-    crossinline isUsagePoint: (UsagePoint) -> R,
-    crossinline isControl: (Control) -> R,
-    crossinline isAnalog: (Analog) -> R,
-    crossinline isAccumulator: (Accumulator) -> R,
-    crossinline isDiscrete: (Discrete) -> R,
-    crossinline isRemoteControl: (RemoteControl) -> R,
-    crossinline isRemoteSource: (RemoteSource) -> R,
-    crossinline isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
+    isAcLineSegment: (AcLineSegment) -> R,
+    isAssetOwner: (AssetOwner) -> R,
+    isBaseVoltage: (BaseVoltage) -> R,
+    isBreaker: (Breaker) -> R,
+    isCableInfo: (CableInfo) -> R,
+    isCircuit: (Circuit) -> R,
+    isConnectivityNode: (ConnectivityNode) -> R,
+    isDisconnector: (Disconnector) -> R,
+    isEnergyConsumer: (EnergyConsumer) -> R,
+    isEnergyConsumerPhase: (EnergyConsumerPhase) -> R,
+    isEnergySource: (EnergySource) -> R,
+    isEnergySourcePhase: (EnergySourcePhase) -> R,
+    isFaultIndicator: (FaultIndicator) -> R,
+    isFeeder: (Feeder) -> R,
+    isFuse: (Fuse) -> R,
+    isGeographicalRegion: (GeographicalRegion) -> R,
+    isJumper: (Jumper) -> R,
+    isJunction: (Junction) -> R,
+    isLinearShuntCompensator: (LinearShuntCompensator) -> R,
+    isLocation: (Location) -> R,
+    isLoop: (Loop) -> R,
+    isMeter: (Meter) -> R,
+    isOperationalRestriction: (OperationalRestriction) -> R,
+    isOrganisation: (Organisation) -> R,
+    isOverheadWireInfo: (OverheadWireInfo) -> R,
+    isPerLengthSequenceImpedance: (PerLengthSequenceImpedance) -> R,
+    isPole: (Pole) -> R,
+    isPowerTransformer: (PowerTransformer) -> R,
+    isPowerTransformerEnd: (PowerTransformerEnd) -> R,
+    isPowerTransformerInfo: (PowerTransformerInfo) -> R,
+    isRatioTapChanger: (RatioTapChanger) -> R,
+    isRecloser: (Recloser) -> R,
+    isSite: (Site) -> R,
+    isStreetlight: (Streetlight) -> R,
+    isSubGeographicalRegion: (SubGeographicalRegion) -> R,
+    isSubstation: (Substation) -> R,
+    isTerminal: (Terminal) -> R,
+    isUsagePoint: (UsagePoint) -> R,
+    isControl: (Control) -> R,
+    isAnalog: (Analog) -> R,
+    isAccumulator: (Accumulator) -> R,
+    isDiscrete: (Discrete) -> R,
+    isRemoteControl: (RemoteControl) -> R,
+    isRemoteSource: (RemoteSource) -> R,
+    isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
 ): R = when (identifiedObject) {
@@ -172,6 +175,7 @@ inline fun <R> whenNetworkServiceObject(
     is Pole -> isPole(identifiedObject)
     is PowerTransformer -> isPowerTransformer(identifiedObject)
     is PowerTransformerEnd -> isPowerTransformerEnd(identifiedObject)
+    is PowerTransformerInfo -> isPowerTransformerInfo(identifiedObject)
     is RatioTapChanger -> isRatioTapChanger(identifiedObject)
     is Recloser -> isRecloser(identifiedObject)
     is Site -> isSite(identifiedObject)

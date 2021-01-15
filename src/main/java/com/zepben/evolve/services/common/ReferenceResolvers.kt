@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.services.common
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.evolve.cim.iec61968.assets.Asset
 import com.zepben.evolve.cim.iec61968.assets.AssetOrganisationRole
@@ -37,25 +38,32 @@ import kotlin.reflect.KClass
 
 
 internal object AcLineSegmentToPerLengthSequenceImpedanceResolver : ReferenceResolver<AcLineSegment, PerLengthSequenceImpedance> by KReferenceResolver(
-    AcLineSegment::class, PerLengthSequenceImpedance::class, AcLineSegment::perLengthSequenceImpedance.setter)
+    AcLineSegment::class, PerLengthSequenceImpedance::class, AcLineSegment::perLengthSequenceImpedance.setter
+)
 
 internal object AssetToAssetOrganisationRoleResolver : ReferenceResolver<Asset, AssetOrganisationRole> by KReferenceResolver(
-    Asset::class, AssetOrganisationRole::class, Asset::addOrganisationRole)
+    Asset::class, AssetOrganisationRole::class, Asset::addOrganisationRole
+)
 
 internal object AssetToLocationResolver : ReferenceResolver<Asset, Location> by KReferenceResolver(
-    Asset::class, Location::class, Asset::location.setter)
+    Asset::class, Location::class, Asset::location.setter
+)
 
-internal object PoleToStreetlightResolver: ReferenceResolver<Pole, Streetlight> by KReferenceResolver(
-    Pole::class, Streetlight::class, Pole::addStreetlight)
+internal object PoleToStreetlightResolver : ReferenceResolver<Pole, Streetlight> by KReferenceResolver(
+    Pole::class, Streetlight::class, Pole::addStreetlight
+)
 
-internal object StreetlightToPoleResolver: ReferenceResolver<Streetlight, Pole> by KReferenceResolver(
-    Streetlight::class, Pole::class, Streetlight::pole.setter)
+internal object StreetlightToPoleResolver : ReferenceResolver<Streetlight, Pole> by KReferenceResolver(
+    Streetlight::class, Pole::class, Streetlight::pole.setter
+)
 
 internal object AuxiliaryEquipmentToTerminalResolver : ReferenceResolver<AuxiliaryEquipment, Terminal> by KReferenceResolver(
-    AuxiliaryEquipment::class, Terminal::class, AuxiliaryEquipment::terminal.setter)
+    AuxiliaryEquipment::class, Terminal::class, AuxiliaryEquipment::terminal.setter
+)
 
 internal object ConductingEquipmentToBaseVoltageResolver : ReferenceResolver<ConductingEquipment, BaseVoltage> by KReferenceResolver(
-    ConductingEquipment::class, BaseVoltage::class, ConductingEquipment::baseVoltage.setter)
+    ConductingEquipment::class, BaseVoltage::class, ConductingEquipment::baseVoltage.setter
+)
 
 internal object ConductingEquipmentToTerminalsResolver : ReferenceResolver<ConductingEquipment, Terminal> by KReferenceResolver(
     ConductingEquipment::class,
@@ -66,24 +74,34 @@ internal object ConductingEquipmentToTerminalsResolver : ReferenceResolver<Condu
     })
 
 internal object ConductorToWireInfoResolver : ReferenceResolver<Conductor, WireInfo> by KReferenceResolver(
-    Conductor::class, WireInfo::class, Conductor::assetInfo.setter)
+    Conductor::class, WireInfo::class, Conductor::assetInfo.setter
+)
+
+internal object PowerTransformerToPowerTransformerInfoResolver : ReferenceResolver<PowerTransformer, PowerTransformerInfo> by KReferenceResolver(
+    PowerTransformer::class, PowerTransformerInfo::class, PowerTransformer::assetInfo.setter
+)
 
 internal object ConnectivityNodeToTerminalResolver : ReferenceResolver<ConnectivityNode, Terminal> by KReferenceResolver(
-    ConnectivityNode::class, Terminal::class, ConnectivityNode::addTerminal)
+    ConnectivityNode::class, Terminal::class, ConnectivityNode::addTerminal
+)
 
 internal object ControlToRemoteControlResolver : ReferenceResolver<Control, RemoteControl> by KReferenceResolver(
-    Control::class, RemoteControl::class, Control::remoteControl.setter)
+    Control::class, RemoteControl::class, Control::remoteControl.setter
+)
 
 internal object CustomerToCustomerAgreementResolver : ReferenceResolver<Customer, CustomerAgreement> by KReferenceResolver(
-    Customer::class, CustomerAgreement::class, Customer::addAgreement)
+    Customer::class, CustomerAgreement::class, Customer::addAgreement
+)
 
 internal object CustomerAgreementToCustomerResolver : ReferenceResolver<CustomerAgreement, Customer> by KReferenceResolver(
-    CustomerAgreement::class, Customer::class, CustomerAgreement::customer.setter)
+    CustomerAgreement::class, Customer::class, CustomerAgreement::customer.setter
+)
 
 internal object CustomerAgreementToPricingStructureResolver : ReferenceResolver<CustomerAgreement, PricingStructure> by KReferenceResolver(
-    CustomerAgreement::class, PricingStructure::class, CustomerAgreement::addPricingStructure)
+    CustomerAgreement::class, PricingStructure::class, CustomerAgreement::addPricingStructure
+)
 
-internal object DiagramToDiagramObjectResolver: ReferenceResolver<Diagram, DiagramObject> by KReferenceResolver(
+internal object DiagramToDiagramObjectResolver : ReferenceResolver<Diagram, DiagramObject> by KReferenceResolver(
     Diagram::class, DiagramObject::class,
     { diagram, diagramObject ->
         diagramObject.diagram = diagram
@@ -91,64 +109,84 @@ internal object DiagramToDiagramObjectResolver: ReferenceResolver<Diagram, Diagr
     })
 
 internal object DiagramObjectToDiagramResolver : ReferenceResolver<DiagramObject, Diagram> by KReferenceResolver(
-    DiagramObject::class, Diagram::class, DiagramObject::diagram.setter)
+    DiagramObject::class, Diagram::class, DiagramObject::diagram.setter
+)
 
 internal object EndDeviceToUsagePointResolver : ReferenceResolver<EndDevice, UsagePoint> by KReferenceResolver(
-    EndDevice::class, UsagePoint::class, EndDevice::addUsagePoint)
+    EndDevice::class, UsagePoint::class, EndDevice::addUsagePoint
+)
 
 internal object EndDeviceToServiceLocationResolver : ReferenceResolver<EndDevice, Location> by KReferenceResolver(
-    EndDevice::class, Location::class, EndDevice::serviceLocation.setter)
+    EndDevice::class, Location::class, EndDevice::serviceLocation.setter
+)
 
 internal object EnergyConsumerToEnergyConsumerPhaseResolver : ReferenceResolver<EnergyConsumer, EnergyConsumerPhase> by KReferenceResolver(
-    EnergyConsumer::class, EnergyConsumerPhase::class, EnergyConsumer::addPhase)
+    EnergyConsumer::class, EnergyConsumerPhase::class, EnergyConsumer::addPhase
+)
 
 internal object EnergyConsumerPhaseToEnergyConsumerResolver : ReferenceResolver<EnergyConsumerPhase, EnergyConsumer> by KReferenceResolver(
-    EnergyConsumerPhase::class, EnergyConsumer::class, EnergyConsumerPhase::energyConsumer.setter)
+    EnergyConsumerPhase::class, EnergyConsumer::class, EnergyConsumerPhase::energyConsumer.setter
+)
 
 internal object EnergySourceToEnergySourcePhaseResolver : ReferenceResolver<EnergySource, EnergySourcePhase> by KReferenceResolver(
-    EnergySource::class, EnergySourcePhase::class, EnergySource::addPhase)
+    EnergySource::class, EnergySourcePhase::class, EnergySource::addPhase
+)
 
 internal object EnergySourcePhaseToEnergySourceResolver : ReferenceResolver<EnergySourcePhase, EnergySource> by KReferenceResolver(
-    EnergySourcePhase::class, EnergySource::class, EnergySourcePhase::energySource.setter)
+    EnergySourcePhase::class, EnergySource::class, EnergySourcePhase::energySource.setter
+)
 
 internal object EquipmentToCurrentFeedersResolver : ReferenceResolver<Equipment, Feeder> by KReferenceResolver(
-    Equipment::class, Feeder::class, Equipment::addCurrentFeeder)
+    Equipment::class, Feeder::class, Equipment::addCurrentFeeder
+)
 
 internal object EquipmentToEquipmentContainerResolver : ReferenceResolver<Equipment, EquipmentContainer> by KReferenceResolver(
-    Equipment::class, EquipmentContainer::class, Equipment::addContainer)
+    Equipment::class, EquipmentContainer::class, Equipment::addContainer
+)
 
 internal object EquipmentToOperationalRestrictionResolver : ReferenceResolver<Equipment, OperationalRestriction> by KReferenceResolver(
-    Equipment::class, OperationalRestriction::class, Equipment::addOperationalRestriction)
+    Equipment::class, OperationalRestriction::class, Equipment::addOperationalRestriction
+)
 
 internal object EquipmentToUsagePointResolver : ReferenceResolver<Equipment, UsagePoint> by KReferenceResolver(
-    Equipment::class, UsagePoint::class, Equipment::addUsagePoint)
+    Equipment::class, UsagePoint::class, Equipment::addUsagePoint
+)
 
 internal object EquipmentContainerToEquipmentResolver : ReferenceResolver<EquipmentContainer, Equipment> by KReferenceResolver(
-    EquipmentContainer::class, Equipment::class, EquipmentContainer::addEquipment)
+    EquipmentContainer::class, Equipment::class, EquipmentContainer::addEquipment
+)
 
 internal object CurrentFeederToEquipmentResolver : ReferenceResolver<Feeder, Equipment> by KReferenceResolver(
-    Feeder::class, Equipment::class, Feeder::addCurrentEquipment)
+    Feeder::class, Equipment::class, Feeder::addCurrentEquipment
+)
 
 internal object FeederToNormalEnergizingSubstationResolver : ReferenceResolver<Feeder, Substation> by KReferenceResolver(
-    Feeder::class, Substation::class, Feeder::normalEnergizingSubstation.setter)
+    Feeder::class, Substation::class, Feeder::normalEnergizingSubstation.setter
+)
 
 internal object FeederToNormalHeadTerminalResolver : ReferenceResolver<Feeder, Terminal> by KReferenceResolver(
-    Feeder::class, Terminal::class, Feeder::normalHeadTerminal.setter)
+    Feeder::class, Terminal::class, Feeder::normalHeadTerminal.setter
+)
 
 internal object GeographicalRegionToSubGeographicalRegionResolver : ReferenceResolver<GeographicalRegion, SubGeographicalRegion> by KReferenceResolver(
-    GeographicalRegion::class, SubGeographicalRegion::class, GeographicalRegion::addSubGeographicalRegion)
+    GeographicalRegion::class, SubGeographicalRegion::class, GeographicalRegion::addSubGeographicalRegion
+)
 
 internal object MeasurementToRemoteSourceResolver : ReferenceResolver<Measurement, RemoteSource> by KReferenceResolver(
-    Measurement::class, RemoteSource::class, Measurement::remoteSource.setter)
+    Measurement::class, RemoteSource::class, Measurement::remoteSource.setter
+)
 
 internal object OperationalRestrictionToEquipmentResolver : ReferenceResolver<OperationalRestriction, Equipment> by KReferenceResolver(
-    OperationalRestriction::class, Equipment::class, OperationalRestriction::addEquipment)
+    OperationalRestriction::class, Equipment::class, OperationalRestriction::addEquipment
+)
 
 internal object OrganisationRoleToOrganisationResolver : ReferenceResolver<OrganisationRole, Organisation> by KReferenceResolver(
-    OrganisationRole::class, Organisation::class, OrganisationRole::organisation.setter)
+    OrganisationRole::class, Organisation::class, OrganisationRole::organisation.setter
+)
 
 internal object PowerSystemResourceToLocationResolver : ReferenceResolver<PowerSystemResource, Location> by KReferenceResolver(
-    PowerSystemResource::class, Location::class, PowerSystemResource::location.setter)
+    PowerSystemResource::class, Location::class, PowerSystemResource::location.setter
+)
 
 internal object PowerTransformerToPowerTransformerEndResolver : ReferenceResolver<PowerTransformer, PowerTransformerEnd> by KReferenceResolver(
     PowerTransformer::class,
@@ -159,22 +197,28 @@ internal object PowerTransformerToPowerTransformerEndResolver : ReferenceResolve
     })
 
 internal object PowerTransformerEndToPowerTransformerResolver : ReferenceResolver<PowerTransformerEnd, PowerTransformer> by KReferenceResolver(
-    PowerTransformerEnd::class, PowerTransformer::class, PowerTransformerEnd::powerTransformer.setter)
+    PowerTransformerEnd::class, PowerTransformer::class, PowerTransformerEnd::powerTransformer.setter
+)
 
 internal object PricingStructureToTariffResolver : ReferenceResolver<PricingStructure, Tariff> by KReferenceResolver(
-    PricingStructure::class, Tariff::class, PricingStructure::addTariff)
+    PricingStructure::class, Tariff::class, PricingStructure::addTariff
+)
 
 internal object RatioTapChangerToTransformerEndResolver : ReferenceResolver<RatioTapChanger, TransformerEnd> by KReferenceResolver(
-    RatioTapChanger::class, TransformerEnd::class, RatioTapChanger::transformerEnd.setter)
+    RatioTapChanger::class, TransformerEnd::class, RatioTapChanger::transformerEnd.setter
+)
 
 internal object RemoteControlToControlResolver : ReferenceResolver<RemoteControl, Control> by KReferenceResolver(
-    RemoteControl::class, Control::class, RemoteControl::control.setter)
+    RemoteControl::class, Control::class, RemoteControl::control.setter
+)
 
 internal object RemoteSourceToMeasurementResolver : ReferenceResolver<RemoteSource, Measurement> by KReferenceResolver(
-    RemoteSource::class, Measurement::class, RemoteSource::measurement.setter)
+    RemoteSource::class, Measurement::class, RemoteSource::measurement.setter
+)
 
 internal object SubGeographicalRegionToGeographicalRegionResolver : ReferenceResolver<SubGeographicalRegion, GeographicalRegion> by KReferenceResolver(
-    SubGeographicalRegion::class, GeographicalRegion::class, SubGeographicalRegion::geographicalRegion.setter)
+    SubGeographicalRegion::class, GeographicalRegion::class, SubGeographicalRegion::geographicalRegion.setter
+)
 
 internal object SubGeographicalRegionToSubstationResolver : ReferenceResolver<SubGeographicalRegion, Substation> by KReferenceResolver(
     SubGeographicalRegion::class, Substation::class, SubGeographicalRegion::addSubstation
@@ -217,7 +261,8 @@ internal object TransformerEndToBaseVoltageResolver : ReferenceResolver<Transfor
 )
 
 internal object TransformerEndToRatioTapChangerResolver : ReferenceResolver<TransformerEnd, RatioTapChanger> by KReferenceResolver(
-    TransformerEnd::class, RatioTapChanger::class, TransformerEnd::ratioTapChanger.setter)
+    TransformerEnd::class, RatioTapChanger::class, TransformerEnd::ratioTapChanger.setter
+)
 
 internal object UsagePointToEndDeviceResolver : ReferenceResolver<UsagePoint, EndDevice> by KReferenceResolver(
     UsagePoint::class, EndDevice::class, UsagePoint::addEndDevice

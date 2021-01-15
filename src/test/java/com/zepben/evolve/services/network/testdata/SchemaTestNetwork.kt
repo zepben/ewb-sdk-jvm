@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.services.network.testdata
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
@@ -38,6 +39,15 @@ object SchemaTestNetwork {
 
         networkService.add(PowerTransformer())
         networkService.add(PowerTransformer().fillFields(networkService, includeRuntime = false))
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    }
+
+    fun createPowerTransformerInfoTestServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.add(PowerTransformerInfo())
+        networkService.add(PowerTransformerInfo().fillFields())
 
         return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
     }

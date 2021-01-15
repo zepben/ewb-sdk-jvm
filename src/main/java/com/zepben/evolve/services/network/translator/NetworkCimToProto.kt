@@ -9,6 +9,7 @@ package com.zepben.evolve.services.network.translator
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
@@ -38,6 +39,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverheadWireInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PPowerTransformerInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireInfo as PBWireInfo
 import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
 import com.zepben.protobuf.cim.iec61968.assets.AssetContainer as PBAssetContainer
@@ -120,6 +122,9 @@ fun toPb(cim: CableInfo, pb: PBCableInfo.Builder): PBCableInfo.Builder =
 
 fun toPb(cim: OverheadWireInfo, pb: PBOverheadWireInfo.Builder): PBOverheadWireInfo.Builder =
     pb.apply { toPb(cim, wiBuilder) }
+
+fun toPb(cim: PowerTransformerInfo, pb: PPowerTransformerInfo.Builder): PPowerTransformerInfo.Builder =
+    pb.apply { toPb(cim, aiBuilder) }
 
 fun toPb(cim: WireInfo, pb: PBWireInfo.Builder): PBWireInfo.Builder =
     pb.apply {
@@ -667,6 +672,7 @@ fun SubGeographicalRegion.toPb(): PBSubGeographicalRegion = toPb(this, PBSubGeog
 fun Terminal.toPb(): PBTerminal = toPb(this, PBTerminal.newBuilder()).build()
 fun PerLengthSequenceImpedance.toPb(): PBPerLengthSequenceImpedance = toPb(this, PBPerLengthSequenceImpedance.newBuilder()).build()
 fun PowerTransformerEnd.toPb(): PBPowerTransformerEnd = toPb(this, PBPowerTransformerEnd.newBuilder()).build()
+fun PowerTransformerInfo.toPb(): PPowerTransformerInfo = toPb(this, PPowerTransformerInfo.newBuilder()).build()
 fun Circuit.toPb(): PBCircuit = toPb(this, PBCircuit.newBuilder()).build()
 fun Loop.toPb(): PBLoop = toPb(this, PBLoop.newBuilder()).build()
 fun Control.toPb(): PBControl = toPb(this, PBControl.newBuilder()).build()

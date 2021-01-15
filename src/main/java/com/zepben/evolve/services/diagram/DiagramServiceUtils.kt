@@ -37,9 +37,9 @@ import com.zepben.evolve.services.customer.CustomerService
 @JvmOverloads
 inline fun <R> whenDiagramServiceObject(
     identifiedObject: IdentifiedObject,
-    crossinline isDiagram: (Diagram) -> R,
-    crossinline isDiagramObject: (DiagramObject) -> R,
-    crossinline isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
+    isDiagram: (Diagram) -> R,
+    isDiagramObject: (DiagramObject) -> R,
+    isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the diagram service")
     }
 ): R = when (identifiedObject) {

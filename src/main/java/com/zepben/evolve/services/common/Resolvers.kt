@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.services.common
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.evolve.cim.iec61968.assets.Asset
 import com.zepben.evolve.cim.iec61968.assets.AssetOrganisationRole
@@ -71,6 +72,10 @@ object Resolvers {
     @JvmStatic
     fun assetInfo(conductor: Conductor): BoundReferenceResolver<Conductor, WireInfo> =
         BoundReferenceResolver(conductor, ConductorToWireInfoResolver, null)
+
+    @JvmStatic
+    fun assetInfo(powerTransformer: PowerTransformer): BoundReferenceResolver<PowerTransformer, PowerTransformerInfo> =
+        BoundReferenceResolver(powerTransformer, PowerTransformerToPowerTransformerInfoResolver, null)
 
     @JvmStatic
     fun streetlights(pole: Pole): BoundReferenceResolver<Pole, Streetlight> =

@@ -9,6 +9,7 @@ package com.zepben.evolve.database.sqlite.upgrade
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
+import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.evolve.database.sqlite.DatabaseReader
 import com.zepben.evolve.services.common.meta.MetadataCollection
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
+import kotlin.test.fail
 
 @Suppress("SqlResolve")
 class ChangeSetTest {
@@ -99,6 +101,40 @@ class ChangeSetTest {
         assertThat(meas3?.description, equalTo("meas3"))
         assertThat(meas3?.numDiagramObjects, equalTo(3))
         assertThat(meas3?.powerSystemResourceMRID, equalTo("psr3"))
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun `removed null constraint from transformer_utilisation column in power_transformers table`(@TempDir tempDir: Path) {
+        val dbFile = File("src/test/data/changeset24.sqlite").copyTo(Path.of(tempDir.toString(), "changeset24.sqlite").toFile()).toPath()
+        val runner = UpgradeRunner()
+        val cr = runner.connectAndUpgrade("jdbc:sqlite:$dbFile", dbFile)
+
+        // Ensure transformer_utilisation column is nullable
+        cr.connection.use { connection ->
+            connection.createStatement().use { statement ->
+                statement.executeQuery("pragma table_info('power_transformers');").use rs@{ rs ->
+                    while (rs.next()) {
+                        if (rs.getString("name") == "transformer_utilisation") {
+                            assertThat(rs.getString("notnull"), equalTo("0"))
+                            return@rs
+                        }
+                    }
+                    fail()
+                }
+            }
+        }
+        cr.connection.close()
+
+        val reader = DatabaseReader(dbFile.toString())
+        val network = NetworkService()
+        reader.load(MetadataCollection(), network, DiagramService(), CustomerService())
+
+        val pt0 = network.get<PowerTransformer>("power_transformer_0")
+        assertThat(pt0?.transformerUtilisation, equalTo(0.0))
+
+        val pt1 = network.get<PowerTransformer>("power_transformer_1")
+        assertThat(pt1?.transformerUtilisation, equalTo(1.2))
     }
 
 }

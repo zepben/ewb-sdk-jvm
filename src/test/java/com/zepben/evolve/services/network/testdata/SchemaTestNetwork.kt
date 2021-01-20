@@ -10,7 +10,12 @@ package com.zepben.evolve.services.network.testdata
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
+import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnection
+import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnectionPhase
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.meta.DataSource
@@ -24,6 +29,51 @@ import java.time.Instant
 
 @Suppress("SameParameterValue", "BooleanLiteralArgument")
 object SchemaTestNetwork {
+
+    fun createBatteryUnitTestServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.add(BatteryUnit("bu1"))
+        networkService.add(BatteryUnit("bu2").fillFields(networkService))
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    }
+
+    fun createPhotoVoltaicUnitTestServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.add(PhotoVoltaicUnit("pv1"))
+        networkService.add(PhotoVoltaicUnit("pv2").fillFields(networkService))
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    }
+
+    fun createPowerElectronicsWindUnitTestServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.add(PowerElectronicsWindUnit("pewu1"))
+        networkService.add(PowerElectronicsWindUnit("pewu2").fillFields(networkService))
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    }
+
+    fun createPowerElectronicsConnectionTestServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.add(PowerElectronicsConnection("pec1"))
+        networkService.add(PowerElectronicsConnection("pec2").fillFields(networkService))
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    }
+
+    fun createPowerElectronicsConnectionPhaseTestServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.add(PowerElectronicsConnectionPhase("pecp1"))
+        networkService.add(PowerElectronicsConnectionPhase("pecp2").fillFields(networkService))
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    }
 
     fun createPoleTestServices(): NetworkModelTestUtil.Services {
         val networkService = NetworkService()

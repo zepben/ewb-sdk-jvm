@@ -32,6 +32,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import kotlin.reflect.KClass
@@ -298,6 +299,22 @@ internal object LoopToSubstationResolver : ReferenceResolver<Loop, Substation> b
 
 internal object LoopToEnergizingSubstationResolver : ReferenceResolver<Loop, Substation> by KReferenceResolver(
     Loop::class, Substation::class, Loop::addEnergizingSubstation
+)
+
+internal object PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver : ReferenceResolver<PowerElectronicsConnection, PowerElectronicsConnectionPhase> by KReferenceResolver(
+    PowerElectronicsConnection::class, PowerElectronicsConnectionPhase::class, PowerElectronicsConnection::addPhase
+)
+
+internal object PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver : ReferenceResolver<PowerElectronicsConnectionPhase, PowerElectronicsConnection> by KReferenceResolver(
+    PowerElectronicsConnectionPhase::class, PowerElectronicsConnection::class, PowerElectronicsConnectionPhase::powerElectronicsConnection.setter
+)
+
+internal object PowerElectronicsConnectionToPowerElectronicsUnitResolver : ReferenceResolver<PowerElectronicsConnection, PowerElectronicsUnit> by KReferenceResolver(
+    PowerElectronicsConnection::class, PowerElectronicsUnit::class, PowerElectronicsConnection::addUnit
+)
+
+internal object PowerElectronicsUnitToPowerElectronicsConnectionResolver : ReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> by KReferenceResolver(
+    PowerElectronicsUnit::class, PowerElectronicsConnection::class, PowerElectronicsUnit::powerElectronicsConnection.setter
 )
 
 //-------------------------------------------//

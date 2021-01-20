@@ -426,8 +426,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val insert = databaseTables.getInsert(TableBatteryUnit::class.java)
 
         insert.setString(table.BATTERY_STATE.queryIndex, batteryUnit.batteryState?.name)
-        insert.setInt(table.RATED_E.queryIndex, batteryUnit.ratedE)
-        insert.setInt(table.STORED_E.queryIndex, batteryUnit.storedE)
+        insert.setDouble(table.RATED_E.queryIndex, batteryUnit.ratedE)
+        insert.setDouble(table.STORED_E.queryIndex, batteryUnit.storedE)
 
         return savePowerElectronicsUnit(table, insert, batteryUnit, "battery unit")
     }

@@ -18,6 +18,6 @@ package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 class BatteryUnit(mRID: String = "") : PowerElectronicsUnit(mRID) {
 
     var batteryState: BatteryStateKind? = null
-    var ratedE: Int = 0
-    var storedE: Int = 0
+    var ratedE: Double = 0.0
+    var storedE: Double = 0.0
 }

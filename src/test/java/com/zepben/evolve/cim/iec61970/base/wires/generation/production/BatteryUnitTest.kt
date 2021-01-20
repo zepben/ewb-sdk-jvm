@@ -36,12 +36,12 @@ internal class BatteryUnitTest {
 
         batteryUnit.apply {
             this.batteryState = BatteryStateKind.charging
-            ratedE = 1
-            storedE = 2
+            ratedE = 1.0
+            storedE = 2.0
         }
 
         MatcherAssert.assertThat(batteryUnit.batteryState, Matchers.equalTo(BatteryStateKind.charging))
-        MatcherAssert.assertThat(batteryUnit.ratedE, Matchers.equalTo(1))
-        MatcherAssert.assertThat(batteryUnit.storedE, Matchers.equalTo(2))
+        MatcherAssert.assertThat(batteryUnit.ratedE, Matchers.equalTo(1.0))
+        MatcherAssert.assertThat(batteryUnit.storedE, Matchers.equalTo(2.0))
     }
 }

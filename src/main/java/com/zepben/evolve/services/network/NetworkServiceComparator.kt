@@ -25,6 +25,10 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseServiceComparator
@@ -258,6 +262,31 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareValues(Terminal::phases, Terminal::tracedPhases, Terminal::sequenceNumber)
         }
 
+    private fun ObjectDifference<out PowerElectronicsUnit>.comparePowerElectronicsUnit(): ObjectDifference<out PowerElectronicsUnit> =
+        apply {
+            compareEquipment()
+
+            compareIdReferences(PowerElectronicsUnit::powerElectronicsConnection)
+            compareValues(PowerElectronicsUnit::maxP, PowerElectronicsUnit::minP)
+        }
+
+    private fun compareBatteryUnit(source: BatteryUnit, target: BatteryUnit): ObjectDifference<BatteryUnit> =
+        ObjectDifference(source, target).apply {
+            comparePowerElectronicsUnit()
+
+            compareValues(BatteryUnit::batteryState, BatteryUnit::ratedE, BatteryUnit::storedE)
+        }
+
+    private fun comparePhotoVoltaicUnit(source: PhotoVoltaicUnit, target: PhotoVoltaicUnit): ObjectDifference<PhotoVoltaicUnit> =
+        ObjectDifference(source, target).apply {
+            comparePowerElectronicsUnit()
+        }
+
+    private fun comparePowerElectronicsWindUnit(source: PowerElectronicsWindUnit, target: PowerElectronicsWindUnit): ObjectDifference<PowerElectronicsWindUnit> =
+        ObjectDifference(source, target).apply {
+            comparePowerElectronicsUnit()
+        }
+
     private fun compareAcLineSegment(source: AcLineSegment, target: AcLineSegment): ObjectDifference<AcLineSegment> =
         ObjectDifference(source, target).apply {
             compareConductor()
@@ -369,6 +398,39 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 PerLengthSequenceImpedance::r, PerLengthSequenceImpedance::x, PerLengthSequenceImpedance::bch,
                 PerLengthSequenceImpedance::gch, PerLengthSequenceImpedance::r0, PerLengthSequenceImpedance::x0,
                 PerLengthSequenceImpedance::b0ch, PerLengthSequenceImpedance::g0ch
+            )
+        }
+
+    private fun comparePowerElectronicsConnection(
+        source: PowerElectronicsConnection,
+        target: PowerElectronicsConnection
+    ): ObjectDifference<PowerElectronicsConnection> =
+        ObjectDifference(source, target).apply {
+            compareRegulatingCondEq()
+            compareIdReferenceCollections(PowerElectronicsConnection::units)
+            compareIdReferenceCollections(PowerElectronicsConnection::phases)
+            compareValues(
+                PowerElectronicsConnection::maxIFault,
+                PowerElectronicsConnection::maxQ,
+                PowerElectronicsConnection::minQ,
+                PowerElectronicsConnection::p,
+                PowerElectronicsConnection::q,
+                PowerElectronicsConnection::ratedS,
+                PowerElectronicsConnection::ratedU
+            )
+        }
+
+    private fun comparePowerElectronicsConnectionPhase(
+        source: PowerElectronicsConnectionPhase,
+        target: PowerElectronicsConnectionPhase
+    ): ObjectDifference<PowerElectronicsConnectionPhase> =
+        ObjectDifference(source, target).apply {
+            comparePowerSystemResource()
+            compareIdReferences(PowerElectronicsConnectionPhase::powerElectronicsConnection)
+            compareValues(
+                PowerElectronicsConnectionPhase::p,
+                PowerElectronicsConnectionPhase::phase,
+                PowerElectronicsConnectionPhase::q,
             )
         }
 

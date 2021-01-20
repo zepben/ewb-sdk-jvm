@@ -4,7 +4,7 @@
  None.
 
 ##### New Features
-* None.
+* Added PowerElectronicsConnection, PowerElectronicsConnectionPhase, BatteryUnit, PhotoVoltaicUnit and PowerElectronicsWindUnit classes.
 
 ##### Enhancements
 * None.

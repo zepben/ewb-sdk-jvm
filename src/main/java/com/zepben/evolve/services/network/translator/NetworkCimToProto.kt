@@ -28,6 +28,10 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.translator.BaseCimToProto
@@ -37,6 +41,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.PhaseShuntConnectionKind
 import com.zepben.protobuf.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverheadWireInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PPowerTransformerInfo
@@ -103,6 +108,8 @@ import com.zepben.protobuf.cim.iec61970.base.wires.LinearShuntCompensator as PBL
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthImpedance as PBPerLengthImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthLineParameter as PBPerLengthLineParameter
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthSequenceImpedance as PBPerLengthSequenceImpedance
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnection as PBPowerElectronicsConnection
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnectionPhase as PBPowerElectronicsConnectionPhase
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformerEnd as PBPowerTransformerEnd
 import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch as PBProtectedSwitch
@@ -113,6 +120,10 @@ import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCo
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryUnit as PBBatteryUnit
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit as PBPhotoVoltaicUnit
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit as PBPowerElectronicsUnit
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit as PBPowerElectronicsWindUnit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 
@@ -361,6 +372,32 @@ fun toPb(cim: Terminal, pb: PBTerminal.Builder): PBTerminal.Builder =
     }
 
 /************ IEC61970 WIRES ************/
+fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder) =
+    pb.apply {
+        cim.powerElectronicsConnection?.let { powerElectronicsConnectionMRID = it.mRID } ?: clearPowerElectronicsConnectionMRID()
+        maxP = cim.maxP
+        minP = cim.minP
+        toPb(cim, eqBuilder)
+    }
+
+fun toPb(cim: BatteryUnit, pb: PBBatteryUnit.Builder): PBBatteryUnit.Builder =
+    pb.apply {
+        batteryState = cim.batteryState?.let { BatteryStateKind.valueOf(it.name) }
+        ratedE = cim.ratedE
+        storedE = cim.storedE
+        toPb(cim, peuBuilder)
+    }
+
+fun toPb(cim: PhotoVoltaicUnit, pb: PBPhotoVoltaicUnit.Builder): PBPhotoVoltaicUnit.Builder =
+    pb.apply {
+        toPb(cim, peuBuilder)
+    }
+
+fun toPb(cim: PowerElectronicsWindUnit, pb: PBPowerElectronicsWindUnit.Builder): PBPowerElectronicsWindUnit.Builder =
+    pb.apply {
+        toPb(cim, peuBuilder)
+    }
+
 fun toPb(cim: AcLineSegment, pb: PBAcLineSegment.Builder): PBAcLineSegment.Builder =
     pb.apply {
         cim.perLengthSequenceImpedance?.let { perLengthSequenceImpedanceMRID = it.mRID } ?: clearPerLengthSequenceImpedanceMRID()
@@ -474,6 +511,33 @@ fun toPb(cim: PerLengthSequenceImpedance, pb: PBPerLengthSequenceImpedance.Build
         b0Ch = cim.b0ch
         g0Ch = cim.g0ch
         toPb(cim, pliBuilder)
+    }
+
+fun toPb(cim: PowerElectronicsConnection, pb: PBPowerElectronicsConnection.Builder): PBPowerElectronicsConnection.Builder =
+    pb.apply {
+        clearPowerElectronicsUnitMRIDs()
+        cim.units.forEach { addPowerElectronicsUnitMRIDs(it.mRID) }
+
+        clearPowerElectronicsConnectionPhaseMRIDs()
+        cim.phases.forEach { addPowerElectronicsConnectionPhaseMRIDs(it.mRID) }
+
+        maxIFault = cim.maxIFault
+        maxQ = cim.maxQ
+        minQ = cim.minQ
+        p = cim.p
+        q = cim.q
+        ratedS = cim.ratedS
+        ratedU = cim.ratedU
+        toPb(cim, rceBuilder)
+    }
+
+fun toPb(cim: PowerElectronicsConnectionPhase, pb: PBPowerElectronicsConnectionPhase.Builder): PBPowerElectronicsConnectionPhase.Builder =
+    pb.apply {
+        cim.powerElectronicsConnection?.let { powerElectronicsConnectionMRID = it.mRID } ?: clearPowerElectronicsConnectionMRID()
+        p = cim.p
+        phase = SinglePhaseKind.valueOf(cim.phase.name)
+        q = cim.q
+        toPb(cim, psrBuilder)
     }
 
 fun toPb(cim: PowerTransformer, pb: PBPowerTransformer.Builder): PBPowerTransformer.Builder =

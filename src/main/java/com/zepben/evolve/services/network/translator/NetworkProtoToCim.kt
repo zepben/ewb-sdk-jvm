@@ -23,6 +23,7 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.Resolvers
@@ -94,6 +95,8 @@ import com.zepben.protobuf.cim.iec61970.base.wires.LinearShuntCompensator as PBL
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthImpedance as PBPerLengthImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthLineParameter as PBPerLengthLineParameter
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthSequenceImpedance as PBPerLengthSequenceImpedance
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnection as PBPowerElectronicsConnection
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnectionPhase as PBPowerElectronicsConnectionPhase
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformerEnd as PBPowerTransformerEnd
 import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch as PBProtectedSwitch
@@ -104,6 +107,10 @@ import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCo
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryUnit as PBBatteryUnit
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit as PBPhotoVoltaicUnit
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit as PBPowerElectronicsUnit
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit as PBPowerElectronicsWindUnit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 
@@ -433,6 +440,32 @@ fun toCim(pb: PBRemoteSource, networkService: NetworkService): RemoteSource =
     }
 
 /************ IEC61970 WIRES ************/
+fun toCim(pb: PBPowerElectronicsUnit, cim: PowerElectronicsUnit, networkService: NetworkService): PowerElectronicsUnit =
+    cim.apply {
+        networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnection(this), pb.powerElectronicsConnectionMRID)
+        maxP = pb.maxP
+        minP = pb.minP
+        toCim(pb.eq, this, networkService)
+    }
+
+fun toCim(pb: PBBatteryUnit, cim: BatteryUnit, networkService: NetworkService): BatteryUnit =
+    cim.apply {
+        batteryState = BatteryStateKind.valueOf(pb.batteryState.name)
+        ratedE = pb.ratedE
+        storedE = pb.storedE
+        toCim(pb.peu, this, networkService)
+    }
+
+fun toCim(pb: PBPhotoVoltaicUnit, cim: PhotoVoltaicUnit, networkService: NetworkService): PhotoVoltaicUnit =
+    cim.apply {
+        toCim(pb.peu, this, networkService)
+    }
+
+fun toCim(pb: PBPowerElectronicsWindUnit, cim: PowerElectronicsWindUnit, networkService: NetworkService): PowerElectronicsWindUnit =
+    cim.apply {
+        toCim(pb.peu, this, networkService)
+    }
+
 fun toCim(pb: PBAcLineSegment, networkService: NetworkService): AcLineSegment =
     AcLineSegment(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.perLengthSequenceImpedance(this), pb.perLengthSequenceImpedanceMRID)
@@ -560,6 +593,33 @@ fun toCim(pb: PBPerLengthSequenceImpedance, networkService: NetworkService): Per
         b0ch = pb.b0Ch
         g0ch = pb.g0Ch
         toCim(pb.pli, this, networkService)
+    }
+
+fun toCim(pb: PBPowerElectronicsConnection, networkService: NetworkService): PowerElectronicsConnection =
+    PowerElectronicsConnection(pb.rce.mRID()).apply {
+        pb.powerElectronicsUnitMRIDsList.forEach { powerElectronicsUnitMRID ->
+            networkService.resolveOrDeferReference(Resolvers.powerElectronicsUnit(this), powerElectronicsUnitMRID)
+        }
+        pb.powerElectronicsConnectionPhaseMRIDsList.forEach { powerElectronicsConnectionPhaseMRID ->
+            networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnectionPhase(this), powerElectronicsConnectionPhaseMRID)
+        }
+        maxIFault = pb.maxIFault
+        maxQ = pb.maxQ
+        minQ = pb.minQ
+        p = pb.p
+        q = pb.q
+        ratedS = pb.ratedS
+        ratedU = pb.ratedU
+        toCim(pb.rce, this, networkService)
+    }
+
+fun toCim(pb: PBPowerElectronicsConnectionPhase, networkService: NetworkService): PowerElectronicsConnectionPhase =
+    PowerElectronicsConnectionPhase(pb.psr.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnection(this), pb.powerElectronicsConnectionMRID)
+        p = pb.p
+        phase = SinglePhaseKind.valueOf(pb.phase.name)
+        q = pb.q
+        toCim(pb.psr, this, networkService)
     }
 
 fun toCim(pb: PBPowerTransformer, networkService: NetworkService): PowerTransformer =

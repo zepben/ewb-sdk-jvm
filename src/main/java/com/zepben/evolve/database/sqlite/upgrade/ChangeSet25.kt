@@ -44,7 +44,7 @@ internal fun changeSet25() = ChangeSet(25) {
             "mrid TEXT NOT NULL," +
             "battery_state TEXT NOT NULL," +
             "rated_e NUMBER NOT NULL," +
-            "store_e NUMBER NOT NULL," +
+            "stored_e NUMBER NOT NULL," +
             "power_electronics_connection_mrid TEXT NULL," +
             "max_p NUMBER NOT NULL," +
             "min_p NUMBER NOT NULL," +

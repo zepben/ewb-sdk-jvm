@@ -18,6 +18,7 @@ package com.zepben.evolve.cim.iec61970.base.wires.generation.production
  */
 @Suppress("EnumEntryName")
 enum class BatteryStateKind {
+    UNKNOWN,
     discharging,
     full,
     waiting,

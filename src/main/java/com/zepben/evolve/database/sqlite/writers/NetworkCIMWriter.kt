@@ -418,7 +418,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setInt(table.MAX_P.queryIndex, powerElectronicsUnit.maxP)
         insert.setInt(table.MIN_P.queryIndex, powerElectronicsUnit.minP)
 
-        return saveIdentifiedObject(table, insert, powerElectronicsUnit, description)
+        return saveEquipment(table, insert, powerElectronicsUnit, description)
     }
 
     fun save(batteryUnit: BatteryUnit): Boolean {

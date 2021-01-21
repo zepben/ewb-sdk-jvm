@@ -217,12 +217,15 @@ fun Substation.fillFields(networkService: NetworkService): Substation {
 
 /************ IEC61970 WIRES ************/
 fun PowerElectronicsUnit.fillFields(networkService: NetworkService): PowerElectronicsUnit {
-    val pec = PowerElectronicsConnection()
+    val pec = PowerElectronicsConnection().also {
+        networkService.add(it)
+        it.addUnit(this)
+    }
     maxP = 1
     minP = 2
     powerElectronicsConnection = pec
 
-    (this as Equipment).fillFields(networkService)
+    (this as Equipment).fillFields(networkService, false)
     return this
 }
 
@@ -256,13 +259,15 @@ fun PowerElectronicsConnection.fillFields(networkService: NetworkService): Power
     ratedS = 6
     ratedU = 7
 
-    (this as RegulatingCondEq).fillFields(networkService)
+    (this as RegulatingCondEq).fillFields(networkService, false)
     return this
 }
 
 fun PowerElectronicsConnectionPhase.fillFields(networkService: NetworkService): PowerElectronicsConnectionPhase {
-    val pec = PowerElectronicsConnection()
-
+    val pec = PowerElectronicsConnection().also {
+        networkService.add(it)
+        it.addPhase(this)
+    }
     powerElectronicsConnection = pec
     p = 1.0
     phase = SinglePhaseKind.B

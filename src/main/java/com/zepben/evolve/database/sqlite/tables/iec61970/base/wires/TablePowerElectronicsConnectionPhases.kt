@@ -9,13 +9,13 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableEquipment
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TablePowerSystemResources
 
 @Suppress("PropertyName")
 class TablePowerElectronicsConnectionPhases : TablePowerSystemResources() {
 
-    val POWER_ELECTRONICS_CONNECTION_MRID = Column(++columnIndex, "power_electronics_connection_mrid", "TEXT", NOT_NULL)
+    val POWER_ELECTRONICS_CONNECTION_MRID = Column(++columnIndex, "power_electronics_connection_mrid", "TEXT", NULL)
     val P = Column(++columnIndex, "p", "NUMBER", NOT_NULL)
     val PHASE = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
     val Q = Column(++columnIndex, "q", "NUMBER", NOT_NULL)

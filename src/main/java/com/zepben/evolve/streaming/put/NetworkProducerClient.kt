@@ -39,6 +39,18 @@ class NetworkProducerClient(
     private fun sendToServer(identifiedObject: IdentifiedObject) = tryRpc {
         whenNetworkServiceObject(
             identifiedObject,
+            isBatteryUnit = {
+                val builder = CreateBatteryUnitRequest.newBuilder().setBatteryUnit(it.toPb()).build()
+                stub.createBatteryUnit(builder)
+            },
+            isPhotoVoltaicUnit = {
+                val builder = CreatePhotoVoltaicRequest.newBuilder().setPhotoVoltaicUnit(it.toPb()).build()
+                stub.createPhotoVoltaicUnit(builder)
+            },
+            isPowerElectronicsWindUnit = {
+                val builder = CreatePowerElectronicsWindUnitRequest.newBuilder().setPowerElectronicsWindUnits(it.toPb()).build()
+                stub.createPowerElectronicsWindUnit(builder)
+            },
             isAcLineSegment = {
                 val builder = CreateAcLineSegmentRequest.newBuilder().setAcLineSegment(it.toPb()).build()
                 stub.createAcLineSegment(builder)
@@ -146,6 +158,14 @@ class NetworkProducerClient(
             isPole = {
                 val builder = CreatePoleRequest.newBuilder().setPole(it.toPb()).build()
                 stub.createPole(builder)
+            },
+            isPowerElectronicsConnection = {
+                val builder = CreatePowerElectronicsConnectionRequest.newBuilder().setPowerElectronicsConnection(it.toPb()).build()
+                stub.createPowerElectronicsConnection(builder)
+            },
+            isPowerElectronicsConnectionPhase = {
+                val builder = CreatePowerElectronicsConnectionPhaseRequest.newBuilder().setPowerElectronicsConnectionPhase(it.toPb()).build()
+                stub.createPowerElectronicsConnectionPhase(builder)
             },
             isPowerTransformer = {
                 val builder = CreatePowerTransformerRequest.newBuilder().setPowerTransformer(it.toPb()).build()

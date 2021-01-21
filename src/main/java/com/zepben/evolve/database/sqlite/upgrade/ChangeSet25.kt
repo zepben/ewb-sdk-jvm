@@ -30,7 +30,7 @@ internal fun changeSet25() = ChangeSet(25) {
             ")",
         "CREATE TABLE power_electronics_connection_phase(" +
             "mrid TEXT NOT NULL," +
-            "power_electronics_connection_mrid TEXT NOT NULL," +
+            "power_electronics_connection_mrid TEXT NULL," +
             "p NUMBER NOT NULL," +
             "phase TEXT NOT NULL," +
             "q NUMBER NOT NULL," +

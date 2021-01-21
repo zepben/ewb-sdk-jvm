@@ -29,6 +29,10 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource
 import com.zepben.protobuf.cim.iec61970.base.wires.*
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop
 
@@ -71,6 +75,10 @@ fun Measurement.mRID(): String = io.mrid
 fun RemoteControl.mRID(): String = rp.mRID()
 fun RemotePoint.mRID(): String = io.mrid
 fun RemoteSource.mRID(): String = rp.mRID()
+fun PowerElectronicsUnit.mRID(): String = eq.mRID()
+fun BatteryUnit.mRID(): String = peu.mRID()
+fun PhotoVoltaicUnit.mRID(): String = peu.mRID()
+fun PowerElectronicsWindUnit.mRID(): String = peu.mRID()
 fun AcLineSegment.mRID(): String = cd.mRID()
 fun Breaker.mRID(): String = sw.mRID()
 fun Conductor.mRID(): String = ce.mRID()
@@ -89,6 +97,8 @@ fun LinearShuntCompensator.mRID(): String = sc.mRID()
 fun PerLengthImpedance.mRID(): String = lp.mRID()
 fun PerLengthLineParameter.mRID(): String = io.mrid
 fun PerLengthSequenceImpedance.mRID(): String = pli.mRID()
+fun PowerElectronicsConnection.mRID(): String = rce.mRID()
+fun PowerElectronicsConnectionPhase.mRID(): String = psr.mRID()
 fun PowerTransformer.mRID(): String = ce.mRID()
 fun PowerTransformerEnd.mRID(): String = te.mRID()
 fun ProtectedSwitch.mRID(): String = sw.mRID()

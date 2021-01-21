@@ -432,19 +432,19 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             storedE = resultSet.getDouble(table.STORED_E.queryIndex)
         }
 
-        return loadPowerElectronicsUnit(batteryUnit, table, resultSet)
+        return loadPowerElectronicsUnit(batteryUnit, table, resultSet) && networkService.addOrThrow(batteryUnit)
     }
 
     fun load(table: TablePhotoVoltaicUnit, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val photoVoltaicUnit = PhotoVoltaicUnit(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadPowerElectronicsUnit(photoVoltaicUnit, table, resultSet)
+        return loadPowerElectronicsUnit(photoVoltaicUnit, table, resultSet) && networkService.addOrThrow(photoVoltaicUnit)
     }
 
     fun load(table: TablePowerElectronicsWindUnit, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val powerElectronicsWindUnit = PowerElectronicsWindUnit(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadPowerElectronicsUnit(powerElectronicsWindUnit, table, resultSet)
+        return loadPowerElectronicsUnit(powerElectronicsWindUnit, table, resultSet) && networkService.addOrThrow(powerElectronicsWindUnit)
     }
 
     fun load(table: TableAcLineSegments, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
@@ -633,7 +633,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             ratedU = resultSet.getInt(table.RATED_U.queryIndex)
         }
 
-        return loadRegulatingCondEq(powerElectronicsConnection, table, resultSet)
+        return loadRegulatingCondEq(powerElectronicsConnection, table, resultSet) && networkService.addOrThrow(powerElectronicsConnection)
     }
 
     fun load(table: TablePowerElectronicsConnectionPhases, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
@@ -648,7 +648,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             q = resultSet.getDouble(table.Q.queryIndex)
         }
 
-        return loadPowerSystemResource(powerElectronicsConnectionPhase, table, resultSet)
+        return loadPowerSystemResource(powerElectronicsConnectionPhase, table, resultSet) && networkService.addOrThrow(powerElectronicsConnectionPhase)
     }
 
     fun load(table: TablePowerTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {

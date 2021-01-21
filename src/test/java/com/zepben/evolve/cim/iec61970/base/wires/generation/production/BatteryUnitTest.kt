@@ -30,7 +30,7 @@ internal class BatteryUnitTest {
     internal fun accessorCoverage() {
         val batteryUnit = BatteryUnit()
 
-        MatcherAssert.assertThat(batteryUnit.batteryState, Matchers.nullValue())
+        MatcherAssert.assertThat(batteryUnit.batteryState, Matchers.equalTo(BatteryStateKind.UNKNOWN))
         MatcherAssert.assertThat(batteryUnit.ratedE, Matchers.equalTo(0.0))
         MatcherAssert.assertThat(batteryUnit.storedE, Matchers.equalTo(0.0))
 

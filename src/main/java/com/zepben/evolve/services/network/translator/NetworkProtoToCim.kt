@@ -448,21 +448,21 @@ fun toCim(pb: PBPowerElectronicsUnit, cim: PowerElectronicsUnit, networkService:
         toCim(pb.eq, this, networkService)
     }
 
-fun toCim(pb: PBBatteryUnit, cim: BatteryUnit, networkService: NetworkService): BatteryUnit =
-    cim.apply {
+fun toCim(pb: PBBatteryUnit, networkService: NetworkService): BatteryUnit =
+    BatteryUnit(pb.mRID()).apply {
         batteryState = BatteryStateKind.valueOf(pb.batteryState.name)
         ratedE = pb.ratedE
         storedE = pb.storedE
         toCim(pb.peu, this, networkService)
     }
 
-fun toCim(pb: PBPhotoVoltaicUnit, cim: PhotoVoltaicUnit, networkService: NetworkService): PhotoVoltaicUnit =
-    cim.apply {
+fun toCim(pb: PBPhotoVoltaicUnit, networkService: NetworkService): PhotoVoltaicUnit =
+    PhotoVoltaicUnit(pb.mRID()).apply {
         toCim(pb.peu, this, networkService)
     }
 
-fun toCim(pb: PBPowerElectronicsWindUnit, cim: PowerElectronicsWindUnit, networkService: NetworkService): PowerElectronicsWindUnit =
-    cim.apply {
+fun toCim(pb: PBPowerElectronicsWindUnit, networkService: NetworkService): PowerElectronicsWindUnit =
+    PowerElectronicsWindUnit(pb.mRID()).apply {
         toCim(pb.peu, this, networkService)
     }
 
@@ -596,7 +596,7 @@ fun toCim(pb: PBPerLengthSequenceImpedance, networkService: NetworkService): Per
     }
 
 fun toCim(pb: PBPowerElectronicsConnection, networkService: NetworkService): PowerElectronicsConnection =
-    PowerElectronicsConnection(pb.rce.mRID()).apply {
+    PowerElectronicsConnection(pb.mRID()).apply {
         pb.powerElectronicsUnitMRIDsList.forEach { powerElectronicsUnitMRID ->
             networkService.resolveOrDeferReference(Resolvers.powerElectronicsUnit(this), powerElectronicsUnitMRID)
         }
@@ -614,7 +614,7 @@ fun toCim(pb: PBPowerElectronicsConnection, networkService: NetworkService): Pow
     }
 
 fun toCim(pb: PBPowerElectronicsConnectionPhase, networkService: NetworkService): PowerElectronicsConnectionPhase =
-    PowerElectronicsConnectionPhase(pb.psr.mRID()).apply {
+    PowerElectronicsConnectionPhase(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnection(this), pb.powerElectronicsConnectionMRID)
         p = pb.p
         phase = SinglePhaseKind.valueOf(pb.phase.name)
@@ -787,6 +787,11 @@ fun NetworkService.addFromPb(pb: PBAccumulator): Accumulator? = tryAddOrNull(toC
 fun NetworkService.addFromPb(pb: PBDiscrete): Discrete? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBRemoteControl): RemoteControl? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBRemoteSource): RemoteSource? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBBatteryUnit): BatteryUnit? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPhotoVoltaicUnit): PhotoVoltaicUnit? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPowerElectronicsConnection): PowerElectronicsConnection? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPowerElectronicsConnectionPhase): PowerElectronicsConnectionPhase? = tryAddOrNull(toCim(pb, this))
 
 /************ Class for Java friendly usage ************/
 
@@ -836,4 +841,9 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim(net
     fun addFromPb(pb: PBDiscrete): Discrete? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRemoteControl): RemoteControl? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRemoteSource): RemoteSource? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBBatteryUnit): BatteryUnit? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPhotoVoltaicUnit): PhotoVoltaicUnit? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPowerElectronicsConnection): PowerElectronicsConnection? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPowerElectronicsConnectionPhase): PowerElectronicsConnectionPhase? = networkService.addFromPb(pb)
 }

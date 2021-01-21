@@ -177,6 +177,9 @@ class NetworkConsumerClient(
 
     private fun extractIdentifiedObject(service: NetworkService, it: NetworkIdentifiedObject): ExtractResult {
         return when (it.identifiedObjectCase) {
+            BATTERYUNIT -> ExtractResult(protoToCimProvider(service).addFromPb(it.batteryUnit), it.batteryUnit.mRID())
+            PHOTOVOLTAICUNIT -> ExtractResult(protoToCimProvider(service).addFromPb(it.photoVoltaicUnit), it.photoVoltaicUnit.mRID())
+            POWERELECTRONICSWINDUNIT -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerElectronicsWindUnit), it.powerElectronicsWindUnit.mRID())
             CABLEINFO -> ExtractResult(protoToCimProvider(service).addFromPb(it.cableInfo), it.cableInfo.mRID())
             OVERHEADWIREINFO -> ExtractResult(protoToCimProvider(service).addFromPb(it.overheadWireInfo), it.overheadWireInfo.mRID())
             POWERTRANSFORMERINFO -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerTransformerInfo), it.powerTransformerInfo.mRID())
@@ -210,6 +213,8 @@ class NetworkConsumerClient(
                 protoToCimProvider(service).addFromPb(it.perLengthSequenceImpedance),
                 it.perLengthSequenceImpedance.mRID()
             )
+            POWERELECTRONICSCONNECTION -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerElectronicsConnection), it.powerElectronicsConnection.mRID())
+            POWERELECTRONICSCONNECTIONPHASE -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerElectronicsConnectionPhase), it.powerElectronicsConnectionPhase.mRID())
             POWERTRANSFORMER -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerTransformer), it.powerTransformer.mRID())
             POWERTRANSFORMEREND -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerTransformerEnd), it.powerTransformerEnd.mRID())
             RATIOTAPCHANGER -> ExtractResult(protoToCimProvider(service).addFromPb(it.ratioTapChanger), it.ratioTapChanger.mRID())

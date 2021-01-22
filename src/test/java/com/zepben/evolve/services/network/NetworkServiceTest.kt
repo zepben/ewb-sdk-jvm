@@ -24,6 +24,9 @@ import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkService.Companion.connectedEquipment
@@ -48,6 +51,27 @@ internal class NetworkServiceTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val service = NetworkService()
+
+    @Test
+    internal fun supportsBatteryUnit() {
+        val batteryUnit = BatteryUnit()
+        assertThat(service.add(batteryUnit), equalTo(true))
+        assertThat(service.remove(batteryUnit), equalTo(true))
+    }
+
+    @Test
+    internal fun supportsPhotoVoltaicUnit() {
+        val photoVolaticUnit = PhotoVoltaicUnit()
+        assertThat(service.add(photoVolaticUnit), equalTo(true))
+        assertThat(service.remove(photoVolaticUnit), equalTo(true))
+    }
+
+    @Test
+    internal fun supportsPowerElectronicWindUnit() {
+        val powerElectronicsWindUnit = PowerElectronicsWindUnit()
+        assertThat(service.add(powerElectronicsWindUnit), equalTo(true))
+        assertThat(service.remove(powerElectronicsWindUnit), equalTo(true))
+    }
 
     @Test
     internal fun supportsAcLineSegment() {
@@ -243,6 +267,20 @@ internal class NetworkServiceTest {
         val pole = Pole()
         assertThat(service.add(pole), equalTo(true))
         assertThat(service.remove(pole), equalTo(true))
+    }
+
+    @Test
+    internal fun supportsPowerElectronicsConnection() {
+        val powerElectronicsConnection = PowerElectronicsConnection()
+        assertThat(service.add(powerElectronicsConnection), equalTo(true))
+        assertThat(service.remove(powerElectronicsConnection), equalTo(true))
+    }
+
+    @Test
+    internal fun supportsPowerElectronicsConnectionPhase() {
+        val powerElectronicsConnectionPhase = PowerElectronicsConnectionPhase()
+        assertThat(service.add(powerElectronicsConnectionPhase), equalTo(true))
+        assertThat(service.remove(powerElectronicsConnectionPhase), equalTo(true))
     }
 
     @Test

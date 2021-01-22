@@ -31,6 +31,9 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableDiscrete
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.services.network.NetworkService
@@ -64,6 +67,11 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableSubstations>("substations", reader::load)
         status = status and loadEach<TableSites>("sites", reader::load)
         status = status and loadEach<TablePerLengthSequenceImpedances>("per length sequence impedances", reader::load)
+        status = status and loadEach<TablePowerElectronicsConnection>("power electronics connection", reader::load)
+        status = status and loadEach<TablePowerElectronicsConnectionPhases>("power electronics connection phases", reader::load)
+        status = status and loadEach<TableBatteryUnit>("battery unit", reader::load)
+        status = status and loadEach<TablePhotoVoltaicUnit>("photo voltaic unit", reader::load)
+        status = status and loadEach<TablePowerElectronicsWindUnit>("power electronics wind unit", reader::load)
         status = status and loadEach<TableAcLineSegments>("AC line segments", reader::load)
         status = status and loadEach<TableBreakers>("breakers", reader::load)
         status = status and loadEach<TableDisconnectors>("disconnectors", reader::load)

@@ -24,6 +24,9 @@ import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
@@ -49,6 +52,15 @@ class NetworkService : BaseService("network") {
     } as MutableMap<String, ConnectivityNode>
 
     private val _measurements: MutableMap<String, MutableList<Measurement>> = mutableMapOf()
+
+    fun add(batteryUnit: BatteryUnit): Boolean = super.add(batteryUnit)
+    fun remove(batteryUnit: BatteryUnit): Boolean = super.remove(batteryUnit)
+
+    fun add(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.add(photoVoltaicUnit)
+    fun remove(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.remove(photoVoltaicUnit)
+
+    fun add(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.add(powerElectronicsWindUnit)
+    fun remove(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.remove(powerElectronicsWindUnit)
 
     fun add(acLineSegment: AcLineSegment): Boolean = super.add(acLineSegment)
     fun remove(acLineSegment: AcLineSegment): Boolean = super.remove(acLineSegment)
@@ -130,6 +142,12 @@ class NetworkService : BaseService("network") {
 
     fun add(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.add(perLengthSequenceImpedance)
     fun remove(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.remove(perLengthSequenceImpedance)
+
+    fun add(powerElectronicsConnection: PowerElectronicsConnection): Boolean = super.add(powerElectronicsConnection)
+    fun remove(powerElectronicsConnection: PowerElectronicsConnection): Boolean = super.remove(powerElectronicsConnection)
+
+    fun add(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): Boolean = super.add(powerElectronicsConnectionPhase)
+    fun remove(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): Boolean = super.remove(powerElectronicsConnectionPhase)
 
     fun add(pole: Pole): Boolean = super.add(pole)
     fun remove(pole: Pole): Boolean = super.remove(pole)

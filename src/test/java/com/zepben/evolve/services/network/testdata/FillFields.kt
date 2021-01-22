@@ -21,6 +21,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createFeeder
@@ -31,6 +32,7 @@ import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locatio
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
 import java.util.*
+import kotlin.math.max
 
 /************ IEC61968 ASSET INFO ************/
 
@@ -214,8 +216,66 @@ fun Substation.fillFields(networkService: NetworkService): Substation {
 }
 
 /************ IEC61970 WIRES ************/
+fun PowerElectronicsUnit.fillFields(networkService: NetworkService): PowerElectronicsUnit {
+    val pec = PowerElectronicsConnection().also {
+        networkService.add(it)
+        it.addUnit(this)
+    }
+    maxP = 1
+    minP = 2
+    powerElectronicsConnection = pec
+
+    (this as Equipment).fillFields(networkService, false)
+    return this
+}
+
+fun BatteryUnit.fillFields(networkService: NetworkService): BatteryUnit {
+    batteryState = BatteryStateKind.charging
+    ratedE = 1.0
+    storedE = 2.0
+
+    (this as PowerElectronicsUnit).fillFields(networkService)
+    return this
+}
+
+fun PhotoVoltaicUnit.fillFields(networkService: NetworkService): PhotoVoltaicUnit {
+    (this as PowerElectronicsUnit).fillFields(networkService)
+    return this
+}
+
+fun PowerElectronicsWindUnit.fillFields(networkService: NetworkService): PowerElectronicsWindUnit {
+    (this as PowerElectronicsUnit).fillFields(networkService)
+    return this
+}
 
 fun Line.fillFields(networkService: NetworkService) = (this as EquipmentContainer).fillFields(networkService)
+
+fun PowerElectronicsConnection.fillFields(networkService: NetworkService): PowerElectronicsConnection {
+    maxIFault = 1
+    maxQ = 2.0
+    minQ = 3.0
+    p = 4.0
+    q = 5.0
+    ratedS = 6
+    ratedU = 7
+
+    (this as RegulatingCondEq).fillFields(networkService, false)
+    return this
+}
+
+fun PowerElectronicsConnectionPhase.fillFields(networkService: NetworkService): PowerElectronicsConnectionPhase {
+    val pec = PowerElectronicsConnection().also {
+        networkService.add(it)
+        it.addPhase(this)
+    }
+    powerElectronicsConnection = pec
+    p = 1.0
+    phase = SinglePhaseKind.B
+    q = 2.0
+
+    (this as PowerSystemResource).fillFields(networkService)
+    return this
+}
 
 fun PowerTransformer.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerTransformer {
     transformerUtilisation = 1.0

@@ -28,6 +28,10 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.database.sqlite.DatabaseTables
@@ -52,6 +56,10 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteC
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import java.sql.PreparedStatement
@@ -405,6 +413,39 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61970 WIRES ************/
+    fun savePowerElectronicsUnit(table: TablePowerElectronicsUnit, insert: PreparedStatement, powerElectronicsUnit: PowerElectronicsUnit, description: String): Boolean {
+        insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex, powerElectronicsUnit.powerElectronicsConnection?.mRID)
+        insert.setInt(table.MAX_P.queryIndex, powerElectronicsUnit.maxP)
+        insert.setInt(table.MIN_P.queryIndex, powerElectronicsUnit.minP)
+
+        return saveEquipment(table, insert, powerElectronicsUnit, description)
+    }
+
+    fun save(batteryUnit: BatteryUnit): Boolean {
+        val table = databaseTables.getTable(TableBatteryUnit::class.java)
+        val insert = databaseTables.getInsert(TableBatteryUnit::class.java)
+
+        insert.setString(table.BATTERY_STATE.queryIndex, batteryUnit.batteryState?.name)
+        insert.setDouble(table.RATED_E.queryIndex, batteryUnit.ratedE)
+        insert.setDouble(table.STORED_E.queryIndex, batteryUnit.storedE)
+
+        return savePowerElectronicsUnit(table, insert, batteryUnit, "battery unit")
+    }
+
+    fun save(photoVoltaicUnit: PhotoVoltaicUnit): Boolean {
+        val table = databaseTables.getTable(TablePhotoVoltaicUnit::class.java)
+        val insert = databaseTables.getInsert(TablePhotoVoltaicUnit::class.java)
+
+        return savePowerElectronicsUnit(table, insert, photoVoltaicUnit, "photo voltaic unit")
+    }
+
+    fun save(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean {
+        val table = databaseTables.getTable(TablePowerElectronicsWindUnit::class.java)
+        val insert = databaseTables.getInsert(TablePowerElectronicsWindUnit::class.java)
+
+        return savePowerElectronicsUnit(table, insert, powerElectronicsWindUnit, "power electronics wind unit")
+    }
+
     fun save(acLineSegment: AcLineSegment): Boolean {
         val table = databaseTables.getTable(TableAcLineSegments::class.java)
         val insert = databaseTables.getInsert(TableAcLineSegments::class.java)
@@ -579,6 +620,33 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setDouble(table.G0CH.queryIndex, perLengthSequenceImpedance.g0ch)
 
         return savePerLengthImpedance(table, insert, perLengthSequenceImpedance, "per length sequence impedance")
+    }
+
+    fun save(powerElectronicsConnection: PowerElectronicsConnection): Boolean {
+        val table = databaseTables.getTable(TablePowerElectronicsConnection::class.java)
+        val insert = databaseTables.getInsert(TablePowerElectronicsConnection::class.java)
+
+        insert.setInt(table.MAX_I_FAULT.queryIndex, powerElectronicsConnection.maxIFault)
+        insert.setDouble(table.MAX_Q.queryIndex, powerElectronicsConnection.maxQ)
+        insert.setDouble(table.MIN_Q.queryIndex, powerElectronicsConnection.minQ)
+        insert.setDouble(table.P.queryIndex, powerElectronicsConnection.p)
+        insert.setDouble(table.Q.queryIndex, powerElectronicsConnection.q)
+        insert.setInt(table.RATED_S.queryIndex, powerElectronicsConnection.ratedS)
+        insert.setInt(table.RATED_U.queryIndex, powerElectronicsConnection.ratedU)
+
+        return saveRegulatingCondEq(table, insert, powerElectronicsConnection, "power electronics connection")
+    }
+
+    fun save(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): Boolean {
+        val table = databaseTables.getTable(TablePowerElectronicsConnectionPhases::class.java)
+        val insert = databaseTables.getInsert(TablePowerElectronicsConnectionPhases::class.java)
+
+        insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex, powerElectronicsConnectionPhase.powerElectronicsConnection?.mRID)
+        insert.setDouble(table.P.queryIndex, powerElectronicsConnectionPhase.p)
+        insert.setString(table.PHASE.queryIndex, powerElectronicsConnectionPhase.phase.name)
+        insert.setDouble(table.Q.queryIndex, powerElectronicsConnectionPhase.q)
+
+        return savePowerSystemResource(table, insert, powerElectronicsConnectionPhase, "power electronics connection phase")
     }
 
     fun save(powerTransformer: PowerTransformer): Boolean {

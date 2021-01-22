@@ -27,6 +27,9 @@ import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.InvokeChecker
@@ -51,6 +54,9 @@ internal class NetworkServiceUtilsTest {
     // then update this one to match and then update the tests.
     private fun whenNetworkServiceObjectProxy(
         identifiedObject: IdentifiedObject,
+        isBatteryUnit: (BatteryUnit) -> String,
+        isPhotoVoltaicUnit: (PhotoVoltaicUnit) -> String,
+        isPowerElectronicsWindUnit: (PowerElectronicsWindUnit) -> String,
         isAcLineSegment: (AcLineSegment) -> String,
         isAssetOwner: (AssetOwner) -> String,
         isBaseVoltage: (BaseVoltage) -> String,
@@ -78,6 +84,8 @@ internal class NetworkServiceUtilsTest {
         isOverheadWireInfo: (OverheadWireInfo) -> String,
         isPerLengthSequenceImpedance: (PerLengthSequenceImpedance) -> String,
         isPole: (Pole) -> String,
+        isPowerElectronicsConnection: (PowerElectronicsConnection) -> String,
+        isPowerElectronicsConnectionPhase: (PowerElectronicsConnectionPhase) -> String,
         isPowerTransformer: (PowerTransformer) -> String,
         isPowerTransformerEnd: (PowerTransformerEnd) -> String,
         isPowerTransformerInfo: (PowerTransformerInfo) -> String,
@@ -98,6 +106,9 @@ internal class NetworkServiceUtilsTest {
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
+        isBatteryUnit = isBatteryUnit,
+        isPhotoVoltaicUnit = isPhotoVoltaicUnit,
+        isPowerElectronicsWindUnit = isPowerElectronicsWindUnit,
         isAcLineSegment = isAcLineSegment,
         isAssetOwner = isAssetOwner,
         isBaseVoltage = isBaseVoltage,
@@ -125,6 +136,8 @@ internal class NetworkServiceUtilsTest {
         isOverheadWireInfo = isOverheadWireInfo,
         isPerLengthSequenceImpedance = isPerLengthSequenceImpedance,
         isPole = isPole,
+        isPowerElectronicsConnection = isPowerElectronicsConnection,
+        isPowerElectronicsConnectionPhase = isPowerElectronicsConnectionPhase,
         isPowerTransformer = isPowerTransformer,
         isPowerTransformerEnd = isPowerTransformerEnd,
         isPowerTransformerInfo = isPowerTransformerInfo,
@@ -147,6 +160,9 @@ internal class NetworkServiceUtilsTest {
 
     private fun whenNetworkServiceObjectTester(
         identifiedObject: IdentifiedObject,
+        isBatteryUnit: InvokeChecker<BatteryUnit> = NeverInvokedChecker(),
+        isPhotoVoltaicUnit: InvokeChecker<PhotoVoltaicUnit> = NeverInvokedChecker(),
+        isPowerElectronicsWindUnit: InvokeChecker<PowerElectronicsWindUnit> = NeverInvokedChecker(),
         isAcLineSegment: InvokeChecker<AcLineSegment> = NeverInvokedChecker(),
         isAssetOwner: InvokeChecker<AssetOwner> = NeverInvokedChecker(),
         isBaseVoltage: InvokeChecker<BaseVoltage> = NeverInvokedChecker(),
@@ -174,6 +190,8 @@ internal class NetworkServiceUtilsTest {
         isOverheadWireInfo: InvokeChecker<OverheadWireInfo> = NeverInvokedChecker(),
         isPerLengthSequenceImpedance: InvokeChecker<PerLengthSequenceImpedance> = NeverInvokedChecker(),
         isPole: InvokeChecker<Pole> = NeverInvokedChecker(),
+        isPowerElectronicsConnection: InvokeChecker<PowerElectronicsConnection> = NeverInvokedChecker(),
+        isPowerElectronicsConnectionPhase: InvokeChecker<PowerElectronicsConnectionPhase> = NeverInvokedChecker(),
         isPowerTransformer: InvokeChecker<PowerTransformer> = NeverInvokedChecker(),
         isPowerTransformerEnd: InvokeChecker<PowerTransformerEnd> = NeverInvokedChecker(),
         isPowerTransformerInfo: InvokeChecker<PowerTransformerInfo> = NeverInvokedChecker(),
@@ -195,6 +213,9 @@ internal class NetworkServiceUtilsTest {
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
             identifiedObject,
+            isBatteryUnit = isBatteryUnit,
+            isPhotoVoltaicUnit = isPhotoVoltaicUnit,
+            isPowerElectronicsWindUnit = isPowerElectronicsWindUnit,
             isAcLineSegment = isAcLineSegment,
             isAssetOwner = isAssetOwner,
             isBaseVoltage = isBaseVoltage,
@@ -222,6 +243,8 @@ internal class NetworkServiceUtilsTest {
             isOverheadWireInfo = isOverheadWireInfo,
             isPerLengthSequenceImpedance = isPerLengthSequenceImpedance,
             isPole = isPole,
+            isPowerElectronicsConnection = isPowerElectronicsConnection,
+            isPowerElectronicsConnectionPhase = isPowerElectronicsConnectionPhase,
             isPowerTransformer = isPowerTransformer,
             isPowerTransformerEnd = isPowerTransformerEnd,
             isPowerTransformerInfo = isPowerTransformerInfo,
@@ -243,6 +266,9 @@ internal class NetworkServiceUtilsTest {
         )
 
         assertThat(returnValue, equalTo(identifiedObject.toString()))
+        isBatteryUnit.verifyInvoke()
+        isPhotoVoltaicUnit.verifyInvoke()
+        isPowerElectronicsWindUnit.verifyInvoke()
         isAcLineSegment.verifyInvoke()
         isAssetOwner.verifyInvoke()
         isBaseVoltage.verifyInvoke()
@@ -270,6 +296,8 @@ internal class NetworkServiceUtilsTest {
         isOverheadWireInfo.verifyInvoke()
         isPerLengthSequenceImpedance.verifyInvoke()
         isPole.verifyInvoke()
+        isPowerElectronicsConnection.verifyInvoke()
+        isPowerElectronicsConnectionPhase.verifyInvoke()
         isPowerTransformer.verifyInvoke()
         isPowerTransformerEnd.verifyInvoke()
         isPowerTransformerInfo.verifyInvoke()
@@ -297,6 +325,9 @@ internal class NetworkServiceUtilsTest {
 
     @Test
     internal fun `invokes correct function`() {
+        BatteryUnit().also { whenNetworkServiceObjectTester(it, isBatteryUnit = InvokedChecker(it)) }
+        PhotoVoltaicUnit().also { whenNetworkServiceObjectTester(it, isPhotoVoltaicUnit = InvokedChecker(it)) }
+        PowerElectronicsWindUnit().also { whenNetworkServiceObjectTester(it, isPowerElectronicsWindUnit = InvokedChecker(it)) }
         AcLineSegment().also { whenNetworkServiceObjectTester(it, isAcLineSegment = InvokedChecker(it)) }
         AssetOwner().also { whenNetworkServiceObjectTester(it, isAssetOwner = InvokedChecker(it)) }
         BaseVoltage().also { whenNetworkServiceObjectTester(it, isBaseVoltage = InvokedChecker(it)) }
@@ -324,6 +355,8 @@ internal class NetworkServiceUtilsTest {
         OverheadWireInfo().also { whenNetworkServiceObjectTester(it, isOverheadWireInfo = InvokedChecker(it)) }
         PerLengthSequenceImpedance().also { whenNetworkServiceObjectTester(it, isPerLengthSequenceImpedance = InvokedChecker(it)) }
         Pole().also { whenNetworkServiceObjectTester(it, isPole = InvokedChecker(it)) }
+        PowerElectronicsConnection().also { whenNetworkServiceObjectTester(it, isPowerElectronicsConnection = InvokedChecker(it)) }
+        PowerElectronicsConnectionPhase().also { whenNetworkServiceObjectTester(it, isPowerElectronicsConnectionPhase = InvokedChecker(it)) }
         PowerTransformer().also { whenNetworkServiceObjectTester(it, isPowerTransformer = InvokedChecker(it)) }
         PowerTransformerEnd().also { whenNetworkServiceObjectTester(it, isPowerTransformerEnd = InvokedChecker(it)) }
         PowerTransformerInfo().also { whenNetworkServiceObjectTester(it, isPowerTransformerInfo = InvokedChecker(it)) }

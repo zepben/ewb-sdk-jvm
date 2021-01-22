@@ -27,6 +27,7 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.database.sqlite.extensions.getNullableDouble
@@ -50,6 +51,10 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteC
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.services.common.extensions.*
@@ -405,6 +410,42 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     }
 
     /************ IEC61970 WIRES ************/
+    fun loadPowerElectronicsUnit(powerElectronicsUnit: PowerElectronicsUnit, table: TablePowerElectronicsUnit, resultSet: ResultSet): Boolean {
+        powerElectronicsUnit.apply {
+            powerElectronicsConnection = networkService.ensureGet(
+                resultSet.getNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex),
+                typeNameAndMRID()
+            )
+            powerElectronicsConnection?.addUnit(this)
+
+            maxP = resultSet.getInt(table.MAX_P.queryIndex)
+            minP = resultSet.getInt(table.MIN_P.queryIndex)
+        }
+
+        return loadEquipment(powerElectronicsUnit, table, resultSet)
+    }
+
+    fun load(table: TableBatteryUnit, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val batteryUnit = BatteryUnit(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            batteryState = BatteryStateKind.valueOf(resultSet.getString(table.BATTERY_STATE.queryIndex))
+            ratedE = resultSet.getDouble(table.RATED_E.queryIndex)
+            storedE = resultSet.getDouble(table.STORED_E.queryIndex)
+        }
+
+        return loadPowerElectronicsUnit(batteryUnit, table, resultSet) && networkService.addOrThrow(batteryUnit)
+    }
+
+    fun load(table: TablePhotoVoltaicUnit, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val photoVoltaicUnit = PhotoVoltaicUnit(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadPowerElectronicsUnit(photoVoltaicUnit, table, resultSet) && networkService.addOrThrow(photoVoltaicUnit)
+    }
+
+    fun load(table: TablePowerElectronicsWindUnit, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val powerElectronicsWindUnit = PowerElectronicsWindUnit(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadPowerElectronicsUnit(powerElectronicsWindUnit, table, resultSet) && networkService.addOrThrow(powerElectronicsWindUnit)
+    }
 
     fun load(table: TableAcLineSegments, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val acLineSegment = AcLineSegment(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
@@ -579,6 +620,35 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadPerLengthImpedance(perLengthSequenceImpedance, table, resultSet) && networkService.addOrThrow(
             perLengthSequenceImpedance
         )
+    }
+
+    fun load(table: TablePowerElectronicsConnection, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val powerElectronicsConnection = PowerElectronicsConnection(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            maxIFault = resultSet.getInt(table.MAX_I_FAULT.queryIndex)
+            maxQ = resultSet.getDouble(table.MAX_Q.queryIndex)
+            minQ = resultSet.getDouble(table.MIN_Q.queryIndex)
+            p = resultSet.getDouble(table.P.queryIndex)
+            q = resultSet.getDouble(table.Q.queryIndex)
+            ratedS = resultSet.getInt(table.RATED_S.queryIndex)
+            ratedU = resultSet.getInt(table.RATED_U.queryIndex)
+        }
+
+        return loadRegulatingCondEq(powerElectronicsConnection, table, resultSet) && networkService.addOrThrow(powerElectronicsConnection)
+    }
+
+    fun load(table: TablePowerElectronicsConnectionPhases, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val powerElectronicsConnectionPhase = PowerElectronicsConnectionPhase(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            powerElectronicsConnection =
+                networkService.ensureGet(resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex), typeNameAndMRID())
+            powerElectronicsConnection?.addPhase(this)
+
+            phase = SinglePhaseKind.valueOf(resultSet.getString(table.PHASE.queryIndex))
+            p = resultSet.getDouble(table.P.queryIndex)
+            phase = SinglePhaseKind.valueOf(resultSet.getString(table.PHASE.queryIndex))
+            q = resultSet.getDouble(table.Q.queryIndex)
+        }
+
+        return loadPowerSystemResource(powerElectronicsConnectionPhase, table, resultSet) && networkService.addOrThrow(powerElectronicsConnectionPhase)
     }
 
     fun load(table: TablePowerTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {

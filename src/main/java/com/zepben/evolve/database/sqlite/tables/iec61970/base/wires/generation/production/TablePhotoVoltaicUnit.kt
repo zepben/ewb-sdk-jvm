@@ -5,21 +5,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.database.sqlite.tables
+package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
+import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 
 @Suppress("PropertyName")
-@EverythingIsNonnullByDefault
-class TableVersion : SqliteTable() {
-
-    val SUPPORTED_VERSION = 25
-
-    val VERSION = Column(++columnIndex, "version", "TEXT", NOT_NULL)
+class TablePhotoVoltaicUnit : TablePowerElectronicsUnit() {
 
     override fun name(): String {
-        return "version"
+        return "photo_voltaic_unit"
     }
 
     override val tableClass = this.javaClass

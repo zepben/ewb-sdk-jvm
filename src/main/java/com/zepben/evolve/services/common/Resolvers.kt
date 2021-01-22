@@ -32,6 +32,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 
@@ -296,4 +297,20 @@ object Resolvers {
     @JvmStatic
     fun normalEnergizingSubstations(loop: Loop): BoundReferenceResolver<Loop, Substation> =
         BoundReferenceResolver(loop, LoopToEnergizingSubstationResolver, SubstationToEnergizedLoopResolver)
+
+    @JvmStatic
+    fun powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit): BoundReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> =
+        BoundReferenceResolver(powerElectronicsUnit, PowerElectronicsUnitToPowerElectronicsConnectionResolver, null)
+
+    @JvmStatic
+    fun powerElectronicsConnection(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): BoundReferenceResolver<PowerElectronicsConnectionPhase, PowerElectronicsConnection> =
+        BoundReferenceResolver(powerElectronicsConnectionPhase, PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver, null)
+
+    @JvmStatic
+    fun powerElectronicsUnit(powerElectronicsConnection: PowerElectronicsConnection): BoundReferenceResolver<PowerElectronicsConnection, PowerElectronicsUnit> =
+        BoundReferenceResolver(powerElectronicsConnection, PowerElectronicsConnectionToPowerElectronicsUnitResolver, null)
+
+    @JvmStatic
+    fun powerElectronicsConnectionPhase(powerElectronicsConnection: PowerElectronicsConnection): BoundReferenceResolver<PowerElectronicsConnection, PowerElectronicsConnectionPhase> =
+        BoundReferenceResolver(powerElectronicsConnection, PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver, null)
 }

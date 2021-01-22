@@ -31,6 +31,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.customer.CustomerService
@@ -49,6 +50,9 @@ import com.zepben.evolve.services.customer.CustomerService
  * `when` statement (Kotlin) or if-else branch (Java) and update new cases as required without breaking your code.
  *
  * @param identifiedObject The identified object to handle.
+ * @param isBatteryUnit Handler when the [identifiedObject] is a [BatteryUnit]
+ * @param isPhotoVoltaicUnit Handler when the [identifiedObject] is a [PhotoVoltaicUnit]
+ * @param isPowerElectronicsWindUnit Handler when the [identifiedObject] is a [PowerElectronicsWindUnit]
  * @param isAcLineSegment Handler when the [identifiedObject] is a [AcLineSegment]
  * @param isAssetOwner Handler when the [identifiedObject] is a [AssetOwner]
  * @param isBaseVoltage Handler when the [identifiedObject] is a [BaseVoltage]
@@ -76,6 +80,8 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isOverheadWireInfo Handler when the [identifiedObject] is a [OverheadWireInfo]
  * @param isPerLengthSequenceImpedance Handler when the [identifiedObject] is a [PerLengthSequenceImpedance]
  * @param isPole Handler when the [identifiedObject] is a [Pole]
+ * @param isPowerElectronicsConnection Handler when the [identifiedObject] is a [PowerElectronicsConnection]
+ * @param isPowerElectronicsConnectionPhase Handler when the [identifiedObject] is a [PowerElectronicsConnectionPhase]
  * @param isPowerTransformer Handler when the [identifiedObject] is a [PowerTransformer]
  * @param isPowerTransformerEnd Handler when the [identifiedObject] is a [PowerTransformerEnd]
  * @param isPowerTransformerInfo Handler when the [identifiedObject] is a [PowerTransformerInfo]
@@ -98,6 +104,9 @@ import com.zepben.evolve.services.customer.CustomerService
 @JvmOverloads
 inline fun <R> whenNetworkServiceObject(
     identifiedObject: IdentifiedObject,
+    isBatteryUnit: (BatteryUnit) -> R,
+    isPhotoVoltaicUnit: (PhotoVoltaicUnit) -> R,
+    isPowerElectronicsWindUnit: (PowerElectronicsWindUnit) -> R,
     isAcLineSegment: (AcLineSegment) -> R,
     isAssetOwner: (AssetOwner) -> R,
     isBaseVoltage: (BaseVoltage) -> R,
@@ -125,6 +134,8 @@ inline fun <R> whenNetworkServiceObject(
     isOverheadWireInfo: (OverheadWireInfo) -> R,
     isPerLengthSequenceImpedance: (PerLengthSequenceImpedance) -> R,
     isPole: (Pole) -> R,
+    isPowerElectronicsConnection: (PowerElectronicsConnection) -> R,
+    isPowerElectronicsConnectionPhase: (PowerElectronicsConnectionPhase) -> R,
     isPowerTransformer: (PowerTransformer) -> R,
     isPowerTransformerEnd: (PowerTransformerEnd) -> R,
     isPowerTransformerInfo: (PowerTransformerInfo) -> R,
@@ -146,6 +157,9 @@ inline fun <R> whenNetworkServiceObject(
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
 ): R = when (identifiedObject) {
+    is BatteryUnit -> isBatteryUnit(identifiedObject)
+    is PhotoVoltaicUnit -> isPhotoVoltaicUnit(identifiedObject)
+    is PowerElectronicsWindUnit -> isPowerElectronicsWindUnit(identifiedObject)
     is AcLineSegment -> isAcLineSegment(identifiedObject)
     is AssetOwner -> isAssetOwner(identifiedObject)
     is BaseVoltage -> isBaseVoltage(identifiedObject)
@@ -173,6 +187,8 @@ inline fun <R> whenNetworkServiceObject(
     is OverheadWireInfo -> isOverheadWireInfo(identifiedObject)
     is PerLengthSequenceImpedance -> isPerLengthSequenceImpedance(identifiedObject)
     is Pole -> isPole(identifiedObject)
+    is PowerElectronicsConnection -> isPowerElectronicsConnection(identifiedObject)
+    is PowerElectronicsConnectionPhase ->  isPowerElectronicsConnectionPhase(identifiedObject)
     is PowerTransformer -> isPowerTransformer(identifiedObject)
     is PowerTransformerEnd -> isPowerTransformerEnd(identifiedObject)
     is PowerTransformerInfo -> isPowerTransformerInfo(identifiedObject)

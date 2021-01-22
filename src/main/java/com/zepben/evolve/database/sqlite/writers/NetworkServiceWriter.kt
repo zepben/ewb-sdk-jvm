@@ -27,6 +27,9 @@ import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkService
@@ -57,6 +60,9 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<SubGeographicalRegion>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Substation>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Terminal>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<BatteryUnit>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<PhotoVoltaicUnit>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<PowerElectronicsWindUnit>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<AcLineSegment>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Breaker>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Disconnector>().forEach { status = status and validateSave(it, writer::save) }
@@ -69,6 +75,8 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<Junction>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<LinearShuntCompensator>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<PerLengthSequenceImpedance>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<PowerElectronicsConnection>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<PowerElectronicsConnectionPhase>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<PowerTransformer>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<PowerTransformerEnd>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<RatioTapChanger>().forEach { status = status and validateSave(it, writer::save) }

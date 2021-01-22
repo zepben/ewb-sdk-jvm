@@ -123,6 +123,31 @@ class DatabaseSqliteTest {
     }
 
     @Test
+    fun `test BatteryUnit Schema`() {
+        validateSchema(SchemaTestNetwork.createBatteryUnitTestServices())
+    }
+
+    @Test
+    fun `test PhotoVoltaic Schema`() {
+        validateSchema(SchemaTestNetwork.createPhotoVoltaicUnitTestServices())
+    }
+
+    @Test
+    fun `test PowerElectronicsWindUnit Schema`() {
+        validateSchema(SchemaTestNetwork.createPowerElectronicsWindUnitTestServices())
+    }
+
+    @Test
+    fun `test PowerElectronicsConnection Schema`() {
+        validateSchema(SchemaTestNetwork.createPowerElectronicsConnectionTestServices())
+    }
+
+    @Test
+    fun `test PowerElectronicsConnectionPhase Schema`() {
+        validateSchema(SchemaTestNetwork.createPowerElectronicsConnectionPhaseTestServices())
+    }
+
+    @Test
     fun testMetadataDataSourceSchema() {
         validateSchema(SchemaTestNetwork.createDataSourceTestServices())
     }

@@ -29,6 +29,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseServiceComparatorTest
@@ -404,6 +405,37 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.IN, SinglePhaseKind.N) })
     }
 
+    private fun comparePowerElectronicsUnit(createPowerElectronicsUnit: (String) -> PowerElectronicsUnit) {
+        compareEquipment(createPowerElectronicsUnit)
+
+        comparatorValidator.validateProperty(
+            PowerElectronicsUnit::powerElectronicsConnection,
+            createPowerElectronicsUnit,
+            { PowerElectronicsConnection("pec1") },
+            { PowerElectronicsConnection("pec2") })
+        comparatorValidator.validateProperty(PowerElectronicsUnit::maxP, createPowerElectronicsUnit, { 1 }, { 2 })
+        comparatorValidator.validateProperty(PowerElectronicsUnit::minP, createPowerElectronicsUnit, { 1 }, { 2 })
+    }
+
+    @Test
+    internal fun compareBatteryUnit() {
+        comparePowerElectronicsUnit { BatteryUnit(it) }
+
+        comparatorValidator.validateProperty(BatteryUnit::batteryState, { BatteryUnit(it) }, { BatteryStateKind.charging }, { BatteryStateKind.discharging })
+        comparatorValidator.validateProperty(BatteryUnit::ratedE, { BatteryUnit(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(BatteryUnit::storedE, { BatteryUnit(it) }, { 1.0 }, { 2.0 })
+    }
+
+    @Test
+    internal fun comparePhotoVoltaicUnit() {
+        comparePowerElectronicsUnit { PhotoVoltaicUnit(it) }
+    }
+
+    @Test
+    internal fun comparePowerElectronicsWindUnit() {
+        comparePowerElectronicsUnit { PowerElectronicsWindUnit(it) }
+    }
+
     @Test
     internal fun compareAcLineSegment() {
         compareConductor { AcLineSegment(it) }
@@ -552,6 +584,42 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(PerLengthSequenceImpedance::x0, { PerLengthSequenceImpedance(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PerLengthSequenceImpedance::b0ch, { PerLengthSequenceImpedance(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PerLengthSequenceImpedance::g0ch, { PerLengthSequenceImpedance(it) }, { 1.0 }, { 2.0 })
+    }
+
+    @Test
+    internal fun comparePowerElectronicsConnection() {
+        compareRegulatingCondEq { PowerElectronicsConnection(it) }
+
+        comparatorValidator.validateIdObjCollection(
+            PowerElectronicsConnection::phases, PowerElectronicsConnection::addPhase, { PowerElectronicsConnection(it) },
+            { PowerElectronicsConnectionPhase("pecp1") }, { PowerElectronicsConnectionPhase("pecp2") })
+        comparatorValidator.validateIdObjCollection(
+            PowerElectronicsConnection::units, PowerElectronicsConnection::addUnit, { PowerElectronicsConnection(it) },
+            { object : PowerElectronicsUnit("peu1") {} }, { object : PowerElectronicsUnit("peu2") {} })
+
+        comparatorValidator.validateProperty(PowerElectronicsConnection::maxIFault, { PowerElectronicsConnection(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::maxQ, { PowerElectronicsConnection(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::minQ, { PowerElectronicsConnection(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::p, { PowerElectronicsConnection(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::q, { PowerElectronicsConnection(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::ratedS, { PowerElectronicsConnection(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::ratedU, { PowerElectronicsConnection(it) }, { 1 }, { 2 })
+    }
+
+    @Test
+    internal fun comparePowerElectronicsConnectionPhase() {
+        comparePowerSystemResource { PowerElectronicsConnectionPhase(it) }
+
+        comparatorValidator.validateProperty(
+            PowerElectronicsConnectionPhase::phase,
+            { PowerElectronicsConnectionPhase(it) },
+            { SinglePhaseKind.A },
+            { SinglePhaseKind.B })
+        comparatorValidator.validateProperty(
+            PowerElectronicsConnectionPhase::powerElectronicsConnection,
+            { PowerElectronicsConnectionPhase(it) },
+            { PowerElectronicsConnection("pec1") },
+            { PowerElectronicsConnection("pec2") })
     }
 
     @Test

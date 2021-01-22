@@ -9,7 +9,9 @@
 package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.testutils.junit.SystemLogExtension
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -22,8 +24,8 @@ internal class PowerElectronicsConnectionPhaseTest {
 
     @Test
     internal fun constructorCoverage() {
-        MatcherAssert.assertThat(PowerElectronicsConnectionPhase().mRID, Matchers.not(Matchers.equalTo("")))
-        MatcherAssert.assertThat(PowerElectronicsConnectionPhase("id").mRID, Matchers.equalTo("id"))
+        assertThat(PowerElectronicsConnectionPhase().mRID, not(equalTo("")))
+        assertThat(PowerElectronicsConnectionPhase("id").mRID, equalTo("id"))
     }
 
     @Test
@@ -31,10 +33,10 @@ internal class PowerElectronicsConnectionPhaseTest {
         val powerElectronicsConnectionsPhase = PowerElectronicsConnectionPhase()
         val powerElectronicsConnection = PowerElectronicsConnection()
 
-        MatcherAssert.assertThat(powerElectronicsConnectionsPhase.powerElectronicsConnection, Matchers.nullValue())
-        MatcherAssert.assertThat(powerElectronicsConnectionsPhase.p, Matchers.equalTo(0.0))
-        MatcherAssert.assertThat(powerElectronicsConnectionsPhase.phase, Matchers.equalTo(SinglePhaseKind.X))
-        MatcherAssert.assertThat(powerElectronicsConnectionsPhase.q, Matchers.equalTo(0.0))
+        assertThat(powerElectronicsConnectionsPhase.powerElectronicsConnection, nullValue())
+        assertThat(powerElectronicsConnectionsPhase.p, equalTo(0.0))
+        assertThat(powerElectronicsConnectionsPhase.phase, equalTo(SinglePhaseKind.X))
+        assertThat(powerElectronicsConnectionsPhase.q, equalTo(0.0))
 
         powerElectronicsConnectionsPhase.apply {
             this.powerElectronicsConnection = powerElectronicsConnection
@@ -43,9 +45,9 @@ internal class PowerElectronicsConnectionPhaseTest {
             q = 2.0
         }
 
-        MatcherAssert.assertThat(powerElectronicsConnectionsPhase.powerElectronicsConnection, Matchers.equalTo(powerElectronicsConnection))
-        MatcherAssert.assertThat(powerElectronicsConnectionsPhase.p, Matchers.equalTo(1.0))
-        MatcherAssert.assertThat(powerElectronicsConnectionsPhase.phase, Matchers.equalTo(SinglePhaseKind.B))
-        MatcherAssert.assertThat(powerElectronicsConnectionsPhase.q, Matchers.equalTo(2.0))
+        assertThat(powerElectronicsConnectionsPhase.powerElectronicsConnection, equalTo(powerElectronicsConnection))
+        assertThat(powerElectronicsConnectionsPhase.p, equalTo(1.0))
+        assertThat(powerElectronicsConnectionsPhase.phase, equalTo(SinglePhaseKind.B))
+        assertThat(powerElectronicsConnectionsPhase.q, equalTo(2.0))
     }
 }

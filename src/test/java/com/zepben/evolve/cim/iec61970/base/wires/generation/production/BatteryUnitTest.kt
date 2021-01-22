@@ -9,7 +9,10 @@
 package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 
 import com.zepben.testutils.junit.SystemLogExtension
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -22,17 +25,17 @@ internal class BatteryUnitTest {
 
     @Test
     internal fun constructorCoverage() {
-        MatcherAssert.assertThat(BatteryUnit().mRID, Matchers.not(Matchers.equalTo("")))
-        MatcherAssert.assertThat(BatteryUnit("id").mRID, Matchers.equalTo("id"))
+       assertThat(BatteryUnit().mRID, not(equalTo("")))
+       assertThat(BatteryUnit("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
         val batteryUnit = BatteryUnit()
 
-        MatcherAssert.assertThat(batteryUnit.batteryState, Matchers.equalTo(BatteryStateKind.UNKNOWN))
-        MatcherAssert.assertThat(batteryUnit.ratedE, Matchers.equalTo(0.0))
-        MatcherAssert.assertThat(batteryUnit.storedE, Matchers.equalTo(0.0))
+       assertThat(batteryUnit.batteryState, equalTo(BatteryStateKind.UNKNOWN))
+       assertThat(batteryUnit.ratedE, equalTo(0.0))
+       assertThat(batteryUnit.storedE, equalTo(0.0))
 
         batteryUnit.apply {
             this.batteryState = BatteryStateKind.charging
@@ -40,8 +43,8 @@ internal class BatteryUnitTest {
             storedE = 2.0
         }
 
-        MatcherAssert.assertThat(batteryUnit.batteryState, Matchers.equalTo(BatteryStateKind.charging))
-        MatcherAssert.assertThat(batteryUnit.ratedE, Matchers.equalTo(1.0))
-        MatcherAssert.assertThat(batteryUnit.storedE, Matchers.equalTo(2.0))
+       assertThat(batteryUnit.batteryState, equalTo(BatteryStateKind.charging))
+       assertThat(batteryUnit.ratedE, equalTo(1.0))
+       assertThat(batteryUnit.storedE, equalTo(2.0))
     }
 }

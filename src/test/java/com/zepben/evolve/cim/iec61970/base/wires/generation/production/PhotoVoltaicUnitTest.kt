@@ -9,7 +9,10 @@
 package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 
 import com.zepben.testutils.junit.SystemLogExtension
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -22,7 +25,7 @@ internal class PhotoVoltaicUnitTest {
 
     @Test
     internal fun constructorCoverage() {
-        MatcherAssert.assertThat(PhotoVoltaicUnit().mRID, Matchers.not(Matchers.equalTo("")))
-        MatcherAssert.assertThat(PhotoVoltaicUnit("id").mRID, Matchers.equalTo("id"))
+        assertThat(PhotoVoltaicUnit().mRID, not(equalTo("")))
+        assertThat(PhotoVoltaicUnit("id").mRID, equalTo("id"))
     }
 }

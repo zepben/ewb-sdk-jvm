@@ -9,8 +9,11 @@
 package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 
 import com.zepben.testutils.junit.SystemLogExtension
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -22,7 +25,7 @@ internal class PowerElectronicsWindUnitTest {
 
     @Test
     internal fun constructorCoverage() {
-        MatcherAssert.assertThat(PowerElectronicsWindUnit().mRID, Matchers.not(Matchers.equalTo("")))
-        MatcherAssert.assertThat(PowerElectronicsWindUnit("id").mRID, Matchers.equalTo("id"))
+       assertThat(PowerElectronicsWindUnit().mRID, not(equalTo("")))
+       assertThat(PowerElectronicsWindUnit("id").mRID, equalTo("id"))
     }
 }

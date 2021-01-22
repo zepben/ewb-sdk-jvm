@@ -8,12 +8,12 @@
 
 package com.zepben.evolve.cim.iec61970.base.wires
 
-import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.not
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -25,21 +25,21 @@ internal class PowerElectronicsConnectionTest {
 
     @Test
     internal fun constructorCoverage() {
-        MatcherAssert.assertThat(PowerElectronicsConnection().mRID, Matchers.not(Matchers.equalTo("")))
-        MatcherAssert.assertThat(PowerElectronicsConnection("id").mRID, Matchers.equalTo("id"))
+        assertThat(PowerElectronicsConnection().mRID, not(equalTo("")))
+        assertThat(PowerElectronicsConnection("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
         val powerElectronicsConnection = PowerElectronicsConnection()
 
-        MatcherAssert.assertThat(powerElectronicsConnection.maxIFault, Matchers.equalTo(0))
-        MatcherAssert.assertThat(powerElectronicsConnection.maxQ, Matchers.equalTo(0.0))
-        MatcherAssert.assertThat(powerElectronicsConnection.minQ, Matchers.equalTo(0.0))
-        MatcherAssert.assertThat(powerElectronicsConnection.p, Matchers.equalTo(0.0))
-        MatcherAssert.assertThat(powerElectronicsConnection.q, Matchers.equalTo(0.0))
-        MatcherAssert.assertThat(powerElectronicsConnection.ratedS, Matchers.equalTo(0))
-        MatcherAssert.assertThat(powerElectronicsConnection.ratedU, Matchers.equalTo(0))
+        assertThat(powerElectronicsConnection.maxIFault, equalTo(0))
+        assertThat(powerElectronicsConnection.maxQ, equalTo(0.0))
+        assertThat(powerElectronicsConnection.minQ, equalTo(0.0))
+        assertThat(powerElectronicsConnection.p, equalTo(0.0))
+        assertThat(powerElectronicsConnection.q, equalTo(0.0))
+        assertThat(powerElectronicsConnection.ratedS, equalTo(0))
+        assertThat(powerElectronicsConnection.ratedU, equalTo(0))
 
         powerElectronicsConnection.maxIFault = 1
         powerElectronicsConnection.maxQ = 2.0
@@ -49,13 +49,13 @@ internal class PowerElectronicsConnectionTest {
         powerElectronicsConnection.ratedS = 6
         powerElectronicsConnection.ratedU = 7
 
-        MatcherAssert.assertThat(powerElectronicsConnection.maxIFault, Matchers.equalTo(1))
-        MatcherAssert.assertThat(powerElectronicsConnection.maxQ, Matchers.equalTo(2.0))
-        MatcherAssert.assertThat(powerElectronicsConnection.minQ, Matchers.equalTo(3.0))
-        MatcherAssert.assertThat(powerElectronicsConnection.p, Matchers.equalTo(4.0))
-        MatcherAssert.assertThat(powerElectronicsConnection.q, Matchers.equalTo(5.0))
-        MatcherAssert.assertThat(powerElectronicsConnection.ratedS, Matchers.equalTo(6))
-        MatcherAssert.assertThat(powerElectronicsConnection.ratedU, Matchers.equalTo(7))
+        assertThat(powerElectronicsConnection.maxIFault, equalTo(1))
+        assertThat(powerElectronicsConnection.maxQ, equalTo(2.0))
+        assertThat(powerElectronicsConnection.minQ, equalTo(3.0))
+        assertThat(powerElectronicsConnection.p, equalTo(4.0))
+        assertThat(powerElectronicsConnection.q, equalTo(5.0))
+        assertThat(powerElectronicsConnection.ratedS, equalTo(6))
+        assertThat(powerElectronicsConnection.ratedU, equalTo(7))
     }
 
     @Test

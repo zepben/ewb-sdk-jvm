@@ -11,7 +11,9 @@ package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnection
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -24,8 +26,8 @@ internal class PowerElectronicsUnitTest {
 
     @Test
     internal fun constructorCoverage() {
-        MatcherAssert.assertThat(object : PowerElectronicsUnit() {}.mRID, Matchers.not(Matchers.equalTo("")))
-        MatcherAssert.assertThat(object : PowerElectronicsUnit("id") {}.mRID, Matchers.equalTo("id"))
+        assertThat(object : PowerElectronicsUnit() {}.mRID, not(equalTo("")))
+        assertThat(object : PowerElectronicsUnit("id") {}.mRID, equalTo("id"))
     }
 
     @Test
@@ -33,9 +35,9 @@ internal class PowerElectronicsUnitTest {
         val powerElectronicsUnit = object : PowerElectronicsUnit() {}
         val powerElectronicsConnection = PowerElectronicsConnection()
 
-        MatcherAssert.assertThat(powerElectronicsUnit.powerElectronicsConnection, Matchers.nullValue())
-        MatcherAssert.assertThat(powerElectronicsUnit.maxP, Matchers.equalTo(0))
-        MatcherAssert.assertThat(powerElectronicsUnit.minP, Matchers.equalTo(0))
+        assertThat(powerElectronicsUnit.powerElectronicsConnection, nullValue())
+        assertThat(powerElectronicsUnit.maxP, equalTo(0))
+        assertThat(powerElectronicsUnit.minP, equalTo(0))
 
         powerElectronicsUnit.apply {
             this.powerElectronicsConnection = powerElectronicsConnection
@@ -43,9 +45,9 @@ internal class PowerElectronicsUnitTest {
             minP = 2
         }
 
-        MatcherAssert.assertThat(powerElectronicsUnit.powerElectronicsConnection, Matchers.equalTo(powerElectronicsConnection))
-        MatcherAssert.assertThat(powerElectronicsUnit.maxP, Matchers.equalTo(1))
-        MatcherAssert.assertThat(powerElectronicsUnit.minP, Matchers.equalTo(2))
+        assertThat(powerElectronicsUnit.powerElectronicsConnection, equalTo(powerElectronicsConnection))
+        assertThat(powerElectronicsUnit.maxP, equalTo(1))
+        assertThat(powerElectronicsUnit.minP, equalTo(2))
     }
 
     @Test

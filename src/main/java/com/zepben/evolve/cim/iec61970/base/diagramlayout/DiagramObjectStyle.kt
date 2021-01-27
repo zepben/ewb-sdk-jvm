@@ -36,6 +36,10 @@ package com.zepben.evolve.cim.iec61970.base.diagramlayout
  * @property CONDUCTOR_22000 Diagram object should be styled as a conductor at 22kV.
  * @property CONDUCTOR_33000 Diagram object should be styled as a conductor at 33kV.
  * @property CONDUCTOR_66000 Diagram object should be styled as a conductor at 66kV.
+ * @property POWER_ELECTRONICS_CONNECTION Diagram object should be styled as a power electronics connection.
+ * @property BATTERY_UNIT Diagram object should be styled as a battery unit.
+ * @property PHOTO_VOLTAIC_UNIT Diagram object should be styled as a photo voltaic unit.
+ * @property POWER_ELECTRONICS_WIND_UNIT Diagram object should be styled as a power electronics wind unit.
  */
 enum class DiagramObjectStyle(val isLineStyle: Boolean) {
 
@@ -73,5 +77,9 @@ enum class DiagramObjectStyle(val isLineStyle: Boolean) {
     CONDUCTOR_132000(true),
     CONDUCTOR_220000(true),
     CONDUCTOR_275000(true),
-    CONDUCTOR_500000(true);
+    CONDUCTOR_500000(true),
+    POWER_ELECTRONICS_CONNECTION(false),
+    BATTERY_UNIT(false),
+    PHOTO_VOLTAIC_UNIT(false),
+    POWER_ELECTRONICS_WIND_UNIT(false)
 }

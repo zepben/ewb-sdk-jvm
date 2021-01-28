@@ -425,7 +425,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableBatteryUnit::class.java)
         val insert = databaseTables.getInsert(TableBatteryUnit::class.java)
 
-        insert.setString(table.BATTERY_STATE.queryIndex, batteryUnit.batteryState?.name)
+        insert.setString(table.BATTERY_STATE.queryIndex, batteryUnit.batteryState.name)
         insert.setDouble(table.RATED_E.queryIndex, batteryUnit.ratedE)
         insert.setDouble(table.STORED_E.queryIndex, batteryUnit.storedE)
 
@@ -463,6 +463,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val insert = databaseTables.getInsert(TableBreakers::class.java)
 
         return saveProtectedSwitch(table, insert, breaker, "breaker")
+    }
+
+    fun save(busbarSection: BusbarSection): Boolean {
+        val table = databaseTables.getTable(TableBusbarSections::class.java)
+        val insert = databaseTables.getInsert(TableBusbarSections::class.java)
+
+        return saveConnector(table, insert, busbarSection, "busbar section")
     }
 
     private fun saveConductor(table: TableConductors, insert: PreparedStatement, conductor: Conductor, description: String): Boolean {

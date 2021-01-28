@@ -92,6 +92,7 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
 import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment as PBAcLineSegment
 import com.zepben.protobuf.cim.iec61970.base.wires.Breaker as PBBreaker
+import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
 import com.zepben.protobuf.cim.iec61970.base.wires.Conductor as PBConductor
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
 import com.zepben.protobuf.cim.iec61970.base.wires.Disconnector as PBDisconnector
@@ -382,7 +383,7 @@ fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder) =
 
 fun toPb(cim: BatteryUnit, pb: PBBatteryUnit.Builder): PBBatteryUnit.Builder =
     pb.apply {
-        batteryState = cim.batteryState?.let { BatteryStateKind.valueOf(it.name) }
+        batteryState = BatteryStateKind.valueOf(cim.batteryState.name)
         ratedE = cim.ratedE
         storedE = cim.storedE
         toPb(cim, peuBuilder)
@@ -406,6 +407,9 @@ fun toPb(cim: AcLineSegment, pb: PBAcLineSegment.Builder): PBAcLineSegment.Build
 
 fun toPb(cim: Breaker, pb: PBBreaker.Builder): PBBreaker.Builder =
     pb.apply { toPb(cim, swBuilder) }
+
+fun toPb(cim: BusbarSection, pb: PBBusbarSection.Builder): PBBusbarSection.Builder =
+    pb.apply { toPb(cim, cnBuilder) }
 
 fun toPb(cim: Conductor, pb: PBConductor.Builder): PBConductor.Builder =
     pb.apply {
@@ -727,6 +731,7 @@ fun Fuse.toPb(): PBFuse = toPb(this, PBFuse.newBuilder()).build()
 fun Jumper.toPb(): PBJumper = toPb(this, PBJumper.newBuilder()).build()
 fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
 fun Breaker.toPb(): PBBreaker = toPb(this, PBBreaker.newBuilder()).build()
+fun BusbarSection.toPb(): PBBusbarSection = toPb(this, PBBusbarSection.newBuilder()).build()
 fun FaultIndicator.toPb(): PBFaultIndicator = toPb(this, PBFaultIndicator.newBuilder()).build()
 fun Feeder.toPb(): PBFeeder = toPb(this, PBFeeder.newBuilder()).build()
 fun Site.toPb(): PBSite = toPb(this, PBSite.newBuilder()).build()
@@ -780,6 +785,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(jumper: Jumper): PBJumper = jumper.toPb()
     fun toPb(recloser: Recloser): PBRecloser = recloser.toPb()
     fun toPb(breaker: Breaker): PBBreaker = breaker.toPb()
+    fun toPb(busbarSection: BusbarSection): PBBusbarSection = busbarSection.toPb()
     fun toPb(faultIndicator: FaultIndicator): PBFaultIndicator = faultIndicator.toPb()
     fun toPb(feeder: Feeder): PBFeeder = feeder.toPb()
     fun toPb(site: Site): PBSite = site.toPb()

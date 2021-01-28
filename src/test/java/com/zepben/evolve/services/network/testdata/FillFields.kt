@@ -32,7 +32,6 @@ import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locatio
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
 import java.util.*
-import kotlin.math.max
 
 /************ IEC61968 ASSET INFO ************/
 
@@ -106,7 +105,10 @@ fun Meter.fillFields(networkService: NetworkService): Meter {
 
 /************ IEC61970 CORE ************/
 
-fun ConnectivityNodeContainer.fillFields(networkService: NetworkService) = (this as PowerSystemResource).fillFields(networkService)
+fun ConnectivityNodeContainer.fillFields(networkService: NetworkService): ConnectivityNodeContainer {
+    (this as PowerSystemResource).fillFields(networkService)
+    return this
+}
 
 fun EquipmentContainer.fillFields(networkService: NetworkService) {
     for (i in 0..1)
@@ -215,19 +217,7 @@ fun Substation.fillFields(networkService: NetworkService): Substation {
     return this
 }
 
-/************ IEC61970 WIRES ************/
-fun PowerElectronicsUnit.fillFields(networkService: NetworkService): PowerElectronicsUnit {
-    val pec = PowerElectronicsConnection().also {
-        networkService.add(it)
-        it.addUnit(this)
-    }
-    maxP = 1
-    minP = 2
-    powerElectronicsConnection = pec
-
-    (this as Equipment).fillFields(networkService, false)
-    return this
-}
+/************ IEC61970 WIRES GENERATION PRODUCTION ************/
 
 fun BatteryUnit.fillFields(networkService: NetworkService): BatteryUnit {
     batteryState = BatteryStateKind.charging
@@ -242,13 +232,6 @@ fun PhotoVoltaicUnit.fillFields(networkService: NetworkService): PhotoVoltaicUni
     (this as PowerElectronicsUnit).fillFields(networkService)
     return this
 }
-
-fun PowerElectronicsWindUnit.fillFields(networkService: NetworkService): PowerElectronicsWindUnit {
-    (this as PowerElectronicsUnit).fillFields(networkService)
-    return this
-}
-
-fun Line.fillFields(networkService: NetworkService) = (this as EquipmentContainer).fillFields(networkService)
 
 fun PowerElectronicsConnection.fillFields(networkService: NetworkService): PowerElectronicsConnection {
     maxIFault = 1
@@ -274,6 +257,36 @@ fun PowerElectronicsConnectionPhase.fillFields(networkService: NetworkService): 
     q = 2.0
 
     (this as PowerSystemResource).fillFields(networkService)
+    return this
+}
+
+fun PowerElectronicsUnit.fillFields(networkService: NetworkService): PowerElectronicsUnit {
+    val pec = PowerElectronicsConnection().also {
+        networkService.add(it)
+        it.addUnit(this)
+    }
+    maxP = 1
+    minP = 2
+    powerElectronicsConnection = pec
+
+    (this as Equipment).fillFields(networkService, false)
+    return this
+}
+
+fun PowerElectronicsWindUnit.fillFields(networkService: NetworkService): PowerElectronicsWindUnit {
+    (this as PowerElectronicsUnit).fillFields(networkService)
+    return this
+}
+
+/************ IEC61970 WIRES ************/
+
+fun BusbarSection.fillFields(networkService: NetworkService): BusbarSection {
+    (this as Connector).fillFields(networkService, false)
+    return this
+}
+
+fun Line.fillFields(networkService: NetworkService): Line {
+    (this as EquipmentContainer).fillFields(networkService)
     return this
 }
 

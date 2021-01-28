@@ -450,6 +450,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareProtectedSwitch { Breaker(it) }
     }
 
+    @Test
+    internal fun compareBusbarSection() {
+        compareConnector { BusbarSection(it) }
+    }
+
     private fun compareConductor(createConductor: (String) -> Conductor) {
         compareConductingEquipment(createConductor)
 

@@ -92,15 +92,65 @@ class DatabaseSqliteTest {
         )
     }
 
+    /************ IEC61968 ASSET INFO ************/
+
     @Test
-    fun `test Pole Schema`() {
+    fun `test PowerTransformerInfo schema`() {
+        validateSchema(SchemaTestNetwork.createPowerTransformerInfoTestServices())
+    }
+
+    /************ IEC61968 ASSETS ************/
+
+    @Test
+    fun `test Pole schema`() {
         validateSchema(SchemaTestNetwork.createPoleTestServices())
     }
 
     @Test
-    fun `test Streetlight Schema`() {
+    fun `test Streetlight schema`() {
         validateSchema(SchemaTestNetwork.createStreetlightTestServices())
     }
+
+    /************ IEC61970 WIRES ************/
+
+    @Test
+    fun `test BusbarSection schema`() {
+        validateSchema(SchemaTestNetwork.createBusbarSectionServices())
+    }
+
+    @Test
+    fun `test PowerTransformer schema`() {
+        validateSchema(SchemaTestNetwork.createPowerTransformerTestServices())
+    }
+
+    /************ IEC61970 WIRES GENERATION PRODUCTION ************/
+
+    @Test
+    fun `test BatteryUnit schema`() {
+        validateSchema(SchemaTestNetwork.createBatteryUnitTestServices())
+    }
+
+    @Test
+    fun `test PhotoVoltaic schema`() {
+        validateSchema(SchemaTestNetwork.createPhotoVoltaicUnitTestServices())
+    }
+
+    @Test
+    fun `test PowerElectronicsConnection schema`() {
+        validateSchema(SchemaTestNetwork.createPowerElectronicsConnectionTestServices())
+    }
+
+    @Test
+    fun `test PowerElectronicsConnectionPhase schema`() {
+        validateSchema(SchemaTestNetwork.createPowerElectronicsConnectionPhaseTestServices())
+    }
+
+    @Test
+    fun `test PowerElectronicsWindUnit schema`() {
+        validateSchema(SchemaTestNetwork.createPowerElectronicsWindUnitTestServices())
+    }
+
+    /************ IEC61970 InfIEC61970 ************/
 
     @Test
     fun testCircuitSchema() {
@@ -112,40 +162,7 @@ class DatabaseSqliteTest {
         validateSchema(SchemaTestNetwork.createLoopTestServices())
     }
 
-    @Test
-    fun `test PowerTransformer Schema`() {
-        validateSchema(SchemaTestNetwork.createPowerTransformerTestServices())
-    }
-
-    @Test
-    fun `test PowerTransformerInfo Schema`() {
-        validateSchema(SchemaTestNetwork.createPowerTransformerInfoTestServices())
-    }
-
-    @Test
-    fun `test BatteryUnit Schema`() {
-        validateSchema(SchemaTestNetwork.createBatteryUnitTestServices())
-    }
-
-    @Test
-    fun `test PhotoVoltaic Schema`() {
-        validateSchema(SchemaTestNetwork.createPhotoVoltaicUnitTestServices())
-    }
-
-    @Test
-    fun `test PowerElectronicsWindUnit Schema`() {
-        validateSchema(SchemaTestNetwork.createPowerElectronicsWindUnitTestServices())
-    }
-
-    @Test
-    fun `test PowerElectronicsConnection Schema`() {
-        validateSchema(SchemaTestNetwork.createPowerElectronicsConnectionTestServices())
-    }
-
-    @Test
-    fun `test PowerElectronicsConnectionPhase Schema`() {
-        validateSchema(SchemaTestNetwork.createPowerElectronicsConnectionPhaseTestServices())
-    }
+    /************ OTHER ************/
 
     @Test
     fun testMetadataDataSourceSchema() {

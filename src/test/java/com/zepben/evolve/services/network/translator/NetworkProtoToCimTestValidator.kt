@@ -20,10 +20,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
-import com.zepben.evolve.cim.iec61970.base.wires.Breaker
-import com.zepben.evolve.cim.iec61970.base.wires.Line
-import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
+import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkService
@@ -49,6 +46,8 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Accumulator as PBAccumulator
 import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
 import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
+import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection.Builder as PBBusbarSectionBuilder
+import com.zepben.protobuf.cim.iec61970.base.wires.Connector.Builder as PBConnectorBuilder
 import com.zepben.protobuf.cim.iec61970.base.wires.Line.Builder as PBLineBuilder
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer.Builder as PBPowerTransformerBuilder
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit.Builder as PBCircuitBuilder
@@ -213,6 +212,10 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
 
         return cim
     }
+
+    inline fun <reified T : Connector> validate(pb: PBConnectorBuilder, fromPb: () -> T): T = validate(pb.ceBuilder, fromPb)
+
+    inline fun validate(pb: PBBusbarSectionBuilder, fromPb: () -> BusbarSection): BusbarSection = validate(pb.cnBuilder, fromPb)
 
     inline fun validate(pb: PBPowerTransformerBuilder, fromPb: () -> PowerTransformer): PowerTransformer {
         pb.vectorGroup = VectorGroup.D0

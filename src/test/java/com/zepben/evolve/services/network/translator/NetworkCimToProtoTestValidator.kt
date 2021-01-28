@@ -43,6 +43,8 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Accumulator as PBAccumulator
 import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
 import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
+import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
+import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
 import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformerEnd as PBPowerTransformerEnd
@@ -93,6 +95,14 @@ internal class NetworkCimToProtoTestValidator {
 
         validateMRID(cim.baseVoltage, pb.baseVoltageMRID)
         validateMRIDList(cim.terminals, pb.terminalMRIDsList)
+    }
+
+    fun validate(cim: Connector, pb: PBConnector) {
+        validate(cim, pb.ce)
+    }
+
+    fun validate(cim: BusbarSection, pb: PBBusbarSection) {
+        validate(cim, pb.cn)
     }
 
     fun validate(cim: PowerTransformer, pb: PBPowerTransformer) {

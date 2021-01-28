@@ -465,6 +465,12 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadProtectedSwitch(breaker, table, resultSet) && networkService.addOrThrow(breaker)
     }
 
+    fun load(table: TableBusbarSections, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val busbarSection = BusbarSection(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadConnector(busbarSection, table, resultSet) && networkService.addOrThrow(busbarSection)
+    }
+
     private fun loadConductor(conductor: Conductor, table: TableConductors, resultSet: ResultSet): Boolean {
         conductor.apply {
             length = resultSet.getNullableDouble(table.LENGTH.queryIndex)

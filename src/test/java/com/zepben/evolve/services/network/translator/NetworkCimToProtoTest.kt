@@ -13,6 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Substation
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
+import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
@@ -30,6 +31,14 @@ internal class NetworkCimToProtoTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val validator = NetworkCimToProtoTestValidator()
+
+    @Test
+    internal fun convertsBusbarSection() {
+        val networkService = NetworkService()
+        val cim = BusbarSection()
+        validator.validate(cim, cim.toPb())
+        validator.validate(cim.fillFields(networkService), cim.toPb())
+    }
 
     @Test
     internal fun convertsPowerTransformer() {

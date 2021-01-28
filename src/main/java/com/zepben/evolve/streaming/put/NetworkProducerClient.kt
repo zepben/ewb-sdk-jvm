@@ -67,6 +67,10 @@ class NetworkProducerClient(
                 val builder = CreateBreakerRequest.newBuilder().setBreaker(it.toPb()).build()
                 stub.createBreaker(builder)
             },
+            isBusbarSection = {
+                val builder = CreateBusbarSectionRequest.newBuilder().setBusbarSection(it.toPb()).build()
+                stub.createBusbarSection(builder)
+            },
             isCableInfo = {
                 val builder = CreateCableInfoRequest.newBuilder().setCableInfo(it.toPb()).build()
                 stub.createCableInfo(builder)

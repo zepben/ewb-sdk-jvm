@@ -10,6 +10,7 @@ package com.zepben.evolve.services.network.testdata
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
+import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnection
 import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnectionPhase
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
@@ -29,6 +30,15 @@ import java.time.Instant
 
 @Suppress("SameParameterValue", "BooleanLiteralArgument")
 object SchemaTestNetwork {
+
+    fun createBusbarSectionServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.add(BusbarSection("busbar1"))
+        networkService.add(BusbarSection("busbar2").fillFields(networkService))
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    }
 
     fun createBatteryUnitTestServices(): NetworkModelTestUtil.Services {
         val networkService = NetworkService()

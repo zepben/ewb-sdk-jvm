@@ -297,6 +297,9 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
     private fun compareBreaker(source: Breaker, target: Breaker): ObjectDifference<Breaker> =
         ObjectDifference(source, target).apply { compareProtectedSwitch() }
 
+    private fun compareBusbarSection(source: BusbarSection, target: BusbarSection): ObjectDifference<BusbarSection> =
+        ObjectDifference(source, target).apply { compareConnector() }
+
     private fun ObjectDifference<out Conductor>.compareConductor(): ObjectDifference<out Conductor> =
         apply {
             compareConductingEquipment()

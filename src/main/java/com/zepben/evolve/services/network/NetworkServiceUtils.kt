@@ -31,7 +31,9 @@ import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
-import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.customer.CustomerService
@@ -57,6 +59,7 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isAssetOwner Handler when the [identifiedObject] is a [AssetOwner]
  * @param isBaseVoltage Handler when the [identifiedObject] is a [BaseVoltage]
  * @param isBreaker Handler when the [identifiedObject] is a [Breaker]
+ * @param isBusbarSection Handler when the [identifiedObject] is a [BusbarSection]
  * @param isCableInfo Handler when the [identifiedObject] is a [CableInfo]
  * @param isCircuit Handler when the [identifiedObject] is a [Circuit]
  * @param isConnectivityNode Handler when the [identifiedObject] is a [ConnectivityNode]
@@ -111,6 +114,7 @@ inline fun <R> whenNetworkServiceObject(
     isAssetOwner: (AssetOwner) -> R,
     isBaseVoltage: (BaseVoltage) -> R,
     isBreaker: (Breaker) -> R,
+    isBusbarSection: (BusbarSection) -> R,
     isCableInfo: (CableInfo) -> R,
     isCircuit: (Circuit) -> R,
     isConnectivityNode: (ConnectivityNode) -> R,
@@ -164,6 +168,7 @@ inline fun <R> whenNetworkServiceObject(
     is AssetOwner -> isAssetOwner(identifiedObject)
     is BaseVoltage -> isBaseVoltage(identifiedObject)
     is Breaker -> isBreaker(identifiedObject)
+    is BusbarSection -> isBusbarSection(identifiedObject)
     is CableInfo -> isCableInfo(identifiedObject)
     is Circuit -> isCircuit(identifiedObject)
     is ConnectivityNode -> isConnectivityNode(identifiedObject)

@@ -53,15 +53,6 @@ class NetworkService : BaseService("network") {
 
     private val _measurements: MutableMap<String, MutableList<Measurement>> = mutableMapOf()
 
-    fun add(batteryUnit: BatteryUnit): Boolean = super.add(batteryUnit)
-    fun remove(batteryUnit: BatteryUnit): Boolean = super.remove(batteryUnit)
-
-    fun add(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.add(photoVoltaicUnit)
-    fun remove(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.remove(photoVoltaicUnit)
-
-    fun add(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.add(powerElectronicsWindUnit)
-    fun remove(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.remove(powerElectronicsWindUnit)
-
     fun add(acLineSegment: AcLineSegment): Boolean = super.add(acLineSegment)
     fun remove(acLineSegment: AcLineSegment): Boolean = super.remove(acLineSegment)
 
@@ -73,6 +64,9 @@ class NetworkService : BaseService("network") {
 
     fun add(breaker: Breaker): Boolean = super.add(breaker)
     fun remove(breaker: Breaker): Boolean = super.remove(breaker)
+
+    fun add(busbarSection: BusbarSection): Boolean = super.add(busbarSection)
+    fun remove(busbarSection: BusbarSection): Boolean = super.remove(busbarSection)
 
     fun add(cableInfo: CableInfo): Boolean = super.add(cableInfo)
     fun remove(cableInfo: CableInfo): Boolean = super.remove(cableInfo)
@@ -121,6 +115,15 @@ class NetworkService : BaseService("network") {
 
     fun add(linearShuntCompensator: LinearShuntCompensator): Boolean = super.add(linearShuntCompensator)
     fun remove(linearShuntCompensator: LinearShuntCompensator): Boolean = super.remove(linearShuntCompensator)
+
+    fun add(batteryUnit: BatteryUnit): Boolean = super.add(batteryUnit)
+    fun remove(batteryUnit: BatteryUnit): Boolean = super.remove(batteryUnit)
+
+    fun add(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.add(photoVoltaicUnit)
+    fun remove(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.remove(photoVoltaicUnit)
+
+    fun add(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.add(powerElectronicsWindUnit)
+    fun remove(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.remove(powerElectronicsWindUnit)
 
     fun add(location: Location): Boolean = super.add(location)
     fun remove(location: Location): Boolean = super.remove(location)

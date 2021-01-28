@@ -65,6 +65,7 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<PowerElectronicsWindUnit>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<AcLineSegment>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Breaker>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<BusbarSection>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Disconnector>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<EnergyConsumer>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<EnergyConsumerPhase>().forEach { status = status and validateSave(it, writer::save) }

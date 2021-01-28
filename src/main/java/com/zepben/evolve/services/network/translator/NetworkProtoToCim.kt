@@ -79,6 +79,7 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
 import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment as PBAcLineSegment
 import com.zepben.protobuf.cim.iec61970.base.wires.Breaker as PBBreaker
+import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
 import com.zepben.protobuf.cim.iec61970.base.wires.Conductor as PBConductor
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
 import com.zepben.protobuf.cim.iec61970.base.wires.Disconnector as PBDisconnector
@@ -477,6 +478,11 @@ fun toCim(pb: PBBreaker, networkService: NetworkService): Breaker =
         toCim(pb.sw, this, networkService)
     }
 
+fun toCim(pb: PBBusbarSection, networkService: NetworkService): BusbarSection =
+    BusbarSection(pb.mRID()).apply {
+        toCim(pb.cn, this, networkService)
+    }
+
 fun toCim(pb: PBConductor, cim: Conductor, networkService: NetworkService): Conductor =
     cim.apply {
         length = pb.length
@@ -767,6 +773,7 @@ fun NetworkService.addFromPb(pb: PBFuse): Fuse? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBJumper): Jumper? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBRecloser): Recloser? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBBreaker): Breaker? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBBusbarSection): BusbarSection? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBFaultIndicator): FaultIndicator? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBFeeder): Feeder? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBSite): Site? = tryAddOrNull(toCim(pb, this))
@@ -821,6 +828,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim(net
     fun addFromPb(pb: PBJumper): Jumper? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRecloser): Recloser? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBBreaker): Breaker? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBBusbarSection): BusbarSection? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBFaultIndicator): FaultIndicator? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBFeeder): Feeder? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBSite): Site? = networkService.addFromPb(pb)

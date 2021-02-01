@@ -219,6 +219,7 @@ class NetworkConsumerClient(
             POWERTRANSFORMEREND -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerTransformerEnd), it.powerTransformerEnd.mRID())
             RATIOTAPCHANGER -> ExtractResult(protoToCimProvider(service).addFromPb(it.ratioTapChanger), it.ratioTapChanger.mRID())
             RECLOSER -> ExtractResult(protoToCimProvider(service).addFromPb(it.recloser), it.recloser.mRID())
+            BUSBARSECTION -> ExtractResult(protoToCimProvider(service).addFromPb(it.busbarSection), it.busbarSection.mRID())
             CIRCUIT -> ExtractResult(protoToCimProvider(service).addFromPb(it.circuit), it.circuit.mRID())
             LOOP -> ExtractResult(protoToCimProvider(service).addFromPb(it.loop), it.loop.mRID())
             POLE -> ExtractResult(protoToCimProvider(service).addFromPb(it.pole), it.pole.mRID())

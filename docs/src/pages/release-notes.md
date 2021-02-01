@@ -2,6 +2,7 @@
 
 | Version | Released |
 | --- | --- |
+|[0.5.0](#v050)| `01 February 2021` |
 |[0.4.0](#v040)| `12 January 2021` |
 |[0.3.0](#v030)| `10 November 2020` |
 | [0.2.0](#v020) | `08 October 2020` |
@@ -10,6 +11,31 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+### v0.5.0
+
+##### Breaking Changes
+ None.
+
+##### New Features
+* Added the following classes:
+  * BatteryUnit
+  * BusbarSection
+  * PhotoVoltaicUnit
+  * PowerElectronicsConnection
+  * PowerElectronicsConnectionPhase
+  * PowerElectronicsWindUnit
+
+##### Enhancements
+* None.
+
+##### Fixes
+* None.
+
+##### Notes
+* None.
 
 ---
 

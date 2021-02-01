@@ -1,16 +1,10 @@
-### v0.5.0
+### v0.6.0
 
 ##### Breaking Changes
  None.
 
 ##### New Features
-* Added the following classes:
-  * BatteryUnit
-  * BusbarSection
-  * PhotoVoltaicUnit
-  * PowerElectronicsConnection
-  * PowerElectronicsConnectionPhase
-  * PowerElectronicsWindUnit
+* None.
 
 ##### Enhancements
 * None.

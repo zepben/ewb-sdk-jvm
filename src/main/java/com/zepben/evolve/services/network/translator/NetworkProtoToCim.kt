@@ -307,10 +307,6 @@ fun toCim(pb: PBEquipment, cim: Equipment, networkService: NetworkService): Equi
 
 fun toCim(pb: PBEquipmentContainer, cim: EquipmentContainer, networkService: NetworkService): EquipmentContainer =
     cim.apply {
-        pb.equipmentMRIDsList.forEach { equipmentMRID ->
-            networkService.resolveOrDeferReference(Resolvers.equipment(this), equipmentMRID)
-        }
-
         toCim(pb.cnc, this, networkService)
     }
 
@@ -318,9 +314,6 @@ fun toCim(pb: PBFeeder, networkService: NetworkService): Feeder =
     Feeder(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.normalHeadTerminal(this), pb.normalHeadTerminalMRID)
         networkService.resolveOrDeferReference(Resolvers.normalEnergizingSubstation(this), pb.normalEnergizingSubstationMRID)
-        pb.currentEquipmentMRIDsList.forEach {
-            networkService.resolveOrDeferReference(Resolvers.currentEquipment(this), it)
-        }
         toCim(pb.ec, this, networkService)
     }
 

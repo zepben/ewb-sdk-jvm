@@ -305,8 +305,6 @@ fun toPb(cim: Equipment, pb: PBEquipment.Builder): PBEquipment.Builder =
 
 fun toPb(cim: EquipmentContainer, pb: PBEquipmentContainer.Builder): PBEquipmentContainer.Builder =
     pb.apply {
-        clearEquipmentMRIDs()
-        cim.equipment.forEach { addEquipmentMRIDs(it.mRID) }
         toPb(cim, cncBuilder)
     }
 
@@ -314,9 +312,6 @@ fun toPb(cim: Feeder, pb: PBFeeder.Builder): PBFeeder.Builder =
     pb.apply {
         cim.normalHeadTerminal?.let { normalHeadTerminalMRID = it.mRID } ?: clearNormalHeadTerminalMRID()
         cim.normalEnergizingSubstation?.let { normalEnergizingSubstationMRID = it.mRID } ?: clearNormalEnergizingSubstationMRID()
-
-        clearCurrentEquipmentMRIDs()
-        cim.currentEquipment.forEach { addCurrentEquipmentMRIDs(it.mRID) }
 
         toPb(cim, ecBuilder)
     }

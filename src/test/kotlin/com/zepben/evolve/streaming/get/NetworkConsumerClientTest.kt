@@ -33,11 +33,13 @@ import io.grpc.StatusRuntimeException
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 
+@Disabled
 internal class NetworkConsumerClientTest {
 
     @JvmField

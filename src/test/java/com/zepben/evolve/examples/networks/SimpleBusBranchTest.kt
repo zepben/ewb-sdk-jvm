@@ -10,7 +10,6 @@ package com.zepben.evolve.examples.networks
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.services.common.BaseService
-import com.zepben.evolve.services.network.NetworkService
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test

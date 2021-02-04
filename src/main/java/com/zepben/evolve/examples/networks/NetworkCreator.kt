@@ -9,7 +9,6 @@
 package com.zepben.evolve.examples.networks
 
 
-import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
@@ -19,7 +18,6 @@ import com.zepben.evolve.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.protobuf.np.CreateTransformerEndInfoResponse
 
 
 fun NetworkService.createBus(bv:  BaseVoltage, init: Junction.() -> Unit): Junction {
@@ -40,7 +38,7 @@ fun NetworkService.createConnectivityNode(init: ConnectivityNode.()-> Unit): Con
     this.add(cn)
     return cn
 }
-fun NetworkService.createTransformer(bus1: Junction, bus2: Junction, numEnds: Int = 2, info: String = "25 MVA 110/20 kV", init: PowerTransformer.() -> Unit): PowerTransformer{
+fun NetworkService.createTransformer(bus1: Junction, bus2: Junction, numEnds: Int = 2, ptInfo: PowerTransformerInfo = getAvailableTransformerInfo("0.4 MVA 20/0.4 kV"), init: PowerTransformer.() -> Unit): PowerTransformer{
     val pt = PowerTransformer().apply(init)
     this.add(pt)
     pt.createTerminals(numEnds, this)
@@ -52,7 +50,6 @@ fun NetworkService.createTransformer(bus1: Junction, bus2: Junction, numEnds: In
         end.terminal = pt.getTerminal(i)
         // TODO: How to associated PowerTrandformerEndInfo to a PowerTranformerInfo?
     }
-    val ptInfo = getAvailableTransformerInfo(info)
     pt.apply{assetInfo=ptInfo}
     return pt
 }
@@ -153,8 +150,7 @@ private fun ConductingEquipment.createTerminals(num: Int, net: NetworkService) {
 }
 
 
-private fun getAvailableTransformerInfo(mrid: String): PowerTransformerInfo
-{
+fun getAvailableTransformerInfo(mrid: String): PowerTransformerInfo {
     /*  {
       "i0_percent": 0.07,
       "pfe_kw": 14,
@@ -195,7 +191,16 @@ private fun getAvailableTransformerInfo(mrid: String): PowerTransformerInfo
     val list = mutableListOf<PowerTransformerInfo>()
     list.add(PowerTransformerInfo("25 MVA 110/20 kV"))
     list.add(PowerTransformerInfo("0.63 MVA 10/0.4 kV"))
-    return list.find { it.mRID == mrid}!!
+    list.add(PowerTransformerInfo("0.4 MVA 20/0.4 kV"))
+    return list.first { it.mRID == mrid}
+    /*return if (txinfo == null ) {
+        val defaultValue= "0.4 MVA 20/0.4 kV"
+        println("PowerTranformerInfo $mrid not found. Default value $defaultValue applied.")
+        getAvailableTransformerInfo(defaultValue)
+        listOf<String>().first
+    } else{
+        txinfo
+    }*/
 }
 
 

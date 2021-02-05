@@ -55,7 +55,7 @@ fun simpleNetwork(): BaseService {
 /*    # create transformer
         pp.create_transformer(net, bus3, bus4, name="110kV/20kV transformer",
             std_type="25 MVA 110/20 kV")*/
-    val ptInfo = getAvailableTransformerInfo("25 MVA 110/20 kV")
+    val ptInfo = net.getAvailablePowerTransformerInfo("25 MVA 110/20 kV")
     net.createTransformer(bus3, bus4, numEnds = 2, ptInfo = ptInfo){name = "110kV/20kV transformer"}
 
     /* # create lines

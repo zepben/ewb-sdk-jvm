@@ -8,6 +8,8 @@
 package com.zepben.evolve.database.sqlite.writers
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.Name
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import org.slf4j.Logger
@@ -20,7 +22,24 @@ abstract class BaseServiceWriter<T : BaseService, W : BaseCIMWriter>(
 
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    abstract fun save(service: T, writer: W): Boolean
+    open fun save(service: T, writer: W): Boolean {
+        var status = true
+        service.nameTypes.forEach {
+            val typeNameId = "NameType:${it.name}"
+            if (!hasCommon(typeNameId)) {
+                status = status and (validateSave(it, writer::save) && addCommon(typeNameId))
+            }
+
+            it.names.forEach { name ->
+                val nameId = "Name:${name.type.name}:${name.name}:${name.identifiedObject.mRID}"
+                if (!hasCommon(nameId)) {
+                    status = status and (validateSave(name, writer::save) && addCommon(nameId))
+                }
+            }
+        }
+
+        return status
+    }
 
     protected inline fun <reified S : IdentifiedObject> trySaveCommon(save: (S) -> Boolean, obj: S): Boolean {
         if (hasCommon(obj.mRID))
@@ -38,6 +57,24 @@ abstract class BaseServiceWriter<T : BaseService, W : BaseCIMWriter>(
     ): Boolean {
         return WriteValidator.validateSave(it, saver) { e ->
             logger.error("Failed to save ${it.typeNameAndMRID()}: ${e.message}")
+        }
+    }
+
+    protected inline fun validateSave(
+        nameType: NameType,
+        saver: (nameType: NameType) -> Boolean
+    ): Boolean {
+        return WriteValidator.validateSave(nameType, saver) { e ->
+            logger.error("Failed to save ${nameType.javaClass.simpleName} ${nameType.name}: ${e.message}")
+        }
+    }
+
+    protected inline fun validateSave(
+        name: Name,
+        saver: (name: Name) -> Boolean
+    ): Boolean {
+        return WriteValidator.validateSave(name, saver) { e ->
+            logger.error("Failed to save ${name.javaClass.simpleName} ${name.name}: ${e.message}")
         }
     }
 

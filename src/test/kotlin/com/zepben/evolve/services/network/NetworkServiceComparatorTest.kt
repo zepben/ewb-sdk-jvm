@@ -59,7 +59,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun comparePowerTransformerInfo() {
         compareAssetInfo { PowerTransformerInfo(mRID = it) }
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             PowerTransformerInfo::transformerTankInfos,
             PowerTransformerInfo::addTransformerTankInfo,
             { PowerTransformerInfo(it) },
@@ -78,7 +78,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     private fun compareAsset(createAsset: (String) -> Asset) {
         compareIdentifiedObject(createAsset)
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Asset::organisationRoles, Asset::addOrganisationRole, createAsset,
             { AssetOwner("a1") }, { AssetOwner("a2") })
         comparatorValidator.validateProperty(Asset::location, createAsset, { Location("l1") }, { Location("l2") })
@@ -105,7 +105,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun comparePole() {
         compareStructure { Pole(mRID = it) }
         comparatorValidator.validateProperty(Pole::classification, { Pole(it) }, { "c1" }, { "c2" })
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Pole::streetlights, Pole::addStreetlight, { Pole(it) },
             { Streetlight("sl1") }, { Streetlight("sl2") }
         )
@@ -146,7 +146,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(EndDevice::customerMRID, createEndDevice, { "customer1" }, { "customer2" })
         comparatorValidator.validateProperty(EndDevice::serviceLocation, createEndDevice, { Location("l1") }, { Location("l2") })
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             EndDevice::usagePoints, EndDevice::addUsagePoint, createEndDevice,
             { UsagePoint("up1") }, { UsagePoint("up2") },
             NetworkServiceCompatatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
@@ -163,13 +163,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareIdentifiedObject { UsagePoint(it) }
 
         comparatorValidator.validateProperty(UsagePoint::usagePointLocation, { UsagePoint(it) }, { Location("l1") }, { Location("l2") })
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             UsagePoint::endDevices, UsagePoint::addEndDevice, { UsagePoint(it) },
             { Meter("m1") }, { Meter("m2") },
             NetworkServiceCompatatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
         )
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             UsagePoint::equipment, UsagePoint::addEquipment, { UsagePoint(it) },
             { Junction("j1") }, { Junction("j2") },
             NetworkServiceCompatatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
@@ -180,7 +180,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun compareOperationalRestriction() {
         compareDocument { OperationalRestriction(it) }
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             OperationalRestriction::equipment, OperationalRestriction::addEquipment, { OperationalRestriction(it) },
             { Junction("j1") }, { Junction("j2") })
     }
@@ -229,7 +229,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun compareConnectivityNode() {
         compareIdentifiedObject { ConnectivityNode(it) }
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             ConnectivityNode::terminals, ConnectivityNode::addTerminal, { ConnectivityNode(it) },
             { Terminal("1") }, { Terminal("2") })
     }
@@ -243,19 +243,19 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(Equipment::inService, createEquipment, { true }, { false })
         comparatorValidator.validateProperty(Equipment::normallyInService, createEquipment, { true }, { false })
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Equipment::containers, Equipment::addContainer, createEquipment,
             { Site("s1") }, { Site("s2") })
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Equipment::usagePoints, Equipment::addUsagePoint, createEquipment,
             { UsagePoint("u1") }, { UsagePoint("u2") })
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Equipment::operationalRestrictions, Equipment::addOperationalRestriction, createEquipment,
             { OperationalRestriction("o1") }, { OperationalRestriction("o2") })
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Equipment::currentFeeders, Equipment::addCurrentFeeder, createEquipment,
             { Feeder("f1") }, { Feeder("f2") })
     }
@@ -263,7 +263,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     private fun compareEquipmentContainer(createEquipmentContainer: (String) -> EquipmentContainer) {
         compareConnectivityNodeContainer(createEquipmentContainer)
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             EquipmentContainer::equipment, EquipmentContainer::addEquipment, createEquipmentContainer,
             { Junction("j1") }, { Junction("j2") })
     }
@@ -274,7 +274,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(Feeder::normalHeadTerminal, { Feeder(it) }, { Terminal("t1") }, { Terminal("t2") })
         comparatorValidator.validateProperty(Feeder::normalEnergizingSubstation, { Feeder(it) }, { Substation("s1") }, { Substation("s2") })
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Feeder::currentEquipment, Feeder::addCurrentEquipment, { Feeder(it) },
             { Junction("j1") }, { Junction("j2") })
     }
@@ -283,7 +283,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun compareGeographicalRegion() {
         compareIdentifiedObject { GeographicalRegion(it) }
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             GeographicalRegion::subGeographicalRegions, GeographicalRegion::addSubGeographicalRegion, { GeographicalRegion(it) },
             { SubGeographicalRegion("sg1") }, { SubGeographicalRegion("sg2") })
     }
@@ -308,7 +308,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             SubGeographicalRegion::geographicalRegion, { SubGeographicalRegion(it) },
             { GeographicalRegion("g1") }, { GeographicalRegion("g2") })
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             SubGeographicalRegion::substations, SubGeographicalRegion::addSubstation, { SubGeographicalRegion(it) },
             { Substation("s1") }, { Substation("s2") })
     }
@@ -321,7 +321,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             Substation::subGeographicalRegion, { Substation(it) },
             { SubGeographicalRegion("sg1") }, { SubGeographicalRegion("sg2") })
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Substation::feeders, Substation::addFeeder, { Substation(it) },
             { Feeder("f1") }, { Feeder("f2") })
     }
@@ -500,7 +500,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { PhaseShuntConnectionKind.D })
         comparatorValidator.validateProperty(EnergyConsumer::q, { EnergyConsumer(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(EnergyConsumer::qFixed, { EnergyConsumer(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             EnergyConsumer::phases, EnergyConsumer::addPhase, { EnergyConsumer(it) },
             { EnergyConsumerPhase("ecp1") }, { EnergyConsumerPhase("ecp2") })
     }
@@ -536,7 +536,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(EnergySource::x, { EnergySource(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(EnergySource::x0, { EnergySource(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(EnergySource::xn, { EnergySource(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             EnergySource::phases, EnergySource::addPhase, { EnergySource(it) },
             { EnergySourcePhase("ecp1") }, { EnergySourcePhase("ecp2") })
     }
@@ -605,10 +605,10 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun comparePowerElectronicsConnection() {
         compareRegulatingCondEq { PowerElectronicsConnection(it) }
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             PowerElectronicsConnection::phases, PowerElectronicsConnection::addPhase, { PowerElectronicsConnection(it) },
             { PowerElectronicsConnectionPhase("pecp1") }, { PowerElectronicsConnectionPhase("pecp2") })
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             PowerElectronicsConnection::units, PowerElectronicsConnection::addUnit, { PowerElectronicsConnection(it) },
             { object : PowerElectronicsUnit("peu1") {} }, { object : PowerElectronicsUnit("peu2") {} })
 
@@ -771,7 +771,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(Circuit::loop, { Circuit(it) }, { Loop("l1") }, { Loop("l2") })
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Circuit::endTerminals,
             Circuit::addEndTerminal,
             { Circuit(it) },
@@ -779,7 +779,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { Terminal("t2") }
         )
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Circuit::endSubstations,
             Circuit::addEndSubstation,
             { Circuit(it) },
@@ -791,21 +791,21 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun compareLoop() {
         compareIdentifiedObject { Loop(it) }
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Loop::circuits,
             Loop::addCircuit,
             { Loop(it) },
             { Circuit("c1") },
             { Circuit("c2") })
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Loop::substations,
             Loop::addSubstation,
             { Loop(it) },
             { Substation("s1") },
             { Substation("s2") })
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Loop::energizingSubstations,
             Loop::addEnergizingSubstation,
             { Loop(it) },
@@ -906,7 +906,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun compareTransformerTankInfo() {
         compareAssetInfo { TransformerTankInfo(it) }
 
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             TransformerTankInfo::transformerEndInfos,
             TransformerTankInfo::addTransformerEndInfo,
             { TransformerTankInfo(it) },

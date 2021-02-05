@@ -8,7 +8,9 @@
 package com.zepben.evolve.services.common.extensions
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.database.sqlite.readers.MRIDLookupException
+import com.zepben.evolve.database.sqlite.readers.NameTypeLookupException
 import com.zepben.evolve.services.common.BaseService
 
 
@@ -26,6 +28,20 @@ import com.zepben.evolve.services.common.BaseService
 inline fun <reified T : IdentifiedObject> BaseService.getOrThrow(mRID: String?, typeNameAndMRID: String): T {
     return get<T>(mRID)
         ?: throw MRIDLookupException("Failed to find ${T::class.simpleName} with mRID $mRID for $typeNameAndMRID")
+}
+
+/**
+ * Get a name type associated with this service and throw if it is not found.
+ *
+ * @param typeName The name of the [NameType] to find.
+ *
+ * @return The [NameType] identified by [typeName].
+ * @throws NameTypeLookupException if no [NameType] is found with the specified [typeName]
+ */
+@Throws(NameTypeLookupException::class)
+fun BaseService.getNameTypeOrThrow(typeName: String): NameType {
+    return getNameType(typeName)
+        ?: throw NameTypeLookupException("Failed to find ${NameType::class.simpleName} with name $typeName")
 }
 
 /**

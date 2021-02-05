@@ -27,7 +27,7 @@ import java.sql.Statement
 class CustomerServiceReader constructor(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
 
     fun load(reader: CustomerCIMReader): Boolean {
-        var status = true
+        var status = loadNameTypes(reader)
 
         status = status and loadEach<TableOrganisations>("organisations", reader::load)
         status = status and loadEach<TableCustomers>("customers", reader::load)
@@ -36,6 +36,8 @@ class CustomerServiceReader constructor(getStatement: () -> Statement) : BaseSer
         status = status and loadEach<TableTariffs>("tariffs", reader::load)
         status = status and loadEach<TableCustomerAgreementsPricingStructures>("customer agreement to pricing structure associations", reader::load)
         status = status and loadEach<TablePricingStructuresTariffs>("pricing structure to tariff associations", reader::load)
+
+        status = status and loadNames(reader)
 
         return status
     }

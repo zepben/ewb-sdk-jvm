@@ -9,4 +9,8 @@ package com.zepben.evolve.database.sqlite.readers
 
 class MRIDLookupException(message: String) : Exception(message)
 
+class NameTypeLookupException(message: String) : Exception(message)
+
 class DuplicateMRIDException(message: String) : Exception(message)
+
+class DuplicateNameTypeException(message: String) : Exception(message)

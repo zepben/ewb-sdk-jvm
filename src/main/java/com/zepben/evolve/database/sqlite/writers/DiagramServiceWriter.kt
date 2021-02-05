@@ -14,7 +14,7 @@ import com.zepben.evolve.services.diagram.DiagramService
 class DiagramServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) : BaseServiceWriter<DiagramService, DiagramCIMWriter>(hasCommon, addCommon) {
 
     override fun save(service: DiagramService, writer: DiagramCIMWriter): Boolean {
-        var status = true
+        var status = super.save(service, writer)
 
         service.sequenceOf<DiagramObject>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Diagram>().forEach { status = status and validateSave(it, writer::save) }

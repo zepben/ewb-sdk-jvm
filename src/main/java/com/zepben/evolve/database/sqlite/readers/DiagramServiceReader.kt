@@ -23,11 +23,13 @@ import java.sql.Statement
 class DiagramServiceReader constructor(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
 
     fun load(reader: DiagramCIMReader): Boolean {
-        var status = true
+        var status = loadNameTypes(reader)
 
         status = status and loadEach<TableDiagrams>("diagrams", reader::load)
         status = status and loadEach<TableDiagramObjects>("diagram objects", reader::load)
         status = status and loadEach<TableDiagramObjectPoints>("diagram object points", reader::load)
+
+        status = status and loadNames(reader)
 
         return status
     }

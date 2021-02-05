@@ -17,7 +17,7 @@ import com.zepben.evolve.services.customer.CustomerService
 class CustomerServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) : BaseServiceWriter<CustomerService, CustomerCIMWriter>(hasCommon, addCommon) {
 
     override fun save(service: CustomerService, writer: CustomerCIMWriter): Boolean {
-        var status = true
+        var status = super.save(service, writer)
 
         service.sequenceOf<Organisation>().forEach { status = status and trySaveCommon(writer::save, it) }
         service.sequenceOf<Customer>().forEach { status = status and validateSave(it, writer::save) }

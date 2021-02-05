@@ -92,6 +92,12 @@ class DatabaseSqliteTest {
         )
     }
 
+    /************ IEC61970 BASE CORE ************/
+    @Test
+    fun `test Name and NameType schema`() {
+        validateSchema(SchemaNetworks.createNameTestServices())
+    }
+
     /************ IEC61968 ASSET INFO ************/
 
     @Test

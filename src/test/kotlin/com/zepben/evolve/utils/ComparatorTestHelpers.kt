@@ -8,6 +8,7 @@
 package com.zepben.evolve.utils
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.network.NetworkServiceCompatatorOptions
 import org.hamcrest.MatcherAssert.assertThat
@@ -46,6 +47,36 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
             assertThat(diff.missingFromSource(), empty())
         else
             assertThat(diff.missingFromSource(), containsInAnyOrder(expectMissingFromSource.mRID))
+    }
+
+    fun validateNameTypes(
+        source: NameType,
+        target: NameType,
+        expectNameTypeDifference: NameTypeDifference? = null,
+        expectMissingFromTarget: String? = null,
+        expectMissingFromSource: String? = null,
+        options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all()
+    ) {
+        val diff = newComparator(options).compare(
+            newService().apply { addNameType(source) },
+            newService().apply { addNameType(target) },
+        )
+
+        if (expectNameTypeDifference == null)
+            assertThat(diff.nameTypeDifferences(), empty())
+        else {
+            assertThat(diff.nameTypeDifferences(), contains(expectNameTypeDifference))
+        }
+
+        if (expectMissingFromTarget == null)
+            assertThat(diff.missingNameTypeFromTarget(), empty())
+        else
+            assertThat(diff.missingNameTypeFromTarget(), containsInAnyOrder(expectMissingFromTarget))
+
+        if (expectMissingFromSource == null)
+            assertThat(diff.missingNameTypeFromSource(), empty())
+        else
+            assertThat(diff.missingNameTypeFromSource(), containsInAnyOrder(expectMissingFromSource))
     }
 
     fun <T : IdentifiedObject> validateCompare(
@@ -102,7 +133,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         }.validateExpected(options, optionsStopCompare)
     }
 
-    fun <T : IdentifiedObject, R : IdentifiedObject> validateIdObjCollection(
+    fun <T : IdentifiedObject, R> validateCollection(
         property: KProperty1<in T, Collection<R>>,
         addToCollection: (T, R) -> Unit,
         createIdObj: (String) -> T,

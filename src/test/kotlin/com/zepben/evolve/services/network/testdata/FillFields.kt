@@ -174,14 +174,21 @@ fun EquipmentContainer.fillFields(networkService: NetworkService, includeRuntime
 }
 
 //
-// Note: `networkService` and `includeRuntime` are added here even though they are not used to make sure everything else
-//       includes them to prevent ambiguity issues.
+// Note: `includeRuntime` is here for consistency to match with all other methods
 //
-@Suppress("UNUSED_PARAMETER")
-fun IdentifiedObject.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+private fun IdentifiedObject.fillFields(networkService: NetworkService, @Suppress("UNUSED_PARAMETER") includeRuntime: Boolean) {
     name = "1"
     description = "the description"
     numDiagramObjects = 2
+
+    for (i in 0..1) {
+        val nameType = networkService.getNameType("name_type $i") ?: NameType("name_type $i").apply {
+            description = "name_type_${i}_description"
+        }
+        networkService.addNameType(nameType)
+        val name = nameType.getOrAddName("name_$i", this)
+        addName(name)
+    }
 }
 
 fun PowerSystemResource.fillFields(networkService: NetworkService, includeRuntime: Boolean) {

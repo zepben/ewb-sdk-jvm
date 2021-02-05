@@ -36,7 +36,7 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
     BaseServiceWriter<NetworkService, NetworkCIMWriter>(hasCommon, addCommon) {
 
     override fun save(service: NetworkService, writer: NetworkCIMWriter): Boolean {
-        var status = true
+        var status = super.save(service, writer)
 
         service.sequenceOf<CableInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<OverheadWireInfo>().forEach { status = status and validateSave(it, writer::save) }

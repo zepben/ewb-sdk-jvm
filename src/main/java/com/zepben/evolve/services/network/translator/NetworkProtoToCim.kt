@@ -233,9 +233,6 @@ fun toCim(pb: PBUsagePoint, networkService: NetworkService): UsagePoint =
 /************ IEC61968 OPERATIONS ************/
 fun toCim(pb: PBOperationalRestriction, networkService: NetworkService): OperationalRestriction =
     OperationalRestriction(pb.mRID()).apply {
-        pb.equipmentMRIDsList.forEach { equipmentMRID ->
-            networkService.resolveOrDeferReference(Resolvers.equipment(this), equipmentMRID)
-        }
         toCim(pb.doc, this, networkService)
     }
 
@@ -272,9 +269,6 @@ fun toCim(pb: PBConductingEquipment, cim: ConductingEquipment, networkService: N
 
 fun toCim(pb: PBConnectivityNode, networkService: NetworkService): ConnectivityNode =
     ConnectivityNode(pb.mRID()).apply {
-        pb.terminalMRIDsList.forEach {
-            networkService.resolveOrDeferReference(Resolvers.terminals(this), it)
-        }
         toCim(pb.io, this, networkService)
     }
 

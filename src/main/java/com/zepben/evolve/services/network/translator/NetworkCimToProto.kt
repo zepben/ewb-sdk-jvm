@@ -238,11 +238,7 @@ fun toPb(cim: UsagePoint, pb: PBUsagePoint.Builder): PBUsagePoint.Builder =
 
 /************ IEC61968 OPERATIONS ************/
 fun toPb(cim: OperationalRestriction, pb: PBOperationalRestriction.Builder): PBOperationalRestriction.Builder =
-    pb.apply {
-        clearEquipmentMRIDs()
-        cim.equipment.forEach { addEquipmentMRIDs(it.mRID) }
-        toPb(cim, docBuilder)
-    }
+    pb.apply { toPb(cim, docBuilder) }
 
 /************ IEC61970 AUXILIARY EQUIPMENT ************/
 fun toPb(cim: AuxiliaryEquipment, pb: PBAuxiliaryEquipment.Builder): PBAuxiliaryEquipment.Builder =
@@ -274,11 +270,7 @@ fun toPb(cim: ConductingEquipment, pb: PBConductingEquipment.Builder): PBConduct
     }
 
 fun toPb(cim: ConnectivityNode, pb: PBConnectivityNode.Builder): PBConnectivityNode.Builder =
-    pb.apply {
-        clearTerminalMRIDs()
-        cim.terminals.forEach { addTerminalMRIDs(it.mRID) }
-        toPb(cim, ioBuilder)
-    }
+    pb.apply { toPb(cim, ioBuilder) }
 
 fun toPb(cim: ConnectivityNodeContainer, pb: PBConnectivityNodeContainer.Builder): PBConnectivityNodeContainer.Builder =
     pb.apply { toPb(cim, psrBuilder) }

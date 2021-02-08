@@ -114,9 +114,14 @@ they wish to use, without needing to pull back large amounts of full object data
 
 ## Requesting Identififed Objects
 
-Identified objects can be requested to build a model client side. When identified objects are loaded, any referenced 
-objects that have not been previously requested need to be requested explicitly. The exception to this is terminals 
-are always sent with their conducting equipment and transformer ends are always sent with transformers.
+:::warning
+The *ConsumerClient APIs will take care of this for you, and you typically only need these functions if you're
+developing the consumer client APIs themselves. Make sure what you want to achieve isn't already covered by the
+API before delving into this code.
+:::
+
+Identified objects can be requested to build a model client side. When identified objects are loaded, any referenced
+objects that have not been previously requested need to be requested explicitly.
 
 To find the mRIDs of any references that need to be requested you can use the [deferred reference](services.mdx#deferred-references) 
 functions on the service provided when requesting identified objects.
@@ -157,6 +162,53 @@ fun getWithBaseVoltage(service: NetworkService, client: NetworkConsumerClient, m
 
     service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(equipment)).firstOrNull()
         ?.let { client.getIdentifiedObject(service, it) }
+}
+```
+
+</TabItem>
+</Tabs>
+
+You can also query the services UnresolvedReferences in the following ways:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+```java
+String mrid = "feeder1";
+
+// To get unresolved references pointing from `equipment` to other objects
+List<UnresolvedReferences> references = service.getUnresolvedReferencesFrom(mrid);
+
+for (UnresolvedReference ref: references) {
+    client.getIdentifiedObject(service, ref.toMrid)
+}
+
+// To get unresolved references pointing to `equipment`
+references = service.getUnresolvedReferencesFrom(mrid);
+
+for (UnresolvedReference ref: references) {
+    client.getIdentifiedObject(service, ref.from.mRID)
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val mrid = "feeder1"
+
+service.getUnresolvedReferencesFrom(mrid).forEach {
+    client.getIdentifiedObject(service, ref.toMrid)
+}
+
+service.getUnresolvedReferencesTo(mrid).forEach {
+    client.getIdentifiedObject(service, ref.from.mRID)
 }
 ```
 

@@ -8,8 +8,6 @@
 package com.zepben.evolve.services.network.translator
 
 import com.zepben.evolve.services.network.NetworkService
-import org.junit.Ignore
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import com.zepben.protobuf.cim.iec61968.assets.Pole as PBPole
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
@@ -46,14 +44,12 @@ class NetworkProtoToCimTest {
     }
 
     @Test
-    @Disabled
     internal fun testFromPbSubstation() {
         val pbSubstation = PBSubstation.newBuilder()
         validator.validate(pbSubstation) { translator.addFromPb(pbSubstation.build())!! }
     }
 
     @Test
-    @Disabled
     internal fun testFromPbCircuit() {
         val pbCircuit = PBCircuit.newBuilder()
         validator.validate(pbCircuit) { translator.addFromPb(pbCircuit.build())!! }

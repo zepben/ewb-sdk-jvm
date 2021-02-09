@@ -46,13 +46,12 @@ import com.zepben.evolve.services.measurement.MeasurementService
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
 import com.zepben.evolve.services.network.testdata.StupidlyLargeNetwork
-import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
+import com.zepben.evolve.services.network.testdata.createTerminal
 import com.zepben.evolve.services.network.translator.addFromPb
 import com.zepben.evolve.services.network.translator.toPb
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -63,7 +62,6 @@ class CimPbTest {
 
 
     @Test
-    @Disabled
     fun cimToPbToCim() {
         val (_, sourceNetworkService, sourceDiagramService, sourceCustomer, sourceMeasurement) = StupidlyLargeNetwork.create()
 
@@ -145,6 +143,17 @@ class CimPbTest {
     private fun testNetworkService(sourceNetworkService: NetworkService) {
         val targetNetwork = NetworkService()
 
+        // Handle EquipmentContainers, OperationalRestrictions, and ConnectivityNodes first, so that their equipment/terminal references
+        // are populated when they are added later.
+        sourceNetworkService.sequenceOf<EquipmentContainer>().forEach {
+            when (it) {
+                is Feeder -> targetNetwork.addFromPb(it.toPb())
+                is Substation -> targetNetwork.addFromPb(it.toPb())
+                is Site -> targetNetwork.addFromPb(it.toPb())
+            }
+        }
+        sourceNetworkService.sequenceOf<OperationalRestriction>().forEach { targetNetwork.addFromPb(it.toPb()) }
+        sourceNetworkService.sequenceOf<ConnectivityNode>().forEach { targetNetwork.addFromPb(it.toPb()) }
         sourceNetworkService.sequenceOf<IdentifiedObject>().forEach {
             when (it) {
                 is CableInfo -> targetNetwork.addFromPb(it.toPb())
@@ -155,7 +164,7 @@ class CimPbTest {
                 is AssetOwner -> targetNetwork.addFromPb(it.toPb())
                 is Location -> targetNetwork.addFromPb(it.toPb())
                 is UsagePoint -> targetNetwork.addFromPb(it.toPb())
-                is ConnectivityNode -> targetNetwork.addFromPb(it.toPb())
+                is ConnectivityNode -> {}
                 is BaseVoltage -> targetNetwork.addFromPb(it.toPb())
                 is Junction -> targetNetwork.addFromPb(it.toPb())
                 is AcLineSegment -> targetNetwork.addFromPb(it.toPb())
@@ -169,9 +178,9 @@ class CimPbTest {
                 is Recloser -> targetNetwork.addFromPb(it.toPb())
                 is Breaker -> targetNetwork.addFromPb(it.toPb())
                 is FaultIndicator -> targetNetwork.addFromPb(it.toPb())
-                is Feeder -> targetNetwork.addFromPb(it.toPb())
-                is Site -> targetNetwork.addFromPb(it.toPb())
-                is Substation -> targetNetwork.addFromPb(it.toPb())
+                is Feeder -> {}
+                is Site -> {}
+                is Substation -> {}
                 is EnergySourcePhase -> targetNetwork.addFromPb(it.toPb())
                 is EnergyConsumerPhase -> targetNetwork.addFromPb(it.toPb())
                 is RatioTapChanger -> targetNetwork.addFromPb(it.toPb())

@@ -60,6 +60,8 @@ internal class NetworkCimToProtoTestValidator {
 
     fun validate(cim: EquipmentContainer, pb: PBEquipmentContainer) {
         validate(cim, pb.cnc)
+
+        validateMRIDList(cim.equipment, pb.equipmentMRIDsList)
     }
 
     fun validate(cim: IdentifiedObject, pb: PBIdentifiedObject) {

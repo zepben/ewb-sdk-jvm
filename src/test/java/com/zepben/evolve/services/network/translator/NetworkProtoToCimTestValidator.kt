@@ -106,6 +106,9 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         network.add(Breaker("breaker1"))
         network.add(Breaker("breaker2"))
 
+        pb.addEquipmentMRIDs("breaker1")
+        pb.addEquipmentMRIDs("breaker2")
+
         val cim = validate(pb.cncBuilder, fromPb)
 
         assertThat(cim.numEquipment(), equalTo(0))

@@ -92,7 +92,6 @@ public class TestDataCreators {
                 usagePoint.addEndDevice(meter);
                 meter.addUsagePoint(usagePoint);
             }
-            network.add(usagePoint);
         }
 
         return powerTransformer;

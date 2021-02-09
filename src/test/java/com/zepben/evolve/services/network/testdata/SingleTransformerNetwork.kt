@@ -10,8 +10,8 @@ package com.zepben.evolve.services.network.testdata
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.testdata.TestDataCreators.createPowerTransformerForConnecting
-import com.zepben.evolve.services.network.testdata.TestDataCreators.createSourceForConnecting
+import com.zepben.evolve.services.network.testdata.createPowerTransformerForConnecting
+import com.zepben.evolve.services.network.testdata.createSourceForConnecting
 import com.zepben.evolve.services.network.tracing.Tracing
 
 object SingleTransformerNetwork {

@@ -20,8 +20,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhasesTestNetwork
-import com.zepben.evolve.services.network.testdata.TestDataCreators.createSourceForConnecting
-import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
+import com.zepben.evolve.services.network.testdata.createSourceForConnecting
+import com.zepben.evolve.services.network.testdata.createTerminal
 import com.zepben.evolve.services.network.testdata.TestNetworks
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.phases.PhaseDirection.*

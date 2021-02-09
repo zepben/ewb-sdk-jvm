@@ -50,7 +50,7 @@ import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createS
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createTransformer
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locationOf
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.testdata.TestDataCreators.*
+import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.Tracing
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

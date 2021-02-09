@@ -14,7 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.testdata.TestDataCreators.*
+import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.Tracing
 
 

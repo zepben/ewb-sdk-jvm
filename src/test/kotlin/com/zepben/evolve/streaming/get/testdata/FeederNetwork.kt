@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61968.common.PositionPoint
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.testdata.TestDataCreators.*
+import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.Tracing
 
 object FeederNetwork {

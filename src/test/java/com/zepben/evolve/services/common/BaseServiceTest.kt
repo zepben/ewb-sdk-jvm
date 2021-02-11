@@ -9,6 +9,7 @@ package com.zepben.evolve.services.common
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.common.Location
+import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
@@ -17,6 +18,9 @@ import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.services.common.exceptions.UnsupportedIdentifiedObjectException
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.translator.addFromPb
+import com.zepben.evolve.services.network.translator.toPb
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -194,7 +198,22 @@ internal class BaseServiceTest {
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(junction)), empty())
 
         assertThat(junction.baseVoltage, equalTo(baseVoltage))
+    }
 
+    @Test
+    fun `test add resolves reverse relationship`() {
+        val ns = NetworkService()
+
+        OperationalRestriction("or1").apply {
+            addEquipment(AcLineSegment("eq1").also {
+                it.addOperationalRestriction(this)
+                ns.addFromPb(it.toPb())
+            })
+            ns.addFromPb(this.toPb())
+        }
+
+        assertThat(ns.get<OperationalRestriction>("or1")!!.equipment, contains(ns.get<AcLineSegment>("eq1")))
+        assertThat(ns.get<AcLineSegment>("eq1")!!.operationalRestrictions, contains(ns.get<OperationalRestriction>("or1")))
     }
 
     @Test

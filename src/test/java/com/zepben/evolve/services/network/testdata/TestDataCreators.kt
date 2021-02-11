@@ -22,9 +22,6 @@ import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import java.util.function.Consumer
 
-/**
- * Class that generates some networks for testing with.
- */
 fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode): EnergySource =
     EnergySource(id).apply {
         phaseCode.singlePhases().forEach(Consumer { phase: SinglePhaseKind? ->
@@ -35,6 +32,7 @@ fun createSourceForConnecting(network: NetworkService, id: String, numTerminals:
                 network.add(it)
             }
         })
+
         createTerminals(network, this, numTerminals, phaseCode)
         network.add(this)
     }
@@ -50,10 +48,12 @@ fun createSwitchForConnecting(network: NetworkService, id: String, numTerminals:
     Breaker(id).apply {
         name = "test name"
         createTerminals(network, this, numTerminals, nominalPhases)
+
         for (index in openStatus.indices) {
             setNormallyOpen(openStatus[index], nominalPhases.singlePhases()[index])
             setOpen(openStatus[index], nominalPhases.singlePhases()[index])
         }
+
         network.add(this)
     }
 
@@ -68,16 +68,22 @@ fun createPowerTransformerForConnecting(
     PowerTransformer(id).apply {
         name = "$id name"
         createTerminals(network, this, numTerminals, nominalPhases)
+
         network.add(this)
+
         for (i in 1..numUsagePoints) {
             val usagePoint = UsagePoint("$id-up$i")
+
             addUsagePoint(usagePoint)
             usagePoint.addEquipment(this)
+
             for (j in 1..numMeters) {
                 val meter = createMeter(network, "$id-up$i-m$j")
+
                 usagePoint.addEndDevice(meter)
                 meter.addUsagePoint(usagePoint)
             }
+
             network.add(usagePoint)
         }
     }
@@ -94,10 +100,13 @@ fun createAcLineSegmentForConnecting(
     AcLineSegment(id).apply {
         perLengthSequenceImpedance = network.get(PerLengthSequenceImpedance::class, perLengthSequenceImpedanceId)
             ?: PerLengthSequenceImpedance(perLengthSequenceImpedanceId).also { network.add(it) }
+
         assetInfo = network.get(WireInfo::class, wireInfoId) ?: OverheadWireInfo(wireInfoId).also { network.add(it) }
         name = "$id name"
         this.length = length
+
         createTerminals(network, this, 2, nominalPhases)
+
         network.add(this)
     }
 
@@ -105,6 +114,7 @@ fun createEnergyConsumer(network: NetworkService, id: String, numTerminals: Int,
     EnergyConsumer(id).apply {
         name = id
         createTerminals(network, this, numTerminals, nominalPhases)
+
         network.add(this)
     }
 
@@ -112,6 +122,7 @@ fun createHvMeterNode(network: NetworkService, id: String, nominalPhases: PhaseC
     Junction(id).apply {
         name = id
         createTerminals(network, this, 1, nominalPhases)
+
         network.add(this)
     }
 
@@ -119,6 +130,7 @@ fun createMeter(network: NetworkService, id: String): Meter =
     Meter(id).apply {
         name = "companyMeterId$id"
         addOrganisationRole(createAssetOwner(network, null, "company$id"))
+
         network.add(this)
     }
 
@@ -127,13 +139,16 @@ fun createAssetOwner(network: NetworkService, customerService: CustomerService?,
         val org = Organisation(company)
         org.name = company
         organisation = org
+
         network.add(org)
         network.add(this)
+
         customerService?.add(org)
     }
 
 fun createTerminals(network: NetworkService, condEq: ConductingEquipment, numTerminals: Int, nominalPhases: PhaseCode) {
-    for (i in 1..numTerminals) createTerminal(network, condEq, nominalPhases, i)
+    for (i in 1..numTerminals)
+        createTerminal(network, condEq, nominalPhases, i)
 }
 
 fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment, phases: PhaseCode): Terminal =
@@ -141,6 +156,7 @@ fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquip
         this.conductingEquipment = conductingEquipment
         this.phases = phases
         conductingEquipment.addTerminal(this)
+
         MatcherAssert.assertThat(network.add(this), Matchers.equalTo(true))
     }
 
@@ -150,32 +166,38 @@ fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquip
         this.phases = phases
         this.sequenceNumber = sequenceNumber
         conductingEquipment?.addTerminal(this)
+
         MatcherAssert.assertThat(network.add(this), Matchers.equalTo(true))
     }
 
 fun createGeographicalRegion(networkService: NetworkService, mRID: String, name: String): GeographicalRegion =
     GeographicalRegion(mRID).apply {
         this.name = name
+
         networkService.add(this)
     }
 
 fun createSubGeographicalRegion(networkService: NetworkService, mRID: String, name: String, geographicalRegion: GeographicalRegion?) =
     SubGeographicalRegion(mRID).apply {
         this.name = name
+
         if (geographicalRegion != null) {
             this.geographicalRegion = geographicalRegion
             geographicalRegion.addSubGeographicalRegion(this)
         }
+
         networkService.add(this)
     }
 
 fun createSubstation(networkService: NetworkService, mRID: String, name: String, subGeographicalRegion: SubGeographicalRegion? = null): Substation =
     Substation(mRID).apply {
         this.name = name
+
         if (subGeographicalRegion != null) {
             this.subGeographicalRegion = subGeographicalRegion
             subGeographicalRegion.addSubstation(this)
         }
+
         networkService.add(this)
     }
 
@@ -189,12 +211,15 @@ fun createFeeder(
 ): Feeder =
     Feeder(mRID).apply {
         this.name = name
+
         if (feederStartPoint != null)
             normalHeadTerminal = headTerminal ?: feederStartPoint.getTerminal(1)!!
+
         if (substation != null) {
             normalEnergizingSubstation = substation
             substation.addFeeder(this)
         }
+
         networkService.add(this)
     }
 
@@ -204,6 +229,7 @@ fun createFeeder(networkService: NetworkService, mRID: String, name: String, sub
             for (equipmentMRID in equipmentMRIDs) {
                 val conductingEquipment = networkService.get(ConductingEquipment::class, equipmentMRID)!!
                 conductingEquipment.addContainer(this)
+
                 this.addEquipment(conductingEquipment)
             }
         }
@@ -212,8 +238,10 @@ fun createEnd(networkService: NetworkService, tx: PowerTransformer, bv: BaseVolt
     PowerTransformerEnd().apply {
         baseVoltage = bv
         this.endNumber = endNumber
+
         powerTransformer = tx
         tx.addEnd(this)
+
         networkService.add(this)
     }
 
@@ -221,15 +249,19 @@ fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int,
     PowerTransformerEnd().apply {
         this.ratedU = ratedU
         this.endNumber = endNumber
+
         powerTransformer = tx
         tx.addEnd(this)
+
         networkService.add(this)
     }
 
 fun createOperationalRestriction(networkService: NetworkService, mRID: String, name: String, vararg equipmentMRIDs: String) =
     OperationalRestriction(mRID).apply {
         this.name = name
+
         networkService.add(this)
+
         equipmentMRIDs.forEach { mRID ->
             networkService.get<Equipment>(mRID)!!.also {
                 it.addOperationalRestriction(this)

@@ -29,7 +29,7 @@ object FeederNetworkWithCurrent {
         val tx = createPowerTransformerForConnecting(networkService, "tx", 2, PhaseCode.AB, 0, 0)
         val tx2 = createPowerTransformerForConnecting(networkService, "tx2", 2, PhaseCode.AB, 0, 0)
         val sw = createSwitchForConnecting(networkService, "sw", 2, PhaseCode.AB)
-        PhaseCode.AB.singlePhases().forEach { sw.setOpen(true, it) }
+        sw.setOpen(true)
 
         val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.AB)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.AB)

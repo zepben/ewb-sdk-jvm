@@ -17,7 +17,7 @@ package com.zepben.evolve.streaming.grpc
  * @property authCertPath The path of the client certificate to use for authentication (must be signed by the servers authentication trust certificate). Use null to disable [default: disabled].
  * @property authKeyPath The path of the private key for the client authentication certificate if one is specified, otherwise ignored.
  */
-data class ConnectionConfig(
+data class ConnectionConfig @JvmOverloads constructor(
     val host: String,
     val port: Int,
     val enableTls: Boolean = false,

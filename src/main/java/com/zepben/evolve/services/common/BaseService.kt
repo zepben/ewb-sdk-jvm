@@ -37,16 +37,16 @@ abstract class BaseService(
     protected val objectsByType: MutableMap<KClass<*>, MutableMap<String, IdentifiedObject>> = mutableMapOf()
 
     /**
-     * A dictionary of references between mRID's that as yet have not been resolved - typically when transferring services between systems.
+     * A map of references between mRID's that as yet have not been resolved - typically when transferring services between systems.
      * The key is the toMrid of the [UnresolvedReference]s, and the value is a list of [UnresolvedReference]s for that specific object.
      * For example, if an AcLineSegment with mRID 'acls1' is present in the service, but the service is missing its [location] with mRID 'location-l1'
      * and `perLengthSequenceImpedance` with mRID 'plsi-1', the following key value pairs would be present:
      * {
      *   "plsi-1": [
-     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='plsi-1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=PerLengthSequenceImpedance, resolve=...))
+     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='plsi-1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=PerLengthSequenceImpedance, resolve=...), ...)
      *   ],
      *   "location-l1": [
-     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='location-l1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=Location, resolve=...))
+     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='location-l1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=Location, resolve=...), ...)
      *   ]
      * }
      *
@@ -59,8 +59,8 @@ abstract class BaseService(
      * An index of the unresolved references by their [UnresolvedReference.from] mRID. For the above example this will be a dictionary of the form:
      * {
      *   "acls1": [
-     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='location-l1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=Location, resolve=...))
-     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='plsi-1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=PerLengthSequenceImpedance, resolve=...))
+     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='location-l1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=Location, resolve=...), ...)
+     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='plsi-1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=PerLengthSequenceImpedance, resolve=...), ...)
      *   ]
      * }
      */
@@ -274,8 +274,10 @@ abstract class BaseService(
         unresolvedReferencesTo.remove(identifiedObject.mRID)?.forEach {
             try {
                 val castedIdentifiedObject = it.resolver.toClass.cast(identifiedObject)
+
                 it.resolver.resolve(it.from, castedIdentifiedObject)
                 it.reverseResolver?.resolve(castedIdentifiedObject, it.from)
+
                 unresolvedReferencesFrom[it.from.mRID]?.let { urs ->
                     urs.remove(it)
                     if (urs.isEmpty())
@@ -338,10 +340,9 @@ abstract class BaseService(
                 }
                 true
             } else {
-                val unresolvedReference =
-                    UnresolvedReference(from, toMrid, resolver, reverseResolver) as UnresolvedReference<IdentifiedObject, IdentifiedObject>
-                unresolvedReferencesTo.getOrPut(toMrid) { mutableSetOf() }.add(unresolvedReference)
-                unresolvedReferencesFrom.getOrPut(from.mRID) { mutableSetOf() }.add(unresolvedReference)
+                val ur = UnresolvedReference(from, toMrid, resolver, reverseResolver) as UnresolvedReference<IdentifiedObject, IdentifiedObject>
+                unresolvedReferencesTo.getOrPut(toMrid) { mutableSetOf() }.add(ur)
+                unresolvedReferencesFrom.getOrPut(from.mRID) { mutableSetOf() }.add(ur)
                 false
             }
         } catch (ex: ClassCastException) {
@@ -366,9 +367,7 @@ abstract class BaseService(
      * @return The number of [UnresolvedReference]s
      */
     fun numUnresolvedReferences(mRID: String? = null): Int =
-        mRID?.let {
-            unresolvedReferencesTo[mRID]?.size ?: 0
-        } ?: unresolvedReferencesTo.values.sumOf { it.size }
+        mRID?.let { unresolvedReferencesTo[mRID]?.size ?: 0 } ?: unresolvedReferencesTo.values.sumOf { it.size }
 
     /**
      *

@@ -16,16 +16,17 @@ import com.zepben.evolve.services.network.testdata.createTerminal
 
 object ConnectivityNodeNetworks {
     fun createSimpleConnectivityNode(): NetworkService {
-
         val ns = NetworkService()
 
         createConnectivityNodeWithTerminals(ns, "cn1", PhaseCode.A, PhaseCode.B, PhaseCode.C)
+
         return ns
     }
 
     private fun createConnectivityNodeWithTerminals(ns: NetworkService, mRID: String, vararg terminalPhases: PhaseCode) =
         ConnectivityNode(mRID).apply {
             ns.add(this)
+
             terminalPhases.forEachIndexed { i, it ->
                 val t = createTerminal(ns, null, it, i+1)
                 ns.connect(t, mRID)

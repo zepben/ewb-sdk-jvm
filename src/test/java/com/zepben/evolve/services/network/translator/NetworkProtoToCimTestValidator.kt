@@ -103,17 +103,9 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         validate(pb.psrBuilder, fromPb)
 
     inline fun <reified T : EquipmentContainer> validate(pb: PBEquipmentContainerBuilder, fromPb: () -> T): T {
-        network.add(Breaker("breaker1"))
-        network.add(Breaker("breaker2"))
-
-        pb.addEquipmentMRIDs("breaker1")
-        pb.addEquipmentMRIDs("breaker2")
-
         val cim = validate(pb.cncBuilder, fromPb)
 
-        assertThat(cim.numEquipment(), equalTo(2))
-        assertThat(cim.getEquipment("breaker1"), equalTo(network["breaker1"]))
-        assertThat(cim.getEquipment("breaker2"), equalTo(network["breaker2"]))
+        assertThat(cim.numEquipment(), equalTo(0))
 
         return cim
     }

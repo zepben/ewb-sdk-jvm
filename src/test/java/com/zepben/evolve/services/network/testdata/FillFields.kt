@@ -30,7 +30,6 @@ import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createR
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createSubstation
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locationOf
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
 import java.util.*
 
 /************ IEC61968 ASSET INFO ************/

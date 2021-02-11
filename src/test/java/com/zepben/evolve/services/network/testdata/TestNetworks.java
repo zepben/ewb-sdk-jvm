@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static com.zepben.evolve.services.network.testdata.TestDataCreators.*;
+import static com.zepben.evolve.services.network.testdata.TestDataCreatorsKt.*;
 
 /**
  * Class that generates some networks for testing with.

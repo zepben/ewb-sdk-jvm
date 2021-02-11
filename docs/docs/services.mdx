@@ -359,10 +359,10 @@ Unresolved references can also be queried back out of the service. Let's see it 
 ```java
 NetworkService service = new NetworkService();
 
-Feeder feeder = new Feeder();
+Feeder feeder = new Feeder("f");
 service.add(feeder)
 
-Breaker switch = new Breaker();
+Breaker switch = new Breaker("b1");
 service.add(switch);
 
 // As the switch is already added to the service, this will be resolved immediately.
@@ -370,12 +370,16 @@ service.resolveOrDeferReference(Resolvers.equipment(feeder), switch.getMRID());
 System.out.println(feeder.getEquipment().contains(switch)); // true
 
 // Now if we try and resolve something not added it will be deferred
-Junction junction = new Junction();
+Junction junction = new Junction("j1");
 service.resolveOrDeferReference(Resolvers.equipment(feeder), junction.getMRID());
 System.out.println(feeder.getEquipment().contains(junction)); // false
 
 // We can query the unresolved reference mRIDs back out of the service
-System.out.println(service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder))); // [junction]
+System.out.println(service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder))); // ["j1"]
+// Or using the mrid of the destination object
+System.out.println(service.getUnresolvedReferencesTo(feeder.mrid)) // [UnresolvedReference(junction, toMrid="f")]
+// Or using the mrid of the source object
+System.out.println(service.getUnresolvedReferencesFrom(junction.mrid)) // [UnresolvedReference(feeder, toMrid="j1")]
 
 // When the object with the deferred mRID is added, the reference gets resolved
 service.add(junction)
@@ -388,10 +392,10 @@ System.out.println(feeder.getEquipment().contains(junction)) // true
 ```kotlin
 val service = NetworkService()
 
-val feeder = Feeder()
+val feeder = Feeder("f")
 service.add(feeder)
 
-val switch = Breaker()
+val switch = Breaker("b1")
 service.add(switch)
 
 // As the switch is already added to the service, this will be resolved immediately.
@@ -399,12 +403,16 @@ service.resolveOrDeferReference(Resolvers.equipment(feeder), switch.mRID)
 println(feeder.equipment.contains(switch)) // true
 
 // Now if we try and resolve something not added it will be deferred
-val junction = Junction()
+val junction = Junction("j1")
 service.resolveOrDeferReference(Resolvers.equipment(feeder), junction.mRID)
 println(feeder.equipment.contains(junction)) // false
 
 // We can query the unresolved reference mRIDs back out of the service
-println(service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder))) // [junction]
+println(service.getUnresolvedReferenceMrids(Resolvers.equipment(feeder))) // ["j1"]
+// Or using the mrid of the destination object
+println(service.getUnresolvedReferencesTo(feeder.mrid)) // [UnresolvedReference(junction, toMrid="f")]
+// Or using the mrid of the source object
+println(service.getUnresolvedReferencesFrom(junction.mrid)) // [UnresolvedReference(feeder, toMrid="j1")]
 
 // When the object with the deferred mRID is added, the reference gets resolved
 service.add(junction)

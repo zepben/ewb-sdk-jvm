@@ -18,7 +18,7 @@ import com.zepben.evolve.streaming.grpc.GrpcResult
  * @property objects A Map of mRID to its IdentifiedObject that were processed.
  * @property failed The set of mRIDs that failed to be processed.
  */
-data class MultiObjectResult(val objects: Map<String, IdentifiedObject>, val failed: Set<String>)
+data class MultiObjectResult(val objects: MutableMap<String, IdentifiedObject> = mutableMapOf(), val failed: MutableSet<String> = mutableSetOf())
 
 /**
  * Represents the result of deserialising a protobuf message and adding it to a service.

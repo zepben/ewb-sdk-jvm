@@ -233,9 +233,6 @@ fun toCim(pb: PBUsagePoint, networkService: NetworkService): UsagePoint =
 /************ IEC61968 OPERATIONS ************/
 fun toCim(pb: PBOperationalRestriction, networkService: NetworkService): OperationalRestriction =
     OperationalRestriction(pb.mRID()).apply {
-        pb.equipmentMRIDsList.forEach { equipmentMRID ->
-            networkService.resolveOrDeferReference(Resolvers.equipment(this), equipmentMRID)
-        }
         toCim(pb.doc, this, networkService)
     }
 
@@ -272,9 +269,6 @@ fun toCim(pb: PBConductingEquipment, cim: ConductingEquipment, networkService: N
 
 fun toCim(pb: PBConnectivityNode, networkService: NetworkService): ConnectivityNode =
     ConnectivityNode(pb.mRID()).apply {
-        pb.terminalMRIDsList.forEach {
-            networkService.resolveOrDeferReference(Resolvers.terminals(this), it)
-        }
         toCim(pb.io, this, networkService)
     }
 
@@ -307,10 +301,6 @@ fun toCim(pb: PBEquipment, cim: Equipment, networkService: NetworkService): Equi
 
 fun toCim(pb: PBEquipmentContainer, cim: EquipmentContainer, networkService: NetworkService): EquipmentContainer =
     cim.apply {
-        pb.equipmentMRIDsList.forEach { equipmentMRID ->
-            networkService.resolveOrDeferReference(Resolvers.equipment(this), equipmentMRID)
-        }
-
         toCim(pb.cnc, this, networkService)
     }
 
@@ -318,9 +308,6 @@ fun toCim(pb: PBFeeder, networkService: NetworkService): Feeder =
     Feeder(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.normalHeadTerminal(this), pb.normalHeadTerminalMRID)
         networkService.resolveOrDeferReference(Resolvers.normalEnergizingSubstation(this), pb.normalEnergizingSubstationMRID)
-        pb.currentEquipmentMRIDsList.forEach {
-            networkService.resolveOrDeferReference(Resolvers.currentEquipment(this), it)
-        }
         toCim(pb.ec, this, networkService)
     }
 

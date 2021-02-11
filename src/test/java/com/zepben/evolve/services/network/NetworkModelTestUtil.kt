@@ -32,7 +32,7 @@ import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.measurement.MeasurementService
-import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
+import com.zepben.evolve.services.network.testdata.createTerminal
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.time.Instant

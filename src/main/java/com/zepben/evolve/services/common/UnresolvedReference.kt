@@ -12,5 +12,6 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 data class UnresolvedReference<T : IdentifiedObject, R : IdentifiedObject>(
     val from: T,
     val toMrid: String,
-    val resolver: ReferenceResolver<T, R>
+    val resolver: ReferenceResolver<T, R>,
+    val reverseResolver: ReferenceResolver<R, T>? = null
 )

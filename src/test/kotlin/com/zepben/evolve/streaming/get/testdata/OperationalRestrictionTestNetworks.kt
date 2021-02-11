@@ -14,12 +14,13 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.*
-import com.zepben.evolve.services.network.tracing.Tracing
 
-object FeederNetwork {
-    //             c1       c2
-    // source-fcb------fsp------tx
-    //
+object OperationalRestrictionTestNetworks {
+    //                      or1
+    //                 |-----------|
+    //             c1  |     c2    |
+    // source-fcb------|fsp------tx|
+    //                 |-----------|
     fun create(): NetworkService {
         val networkService = NetworkService()
 
@@ -31,8 +32,7 @@ object FeederNetwork {
         val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.AB)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.AB)
 
-        val substation = createSubstation(networkService, "f", "f", null)
-        createFeeder(networkService, "f001", "f001", substation, fsp, fsp.getTerminal(2))
+        val or = createOperationalRestriction(networkService, "or1", "test_or1", fsp.mRID, c2.mRID, tx.mRID)
 
         createEnd(networkService, tx, 22000, 1)
         createEnd(networkService, tx, 415, 2)
@@ -49,9 +49,6 @@ object FeederNetwork {
         networkService.connect(c1.getTerminal(2)!!, fsp.getTerminal(1)!!)
         networkService.connect(fsp.getTerminal(2)!!, c2.getTerminal(1)!!)
         networkService.connect(c2.getTerminal(2)!!, tx.getTerminal(1)!!)
-
-        Tracing.setPhases().run(networkService)
-        Tracing.assignEquipmentContainersToFeeders().run(networkService)
 
         return networkService
     }

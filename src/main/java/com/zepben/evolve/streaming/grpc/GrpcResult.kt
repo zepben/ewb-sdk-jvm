@@ -17,7 +17,7 @@ package com.zepben.evolve.streaming.grpc
  */
 data class GrpcResult<T>(
     private val result: Any?,
-    val wasErrorHandled: Boolean
+    val wasErrorHandled: Boolean = false
 ) {
     val wasSuccessful: Boolean get() = result !is Throwable
     val wasFailure: Boolean get() = result is Throwable

@@ -46,7 +46,7 @@ import com.zepben.evolve.services.measurement.MeasurementService
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
 import com.zepben.evolve.services.network.testdata.StupidlyLargeNetwork
-import com.zepben.evolve.services.network.testdata.TestDataCreators.createTerminal
+import com.zepben.evolve.services.network.testdata.createTerminal
 import com.zepben.evolve.services.network.translator.addFromPb
 import com.zepben.evolve.services.network.translator.toPb
 import com.zepben.testutils.junit.SystemLogExtension

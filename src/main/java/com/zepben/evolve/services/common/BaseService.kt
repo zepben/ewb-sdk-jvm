@@ -36,7 +36,35 @@ abstract class BaseService(
 ) {
     protected val objectsByType: MutableMap<KClass<*>, MutableMap<String, IdentifiedObject>> = mutableMapOf()
 
-    private val unresolvedReferences = mutableMapOf<String, MutableList<UnresolvedReference<IdentifiedObject, IdentifiedObject>>>()
+    /**
+     * A map of references between mRID's that as yet have not been resolved - typically when transferring services between systems.
+     * The key is the toMrid of the [UnresolvedReference]s, and the value is a list of [UnresolvedReference]s for that specific object.
+     * For example, if an AcLineSegment with mRID 'acls1' is present in the service, but the service is missing its [location] with mRID 'location-l1'
+     * and `perLengthSequenceImpedance` with mRID 'plsi-1', the following key value pairs would be present:
+     * {
+     *   "plsi-1": [
+     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='plsi-1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=PerLengthSequenceImpedance, resolve=...), ...)
+     *   ],
+     *   "location-l1": [
+     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='location-l1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=Location, resolve=...), ...)
+     *   ]
+     * }
+     *
+     * [resolve] in [ReferenceResolver] will be the function used to populate the relationship between the [IdentifiedObject]s either when
+     * [resolveOrDeferReference] is called if the other side of the reference exists in the service, or otherwise when the second object is added to the service.
+     */
+    private val unresolvedReferencesTo = mutableMapOf<String, MutableSet<UnresolvedReference<IdentifiedObject, IdentifiedObject>>>()
+
+    /**
+     * An index of the unresolved references by their [UnresolvedReference.from] mRID. For the above example this will be a dictionary of the form:
+     * {
+     *   "acls1": [
+     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='location-l1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=Location, resolve=...), ...)
+     *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='plsi-1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=PerLengthSequenceImpedance, resolve=...), ...)
+     *   ]
+     * }
+     */
+    private val unresolvedReferencesFrom = mutableMapOf<String, MutableSet<UnresolvedReference<IdentifiedObject, IdentifiedObject>>>()
 
     private val addFunctions: Map<KClass<out IdentifiedObject>, KFunction<*>> = findFunctionsForDispatch("add")
     private val removeFunctions: Map<KClass<out IdentifiedObject>, KFunction<*>> = findFunctionsForDispatch("remove")
@@ -243,10 +271,18 @@ abstract class BaseService(
         if (objectsByType.any { (_, v) -> v.containsKey(identifiedObject.mRID) })
             return false
 
-        unresolvedReferences.remove(identifiedObject.mRID)?.forEach {
+        unresolvedReferencesTo.remove(identifiedObject.mRID)?.forEach {
             try {
                 val castedIdentifiedObject = it.resolver.toClass.cast(identifiedObject)
+
                 it.resolver.resolve(it.from, castedIdentifiedObject)
+                it.reverseResolver?.resolve(castedIdentifiedObject, it.from)
+
+                unresolvedReferencesFrom[it.from.mRID]?.let { urs ->
+                    urs.remove(it)
+                    if (urs.isEmpty())
+                        unresolvedReferencesFrom.remove(it.from.mRID)
+                }
             } catch (ex: ClassCastException) {
                 throw IllegalStateException(
                     "Expected a ${it.resolver.toClass.simpleName} when resolving ${identifiedObject.nameAndMRID()} references but got a ${identifiedObject::class.simpleName}. Make sure you sent the correct types in every reference.",
@@ -291,16 +327,22 @@ abstract class BaseService(
                     reverseResolver.resolve(to, from)
 
                     // Clean up any reverse unresolved references now that the reference has been resolved
-                    unresolvedReferences[from.mRID]?.apply {
+                    unresolvedReferencesTo[from.mRID]?.apply {
                         removeIf { it.toMrid == from.mRID && it.resolver == reverseResolver }
                         if (isEmpty())
-                            unresolvedReferences.remove(from.mRID)
+                            unresolvedReferencesTo.remove(from.mRID)
+                    }
+                    unresolvedReferencesFrom[to.mRID]?.apply {
+                        removeIf { it.toMrid == from.mRID && it.resolver == reverseResolver }
+                        if (isEmpty())
+                            unresolvedReferencesFrom.remove(to.mRID)
                     }
                 }
                 true
             } else {
-                val unresolvedReference = UnresolvedReference(from, toMrid, resolver) as UnresolvedReference<IdentifiedObject, IdentifiedObject>
-                unresolvedReferences.getOrPut(toMrid) { mutableListOf() }.add(unresolvedReference)
+                val ur = UnresolvedReference(from, toMrid, resolver, reverseResolver) as UnresolvedReference<IdentifiedObject, IdentifiedObject>
+                unresolvedReferencesTo.getOrPut(toMrid) { mutableSetOf() }.add(ur)
+                unresolvedReferencesFrom.getOrPut(from.mRID) { mutableSetOf() }.add(ur)
                 false
             }
         } catch (ex: ClassCastException) {
@@ -309,10 +351,30 @@ abstract class BaseService(
     }
 
     /**
+     * Check if there are [UnresolvedReference]s in the service
+     *
+     * @param mRID, The mRID to check for [UnresolvedReference]s. If null, will check if any unresolved references exist in the service.
+     *
+     * @return true if at least one reference exists.
+     */
+    fun hasUnresolvedReferences(mRID: String? = null) = if (mRID != null) unresolvedReferencesTo.containsKey(mRID) else unresolvedReferencesTo.isNotEmpty()
+
+    /**
+     * Get the number of [UnresolvedReference]s in this service.
+     *
+     * @param mRID The mRID to check the number of [UnresolvedReference]s for. If null, will default to number of all unresolved references in the service.
+     *
+     * @return The number of [UnresolvedReference]s
+     */
+    fun numUnresolvedReferences(mRID: String? = null): Int =
+        mRID?.let { unresolvedReferencesTo[mRID]?.size ?: 0 } ?: unresolvedReferencesTo.values.sumOf { it.size }
+
+    /**
+     *
      * Gets a set of MRIDs that are unresolved references via the [referenceResolver].
      */
     fun <T : IdentifiedObject, R : IdentifiedObject> getUnresolvedReferenceMrids(referenceResolver: ReferenceResolver<T, R>): Set<String> =
-        unresolvedReferences.values.asSequence()
+        unresolvedReferencesTo.values.asSequence()
             .flatMap { it.asSequence() }
             .filter { it.resolver == referenceResolver }
             .map { it.toMrid }
@@ -322,17 +384,31 @@ abstract class BaseService(
      * Gets a set of MRIDs that are referenced by the [T] held by [boundResolver] that are unresolved.
      */
     fun <T : IdentifiedObject, R : IdentifiedObject> getUnresolvedReferenceMrids(boundResolver: BoundReferenceResolver<T, R>): Set<String> =
-        unresolvedReferences.values.asSequence()
+        unresolvedReferencesTo.values.asSequence()
             .flatMap { it.asSequence() }
             .filter { it.from == boundResolver.from && it.resolver == boundResolver.resolver }
             .map { it.toMrid }
             .toSet()
 
     /**
+     * Get the [UnresolvedReference]s that [mRID] has to other objects.
+     * @param mRID The mRID to get unresolved references for.
+     * @return a sequence of the [UnresolvedReference]s that need to be resolved for [mRID].
+     */
+    fun getUnresolvedReferencesFrom(mRID: String): Sequence<UnresolvedReference<*,*>> = unresolvedReferencesFrom[mRID]?.asSequence() ?: emptySequence()
+
+    /**
+     * Get the [UnresolvedReference]s that other objects have to [mRID].
+     * @param mRID The mRID to get unresolved references for.
+     * @return a sequence of the [UnresolvedReference]s that need to be resolved for [mRID].
+     */
+    fun getUnresolvedReferencesTo(mRID: String): Sequence<UnresolvedReference<*,*>> = unresolvedReferencesTo[mRID]?.asSequence() ?: emptySequence()
+
+    /**
      * Returns a sequence of all unresolved references.
      */
     fun unresolvedReferences(): Sequence<UnresolvedReference<*, *>> =
-        unresolvedReferences.values.asSequence().flatMap { it.asSequence() }
+        unresolvedReferencesTo.values.asSequence().flatMap { it.asSequence() }
 
     /**
      * Disassociate an object from this service.

@@ -162,7 +162,7 @@ internal class BaseServiceTest {
         assertThat(service.add(terminal), equalTo(true))
         assertThat(service.resolveOrDeferReference(Resolvers.conductingEquipment(terminal), "j1"), equalTo(false))
 
-        assertThat(service.unresolvedReferences().toList(), equalTo(listOf(UnresolvedReference(terminal, "j1", Resolvers.conductingEquipment(terminal).resolver))))
+        assertThat(service.unresolvedReferences().toList(), equalTo(listOf(UnresolvedReference(terminal, "j1", Resolvers.conductingEquipment(terminal).resolver, Resolvers.conductingEquipment(terminal).reverseResolver))))
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.conductingEquipment(terminal)), contains("j1"))
 
         val junction = Junction("j1")

@@ -275,6 +275,7 @@ abstract class BaseService(
             try {
                 val castedIdentifiedObject = it.resolver.toClass.cast(identifiedObject)
                 it.resolver.resolve(it.from, castedIdentifiedObject)
+                it.reverseResolver?.resolve(castedIdentifiedObject, it.from)
                 unresolvedReferencesFrom[it.from.mRID]?.let { urs ->
                     urs.remove(it)
                     if (urs.isEmpty())
@@ -337,7 +338,8 @@ abstract class BaseService(
                 }
                 true
             } else {
-                val unresolvedReference = UnresolvedReference(from, toMrid, resolver) as UnresolvedReference<IdentifiedObject, IdentifiedObject>
+                val unresolvedReference =
+                    UnresolvedReference(from, toMrid, resolver, reverseResolver) as UnresolvedReference<IdentifiedObject, IdentifiedObject>
                 unresolvedReferencesTo.getOrPut(toMrid) { mutableSetOf() }.add(unresolvedReference)
                 unresolvedReferencesFrom.getOrPut(from.mRID) { mutableSetOf() }.add(unresolvedReference)
                 false

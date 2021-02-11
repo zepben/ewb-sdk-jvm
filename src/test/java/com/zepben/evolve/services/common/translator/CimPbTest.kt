@@ -143,17 +143,6 @@ class CimPbTest {
     private fun testNetworkService(sourceNetworkService: NetworkService) {
         val targetNetwork = NetworkService()
 
-        // Handle EquipmentContainers, OperationalRestrictions, and ConnectivityNodes first, so that their equipment/terminal references
-        // are populated when they are added later.
-        sourceNetworkService.sequenceOf<EquipmentContainer>().forEach {
-            when (it) {
-                is Feeder -> targetNetwork.addFromPb(it.toPb())
-                is Substation -> targetNetwork.addFromPb(it.toPb())
-                is Site -> targetNetwork.addFromPb(it.toPb())
-            }
-        }
-        sourceNetworkService.sequenceOf<OperationalRestriction>().forEach { targetNetwork.addFromPb(it.toPb()) }
-        sourceNetworkService.sequenceOf<ConnectivityNode>().forEach { targetNetwork.addFromPb(it.toPb()) }
         sourceNetworkService.sequenceOf<IdentifiedObject>().forEach {
             when (it) {
                 is CableInfo -> targetNetwork.addFromPb(it.toPb())
@@ -164,7 +153,7 @@ class CimPbTest {
                 is AssetOwner -> targetNetwork.addFromPb(it.toPb())
                 is Location -> targetNetwork.addFromPb(it.toPb())
                 is UsagePoint -> targetNetwork.addFromPb(it.toPb())
-                is ConnectivityNode -> {}
+                is ConnectivityNode -> targetNetwork.addFromPb(it.toPb())
                 is BaseVoltage -> targetNetwork.addFromPb(it.toPb())
                 is Junction -> targetNetwork.addFromPb(it.toPb())
                 is AcLineSegment -> targetNetwork.addFromPb(it.toPb())
@@ -178,9 +167,9 @@ class CimPbTest {
                 is Recloser -> targetNetwork.addFromPb(it.toPb())
                 is Breaker -> targetNetwork.addFromPb(it.toPb())
                 is FaultIndicator -> targetNetwork.addFromPb(it.toPb())
-                is Feeder -> {}
-                is Site -> {}
-                is Substation -> {}
+                is Feeder -> targetNetwork.addFromPb(it.toPb())
+                is Site -> targetNetwork.addFromPb(it.toPb())
+                is Substation -> targetNetwork.addFromPb(it.toPb())
                 is EnergySourcePhase -> targetNetwork.addFromPb(it.toPb())
                 is EnergyConsumerPhase -> targetNetwork.addFromPb(it.toPb())
                 is RatioTapChanger -> targetNetwork.addFromPb(it.toPb())

@@ -11,6 +11,7 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.diagram.translator.toPb
 import com.zepben.evolve.services.diagram.whenDiagramServiceObject
+import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.dp.*
 import io.grpc.Channel
 
@@ -24,6 +25,7 @@ class DiagramProducerClient(
 ) : CimProducerClient<DiagramService>() {
 
     constructor(channel: Channel) : this(DiagramProducerGrpc.newBlockingStub(channel))
+    constructor(channel: GrpcChannel) : this(DiagramProducerGrpc.newBlockingStub(channel.channel))
 
     override fun send(service: DiagramService) {
         tryRpc { stub.createDiagramService(CreateDiagramServiceRequest.newBuilder().build()) }

@@ -9,7 +9,6 @@ package com.zepben.evolve.streaming.grpc
 
 import com.zepben.evolve.streaming.get.CimConsumerClient
 import com.zepben.evolve.streaming.put.CimProducerClient
-import io.grpc.ManagedChannel
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import java.io.File
@@ -23,7 +22,7 @@ object GrpcChannelFactory {
      * [CimConsumerClient] implementation.
      */
     @JvmStatic
-    fun create(config: ConnectionConfig): ManagedChannel {
+    fun create(config: ConnectionConfig): GrpcChannel {
         val channelBuilder = NettyChannelBuilder.forAddress(config.host, config.port)
 
         if (config.enableTls) {
@@ -43,7 +42,7 @@ object GrpcChannelFactory {
         } else
             channelBuilder.usePlaintext()
 
-        return channelBuilder.build()
+        return GrpcChannel(channelBuilder.build())
     }
 
 }

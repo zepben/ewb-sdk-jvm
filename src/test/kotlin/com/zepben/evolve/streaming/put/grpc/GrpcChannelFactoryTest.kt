@@ -20,7 +20,7 @@ internal class GrpcChannelFactoryTest {
         // TODO How do we actually test the channel is configured correctly?
         val config = ConnectionConfig("localhost", 80)
         val channel = GrpcChannelFactory.create(config)
-        channel.shutdownNow()
+        channel.close()
     }
 
     @Test
@@ -35,7 +35,7 @@ internal class GrpcChannelFactoryTest {
     fun onlyRequiresKeyAndCertForAuthWithTls() {
         val config = ConnectionConfig("localhost", 80, enableTls = false, authCertPath = "someFile")
         val channel = GrpcChannelFactory.create(config)
-        channel.shutdownNow()
+        channel.close()
     }
 
 }

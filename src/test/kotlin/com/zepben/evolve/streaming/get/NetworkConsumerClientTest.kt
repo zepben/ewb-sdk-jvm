@@ -210,7 +210,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getFeeder(service, mRID)
 
         verify(stub, times(1)).getEquipmentForContainer(any())
-        verify(stub, times(4)).getIdentifiedObjects(any())
+        verify(stub, times(3)).getIdentifiedObjects(any())
 
         assertThat(result.wasSuccessful, equalTo(true))
         assertThat(result.value.objects.containsKey(mRID), equalTo(true))

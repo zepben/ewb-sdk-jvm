@@ -223,11 +223,17 @@ class NetworkConsumerClient(
             .map { ExtractResult(protoToCimProvider(service).addFromPb(it.terminal), it.terminal.mRID()) }
 
     private fun processIdentifiedObjects(service: NetworkService, mRIDs: Set<String>): Sequence<ExtractResult> {
+        if (mRIDs.isEmpty())
+            return emptySequence()
+
         val toFetch = mutableSetOf<String>()
         val existing = mutableSetOf<ExtractResult>()
         mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service
             service.get<IdentifiedObject>(mRID)?.let { existing.add(ExtractResult(it, it.mRID)) } ?: toFetch.add(mRID)
         }
+
+        if (toFetch.isEmpty())
+            return existing.asSequence()
 
         return stub.getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(toFetch).build())
             .asSequence()

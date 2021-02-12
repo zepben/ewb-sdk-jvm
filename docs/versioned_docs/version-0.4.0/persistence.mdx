@@ -23,14 +23,23 @@ it is rebuilding your model from a source data system every time you want to bui
 <TabItem value="java">
 
 ```java
-void saveToDb(String dbFile, NetworkService networkService, DiagramService diagramService, CustomerService customerService) {
+void saveToDb(String dbFile,
+              NetworkService networkService,
+              DiagramService diagramService,
+              CustomerService customerService) {
     // All service are saved to the given dbFile file
-    new DatabaseWriter(dbFile).save(listOf(networkService, diagramService, customerService));
+    MetadataCollection metaData = new MetadataCollection();
+    metaData.add(new DataSource("Name of source (e.g. GisExtractor)", "0.1", Instant.now()));
+    new DatabaseWriter(dbFile).save(metaData, Arrays.asList(networkService, diagramService, customerService));
 }
 
-void readFromDb(String dbFile, NetworkService networkService, DiagramService diagramService, CustomerService customerService) {
+void readFromDb(String dbFile,
+                MetadataCollection metaData,
+                NetworkService networkService,
+                DiagramService diagramService,
+                CustomerService customerService) {
     // All the services will be loaded with their respective objects from dbFile
-    new DatabaseReader(dbFile).load(networkService, diagramService, customerService)
+    new DatabaseReader(dbFile).load(metaData, networkService, diagramService, customerService)
 }
 ```
 
@@ -38,14 +47,26 @@ void readFromDb(String dbFile, NetworkService networkService, DiagramService dia
 <TabItem  value="kotlin">
 
 ```kotlin
-fun saveToDb(dbFile: String, networkService: NetworkService, diagramService: DiagramService, customerService: CustomerService) {
-    // All service are saved to the given dbFile file
-    DatabaseWriter(dbFile).save(listOf(networkService, diagramService, customerService))
+fun saveToDb(
+    dbFile: String,
+    networkService: NetworkService,
+    diagramService: DiagramService,
+    customerService: CustomerService
+) {
+    // The metadata and all service are saved to the given dbFile file
+    val metaData = MetadataCollection().apply { add(DataSource("Name of source (e.g. GisExtractor)", version = "0.1")) }
+    DatabaseWriter(dbFile).save(metaData, listOf(networkService, diagramService, customerService))
 }
 
-fun readFromDb(dbFile: String, networkService: NetworkService, diagramService: DiagramService, customerService: CustomerService) {
-    // All the services will be loaded with their respective objects from dbFile
-    DatabaseReader(dbFile).load(networkService, diagramService, customerService)
+fun readFromDb(
+    dbFile: String,
+    metaData: MetadataCollection,
+    networkService: NetworkService,
+    diagramService: DiagramService,
+    customerService: CustomerService
+) {
+    // The metadata and all the services will be loaded with their respective objects from dbFile
+    DatabaseReader(dbFile).load(metaData, networkService, diagramService, customerService)
 }
 ```
 

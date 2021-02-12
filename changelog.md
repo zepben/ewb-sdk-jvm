@@ -1,9 +1,11 @@
 ### v0.6.0
 
 ##### Breaking Changes
- None.
+* `GrpcChannelFactory.create()` now returns a `GrpcChannel`, which is a wrapper around a `Channel` or `ManagedChannel`. This should only be breaking for Java users.
 
 ##### New Features
+* New class `GrpcChannel` that can be used in try-with-resources blocks when communicating with a Grpc server.
+  
 * NetworkConsumerClient has 4 new functions:
     - For fetching equipment for an EquipmentContainer
 

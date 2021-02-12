@@ -97,32 +97,32 @@ Here is an example of how to connect to and send a model to the evolve data serv
 <TabItem value="java">
 
 ```java
-Channel channel = GrpcChannelFactory.create(new ConnectionConfig(host, port));
-
 NetworkService networkService = new NetworkService();
 CustomerService customerService = new CustomerService();
 DiagramService diagramService = new DiagramService();
 populateNetworkObjects(networkService)
 
-new NetworkProducerClient(channel).send(networkService);
-new CustomerProducerClient(channel).send(customerService);
-new DiagramProducerClient(channel).send(diagramService);
+try (GrpcChannel channel = GrpcChannelFactory.create(new ConnectionConfig(host, port))) {
+    new NetworkProducerClient(channel).send(networkService);
+    new CustomerProducerClient(channel).send(customerService);
+    new DiagramProducerClient(channel).send(diagramService);
+}
 ```
 
 </TabItem>
 <TabItem  value="kotlin">
 
 ```kotlin
-val channel = GrpcChannelFactory.create(ConnectionConfig(host, port))
-
 val networkService = NetworkService()
 val customerService = CustomerService()
 val diagramService = DiagramService()
 populateNetworkObjects(networkService)
 
-NetworkProducerClient(channel).send(networkService)
-CustomerProducerClient(channel).send(customerService)
-DiagramProducerClient(channel).send(diagramService)
+GrpcChannelFactory.create(ConnectionConfig(host, port)).use {
+    NetworkProducerClient(it).send(networkService)
+    CustomerProducerClient(it).send(customerService)
+    DiagramProducerClient(it).send(diagramService)
+}
 ```
 
 </TabItem>

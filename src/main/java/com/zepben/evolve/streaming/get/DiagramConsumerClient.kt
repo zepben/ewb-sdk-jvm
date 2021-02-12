@@ -12,6 +12,7 @@ import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.diagram.translator.DiagramProtoToCim
 import com.zepben.evolve.services.diagram.translator.mRID
+import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.dc.DiagramIdentifiedObject
@@ -30,6 +31,7 @@ class DiagramConsumerClient(
 ) : CimConsumerClient<DiagramService>() {
 
     constructor(channel: Channel) : this(DiagramConsumerGrpc.newBlockingStub(channel))
+    constructor(channel: GrpcChannel) : this(DiagramConsumerGrpc.newBlockingStub(channel.channel))
 
     /**
      * Retrieve the object with the given [mRID] and store the result in the [service].

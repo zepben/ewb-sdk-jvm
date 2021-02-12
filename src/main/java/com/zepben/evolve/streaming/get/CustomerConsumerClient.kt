@@ -13,6 +13,7 @@ import com.zepben.evolve.services.common.translator.mRID
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.customer.translator.CustomerProtoToCim
 import com.zepben.evolve.services.customer.translator.mRID
+import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.cc.CustomerIdentifiedObject
@@ -31,6 +32,7 @@ class CustomerConsumerClient(
 ) : CimConsumerClient<CustomerService>() {
 
     constructor(channel: Channel) : this(CustomerConsumerGrpc.newBlockingStub(channel))
+    constructor(channel: GrpcChannel) : this(CustomerConsumerGrpc.newBlockingStub(channel.channel))
 
     /**
      * Retrieve the object with the given [mRID] and store the result in the [service].

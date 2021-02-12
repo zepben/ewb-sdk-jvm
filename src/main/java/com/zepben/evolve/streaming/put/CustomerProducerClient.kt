@@ -12,6 +12,7 @@ import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.customer.translator.toPb
 import com.zepben.evolve.services.customer.whenCustomerServiceObject
+import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.cp.*
 import io.grpc.Channel
 
@@ -25,6 +26,7 @@ class CustomerProducerClient(
 ) : CimProducerClient<CustomerService>() {
 
     constructor(channel: Channel) : this(CustomerProducerGrpc.newBlockingStub(channel))
+    constructor(channel: GrpcChannel) : this(CustomerProducerGrpc.newBlockingStub(channel.channel))
 
     override fun send(service: CustomerService) {
         tryRpc { stub.createCustomerService(CreateCustomerServiceRequest.newBuilder().build()) }

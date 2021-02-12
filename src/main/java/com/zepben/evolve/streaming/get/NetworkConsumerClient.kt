@@ -20,10 +20,11 @@ import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchyFeeder
 import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchyGeographicalRegion
 import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchySubGeographicalRegion
 import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchySubstation
+import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.nc.*
 import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
-import io.grpc.Channel
+import io.grpc.ManagedChannel
 
 
 /**
@@ -36,7 +37,8 @@ class NetworkConsumerClient(
     private val protoToCimProvider: (NetworkService) -> NetworkProtoToCim = { NetworkProtoToCim(it) }
 ) : CimConsumerClient<NetworkService>() {
 
-    constructor(channel: Channel) : this(NetworkConsumerGrpc.newBlockingStub(channel))
+    constructor(channel: ManagedChannel) : this(NetworkConsumerGrpc.newBlockingStub(channel))
+    constructor(channel: GrpcChannel) : this(NetworkConsumerGrpc.newBlockingStub(channel.channel))
 
     /**
      * Retrieve the object with the given [mRID] and store the result in the [service].

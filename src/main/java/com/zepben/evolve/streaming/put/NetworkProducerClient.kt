@@ -12,6 +12,7 @@ import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.translator.toPb
 import com.zepben.evolve.services.network.whenNetworkServiceObject
+import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.np.*
 import io.grpc.Channel
 
@@ -25,6 +26,7 @@ class NetworkProducerClient(
 ) : CimProducerClient<NetworkService>() {
 
     constructor(channel: Channel) : this(NetworkProducerGrpc.newBlockingStub(channel))
+    constructor(channel: GrpcChannel) : this(NetworkProducerGrpc.newBlockingStub(channel.channel))
 
     override fun send(service: NetworkService) {
         tryRpc { stub.createNetwork(CreateNetworkRequest.newBuilder().build()) }

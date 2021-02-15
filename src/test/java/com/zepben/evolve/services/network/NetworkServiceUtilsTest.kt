@@ -61,6 +61,7 @@ internal class NetworkServiceUtilsTest {
         isAssetOwner: (AssetOwner) -> String,
         isBaseVoltage: (BaseVoltage) -> String,
         isBreaker: (Breaker) -> String,
+        isLoadBreakSwitch: (LoadBreakSwitch) -> String,
         isBusbarSection: (BusbarSection) -> String,
         isCableInfo: (CableInfo) -> String,
         isCircuit: (Circuit) -> String,
@@ -114,6 +115,7 @@ internal class NetworkServiceUtilsTest {
         isAssetOwner = isAssetOwner,
         isBaseVoltage = isBaseVoltage,
         isBreaker = isBreaker,
+        isLoadBreakSwitch = isLoadBreakSwitch,
         isBusbarSection = isBusbarSection,
         isCableInfo = isCableInfo,
         isCircuit = isCircuit,
@@ -169,6 +171,7 @@ internal class NetworkServiceUtilsTest {
         isAssetOwner: InvokeChecker<AssetOwner> = NeverInvokedChecker(),
         isBaseVoltage: InvokeChecker<BaseVoltage> = NeverInvokedChecker(),
         isBreaker: InvokeChecker<Breaker> = NeverInvokedChecker(),
+        isLoadBreakSwitch: InvokeChecker<LoadBreakSwitch> = NeverInvokedChecker(),
         isBusbarSection: InvokeChecker<BusbarSection> = NeverInvokedChecker(),
         isCableInfo: InvokeChecker<CableInfo> = NeverInvokedChecker(),
         isCircuit: InvokeChecker<Circuit> = NeverInvokedChecker(),
@@ -223,6 +226,7 @@ internal class NetworkServiceUtilsTest {
             isAssetOwner = isAssetOwner,
             isBaseVoltage = isBaseVoltage,
             isBreaker = isBreaker,
+            isLoadBreakSwitch = isLoadBreakSwitch,
             isBusbarSection = isBusbarSection,
             isCableInfo = isCableInfo,
             isCircuit = isCircuit,
@@ -277,6 +281,7 @@ internal class NetworkServiceUtilsTest {
         isAssetOwner.verifyInvoke()
         isBaseVoltage.verifyInvoke()
         isBreaker.verifyInvoke()
+        isLoadBreakSwitch.verifyInvoke()
         isBusbarSection.verifyInvoke()
         isCableInfo.verifyInvoke()
         isCircuit.verifyInvoke()
@@ -337,6 +342,7 @@ internal class NetworkServiceUtilsTest {
         AssetOwner().also { whenNetworkServiceObjectTester(it, isAssetOwner = InvokedChecker(it)) }
         BaseVoltage().also { whenNetworkServiceObjectTester(it, isBaseVoltage = InvokedChecker(it)) }
         Breaker().also { whenNetworkServiceObjectTester(it, isBreaker = InvokedChecker(it)) }
+        LoadBreakSwitch().also { whenNetworkServiceObjectTester(it, isLoadBreakSwitch = InvokedChecker(it)) }
         BusbarSection().also { whenNetworkServiceObjectTester(it, isBusbarSection = InvokedChecker(it)) }
         CableInfo().also { whenNetworkServiceObjectTester(it, isCableInfo = InvokedChecker(it)) }
         Circuit().also { whenNetworkServiceObjectTester(it, isCircuit = InvokedChecker(it)) }

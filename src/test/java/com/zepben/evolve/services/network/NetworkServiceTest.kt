@@ -31,8 +31,8 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkService.Companion.connectedEquipment
 import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
-import com.zepben.evolve.services.network.testdata.createNodeForConnecting
 import com.zepben.evolve.services.network.testdata.TestNetworks
+import com.zepben.evolve.services.network.testdata.createNodeForConnecting
 import com.zepben.evolve.services.network.tracing.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.testutils.junit.SystemLogExtension
@@ -99,6 +99,13 @@ internal class NetworkServiceTest {
         val breaker = Breaker()
         assertThat(service.add(breaker), equalTo(true))
         assertThat(service.remove(breaker), equalTo(true))
+    }
+
+    @Test
+    internal fun supportsLoadBreakSwitch() {
+        val loadBreakSwitch = LoadBreakSwitch()
+        assertThat(service.add(loadBreakSwitch), equalTo(true))
+        assertThat(service.remove(loadBreakSwitch), equalTo(true))
     }
 
     @Test

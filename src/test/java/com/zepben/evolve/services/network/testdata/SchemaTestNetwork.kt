@@ -10,10 +10,7 @@ package com.zepben.evolve.services.network.testdata
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
-import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
-import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnection
-import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnectionPhase
-import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
@@ -99,6 +96,24 @@ object SchemaTestNetwork {
 
         networkService.add(PowerTransformer())
         networkService.add(PowerTransformer().fillFields(networkService, includeRuntime = false))
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    }
+
+    fun createLoadBreakSwitchTestServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.add(LoadBreakSwitch())
+        networkService.add(LoadBreakSwitch().fillFields())
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    }
+
+    fun createBreakerTestServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.add(Breaker())
+        networkService.add(Breaker().fillFields())
 
         return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
     }

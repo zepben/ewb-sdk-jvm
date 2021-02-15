@@ -123,6 +123,16 @@ class DatabaseSqliteTest {
         validateSchema(SchemaTestNetwork.createPowerTransformerTestServices())
     }
 
+    @Test
+    fun `test LoadBreakSwitch schema`() {
+        validateSchema(SchemaTestNetwork.createLoadBreakSwitchTestServices())
+    }
+
+    @Test
+    fun `test Breaker schema`() {
+        validateSchema(SchemaTestNetwork.createBreakerTestServices())
+    }
+
     /************ IEC61970 WIRES GENERATION PRODUCTION ************/
 
     @Test

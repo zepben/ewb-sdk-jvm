@@ -413,7 +413,12 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61970 WIRES ************/
-    fun savePowerElectronicsUnit(table: TablePowerElectronicsUnit, insert: PreparedStatement, powerElectronicsUnit: PowerElectronicsUnit, description: String): Boolean {
+    fun savePowerElectronicsUnit(
+        table: TablePowerElectronicsUnit,
+        insert: PreparedStatement,
+        powerElectronicsUnit: PowerElectronicsUnit,
+        description: String
+    ): Boolean {
         insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex, powerElectronicsUnit.powerElectronicsConnection?.mRID)
         insert.setInt(table.MAX_P.queryIndex, powerElectronicsUnit.maxP)
         insert.setInt(table.MIN_P.queryIndex, powerElectronicsUnit.minP)
@@ -463,6 +468,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val insert = databaseTables.getInsert(TableBreakers::class.java)
 
         return saveProtectedSwitch(table, insert, breaker, "breaker")
+    }
+
+    fun save(loadBreakSwitch: LoadBreakSwitch): Boolean {
+        val table = databaseTables.getTable(TableLoadBreakSwitches::class.java)
+        val insert = databaseTables.getInsert(TableLoadBreakSwitches::class.java)
+
+        return saveProtectedSwitch(table, insert, loadBreakSwitch, "load break switch")
     }
 
     fun save(busbarSection: BusbarSection): Boolean {

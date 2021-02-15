@@ -92,6 +92,7 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
 import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment as PBAcLineSegment
 import com.zepben.protobuf.cim.iec61970.base.wires.Breaker as PBBreaker
+import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBreakSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
 import com.zepben.protobuf.cim.iec61970.base.wires.Conductor as PBConductor
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
@@ -394,6 +395,9 @@ fun toPb(cim: AcLineSegment, pb: PBAcLineSegment.Builder): PBAcLineSegment.Build
 
 fun toPb(cim: Breaker, pb: PBBreaker.Builder): PBBreaker.Builder =
     pb.apply { toPb(cim, swBuilder) }
+
+fun toPb(cim: LoadBreakSwitch, pb: PBLoadBreakSwitch.Builder): PBLoadBreakSwitch.Builder =
+    pb.apply { toPb(cim, psBuilder) }
 
 fun toPb(cim: BusbarSection, pb: PBBusbarSection.Builder): PBBusbarSection.Builder =
     pb.apply { toPb(cim, cnBuilder) }
@@ -718,6 +722,7 @@ fun Fuse.toPb(): PBFuse = toPb(this, PBFuse.newBuilder()).build()
 fun Jumper.toPb(): PBJumper = toPb(this, PBJumper.newBuilder()).build()
 fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
 fun Breaker.toPb(): PBBreaker = toPb(this, PBBreaker.newBuilder()).build()
+fun LoadBreakSwitch.toPb(): PBLoadBreakSwitch = toPb(this, PBLoadBreakSwitch.newBuilder()).build()
 fun BusbarSection.toPb(): PBBusbarSection = toPb(this, PBBusbarSection.newBuilder()).build()
 fun FaultIndicator.toPb(): PBFaultIndicator = toPb(this, PBFaultIndicator.newBuilder()).build()
 fun Feeder.toPb(): PBFeeder = toPb(this, PBFeeder.newBuilder()).build()
@@ -772,6 +777,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(jumper: Jumper): PBJumper = jumper.toPb()
     fun toPb(recloser: Recloser): PBRecloser = recloser.toPb()
     fun toPb(breaker: Breaker): PBBreaker = breaker.toPb()
+    fun toPb(LoadBreakSwitch: LoadBreakSwitch): PBLoadBreakSwitch = LoadBreakSwitch.toPb()
     fun toPb(busbarSection: BusbarSection): PBBusbarSection = busbarSection.toPb()
     fun toPb(faultIndicator: FaultIndicator): PBFaultIndicator = faultIndicator.toPb()
     fun toPb(feeder: Feeder): PBFeeder = feeder.toPb()

@@ -59,6 +59,7 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isAssetOwner Handler when the [identifiedObject] is a [AssetOwner]
  * @param isBaseVoltage Handler when the [identifiedObject] is a [BaseVoltage]
  * @param isBreaker Handler when the [identifiedObject] is a [Breaker]
+ * @param isLoadBreakSwitch Handler when the [identifiedObject] is a [LoadBreakSwitch]
  * @param isBusbarSection Handler when the [identifiedObject] is a [BusbarSection]
  * @param isCableInfo Handler when the [identifiedObject] is a [CableInfo]
  * @param isCircuit Handler when the [identifiedObject] is a [Circuit]
@@ -114,6 +115,7 @@ inline fun <R> whenNetworkServiceObject(
     isAssetOwner: (AssetOwner) -> R,
     isBaseVoltage: (BaseVoltage) -> R,
     isBreaker: (Breaker) -> R,
+    isLoadBreakSwitch: (LoadBreakSwitch) -> R,
     isBusbarSection: (BusbarSection) -> R,
     isCableInfo: (CableInfo) -> R,
     isCircuit: (Circuit) -> R,
@@ -168,6 +170,7 @@ inline fun <R> whenNetworkServiceObject(
     is AssetOwner -> isAssetOwner(identifiedObject)
     is BaseVoltage -> isBaseVoltage(identifiedObject)
     is Breaker -> isBreaker(identifiedObject)
+    is LoadBreakSwitch -> isLoadBreakSwitch(identifiedObject)
     is BusbarSection -> isBusbarSection(identifiedObject)
     is CableInfo -> isCableInfo(identifiedObject)
     is Circuit -> isCircuit(identifiedObject)
@@ -193,7 +196,7 @@ inline fun <R> whenNetworkServiceObject(
     is PerLengthSequenceImpedance -> isPerLengthSequenceImpedance(identifiedObject)
     is Pole -> isPole(identifiedObject)
     is PowerElectronicsConnection -> isPowerElectronicsConnection(identifiedObject)
-    is PowerElectronicsConnectionPhase ->  isPowerElectronicsConnectionPhase(identifiedObject)
+    is PowerElectronicsConnectionPhase -> isPowerElectronicsConnectionPhase(identifiedObject)
     is PowerTransformer -> isPowerTransformer(identifiedObject)
     is PowerTransformerEnd -> isPowerTransformerEnd(identifiedObject)
     is PowerTransformerInfo -> isPowerTransformerInfo(identifiedObject)

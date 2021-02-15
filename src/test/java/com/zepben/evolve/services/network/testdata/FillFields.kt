@@ -289,6 +289,27 @@ fun Line.fillFields(networkService: NetworkService): Line {
     return this
 }
 
+fun Breaker.fillFields(): Breaker {
+    (this as ProtectedSwitch).fillFields()
+    return this
+}
+
+fun LoadBreakSwitch.fillFields(): LoadBreakSwitch {
+    (this as ProtectedSwitch).fillFields()
+    return this
+}
+
+fun ProtectedSwitch.fillFields(): ProtectedSwitch {
+    (this as Switch).fillFields()
+    return this
+}
+
+fun Switch.fillFields(): Switch {
+    normalOpen = 1
+    open = 1
+    return this
+}
+
 fun PowerTransformer.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerTransformer {
     transformerUtilisation = 1.0
     vectorGroup = VectorGroup.DD0

@@ -116,8 +116,8 @@ internal class NetworkCimToProtoTestValidator {
 
     fun validate(cim: Switch, pb: PBSwitch) {
         validate(cim, pb.ce)
-        assertThat(pb.normalOpen, equalTo(cim.isOpen()))
-        assertThat(pb.open, equalTo(cim.isNormallyOpen()))
+        assertThat(pb.open, equalTo(cim.isOpen()))
+        assertThat(pb.normalOpen, equalTo(cim.isNormallyOpen()))
     }
 
     fun validate(cim: PowerTransformer, pb: PBPowerTransformer) {

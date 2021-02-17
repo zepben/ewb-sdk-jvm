@@ -166,7 +166,6 @@ class CimPbTest {
                 is Jumper -> targetNetwork.addFromPb(it.toPb())
                 is Recloser -> targetNetwork.addFromPb(it.toPb())
                 is Breaker -> targetNetwork.addFromPb(it.toPb())
-                is LoadBreakSwitch -> targetNetwork.addFromPb(it.toPb())
                 is FaultIndicator -> targetNetwork.addFromPb(it.toPb())
                 is Feeder -> targetNetwork.addFromPb(it.toPb())
                 is Site -> targetNetwork.addFromPb(it.toPb())

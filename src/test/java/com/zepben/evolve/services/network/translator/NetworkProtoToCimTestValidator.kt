@@ -49,7 +49,10 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection.Builder as PBBusbarSectionBuilder
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector.Builder as PBConnectorBuilder
 import com.zepben.protobuf.cim.iec61970.base.wires.Line.Builder as PBLineBuilder
+import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch.Builder as PBLoadBreakSwitchBuilder
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer.Builder as PBPowerTransformerBuilder
+import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch.Builder as PBProtectedSwitchBuilder
+import com.zepben.protobuf.cim.iec61970.base.wires.Switch.Builder as PBSwitchBuilder
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit.Builder as PBCircuitBuilder
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop.Builder as PBLoopBuilder
 
@@ -223,6 +226,26 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         assertThat(cim.transformerUtilisation, equalTo(0.9))
         assertThat(cim.getEnd("pte1"), equalTo(network["pte1"]))
         assertThat(cim.getEnd("pte2"), equalTo(network["pte2"]))
+
+        return cim
+    }
+
+    inline fun validate(pb: PBLoadBreakSwitchBuilder, fromPb: () -> LoadBreakSwitch): LoadBreakSwitch {
+        return validate(pb.psBuilder, fromPb)
+    }
+
+    inline fun <reified T : ProtectedSwitch> validate(pb: PBProtectedSwitchBuilder, fromPb: () -> T): T {
+        return validate(pb.swBuilder, fromPb)
+    }
+
+    inline fun <reified T : Switch> validate(pb: PBSwitchBuilder, fromPb: () -> T): T {
+        pb.normalOpen = true
+        pb.open = true
+
+        val cim = validate(pb.ceBuilder, fromPb)
+
+        assertThat(cim.isNormallyOpen(), equalTo(true))
+        assertThat(cim.isOpen(), equalTo(true))
 
         return cim
     }

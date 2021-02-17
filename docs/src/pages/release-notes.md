@@ -2,7 +2,6 @@
 
 | Version | Released |
 | --- | --- |
-|[0.6.0](#v060)| `TDB` |
 |[0.5.0](#v050)| `01 February 2021` |
 |[0.4.0](#v040)| `12 January 2021` |
 |[0.3.0](#v030)| `10 November 2020` |
@@ -12,25 +11,6 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
-
----
-### v0.6.0
-
-##### Breaking Changes
-* None.
-
-##### New Features
-* Added the following classes:
-  * LoadBreakSwitch
-
-##### Enhancements
-* None.
-
-##### Fixes
-* None.
-
-##### Notes
-* None.
 
 ---
 

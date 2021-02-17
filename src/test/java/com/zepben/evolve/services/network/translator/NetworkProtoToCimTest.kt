@@ -17,6 +17,7 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
 import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
+import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBreakSwitch
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 
@@ -84,4 +85,11 @@ class NetworkProtoToCimTest {
         val pb = PBDiscrete.newBuilder()
         validator.validate(pb) { translator.addFromPb(pb.build())!! }
     }
+
+    @Test
+    internal fun testFromPbLoadBreakSwitch() {
+        val pb = PBLoadBreakSwitch.newBuilder()
+        validator.validate(pb) { translator.addFromPb(pb.build())!! }
+    }
+
 }

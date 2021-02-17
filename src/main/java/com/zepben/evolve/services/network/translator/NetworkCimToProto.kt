@@ -777,7 +777,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(jumper: Jumper): PBJumper = jumper.toPb()
     fun toPb(recloser: Recloser): PBRecloser = recloser.toPb()
     fun toPb(breaker: Breaker): PBBreaker = breaker.toPb()
-    fun toPb(LoadBreakSwitch: LoadBreakSwitch): PBLoadBreakSwitch = LoadBreakSwitch.toPb()
+    fun toPb(loadBreakSwitch: LoadBreakSwitch): PBLoadBreakSwitch = loadBreakSwitch.toPb()
     fun toPb(busbarSection: BusbarSection): PBBusbarSection = busbarSection.toPb()
     fun toPb(faultIndicator: FaultIndicator): PBFaultIndicator = faultIndicator.toPb()
     fun toPb(feeder: Feeder): PBFeeder = feeder.toPb()

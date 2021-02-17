@@ -36,4 +36,5 @@ To build:
     1. *ProtoToCim(s) updated and tested.
 1. *ServiceComparator(s) updated and tested.
 1. Exhaustive when functions in *ServiceUtils updated if a new class is added.
+1. Update the *ProtoToCimTest and the *CimToProtoTest to account for your change (Do not update the CimPbTest or the StupidlyLargeNetwork files, these will be phased out).
 1. Release notes updated.

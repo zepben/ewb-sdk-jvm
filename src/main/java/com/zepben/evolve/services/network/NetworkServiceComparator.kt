@@ -282,7 +282,10 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             comparePowerElectronicsUnit()
         }
 
-    private fun comparePowerElectronicsWindUnit(source: PowerElectronicsWindUnit, target: PowerElectronicsWindUnit): ObjectDifference<PowerElectronicsWindUnit> =
+    private fun comparePowerElectronicsWindUnit(
+        source: PowerElectronicsWindUnit,
+        target: PowerElectronicsWindUnit
+    ): ObjectDifference<PowerElectronicsWindUnit> =
         ObjectDifference(source, target).apply {
             comparePowerElectronicsUnit()
         }
@@ -295,6 +298,9 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         }
 
     private fun compareBreaker(source: Breaker, target: Breaker): ObjectDifference<Breaker> =
+        ObjectDifference(source, target).apply { compareProtectedSwitch() }
+
+    private fun compareLoadBreakSwitch(source: LoadBreakSwitch, target: LoadBreakSwitch): ObjectDifference<LoadBreakSwitch> =
         ObjectDifference(source, target).apply { compareProtectedSwitch() }
 
     private fun compareBusbarSection(source: BusbarSection, target: BusbarSection): ObjectDifference<BusbarSection> =

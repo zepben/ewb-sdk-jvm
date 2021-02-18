@@ -465,6 +465,12 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadProtectedSwitch(breaker, table, resultSet) && networkService.addOrThrow(breaker)
     }
 
+    fun load(table: TableLoadBreakSwitches, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val loadBreakSwitch = LoadBreakSwitch(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadProtectedSwitch(loadBreakSwitch, table, resultSet) && networkService.addOrThrow(loadBreakSwitch)
+    }
+
     fun load(table: TableBusbarSections, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val busbarSection = BusbarSection(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 

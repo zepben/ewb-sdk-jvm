@@ -267,6 +267,7 @@ class NetworkConsumerClient(
             TERMINAL -> ExtractResult(protoToCimProvider(service).addFromPb(it.terminal), it.terminal.mRID())
             ACLINESEGMENT -> ExtractResult(protoToCimProvider(service).addFromPb(it.acLineSegment), it.acLineSegment.mRID())
             BREAKER -> ExtractResult(protoToCimProvider(service).addFromPb(it.breaker), it.breaker.mRID())
+            LOADBREAKSWITCH -> ExtractResult(protoToCimProvider(service).addFromPb(it.loadBreakSwitch), it.loadBreakSwitch.mRID())
             DISCONNECTOR -> ExtractResult(protoToCimProvider(service).addFromPb(it.disconnector), it.disconnector.mRID())
             ENERGYCONSUMER -> ExtractResult(protoToCimProvider(service).addFromPb(it.energyConsumer), it.energyConsumer.mRID())
             ENERGYCONSUMERPHASE -> ExtractResult(protoToCimProvider(service).addFromPb(it.energyConsumerPhase), it.energyConsumerPhase.mRID())

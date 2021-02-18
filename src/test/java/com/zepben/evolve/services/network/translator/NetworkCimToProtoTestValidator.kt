@@ -46,8 +46,11 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
 import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
+import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBreakSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformerEnd as PBPowerTransformerEnd
+import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch as PBProtectedSwitch
+import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
@@ -101,6 +104,20 @@ internal class NetworkCimToProtoTestValidator {
 
     fun validate(cim: BusbarSection, pb: PBBusbarSection) {
         validate(cim, pb.cn)
+    }
+
+    fun validate(cim: LoadBreakSwitch, pb: PBLoadBreakSwitch) {
+        validate(cim, pb.ps)
+    }
+
+    fun validate(cim: ProtectedSwitch, pb: PBProtectedSwitch) {
+        validate(cim, pb.sw)
+    }
+
+    fun validate(cim: Switch, pb: PBSwitch) {
+        validate(cim, pb.ce)
+        assertThat(pb.open, equalTo(cim.isOpen()))
+        assertThat(pb.normalOpen, equalTo(cim.isNormallyOpen()))
     }
 
     fun validate(cim: PowerTransformer, pb: PBPowerTransformer) {

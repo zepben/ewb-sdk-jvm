@@ -25,6 +25,9 @@
 * BaseService has two new functions which allow retrieving the UnresolvedReferences for an mRID by either `toMrid` or `from.mRID`: 
   - getUnresolvedReferencesTo(mRID: String): Sequence<UnresolvedReference<*,*>>
   - getUnresolvedReferencesFrom(mRID: String): Sequence<UnresolvedReference<*,*>>
+
+* Added the following classes:
+    * LoadBreakSwitch
     
 ##### Enhancements
 * None.

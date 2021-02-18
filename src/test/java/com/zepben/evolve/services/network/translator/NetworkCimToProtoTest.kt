@@ -14,6 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
+import com.zepben.evolve.cim.iec61970.base.wires.LoadBreakSwitch
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
@@ -110,6 +111,13 @@ internal class NetworkCimToProtoTest {
         val cim = Discrete()
         validator.validate(cim, cim.toPb())
         validator.validate(cim.fillFields(NetworkService()), cim.toPb())
+    }
+
+    @Test
+    internal fun convertsLoadBreakSwitch() {
+        val cim = LoadBreakSwitch()
+        validator.validate(cim, cim.toPb())
+        validator.validate(cim.fillFields(), cim.toPb())
     }
 
 }

@@ -65,6 +65,9 @@ class NetworkService : BaseService("network") {
     fun add(breaker: Breaker): Boolean = super.add(breaker)
     fun remove(breaker: Breaker): Boolean = super.remove(breaker)
 
+    fun add(loadBreakSwitch: LoadBreakSwitch): Boolean = super.add(loadBreakSwitch)
+    fun remove(loadBreakSwitch: LoadBreakSwitch): Boolean = super.remove(loadBreakSwitch)
+
     fun add(busbarSection: BusbarSection): Boolean = super.add(busbarSection)
     fun remove(busbarSection: BusbarSection): Boolean = super.remove(busbarSection)
 

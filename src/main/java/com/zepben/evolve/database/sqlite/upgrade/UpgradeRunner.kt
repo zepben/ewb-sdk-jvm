@@ -22,26 +22,27 @@ class UpgradeRunner constructor(
     private val getConnection: (String) -> Connection = DriverManager::getConnection,
     private val getStatement: (Connection) -> Statement = Connection::createStatement,
     private val getPreparedStatement: (Connection, String) -> PreparedStatement = Connection::prepareStatement,
-    private val createBackup: (databaseFilename: Path, backupFilename: Path, copyOption: CopyOption) -> Unit = { f, b, o -> Files.copy(f, b, o) }
+    private val createBackup: (databaseFilename: Path, backupFilename: Path, copyOption: CopyOption) -> Unit = { f, b, o -> Files.copy(f, b, o) },
+    internal val changeSets: List<ChangeSet> =
+        listOf(
+            changeSet15(),
+            changeSet16(),
+            changeSet17(),
+            changeSet18(),
+            changeSet19(),
+            changeSet20(),
+            changeSet21(),
+            changeSet22(),
+            changeSet23(),
+            changeSet24(),
+            changeSet25(),
+            changeSet26(),
+            changeSet27(),
+            changeSet28()
+        ).asUnmodifiable()
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-
-    internal val changeSets: List<ChangeSet> = listOf(
-        changeSet15(),
-        changeSet16(),
-        changeSet17(),
-        changeSet18(),
-        changeSet19(),
-        changeSet20(),
-        changeSet21(),
-        changeSet22(),
-        changeSet23(),
-        changeSet24(),
-        changeSet25(),
-        changeSet26(),
-        changeSet27()
-    ).asUnmodifiable()
 
     private val tableVersion = TableVersion()
 

@@ -22,8 +22,11 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
+import org.mockito.Mockito.*
 import java.io.File
 import java.nio.file.Path
+import java.sql.Connection
+import java.sql.DriverManager.getConnection
 import kotlin.test.fail
 
 @Suppress("SqlResolve")
@@ -137,4 +140,35 @@ class ChangeSetTest {
         assertThat(pt1?.transformerUtilisation, equalTo(1.2))
     }
 
+    @Test
+    fun `cs28 updates rated_e and stored_e to longs`(){
+        val conn = sqlDumpToDB("src/test/data/changeset28.sql")
+        val runner = UpgradeRunner(getConnection = { conn }, changeSets = listOf(changeSet28()), createBackup = {_, _, _ -> })
+        val cr = runner.connectAndUpgrade("ignored", Path.of("none"))
+
+        cr.connection.use { c ->
+            c.createStatement().use { statement ->
+                val rs = statement.executeQuery("SELECT rated_e, stored_e FROM battery_unit WHERE mrid = 'abc'")
+                assertThat(rs.getLong("rated_e"), equalTo(1500L))
+                assertThat(rs.getLong("stored_e"), equalTo(2500L))
+            }
+        }
+    }
+
+    /**
+     * Takes a path to an SQL dump and executes it against an in-memory sqlite database, returning the connection.
+     * @param path The filesystem path to the SQL file.
+     * @return A [Connection] to the in-memory database.
+     */
+    fun sqlDumpToDB(path: String): Connection {
+        val f = File(path)
+        val lines = f.readLines()
+        val conn = getConnection("jdbc:sqlite::memory:")
+        conn.createStatement().use { statement ->
+            lines.forEach {
+                statement.executeUpdate(it)
+            }
+        }
+        return conn
+    }
 }

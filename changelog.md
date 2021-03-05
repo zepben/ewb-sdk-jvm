@@ -2,6 +2,7 @@
 
 ##### Breaking Changes
 * `GrpcChannelFactory.create()` now returns a `GrpcChannel`, which is a wrapper around a `Channel` or `ManagedChannel`. This should only be breaking for Java users.
+* `BatteryUnit` `ratedE` and `storedE` are now `Long` instead of `Double`
 
 ##### New Features
 * New class `GrpcChannel` that can be used in try-with-resources blocks when communicating with a Grpc server.
@@ -30,10 +31,14 @@
     * LoadBreakSwitch
     
 ##### Enhancements
-* None.
+* Added some better testing mechanism for database upgrades.
 
 ##### Fixes
-* None.
-
+* `Resolvers.powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit).` 
+  `Resolvers.powerElectronicsConnection(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase)` 
+  `Resolvers.powerElectronicsUnit(powerElectronicsConnection: PowerElectronicsConnection)` 
+  `Resolvers.powerElectronicsConnectionPhase(powerElectronicsConnection: PowerElectronicsConnection)` 
+  now all have their reverse resolver assigned.
+  
 ##### Notes
 * None.

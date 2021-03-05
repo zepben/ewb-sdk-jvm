@@ -220,8 +220,8 @@ fun Substation.fillFields(networkService: NetworkService): Substation {
 
 fun BatteryUnit.fillFields(networkService: NetworkService): BatteryUnit {
     batteryState = BatteryStateKind.charging
-    ratedE = 1.0
-    storedE = 2.0
+    ratedE = 1L
+    storedE = 2L
 
     (this as PowerElectronicsUnit).fillFields(networkService)
     return this

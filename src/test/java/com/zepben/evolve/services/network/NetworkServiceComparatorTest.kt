@@ -422,8 +422,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparePowerElectronicsUnit { BatteryUnit(it) }
 
         comparatorValidator.validateProperty(BatteryUnit::batteryState, { BatteryUnit(it) }, { BatteryStateKind.charging }, { BatteryStateKind.discharging })
-        comparatorValidator.validateProperty(BatteryUnit::ratedE, { BatteryUnit(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(BatteryUnit::storedE, { BatteryUnit(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(BatteryUnit::ratedE, { BatteryUnit(it) }, { 1L }, { 2L })
+        comparatorValidator.validateProperty(BatteryUnit::storedE, { BatteryUnit(it) }, { 1L }, { 2L })
     }
 
     @Test

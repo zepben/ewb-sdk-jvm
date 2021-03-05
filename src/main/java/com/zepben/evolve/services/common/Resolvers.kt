@@ -300,17 +300,17 @@ object Resolvers {
 
     @JvmStatic
     fun powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit): BoundReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> =
-        BoundReferenceResolver(powerElectronicsUnit, PowerElectronicsUnitToPowerElectronicsConnectionResolver, null)
+        BoundReferenceResolver(powerElectronicsUnit, PowerElectronicsUnitToPowerElectronicsConnectionResolver, PowerElectronicsConnectionToPowerElectronicsUnitResolver)
 
     @JvmStatic
     fun powerElectronicsConnection(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): BoundReferenceResolver<PowerElectronicsConnectionPhase, PowerElectronicsConnection> =
-        BoundReferenceResolver(powerElectronicsConnectionPhase, PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver, null)
+        BoundReferenceResolver(powerElectronicsConnectionPhase, PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver, PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver)
 
     @JvmStatic
     fun powerElectronicsUnit(powerElectronicsConnection: PowerElectronicsConnection): BoundReferenceResolver<PowerElectronicsConnection, PowerElectronicsUnit> =
-        BoundReferenceResolver(powerElectronicsConnection, PowerElectronicsConnectionToPowerElectronicsUnitResolver, null)
+        BoundReferenceResolver(powerElectronicsConnection, PowerElectronicsConnectionToPowerElectronicsUnitResolver, PowerElectronicsUnitToPowerElectronicsConnectionResolver)
 
     @JvmStatic
     fun powerElectronicsConnectionPhase(powerElectronicsConnection: PowerElectronicsConnection): BoundReferenceResolver<PowerElectronicsConnection, PowerElectronicsConnectionPhase> =
-        BoundReferenceResolver(powerElectronicsConnection, PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver, null)
+        BoundReferenceResolver(powerElectronicsConnection, PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver, PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver)
 }

@@ -14,6 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnection
 /**
  * A generating unit or battery or aggregation that connects to the AC network using power electronics rather than rotating machines.
  *
+ * @property powerElectronicsConnection An AC network connection may have several power electronics units connecting through it.
  * @property maxP Maximum active power limit. This is the maximum (nameplate) limit for the unit.
  * @property minP Minimum active power limit. This is the minimum (nameplate) limit for the unit.
  */

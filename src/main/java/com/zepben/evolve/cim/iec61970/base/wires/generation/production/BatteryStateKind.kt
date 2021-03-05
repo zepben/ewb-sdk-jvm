@@ -12,7 +12,7 @@ package com.zepben.evolve.cim.iec61970.base.wires.generation.production
  * Battery state.
  * @property discharging Stored energy is decreasing.
  * @property full Unable to charge, and not discharging.
- * @property waiting Neither charging not discharging, but able to do so.
+ * @property waiting Neither charging nor discharging, but able to do so.
  * @property charging Stored energy is increasing.
  * @property empty Unable to discharge, and not charging.
  */

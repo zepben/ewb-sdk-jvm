@@ -428,8 +428,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TableBatteryUnit, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val batteryUnit = BatteryUnit(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             batteryState = BatteryStateKind.valueOf(resultSet.getString(table.BATTERY_STATE.queryIndex))
-            ratedE = resultSet.getDouble(table.RATED_E.queryIndex)
-            storedE = resultSet.getDouble(table.STORED_E.queryIndex)
+            ratedE = resultSet.getLong(table.RATED_E.queryIndex)
+            storedE = resultSet.getLong(table.STORED_E.queryIndex)
         }
 
         return loadPowerElectronicsUnit(batteryUnit, table, resultSet) && networkService.addOrThrow(batteryUnit)

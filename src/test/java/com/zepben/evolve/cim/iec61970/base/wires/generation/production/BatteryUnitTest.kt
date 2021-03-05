@@ -34,17 +34,17 @@ internal class BatteryUnitTest {
         val batteryUnit = BatteryUnit()
 
        assertThat(batteryUnit.batteryState, equalTo(BatteryStateKind.UNKNOWN))
-       assertThat(batteryUnit.ratedE, equalTo(0.0))
-       assertThat(batteryUnit.storedE, equalTo(0.0))
+       assertThat(batteryUnit.ratedE, equalTo(0L))
+       assertThat(batteryUnit.storedE, equalTo(0L))
 
         batteryUnit.apply {
             this.batteryState = BatteryStateKind.charging
-            ratedE = 1.0
-            storedE = 2.0
+            ratedE = 1L
+            storedE = 2L
         }
 
        assertThat(batteryUnit.batteryState, equalTo(BatteryStateKind.charging))
-       assertThat(batteryUnit.ratedE, equalTo(1.0))
-       assertThat(batteryUnit.storedE, equalTo(2.0))
+       assertThat(batteryUnit.ratedE, equalTo(1L))
+       assertThat(batteryUnit.storedE, equalTo(2L))
     }
 }

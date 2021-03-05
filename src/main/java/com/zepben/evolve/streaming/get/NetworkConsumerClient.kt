@@ -299,6 +299,10 @@ class NetworkConsumerClient(
             REMOTECONTROL -> ExtractResult(protoToCimProvider(service).addFromPb(it.remoteControl), it.remoteControl.mRID())
             REMOTESOURCE -> ExtractResult(protoToCimProvider(service).addFromPb(it.remoteSource), it.remoteSource.mRID())
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${it.identifiedObjectCase} is not supported by the network service")
+            // TODO Branch implementing these classes needs to clean this up
+            TRANSFORMERSTARIMPEDANCE -> ExtractResult(object : IdentifiedObject(it.transformerStarImpedance.io.mrid) {}, it.transformerStarImpedance.io.mrid)
+            TRANSFORMERENDINFO -> ExtractResult(object : IdentifiedObject(it.transformerEndInfo.ai.mRID()) {}, it.transformerEndInfo.ai.mRID())
+            TRANSFORMERTANKINFO -> ExtractResult(object : IdentifiedObject(it.transformerTankInfo.ai.mRID()) {}, it.transformerTankInfo.ai.mRID())
         }
     }
 

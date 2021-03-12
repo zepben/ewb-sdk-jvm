@@ -23,6 +23,8 @@
 
 * `NetworkConsumerClient.get_feeder()` now resolves all references, and thus you can expect to receive a Feeder with all equipment and their associations populated.
 
+* New class `SwitchStateClient` that allows you to set the current state of switches via a gRPC service.
+
 * BaseService has two new functions which allow retrieving the UnresolvedReferences for an mRID by either `toMrid` or `from.mRID`: 
   - getUnresolvedReferencesTo(mRID: String): Sequence<UnresolvedReference<*,*>>
   - getUnresolvedReferencesFrom(mRID: String): Sequence<UnresolvedReference<*,*>>

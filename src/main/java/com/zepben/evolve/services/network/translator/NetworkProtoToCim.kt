@@ -34,6 +34,8 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverheadWireInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PBPowerTransformerInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerEndInfo as PBTransformerEndInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTankInfo as PBTransformerTankInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireInfo as PBWireInfo
 import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
 import com.zepben.protobuf.cim.iec61968.assets.AssetContainer as PBAssetContainer
@@ -79,7 +81,6 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
 import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment as PBAcLineSegment
 import com.zepben.protobuf.cim.iec61970.base.wires.Breaker as PBBreaker
-import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBreakSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
 import com.zepben.protobuf.cim.iec61970.base.wires.Conductor as PBConductor
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
@@ -94,6 +95,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.Jumper as PBJumper
 import com.zepben.protobuf.cim.iec61970.base.wires.Junction as PBJunction
 import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
 import com.zepben.protobuf.cim.iec61970.base.wires.LinearShuntCompensator as PBLinearShuntCompensator
+import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBreakSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthImpedance as PBPerLengthImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthLineParameter as PBPerLengthLineParameter
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthSequenceImpedance as PBPerLengthSequenceImpedance
@@ -109,6 +111,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCo
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
+import com.zepben.protobuf.cim.iec61970.base.wires.TransformerStarImpedance as PBTransformerStarImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryUnit as PBBatteryUnit
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit as PBPhotoVoltaicUnit
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit as PBPowerElectronicsUnit
@@ -129,6 +132,32 @@ fun toCim(pb: PBOverheadWireInfo, networkService: NetworkService): OverheadWireI
 
 fun toCim(pb: PBPowerTransformerInfo, networkService: NetworkService): PowerTransformerInfo =
     PowerTransformerInfo(pb.mRID()).apply {
+        pb.transformerTankInfoMRIDsList.forEach {
+            networkService.resolveOrDeferReference(Resolvers.transformerTankInfo(this), it)
+        }
+        toCim(pb.ai, this, networkService)
+    }
+
+fun toCim(pb: PBTransformerEndInfo, networkService: NetworkService): TransformerEndInfo =
+    TransformerEndInfo(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.transformerStarImpedance(this), pb.transformerStarImpedanceMRID)
+        connectionKind = WindingConnection.valueOf(pb.connectionKind.name)
+        emergencyS = pb.emergencyS
+        endNumber = pb.endNumber
+        insulationU = pb.insulationU
+        phaseAngleClock = pb.phaseAngleClock
+        r = pb.r
+        ratedS = pb.ratedS
+        ratedU = pb.ratedU
+        shortTermS = pb.shortTermS
+        toCim(pb.ai, this, networkService)
+    }
+
+fun toCim(pb: PBTransformerTankInfo, networkService: NetworkService): TransformerTankInfo =
+    TransformerTankInfo(pb.mRID()).apply {
+        pb.transformerEndInfoMRIDsList.forEach {
+            networkService.resolveOrDeferReference(Resolvers.transformerEndInfo(this), it)
+        }
         toCim(pb.ai, this, networkService)
     }
 
@@ -704,10 +733,21 @@ fun toCim(pb: PBTransformerEnd, cim: TransformerEnd, networkService: NetworkServ
         networkService.resolveOrDeferReference(Resolvers.terminal(this), pb.terminalMRID)
         networkService.resolveOrDeferReference(Resolvers.baseVoltage(this), pb.baseVoltageMRID)
         networkService.resolveOrDeferReference(Resolvers.ratioTapChanger(this), pb.ratioTapChangerMRID)
+        networkService.resolveOrDeferReference(Resolvers.starImpedance(this), pb.transformerStarImpedanceMRID)
         endNumber = pb.endNumber
         grounded = pb.grounded
         rGround = pb.rGround
         xGround = pb.xGround
+        toCim(pb.io, this, networkService)
+    }
+
+fun toCim(pb: PBTransformerStarImpedance, networkService: NetworkService): TransformerStarImpedance =
+    TransformerStarImpedance(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.transformerEndInfo(this), pb.transformerEndInfoMRID)
+        r = pb.r
+        r0 = pb.r0
+        x = pb.x
+        x0 = pb.x0
         toCim(pb.io, this, networkService)
     }
 
@@ -793,6 +833,9 @@ fun NetworkService.addFromPb(pb: PBPhotoVoltaicUnit): PhotoVoltaicUnit? = tryAdd
 fun NetworkService.addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPowerElectronicsConnection): PowerElectronicsConnection? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPowerElectronicsConnectionPhase): PowerElectronicsConnectionPhase? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = tryAddOrNull(toCim(pb, this))
 
 /************ Class for Java friendly usage ************/
 
@@ -849,4 +892,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim(net
     fun addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerElectronicsConnection): PowerElectronicsConnection? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerElectronicsConnectionPhase): PowerElectronicsConnectionPhase? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = networkService.addFromPb(pb)
 }

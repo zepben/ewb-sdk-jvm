@@ -21,5 +21,14 @@ abstract class TableTransformerEnds : TableIdentifiedObjects() {
     val GROUNDED = Column(++columnIndex, "grounded", "BOOLEAN", NOT_NULL)
     val R_GROUND = Column(++columnIndex, "r_ground", "NUMBER", NOT_NULL)
     val X_GROUND = Column(++columnIndex, "x_ground", "NUMBER", NOT_NULL)
+    val STAR_IMPEDANCE_MRID = Column(++columnIndex, "star_impedance_mrid", "TEXT", NULL)
+
+    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.nonUniqueIndexColumns()
+
+        cols.add(listOf(STAR_IMPEDANCE_MRID))
+
+        return cols
+    }
 
 }

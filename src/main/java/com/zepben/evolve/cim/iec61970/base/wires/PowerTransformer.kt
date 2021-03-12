@@ -8,6 +8,7 @@
 package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assets.AssetInfo
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.common.extensions.*
 
@@ -61,6 +62,13 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
      * Override the [AssetInfo] as [PowerTransformerInfo].
      */
     override var assetInfo: PowerTransformerInfo? = null
+        set(value) {
+            val invalidEnds = ends.filter { it.starImpedance != null }
+            require(invalidEnds.isEmpty()) {
+                "Unable to use a catalog for ${typeNameAndMRID()} because the following associated ends have a direct link to a star impedance: ${invalidEnds.map { it.typeNameAndMRID() }}."
+            }
+            field = value
+        }
 
     /**
      * The PowerTransformerEnd's for this PowerTransformer. The returned collection is read only.

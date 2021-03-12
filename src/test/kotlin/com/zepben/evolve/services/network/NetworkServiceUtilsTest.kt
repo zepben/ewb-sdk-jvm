@@ -7,9 +7,7 @@
  */
 package com.zepben.evolve.services.network
 
-import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
@@ -105,6 +103,9 @@ internal class NetworkServiceUtilsTest {
         isDiscrete: (Discrete) -> String,
         isRemoteControl: (RemoteControl) -> String,
         isRemoteSource: (RemoteSource) -> String,
+        isTransformerEndInfo: (TransformerEndInfo) -> String,
+        isTransformerStarImpedance: (TransformerStarImpedance) -> String,
+        isTransformerTankInfo: (TransformerTankInfo) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -159,6 +160,9 @@ internal class NetworkServiceUtilsTest {
         isDiscrete = isDiscrete,
         isRemoteControl = isRemoteControl,
         isRemoteSource = isRemoteSource,
+        isTransformerEndInfo = isTransformerEndInfo,
+        isTransformerStarImpedance = isTransformerStarImpedance,
+        isTransformerTankInfo = isTransformerTankInfo,
         isOther = isOther
     )
 
@@ -215,6 +219,9 @@ internal class NetworkServiceUtilsTest {
         isDiscrete: InvokeChecker<Discrete> = NeverInvokedChecker(),
         isRemoteControl: InvokeChecker<RemoteControl> = NeverInvokedChecker(),
         isRemoteSource: InvokeChecker<RemoteSource> = NeverInvokedChecker(),
+        isTransformerEndInfo: InvokeChecker<TransformerEndInfo> = NeverInvokedChecker(),
+        isTransformerStarImpedance: InvokeChecker<TransformerStarImpedance> = NeverInvokedChecker(),
+        isTransformerTankInfo: InvokeChecker<TransformerTankInfo> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -270,6 +277,9 @@ internal class NetworkServiceUtilsTest {
             isDiscrete = isDiscrete,
             isRemoteControl = isRemoteControl,
             isRemoteSource = isRemoteSource,
+            isTransformerEndInfo = isTransformerEndInfo,
+            isTransformerStarImpedance = isTransformerStarImpedance,
+            isTransformerTankInfo = isTransformerTankInfo,
             isOther = isOther
         )
 
@@ -325,6 +335,9 @@ internal class NetworkServiceUtilsTest {
         isDiscrete.verifyInvoke()
         isRemoteControl.verifyInvoke()
         isRemoteSource.verifyInvoke()
+        isTransformerEndInfo.verifyInvoke()
+        isTransformerStarImpedance.verifyInvoke()
+        isTransformerTankInfo.verifyInvoke()
         isOther.verifyInvoke()
     }
 
@@ -380,6 +393,15 @@ internal class NetworkServiceUtilsTest {
         Substation().also { whenNetworkServiceObjectTester(it, isSubstation = InvokedChecker(it)) }
         Terminal().also { whenNetworkServiceObjectTester(it, isTerminal = InvokedChecker(it)) }
         UsagePoint().also { whenNetworkServiceObjectTester(it, isUsagePoint = InvokedChecker(it)) }
+        Control().also { whenNetworkServiceObjectTester(it, isControl = InvokedChecker(it)) }
+        Analog().also { whenNetworkServiceObjectTester(it, isAnalog = InvokedChecker(it)) }
+        Accumulator().also { whenNetworkServiceObjectTester(it, isAccumulator = InvokedChecker(it)) }
+        Discrete().also { whenNetworkServiceObjectTester(it, isDiscrete = InvokedChecker(it)) }
+        RemoteControl().also { whenNetworkServiceObjectTester(it, isRemoteControl = InvokedChecker(it)) }
+        RemoteSource().also { whenNetworkServiceObjectTester(it, isRemoteSource = InvokedChecker(it)) }
+        TransformerEndInfo().also { whenNetworkServiceObjectTester(it, isTransformerEndInfo = InvokedChecker(it)) }
+        TransformerStarImpedance().also { whenNetworkServiceObjectTester(it, isTransformerStarImpedance = InvokedChecker(it)) }
+        TransformerTankInfo().also { whenNetworkServiceObjectTester(it, isTransformerTankInfo = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

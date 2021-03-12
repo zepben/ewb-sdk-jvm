@@ -7,10 +7,7 @@
  */
 package com.zepben.evolve.services.network.translator
 
-import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.PositionPoint
@@ -44,7 +41,9 @@ import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverheadWireInfo
-import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PPowerTransformerInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PBPowerTransformerInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerEndInfo as PBTransformerEndInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTankInfo as PBTransformerTankInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireInfo as PBWireInfo
 import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
 import com.zepben.protobuf.cim.iec61968.assets.AssetContainer as PBAssetContainer
@@ -92,7 +91,6 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
 import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment as PBAcLineSegment
 import com.zepben.protobuf.cim.iec61970.base.wires.Breaker as PBBreaker
-import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBreakSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
 import com.zepben.protobuf.cim.iec61970.base.wires.Conductor as PBConductor
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
@@ -107,6 +105,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.Jumper as PBJumper
 import com.zepben.protobuf.cim.iec61970.base.wires.Junction as PBJunction
 import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
 import com.zepben.protobuf.cim.iec61970.base.wires.LinearShuntCompensator as PBLinearShuntCompensator
+import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBreakSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthImpedance as PBPerLengthImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthLineParameter as PBPerLengthLineParameter
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthSequenceImpedance as PBPerLengthSequenceImpedance
@@ -122,6 +121,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCo
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
+import com.zepben.protobuf.cim.iec61970.base.wires.TransformerStarImpedance as PBTransformerStarImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryUnit as PBBatteryUnit
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit as PBPhotoVoltaicUnit
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit as PBPowerElectronicsUnit
@@ -136,8 +136,35 @@ fun toPb(cim: CableInfo, pb: PBCableInfo.Builder): PBCableInfo.Builder =
 fun toPb(cim: OverheadWireInfo, pb: PBOverheadWireInfo.Builder): PBOverheadWireInfo.Builder =
     pb.apply { toPb(cim, wiBuilder) }
 
-fun toPb(cim: PowerTransformerInfo, pb: PPowerTransformerInfo.Builder): PPowerTransformerInfo.Builder =
-    pb.apply { toPb(cim, aiBuilder) }
+fun toPb(cim: PowerTransformerInfo, pb: PBPowerTransformerInfo.Builder): PBPowerTransformerInfo.Builder =
+    pb.apply {
+        clearTransformerTankInfoMRIDs()
+        cim.transformerTankInfos.forEach { addTransformerTankInfoMRIDs(it.mRID) }
+        toPb(cim, aiBuilder)
+    }
+
+fun toPb(cim: TransformerEndInfo, pb: PBTransformerEndInfo.Builder): PBTransformerEndInfo.Builder =
+    pb.apply {
+        cim.transformerStarImpedance?.let { transformerStarImpedanceMRID = it.mRID } ?: clearTransformerStarImpedanceMRID()
+        connectionKind = WindingConnection.valueOf(cim.connectionKind.name)
+        emergencyS = cim.emergencyS
+        endNumber = cim.endNumber
+        insulationU = cim.insulationU
+        phaseAngleClock = cim.phaseAngleClock
+        r = cim.r
+        ratedS = cim.ratedS
+        ratedU = cim.ratedU
+        shortTermS = cim.shortTermS
+        toPb(cim, aiBuilder)
+    }
+
+fun toPb(cim: TransformerTankInfo, pb: PBTransformerTankInfo.Builder): PBTransformerTankInfo.Builder =
+    pb.apply {
+        clearTransformerEndInfoMRIDs()
+        cim.transformerEndInfos.forEach { addTransformerEndInfoMRIDs(it.mRID) }
+        toPb(cim, aiBuilder)
+    }
+
 
 fun toPb(cim: WireInfo, pb: PBWireInfo.Builder): PBWireInfo.Builder =
     pb.apply {
@@ -170,6 +197,7 @@ fun toPb(cim: AssetOwner, pb: PBAssetOwner.Builder): PBAssetOwner.Builder =
 fun toPb(cim: Pole, pb: PBPole.Builder): PBPole.Builder =
     pb.apply {
         classification = cim.classification
+        clearStreetlightMRIDs()
         cim.streetlights.forEach { addStreetlightMRIDs(it.mRID) }
         toPb(cim, stBuilder)
     }
@@ -615,10 +643,21 @@ fun toPb(cim: TransformerEnd, pb: PBTransformerEnd.Builder): PBTransformerEnd.Bu
         cim.terminal?.let { terminalMRID = it.mRID } ?: clearTerminalMRID()
         cim.baseVoltage?.let { baseVoltageMRID = it.mRID } ?: clearBaseVoltageMRID()
         cim.ratioTapChanger?.let { ratioTapChangerMRID = it.mRID } ?: clearRatioTapChangerMRID()
+        cim.starImpedance?.let { transformerStarImpedanceMRID = it.mRID } ?: clearTransformerStarImpedanceMRID()
         endNumber = cim.endNumber
         grounded = cim.grounded
         rGround = cim.rGround
         xGround = cim.xGround
+        toPb(cim, ioBuilder)
+    }
+
+fun toPb(cim: TransformerStarImpedance, pb: PBTransformerStarImpedance.Builder): PBTransformerStarImpedance.Builder =
+    pb.apply {
+        cim.transformerEndInfo?.let { transformerEndInfoMRID = it.mRID } ?: clearTransformerEndInfoMRID()
+        r = cim.r
+        r0 = cim.r0
+        x = cim.x
+        x0 = cim.x0
         toPb(cim, ioBuilder)
     }
 
@@ -738,7 +777,7 @@ fun PerLengthSequenceImpedance.toPb(): PBPerLengthSequenceImpedance = toPb(this,
 fun PowerElectronicsConnection.toPb(): PBPowerElectronicsConnection = toPb(this, PBPowerElectronicsConnection.newBuilder()).build()
 fun PowerElectronicsConnectionPhase.toPb(): PBPowerElectronicsConnectionPhase = toPb(this, PBPowerElectronicsConnectionPhase.newBuilder()).build()
 fun PowerTransformerEnd.toPb(): PBPowerTransformerEnd = toPb(this, PBPowerTransformerEnd.newBuilder()).build()
-fun PowerTransformerInfo.toPb(): PPowerTransformerInfo = toPb(this, PPowerTransformerInfo.newBuilder()).build()
+fun PowerTransformerInfo.toPb(): PBPowerTransformerInfo = toPb(this, PBPowerTransformerInfo.newBuilder()).build()
 fun Circuit.toPb(): PBCircuit = toPb(this, PBCircuit.newBuilder()).build()
 fun Loop.toPb(): PBLoop = toPb(this, PBLoop.newBuilder()).build()
 fun Control.toPb(): PBControl = toPb(this, PBControl.newBuilder()).build()
@@ -747,6 +786,9 @@ fun Accumulator.toPb(): PBAccumulator = toPb(this, PBAccumulator.newBuilder()).b
 fun Discrete.toPb(): PBDiscrete = toPb(this, PBDiscrete.newBuilder()).build()
 fun RemoteControl.toPb(): PBRemoteControl = toPb(this, PBRemoteControl.newBuilder()).build()
 fun RemoteSource.toPb(): PBRemoteSource = toPb(this, PBRemoteSource.newBuilder()).build()
+fun TransformerEndInfo.toPb(): PBTransformerEndInfo = toPb(this, PBTransformerEndInfo.newBuilder()).build()
+fun TransformerStarImpedance.toPb(): PBTransformerStarImpedance = toPb(this, PBTransformerStarImpedance.newBuilder()).build()
+fun TransformerTankInfo.toPb(): PBTransformerTankInfo = toPb(this, PBTransformerTankInfo.newBuilder()).build()
 
 /************ Class for Java friendly usage ************/
 
@@ -791,6 +833,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(terminal: Terminal): PBTerminal = terminal.toPb()
     fun toPb(perLengthSequenceImpedance: PerLengthSequenceImpedance): PBPerLengthSequenceImpedance =
         perLengthSequenceImpedance.toPb()
+
     fun toPb(powerElectronicsConnection: PowerElectronicsConnection): PBPowerElectronicsConnection = powerElectronicsConnection.toPb()
     fun toPb(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): PBPowerElectronicsConnectionPhase = powerElectronicsConnectionPhase.toPb()
     fun toPb(powerTransformerEnd: PowerTransformerEnd): PBPowerTransformerEnd = powerTransformerEnd.toPb()

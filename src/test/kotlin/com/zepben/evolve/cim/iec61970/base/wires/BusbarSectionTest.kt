@@ -19,19 +19,12 @@ internal class BusbarSectionTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    internal class BusbarSectionTest {
-
-        @JvmField
-        @RegisterExtension
-        var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
-
-        @Test
-        internal fun constructorCoverage() {
-            assertThat(BusbarSection().mRID, Matchers.not(equalTo("")))
-            assertThat(BusbarSection("id").mRID, equalTo("id"))
-        }
+    @Test
+    internal fun constructorCoverage() {
+        assertThat(BusbarSection().mRID, Matchers.not(equalTo("")))
+        assertThat(BusbarSection("id").mRID, equalTo("id"))
     }
 
 }

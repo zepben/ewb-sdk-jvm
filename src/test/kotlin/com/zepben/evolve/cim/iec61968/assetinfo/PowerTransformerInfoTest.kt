@@ -8,17 +8,32 @@
 
 package com.zepben.evolve.cim.iec61968.assetinfo
 
-import org.hamcrest.CoreMatchers.equalTo
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.not
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 internal class PowerTransformerInfoTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(CableInfo().mRID, not(equalTo("")))
-        assertThat(CableInfo("id").mRID, equalTo("id"))
+        assertThat(PowerTransformerInfo().mRID, not(equalTo("")))
+        assertThat(PowerTransformerInfo("id").mRID, equalTo("id"))
+    }
+
+    @Test
+    internal fun transformerTankInfo() {
+        PrivateCollectionValidator.validate(
+            { PowerTransformerInfo() },
+            { id, info -> TransformerTankInfo(id).apply { powerTransformerInfo = info } },
+            PowerTransformerInfo::numTransformerTankInfos,
+            PowerTransformerInfo::getTransformerTankInfo,
+            PowerTransformerInfo::transformerTankInfos,
+            PowerTransformerInfo::addTransformerTankInfo,
+            PowerTransformerInfo::removeTransformerTankInfo,
+            PowerTransformerInfo::clearTransformerTankInfos
+        )
     }
 
 }

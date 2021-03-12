@@ -7,12 +7,11 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
-import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -31,30 +30,24 @@ internal class TransformerEndTest {
     @Test
     internal fun accessorCoverage() {
         val transformerEnd = object : TransformerEnd() {}
-        val baseVoltage = BaseVoltage()
-        val ratioTapChanger = RatioTapChanger()
-        val terminal = Terminal()
 
         assertThat(transformerEnd.grounded, equalTo(false))
         assertThat(transformerEnd.rGround, equalTo(0.0))
         assertThat(transformerEnd.xGround, equalTo(0.0))
-        assertThat(transformerEnd.baseVoltage, equalTo(null))
-        assertThat(transformerEnd.ratioTapChanger, equalTo(null))
-        assertThat(transformerEnd.terminal, equalTo(null))
+        assertThat(transformerEnd.baseVoltage, nullValue())
+        assertThat(transformerEnd.ratioTapChanger, nullValue())
+        assertThat(transformerEnd.terminal, nullValue())
+        assertThat(transformerEnd.starImpedance, nullValue())
 
-        transformerEnd.grounded = true
-        transformerEnd.rGround = 1.2
-        transformerEnd.xGround = 3.4
-        transformerEnd.baseVoltage = baseVoltage
-        transformerEnd.ratioTapChanger = ratioTapChanger
-        transformerEnd.terminal = terminal
+        transformerEnd.fillFields(NetworkService(), true)
 
         assertThat(transformerEnd.grounded, equalTo(true))
-        assertThat(transformerEnd.rGround, equalTo(1.2))
-        assertThat(transformerEnd.xGround, equalTo(3.4))
-        assertThat(transformerEnd.baseVoltage, equalTo(baseVoltage))
-        assertThat(transformerEnd.ratioTapChanger, equalTo(ratioTapChanger))
-        assertThat(transformerEnd.terminal, equalTo(terminal))
+        assertThat(transformerEnd.rGround, equalTo(1.0))
+        assertThat(transformerEnd.xGround, equalTo(2.0))
+        assertThat(transformerEnd.baseVoltage, notNullValue())
+        assertThat(transformerEnd.ratioTapChanger, notNullValue())
+        assertThat(transformerEnd.terminal, notNullValue())
+        assertThat(transformerEnd.starImpedance, notNullValue())
     }
 
 }

@@ -8,6 +8,8 @@
 package com.zepben.evolve.services.network.testdata
 
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -24,215 +26,270 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createFeeder
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createJunction
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createRemoteSource
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createSubstation
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locationOf
 import com.zepben.evolve.services.network.NetworkService
 import java.util.*
 
 /************ IEC61968 ASSET INFO ************/
 
-fun PowerTransformerInfo.fillFields(): PowerTransformerInfo {
-    (this as AssetInfo).fillFields()
+fun PowerTransformerInfo.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerTransformerInfo {
+    (this as AssetInfo).fillFields(networkService, includeRuntime)
+
+    for (i in 0..1) {
+        addTransformerTankInfo(TransformerTankInfo().also {
+            it.powerTransformerInfo = this
+            networkService.add(it)
+        })
+    }
+
     return this
 }
 
-fun AssetInfo.fillFields() {
-    (this as IdentifiedObject).fillFields()
+fun TransformerEndInfo.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): TransformerEndInfo {
+    (this as AssetInfo).fillFields(networkService, includeRuntime)
+
+    connectionKind = WindingConnection.D
+    emergencyS = 1
+    endNumber = 2
+    insulationU = 3
+    phaseAngleClock = 4
+    r = 5.0
+    ratedS = 6
+    ratedU = 7
+    shortTermS = 8
+
+    transformerTankInfo = TransformerTankInfo().also {
+        it.addTransformerEndInfo(this)
+        networkService.add(it)
+    }
+    transformerStarImpedance = TransformerStarImpedance().also {
+        it.transformerEndInfo = this
+        networkService.add(it)
+    }
+
+    return this
+}
+
+fun TransformerTankInfo.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): TransformerTankInfo {
+    (this as AssetInfo).fillFields(networkService, includeRuntime)
+
+    powerTransformerInfo = PowerTransformerInfo().also {
+        it.addTransformerTankInfo(this)
+        networkService.add(it)
+    }
+
+    for (i in 0..1) {
+        addTransformerEndInfo(TransformerEndInfo().also {
+            it.transformerTankInfo = this
+            networkService.add(it)
+        })
+    }
+
+    return this
+}
+
+fun AssetInfo.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as IdentifiedObject).fillFields(networkService, includeRuntime)
 }
 
 /************ IEC61968 ASSETS ************/
-fun Asset.fillFields(networkService: NetworkService) {
-    val ao = AssetOwner()
-    networkService.add(ao)
-    addOrganisationRole(ao)
+fun Asset.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as IdentifiedObject).fillFields(networkService, includeRuntime)
+
+    addOrganisationRole(AssetOwner().also { networkService.add(it) })
     location = Location().also { networkService.add(it) }
-    (this as IdentifiedObject).fillFields()
 }
 
-fun AssetContainer.fillFields(networkService: NetworkService) {
-    (this as Asset).fillFields(networkService)
+fun AssetContainer.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as Asset).fillFields(networkService, includeRuntime)
 }
 
-fun Pole.fillFields(networkService: NetworkService): Pole {
+fun Pole.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): Pole {
+    (this as Structure).fillFields(networkService, includeRuntime)
+
     classification = "classification"
 
-    val streetlight = Streetlight()
-    streetlight.pole = this
-    networkService.add(streetlight)
-    addStreetlight(streetlight)
-    (this as Structure).fillFields(networkService)
+    addStreetlight(Streetlight().also {
+        it.pole = this
+        networkService.add(it)
+    })
+
     return this
 }
 
-fun Streetlight.fillFields(networkService: NetworkService): Streetlight {
-    pole = Pole()
-    pole!!.addStreetlight(this)
-    networkService.add(pole!!)
+fun Streetlight.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): Streetlight {
+    (this as Asset).fillFields(networkService, includeRuntime)
+
+    pole = Pole().also {
+        it.addStreetlight(this)
+        networkService.add(it)
+    }
     lampKind = StreetlightLampKind.MERCURY_VAPOR
     lightRating = 20
-    (this as Asset).fillFields(networkService)
+
     return this
 }
 
-fun Structure.fillFields(networkService: NetworkService) {
-    (this as AssetContainer).fillFields(networkService)
+fun Structure.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as AssetContainer).fillFields(networkService, includeRuntime)
 }
 
 /************ IEC61968 METERING ************/
 
-fun EndDevice.fillFields(networkService: NetworkService) {
+fun EndDevice.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as AssetContainer).fillFields(networkService, includeRuntime)
+
     for (i in 0..1) {
-        val usagePoint = UsagePoint()
-        addUsagePoint(usagePoint)
-        usagePoint.addEndDevice(this)
-        networkService.add(usagePoint)
+        addUsagePoint(UsagePoint().also {
+            it.addEndDevice(this)
+            networkService.add(it)
+        })
     }
 
     customerMRID = UUID.randomUUID().toString()
     serviceLocation = Location().also { networkService.add(it) }
-    (this as AssetContainer).fillFields(networkService)
 }
 
-fun Meter.fillFields(networkService: NetworkService): Meter {
-    (this as EndDevice).fillFields(networkService)
+fun Meter.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): Meter {
+    (this as EndDevice).fillFields(networkService, includeRuntime)
     return this
 }
 
 
 /************ IEC61970 CORE ************/
 
-fun ConnectivityNodeContainer.fillFields(networkService: NetworkService): ConnectivityNodeContainer {
-    (this as PowerSystemResource).fillFields(networkService)
-    return this
+fun ConnectivityNodeContainer.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as PowerSystemResource).fillFields(networkService, includeRuntime)
 }
 
-fun EquipmentContainer.fillFields(networkService: NetworkService) {
+fun EquipmentContainer.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as ConnectivityNodeContainer).fillFields(networkService, includeRuntime)
+
     for (i in 0..1)
-        createJunction(networkService, i, this, null)
-
-    (this as ConnectivityNodeContainer).fillFields(networkService)
+        addEquipment(Junction().also {
+            it.addContainer(this)
+            networkService.add(it)
+        })
 }
 
-private fun IdentifiedObject.fillFields() {
+//
+// Note: `networkService` and `includeRuntime` are added here even though they are not used to make sure everything else
+//       includes them to prevent ambiguity issues.
+//
+@Suppress("UNUSED_PARAMETER")
+fun IdentifiedObject.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
     name = "1"
     description = "the description"
     numDiagramObjects = 2
 }
 
-fun PowerSystemResource.fillFields(networkService: NetworkService) {
+fun PowerSystemResource.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as IdentifiedObject).fillFields(networkService, includeRuntime)
+
     location = locationOf(3.3, 4.4)
     networkService.add(location!!)
 
     numControls = 5
-
-    (this as IdentifiedObject).fillFields()
 }
 
-fun Equipment.fillFields(networkService: NetworkService, includeRuntime: Boolean = true) {
+fun Equipment.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as PowerSystemResource).fillFields(networkService, includeRuntime)
+
     inService = false
     normallyInService = false
 
     for (i in 0..1) {
-        val usagePoint = UsagePoint()
-        networkService.add(usagePoint)
-        addUsagePoint(usagePoint)
-        usagePoint.addEquipment(this)
-    }
+        addUsagePoint(UsagePoint().also {
+            it.addEquipment(this)
+            networkService.add(it)
+        })
 
-    for (i in 0..1) {
-        val operationalRestriction = OperationalRestriction()
-        networkService.add(operationalRestriction)
-        addOperationalRestriction(operationalRestriction)
-        operationalRestriction.addEquipment(this)
-    }
+        addOperationalRestriction(OperationalRestriction().also {
+            it.addEquipment(this)
+            networkService.add(it)
+        })
 
-    for (i in 0..1) {
-        val container = Circuit()
-        networkService.add(container)
-        addContainer(container)
-        container.addEquipment(this)
-    }
+        addContainer(Circuit().also {
+            it.addEquipment(this)
+            networkService.add(it)
+        })
 
-    if (includeRuntime) {
-        for (i in 0..1) {
-            val feeder = Feeder()
-            networkService.add(feeder)
-            addCurrentFeeder(feeder)
-            feeder.addEquipment(this)
+        if (includeRuntime) {
+            addCurrentFeeder(Feeder().also {
+                it.addEquipment(this)
+                networkService.add(it)
+            })
         }
     }
-
-    (this as PowerSystemResource).fillFields(networkService)
 }
 
-fun ConductingEquipment.fillFields(networkService: NetworkService, includeRuntime: Boolean = true) {
-    val bv = BaseVoltage()
-    networkService.add(bv)
-    baseVoltage = bv
-
-    for (i in 0..1) {
-        val terminal = Terminal()
-        terminal.conductingEquipment = this
-        addTerminal(terminal)
-        networkService.add(terminal)
-    }
-
+fun ConductingEquipment.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
     (this as Equipment).fillFields(networkService, includeRuntime)
+
+    baseVoltage = BaseVoltage().also { networkService.add(it) }
+
+    for (i in 0..1) {
+        addTerminal(Terminal().also {
+            it.conductingEquipment = this
+            networkService.add(it)
+        })
+    }
 }
 
-fun Substation.fillFields(networkService: NetworkService): Substation {
-    subGeographicalRegion = SubGeographicalRegion()
-    subGeographicalRegion!!.addSubstation(this)
-    networkService.add(subGeographicalRegion!!)
+fun Substation.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): Substation {
+    (this as EquipmentContainer).fillFields(networkService, includeRuntime)
 
-    for (i in 0..1)
-        createFeeder(networkService, i, null, this)
-
-    for (i in 0..1) {
-        val loop = Loop()
-        networkService.add(loop)
-        addLoop(loop)
-        loop.addSubstation(this)
+    subGeographicalRegion = SubGeographicalRegion().also {
+        it.addSubstation(this)
+        networkService.add(it)
     }
 
     for (i in 0..1) {
-        val loop = Loop()
-        networkService.add(loop)
-        addEnergizedLoop(loop)
-        loop.addEnergizingSubstation(this)
+        addFeeder(Feeder().also {
+            it.normalEnergizingSubstation = this
+            networkService.add(it)
+        })
+
+        addLoop(Loop().also {
+            it.addSubstation(this)
+            networkService.add(it)
+        })
+
+        addEnergizedLoop(Loop().also {
+            it.addEnergizingSubstation(this)
+            networkService.add(it)
+        })
+
+        addCircuit(Circuit().also {
+            it.addEndSubstation(this)
+            networkService.add(it)
+        })
     }
 
-    for (i in 0..1) {
-        val circuit = Circuit()
-        networkService.add(circuit)
-        addCircuit(circuit)
-        circuit.addEndSubstation(this)
-    }
-
-    (this as EquipmentContainer).fillFields()
     return this
 }
 
 /************ IEC61970 WIRES GENERATION PRODUCTION ************/
 
-fun BatteryUnit.fillFields(networkService: NetworkService): BatteryUnit {
+fun BatteryUnit.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): BatteryUnit {
+    (this as PowerElectronicsUnit).fillFields(networkService, includeRuntime)
+
     batteryState = BatteryStateKind.charging
     ratedE = 1L
     storedE = 2L
 
-    (this as PowerElectronicsUnit).fillFields(networkService)
     return this
 }
 
-fun PhotoVoltaicUnit.fillFields(networkService: NetworkService): PhotoVoltaicUnit {
-    (this as PowerElectronicsUnit).fillFields(networkService)
+fun PhotoVoltaicUnit.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PhotoVoltaicUnit {
+    (this as PowerElectronicsUnit).fillFields(networkService, includeRuntime)
     return this
 }
 
-fun PowerElectronicsConnection.fillFields(networkService: NetworkService): PowerElectronicsConnection {
+fun PowerElectronicsConnection.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerElectronicsConnection {
+    (this as RegulatingCondEq).fillFields(networkService, includeRuntime)
+
     maxIFault = 1
     maxQ = 2.0
     minQ = 3.0
@@ -241,191 +298,205 @@ fun PowerElectronicsConnection.fillFields(networkService: NetworkService): Power
     ratedS = 6
     ratedU = 7
 
-    (this as RegulatingCondEq).fillFields(networkService, false)
     return this
 }
 
-fun PowerElectronicsConnectionPhase.fillFields(networkService: NetworkService): PowerElectronicsConnectionPhase {
-    val pec = PowerElectronicsConnection().also {
-        networkService.add(it)
+fun PowerElectronicsConnectionPhase.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerElectronicsConnectionPhase {
+    (this as PowerSystemResource).fillFields(networkService, includeRuntime)
+
+    powerElectronicsConnection = PowerElectronicsConnection().also {
         it.addPhase(this)
+        networkService.add(it)
     }
-    powerElectronicsConnection = pec
     p = 1.0
     phase = SinglePhaseKind.B
     q = 2.0
 
-    (this as PowerSystemResource).fillFields(networkService)
     return this
 }
 
-fun PowerElectronicsUnit.fillFields(networkService: NetworkService): PowerElectronicsUnit {
-    val pec = PowerElectronicsConnection().also {
-        networkService.add(it)
+fun PowerElectronicsUnit.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerElectronicsUnit {
+    (this as Equipment).fillFields(networkService, includeRuntime)
+
+    powerElectronicsConnection = PowerElectronicsConnection().also {
         it.addUnit(this)
+        networkService.add(it)
     }
     maxP = 1
     minP = 2
-    powerElectronicsConnection = pec
 
-    (this as Equipment).fillFields(networkService, false)
     return this
 }
 
-fun PowerElectronicsWindUnit.fillFields(networkService: NetworkService): PowerElectronicsWindUnit {
-    (this as PowerElectronicsUnit).fillFields(networkService)
+fun PowerElectronicsWindUnit.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerElectronicsWindUnit {
+    (this as PowerElectronicsUnit).fillFields(networkService, includeRuntime)
     return this
 }
 
 /************ IEC61970 WIRES ************/
 
-fun BusbarSection.fillFields(networkService: NetworkService): BusbarSection {
-    (this as Connector).fillFields(networkService, false)
+fun BusbarSection.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): BusbarSection {
+    (this as Connector).fillFields(networkService, includeRuntime)
     return this
 }
 
-fun Line.fillFields(networkService: NetworkService): Line {
-    (this as EquipmentContainer).fillFields(networkService)
+fun Line.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as EquipmentContainer).fillFields(networkService, includeRuntime)
+}
+
+fun Breaker.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): Breaker {
+    (this as ProtectedSwitch).fillFields(networkService, includeRuntime)
     return this
 }
 
-fun Breaker.fillFields(): Breaker {
-    (this as ProtectedSwitch).fillFields()
+fun LoadBreakSwitch.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): LoadBreakSwitch {
+    (this as ProtectedSwitch).fillFields(networkService, includeRuntime)
     return this
 }
 
-fun LoadBreakSwitch.fillFields(): LoadBreakSwitch {
-    (this as ProtectedSwitch).fillFields()
-    return this
+fun ProtectedSwitch.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as Switch).fillFields(networkService, includeRuntime)
 }
 
-fun ProtectedSwitch.fillFields(): ProtectedSwitch {
-    (this as Switch).fillFields()
-    return this
-}
+fun Switch.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as ConductingEquipment).fillFields(networkService, includeRuntime)
 
-fun Switch.fillFields(): Switch {
     normalOpen = 1
-    open = 1
-    return this
+    open = 2
 }
 
 fun PowerTransformer.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerTransformer {
+    (this as ConductingEquipment).fillFields(networkService, includeRuntime)
+
     transformerUtilisation = 1.0
     vectorGroup = VectorGroup.DD0
-    assetInfo = PowerTransformerInfo().fillFields().also { networkService.add(it) }
+    assetInfo = PowerTransformerInfo().also { networkService.add(it) }
 
-    (this as ConductingEquipment).fillFields(networkService, includeRuntime)
     return this
 }
 
-fun TransformerEnd.fillFields(networkService: NetworkService): TransformerEnd {
-    val term = Terminal()
-    val rtc = RatioTapChanger()
-    rtc.transformerEnd = this
-    val bv = BaseVoltage()
-    networkService.add(term)
-    networkService.add(rtc)
-    networkService.add(bv)
-    terminal = term
-    ratioTapChanger = rtc
-    baseVoltage = bv
+fun PowerTransformerEnd.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): PowerTransformerEnd {
+    (this as TransformerEnd).fillFields(networkService, includeRuntime)
+
+    powerTransformer = PowerTransformer().also { networkService.add(it) }
+    powerTransformer?.addEnd(this)
+
+    b = 1.0
+    b0 = 2.0
+    connectionKind = WindingConnection.Zn
+    g = 3.0
+    g0 = 4.0
+    phaseAngleClock = 5
+    r = 6.0
+    r0 = 7.0
+    ratedS = 8
+    ratedU = 9
+    x = 10.0
+    x0 = 11.0
+
+    return this
+}
+
+fun TransformerEnd.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as IdentifiedObject).fillFields(networkService, includeRuntime)
+
+    terminal = Terminal().also { networkService.add(it) }
+    ratioTapChanger = RatioTapChanger().also {
+        it.transformerEnd = this
+        networkService.add(it)
+    }
+    baseVoltage = BaseVoltage().also { networkService.add(it) }
     grounded = true
     rGround = 1.0
     xGround = 2.0
     endNumber = 1
-
-    (this as IdentifiedObject).fillFields()
-    return this
+    starImpedance = TransformerStarImpedance().also { networkService.add(it) }
 }
 
-fun PowerTransformerEnd.fillFields(networkService: NetworkService): PowerTransformerEnd {
-    val pt = PowerTransformer()
-    powerTransformer = pt
-    pt.addEnd(this)
-    networkService.add(pt)
-    b = 1.0
-    b0 = 2.0
-    r = 3.0
-    r0 = 4.0
-    x = 5.0
-    x0 = 6.0
-    g = 7.0
-    g0 = 8.0
-    ratedS = 100
-    ratedU = 4000
-    phaseAngleClock = 3
-    connectionKind = WindingConnection.D
+fun TransformerStarImpedance.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): TransformerStarImpedance {
+    (this as IdentifiedObject).fillFields(networkService, includeRuntime)
 
-    (this as TransformerEnd).fillFields(networkService)
+    r = 1.0
+    r0 = 2.0
+    x = 3.0
+    x0 = 4.0
+
+    transformerEndInfo = TransformerEndInfo().also {
+        it.transformerStarImpedance = this
+        networkService.add(it)
+    }
+
     return this
 }
 
 /************ IEC61970 InfIEC61970 ************/
 
-fun Circuit.fillFields(networkService: NetworkService): Circuit {
-    loop = Loop()
-    loop!!.addCircuit(this)
-    networkService.add(loop!!)
+fun Circuit.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): Circuit {
+    (this as Line).fillFields(networkService, includeRuntime)
 
-    for (i in 1..2)
-        addEndTerminal(createTerminal(networkService, null, PhaseCode.A, i))
-
-    for (i in 0..1) {
-        val substation = createSubstation(networkService, i, null)
-        addEndSubstation(substation)
-        substation.addCircuit(this)
+    loop = Loop().also {
+        it.addCircuit(this)
+        networkService.add(it)
     }
 
-    (this as Line).fillFields(networkService)
+    for (i in 0..1) {
+        addEndTerminal(Terminal().also { networkService.add(it) })
+        addEndSubstation(Substation().also {
+            it.addCircuit(this)
+            networkService.add(it)
+        })
+    }
+
+
     return this
 }
 
-fun Loop.fillFields(networkService: NetworkService): Loop {
-    for (i in 0..1) {
-        val circuit = Circuit()
-        addCircuit(circuit)
-        circuit.loop = this
-        networkService.add(circuit)
-    }
+fun Loop.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): Loop {
+    (this as IdentifiedObject).fillFields(networkService, includeRuntime)
 
     for (i in 0..1) {
-        val substation = createSubstation(networkService, i, null)
-        addSubstation(substation)
-        substation.addLoop(this)
+        addCircuit(Circuit().also {
+            it.loop = this
+            networkService.add(it)
+        })
+
+        addSubstation(Substation().also {
+            it.addLoop(this)
+            networkService.add(it)
+        })
+
+        addEnergizingSubstation(Substation().also {
+            it.addEnergizedLoop(this)
+            networkService.add(it)
+        })
     }
 
-    for (i in 2..3) {
-        val substation = createSubstation(networkService, i, null)
-        addEnergizingSubstation(substation)
-        substation.addLoop(this)
-    }
-
-    (this as IdentifiedObject).fillFields()
     return this
 }
 
 /************ IEC61970 MEASUREMENT ************/
-private fun Measurement.fillFields(networkService: NetworkService) {
+
+fun Measurement.fillFields(networkService: NetworkService, includeRuntime: Boolean) {
+    (this as IdentifiedObject).fillFields(networkService, includeRuntime)
+
     powerSystemResourceMRID = PowerTransformer().mRID
     remoteSource = createRemoteSource(networkService, this)
     terminalMRID = Terminal().mRID
     phases = PhaseCode.ABCN
     unitSymbol = UnitSymbol.HENRYS
-    (this as IdentifiedObject).fillFields()
 }
 
-fun Analog.fillFields(networkService: NetworkService): Analog {
-    (this as Measurement).fillFields(networkService)
+fun Analog.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): Analog {
+    (this as Measurement).fillFields(networkService, includeRuntime)
     return this
 }
 
-fun Accumulator.fillFields(networkService: NetworkService): Accumulator {
-    (this as Measurement).fillFields(networkService)
+fun Accumulator.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): Accumulator {
+    (this as Measurement).fillFields(networkService, includeRuntime)
     return this
 }
 
-fun Discrete.fillFields(networkService: NetworkService): Discrete {
-    (this as Measurement).fillFields(networkService)
+fun Discrete.fillFields(networkService: NetworkService, includeRuntime: Boolean = true): Discrete {
+    (this as Measurement).fillFields(networkService, includeRuntime)
     return this
 }

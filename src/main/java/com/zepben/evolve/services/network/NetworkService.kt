@@ -7,9 +7,7 @@
  */
 package com.zepben.evolve.services.network
 
-import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
@@ -217,6 +215,15 @@ class NetworkService : BaseService("network") {
         removeMeasurementIndex(discrete)
         return super.remove(discrete)
     }
+
+    fun add(transformerEndInfo: TransformerEndInfo): Boolean = super.add(transformerEndInfo)
+    fun remove(transformerEndInfo: TransformerEndInfo): Boolean = super.remove(transformerEndInfo)
+
+    fun add(transformerStarImpedance: TransformerStarImpedance): Boolean = super.add(transformerStarImpedance)
+    fun remove(transformerStarImpedance: TransformerStarImpedance): Boolean = super.remove(transformerStarImpedance)
+
+    fun add(transformerTankInfo: TransformerTankInfo): Boolean = super.add(transformerTankInfo)
+    fun remove(transformerTankInfo: TransformerTankInfo): Boolean = super.remove(transformerTankInfo)
 
     /**
      * Get all measurements of type [T] associated with the given [mRID].

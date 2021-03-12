@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2021 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,6 +7,11 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -28,7 +33,6 @@ internal class PowerTransformerEndTest {
     @Test
     internal fun accessorCoverage() {
         val powerTransformerEnd = PowerTransformerEnd()
-        val powerTransformer = PowerTransformer()
 
         assertThat(powerTransformerEnd.powerTransformer, nullValue())
         assertThat(powerTransformerEnd.b, equalTo(0.0))
@@ -37,30 +41,16 @@ internal class PowerTransformerEndTest {
         assertThat(powerTransformerEnd.g, equalTo(0.0))
         assertThat(powerTransformerEnd.g0, equalTo(0.0))
         assertThat(powerTransformerEnd.phaseAngleClock, equalTo(0))
-        assertThat(powerTransformerEnd.r, equalTo(0.0))
-        assertThat(powerTransformerEnd.r0, equalTo(0.0))
+        assertThat(powerTransformerEnd.r, notANumber())
+        assertThat(powerTransformerEnd.r0, notANumber())
         assertThat(powerTransformerEnd.ratedS, equalTo(0))
         assertThat(powerTransformerEnd.ratedU, equalTo(0))
-        assertThat(powerTransformerEnd.x, equalTo(0.0))
-        assertThat(powerTransformerEnd.x0, equalTo(0.0))
+        assertThat(powerTransformerEnd.x, notANumber())
+        assertThat(powerTransformerEnd.x0, notANumber())
 
-        powerTransformerEnd.apply {
-            this.powerTransformer = powerTransformer
-            b = 1.0
-            b0 = 2.0
-            connectionKind = WindingConnection.Zn
-            g = 3.0
-            g0 = 4.0
-            phaseAngleClock = 5
-            r = 6.0
-            r0 = 7.0
-            ratedS = 8
-            ratedU = 9
-            x = 10.0
-            x0 = 11.0
-        }
+        powerTransformerEnd.fillFields(NetworkService())
 
-        assertThat(powerTransformerEnd.powerTransformer, equalTo(powerTransformer))
+        assertThat(powerTransformerEnd.powerTransformer, notNullValue())
         assertThat(powerTransformerEnd.b, equalTo(1.0))
         assertThat(powerTransformerEnd.b0, equalTo(2.0))
         assertThat(powerTransformerEnd.connectionKind, equalTo(WindingConnection.Zn))
@@ -74,4 +64,15 @@ internal class PowerTransformerEndTest {
         assertThat(powerTransformerEnd.x, equalTo(10.0))
         assertThat(powerTransformerEnd.x0, equalTo(11.0))
     }
+
+    @Test
+    internal fun cantAssignStarImpedanceWithCatalogAssigned() {
+        val tx = PowerTransformer().apply { assetInfo = PowerTransformerInfo() }
+        val end = PowerTransformerEnd().apply { powerTransformer = tx }.also { tx.addEnd(it) }
+
+        ExpectException.expect { end.starImpedance = TransformerStarImpedance() }
+            .toThrow(IllegalArgumentException::class.java)
+            .withMessage("Unable to use a star impedance for ${end.typeNameAndMRID()} directly because ${tx.typeNameAndMRID()} references a catalog.")
+    }
+
 }

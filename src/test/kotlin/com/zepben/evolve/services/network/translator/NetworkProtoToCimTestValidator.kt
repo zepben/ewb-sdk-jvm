@@ -7,6 +7,9 @@
  */
 package com.zepben.evolve.services.network.translator
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -24,41 +27,49 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
-import com.zepben.protobuf.cim.iec61968.assets.Asset.Builder as PBAssetBuilder
-import com.zepben.protobuf.cim.iec61968.assets.AssetContainer.Builder as PBAssetContainerBuilder
+import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PBPowerTransformerInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerEndInfo as PBTransformerEndInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTankInfo as PBTransformerTankInfo
+import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
+import com.zepben.protobuf.cim.iec61968.assets.AssetContainer as PBAssetContainer
+import com.zepben.protobuf.cim.iec61968.assets.AssetInfo as PBAssetInfo
 import com.zepben.protobuf.cim.iec61968.assets.Pole as PBPole
 import com.zepben.protobuf.cim.iec61968.assets.Structure as PBStructure
-import com.zepben.protobuf.cim.iec61968.metering.EndDevice.Builder as PBEndDeviceBuilder
-import com.zepben.protobuf.cim.iec61968.metering.Meter.Builder as PBMeterBuilder
-import com.zepben.protobuf.cim.iec61970.base.core.ConductingEquipment.Builder as PBConductingEquipmentBuilder
-import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNodeContainer.Builder as PBConnectivityNodeContainerBuilder
-import com.zepben.protobuf.cim.iec61970.base.core.Equipment.Builder as PBEquipmentBuilder
-import com.zepben.protobuf.cim.iec61970.base.core.EquipmentContainer.Builder as PBEquipmentContainerBuilder
-import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject.Builder as PBIdentifiedObjectBuilder
+import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
+import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
+import com.zepben.protobuf.cim.iec61970.base.core.ConductingEquipment as PBConductingEquipment
+import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNodeContainer as PBConnectivityNodeContainer
+import com.zepben.protobuf.cim.iec61970.base.core.Equipment as PBEquipment
+import com.zepben.protobuf.cim.iec61970.base.core.EquipmentContainer as PBEquipmentContainer
+import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject as PBIdentifiedObject
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
-import com.zepben.protobuf.cim.iec61970.base.core.PowerSystemResource.Builder as PBPowerSystemResourceBuilder
-import com.zepben.protobuf.cim.iec61970.base.core.Substation.Builder as PBSubstationBuilder
+import com.zepben.protobuf.cim.iec61970.base.core.PowerSystemResource as PBPowerSystemResource
+import com.zepben.protobuf.cim.iec61970.base.core.Substation as PBSubstation
 import com.zepben.protobuf.cim.iec61970.base.domain.UnitSymbol as PBUnitSymbol
 import com.zepben.protobuf.cim.iec61970.base.meas.Accumulator as PBAccumulator
 import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
 import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
-import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection.Builder as PBBusbarSectionBuilder
-import com.zepben.protobuf.cim.iec61970.base.wires.Connector.Builder as PBConnectorBuilder
-import com.zepben.protobuf.cim.iec61970.base.wires.Line.Builder as PBLineBuilder
-import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch.Builder as PBLoadBreakSwitchBuilder
-import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer.Builder as PBPowerTransformerBuilder
-import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch.Builder as PBProtectedSwitchBuilder
-import com.zepben.protobuf.cim.iec61970.base.wires.Switch.Builder as PBSwitchBuilder
-import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit.Builder as PBCircuitBuilder
-import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop.Builder as PBLoopBuilder
+import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
+import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
+import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
+import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBreakSwitch
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformerEnd as PBPowerTransformerEnd
+import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch as PBProtectedSwitch
+import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
+import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
+import com.zepben.protobuf.cim.iec61970.base.wires.TransformerStarImpedance as PBTransformerStarImpedance
+import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup as PBVectorGroup
+import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection as PBWindingConnection
+import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
+import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 
 class NetworkProtoToCimTestValidator(val network: NetworkService) {
 
-    inline fun <reified T : Asset> validate(pb: PBAssetBuilder, fromPb: () -> T): T {
+    inline fun <reified T : Asset> validate(pb: PBAsset.Builder, fromPb: () -> T): T {
         network.add(AssetOwner("role1"))
         network.add(AssetOwner("role2"))
         network.add(Location("assetLocation"))
@@ -76,10 +87,10 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun <reified T : AssetContainer> validate(pb: PBAssetContainerBuilder, fromPb: () -> T): T =
+    inline fun <reified T : AssetContainer> validate(pb: PBAssetContainer.Builder, fromPb: () -> T): T =
         validate(pb.atBuilder, fromPb)
 
-    inline fun <reified T : EndDevice> validate(pb: PBEndDeviceBuilder, fromPb: () -> T): T {
+    inline fun <reified T : EndDevice> validate(pb: PBEndDevice.Builder, fromPb: () -> T): T {
         network.add(UsagePoint("up1"))
         network.add(UsagePoint("up2"))
         network.add(Location("customerServiceLocation"))
@@ -100,12 +111,12 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun validate(pb: PBMeterBuilder, fromPb: () -> Meter): Meter = validate(pb.edBuilder, fromPb)
+    inline fun validate(pb: PBMeter.Builder, fromPb: () -> Meter): Meter = validate(pb.edBuilder, fromPb)
 
-    inline fun <reified T : ConnectivityNodeContainer> validate(pb: PBConnectivityNodeContainerBuilder, fromPb: () -> T): T =
+    inline fun <reified T : ConnectivityNodeContainer> validate(pb: PBConnectivityNodeContainer.Builder, fromPb: () -> T): T =
         validate(pb.psrBuilder, fromPb)
 
-    inline fun <reified T : EquipmentContainer> validate(pb: PBEquipmentContainerBuilder, fromPb: () -> T): T {
+    inline fun <reified T : EquipmentContainer> validate(pb: PBEquipmentContainer.Builder, fromPb: () -> T): T {
         val cim = validate(pb.cncBuilder, fromPb)
 
         assertThat(cim.numEquipment(), equalTo(0))
@@ -113,7 +124,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun <reified T : IdentifiedObject> validate(pb: PBIdentifiedObjectBuilder, fromPb: () -> T): T {
+    inline fun <reified T : IdentifiedObject> validate(pb: PBIdentifiedObject.Builder, fromPb: () -> T): T {
         pb.mrid = "mrid"
         pb.name = "name"
         pb.description = "description"
@@ -129,7 +140,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun <reified T : PowerSystemResource> validate(pb: PBPowerSystemResourceBuilder, fromPb: () -> T): T {
+    inline fun <reified T : PowerSystemResource> validate(pb: PBPowerSystemResource.Builder, fromPb: () -> T): T {
         network.add(Location("location1"))
 
         pb.locationMRID = "location1"
@@ -147,7 +158,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun <reified T : Equipment> validate(pb: PBEquipmentBuilder, fromPb: () -> T): T {
+    inline fun <reified T : Equipment> validate(pb: PBEquipment.Builder, fromPb: () -> T): T {
         pb.inService = false
         pb.normallyInService = false
 
@@ -191,7 +202,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun <reified T : ConductingEquipment> validate(pb: PBConductingEquipmentBuilder, fromPb: () -> T): T {
+    inline fun <reified T : ConductingEquipment> validate(pb: PBConductingEquipment.Builder, fromPb: () -> T): T {
         network.add(BaseVoltage("bv1"))
         pb.baseVoltageMRID = "bv1"
 
@@ -208,12 +219,12 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun <reified T : Connector> validate(pb: PBConnectorBuilder, fromPb: () -> T): T = validate(pb.ceBuilder, fromPb)
+    inline fun <reified T : Connector> validate(pb: PBConnector.Builder, fromPb: () -> T): T = validate(pb.ceBuilder, fromPb)
 
-    inline fun validate(pb: PBBusbarSectionBuilder, fromPb: () -> BusbarSection): BusbarSection = validate(pb.cnBuilder, fromPb)
+    inline fun validate(pb: PBBusbarSection.Builder, fromPb: () -> BusbarSection): BusbarSection = validate(pb.cnBuilder, fromPb)
 
-    inline fun validate(pb: PBPowerTransformerBuilder, fromPb: () -> PowerTransformer): PowerTransformer {
-        pb.vectorGroup = VectorGroup.D0
+    inline fun validate(pb: PBPowerTransformer.Builder, fromPb: () -> PowerTransformer): PowerTransformer {
+        pb.vectorGroup = PBVectorGroup.D0
         pb.transformerUtilisation = 0.9
 
         network.add(PowerTransformerEnd("pte1"))
@@ -222,7 +233,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
 
         val cim = validate(pb.ceBuilder, fromPb)
 
-        assertThat(cim.vectorGroup.name, equalTo(VectorGroup.D0.name))
+        assertThat(cim.vectorGroup, equalTo(VectorGroup.D0))
         assertThat(cim.transformerUtilisation, equalTo(0.9))
         assertThat(cim.getEnd("pte1"), equalTo(network["pte1"]))
         assertThat(cim.getEnd("pte2"), equalTo(network["pte2"]))
@@ -230,15 +241,11 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun validate(pb: PBLoadBreakSwitchBuilder, fromPb: () -> LoadBreakSwitch): LoadBreakSwitch {
-        return validate(pb.psBuilder, fromPb)
-    }
+    inline fun validate(pb: PBLoadBreakSwitch.Builder, fromPb: () -> LoadBreakSwitch): LoadBreakSwitch = validate(pb.psBuilder, fromPb)
 
-    inline fun <reified T : ProtectedSwitch> validate(pb: PBProtectedSwitchBuilder, fromPb: () -> T): T {
-        return validate(pb.swBuilder, fromPb)
-    }
+    inline fun <reified T : ProtectedSwitch> validate(pb: PBProtectedSwitch.Builder, fromPb: () -> T): T = validate(pb.swBuilder, fromPb)
 
-    inline fun <reified T : Switch> validate(pb: PBSwitchBuilder, fromPb: () -> T): T {
+    inline fun <reified T : Switch> validate(pb: PBSwitch.Builder, fromPb: () -> T): T {
         pb.normalOpen = true
         pb.open = true
 
@@ -250,7 +257,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun validate(pb: PBSubstationBuilder, fromPb: () -> Substation): Substation {
+    inline fun validate(pb: PBSubstation.Builder, fromPb: () -> Substation): Substation {
         network.add(SubGeographicalRegion("sgr1"))
         network.add(Feeder("feeder1"))
         network.add(Feeder("feeder2"))
@@ -290,10 +297,10 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun <reified T : Line> validate(pb: PBLineBuilder, fromPb: () -> T): T =
+    inline fun <reified T : Line> validate(pb: PBLine.Builder, fromPb: () -> T): T =
         validate(pb.ecBuilder, fromPb)
 
-    inline fun validate(pb: PBCircuitBuilder, fromPb: () -> Circuit): Circuit {
+    inline fun validate(pb: PBCircuit.Builder, fromPb: () -> Circuit): Circuit {
         network.add(Loop("loop1"))
         network.add(Terminal("terminal1"))
         network.add(Terminal("terminal2"))
@@ -319,7 +326,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         return cim
     }
 
-    inline fun validate(pb: PBLoopBuilder, fromPb: () -> Loop): Loop {
+    inline fun validate(pb: PBLoop.Builder, fromPb: () -> Loop): Loop {
         network.add(Circuit("circuit1"))
         network.add(Circuit("circuit2"))
         network.add(Substation("substation1"))
@@ -379,12 +386,12 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         val rs = RemoteSource("rs1")
         network.add(rs)
 
-        assertThat(cim.terminalMRID, `is`("terminal1"))
-        assertThat(cim.powerSystemResourceMRID, `is`("psr1"))
+        assertThat(cim.terminalMRID, equalTo("terminal1"))
+        assertThat(cim.powerSystemResourceMRID, equalTo("psr1"))
 
         assertThat(cim.remoteSource, equalTo(rs))
-        assertThat(cim.phases, `is`(PhaseCode.ABC))
-        assertThat(cim.unitSymbol, `is`(UnitSymbol.N))
+        assertThat(cim.phases, equalTo(PhaseCode.ABC))
+        assertThat(cim.unitSymbol, equalTo(UnitSymbol.N))
 
         return cim
     }
@@ -392,7 +399,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
     inline fun validate(pb: PBAnalog.Builder, fromPb: () -> Analog): Analog {
         pb.positiveFlowIn = true
         val cim = validate(pb.measurementBuilder, fromPb)
-        assertThat(cim.positiveFlowIn, `is`(true))
+        assertThat(cim.positiveFlowIn, equalTo(true))
 
         return cim
     }
@@ -402,4 +409,159 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
     inline fun validate(pb: PBDiscrete.Builder, fromPb: () -> Discrete): Discrete = validate(pb.measurementBuilder.ioBuilder, fromPb)
 
     inline fun <reified T : Structure> validate(pb: PBStructure.Builder, fromPb: () -> T): T = validate(pb.acBuilder, fromPb)
+
+    inline fun <reified T : AssetInfo> validate(pb: PBAssetInfo.Builder, fromPb: () -> T): T = validate(pb.ioBuilder, fromPb)
+
+    inline fun validate(pb: PBPowerTransformerInfo.Builder, fromPb: () -> PowerTransformerInfo): PowerTransformerInfo {
+        network.add(TransformerTankInfo("info1"))
+        network.add(TransformerTankInfo("info2"))
+
+        pb.addTransformerTankInfoMRIDs("info1")
+        pb.addTransformerTankInfoMRIDs("info2")
+
+        val cim = validate(pb.aiBuilder, fromPb)
+
+        assertThat(cim.transformerTankInfos, containsInAnyOrder(*getObjects<TransformerTankInfo>("info1", "info2")))
+
+        return cim
+    }
+
+    inline fun validate(pb: PBTransformerEndInfo.Builder, fromPb: () -> TransformerEndInfo): TransformerEndInfo {
+        network.add(TransformerTankInfo("info1"))
+        network.add(TransformerStarImpedance("star1"))
+
+        pb.connectionKind = PBWindingConnection.D
+        pb.emergencyS = 1
+        pb.endNumber = 2
+        pb.insulationU = 3
+        pb.phaseAngleClock = 4
+        pb.r = 5.0
+        pb.ratedS = 6
+        pb.ratedU = 7
+        pb.shortTermS = 8
+
+        // This link is not currently implemented
+        // pb.transformerTankInfoMRID = "info1"
+        pb.transformerStarImpedanceMRID = "star1"
+
+        val cim = validate(pb.aiBuilder, fromPb)
+
+        assertThat(cim.connectionKind, equalTo(WindingConnection.D))
+        assertThat(cim.emergencyS, equalTo(1))
+        assertThat(cim.endNumber, equalTo(2))
+        assertThat(cim.insulationU, equalTo(3))
+        assertThat(cim.phaseAngleClock, equalTo(4))
+        assertThat(cim.r, equalTo(5.0))
+        assertThat(cim.ratedS, equalTo(6))
+        assertThat(cim.ratedU, equalTo(7))
+        assertThat(cim.shortTermS, equalTo(8))
+
+        // This link is not currently implemented
+        // assertThat(cim.transformerTankInfo, equalTo(network["info1"]))
+        assertThat(cim.transformerStarImpedance, equalTo(network["star1"]))
+
+        return cim
+    }
+
+    inline fun validate(pb: PBTransformerTankInfo.Builder, fromPb: () -> TransformerTankInfo): TransformerTankInfo {
+        network.add(TransformerEndInfo("info1"))
+        network.add(TransformerEndInfo("info2"))
+
+        pb.addTransformerEndInfoMRIDs("info1")
+        pb.addTransformerEndInfoMRIDs("info2")
+
+        val cim = validate(pb.aiBuilder, fromPb)
+
+        assertThat(cim.transformerEndInfos, containsInAnyOrder(*getObjects<TransformerEndInfo>("info1", "info2")))
+
+        return cim
+    }
+
+    inline fun validate(pb: PBPowerTransformerEnd.Builder, fromPb: () -> PowerTransformerEnd): PowerTransformerEnd {
+        network.add(PowerTransformer("tx1"))
+
+        pb.powerTransformerMRID = "tx1"
+        pb.b = 1.0
+        pb.b0 = 2.0
+        pb.connectionKind = PBWindingConnection.UNKNOWN_WINDING
+        pb.g = 3.0
+        pb.g0 = 4.0
+        pb.phaseAngleClock = 5
+        pb.r = 6.0
+        pb.r0 = 7.0
+        pb.ratedS = 8
+        pb.ratedU = 9
+        pb.x = 10.0
+        pb.x0 = 11.0
+
+        val cim = validate(pb.teBuilder, fromPb)
+
+        assertThat(cim.powerTransformer, equalTo(network["tx1"]))
+        assertThat(cim.b, equalTo(1.0))
+        assertThat(cim.b0, equalTo(2.0))
+        assertThat(cim.connectionKind, equalTo(WindingConnection.UNKNOWN_WINDING))
+        assertThat(cim.g, equalTo(3.0))
+        assertThat(cim.g0, equalTo(4.0))
+        assertThat(cim.phaseAngleClock, equalTo(5))
+        assertThat(cim.r, equalTo(6.0))
+        assertThat(cim.r0, equalTo(7.0))
+        assertThat(cim.ratedS, equalTo(8))
+        assertThat(cim.ratedU, equalTo(9))
+        assertThat(cim.x, equalTo(10.0))
+        assertThat(cim.x0, equalTo(11.0))
+
+        return cim
+    }
+
+    inline fun <reified T : TransformerEnd> validate(pb: PBTransformerEnd.Builder, fromPb: () -> T): T {
+        network.add(BaseVoltage("bv1"))
+        network.add(RatioTapChanger("rtc1"))
+        network.add(Terminal("term1"))
+        network.add(TransformerStarImpedance("star1"))
+
+        pb.grounded = true
+        pb.rGround = 1.0
+        pb.xGround = 2.0
+        pb.baseVoltageMRID = "bv1"
+        pb.ratioTapChangerMRID = "rtc1"
+        pb.terminalMRID = "term1"
+        pb.endNumber = 0
+        pb.transformerStarImpedanceMRID = "star1"
+
+        val cim = validate(pb.ioBuilder, fromPb)
+
+        assertThat(cim.grounded, equalTo(true))
+        assertThat(cim.rGround, equalTo(1.0))
+        assertThat(cim.xGround, equalTo(2.0))
+        assertThat(cim.baseVoltage, equalTo(network["bv1"]))
+        assertThat(cim.ratioTapChanger, equalTo(network["rtc1"]))
+        assertThat(cim.terminal, equalTo(network["term1"]))
+        assertThat(cim.endNumber, equalTo(0))
+        assertThat(cim.starImpedance, equalTo(network["star1"]))
+
+        return cim
+    }
+
+    inline fun validate(pb: PBTransformerStarImpedance.Builder, fromPb: () -> TransformerStarImpedance): TransformerStarImpedance {
+        network.add(TransformerEndInfo("info1"))
+
+        pb.r = 1.0
+        pb.r0 = 2.0
+        pb.x = 3.0
+        pb.x0 = 4.0
+        pb.transformerEndInfoMRID = "info1"
+
+        val cim = validate(pb.ioBuilder, fromPb)
+
+        assertThat(cim.r, equalTo(1.0))
+        assertThat(cim.r0, equalTo(2.0))
+        assertThat(cim.x, equalTo(3.0))
+        assertThat(cim.x0, equalTo(4.0))
+        assertThat(cim.transformerEndInfo, equalTo(network["info1"]))
+
+        return cim
+    }
+
+    inline fun <reified T : IdentifiedObject> getObjects(vararg mRIDs: String) = listOf(*mRIDs).map<String, T?> { network[it] }.toTypedArray()
+
 }

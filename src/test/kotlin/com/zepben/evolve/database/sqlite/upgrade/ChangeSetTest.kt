@@ -12,6 +12,8 @@ import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.evolve.database.sqlite.DatabaseReader
+import com.zepben.evolve.database.sqlite.tables.TableVersion
+import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet28
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
@@ -27,9 +29,10 @@ import java.io.File
 import java.nio.file.Path
 import java.sql.Connection
 import java.sql.DriverManager.getConnection
+import java.sql.Statement
 import kotlin.test.fail
 
-@Suppress("SqlResolve")
+@Suppress("SqlResolve", "SameParameterValue")
 class ChangeSetTest {
 
     @JvmField
@@ -37,8 +40,7 @@ class ChangeSetTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    @Throws(Exception::class)
-    fun `can upgrade to latest`(@TempDir tempDir: Path) {
+    internal fun `can upgrade to latest`(@TempDir tempDir: Path) {
         val dbFile = File("src/test/data/changeset20.sqlite").copyTo(Path.of(tempDir.toString(), "changeset20.sqlite").toFile()).toPath()
         val runner = UpgradeRunner()
         val cr = runner.connectAndUpgrade("jdbc:sqlite:$dbFile", dbFile)
@@ -46,8 +48,7 @@ class ChangeSetTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun `updates sequence and end numbers`(@TempDir tempDir: Path) {
+    internal fun `updates sequence and end numbers`(@TempDir tempDir: Path) {
         val dbFile = File("src/test/data/changeset20.sqlite").copyTo(Path.of(tempDir.toString(), "changeset20.sqlite").toFile()).toPath()
         val runner = UpgradeRunner()
         val cr = runner.connectAndUpgrade("jdbc:sqlite:$dbFile", dbFile)
@@ -76,8 +77,7 @@ class ChangeSetTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun `migrates measurement to analog`(@TempDir tempDir: Path) {
+    internal fun `migrates measurement to analog`(@TempDir tempDir: Path) {
         val dbFile = File("src/test/data/changeset21.sqlite").copyTo(Path.of(tempDir.toString(), "changeset21.sqlite").toFile()).toPath()
         val runner = UpgradeRunner()
         val cr = runner.connectAndUpgrade("jdbc:sqlite:$dbFile", dbFile)
@@ -107,8 +107,7 @@ class ChangeSetTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun `removed null constraint from transformer_utilisation column in power_transformers table`(@TempDir tempDir: Path) {
+    internal fun `removed null constraint from transformer_utilisation column in power_transformers table`(@TempDir tempDir: Path) {
         val dbFile = File("src/test/data/changeset24.sqlite").copyTo(Path.of(tempDir.toString(), "changeset24.sqlite").toFile()).toPath()
         val runner = UpgradeRunner()
         val cr = runner.connectAndUpgrade("jdbc:sqlite:$dbFile", dbFile)
@@ -141,17 +140,11 @@ class ChangeSetTest {
     }
 
     @Test
-    fun `cs28 updates rated_e and stored_e to longs`() {
-        val conn = sqlDumpToDB("src/test/data/changeset28.sql")
-        val runner = UpgradeRunner(getConnection = { conn }, changeSets = listOf(changeSet28()), createBackup = { _, _, _ -> })
-        val cr = runner.connectAndUpgrade("ignored", Path.of("none"))
-
-        cr.connection.use { c ->
-            c.createStatement().use { statement ->
-                val rs = statement.executeQuery("SELECT rated_e, stored_e FROM battery_unit WHERE mrid = 'abc'")
-                assertThat(rs.getLong("rated_e"), equalTo(1500L))
-                assertThat(rs.getLong("stored_e"), equalTo(2500L))
-            }
+    internal fun `cs28 updates rated_e and stored_e to longs`() {
+        validateChangeSet("src/test/data/changeset28.sql", changeSet28()) {
+            val rs = executeQuery("SELECT rated_e, stored_e FROM battery_unit WHERE mrid = 'abc'")
+            assertThat(rs.getLong("rated_e"), equalTo(1500L))
+            assertThat(rs.getLong("stored_e"), equalTo(2500L))
         }
     }
 
@@ -160,7 +153,7 @@ class ChangeSetTest {
      * @param path The filesystem path to the SQL file.
      * @return A [Connection] to the in-memory database.
      */
-    fun sqlDumpToDB(path: String): Connection {
+    internal fun sqlDumpToDB(path: String): Connection {
         val f = File(path)
         val lines = f.readLines()
         val conn = getConnection("jdbc:sqlite::memory:")
@@ -171,4 +164,19 @@ class ChangeSetTest {
         }
         return conn
     }
+
+    private fun validateChangeSet(sqlPath: String, changeSet: ChangeSet, validation: Statement.() -> Unit) {
+        sqlDumpToDB(sqlPath).use { conn ->
+            conn.createStatement().use { statement ->
+                conn.prepareStatement(TableVersion().preparedUpdateSql()).use { versionUpdateStatement ->
+                    statement.executeUpdate("BEGIN TRANSACTION")
+
+                    UpgradeRunner().runUpgrade(changeSet, statement, versionUpdateStatement)
+
+                    validation(statement)
+                }
+            }
+        }
+    }
+
 }

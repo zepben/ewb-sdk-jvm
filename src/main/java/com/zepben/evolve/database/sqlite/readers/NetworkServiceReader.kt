@@ -9,9 +9,7 @@
 package com.zepben.evolve.database.sqlite.readers
 
 import com.zepben.evolve.database.sqlite.tables.associations.*
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableCableInfo
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableOverheadWireInfo
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TablePowerTransformerInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetOwners
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TablePoles
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableStreetlights
@@ -52,6 +50,8 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableCableInfo>("cable info", reader::load)
         status = status and loadEach<TableOverheadWireInfo>("overhead wire info", reader::load)
         status = status and loadEach<TablePowerTransformerInfo>("power transformer info", reader::load)
+        status = status and loadEach<TableTransformerTankInfo>("transformer tank info", reader::load)
+        status = status and loadEach<TableTransformerEndInfo>("transformer end info", reader::load)
         status = status and loadEach<TableLocations>("locations", reader::load)
         status = status and loadEach<TableOrganisations>("organisations", reader::load)
         status = status and loadEach<TableAssetOwners>("asset owners", reader::load)
@@ -88,6 +88,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TablePowerTransformers>("power transformers", reader::load)
         status = status and loadEach<TableReclosers>("reclosers", reader::load)
         status = status and loadEach<TableTerminals>("terminals", reader::load)
+        status = status and loadEach<TableTransformerStarImpedance>("transformer star impedance", reader::load)
         status = status and loadEach<TablePowerTransformerEnds>("power transformer ends", reader::load)
         status = status and loadEach<TableRatioTapChangers>("ratio tap changers", reader::load)
         status = status and loadEach<TableFaultIndicators>("fault indicators", reader::load)

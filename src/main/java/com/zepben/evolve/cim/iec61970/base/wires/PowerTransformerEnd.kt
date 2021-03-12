@@ -57,10 +57,11 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
     var g: Double = 0.0
     var g0: Double = 0.0
     var phaseAngleClock: Int = 0
-    var r: Double = 0.0
-    var r0: Double = 0.0
+    var r: Double = Double.NaN
+    var r0: Double = Double.NaN
     var ratedS: Int = 0
     var ratedU: Int = 0
-    var x: Double = 0.0
-    var x0: Double = 0.0
+    var x: Double = Double.NaN
+    var x0: Double = Double.NaN
+
 }

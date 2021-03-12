@@ -8,6 +8,8 @@
 package com.zepben.evolve.services.common
 
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.evolve.cim.iec61968.assets.Asset
 import com.zepben.evolve.cim.iec61968.assets.AssetOrganisationRole
@@ -304,13 +306,50 @@ object Resolvers {
 
     @JvmStatic
     fun powerElectronicsConnection(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): BoundReferenceResolver<PowerElectronicsConnectionPhase, PowerElectronicsConnection> =
-        BoundReferenceResolver(powerElectronicsConnectionPhase, PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver, PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver)
+        BoundReferenceResolver(
+            powerElectronicsConnectionPhase,
+            PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver,
+            PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver
+        )
 
     @JvmStatic
     fun powerElectronicsUnit(powerElectronicsConnection: PowerElectronicsConnection): BoundReferenceResolver<PowerElectronicsConnection, PowerElectronicsUnit> =
-        BoundReferenceResolver(powerElectronicsConnection, PowerElectronicsConnectionToPowerElectronicsUnitResolver, PowerElectronicsUnitToPowerElectronicsConnectionResolver)
+        BoundReferenceResolver(
+            powerElectronicsConnection,
+            PowerElectronicsConnectionToPowerElectronicsUnitResolver,
+            PowerElectronicsUnitToPowerElectronicsConnectionResolver
+        )
 
     @JvmStatic
     fun powerElectronicsConnectionPhase(powerElectronicsConnection: PowerElectronicsConnection): BoundReferenceResolver<PowerElectronicsConnection, PowerElectronicsConnectionPhase> =
-        BoundReferenceResolver(powerElectronicsConnection, PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver, PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver)
+        BoundReferenceResolver(
+            powerElectronicsConnection,
+            PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver,
+            PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver
+        )
+
+    @JvmStatic
+    fun starImpedance(transformerEnd: TransformerEnd): BoundReferenceResolver<TransformerEnd, TransformerStarImpedance> =
+        BoundReferenceResolver(transformerEnd, TransformerEndToTransformerStarImpedanceResolver, null)
+
+    @JvmStatic
+    fun transformerTankInfo(powerTransformerInfo: PowerTransformerInfo): BoundReferenceResolver<PowerTransformerInfo, TransformerTankInfo> =
+        BoundReferenceResolver(powerTransformerInfo, PowerTransformerInfoToTransformerTankInfoResolver, TransformerTankInfoToPowerTransformerInfoResolver)
+
+    @JvmStatic
+    fun transformerEndInfo(transformerTankInfo: TransformerTankInfo): BoundReferenceResolver<TransformerTankInfo, TransformerEndInfo> =
+        BoundReferenceResolver(transformerTankInfo, TransformerTankInfoToTransformerEndInfoResolver, TransformerEndInfoToTransformerTankInfoResolver)
+
+    @JvmStatic
+    fun transformerStarImpedance(transformerEndInfo: TransformerEndInfo): BoundReferenceResolver<TransformerEndInfo, TransformerStarImpedance> =
+        BoundReferenceResolver(transformerEndInfo, TransformerEndInfoToTransformerStarImpedanceResolver, TransformerStarImpedanceToTransformerEndInfoResolver)
+
+    @JvmStatic
+    fun transformerEndInfo(transformerStarImpedance: TransformerStarImpedance): BoundReferenceResolver<TransformerStarImpedance, TransformerEndInfo> =
+        BoundReferenceResolver(
+            transformerStarImpedance,
+            TransformerStarImpedanceToTransformerEndInfoResolver,
+            TransformerEndInfoToTransformerStarImpedanceResolver
+        )
+
 }

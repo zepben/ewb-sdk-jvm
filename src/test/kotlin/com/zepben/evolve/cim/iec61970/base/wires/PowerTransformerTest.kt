@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2021 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,9 +10,8 @@ package com.zepben.evolve.cim.iec61970.base.wires
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
-import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException
+import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -42,7 +41,7 @@ internal class PowerTransformerTest {
         powerTransformer.vectorGroup = VectorGroup.DYN11
         powerTransformer.transformerUtilisation = 1.0
 
-        val powerTransformerInfo = PowerTransformerInfo().fillFields()
+        val powerTransformerInfo = PowerTransformerInfo()
         powerTransformer.assetInfo = powerTransformerInfo
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.DYN11))
@@ -78,7 +77,7 @@ internal class PowerTransformerTest {
         }
 
         // Test throws if missing ConductingEquipment
-        ExpectException.expect { pt.addEnd(e1) }.toThrow(IllegalArgumentException::class.java)
+        expect { pt.addEnd(e1) }.toThrow(IllegalArgumentException::class.java)
             .withMessage("${e1.typeNameAndMRID()} references another PowerTransformer ${e1.powerTransformer}, expected $pt.")
 
         e1.apply {
@@ -98,7 +97,7 @@ internal class PowerTransformerTest {
 
         // Test try to add terminal with same sequence number fails
         val duplicatePowerTransformerEnd = PowerTransformerEnd().apply { powerTransformer = pt; endNumber = 1 }
-        ExpectException.expect {
+        expect {
             pt.addEnd(duplicatePowerTransformerEnd)
         }.toThrow(IllegalArgumentException::class.java)
             .withMessage("Unable to add ${duplicatePowerTransformerEnd.typeNameAndMRID()} to ${pt.typeNameAndMRID()}. A ${e1.typeNameAndMRID()} already exists with endNumber 1.")
@@ -129,6 +128,19 @@ internal class PowerTransformerTest {
 
         e1.baseVoltage = BaseVoltage().apply { nominalVoltage = 10 }
         assertThat(pt.primaryVoltage, equalTo(10))
+    }
+
+    @Test
+    internal fun cantAssignCatalogDataWithEndsReferencingStarImpedance() {
+        val tx = PowerTransformer()
+        val end = PowerTransformerEnd().apply {
+            powerTransformer = tx
+            starImpedance = TransformerStarImpedance()
+        }.also { tx.addEnd(it) }
+
+        expect { tx.assetInfo = PowerTransformerInfo() }
+            .toThrow(IllegalArgumentException::class.java)
+            .withMessage("Unable to use a catalog for ${tx.typeNameAndMRID()} because the following associated ends have a direct link to a star impedance: [${end.typeNameAndMRID()}].")
     }
 
 }

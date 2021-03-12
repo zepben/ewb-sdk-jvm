@@ -7,16 +7,16 @@
  */
 package com.zepben.evolve.services.network.translator
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61970.base.core.Substation
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
-import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
-import com.zepben.evolve.cim.iec61970.base.wires.LoadBreakSwitch
-import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
+import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkService
@@ -117,7 +117,35 @@ internal class NetworkCimToProtoTest {
     internal fun convertsLoadBreakSwitch() {
         val cim = LoadBreakSwitch()
         validator.validate(cim, cim.toPb())
-        validator.validate(cim.fillFields(), cim.toPb())
+        validator.validate(cim.fillFields(NetworkService()), cim.toPb())
+    }
+
+    @Test
+    internal fun convertsPowerTransformerInfo() {
+        val cim = PowerTransformerInfo()
+        validator.validate(cim, cim.toPb())
+        validator.validate(cim.fillFields(NetworkService()), cim.toPb())
+    }
+
+    @Test
+    internal fun convertsTransformerTankInfo() {
+        val cim = TransformerTankInfo()
+        validator.validate(cim, cim.toPb())
+        validator.validate(cim.fillFields(NetworkService()), cim.toPb())
+    }
+
+    @Test
+    internal fun convertsTransformerEndInfo() {
+        val cim = TransformerEndInfo()
+        validator.validate(cim, cim.toPb())
+        validator.validate(cim.fillFields(NetworkService()), cim.toPb())
+    }
+
+    @Test
+    internal fun convertsTransformerStarImpedance() {
+        val cim = TransformerStarImpedance()
+        validator.validate(cim, cim.toPb())
+        validator.validate(cim.fillFields(NetworkService()), cim.toPb())
     }
 
 }

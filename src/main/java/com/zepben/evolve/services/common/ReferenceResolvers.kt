@@ -8,6 +8,8 @@
 package com.zepben.evolve.services.common
 
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.evolve.cim.iec61968.assets.Asset
 import com.zepben.evolve.cim.iec61968.assets.AssetOrganisationRole
@@ -301,20 +303,52 @@ internal object LoopToEnergizingSubstationResolver : ReferenceResolver<Loop, Sub
     Loop::class, Substation::class, Loop::addEnergizingSubstation
 )
 
-internal object PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver : ReferenceResolver<PowerElectronicsConnection, PowerElectronicsConnectionPhase> by KReferenceResolver(
-    PowerElectronicsConnection::class, PowerElectronicsConnectionPhase::class, PowerElectronicsConnection::addPhase
+internal object PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver :
+    ReferenceResolver<PowerElectronicsConnection, PowerElectronicsConnectionPhase> by KReferenceResolver(
+        PowerElectronicsConnection::class, PowerElectronicsConnectionPhase::class, PowerElectronicsConnection::addPhase
+    )
+
+internal object PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver :
+    ReferenceResolver<PowerElectronicsConnectionPhase, PowerElectronicsConnection> by KReferenceResolver(
+        PowerElectronicsConnectionPhase::class, PowerElectronicsConnection::class, PowerElectronicsConnectionPhase::powerElectronicsConnection.setter
+    )
+
+internal object PowerElectronicsConnectionToPowerElectronicsUnitResolver :
+    ReferenceResolver<PowerElectronicsConnection, PowerElectronicsUnit> by KReferenceResolver(
+        PowerElectronicsConnection::class, PowerElectronicsUnit::class, PowerElectronicsConnection::addUnit
+    )
+
+internal object PowerElectronicsUnitToPowerElectronicsConnectionResolver :
+    ReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> by KReferenceResolver(
+        PowerElectronicsUnit::class, PowerElectronicsConnection::class, PowerElectronicsUnit::powerElectronicsConnection.setter
+    )
+
+internal object TransformerEndToTransformerStarImpedanceResolver : ReferenceResolver<TransformerEnd, TransformerStarImpedance> by KReferenceResolver(
+    TransformerEnd::class, TransformerStarImpedance::class, TransformerEnd::starImpedance.setter
 )
 
-internal object PowerElectronicsConnectionPhaseToPowerElectronicsConnectionResolver : ReferenceResolver<PowerElectronicsConnectionPhase, PowerElectronicsConnection> by KReferenceResolver(
-    PowerElectronicsConnectionPhase::class, PowerElectronicsConnection::class, PowerElectronicsConnectionPhase::powerElectronicsConnection.setter
+internal object PowerTransformerInfoToTransformerTankInfoResolver : ReferenceResolver<PowerTransformerInfo, TransformerTankInfo> by KReferenceResolver(
+    PowerTransformerInfo::class, TransformerTankInfo::class, PowerTransformerInfo::addTransformerTankInfo
 )
 
-internal object PowerElectronicsConnectionToPowerElectronicsUnitResolver : ReferenceResolver<PowerElectronicsConnection, PowerElectronicsUnit> by KReferenceResolver(
-    PowerElectronicsConnection::class, PowerElectronicsUnit::class, PowerElectronicsConnection::addUnit
+internal object TransformerTankInfoToPowerTransformerInfoResolver : ReferenceResolver<TransformerTankInfo, PowerTransformerInfo> by KReferenceResolver(
+    TransformerTankInfo::class, PowerTransformerInfo::class, TransformerTankInfo::powerTransformerInfo.setter
 )
 
-internal object PowerElectronicsUnitToPowerElectronicsConnectionResolver : ReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> by KReferenceResolver(
-    PowerElectronicsUnit::class, PowerElectronicsConnection::class, PowerElectronicsUnit::powerElectronicsConnection.setter
+internal object TransformerTankInfoToTransformerEndInfoResolver : ReferenceResolver<TransformerTankInfo, TransformerEndInfo> by KReferenceResolver(
+    TransformerTankInfo::class, TransformerEndInfo::class, TransformerTankInfo::addTransformerEndInfo
+)
+
+internal object TransformerEndInfoToTransformerTankInfoResolver : ReferenceResolver<TransformerEndInfo, TransformerTankInfo> by KReferenceResolver(
+    TransformerEndInfo::class, TransformerTankInfo::class, TransformerEndInfo::transformerTankInfo.setter
+)
+
+internal object TransformerEndInfoToTransformerStarImpedanceResolver : ReferenceResolver<TransformerEndInfo, TransformerStarImpedance> by KReferenceResolver(
+    TransformerEndInfo::class, TransformerStarImpedance::class, TransformerEndInfo::transformerStarImpedance.setter
+)
+
+internal object TransformerStarImpedanceToTransformerEndInfoResolver : ReferenceResolver<TransformerStarImpedance, TransformerEndInfo> by KReferenceResolver(
+    TransformerStarImpedance::class, TransformerEndInfo::class, TransformerStarImpedance::transformerEndInfo.setter
 )
 
 //-------------------------------------------//

@@ -1,6 +1,6 @@
 # Evolve SDK #
 
-The Evolve SDK contains everything necessary to communicate with a [Zepben EWB Server](TODO). See the [architecture](docs/architecture.md) documentation for more details.
+The Evolve SDK contains everything necessary to communicate with a [Zepben EWB Server](https://github.com/zepben/energy-workbench-server). See the complete [Evolve JVM SDK Documentation](https://zepben.github.io/evolve/docs/jvm-sdk/) for more details.
 
 ## Requirements ##
 

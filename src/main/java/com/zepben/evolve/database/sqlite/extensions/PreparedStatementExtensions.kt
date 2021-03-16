@@ -16,33 +16,32 @@ import java.sql.Types
 import java.sql.Types.DOUBLE
 import java.time.Instant
 
-
-fun PreparedStatement.setNullableString(queryIndex: Int, value: String?) {
+internal fun PreparedStatement.setNullableString(queryIndex: Int, value: String?) {
     when (value) {
         null -> setNull(queryIndex, Types.VARCHAR)
         else -> setString(queryIndex, value)
     }
 }
 
-fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?) {
+internal fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?) {
     if (value == null || isNaN(value))
         this.setNull(queryIndex, DOUBLE)
     else
         this.setDouble(queryIndex, value)
 }
 
-fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
+internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
     when (value) {
         null -> setNull(queryIndex, Types.VARCHAR)
         else -> setString(queryIndex, value.toString())
     }
 }
 
-fun PreparedStatement.executeSingleUpdate(): Boolean {
+internal fun PreparedStatement.executeSingleUpdate(): Boolean {
     return executeUpdate() == 1
 }
 
-fun PreparedStatement.sql(): String {
+internal fun PreparedStatement.sql(): String {
     return try {
         AccessController.doPrivileged(PrivilegedExceptionAction {
             val field = javaClass.getFieldExt("sql")
@@ -54,7 +53,7 @@ fun PreparedStatement.sql(): String {
     }
 }
 
-fun PreparedStatement.parameters(): String {
+internal fun PreparedStatement.parameters(): String {
     return try {
         AccessController.doPrivileged(PrivilegedExceptionAction {
             val field = javaClass.getFieldExt("batch")

@@ -8,8 +8,11 @@
 package com.zepben.evolve.services.network.testdata
 
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
@@ -28,132 +31,6 @@ import java.time.Instant
 @Suppress("SameParameterValue", "BooleanLiteralArgument")
 object SchemaNetworks {
 
-    fun createBusbarSectionServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(BusbarSection("busbar1"))
-        networkService.add(BusbarSection("busbar2").fillFields(networkService))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createBatteryUnitTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(BatteryUnit("bu1"))
-        networkService.add(BatteryUnit("bu2").fillFields(networkService))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createPhotoVoltaicUnitTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(PhotoVoltaicUnit("pv1"))
-        networkService.add(PhotoVoltaicUnit("pv2").fillFields(networkService))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createPowerElectronicsWindUnitTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(PowerElectronicsWindUnit("pewu1"))
-        networkService.add(PowerElectronicsWindUnit("pewu2").fillFields(networkService))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createPowerElectronicsConnectionTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(PowerElectronicsConnection("pec1"))
-        networkService.add(PowerElectronicsConnection("pec2").fillFields(networkService))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createPowerElectronicsConnectionPhaseTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(PowerElectronicsConnectionPhase("pecp1"))
-        networkService.add(PowerElectronicsConnectionPhase("pecp2").fillFields(networkService))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createPoleTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(Pole("pole1"))
-        networkService.add(Pole("pole2").fillFields(networkService))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createPowerTransformerTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(PowerTransformer())
-        networkService.add(PowerTransformer().fillFields(networkService, includeRuntime = false))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createLoadBreakSwitchTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(LoadBreakSwitch())
-        networkService.add(LoadBreakSwitch().fillFields())
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createBreakerTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(Breaker())
-        networkService.add(Breaker().fillFields())
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createPowerTransformerInfoTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(PowerTransformerInfo())
-        networkService.add(PowerTransformerInfo().fillFields())
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createStreetlightTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(Streetlight("streetlight1"))
-        networkService.add(Streetlight("streetlight2").fillFields(networkService))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createCircuitTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(Circuit("circuit1"))
-        networkService.add(Circuit("circuit2").fillFields(networkService))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
-    fun createLoopTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.add(Loop("loop1"))
-        networkService.add(Loop("loop2").fillFields(networkService))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
-    }
-
     fun createDataSourceTestServices(): NetworkModelTestUtil.Services {
         val metadataCollection = MetadataCollection()
 
@@ -161,6 +38,51 @@ object SchemaNetworks {
         metadataCollection.add(DataSource("source2", "v2", Instant.now()))
 
         return NetworkModelTestUtil.Services(metadataCollection, NetworkService(), DiagramService(), CustomerService(), MeasurementService())
+    }
+
+    fun createBusbarSectionServices() = servicesOf(::BusbarSection, BusbarSection::fillFields)
+
+    fun createBatteryUnitServices() = servicesOf(::BatteryUnit, BatteryUnit::fillFields)
+
+    fun createPhotoVoltaicUnitServices() = servicesOf(::PhotoVoltaicUnit, PhotoVoltaicUnit::fillFields)
+
+    fun createPowerElectronicsWindUnitServices() = servicesOf(::PowerElectronicsWindUnit, PowerElectronicsWindUnit::fillFields)
+
+    fun createPowerElectronicsConnectionServices() = servicesOf(::PowerElectronicsConnection, PowerElectronicsConnection::fillFields)
+
+    fun createPowerElectronicsConnectionPhaseServices() = servicesOf(::PowerElectronicsConnectionPhase, PowerElectronicsConnectionPhase::fillFields)
+
+    fun createPoleServices() = servicesOf(::Pole, Pole::fillFields)
+
+    fun createPowerTransformerServices() = servicesOf(::PowerTransformer, PowerTransformer::fillFields)
+
+    fun createLoadBreakSwitchServices() = servicesOf(::LoadBreakSwitch, LoadBreakSwitch::fillFields)
+
+    fun createBreakerServices() = servicesOf(::Breaker, Breaker::fillFields)
+
+    fun createPowerTransformerInfoServices() = servicesOf(::PowerTransformerInfo, PowerTransformerInfo::fillFields)
+
+    fun createStreetlightServices() = servicesOf(::Streetlight, Streetlight::fillFields)
+
+    fun createCircuitServices() = servicesOf(::Circuit, Circuit::fillFields)
+
+    fun createLoopServices() = servicesOf(::Loop, Loop::fillFields)
+
+    fun createPowerTransformerEndServices() = servicesOf(::PowerTransformerEnd, PowerTransformerEnd::fillFields)
+
+    fun createTransformerStarImpedanceServices() = servicesOf(::TransformerStarImpedance, TransformerStarImpedance::fillFields)
+
+    fun createTransformerTankInfoServices() = servicesOf(::TransformerTankInfo, TransformerTankInfo::fillFields)
+
+    fun createTransformerEndInfoServices() = servicesOf(::TransformerEndInfo, TransformerEndInfo::fillFields)
+
+    private fun <T : IdentifiedObject> servicesOf(factory: (mRID: String) -> T, filler: (T, NetworkService, Boolean) -> T): NetworkModelTestUtil.Services {
+        val networkService = NetworkService()
+
+        networkService.tryAdd(factory("empty"))
+        networkService.tryAdd(filler(factory("filled"), networkService, false))
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
     }
 
 }

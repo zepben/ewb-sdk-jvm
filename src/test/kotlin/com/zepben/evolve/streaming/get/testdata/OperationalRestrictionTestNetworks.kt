@@ -32,7 +32,7 @@ object OperationalRestrictionTestNetworks {
         val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.AB)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.AB)
 
-        val or = createOperationalRestriction(networkService, "or1", "test_or1", fsp.mRID, c2.mRID, tx.mRID)
+        createOperationalRestriction(networkService, "or1", "test_or1", fsp.mRID, c2.mRID, tx.mRID)
 
         createEnd(networkService, tx, 22000, 1)
         createEnd(networkService, tx, 415, 2)

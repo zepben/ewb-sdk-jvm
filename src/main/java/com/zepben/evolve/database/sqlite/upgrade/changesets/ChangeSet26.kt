@@ -1,15 +1,17 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2021 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.database.sqlite.upgrade
+package com.zepben.evolve.database.sqlite.upgrade.changesets
 
-internal fun changeSet27() = ChangeSet(27) {
+import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
+
+internal fun changeSet26() = ChangeSet(26) {
     listOf(
-        """CREATE TABLE load_break_switches(
+        """CREATE TABLE busbar_sections(
             mrid TEXT NOT NULL,
             name TEXT NOT NULL,
             description TEXT NOT NULL,
@@ -18,11 +20,9 @@ internal fun changeSet27() = ChangeSet(27) {
             num_controls INTEGER NOT NULL,
             normally_in_service BOOLEAN,
             in_service BOOLEAN,
-            base_voltage_mrid TEXT NULL,
-            normal_open INTEGER NOT_NULL,
-            open INTEGER NOT_NULL
+            base_voltage_mrid TEXT NULL
         );""",
-        "CREATE UNIQUE INDEX load_break_switches_mrid ON load_break_switches (mrid);",
-        "CREATE INDEX load_break_switches_name ON load_break_switches (name);"
+        "CREATE UNIQUE INDEX busbar_sections_mrid ON busbar_sections (mrid);",
+        "CREATE INDEX busbar_sections_name ON busbar_sections (name);"
     )
 }

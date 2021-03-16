@@ -1,29 +1,28 @@
 /*
- * Copyright 2021 Zeppelin Bend Pty Ltd
+ * Copyright 2020 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-
-package com.zepben.evolve.cim.iec61970.base.wires.generation.production
+package com.zepben.evolve.services.common
 
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-internal class PhotoVoltaicUnitTest {
+internal class UnknownPrimitivesTest {
 
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    internal fun constructorCoverage() {
-        assertThat(PhotoVoltaicUnit().mRID, not(equalTo("")))
-        assertThat(PhotoVoltaicUnit("id").mRID, equalTo("id"))
+    internal fun checkEqualsOperator() {
+        assertThat(UNKNOWN_DOUBLE == UNKNOWN_DOUBLE, equalTo(true))
+        assertThat(UNKNOWN_INT == UNKNOWN_INT, equalTo(true))
     }
+
 }

@@ -11,9 +11,7 @@
 
 package com.zepben.evolve.services.network
 
-import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
@@ -103,6 +101,9 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isDiscrete Handler when the [identifiedObject] is a [Discrete]
  * @param isRemoteControl Handler when the [identifiedObject] is a [RemoteControl]
  * @param isRemoteSource Handler when the [identifiedObject] is a [RemoteSource]
+ * @param isTransformerEndInfo Handler when the [identifiedObject] is a [TransformerEndInfo]
+ * @param isTransformerStarImpedance Handler when the [identifiedObject] is a [TransformerStarImpedance]
+ * @param isTransformerTankInfo Handler when the [identifiedObject] is a [TransformerTankInfo]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -159,6 +160,9 @@ inline fun <R> whenNetworkServiceObject(
     isDiscrete: (Discrete) -> R,
     isRemoteControl: (RemoteControl) -> R,
     isRemoteSource: (RemoteSource) -> R,
+    isTransformerEndInfo: (TransformerEndInfo) -> R,
+    isTransformerStarImpedance: (TransformerStarImpedance) -> R,
+    isTransformerTankInfo: (TransformerTankInfo) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -214,5 +218,8 @@ inline fun <R> whenNetworkServiceObject(
     is Discrete -> isDiscrete(identifiedObject)
     is RemoteControl -> isRemoteControl(identifiedObject)
     is RemoteSource -> isRemoteSource(identifiedObject)
+    is TransformerEndInfo -> isTransformerEndInfo(identifiedObject)
+    is TransformerStarImpedance -> isTransformerStarImpedance(identifiedObject)
+    is TransformerTankInfo -> isTransformerTankInfo(identifiedObject)
     else -> isOther(identifiedObject)
 }

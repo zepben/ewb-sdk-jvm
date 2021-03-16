@@ -7,10 +7,7 @@
  */
 package com.zepben.evolve.services.network
 
-import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.WireMaterialKind
+import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.PositionPoint
@@ -24,9 +21,9 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
-import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
-import com.zepben.evolve.cim.iec61970.base.meas.Analog
-import com.zepben.evolve.cim.iec61970.base.meas.Measurement
+import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
+import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
@@ -56,6 +53,19 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     @Test
     internal fun compareOverheadWireInfo() {
         compareWireInfo { OverheadWireInfo(mRID = it) }
+    }
+
+    @Test
+    internal fun comparePowerTransformerInfo() {
+        compareAssetInfo { PowerTransformerInfo(mRID = it) }
+
+        comparatorValidator.validateIdObjCollection(
+            PowerTransformerInfo::transformerTankInfos,
+            PowerTransformerInfo::addTransformerTankInfo,
+            { PowerTransformerInfo(it) },
+            { TransformerTankInfo("tti1") },
+            { TransformerTankInfo("tti2") }
+        )
     }
 
     private fun compareWireInfo(createWireInfo: (String) -> WireInfo) {
@@ -661,6 +671,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(PowerTransformerEnd::ratedU, { PowerTransformerEnd(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(PowerTransformerEnd::x, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PowerTransformerEnd::x0, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
+
+        comparatorValidator.validateProperty(PowerTransformerEnd::r, { PowerTransformerEnd(it) }, { 1.0 }, { Double.NaN })
+        comparatorValidator.validateProperty(PowerTransformerEnd::r0, { PowerTransformerEnd(it) }, { 1.0 }, { Double.NaN })
+        comparatorValidator.validateProperty(PowerTransformerEnd::x, { PowerTransformerEnd(it) }, { 1.0 }, { Double.NaN })
+        comparatorValidator.validateProperty(PowerTransformerEnd::x0, { PowerTransformerEnd(it) }, { 1.0 }, { Double.NaN })
     }
 
     private fun compareProtectedSwitch(createProtectedSwitch: (String) -> ProtectedSwitch) {
@@ -742,6 +757,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(TransformerEnd::baseVoltage, createTransformerEnd, { BaseVoltage("bv1") }, { BaseVoltage("b21") })
         comparatorValidator.validateProperty(TransformerEnd::ratioTapChanger, createTransformerEnd, { RatioTapChanger("rtc1") }, { RatioTapChanger("rtc2") })
         comparatorValidator.validateProperty(TransformerEnd::terminal, createTransformerEnd, { Terminal("t1") }, { Terminal("t2") })
+        comparatorValidator.validateProperty(
+            TransformerEnd::starImpedance,
+            createTransformerEnd,
+            { TransformerStarImpedance("tsi1") },
+            { TransformerStarImpedance("tsi2") }
+        )
     }
 
     @Test
@@ -815,6 +836,87 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
     @Test
     internal fun compareDiscrete() {
-        compareMeasurement { Accumulator(it) }
+        compareMeasurement { Discrete(it) }
     }
+
+    @Test
+    internal fun compareRemoteControl() {
+        compareRemotePoint { RemoteControl(it) }
+
+        comparatorValidator.validateProperty(RemoteControl::control, { RemoteControl(it) }, { Control("c1") }, { Control("c2") })
+    }
+
+    @Test
+    internal fun compareRemoteSource() {
+        compareRemotePoint { RemoteSource(it) }
+
+        comparatorValidator.validateProperty(
+            RemoteSource::measurement,
+            { RemoteSource(it) },
+            { object : Measurement("m1") {} },
+            { object : Measurement("m2") {} }
+        )
+    }
+
+    @Test
+    internal fun compareTransformerEndInfo() {
+        compareAssetInfo { TransformerEndInfo(it) }
+
+        comparatorValidator.validateProperty(TransformerEndInfo::connectionKind, { TransformerEndInfo(it) }, { WindingConnection.D }, { WindingConnection.Y })
+        comparatorValidator.validateProperty(TransformerEndInfo::emergencyS, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::endNumber, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::insulationU, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::phaseAngleClock, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::r, { TransformerEndInfo(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(TransformerEndInfo::ratedS, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::ratedU, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::shortTermS, { TransformerEndInfo(it) }, { 1 }, { 2 })
+
+        comparatorValidator.validateProperty(
+            TransformerEndInfo::transformerStarImpedance,
+            { TransformerEndInfo(it) },
+            { TransformerStarImpedance("tsi1") },
+            { TransformerStarImpedance("tsi2") }
+        )
+    }
+
+    @Test
+    internal fun compareTransformerStarImpedance() {
+        compareIdentifiedObject { TransformerStarImpedance(it) }
+
+        comparatorValidator.validateProperty(TransformerStarImpedance::r, { TransformerStarImpedance(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(TransformerStarImpedance::r0, { TransformerStarImpedance(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(TransformerStarImpedance::x, { TransformerStarImpedance(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(TransformerStarImpedance::x0, { TransformerStarImpedance(it) }, { 1.0 }, { 2.0 })
+
+        comparatorValidator.validateProperty(TransformerStarImpedance::r, { TransformerStarImpedance(it) }, { 1.0 }, { Double.NaN })
+        comparatorValidator.validateProperty(TransformerStarImpedance::r0, { TransformerStarImpedance(it) }, { 1.0 }, { Double.NaN })
+        comparatorValidator.validateProperty(TransformerStarImpedance::x, { TransformerStarImpedance(it) }, { 1.0 }, { Double.NaN })
+        comparatorValidator.validateProperty(TransformerStarImpedance::x0, { TransformerStarImpedance(it) }, { 1.0 }, { Double.NaN })
+
+        comparatorValidator.validateProperty(
+            TransformerStarImpedance::transformerEndInfo,
+            { TransformerStarImpedance(it) },
+            { TransformerEndInfo("tei1") },
+            { TransformerEndInfo("tei2") }
+        )
+    }
+
+    @Test
+    internal fun compareTransformerTankInfo() {
+        compareAssetInfo { TransformerTankInfo(it) }
+
+        comparatorValidator.validateIdObjCollection(
+            TransformerTankInfo::transformerEndInfos,
+            TransformerTankInfo::addTransformerEndInfo,
+            { TransformerTankInfo(it) },
+            { TransformerEndInfo("tei1") },
+            { TransformerEndInfo("tei2") }
+        )
+    }
+
+    private fun compareRemotePoint(createIdObj: (String) -> RemotePoint) {
+        compareIdentifiedObject { createIdObj(it) }
+    }
+
 }

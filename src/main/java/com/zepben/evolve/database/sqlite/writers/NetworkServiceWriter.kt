@@ -7,9 +7,7 @@
  */
 package com.zepben.evolve.database.sqlite.writers
 
-import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
@@ -43,6 +41,8 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<CableInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<OverheadWireInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<PowerTransformerInfo>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<TransformerTankInfo>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<TransformerEndInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<AssetOwner>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Pole>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Streetlight>().forEach { status = status and validateSave(it, writer::save) }
@@ -83,6 +83,7 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<PowerTransformerEnd>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<RatioTapChanger>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Recloser>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<TransformerStarImpedance>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Circuit>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Loop>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Analog>().forEach { status = status and validateSave(it, writer::save) }

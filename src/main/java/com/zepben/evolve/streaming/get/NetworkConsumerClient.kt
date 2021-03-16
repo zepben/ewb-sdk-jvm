@@ -7,8 +7,8 @@
  */
 package com.zepben.evolve.streaming.get
 
-import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.translator.mRID
@@ -25,7 +25,6 @@ import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.nc.*
 import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import io.grpc.ManagedChannel
-
 
 /**
  * Consumer client for a [NetworkService].
@@ -281,8 +280,14 @@ class NetworkConsumerClient(
                 protoToCimProvider(service).addFromPb(it.perLengthSequenceImpedance),
                 it.perLengthSequenceImpedance.mRID()
             )
-            POWERELECTRONICSCONNECTION -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerElectronicsConnection), it.powerElectronicsConnection.mRID())
-            POWERELECTRONICSCONNECTIONPHASE -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerElectronicsConnectionPhase), it.powerElectronicsConnectionPhase.mRID())
+            POWERELECTRONICSCONNECTION -> ExtractResult(
+                protoToCimProvider(service).addFromPb(it.powerElectronicsConnection),
+                it.powerElectronicsConnection.mRID()
+            )
+            POWERELECTRONICSCONNECTIONPHASE -> ExtractResult(
+                protoToCimProvider(service).addFromPb(it.powerElectronicsConnectionPhase),
+                it.powerElectronicsConnectionPhase.mRID()
+            )
             POWERTRANSFORMER -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerTransformer), it.powerTransformer.mRID())
             POWERTRANSFORMEREND -> ExtractResult(protoToCimProvider(service).addFromPb(it.powerTransformerEnd), it.powerTransformerEnd.mRID())
             RATIOTAPCHANGER -> ExtractResult(protoToCimProvider(service).addFromPb(it.ratioTapChanger), it.ratioTapChanger.mRID())
@@ -298,11 +303,12 @@ class NetworkConsumerClient(
             CONTROL -> ExtractResult(protoToCimProvider(service).addFromPb(it.control), it.control.mRID())
             REMOTECONTROL -> ExtractResult(protoToCimProvider(service).addFromPb(it.remoteControl), it.remoteControl.mRID())
             REMOTESOURCE -> ExtractResult(protoToCimProvider(service).addFromPb(it.remoteSource), it.remoteSource.mRID())
-            OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${it.identifiedObjectCase} is not supported by the network service")
-            // TODO Branch implementing these classes needs to clean this up
-            TRANSFORMERSTARIMPEDANCE -> ExtractResult(object : IdentifiedObject(it.transformerStarImpedance.io.mrid) {}, it.transformerStarImpedance.io.mrid)
-            TRANSFORMERENDINFO -> ExtractResult(object : IdentifiedObject(it.transformerEndInfo.ai.mRID()) {}, it.transformerEndInfo.ai.mRID())
-            TRANSFORMERTANKINFO -> ExtractResult(object : IdentifiedObject(it.transformerTankInfo.ai.mRID()) {}, it.transformerTankInfo.ai.mRID())
+            TRANSFORMERSTARIMPEDANCE -> ExtractResult(protoToCimProvider(service).addFromPb(it.transformerStarImpedance), it.transformerStarImpedance.mRID())
+            TRANSFORMERENDINFO -> ExtractResult(protoToCimProvider(service).addFromPb(it.transformerEndInfo), it.transformerEndInfo.mRID())
+            TRANSFORMERTANKINFO -> ExtractResult(protoToCimProvider(service).addFromPb(it.transformerTankInfo), it.transformerTankInfo.mRID())
+            OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
+                "Identified object type ${it.identifiedObjectCase} is not supported by the network service"
+            )
         }
     }
 

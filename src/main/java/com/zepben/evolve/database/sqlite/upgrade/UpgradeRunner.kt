@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.tables.TableVersion
+import com.zepben.evolve.database.sqlite.upgrade.changesets.*
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -38,7 +39,8 @@ class UpgradeRunner constructor(
             changeSet25(),
             changeSet26(),
             changeSet27(),
-            changeSet28()
+            changeSet28(),
+            changeSet29()
         ).asUnmodifiable()
 ) {
 
@@ -126,7 +128,7 @@ class UpgradeRunner constructor(
     }
 
     @Throws(SQLException::class, SecurityException::class)
-    private fun runUpgrade(
+    internal fun runUpgrade(
         changeSet: ChangeSet,
         statement: Statement,
         versionUpdateStatement: PreparedStatement

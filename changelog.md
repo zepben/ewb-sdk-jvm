@@ -29,6 +29,9 @@
 
 * Added the following classes:
     * LoadBreakSwitch
+    * TransformerEndInfo
+    * TransformerTankInfo
+    * TransformerStarImpedance
     
 ##### Enhancements
 * Added some better testing mechanism for database upgrades.

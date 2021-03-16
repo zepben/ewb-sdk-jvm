@@ -7,14 +7,14 @@
  */
 package com.zepben.evolve.services.network.translator
 
-import com.google.protobuf.ProtocolStringList
-import com.zepben.evolve.cim.iec61968.assets.Asset
-import com.zepben.evolve.cim.iec61968.assets.AssetContainer
-import com.zepben.evolve.cim.iec61968.assets.Pole
-import com.zepben.evolve.cim.iec61968.assets.Structure
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
+import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
@@ -22,23 +22,28 @@ import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
+import com.zepben.evolve.utils.validateMRID
+import com.zepben.evolve.utils.validateMRIDList
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PBPowerTransformerInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerEndInfo as PBTransformerEndInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTankInfo as PBTransformerTankInfo
 import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
 import com.zepben.protobuf.cim.iec61968.assets.AssetContainer as PBAssetContainer
+import com.zepben.protobuf.cim.iec61968.assets.AssetInfo as PBAssetInfo
 import com.zepben.protobuf.cim.iec61968.assets.Pole as PBPole
 import com.zepben.protobuf.cim.iec61968.assets.Structure as PBStructure
-import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevive
+import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
 import com.zepben.protobuf.cim.iec61970.base.core.ConductingEquipment as PBConductingEquipment
 import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNodeContainer as PBConnectivityNodeContainer
 import com.zepben.protobuf.cim.iec61970.base.core.Equipment as PBEquipment
 import com.zepben.protobuf.cim.iec61970.base.core.EquipmentContainer as PBEquipmentContainer
 import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject as PBIdentifiedObject
-import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 import com.zepben.protobuf.cim.iec61970.base.core.PowerSystemResource as PBPowerSystemResource
 import com.zepben.protobuf.cim.iec61970.base.core.Substation as PBSubstation
-import com.zepben.protobuf.cim.iec61970.base.domain.UnitSymbol as PBUnitSymbol
 import com.zepben.protobuf.cim.iec61970.base.meas.Accumulator as PBAccumulator
 import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
 import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
@@ -52,6 +57,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformerEnd as PBPowe
 import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch as PBProtectedSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
+import com.zepben.protobuf.cim.iec61970.base.wires.TransformerStarImpedance as PBTransformerStarImpedance
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 
@@ -75,8 +81,8 @@ internal class NetworkCimToProtoTestValidator {
     fun validate(cim: PowerSystemResource, pb: PBPowerSystemResource) {
         validate(cim, pb.io)
 
-        validateMRID(cim.assetInfo, pb.assetInfoMRID)
-        validateMRID(cim.location, pb.locationMRID)
+        validateMRID(pb.assetInfoMRID, cim.assetInfo)
+        validateMRID(pb.locationMRID, cim.location)
         assertThat(pb.numControls, equalTo(cim.numControls))
     }
 
@@ -85,17 +91,17 @@ internal class NetworkCimToProtoTestValidator {
 
         assertThat(pb.inService, equalTo(cim.inService))
         assertThat(pb.normallyInService, equalTo(cim.normallyInService))
-        validateMRIDList(cim.containers, pb.equipmentContainerMRIDsList)
-        validateMRIDList(cim.usagePoints, pb.usagePointMRIDsList)
-        validateMRIDList(cim.operationalRestrictions, pb.operationalRestrictionMRIDsList)
-        validateMRIDList(cim.currentFeeders, pb.currentFeederMRIDsList)
+        validateMRIDList(pb.equipmentContainerMRIDsList, cim.containers)
+        validateMRIDList(pb.usagePointMRIDsList, cim.usagePoints)
+        validateMRIDList(pb.operationalRestrictionMRIDsList, cim.operationalRestrictions)
+        validateMRIDList(pb.currentFeederMRIDsList, cim.currentFeeders)
     }
 
     fun validate(cim: ConductingEquipment, pb: PBConductingEquipment) {
         validate(cim, pb.eq)
 
-        validateMRID(cim.baseVoltage, pb.baseVoltageMRID)
-        validateMRIDList(cim.terminals, pb.terminalMRIDsList)
+        validateMRID(pb.baseVoltageMRID, cim.baseVoltage)
+        validateMRIDList(pb.terminalMRIDsList, cim.terminals)
     }
 
     fun validate(cim: Connector, pb: PBConnector) {
@@ -123,7 +129,7 @@ internal class NetworkCimToProtoTestValidator {
     fun validate(cim: PowerTransformer, pb: PBPowerTransformer) {
         validate(cim, pb.ce)
 
-        validateMRIDList(cim.ends, pb.powerTransformerEndMRIDsList)
+        validateMRIDList(pb.powerTransformerEndMRIDsList, cim.ends)
         assertThat(VectorGroup.valueOf(pb.vectorGroup.name), equalTo(cim.vectorGroup))
         assertThat(pb.transformerUtilisation, equalTo(cim.transformerUtilisation))
     }
@@ -131,40 +137,40 @@ internal class NetworkCimToProtoTestValidator {
     fun validate(cim: TransformerEnd, pb: PBTransformerEnd) {
         validate(cim, pb.io)
 
-        validateMRID(cim.baseVoltage, pb.baseVoltageMRID)
-        validateMRID(cim.ratioTapChanger, pb.ratioTapChangerMRID)
-        validateMRID(cim.terminal, pb.terminalMRID)
-        assertThat(cim.grounded, equalTo(pb.grounded))
-        assertThat(cim.rGround, equalTo(pb.rGround))
-        assertThat(cim.xGround, equalTo(pb.xGround))
-        assertThat(cim.endNumber, equalTo(pb.endNumber))
+        validateMRID(pb.baseVoltageMRID, cim.baseVoltage)
+        validateMRID(pb.ratioTapChangerMRID, cim.ratioTapChanger)
+        validateMRID(pb.terminalMRID, cim.terminal)
+        assertThat(pb.grounded, equalTo(cim.grounded))
+        assertThat(pb.rGround, equalTo(cim.rGround))
+        assertThat(pb.xGround, equalTo(cim.xGround))
+        assertThat(pb.endNumber, equalTo(cim.endNumber))
     }
 
     fun validate(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd) {
         validate(cim, pb.te)
 
-        assertThat(cim.b, equalTo(pb.b))
-        assertThat(cim.g, equalTo(pb.g))
-        assertThat(cim.b0, equalTo(pb.b0))
-        assertThat(cim.g0, equalTo(pb.g0))
-        assertThat(cim.r, equalTo(pb.r))
-        assertThat(cim.r0, equalTo(pb.r0))
-        assertThat(cim.x, equalTo(pb.x))
-        assertThat(cim.x0, equalTo(pb.x0))
+        assertThat(pb.b, equalTo(cim.b))
+        assertThat(pb.g, equalTo(cim.g))
+        assertThat(pb.b0, equalTo(cim.b0))
+        assertThat(pb.g0, equalTo(cim.g0))
+        assertThat(pb.r, equalTo(cim.r ?: UNKNOWN_DOUBLE))
+        assertThat(pb.r0, equalTo(cim.r0 ?: UNKNOWN_DOUBLE))
+        assertThat(pb.x, equalTo(cim.x ?: UNKNOWN_DOUBLE))
+        assertThat(pb.x0, equalTo(cim.x0 ?: UNKNOWN_DOUBLE))
         assertThat(WindingConnection.valueOf(pb.connectionKind.name), equalTo(cim.connectionKind))
-        assertThat(cim.ratedS, equalTo(pb.ratedS))
-        assertThat(cim.ratedU, equalTo(pb.ratedU))
-        assertThat(cim.phaseAngleClock, equalTo(pb.phaseAngleClock))
+        assertThat(pb.ratedS, equalTo(cim.ratedS))
+        assertThat(pb.ratedU, equalTo(cim.ratedU))
+        assertThat(pb.phaseAngleClock, equalTo(cim.phaseAngleClock))
     }
 
     fun validate(cim: Substation, pb: PBSubstation) {
         validate(cim, pb.ec)
 
-        validateMRID(cim.subGeographicalRegion, pb.subGeographicalRegionMRID)
-        validateMRIDList(cim.feeders, pb.normalEnergizedFeederMRIDsList)
-        validateMRIDList(cim.loops, pb.loopMRIDsList)
-        validateMRIDList(cim.energizedLoops, pb.normalEnergizedLoopMRIDsList)
-        validateMRIDList(cim.circuits, pb.circuitMRIDsList)
+        validateMRID(pb.subGeographicalRegionMRID, cim.subGeographicalRegion)
+        validateMRIDList(pb.normalEnergizedFeederMRIDsList, cim.feeders)
+        validateMRIDList(pb.loopMRIDsList, cim.loops)
+        validateMRIDList(pb.normalEnergizedLoopMRIDsList, cim.energizedLoops)
+        validateMRIDList(pb.circuitMRIDsList, cim.circuits)
     }
 
     fun validate(cim: Line, pb: PBLine) {
@@ -174,29 +180,29 @@ internal class NetworkCimToProtoTestValidator {
     fun validate(cim: Circuit, pb: PBCircuit) {
         validate(cim, pb.l)
 
-        validateMRID(cim.loop, pb.loopMRID)
-        validateMRIDList(cim.endTerminals, pb.endTerminalMRIDsList)
-        validateMRIDList(cim.endSubstations, pb.endSubstationMRIDsList)
+        validateMRID(pb.loopMRID, cim.loop)
+        validateMRIDList(pb.endTerminalMRIDsList, cim.endTerminals)
+        validateMRIDList(pb.endSubstationMRIDsList, cim.endSubstations)
     }
 
     fun validate(cim: Loop, pb: PBLoop) {
         validate(cim, pb.io)
 
-        validateMRIDList(cim.circuits, pb.circuitMRIDsList)
-        validateMRIDList(cim.substations, pb.substationMRIDsList)
-        validateMRIDList(cim.energizingSubstations, pb.normalEnergizingSubstationMRIDsList)
+        validateMRIDList(pb.circuitMRIDsList, cim.circuits)
+        validateMRIDList(pb.substationMRIDsList, cim.substations)
+        validateMRIDList(pb.normalEnergizingSubstationMRIDsList, cim.energizingSubstations)
     }
 
     fun validate(cim: Meter, pb: PBMeter) {
         validate(cim, pb.ed)
     }
 
-    fun validate(cim: EndDevice, pb: PBEndDevive) {
+    fun validate(cim: EndDevice, pb: PBEndDevice) {
         validate(cim, pb.ac)
 
-        validateMRIDList(cim.usagePoints, pb.usagePointMRIDsList)
-        validateMRID(cim.customerMRID, pb.customerMRID)
-        validateMRID(cim.serviceLocation, pb.serviceLocationMRID)
+        validateMRIDList(pb.usagePointMRIDsList, cim.usagePoints)
+        validateMRID(pb.customerMRID, cim.customerMRID)
+        validateMRID(pb.serviceLocationMRID, cim.serviceLocation)
     }
 
     fun validate(cim: AssetContainer, pb: PBAssetContainer) {
@@ -206,57 +212,35 @@ internal class NetworkCimToProtoTestValidator {
     fun validate(cim: Asset, pb: PBAsset) {
         validate(cim, pb.io)
 
-        validateMRIDList(cim.organisationRoles, pb.organisationRoleMRIDsList)
-        validateMRID(cim.location, pb.locationMRID)
+        validateMRIDList(pb.organisationRoleMRIDsList, cim.organisationRoles)
+        validateMRID(pb.locationMRID, cim.location)
     }
 
     fun validate(cim: Pole, pb: PBPole) {
         validate(cim, pb.st)
 
-        assertThat(cim.classification, equalTo(pb.classification))
-        validateMRIDList(cim.streetlights, pb.streetlightMRIDsList)
+        assertThat(pb.classification, equalTo(cim.classification))
+        validateMRIDList(pb.streetlightMRIDsList, cim.streetlights)
     }
 
     private fun validate(cim: Structure, pb: PBStructure) {
         validate(cim, pb.ac)
     }
 
-    private fun validateMRID(mrid: String?, pb: String) {
-        mrid?.let { assertThat(pb, equalTo(it)) } ?: assertThat(pb, emptyString())
-    }
-
-    private fun validateMRID(cim: IdentifiedObject?, pb: String) {
-        validateMRID(cim?.mRID, pb)
-    }
-
-    private fun validateMRIDList(cim: Collection<IdentifiedObject>, pb: ProtocolStringList) {
-        assertThat(pb.size, equalTo(cim.size))
-        if (cim.isNotEmpty())
-            assertThat(pb, containsInAnyOrder(*cim.stream().map { it.mRID }.toArray()))
-    }
-
-    private fun validateMRIDList(cim: List<IdentifiedObject>, pb: ProtocolStringList) {
-        assertThat(pb.size, equalTo(cim.size))
-        if (cim.isNotEmpty())
-            assertThat(pb, contains(*cim.stream().map { it.mRID }.toArray()))
-    }
-
-    private fun validate(cim: PhaseCode, pb: PBPhaseCode) {
-        assertThat(PBPhaseCode.valueOf(cim.name), `is`(pb))
-    }
-
     fun validate(cim: Measurement, pb: PBMeasurement) {
-        validateMRID(cim.terminalMRID, pb.terminalMRID)
-        validateMRID(cim.powerSystemResourceMRID, pb.powerSystemResourceMRID)
-        validateMRID(cim.remoteSource?.mRID, pb.remoteSourceMRID)
-        validate(cim.phases, pb.phases)
-        assertThat(PBUnitSymbol.valueOf(cim.unitSymbol.name), `is`(pb.unitSymbol))
         validate(cim, pb.io)
+
+        validateMRID(pb.terminalMRID, cim.terminalMRID)
+        validateMRID(pb.powerSystemResourceMRID, cim.powerSystemResourceMRID)
+        validateMRID(pb.remoteSourceMRID, cim.remoteSource)
+        assertThat(PhaseCode.valueOf(pb.phases.name), equalTo(cim.phases))
+        assertThat(UnitSymbol.valueOf(pb.unitSymbol.name), equalTo(cim.unitSymbol))
     }
 
     fun validate(cim: Analog, pb: PBAnalog) {
         validate(cim as Measurement, pb.measurement)
-        assertThat(cim.positiveFlowIn, `is`(pb.positiveFlowIn))
+
+        assertThat(pb.positiveFlowIn, equalTo(cim.positiveFlowIn))
     }
 
     fun validate(cim: Accumulator, pb: PBAccumulator) {
@@ -265,6 +249,51 @@ internal class NetworkCimToProtoTestValidator {
 
     fun validate(cim: Discrete, pb: PBDiscrete) {
         validate(cim as Measurement, pb.measurement)
+    }
+
+    fun validate(cim: PowerTransformerInfo, pb: PBPowerTransformerInfo) {
+        validate(cim as AssetInfo, pb.ai)
+
+        validateMRIDList(pb.transformerTankInfoMRIDsList, cim.transformerTankInfos)
+    }
+
+    fun validate(cim: TransformerTankInfo, pb: PBTransformerTankInfo) {
+        validate(cim as AssetInfo, pb.ai)
+
+        validateMRID(pb.powerTransformerInfoMRID, cim.powerTransformerInfo)
+        validateMRIDList(pb.transformerEndInfoMRIDsList, cim.transformerEndInfos)
+    }
+
+    fun validate(cim: TransformerEndInfo, pb: PBTransformerEndInfo) {
+        validate(cim as AssetInfo, pb.ai)
+
+        assertThat(WindingConnection.valueOf(pb.connectionKind.name), equalTo(cim.connectionKind))
+        assertThat(pb.emergencyS, equalTo(cim.emergencyS))
+        assertThat(pb.endNumber, equalTo(cim.endNumber))
+        assertThat(pb.insulationU, equalTo(cim.insulationU))
+        assertThat(pb.phaseAngleClock, equalTo(cim.phaseAngleClock))
+        assertThat(pb.r, equalTo(cim.r))
+        assertThat(pb.ratedS, equalTo(cim.ratedS))
+        assertThat(pb.ratedU, equalTo(cim.ratedU))
+        assertThat(pb.shortTermS, equalTo(cim.shortTermS))
+
+        validateMRID(pb.transformerTankInfoMRID, cim.transformerTankInfo)
+        validateMRID(pb.transformerStarImpedanceMRID, cim.transformerStarImpedance)
+    }
+
+    private fun validate(cim: AssetInfo, pb: PBAssetInfo) {
+        validate(cim as IdentifiedObject, pb.io)
+    }
+
+    fun validate(cim: TransformerStarImpedance, pb: PBTransformerStarImpedance) {
+        validate(cim as IdentifiedObject, pb.io)
+
+        assertThat(pb.r, equalTo(cim.r ?: UNKNOWN_DOUBLE))
+        assertThat(pb.r0, equalTo(cim.r0 ?: UNKNOWN_DOUBLE))
+        assertThat(pb.x, equalTo(cim.x ?: UNKNOWN_DOUBLE))
+        assertThat(pb.x0, equalTo(cim.x0 ?: UNKNOWN_DOUBLE))
+
+        validateMRID(pb.transformerEndInfoMRID, cim.transformerEndInfo)
     }
 
 }

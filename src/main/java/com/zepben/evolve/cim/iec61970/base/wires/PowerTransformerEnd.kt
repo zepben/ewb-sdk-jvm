@@ -7,6 +7,10 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
+import com.zepben.evolve.services.network.ResistanceReactance
+import com.zepben.evolve.services.network.mergeIfIncomplete
+
 /**
  * A PowerTransformerEnd is associated with each Terminal of a PowerTransformer.
  *
@@ -34,14 +38,16 @@ package com.zepben.evolve.cim.iec61970.base.wires
  *                           are 0 to 11. For example, for the secondary side end of a transformer with vector group code of 'Dyn11', specify the
  *                           connection kind as wye with neutral and specify the phase angle of the clock as 11.  The clock value of the transformer
  *                           end number specified as 1, is assumed to be zero.
- * @property r Resistance (star-model) of the transformer end. The attribute shall be equal or greater than zero for non-equivalent transformers.
- * @property r0 Zero sequence series resistance (star-model) of the transformer end.
- * @property ratedS Normal apparent power rating. The attribute shall be a positive value. For a two-winding transformer the values for the high and low voltage sides shall be identical.
+ * @property r Resistance (star-model) of the transformer end in ohms. The attribute shall be equal or greater than zero for non-equivalent transformers.
+ *             Do not read this directly, use [resistanceReactance().r] instead.
+ * @property r0 Zero sequence series resistance (star-model) of the transformer end in ohms. Do not read this directly, use [resistanceReactance().r0] instead.
+ * @property ratedS Normal apparent power rating. The attribute shall be a positive value. For a two-winding transformer the values for the high and low voltage
+ *                  sides shall be identical.
  * @property ratedU  Rated voltage: phase-phase for three-phase windings, and either phase-phase or phase-neutral for single-phase windings.
  *                   A high voltage side, as given by TransformerEnd.endNumber, shall have a ratedU that is greater or equal than ratedU
  *                   for the lower voltage sides.
- * @property x Positive sequence series reactance (star-model) of the transformer end.
- * @property x0 Zero sequence series reactance of the transformer end.
+ * @property x Positive sequence series reactance (star-model) of the transformer end in ohms. Do not read this directly, use [resistanceReactance().x] instead.
+ * @property x0 Zero sequence series reactance of the transformer end in ohms. Do not read this directly, use [resistanceReactance().x0] instead.
  */
 class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : TransformerEnd(mRID) {
 
@@ -57,10 +63,51 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
     var g: Double = 0.0
     var g0: Double = 0.0
     var phaseAngleClock: Int = 0
-    var r: Double = 0.0
-    var r0: Double = 0.0
+    var r: Double?
+        get() = _r.takeIf { it != UNKNOWN_DOUBLE }
+        set(value) {
+            _r = value ?: UNKNOWN_DOUBLE
+        }
+    var r0: Double?
+        get() = _r0.takeIf { it != UNKNOWN_DOUBLE }
+        set(value) {
+            _r0 = value ?: UNKNOWN_DOUBLE
+        }
     var ratedS: Int = 0
     var ratedU: Int = 0
-    var x: Double = 0.0
-    var x0: Double = 0.0
+    var x: Double?
+        get() = _x.takeIf { it != UNKNOWN_DOUBLE }
+        set(value) {
+            _x = value ?: UNKNOWN_DOUBLE
+        }
+    var x0: Double?
+        get() = _x0.takeIf { it != UNKNOWN_DOUBLE }
+        set(value) {
+            _x0 = value ?: UNKNOWN_DOUBLE
+        }
+
+    //
+    // NOTE: These fields are using non null primitive backing types to save memory.
+    //
+    private var _r: Double = UNKNOWN_DOUBLE
+    private var _r0: Double = UNKNOWN_DOUBLE
+    private var _x: Double = UNKNOWN_DOUBLE
+    private var _x0: Double = UNKNOWN_DOUBLE
+
+
+    /**
+     * Get the [ResistanceReactance] for this [PowerTransformerEnd] from either:
+     * 1. directly assigned values or
+     * 2. the pre-calculated [starImpedance] or
+     * 3. from the datasheet information of the associated [powerTransformer]
+     *
+     * If the data is not complete in any of the above it will merge in the missing values from the subsequent sources.
+     */
+    override fun resistanceReactance(): ResistanceReactance =
+        ResistanceReactance(r, r0, x, x0).mergeIfIncomplete {
+            starImpedance?.resistanceReactance()
+        }.mergeIfIncomplete {
+            powerTransformer?.assetInfo?.resistanceReactance(endNumber)
+        }
+
 }

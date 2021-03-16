@@ -11,8 +11,8 @@ package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnection
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 

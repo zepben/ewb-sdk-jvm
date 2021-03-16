@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2021 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -96,19 +96,29 @@ class DatabaseSqliteTest {
 
     @Test
     fun `test PowerTransformerInfo schema`() {
-        validateSchema(SchemaNetworks.createPowerTransformerInfoTestServices())
+        validateSchema(SchemaNetworks.createPowerTransformerInfoServices())
+    }
+
+    @Test
+    fun `test transformer tank info schema`() {
+        validateSchema(SchemaNetworks.createTransformerTankInfoServices())
+    }
+
+    @Test
+    fun `test transformer end info schema`() {
+        validateSchema(SchemaNetworks.createTransformerEndInfoServices())
     }
 
     /************ IEC61968 ASSETS ************/
 
     @Test
     fun `test Pole schema`() {
-        validateSchema(SchemaNetworks.createPoleTestServices())
+        validateSchema(SchemaNetworks.createPoleServices())
     }
 
     @Test
     fun `test Streetlight schema`() {
-        validateSchema(SchemaNetworks.createStreetlightTestServices())
+        validateSchema(SchemaNetworks.createStreetlightServices())
     }
 
     /************ IEC61970 WIRES ************/
@@ -120,56 +130,66 @@ class DatabaseSqliteTest {
 
     @Test
     fun `test PowerTransformer schema`() {
-        validateSchema(SchemaNetworks.createPowerTransformerTestServices())
+        validateSchema(SchemaNetworks.createPowerTransformerServices())
     }
 
     @Test
     fun `test LoadBreakSwitch schema`() {
-        validateSchema(SchemaNetworks.createLoadBreakSwitchTestServices())
+        validateSchema(SchemaNetworks.createLoadBreakSwitchServices())
     }
 
     @Test
     fun `test Breaker schema`() {
-        validateSchema(SchemaNetworks.createBreakerTestServices())
+        validateSchema(SchemaNetworks.createBreakerServices())
+    }
+
+    @Test
+    fun `test power transformer end schema`() {
+        validateSchema(SchemaNetworks.createPowerTransformerEndServices())
+    }
+
+    @Test
+    fun `test transformer star impedance schema`() {
+        validateSchema(SchemaNetworks.createTransformerStarImpedanceServices())
     }
 
     /************ IEC61970 WIRES GENERATION PRODUCTION ************/
 
     @Test
     fun `test BatteryUnit schema`() {
-        validateSchema(SchemaNetworks.createBatteryUnitTestServices())
+        validateSchema(SchemaNetworks.createBatteryUnitServices())
     }
 
     @Test
     fun `test PhotoVoltaic schema`() {
-        validateSchema(SchemaNetworks.createPhotoVoltaicUnitTestServices())
+        validateSchema(SchemaNetworks.createPhotoVoltaicUnitServices())
     }
 
     @Test
     fun `test PowerElectronicsConnection schema`() {
-        validateSchema(SchemaNetworks.createPowerElectronicsConnectionTestServices())
+        validateSchema(SchemaNetworks.createPowerElectronicsConnectionServices())
     }
 
     @Test
     fun `test PowerElectronicsConnectionPhase schema`() {
-        validateSchema(SchemaNetworks.createPowerElectronicsConnectionPhaseTestServices())
+        validateSchema(SchemaNetworks.createPowerElectronicsConnectionPhaseServices())
     }
 
     @Test
     fun `test PowerElectronicsWindUnit schema`() {
-        validateSchema(SchemaNetworks.createPowerElectronicsWindUnitTestServices())
+        validateSchema(SchemaNetworks.createPowerElectronicsWindUnitServices())
     }
 
     /************ IEC61970 InfIEC61970 ************/
 
     @Test
     fun testCircuitSchema() {
-        validateSchema(SchemaNetworks.createCircuitTestServices())
+        validateSchema(SchemaNetworks.createCircuitServices())
     }
 
     @Test
     fun testLoopSchema() {
-        validateSchema(SchemaNetworks.createLoopTestServices())
+        validateSchema(SchemaNetworks.createLoopServices())
     }
 
     /************ OTHER ************/
@@ -321,9 +341,9 @@ class DatabaseSqliteTest {
 
         System.err.println(differences.toString())
 
-        assertThat("objects missing from actual network", differences.missingFromTarget(), empty())
+        assertThat("unexpected objects found in loaded network", differences.missingFromTarget(), empty())
         assertThat("unexpected modifications", differences.modifications(), anEmptyMap())
-        assertThat("unexpected objects found in actual network", differences.missingFromSource(), empty())
+        assertThat("objects missing from loaded network", differences.missingFromSource(), empty())
     }
 
     companion object {

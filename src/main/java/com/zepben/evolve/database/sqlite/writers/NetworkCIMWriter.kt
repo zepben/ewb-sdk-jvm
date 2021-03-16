@@ -7,10 +7,7 @@
  */
 package com.zepben.evolve.database.sqlite.writers
 
-import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.PositionPoint
@@ -38,10 +35,7 @@ import com.zepben.evolve.database.sqlite.DatabaseTables
 import com.zepben.evolve.database.sqlite.extensions.setNullableDouble
 import com.zepben.evolve.database.sqlite.extensions.setNullableString
 import com.zepben.evolve.database.sqlite.tables.associations.*
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableCableInfo
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableOverheadWireInfo
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TablePowerTransformerInfo
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableWireInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableEndDevices
@@ -81,6 +75,40 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val insert = databaseTables.getInsert(TableOverheadWireInfo::class.java)
 
         return saveWireInfo(table, insert, overheadWireInfo, "overhead wire info")
+    }
+
+    fun save(powerTransformerInfo: PowerTransformerInfo): Boolean {
+        val table = databaseTables.getTable(TablePowerTransformerInfo::class.java)
+        val insert = databaseTables.getInsert(TablePowerTransformerInfo::class.java)
+
+        return saveAssetInfo(table, insert, powerTransformerInfo, "power transformer info")
+    }
+
+    fun save(transformerTankInfo: TransformerTankInfo): Boolean {
+        val table = databaseTables.getTable(TableTransformerTankInfo::class.java)
+        val insert = databaseTables.getInsert(TableTransformerTankInfo::class.java)
+
+        insert.setNullableString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex, transformerTankInfo.powerTransformerInfo?.mRID)
+
+        return saveAssetInfo(table, insert, transformerTankInfo, "transformer tank info")
+    }
+
+    fun save(transformerEndInfo: TransformerEndInfo): Boolean {
+        val table = databaseTables.getTable(TableTransformerEndInfo::class.java)
+        val insert = databaseTables.getInsert(TableTransformerEndInfo::class.java)
+
+        insert.setString(table.CONNECTION_KIND.queryIndex, transformerEndInfo.connectionKind.name)
+        insert.setInt(table.EMERGENCY_S.queryIndex, transformerEndInfo.emergencyS)
+        insert.setInt(table.END_NUMBER.queryIndex, transformerEndInfo.endNumber)
+        insert.setInt(table.INSULATION_U.queryIndex, transformerEndInfo.insulationU)
+        insert.setInt(table.PHASE_ANGLE_CLOCK.queryIndex, transformerEndInfo.phaseAngleClock)
+        insert.setNullableDouble(table.R.queryIndex, transformerEndInfo.r)
+        insert.setInt(table.RATED_S.queryIndex, transformerEndInfo.ratedS)
+        insert.setInt(table.RATED_U.queryIndex, transformerEndInfo.ratedU)
+        insert.setInt(table.SHORT_TERM_S.queryIndex, transformerEndInfo.shortTermS)
+        insert.setNullableString(table.TRANSFORMER_TANK_INFO_MRID.queryIndex, transformerEndInfo.transformerTankInfo?.mRID)
+
+        return saveAssetInfo(table, insert, transformerEndInfo, "transformer end info")
     }
 
     private fun saveWireInfo(table: TableWireInfo, insert: PreparedStatement, wireInfo: WireInfo, description: String): Boolean {
@@ -679,13 +707,6 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConductingEquipment(table, insert, powerTransformer, "power transformer")
     }
 
-    fun save(powerTransformerInfo: PowerTransformerInfo): Boolean {
-        val table = databaseTables.getTable(TablePowerTransformerInfo::class.java)
-        val insert = databaseTables.getInsert(TablePowerTransformerInfo::class.java)
-
-        return saveAssetInfo(table, insert, powerTransformerInfo, "power transformer info")
-    }
-
     fun save(powerTransformerEnd: PowerTransformerEnd): Boolean {
         val table = databaseTables.getTable(TablePowerTransformerEnds::class.java)
         val insert = databaseTables.getInsert(TablePowerTransformerEnds::class.java)
@@ -697,12 +718,12 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setDouble(table.B0.queryIndex, powerTransformerEnd.b0)
         insert.setDouble(table.G.queryIndex, powerTransformerEnd.g)
         insert.setDouble(table.G0.queryIndex, powerTransformerEnd.g0)
-        insert.setDouble(table.R.queryIndex, powerTransformerEnd.r)
-        insert.setDouble(table.R0.queryIndex, powerTransformerEnd.r0)
+        insert.setNullableDouble(table.R.queryIndex, powerTransformerEnd.r)
+        insert.setNullableDouble(table.R0.queryIndex, powerTransformerEnd.r0)
         insert.setInt(table.RATED_S.queryIndex, powerTransformerEnd.ratedS)
         insert.setInt(table.RATED_U.queryIndex, powerTransformerEnd.ratedU)
-        insert.setDouble(table.X.queryIndex, powerTransformerEnd.x)
-        insert.setDouble(table.X0.queryIndex, powerTransformerEnd.x0)
+        insert.setNullableDouble(table.X.queryIndex, powerTransformerEnd.x)
+        insert.setNullableDouble(table.X0.queryIndex, powerTransformerEnd.x0)
 
         return saveTransformerEnd(table, insert, powerTransformerEnd, "power transformer end")
     }
@@ -784,8 +805,22 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setBoolean(table.GROUNDED.queryIndex, transformerEnd.grounded)
         insert.setDouble(table.R_GROUND.queryIndex, transformerEnd.rGround)
         insert.setDouble(table.X_GROUND.queryIndex, transformerEnd.xGround)
+        insert.setNullableString(table.STAR_IMPEDANCE_MRID.queryIndex, transformerEnd.starImpedance?.mRID)
 
         return saveIdentifiedObject(table, insert, transformerEnd, description)
+    }
+
+    fun save(transformerStarImpedance: TransformerStarImpedance): Boolean {
+        val table = databaseTables.getTable(TableTransformerStarImpedance::class.java)
+        val insert = databaseTables.getInsert(TableTransformerStarImpedance::class.java)
+
+        insert.setNullableDouble(table.R.queryIndex, transformerStarImpedance.r)
+        insert.setNullableDouble(table.R0.queryIndex, transformerStarImpedance.r0)
+        insert.setNullableDouble(table.X.queryIndex, transformerStarImpedance.x)
+        insert.setNullableDouble(table.X0.queryIndex, transformerStarImpedance.x0)
+        insert.setNullableString(table.TRANSFORMER_END_INFO_MRID.queryIndex, transformerStarImpedance.transformerEndInfo?.mRID)
+
+        return saveIdentifiedObject(table, insert, transformerStarImpedance, "transformer star impedance")
     }
 
     /************ IEC61970 InfIEC61970 ************/

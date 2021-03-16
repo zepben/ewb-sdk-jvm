@@ -33,10 +33,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.database.sqlite.extensions.getNullableDouble
 import com.zepben.evolve.database.sqlite.extensions.getNullableString
 import com.zepben.evolve.database.sqlite.tables.associations.*
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableCableInfo
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableOverheadWireInfo
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TablePowerTransformerInfo
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.TableWireInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableEndDevices
@@ -91,6 +88,36 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         val powerTransformerInfo = PowerTransformerInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadAssetInfo(powerTransformerInfo, table, resultSet) && networkService.addOrThrow(powerTransformerInfo)
+    }
+
+    fun load(table: TableTransformerTankInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val transformerTankInfo = TransformerTankInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            powerTransformerInfo =
+                networkService.ensureGet<PowerTransformerInfo>(resultSet.getString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex), typeNameAndMRID())
+                    ?.addTransformerTankInfo(this)
+        }
+
+        return loadAssetInfo(transformerTankInfo, table, resultSet) && networkService.addOrThrow(transformerTankInfo)
+    }
+
+    fun load(table: TableTransformerEndInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val transformerEndInfo = TransformerEndInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            connectionKind = WindingConnection.valueOf(resultSet.getString(table.CONNECTION_KIND.queryIndex))
+            emergencyS = resultSet.getInt(table.EMERGENCY_S.queryIndex)
+            endNumber = resultSet.getInt(table.END_NUMBER.queryIndex)
+            insulationU = resultSet.getInt(table.INSULATION_U.queryIndex)
+            phaseAngleClock = resultSet.getInt(table.PHASE_ANGLE_CLOCK.queryIndex)
+            r = resultSet.getDouble(table.R.queryIndex)
+            ratedS = resultSet.getInt(table.RATED_S.queryIndex)
+            ratedU = resultSet.getInt(table.RATED_U.queryIndex)
+            shortTermS = resultSet.getInt(table.SHORT_TERM_S.queryIndex)
+
+            transformerTankInfo =
+                networkService.ensureGet<TransformerTankInfo>(resultSet.getString(table.TRANSFORMER_TANK_INFO_MRID.queryIndex), typeNameAndMRID())
+                    ?.addTransformerEndInfo(this)
+        }
+
+        return loadAssetInfo(transformerEndInfo, table, resultSet) && networkService.addOrThrow(transformerEndInfo)
     }
 
     /************ IEC61968 ASSETS ************/
@@ -479,7 +506,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     private fun loadConductor(conductor: Conductor, table: TableConductors, resultSet: ResultSet): Boolean {
         conductor.apply {
-            length = resultSet.getNullableDouble(table.LENGTH.queryIndex)
+            length = resultSet.getNullableDouble(table.LENGTH.queryIndex) ?: Double.NaN
             assetInfo = networkService.ensureGet(
                 resultSet.getNullableString(table.WIRE_INFO_MRID.queryIndex),
                 typeNameAndMRID()
@@ -666,7 +693,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TablePowerTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val powerTransformer = PowerTransformer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             vectorGroup = VectorGroup.valueOf(resultSet.getString(table.VECTOR_GROUP.queryIndex))
-            transformerUtilisation = resultSet.getNullableDouble(table.TRANSFORMER_UTILISATION.queryIndex)
+            transformerUtilisation = resultSet.getNullableDouble(table.TRANSFORMER_UTILISATION.queryIndex) ?: Double.NaN
             assetInfo = networkService.ensureGet(
                 resultSet.getNullableString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex),
                 typeNameAndMRID()
@@ -683,10 +710,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TablePowerTransformerEnds, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val powerTransformerEnd = PowerTransformerEnd(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             endNumber = resultSet.getInt(table.END_NUMBER.queryIndex)
-            powerTransformer = networkService.ensureGet(
-                resultSet.getString(table.POWER_TRANSFORMER_MRID.queryIndex),
-                typeNameAndMRID()
-            )
+            powerTransformer = networkService.ensureGet(resultSet.getString(table.POWER_TRANSFORMER_MRID.queryIndex), typeNameAndMRID())
             powerTransformer?.addEnd(this)
 
             connectionKind = WindingConnection.valueOf(resultSet.getString(table.CONNECTION_KIND.queryIndex))
@@ -695,12 +719,12 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             b0 = resultSet.getDouble(table.B0.queryIndex)
             g = resultSet.getDouble(table.G.queryIndex)
             g0 = resultSet.getDouble(table.G0.queryIndex)
-            r = resultSet.getDouble(table.R.queryIndex)
-            r0 = resultSet.getDouble(table.R0.queryIndex)
+            r = resultSet.getNullableDouble(table.R.queryIndex)
+            r0 = resultSet.getNullableDouble(table.R0.queryIndex)
             ratedS = resultSet.getInt(table.RATED_S.queryIndex)
             ratedU = resultSet.getInt(table.RATED_U.queryIndex)
-            x = resultSet.getDouble(table.X.queryIndex)
-            x0 = resultSet.getDouble(table.X0.queryIndex)
+            x = resultSet.getNullableDouble(table.X.queryIndex)
+            x0 = resultSet.getNullableDouble(table.X0.queryIndex)
         }
 
         return loadTransformerEnd(powerTransformerEnd, table, resultSet) && networkService.addOrThrow(powerTransformerEnd)
@@ -782,18 +806,29 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     private fun loadTransformerEnd(transformerEnd: TransformerEnd, table: TableTransformerEnds, resultSet: ResultSet): Boolean {
         transformerEnd.apply {
-            terminal =
-                networkService.ensureGet(resultSet.getNullableString(table.TERMINAL_MRID.queryIndex), typeNameAndMRID())
-            baseVoltage = networkService.ensureGet(
-                resultSet.getNullableString(table.BASE_VOLTAGE_MRID.queryIndex),
-                typeNameAndMRID()
-            )
+            terminal = networkService.ensureGet(resultSet.getNullableString(table.TERMINAL_MRID.queryIndex), typeNameAndMRID())
+            baseVoltage = networkService.ensureGet(resultSet.getNullableString(table.BASE_VOLTAGE_MRID.queryIndex), typeNameAndMRID())
             grounded = resultSet.getBoolean(table.GROUNDED.queryIndex)
             rGround = resultSet.getDouble(table.R_GROUND.queryIndex)
             xGround = resultSet.getDouble(table.X_GROUND.queryIndex)
+            starImpedance = networkService.ensureGet(resultSet.getNullableString(table.STAR_IMPEDANCE_MRID.queryIndex), typeNameAndMRID())
         }
 
         return loadIdentifiedObject(transformerEnd, table, resultSet)
+    }
+
+    fun load(table: TableTransformerStarImpedance, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val transformerStarImpedance = TransformerStarImpedance(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            r = resultSet.getNullableDouble(table.R.queryIndex)
+            r0 = resultSet.getNullableDouble(table.R0.queryIndex)
+            x = resultSet.getNullableDouble(table.X.queryIndex)
+            x0 = resultSet.getNullableDouble(table.X0.queryIndex)
+
+            transformerEndInfo = networkService.ensureGet(resultSet.getNullableString(table.TRANSFORMER_END_INFO_MRID.queryIndex), typeNameAndMRID())
+            transformerEndInfo?.transformerStarImpedance = this
+        }
+
+        return loadIdentifiedObject(transformerStarImpedance, table, resultSet) && networkService.addOrThrow(transformerStarImpedance)
     }
 
     /************ IEC61970 InfIEC61970 ************/

@@ -10,18 +10,11 @@ package com.zepben.evolve.database.sqlite.extensions
 import java.sql.ResultSet
 import java.time.Instant
 
+internal fun ResultSet.getNullableString(queryIndex: Int): String? =
+    getString(queryIndex).takeUnless { wasNull() }
 
-fun ResultSet.getNullableString(queryIndex: Int): String? {
-    val value = getString(queryIndex)
-    return if (wasNull()) null else value
-}
+internal fun ResultSet.getNullableDouble(queryIndex: Int): Double? =
+    getDouble(queryIndex).takeUnless { wasNull() }
 
-fun ResultSet.getNullableDouble(queryIndex: Int): Double {
-    val value = getDouble(queryIndex)
-    return if (wasNull()) Double.NaN else value
-}
-
-fun ResultSet.getInstant(queryIndex: Int): Instant? {
-    val value = getString(queryIndex)
-    return if (wasNull()) null else Instant.parse(value)
-}
+internal fun ResultSet.getInstant(queryIndex: Int): Instant? =
+    getString(queryIndex).takeUnless { wasNull() }?.let { Instant.parse(it) }

@@ -14,8 +14,8 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 class TableBatteryUnit : TablePowerElectronicsUnit() {
 
     val BATTERY_STATE = Column(++columnIndex, "battery_state", "TEXT", NOT_NULL)
-    val RATED_E = Column(++columnIndex, "rated_e", "NUMBER", NOT_NULL)
-    val STORED_E = Column(++columnIndex, "stored_e", "NUMBER", NOT_NULL)
+    val RATED_E = Column(++columnIndex, "rated_e", "INTEGER", NOT_NULL)
+    val STORED_E = Column(++columnIndex, "stored_e", "INTEGER", NOT_NULL)
 
     override fun name(): String {
         return "battery_unit"

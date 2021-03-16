@@ -227,7 +227,19 @@ class NetworkProducerClient(
             isAccumulator = {},
             isDiscrete = {},
             isRemoteControl = {},
-            isRemoteSource = {}
+            isRemoteSource = {},
+            isTransformerEndInfo = {
+                val builder = CreateTransformerEndInfoRequest.newBuilder().setTransformerEndInfo(it.toPb()).build()
+                stub.createTransformerEndInfo(builder)
+            },
+            isTransformerStarImpedance = {
+                val builder = CreateTransformerStarImpedanceRequest.newBuilder().setTransformerStarImpedance(it.toPb()).build()
+                stub.createTransformerStarImpedance(builder)
+            },
+            isTransformerTankInfo = {
+                val builder = CreateTransformerTankInfoRequest.newBuilder().setTransformerTankInfo(it.toPb()).build()
+                stub.createTransformerTankInfo(builder)
+            }
         )
     }.throwOnUnhandledError()
 }

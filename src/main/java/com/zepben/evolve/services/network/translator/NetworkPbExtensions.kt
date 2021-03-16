@@ -9,10 +9,7 @@ package com.zepben.evolve.services.network.translator
 
 import com.zepben.evolve.services.common.translator.mRID
 import com.zepben.evolve.services.common.translator.nameAndMRID
-import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo
-import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo
-import com.zepben.protobuf.cim.iec61968.assetinfo.WireInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.*
 import com.zepben.protobuf.cim.iec61968.assets.*
 import com.zepben.protobuf.cim.iec61968.common.Location
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice
@@ -39,6 +36,8 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop
 fun CableInfo.mRID(): String = wi.mRID()
 fun OverheadWireInfo.mRID(): String = wi.mRID()
 fun PowerTransformerInfo.mRID(): String = ai.mRID()
+fun TransformerEndInfo.mRID(): String = ai.mRID()
+fun TransformerTankInfo.mRID(): String = ai.mRID()
 fun WireInfo.mRID(): String = ai.mRID()
 fun Asset.mRID(): String = io.mrid
 fun AssetContainer.mRID(): String = at.mRID()
@@ -111,6 +110,7 @@ fun ShuntCompensator.mRID(): String = rce.mRID()
 fun Switch.mRID(): String = ce.mRID()
 fun TapChanger.mRID(): String = psr.mRID()
 fun TransformerEnd.mRID(): String = io.mrid
+fun TransformerStarImpedance.mRID(): String = io.mrid
 fun Circuit.mRID(): String = l.mRID()
 fun Loop.mRID(): String = io.mrid
 

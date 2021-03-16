@@ -140,6 +140,7 @@ fun toCim(pb: PBPowerTransformerInfo, networkService: NetworkService): PowerTran
 
 fun toCim(pb: PBTransformerEndInfo, networkService: NetworkService): TransformerEndInfo =
     TransformerEndInfo(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.transformerTankInfo(this), pb.transformerTankInfoMRID)
         networkService.resolveOrDeferReference(Resolvers.transformerStarImpedance(this), pb.transformerStarImpedanceMRID)
         connectionKind = WindingConnection.valueOf(pb.connectionKind.name)
         emergencyS = pb.emergencyS
@@ -155,6 +156,7 @@ fun toCim(pb: PBTransformerEndInfo, networkService: NetworkService): Transformer
 
 fun toCim(pb: PBTransformerTankInfo, networkService: NetworkService): TransformerTankInfo =
     TransformerTankInfo(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.powerTransformerInfo(this), pb.powerTransformerInfoMRID)
         pb.transformerEndInfoMRIDsList.forEach {
             networkService.resolveOrDeferReference(Resolvers.transformerEndInfo(this), it)
         }
@@ -733,7 +735,7 @@ fun toCim(pb: PBTransformerEnd, cim: TransformerEnd, networkService: NetworkServ
         networkService.resolveOrDeferReference(Resolvers.terminal(this), pb.terminalMRID)
         networkService.resolveOrDeferReference(Resolvers.baseVoltage(this), pb.baseVoltageMRID)
         networkService.resolveOrDeferReference(Resolvers.ratioTapChanger(this), pb.ratioTapChangerMRID)
-        networkService.resolveOrDeferReference(Resolvers.starImpedance(this), pb.transformerStarImpedanceMRID)
+        networkService.resolveOrDeferReference(Resolvers.starImpedance(this), pb.starImpedanceMRID)
         endNumber = pb.endNumber
         grounded = pb.grounded
         rGround = pb.rGround

@@ -440,8 +440,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         pb.ratedU = 7
         pb.shortTermS = 8
 
-        // This link is not currently implemented
-        // pb.transformerTankInfoMRID = "info1"
+        pb.transformerTankInfoMRID = "info1"
         pb.transformerStarImpedanceMRID = "star1"
 
         val cim = validate(pb.aiBuilder, fromPb)
@@ -456,8 +455,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         assertThat(cim.ratedU, equalTo(7))
         assertThat(cim.shortTermS, equalTo(8))
 
-        // This link is not currently implemented
-        // assertThat(cim.transformerTankInfo, equalTo(network["info1"]))
+        assertThat(cim.transformerTankInfo, equalTo(network["info1"]))
         assertThat(cim.transformerStarImpedance, equalTo(network["star1"]))
 
         return cim
@@ -526,7 +524,7 @@ class NetworkProtoToCimTestValidator(val network: NetworkService) {
         pb.ratioTapChangerMRID = "rtc1"
         pb.terminalMRID = "term1"
         pb.endNumber = 0
-        pb.transformerStarImpedanceMRID = "star1"
+        pb.starImpedanceMRID = "star1"
 
         val cim = validate(pb.ioBuilder, fromPb)
 

@@ -333,8 +333,16 @@ object Resolvers {
         BoundReferenceResolver(transformerEnd, TransformerEndToTransformerStarImpedanceResolver, null)
 
     @JvmStatic
+    fun powerTransformerInfo(transformerTankInfo: TransformerTankInfo): BoundReferenceResolver<TransformerTankInfo, PowerTransformerInfo> =
+        BoundReferenceResolver(transformerTankInfo, TransformerTankInfoToPowerTransformerInfoResolver, PowerTransformerInfoToTransformerTankInfoResolver)
+
+    @JvmStatic
     fun transformerTankInfo(powerTransformerInfo: PowerTransformerInfo): BoundReferenceResolver<PowerTransformerInfo, TransformerTankInfo> =
         BoundReferenceResolver(powerTransformerInfo, PowerTransformerInfoToTransformerTankInfoResolver, TransformerTankInfoToPowerTransformerInfoResolver)
+
+    @JvmStatic
+    fun transformerTankInfo(transformerEndInfo: TransformerEndInfo): BoundReferenceResolver<TransformerEndInfo, TransformerTankInfo> =
+        BoundReferenceResolver(transformerEndInfo, TransformerEndInfoToTransformerTankInfoResolver, TransformerTankInfoToTransformerEndInfoResolver)
 
     @JvmStatic
     fun transformerEndInfo(transformerTankInfo: TransformerTankInfo): BoundReferenceResolver<TransformerTankInfo, TransformerEndInfo> =

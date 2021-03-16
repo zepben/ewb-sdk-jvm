@@ -259,8 +259,7 @@ internal class NetworkCimToProtoTestValidator {
     fun validate(cim: TransformerTankInfo, pb: PBTransformerTankInfo) {
         validate(cim as AssetInfo, pb.ai)
 
-        // This link is not currently implemented
-        // validateMRID(cim.powerTransformerInfo, pb.powerTransformerInfoMRID)
+        validateMRID(pb.powerTransformerInfoMRID, cim.powerTransformerInfo)
         validateMRIDList(pb.transformerEndInfoMRIDsList, cim.transformerEndInfos)
     }
 
@@ -277,8 +276,7 @@ internal class NetworkCimToProtoTestValidator {
         assertThat(pb.ratedU, equalTo(cim.ratedU))
         assertThat(pb.shortTermS, equalTo(cim.shortTermS))
 
-        // This link is not currently implemented
-        // validateMRID(cim.transformerTankInfo, pb.transformerTankInfoMRID)
+        validateMRID(pb.transformerTankInfoMRID, cim.transformerTankInfo)
         validateMRID(pb.transformerStarImpedanceMRID, cim.transformerStarImpedance)
     }
 

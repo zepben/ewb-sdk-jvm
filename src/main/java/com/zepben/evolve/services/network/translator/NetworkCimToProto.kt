@@ -145,6 +145,7 @@ fun toPb(cim: PowerTransformerInfo, pb: PBPowerTransformerInfo.Builder): PBPower
 
 fun toPb(cim: TransformerEndInfo, pb: PBTransformerEndInfo.Builder): PBTransformerEndInfo.Builder =
     pb.apply {
+        cim.transformerTankInfo?.let { transformerTankInfoMRID = it.mRID } ?: clearTransformerTankInfoMRID()
         cim.transformerStarImpedance?.let { transformerStarImpedanceMRID = it.mRID } ?: clearTransformerStarImpedanceMRID()
         connectionKind = WindingConnection.valueOf(cim.connectionKind.name)
         emergencyS = cim.emergencyS
@@ -160,6 +161,7 @@ fun toPb(cim: TransformerEndInfo, pb: PBTransformerEndInfo.Builder): PBTransform
 
 fun toPb(cim: TransformerTankInfo, pb: PBTransformerTankInfo.Builder): PBTransformerTankInfo.Builder =
     pb.apply {
+        cim.powerTransformerInfo?.let { powerTransformerInfoMRID = it.mRID } ?: clearPowerTransformerInfoMRID()
         clearTransformerEndInfoMRIDs()
         cim.transformerEndInfos.forEach { addTransformerEndInfoMRIDs(it.mRID) }
         toPb(cim, aiBuilder)
@@ -643,7 +645,7 @@ fun toPb(cim: TransformerEnd, pb: PBTransformerEnd.Builder): PBTransformerEnd.Bu
         cim.terminal?.let { terminalMRID = it.mRID } ?: clearTerminalMRID()
         cim.baseVoltage?.let { baseVoltageMRID = it.mRID } ?: clearBaseVoltageMRID()
         cim.ratioTapChanger?.let { ratioTapChangerMRID = it.mRID } ?: clearRatioTapChangerMRID()
-        cim.starImpedance?.let { transformerStarImpedanceMRID = it.mRID } ?: clearTransformerStarImpedanceMRID()
+        cim.starImpedance?.let { starImpedanceMRID = it.mRID } ?: clearStarImpedanceMRID()
         endNumber = cim.endNumber
         grounded = cim.grounded
         rGround = cim.rGround

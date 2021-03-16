@@ -13,6 +13,7 @@ import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
 import com.zepben.evolve.services.common.extensions.safeRemove
 import com.zepben.evolve.services.common.extensions.validateReference
+import com.zepben.evolve.services.network.ResistanceReactance
 
 /**
  * Set of transformer tank data, from an equipment library.
@@ -79,5 +80,11 @@ class TransformerTankInfo(mRID: String = "") : AssetInfo(mRID) {
         _transformerEndInfos = null
         return this
     }
+
+    /**
+     * Get the [ResistanceReactance] for the specified [endNumber] from the datasheet information.
+     */
+    fun resistanceReactance(endNumber: Int): ResistanceReactance? =
+        transformerEndInfos.firstOrNull { it.endNumber == endNumber }?.resistanceReactance()
 
 }

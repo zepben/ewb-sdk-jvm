@@ -8,7 +8,11 @@
 
 package com.zepben.evolve.cim.iec61968.assetinfo
 
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.spy
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.ResistanceReactance
+import com.zepben.evolve.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
@@ -57,5 +61,21 @@ internal class TransformerTankInfoTest {
         )
     }
 
+    @Test
+    internal fun populatesResistanceReactanceFromEndsWithMatchingNumber() {
+        val end1 = spy(TransformerEndInfo().apply { endNumber = 1 })
+        val end2 = spy(TransformerEndInfo().apply { endNumber = 2 })
+        val tankInfo = TransformerTankInfo().apply {
+            addTransformerEndInfo(end1)
+            addTransformerEndInfo(end2)
+        }
+
+        doReturn(ResistanceReactance(1.1, 1.2, 1.3, 1.4)).`when`(end1).resistanceReactance()
+        doReturn(ResistanceReactance(2.1, 2.2, 2.3, 2.4)).`when`(end2).resistanceReactance()
+
+        validateResistanceReactance(tankInfo.resistanceReactance(1)!!, 1.1, 1.2, 1.3, 1.4)
+        validateResistanceReactance(tankInfo.resistanceReactance(2)!!, 2.1, 2.2, 2.3, 2.4)
+        assertThat(tankInfo.resistanceReactance(3), nullValue())
+    }
 
 }

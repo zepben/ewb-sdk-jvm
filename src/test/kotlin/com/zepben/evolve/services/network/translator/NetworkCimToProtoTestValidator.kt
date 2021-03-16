@@ -22,6 +22,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
 import com.zepben.evolve.utils.validateMRID
 import com.zepben.evolve.utils.validateMRIDList
 import org.hamcrest.MatcherAssert.assertThat
@@ -152,10 +153,10 @@ internal class NetworkCimToProtoTestValidator {
         assertThat(pb.g, equalTo(cim.g))
         assertThat(pb.b0, equalTo(cim.b0))
         assertThat(pb.g0, equalTo(cim.g0))
-        assertThat(pb.r, equalTo(cim.r))
-        assertThat(pb.r0, equalTo(cim.r0))
-        assertThat(pb.x, equalTo(cim.x))
-        assertThat(pb.x0, equalTo(cim.x0))
+        assertThat(pb.r, equalTo(cim.r ?: UNKNOWN_DOUBLE))
+        assertThat(pb.r0, equalTo(cim.r0 ?: UNKNOWN_DOUBLE))
+        assertThat(pb.x, equalTo(cim.x ?: UNKNOWN_DOUBLE))
+        assertThat(pb.x0, equalTo(cim.x0 ?: UNKNOWN_DOUBLE))
         assertThat(WindingConnection.valueOf(pb.connectionKind.name), equalTo(cim.connectionKind))
         assertThat(pb.ratedS, equalTo(cim.ratedS))
         assertThat(pb.ratedU, equalTo(cim.ratedU))
@@ -287,10 +288,10 @@ internal class NetworkCimToProtoTestValidator {
     fun validate(cim: TransformerStarImpedance, pb: PBTransformerStarImpedance) {
         validate(cim as IdentifiedObject, pb.io)
 
-        assertThat(pb.r, equalTo(cim.r))
-        assertThat(pb.r0, equalTo(cim.r0))
-        assertThat(pb.x, equalTo(cim.x))
-        assertThat(pb.x0, equalTo(cim.x0))
+        assertThat(pb.r, equalTo(cim.r ?: UNKNOWN_DOUBLE))
+        assertThat(pb.r0, equalTo(cim.r0 ?: UNKNOWN_DOUBLE))
+        assertThat(pb.x, equalTo(cim.x ?: UNKNOWN_DOUBLE))
+        assertThat(pb.x0, equalTo(cim.x0 ?: UNKNOWN_DOUBLE))
 
         validateMRID(pb.transformerEndInfoMRID, cim.transformerEndInfo)
     }

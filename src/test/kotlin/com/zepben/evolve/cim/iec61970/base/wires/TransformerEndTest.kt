@@ -7,8 +7,10 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -48,6 +50,14 @@ internal class TransformerEndTest {
         assertThat(transformerEnd.ratioTapChanger, notNullValue())
         assertThat(transformerEnd.terminal, notNullValue())
         assertThat(transformerEnd.starImpedance, notNullValue())
+    }
+
+    @Test
+    internal fun throwsOnUnknownEndType() {
+        val end = object : TransformerEnd() {}
+        ExpectException.expect { end.resistanceReactance() }
+            .toThrow(NotImplementedError::class.java)
+            .withMessage("Unknown transformer end leaf type: ${end.typeNameAndMRID()}. Add support which should at least include `starImpedance?.resistanceReactance() ?: ResistanceReactance()`.")
     }
 
 }

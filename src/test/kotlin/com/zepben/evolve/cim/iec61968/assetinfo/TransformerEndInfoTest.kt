@@ -8,10 +8,15 @@
 
 package com.zepben.evolve.cim.iec61968.assetinfo
 
+import com.nhaarman.mockitokotlin2.*
+import com.zepben.evolve.cim.iec61970.base.wires.TransformerStarImpedance
 import com.zepben.evolve.cim.iec61970.base.wires.WindingConnection
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.ResistanceReactance
+import com.zepben.evolve.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
+import com.zepben.testutils.mockito.DefaultAnswer
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
@@ -58,6 +63,50 @@ internal class TransformerEndInfoTest {
         assertThat(transformerEndInfo.shortTermS, equalTo(8))
         assertThat(transformerEndInfo.transformerTankInfo, notNullValue())
         assertThat(transformerEndInfo.transformerStarImpedance, notNullValue())
+    }
+
+    @Test
+    internal fun populatesResistanceReactanceOffEndStarImpedanceIfAvailable() {
+        val info = spy(TransformerEndInfo().apply {
+            transformerStarImpedance = TransformerStarImpedance().apply {
+                r = 1.1
+                r0 = 1.2
+                x = 1.3
+                x0 = 1.4
+            }
+        })
+
+        validateResistanceReactance(info.resistanceReactance()!!, 1.1, 1.2, 1.3, 1.4)
+        verify(info, never()).calculateResistanceReactanceFromTests()
+    }
+
+    @Test
+    internal fun populatesResistanceReactanceOffEndInfoTestsIfAvailable() {
+        val info = spy(TransformerEndInfo())
+        doReturn(ResistanceReactance(2.1, 2.2, 2.3, 2.4)).`when`(info).calculateResistanceReactanceFromTests()
+
+        validateResistanceReactance(info.resistanceReactance()!!, 2.1, 2.2, 2.3, 2.4)
+        verify(info, times(1)).calculateResistanceReactanceFromTests()
+    }
+
+    @Test
+    internal fun mergesResistanceReactanceIfRequired() {
+        val info = spy(TransformerEndInfo().apply {
+            transformerStarImpedance =
+                mock(defaultAnswer = DefaultAnswer.of(ResistanceReactance::class.java, ResistanceReactance(1.1, null, null, null)))
+        })
+        doReturn(ResistanceReactance(null, 2.2, null, null)).`when`(info).calculateResistanceReactanceFromTests()
+
+        validateResistanceReactance(info.resistanceReactance()!!, 1.1, 2.2, null, null)
+        verify(info, times(1)).calculateResistanceReactanceFromTests()
+    }
+
+    @Test
+    internal fun calculatesResistanceReactanceOffEndInfoTestsIfAvailable() {
+        val info = TransformerEndInfo()
+
+        // https://app.clickup.com/t/6929263/EWB-615 Add checks for calculating off tests
+        assertThat(info.calculateResistanceReactanceFromTests(), nullValue())
     }
 
 }

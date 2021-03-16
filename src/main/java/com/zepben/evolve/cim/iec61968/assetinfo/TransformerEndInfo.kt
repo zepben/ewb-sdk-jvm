@@ -11,6 +11,8 @@ package com.zepben.evolve.cim.iec61968.assetinfo
 import com.zepben.evolve.cim.iec61968.assets.AssetInfo
 import com.zepben.evolve.cim.iec61970.base.wires.TransformerStarImpedance
 import com.zepben.evolve.cim.iec61970.base.wires.WindingConnection
+import com.zepben.evolve.services.network.ResistanceReactance
+import com.zepben.evolve.services.network.mergeIfIncomplete
 
 /**
  * Transformer end data.
@@ -44,5 +46,19 @@ class TransformerEndInfo(mRID: String = "") : AssetInfo(mRID) {
 
     var transformerTankInfo: TransformerTankInfo? = null
     var transformerStarImpedance: TransformerStarImpedance? = null
+
+    /**
+     * Get the [ResistanceReactance] for this [TransformerEndInfo] from either the pre-calculated [transformerStarImpedance] or
+     * calculated from the associated test data.
+     */
+    fun resistanceReactance(): ResistanceReactance? =
+        transformerStarImpedance?.resistanceReactance()?.mergeIfIncomplete {
+            calculateResistanceReactanceFromTests()
+        } ?: calculateResistanceReactanceFromTests()
+
+    // https://app.clickup.com/t/6929263/EWB-615 Calculate from test data if available.
+    @Suppress("RedundantNullableReturnType")
+    internal fun calculateResistanceReactanceFromTests(): ResistanceReactance? =
+        null
 
 }

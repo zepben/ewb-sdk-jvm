@@ -506,7 +506,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     private fun loadConductor(conductor: Conductor, table: TableConductors, resultSet: ResultSet): Boolean {
         conductor.apply {
-            length = resultSet.getNullableDouble(table.LENGTH.queryIndex)
+            length = resultSet.getNullableDouble(table.LENGTH.queryIndex) ?: Double.NaN
             assetInfo = networkService.ensureGet(
                 resultSet.getNullableString(table.WIRE_INFO_MRID.queryIndex),
                 typeNameAndMRID()
@@ -693,7 +693,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TablePowerTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val powerTransformer = PowerTransformer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             vectorGroup = VectorGroup.valueOf(resultSet.getString(table.VECTOR_GROUP.queryIndex))
-            transformerUtilisation = resultSet.getNullableDouble(table.TRANSFORMER_UTILISATION.queryIndex)
+            transformerUtilisation = resultSet.getNullableDouble(table.TRANSFORMER_UTILISATION.queryIndex) ?: Double.NaN
             assetInfo = networkService.ensureGet(
                 resultSet.getNullableString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex),
                 typeNameAndMRID()

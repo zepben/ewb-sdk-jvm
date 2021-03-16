@@ -11,6 +11,7 @@ import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
+import com.zepben.evolve.services.network.ResistanceReactance
 
 /**
  * A conducting connection point of a power transformer. It corresponds to a physical transformer winding terminal.
@@ -50,4 +51,12 @@ abstract class TransformerEnd(mRID: String = "") : IdentifiedObject(mRID) {
             }
             field = value
         }
+
+    /**
+     * Interface for getting access to the resistance and reactance characteristics of this end. Implementation details will vary
+     * based on end type.
+     */
+    open fun resistanceReactance(): ResistanceReactance =
+        throw NotImplementedError("Unknown transformer end leaf type: ${typeNameAndMRID()}. Add support which should at least include `starImpedance?.resistanceReactance() ?: ResistanceReactance()`.")
+
 }

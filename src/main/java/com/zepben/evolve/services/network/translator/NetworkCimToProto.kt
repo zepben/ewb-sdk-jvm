@@ -31,6 +31,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
 import com.zepben.evolve.services.common.translator.BaseCimToProto
 import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind
@@ -579,10 +580,10 @@ fun toPb(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd.Builder): PBPowerTr
         cim.powerTransformer?.let { powerTransformerMRID = it.mRID } ?: clearPowerTransformerMRID()
         ratedS = cim.ratedS
         ratedU = cim.ratedU
-        r = cim.r
-        r0 = cim.r0
-        x = cim.x
-        x0 = cim.x0
+        r = cim.r ?: UNKNOWN_DOUBLE
+        r0 = cim.r0 ?: UNKNOWN_DOUBLE
+        x = cim.x ?: UNKNOWN_DOUBLE
+        x0 = cim.x0 ?: UNKNOWN_DOUBLE
         connectionKind = WindingConnection.valueOf(cim.connectionKind.name)
         b = cim.b
         b0 = cim.b0
@@ -656,10 +657,10 @@ fun toPb(cim: TransformerEnd, pb: PBTransformerEnd.Builder): PBTransformerEnd.Bu
 fun toPb(cim: TransformerStarImpedance, pb: PBTransformerStarImpedance.Builder): PBTransformerStarImpedance.Builder =
     pb.apply {
         cim.transformerEndInfo?.let { transformerEndInfoMRID = it.mRID } ?: clearTransformerEndInfoMRID()
-        r = cim.r
-        r0 = cim.r0
-        x = cim.x
-        x0 = cim.x0
+        r = cim.r ?: UNKNOWN_DOUBLE
+        r0 = cim.r0 ?: UNKNOWN_DOUBLE
+        x = cim.x ?: UNKNOWN_DOUBLE
+        x0 = cim.x0 ?: UNKNOWN_DOUBLE
         toPb(cim, ioBuilder)
     }
 

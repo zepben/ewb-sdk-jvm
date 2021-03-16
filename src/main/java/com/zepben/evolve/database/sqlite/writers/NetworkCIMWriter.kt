@@ -718,12 +718,12 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setDouble(table.B0.queryIndex, powerTransformerEnd.b0)
         insert.setDouble(table.G.queryIndex, powerTransformerEnd.g)
         insert.setDouble(table.G0.queryIndex, powerTransformerEnd.g0)
-        insert.setDouble(table.R.queryIndex, powerTransformerEnd.r)
-        insert.setDouble(table.R0.queryIndex, powerTransformerEnd.r0)
+        insert.setNullableDouble(table.R.queryIndex, powerTransformerEnd.r)
+        insert.setNullableDouble(table.R0.queryIndex, powerTransformerEnd.r0)
         insert.setInt(table.RATED_S.queryIndex, powerTransformerEnd.ratedS)
         insert.setInt(table.RATED_U.queryIndex, powerTransformerEnd.ratedU)
-        insert.setDouble(table.X.queryIndex, powerTransformerEnd.x)
-        insert.setDouble(table.X0.queryIndex, powerTransformerEnd.x0)
+        insert.setNullableDouble(table.X.queryIndex, powerTransformerEnd.x)
+        insert.setNullableDouble(table.X0.queryIndex, powerTransformerEnd.x0)
 
         return saveTransformerEnd(table, insert, powerTransformerEnd, "power transformer end")
     }

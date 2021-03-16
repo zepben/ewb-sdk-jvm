@@ -7,9 +7,12 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.nhaarman.mockitokotlin2.*
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.ResistanceReactance
+import com.zepben.evolve.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
@@ -17,12 +20,17 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.Mockito.times
 
 internal class PowerTransformerEndTest {
 
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+
+    private val si = mock<TransformerStarImpedance>()
+    private val info = mock<PowerTransformerInfo>()
+    private val tx = mock<PowerTransformer>()
 
     @Test
     internal fun constructorCoverage() {
@@ -41,12 +49,12 @@ internal class PowerTransformerEndTest {
         assertThat(powerTransformerEnd.g, equalTo(0.0))
         assertThat(powerTransformerEnd.g0, equalTo(0.0))
         assertThat(powerTransformerEnd.phaseAngleClock, equalTo(0))
-        assertThat(powerTransformerEnd.r, notANumber())
-        assertThat(powerTransformerEnd.r0, notANumber())
+        assertThat(powerTransformerEnd.r, nullValue())
+        assertThat(powerTransformerEnd.r0, nullValue())
         assertThat(powerTransformerEnd.ratedS, equalTo(0))
         assertThat(powerTransformerEnd.ratedU, equalTo(0))
-        assertThat(powerTransformerEnd.x, notANumber())
-        assertThat(powerTransformerEnd.x0, notANumber())
+        assertThat(powerTransformerEnd.x, nullValue())
+        assertThat(powerTransformerEnd.x0, nullValue())
 
         powerTransformerEnd.fillFields(NetworkService())
 
@@ -73,6 +81,91 @@ internal class PowerTransformerEndTest {
         ExpectException.expect { end.starImpedance = TransformerStarImpedance() }
             .toThrow(IllegalArgumentException::class.java)
             .withMessage("Unable to use a star impedance for ${end.typeNameAndMRID()} directly because ${tx.typeNameAndMRID()} references a catalog.")
+    }
+
+    @Test
+    internal fun populatesResistanceReactanceDirectlyIfAvailable() {
+        val end = PowerTransformerEnd().apply {
+            r = 1.1
+            r0 = 1.2
+            x = 1.3
+            x0 = 1.4
+        }
+
+        validateResistanceReactance(end.resistanceReactance(), 1.1, 1.2, 1.3, 1.4)
+    }
+
+    @Test
+    internal fun populatesResistanceReactanceOffStarImpedanceIfAvailable() {
+        val end = PowerTransformerEnd().apply {
+            powerTransformer = tx
+            starImpedance = si
+        }
+        clearMockitoInvocations()
+
+        doReturn(ResistanceReactance(2.1, 2.2, 2.3, 2.4)).`when`(si).resistanceReactance()
+
+        validateResistanceReactance(end.resistanceReactance(), 2.1, 2.2, 2.3, 2.4)
+        verify(si, times(1)).resistanceReactance()
+        verify(tx, never()).assetInfo
+    }
+
+    @Test
+    internal fun populatesResistanceReactanceOffAssetInfoIfAvailable() {
+        val end = PowerTransformerEnd().apply {
+            endNumber = 123
+            powerTransformer = tx
+        }
+
+        clearMockitoInvocations()
+        doReturn(info).`when`(tx).assetInfo
+        doReturn(ResistanceReactance(3.1, 3.2, 3.3, 3.4)).`when`(info).resistanceReactance(end.endNumber)
+
+        validateResistanceReactance(end.resistanceReactance(), 3.1, 3.2, 3.3, 3.4)
+        verify(tx, times(1)).assetInfo
+        verify(info, times(1)).resistanceReactance(end.endNumber)
+    }
+
+    @Test
+    internal fun leavesResistanceReactanceUnpopulatedIfNoSourceAvailable() {
+        // Isolated end
+        val end = PowerTransformerEnd()
+        validateResistanceReactance(end.resistanceReactance(), null, null, null, null)
+
+        // With invalid star impedance
+        end.starImpedance = si
+        validateResistanceReactance(end.resistanceReactance(), null, null, null, null)
+
+        // End on transformer without info
+        end.powerTransformer = tx
+        validateResistanceReactance(end.resistanceReactance(), null, null, null, null)
+
+        // End on transformer with info but no end info
+        doReturn(info).`when`(tx).assetInfo
+        validateResistanceReactance(end.resistanceReactance(), null, null, null, null)
+    }
+
+    @Test
+    internal fun mergesIncompleteWithPrecedence() {
+        val end = PowerTransformerEnd().apply {
+            r = 1.1
+            endNumber = 1
+            starImpedance = si
+            powerTransformer = tx
+        }
+
+        doReturn(info).`when`(tx).assetInfo
+
+        doReturn(ResistanceReactance(null, 2.2, null, null)).`when`(si).resistanceReactance()
+        doReturn(ResistanceReactance(null, null, 3.3, null)).`when`(info).resistanceReactance(end.endNumber)
+
+        validateResistanceReactance(end.resistanceReactance(), 1.1, 2.2, 3.3, null)
+    }
+
+    private fun clearMockitoInvocations() {
+        clearInvocations(si)
+        clearInvocations(info)
+        clearInvocations(tx)
     }
 
 }

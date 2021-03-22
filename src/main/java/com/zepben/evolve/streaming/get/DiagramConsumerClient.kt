@@ -18,7 +18,8 @@ import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.dc.DiagramIdentifiedObject
 import com.zepben.protobuf.dc.DiagramIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.dc.GetIdentifiedObjectsRequest
-import io.grpc.Channel
+import io.grpc.CallCredentials
+import io.grpc.ManagedChannel
 
 /**
  * Consumer client for a [DiagramService].
@@ -30,8 +31,27 @@ class DiagramConsumerClient(
     private val protoToCimProvider: (DiagramService) -> DiagramProtoToCim = { DiagramProtoToCim(it) }
 ) : CimConsumerClient<DiagramService>() {
 
-    constructor(channel: Channel) : this(DiagramConsumerGrpc.newBlockingStub(channel))
-    constructor(channel: GrpcChannel) : this(DiagramConsumerGrpc.newBlockingStub(channel.channel))
+    /**
+     * Create a [DiagramConsumerClient]
+     *
+     * @param channel [ManagedChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { DiagramConsumerGrpc.newBlockingStub(channel).withCallCredentials(callCredentials) }
+            ?: DiagramConsumerGrpc.newBlockingStub(channel))
+
+    /**
+     * Create a [DiagramConsumerClient]
+     *
+     * @param channel [GrpcChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { DiagramConsumerGrpc.newBlockingStub(channel.channel).withCallCredentials(callCredentials) }
+            ?: DiagramConsumerGrpc.newBlockingStub(channel.channel))
 
     /**
      * Retrieve the object with the given [mRID] and store the result in the [service].

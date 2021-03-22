@@ -13,7 +13,8 @@ import com.zepben.evolve.services.diagram.translator.toPb
 import com.zepben.evolve.services.diagram.whenDiagramServiceObject
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.dp.*
-import io.grpc.Channel
+import io.grpc.CallCredentials
+import io.grpc.ManagedChannel
 
 /**
  * Producer client for a [DiagramService].
@@ -24,8 +25,27 @@ class DiagramProducerClient(
     private val stub: DiagramProducerGrpc.DiagramProducerBlockingStub
 ) : CimProducerClient<DiagramService>() {
 
-    constructor(channel: Channel) : this(DiagramProducerGrpc.newBlockingStub(channel))
-    constructor(channel: GrpcChannel) : this(DiagramProducerGrpc.newBlockingStub(channel.channel))
+    /**
+     * Create a [DiagramProducerClient]
+     *
+     * @param channel [ManagedChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { DiagramProducerGrpc.newBlockingStub(channel).withCallCredentials(callCredentials) }
+            ?: DiagramProducerGrpc.newBlockingStub(channel))
+
+    /**
+     * Create a [DiagramProducerClient]
+     *
+     * @param channel [GrpcChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { DiagramProducerGrpc.newBlockingStub(channel.channel).withCallCredentials(callCredentials) }
+            ?: DiagramProducerGrpc.newBlockingStub(channel.channel))
 
     override fun send(service: DiagramService) {
         tryRpc { stub.createDiagramService(CreateDiagramServiceRequest.newBuilder().build()) }

@@ -14,7 +14,8 @@ import com.zepben.evolve.services.customer.translator.toPb
 import com.zepben.evolve.services.customer.whenCustomerServiceObject
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.cp.*
-import io.grpc.Channel
+import io.grpc.CallCredentials
+import io.grpc.ManagedChannel
 
 /**
  * Producer client for a [CustomerService].
@@ -25,8 +26,28 @@ class CustomerProducerClient(
     private val stub: CustomerProducerGrpc.CustomerProducerBlockingStub,
 ) : CimProducerClient<CustomerService>() {
 
-    constructor(channel: Channel) : this(CustomerProducerGrpc.newBlockingStub(channel))
-    constructor(channel: GrpcChannel) : this(CustomerProducerGrpc.newBlockingStub(channel.channel))
+    /**
+     * Create a [CustomerProducerClient]
+     *
+     * @param channel [ManagedChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { CustomerProducerGrpc.newBlockingStub(channel).withCallCredentials(callCredentials) }
+            ?: CustomerProducerGrpc.newBlockingStub(channel))
+
+    /**
+     * Create a [CustomerProducerClient]
+     *
+     * @param channel [GrpcChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { CustomerProducerGrpc.newBlockingStub(channel.channel).withCallCredentials(callCredentials) }
+            ?: CustomerProducerGrpc.newBlockingStub(channel.channel))
+
 
     override fun send(service: CustomerService) {
         tryRpc { stub.createCustomerService(CreateCustomerServiceRequest.newBuilder().build()) }

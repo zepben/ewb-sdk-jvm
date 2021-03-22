@@ -14,7 +14,8 @@ import com.zepben.evolve.services.network.translator.toPb
 import com.zepben.evolve.services.network.whenNetworkServiceObject
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.np.*
-import io.grpc.Channel
+import io.grpc.CallCredentials
+import io.grpc.ManagedChannel
 
 /**
  * Producer client for a [NetworkService].
@@ -25,8 +26,27 @@ class NetworkProducerClient(
     private val stub: NetworkProducerGrpc.NetworkProducerBlockingStub
 ) : CimProducerClient<NetworkService>() {
 
-    constructor(channel: Channel) : this(NetworkProducerGrpc.newBlockingStub(channel))
-    constructor(channel: GrpcChannel) : this(NetworkProducerGrpc.newBlockingStub(channel.channel))
+    /**
+     * Create a [NetworkProducerClient]
+     *
+     * @param channel [ManagedChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { NetworkProducerGrpc.newBlockingStub(channel).withCallCredentials(callCredentials) }
+            ?: NetworkProducerGrpc.newBlockingStub(channel))
+
+    /**
+     * Create a [NetworkProducerClient]
+     *
+     * @param channel [GrpcChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { NetworkProducerGrpc.newBlockingStub(channel.channel).withCallCredentials(callCredentials) }
+            ?: NetworkProducerGrpc.newBlockingStub(channel.channel))
 
     override fun send(service: NetworkService) {
         tryRpc { stub.createNetwork(CreateNetworkRequest.newBuilder().build()) }

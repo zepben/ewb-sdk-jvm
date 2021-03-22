@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
 package com.zepben.evolve.services.common.extensions
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
@@ -28,4 +29,11 @@ internal fun IdentifiedObject.validateReference(other: IdentifiedObject, getter:
 
     require((getResult == null) || (getResult == other)) { "$typeDescription with mRID ${other.mRID} already exists in ${typeNameAndMRID()}." }
     return false
+}
+
+/**
+ * Removes all names that belong to this object from their corresponding [NameType][com.zepben.evolve.cim.iec61970.base.core.NameType].
+ */
+fun IdentifiedObject.removeNamesFromTypes() {
+    names.forEach { it.type.removeName(it) }
 }

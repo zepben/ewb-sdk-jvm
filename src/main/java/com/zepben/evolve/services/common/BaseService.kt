@@ -8,7 +8,10 @@
 package com.zepben.evolve.services.common
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.Name
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.services.common.exceptions.UnsupportedIdentifiedObjectException
+import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.nameAndMRID
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import java.util.*
@@ -72,6 +75,8 @@ abstract class BaseService(
     val supportedClasses: Set<Class<out IdentifiedObject>> = Collections.unmodifiableSet(addFunctions.keys.map { it.java }.toSet())
     val supportedKClasses: Set<KClass<out IdentifiedObject>> get() = addFunctions.keys
 
+    private var _nameTypes: MutableMap<String, NameType> = mutableMapOf()
+
     init {
         check(addFunctions.keys == removeFunctions.keys) {
             "Add and remove functions should be defined in matching pairs. They don't seem to match...\n" +
@@ -104,6 +109,35 @@ abstract class BaseService(
     fun <T : IdentifiedObject> get(clazz: Class<T>, mRID: String?): T? {
         return get(clazz.kotlin, mRID)
     }
+
+    /**
+     * The name types associated with this service. The returned collection is read only.
+     */
+    val nameTypes: Collection<NameType> get() = _nameTypes.values.asUnmodifiable()
+
+    /**
+     * Associates the provided [nameType] with this service.
+     *
+     * @param [nameType] the [NameType] to add to this service
+     * @return true if the object is associated with this service, false if an object already exists in the service with
+     * the same name.
+     */
+    fun addNameType(nameType: NameType): Boolean {
+        if (_nameTypes.containsKey(nameType.name)) {
+            return false
+        }
+        _nameTypes[nameType.name] = nameType
+
+        return true
+    }
+
+    /**
+     * Gets the [NameType] for the provided type name associated with this service.
+     *
+     * @param [type] the type name.
+     * @return The [NameType] identified by [type] if it was found, otherwise null.
+     */
+    fun getNameType(type: String): NameType? = _nameTypes[type]
 
     /**
      * Get an object associated with this service. If the object exists with this service but is not an instance of [T]

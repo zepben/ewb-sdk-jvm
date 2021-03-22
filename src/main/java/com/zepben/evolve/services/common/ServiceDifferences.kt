@@ -8,6 +8,7 @@
 package com.zepben.evolve.services.common
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
@@ -18,6 +19,10 @@ class ServiceDifferences internal constructor(
     private val missingFromTarget: MutableSet<String> = LinkedHashSet()
     private val missingFromSource: MutableSet<String> = LinkedHashSet()
     private val modifications: MutableMap<String, ObjectDifference<*>> = LinkedHashMap()
+
+    private val missingNameTypeFromTarget: MutableSet<String> = LinkedHashSet()
+    private val missingNameTypeFromSource: MutableSet<String> = LinkedHashSet()
+    private val nameTypeDifferences: MutableList<NameTypeDifference> = mutableListOf()
 
     fun missingFromTarget(): Set<String> {
         return Collections.unmodifiableSet(missingFromTarget)
@@ -31,6 +36,10 @@ class ServiceDifferences internal constructor(
         return Collections.unmodifiableMap(modifications)
     }
 
+    fun missingNameTypeFromTarget(): Set<String> = missingNameTypeFromTarget.asUnmodifiable()
+    fun missingNameTypeFromSource(): Set<String> = missingNameTypeFromSource.asUnmodifiable()
+    fun nameTypeDifferences(): List<NameTypeDifference> = nameTypeDifferences.asUnmodifiable()
+
     fun addToMissingFromTarget(id: String) {
         missingFromTarget.add(id)
     }
@@ -43,6 +52,18 @@ class ServiceDifferences internal constructor(
         modifications[id] = difference
     }
 
+    fun addMissingNameTypeFromTarget(id: String) {
+        missingNameTypeFromTarget.add(id)
+    }
+
+    fun addMissingNameTypeFromSource(id: String) {
+        missingNameTypeFromSource.add(id)
+    }
+
+    fun addNameTypeDifference(diff: NameTypeDifference) {
+        nameTypeDifferences.add(diff)
+    }
+
     override fun toString(): String {
         val sb = StringBuilder("Missing From Target:")
         missingFromTarget.forEach { addIndentedLine(sb, sourceLookup(it).toString()) }
@@ -52,6 +73,15 @@ class ServiceDifferences internal constructor(
 
         sb.append("\nModifications:")
         modifications.forEach { (k, v) -> addIndentedLine(sb, "$k: $v") }
+
+        sb.append("\nMissing Name Types From Target:")
+        missingNameTypeFromTarget.forEach { addIndentedLine(sb, sourceLookup(it).toString()) }
+
+        sb.append("\nMissing Name Types From Source:")
+        missingNameTypeFromSource.forEach { addIndentedLine(sb, targetLookup(it).toString()) }
+
+        sb.append("\nName Type differences:")
+        nameTypeDifferences.forEach { addIndentedLine(sb, it.toString()) }
 
         return sb.toString()
     }

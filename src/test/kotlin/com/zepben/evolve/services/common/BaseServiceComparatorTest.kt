@@ -11,6 +11,9 @@ import com.zepben.evolve.cim.iec61968.common.Document
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.Name
+import com.zepben.evolve.cim.iec61970.base.core.NameType
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.utils.ServiceComparatorValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
@@ -32,6 +35,13 @@ abstract class BaseServiceComparatorTest {
         comparatorValidator.validateProperty(IdentifiedObject::name, newIdObj, { "name" }, { "diff name" })
         comparatorValidator.validateProperty(IdentifiedObject::description, newIdObj, { "description" }, { "other description" })
         comparatorValidator.validateProperty(IdentifiedObject::numDiagramObjects, newIdObj, { 0 }, { 1 })
+
+        comparatorValidator.validateCollection(
+            IdentifiedObject::names,
+            IdentifiedObject::addName,
+            newIdObj,
+            { Name("name1", NameType("type1"), it) }, { Name("name2", NameType("type2"), it) }
+        )
     }
 
     protected fun compareDocument(newDocument: (mRID: String) -> Document) {
@@ -75,5 +85,42 @@ abstract class BaseServiceComparatorTest {
         comparatorValidator.validateServiceOf(
             subject, diffName,
             expectModification = ObjectDifference(subject, diffName).apply { differences["name"] = ValueDifference(subject.name, diffName.name) })
+    }
+
+    @Test
+    internal fun nameTypesNoDifference() {
+        val sourceType = NameType("type").apply {
+            description = "desc"
+            getOrAddName("name", Junction("id"))
+        }
+
+        val targetType = NameType("type").apply {
+            description = "desc"
+            getOrAddName("name", Junction("id"))
+        }
+
+        comparatorValidator.validateNameTypes(sourceType, targetType)
+    }
+
+    @Test
+    internal fun nameTypeDifference() {
+        val sourceType = NameType("type").apply { description = "source" }
+        val targetType = NameType("type").apply { description = "target" }
+        val missingFromTargetName = sourceType.getOrAddName("missingFromTargetName", Junction("idObj"))
+        val missingFromSourceName = targetType.getOrAddName("missingFromSourceName", Junction("idObj"))
+        comparatorValidator.validateNameTypes(
+            sourceType, targetType,
+            NameTypeDifference(ValueDifference("source", "target"), mutableListOf(missingFromTargetName), mutableListOf(missingFromSourceName)))
+    }
+
+    @Test
+    internal fun nameTypesMissing() {
+        val missingFromTarget = NameType("missingFromTarget")
+        val missingFromSource = NameType("missingFromSource")
+        comparatorValidator.validateNameTypes(
+            missingFromTarget, missingFromSource,
+            expectMissingFromTarget = missingFromTarget.name,
+            expectMissingFromSource = missingFromSource.name
+        )
     }
 }

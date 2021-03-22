@@ -11,6 +11,8 @@ package com.zepben.evolve.database.sqlite.readers
 import com.zepben.evolve.database.sqlite.DatabaseTables
 import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNames
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNameTypes
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.ResultSet
@@ -27,25 +29,39 @@ open class BaseServiceReader constructor(protected val getStatement: () -> State
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
     protected val databaseTables = DatabaseTables()
 
+    fun loadNameTypes(reader: BaseCIMReader): Boolean {
+        var status = true
+        status = status and loadEach<TableNameTypes>("name type", reader::load)
+
+        return status
+    }
+
+    fun loadNames(reader: BaseCIMReader): Boolean {
+        var status = true
+        status = status and loadEach<TableNames>("name", reader::load)
+
+        return status
+    }
+
     protected inline fun <reified T : SqliteTable> loadEach(
         description: String,
         processRow: (T, ResultSet, (String) -> String) -> Boolean
     ): Boolean {
         return loadTable<T>(description) { table, results ->
-            var lastMRID: String? = null
-            val setLastMRID = { mrid: String -> lastMRID = mrid; mrid }
+            var lastIdentifier: String? = null
+            val setLastIdentifier = { identifier: String -> lastIdentifier = identifier; identifier }
 
             try {
                 var count = 0
                 while (results.next()) {
-                    if (processRow(table, results, setLastMRID)) {
+                    if (processRow(table, results, setLastIdentifier)) {
                         ++count
                     }
                 }
 
                 return@loadTable count
             } catch (e: SQLException) {
-                logger.error("Failed to load '" + lastMRID + "' from '" + table.name() + "': " + e.message)
+                logger.error("Failed to load '" + lastIdentifier + "' from '" + table.name() + "': " + e.message)
                 throw e
             }
         }

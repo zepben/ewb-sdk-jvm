@@ -11,6 +11,7 @@ import com.zepben.evolve.cim.iec61968.common.Document
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.Name
 import java.security.AccessController
 import java.security.PrivilegedActionException
 import java.security.PrivilegedExceptionAction
@@ -84,6 +85,42 @@ abstract class BaseServiceComparator {
                 differences.addToMissingFromSource(t.mRID)
         }
 
+        fun Name.compareMatch(other: Name): Boolean =
+            this.name == other.name &&
+                this.type.name == other.type.name &&
+                this.identifiedObject.mRID == other.identifiedObject.mRID
+
+        source.nameTypes.forEach { s ->
+            val t = target.getNameType(s.name)
+
+            if (t == null) {
+                differences.addMissingNameTypeFromTarget(s.name)
+            } else {
+                val descDiff = if (s.description != t.description) ValueDifference(s.description, t.description) else null
+
+                val namesMissingFromTarget = mutableListOf<Name>()
+                val namesMissingFromSource = mutableListOf<Name>()
+                s.names.forEach { sName ->
+                    if (!t.names.any { tName -> sName.compareMatch(tName) })
+                        namesMissingFromTarget.add(sName)
+                }
+
+                t.names.forEach { tName ->
+                    if (!s.names.any { sName -> tName.compareMatch(sName) })
+                        namesMissingFromSource.add(tName)
+                }
+
+                if (descDiff != null || namesMissingFromTarget.isNotEmpty() || namesMissingFromSource.isNotEmpty()) {
+                    differences.addNameTypeDifference(NameTypeDifference(descDiff, namesMissingFromTarget, namesMissingFromSource))
+                }
+            }
+        }
+
+        target.nameTypes.forEach { t ->
+            if (source.getNameType(t.name) == null)
+                differences.addMissingNameTypeFromSource(t.name)
+        }
+
         return differences
     }
 
@@ -92,7 +129,7 @@ abstract class BaseServiceComparator {
         val sourceType = getComparableType(source::class)
         val targetType = getComparableType(target::class)
 
-        require(sourceType == targetType) { "source and target must be of the same type"}
+        require(sourceType == targetType) { "source and target must be of the same type" }
         return requireNotNull(compareByType[sourceType]) {
             "INTERNAL ERROR: Attempted to compare Zepben CIM class ${source::class} which is not registered with the comparator."
         }.call(this, source, target) as ObjectDifference<T>
@@ -100,6 +137,7 @@ abstract class BaseServiceComparator {
 
     protected fun ObjectDifference<out IdentifiedObject>.compareIdentifiedObject(): ObjectDifference<out IdentifiedObject> = apply {
         compareValues(IdentifiedObject::mRID, IdentifiedObject::name, IdentifiedObject::description, IdentifiedObject::numDiagramObjects)
+        compareNames(IdentifiedObject::names)
     }
 
     protected fun ObjectDifference<out Document>.compareDocument(): ObjectDifference<out Document> =
@@ -149,6 +187,13 @@ abstract class BaseServiceComparator {
         vararg properties: KProperty1<in T, R?>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIdReference(source, target)) }
+        return this
+    }
+
+    protected fun <T : IdentifiedObject> ObjectDifference<T>.compareNames(
+        vararg properties: KProperty1<IdentifiedObject, Collection<Name>>
+    ): ObjectDifference<T> {
+        properties.forEach { addIfDifferent(it.name, it.compareNames(source, target)) }
         return this
     }
 

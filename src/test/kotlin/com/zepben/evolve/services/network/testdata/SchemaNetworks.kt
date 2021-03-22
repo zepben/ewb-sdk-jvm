@@ -12,7 +12,9 @@ import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
+import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
@@ -30,6 +32,32 @@ import java.time.Instant
 
 @Suppress("SameParameterValue", "BooleanLiteralArgument")
 object SchemaNetworks {
+
+    fun createNameTestServices(): NetworkModelTestUtil.Services {
+        val networkService = NetworkService().apply {
+            val nameType = NameType("type1").apply {
+                description = "type description"
+                val identifiedObject = Organisation("org1")
+                val name = getOrAddName("name1", identifiedObject)
+                identifiedObject.addName(name)
+            }
+
+            addNameType(nameType)
+        }
+
+        val customerService = CustomerService().apply {
+            val nameType = NameType("type1").apply {
+                description = "type description"
+                val identifiedObject = Organisation("org1")
+                val name = getOrAddName("name1", identifiedObject)
+                identifiedObject.addName(name)
+            }
+
+            addNameType(nameType)
+        }
+
+        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), customerService, MeasurementService())
+    }
 
     fun createDataSourceTestServices(): NetworkModelTestUtil.Services {
         val metadataCollection = MetadataCollection()

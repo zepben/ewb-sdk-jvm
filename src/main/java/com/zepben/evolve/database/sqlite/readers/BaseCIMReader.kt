@@ -12,17 +12,17 @@ import com.zepben.evolve.cim.iec61968.common.Document
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.database.sqlite.extensions.getInstant
 import com.zepben.evolve.database.sqlite.extensions.getNullableString
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableDocuments
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableOrganisationRoles
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableOrganisations
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNameTypes
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNames
 import com.zepben.evolve.services.common.BaseService
-import com.zepben.evolve.services.common.extensions.emptyIfNull
-import com.zepben.evolve.services.common.extensions.ensureGet
-import com.zepben.evolve.services.common.extensions.internEmpty
-import com.zepben.evolve.services.common.extensions.typeNameAndMRID
+import com.zepben.evolve.services.common.extensions.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.ResultSet
@@ -51,6 +51,33 @@ abstract class BaseCIMReader(private val baseService: BaseService) {
         val organisation = Organisation(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadIdentifiedObject(organisation, table, resultSet) && baseService.addOrThrow(organisation)
+    }
+
+    fun load(table: TableNameTypes, resultSet: ResultSet, setLastNameType: (String) -> String): Boolean {
+        val nameType = NameType(setLastNameType(resultSet.getString(table.NAME.queryIndex))).apply {
+            description = resultSet.getString(table.DESCRIPTION.queryIndex)
+        }
+
+        return baseService.addOrThrow(nameType)
+    }
+
+    fun load(table: TableNames, resultSet: ResultSet, setLastName: (String) -> String): Boolean {
+        val nameTypeName = resultSet.getString(table.NAME_TYPE_NAME.queryIndex)
+        val nameName = resultSet.getString(table.NAME.queryIndex)
+        setLastName("$nameTypeName:$nameName")
+
+        val nameType = baseService.getNameTypeOrThrow(nameTypeName)
+        // Because each service type loads all the name types, but not all services hold all identified objects, there can
+        // be records in the names table that only apply to certain services. We attempt to find the IdentifiedObject on this
+        // service and add a name for it if it exists, but ignore if it doesn't. Note that this can potentially lead to there being
+        // a name record that never gets used because that identified object doesn't exist in any service and currently we
+        // don't check or warn about that.
+        baseService.get<IdentifiedObject>(resultSet.getString(table.IDENTIFIED_OBJECT_MRID.queryIndex))?.let {
+            val name = nameType.getOrAddName(nameName, it)
+            it.addName(name)
+        }
+
+        return true
     }
 
     @Throws(SQLException::class)
@@ -93,6 +120,17 @@ abstract class BaseCIMReader(private val baseService: BaseService) {
             throw DuplicateMRIDException(
                 "Failed to load ${identifiedObject.typeNameAndMRID()}. " +
                     "Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})"
+            )
+        }
+    }
+
+    protected fun BaseService.addOrThrow(nameType: NameType): Boolean {
+        return if (addNameType(nameType)) {
+            true
+        } else {
+            throw DuplicateNameTypeException(
+                "Failed to load NameType ${nameType.name}. " +
+                    "Unable to add to service '$name': duplicate NameType"
             )
         }
     }

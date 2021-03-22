@@ -45,7 +45,7 @@ import java.sql.Statement
 class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
 
     fun load(reader: NetworkCIMReader): Boolean {
-        var status = true
+        var status = loadNameTypes(reader)
 
         status = status and loadEach<TableCableInfo>("cable info", reader::load)
         status = status and loadEach<TableOverheadWireInfo>("overhead wire info", reader::load)
@@ -111,6 +111,8 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableAnalogs>("analogs", reader::load)
         status = status and loadEach<TableAccumulators>("accumulators", reader::load)
         status = status and loadEach<TableDiscretes>("discretes", reader::load)
+
+        status = status and loadNames(reader)
 
         return status
     }

@@ -26,7 +26,7 @@ internal class DiagramServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(Diagram::diagramStyle, { Diagram(it) }, { DiagramStyle.SCHEMATIC }, { DiagramStyle.GEOGRAPHIC })
         comparatorValidator.validateProperty(Diagram::orientationKind, { Diagram(it) }, { OrientationKind.POSITIVE }, { OrientationKind.NEGATIVE })
         comparatorValidator.validateProperty(Diagram::orientationKind, { Diagram(it) }, { OrientationKind.POSITIVE }, { OrientationKind.NEGATIVE })
-        comparatorValidator.validateIdObjCollection(
+        comparatorValidator.validateCollection(
             Diagram::diagramObjects, Diagram::addDiagramObject,
             { Diagram(it) },
             { DiagramObject("1").apply { diagram = it } },

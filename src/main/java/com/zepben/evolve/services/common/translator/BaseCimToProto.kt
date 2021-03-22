@@ -11,10 +11,14 @@ import com.zepben.evolve.cim.iec61968.common.Document
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.Name
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.protobuf.cim.iec61968.common.Document as PBDocument
 import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
 import com.zepben.protobuf.cim.iec61968.common.OrganisationRole as PBOrganisationRole
 import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject as PBIdentifiedObject
+import com.zepben.protobuf.cim.iec61970.base.core.Name as PBName
+import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 
 /************ IEC61968 COMMON ************/
 fun toPb(cim: Document, pb: PBDocument.Builder): PBDocument.Builder =
@@ -38,22 +42,39 @@ fun toPb(cim: OrganisationRole, pb: PBOrganisationRole.Builder): PBOrganisationR
     }
 
 /************ IEC61970 CORE ************/
+fun toPb(cim: NameType, pb: PBNameType.Builder): PBNameType.Builder =
+    pb.apply {
+        pb.name = cim.name
+        pb.description = cim.description
+    }
+
+fun toPb(cim: Name, pb: PBName.Builder): PBName.Builder =
+    pb.apply {
+        pb.name = cim.name
+        pb.type = cim.type.name
+    }
+
 fun toPb(cim: IdentifiedObject, pb: PBIdentifiedObject.Builder): PBIdentifiedObject.Builder =
     pb.apply {
         pb.mrid = cim.mRID
         pb.name = cim.name
         pb.description = cim.description
         pb.numDiagramObjects = cim.numDiagramObjects
+        cim.names.forEach { name -> addNamesBuilder().apply { toPb(name, this) } }
     }
 
 /************ Extensions ************/
 
 fun Organisation.toPb(): PBOrganisation = toPb(this, PBOrganisation.newBuilder()).build()
+fun NameType.toPb(): PBNameType = toPb(this, PBNameType.newBuilder()).build()
+fun Name.toPb(): PBName = toPb(this, PBName.newBuilder()).build()
 
 /************ Class for Java friendly usage ************/
 
 abstract class BaseCimToProto {
 
     fun toPb(organisation: Organisation): PBOrganisation = organisation.toPb()
+    fun toPb(nameType: NameType): PBNameType = nameType.toPb()
+    fun toPb(name: Name): PBName = name.toPb()
 
 }

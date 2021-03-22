@@ -11,6 +11,8 @@ import com.zepben.evolve.cim.iec61968.common.Document
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.Name
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.extensions.internEmpty
@@ -18,6 +20,8 @@ import com.zepben.protobuf.cim.iec61968.common.Document as PBDocument
 import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
 import com.zepben.protobuf.cim.iec61968.common.OrganisationRole as PBOrganisationRole
 import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject as PBIdentifiedObject
+import com.zepben.protobuf.cim.iec61970.base.core.Name as PBName
+import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 
 /************ IEC61968 COMMON ************/
 fun toCim(pb: PBDocument, cim: Document, baseService: BaseService): Document =
@@ -49,8 +53,18 @@ fun toCim(pb: PBIdentifiedObject, cim: IdentifiedObject, baseService: BaseServic
         name = pb.name.internEmpty()
         description = pb.description.internEmpty()
         numDiagramObjects = pb.numDiagramObjects
+        pb.namesList.forEach { addName(toCim(it, this, baseService)) }
     }
 
+fun toCim(pb: PBNameType): NameType =
+    NameType(pb.name).apply {
+        description = pb.description
+    }
+
+fun toCim(pb: PBName, cim: IdentifiedObject, baseService: BaseService): Name {
+    val nameType = baseService.getNameType(pb.type) ?: NameType(pb.type).also { baseService.addNameType(it) }
+    return nameType.getOrAddName(pb.name, cim)
+}
 
 /************ Class for Java friendly usage ************/
 

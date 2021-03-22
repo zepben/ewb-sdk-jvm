@@ -14,6 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.evolve.database.sqlite.DatabaseReader
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet28
+import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet30
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
@@ -145,6 +146,15 @@ class ChangeSetTest {
             val rs = executeQuery("SELECT rated_e, stored_e FROM battery_unit WHERE mrid = 'abc'")
             assertThat(rs.getLong("rated_e"), equalTo(1500L))
             assertThat(rs.getLong("stored_e"), equalTo(2500L))
+        }
+    }
+
+    @Test
+    internal fun `cs30 creates names tables`() {
+        validateChangeSet("src/test/data/changeset30.sql", changeSet30()) {
+            // Test the these tables exist
+            executeQuery("SELECT * FROM names")
+            executeQuery("SELECT * FROM name_types")
         }
     }
 

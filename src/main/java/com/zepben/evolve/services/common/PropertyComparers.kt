@@ -8,6 +8,7 @@
 package com.zepben.evolve.services.common
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.Name
 import kotlin.reflect.KProperty1
 
 fun <T, R> KProperty1<in T, R?>.compareValues(source: T?, target: T?): ValueDifference? {
@@ -57,6 +58,30 @@ fun <T, R : IdentifiedObject> KProperty1<in T, Collection<R>>.compareIdReference
 
     targetCollection.forEach {
         if (!sourceMRIDs.contains(it.mRID))
+            differences.missingFromSource.add(it)
+    }
+
+    return differences.nullIfEmpty()
+}
+
+fun <T : IdentifiedObject> KProperty1<in T, Collection<Name>>.compareNames(source: T, target: T): CollectionDifference? {
+    data class NameTypeName(val nameType: String, val name: String)
+
+    val differences = CollectionDifference()
+    val sourceCollection = this.get(source)
+    val targetCollection = this.get(target)
+
+    val sourceNameTypeNames = mutableListOf<NameTypeName>()
+    sourceCollection.forEach { sourceIdObj ->
+        sourceNameTypeNames.add(NameTypeName(sourceIdObj.type.name, sourceIdObj.name))
+        val targetIdObj = targetCollection.find { it.name == sourceIdObj.name && it.type.name == sourceIdObj.type.name }
+        if (targetIdObj == null) {
+            differences.missingFromTarget.add(sourceIdObj)
+        }
+    }
+
+    targetCollection.forEach {
+        if (sourceNameTypeNames.find { nameTypeName -> it.name == nameTypeName.name && it.type.name == nameTypeName.nameType } == null)
             differences.missingFromSource.add(it)
     }
 

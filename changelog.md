@@ -34,9 +34,12 @@
     * TransformerEndInfo
     * TransformerTankInfo
     * TransformerStarImpedance
+    * Name
+    * NameType
     
 ##### Enhancements
 * Added some better testing mechanism for database upgrades.
+* Instantiating database reader / writer classes is now faster. (Mainly benefits tests)
 
 ##### Fixes
 * `Resolvers.powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit).` 
@@ -46,4 +49,4 @@
   now all have their reverse resolver assigned.
   
 ##### Notes
-* None.
+* Name and NameType classes enable the ability to give IdentifiedObjects multiple names.

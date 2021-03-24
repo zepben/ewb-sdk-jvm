@@ -84,6 +84,13 @@ internal class PowerTransformerEndTest {
     }
 
     @Test
+    internal fun onlyChecksForCatalogAssignedWithNonNullStarImpedance() {
+        val tx = PowerTransformer().apply { assetInfo = PowerTransformerInfo() }
+        val end = PowerTransformerEnd().apply { powerTransformer = tx }.also { tx.addEnd(it) }
+        end.starImpedance = null
+    }
+
+    @Test
     internal fun populatesResistanceReactanceDirectlyIfAvailable() {
         val end = PowerTransformerEnd().apply {
             r = 1.1

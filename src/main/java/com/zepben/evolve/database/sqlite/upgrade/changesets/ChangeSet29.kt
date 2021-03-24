@@ -175,7 +175,7 @@ private val `Convert power_transformer_ends power_transformer_mrid, R, R0, X and
 
 @Suppress("ObjectPropertyName")
 private val `Create transformer_end_info table` = arrayOf(
-    "CREATE TABLE transformer_end_info(mrid TEXT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, num_diagram_objects INTEGER NOT NULL, transformer_tank_info_mrid TEXT NULL)",
+    "CREATE TABLE transformer_end_info(mrid TEXT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, num_diagram_objects INTEGER NOT NULL, connection_kind TEXT NOT NULL, emergency_s INT NOT NULL, end_number INT NOT NULL, insulation_u INT NOT NULL, phase_angle_clock INT NOT NULL, r NUMBER NOT NULL, rated_s INT NOT NULL, rated_u INT NOT NULL, short_term_s INT NOT NULL, transformer_tank_info_mrid TEXT NULL)",
     "CREATE UNIQUE INDEX transformer_end_info_mrid ON transformer_end_info (mrid)",
     "CREATE INDEX transformer_end_info_name ON transformer_end_info (name)",
     "CREATE INDEX transformer_end_info_transformer_tank_info_mrid ON transformer_end_info (transformer_tank_info_mrid)",

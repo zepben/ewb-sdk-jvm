@@ -143,4 +143,15 @@ internal class PowerTransformerTest {
             .withMessage("Unable to use a catalog for ${tx.typeNameAndMRID()} because the following associated ends have a direct link to a star impedance: [${end.typeNameAndMRID()}].")
     }
 
+    @Test
+    internal fun onlyChecksForStarImpedanceAssignedWithNonNullCatalog() {
+        val tx = PowerTransformer()
+        PowerTransformerEnd()
+            .apply {
+                powerTransformer = tx
+                starImpedance = TransformerStarImpedance()
+            }.also { tx.addEnd(it) }
+        tx.assetInfo = null
+    }
+
 }

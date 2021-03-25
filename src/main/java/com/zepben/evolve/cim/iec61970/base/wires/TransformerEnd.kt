@@ -44,7 +44,7 @@ abstract class TransformerEnd(mRID: String = "") : IdentifiedObject(mRID) {
 
     var starImpedance: TransformerStarImpedance? = null
         set(value) {
-            if (this is PowerTransformerEnd) {
+            if (this is PowerTransformerEnd && value != null) {
                 require(powerTransformer?.assetInfo == null) {
                     "Unable to use a star impedance for ${typeNameAndMRID()} directly because ${powerTransformer?.typeNameAndMRID()} references a catalog."
                 }

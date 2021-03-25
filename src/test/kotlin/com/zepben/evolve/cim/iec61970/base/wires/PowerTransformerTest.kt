@@ -131,27 +131,19 @@ internal class PowerTransformerTest {
     }
 
     @Test
-    internal fun cantAssignCatalogDataWithEndsReferencingStarImpedance() {
+    internal fun `only checks for TransformerStarImpedance with non-null AssetInfo`() {
         val tx = PowerTransformer()
         val end = PowerTransformerEnd().apply {
             powerTransformer = tx
             starImpedance = TransformerStarImpedance()
         }.also { tx.addEnd(it) }
-
-        expect { tx.assetInfo = PowerTransformerInfo() }
-            .toThrow(IllegalArgumentException::class.java)
-            .withMessage("Unable to use a catalog for ${tx.typeNameAndMRID()} because the following associated ends have a direct link to a star impedance: [${end.typeNameAndMRID()}].")
-    }
-
-    @Test
-    internal fun onlyChecksForStarImpedanceAssignedWithNonNullCatalog() {
-        val tx = PowerTransformer()
-        PowerTransformerEnd()
-            .apply {
-                powerTransformer = tx
-                starImpedance = TransformerStarImpedance()
-            }.also { tx.addEnd(it) }
+        assertThat(tx.assetInfo, nullValue())
         tx.assetInfo = null
+
+        val pti = PowerTransformerInfo()
+        expect { tx.assetInfo =  pti }
+            .toThrow(IllegalArgumentException::class.java)
+            .withMessage("Unable to use ${pti.typeNameAndMRID()} for ${tx.typeNameAndMRID()} because the following associated ends have a direct link to a star impedance: [${end.typeNameAndMRID()}].")
     }
 
 }

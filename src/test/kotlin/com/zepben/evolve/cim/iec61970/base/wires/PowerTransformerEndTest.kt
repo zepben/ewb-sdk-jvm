@@ -74,17 +74,17 @@ internal class PowerTransformerEndTest {
     }
 
     @Test
-    internal fun cantAssignStarImpedanceWithCatalogAssigned() {
+    internal fun `cant assign star impedance when powerTransformer has an AssetInfo`() {
         val tx = PowerTransformer().apply { assetInfo = PowerTransformerInfo() }
         val end = PowerTransformerEnd().apply { powerTransformer = tx }.also { tx.addEnd(it) }
 
         ExpectException.expect { end.starImpedance = TransformerStarImpedance() }
             .toThrow(IllegalArgumentException::class.java)
-            .withMessage("Unable to use a star impedance for ${end.typeNameAndMRID()} directly because ${tx.typeNameAndMRID()} references a catalog.")
+            .withMessage("Unable to use a star impedance for ${end.typeNameAndMRID()} directly because ${tx.typeNameAndMRID()} references ${tx.assetInfo?.typeNameAndMRID()}.")
     }
 
     @Test
-    internal fun onlyChecksForCatalogAssignedWithNonNullStarImpedance() {
+    internal fun `only checks for AssetInfo assigned with non-null star impedance`() {
         val tx = PowerTransformer().apply { assetInfo = PowerTransformerInfo() }
         val end = PowerTransformerEnd().apply { powerTransformer = tx }.also { tx.addEnd(it) }
         end.starImpedance = null

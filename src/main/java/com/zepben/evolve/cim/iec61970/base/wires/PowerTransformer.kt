@@ -66,7 +66,7 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
             if (value != null) {
                 val invalidEnds = ends.filter { it.starImpedance != null }
                 require(invalidEnds.isEmpty()) {
-                    "Unable to use a catalog for ${typeNameAndMRID()} because the following associated ends have a direct link to a star impedance: ${invalidEnds.map { it.typeNameAndMRID() }}."
+                    "Unable to use ${value.typeNameAndMRID()} for ${typeNameAndMRID()} because the following associated ends have a direct link to a star impedance: ${invalidEnds.map { it.typeNameAndMRID() }}."
                 }
             }
             field = value

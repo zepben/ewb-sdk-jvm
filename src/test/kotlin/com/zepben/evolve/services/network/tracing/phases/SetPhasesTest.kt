@@ -511,8 +511,8 @@ class SetPhasesTest {
         assertThat(t!!.phases.singlePhases().size, equalTo(singlePhaseKinds.size))
         for (i in singlePhaseKinds.indices) {
             val ps = phaseStatusSelector.apply(t.phases.singlePhases()[i])
-            assertThat(ps.phase(), equalTo(singlePhaseKinds[i]))
-            assertThat(ps.direction(), equalTo(directions[i]))
+            assertThat(ps.phase, equalTo(singlePhaseKinds[i]))
+            assertThat(ps.direction, equalTo(directions[i]))
         }
     }
 

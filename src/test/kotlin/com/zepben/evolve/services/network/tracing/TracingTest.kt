@@ -18,11 +18,11 @@ import com.zepben.evolve.services.network.tracing.phases.PhaseStep
 import com.zepben.evolve.services.network.tracing.phases.RemovePhases
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
+import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import org.junit.Assert
 import org.junit.jupiter.api.Test
-import java.util.*
 import java.util.function.Supplier
 
 class TracingTest {
@@ -31,7 +31,7 @@ class TracingTest {
     internal fun basicAssetTrace() {
         val n = PhaseSwapLoopNetwork.create()
         val expected = n.setOf<ConductingEquipment>()
-        val visited: MutableSet<ConductingEquipment> = HashSet()
+        val visited = mutableSetOf<ConductingEquipment>()
         val start = n.get<ConductingEquipment>("node0")!!
         val trace = Tracing.connectedEquipmentTrace().addStepAction { ce, _ -> visited.add(ce) }
         trace.run(start)

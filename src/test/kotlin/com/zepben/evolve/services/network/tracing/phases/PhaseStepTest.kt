@@ -28,8 +28,8 @@ class PhaseStepTest {
         val asset = mock<ConductingEquipment>()
         val atoc = PhaseStep.startAt(asset, listOf(A, B, C, N, B, C, N))
 
-        assertThat(atoc.conductingEquipment(), equalTo(asset))
-        assertThat(atoc.phases(), containsInAnyOrder(A, B, C, N))
+        assertThat(atoc.conductingEquipment, equalTo(asset))
+        assertThat(atoc.phases, containsInAnyOrder(A, B, C, N))
     }
 
     @Test

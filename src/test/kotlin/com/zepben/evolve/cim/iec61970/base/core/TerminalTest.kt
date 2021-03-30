@@ -87,9 +87,9 @@ internal class TerminalTest {
         currentPhase: SinglePhaseKind,
         currentDirection: PhaseDirection
     ) {
-        assertThat(terminal.normalPhases(SinglePhaseKind.A).phase(), equalTo(normalPhase))
-        assertThat(terminal.normalPhases(SinglePhaseKind.A).direction(), equalTo(normalDirection))
-        assertThat(terminal.currentPhases(SinglePhaseKind.A).phase(), equalTo(currentPhase))
-        assertThat(terminal.currentPhases(SinglePhaseKind.A).direction(), equalTo(currentDirection))
+        assertThat(terminal.normalPhases(SinglePhaseKind.A).phase, equalTo(normalPhase))
+        assertThat(terminal.normalPhases(SinglePhaseKind.A).direction, equalTo(normalDirection))
+        assertThat(terminal.currentPhases(SinglePhaseKind.A).phase, equalTo(currentPhase))
+        assertThat(terminal.currentPhases(SinglePhaseKind.A).direction, equalTo(currentDirection))
     }
 }

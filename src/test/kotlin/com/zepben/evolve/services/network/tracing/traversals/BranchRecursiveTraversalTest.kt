@@ -11,7 +11,6 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
-import java.util.*
 
 /**
  * I'm not entirely sure how to test this class thoroughly...
@@ -19,7 +18,7 @@ import java.util.*
  */
 class BranchRecursiveTraversalTest {
 
-    private val visitOrder: MutableList<Int> = ArrayList()
+    private val visitOrder = mutableListOf<Int>()
     private var stopCount = 0
 
     private val traversal = BranchRecursiveTraversal(
@@ -57,25 +56,25 @@ class BranchRecursiveTraversalTest {
         assertThat(stopCount, equalTo(visitOrder.size))
     }
 
-    private fun queueNext(item: Int?, traversal: BranchRecursiveTraversal<Int>) {
+    private fun queueNext(item: Int, traversal: BranchRecursiveTraversal<Int>) {
         if (item == 0) {
-            var branch = traversal.branchSupplier().get()
+            var branch = traversal.branchSupplier()
             branch.setStart(1)
-            traversal.branchQueue().add(branch)
+            traversal.branchQueue.add(branch)
 
-            branch = traversal.branchSupplier().get()
+            branch = traversal.branchSupplier()
             branch.setStart(3)
-            traversal.branchQueue().add(branch)
+            traversal.branchQueue.add(branch)
         } else if (item == 1 || item == 3) {
-            if (traversal.tracker().hasVisited(2))
-                traversal.queue().add(0)
+            if (traversal.tracker.hasVisited(2))
+                traversal.queue.add(0)
             else
-                traversal.queue().add(2)
+                traversal.queue.add(2)
         } else if (item == 2) {
-            if (traversal.tracker().hasVisited(1))
-                traversal.queue().add(3)
-            else if (traversal.tracker().hasVisited(3))
-                traversal.queue().add(1)
+            if (traversal.tracker.hasVisited(1))
+                traversal.queue.add(3)
+            else if (traversal.tracker.hasVisited(3))
+                traversal.queue.add(1)
         }
     }
 

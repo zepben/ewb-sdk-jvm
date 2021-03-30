@@ -42,14 +42,14 @@ object PhaseValidator {
 
         if ((expectedPhases.size == 1) && (expectedPhases[0] == SinglePhaseKind.NONE)) {
             terminal.phases.singlePhases().forEach {
-                assertThat(terminal.normalPhases(it).phase(), equalTo(SinglePhaseKind.NONE))
+                assertThat(terminal.normalPhases(it).phase, equalTo(SinglePhaseKind.NONE))
             }
         } else {
             assertThat(terminal.phases.numPhases(), equalTo(expectedPhases.size))
 
             for (index in expectedPhases.indices) {
                 val nominalPhase = terminal.phases.singlePhases()[index]
-                assertThat(terminal.normalPhases(nominalPhase).phase(), equalTo(expectedPhases[index]))
+                assertThat(terminal.normalPhases(nominalPhase).phase, equalTo(expectedPhases[index]))
             }
         }
     }
@@ -67,14 +67,14 @@ object PhaseValidator {
         if (t1 != null) {
             for (index in expectedDirectionT1.indices) {
                 val nominalPhase = t1.phases.singlePhases()[index]
-                assertThat(t1.normalPhases(nominalPhase).direction(), equalTo(expectedDirectionT1[index]))
+                assertThat(t1.normalPhases(nominalPhase).direction, equalTo(expectedDirectionT1[index]))
             }
         }
 
         if (t2 != null) {
             for (index in expectedDirectionT2.indices) {
                 val nominalPhase = t2.phases.singlePhases()[index]
-                assertThat(t2.normalPhases(nominalPhase).direction(), equalTo(expectedDirectionT2[index]))
+                assertThat(t2.normalPhases(nominalPhase).direction, equalTo(expectedDirectionT2[index]))
             }
         }
 

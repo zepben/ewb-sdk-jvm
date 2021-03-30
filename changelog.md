@@ -1,8 +1,13 @@
 ### v0.6.0
 
 ##### Breaking Changes
-* `GrpcChannelFactory.create()` now returns a `GrpcChannel`, which is a wrapper around a `Channel` or `ManagedChannel`. This should only be breaking for Java users.
-* `BatteryUnit` `ratedE` and `storedE` are now `Long` instead of `Double`
+* `GrpcChannelFactory.create()` now returns a `GrpcChannel`, which is a wrapper around a `Channel` or `ManagedChannel`. This should only be breaking for Java
+  users.
+* `BatteryUnit` `ratedE` and `storedE` are now `Long` instead of `Double`.
+* The package for `DownstreamTree` has been changed from `*.tracing` to `*.tracing.tree`, you will need to reimport.
+* `DownstreamTree.TreeNode` has been moved to a top level class in the `*.tracing.tree` package.
+* Converted the remaining tracing classes to Kotlin. This will require fixing of many getter calls to include a `get*` from Java and removal of the function
+  call in Kotlin etc.
 
 ##### New Features
 * New class `GrpcChannel` that can be used in try-with-resources blocks when communicating with a Grpc server.

@@ -24,6 +24,7 @@ import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.nc.*
 import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
+import io.grpc.CallCredentials
 import io.grpc.ManagedChannel
 
 /**
@@ -33,11 +34,30 @@ import io.grpc.ManagedChannel
  */
 class NetworkConsumerClient(
     private val stub: NetworkConsumerGrpc.NetworkConsumerBlockingStub,
-    private val protoToCimProvider: (NetworkService) -> NetworkProtoToCim = { NetworkProtoToCim(it) }
+    private val protoToCimProvider: (NetworkService) -> NetworkProtoToCim = { NetworkProtoToCim(it) },
 ) : CimConsumerClient<NetworkService>() {
 
-    constructor(channel: ManagedChannel) : this(NetworkConsumerGrpc.newBlockingStub(channel))
-    constructor(channel: GrpcChannel) : this(NetworkConsumerGrpc.newBlockingStub(channel.channel))
+    /**
+     * Create a [NetworkConsumerClient]
+     *
+     * @param channel [ManagedChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { NetworkConsumerGrpc.newBlockingStub(channel).withCallCredentials(callCredentials) }
+            ?: NetworkConsumerGrpc.newBlockingStub(channel))
+
+    /**
+     * Create a [NetworkConsumerClient]
+     *
+     * @param channel [GrpcChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { NetworkConsumerGrpc.newBlockingStub(channel.channel).withCallCredentials(callCredentials) }
+            ?: NetworkConsumerGrpc.newBlockingStub(channel.channel))
 
     /**
      * Retrieve the object with the given [mRID] and store the result in the [service].

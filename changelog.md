@@ -37,6 +37,9 @@
     * Name
     * NameType
     
+* New class `JwtCredentials` added to support managing OAuth2 refresh tokens from Auth0. To be using with the gRPC Consumer and Producer clients which now
+also accept `JwtCredentials` or other `CallCredentials` at initialisation to apply to the stub.
+
 ##### Enhancements
 * Added some better testing mechanism for database upgrades.
 * Instantiating database reader / writer classes is now faster. (Mainly benefits tests)

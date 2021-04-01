@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.zepben.maven</groupId>
         <artifactId>evolve-super-pom</artifactId>
-        <version>0.7.0</version>
+        <version>0.9.0</version>
     </parent>
 
     <groupId>com.zepben</groupId>
@@ -93,6 +93,12 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-serialization-json</artifactId>
+            <version>${kotlin.serialization.version}</version>
+        </dependency>
+
 
         <!-- Protobuf/gRPC -->
         <dependency>
@@ -121,6 +127,12 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
+        <!-- Utilities -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.14.0</version>
+        </dependency>
 
         <!-- Test deps -->
         <dependency>
@@ -142,6 +154,12 @@
             <groupId>com.nhaarman.mockitokotlin2</groupId>
             <artifactId>mockito-kotlin</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.marcinziolo</groupId>
+            <artifactId>kotlin-wiremock</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -149,12 +167,23 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
+                <configuration>
+                    <compilerPlugins>
+                        <plugin>kotlinx-serialization</plugin>
+                    </compilerPlugins>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-serialization</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-
         </plugins>
     </build>
 </project>

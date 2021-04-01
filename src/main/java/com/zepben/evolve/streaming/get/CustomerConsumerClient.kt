@@ -19,7 +19,8 @@ import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.cc.CustomerIdentifiedObject
 import com.zepben.protobuf.cc.CustomerIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest
-import io.grpc.Channel
+import io.grpc.CallCredentials
+import io.grpc.ManagedChannel
 
 /**
  * Consumer client for a [CustomerService].
@@ -31,8 +32,28 @@ class CustomerConsumerClient(
     private val protoToCimProvider: (CustomerService) -> CustomerProtoToCim = { CustomerProtoToCim(it) }
 ) : CimConsumerClient<CustomerService>() {
 
-    constructor(channel: Channel) : this(CustomerConsumerGrpc.newBlockingStub(channel))
-    constructor(channel: GrpcChannel) : this(CustomerConsumerGrpc.newBlockingStub(channel.channel))
+    /**
+     * Create a [CustomerConsumerClient]
+     *
+     * @param channel [ManagedChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { CustomerConsumerGrpc.newBlockingStub(channel).withCallCredentials(callCredentials) }
+            ?: CustomerConsumerGrpc.newBlockingStub(channel))
+
+    /**
+     * Create a [CustomerConsumerClient]
+     *
+     * @param channel [GrpcChannel] to build a blocking stub from.
+     * @param callCredentials [CallCredentials] to be attached to the stub.
+     */
+    @JvmOverloads
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
+        this(callCredentials?.let { CustomerConsumerGrpc.newBlockingStub(channel.channel).withCallCredentials(callCredentials) }
+            ?: CustomerConsumerGrpc.newBlockingStub(channel.channel))
+
 
     /**
      * Retrieve the object with the given [mRID] and store the result in the [service].

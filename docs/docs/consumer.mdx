@@ -34,14 +34,100 @@ run any analytics you may wish to perform across the whole model.
 <TabItem value="java">
 
 ```java
-TODO
+// Insecure
+GrpcChannel channel = GrpcChannelFactory.create(new ConnectionConfig("localhost", 50051));
+
+NetworkConsumerClient client = new NetworkConsumerClient(channel);
+NetworkService ns = new NetworkService();
+GrpcResult result = client.getFeeder(ns).throwOnError();
+
+
+// With SSL
+GrpcChannel channel = GrpcChannelFactory.create(new ConnectionConfig("localhost", 50051, true, "ca.cert"));
+
+NetworkConsumerClient client = new NetworkConsumerClient(channel);
+NetworkService ns = new NetworkService();
+GrpcResult result = client.getFeeder(ns).throwOnError();
+
+
+// With SSL and OAuth2. Note that you should never connect to a non-SSL server while using OAuth2, as you will be vulnerable to MITM attacks.
+GrpcChannel channel = GrpcChannelFactory.create(new ConnectionConfig("localhost", 50051, true, "ca.cert"));
+
+// Create CallCredentials using a configuration URL. This configuration endpoint will often be provided by the service you are connecting to.
+JwtCredentials creds = EvolveCallCredentials.create(
+    "<client_id>",
+    "<client_secret>",
+    "<ewb_auth_config_URL>"
+);
+
+// Or create them with an AuthConfig if a configuration endpoint doesn't exist.
+JwtCredentials creds = EvolveCallCredentials.create(
+    "<client_id>",
+    "<client_secret>",
+    new AuthConfig(tokenUrl="https://zepben.au.auth0.com/oauth/token", audience="https://evolve/", authType=AuthType.AUTH0)
+);
+
+NetworkConsumerClient client = new NetworkConsumerClient(channel, creds);
+NetworkService ns = new NetworkService();
+GrpcResult result = client.getFeeder(ns).throwOnError();
+
+
+// With SSL and client authentication
+GrpcChannel channel = GrpcChannelFactory.create(new ConnectionConfig("localhost", 50051, true, "ca.cert", "path/to/signed.cert", "path/to/private.key"));
+
+NetworkConsumerClient client = new NetworkConsumerClient(channel);
+NetworkService ns = new NetworkService();
+GrpcResult result = client.getFeeder(ns).throwOnError();
 ```
 
 </TabItem>
 <TabItem  value="kotlin">
 
 ```kotlin
-TODO
+// Insecure
+val channel = GrpcChannelFactory.create(ConnectionConfig("localhost", 50051))
+
+val client = NetworkConsumerClient(channel)
+val ns = NetworkService()
+val result = client.getFeeder(ns).throwOnError()
+
+
+// With just SSL
+val channel = GrpcChannelFactory.create(ConnectionConfig("localhost", 50051, true, trustCertPath = "path/to/zepben/ca.cert"))
+
+val client = NetworkConsumerClient(channel)
+val ns = NetworkService()
+val result = client.getFeeder(ns).throwOnError()
+
+
+// With SSL and OAuth2. Note that you should never connect to a non-SSL server while using OAuth2, as you will be vulnerable to MITM attacks.
+val channel = GrpcChannelFactory.create(ConnectionConfig("localhost", 50051, true, trustCertPath = "path/to/zepben/ca.cert"))
+
+// Create CallCredentials using a configuration URL. This configuration endpoint will often be provided by the service you are connecting to.
+val creds = EvolveCallCredentials.create(
+    "<client_id>",
+    "<client_secret>",
+    "<ewb_auth_config_URL>"
+)
+
+// Or create them with an AuthConfig if a configuration endpoint doesn't exist.
+val creds = EvolveCallCredentials.create(
+    "<client_id>",
+    "<client_secret>",
+    AuthConfig(tokenUrl="https://zepben.au.auth0.com/oauth/token", audience="https://evolve/", authType=AuthType.AUTH0)
+)
+
+val client = NetworkConsumerClient(channel, creds)
+val ns = NetworkService()
+val result = client.getFeeder(ns).throwOnError()
+
+
+// With SSL and client authentication
+val channel = GrpcChannelFactory.create(ConnectionConfig("localhost", 50051, true, trustCertPath = "path/to/zepben/ca.cert", authCertPath = "path/to/signed.cert", authKeyPath = "path/to/private.key"))
+
+val client = NetworkConsumerClient(channel)
+val ns = NetworkService()
+val result = client.getFeeder(ns).throwOnError()
 ```
 
 </TabItem>

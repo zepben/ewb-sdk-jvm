@@ -29,7 +29,7 @@ internal class PhaseLogger private constructor(asset: ConductingEquipment) : (Co
                 val nps = t.normalPhases(phase)
                 val cps = t.currentPhases(phase)
 
-                b.append("{$phase: n:${nps.phase()}:${nps.direction()}, c:${cps.phase()}:${cps.direction()}}, ")
+                b.append("{$phase: n:${nps.phase}:${nps.direction}, c:${cps.phase}:${cps.direction}}, ")
             }
 
             clearLastComma(b)

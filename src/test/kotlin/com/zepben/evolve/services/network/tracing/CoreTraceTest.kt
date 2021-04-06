@@ -20,7 +20,6 @@ import org.hamcrest.Matchers
 import org.junit.Assert
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.util.*
 
 class CoreTraceTest {
 
@@ -86,8 +85,8 @@ class CoreTraceTest {
         Assert.assertEquals(4, visited.size.toLong())
         Assert.assertTrue(visited.contains(createResultItem(n, "node1", SinglePhaseKind.A)))
         Assert.assertTrue(visited.contains(createResultItem(n, "node2", SinglePhaseKind.A)))
-        Assert.assertTrue(visited.stream().noneMatch { i: PhaseStep -> i.conductingEquipment().mRID == "acLineSegment1" })
-        Assert.assertTrue(visited.stream().noneMatch { i: PhaseStep -> i.conductingEquipment().mRID == "acLineSegment9" })
+        Assert.assertTrue(visited.stream().noneMatch { i: PhaseStep -> i.conductingEquipment.mRID == "acLineSegment1" })
+        Assert.assertTrue(visited.stream().noneMatch { i: PhaseStep -> i.conductingEquipment.mRID == "acLineSegment9" })
 
         // Test on a core that splits onto different cores on different branches
         start = n["node0"]!!
@@ -97,7 +96,7 @@ class CoreTraceTest {
         Assert.assertTrue(visited.contains(createResultItem(n, "node2", SinglePhaseKind.C)))
         Assert.assertTrue(visited.contains(createResultItem(n, "node7", SinglePhaseKind.C)))
         Assert.assertTrue(visited.contains(createResultItem(n, "node6", SinglePhaseKind.Y)))
-        Assert.assertTrue(visited.stream().noneMatch { i: PhaseStep -> i.conductingEquipment().mRID == "node3" })
+        Assert.assertTrue(visited.stream().noneMatch { i: PhaseStep -> i.conductingEquipment.mRID == "node3" })
     }
 
     @Test
@@ -211,7 +210,7 @@ class CoreTraceTest {
     }
 
     private fun runTrace(trace: Traversal<PhaseStep>, start: ConductingEquipment, vararg phases: SinglePhaseKind): Set<PhaseStep> {
-        val visited: MutableSet<PhaseStep> = HashSet()
+        val visited = mutableSetOf<PhaseStep>()
 
         trace.addStepAction { phaseStep, _ -> System.err.println(phaseStep) }
         trace.addStepAction { phaseStep, _ -> visited.add(phaseStep) }
@@ -221,7 +220,7 @@ class CoreTraceTest {
     }
 
     private fun createResultItem(n: NetworkService, id: String, vararg phases: SinglePhaseKind): PhaseStep {
-        val a = n.get<ConductingEquipment>(id)!!
-        return PhaseStep.startAt(a, CollectionUtils.setOf(*phases))
+        return PhaseStep.startAt(n[id]!!, CollectionUtils.setOf(*phases))
     }
+
 }

@@ -8,7 +8,6 @@
 package com.zepben.evolve.database.sqlite
 
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
-import com.zepben.evolve.services.common.interop.JavaLambda
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
@@ -20,7 +19,7 @@ class GenerateSqliteSql {
     @Test
     @Disabled
     fun runThisFunctionAsATestToGetSqlForAnSqliteDatabase() {
-        DatabaseTables().forEachTable(JavaLambda.unit { table: SqliteTable -> printSqlFields(table) })
+        DatabaseTables().forEachTable { table: SqliteTable -> printSqlFields(table) }
     }
 
     private fun printSqlFields(table: SqliteTable) {

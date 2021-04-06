@@ -10,14 +10,13 @@ package com.zepben.evolve.services.network.tracing.traversals
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
-import java.util.*
 
 class BasicTraversalTest {
 
     private val queueNext = BasicTraversal.QueueNext<Int> { i, t ->
-        sequenceOf(i!! - 2, i - 1, i + 1, i + 2)
+        sequenceOf(i - 2, i - 1, i + 1, i + 2)
             .filter { n -> n > 0 }
-            .forEach { item -> t.queue().add(item) }
+            .forEach { item -> t.queue.add(item) }
     }
 
     @Test
@@ -53,12 +52,12 @@ class BasicTraversalTest {
     @Test
     fun passesStoppingToStep() {
         val queueNext = BasicTraversal.QueueNext<Int> { i, t ->
-            t.queue().add(i!! + 1)
-            t.queue().add(i + 2)
+            t.queue.add(i + 1)
+            t.queue.add(i + 2)
         }
 
-        val visited: MutableSet<Int> = HashSet()
-        val stoppingOn: MutableSet<Int> = HashSet()
+        val visited = mutableSetOf<Int>()
+        val stoppingOn = mutableSetOf<Int>()
 
         val t = BasicTraversal(queueNext, BasicQueue.depthFirst(), BasicTracker())
             .addStopCondition { i -> i >= 3 }
@@ -71,6 +70,19 @@ class BasicTraversalTest {
         t.run(1, true)
         assertThat<Set<Int>>(visited, containsInAnyOrder(1, 2, 3, 4))
         assertThat<Set<Int>>(stoppingOn, containsInAnyOrder(3, 4))
+    }
+
+    @Test
+    internal fun runsAllStopChecks() {
+        val stopCalls = mutableListOf(0, 0, 0)
+
+        BasicTraversal<Int>({ _, _ -> }, BasicQueue.depthFirst(), BasicTracker())
+            .addStopCondition { i -> stopCalls[0] = i; true }
+            .addStopCondition { i -> stopCalls[1] = i; true }
+            .addStopCondition { i -> stopCalls[2] = i; true }
+            .run(1, true)
+
+        assertThat(stopCalls, contains(1, 1, 1))
     }
 
     private fun validateStoppingOnFirstAsset(t: BasicTraversal<Int>, expectedOrder: List<Int>) {
@@ -91,7 +103,7 @@ class BasicTraversalTest {
     private fun validateRun(t: Traversal<Int>, canStopOnStart: Boolean, visitOrder: List<Int>, expectedOrder: List<Int>) {
         t.run(1, canStopOnStart)
         assertThat(visitOrder, contains<Any>(*expectedOrder.toTypedArray()))
-        expectedOrder.forEach { assertThat(t.tracker().hasVisited(it), equalTo(true)) }
+        expectedOrder.forEach { assertThat(t.tracker.hasVisited(it), equalTo(true)) }
     }
 
 }

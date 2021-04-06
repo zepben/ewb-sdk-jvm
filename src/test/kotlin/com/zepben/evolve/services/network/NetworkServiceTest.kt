@@ -42,7 +42,6 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.IntStream
 
@@ -567,7 +566,7 @@ internal class NetworkServiceTest {
         val acLineSegment5 = network.get<AcLineSegment>("acLineSegment5")!!
         val acLineSegment9 = network.get<AcLineSegment>("acLineSegment9")!!
         val acLineSegment11 = network.get<AcLineSegment>("acLineSegment11")!!
-        val expectedTerminals: MutableList<ConnectivityResult> = ArrayList()
+        val expectedTerminals = mutableListOf<ConnectivityResult>()
 
         expectedTerminals.add(ConnectivityResult.between(node0.getTerminal(1)!!, acLineSegment0.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.ABCN)))
         assertThat(connectedTerminals(node0.getTerminal(1)!!, PhaseCode.ABCN), containsInAnyOrder(*expectedTerminals.toTypedArray()))
@@ -654,7 +653,7 @@ internal class NetworkServiceTest {
         val acLineSegment9 = network.get<AcLineSegment>("acLineSegment9")!!
         val acLineSegment10 = network.get<AcLineSegment>("acLineSegment10")!!
         val acLineSegment11 = network.get<AcLineSegment>("acLineSegment11")!!
-        val expectedAssets: MutableList<ConnectivityResult> = ArrayList()
+        val expectedAssets = mutableListOf<ConnectivityResult>()
 
         expectedAssets.add(ConnectivityResult.between(acLineSegment0.getTerminal(1)!!, node0.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.ABCN)))
         expectedAssets.add(ConnectivityResult.between(acLineSegment0.getTerminal(2)!!, acLineSegment1.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.ABCN)))
@@ -740,7 +739,7 @@ internal class NetworkServiceTest {
         val acLineSegment3 = network.get<AcLineSegment>("acLineSegment3")!!
         val acLineSegment4 = network.get<AcLineSegment>("acLineSegment4")!!
         val acLineSegment5 = network.get<AcLineSegment>("acLineSegment5")!!
-        val expectedAssets: MutableList<ConnectivityResult> = ArrayList()
+        val expectedAssets = mutableListOf<ConnectivityResult>()
 
         expectedAssets.add(ConnectivityResult.between(node1.getTerminal(1)!!, acLineSegment1.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.ABCN)))
         expectedAssets.add(ConnectivityResult.between(node1.getTerminal(2)!!, acLineSegment2.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.A)))
@@ -763,7 +762,7 @@ internal class NetworkServiceTest {
         val acLineSegment2 = network.get<AcLineSegment>("acLineSegment2")!!
         val acLineSegment3 = network.get<AcLineSegment>("acLineSegment3")!!
         val acLineSegment4 = network.get<AcLineSegment>("acLineSegment4")!!
-        val expectedAssets: MutableList<ConnectivityResult> = ArrayList()
+        val expectedAssets = mutableListOf<ConnectivityResult>()
 
         expectedAssets.add(ConnectivityResult.between(acLineSegment1.getTerminal(1)!!, acLineSegment2.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.AB)))
         expectedAssets.add(ConnectivityResult.between(acLineSegment1.getTerminal(1)!!, acLineSegment3.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.AC)))

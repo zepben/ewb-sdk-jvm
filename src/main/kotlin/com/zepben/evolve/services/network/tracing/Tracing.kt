@@ -8,7 +8,6 @@
 package com.zepben.evolve.services.network.tracing
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.phases.*
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
@@ -38,7 +37,7 @@ object Tracing {
      * @return The new traversal instance.
      */
     @JvmStatic
-    fun connectedEquipmentTrace(): BasicTraversal<ConductingEquipment> = createBasicDepthTrace(this::conductingEquipmentQueueNext)
+    fun connectedEquipmentTrace(): BasicTraversal<ConductingEquipment> = ConnectedEquipmentTrace.newConnectedEquipmentTrace()
 
     /**
      * Creates a new traversal that traces equipment that are connected. This ignores phases, open status etc.
@@ -47,7 +46,23 @@ object Tracing {
      * @return The new traversal instance.
      */
     @JvmStatic
-    fun connectedEquipmentBreadthTrace(): BasicTraversal<ConductingEquipment> = createBasicBreadthTrace(this::conductingEquipmentQueueNext)
+    fun connectedEquipmentBreadthTrace(): BasicTraversal<ConductingEquipment> = ConnectedEquipmentTrace.newConnectedEquipmentBreadthTrace()
+
+    /**
+     * Creates a new traversal that traces equipment that are connected stopping at normally open points. This ignores phases etc.
+     * It is purely to trace equipment that are connected in any way.
+     *
+     * @return The new traversal instance.
+     */
+    fun normalConnectedEquipmentTrace(): BasicTraversal<ConductingEquipment> = ConnectedEquipmentTrace.newNormalConnectedEquipmentTrace()
+
+    /**
+     * Creates a new traversal that traces equipment that are connected stopping at currently open points. This ignores phases etc.
+     * It is purely to trace equipment that are connected in any way.
+     *
+     * @return The new traversal instance.
+     */
+    fun currentConnectedEquipmentTrace(): BasicTraversal<ConductingEquipment> = ConnectedEquipmentTrace.newCurrentConnectedEquipmentTrace()
 
     /**
      * Creates a new phase based trace ignoring the state of open phases
@@ -167,12 +182,5 @@ object Tracing {
      */
     @JvmStatic
     fun findWithUsagePoints(): FindWithUsagePoints = FindWithUsagePoints()
-
-    @JvmStatic
-    private fun conductingEquipmentQueueNext(conductingEquipment: ConductingEquipment, traversal: BasicTraversal<ConductingEquipment>) {
-        NetworkService.connectedEquipment(conductingEquipment)
-            .mapNotNull { it.to }
-            .forEach { traversal.queue.add(it) }
-    }
 
 }

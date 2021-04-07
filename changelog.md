@@ -4,7 +4,7 @@
  None.
 
 ##### New Features
-* None.
+* Added normal and current version of the connected equipment trace. See `Tracing` for details.
 
 ##### Enhancements
 * None.

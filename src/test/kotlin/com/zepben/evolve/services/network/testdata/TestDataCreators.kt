@@ -44,7 +44,13 @@ fun createNodeForConnecting(network: NetworkService, id: String, numTerminals: I
         network.add(this)
     }
 
-fun createSwitchForConnecting(network: NetworkService, id: String, numTerminals: Int, nominalPhases: PhaseCode, vararg openStatus: Boolean): Breaker =
+fun createSwitchForConnecting(
+    network: NetworkService,
+    id: String,
+    numTerminals: Int,
+    nominalPhases: PhaseCode = PhaseCode.ABCN,
+    vararg openStatus: Boolean
+): Breaker =
     Breaker(id).apply {
         name = "test name"
         createTerminals(network, this, numTerminals, nominalPhases)

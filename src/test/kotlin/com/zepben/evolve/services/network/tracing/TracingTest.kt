@@ -19,13 +19,14 @@ import com.zepben.evolve.services.network.tracing.phases.RemovePhases
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.jupiter.api.Test
 import java.util.function.Supplier
 
 class TracingTest {
+
     // Just trace all connected assets and make sure we actually visit every item.
     @Test
     internal fun basicAssetTrace() {
@@ -40,10 +41,12 @@ class TracingTest {
 
     @Test
     internal fun coverage() {
-        validate<BasicTraversal<Any>>({ Tracing.createBasicDepthTrace { _, _ -> } }, BasicTraversal::class.java)
-        validate<BasicTraversal<Any>>({ Tracing.createBasicBreadthTrace { _, _ -> } }, BasicTraversal::class.java)
+        validate({ Tracing.createBasicDepthTrace { _: Any, _ -> } }, BasicTraversal::class.java)
+        validate({ Tracing.createBasicBreadthTrace { _: Any, _ -> } }, BasicTraversal::class.java)
         validate({ Tracing.connectedEquipmentTrace() }, BasicTraversal::class.java)
         validate({ Tracing.connectedEquipmentBreadthTrace() }, BasicTraversal::class.java)
+        validate({ Tracing.normalConnectedEquipmentTrace() }, BasicTraversal::class.java)
+        validate({ Tracing.currentConnectedEquipmentTrace() }, BasicTraversal::class.java)
         validate({ Tracing.phaseTrace() }, BasicTraversal::class.java)
         validate({ Tracing.normalPhaseTrace() }, BasicTraversal::class.java)
         validate({ Tracing.currentPhaseTrace() }, BasicTraversal::class.java)
@@ -75,7 +78,8 @@ class TracingTest {
     }
 
     private fun <T> validate(supplier: Supplier<T>, expectedClass: Class<*>) {
-        MatcherAssert.assertThat("has the correct class type", supplier.get(), Matchers.instanceOf(expectedClass))
-        MatcherAssert.assertThat("returns a new instance", supplier.get(), Matchers.not(Matchers.equalTo(supplier.get())))
+        assertThat("has the correct class type", supplier.get(), instanceOf(expectedClass))
+        assertThat("returns a new instance", supplier.get(), not(equalTo(supplier.get())))
     }
+
 }

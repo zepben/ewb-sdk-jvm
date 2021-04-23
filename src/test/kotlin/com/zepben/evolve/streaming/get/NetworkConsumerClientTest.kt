@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.streaming.get
 
+import com.nhaarman.mockitokotlin2.*
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
@@ -14,6 +15,8 @@ import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
@@ -31,12 +34,9 @@ import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.*
 
 internal class NetworkConsumerClientTest {
 
@@ -44,10 +44,10 @@ internal class NetworkConsumerClientTest {
     @RegisterExtension
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
-    private val stub = mock(NetworkConsumerGrpc.NetworkConsumerBlockingStub::class.java)
+    private val stub = mock<NetworkConsumerGrpc.NetworkConsumerBlockingStub>()
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val consumerClient: NetworkConsumerClient = NetworkConsumerClient(stub).apply { addErrorHandler(onErrorHandler) }
-    private val service: NetworkService = NetworkService()
+    private val consumerClient = spy(NetworkConsumerClient(stub).apply { addErrorHandler(onErrorHandler) })
+    private val service = NetworkService()
 
     @Test
     internal fun `can get all supported types`() {
@@ -207,7 +207,7 @@ internal class NetworkConsumerClientTest {
         configureFeederResponses(expectedService)
 
         val mRID = "f001"
-        val result = consumerClient.getFeeder(service, mRID)
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, mRID)
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(3)).getIdentifiedObjects(any())
@@ -215,13 +215,10 @@ internal class NetworkConsumerClientTest {
         assertThat(result.wasSuccessful, equalTo(true))
         assertThat(result.value.objects.containsKey(mRID), equalTo(true))
         assertThat(result.value.objects.size, equalTo(21))
-        result.value.objects.values.forEach {
-            assertThat(service[it.mRID], equalTo(it))
-        }
-        service.sequenceOf<IdentifiedObject>().forEach {
-            assertThat(result.value.objects[it.mRID], equalTo(it))
-        }
-        assertThat(result.value.failed.size, equalTo(0))
+
+        result.value.objects.values.forEach { assertThat(service[it.mRID], equalTo(it)) }
+        service.sequenceOf<IdentifiedObject>().forEach { assertThat(result.value.objects[it.mRID], equalTo(it)) }
+        assertThat(result.value.failed, empty())
 
         val actualFeeder: Feeder = service[mRID]!!
         val expectedFeeder: Feeder = expectedService[mRID]!!
@@ -234,7 +231,7 @@ internal class NetworkConsumerClientTest {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService)
 
-        val result = consumerClient.getFeeder(service, "f002")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f002")
 
         verify(stub, times(1)).getIdentifiedObjects(any())
 
@@ -249,7 +246,7 @@ internal class NetworkConsumerClientTest {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validFeeder = false)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getIdentifiedObjects(any())
         validateNestedFailure(result, "validFeeder", true)
@@ -262,7 +259,7 @@ internal class NetworkConsumerClientTest {
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getIdentifiedObjects(any())
         validateNestedFailure(result, "validFeeder", false)
@@ -273,7 +270,7 @@ internal class NetworkConsumerClientTest {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validEquipment = false)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(1)).getIdentifiedObjects(any())
@@ -287,7 +284,7 @@ internal class NetworkConsumerClientTest {
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(1)).getIdentifiedObjects(any())
@@ -300,7 +297,7 @@ internal class NetworkConsumerClientTest {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validSubstation = false)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(2)).getIdentifiedObjects(any())
@@ -314,7 +311,7 @@ internal class NetworkConsumerClientTest {
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(2)).getIdentifiedObjects(any())
@@ -326,7 +323,7 @@ internal class NetworkConsumerClientTest {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validConnectivityNode = false)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
         validateNestedFailure(result, "validConnectivityNode", true)
@@ -339,7 +336,7 @@ internal class NetworkConsumerClientTest {
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(3)).getIdentifiedObjects(any())
         validateNestedFailure(result, "validConnectivityNode", false)
@@ -350,7 +347,7 @@ internal class NetworkConsumerClientTest {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validLocation = false)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(2)).getIdentifiedObjects(any())
@@ -364,7 +361,7 @@ internal class NetworkConsumerClientTest {
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(2)).getIdentifiedObjects(any())
@@ -376,7 +373,7 @@ internal class NetworkConsumerClientTest {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validWireInfo = false)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(2)).getIdentifiedObjects(any())
@@ -390,7 +387,7 @@ internal class NetworkConsumerClientTest {
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(2)).getIdentifiedObjects(any())
@@ -402,7 +399,7 @@ internal class NetworkConsumerClientTest {
         val expectedService = FeederNetwork.create()
         configureFeederResponses(expectedService, validPerLengthSequenceInformation = false)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(2)).getIdentifiedObjects(any())
@@ -416,7 +413,7 @@ internal class NetworkConsumerClientTest {
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getFeeder(service, "f001")
+        val result = consumerClient.getEquipmentContainer<Feeder>(service, "f001")
 
         verify(stub, times(1)).getEquipmentForContainer(any())
         verify(stub, times(2)).getIdentifiedObjects(any())
@@ -435,7 +432,7 @@ internal class NetworkConsumerClientTest {
         assertThat(result.wasSuccessful, equalTo(true))
         assertThat(result.value.objects.size, equalTo(1))
         assertThat(result.value.objects["id1"], instanceOf(AcLineSegment::class.java))
-        assertThat(result.value.failed, Matchers.contains("id1"))
+        assertThat(result.value.failed, contains("id1"))
 
         verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(listOf("id1")).build())
         clearInvocations(stub)
@@ -518,6 +515,50 @@ internal class NetworkConsumerClientTest {
         expectedService.get<ConnectivityNode>("cn1")!!.terminals.forEach {
             assertThat(ns[it.mRID], notNullValue())
         }
+    }
+
+    @Test
+    internal fun `direct object variant coverage`() {
+        val ns = NetworkService()
+        val expectedResult = mock<GrpcResult<MultiObjectResult>>()
+
+        val feeder = Feeder()
+        val operationalRestriction = OperationalRestriction()
+        val connectivityNode = ConnectivityNode()
+
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(ns), eq(feeder.mRID))
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentForRestriction(eq(ns), eq(operationalRestriction.mRID))
+        doReturn(expectedResult).`when`(consumerClient).getCurrentEquipmentForFeeder(eq(ns), eq(feeder.mRID))
+        doReturn(expectedResult).`when`(consumerClient).getTerminalsForConnectivityNode(eq(ns), eq(connectivityNode.mRID))
+
+        assertThat(consumerClient.getEquipmentForContainer(ns, feeder), equalTo(expectedResult))
+        assertThat(consumerClient.getEquipmentForRestriction(ns, operationalRestriction), equalTo(expectedResult))
+        assertThat(consumerClient.getCurrentEquipmentForFeeder(ns, feeder), equalTo(expectedResult))
+        assertThat(consumerClient.getTerminalsForConnectivityNode(ns, connectivityNode), equalTo(expectedResult))
+    }
+
+    @Test
+    internal fun `can get a loop`() {
+        val expectedService = LoopNetwork.create()
+        configureLoopResponses(expectedService)
+
+        val mRID = "BTS-ZEP-BEN-BTS-CBR"
+        val expectedContainers = listOf("BTS", "ZEP", "BEN", "CBR", "BTSZEP", "ZEPBENCBR", "BTSBEN")
+
+        val result = consumerClient.getEquipmentForLoop(service, mRID)
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.value.failed, empty())
+
+        val identifiedObjectRequestCaptor = argumentCaptor<GetIdentifiedObjectsRequest>()
+        val equipmentContainerRequestCaptor = argumentCaptor<GetEquipmentForContainerRequest>()
+
+        verify(stub, atLeastOnce()).getIdentifiedObjects(identifiedObjectRequestCaptor.capture())
+        verify(stub, times(expectedContainers.size)).getEquipmentForContainer(equipmentContainerRequestCaptor.capture())
+
+        assertThat(identifiedObjectRequestCaptor.firstValue.mridsList[0], equalTo("BTS-ZEP-BEN-BTS-CBR"))
+        assertThat(equipmentContainerRequestCaptor.allValues.map { it.mrid }, containsInAnyOrder(*expectedContainers.toTypedArray()))
+
+        NetworkServiceComparator().compare(service.get<Loop>(mRID)!!, expectedService[mRID]!!)
     }
 
     private fun createResponse(
@@ -678,6 +719,20 @@ internal class NetworkConsumerClientTest {
             .getTerminalsForNode(any())
     }
 
+    private fun configureLoopResponses(expectedService: NetworkService) {
+        doAnswer { inv ->
+            val request = inv.getArgument<GetIdentifiedObjectsRequest>(0)
+            responseOf(request.mridsList.map { expectedService[it]!! })
+        }.`when`(stub)
+            .getIdentifiedObjects(any())
+
+        doAnswer {
+            val request = it.getArgument<GetEquipmentForContainerRequest>(0)
+            containerEquipmentResponseOf(expectedService.get<EquipmentContainer>(request.mrid)!!.equipment.toList())
+        }.`when`(stub)
+            .getEquipmentForContainer(any())
+    }
+
     private fun responseOf(objects: List<IdentifiedObject>): MutableIterator<GetIdentifiedObjectsResponse> {
         val responses = mutableListOf<GetIdentifiedObjectsResponse>()
         objects.forEach {
@@ -729,16 +784,11 @@ internal class NetworkConsumerClientTest {
     private fun buildNetworkIdentifiedObject(obj: IdentifiedObject, identifiedObjectBuilder: NetworkIdentifiedObject.Builder): NetworkIdentifiedObject? {
         when (obj) {
             is CableInfo -> identifiedObjectBuilder.cableInfo = obj.toPb()
-            is ConductingEquipment -> {
-                when (obj) {
-                    is AcLineSegment -> identifiedObjectBuilder.acLineSegment = obj.toPb()
-                    is Breaker -> identifiedObjectBuilder.breaker = obj.toPb()
-                    is EnergySource -> identifiedObjectBuilder.energySource = obj.toPb()
-                    is Junction -> identifiedObjectBuilder.junction = obj.toPb()
-                    is PowerTransformer -> identifiedObjectBuilder.powerTransformer = obj.toPb()
-                    else -> throw Exception("Missing class in create response: ${obj.typeNameAndMRID()}")
-                }
-            }
+            is AcLineSegment -> identifiedObjectBuilder.acLineSegment = obj.toPb()
+            is Breaker -> identifiedObjectBuilder.breaker = obj.toPb()
+            is EnergySource -> identifiedObjectBuilder.energySource = obj.toPb()
+            is Junction -> identifiedObjectBuilder.junction = obj.toPb()
+            is PowerTransformer -> identifiedObjectBuilder.powerTransformer = obj.toPb()
             is ConnectivityNode -> identifiedObjectBuilder.connectivityNode = obj.toPb()
             is EnergySourcePhase -> identifiedObjectBuilder.energySourcePhase = obj.toPb()
             is Feeder -> identifiedObjectBuilder.feeder = obj.toPb()
@@ -748,6 +798,9 @@ internal class NetworkConsumerClientTest {
             is PowerTransformerEnd -> identifiedObjectBuilder.powerTransformerEnd = obj.toPb()
             is Substation -> identifiedObjectBuilder.substation = obj.toPb()
             is Terminal -> identifiedObjectBuilder.terminal = obj.toPb()
+            is Loop -> identifiedObjectBuilder.loop = obj.toPb()
+            is Circuit -> identifiedObjectBuilder.circuit = obj.toPb()
+            is BaseVoltage -> identifiedObjectBuilder.baseVoltage = obj.toPb()
             else -> throw Exception("Missing class in create response: ${obj.typeNameAndMRID()}")
         }
 

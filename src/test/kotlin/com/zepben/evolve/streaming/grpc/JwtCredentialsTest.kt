@@ -18,6 +18,7 @@ import com.marcinziolo.kotlin.wiremock.returnsJson
 import com.zepben.testutils.auth.TOKEN
 import com.zepben.testutils.auth.TOKEN_EXPIRED
 import com.zepben.testutils.exception.ExpectException
+import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.CallCredentials
 import io.grpc.CallCredentials.MetadataApplier
 import io.grpc.Metadata
@@ -27,22 +28,32 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito.mock
 import java.net.ServerSocket
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 
-
 class JwtCredentialsTest {
 
+    @JvmField
+    @RegisterExtension
+    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+
+    @JvmField
+    @RegisterExtension
+    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+
     private val port = ServerSocket(0).use { socket -> socket.localPort }
-    private val wireMock: WireMockServer = WireMockServer(options().port(port).notifier(ConsoleNotifier(true)))
+    private lateinit var wireMock: WireMockServer
     private val address
         get() = "http://localhost:$port"
 
     @BeforeEach
     fun setUp() {
+        // wireMock is created here rather than inline above to avoid log messages escaping the mute on success.
+        wireMock = WireMockServer(options().port(port).notifier(ConsoleNotifier(true)))
         wireMock.start()
     }
 

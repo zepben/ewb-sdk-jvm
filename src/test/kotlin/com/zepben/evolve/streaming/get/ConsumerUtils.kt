@@ -29,15 +29,20 @@ object ConsumerUtils {
             .forEach(action)
     }
 
-    fun buildFromBuilder(builder: Any, mRID: String): Any {
+    fun buildFromBuilder(builder: Any, mRID: String): Any = buildFromBuilder(builder, "setMRID" to mRID)
+
+    fun buildFromBuilder(builder: Any, vararg props: Pair<String, Any>): Any = buildFromBuilder(builder, props.toMap())
+
+    fun buildFromBuilder(builder: Any, props: Map<String, Any>): Any {
         println("-> ${builder::class.java.enclosingClass.simpleName}.${builder::class.simpleName}")
-        builder::class.declaredMemberFunctions.find { it.name == "setMRID" }?.call(builder, mRID)
 
         // Add any customisations required to build the object at a bare minimum
         if (builder is TapChanger.Builder)
             builder.highStep = 1
 
-        forEachBuilder(builder) { buildFromBuilder(it, mRID) }
+        props.forEach { (name, value) -> builder::class.declaredMemberFunctions.find { it.name == name }?.call(builder, value) }
+
+        forEachBuilder(builder) { buildFromBuilder(it, props) }
 
         return builder::class.declaredMemberFunctions.single { it.name == "build" }.call(builder)!!
     }

@@ -46,14 +46,12 @@ class SwitchStateClient(
      * @param switchesToUpdate A set of switches and their states to be updated.
      * @return a GrpcResult that indicates success or failure of the remote call.
      */
-    fun setCurrentSwitchStates(switchesToUpdate: List<SwitchStateUpdate>): GrpcResult<Unit> {
-        val request = SetCurrentSwitchStatesRequest.newBuilder()
-            .addAllSwitchesToUpdate(switchesToUpdate.map { it.toPb() })
-            .build()
-
-        return tryRpc {
-            stub.setCurrentSwitchStates(request)
-        }
+    fun setCurrentSwitchStates(switchesToUpdate: List<SwitchStateUpdate>): GrpcResult<Unit> = tryRpc {
+        stub.setCurrentSwitchStates(
+            SetCurrentSwitchStatesRequest.newBuilder()
+                .addAllSwitchesToUpdate(switchesToUpdate.map { it.toPb() })
+                .build()
+        )
     }
 }
 

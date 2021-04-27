@@ -9,17 +9,15 @@ package com.zepben.evolve.streaming.get
 
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.translator.mRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.translator.NetworkProtoToCim
+import com.zepben.evolve.services.network.translator.addFromPb
 import com.zepben.evolve.services.network.translator.mRID
-import com.zepben.evolve.streaming.get.hierarchy.*
-import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchyFeeder
-import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchyGeographicalRegion
-import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchySubGeographicalRegion
-import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchySubstation
+import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchy
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.nc.*
@@ -69,10 +67,8 @@ class NetworkConsumerClient(
      * - null if an object could not be found or it was found but not added to [service] (see [BaseService.add]).
      * - A [Throwable] if an error occurred while retrieving or processing the object, in which case, [GrpcResult.wasSuccessful] will return false.
      */
-    override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject?> {
-        return tryRpc {
-            processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
-        }
+    override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject?> = tryRpc {
+        processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
     }
 
     /**
@@ -91,18 +87,28 @@ class NetworkConsumerClient(
      * - A [Throwable] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
      *   Note the warning above in this case.
      */
-    override fun getIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> {
-        return tryRpc {
-            processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
-                val results = mutableMapOf<String, IdentifiedObject>()
-                val failed = mutableSetOf<String>()
-                extracted.forEach {
-                    if (it.identifiedObject == null) failed.add(it.mRID) else results[it.identifiedObject.mRID] = it.identifiedObject
-                }
-                MultiObjectResult(results, failed)
-            }
+    override fun getIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> = tryRpc {
+        processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
+            val objects = mutableMapOf<String, IdentifiedObject>()
+            val failed = mutableSetOf<String>()
+            extracted.forEach { result -> result.identifiedObject?.let { objects[it.mRID] = it } ?: failed.add(result.mRID) }
+            MultiObjectResult(objects, failed)
         }
     }
+
+    /**
+     * Retrieve the [Equipment] for [equipmentContainer]
+     *
+     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
+     *
+     * @param equipmentContainer The [EquipmentContainer] to fetch equipment for.
+     * @return A [GrpcResult] with a result of one of the following:
+     * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
+     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - An [Exception] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
+     */
+    fun getEquipmentForContainer(service: NetworkService, equipmentContainer: EquipmentContainer): GrpcResult<MultiObjectResult> =
+        getEquipmentForContainer(service, equipmentContainer.mRID)
 
     /**
      * Retrieve the [Equipment] for the [EquipmentContainer] represented by [mRID]
@@ -119,6 +125,20 @@ class NetworkConsumerClient(
         tryRpc { handleMultiObjectRPC(service, mRID, ::processEquipmentContainer) }
 
     /**
+     * Retrieve the [Equipment] for [operationalRestriction].
+     *
+     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
+     *
+     * @param operationalRestriction The [OperationalRestriction] to fetch equipment for.
+     * @return A [GrpcResult] with a result of one of the following:
+     * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
+     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - An [Exception] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
+     */
+    fun getEquipmentForRestriction(service: NetworkService, operationalRestriction: OperationalRestriction): GrpcResult<MultiObjectResult> =
+        getEquipmentForRestriction(service, operationalRestriction.mRID)
+
+    /**
      * Retrieve the [Equipment] for the [OperationalRestriction] represented by [mRID].
      *
      * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
@@ -131,6 +151,21 @@ class NetworkConsumerClient(
      */
     fun getEquipmentForRestriction(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> =
         tryRpc { handleMultiObjectRPC(service, mRID, ::processRestriction) }
+
+    /**
+     * Retrieve the current [Equipment] for [feeder]. The current equipment is the equipment connected to the Feeder based on
+     * the current phasing and switching of the network.
+     *
+     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
+     *
+     * @param feeder The [Feeder] to fetch current equipment for.
+     * @return A [GrpcResult] with a result of one of the following:
+     * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
+     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - An [Exception] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
+     */
+    fun getCurrentEquipmentForFeeder(service: NetworkService, feeder: Feeder): GrpcResult<MultiObjectResult> =
+        getCurrentEquipmentForFeeder(service, feeder.mRID)
 
     /**
      * Retrieve the current [Equipment] for the [Feeder] represented by [mRID]. The current equipment is the equipment connected to the Feeder based on
@@ -146,6 +181,20 @@ class NetworkConsumerClient(
      */
     fun getCurrentEquipmentForFeeder(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> =
         tryRpc { handleMultiObjectRPC(service, mRID, ::processFeeder) }
+
+    /**
+     * Retrieve the [Terminal]s for [connectivityNode].
+     *
+     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
+     *
+     * @param connectivityNode The [ConnectivityNode] to fetch terminals for.
+     * @return A [GrpcResult] with a result of one of the following:
+     * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
+     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - An [Exception] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
+     */
+    fun getTerminalsForConnectivityNode(service: NetworkService, connectivityNode: ConnectivityNode): GrpcResult<MultiObjectResult> =
+        getTerminalsForConnectivityNode(service, connectivityNode.mRID)
 
     /**
      * Retrieve the [Terminal]s for the [ConnectivityNode] represented by [mRID].
@@ -166,22 +215,17 @@ class NetworkConsumerClient(
      *
      * @return A simplified version of the network hierarchy that can be used to make further in-depth requests.
      */
-    fun getNetworkHierarchy(): GrpcResult<NetworkHierarchy> {
-        return tryRpc {
-            val response = stub.getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
+    fun getNetworkHierarchy(service: NetworkService): GrpcResult<NetworkHierarchy> = tryRpc {
+        val response = stub.getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
 
-            val feeders = toMap(response.feedersList) { NetworkHierarchyFeeder(it.mrid, it.name) }
-            val substations = toMap(response.substationsList) { NetworkHierarchySubstation(it.mrid, it.name, lookup(it.feederMridsList, feeders)) }
-            val subGeographicalRegions = toMap(response.subGeographicalRegionsList) {
-                NetworkHierarchySubGeographicalRegion(it.mrid, it.name, lookup(it.substationMridsList, substations))
-            }
-            val geographicalRegions = toMap(response.geographicalRegionsList) {
-                NetworkHierarchyGeographicalRegion(it.mrid, it.name, lookup(it.subGeographicalRegionMridsList, subGeographicalRegions))
-            }
-
-            finaliseLinks(geographicalRegions, subGeographicalRegions, substations)
-            NetworkHierarchy(geographicalRegions, subGeographicalRegions, substations, feeders)
-        }
+        NetworkHierarchy(
+            toMap(response.geographicalRegionsList) { service.addFromPb(it) ?: service[it.mRID()] },
+            toMap(response.subGeographicalRegionsList) { service.addFromPb(it) ?: service[it.mRID()] },
+            toMap(response.substationsList) { service.addFromPb(it) ?: service[it.mRID()] },
+            toMap(response.feedersList) { service.addFromPb(it) ?: service[it.mRID()] },
+            toMap(response.circuitsList) { service.addFromPb(it) ?: service[it.mRID()] },
+            toMap(response.loopsList) { service.addFromPb(it) ?: service[it.mRID()] }
+        )
     }
 
     /***
@@ -193,27 +237,109 @@ class NetworkConsumerClient(
      * @return A GrpcResult of a [MultiObjectResult], containing a map keyed by mRID of all the objects retrieved as part of retrieving the [Feeder] and the
      * [Feeder] itself. If an item couldn't be added to [service], its mRID will be present in [MultiObjectResult.failed].
      */
-    fun getFeeder(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> {
-        val feederResponse = getIdentifiedObject(service, mRID)
-        val feeder = feederResponse.onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }.value
+    @Deprecated(
+        "prefer the more generic getEquipmentContainer",
+        replaceWith = ReplaceWith(
+            "this.getEquipmentContainer<Feeder>(service, mRID)",
+            "com.zepben.evolve.cim.iec61970.base.core.Feeder"
+        )
+    )
+    fun getFeeder(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> = getEquipmentContainer(service, mRID, Feeder::class.java)
 
-        if (feeder == null)
-            return GrpcResult.of(null)
-        else if (feeder !is Feeder)
-            return GrpcResult.ofError(ClassCastException("Unable to extract feeder network from ${feeder.typeNameAndMRID()}."), false)
+    /***
+     * Retrieve the equipment container network for the specified [mRID] and store the results in the [service].
+     *
+     * This is a convenience method that will fetch the container object and all of the equipment contained, along with all subsequent
+     * references. This should entail a complete connectivity model for the container, however not the connectivity between multiple containers.
+     *
+     * @return A GrpcResult of a [MultiObjectResult], containing a map keyed by mRID of all the objects retrieved. If an item couldn't be added to
+     * [service], its mRID will be present in [MultiObjectResult.failed].
+     */
+    @JvmOverloads
+    fun getEquipmentContainer(
+        service: NetworkService,
+        mRID: String,
+        expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java
+    ): GrpcResult<MultiObjectResult> = getWithReferences(service, mRID, expectedClass) { it, mor ->
+        mor.objects.putAll(getEquipmentForContainer(service, it)
+            .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
+            .value.objects
+        )
+        null
+    }
+
+    /**
+     * Retrieve the [Equipment] for the [loop]
+     *
+     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
+     *
+     * @param loop The [Loop] to fetch equipment for.
+     * @return A [GrpcResult] with a result of one of the following:
+     * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
+     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - An [Exception] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
+     */
+    fun getEquipmentForLoop(service: NetworkService, loop: Loop): GrpcResult<MultiObjectResult> =
+        getEquipmentForLoop(service, loop.mRID)
+
+    /**
+     * Retrieve the [Equipment] for the [Loop] represented by [mRID]
+     *
+     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
+     *
+     * @param mRID The mRID of the [Loop] to fetch equipment for.
+     * @return A [GrpcResult] with a result of one of the following:
+     * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
+     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - An [Exception] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
+     */
+    fun getEquipmentForLoop(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> =
+        getWithReferences(service, mRID, Loop::class.java) { loop, mor ->
+            resolveReferences(service, mor)?.let { return@getWithReferences it }
+            (loop.circuits + loop.substations + loop.energizingSubstations).forEach {
+                mor.objects.putAll(getEquipmentForContainer(service, it.mRID)
+                    .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
+                    .value.objects
+                )
+            }
+            null
+        }
+
+    /**
+     * Retrieve the [Equipment] for all [Loop]s
+     *
+     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
+     *
+     * @return A [GrpcResult] with a result of one of the following:
+     * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
+     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - An [Exception] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
+     */
+    fun getAllLoops(service: NetworkService): GrpcResult<MultiObjectResult> {
+        val response = getNetworkHierarchy(service)
+        val hierarchy = response.onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }.value
 
         val mor = MultiObjectResult()
-        mor.objects[feeder.mRID] = feeder
+        mor.objects.putAll(hierarchy.geographicalRegions)
+        mor.objects.putAll(hierarchy.subGeographicalRegions)
+        mor.objects.putAll(hierarchy.substations)
+        mor.objects.putAll(hierarchy.feeders)
+        mor.objects.putAll(hierarchy.circuits)
+        mor.objects.putAll(hierarchy.loops)
 
-        val result = getEquipmentForContainer(service, mRID).onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }
-        mor.objects.putAll(result.value.objects)
+        resolveReferences(service, mor)?.let { return it }
 
-        var res = mor
-        do {
-            val toResolve = getUnresolvedMRIDs(service, res.objects.keys)
-            res = getIdentifiedObjects(service, toResolve).onError { thrown, wasHandled -> return@getFeeder GrpcResult.ofError(thrown, wasHandled) }.value
-            mor.objects.putAll(res.objects)
-        } while (res.objects.isNotEmpty())
+        hierarchy.loops.values
+            .flatMap { it.circuits + it.substations + it.energizingSubstations }
+            .toSet()
+            .forEach {
+                mor.objects.putAll(getEquipmentForContainer(service, it.mRID)
+                    .onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }
+                    .value.objects
+                )
+            }
+
+        resolveReferences(service, mor)?.let { return it }
 
         return GrpcResult(mor)
     }
@@ -332,23 +458,9 @@ class NetworkConsumerClient(
         }
     }
 
-    private fun <T, U : NetworkHierarchyIdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U): Map<String, U> = objects
-        .map(mapper)
+    private fun <T, U : IdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> = objects
+        .mapNotNull(mapper)
         .associateBy { it.mRID }
-
-    private fun <T : NetworkHierarchyIdentifiedObject> lookup(mRIDs: Iterable<String>, lookup: Map<String, T>): Map<String, T> =
-        mRIDs.mapNotNull { mRID -> lookup[mRID] }
-            .associateBy { it.mRID }
-
-    private fun finaliseLinks(
-        geographicalRegions: Map<String, NetworkHierarchyGeographicalRegion>,
-        subGeographicalRegions: Map<String, NetworkHierarchySubGeographicalRegion>,
-        substations: Map<String, NetworkHierarchySubstation>
-    ) {
-        geographicalRegions.values.forEach { it.subGeographicalRegions.values.forEach { other -> other.geographicalRegion = it } }
-        subGeographicalRegions.values.forEach { it.substations.values.forEach { other -> other.subGeographicalRegion = it } }
-        substations.values.forEach { it.feeders.values.forEach { other -> other.substation = it } }
-    }
 
     private fun handleMultiObjectRPC(
         service: NetworkService,
@@ -366,5 +478,49 @@ class NetworkConsumerClient(
         }
     }
 
+    private inline fun <reified T : IdentifiedObject> getWithReferences(
+        service: NetworkService,
+        mRID: String,
+        expectedClass: Class<out T>,
+        getAdditional: (T, MultiObjectResult) -> GrpcResult<MultiObjectResult>?
+    ): GrpcResult<MultiObjectResult> {
+        val response = getIdentifiedObject(service, mRID)
+        val identifiedObject = response.onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }.value
 
+        if (identifiedObject == null)
+            return GrpcResult.of(null)
+        else if (identifiedObject !is T)
+            return GrpcResult.ofError(
+                ClassCastException("Unable to extract ${T::class.simpleName} network from ${identifiedObject.typeNameAndMRID()}."),
+                false
+            )
+
+        val mor = MultiObjectResult()
+        mor.objects[identifiedObject.mRID] = identifiedObject
+
+        getAdditional(expectedClass.cast(identifiedObject), mor)?.let { return@getWithReferences it }
+        resolveReferences(service, mor)?.let { return@getWithReferences it }
+
+        return GrpcResult(mor)
+    }
+
+    private fun resolveReferences(service: NetworkService, mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
+        var res = mor
+        do {
+            val toResolve = getUnresolvedMRIDs(service, res.objects.keys)
+            res = getIdentifiedObjects(service, toResolve).onError { thrown, wasHandled ->
+                return GrpcResult.ofError(
+                    thrown,
+                    wasHandled
+                )
+            }.value
+            mor.objects.putAll(res.objects)
+        } while (res.objects.isNotEmpty())
+        return null
+    }
+
+}
+
+inline fun <reified T : EquipmentContainer> NetworkConsumerClient.getEquipmentContainer(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> {
+    return getEquipmentContainer(service, mRID, T::class.java)
 }

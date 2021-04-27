@@ -63,10 +63,8 @@ class DiagramConsumerClient(
      * - null if an object could not be found or it was found but not added to [service] (see [BaseService.add]).
      * - A [Throwable] if an error occurred while retrieving or processing the object, in which case, [GrpcResult.wasSuccessful] will return false.
      */
-    override fun getIdentifiedObject(service: DiagramService, mRID: String): GrpcResult<IdentifiedObject?> {
-        return tryRpc {
-            processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
-        }
+    override fun getIdentifiedObject(service: DiagramService, mRID: String): GrpcResult<IdentifiedObject?> = tryRpc {
+        processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
     }
 
     /**
@@ -85,16 +83,14 @@ class DiagramConsumerClient(
      * - A [Throwable] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
      * Note the warning above in this case.
      */
-    override fun getIdentifiedObjects(service: DiagramService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> {
-        return tryRpc {
-            processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
-                val results = mutableMapOf<String, IdentifiedObject>()
-                val failed = mutableSetOf<String>()
-                extracted.forEach {
-                    if (it.identifiedObject == null) failed.add(it.mRID) else results[it.identifiedObject.mRID] = it.identifiedObject
-                }
-                MultiObjectResult(results, failed)
+    override fun getIdentifiedObjects(service: DiagramService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> = tryRpc {
+        processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
+            val results = mutableMapOf<String, IdentifiedObject>()
+            val failed = mutableSetOf<String>()
+            extracted.forEach {
+                if (it.identifiedObject == null) failed.add(it.mRID) else results[it.identifiedObject.mRID] = it.identifiedObject
             }
+            MultiObjectResult(results, failed)
         }
     }
 

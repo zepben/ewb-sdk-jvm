@@ -25,7 +25,6 @@ import com.zepben.evolve.streaming.get.ConsumerUtils.buildFromBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
 import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchy
-import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchyIdentifiedObject
 import com.zepben.evolve.streaming.get.testdata.*
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.evolve.streaming.grpc.GrpcResult
@@ -170,7 +169,7 @@ internal class NetworkConsumerClientTest {
     internal fun `can get network hierarchy`() {
         doReturn(NetworkHierarchyAllTypes.createResponse()).`when`(stub).getNetworkHierarchy(any())
 
-        val result = consumerClient.getNetworkHierarchy()
+        val result = consumerClient.getNetworkHierarchy(service)
 
         verify(stub).getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
         assertThat(result.wasSuccessful, equalTo(true))
@@ -182,7 +181,7 @@ internal class NetworkConsumerClientTest {
         val expectedEx = StatusRuntimeException(Status.UNAVAILABLE)
         doAnswer { throw expectedEx }.`when`(stub).getNetworkHierarchy(any())
 
-        val result = consumerClient.getNetworkHierarchy()
+        val result = consumerClient.getNetworkHierarchy(service)
 
         verify(stub).getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
         validateFailure(onErrorHandler, result, expectedEx, true)
@@ -195,7 +194,7 @@ internal class NetworkConsumerClientTest {
 
         consumerClient.removeErrorHandler(onErrorHandler)
 
-        val result = consumerClient.getNetworkHierarchy()
+        val result = consumerClient.getNetworkHierarchy(service)
 
         verify(stub).getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
         validateFailure(onErrorHandler, result, expectedEx, false)
@@ -223,7 +222,7 @@ internal class NetworkConsumerClientTest {
         val actualFeeder: Feeder = service[mRID]!!
         val expectedFeeder: Feeder = expectedService[mRID]!!
 
-        NetworkServiceComparator().compare(actualFeeder, expectedFeeder)
+        assertThat(NetworkServiceComparator().compare(actualFeeder, expectedFeeder).differences, anEmptyMap())
     }
 
     @Test
@@ -492,7 +491,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `getEquipmentForRestriction returns equipment for a given OperationalRestriction`() {
         val expectedService = OperationalRestrictionTestNetworks.create()
-        configureRestrictionResponses(expectedService)
+        configureResponses(expectedService)
 
         val ns = NetworkService()
         val result = consumerClient.getEquipmentForRestriction(ns, "or1").throwOnError()
@@ -505,7 +504,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `getTerminalsForNode returns terminals for a given ConnectivityNode`() {
         val expectedService = ConnectivityNodeNetworks.createSimpleConnectivityNode()
-        configureNodeResponses(expectedService)
+        configureResponses(expectedService)
 
         val ns = NetworkService()
         val result = consumerClient.getTerminalsForConnectivityNode(ns, "cn1").throwOnError()
@@ -540,7 +539,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `can get a loop`() {
         val expectedService = LoopNetwork.create()
-        configureLoopResponses(expectedService)
+        configureResponses(expectedService)
 
         val mRID = "BTS-ZEP-BEN-BTS-CBR"
         val expectedContainers = listOf("BTS", "ZEP", "BEN", "CBR", "BTSZEP", "ZEPBENCBR", "BTSBEN")
@@ -557,8 +556,28 @@ internal class NetworkConsumerClientTest {
 
         assertThat(identifiedObjectRequestCaptor.firstValue.mridsList[0], equalTo("BTS-ZEP-BEN-BTS-CBR"))
         assertThat(equipmentContainerRequestCaptor.allValues.map { it.mrid }, containsInAnyOrder(*expectedContainers.toTypedArray()))
+    }
 
-        NetworkServiceComparator().compare(service.get<Loop>(mRID)!!, expectedService[mRID]!!)
+    @Test
+    internal fun `can get all loops`() {
+        val expectedService = LoopNetwork.create()
+        configureResponses(expectedService)
+
+        val expectedContainers = listOf(
+            "TG", "ZTS", "BTS", "ZEP", "BEN", "CBR", "ACT",
+            "TGZTS", "TGBTS", "ZTSBTS", "BTSZEP", "BTSBEN", "ZEPBENCBR", "BTSACT", "ZTSACT"
+        )
+
+        val result = consumerClient.getAllLoops(service)
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.value.failed, empty())
+
+        val equipmentContainerRequestCaptor = argumentCaptor<GetEquipmentForContainerRequest>()
+
+        verify(stub).getNetworkHierarchy(any())
+        verify(stub, times(expectedContainers.size)).getEquipmentForContainer(equipmentContainerRequestCaptor.capture())
+
+        assertThat(equipmentContainerRequestCaptor.allValues.map { it.mrid }, containsInAnyOrder(*expectedContainers.toTypedArray()))
     }
 
     private fun createResponse(
@@ -590,45 +609,22 @@ internal class NetworkConsumerClientTest {
     private fun validateNetworkHierarchy(actual: NetworkHierarchy?, expected: NetworkHierarchy) {
         assertThat(actual, notNullValue())
 
-        validateMap(actual!!.geographicalRegions, expected.geographicalRegions) { it, other ->
-            assertThat(it.mRID, equalTo(other.mRID))
-            assertThat(it.name, equalTo(other.name))
-            assertThat(it.subGeographicalRegions.keys, equalTo(other.subGeographicalRegions.keys))
-        }
-
-        validateMap(actual.subGeographicalRegions, expected.subGeographicalRegions) { it, other ->
-            assertThat(it.mRID, equalTo(other.mRID))
-            assertThat(it.name, equalTo(other.name))
-            assertThat(it.geographicalRegion?.mRID, equalTo(other.geographicalRegion?.mRID))
-            assertThat(it.substations.keys, equalTo(other.substations.keys))
-        }
-
-        validateMap(actual.substations, expected.substations) { it, other ->
-            assertThat(it.mRID, equalTo(other.mRID))
-            assertThat(it.name, equalTo(other.name))
-            assertThat(it.subGeographicalRegion?.mRID, equalTo(other.subGeographicalRegion?.mRID))
-            assertThat(it.feeders.keys, equalTo(other.feeders.keys))
-        }
-
-        validateMap(actual.feeders, expected.feeders) { it, other ->
-            assertThat(it.mRID, equalTo(other.mRID))
-            assertThat(it.name, equalTo(other.name))
-            assertThat(it.substation?.mRID, equalTo(other.substation?.mRID))
-        }
+        validateMap(actual!!.geographicalRegions, expected.geographicalRegions)
+        validateMap(actual.subGeographicalRegions, expected.subGeographicalRegions)
+        validateMap(actual.substations, expected.substations)
+        validateMap(actual.feeders, expected.feeders)
+        validateMap(actual.circuits, expected.circuits)
+        validateMap(actual.loops, expected.loops)
     }
 
-    private fun <T : NetworkHierarchyIdentifiedObject> validateMap(
-        actualMap: Map<String, T>,
-        expectedMap: Map<String, T>,
-        comparator: (T, T) -> Unit
-    ) {
+    private fun <T : IdentifiedObject> validateMap(actualMap: Map<String, T>, expectedMap: Map<String, T>) {
         assertThat(actualMap.size, equalTo(expectedMap.size))
 
         actualMap.forEach { (mRID, it) ->
             val expected = expectedMap[mRID]
             assertThat(expected, notNullValue())
 
-            comparator(it, expected!!)
+            assertThat(NetworkServiceComparator().compare(it, expected!!).differences, anEmptyMap())
         }
     }
 
@@ -695,31 +691,21 @@ internal class NetworkConsumerClientTest {
             .getCurrentEquipmentForFeeder(any())
     }
 
-    private fun configureRestrictionResponses(expectedService: NetworkService) {
+    private fun configureResponses(expectedService: NetworkService) {
         doAnswer {
             val request = it.getArgument<GetEquipmentForRestrictionRequest>(0)
-            val objects = mutableListOf<IdentifiedObject>()
-            val or = expectedService.get<OperationalRestriction>(request.mrid)!!
-            or.equipment.forEach { equip -> objects.add(equip) }
-            restrictionEquipmentResponseOf(objects)
+            restrictionEquipmentResponseOf(expectedService.get<OperationalRestriction>(request.mrid)!!.equipment.toList())
         }
             .`when`(stub)
             .getEquipmentForRestriction(any())
-    }
 
-    private fun configureNodeResponses(expectedService: NetworkService) {
-        doAnswer {
-            val request = it.getArgument<GetTerminalsForNodeRequest>(0)
-            val objects = mutableListOf<Terminal>()
-            val cn = expectedService.get<ConnectivityNode>(request.mrid)!!
-            cn.terminals.forEach { equip -> objects.add(equip) }
-            nodeTerminalResponseOf(objects)
+        doAnswer { inv ->
+            val request = inv.getArgument<GetTerminalsForNodeRequest>(0)
+            nodeTerminalResponseOf(expectedService.get<ConnectivityNode>(request.mrid)!!.terminals.toList())
         }
             .`when`(stub)
             .getTerminalsForNode(any())
-    }
 
-    private fun configureLoopResponses(expectedService: NetworkService) {
         doAnswer { inv ->
             val request = inv.getArgument<GetIdentifiedObjectsRequest>(0)
             responseOf(request.mridsList.map { expectedService[it]!! })
@@ -731,6 +717,18 @@ internal class NetworkConsumerClientTest {
             containerEquipmentResponseOf(expectedService.get<EquipmentContainer>(request.mrid)!!.equipment.toList())
         }.`when`(stub)
             .getEquipmentForContainer(any())
+
+        doReturn(
+            networkHierarchyResponseOf(
+                expectedService.listOf(),
+                expectedService.listOf(),
+                expectedService.listOf(),
+                expectedService.listOf(),
+                expectedService.listOf(),
+                expectedService.listOf()
+            )
+        ).`when`(stub)
+            .getNetworkHierarchy(any())
     }
 
     private fun responseOf(objects: List<IdentifiedObject>): MutableIterator<GetIdentifiedObjectsResponse> {
@@ -780,6 +778,22 @@ internal class NetworkConsumerClientTest {
         }
         return responses.iterator()
     }
+
+    private fun networkHierarchyResponseOf(
+        geographicalRegions: List<GeographicalRegion>,
+        subGeographicalRegions: List<SubGeographicalRegion>,
+        substations: List<Substation>,
+        feeders: List<Feeder>,
+        circuits: List<Circuit>,
+        loops: List<Loop>
+    ): GetNetworkHierarchyResponse = GetNetworkHierarchyResponse.newBuilder()
+        .addAllGeographicalRegions(geographicalRegions.map { it.toPb() })
+        .addAllSubGeographicalRegions(subGeographicalRegions.map { it.toPb() })
+        .addAllSubstations(substations.map { it.toPb() })
+        .addAllFeeders(feeders.map { it.toPb() })
+        .addAllCircuits(circuits.map { it.toPb() })
+        .addAllLoops(loops.map { it.toPb() })
+        .build()
 
     private fun buildNetworkIdentifiedObject(obj: IdentifiedObject, identifiedObjectBuilder: NetworkIdentifiedObject.Builder): NetworkIdentifiedObject? {
         when (obj) {

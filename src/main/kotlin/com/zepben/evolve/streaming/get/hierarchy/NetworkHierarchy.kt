@@ -8,12 +8,21 @@
 
 package com.zepben.evolve.streaming.get.hierarchy
 
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.base.core.GeographicalRegion
+import com.zepben.evolve.cim.iec61970.base.core.SubGeographicalRegion
+import com.zepben.evolve.cim.iec61970.base.core.Substation
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+
 /**
  * Container for simplified network hierarchy objects
  */
 class NetworkHierarchy(
-    val geographicalRegions: Map<String, NetworkHierarchyGeographicalRegion>,
-    val subGeographicalRegions: Map<String, NetworkHierarchySubGeographicalRegion>,
-    val substations: Map<String, NetworkHierarchySubstation>,
-    val feeders: Map<String, NetworkHierarchyFeeder>
+    val geographicalRegions: Map<String, GeographicalRegion>,
+    val subGeographicalRegions: Map<String, SubGeographicalRegion>,
+    val substations: Map<String, Substation>,
+    val feeders: Map<String, Feeder>,
+    val circuits: Map<String, Circuit>,
+    val loops: Map<String, Loop>
 )

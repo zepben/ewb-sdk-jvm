@@ -15,12 +15,9 @@ import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.translator.mRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.translator.NetworkProtoToCim
+import com.zepben.evolve.services.network.translator.addFromPb
 import com.zepben.evolve.services.network.translator.mRID
-import com.zepben.evolve.streaming.get.hierarchy.*
-import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchyFeeder
-import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchyGeographicalRegion
-import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchySubGeographicalRegion
-import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchySubstation
+import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchy
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.nc.*
@@ -70,10 +67,8 @@ class NetworkConsumerClient(
      * - null if an object could not be found or it was found but not added to [service] (see [BaseService.add]).
      * - A [Throwable] if an error occurred while retrieving or processing the object, in which case, [GrpcResult.wasSuccessful] will return false.
      */
-    override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject?> {
-        return tryRpc {
-            processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
-        }
+    override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject?> = tryRpc {
+        processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
     }
 
     /**
@@ -92,14 +87,12 @@ class NetworkConsumerClient(
      * - A [Throwable] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
      *   Note the warning above in this case.
      */
-    override fun getIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> {
-        return tryRpc {
-            processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
-                val objects = mutableMapOf<String, IdentifiedObject>()
-                val failed = mutableSetOf<String>()
-                extracted.forEach { result -> result.identifiedObject?.let { objects[it.mRID] = it } ?: failed.add(result.mRID) }
-                MultiObjectResult(objects, failed)
-            }
+    override fun getIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> = tryRpc {
+        processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
+            val objects = mutableMapOf<String, IdentifiedObject>()
+            val failed = mutableSetOf<String>()
+            extracted.forEach { result -> result.identifiedObject?.let { objects[it.mRID] = it } ?: failed.add(result.mRID) }
+            MultiObjectResult(objects, failed)
         }
     }
 
@@ -222,22 +215,17 @@ class NetworkConsumerClient(
      *
      * @return A simplified version of the network hierarchy that can be used to make further in-depth requests.
      */
-    fun getNetworkHierarchy(): GrpcResult<NetworkHierarchy> {
-        return tryRpc {
-            val response = stub.getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
+    fun getNetworkHierarchy(service: NetworkService): GrpcResult<NetworkHierarchy> = tryRpc {
+        val response = stub.getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
 
-            val feeders = toMap(response.feedersList) { NetworkHierarchyFeeder(it.mrid, it.name) }
-            val substations = toMap(response.substationsList) { NetworkHierarchySubstation(it.mrid, it.name, lookup(it.feederMridsList, feeders)) }
-            val subGeographicalRegions = toMap(response.subGeographicalRegionsList) {
-                NetworkHierarchySubGeographicalRegion(it.mrid, it.name, lookup(it.substationMridsList, substations))
-            }
-            val geographicalRegions = toMap(response.geographicalRegionsList) {
-                NetworkHierarchyGeographicalRegion(it.mrid, it.name, lookup(it.subGeographicalRegionMridsList, subGeographicalRegions))
-            }
-
-            finaliseLinks(geographicalRegions, subGeographicalRegions, substations)
-            NetworkHierarchy(geographicalRegions, subGeographicalRegions, substations, feeders)
-        }
+        NetworkHierarchy(
+            toMap(response.geographicalRegionsList) { service.addFromPb(it) ?: service[it.mRID()] },
+            toMap(response.subGeographicalRegionsList) { service.addFromPb(it) ?: service[it.mRID()] },
+            toMap(response.substationsList) { service.addFromPb(it) ?: service[it.mRID()] },
+            toMap(response.feedersList) { service.addFromPb(it) ?: service[it.mRID()] },
+            toMap(response.circuitsList) { service.addFromPb(it) ?: service[it.mRID()] },
+            toMap(response.loopsList) { service.addFromPb(it) ?: service[it.mRID()] }
+        )
     }
 
     /***
@@ -308,19 +296,7 @@ class NetworkConsumerClient(
     fun getEquipmentForLoop(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> =
         getWithReferences(service, mRID, Loop::class.java) { loop, mor ->
             resolveReferences(service, mor)?.let { return@getWithReferences it }
-            loop.circuits.forEach {
-                mor.objects.putAll(getEquipmentForContainer(service, it.mRID)
-                    .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
-                    .value.objects
-                )
-            }
-            loop.substations.forEach {
-                mor.objects.putAll(getEquipmentForContainer(service, it.mRID)
-                    .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
-                    .value.objects
-                )
-            }
-            loop.energizingSubstations.forEach {
+            (loop.circuits + loop.substations + loop.energizingSubstations).forEach {
                 mor.objects.putAll(getEquipmentForContainer(service, it.mRID)
                     .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
                     .value.objects
@@ -328,6 +304,45 @@ class NetworkConsumerClient(
             }
             null
         }
+
+    /**
+     * Retrieve the [Equipment] for all [Loop]s
+     *
+     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
+     *
+     * @return A [GrpcResult] with a result of one of the following:
+     * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
+     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - An [Exception] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
+     */
+    fun getAllLoops(service: NetworkService): GrpcResult<MultiObjectResult> {
+        val response = getNetworkHierarchy(service)
+        val hierarchy = response.onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }.value
+
+        val mor = MultiObjectResult()
+        mor.objects.putAll(hierarchy.geographicalRegions)
+        mor.objects.putAll(hierarchy.subGeographicalRegions)
+        mor.objects.putAll(hierarchy.substations)
+        mor.objects.putAll(hierarchy.feeders)
+        mor.objects.putAll(hierarchy.circuits)
+        mor.objects.putAll(hierarchy.loops)
+
+        resolveReferences(service, mor)?.let { return it }
+
+        hierarchy.loops.values
+            .flatMap { it.circuits + it.substations + it.energizingSubstations }
+            .toSet()
+            .forEach {
+                mor.objects.putAll(getEquipmentForContainer(service, it.mRID)
+                    .onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }
+                    .value.objects
+                )
+            }
+
+        resolveReferences(service, mor)?.let { return it }
+
+        return GrpcResult(mor)
+    }
 
     private fun getUnresolvedMRIDs(service: NetworkService, mRIDs: Set<String>): Set<String> =
         mRIDs.flatMap { service.getUnresolvedReferencesFrom(it) }
@@ -443,23 +458,9 @@ class NetworkConsumerClient(
         }
     }
 
-    private fun <T, U : NetworkHierarchyIdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U): Map<String, U> = objects
-        .map(mapper)
+    private fun <T, U : IdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> = objects
+        .mapNotNull(mapper)
         .associateBy { it.mRID }
-
-    private fun <T : NetworkHierarchyIdentifiedObject> lookup(mRIDs: Iterable<String>, lookup: Map<String, T>): Map<String, T> =
-        mRIDs.mapNotNull { mRID -> lookup[mRID] }
-            .associateBy { it.mRID }
-
-    private fun finaliseLinks(
-        geographicalRegions: Map<String, NetworkHierarchyGeographicalRegion>,
-        subGeographicalRegions: Map<String, NetworkHierarchySubGeographicalRegion>,
-        substations: Map<String, NetworkHierarchySubstation>
-    ) {
-        geographicalRegions.values.forEach { it.subGeographicalRegions.values.forEach { other -> other.geographicalRegion = it } }
-        subGeographicalRegions.values.forEach { it.substations.values.forEach { other -> other.subGeographicalRegion = it } }
-        substations.values.forEach { it.feeders.values.forEach { other -> other.substation = it } }
-    }
 
     private fun handleMultiObjectRPC(
         service: NetworkService,

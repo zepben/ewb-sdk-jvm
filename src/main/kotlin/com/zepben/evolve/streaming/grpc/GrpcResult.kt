@@ -101,7 +101,7 @@ data class GrpcResult<T>(
          * Create a new successful [GrpcResult].
          */
         @JvmStatic
-        fun <T> of(result: T?): GrpcResult<T> {
+        fun <T> of(result: T): GrpcResult<T> {
             return GrpcResult(result, false)
         }
 

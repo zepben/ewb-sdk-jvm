@@ -35,7 +35,7 @@ internal class GrpcResultTest {
 
     @Test
     internal fun canCreateNullResult() {
-        val result: GrpcResult<Int> = GrpcResult.of(null)
+        val result: GrpcResult<Int?> = GrpcResult.of(null)
 
         assertThat(result.wasSuccessful, equalTo(true))
         assertThat(result.value, nullValue())

@@ -25,6 +25,11 @@ import io.grpc.ManagedChannel
 /**
  * Consumer client for a [CustomerService].
  *
+ * WARNING: The [MultiObjectResult] operations below are not atomic upon a [CustomerService], and thus if processing fails partway through, any previously
+ * successful additions will have been processed by the service, and thus you may have an incomplete service. Also note that adding to the service may not
+ * occur for an object if another object with the same mRID is already present in service. [MultiObjectResult.failed] can be used to check for mRIDs that
+ * were retrieved but not added to service. This should not be the case unless you are processing things concurrently.
+ *
  * @property stub The gRPC stub to be used to communicate with the server
  */
 class CustomerConsumerClient(
@@ -61,12 +66,14 @@ class CustomerConsumerClient(
      * Exceptions that occur during sending will be caught and passed to all error handlers that have been registered by [addErrorHandler].
      *
      * @return A [GrpcResult] with a result of one of the following:
-     * - The item if found
-     * - null if an object could not be found or it was found but not added to [service] (see [BaseService.add]).
-     * - A [Throwable] if an error occurred while retrieving or processing the object, in which case, [GrpcResult.wasSuccessful] will return false.
+     * - When [GrpcResult.wasSuccessful], the item found, accessible via [GrpcResult.value].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown]. One of:
+     *    - [NoSuchElementException] if the object could not be found.
+     *    - The gRPC error that occurred while retrieving the object
      */
-    override fun getIdentifiedObject(service: CustomerService, mRID: String): GrpcResult<IdentifiedObject?> = tryRpc {
+    override fun getIdentifiedObject(service: CustomerService, mRID: String): GrpcResult<IdentifiedObject> = tryRpc {
         processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
+            ?: throw NoSuchElementException("No object with mRID $mRID could be found.")
     }
 
     /**
@@ -74,26 +81,14 @@ class CustomerConsumerClient(
      *
      * Exceptions that occur during processing will be caught and passed to all error handlers that have been registered by [addErrorHandler].
      *
-     * WARNING: This operation is not atomic upon [service], and thus if processing fails partway through [mRIDs], any previously successful mRID will have been
-     * added to the service, and thus you may have an incomplete [CustomerService]. Also note that adding to the [service] may not occur for an object if another
-     * object with the same mRID is already present in [service]. [MultiObjectResult.failed] can be used to check for mRIDs that were retrieved but not
-     * added to [service].
-     *
      * @return A [GrpcResult] with a result of one of the following:
-     * - A [MultiObjectResult] containing a map of the retrieved objects keyed by mRID. If an item is not found it will be excluded from the map.
-     *   If an item couldn't be added to [service] its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - A [Throwable] if an error occurred while retrieving or processing the objects, in which case, [GrpcResult.wasSuccessful] will return false.
-     * Note the warning above in this case.
+     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * Note the [CustomerConsumerClient] warning in this case.
      */
     override fun getIdentifiedObjects(service: CustomerService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> = tryRpc {
-        processIdentifiedObjects(service, mRIDs.toSet()).let { extracted ->
-            val results = mutableMapOf<String, IdentifiedObject>()
-            val failed = mutableSetOf<String>()
-            extracted.forEach {
-                if (it.identifiedObject == null) failed.add(it.mRID) else results[it.identifiedObject.mRID] = it.identifiedObject
-            }
-            MultiObjectResult(results, failed)
-        }
+        processExtractResults(mRIDs, processIdentifiedObjects(service, mRIDs.toSet()))
     }
 
     private fun processIdentifiedObjects(service: CustomerService, mRIDs: Set<String>): Sequence<ExtractResult> {
@@ -111,15 +106,22 @@ class CustomerConsumerClient(
             } + existing
     }
 
-    private fun extractIdentifiedObject(service: CustomerService, it: CustomerIdentifiedObject): ExtractResult {
-        return when (it.identifiedObjectCase) {
-            ORGANISATION -> ExtractResult(protoToCimProvider(service).addFromPb(it.organisation), it.organisation.mRID())
-            CUSTOMER -> ExtractResult(protoToCimProvider(service).addFromPb(it.customer), it.customer.mRID())
-            CUSTOMERAGREEMENT -> ExtractResult(protoToCimProvider(service).addFromPb(it.customerAgreement), it.customerAgreement.mRID())
-            PRICINGSTRUCTURE -> ExtractResult(protoToCimProvider(service).addFromPb(it.pricingStructure), it.pricingStructure.mRID())
-            TARIFF -> ExtractResult(protoToCimProvider(service).addFromPb(it.tariff), it.tariff.mRID())
-            OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${it.identifiedObjectCase} is not supported by the customer service")
+    private fun extractIdentifiedObject(service: CustomerService, io: CustomerIdentifiedObject): ExtractResult {
+        return when (io.identifiedObjectCase) {
+            ORGANISATION -> extractResult(service, io.organisation.mRID()) { it.addFromPb(io.organisation) }
+            CUSTOMER -> extractResult(service, io.customer.mRID()) { it.addFromPb(io.customer) }
+            CUSTOMERAGREEMENT -> extractResult(service, io.customerAgreement.mRID()) { it.addFromPb(io.customerAgreement) }
+            PRICINGSTRUCTURE -> extractResult(service, io.pricingStructure.mRID()) { it.addFromPb(io.pricingStructure) }
+            TARIFF -> extractResult(service, io.tariff.mRID()) { it.addFromPb(io.tariff) }
+            OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException("Identified object type ${io.identifiedObjectCase} is not supported by the customer service")
         }
     }
+
+    private inline fun <reified CIM : IdentifiedObject> extractResult(
+        service: CustomerService,
+        mRID: String,
+        addFromPb: (CustomerProtoToCim) -> CIM?
+    ): ExtractResult =
+        ExtractResult(service[mRID] ?: addFromPb(protoToCimProvider(service)), mRID)
 
 }

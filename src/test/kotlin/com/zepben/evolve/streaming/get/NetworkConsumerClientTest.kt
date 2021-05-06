@@ -29,6 +29,7 @@ import com.zepben.evolve.streaming.get.testdata.*
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.nc.*
+import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -64,7 +65,7 @@ internal class NetworkConsumerClientTest {
             val type = response.identifiedObject.identifiedObjectCase
             if (isSupported(type)) {
                 assertThat(result.wasSuccessful, equalTo(true))
-                assertThat(result.value?.mRID, equalTo(mRID))
+                assertThat(result.value.mRID, equalTo(mRID))
             } else {
                 assertThat(result.wasFailure, equalTo(true))
                 assertThat(result.thrown, instanceOf(UnsupportedOperationException::class.java))
@@ -78,6 +79,20 @@ internal class NetworkConsumerClientTest {
             verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
             clearInvocations(stub)
         }
+    }
+
+    @Test
+    internal fun `returns error when object is not found`() {
+        val mRID = "unknown"
+        doReturn(listOf<GetIdentifiedObjectsResponse>().iterator()).`when`(stub).getIdentifiedObjects(any())
+
+        val result = consumerClient.getIdentifiedObject(service, mRID)
+
+        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
+        assertThat(result.wasFailure, equalTo(true))
+        expect { throw result.thrown }
+            .toThrow(NoSuchElementException::class.java)
+            .withMessage("No object with mRID $mRID could be found.")
     }
 
     @Test
@@ -234,8 +249,10 @@ internal class NetworkConsumerClientTest {
 
         verify(stub, times(1)).getIdentifiedObjects(any())
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value, nullValue())
+        assertThat(result.wasSuccessful, equalTo(false))
+        expect { throw result.thrown }
+            .toThrow(NoSuchElementException::class.java)
+            .withMessage("No object with mRID f002 could be found.")
 
         validateFeederNetwork(service, NetworkService())
     }
@@ -420,20 +437,20 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
-    internal fun `getIdentifiedObjects returns failed mRID when duplicate mRIDs are returned`() {
-        val response = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, "id1")
+    internal fun `getIdentifiedObjects returns failed mRID when an mRID is not found`() {
+        val mRIDs = listOf("id1", "id2")
+        val response = createResponse(NetworkIdentifiedObject.newBuilder(), NetworkIdentifiedObject.Builder::getAcLineSegmentBuilder, mRIDs[0])
 
-        // We are only testing behaviour of duplicate responses when adding to the service.
-        doReturn(listOf(response, response).iterator()).`when`(stub).getIdentifiedObjects(any())
+        doReturn(listOf(response).iterator()).`when`(stub).getIdentifiedObjects(any())
 
-        val result = consumerClient.getIdentifiedObjects(service, setOf("id1"))
+        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         assertThat(result.wasSuccessful, equalTo(true))
         assertThat(result.value.objects.size, equalTo(1))
         assertThat(result.value.objects["id1"], instanceOf(AcLineSegment::class.java))
-        assertThat(result.value.failed, contains("id1"))
+        assertThat(result.value.failed, containsInAnyOrder(mRIDs[1]))
 
-        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(listOf("id1")).build())
+        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
         clearInvocations(stub)
     }
 
@@ -578,6 +595,19 @@ internal class NetworkConsumerClientTest {
         verify(stub, times(expectedContainers.size)).getEquipmentForContainer(equipmentContainerRequestCaptor.capture())
 
         assertThat(equipmentContainerRequestCaptor.allValues.map { it.mrid }, containsInAnyOrder(*expectedContainers.toTypedArray()))
+    }
+
+    @Test
+    internal fun `get equipment container validates type`() {
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService)
+
+        val result = consumerClient.getEquipmentContainer<Circuit>(service, "f001")
+
+        assertThat(result.wasSuccessful, equalTo(false))
+        expect { throw result.thrown }
+            .toThrow(ClassCastException::class.java)
+            .withMessage("Unable to extract Circuit network from ${expectedService.get<Feeder>("f001")?.typeNameAndMRID()}.")
     }
 
     private fun createResponse(

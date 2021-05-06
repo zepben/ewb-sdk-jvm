@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.streaming.get
 
+import com.nhaarman.mockitokotlin2.*
 import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.services.customer.CustomerService
@@ -18,16 +19,14 @@ import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.cc.CustomerIdentifiedObject
 import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.cc.GetIdentifiedObjectsResponse
+import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.*
 
 internal class CustomerConsumerClientTest {
 
@@ -35,10 +34,9 @@ internal class CustomerConsumerClientTest {
     @RegisterExtension
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
-    private val stub = mock(CustomerConsumerGrpc.CustomerConsumerBlockingStub::class.java)
+    private val stub = mock<CustomerConsumerGrpc.CustomerConsumerBlockingStub>()
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val consumerClient: CustomerConsumerClient =
-        CustomerConsumerClient(stub).apply { addErrorHandler(onErrorHandler) }
+    private val consumerClient: CustomerConsumerClient = CustomerConsumerClient(stub).apply { addErrorHandler(onErrorHandler) }
     private val service: CustomerService = CustomerService()
 
     @Test
@@ -57,7 +55,7 @@ internal class CustomerConsumerClientTest {
             val type = response.identifiedObjectsList[0].identifiedObjectCase
             if (isSupported(type)) {
                 assertThat(result.wasSuccessful, equalTo(true))
-                assertThat(result.value?.mRID, equalTo(mRID))
+                assertThat(result.value.mRID, equalTo(mRID))
             } else {
                 assertThat(result.wasFailure, equalTo(true))
                 assertThat(result.thrown, instanceOf(UnsupportedOperationException::class.java))
@@ -71,6 +69,20 @@ internal class CustomerConsumerClientTest {
             verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
             clearInvocations(stub)
         }
+    }
+
+    @Test
+    internal fun `returns error when object is not found`() {
+        val mRID = "unknown"
+        doReturn(listOf<GetIdentifiedObjectsResponse>().iterator()).`when`(stub).getIdentifiedObjects(any())
+
+        val result = consumerClient.getIdentifiedObject(service, mRID)
+
+        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build())
+        assertThat(result.wasFailure, equalTo(true))
+        expect { throw result.thrown }
+            .toThrow(NoSuchElementException::class.java)
+            .withMessage("No object with mRID $mRID could be found.")
     }
 
     @Test
@@ -159,20 +171,20 @@ internal class CustomerConsumerClientTest {
     }
 
     @Test
-    internal fun `getIdentifiedObjects returns failed mRID when duplicate mRIDs are returned`() {
-        val response = createResponse(CustomerIdentifiedObject.newBuilder(), CustomerIdentifiedObject.Builder::getCustomerBuilder, "id1")
+    internal fun `getIdentifiedObjects returns failed mRID when an mRID is not found`() {
+        val mRIDs = listOf("id1", "id2")
+        val response = createResponse(CustomerIdentifiedObject.newBuilder(), CustomerIdentifiedObject.Builder::getCustomerBuilder, mRIDs[0])
 
-        // We are only testing behaviour of duplicate responses when adding to the service.
-        doReturn(listOf(response, response).iterator()).`when`(stub).getIdentifiedObjects(any())
+        doReturn(listOf(response).iterator()).`when`(stub).getIdentifiedObjects(any())
 
-        val result = consumerClient.getIdentifiedObjects(service, setOf("id1"))
+        val result = consumerClient.getIdentifiedObjects(service, mRIDs)
 
         assertThat(result.wasSuccessful, equalTo(true))
         assertThat(result.value.objects.size, equalTo(1))
         assertThat(result.value.objects["id1"], instanceOf(Customer::class.java))
-        assertThat(result.value.failed, Matchers.contains("id1"))
+        assertThat(result.value.failed, containsInAnyOrder(mRIDs[1]))
 
-        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(listOf("id1")).build())
+        verify(stub).getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build())
         clearInvocations(stub)
     }
 

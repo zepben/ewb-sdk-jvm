@@ -29,8 +29,10 @@ jobs:
           key: maven
 
       - name: Maven build and test
+        id: build
         run: mvn clean test -P '!zepben-maven' -f pom.xml
         shell: bash
 
       - name: Upload coverage to Codecov
+        if: steps.build.outcome == 'success'
         uses: codecov/codecov-action@v1

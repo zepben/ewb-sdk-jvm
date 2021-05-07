@@ -1,6 +1,9 @@
+[![codecov](https://codecov.io/gh/zepben/evolve-sdk-jvm/branch/main/graph/badge.svg?token=WJKHSV0GS4)](https://codecov.io/gh/zepben/evolve-sdk-jvm)
+
 # Evolve SDK #
 
-The Evolve SDK contains everything necessary to communicate with a [Zepben EWB Server](https://github.com/zepben/energy-workbench-server). See the complete [Evolve JVM SDK Documentation](https://zepben.github.io/evolve/docs/jvm-sdk/) for more details.
+The Evolve SDK contains everything necessary to communicate with a [Zepben EWB Server](https://github.com/zepben/energy-workbench-server). See the
+complete [Evolve JVM SDK Documentation](https://zepben.github.io/evolve/docs/jvm-sdk/) for more details.
 
 ## Requirements ##
 
@@ -33,9 +36,9 @@ To build:
    1. Add schema tests - `DatabaseSqliteTest.kt`
 1. Reference resolver(s) added (if new associations).
 1. Protobuf/gRPC
-    1. *CimToProto(s) updated and tested.
-    1. *ProtoToCim(s) updated and tested.
-   
+   1. *CimToProto(s) updated and tested.
+   1. *ProtoToCim(s) updated and tested.
+
 NOTE: Do not update the CimPbTest or the StupidlyLargeNetwork files, these will be phased out.
 1. *ServiceComparator(s) updated and tested.
 1. Exhaustive when functions in *ServiceUtils updated if a new class is added.

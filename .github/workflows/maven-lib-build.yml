@@ -31,3 +31,6 @@ jobs:
       - name: Maven build and test
         run: mvn clean test -P '!zepben-maven' -f pom.xml
         shell: bash
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1

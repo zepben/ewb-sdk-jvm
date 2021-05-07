@@ -55,15 +55,19 @@ jobs:
           GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
         continue-on-error: true
 
+      - name: Upload coverage to Codecov
+        if: steps.build.outcome == 'success'
+        uses: codecov/codecov-action@v1
+
       - uses: actions/upload-artifact@master
         if: steps.build.outcome == 'success'
         with:
           name: ${{ steps.build.outputs.artifact }}
           path: ${{ steps.build.outputs.artifact-path }}
-      
+
       - name: Fail build
         if: steps.build.outcome == 'failure'
-        run: | 
+        run: |
           git push origin -d release
           echo "There was an error in the mvn deploy command above."
           exit 1

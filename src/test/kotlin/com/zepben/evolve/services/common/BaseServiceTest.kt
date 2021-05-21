@@ -63,6 +63,12 @@ internal class BaseServiceTest {
     }
 
     @Test
+    fun supportedTypesCollectionMatch() {
+        assertThat(service.supportedClasses, containsInAnyOrder(*service.supportedKClasses.map { it.java }.toTypedArray()))
+    }
+
+
+    @Test
     internal fun tryFunctions() {
         val junction = Junction()
         assertThat(service.tryAdd(junction), equalTo(true))
@@ -167,20 +173,13 @@ internal class BaseServiceTest {
         assertThat(service.add(terminal), equalTo(true))
         assertThat(service.resolveOrDeferReference(Resolvers.conductingEquipment(terminal), "j1"), equalTo(false))
 
-        assertThat(
-            service.unresolvedReferences().toList(),
-            equalTo(
-                listOf(
-                    UnresolvedReference(
-                        terminal,
-                        "j1",
-                        Resolvers.conductingEquipment(terminal).resolver,
-                        Resolvers.conductingEquipment(terminal).reverseResolver
-                    )
-                )
-            )
-        )
+        val resolver = Resolvers.conductingEquipment(terminal)
+        val unresolvedReference = UnresolvedReference(terminal, "j1", resolver.resolver, resolver.reverseResolver)
+
+        assertThat(service.unresolvedReferences().toList(), contains(unresolvedReference))
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.conductingEquipment(terminal)), contains("j1"))
+        assertThat(service.getUnresolvedReferencesFrom(terminal.mRID).toList(), contains(unresolvedReference))
+        assertThat(service.getUnresolvedReferencesTo("j1").toList(), contains(unresolvedReference))
 
         val junction = Junction("j1")
         assertThat(service.resolveOrDeferReference(Resolvers.terminals(junction), terminal.mRID), equalTo(true))
@@ -188,6 +187,8 @@ internal class BaseServiceTest {
         assertThat(service.unresolvedReferences().toList(), empty())
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.conductingEquipment(terminal)), empty())
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.terminals(junction)), empty())
+        assertThat(service.getUnresolvedReferencesFrom(terminal.mRID).toList(), empty())
+        assertThat(service.getUnresolvedReferencesTo("j1").toList(), empty())
 
         assertThat(terminal.conductingEquipment, equalTo(junction))
         assertThat(junction.getTerminal(terminal.mRID), equalTo(terminal))

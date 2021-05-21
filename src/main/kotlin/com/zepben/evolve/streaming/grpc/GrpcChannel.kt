@@ -19,6 +19,8 @@ class GrpcChannel(val channel: Channel) : AutoCloseable {
             if (!channel.isShutdown)
                 channel.shutdown()
             channel.awaitTermination(100, TimeUnit.MILLISECONDS)
+            if (!channel.isTerminated)
+                channel.shutdownNow()
         }
     }
 }

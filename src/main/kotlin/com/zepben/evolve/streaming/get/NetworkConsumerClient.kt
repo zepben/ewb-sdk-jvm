@@ -9,6 +9,7 @@ package com.zepben.evolve.streaming.get
 
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
@@ -23,6 +24,8 @@ import com.zepben.protobuf.nc.*
 import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import io.grpc.CallCredentials
 import io.grpc.ManagedChannel
+import java.io.IOException
+import java.util.concurrent.Executors
 
 /**
  * Consumer client for a [NetworkService].
@@ -33,64 +36,38 @@ import io.grpc.ManagedChannel
  * were retrieved but not added to service. This should not be the case unless you are processing things concurrently.
  *
  * @property stub The gRPC stub to be used to communicate with the server
+ * @property service The [NetworkService] to store fetched objects in.
  */
 class NetworkConsumerClient(
-    private val stub: NetworkConsumerGrpc.NetworkConsumerBlockingStub,
-    private val protoToCimProvider: (NetworkService) -> NetworkProtoToCim = { NetworkProtoToCim(it) },
-) : CimConsumerClient<NetworkService>() {
+    private val stub: NetworkConsumerGrpc.NetworkConsumerStub,
+    override val service: NetworkService = NetworkService(),
+    override val protoToCim: NetworkProtoToCim = NetworkProtoToCim(service)
+) : CimConsumerClient<NetworkService, NetworkProtoToCim>() {
+
+    private var networkHierarchy: NetworkHierarchy? = null
+    private val networkHierarchyContainerClasses: Set<Class<out EquipmentContainer>> = setOf(Feeder::class.java, Substation::class.java, Circuit::class.java)
 
     /**
      * Create a [NetworkConsumerClient]
      *
-     * @param channel [ManagedChannel] to build a blocking stub from.
+     * @param channel [ManagedChannel] to build a stub from.
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
     constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
-        this(callCredentials?.let { NetworkConsumerGrpc.newBlockingStub(channel).withCallCredentials(callCredentials) }
-            ?: NetworkConsumerGrpc.newBlockingStub(channel))
+        this(NetworkConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor())
+            .apply { callCredentials?.let { withCallCredentials(it) } })
 
     /**
      * Create a [NetworkConsumerClient]
      *
-     * @param channel [GrpcChannel] to build a blocking stub from.
+     * @param channel [GrpcChannel] to build a stub from.
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
     constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
-        this(callCredentials?.let { NetworkConsumerGrpc.newBlockingStub(channel.channel).withCallCredentials(callCredentials) }
-            ?: NetworkConsumerGrpc.newBlockingStub(channel.channel))
-
-    /**
-     * Retrieve the object with the given [mRID] and store the result in the [service].
-     *
-     * Exceptions that occur during sending will be caught and passed to all error handlers that have been registered by [addErrorHandler].
-     *
-     * @return A [GrpcResult] with a result of one of the following:
-     * - When [GrpcResult.wasSuccessful], the item found, accessible via [GrpcResult.value].
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown]. One of:
-     *    - [NoSuchElementException] if the object could not be found.
-     *    - The gRPC error that occurred while retrieving the object
-     */
-    override fun getIdentifiedObject(service: NetworkService, mRID: String): GrpcResult<IdentifiedObject> = tryRpc {
-        processIdentifiedObjects(service, setOf(mRID)).firstOrNull()?.identifiedObject
-            ?: throw NoSuchElementException("No object with mRID $mRID could be found.")
-    }
-
-    /**
-     * Retrieve the objects with the given [mRIDs] and store the results in the [service].
-     *
-     * Exceptions that occur during processing will be caught and passed to all error handlers that have been registered by [addErrorHandler].
-     *
-     * @return A [GrpcResult] with a result of one of the following:
-     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
-     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
-     * Note the [NetworkConsumerClient] warning in this case.
-     */
-    override fun getIdentifiedObjects(service: NetworkService, mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> = tryRpc {
-        processExtractResults(mRIDs, processIdentifiedObjects(service, mRIDs.toSet()))
-    }
+        this(NetworkConsumerGrpc.newStub(channel.channel).withExecutor(Executors.newSingleThreadExecutor())
+            .apply { callCredentials?.let { withCallCredentials(it) } })
 
     /**
      * Retrieve the [Equipment] for [equipmentContainer]
@@ -98,14 +75,15 @@ class NetworkConsumerClient(
      * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
      *
      * @param equipmentContainer The [EquipmentContainer] to fetch equipment for.
+     *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForContainer(service: NetworkService, equipmentContainer: EquipmentContainer): GrpcResult<MultiObjectResult> =
-        getEquipmentForContainer(service, equipmentContainer.mRID)
+    fun getEquipmentForContainer(equipmentContainer: EquipmentContainer): GrpcResult<MultiObjectResult> =
+        getEquipmentForContainer(equipmentContainer.mRID)
 
     /**
      * Retrieve the [Equipment] for the [EquipmentContainer] represented by [mRID]
@@ -113,14 +91,45 @@ class NetworkConsumerClient(
      * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
      *
      * @param mRID The mRID of the [EquipmentContainer] to fetch equipment for.
+     *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForContainer(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> =
-        tryRpc { handleMultiObjectRPC(service, mRID, ::processEquipmentContainer) }
+    fun getEquipmentForContainer(mRID: String): GrpcResult<MultiObjectResult> =
+        getEquipmentForContainers(sequenceOf(mRID))
+
+    /**
+     * Retrieve the [Equipment] for all [EquipmentContainer]s represented by [mRIDs]
+     *
+     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
+     *
+     * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch equipment for.
+     *
+     * @return A [GrpcResult] with a result of one of the following:
+     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * Note the [NetworkConsumerClient] warning in this case.
+     */
+    fun getEquipmentForContainers(mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> = getEquipmentForContainers(mRIDs.asSequence())
+
+    /**
+     * Retrieve the [Equipment] for all [EquipmentContainer]s represented by [mRIDs]
+     *
+     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
+     *
+     * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch equipment for.
+     *
+     * @return A [GrpcResult] with a result of one of the following:
+     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * Note the [NetworkConsumerClient] warning in this case.
+     */
+    fun getEquipmentForContainers(mRIDs: Sequence<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC { processEquipmentForContainers(mRIDs) }
 
     /**
      * Retrieve the [Equipment] for [operationalRestriction].
@@ -134,8 +143,8 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForRestriction(service: NetworkService, operationalRestriction: OperationalRestriction): GrpcResult<MultiObjectResult> =
-        getEquipmentForRestriction(service, operationalRestriction.mRID)
+    fun getEquipmentForRestriction(operationalRestriction: OperationalRestriction): GrpcResult<MultiObjectResult> =
+        getEquipmentForRestriction(operationalRestriction.mRID)
 
     /**
      * Retrieve the [Equipment] for the [OperationalRestriction] represented by [mRID].
@@ -149,8 +158,8 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForRestriction(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> =
-        tryRpc { handleMultiObjectRPC(service, mRID, ::processRestriction) }
+    fun getEquipmentForRestriction(mRID: String): GrpcResult<MultiObjectResult> =
+        handleMultiObjectRPC { processRestriction(mRID) }
 
     /**
      * Retrieve the current [Equipment] for [feeder]. The current equipment is the equipment connected to the Feeder based on
@@ -165,8 +174,8 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getCurrentEquipmentForFeeder(service: NetworkService, feeder: Feeder): GrpcResult<MultiObjectResult> =
-        getCurrentEquipmentForFeeder(service, feeder.mRID)
+    fun getCurrentEquipmentForFeeder(feeder: Feeder): GrpcResult<MultiObjectResult> =
+        getCurrentEquipmentForFeeder(feeder.mRID)
 
     /**
      * Retrieve the current [Equipment] for the [Feeder] represented by [mRID]. The current equipment is the equipment connected to the Feeder based on
@@ -181,8 +190,8 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getCurrentEquipmentForFeeder(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> =
-        tryRpc { handleMultiObjectRPC(service, mRID, ::processFeeder) }
+    fun getCurrentEquipmentForFeeder(mRID: String): GrpcResult<MultiObjectResult> =
+        handleMultiObjectRPC { processFeeder(mRID) }
 
     /**
      * Retrieve the [Terminal]s for [connectivityNode].
@@ -196,8 +205,8 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getTerminalsForConnectivityNode(service: NetworkService, connectivityNode: ConnectivityNode): GrpcResult<MultiObjectResult> =
-        getTerminalsForConnectivityNode(service, connectivityNode.mRID)
+    fun getTerminalsForConnectivityNode(connectivityNode: ConnectivityNode): GrpcResult<MultiObjectResult> =
+        getTerminalsForConnectivityNode(connectivityNode.mRID)
 
     /**
      * Retrieve the [Terminal]s for the [ConnectivityNode] represented by [mRID].
@@ -211,25 +220,33 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getTerminalsForConnectivityNode(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> =
-        tryRpc { handleMultiObjectRPC(service, mRID, ::processConnectivityNode) }
+    fun getTerminalsForConnectivityNode(mRID: String): GrpcResult<MultiObjectResult> =
+        handleMultiObjectRPC { processConnectivityNode(mRID) }
 
     /***
      * Retrieve the network hierarchy.
      *
+     *
      * @return A simplified version of the network hierarchy that can be used to make further in-depth requests.
      */
-    fun getNetworkHierarchy(service: NetworkService): GrpcResult<NetworkHierarchy> = tryRpc {
-        val response = stub.getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build())
+    fun getNetworkHierarchy(): GrpcResult<NetworkHierarchy> = tryRpc {
+        if (networkHierarchy == null) {
+            val streamObserver = AwaitableStreamObserver<GetNetworkHierarchyResponse> { response ->
+                networkHierarchy = NetworkHierarchy(
+                    toMap(response.geographicalRegionsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
+                    toMap(response.subGeographicalRegionsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
+                    toMap(response.substationsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
+                    toMap(response.feedersList) { getOrAdd(it.mRID()) { addFromPb(it) } },
+                    toMap(response.circuitsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
+                    toMap(response.loopsList) { getOrAdd(it.mRID()) { addFromPb(it) } }
+                )
+            }
 
-        NetworkHierarchy(
-            toMap(response.geographicalRegionsList) { service[it.mRID()] ?: protoToCimProvider(service).addFromPb(it) },
-            toMap(response.subGeographicalRegionsList) { service[it.mRID()] ?: protoToCimProvider(service).addFromPb(it) },
-            toMap(response.substationsList) { service[it.mRID()] ?: protoToCimProvider(service).addFromPb(it) },
-            toMap(response.feedersList) { service[it.mRID()] ?: protoToCimProvider(service).addFromPb(it) },
-            toMap(response.circuitsList) { service[it.mRID()] ?: protoToCimProvider(service).addFromPb(it) },
-            toMap(response.loopsList) { service[it.mRID()] ?: protoToCimProvider(service).addFromPb(it) }
-        )
+            stub.getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build(), streamObserver)
+
+            streamObserver.await()
+        }
+        networkHierarchy ?: throw IOException("No network hierarchy was received before GRPC channel was closed.")
     }
 
     /***
@@ -237,6 +254,8 @@ class NetworkConsumerClient(
      *
      * This is a convenience method that will fetch the feeder object and all of the equipment referenced by the feeder (normal state), along with
      * all references. This should entail a complete connectivity model for the feeder, however not the connectivity between multiple feeders.
+     *
+     * @param mRID The mRID of the [Feeder] to fetch equipment for.
      *
      * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item couldn't be added to
      * [service], its mRID will be present in [MultiObjectResult.failed].
@@ -248,17 +267,20 @@ class NetworkConsumerClient(
     @Deprecated(
         "prefer the more generic getEquipmentContainer",
         replaceWith = ReplaceWith(
-            "this.getEquipmentContainer<Feeder>(service, mRID)",
+            "this.getEquipmentContainer<Feeder>(mRID)",
             "com.zepben.evolve.cim.iec61970.base.core.Feeder"
         )
     )
-    fun getFeeder(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> = getEquipmentContainer(service, mRID, Feeder::class.java)
+    fun getFeeder(mRID: String): GrpcResult<MultiObjectResult> = getEquipmentContainer(mRID, Feeder::class.java)
 
     /***
      * Retrieve the equipment container network for the specified [mRID] and store the results in the [service].
      *
      * This is a convenience method that will fetch the container object and all of the equipment contained, along with all subsequent
      * references. This should entail a complete connectivity model for the container, however not the connectivity between multiple containers.
+     *
+     * @param mRID The mRID of the [EquipmentContainer] to fetch.
+     * @param expectedClass The expected type of the fetched container.
      *
      * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item couldn't be added to
      * [service], its mRID will be present in [MultiObjectResult.failed].
@@ -268,12 +290,58 @@ class NetworkConsumerClient(
      * - [ClassCastException] if the requested object was of the wrong type.
      */
     @JvmOverloads
-    fun getEquipmentContainer(
-        service: NetworkService,
-        mRID: String,
+    fun getEquipmentContainer(mRID: String, expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java): GrpcResult<MultiObjectResult> =
+        tryRpc {
+            val result = getEquipmentContainers(sequenceOf(mRID), expectedClass)
+            if (result.wasFailure)
+                throw result.thrown
+
+            if (result.value.objects.isEmpty())
+                throw NoSuchElementException("No object with mRID $mRID could be found.")
+
+            result.value
+        }
+
+    /***
+     * Retrieve the equipment container networks for the specified [mRID]s and store the results in the [service].
+     *
+     * This is a convenience method that will fetch the container objects and all of the equipment contained, along with all subsequent
+     * references. This should entail a complete connectivity model for the containers, however not the connectivity between multiple containers.
+     *
+     * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch.
+     * @param expectedClass The expected type of the fetched containers.
+     *
+     * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed]
+     *
+     * In addition to normal gRPC errors, you may also receive an unsuccessful [GrpcResult] with the following errors:
+     * - [ClassCastException] if the requested object was of the wrong type.
+     */
+    fun getEquipmentContainers(
+        mRIDs: Iterable<String>,
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java
-    ): GrpcResult<MultiObjectResult> = getWithReferences(service, mRID, expectedClass) { it, mor ->
-        mor.objects.putAll(getEquipmentForContainer(service, it)
+    ): GrpcResult<MultiObjectResult> = getEquipmentContainers(mRIDs.asSequence(), expectedClass)
+
+    /***
+     * Retrieve the equipment container networks for the specified [mRID]s and store the results in the [service].
+     *
+     * This is a convenience method that will fetch the container objects and all of the equipment contained, along with all subsequent
+     * references. This should entail a complete connectivity model for the containers, however not the connectivity between multiple containers.
+     *
+     * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch.
+     * @param expectedClass The expected type of the fetched containers.
+     *
+     * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed]
+     *
+     * In addition to normal gRPC errors, you may also receive an unsuccessful [GrpcResult] with the following errors:
+     * - [ClassCastException] if the requested object was of the wrong type.
+     */
+    fun getEquipmentContainers(
+        mRIDs: Sequence<String>,
+        expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java
+    ): GrpcResult<MultiObjectResult> = getWithReferences(mRIDs, expectedClass) { it, mor ->
+        mor.objects.putAll(getEquipmentForContainers(it.map { eq -> eq.mRID })
             .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
             .value.objects
         )
@@ -286,14 +354,15 @@ class NetworkConsumerClient(
      * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
      *
      * @param loop The [Loop] to fetch equipment for.
+     *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForLoop(service: NetworkService, loop: Loop): GrpcResult<MultiObjectResult> =
-        getEquipmentForLoop(service, loop.mRID)
+    fun getEquipmentForLoop(loop: Loop): GrpcResult<MultiObjectResult> =
+        getEquipmentForLoop(loop.mRID)
 
     /**
      * Retrieve the [Equipment] for the [Loop] represented by [mRID]
@@ -301,21 +370,20 @@ class NetworkConsumerClient(
      * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
      *
      * @param mRID The mRID of the [Loop] to fetch equipment for.
+     *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForLoop(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> =
-        getWithReferences(service, mRID, Loop::class.java) { loop, mor ->
-            resolveReferences(service, mor)?.let { return@getWithReferences it }
-            (loop.circuits + loop.substations + loop.energizingSubstations).forEach {
-                mor.objects.putAll(getEquipmentForContainer(service, it.mRID)
-                    .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
-                    .value.objects
-                )
-            }
+    fun getEquipmentForLoop(mRID: String): GrpcResult<MultiObjectResult> =
+        getWithReferences(mRID, Loop::class.java) { loop, mor ->
+            resolveReferences(mor)?.let { return@getWithReferences it }
+            val containers = loop.circuits.asSequence() + loop.substations.asSequence() + loop.energizingSubstations.asSequence()
+            mor.objects.putAll(getEquipmentForContainers(containers.map { it.mRID })
+                .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
+                .value.objects)
             null
         }
 
@@ -324,14 +392,15 @@ class NetworkConsumerClient(
      *
      * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
      *
+     *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getAllLoops(service: NetworkService): GrpcResult<MultiObjectResult> {
-        val response = getNetworkHierarchy(service)
+    fun getAllLoops(): GrpcResult<MultiObjectResult> {
+        val response = getNetworkHierarchy()
         val hierarchy = response.onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }.value
 
         val mor = MultiObjectResult()
@@ -342,180 +411,231 @@ class NetworkConsumerClient(
         mor.objects.putAll(hierarchy.circuits)
         mor.objects.putAll(hierarchy.loops)
 
-        resolveReferences(service, mor)?.let { return it }
+        mor.objects.putAll(getEquipmentForContainers(hierarchy.loops.values
+            .asSequence()
+            .flatMap { it.circuits.asSequence() + it.substations.asSequence() + it.energizingSubstations.asSequence() }
+            .distinct()
+            .map { it.mRID })
+            .onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }
+            .value.objects
+        )
 
-        hierarchy.loops.values
-            .flatMap { it.circuits + it.substations + it.energizingSubstations }
-            .toSet()
-            .forEach {
-                mor.objects.putAll(getEquipmentForContainer(service, it.mRID)
-                    .onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }
-                    .value.objects
-                )
-            }
-
-        resolveReferences(service, mor)?.let { return it }
+        resolveReferences(mor)?.let { return it }
 
         return GrpcResult(mor)
     }
 
-    private fun getUnresolvedMRIDs(service: NetworkService, mRIDs: Set<String>): Set<String> =
-        mRIDs.flatMap { service.getUnresolvedReferencesFrom(it) }
-            .map { it.toMrid }
-            .toSet()
-
-    private fun processEquipmentContainer(service: NetworkService, mRID: String): Sequence<ExtractResult> =
-        stub.getEquipmentForContainer(GetEquipmentForContainerRequest.newBuilder().setMrid(mRID).build())
-            .asSequence()
-            .map { extractIdentifiedObject(service, it.identifiedObject) }
-
-    private fun processFeeder(service: NetworkService, mRID: String): Sequence<ExtractResult> =
-        stub.getCurrentEquipmentForFeeder(GetCurrentEquipmentForFeederRequest.newBuilder().setMrid(mRID).build())
-            .asSequence()
-            .map { extractIdentifiedObject(service, it.identifiedObject) }
-
-    private fun processRestriction(service: NetworkService, mRID: String): Sequence<ExtractResult> =
-        stub.getEquipmentForRestriction(GetEquipmentForRestrictionRequest.newBuilder().setMrid(mRID).build())
-            .asSequence()
-            .map { extractIdentifiedObject(service, it.identifiedObject) }
-
-    private fun processConnectivityNode(service: NetworkService, mRID: String): Sequence<ExtractResult> =
-        stub.getTerminalsForNode(GetTerminalsForNodeRequest.newBuilder().setMrid(mRID).build())
-            .asSequence()
-            .map { response -> extractResult(service, response.terminal.mRID()) { it.addFromPb(response.terminal) } }
-
-    private fun processIdentifiedObjects(service: NetworkService, mRIDs: Set<String>): Sequence<ExtractResult> {
-        if (mRIDs.isEmpty())
-            return emptySequence()
-
-        val toFetch = mutableSetOf<String>()
-        val existing = mutableSetOf<ExtractResult>()
-        mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service
-            service.get<IdentifiedObject>(mRID)?.let { existing.add(ExtractResult(it, it.mRID)) } ?: toFetch.add(mRID)
+    override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
+        val extractResults = mutableListOf<ExtractResult>()
+        val streamObserver = AwaitableStreamObserver<GetIdentifiedObjectsResponse> { response ->
+            response.identifiedObjectsList.forEach {
+                extractResults.add(extractIdentifiedObject(it))
+            }
         }
 
-        if (toFetch.isEmpty())
-            return existing.asSequence()
+        val request = stub.getIdentifiedObjects(streamObserver)
+        val builder = GetIdentifiedObjectsRequest.newBuilder()
 
-        return stub.getIdentifiedObjects(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(toFetch).build())
-            .asSequence()
-            .map { extractIdentifiedObject(service, it.identifiedObject) } + existing
+        batchSend(mRIDs, builder::addMrids) {
+            if (builder.mridsList.isNotEmpty())
+                request.onNext(builder.build())
+            builder.clearMrids()
+        }
+
+        request.onCompleted()
+        streamObserver.await()
+
+        return extractResults.asSequence()
     }
 
-    private fun extractIdentifiedObject(service: NetworkService, io: NetworkIdentifiedObject): ExtractResult {
+    private fun processEquipmentForContainers(mRIDs: Sequence<String>): Sequence<ExtractResult> {
+        val extractResults = mutableListOf<ExtractResult>()
+        val streamObserver = AwaitableStreamObserver<GetEquipmentForContainersResponse> { response ->
+            response.identifiedObjectsList.forEach {
+                extractResults.add(extractIdentifiedObject(it))
+            }
+        }
+
+        val request = stub.getEquipmentForContainers(streamObserver)
+        val builder = GetEquipmentForContainersRequest.newBuilder()
+
+        batchSend(mRIDs, builder::addMrids) {
+            if (builder.mridsList.isNotEmpty())
+                request.onNext(builder.build())
+            builder.clearMrids()
+        }
+
+        request.onCompleted()
+        streamObserver.await()
+
+        return extractResults.asSequence()
+    }
+
+    private fun processFeeder(mRID: String): Sequence<ExtractResult> {
+        val extractResults = mutableListOf<ExtractResult>()
+        val streamObserver = AwaitableStreamObserver<GetCurrentEquipmentForFeederResponse> { response ->
+            response.identifiedObjectsList.forEach {
+                extractResults.add(extractIdentifiedObject(it))
+            }
+        }
+
+        stub.getCurrentEquipmentForFeeder(GetCurrentEquipmentForFeederRequest.newBuilder().setMrid(mRID).build(), streamObserver)
+        streamObserver.await()
+
+        return extractResults.asSequence()
+    }
+
+    private fun processRestriction(mRID: String): Sequence<ExtractResult> {
+        val extractResults = mutableListOf<ExtractResult>()
+        val streamObserver = AwaitableStreamObserver<GetEquipmentForRestrictionResponse> { response ->
+            response.identifiedObjectsList.forEach {
+                extractResults.add(extractIdentifiedObject(it))
+            }
+        }
+
+        stub.getEquipmentForRestriction(GetEquipmentForRestrictionRequest.newBuilder().setMrid(mRID).build(), streamObserver)
+        streamObserver.await()
+
+        return extractResults.asSequence()
+    }
+
+    private fun processConnectivityNode(mRID: String): Sequence<ExtractResult> {
+        val extractResults = mutableListOf<ExtractResult>()
+        val streamObserver = AwaitableStreamObserver<GetTerminalsForNodeResponse> { response ->
+            extractResults.add(extractResult(response.terminal.mRID()) { addFromPb(response.terminal) })
+        }
+
+        stub.getTerminalsForNode(GetTerminalsForNodeRequest.newBuilder().setMrid(mRID).build(), streamObserver)
+        streamObserver.await()
+
+        return extractResults.asSequence()
+    }
+
+    private fun extractIdentifiedObject(io: NetworkIdentifiedObject): ExtractResult {
         return when (io.identifiedObjectCase) {
-            BATTERYUNIT -> extractResult(service, io.batteryUnit.mRID()) { it.addFromPb(io.batteryUnit) }
-            PHOTOVOLTAICUNIT -> extractResult(service, io.photoVoltaicUnit.mRID()) { it.addFromPb(io.photoVoltaicUnit) }
-            POWERELECTRONICSWINDUNIT -> extractResult(service, io.powerElectronicsWindUnit.mRID()) { it.addFromPb(io.powerElectronicsWindUnit) }
-            CABLEINFO -> extractResult(service, io.cableInfo.mRID()) { it.addFromPb(io.cableInfo) }
-            OVERHEADWIREINFO -> extractResult(service, io.overheadWireInfo.mRID()) { it.addFromPb(io.overheadWireInfo) }
-            POWERTRANSFORMERINFO -> extractResult(service, io.powerTransformerInfo.mRID()) { it.addFromPb(io.powerTransformerInfo) }
-            ASSETOWNER -> extractResult(service, io.assetOwner.mRID()) { it.addFromPb(io.assetOwner) }
-            ORGANISATION -> extractResult(service, io.organisation.mRID()) { it.addFromPb(io.organisation) }
-            LOCATION -> extractResult(service, io.location.mRID()) { it.addFromPb(io.location) }
-            METER -> extractResult(service, io.meter.mRID()) { it.addFromPb(io.meter) }
-            USAGEPOINT -> extractResult(service, io.usagePoint.mRID()) { it.addFromPb(io.usagePoint) }
-            OPERATIONALRESTRICTION -> extractResult(service, io.operationalRestriction.mRID()) { it.addFromPb(io.operationalRestriction) }
-            FAULTINDICATOR -> extractResult(service, io.faultIndicator.mRID()) { it.addFromPb(io.faultIndicator) }
-            BASEVOLTAGE -> extractResult(service, io.baseVoltage.mRID()) { it.addFromPb(io.baseVoltage) }
-            CONNECTIVITYNODE -> extractResult(service, io.connectivityNode.mRID()) { it.addFromPb(io.connectivityNode) }
-            FEEDER -> extractResult(service, io.feeder.mRID()) { it.addFromPb(io.feeder) }
-            GEOGRAPHICALREGION -> extractResult(service, io.geographicalRegion.mRID()) { it.addFromPb(io.geographicalRegion) }
-            SITE -> extractResult(service, io.site.mRID()) { it.addFromPb(io.site) }
-            SUBGEOGRAPHICALREGION -> extractResult(service, io.subGeographicalRegion.mRID()) { it.addFromPb(io.subGeographicalRegion) }
-            SUBSTATION -> extractResult(service, io.substation.mRID()) { it.addFromPb(io.substation) }
-            TERMINAL -> extractResult(service, io.terminal.mRID()) { it.addFromPb(io.terminal) }
-            ACLINESEGMENT -> extractResult(service, io.acLineSegment.mRID()) { it.addFromPb(io.acLineSegment) }
-            BREAKER -> extractResult(service, io.breaker.mRID()) { it.addFromPb(io.breaker) }
-            LOADBREAKSWITCH -> extractResult(service, io.loadBreakSwitch.mRID()) { it.addFromPb(io.loadBreakSwitch) }
-            DISCONNECTOR -> extractResult(service, io.disconnector.mRID()) { it.addFromPb(io.disconnector) }
-            ENERGYCONSUMER -> extractResult(service, io.energyConsumer.mRID()) { it.addFromPb(io.energyConsumer) }
-            ENERGYCONSUMERPHASE -> extractResult(service, io.energyConsumerPhase.mRID()) { it.addFromPb(io.energyConsumerPhase) }
-            ENERGYSOURCE -> extractResult(service, io.energySource.mRID()) { it.addFromPb(io.energySource) }
-            ENERGYSOURCEPHASE -> extractResult(service, io.energySourcePhase.mRID()) { it.addFromPb(io.energySourcePhase) }
-            FUSE -> extractResult(service, io.fuse.mRID()) { it.addFromPb(io.fuse) }
-            JUMPER -> extractResult(service, io.jumper.mRID()) { it.addFromPb(io.jumper) }
-            JUNCTION -> extractResult(service, io.junction.mRID()) { it.addFromPb(io.junction) }
-            LINEARSHUNTCOMPENSATOR -> extractResult(service, io.linearShuntCompensator.mRID()) { it.addFromPb(io.linearShuntCompensator) }
-            PERLENGTHSEQUENCEIMPEDANCE -> extractResult(service, io.perLengthSequenceImpedance.mRID()) { it.addFromPb(io.perLengthSequenceImpedance) }
-            POWERELECTRONICSCONNECTION -> extractResult(service, io.powerElectronicsConnection.mRID()) { it.addFromPb(io.powerElectronicsConnection) }
-            POWERELECTRONICSCONNECTIONPHASE -> extractResult(
-                service,
-                io.powerElectronicsConnectionPhase.mRID()
-            ) { it.addFromPb(io.powerElectronicsConnectionPhase) }
-            POWERTRANSFORMER -> extractResult(service, io.powerTransformer.mRID()) { it.addFromPb(io.powerTransformer) }
-            POWERTRANSFORMEREND -> extractResult(service, io.powerTransformerEnd.mRID()) { it.addFromPb(io.powerTransformerEnd) }
-            RATIOTAPCHANGER -> extractResult(service, io.ratioTapChanger.mRID()) { it.addFromPb(io.ratioTapChanger) }
-            RECLOSER -> extractResult(service, io.recloser.mRID()) { it.addFromPb(io.recloser) }
-            BUSBARSECTION -> extractResult(service, io.busbarSection.mRID()) { it.addFromPb(io.busbarSection) }
-            CIRCUIT -> extractResult(service, io.circuit.mRID()) { it.addFromPb(io.circuit) }
-            LOOP -> extractResult(service, io.loop.mRID()) { it.addFromPb(io.loop) }
-            POLE -> extractResult(service, io.pole.mRID()) { it.addFromPb(io.pole) }
-            STREETLIGHT -> extractResult(service, io.streetlight.mRID()) { it.addFromPb(io.streetlight) }
-            ACCUMULATOR -> extractResult(service, io.accumulator.measurement.mRID()) { it.addFromPb(io.accumulator) }
-            ANALOG -> extractResult(service, io.analog.measurement.mRID()) { it.addFromPb(io.analog) }
-            DISCRETE -> extractResult(service, io.discrete.measurement.mRID()) { it.addFromPb(io.discrete) }
-            CONTROL -> extractResult(service, io.control.mRID()) { it.addFromPb(io.control) }
-            REMOTECONTROL -> extractResult(service, io.remoteControl.mRID()) { it.addFromPb(io.remoteControl) }
-            REMOTESOURCE -> extractResult(service, io.remoteSource.mRID()) { it.addFromPb(io.remoteSource) }
-            TRANSFORMERSTARIMPEDANCE -> extractResult(service, io.transformerStarImpedance.mRID()) { it.addFromPb(io.transformerStarImpedance) }
-            TRANSFORMERENDINFO -> extractResult(service, io.transformerEndInfo.mRID()) { it.addFromPb(io.transformerEndInfo) }
-            TRANSFORMERTANKINFO -> extractResult(service, io.transformerTankInfo.mRID()) { it.addFromPb(io.transformerTankInfo) }
+            BATTERYUNIT -> extractResult(io.batteryUnit.mRID()) { addFromPb(io.batteryUnit) }
+            PHOTOVOLTAICUNIT -> extractResult(io.photoVoltaicUnit.mRID()) { addFromPb(io.photoVoltaicUnit) }
+            POWERELECTRONICSWINDUNIT -> extractResult(io.powerElectronicsWindUnit.mRID()) { addFromPb(io.powerElectronicsWindUnit) }
+            CABLEINFO -> extractResult(io.cableInfo.mRID()) { addFromPb(io.cableInfo) }
+            OVERHEADWIREINFO -> extractResult(io.overheadWireInfo.mRID()) { addFromPb(io.overheadWireInfo) }
+            POWERTRANSFORMERINFO -> extractResult(io.powerTransformerInfo.mRID()) { addFromPb(io.powerTransformerInfo) }
+            ASSETOWNER -> extractResult(io.assetOwner.mRID()) { addFromPb(io.assetOwner) }
+            ORGANISATION -> extractResult(io.organisation.mRID()) { addFromPb(io.organisation) }
+            LOCATION -> extractResult(io.location.mRID()) { addFromPb(io.location) }
+            METER -> extractResult(io.meter.mRID()) { addFromPb(io.meter) }
+            USAGEPOINT -> extractResult(io.usagePoint.mRID()) { addFromPb(io.usagePoint) }
+            OPERATIONALRESTRICTION -> extractResult(io.operationalRestriction.mRID()) { addFromPb(io.operationalRestriction) }
+            FAULTINDICATOR -> extractResult(io.faultIndicator.mRID()) { addFromPb(io.faultIndicator) }
+            BASEVOLTAGE -> extractResult(io.baseVoltage.mRID()) { addFromPb(io.baseVoltage) }
+            CONNECTIVITYNODE -> extractResult(io.connectivityNode.mRID()) { addFromPb(io.connectivityNode) }
+            FEEDER -> extractResult(io.feeder.mRID()) { addFromPb(io.feeder) }
+            GEOGRAPHICALREGION -> extractResult(io.geographicalRegion.mRID()) { addFromPb(io.geographicalRegion) }
+            SITE -> extractResult(io.site.mRID()) { addFromPb(io.site) }
+            SUBGEOGRAPHICALREGION -> extractResult(io.subGeographicalRegion.mRID()) { addFromPb(io.subGeographicalRegion) }
+            SUBSTATION -> extractResult(io.substation.mRID()) { addFromPb(io.substation) }
+            TERMINAL -> extractResult(io.terminal.mRID()) { addFromPb(io.terminal) }
+            ACLINESEGMENT -> extractResult(io.acLineSegment.mRID()) { addFromPb(io.acLineSegment) }
+            BREAKER -> extractResult(io.breaker.mRID()) { addFromPb(io.breaker) }
+            LOADBREAKSWITCH -> extractResult(io.loadBreakSwitch.mRID()) { addFromPb(io.loadBreakSwitch) }
+            DISCONNECTOR -> extractResult(io.disconnector.mRID()) { addFromPb(io.disconnector) }
+            ENERGYCONSUMER -> extractResult(io.energyConsumer.mRID()) { addFromPb(io.energyConsumer) }
+            ENERGYCONSUMERPHASE -> extractResult(io.energyConsumerPhase.mRID()) { addFromPb(io.energyConsumerPhase) }
+            ENERGYSOURCE -> extractResult(io.energySource.mRID()) { addFromPb(io.energySource) }
+            ENERGYSOURCEPHASE -> extractResult(io.energySourcePhase.mRID()) { addFromPb(io.energySourcePhase) }
+            FUSE -> extractResult(io.fuse.mRID()) { addFromPb(io.fuse) }
+            JUMPER -> extractResult(io.jumper.mRID()) { addFromPb(io.jumper) }
+            JUNCTION -> extractResult(io.junction.mRID()) { addFromPb(io.junction) }
+            LINEARSHUNTCOMPENSATOR -> extractResult(io.linearShuntCompensator.mRID()) { addFromPb(io.linearShuntCompensator) }
+            PERLENGTHSEQUENCEIMPEDANCE -> extractResult(io.perLengthSequenceImpedance.mRID()) { addFromPb(io.perLengthSequenceImpedance) }
+            POWERELECTRONICSCONNECTION -> extractResult(io.powerElectronicsConnection.mRID()) { addFromPb(io.powerElectronicsConnection) }
+            POWERELECTRONICSCONNECTIONPHASE -> extractResult(io.powerElectronicsConnectionPhase.mRID()) { addFromPb(io.powerElectronicsConnectionPhase) }
+            POWERTRANSFORMER -> extractResult(io.powerTransformer.mRID()) { addFromPb(io.powerTransformer) }
+            POWERTRANSFORMEREND -> extractResult(io.powerTransformerEnd.mRID()) { addFromPb(io.powerTransformerEnd) }
+            RATIOTAPCHANGER -> extractResult(io.ratioTapChanger.mRID()) { addFromPb(io.ratioTapChanger) }
+            RECLOSER -> extractResult(io.recloser.mRID()) { addFromPb(io.recloser) }
+            BUSBARSECTION -> extractResult(io.busbarSection.mRID()) { addFromPb(io.busbarSection) }
+            CIRCUIT -> extractResult(io.circuit.mRID()) { addFromPb(io.circuit) }
+            LOOP -> extractResult(io.loop.mRID()) { addFromPb(io.loop) }
+            POLE -> extractResult(io.pole.mRID()) { addFromPb(io.pole) }
+            STREETLIGHT -> extractResult(io.streetlight.mRID()) { addFromPb(io.streetlight) }
+            ACCUMULATOR -> extractResult(io.accumulator.measurement.mRID()) { addFromPb(io.accumulator) }
+            ANALOG -> extractResult(io.analog.measurement.mRID()) { addFromPb(io.analog) }
+            DISCRETE -> extractResult(io.discrete.measurement.mRID()) { addFromPb(io.discrete) }
+            CONTROL -> extractResult(io.control.mRID()) { addFromPb(io.control) }
+            REMOTECONTROL -> extractResult(io.remoteControl.mRID()) { addFromPb(io.remoteControl) }
+            REMOTESOURCE -> extractResult(io.remoteSource.mRID()) { addFromPb(io.remoteSource) }
+            TRANSFORMERSTARIMPEDANCE -> extractResult(io.transformerStarImpedance.mRID()) { addFromPb(io.transformerStarImpedance) }
+            TRANSFORMERENDINFO -> extractResult(io.transformerEndInfo.mRID()) { addFromPb(io.transformerEndInfo) }
+            TRANSFORMERTANKINFO -> extractResult(io.transformerTankInfo.mRID()) { addFromPb(io.transformerTankInfo) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )
         }
     }
 
-    private inline fun <reified CIM : IdentifiedObject> extractResult(
-        service: NetworkService,
-        mRID: String,
-        addFromPb: (NetworkProtoToCim) -> CIM?
-    ): ExtractResult =
-        ExtractResult(service[mRID] ?: addFromPb(protoToCimProvider(service)), mRID)
-
     private fun <T, U : IdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> = objects
         .mapNotNull(mapper)
         .associateBy { it.mRID }
 
-    private fun handleMultiObjectRPC(service: NetworkService, mRID: String, rpc: (NetworkService, String) -> Sequence<ExtractResult>): MultiObjectResult =
-        rpc(service, mRID).let { extracted ->
+    private fun handleMultiObjectRPC(processor: () -> Sequence<ExtractResult>): GrpcResult<MultiObjectResult> =
+        tryRpc {
             val results = mutableMapOf<String, IdentifiedObject>()
             val failed = mutableSetOf<String>()
-            extracted.forEach {
-                if (it.identifiedObject == null) failed.add(it.mRID) else results[it.identifiedObject.mRID] = it.identifiedObject
+            processor().forEach { result ->
+                result.identifiedObject?.let { results[it.mRID] = it } ?: failed.add(result.mRID)
             }
             MultiObjectResult(results, failed)
         }
 
-    private inline fun <reified T : IdentifiedObject> getWithReferences(
-        service: NetworkService,
+    private inline fun <reified T> getWithReferences(
         mRID: String,
         expectedClass: Class<out T>,
         getAdditional: (T, MultiObjectResult) -> GrpcResult<MultiObjectResult>?
-    ): GrpcResult<MultiObjectResult> {
-        val response = getIdentifiedObject(service, mRID)
-        val identifiedObject = response.onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }.value
+    ): GrpcResult<MultiObjectResult> = getWithReferences(sequenceOf(mRID), expectedClass) { it, mor -> getAdditional(it.elementAt(0), mor) }
 
-        if (!expectedClass.isInstance(identifiedObject)) {
-            val e = ClassCastException("Unable to extract ${expectedClass.simpleName} network from ${identifiedObject.typeNameAndMRID()}.")
+    private inline fun <reified T> getWithReferences(
+        mRIDs: Sequence<String>,
+        expectedClass: Class<out T>,
+        getAdditional: (Sequence<T>, MultiObjectResult) -> GrpcResult<MultiObjectResult>?
+    ): GrpcResult<MultiObjectResult> {
+        val mor = MultiObjectResult()
+
+        if ((networkHierarchy == null) && networkHierarchyContainerClasses.contains<Class<*>>(expectedClass))
+            getNetworkHierarchy().onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
+
+        val toFetch = mutableListOf<String>()
+        mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service
+            service.get<IdentifiedObject>(mRID)?.let { mor.objects[it.mRID] = it } ?: toFetch.add(mRID)
+        }
+
+        val response = getIdentifiedObjects(toFetch.asSequence())
+        val result = response.onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }.value
+
+        val invalid = result.objects.values.filter { !expectedClass.isInstance(it) }.toMutableSet()
+        if (invalid.isNotEmpty()) {
+            val e = ClassCastException("Unable to extract ${expectedClass.simpleName} networks from ${invalid.map { it.typeNameAndMRID() }}.")
             return GrpcResult.ofError(e, tryHandleError(e))
         }
 
-        val mor = MultiObjectResult()
-        mor.objects[identifiedObject.mRID] = identifiedObject
+        mor.objects.putAll(result.objects)
+        mor.failed.addAll(result.failed)
 
-        getAdditional(expectedClass.cast(identifiedObject), mor)?.let { return@getWithReferences it }
-        resolveReferences(service, mor)?.let { return@getWithReferences it }
+        getAdditional(mor.objects.values.asSequence().filterIsInstance(expectedClass), mor)?.let { return@getWithReferences it }
+        resolveReferences(mor)?.let { return@getWithReferences it }
 
         return GrpcResult(mor)
     }
 
-    private fun resolveReferences(service: NetworkService, mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
+    private fun resolveReferences(mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
         var res = mor
         do {
-            val toResolve = getUnresolvedMRIDs(service, res.objects.keys)
-            res = getIdentifiedObjects(service, toResolve).onError { thrown, wasHandled ->
+            val toResolve = res.objects.keys
+                .asSequence()
+                .flatMap { service.getUnresolvedReferencesFrom(it) }
+                .map { it.toMrid }
+                .distinct()
+
+            res = getIdentifiedObjects(toResolve).onError { thrown, wasHandled ->
                 return GrpcResult.ofError(thrown, wasHandled)
             }.value
             mor.objects.putAll(res.objects)
@@ -525,6 +645,6 @@ class NetworkConsumerClient(
 
 }
 
-inline fun <reified T : EquipmentContainer> NetworkConsumerClient.getEquipmentContainer(service: NetworkService, mRID: String): GrpcResult<MultiObjectResult> {
-    return getEquipmentContainer(service, mRID, T::class.java)
+inline fun <reified T : EquipmentContainer> NetworkConsumerClient.getEquipmentContainer(mRID: String): GrpcResult<MultiObjectResult> {
+    return getEquipmentContainer(mRID, T::class.java)
 }

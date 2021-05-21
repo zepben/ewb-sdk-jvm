@@ -5,6 +5,10 @@
 * `NetworkHierarchy` has been updated to use CIM classes.
 * `getFeeder` has been deprecated. Prefer the use of the more generic `getEquipmentContainer`.
 * `getIdentifiedObject` now returns a `NoSuchElementException` error if the requested object does not exist rather than a `null` successful result.
+* All `CimConsumerClient` implementations have been changed to control a single service rather than one per call.
+* `NetworkConsumerClient` has been updated to use the async stub internally and has received a significant performance boost. This only has an impact if you are
+  passing the stub directly to the client rather than a channel.
+* Updated to use v0.15.0 gRPC protocols.
 
 ##### New Features
 
@@ -12,10 +16,14 @@
 * Added a generic API call, `getEquipmentContainer`, for populating the `Equipment` of an
   `EquipmentContainer`.
 * Added API calls for getting loops.
+* Added `RunStreaming` examples to the tests, which can be used to talk to a real server.
 
 ##### Enhancements
 
 * `NetworkHierarchy` now contains circuits and loops.
+* Speed of `BaseService.get` has been improved when an explict type is not provided.
+* `getIdentifiedObjects` can now take a `Sequence` of mRIDs in addition to an `Iterable` for performance reasons.
+* `GrpcChannel` now attempts to clean up channels that fail to shut down.
 
 ##### Fixes
 

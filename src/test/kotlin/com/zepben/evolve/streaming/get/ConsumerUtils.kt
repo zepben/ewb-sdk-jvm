@@ -10,6 +10,7 @@ package com.zepben.evolve.streaming.get
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger
+import io.grpc.Status
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
@@ -51,12 +52,20 @@ object ConsumerUtils {
         onErrorHandler: CaptureLastRpcErrorHandler,
         result: GrpcResult<*>,
         expectedEx: Throwable,
-        expectHandled: Boolean
+        expectHandled: Boolean = true,
+        fromServer: Boolean = true
     ) {
         assertThat(result.wasFailure, equalTo(true))
-        assertThat(result.thrown, equalTo(expectedEx))
         assertThat(result.wasErrorHandled, equalTo(expectHandled))
-        assertThat(onErrorHandler.lastError, if (expectHandled) equalTo(expectedEx) else nullValue())
+        assertThat(onErrorHandler.lastError, if (expectHandled) equalTo(result.thrown) else nullValue())
+
+        if (fromServer) {
+            // Can't check exception directly as it has been streamed from the server wrapped as a GRPC error.
+            val grpcWrappedException = Status.ABORTED.withDescription(expectedEx.message).asRuntimeException()
+            assertThat(result.thrown::class.java, equalTo(grpcWrappedException::class.java))
+            assertThat(result.thrown.message, equalTo(grpcWrappedException.message))
+        } else
+            assertThat(result.thrown, equalTo(expectedEx))
     }
 
 }

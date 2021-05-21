@@ -41,8 +41,8 @@ abstract class BaseService(
     /**
      * A map of references between mRID's that as yet have not been resolved - typically when transferring services between systems.
      * The key is the toMrid of the [UnresolvedReference]s, and the value is a list of [UnresolvedReference]s for that specific object.
-     * For example, if an AcLineSegment with mRID 'acls1' is present in the service, but the service is missing its [location] with mRID 'location-l1'
-     * and `perLengthSequenceImpedance` with mRID 'plsi-1', the following key value pairs would be present:
+     * For example, if an AcLineSegment with mRID 'acls1' is present in the service, but the service is missing its 'location' with mRID 'location-l1'
+     * and 'perLengthSequenceImpedance' with mRID 'plsi-1', the following key value pairs would be present:
      * {
      *   "plsi-1": [
      *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='plsi-1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=PerLengthSequenceImpedance, resolve=...), ...)
@@ -149,32 +149,16 @@ abstract class BaseService(
      */
     @Suppress("UNCHECKED_CAST")
     fun <T : IdentifiedObject> get(clazz: KClass<T>, mRID: String?): T? {
-        if (mRID == null)
-            return null
+        mRID ?: return null
 
-        val exactTypeMap = objectsByType[clazz]
-        if (exactTypeMap != null)
-            return exactTypeMap[mRID] as T?
-        else {
-            for ((c, map) in objectsByType) {
-                if (clazz.isSuperclassOf(c)) {
-                    val io = map[mRID]
-                    if (io != null)
-                        return io as T
-                }
-            }
-        }
+        if (clazz != IdentifiedObject::class)
+            objectsByType[clazz]?.let { return it[mRID] as T? }
 
-        // If clazz is IdentifiedObject::class, then we know we have searched every object and it does not exist on the service.
-        // However if clazz is a subclass of Identified object, it's possible that the object exists on the service as a different
-        // type. So we look up by IdentifiedObject::class and cast to clazz to force a ClassCastException if that object exists
-        // on the service as a type different than requested.
-        return if (clazz == IdentifiedObject::class) {
-            null
-        } else {
-            // Using java cast as null is valid and it also produces a more useful exception message.
-            clazz.java.cast(get(IdentifiedObject::class, mRID))
-        }
+        return clazz.java.cast(objectsByType.values
+            .asSequence()
+            .mapNotNull { it[mRID] }
+            .firstOrNull()
+        )
     }
 
     /**
@@ -250,7 +234,7 @@ abstract class BaseService(
                 cim
             else
                 null
-        } catch (ex: UnsupportedIdentifiedObjectException){
+        } catch (ex: UnsupportedIdentifiedObjectException) {
             null
         }
 
@@ -379,7 +363,10 @@ abstract class BaseService(
                 false
             }
         } catch (ex: ClassCastException) {
-            throw IllegalStateException("$toMrid didn't match the expected class ${resolver.toClass.simpleName}. Did you re-use an mRID?: ${ex.localizedMessage}", ex)
+            throw IllegalStateException(
+                "$toMrid didn't match the expected class ${resolver.toClass.simpleName}. Did you re-use an mRID?: ${ex.localizedMessage}",
+                ex
+            )
         }
     }
 
@@ -428,14 +415,14 @@ abstract class BaseService(
      * @param mRID The mRID to get unresolved references for.
      * @return a sequence of the [UnresolvedReference]s that need to be resolved for [mRID].
      */
-    fun getUnresolvedReferencesFrom(mRID: String): Sequence<UnresolvedReference<*,*>> = unresolvedReferencesFrom[mRID]?.asSequence() ?: emptySequence()
+    fun getUnresolvedReferencesFrom(mRID: String): Sequence<UnresolvedReference<*, *>> = unresolvedReferencesFrom[mRID]?.asSequence() ?: emptySequence()
 
     /**
      * Get the [UnresolvedReference]s that other objects have to [mRID].
      * @param mRID The mRID to get unresolved references for.
      * @return a sequence of the [UnresolvedReference]s that need to be resolved for [mRID].
      */
-    fun getUnresolvedReferencesTo(mRID: String): Sequence<UnresolvedReference<*,*>> = unresolvedReferencesTo[mRID]?.asSequence() ?: emptySequence()
+    fun getUnresolvedReferencesTo(mRID: String): Sequence<UnresolvedReference<*, *>> = unresolvedReferencesTo[mRID]?.asSequence() ?: emptySequence()
 
     /**
      * Returns a sequence of all unresolved references.

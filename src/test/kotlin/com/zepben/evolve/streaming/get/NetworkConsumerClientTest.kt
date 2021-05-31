@@ -499,24 +499,26 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `can get a loop`() {
-        val expectedService = LoopNetwork.create()
-        configureResponses(expectedService)
+        val loopNetwork = LoopNetwork.create()
+        configureResponses(loopNetwork)
 
-        val mRID = "BTS-ZEP-BEN-BTS-CBR"
-        val expectedContainers = listOf("BTS", "ZEP", "BEN", "CBR", "BTSZEP", "ZEPBENCBR", "BTSBEN")
+        val loop = "BTS-ZEP-BEN-BTS-CBR"
+        val loopContainers = listOf("BTS", "ZEP", "BEN", "CBR", "BTSZEP", "ZEPBENCBR", "BTSBEN")
+        val hierarchyObjs = listOf(
+            "TG", "ZTS", "ACT",
+            "TGZTS", "TGBTS", "ZTSBTS", "BTSACT", "ZTSACT",
+            "TG-ZTS-BTS-TG", "ZTS-ACT-BTS",
+            "ZEP001", "BEN001", "CBR001", "ACT001"
+        )
+        val containerEquip = listOf(
+            "BTS-j-132000", "BTS-j-66000", "ZEP-j-66000", "ZEP-j-11000", "BEN-j-66000", "BEN-j-11000", "CBR-j-66000", "CBR-j-11000",
+            "BTSZEP-j", "ZEPBENCBR-j", "BTSBEN-j"
+        )
+        val assocObjs = containerEquip.map { "$it-t" } + listOf("bv132", "bv66", "bv11")
 
-        val result = consumerClient.getEquipmentForLoop(mRID)
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.failed, empty())
-
-        val identifiedObjectRequestCaptor = argumentCaptor<GetIdentifiedObjectsRequest>()
-        val equipmentContainersRequestCaptor = argumentCaptor<GetEquipmentForContainersRequest>()
-
-        verify(consumerService.onGetIdentifiedObjects, atLeastOnce()).invoke(identifiedObjectRequestCaptor.capture(), any())
-        verify(consumerService.onGetEquipmentForContainers).invoke(equipmentContainersRequestCaptor.capture(), any())
-
-        assertThat(identifiedObjectRequestCaptor.firstValue.mridsList[0], equalTo("BTS-ZEP-BEN-BTS-CBR"))
-        assertThat(equipmentContainersRequestCaptor.allValues.flatMap { it.mridsList }, containsInAnyOrder(*expectedContainers.toTypedArray()))
+        val mor = consumerClient.getEquipmentForLoop(loop).throwOnError().value
+        assertThat(service.num<IdentifiedObject>(), equalTo((listOf(loop) + loopContainers + hierarchyObjs + containerEquip + assocObjs).size))
+        assertThat(mor.objects.size, equalTo((listOf(loop) + loopContainers + containerEquip + assocObjs).size))
     }
 
     @Test

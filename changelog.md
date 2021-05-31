@@ -8,6 +8,7 @@
 * All `CimConsumerClient` implementations have been changed to control a single service rather than one per call.
 * `NetworkConsumerClient` has been updated to use the async stub internally and has received a significant performance boost. This only has an impact if you are
   passing the stub directly to the client rather than a channel.
+* All SDK methods that retrieve objects with references will now request the network hierarchy first to provide a consistent result, regardless of call order.
 * Updated to use v0.15.0 gRPC protocols.
 
 ##### New Features

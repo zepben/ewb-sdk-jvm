@@ -9,7 +9,6 @@ package com.zepben.evolve.streaming.get
 
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.*
-import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
@@ -45,7 +44,6 @@ class NetworkConsumerClient(
 ) : CimConsumerClient<NetworkService, NetworkProtoToCim>() {
 
     private var networkHierarchy: NetworkHierarchy? = null
-    private val networkHierarchyContainerClasses: Set<Class<out EquipmentContainer>> = setOf(Feeder::class.java, Substation::class.java, Circuit::class.java)
 
     /**
      * Create a [NetworkConsumerClient]
@@ -379,7 +377,10 @@ class NetworkConsumerClient(
      */
     fun getEquipmentForLoop(mRID: String): GrpcResult<MultiObjectResult> =
         getWithReferences(mRID, Loop::class.java) { loop, mor ->
-            resolveReferences(mor)?.let { return@getWithReferences it }
+            mor.objects.putAll(loop.circuits.associateBy { it.mRID })
+            mor.objects.putAll(loop.substations.associateBy { it.mRID })
+            mor.objects.putAll(loop.energizingSubstations.associateBy { it.mRID })
+
             val containers = loop.circuits.asSequence() + loop.substations.asSequence() + loop.energizingSubstations.asSequence()
             mor.objects.putAll(getEquipmentForContainers(containers.map { it.mRID })
                 .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
@@ -600,8 +601,7 @@ class NetworkConsumerClient(
     ): GrpcResult<MultiObjectResult> {
         val mor = MultiObjectResult()
 
-        if ((networkHierarchy == null) && networkHierarchyContainerClasses.contains<Class<*>>(expectedClass))
-            getNetworkHierarchy().onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
+        networkHierarchy ?: getNetworkHierarchy().onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
 
         val toFetch = mutableListOf<String>()
         mRIDs.forEach { mRID ->  // Only process mRIDs not already present in service

@@ -7,6 +7,8 @@
  */
 package com.zepben.evolve.cim.iec61968.assetinfo
 
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -33,13 +35,11 @@ internal class WireInfoTest {
         assertThat(wireInfo.material, equalTo(WireMaterialKind.UNKNOWN))
         assertThat(wireInfo.ratedCurrent, equalTo(0))
 
-        wireInfo.apply {
-            material = WireMaterialKind.aaac
-            ratedCurrent = 123
-        }
+        wireInfo.fillFields(NetworkService(), true)
 
         assertThat(wireInfo.material, equalTo(WireMaterialKind.aaac))
         assertThat(wireInfo.ratedCurrent, equalTo(123))
     }
+
 }
     

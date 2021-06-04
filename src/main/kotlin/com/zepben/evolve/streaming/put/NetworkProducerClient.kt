@@ -241,13 +241,12 @@ class NetworkProducerClient(
                 val builder = CreateUsagePointRequest.newBuilder().setUsagePoint(it.toPb()).build()
                 stub.createUsagePoint(builder)
             },
-            isControl = {
-            },
-            isAnalog = {},
-            isAccumulator = {},
-            isDiscrete = {},
-            isRemoteControl = {},
-            isRemoteSource = {},
+            isControl = { throw NotImplementedError() },
+            isAnalog = { throw NotImplementedError() },
+            isAccumulator = { throw NotImplementedError() },
+            isDiscrete = { throw NotImplementedError() },
+            isRemoteControl = { throw NotImplementedError() },
+            isRemoteSource = { throw NotImplementedError() },
             isTransformerEndInfo = {
                 val builder = CreateTransformerEndInfoRequest.newBuilder().setTransformerEndInfo(it.toPb()).build()
                 stub.createTransformerEndInfo(builder)
@@ -259,7 +258,10 @@ class NetworkProducerClient(
             isTransformerTankInfo = {
                 val builder = CreateTransformerTankInfoRequest.newBuilder().setTransformerTankInfo(it.toPb()).build()
                 stub.createTransformerTankInfo(builder)
-            }
+            },
+            isNoLoadTest = { throw NotImplementedError() },
+            isOpenCircuitTest = { throw NotImplementedError() },
+            isShortCircuitTest = { throw NotImplementedError() }
         )
     }.throwOnUnhandledError()
 }

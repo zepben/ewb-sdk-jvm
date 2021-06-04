@@ -163,6 +163,9 @@ inline fun <R> whenNetworkServiceObject(
     isTransformerEndInfo: (TransformerEndInfo) -> R,
     isTransformerStarImpedance: (TransformerStarImpedance) -> R,
     isTransformerTankInfo: (TransformerTankInfo) -> R,
+    isNoLoadTest: (NoLoadTest) -> R,
+    isOpenCircuitTest: (OpenCircuitTest) -> R,
+    isShortCircuitTest: (ShortCircuitTest) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -221,5 +224,8 @@ inline fun <R> whenNetworkServiceObject(
     is TransformerEndInfo -> isTransformerEndInfo(identifiedObject)
     is TransformerStarImpedance -> isTransformerStarImpedance(identifiedObject)
     is TransformerTankInfo -> isTransformerTankInfo(identifiedObject)
+    is NoLoadTest -> isNoLoadTest(identifiedObject)
+    is OpenCircuitTest -> isOpenCircuitTest(identifiedObject)
+    is ShortCircuitTest -> isShortCircuitTest(identifiedObject)
     else -> isOther(identifiedObject)
 }

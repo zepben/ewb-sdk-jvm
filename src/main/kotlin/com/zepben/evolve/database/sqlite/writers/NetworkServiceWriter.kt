@@ -42,6 +42,9 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<OverheadWireInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<PowerTransformerInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<TransformerTankInfo>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<NoLoadTest>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<OpenCircuitTest>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<ShortCircuitTest>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<TransformerEndInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<AssetOwner>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Pole>().forEach { status = status and validateSave(it, writer::save) }

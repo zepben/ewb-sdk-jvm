@@ -32,10 +32,14 @@ import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.services.common.translator.toCim
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.NoLoadTest as PBNoLoadTest
+import com.zepben.protobuf.cim.iec61968.assetinfo.OpenCircuitTest as PBOpenCircuitTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverheadWireInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PBPowerTransformerInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.ShortCircuitTest as PBShortCircuitTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerEndInfo as PBTransformerEndInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTankInfo as PBTransformerTankInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTest as PBTransformerTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireInfo as PBWireInfo
 import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
 import com.zepben.protobuf.cim.iec61968.assets.AssetContainer as PBAssetContainer
@@ -120,6 +124,7 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 
 /************ IEC61968 ASSET INFO ************/
+
 fun toCim(pb: PBCableInfo, networkService: NetworkService): CableInfo =
     CableInfo(pb.mRID()).apply {
         toCim(pb.wi, this, networkService)
@@ -130,6 +135,26 @@ fun toCim(pb: PBOverheadWireInfo, networkService: NetworkService): OverheadWireI
         toCim(pb.wi, this, networkService)
     }
 
+fun toCim(pb: PBNoLoadTest, networkService: NetworkService): NoLoadTest =
+    NoLoadTest(pb.mRID()).apply {
+        energisedEndVoltage = pb.energisedEndVoltage
+        excitingCurrent = pb.excitingCurrent
+        excitingCurrentZero = pb.excitingCurrentZero
+        loss = pb.loss
+        lossZero = pb.lossZero
+        toCim(pb.tt, this, networkService)
+    }
+
+fun toCim(pb: PBOpenCircuitTest, networkService: NetworkService): OpenCircuitTest =
+    OpenCircuitTest(pb.mRID()).apply {
+        energisedEndStep = pb.energisedEndStep
+        energisedEndVoltage = pb.energisedEndVoltage
+        openEndStep = pb.openEndStep
+        openEndVoltage = pb.openEndVoltage
+        phaseShift = pb.phaseShift
+        toCim(pb.tt, this, networkService)
+    }
+
 fun toCim(pb: PBPowerTransformerInfo, networkService: NetworkService): PowerTransformerInfo =
     PowerTransformerInfo(pb.mRID()).apply {
         pb.transformerTankInfoMRIDsList.forEach {
@@ -138,10 +163,23 @@ fun toCim(pb: PBPowerTransformerInfo, networkService: NetworkService): PowerTran
         toCim(pb.ai, this, networkService)
     }
 
+fun toCim(pb: PBShortCircuitTest, networkService: NetworkService): ShortCircuitTest =
+    ShortCircuitTest(pb.mRID()).apply {
+        current = pb.current
+        energisedEndStep = pb.energisedEndStep
+        groundedEndStep = pb.groundedEndStep
+        leakageImpedance = pb.leakageImpedance
+        leakageImpedanceZero = pb.leakageImpedanceZero
+        loss = pb.loss
+        lossZero = pb.lossZero
+        power = pb.power
+        voltage = pb.voltage
+        voltageOhmicPart = pb.voltageOhmicPart
+        toCim(pb.tt, this, networkService)
+    }
+
 fun toCim(pb: PBTransformerEndInfo, networkService: NetworkService): TransformerEndInfo =
     TransformerEndInfo(pb.mRID()).apply {
-        networkService.resolveOrDeferReference(Resolvers.transformerTankInfo(this), pb.transformerTankInfoMRID)
-        networkService.resolveOrDeferReference(Resolvers.transformerStarImpedance(this), pb.transformerStarImpedanceMRID)
         connectionKind = WindingConnection.valueOf(pb.connectionKind.name)
         emergencyS = pb.emergencyS
         endNumber = pb.endNumber
@@ -151,6 +189,15 @@ fun toCim(pb: PBTransformerEndInfo, networkService: NetworkService): Transformer
         ratedS = pb.ratedS
         ratedU = pb.ratedU
         shortTermS = pb.shortTermS
+
+        networkService.resolveOrDeferReference(Resolvers.transformerTankInfo(this), pb.transformerTankInfoMRID)
+        networkService.resolveOrDeferReference(Resolvers.transformerStarImpedance(this), pb.transformerStarImpedanceMRID)
+        networkService.resolveOrDeferReference(Resolvers.energisedEndNoLoadTests(this), pb.energisedEndNoLoadTestsMRID)
+        networkService.resolveOrDeferReference(Resolvers.energisedEndShortCircuitTests(this), pb.energisedEndShortCircuitTestsMRID)
+        networkService.resolveOrDeferReference(Resolvers.groundedEndShortCircuitTests(this), pb.groundedEndShortCircuitTestsMRID)
+        networkService.resolveOrDeferReference(Resolvers.openEndOpenCircuitTests(this), pb.openEndOpenCircuitTestsMRID)
+        networkService.resolveOrDeferReference(Resolvers.energisedEndOpenCircuitTests(this), pb.energisedEndOpenCircuitTestsMRID)
+
         toCim(pb.ai, this, networkService)
     }
 
@@ -163,6 +210,13 @@ fun toCim(pb: PBTransformerTankInfo, networkService: NetworkService): Transforme
         toCim(pb.ai, this, networkService)
     }
 
+fun toCim(pb: PBTransformerTest, cim: TransformerTest, networkService: NetworkService): TransformerTest =
+    cim.apply {
+        basePower = pb.basePower
+        temperature = pb.temperature
+        toCim(pb.io, this, networkService)
+    }
+
 fun toCim(pb: PBWireInfo, cim: WireInfo, networkService: NetworkService): WireInfo =
     cim.apply {
         ratedCurrent = pb.ratedCurrent
@@ -171,6 +225,7 @@ fun toCim(pb: PBWireInfo, cim: WireInfo, networkService: NetworkService): WireIn
     }
 
 /************ IEC61968 ASSETS ************/
+
 fun toCim(pb: PBAsset, cim: Asset, networkService: NetworkService): Asset =
     cim.apply {
         networkService.resolveOrDeferReference(Resolvers.location(this), pb.locationMRID)
@@ -215,6 +270,7 @@ fun toCim(pb: PBStructure, cim: Structure, networkService: NetworkService): Stru
     cim.apply { toCim(pb.ac, this, networkService) }
 
 /************ IEC61968 COMMON ************/
+
 fun toCim(pb: PBLocation, networkService: NetworkService): Location =
     Location(pb.mRID()).apply {
         mainAddress = if (pb.hasMainAddress()) toCim(pb.mainAddress) else null
@@ -232,6 +288,7 @@ fun toCim(pb: PBTownDetail): TownDetail =
     TownDetail(pb.name.internEmpty(), pb.stateOrProvince.internEmpty())
 
 /************ IEC61968 METERING ************/
+
 fun toCim(pb: PBEndDevice, cim: EndDevice, networkService: NetworkService): EndDevice =
     cim.apply {
         pb.usagePointMRIDsList.forEach { usagePointMRID ->
@@ -263,12 +320,14 @@ fun toCim(pb: PBUsagePoint, networkService: NetworkService): UsagePoint =
     }
 
 /************ IEC61968 OPERATIONS ************/
+
 fun toCim(pb: PBOperationalRestriction, networkService: NetworkService): OperationalRestriction =
     OperationalRestriction(pb.mRID()).apply {
         toCim(pb.doc, this, networkService)
     }
 
 /************ IEC61970 AUXILIARY EQUIPMENT ************/
+
 fun toCim(pb: PBAuxiliaryEquipment, cim: AuxiliaryEquipment, networkService: NetworkService): AuxiliaryEquipment =
     cim.apply {
         networkService.resolveOrDeferReference(Resolvers.terminal(this), pb.terminalMRID)
@@ -281,6 +340,7 @@ fun toCim(pb: PBFaultIndicator, networkService: NetworkService): FaultIndicator 
     }
 
 /************ IEC61970 CORE ************/
+
 fun toCim(pb: PBAcDcTerminal, cim: AcDcTerminal, networkService: NetworkService): AcDcTerminal =
     cim.apply { toCim(pb.io, this, networkService) }
 
@@ -406,9 +466,10 @@ fun toCim(pb: PBTerminal, networkService: NetworkService): Terminal =
     }
 
 /************ IEC61970 MEAS ************/
+
 fun toCim(pb: PBControl, networkService: NetworkService): Control =
     Control(pb.mRID()).apply {
-        powerSystemResourceMRID = pb.powerSystemResourceMRID
+        powerSystemResourceMRID = pb.powerSystemResourceMRID.takeIf { it.isNotBlank() }
         networkService.resolveOrDeferReference(Resolvers.remoteControl(this), pb.remoteControlMRID)
         toCim(pb.ip, this, networkService)
     }
@@ -418,9 +479,9 @@ fun toCim(pb: PBIoPoint, cim: IoPoint, networkService: NetworkService): IoPoint 
 
 fun toCim(pb: PBMeasurement, cim: Measurement, networkService: NetworkService) {
     cim.apply {
-        powerSystemResourceMRID = pb.powerSystemResourceMRID
+        powerSystemResourceMRID = pb.powerSystemResourceMRID.takeIf { it.isNotBlank() }
         networkService.resolveOrDeferReference(Resolvers.remoteSource(this), pb.remoteSourceMRID)
-        terminalMRID = pb.terminalMRID
+        terminalMRID = pb.terminalMRID.takeIf { it.isNotBlank() }
         phases = PhaseCode.valueOf(pb.phases.name)
         unitSymbol = UnitSymbol.valueOf(pb.unitSymbol.name)
         toCim(pb.io, this, networkService)
@@ -444,6 +505,7 @@ fun toCim(pb: PBDiscrete, networkService: NetworkService): Discrete =
     }
 
 /************ IEC61970 SCADA ************/
+
 fun toCim(pb: PBRemoteControl, networkService: NetworkService): RemoteControl =
     RemoteControl(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.control(this), pb.controlMRID)
@@ -460,6 +522,7 @@ fun toCim(pb: PBRemoteSource, networkService: NetworkService): RemoteSource =
     }
 
 /************ IEC61970 WIRES ************/
+
 fun toCim(pb: PBPowerElectronicsUnit, cim: PowerElectronicsUnit, networkService: NetworkService): PowerElectronicsUnit =
     cim.apply {
         networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnection(this), pb.powerElectronicsConnectionMRID)
@@ -715,6 +778,9 @@ fun toCim(pb: PBSwitch, cim: Switch, networkService: NetworkService): Switch =
     cim.apply {
         setNormallyOpen(pb.normalOpen)
         setOpen(pb.open)
+        // when unganged support is added to protobuf
+        // normalOpen = pb.normalOpen
+        // open = pb.open
         toCim(pb.ce, this, networkService)
     }
 
@@ -754,6 +820,7 @@ fun toCim(pb: PBTransformerStarImpedance, networkService: NetworkService): Trans
     }
 
 /************ IEC61970 InfIEC61970 Feeder ************/
+
 fun toCim(pb: PBCircuit, networkService: NetworkService): Circuit =
     Circuit(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.loop(this), pb.loopMRID)
@@ -838,6 +905,9 @@ fun NetworkService.addFromPb(pb: PBPowerElectronicsConnectionPhase): PowerElectr
 fun NetworkService.addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBNoLoadTest): NoLoadTest? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBOpenCircuitTest): OpenCircuitTest? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBShortCircuitTest): ShortCircuitTest? = tryAddOrNull(toCim(pb, this))
 
 /************ Class for Java friendly usage ************/
 
@@ -897,4 +967,8 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim(net
     fun addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBNoLoadTest): NoLoadTest? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBOpenCircuitTest): OpenCircuitTest? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBShortCircuitTest): ShortCircuitTest? = networkService.addFromPb(pb)
+
 }

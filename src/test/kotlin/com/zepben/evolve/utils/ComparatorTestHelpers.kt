@@ -52,9 +52,9 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
     fun validateNameTypes(
         source: NameType,
         target: NameType,
-        expectNameTypeDifference: NameTypeDifference? = null,
-        expectMissingFromTarget: String? = null,
-        expectMissingFromSource: String? = null,
+        expectModification: ObjectDifference<NameType>? = null,
+        expectMissingFromTarget: NameType? = null,
+        expectMissingFromSource: NameType? = null,
         options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all()
     ) {
         val diff = newComparator(options).compare(
@@ -62,27 +62,15 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
             newService().apply { addNameType(target) },
         )
 
-        if (expectNameTypeDifference == null)
-            assertThat(diff.nameTypeDifferences(), empty())
-        else {
-            assertThat(diff.nameTypeDifferences(), contains(expectNameTypeDifference))
-        }
-
-        if (expectMissingFromTarget == null)
-            assertThat(diff.missingNameTypeFromTarget(), empty())
-        else
-            assertThat(diff.missingNameTypeFromTarget(), containsInAnyOrder(expectMissingFromTarget))
-
-        if (expectMissingFromSource == null)
-            assertThat(diff.missingNameTypeFromSource(), empty())
-        else
-            assertThat(diff.missingNameTypeFromSource(), containsInAnyOrder(expectMissingFromSource))
+        expectModification?.let { assertThat(diff.modifications().values, contains(it)) } ?: assertThat(diff.modifications().values, empty())
+        expectMissingFromTarget?.let { assertThat(diff.missingFromTarget(), contains(it.name)) } ?: assertThat(diff.missingFromTarget(), empty())
+        expectMissingFromSource?.let { assertThat(diff.missingFromSource(), contains(it.name)) } ?: assertThat(diff.missingFromSource(), empty())
     }
 
-    fun <T : IdentifiedObject> validateCompare(
+    fun <T : Any> validateCompare(
         source: T,
         target: T,
-        expectModification: ObjectDifference<out IdentifiedObject> = ObjectDifference(source, target),
+        expectModification: ObjectDifference<T> = ObjectDifference(source, target),
         options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all(),
         optionsStopCompare: Boolean = false
     ) {
@@ -90,8 +78,8 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         assertThat(diff, equalTo(expectModification))
 
         if (optionsStopCompare) {
-            val noDiffExpecited: ObjectDifference<T> = newComparator(options).compare(source, target)
-            assertThat(noDiffExpecited, equalTo(ObjectDifference(source, target)))
+            val noDiffExpected: ObjectDifference<T> = newComparator(options).compare(source, target)
+            assertThat(noDiffExpected, equalTo(ObjectDifference(source, target)))
         }
     }
 

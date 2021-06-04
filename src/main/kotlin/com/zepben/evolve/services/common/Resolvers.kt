@@ -7,10 +7,7 @@
  */
 package com.zepben.evolve.services.common
 
-import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.Asset
 import com.zepben.evolve.cim.iec61968.assets.AssetOrganisationRole
 import com.zepben.evolve.cim.iec61968.assets.Pole
@@ -359,5 +356,25 @@ object Resolvers {
             TransformerStarImpedanceToTransformerEndInfoResolver,
             TransformerEndInfoToTransformerStarImpedanceResolver
         )
+
+    @JvmStatic
+    fun energisedEndNoLoadTests(transformerEndInfo: TransformerEndInfo): BoundReferenceResolver<TransformerEndInfo, NoLoadTest> =
+        BoundReferenceResolver(transformerEndInfo, TransformerEndInfoToNoLoadTestResolver, null)
+
+    @JvmStatic
+    fun energisedEndShortCircuitTests(transformerEndInfo: TransformerEndInfo): BoundReferenceResolver<TransformerEndInfo, ShortCircuitTest> =
+        BoundReferenceResolver(transformerEndInfo, TransformerEndInfoToEnergisedEndShortCircuitTestResolver, null)
+
+    @JvmStatic
+    fun groundedEndShortCircuitTests(transformerEndInfo: TransformerEndInfo): BoundReferenceResolver<TransformerEndInfo, ShortCircuitTest> =
+        BoundReferenceResolver(transformerEndInfo, TransformerEndInfoToGroundedEndShortCircuitTestResolver, null)
+
+    @JvmStatic
+    fun openEndOpenCircuitTests(transformerEndInfo: TransformerEndInfo): BoundReferenceResolver<TransformerEndInfo, OpenCircuitTest> =
+        BoundReferenceResolver(transformerEndInfo, TransformerEndInfoToOpenEndOpenCircuitTestResolver, null)
+
+    @JvmStatic
+    fun energisedEndOpenCircuitTests(transformerEndInfo: TransformerEndInfo): BoundReferenceResolver<TransformerEndInfo, OpenCircuitTest> =
+        BoundReferenceResolver(transformerEndInfo, TransformerEndInfoToEnergisedEndOpenCircuitTestResolver, null)
 
 }

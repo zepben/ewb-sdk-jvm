@@ -49,6 +49,11 @@ internal class TransformerEndInfoTest {
         assertThat(transformerEndInfo.shortTermS, equalTo(0))
         assertThat(transformerEndInfo.transformerTankInfo, nullValue())
         assertThat(transformerEndInfo.transformerStarImpedance, nullValue())
+        assertThat(transformerEndInfo.energisedEndNoLoadTests, nullValue())
+        assertThat(transformerEndInfo.energisedEndShortCircuitTests, nullValue())
+        assertThat(transformerEndInfo.groundedEndShortCircuitTests, nullValue())
+        assertThat(transformerEndInfo.openEndOpenCircuitTests, nullValue())
+        assertThat(transformerEndInfo.energisedEndOpenCircuitTests, nullValue())
 
         transformerEndInfo.fillFields(NetworkService())
 
@@ -63,6 +68,11 @@ internal class TransformerEndInfoTest {
         assertThat(transformerEndInfo.shortTermS, equalTo(8))
         assertThat(transformerEndInfo.transformerTankInfo, notNullValue())
         assertThat(transformerEndInfo.transformerStarImpedance, notNullValue())
+        assertThat(transformerEndInfo.energisedEndNoLoadTests, notNullValue())
+        assertThat(transformerEndInfo.energisedEndShortCircuitTests, notNullValue())
+        assertThat(transformerEndInfo.groundedEndShortCircuitTests, notNullValue())
+        assertThat(transformerEndInfo.openEndOpenCircuitTests, notNullValue())
+        assertThat(transformerEndInfo.energisedEndOpenCircuitTests, notNullValue())
     }
 
     @Test

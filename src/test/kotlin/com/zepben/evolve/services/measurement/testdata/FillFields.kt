@@ -10,7 +10,8 @@ package com.zepben.evolve.services.measurement.testdata
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import java.time.Instant
 
-/************ IEC61970 MEASUREMENT ************/
+/************ IEC61970 BASE MEAS ************/
+
 private fun MeasurementValue.fillFields() {
     timeStamp = Instant.now()
 }

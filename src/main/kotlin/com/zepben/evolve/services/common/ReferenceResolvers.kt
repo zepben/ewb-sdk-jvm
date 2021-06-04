@@ -7,10 +7,7 @@
  */
 package com.zepben.evolve.services.common
 
-import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
+import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.Asset
 import com.zepben.evolve.cim.iec61968.assets.AssetOrganisationRole
 import com.zepben.evolve.cim.iec61968.assets.Pole
@@ -349,6 +346,26 @@ internal object TransformerEndInfoToTransformerStarImpedanceResolver : Reference
 
 internal object TransformerStarImpedanceToTransformerEndInfoResolver : ReferenceResolver<TransformerStarImpedance, TransformerEndInfo> by KReferenceResolver(
     TransformerStarImpedance::class, TransformerEndInfo::class, TransformerStarImpedance::transformerEndInfo.setter
+)
+
+internal object TransformerEndInfoToNoLoadTestResolver : ReferenceResolver<TransformerEndInfo, NoLoadTest> by KReferenceResolver(
+    TransformerEndInfo::class, NoLoadTest::class, TransformerEndInfo::energisedEndNoLoadTests.setter
+)
+
+internal object TransformerEndInfoToEnergisedEndShortCircuitTestResolver : ReferenceResolver<TransformerEndInfo, ShortCircuitTest> by KReferenceResolver(
+    TransformerEndInfo::class, ShortCircuitTest::class, TransformerEndInfo::energisedEndShortCircuitTests.setter
+)
+
+internal object TransformerEndInfoToGroundedEndShortCircuitTestResolver : ReferenceResolver<TransformerEndInfo, ShortCircuitTest> by KReferenceResolver(
+    TransformerEndInfo::class, ShortCircuitTest::class, TransformerEndInfo::groundedEndShortCircuitTests.setter
+)
+
+internal object TransformerEndInfoToOpenEndOpenCircuitTestResolver : ReferenceResolver<TransformerEndInfo, OpenCircuitTest> by KReferenceResolver(
+    TransformerEndInfo::class, OpenCircuitTest::class, TransformerEndInfo::openEndOpenCircuitTests.setter
+)
+
+internal object TransformerEndInfoToEnergisedEndOpenCircuitTestResolver : ReferenceResolver<TransformerEndInfo, OpenCircuitTest> by KReferenceResolver(
+    TransformerEndInfo::class, OpenCircuitTest::class, TransformerEndInfo::energisedEndOpenCircuitTests.setter
 )
 
 //-------------------------------------------//

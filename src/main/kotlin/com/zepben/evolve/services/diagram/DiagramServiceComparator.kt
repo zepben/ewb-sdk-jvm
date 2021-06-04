@@ -36,4 +36,5 @@ class DiagramServiceComparator : BaseServiceComparator() {
             compareValues(DiagramObject::identifiedObjectMRID, DiagramObject::style, DiagramObject::rotation)
             compareIndexedValueCollections(DiagramObject::points)
         }
+
 }

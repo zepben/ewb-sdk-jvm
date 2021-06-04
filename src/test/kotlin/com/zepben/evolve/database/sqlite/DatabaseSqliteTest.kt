@@ -7,25 +7,54 @@
  */
 package com.zepben.evolve.database.sqlite
 
+import com.zepben.evolve.cim.iec61968.assetinfo.*
+import com.zepben.evolve.cim.iec61968.assets.AssetOwner
+import com.zepben.evolve.cim.iec61968.assets.Pole
+import com.zepben.evolve.cim.iec61968.assets.Streetlight
+import com.zepben.evolve.cim.iec61968.common.Location
+import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.customers.Customer
-import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
+import com.zepben.evolve.cim.iec61968.customers.PricingStructure
+import com.zepben.evolve.cim.iec61968.customers.Tariff
+import com.zepben.evolve.cim.iec61968.metering.Meter
+import com.zepben.evolve.cim.iec61968.metering.UsagePoint
+import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
-import com.zepben.evolve.cim.iec61970.base.wires.Junction
+import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
+import com.zepben.evolve.cim.iec61970.base.meas.Analog
+import com.zepben.evolve.cim.iec61970.base.meas.Control
+import com.zepben.evolve.cim.iec61970.base.meas.Discrete
+import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
+import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
+import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.BaseServiceComparator
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
+import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.customer.CustomerServiceComparator
+import com.zepben.evolve.services.customer.testdata.fillFields
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.diagram.DiagramServiceComparator
+import com.zepben.evolve.services.diagram.testdata.fillFields
 import com.zepben.evolve.services.network.NetworkModelTestUtil
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
 import com.zepben.evolve.services.network.testdata.SchemaNetworks
 import com.zepben.evolve.services.network.testdata.StupidlyLargeNetwork
+import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -84,6 +113,8 @@ class DatabaseSqliteTest {
 
     @Test
     fun testStupidlyLargeSchema() {
+        // TODO - This needs to be replaced with a test for assigning to feeders and checking the below error. This should be
+        //        done in a separate task to monitor code coverage drops.
         validateSchema(StupidlyLargeNetwork.create())
 
         assertThat(
@@ -92,117 +123,112 @@ class DatabaseSqliteTest {
         )
     }
 
-    /************ IEC61970 BASE CORE ************/
     @Test
-    fun `test Name and NameType schema`() {
-        validateSchema(SchemaNetworks.createNameTestServices())
+    fun `test schema for each supported type`() {
+        /************ IEC61968 ASSET INFO ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::CableInfo, CableInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::NoLoadTest, NoLoadTest::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::OpenCircuitTest, OpenCircuitTest::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::OverheadWireInfo, OverheadWireInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PowerTransformerInfo, PowerTransformerInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::ShortCircuitTest, ShortCircuitTest::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::TransformerEndInfo, TransformerEndInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::TransformerTankInfo, TransformerTankInfo::fillFields))
+
+        /************ IEC61968 ASSETS ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::AssetOwner, AssetOwner::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Pole, Pole::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Streetlight, Streetlight::fillFields))
+
+        /************ IEC61968 CUSTOMERS ************/
+        validateSchema(SchemaNetworks.customerServicesOf(::Customer, Customer::fillFields))
+        validateSchema(SchemaNetworks.customerServicesOf(::CustomerAgreement, CustomerAgreement::fillFields))
+        validateSchema(SchemaNetworks.customerServicesOf(::PricingStructure, PricingStructure::fillFields))
+        validateSchema(SchemaNetworks.customerServicesOf(::Tariff, Tariff::fillFields))
+
+        /************ IEC61968 METERING ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::Meter, Meter::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::UsagePoint, UsagePoint::fillFields))
+
+        /************ IEC61968 COMMON ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::Location, Location::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Organisation, Organisation::fillFieldsCommon))
+        validateSchema(SchemaNetworks.customerServicesOf(::Organisation, Organisation::fillFieldsCommon))
+
+        /************ IEC61968 OPERATIONS ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::OperationalRestriction, OperationalRestriction::fillFields))
+
+        /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::FaultIndicator, FaultIndicator::fillFields))
+
+        /************ IEC61970 BASE CORE ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::BaseVoltage, BaseVoltage::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::ConnectivityNode, ConnectivityNode::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Feeder, Feeder::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::GeographicalRegion, GeographicalRegion::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Site, Site::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::SubGeographicalRegion, SubGeographicalRegion::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Substation, Substation::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Terminal, Terminal::fillFields))
+
+        /************ IEC61970 BASE DIAGRAM LAYOUT ************/
+        validateSchema(SchemaNetworks.diagramServicesOf(::Diagram, Diagram::fillFields))
+        validateSchema(SchemaNetworks.diagramServicesOf(::DiagramObject, DiagramObject::fillFields))
+
+        /************ IEC61970 BASE MEAS ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::Accumulator, Accumulator::fillFields))
+        // validateSchema(SchemaNetworks.measurementServicesOf(::AccumulatorValue, AccumulatorValue::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Analog, Analog::fillFields))
+        // validateSchema(SchemaNetworks.measurementServicesOf(::AnalogValue, AnalogValue::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Control, Control::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Discrete, Discrete::fillFields))
+        // validateSchema(SchemaNetworks.measurementServicesOf(::DiscreteValue, DiscreteValue::fillFields))
+
+        /************ IEC61970 BASE SCADA ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::RemoteControl, RemoteControl::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::RemoteSource, RemoteSource::fillFields))
+
+        /************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::BatteryUnit, BatteryUnit::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PhotoVoltaicUnit, PhotoVoltaicUnit::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PowerElectronicsConnection, PowerElectronicsConnection::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PowerElectronicsConnectionPhase, PowerElectronicsConnectionPhase::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PowerElectronicsWindUnit, PowerElectronicsWindUnit::fillFields))
+
+        /************ IEC61970 BASE WIRES ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::AcLineSegment, AcLineSegment::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Breaker, Breaker::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::BusbarSection, BusbarSection::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Disconnector, Disconnector::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::EnergyConsumer, EnergyConsumer::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::EnergyConsumerPhase, EnergyConsumerPhase::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::EnergySource, EnergySource::fillFields).apply { Tracing.setPhases().run(networkService) })
+        validateSchema(SchemaNetworks.networkServicesOf(::EnergySourcePhase, EnergySourcePhase::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Fuse, Fuse::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Jumper, Jumper::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Junction, Junction::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::LinearShuntCompensator, LinearShuntCompensator::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::LoadBreakSwitch, LoadBreakSwitch::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PerLengthSequenceImpedance, PerLengthSequenceImpedance::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PowerTransformer, PowerTransformer::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PowerTransformerEnd, PowerTransformerEnd::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::RatioTapChanger, RatioTapChanger::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Recloser, Recloser::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::TransformerStarImpedance, TransformerStarImpedance::fillFields))
+
+        /************ IEC61970 InfIEC61970 ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::Circuit, Circuit::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Loop, Loop::fillFields))
     }
-
-    /************ IEC61968 ASSET INFO ************/
-
-    @Test
-    fun `test PowerTransformerInfo schema`() {
-        validateSchema(SchemaNetworks.createPowerTransformerInfoServices())
-    }
-
-    @Test
-    fun `test transformer tank info schema`() {
-        validateSchema(SchemaNetworks.createTransformerTankInfoServices())
-    }
-
-    @Test
-    fun `test transformer end info schema`() {
-        validateSchema(SchemaNetworks.createTransformerEndInfoServices())
-    }
-
-    /************ IEC61968 ASSETS ************/
-
-    @Test
-    fun `test Pole schema`() {
-        validateSchema(SchemaNetworks.createPoleServices())
-    }
-
-    @Test
-    fun `test Streetlight schema`() {
-        validateSchema(SchemaNetworks.createStreetlightServices())
-    }
-
-    /************ IEC61970 WIRES ************/
-
-    @Test
-    fun `test BusbarSection schema`() {
-        validateSchema(SchemaNetworks.createBusbarSectionServices())
-    }
-
-    @Test
-    fun `test PowerTransformer schema`() {
-        validateSchema(SchemaNetworks.createPowerTransformerServices())
-    }
-
-    @Test
-    fun `test LoadBreakSwitch schema`() {
-        validateSchema(SchemaNetworks.createLoadBreakSwitchServices())
-    }
-
-    @Test
-    fun `test Breaker schema`() {
-        validateSchema(SchemaNetworks.createBreakerServices())
-    }
-
-    @Test
-    fun `test power transformer end schema`() {
-        validateSchema(SchemaNetworks.createPowerTransformerEndServices())
-    }
-
-    @Test
-    fun `test transformer star impedance schema`() {
-        validateSchema(SchemaNetworks.createTransformerStarImpedanceServices())
-    }
-
-    /************ IEC61970 WIRES GENERATION PRODUCTION ************/
-
-    @Test
-    fun `test BatteryUnit schema`() {
-        validateSchema(SchemaNetworks.createBatteryUnitServices())
-    }
-
-    @Test
-    fun `test PhotoVoltaic schema`() {
-        validateSchema(SchemaNetworks.createPhotoVoltaicUnitServices())
-    }
-
-    @Test
-    fun `test PowerElectronicsConnection schema`() {
-        validateSchema(SchemaNetworks.createPowerElectronicsConnectionServices())
-    }
-
-    @Test
-    fun `test PowerElectronicsConnectionPhase schema`() {
-        validateSchema(SchemaNetworks.createPowerElectronicsConnectionPhaseServices())
-    }
-
-    @Test
-    fun `test PowerElectronicsWindUnit schema`() {
-        validateSchema(SchemaNetworks.createPowerElectronicsWindUnitServices())
-    }
-
-    /************ IEC61970 InfIEC61970 ************/
-
-    @Test
-    fun testCircuitSchema() {
-        validateSchema(SchemaNetworks.createCircuitServices())
-    }
-
-    @Test
-    fun testLoopSchema() {
-        validateSchema(SchemaNetworks.createLoopServices())
-    }
-
-    /************ OTHER ************/
 
     @Test
     fun testMetadataDataSourceSchema() {
         validateSchema(SchemaNetworks.createDataSourceTestServices())
+    }
+
+    @Test
+    fun `test Name and NameType schema`() {
+        validateSchema(SchemaNetworks.createNameTestServices())
     }
 
     @Test
@@ -262,7 +288,7 @@ class DatabaseSqliteTest {
     }
 
     private fun validateSchema(services: NetworkModelTestUtil.Services) {
-        assertThat(systemErr.logLines.size, equalTo(0))
+        systemErr.clearCapturedLog()
 
         val (expectedMetadata, expectedNetworkService, expectedDiagramService, expectedCustomerService) = services
 
@@ -345,7 +371,8 @@ class DatabaseSqliteTest {
     ) {
         val differences = getComparator().compare(service, expectedService)
 
-        System.err.println(differences.toString())
+        if (differences.modifications().isNotEmpty())
+            System.err.println(differences.toString())
 
         assertThat("unexpected objects found in loaded network", differences.missingFromTarget(), empty())
         assertThat("unexpected modifications", differences.modifications(), anEmptyMap())
@@ -356,4 +383,5 @@ class DatabaseSqliteTest {
         private val logger = LoggerFactory.getLogger(DatabaseSqliteTest::class.java)
         private const val SCHEMA_TEST_FILE = "src/test/data/schemaTest.sqlite"
     }
+
 }

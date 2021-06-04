@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.Name
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import java.security.AccessController
 import java.security.PrivilegedActionException
 import java.security.PrivilegedExceptionAction
@@ -63,8 +64,7 @@ abstract class BaseServiceComparator {
         source.sequenceOf<IdentifiedObject>().forEach { s ->
             val difference = target.get<IdentifiedObject>(s.mRID)?.let { t ->
                 val sourceType = getComparableType(s::class)
-                val targetType = getComparableType(t::class)
-                if (sourceType != targetType) {
+                if (sourceType != getComparableType(t::class)) {
                     differences.addToMissingFromSource(s.mRID)
                     null
                 } else {
@@ -80,52 +80,28 @@ abstract class BaseServiceComparator {
                 differences.addModifications(s.mRID, difference)
         }
 
-        target.sequenceOf<IdentifiedObject>().forEach { t ->
-            if (!source.contains(t.mRID))
-                differences.addToMissingFromSource(t.mRID)
-        }
-
-        fun Name.compareMatch(other: Name): Boolean =
-            this.name == other.name &&
-                this.type.name == other.type.name &&
-                this.identifiedObject.mRID == other.identifiedObject.mRID
+        target.sequenceOf<IdentifiedObject>()
+            .filter { !source.contains(it.mRID) }
+            .forEach { differences.addToMissingFromSource(it.mRID) }
 
         source.nameTypes.forEach { s ->
-            val t = target.getNameType(s.name)
+            val difference = target.getNameType(s.name)?.let { t -> compareNameType(s, t) }
 
-            if (t == null) {
-                differences.addMissingNameTypeFromTarget(s.name)
-            } else {
-                val descDiff = if (s.description != t.description) ValueDifference(s.description, t.description) else null
-
-                val namesMissingFromTarget = mutableListOf<Name>()
-                val namesMissingFromSource = mutableListOf<Name>()
-                s.names.forEach { sName ->
-                    if (!t.names.any { tName -> sName.compareMatch(tName) })
-                        namesMissingFromTarget.add(sName)
-                }
-
-                t.names.forEach { tName ->
-                    if (!s.names.any { sName -> tName.compareMatch(sName) })
-                        namesMissingFromSource.add(tName)
-                }
-
-                if (descDiff != null || namesMissingFromTarget.isNotEmpty() || namesMissingFromSource.isNotEmpty()) {
-                    differences.addNameTypeDifference(NameTypeDifference(descDiff, namesMissingFromTarget, namesMissingFromSource))
-                }
-            }
+            if (difference == null)  // Wasn't present in target
+                differences.addToMissingFromTarget(s.name)
+            else if (difference.differences.isNotEmpty())  // present, but not the same
+                differences.addModifications(s.name, difference)
         }
 
-        target.nameTypes.forEach { t ->
-            if (source.getNameType(t.name) == null)
-                differences.addMissingNameTypeFromSource(t.name)
-        }
+        target.nameTypes
+            .filter { source.getNameType(it.name) == null }
+            .forEach { differences.addToMissingFromSource(it.name) }
 
         return differences
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : IdentifiedObject> compare(source: T, target: T): ObjectDifference<T> {
+    fun <T : Any> compare(source: T, target: T): ObjectDifference<T> {
         val sourceType = getComparableType(source::class)
         val targetType = getComparableType(target::class)
 
@@ -139,6 +115,30 @@ abstract class BaseServiceComparator {
         compareValues(IdentifiedObject::mRID, IdentifiedObject::name, IdentifiedObject::description, IdentifiedObject::numDiagramObjects)
         compareNames(IdentifiedObject::names)
     }
+
+    protected fun compareNameType(source: NameType, target: NameType): ObjectDifference<NameType> =
+        ObjectDifference(source, target).apply {
+            compareValues(NameType::description)
+
+            fun Name.compareMatch(other: Name): Boolean =
+                this.name == other.name &&
+                    this.type.name == other.type.name &&
+                    this.identifiedObject.mRID == other.identifiedObject.mRID
+
+            val differences = CollectionDifference()
+
+            source.names.forEach { sName ->
+                if (!target.names.any { tName -> sName.compareMatch(tName) })
+                    differences.missingFromTarget.add(sName)
+            }
+
+            target.names.forEach { tName ->
+                if (!source.names.any { sName -> tName.compareMatch(sName) })
+                    differences.missingFromSource.add(tName)
+            }
+
+            addIfDifferent(NameType::names.name, differences.nullIfEmpty())
+        }
 
     protected fun ObjectDifference<out Document>.compareDocument(): ObjectDifference<out Document> =
         apply {
@@ -169,56 +169,56 @@ abstract class BaseServiceComparator {
             .firstOrNull()
     }
 
-    protected fun <T : IdentifiedObject> ObjectDifference<T>.compareValues(
+    fun <T> ObjectDifference<T>.compareValues(
         vararg properties: KProperty1<in T, *>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareValues(source, target)) }
         return this
     }
 
-    protected fun <T : IdentifiedObject> ObjectDifference<T>.compareDoubles(
+    fun <T> ObjectDifference<T>.compareDoubles(
         vararg properties: KProperty1<in T, Double>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareDoubles(source, target)) }
         return this
     }
 
-    protected fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIdReferences(
+    fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIdReferences(
         vararg properties: KProperty1<in T, R?>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIdReference(source, target)) }
         return this
     }
 
-    protected fun <T : IdentifiedObject> ObjectDifference<T>.compareNames(
+    fun <T : IdentifiedObject> ObjectDifference<T>.compareNames(
         vararg properties: KProperty1<IdentifiedObject, Collection<Name>>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareNames(source, target)) }
         return this
     }
 
-    protected fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIdReferenceCollections(
+    fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIdReferenceCollections(
         vararg properties: KProperty1<in T, Collection<R>>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIdReferenceCollection(source, target)) }
         return this
     }
 
-    protected fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIndexedIdReferenceCollections(
+    fun <T : IdentifiedObject, R : IdentifiedObject> ObjectDifference<T>.compareIndexedIdReferenceCollections(
         vararg properties: KProperty1<in T, List<R>>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIndexedIdReferenceCollection(source, target)) }
         return this
     }
 
-    protected fun <T : IdentifiedObject> ObjectDifference<T>.compareIndexedValueCollections(
+    fun <T> ObjectDifference<T>.compareIndexedValueCollections(
         vararg properties: KProperty1<in T, List<*>>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIndexedValueCollection(source, target)) }
         return this
     }
 
-    protected fun <T : IdentifiedObject> ObjectDifference<T>.addIfDifferent(name: String, difference: Difference?) {
+    fun <T> ObjectDifference<T>.addIfDifferent(name: String, difference: Difference?) {
         if (difference != null) {
             differences[name] = difference
         }

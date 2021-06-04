@@ -111,4 +111,10 @@ class NameType(var name: String) {
         namesMultiIndex = mutableMapOf()
         return this
     }
+
+    override fun toString(): String {
+        return "NameType(name='$name', description='$description')"
+    }
+
+
 }

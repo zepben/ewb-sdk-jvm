@@ -21,21 +21,21 @@ fun toCim(pb: PBMeasurementValue, cim: MeasurementValue): MeasurementValue =
 
 fun toCim(pb: PBAnalogValue): AnalogValue =
     AnalogValue().apply {
-        analogMRID = pb.analogMRID
+        analogMRID = pb.analogMRID.takeIf { it.isNotBlank() }
         value = pb.value
         toCim(pb.mv, this)
     }
 
 fun toCim(pb: PBAccumulatorValue): AccumulatorValue =
     AccumulatorValue().apply {
-        accumulatorMRID = pb.accumulatorMRID
+        accumulatorMRID = pb.accumulatorMRID.takeIf { it.isNotBlank() }
         value = pb.value.toUInt()
         toCim(pb.mv, this)
     }
 
 fun toCim(pb: PBDiscreteValue): DiscreteValue =
     DiscreteValue().apply {
-        discreteMRID = pb.discreteMRID
+        discreteMRID = pb.discreteMRID.takeIf { it.isNotBlank() }
         value = pb.value
         toCim(pb.mv, this)
     }

@@ -31,6 +31,12 @@ import com.zepben.evolve.services.network.mergeIfIncomplete
  * @property shortTermS Apparent power that this winding can carry for a short period of time (in emergency) in volt amperes (VA).
  * @property transformerTankInfo Transformer tank data that this end description is part of.
  * @property transformerStarImpedance Transformer star impedance calculated from this transformer end datasheet.
+ * @property energisedEndNoLoadTests All no-load test measurements in which this transformer end was energised.
+ * @property energisedEndShortCircuitTests All short-circuit test measurements in which this transformer end was short-circuited.
+ * @property groundedEndShortCircuitTests All short-circuit test measurements in which this transformer end was energised.
+ * @property openEndOpenCircuitTests All open-circuit test measurements in which this transformer end was not excited.
+ * @property energisedEndOpenCircuitTests All open-circuit test measurements in which this transformer end was excited.
+
  */
 class TransformerEndInfo(mRID: String = "") : AssetInfo(mRID) {
 
@@ -46,6 +52,11 @@ class TransformerEndInfo(mRID: String = "") : AssetInfo(mRID) {
 
     var transformerTankInfo: TransformerTankInfo? = null
     var transformerStarImpedance: TransformerStarImpedance? = null
+    var energisedEndNoLoadTests: NoLoadTest? = null
+    var energisedEndShortCircuitTests: ShortCircuitTest? = null
+    var groundedEndShortCircuitTests: ShortCircuitTest? = null
+    var openEndOpenCircuitTests: OpenCircuitTest? = null
+    var energisedEndOpenCircuitTests: OpenCircuitTest? = null
 
     /**
      * Get the [ResistanceReactance] for this [TransformerEndInfo] from either the pre-calculated [transformerStarImpedance] or
@@ -56,7 +67,7 @@ class TransformerEndInfo(mRID: String = "") : AssetInfo(mRID) {
             calculateResistanceReactanceFromTests()
         } ?: calculateResistanceReactanceFromTests()
 
-    // https://app.clickup.com/t/6929263/EWB-615 Calculate from test data if available.
+    // https://app.clickup.com/t/6929263/EWB-772
     @Suppress("RedundantNullableReturnType")
     internal fun calculateResistanceReactanceFromTests(): ResistanceReactance? =
         null

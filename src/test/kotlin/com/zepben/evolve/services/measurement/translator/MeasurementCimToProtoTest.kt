@@ -17,6 +17,10 @@ class MeasurementCimToProtoTest {
 
     private val validator = MeasurementCimToProtoTestValidator()
 
+    //
+    // NOTE: We can't use the same method for testing the measurement service as the others because there is no comparator and the
+    //
+
     @Test
     internal fun convertsAnalogValue() {
         val cim = AnalogValue()

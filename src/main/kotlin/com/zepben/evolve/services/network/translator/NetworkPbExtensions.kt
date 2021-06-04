@@ -35,9 +35,13 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop
 
 fun CableInfo.mRID(): String = wi.mRID()
 fun OverheadWireInfo.mRID(): String = wi.mRID()
+fun NoLoadTest.mRID(): String = tt.mRID()
+fun OpenCircuitTest.mRID(): String = tt.mRID()
 fun PowerTransformerInfo.mRID(): String = ai.mRID()
+fun ShortCircuitTest.mRID(): String = tt.mRID()
 fun TransformerEndInfo.mRID(): String = ai.mRID()
 fun TransformerTankInfo.mRID(): String = ai.mRID()
+fun TransformerTest.mRID(): String = io.mrid
 fun WireInfo.mRID(): String = ai.mRID()
 fun Asset.mRID(): String = io.mrid
 fun AssetContainer.mRID(): String = at.mRID()

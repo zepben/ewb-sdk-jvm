@@ -36,10 +36,12 @@ To build:
    1. Add schema tests - `DatabaseSqliteTest.kt`
 1. Reference resolver(s) added (if new associations).
 1. Protobuf/gRPC
-   1. *CimToProto(s) updated and tested.
-   1. *ProtoToCim(s) updated and tested.
+   1. *CimToProto(s) updated (including java wrapper).
+   1. *ProtoToCim(s) updated (including java wrapper).
+   1. *TranslatorTest(s) updated.
 
-NOTE: Do not update the CimPbTest or the StupidlyLargeNetwork files, these will be phased out.
+NOTE: Do not update the StupidlyLargeNetwork file, this will be phased out.
+
 1. *ServiceComparator(s) updated and tested.
 1. Exhaustive when functions in *ServiceUtils updated if a new class is added.
 1. Release notes updated.

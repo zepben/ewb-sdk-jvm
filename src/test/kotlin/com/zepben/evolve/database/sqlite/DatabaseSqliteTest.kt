@@ -52,6 +52,7 @@ import com.zepben.evolve.services.network.NetworkModelTestUtil
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
 import com.zepben.evolve.services.network.testdata.SchemaNetworks
+import com.zepben.evolve.services.network.testdata.StupidlyLargeNetwork
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.testutils.junit.SystemLogExtension
@@ -108,6 +109,18 @@ class DatabaseSqliteTest {
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
+    }
+
+    @Test
+    fun testStupidlyLargeSchema() {
+        // TODO - This needs to be replaced with a test for assigning to feeders and checking the below error. This should be
+        //        done in a separate task to monitor code coverage drops.
+        validateSchema(StupidlyLargeNetwork.create())
+
+        assertThat(
+            systemErr.log,
+            containsString("Primary source 'primary source' [primary_source] has been assigned to the following feeders: normal [f1], current [f2]")
+        )
     }
 
     @Test

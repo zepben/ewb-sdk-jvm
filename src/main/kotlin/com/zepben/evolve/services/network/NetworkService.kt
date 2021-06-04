@@ -225,6 +225,15 @@ class NetworkService : BaseService("network") {
     fun add(transformerTankInfo: TransformerTankInfo): Boolean = super.add(transformerTankInfo)
     fun remove(transformerTankInfo: TransformerTankInfo): Boolean = super.remove(transformerTankInfo)
 
+    fun add(noLoadTest: NoLoadTest): Boolean = super.add(noLoadTest)
+    fun remove(noLoadTest: NoLoadTest): Boolean = super.remove(noLoadTest)
+
+    fun add(openCircuitTest: OpenCircuitTest): Boolean = super.add(openCircuitTest)
+    fun remove(openCircuitTest: OpenCircuitTest): Boolean = super.remove(openCircuitTest)
+
+    fun add(shortCircuitTest: ShortCircuitTest): Boolean = super.add(shortCircuitTest)
+    fun remove(shortCircuitTest: ShortCircuitTest): Boolean = super.remove(shortCircuitTest)
+
     /**
      * Get all measurements of type [T] associated with the given [mRID].
      *

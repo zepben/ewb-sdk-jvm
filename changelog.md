@@ -18,6 +18,11 @@
   `EquipmentContainer`.
 * Added API calls for getting loops.
 * Added `RunStreaming` examples to the tests, which can be used to talk to a real server.
+* Added the following CIM classes:
+  * TransformerTest
+  * NoLoadTest
+  * OpenCircuitTest
+  * ShortCircuitTest
 
 ##### Enhancements
 
@@ -30,6 +35,7 @@
 
 * `getIdentifiedObjects` now adds unknown mRIDs to the failed collection.
 * Fixed an error in the typing for `GrpcResult` that allowed you to set a value to `null` without specifying a nullable type.
+* Fixed errors in the decoding fromm protobuf of optional reference mRIDs that were not assigned.
 
 ##### Notes
 

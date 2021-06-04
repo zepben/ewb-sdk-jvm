@@ -47,15 +47,28 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
     private fun compareCableInfo(source: CableInfo, target: CableInfo): ObjectDifference<CableInfo> =
         ObjectDifference(source, target).apply { compareWireInfo() }
 
+    private fun compareNoLoadTest(source: NoLoadTest, target: NoLoadTest): ObjectDifference<NoLoadTest> =
+        ObjectDifference(source, target).apply {
+            compareTransformerTest()
+
+            compareValues(NoLoadTest::energisedEndVoltage, NoLoadTest::excitingCurrent, NoLoadTest::excitingCurrentZero, NoLoadTest::loss, NoLoadTest::lossZero)
+        }
+
+    private fun compareOpenCircuitTest(source: OpenCircuitTest, target: OpenCircuitTest): ObjectDifference<OpenCircuitTest> =
+        ObjectDifference(source, target).apply {
+            compareTransformerTest()
+
+            compareValues(
+                OpenCircuitTest::energisedEndStep,
+                OpenCircuitTest::energisedEndVoltage,
+                OpenCircuitTest::openEndStep,
+                OpenCircuitTest::openEndVoltage,
+                OpenCircuitTest::phaseShift
+            )
+        }
+
     private fun compareOverheadWireInfo(source: OverheadWireInfo, target: OverheadWireInfo): ObjectDifference<OverheadWireInfo> =
         ObjectDifference(source, target).apply { compareWireInfo() }
-
-    private fun ObjectDifference<out WireInfo>.compareWireInfo(): ObjectDifference<out WireInfo> =
-        apply {
-            compareAssetInfo()
-
-            compareValues(WireInfo::ratedCurrent, WireInfo::material)
-        }
 
     private fun comparePowerTransformerInfo(source: PowerTransformerInfo, target: PowerTransformerInfo): ObjectDifference<PowerTransformerInfo> =
         ObjectDifference(source, target).apply {
@@ -64,11 +77,36 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareIdReferenceCollections(PowerTransformerInfo::transformerTankInfos)
         }
 
+    private fun compareShortCircuitTest(source: ShortCircuitTest, target: ShortCircuitTest): ObjectDifference<ShortCircuitTest> =
+        ObjectDifference(source, target).apply {
+            compareTransformerTest()
+
+            compareValues(
+                ShortCircuitTest::current,
+                ShortCircuitTest::energisedEndStep,
+                ShortCircuitTest::groundedEndStep,
+                ShortCircuitTest::leakageImpedance,
+                ShortCircuitTest::leakageImpedanceZero,
+                ShortCircuitTest::loss,
+                ShortCircuitTest::lossZero,
+                ShortCircuitTest::power,
+                ShortCircuitTest::voltage,
+                ShortCircuitTest::voltageOhmicPart
+            )
+        }
+
     private fun compareTransformerEndInfo(source: TransformerEndInfo, target: TransformerEndInfo): ObjectDifference<TransformerEndInfo> =
         ObjectDifference(source, target).apply {
             compareAssetInfo()
 
-            compareIdReferences(TransformerEndInfo::transformerStarImpedance)
+            compareIdReferences(
+                TransformerEndInfo::transformerStarImpedance,
+                TransformerEndInfo::energisedEndNoLoadTests,
+                TransformerEndInfo::energisedEndShortCircuitTests,
+                TransformerEndInfo::groundedEndShortCircuitTests,
+                TransformerEndInfo::openEndOpenCircuitTests,
+                TransformerEndInfo::energisedEndOpenCircuitTests
+            )
             compareValues(
                 TransformerEndInfo::connectionKind,
                 TransformerEndInfo::emergencyS,
@@ -87,6 +125,20 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareAssetInfo()
 
             compareIdReferenceCollections(TransformerTankInfo::transformerEndInfos)
+        }
+
+    private fun ObjectDifference<out TransformerTest>.compareTransformerTest(): ObjectDifference<out TransformerTest> =
+        apply {
+            compareIdentifiedObject()
+
+            compareValues(TransformerTest::basePower, TransformerTest::temperature)
+        }
+
+    private fun ObjectDifference<out WireInfo>.compareWireInfo(): ObjectDifference<out WireInfo> =
+        apply {
+            compareAssetInfo()
+
+            compareValues(WireInfo::ratedCurrent, WireInfo::material)
         }
 
     private fun ObjectDifference<out Asset>.compareAsset(): ObjectDifference<out Asset> =
@@ -671,4 +723,5 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
 
             compareIdReferences(RemoteSource::measurement)
         }
+
 }

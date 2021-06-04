@@ -14,7 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TablePowerSys
 @Suppress("PropertyName")
 class TableEnergyConsumerPhases : TablePowerSystemResources() {
 
-    val ENERGY_CONSUMER_MRID = Column(++columnIndex, "ENERGY_CONSUMER_MRID", "TEXT", NOT_NULL)
+    val ENERGY_CONSUMER_MRID = Column(++columnIndex, "energy_consumer_mrid", "TEXT", NOT_NULL)
     val PHASE = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
     val P = Column(++columnIndex, "p", "NUMBER", NOT_NULL)
     val Q = Column(++columnIndex, "q", "NUMBER", NOT_NULL)
@@ -23,6 +23,14 @@ class TableEnergyConsumerPhases : TablePowerSystemResources() {
 
     override fun name(): String {
         return "energy_consumer_phases"
+    }
+
+    override fun uniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.uniqueIndexColumns()
+
+        cols.add(listOf(ENERGY_CONSUMER_MRID, PHASE))
+
+        return cols
     }
 
     override fun nonUniqueIndexColumns(): MutableList<List<Column>> {

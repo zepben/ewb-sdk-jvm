@@ -25,6 +25,11 @@ class TableTransformerEndInfo : TableAssetInfo() {
     val RATED_U = Column(++columnIndex, "rated_u", "INT", NOT_NULL)
     val SHORT_TERM_S = Column(++columnIndex, "short_term_s", "INT", NOT_NULL)
     val TRANSFORMER_TANK_INFO_MRID = Column(++columnIndex, "transformer_tank_info_mrid", "TEXT", NULL)
+    val ENERGISED_END_NO_LOAD_TESTS = Column(++columnIndex, "energised_end_no_load_tests", "TEXT", NULL)
+    val ENERGISED_END_SHORT_CIRCUIT_TESTS = Column(++columnIndex, "energised_end_short_circuit_tests", "TEXT", NULL)
+    val GROUNDED_END_SHORT_CIRCUIT_TESTS = Column(++columnIndex, "grounded_end_short_circuit_tests", "TEXT", NULL)
+    val OPEN_END_OPEN_CIRCUIT_TESTS = Column(++columnIndex, "open_end_open_circuit_tests", "TEXT", NULL)
+    val ENERGISED_END_OPEN_CIRCUIT_TESTS = Column(++columnIndex, "energised_end_open_circuit_tests", "TEXT", NULL)
 
     override fun name(): String {
         return "transformer_end_info"
@@ -34,6 +39,11 @@ class TableTransformerEndInfo : TableAssetInfo() {
         val cols = super.nonUniqueIndexColumns()
 
         cols.add(listOf(TRANSFORMER_TANK_INFO_MRID))
+        cols.add(listOf(ENERGISED_END_NO_LOAD_TESTS))
+        cols.add(listOf(ENERGISED_END_SHORT_CIRCUIT_TESTS))
+        cols.add(listOf(GROUNDED_END_SHORT_CIRCUIT_TESTS))
+        cols.add(listOf(OPEN_END_OPEN_CIRCUIT_TESTS))
+        cols.add(listOf(ENERGISED_END_OPEN_CIRCUIT_TESTS))
 
         return cols
     }

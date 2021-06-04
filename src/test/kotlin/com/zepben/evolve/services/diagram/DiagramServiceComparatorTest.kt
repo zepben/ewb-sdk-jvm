@@ -16,7 +16,7 @@ internal class DiagramServiceComparatorTest : BaseServiceComparatorTest() {
 
     override val comparatorValidator: ServiceComparatorValidator<DiagramService, DiagramServiceComparator> = ServiceComparatorValidator(
         { DiagramService() },
-        { _ -> DiagramServiceComparator() }
+        { DiagramServiceComparator() }
     )
 
     @Test

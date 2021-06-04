@@ -32,7 +32,7 @@ fun toCim(pb: PBDiagramObject, diagramService: DiagramService): DiagramObject =
         diagramService.resolveOrDeferReference(Resolvers.diagram(this), pb.diagramMRID)
         diagram?.addDiagramObject(this)
         rotation = pb.rotation
-        identifiedObjectMRID = pb.identifiedObjectMRID
+        identifiedObjectMRID = pb.identifiedObjectMRID.takeIf { it.isNotBlank() }
         style = DiagramObjectStyle.valueOf(pb.diagramObjectStyle.name)
         pb.diagramObjectPointsList.forEach { addPoint(toCim(it)) }
         toCim(pb.io, this, diagramService)

@@ -24,8 +24,8 @@ fun toPb(cim: Diagram, pb: PBDiagram.Builder): PBDiagram.Builder =
     pb.apply {
         clearDiagramObjectMRIDs()
         cim.diagramObjects.forEach { addDiagramObjectMRIDs(it.mRID) }
-        orientationKind = PBOrientationKind.valueOf(pb.orientationKind.name)
-        diagramStyle = PBDiagramStyle.valueOf(pb.diagramStyle.name)
+        orientationKind = PBOrientationKind.valueOf(cim.orientationKind.name)
+        diagramStyle = PBDiagramStyle.valueOf(cim.diagramStyle.name)
         toPb(cim, ioBuilder)
     }
 

@@ -134,7 +134,7 @@ fun <T, R> KProperty1<in T, List<R>>.compareIndexedValueCollection(
     return differences.nullIfEmpty()
 }
 
-private fun CollectionDifference.nullIfEmpty() =
+internal fun CollectionDifference.nullIfEmpty() =
     if (missingFromSource.isEmpty() && missingFromTarget.isEmpty() && modifications.isEmpty()) {
         null
     } else {

@@ -7,25 +7,16 @@
  */
 package com.zepben.evolve.services.network.testdata
 
-import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.TransformerTankInfo
-import com.zepben.evolve.cim.iec61968.assets.Pole
-import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.NameType
-import com.zepben.evolve.cim.iec61970.base.wires.*
-import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
-import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
-import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
-import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.base.wires.EnergyConsumer
+import com.zepben.evolve.cim.iec61970.base.wires.EnergyConsumerPhase
+import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
+import com.zepben.evolve.cim.iec61970.base.wires.EnergySourcePhase
 import com.zepben.evolve.services.common.meta.DataSource
-import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
-import com.zepben.evolve.services.measurement.MeasurementService
 import com.zepben.evolve.services.network.NetworkModelTestUtil
 import com.zepben.evolve.services.network.NetworkService
 import java.time.Instant
@@ -33,84 +24,104 @@ import java.time.Instant
 @Suppress("SameParameterValue", "BooleanLiteralArgument")
 object SchemaNetworks {
 
-    fun createNameTestServices(): NetworkModelTestUtil.Services {
-        val networkService = NetworkService().apply {
+    fun createNameTestServices() = NetworkModelTestUtil.Services().apply {
+        networkService.apply {
             val nameType = NameType("type1").apply {
                 description = "type description"
-                val identifiedObject = Organisation("org1")
-                val name = getOrAddName("name1", identifiedObject)
-                identifiedObject.addName(name)
+                Organisation("org1").also {
+                    it.addName(getOrAddName("name1", it))
+                    add(it)
+                }
             }
 
             addNameType(nameType)
         }
 
-        val customerService = CustomerService().apply {
+        customerService.apply {
             val nameType = NameType("type1").apply {
                 description = "type description"
-                val identifiedObject = Organisation("org1")
-                val name = getOrAddName("name1", identifiedObject)
-                identifiedObject.addName(name)
+                Organisation("org1").also {
+                    it.addName(getOrAddName("name1", it))
+                    add(it)
+                }
             }
 
             addNameType(nameType)
         }
 
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), customerService, MeasurementService())
+        diagramService.apply {
+            addNameType(NameType("type1").apply { description = "type description" })
+        }
     }
 
-    fun createDataSourceTestServices(): NetworkModelTestUtil.Services {
-        val metadataCollection = MetadataCollection()
-
+    fun createDataSourceTestServices() = NetworkModelTestUtil.Services().apply {
         metadataCollection.add(DataSource("source1", "v1", Instant.EPOCH))
         metadataCollection.add(DataSource("source2", "v2", Instant.now()))
-
-        return NetworkModelTestUtil.Services(metadataCollection, NetworkService(), DiagramService(), CustomerService(), MeasurementService())
     }
 
-    fun createBusbarSectionServices() = servicesOf(::BusbarSection, BusbarSection::fillFields)
+    fun <T : IdentifiedObject> customerServicesOf(factory: (mRID: String) -> T, filler: (T, CustomerService, Boolean) -> T) =
+        NetworkModelTestUtil.Services().apply {
+            customerService.tryAdd(factory("empty"))
+            customerService.tryAdd(filler(factory("filled"), customerService, false))
 
-    fun createBatteryUnitServices() = servicesOf(::BatteryUnit, BatteryUnit::fillFields)
+            // Copy items to other services that get auto loaded there.
+            customerService.sequenceOf<Organisation>().forEach { networkService.add(it) }
+            customerService.nameTypes.forEach {
+                networkService.addNameType(NameType(it.name).apply {
+                    description = it.description
+                    it.names
+                        .filter { name -> name.identifiedObject is Organisation }
+                        .forEach { name -> getOrAddName(name.name, name.identifiedObject) }
+                })
+                diagramService.addNameType(NameType(it.name).apply { description = it.description })
+            }
+        }
 
-    fun createPhotoVoltaicUnitServices() = servicesOf(::PhotoVoltaicUnit, PhotoVoltaicUnit::fillFields)
+    fun <T : IdentifiedObject> diagramServicesOf(factory: (mRID: String) -> T, filler: (T, DiagramService, Boolean) -> T) =
+        NetworkModelTestUtil.Services().apply {
+            diagramService.tryAdd(factory("empty"))
+            diagramService.tryAdd(filler(factory("filled"), diagramService, false))
 
-    fun createPowerElectronicsWindUnitServices() = servicesOf(::PowerElectronicsWindUnit, PowerElectronicsWindUnit::fillFields)
+            // Copy items to other services that get auto loaded there.
+            diagramService.nameTypes.forEach {
+                customerService.addNameType(NameType(it.name).apply { description = it.description })
+                networkService.addNameType(NameType(it.name).apply { description = it.description })
+            }
+        }
 
-    fun createPowerElectronicsConnectionServices() = servicesOf(::PowerElectronicsConnection, PowerElectronicsConnection::fillFields)
+    fun <T : IdentifiedObject> networkServicesOf(factory: (mRID: String) -> T, filler: (T, NetworkService, Boolean) -> T) =
+        NetworkModelTestUtil.Services().apply {
+            networkService.tryAdd(factory("empty").also { fillRequired(networkService, it) })
+            networkService.tryAdd(filler(factory("filled"), networkService, false))
 
-    fun createPowerElectronicsConnectionPhaseServices() = servicesOf(::PowerElectronicsConnectionPhase, PowerElectronicsConnectionPhase::fillFields)
+            // Copy items to other services that get auto loaded there.
+            networkService.sequenceOf<Organisation>().forEach { customerService.add(it) }
+            networkService.nameTypes.forEach {
+                customerService.addNameType(NameType(it.name).apply {
+                    description = it.description
+                    it.names
+                        .filter { name -> name.identifiedObject is Organisation }
+                        .forEach { name -> getOrAddName(name.name, name.identifiedObject) }
+                })
+                diagramService.addNameType(NameType(it.name).apply { description = it.description })
+            }
+        }
 
-    fun createPoleServices() = servicesOf(::Pole, Pole::fillFields)
-
-    fun createPowerTransformerServices() = servicesOf(::PowerTransformer, PowerTransformer::fillFields)
-
-    fun createLoadBreakSwitchServices() = servicesOf(::LoadBreakSwitch, LoadBreakSwitch::fillFields)
-
-    fun createBreakerServices() = servicesOf(::Breaker, Breaker::fillFields)
-
-    fun createPowerTransformerInfoServices() = servicesOf(::PowerTransformerInfo, PowerTransformerInfo::fillFields)
-
-    fun createStreetlightServices() = servicesOf(::Streetlight, Streetlight::fillFields)
-
-    fun createCircuitServices() = servicesOf(::Circuit, Circuit::fillFields)
-
-    fun createLoopServices() = servicesOf(::Loop, Loop::fillFields)
-
-    fun createPowerTransformerEndServices() = servicesOf(::PowerTransformerEnd, PowerTransformerEnd::fillFields)
-
-    fun createTransformerStarImpedanceServices() = servicesOf(::TransformerStarImpedance, TransformerStarImpedance::fillFields)
-
-    fun createTransformerTankInfoServices() = servicesOf(::TransformerTankInfo, TransformerTankInfo::fillFields)
-
-    fun createTransformerEndInfoServices() = servicesOf(::TransformerEndInfo, TransformerEndInfo::fillFields)
-
-    private fun <T : IdentifiedObject> servicesOf(factory: (mRID: String) -> T, filler: (T, NetworkService, Boolean) -> T): NetworkModelTestUtil.Services {
-        val networkService = NetworkService()
-
-        networkService.tryAdd(factory("empty"))
-        networkService.tryAdd(filler(factory("filled"), networkService, false))
-
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, DiagramService(), CustomerService(), MeasurementService())
+    private fun fillRequired(service: NetworkService, io: IdentifiedObject) {
+        when (io) {
+            is EnergyConsumerPhase -> {
+                io.energyConsumer = EnergyConsumer().also {
+                    it.addPhase(io)
+                    service.add(it)
+                }
+            }
+            is EnergySourcePhase -> {
+                io.energySource = EnergySource().also {
+                    it.addPhase(io)
+                    service.add(it)
+                }
+            }
+        }
     }
 
 }

@@ -568,6 +568,9 @@ class NetworkConsumerClient(
             TRANSFORMERSTARIMPEDANCE -> extractResult(io.transformerStarImpedance.mRID()) { addFromPb(io.transformerStarImpedance) }
             TRANSFORMERENDINFO -> extractResult(io.transformerEndInfo.mRID()) { addFromPb(io.transformerEndInfo) }
             TRANSFORMERTANKINFO -> extractResult(io.transformerTankInfo.mRID()) { addFromPb(io.transformerTankInfo) }
+            NOLOADTEST -> extractResult(io.noLoadTest.mRID()) { addFromPb(io.noLoadTest) }
+            OPENCIRCUITTEST -> extractResult(io.openCircuitTest.mRID()) { addFromPb(io.openCircuitTest) }
+            SHORTCIRCUITTEST -> extractResult(io.shortCircuitTest.mRID()) { addFromPb(io.shortCircuitTest) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )

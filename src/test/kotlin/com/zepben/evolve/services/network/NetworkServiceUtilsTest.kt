@@ -106,6 +106,9 @@ internal class NetworkServiceUtilsTest {
         isTransformerEndInfo: (TransformerEndInfo) -> String,
         isTransformerStarImpedance: (TransformerStarImpedance) -> String,
         isTransformerTankInfo: (TransformerTankInfo) -> String,
+        isNoLoadTest: (NoLoadTest) -> String,
+        isOpenCircuitTest: (OpenCircuitTest) -> String,
+        isShortCircuitTest: (ShortCircuitTest) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -163,6 +166,9 @@ internal class NetworkServiceUtilsTest {
         isTransformerEndInfo = isTransformerEndInfo,
         isTransformerStarImpedance = isTransformerStarImpedance,
         isTransformerTankInfo = isTransformerTankInfo,
+        isNoLoadTest = isNoLoadTest,
+        isOpenCircuitTest = isOpenCircuitTest,
+        isShortCircuitTest = isShortCircuitTest,
         isOther = isOther
     )
 
@@ -222,6 +228,9 @@ internal class NetworkServiceUtilsTest {
         isTransformerEndInfo: InvokeChecker<TransformerEndInfo> = NeverInvokedChecker(),
         isTransformerStarImpedance: InvokeChecker<TransformerStarImpedance> = NeverInvokedChecker(),
         isTransformerTankInfo: InvokeChecker<TransformerTankInfo> = NeverInvokedChecker(),
+        isNoLoadTest: InvokeChecker<NoLoadTest> = NeverInvokedChecker(),
+        isOpenCircuitTest: InvokeChecker<OpenCircuitTest> = NeverInvokedChecker(),
+        isShortCircuitTest: InvokeChecker<ShortCircuitTest> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -280,6 +289,9 @@ internal class NetworkServiceUtilsTest {
             isTransformerEndInfo = isTransformerEndInfo,
             isTransformerStarImpedance = isTransformerStarImpedance,
             isTransformerTankInfo = isTransformerTankInfo,
+            isNoLoadTest = isNoLoadTest,
+            isOpenCircuitTest = isOpenCircuitTest,
+            isShortCircuitTest = isShortCircuitTest,
             isOther = isOther
         )
 
@@ -338,11 +350,14 @@ internal class NetworkServiceUtilsTest {
         isTransformerEndInfo.verifyInvoke()
         isTransformerStarImpedance.verifyInvoke()
         isTransformerTankInfo.verifyInvoke()
+        isNoLoadTest.verifyInvoke()
+        isOpenCircuitTest.verifyInvoke()
+        isShortCircuitTest.verifyInvoke()
         isOther.verifyInvoke()
     }
 
     @Test
-    fun `supports all diagram service types`() {
+    fun `supports all network service types`() {
         verifyWhenServiceObjectFunctionSupportsAllServiceObjectTypes(NetworkService().supportedKClasses, ::whenNetworkServiceObjectProxy)
     }
 
@@ -402,6 +417,9 @@ internal class NetworkServiceUtilsTest {
         TransformerEndInfo().also { whenNetworkServiceObjectTester(it, isTransformerEndInfo = InvokedChecker(it)) }
         TransformerStarImpedance().also { whenNetworkServiceObjectTester(it, isTransformerStarImpedance = InvokedChecker(it)) }
         TransformerTankInfo().also { whenNetworkServiceObjectTester(it, isTransformerTankInfo = InvokedChecker(it)) }
+        NoLoadTest().also { whenNetworkServiceObjectTester(it, isNoLoadTest = InvokedChecker(it)) }
+        OpenCircuitTest().also { whenNetworkServiceObjectTester(it, isOpenCircuitTest = InvokedChecker(it)) }
+        ShortCircuitTest().also { whenNetworkServiceObjectTester(it, isShortCircuitTest = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

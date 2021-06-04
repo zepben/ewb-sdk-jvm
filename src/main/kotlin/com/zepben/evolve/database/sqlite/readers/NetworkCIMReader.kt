@@ -69,19 +69,34 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadWireInfo(cableInfo, table, resultSet) && networkService.addOrThrow(cableInfo)
     }
 
+    fun load(table: TableNoLoadTests, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val noLoadTest = NoLoadTest(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            energisedEndVoltage = resultSet.getInt(table.ENERGISED_END_VOLTAGE.queryIndex)
+            excitingCurrent = resultSet.getDouble(table.EXCITING_CURRENT.queryIndex)
+            excitingCurrentZero = resultSet.getDouble(table.EXCITING_CURRENT_ZERO.queryIndex)
+            loss = resultSet.getInt(table.LOSS.queryIndex)
+            lossZero = resultSet.getInt(table.LOSS_ZERO.queryIndex)
+        }
+
+        return loadTransformerTest(noLoadTest, table, resultSet) && networkService.addOrThrow(noLoadTest)
+    }
+
+    fun load(table: TableOpenCircuitTests, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val openCircuitTest = OpenCircuitTest(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            energisedEndStep = resultSet.getInt(table.ENERGISED_END_STEP.queryIndex)
+            energisedEndVoltage = resultSet.getInt(table.ENERGISED_END_VOLTAGE.queryIndex)
+            openEndStep = resultSet.getInt(table.OPEN_END_STEP.queryIndex)
+            openEndVoltage = resultSet.getInt(table.OPEN_END_VOLTAGE.queryIndex)
+            phaseShift = resultSet.getDouble(table.PHASE_SHIFT.queryIndex)
+        }
+
+        return loadTransformerTest(openCircuitTest, table, resultSet) && networkService.addOrThrow(openCircuitTest)
+    }
+
     fun load(table: TableOverheadWireInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val overheadWireInfo = OverheadWireInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadWireInfo(overheadWireInfo, table, resultSet) && networkService.addOrThrow(overheadWireInfo)
-    }
-
-    private fun loadWireInfo(wireInfo: WireInfo, table: TableWireInfo, resultSet: ResultSet): Boolean {
-        wireInfo.apply {
-            ratedCurrent = resultSet.getInt(table.RATED_CURRENT.queryIndex)
-            material = WireMaterialKind.valueOf(resultSet.getString(table.MATERIAL.queryIndex))
-        }
-
-        return loadAssetInfo(wireInfo, table, resultSet)
     }
 
     fun load(table: TablePowerTransformerInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
@@ -90,14 +105,21 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadAssetInfo(powerTransformerInfo, table, resultSet) && networkService.addOrThrow(powerTransformerInfo)
     }
 
-    fun load(table: TableTransformerTankInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val transformerTankInfo = TransformerTankInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            powerTransformerInfo =
-                networkService.ensureGet<PowerTransformerInfo>(resultSet.getString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex), typeNameAndMRID())
-                    ?.addTransformerTankInfo(this)
+    fun load(table: TableShortCircuitTests, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val shortCircuitTest = ShortCircuitTest(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            current = resultSet.getDouble(table.CURRENT.queryIndex)
+            energisedEndStep = resultSet.getInt(table.ENERGISED_END_STEP.queryIndex)
+            groundedEndStep = resultSet.getInt(table.GROUNDED_END_STEP.queryIndex)
+            leakageImpedance = resultSet.getDouble(table.LEAKAGE_IMPEDANCE.queryIndex)
+            leakageImpedanceZero = resultSet.getDouble(table.LEAKAGE_IMPEDANCE_ZERO.queryIndex)
+            loss = resultSet.getInt(table.LOSS.queryIndex)
+            lossZero = resultSet.getInt(table.LOSS_ZERO.queryIndex)
+            power = resultSet.getInt(table.POWER.queryIndex)
+            voltage = resultSet.getDouble(table.VOLTAGE.queryIndex)
+            voltageOhmicPart = resultSet.getDouble(table.VOLTAGE_OHMIC_PART.queryIndex)
         }
 
-        return loadAssetInfo(transformerTankInfo, table, resultSet) && networkService.addOrThrow(transformerTankInfo)
+        return loadTransformerTest(shortCircuitTest, table, resultSet) && networkService.addOrThrow(shortCircuitTest)
     }
 
     fun load(table: TableTransformerEndInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
@@ -112,12 +134,45 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             ratedU = resultSet.getInt(table.RATED_U.queryIndex)
             shortTermS = resultSet.getInt(table.SHORT_TERM_S.queryIndex)
 
-            transformerTankInfo =
-                networkService.ensureGet<TransformerTankInfo>(resultSet.getString(table.TRANSFORMER_TANK_INFO_MRID.queryIndex), typeNameAndMRID())
-                    ?.addTransformerEndInfo(this)
+            transformerTankInfo = networkService.ensureGet(resultSet.getString(table.TRANSFORMER_TANK_INFO_MRID.queryIndex), typeNameAndMRID())
+            energisedEndNoLoadTests = networkService.ensureGet(resultSet.getString(table.ENERGISED_END_NO_LOAD_TESTS.queryIndex), typeNameAndMRID())
+            energisedEndShortCircuitTests = networkService.ensureGet(resultSet.getString(table.ENERGISED_END_SHORT_CIRCUIT_TESTS.queryIndex), typeNameAndMRID())
+            groundedEndShortCircuitTests = networkService.ensureGet(resultSet.getString(table.GROUNDED_END_SHORT_CIRCUIT_TESTS.queryIndex), typeNameAndMRID())
+            openEndOpenCircuitTests = networkService.ensureGet(resultSet.getString(table.OPEN_END_OPEN_CIRCUIT_TESTS.queryIndex), typeNameAndMRID())
+            energisedEndOpenCircuitTests = networkService.ensureGet(resultSet.getString(table.ENERGISED_END_OPEN_CIRCUIT_TESTS.queryIndex), typeNameAndMRID())
+
+            transformerTankInfo?.addTransformerEndInfo(this)
         }
 
         return loadAssetInfo(transformerEndInfo, table, resultSet) && networkService.addOrThrow(transformerEndInfo)
+    }
+
+    fun load(table: TableTransformerTankInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val transformerTankInfo = TransformerTankInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            powerTransformerInfo =
+                networkService.ensureGet<PowerTransformerInfo>(resultSet.getString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex), typeNameAndMRID())
+                    ?.addTransformerTankInfo(this)
+        }
+
+        return loadAssetInfo(transformerTankInfo, table, resultSet) && networkService.addOrThrow(transformerTankInfo)
+    }
+
+    private fun loadTransformerTest(transformerTest: TransformerTest, table: TableTransformerTest, resultSet: ResultSet): Boolean {
+        transformerTest.apply {
+            basePower = resultSet.getInt(table.BASE_POWER.queryIndex)
+            temperature = resultSet.getDouble(table.TEMPERATURE.queryIndex)
+        }
+
+        return loadIdentifiedObject(transformerTest, table, resultSet)
+    }
+
+    private fun loadWireInfo(wireInfo: WireInfo, table: TableWireInfo, resultSet: ResultSet): Boolean {
+        wireInfo.apply {
+            ratedCurrent = resultSet.getInt(table.RATED_CURRENT.queryIndex)
+            material = WireMaterialKind.valueOf(resultSet.getString(table.MATERIAL.queryIndex))
+        }
+
+        return loadAssetInfo(wireInfo, table, resultSet)
     }
 
     /************ IEC61968 ASSETS ************/

@@ -9,10 +9,7 @@ package com.zepben.evolve.services.network.translator
 
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
-import com.zepben.evolve.cim.iec61968.common.Location
-import com.zepben.evolve.cim.iec61968.common.PositionPoint
-import com.zepben.evolve.cim.iec61968.common.StreetAddress
-import com.zepben.evolve.cim.iec61968.common.TownDetail
+import com.zepben.evolve.cim.iec61968.common.*
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -41,10 +38,14 @@ import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.NoLoadTest as PBNoLoadTest
+import com.zepben.protobuf.cim.iec61968.assetinfo.OpenCircuitTest as PBOpenCircuitTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverheadWireInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PBPowerTransformerInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.ShortCircuitTest as PBShortCircuitTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerEndInfo as PBTransformerEndInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTankInfo as PBTransformerTankInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTest as PBTransformerTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireInfo as PBWireInfo
 import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
 import com.zepben.protobuf.cim.iec61968.assets.AssetContainer as PBAssetContainer
@@ -131,11 +132,32 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 
 /************ IEC61968 ASSET INFO ************/
+
 fun toPb(cim: CableInfo, pb: PBCableInfo.Builder): PBCableInfo.Builder =
     pb.apply { toPb(cim, wiBuilder) }
 
 fun toPb(cim: OverheadWireInfo, pb: PBOverheadWireInfo.Builder): PBOverheadWireInfo.Builder =
     pb.apply { toPb(cim, wiBuilder) }
+
+fun toPb(cim: NoLoadTest, pb: PBNoLoadTest.Builder): PBNoLoadTest.Builder =
+    pb.apply {
+        energisedEndVoltage = cim.energisedEndVoltage
+        excitingCurrent = cim.excitingCurrent
+        excitingCurrentZero = cim.excitingCurrentZero
+        loss = cim.loss
+        lossZero = cim.lossZero
+        toPb(cim, ttBuilder)
+    }
+
+fun toPb(cim: OpenCircuitTest, pb: PBOpenCircuitTest.Builder): PBOpenCircuitTest.Builder =
+    pb.apply {
+        energisedEndStep = cim.energisedEndStep
+        energisedEndVoltage = cim.energisedEndVoltage
+        openEndStep = cim.openEndStep
+        openEndVoltage = cim.openEndVoltage
+        phaseShift = cim.phaseShift
+        toPb(cim, ttBuilder)
+    }
 
 fun toPb(cim: PowerTransformerInfo, pb: PBPowerTransformerInfo.Builder): PBPowerTransformerInfo.Builder =
     pb.apply {
@@ -144,10 +166,23 @@ fun toPb(cim: PowerTransformerInfo, pb: PBPowerTransformerInfo.Builder): PBPower
         toPb(cim, aiBuilder)
     }
 
+fun toPb(cim: ShortCircuitTest, pb: PBShortCircuitTest.Builder): PBShortCircuitTest.Builder =
+    pb.apply {
+        current = cim.current
+        energisedEndStep = cim.energisedEndStep
+        groundedEndStep = cim.groundedEndStep
+        leakageImpedance = cim.leakageImpedance
+        leakageImpedanceZero = cim.leakageImpedanceZero
+        loss = cim.loss
+        lossZero = cim.lossZero
+        power = cim.power
+        voltage = cim.voltage
+        voltageOhmicPart = cim.voltageOhmicPart
+        toPb(cim, ttBuilder)
+    }
+
 fun toPb(cim: TransformerEndInfo, pb: PBTransformerEndInfo.Builder): PBTransformerEndInfo.Builder =
     pb.apply {
-        cim.transformerTankInfo?.let { transformerTankInfoMRID = it.mRID } ?: clearTransformerTankInfoMRID()
-        cim.transformerStarImpedance?.let { transformerStarImpedanceMRID = it.mRID } ?: clearTransformerStarImpedanceMRID()
         connectionKind = WindingConnection.valueOf(cim.connectionKind.name)
         emergencyS = cim.emergencyS
         endNumber = cim.endNumber
@@ -157,6 +192,15 @@ fun toPb(cim: TransformerEndInfo, pb: PBTransformerEndInfo.Builder): PBTransform
         ratedS = cim.ratedS
         ratedU = cim.ratedU
         shortTermS = cim.shortTermS
+
+        cim.transformerTankInfo?.let { transformerTankInfoMRID = it.mRID } ?: clearTransformerTankInfoMRID()
+        cim.transformerStarImpedance?.let { transformerStarImpedanceMRID = it.mRID } ?: clearTransformerStarImpedanceMRID()
+        cim.energisedEndNoLoadTests?.let { energisedEndNoLoadTestsMRID = it.mRID } ?: clearEnergisedEndNoLoadTestsMRID()
+        cim.energisedEndShortCircuitTests?.let { energisedEndShortCircuitTestsMRID = it.mRID } ?: clearEnergisedEndShortCircuitTestsMRID()
+        cim.groundedEndShortCircuitTests?.let { groundedEndShortCircuitTestsMRID = it.mRID } ?: clearGroundedEndShortCircuitTestsMRID()
+        cim.openEndOpenCircuitTests?.let { openEndOpenCircuitTestsMRID = it.mRID } ?: clearOpenEndOpenCircuitTestsMRID()
+        cim.energisedEndOpenCircuitTests?.let { energisedEndOpenCircuitTestsMRID = it.mRID } ?: clearEnergisedEndOpenCircuitTestsMRID()
+
         toPb(cim, aiBuilder)
     }
 
@@ -168,6 +212,12 @@ fun toPb(cim: TransformerTankInfo, pb: PBTransformerTankInfo.Builder): PBTransfo
         toPb(cim, aiBuilder)
     }
 
+fun toPb(cim: TransformerTest, pb: PBTransformerTest.Builder): PBTransformerTest.Builder =
+    pb.apply {
+        basePower = cim.basePower
+        temperature = cim.temperature
+        toPb(cim, ioBuilder)
+    }
 
 fun toPb(cim: WireInfo, pb: PBWireInfo.Builder): PBWireInfo.Builder =
     pb.apply {
@@ -177,6 +227,7 @@ fun toPb(cim: WireInfo, pb: PBWireInfo.Builder): PBWireInfo.Builder =
     }
 
 /************ IEC61968 ASSETS ************/
+
 fun toPb(cim: Asset, pb: PBAsset.Builder): PBAsset.Builder =
     pb.apply {
         cim.location?.let { locationMRID = it.mRID } ?: clearLocationMRID()
@@ -217,6 +268,7 @@ fun toPb(cim: Structure, pb: PBStructure.Builder): PBStructure.Builder =
     pb.apply { toPb(cim, acBuilder) }
 
 /************ IEC61968 COMMON ************/
+
 fun toPb(cim: Location, pb: PBLocation.Builder): PBLocation.Builder =
     pb.apply {
         cim.mainAddress?.let { toPb(it, mainAddressBuilder) } ?: clearMainAddress()
@@ -244,6 +296,7 @@ fun toPb(cim: TownDetail, pb: PBTownDetail.Builder): PBTownDetail.Builder =
     }
 
 /************ IEC61968 METERING ************/
+
 fun toPb(cim: EndDevice, pb: PBEndDevice.Builder): PBEndDevice.Builder =
     pb.apply {
         clearUsagePointMRIDs()
@@ -269,10 +322,12 @@ fun toPb(cim: UsagePoint, pb: PBUsagePoint.Builder): PBUsagePoint.Builder =
     }
 
 /************ IEC61968 OPERATIONS ************/
+
 fun toPb(cim: OperationalRestriction, pb: PBOperationalRestriction.Builder): PBOperationalRestriction.Builder =
     pb.apply { toPb(cim, docBuilder) }
 
 /************ IEC61970 AUXILIARY EQUIPMENT ************/
+
 fun toPb(cim: AuxiliaryEquipment, pb: PBAuxiliaryEquipment.Builder): PBAuxiliaryEquipment.Builder =
     pb.apply {
         cim.terminal?.let { terminalMRID = it.mRID } ?: clearTerminalMRID()
@@ -284,6 +339,7 @@ fun toPb(cim: FaultIndicator, pb: PBFaultIndicator.Builder): PBFaultIndicator.Bu
 
 
 /************ IEC61970 CORE ************/
+
 fun toPb(cim: AcDcTerminal, pb: PBAcDcTerminal.Builder): PBAcDcTerminal.Builder =
     pb.apply { toPb(cim, ioBuilder) }
 
@@ -392,6 +448,7 @@ fun toPb(cim: Terminal, pb: PBTerminal.Builder): PBTerminal.Builder =
     }
 
 /************ IEC61970 WIRES ************/
+
 fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder) =
     pb.apply {
         cim.powerElectronicsConnection?.let { powerElectronicsConnectionMRID = it.mRID } ?: clearPowerElectronicsConnectionMRID()
@@ -626,6 +683,9 @@ fun toPb(cim: Switch, pb: PBSwitch.Builder): PBSwitch.Builder =
     pb.apply {
         normalOpen = cim.isNormallyOpen()
         open = cim.isOpen()
+        // when unganged support is added to protobuf
+        // normalOpen = cim.normalOpen
+        // open = cim.open
         toPb(cim, ceBuilder)
     }
 
@@ -692,6 +752,7 @@ fun toPb(cim: Loop, pb: PBLoop.Builder): PBLoop.Builder =
     }
 
 /************ IEC61970 MEAS ************/
+
 fun toPb(cim: Control, pb: PBControl.Builder): PBControl.Builder =
     pb.apply {
         cim.remoteControl?.let { remoteControlMRID = it.mRID } ?: clearRemoteControlMRID()
@@ -722,6 +783,7 @@ fun toPb(cim: Measurement, pb: PBMeasurement.Builder): PBMeasurement.Builder =
     }
 
 /************ IEC61970 SCADA ************/
+
 fun toPb(cim: RemoteControl, pb: PBRemoteControl.Builder): PBRemoteControl.Builder =
     pb.apply {
         cim.control?.let { controlMRID = it.mRID } ?: clearControlMRID()
@@ -739,113 +801,122 @@ fun toPb(cim: RemoteSource, pb: PBRemoteSource.Builder): PBRemoteSource.Builder 
 
 /************ Extensions ************/
 
-fun CableInfo.toPb(): PBCableInfo = toPb(this, PBCableInfo.newBuilder()).build()
-fun OverheadWireInfo.toPb(): PBOverheadWireInfo = toPb(this, PBOverheadWireInfo.newBuilder()).build()
-fun Meter.toPb(): PBMeter = toPb(this, PBMeter.newBuilder()).build()
-fun OperationalRestriction.toPb(): PBOperationalRestriction = toPb(this, PBOperationalRestriction.newBuilder()).build()
-fun AssetOwner.toPb(): PBAssetOwner = toPb(this, PBAssetOwner.newBuilder()).build()
-fun Pole.toPb(): PBPole = toPb(this, PBPole.newBuilder()).build()
-fun Streetlight.toPb(): PBStreetlight = toPb(this, PBStreetlight.newBuilder()).build()
-fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()
-fun UsagePoint.toPb(): PBUsagePoint = toPb(this, PBUsagePoint.newBuilder()).build()
-fun ConnectivityNode.toPb(): PBConnectivityNode = toPb(this, PBConnectivityNode.newBuilder()).build()
-fun BaseVoltage.toPb(): PBBaseVoltage = toPb(this, PBBaseVoltage.newBuilder()).build()
-fun Junction.toPb(): PBJunction = toPb(this, PBJunction.newBuilder()).build()
-fun BatteryUnit.toPb(): PBBatteryUnit = toPb(this, PBBatteryUnit.newBuilder()).build()
-fun PhotoVoltaicUnit.toPb(): PBPhotoVoltaicUnit = toPb(this, PBPhotoVoltaicUnit.newBuilder()).build()
-fun PowerElectronicsWindUnit.toPb(): PBPowerElectronicsWindUnit = toPb(this, PBPowerElectronicsWindUnit.newBuilder()).build()
 fun AcLineSegment.toPb(): PBAcLineSegment = toPb(this, PBAcLineSegment.newBuilder()).build()
-fun LinearShuntCompensator.toPb(): PBLinearShuntCompensator = toPb(this, PBLinearShuntCompensator.newBuilder()).build()
-fun EnergyConsumer.toPb(): PBEnergyConsumer = toPb(this, PBEnergyConsumer.newBuilder()).build()
-fun EnergySource.toPb(): PBEnergySource = toPb(this, PBEnergySource.newBuilder()).build()
-fun PowerTransformer.toPb(): PBPowerTransformer = toPb(this, PBPowerTransformer.newBuilder()).build()
-fun Disconnector.toPb(): PBDisconnector = toPb(this, PBDisconnector.newBuilder()).build()
-fun Fuse.toPb(): PBFuse = toPb(this, PBFuse.newBuilder()).build()
-fun Jumper.toPb(): PBJumper = toPb(this, PBJumper.newBuilder()).build()
-fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
+fun Accumulator.toPb(): PBAccumulator = toPb(this, PBAccumulator.newBuilder()).build()
+fun Analog.toPb(): PBAnalog = toPb(this, PBAnalog.newBuilder()).build()
+fun AssetOwner.toPb(): PBAssetOwner = toPb(this, PBAssetOwner.newBuilder()).build()
+fun BaseVoltage.toPb(): PBBaseVoltage = toPb(this, PBBaseVoltage.newBuilder()).build()
+fun BatteryUnit.toPb(): PBBatteryUnit = toPb(this, PBBatteryUnit.newBuilder()).build()
 fun Breaker.toPb(): PBBreaker = toPb(this, PBBreaker.newBuilder()).build()
-fun LoadBreakSwitch.toPb(): PBLoadBreakSwitch = toPb(this, PBLoadBreakSwitch.newBuilder()).build()
 fun BusbarSection.toPb(): PBBusbarSection = toPb(this, PBBusbarSection.newBuilder()).build()
+fun CableInfo.toPb(): PBCableInfo = toPb(this, PBCableInfo.newBuilder()).build()
+fun Circuit.toPb(): PBCircuit = toPb(this, PBCircuit.newBuilder()).build()
+fun ConnectivityNode.toPb(): PBConnectivityNode = toPb(this, PBConnectivityNode.newBuilder()).build()
+fun Control.toPb(): PBControl = toPb(this, PBControl.newBuilder()).build()
+fun Disconnector.toPb(): PBDisconnector = toPb(this, PBDisconnector.newBuilder()).build()
+fun Discrete.toPb(): PBDiscrete = toPb(this, PBDiscrete.newBuilder()).build()
+fun EnergyConsumer.toPb(): PBEnergyConsumer = toPb(this, PBEnergyConsumer.newBuilder()).build()
+fun EnergyConsumerPhase.toPb(): PBEnergyConsumerPhase = toPb(this, PBEnergyConsumerPhase.newBuilder()).build()
+fun EnergySource.toPb(): PBEnergySource = toPb(this, PBEnergySource.newBuilder()).build()
+fun EnergySourcePhase.toPb(): PBEnergySourcePhase = toPb(this, PBEnergySourcePhase.newBuilder()).build()
 fun FaultIndicator.toPb(): PBFaultIndicator = toPb(this, PBFaultIndicator.newBuilder()).build()
 fun Feeder.toPb(): PBFeeder = toPb(this, PBFeeder.newBuilder()).build()
-fun Site.toPb(): PBSite = toPb(this, PBSite.newBuilder()).build()
-fun Substation.toPb(): PBSubstation = toPb(this, PBSubstation.newBuilder()).build()
-fun EnergySourcePhase.toPb(): PBEnergySourcePhase = toPb(this, PBEnergySourcePhase.newBuilder()).build()
-fun EnergyConsumerPhase.toPb(): PBEnergyConsumerPhase = toPb(this, PBEnergyConsumerPhase.newBuilder()).build()
-fun RatioTapChanger.toPb(): PBRatioTapChanger = toPb(this, PBRatioTapChanger.newBuilder()).build()
+fun Fuse.toPb(): PBFuse = toPb(this, PBFuse.newBuilder()).build()
 fun GeographicalRegion.toPb(): PBGeographicalRegion = toPb(this, PBGeographicalRegion.newBuilder()).build()
-fun SubGeographicalRegion.toPb(): PBSubGeographicalRegion = toPb(this, PBSubGeographicalRegion.newBuilder()).build()
-fun Terminal.toPb(): PBTerminal = toPb(this, PBTerminal.newBuilder()).build()
+fun Jumper.toPb(): PBJumper = toPb(this, PBJumper.newBuilder()).build()
+fun Junction.toPb(): PBJunction = toPb(this, PBJunction.newBuilder()).build()
+fun LinearShuntCompensator.toPb(): PBLinearShuntCompensator = toPb(this, PBLinearShuntCompensator.newBuilder()).build()
+fun LoadBreakSwitch.toPb(): PBLoadBreakSwitch = toPb(this, PBLoadBreakSwitch.newBuilder()).build()
+fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()
+fun Loop.toPb(): PBLoop = toPb(this, PBLoop.newBuilder()).build()
+fun Meter.toPb(): PBMeter = toPb(this, PBMeter.newBuilder()).build()
+fun NoLoadTest.toPb(): PBNoLoadTest = toPb(this, PBNoLoadTest.newBuilder()).build()
+fun OpenCircuitTest.toPb(): PBOpenCircuitTest = toPb(this, PBOpenCircuitTest.newBuilder()).build()
+fun OperationalRestriction.toPb(): PBOperationalRestriction = toPb(this, PBOperationalRestriction.newBuilder()).build()
+fun OverheadWireInfo.toPb(): PBOverheadWireInfo = toPb(this, PBOverheadWireInfo.newBuilder()).build()
 fun PerLengthSequenceImpedance.toPb(): PBPerLengthSequenceImpedance = toPb(this, PBPerLengthSequenceImpedance.newBuilder()).build()
+fun PhotoVoltaicUnit.toPb(): PBPhotoVoltaicUnit = toPb(this, PBPhotoVoltaicUnit.newBuilder()).build()
+fun Pole.toPb(): PBPole = toPb(this, PBPole.newBuilder()).build()
 fun PowerElectronicsConnection.toPb(): PBPowerElectronicsConnection = toPb(this, PBPowerElectronicsConnection.newBuilder()).build()
 fun PowerElectronicsConnectionPhase.toPb(): PBPowerElectronicsConnectionPhase = toPb(this, PBPowerElectronicsConnectionPhase.newBuilder()).build()
+fun PowerElectronicsWindUnit.toPb(): PBPowerElectronicsWindUnit = toPb(this, PBPowerElectronicsWindUnit.newBuilder()).build()
+fun PowerTransformer.toPb(): PBPowerTransformer = toPb(this, PBPowerTransformer.newBuilder()).build()
 fun PowerTransformerEnd.toPb(): PBPowerTransformerEnd = toPb(this, PBPowerTransformerEnd.newBuilder()).build()
 fun PowerTransformerInfo.toPb(): PBPowerTransformerInfo = toPb(this, PBPowerTransformerInfo.newBuilder()).build()
-fun Circuit.toPb(): PBCircuit = toPb(this, PBCircuit.newBuilder()).build()
-fun Loop.toPb(): PBLoop = toPb(this, PBLoop.newBuilder()).build()
-fun Control.toPb(): PBControl = toPb(this, PBControl.newBuilder()).build()
-fun Analog.toPb(): PBAnalog = toPb(this, PBAnalog.newBuilder()).build()
-fun Accumulator.toPb(): PBAccumulator = toPb(this, PBAccumulator.newBuilder()).build()
-fun Discrete.toPb(): PBDiscrete = toPb(this, PBDiscrete.newBuilder()).build()
+fun RatioTapChanger.toPb(): PBRatioTapChanger = toPb(this, PBRatioTapChanger.newBuilder()).build()
+fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
 fun RemoteControl.toPb(): PBRemoteControl = toPb(this, PBRemoteControl.newBuilder()).build()
 fun RemoteSource.toPb(): PBRemoteSource = toPb(this, PBRemoteSource.newBuilder()).build()
+fun ShortCircuitTest.toPb(): PBShortCircuitTest = toPb(this, PBShortCircuitTest.newBuilder()).build()
+fun Site.toPb(): PBSite = toPb(this, PBSite.newBuilder()).build()
+fun Streetlight.toPb(): PBStreetlight = toPb(this, PBStreetlight.newBuilder()).build()
+fun SubGeographicalRegion.toPb(): PBSubGeographicalRegion = toPb(this, PBSubGeographicalRegion.newBuilder()).build()
+fun Substation.toPb(): PBSubstation = toPb(this, PBSubstation.newBuilder()).build()
+fun Terminal.toPb(): PBTerminal = toPb(this, PBTerminal.newBuilder()).build()
 fun TransformerEndInfo.toPb(): PBTransformerEndInfo = toPb(this, PBTransformerEndInfo.newBuilder()).build()
 fun TransformerStarImpedance.toPb(): PBTransformerStarImpedance = toPb(this, PBTransformerStarImpedance.newBuilder()).build()
 fun TransformerTankInfo.toPb(): PBTransformerTankInfo = toPb(this, PBTransformerTankInfo.newBuilder()).build()
+fun UsagePoint.toPb(): PBUsagePoint = toPb(this, PBUsagePoint.newBuilder()).build()
 
 /************ Class for Java friendly usage ************/
 
 class NetworkCimToProto : BaseCimToProto() {
 
-    fun toPb(cableInfo: CableInfo): PBCableInfo = cableInfo.toPb()
-    fun toPb(overheadWireInfo: OverheadWireInfo): PBOverheadWireInfo = overheadWireInfo.toPb()
-    fun toPb(meter: Meter): PBMeter = meter.toPb()
-    fun toPb(operationalRestriction: OperationalRestriction): PBOperationalRestriction = operationalRestriction.toPb()
-    fun toPb(assetOwner: AssetOwner): PBAssetOwner = assetOwner.toPb()
-    fun toPb(pole: Pole): PBPole = pole.toPb()
-    fun toPb(streetlight: Streetlight): PBStreetlight = streetlight.toPb()
-    fun toPb(location: Location): PBLocation = location.toPb()
-    fun toPb(usagePoint: UsagePoint): PBUsagePoint = usagePoint.toPb()
-    fun toPb(connectivityNode: ConnectivityNode): PBConnectivityNode = connectivityNode.toPb()
-    fun toPb(baseVoltage: BaseVoltage): PBBaseVoltage = baseVoltage.toPb()
-    fun toPb(junction: Junction): PBJunction = junction.toPb()
-    fun toPb(batteryUnit: BatteryUnit): PBBatteryUnit = batteryUnit.toPb()
-    fun toPb(photoVoltaicUnit: PhotoVoltaicUnit): PBPhotoVoltaicUnit = photoVoltaicUnit.toPb()
-    fun toPb(powerElectronicsWindUnit: PowerElectronicsWindUnit): PBPowerElectronicsWindUnit = powerElectronicsWindUnit.toPb()
-    fun toPb(acLineSegment: AcLineSegment): PBAcLineSegment = acLineSegment.toPb()
-    fun toPb(linearShuntCompensator: LinearShuntCompensator): PBLinearShuntCompensator = linearShuntCompensator.toPb()
-    fun toPb(energyConsumer: EnergyConsumer): PBEnergyConsumer = energyConsumer.toPb()
-    fun toPb(energySource: EnergySource): PBEnergySource = energySource.toPb()
-    fun toPb(powerTransformer: PowerTransformer): PBPowerTransformer = powerTransformer.toPb()
-    fun toPb(disconnector: Disconnector): PBDisconnector = disconnector.toPb()
-    fun toPb(fuse: Fuse): PBFuse = fuse.toPb()
-    fun toPb(jumper: Jumper): PBJumper = jumper.toPb()
-    fun toPb(recloser: Recloser): PBRecloser = recloser.toPb()
-    fun toPb(breaker: Breaker): PBBreaker = breaker.toPb()
-    fun toPb(loadBreakSwitch: LoadBreakSwitch): PBLoadBreakSwitch = loadBreakSwitch.toPb()
-    fun toPb(busbarSection: BusbarSection): PBBusbarSection = busbarSection.toPb()
-    fun toPb(faultIndicator: FaultIndicator): PBFaultIndicator = faultIndicator.toPb()
-    fun toPb(feeder: Feeder): PBFeeder = feeder.toPb()
-    fun toPb(site: Site): PBSite = site.toPb()
-    fun toPb(substation: Substation): PBSubstation = substation.toPb()
-    fun toPb(energySourcePhase: EnergySourcePhase): PBEnergySourcePhase = energySourcePhase.toPb()
-    fun toPb(energyConsumerPhase: EnergyConsumerPhase): PBEnergyConsumerPhase = energyConsumerPhase.toPb()
-    fun toPb(ratioTapChanger: RatioTapChanger): PBRatioTapChanger = ratioTapChanger.toPb()
-    fun toPb(geographicalRegion: GeographicalRegion): PBGeographicalRegion = geographicalRegion.toPb()
-    fun toPb(subGeographicalRegion: SubGeographicalRegion): PBSubGeographicalRegion = subGeographicalRegion.toPb()
-    fun toPb(terminal: Terminal): PBTerminal = terminal.toPb()
-    fun toPb(perLengthSequenceImpedance: PerLengthSequenceImpedance): PBPerLengthSequenceImpedance =
-        perLengthSequenceImpedance.toPb()
+    fun toPb(cim: AcLineSegment): PBAcLineSegment = cim.toPb()
+    fun toPb(cim: Accumulator): PBAccumulator = cim.toPb()
+    fun toPb(cim: Analog): PBAnalog = cim.toPb()
+    fun toPb(cim: AssetOwner): PBAssetOwner = cim.toPb()
+    fun toPb(cim: BaseVoltage): PBBaseVoltage = cim.toPb()
+    fun toPb(cim: BatteryUnit): PBBatteryUnit = cim.toPb()
+    fun toPb(cim: Breaker): PBBreaker = cim.toPb()
+    fun toPb(cim: BusbarSection): PBBusbarSection = cim.toPb()
+    fun toPb(cim: CableInfo): PBCableInfo = cim.toPb()
+    fun toPb(cim: Circuit): PBCircuit = cim.toPb()
+    fun toPb(cim: ConnectivityNode): PBConnectivityNode = cim.toPb()
+    fun toPb(cim: Control): PBControl = cim.toPb()
+    fun toPb(cim: Disconnector): PBDisconnector = cim.toPb()
+    fun toPb(cim: Discrete): PBDiscrete = cim.toPb()
+    fun toPb(cim: EnergyConsumer): PBEnergyConsumer = cim.toPb()
+    fun toPb(cim: EnergyConsumerPhase): PBEnergyConsumerPhase = cim.toPb()
+    fun toPb(cim: EnergySource): PBEnergySource = cim.toPb()
+    fun toPb(cim: EnergySourcePhase): PBEnergySourcePhase = cim.toPb()
+    fun toPb(cim: FaultIndicator): PBFaultIndicator = cim.toPb()
+    fun toPb(cim: Feeder): PBFeeder = cim.toPb()
+    fun toPb(cim: Fuse): PBFuse = cim.toPb()
+    fun toPb(cim: GeographicalRegion): PBGeographicalRegion = cim.toPb()
+    fun toPb(cim: Jumper): PBJumper = cim.toPb()
+    fun toPb(cim: Junction): PBJunction = cim.toPb()
+    fun toPb(cim: LinearShuntCompensator): PBLinearShuntCompensator = cim.toPb()
+    fun toPb(cim: LoadBreakSwitch): PBLoadBreakSwitch = cim.toPb()
+    fun toPb(cim: Location): PBLocation = cim.toPb()
+    fun toPb(cim: Loop): PBLoop = cim.toPb()
+    fun toPb(cim: Meter): PBMeter = cim.toPb()
+    fun toPb(cim: NoLoadTest): PBNoLoadTest = cim.toPb()
+    fun toPb(cim: OpenCircuitTest): PBOpenCircuitTest = cim.toPb()
+    fun toPb(cim: OperationalRestriction): PBOperationalRestriction = cim.toPb()
+    fun toPb(cim: OverheadWireInfo): PBOverheadWireInfo = cim.toPb()
+    fun toPb(cim: PerLengthSequenceImpedance): PBPerLengthSequenceImpedance = cim.toPb()
+    fun toPb(cim: PhotoVoltaicUnit): PBPhotoVoltaicUnit = cim.toPb()
+    fun toPb(cim: Pole): PBPole = cim.toPb()
+    fun toPb(cim: PowerElectronicsConnection): PBPowerElectronicsConnection = cim.toPb()
+    fun toPb(cim: PowerElectronicsConnectionPhase): PBPowerElectronicsConnectionPhase = cim.toPb()
+    fun toPb(cim: PowerElectronicsWindUnit): PBPowerElectronicsWindUnit = cim.toPb()
+    fun toPb(cim: PowerTransformer): PBPowerTransformer = cim.toPb()
+    fun toPb(cim: PowerTransformerEnd): PBPowerTransformerEnd = cim.toPb()
+    fun toPb(cim: PowerTransformerInfo): PBPowerTransformerInfo = cim.toPb()
+    fun toPb(cim: RatioTapChanger): PBRatioTapChanger = cim.toPb()
+    fun toPb(cim: Recloser): PBRecloser = cim.toPb()
+    fun toPb(cim: RemoteControl): PBRemoteControl = cim.toPb()
+    fun toPb(cim: RemoteSource): PBRemoteSource = cim.toPb()
+    fun toPb(cim: ShortCircuitTest): PBShortCircuitTest = cim.toPb()
+    fun toPb(cim: Site): PBSite = cim.toPb()
+    fun toPb(cim: Streetlight): PBStreetlight = cim.toPb()
+    fun toPb(cim: SubGeographicalRegion): PBSubGeographicalRegion = cim.toPb()
+    fun toPb(cim: Substation): PBSubstation = cim.toPb()
+    fun toPb(cim: Terminal): PBTerminal = cim.toPb()
+    fun toPb(cim: TransformerEndInfo): PBTransformerEndInfo = cim.toPb()
+    fun toPb(cim: TransformerStarImpedance): PBTransformerStarImpedance = cim.toPb()
+    fun toPb(cim: TransformerTankInfo): PBTransformerTankInfo = cim.toPb()
+    fun toPb(cim: UsagePoint): PBUsagePoint = cim.toPb()
 
-    fun toPb(powerElectronicsConnection: PowerElectronicsConnection): PBPowerElectronicsConnection = powerElectronicsConnection.toPb()
-    fun toPb(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): PBPowerElectronicsConnectionPhase = powerElectronicsConnectionPhase.toPb()
-    fun toPb(powerTransformerEnd: PowerTransformerEnd): PBPowerTransformerEnd = powerTransformerEnd.toPb()
-    fun toPb(circuit: Circuit): PBCircuit = circuit.toPb()
-    fun toPb(loop: Loop): PBLoop = loop.toPb()
-    fun toPb(control: Control): PBControl = control.toPb()
-    fun toPb(analog: Analog): PBAnalog = analog.toPb()
-    fun toPb(accumulator: Accumulator): PBAccumulator = accumulator.toPb()
-    fun toPb(discrete: Discrete): PBDiscrete = discrete.toPb()
-    fun toPb(remoteControl: RemoteControl): PBRemoteControl = remoteControl.toPb()
-    fun toPb(remoteSource: RemoteSource): PBRemoteSource = remoteSource.toPb()
 }

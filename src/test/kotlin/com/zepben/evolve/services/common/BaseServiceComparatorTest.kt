@@ -74,12 +74,15 @@ abstract class BaseServiceComparatorTest {
 
         val subject = clazz1.primaryConstructor?.call("mRID")?.apply { name = "the name" }
             ?: throw Error("expected primary constructor")
+        val match = clazz1.primaryConstructor?.call("mRID")?.apply { name = "the name" }
+            ?: throw Error("expected primary constructor")
         val diffMRID = clazz1.primaryConstructor?.call("diff mRID")?.apply { name = "the name" }
             ?: throw Error("expected primary constructor")
         val diffClass = clazz2.primaryConstructor?.call("mRID")?.apply { name = "the name" }
             ?: throw Error("expected primary constructor")
         val diffName = clazz1.primaryConstructor?.call("mRID")?.apply { name = "diff name" }
             ?: throw Error("expected primary constructor")
+        comparatorValidator.validateServiceOf(subject, match)
         comparatorValidator.validateServiceOf(subject, diffMRID, expectMissingFromTarget = subject, expectMissingFromSource = diffMRID)
         comparatorValidator.validateServiceOf(subject, diffClass, expectMissingFromTarget = subject, expectMissingFromSource = diffClass)
         comparatorValidator.validateServiceOf(
@@ -88,7 +91,38 @@ abstract class BaseServiceComparatorTest {
     }
 
     @Test
-    internal fun nameTypesNoDifference() {
+    internal fun testValidateNameTypes() {
+        val subject = NameType("type").apply { description = "desc"; getOrAddName("name", Junction("id")) }
+        val match = NameType("type").apply { description = "desc"; getOrAddName("name", Junction("id")) }
+        val diffName = NameType("diff type").apply { description = "desc"; getOrAddName("name", Junction("id")) }
+        val diffDescription = NameType("type").apply { description = "diff desc"; getOrAddName("name", Junction("id")) }
+        val diffNameName = NameType("type").apply { description = "desc"; getOrAddName("diff name", Junction("id")) }
+        val diffNameIdentifiedObject = NameType("type").apply { description = "desc"; getOrAddName("name", Junction("diff id")) }
+
+        comparatorValidator.validateNameTypes(subject, match)
+        comparatorValidator.validateNameTypes(subject, diffName, expectMissingFromTarget = subject, expectMissingFromSource = diffName)
+        comparatorValidator.validateNameTypes(
+            subject,
+            diffDescription,
+            expectModification = ObjectDifference(subject, diffDescription).apply {
+                differences["description"] = ValueDifference(subject.description, diffDescription.description)
+            })
+        comparatorValidator.validateNameTypes(
+            subject,
+            diffNameName,
+            expectModification = ObjectDifference(subject, diffNameName).apply {
+                differences["names"] =
+                    CollectionDifference(missingFromTarget = subject.names.toMutableList(), missingFromSource = diffNameName.names.toMutableList())
+            })
+        comparatorValidator.validateNameTypes(
+            subject,
+            diffNameIdentifiedObject,
+            expectModification = ObjectDifference(subject, diffNameIdentifiedObject).apply {
+                differences["names"] =
+                    CollectionDifference(missingFromTarget = subject.names.toMutableList(), missingFromSource = diffNameIdentifiedObject.names.toMutableList())
+            })
+
+
         val sourceType = NameType("type").apply {
             description = "desc"
             getOrAddName("name", Junction("id"))
@@ -102,25 +136,4 @@ abstract class BaseServiceComparatorTest {
         comparatorValidator.validateNameTypes(sourceType, targetType)
     }
 
-    @Test
-    internal fun nameTypeDifference() {
-        val sourceType = NameType("type").apply { description = "source" }
-        val targetType = NameType("type").apply { description = "target" }
-        val missingFromTargetName = sourceType.getOrAddName("missingFromTargetName", Junction("idObj"))
-        val missingFromSourceName = targetType.getOrAddName("missingFromSourceName", Junction("idObj"))
-        comparatorValidator.validateNameTypes(
-            sourceType, targetType,
-            NameTypeDifference(ValueDifference("source", "target"), mutableListOf(missingFromTargetName), mutableListOf(missingFromSourceName)))
-    }
-
-    @Test
-    internal fun nameTypesMissing() {
-        val missingFromTarget = NameType("missingFromTarget")
-        val missingFromSource = NameType("missingFromSource")
-        comparatorValidator.validateNameTypes(
-            missingFromTarget, missingFromSource,
-            expectMissingFromTarget = missingFromTarget.name,
-            expectMissingFromSource = missingFromSource.name
-        )
-    }
 }

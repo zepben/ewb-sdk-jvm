@@ -70,6 +70,32 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveWireInfo(table, insert, cableInfo, "cable info")
     }
 
+    fun save(noLoadTest: NoLoadTest): Boolean {
+        val table = databaseTables.getTable(TableNoLoadTests::class.java)
+        val insert = databaseTables.getInsert(TableNoLoadTests::class.java)
+
+        insert.setInt(table.ENERGISED_END_VOLTAGE.queryIndex, noLoadTest.energisedEndVoltage)
+        insert.setDouble(table.EXCITING_CURRENT.queryIndex, noLoadTest.excitingCurrent)
+        insert.setDouble(table.EXCITING_CURRENT_ZERO.queryIndex, noLoadTest.excitingCurrentZero)
+        insert.setInt(table.LOSS.queryIndex, noLoadTest.loss)
+        insert.setInt(table.LOSS_ZERO.queryIndex, noLoadTest.lossZero)
+
+        return saveTransformerTest(table, insert, noLoadTest, "no load test")
+    }
+
+    fun save(openCircuitTest: OpenCircuitTest): Boolean {
+        val table = databaseTables.getTable(TableOpenCircuitTests::class.java)
+        val insert = databaseTables.getInsert(TableOpenCircuitTests::class.java)
+
+        insert.setInt(table.ENERGISED_END_STEP.queryIndex, openCircuitTest.energisedEndStep)
+        insert.setInt(table.ENERGISED_END_VOLTAGE.queryIndex, openCircuitTest.energisedEndVoltage)
+        insert.setInt(table.OPEN_END_STEP.queryIndex, openCircuitTest.openEndStep)
+        insert.setInt(table.OPEN_END_VOLTAGE.queryIndex, openCircuitTest.openEndVoltage)
+        insert.setDouble(table.PHASE_SHIFT.queryIndex, openCircuitTest.phaseShift)
+
+        return saveTransformerTest(table, insert, openCircuitTest, "open circuit test")
+    }
+
     fun save(overheadWireInfo: OverheadWireInfo): Boolean {
         val table = databaseTables.getTable(TableOverheadWireInfo::class.java)
         val insert = databaseTables.getInsert(TableOverheadWireInfo::class.java)
@@ -84,13 +110,22 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveAssetInfo(table, insert, powerTransformerInfo, "power transformer info")
     }
 
-    fun save(transformerTankInfo: TransformerTankInfo): Boolean {
-        val table = databaseTables.getTable(TableTransformerTankInfo::class.java)
-        val insert = databaseTables.getInsert(TableTransformerTankInfo::class.java)
+    fun save(shortCircuitTest: ShortCircuitTest): Boolean {
+        val table = databaseTables.getTable(TableShortCircuitTests::class.java)
+        val insert = databaseTables.getInsert(TableShortCircuitTests::class.java)
 
-        insert.setNullableString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex, transformerTankInfo.powerTransformerInfo?.mRID)
+        insert.setDouble(table.CURRENT.queryIndex, shortCircuitTest.current)
+        insert.setInt(table.ENERGISED_END_STEP.queryIndex, shortCircuitTest.energisedEndStep)
+        insert.setInt(table.GROUNDED_END_STEP.queryIndex, shortCircuitTest.groundedEndStep)
+        insert.setDouble(table.LEAKAGE_IMPEDANCE.queryIndex, shortCircuitTest.leakageImpedance)
+        insert.setDouble(table.LEAKAGE_IMPEDANCE_ZERO.queryIndex, shortCircuitTest.leakageImpedanceZero)
+        insert.setInt(table.LOSS.queryIndex, shortCircuitTest.loss)
+        insert.setInt(table.LOSS_ZERO.queryIndex, shortCircuitTest.lossZero)
+        insert.setInt(table.POWER.queryIndex, shortCircuitTest.power)
+        insert.setDouble(table.VOLTAGE.queryIndex, shortCircuitTest.voltage)
+        insert.setDouble(table.VOLTAGE_OHMIC_PART.queryIndex, shortCircuitTest.voltageOhmicPart)
 
-        return saveAssetInfo(table, insert, transformerTankInfo, "transformer tank info")
+        return saveTransformerTest(table, insert, shortCircuitTest, "short circuit test")
     }
 
     fun save(transformerEndInfo: TransformerEndInfo): Boolean {
@@ -107,8 +142,29 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setInt(table.RATED_U.queryIndex, transformerEndInfo.ratedU)
         insert.setInt(table.SHORT_TERM_S.queryIndex, transformerEndInfo.shortTermS)
         insert.setNullableString(table.TRANSFORMER_TANK_INFO_MRID.queryIndex, transformerEndInfo.transformerTankInfo?.mRID)
+        insert.setNullableString(table.ENERGISED_END_NO_LOAD_TESTS.queryIndex, transformerEndInfo.energisedEndNoLoadTests?.mRID)
+        insert.setNullableString(table.ENERGISED_END_SHORT_CIRCUIT_TESTS.queryIndex, transformerEndInfo.energisedEndShortCircuitTests?.mRID)
+        insert.setNullableString(table.GROUNDED_END_SHORT_CIRCUIT_TESTS.queryIndex, transformerEndInfo.groundedEndShortCircuitTests?.mRID)
+        insert.setNullableString(table.OPEN_END_OPEN_CIRCUIT_TESTS.queryIndex, transformerEndInfo.openEndOpenCircuitTests?.mRID)
+        insert.setNullableString(table.ENERGISED_END_OPEN_CIRCUIT_TESTS.queryIndex, transformerEndInfo.energisedEndOpenCircuitTests?.mRID)
 
         return saveAssetInfo(table, insert, transformerEndInfo, "transformer end info")
+    }
+
+    fun save(transformerTankInfo: TransformerTankInfo): Boolean {
+        val table = databaseTables.getTable(TableTransformerTankInfo::class.java)
+        val insert = databaseTables.getInsert(TableTransformerTankInfo::class.java)
+
+        insert.setNullableString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex, transformerTankInfo.powerTransformerInfo?.mRID)
+
+        return saveAssetInfo(table, insert, transformerTankInfo, "transformer tank info")
+    }
+
+    private fun saveTransformerTest(table: TableTransformerTest, insert: PreparedStatement, transformerTest: TransformerTest, description: String): Boolean {
+        insert.setInt(table.BASE_POWER.queryIndex, transformerTest.basePower)
+        insert.setDouble(table.TEMPERATURE.queryIndex, transformerTest.temperature)
+
+        return saveIdentifiedObject(table, insert, transformerTest, description)
     }
 
     private fun saveWireInfo(table: TableWireInfo, insert: PreparedStatement, wireInfo: WireInfo, description: String): Boolean {

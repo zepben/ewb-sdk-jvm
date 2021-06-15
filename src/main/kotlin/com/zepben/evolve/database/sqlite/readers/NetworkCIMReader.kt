@@ -31,6 +31,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.database.sqlite.extensions.getNullableDouble
+import com.zepben.evolve.database.sqlite.extensions.getNullableInt
+import com.zepben.evolve.database.sqlite.extensions.getNullableLong
 import com.zepben.evolve.database.sqlite.extensions.getNullableString
 import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
@@ -71,11 +73,11 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TableNoLoadTests, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val noLoadTest = NoLoadTest(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            energisedEndVoltage = resultSet.getInt(table.ENERGISED_END_VOLTAGE.queryIndex)
-            excitingCurrent = resultSet.getDouble(table.EXCITING_CURRENT.queryIndex)
-            excitingCurrentZero = resultSet.getDouble(table.EXCITING_CURRENT_ZERO.queryIndex)
-            loss = resultSet.getInt(table.LOSS.queryIndex)
-            lossZero = resultSet.getInt(table.LOSS_ZERO.queryIndex)
+            energisedEndVoltage = resultSet.getNullableInt(table.ENERGISED_END_VOLTAGE.queryIndex)
+            excitingCurrent = resultSet.getNullableDouble(table.EXCITING_CURRENT.queryIndex)
+            excitingCurrentZero = resultSet.getNullableDouble(table.EXCITING_CURRENT_ZERO.queryIndex)
+            loss = resultSet.getNullableInt(table.LOSS.queryIndex)
+            lossZero = resultSet.getNullableInt(table.LOSS_ZERO.queryIndex)
         }
 
         return loadTransformerTest(noLoadTest, table, resultSet) && networkService.addOrThrow(noLoadTest)
@@ -83,11 +85,11 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TableOpenCircuitTests, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val openCircuitTest = OpenCircuitTest(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            energisedEndStep = resultSet.getInt(table.ENERGISED_END_STEP.queryIndex)
-            energisedEndVoltage = resultSet.getInt(table.ENERGISED_END_VOLTAGE.queryIndex)
-            openEndStep = resultSet.getInt(table.OPEN_END_STEP.queryIndex)
-            openEndVoltage = resultSet.getInt(table.OPEN_END_VOLTAGE.queryIndex)
-            phaseShift = resultSet.getDouble(table.PHASE_SHIFT.queryIndex)
+            energisedEndStep = resultSet.getNullableInt(table.ENERGISED_END_STEP.queryIndex)
+            energisedEndVoltage = resultSet.getNullableInt(table.ENERGISED_END_VOLTAGE.queryIndex)
+            openEndStep = resultSet.getNullableInt(table.OPEN_END_STEP.queryIndex)
+            openEndVoltage = resultSet.getNullableInt(table.OPEN_END_VOLTAGE.queryIndex)
+            phaseShift = resultSet.getNullableDouble(table.PHASE_SHIFT.queryIndex)
         }
 
         return loadTransformerTest(openCircuitTest, table, resultSet) && networkService.addOrThrow(openCircuitTest)
@@ -107,16 +109,16 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TableShortCircuitTests, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val shortCircuitTest = ShortCircuitTest(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            current = resultSet.getDouble(table.CURRENT.queryIndex)
-            energisedEndStep = resultSet.getInt(table.ENERGISED_END_STEP.queryIndex)
-            groundedEndStep = resultSet.getInt(table.GROUNDED_END_STEP.queryIndex)
-            leakageImpedance = resultSet.getDouble(table.LEAKAGE_IMPEDANCE.queryIndex)
-            leakageImpedanceZero = resultSet.getDouble(table.LEAKAGE_IMPEDANCE_ZERO.queryIndex)
-            loss = resultSet.getInt(table.LOSS.queryIndex)
-            lossZero = resultSet.getInt(table.LOSS_ZERO.queryIndex)
-            power = resultSet.getInt(table.POWER.queryIndex)
-            voltage = resultSet.getDouble(table.VOLTAGE.queryIndex)
-            voltageOhmicPart = resultSet.getDouble(table.VOLTAGE_OHMIC_PART.queryIndex)
+            current = resultSet.getNullableDouble(table.CURRENT.queryIndex)
+            energisedEndStep = resultSet.getNullableInt(table.ENERGISED_END_STEP.queryIndex)
+            groundedEndStep = resultSet.getNullableInt(table.GROUNDED_END_STEP.queryIndex)
+            leakageImpedance = resultSet.getNullableDouble(table.LEAKAGE_IMPEDANCE.queryIndex)
+            leakageImpedanceZero = resultSet.getNullableDouble(table.LEAKAGE_IMPEDANCE_ZERO.queryIndex)
+            loss = resultSet.getNullableInt(table.LOSS.queryIndex)
+            lossZero = resultSet.getNullableInt(table.LOSS_ZERO.queryIndex)
+            power = resultSet.getNullableInt(table.POWER.queryIndex)
+            voltage = resultSet.getNullableDouble(table.VOLTAGE.queryIndex)
+            voltageOhmicPart = resultSet.getNullableDouble(table.VOLTAGE_OHMIC_PART.queryIndex)
         }
 
         return loadTransformerTest(shortCircuitTest, table, resultSet) && networkService.addOrThrow(shortCircuitTest)
@@ -125,14 +127,14 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TableTransformerEndInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val transformerEndInfo = TransformerEndInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             connectionKind = WindingConnection.valueOf(resultSet.getString(table.CONNECTION_KIND.queryIndex))
-            emergencyS = resultSet.getInt(table.EMERGENCY_S.queryIndex)
+            emergencyS = resultSet.getNullableInt(table.EMERGENCY_S.queryIndex)
             endNumber = resultSet.getInt(table.END_NUMBER.queryIndex)
-            insulationU = resultSet.getInt(table.INSULATION_U.queryIndex)
-            phaseAngleClock = resultSet.getInt(table.PHASE_ANGLE_CLOCK.queryIndex)
-            r = resultSet.getDouble(table.R.queryIndex)
-            ratedS = resultSet.getInt(table.RATED_S.queryIndex)
-            ratedU = resultSet.getInt(table.RATED_U.queryIndex)
-            shortTermS = resultSet.getInt(table.SHORT_TERM_S.queryIndex)
+            insulationU = resultSet.getNullableInt(table.INSULATION_U.queryIndex)
+            phaseAngleClock = resultSet.getNullableInt(table.PHASE_ANGLE_CLOCK.queryIndex)
+            r = resultSet.getNullableDouble(table.R.queryIndex)
+            ratedS = resultSet.getNullableInt(table.RATED_S.queryIndex)
+            ratedU = resultSet.getNullableInt(table.RATED_U.queryIndex)
+            shortTermS = resultSet.getNullableInt(table.SHORT_TERM_S.queryIndex)
 
             transformerTankInfo = networkService.ensureGet(resultSet.getString(table.TRANSFORMER_TANK_INFO_MRID.queryIndex), typeNameAndMRID())
             energisedEndNoLoadTests = networkService.ensureGet(resultSet.getString(table.ENERGISED_END_NO_LOAD_TESTS.queryIndex), typeNameAndMRID())
@@ -159,8 +161,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     private fun loadTransformerTest(transformerTest: TransformerTest, table: TableTransformerTest, resultSet: ResultSet): Boolean {
         transformerTest.apply {
-            basePower = resultSet.getInt(table.BASE_POWER.queryIndex)
-            temperature = resultSet.getDouble(table.TEMPERATURE.queryIndex)
+            basePower = resultSet.getNullableInt(table.BASE_POWER.queryIndex)
+            temperature = resultSet.getNullableDouble(table.TEMPERATURE.queryIndex)
         }
 
         return loadIdentifiedObject(transformerTest, table, resultSet)
@@ -168,7 +170,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     private fun loadWireInfo(wireInfo: WireInfo, table: TableWireInfo, resultSet: ResultSet): Boolean {
         wireInfo.apply {
-            ratedCurrent = resultSet.getInt(table.RATED_CURRENT.queryIndex)
+            ratedCurrent = resultSet.getNullableInt(table.RATED_CURRENT.queryIndex)
             material = WireMaterialKind.valueOf(resultSet.getString(table.MATERIAL.queryIndex))
         }
 
@@ -226,7 +228,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TableStreetlights, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val streetlight = Streetlight(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             lampKind = StreetlightLampKind.valueOf(resultSet.getString(table.LAMP_KIND.queryIndex))
-            lightRating = resultSet.getInt(table.LIGHT_RATING.queryIndex)
+            lightRating = resultSet.getNullableInt(table.LIGHT_RATING.queryIndex)
             pole = networkService.ensureGet(resultSet.getString(table.POLE_MRID.queryIndex), typeNameAndMRID())
             pole?.addStreetlight(this)
         }
@@ -500,8 +502,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             )
             powerElectronicsConnection?.addUnit(this)
 
-            maxP = resultSet.getInt(table.MAX_P.queryIndex)
-            minP = resultSet.getInt(table.MIN_P.queryIndex)
+            maxP = resultSet.getNullableInt(table.MAX_P.queryIndex)
+            minP = resultSet.getNullableInt(table.MIN_P.queryIndex)
         }
 
         return loadEquipment(powerElectronicsUnit, table, resultSet)
@@ -510,8 +512,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TableBatteryUnit, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val batteryUnit = BatteryUnit(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             batteryState = BatteryStateKind.valueOf(resultSet.getString(table.BATTERY_STATE.queryIndex))
-            ratedE = resultSet.getLong(table.RATED_E.queryIndex)
-            storedE = resultSet.getLong(table.STORED_E.queryIndex)
+            ratedE = resultSet.getNullableLong(table.RATED_E.queryIndex)
+            storedE = resultSet.getNullableLong(table.STORED_E.queryIndex)
         }
 
         return loadPowerElectronicsUnit(batteryUnit, table, resultSet) && networkService.addOrThrow(batteryUnit)
@@ -561,7 +563,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     private fun loadConductor(conductor: Conductor, table: TableConductors, resultSet: ResultSet): Boolean {
         conductor.apply {
-            length = resultSet.getNullableDouble(table.LENGTH.queryIndex) ?: Double.NaN
+            length = resultSet.getNullableDouble(table.LENGTH.queryIndex)
             assetInfo = networkService.ensureGet(
                 resultSet.getNullableString(table.WIRE_INFO_MRID.queryIndex),
                 typeNameAndMRID()
@@ -591,12 +593,12 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TableEnergyConsumers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val energyConsumer = EnergyConsumer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            customerCount = resultSet.getInt(table.CUSTOMER_COUNT.queryIndex)
+            customerCount = resultSet.getNullableInt(table.CUSTOMER_COUNT.queryIndex)
             grounded = resultSet.getBoolean(table.GROUNDED.queryIndex)
-            p = resultSet.getDouble(table.P.queryIndex)
-            q = resultSet.getDouble(table.Q.queryIndex)
-            pFixed = resultSet.getDouble(table.P_FIXED.queryIndex)
-            qFixed = resultSet.getDouble(table.Q_FIXED.queryIndex)
+            p = resultSet.getNullableDouble(table.P.queryIndex)
+            q = resultSet.getNullableDouble(table.Q.queryIndex)
+            pFixed = resultSet.getNullableDouble(table.P_FIXED.queryIndex)
+            qFixed = resultSet.getNullableDouble(table.Q_FIXED.queryIndex)
             phaseConnection = PhaseShuntConnectionKind.valueOf(resultSet.getString(table.PHASE_CONNECTION.queryIndex))
         }
 
@@ -610,10 +612,10 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             energyConsumer?.addPhase(this)
 
             phase = SinglePhaseKind.valueOf(resultSet.getString(table.PHASE.queryIndex))
-            p = resultSet.getDouble(table.P.queryIndex)
-            q = resultSet.getDouble(table.Q.queryIndex)
-            pFixed = resultSet.getDouble(table.P_FIXED.queryIndex)
-            qFixed = resultSet.getDouble(table.Q_FIXED.queryIndex)
+            p = resultSet.getNullableDouble(table.P.queryIndex)
+            q = resultSet.getNullableDouble(table.Q.queryIndex)
+            pFixed = resultSet.getNullableDouble(table.P_FIXED.queryIndex)
+            qFixed = resultSet.getNullableDouble(table.Q_FIXED.queryIndex)
         }
 
         return loadPowerSystemResource(energyConsumerPhase, table, resultSet) && networkService.addOrThrow(
@@ -623,18 +625,18 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TableEnergySources, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val energySource = EnergySource(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            activePower = resultSet.getDouble(table.ACTIVE_POWER.queryIndex)
-            reactivePower = resultSet.getDouble(table.REACTIVE_POWER.queryIndex)
-            voltageAngle = resultSet.getDouble(table.VOLTAGE_ANGLE.queryIndex)
-            voltageMagnitude = resultSet.getDouble(table.VOLTAGE_MAGNITUDE.queryIndex)
-            pMax = resultSet.getDouble(table.P_MAX.queryIndex)
-            pMin = resultSet.getDouble(table.P_MIN.queryIndex)
-            r = resultSet.getDouble(table.R.queryIndex)
-            r0 = resultSet.getDouble(table.R0.queryIndex)
-            rn = resultSet.getDouble(table.RN.queryIndex)
-            x = resultSet.getDouble(table.X.queryIndex)
-            x0 = resultSet.getDouble(table.X0.queryIndex)
-            xn = resultSet.getDouble(table.XN.queryIndex)
+            activePower = resultSet.getNullableDouble(table.ACTIVE_POWER.queryIndex)
+            reactivePower = resultSet.getNullableDouble(table.REACTIVE_POWER.queryIndex)
+            voltageAngle = resultSet.getNullableDouble(table.VOLTAGE_ANGLE.queryIndex)
+            voltageMagnitude = resultSet.getNullableDouble(table.VOLTAGE_MAGNITUDE.queryIndex)
+            pMax = resultSet.getNullableDouble(table.P_MAX.queryIndex)
+            pMin = resultSet.getNullableDouble(table.P_MIN.queryIndex)
+            r = resultSet.getNullableDouble(table.R.queryIndex)
+            r0 = resultSet.getNullableDouble(table.R0.queryIndex)
+            rn = resultSet.getNullableDouble(table.RN.queryIndex)
+            x = resultSet.getNullableDouble(table.X.queryIndex)
+            x0 = resultSet.getNullableDouble(table.X0.queryIndex)
+            xn = resultSet.getNullableDouble(table.XN.queryIndex)
         }
 
         return loadEnergyConnection(energySource, table, resultSet) && networkService.addOrThrow(energySource)
@@ -679,10 +681,10 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TableLinearShuntCompensators, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val linearShuntCompensator =
             LinearShuntCompensator(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-                b0PerSection = resultSet.getDouble(table.B0_PER_SECTION.queryIndex)
-                bPerSection = resultSet.getDouble(table.B_PER_SECTION.queryIndex)
-                g0PerSection = resultSet.getDouble(table.G0_PER_SECTION.queryIndex)
-                gPerSection = resultSet.getDouble(table.G_PER_SECTION.queryIndex)
+                b0PerSection = resultSet.getNullableDouble(table.B0_PER_SECTION.queryIndex)
+                bPerSection = resultSet.getNullableDouble(table.B_PER_SECTION.queryIndex)
+                g0PerSection = resultSet.getNullableDouble(table.G0_PER_SECTION.queryIndex)
+                gPerSection = resultSet.getNullableDouble(table.G_PER_SECTION.queryIndex)
             }
 
         return loadShuntCompensator(linearShuntCompensator, table, resultSet) && networkService.addOrThrow(
@@ -701,14 +703,14 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TablePerLengthSequenceImpedances, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val perLengthSequenceImpedance =
             PerLengthSequenceImpedance(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-                r = resultSet.getDouble(table.R.queryIndex)
-                x = resultSet.getDouble(table.X.queryIndex)
-                r0 = resultSet.getDouble(table.R0.queryIndex)
-                x0 = resultSet.getDouble(table.X0.queryIndex)
-                bch = resultSet.getDouble(table.BCH.queryIndex)
-                gch = resultSet.getDouble(table.GCH.queryIndex)
-                b0ch = resultSet.getDouble(table.B0CH.queryIndex)
-                g0ch = resultSet.getDouble(table.G0CH.queryIndex)
+                r = resultSet.getNullableDouble(table.R.queryIndex)
+                x = resultSet.getNullableDouble(table.X.queryIndex)
+                r0 = resultSet.getNullableDouble(table.R0.queryIndex)
+                x0 = resultSet.getNullableDouble(table.X0.queryIndex)
+                bch = resultSet.getNullableDouble(table.BCH.queryIndex)
+                gch = resultSet.getNullableDouble(table.GCH.queryIndex)
+                b0ch = resultSet.getNullableDouble(table.B0CH.queryIndex)
+                g0ch = resultSet.getNullableDouble(table.G0CH.queryIndex)
             }
 
         return loadPerLengthImpedance(perLengthSequenceImpedance, table, resultSet) && networkService.addOrThrow(
@@ -718,13 +720,13 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TablePowerElectronicsConnection, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val powerElectronicsConnection = PowerElectronicsConnection(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            maxIFault = resultSet.getInt(table.MAX_I_FAULT.queryIndex)
-            maxQ = resultSet.getDouble(table.MAX_Q.queryIndex)
-            minQ = resultSet.getDouble(table.MIN_Q.queryIndex)
-            p = resultSet.getDouble(table.P.queryIndex)
-            q = resultSet.getDouble(table.Q.queryIndex)
-            ratedS = resultSet.getInt(table.RATED_S.queryIndex)
-            ratedU = resultSet.getInt(table.RATED_U.queryIndex)
+            maxIFault = resultSet.getNullableInt(table.MAX_I_FAULT.queryIndex)
+            maxQ = resultSet.getNullableDouble(table.MAX_Q.queryIndex)
+            minQ = resultSet.getNullableDouble(table.MIN_Q.queryIndex)
+            p = resultSet.getNullableDouble(table.P.queryIndex)
+            q = resultSet.getNullableDouble(table.Q.queryIndex)
+            ratedS = resultSet.getNullableInt(table.RATED_S.queryIndex)
+            ratedU = resultSet.getNullableInt(table.RATED_U.queryIndex)
         }
 
         return loadRegulatingCondEq(powerElectronicsConnection, table, resultSet) && networkService.addOrThrow(powerElectronicsConnection)
@@ -737,9 +739,9 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             powerElectronicsConnection?.addPhase(this)
 
             phase = SinglePhaseKind.valueOf(resultSet.getString(table.PHASE.queryIndex))
-            p = resultSet.getDouble(table.P.queryIndex)
+            p = resultSet.getNullableDouble(table.P.queryIndex)
             phase = SinglePhaseKind.valueOf(resultSet.getString(table.PHASE.queryIndex))
-            q = resultSet.getDouble(table.Q.queryIndex)
+            q = resultSet.getNullableDouble(table.Q.queryIndex)
         }
 
         return loadPowerSystemResource(powerElectronicsConnectionPhase, table, resultSet) && networkService.addOrThrow(powerElectronicsConnectionPhase)
@@ -748,7 +750,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TablePowerTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val powerTransformer = PowerTransformer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             vectorGroup = VectorGroup.valueOf(resultSet.getString(table.VECTOR_GROUP.queryIndex))
-            transformerUtilisation = resultSet.getNullableDouble(table.TRANSFORMER_UTILISATION.queryIndex) ?: Double.NaN
+            transformerUtilisation = resultSet.getNullableDouble(table.TRANSFORMER_UTILISATION.queryIndex)
             assetInfo = networkService.ensureGet(
                 resultSet.getNullableString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex),
                 typeNameAndMRID()
@@ -769,15 +771,15 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             powerTransformer?.addEnd(this)
 
             connectionKind = WindingConnection.valueOf(resultSet.getString(table.CONNECTION_KIND.queryIndex))
-            phaseAngleClock = resultSet.getInt(table.PHASE_ANGLE_CLOCK.queryIndex)
-            b = resultSet.getDouble(table.B.queryIndex)
-            b0 = resultSet.getDouble(table.B0.queryIndex)
-            g = resultSet.getDouble(table.G.queryIndex)
-            g0 = resultSet.getDouble(table.G0.queryIndex)
+            phaseAngleClock = resultSet.getNullableInt(table.PHASE_ANGLE_CLOCK.queryIndex)
+            b = resultSet.getNullableDouble(table.B.queryIndex)
+            b0 = resultSet.getNullableDouble(table.B0.queryIndex)
+            g = resultSet.getNullableDouble(table.G.queryIndex)
+            g0 = resultSet.getNullableDouble(table.G0.queryIndex)
             r = resultSet.getNullableDouble(table.R.queryIndex)
             r0 = resultSet.getNullableDouble(table.R0.queryIndex)
-            ratedS = resultSet.getInt(table.RATED_S.queryIndex)
-            ratedU = resultSet.getInt(table.RATED_U.queryIndex)
+            ratedS = resultSet.getNullableInt(table.RATED_S.queryIndex)
+            ratedU = resultSet.getNullableInt(table.RATED_U.queryIndex)
             x = resultSet.getNullableDouble(table.X.queryIndex)
             x0 = resultSet.getNullableDouble(table.X0.queryIndex)
         }
@@ -797,7 +799,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             )
             transformerEnd?.ratioTapChanger = this
 
-            stepVoltageIncrement = resultSet.getDouble(table.STEP_VOLTAGE_INCREMENT.queryIndex)
+            stepVoltageIncrement = resultSet.getNullableDouble(table.STEP_VOLTAGE_INCREMENT.queryIndex)
         }
 
         return loadTapChanger(ratioTapChanger, table, resultSet) && networkService.addOrThrow(ratioTapChanger)
@@ -828,9 +830,9 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     ): Boolean {
         shuntCompensator.apply {
             grounded = resultSet.getBoolean(table.GROUNDED.queryIndex)
-            nomU = resultSet.getInt(table.NOM_U.queryIndex)
+            nomU = resultSet.getNullableInt(table.NOM_U.queryIndex)
             phaseConnection = PhaseShuntConnectionKind.valueOf(resultSet.getString(table.PHASE_CONNECTION.queryIndex))
-            sections = resultSet.getDouble(table.SECTIONS.queryIndex)
+            sections = resultSet.getNullableDouble(table.SECTIONS.queryIndex)
         }
 
         return loadRegulatingCondEq(shuntCompensator, table, resultSet)
@@ -848,12 +850,12 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     private fun loadTapChanger(tapChanger: TapChanger, table: TableTapChangers, resultSet: ResultSet): Boolean {
         tapChanger.apply {
             controlEnabled = resultSet.getBoolean(table.CONTROL_ENABLED.queryIndex)
-            highStep = resultSet.getInt(table.HIGH_STEP.queryIndex)
-            lowStep = resultSet.getInt(table.LOW_STEP.queryIndex)
-            neutralStep = resultSet.getInt(table.NEUTRAL_STEP.queryIndex)
-            neutralU = resultSet.getInt(table.NEUTRAL_U.queryIndex)
-            normalStep = resultSet.getInt(table.NORMAL_STEP.queryIndex)
-            step = resultSet.getDouble(table.STEP.queryIndex)
+            highStep = resultSet.getNullableInt(table.HIGH_STEP.queryIndex)
+            lowStep = resultSet.getNullableInt(table.LOW_STEP.queryIndex)
+            neutralStep = resultSet.getNullableInt(table.NEUTRAL_STEP.queryIndex)
+            neutralU = resultSet.getNullableInt(table.NEUTRAL_U.queryIndex)
+            normalStep = resultSet.getNullableInt(table.NORMAL_STEP.queryIndex)
+            step = resultSet.getNullableDouble(table.STEP.queryIndex)
         }
 
         return loadPowerSystemResource(tapChanger, table, resultSet)
@@ -864,8 +866,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             terminal = networkService.ensureGet(resultSet.getNullableString(table.TERMINAL_MRID.queryIndex), typeNameAndMRID())
             baseVoltage = networkService.ensureGet(resultSet.getNullableString(table.BASE_VOLTAGE_MRID.queryIndex), typeNameAndMRID())
             grounded = resultSet.getBoolean(table.GROUNDED.queryIndex)
-            rGround = resultSet.getDouble(table.R_GROUND.queryIndex)
-            xGround = resultSet.getDouble(table.X_GROUND.queryIndex)
+            rGround = resultSet.getNullableDouble(table.R_GROUND.queryIndex)
+            xGround = resultSet.getNullableDouble(table.X_GROUND.queryIndex)
             starImpedance = networkService.ensureGet(resultSet.getNullableString(table.STAR_IMPEDANCE_MRID.queryIndex), typeNameAndMRID())
         }
 

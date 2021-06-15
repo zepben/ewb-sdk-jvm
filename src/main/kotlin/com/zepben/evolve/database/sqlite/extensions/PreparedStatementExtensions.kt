@@ -24,10 +24,25 @@ internal fun PreparedStatement.setNullableString(queryIndex: Int, value: String?
 }
 
 internal fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?) {
-    if (value == null || isNaN(value))
-        this.setNull(queryIndex, DOUBLE)
+    when {
+        value == null -> this.setNull(queryIndex, DOUBLE)
+        isNaN(value) -> this.setString(queryIndex, "NaN")
+        else -> this.setDouble(queryIndex, value)
+    }
+}
+
+internal fun PreparedStatement.setNullableInt(queryIndex: Int, value: Int?) {
+    if (value == null)
+        this.setNull(queryIndex, Types.INTEGER)
     else
-        this.setDouble(queryIndex, value)
+        this.setInt(queryIndex, value)
+}
+
+internal fun PreparedStatement.setNullableLong(queryIndex: Int, value: Long?) {
+    if (value == null)
+        this.setNull(queryIndex, Types.INTEGER)
+    else
+        this.setLong(queryIndex, value)
 }
 
 internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {

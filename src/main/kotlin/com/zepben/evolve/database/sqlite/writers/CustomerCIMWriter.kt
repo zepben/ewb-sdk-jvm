@@ -13,6 +13,7 @@ import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
 import com.zepben.evolve.database.sqlite.DatabaseTables
+import com.zepben.evolve.database.sqlite.extensions.setNullableInt
 import com.zepben.evolve.database.sqlite.extensions.setNullableString
 import com.zepben.evolve.database.sqlite.tables.associations.TableCustomerAgreementsPricingStructures
 import com.zepben.evolve.database.sqlite.tables.associations.TablePricingStructuresTariffs
@@ -38,7 +39,7 @@ class CustomerCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(database
         val insert = databaseTables.getInsert(TableCustomers::class.java)
 
         insert.setNullableString(table.KIND.queryIndex, customer.kind.name)
-        insert.setInt(table.NUM_END_DEVICES.queryIndex, customer.numEndDevices)
+        insert.setNullableInt(table.NUM_END_DEVICES.queryIndex, customer.numEndDevices)
 
         return saveOrganisationRole(table, insert, customer, "customer")
     }

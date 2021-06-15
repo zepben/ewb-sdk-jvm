@@ -31,17 +31,17 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * @property units An AC network connection may have several power electronics units connecting through it.
  * @property phases The individual units models for the power electronics connection.
  */
-class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = ""): RegulatingCondEq(mRID) {
+class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : RegulatingCondEq(mRID) {
 
     private var _powerElectronicsUnits: MutableList<PowerElectronicsUnit>? = null
     private var _powerElectronicsConnectionPhases: MutableList<PowerElectronicsConnectionPhase>? = null
-    var maxIFault: Int = 0
-    var maxQ: Double = 0.0
-    var minQ: Double = 0.0
-    var p: Double = 0.0
-    var q: Double = 0.0
-    var ratedS: Int = 0
-    var ratedU: Int = 0
+    var maxIFault: Int? = null
+    var maxQ: Double? = null
+    var minQ: Double? = null
+    var p: Double? = null
+    var q: Double? = null
+    var ratedS: Int? = null
+    var ratedU: Int? = null
 
     /**
      * The units for this power electronics connection. The returned collection is read only.

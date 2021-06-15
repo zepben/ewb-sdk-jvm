@@ -51,12 +51,12 @@ import com.zepben.evolve.services.common.extensions.*
  */
 class PowerTransformer @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
 
-    val primaryVoltage: Int
-        get() = if (ends.isEmpty()) baseVoltageValue else ends[0].baseVoltage?.nominalVoltage ?: ends[0].ratedU
+    val primaryVoltage: Int?
+        get() = if (ends.isEmpty()) baseVoltage?.nominalVoltage else ends[0].baseVoltage?.nominalVoltage ?: ends[0].ratedU
 
     private var _powerTransformerEnds: MutableList<PowerTransformerEnd>? = null
     var vectorGroup: VectorGroup = VectorGroup.UNKNOWN
-    var transformerUtilisation: Double = Double.NaN
+    var transformerUtilisation: Double? = null
 
     /**
      * Override the [AssetInfo] as [PowerTransformerInfo].

@@ -10,8 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -32,8 +31,8 @@ internal class BatteryUnitTest {
         val batteryUnit = BatteryUnit()
 
         assertThat(batteryUnit.batteryState, equalTo(BatteryStateKind.UNKNOWN))
-        assertThat(batteryUnit.ratedE, equalTo(0L))
-        assertThat(batteryUnit.storedE, equalTo(0L))
+        assertThat(batteryUnit.ratedE, nullValue())
+        assertThat(batteryUnit.storedE, nullValue())
 
         batteryUnit.apply {
             this.batteryState = BatteryStateKind.charging

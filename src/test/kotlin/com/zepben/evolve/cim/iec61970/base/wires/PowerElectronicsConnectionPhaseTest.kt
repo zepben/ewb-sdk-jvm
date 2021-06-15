@@ -32,9 +32,9 @@ internal class PowerElectronicsConnectionPhaseTest {
         val powerElectronicsConnection = PowerElectronicsConnection()
 
         assertThat(powerElectronicsConnectionsPhase.powerElectronicsConnection, nullValue())
-        assertThat(powerElectronicsConnectionsPhase.p, equalTo(0.0))
+        assertThat(powerElectronicsConnectionsPhase.p, nullValue())
         assertThat(powerElectronicsConnectionsPhase.phase, equalTo(SinglePhaseKind.X))
-        assertThat(powerElectronicsConnectionsPhase.q, equalTo(0.0))
+        assertThat(powerElectronicsConnectionsPhase.q, nullValue())
 
         powerElectronicsConnectionsPhase.apply {
             this.powerElectronicsConnection = powerElectronicsConnection

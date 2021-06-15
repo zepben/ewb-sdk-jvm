@@ -17,6 +17,6 @@ import com.zepben.evolve.cim.iec61968.assets.AssetInfo
  */
 abstract class WireInfo(mRID: String = "") : AssetInfo(mRID) {
 
-    var ratedCurrent: Int = 0
+    var ratedCurrent: Int? = null
     var material: WireMaterialKind = WireMaterialKind.UNKNOWN
 }

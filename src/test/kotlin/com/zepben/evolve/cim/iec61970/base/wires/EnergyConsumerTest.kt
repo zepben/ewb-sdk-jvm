@@ -10,8 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -31,13 +30,13 @@ internal class EnergyConsumerTest {
     internal fun accessorCoverage() {
         val energyConsumer = EnergyConsumer()
 
-        assertThat(energyConsumer.customerCount, equalTo(0))
+        assertThat(energyConsumer.customerCount, nullValue())
         assertThat(energyConsumer.grounded, equalTo(false))
-        assertThat(energyConsumer.p, equalTo(0.0))
-        assertThat(energyConsumer.pFixed, equalTo(0.0))
+        assertThat(energyConsumer.p, nullValue())
+        assertThat(energyConsumer.pFixed, nullValue())
         assertThat(energyConsumer.phaseConnection, equalTo(PhaseShuntConnectionKind.D))
-        assertThat(energyConsumer.q, equalTo(0.0))
-        assertThat(energyConsumer.qFixed, equalTo(0.0))
+        assertThat(energyConsumer.q, nullValue())
+        assertThat(energyConsumer.qFixed, nullValue())
 
         energyConsumer.customerCount = 1
         energyConsumer.grounded = true

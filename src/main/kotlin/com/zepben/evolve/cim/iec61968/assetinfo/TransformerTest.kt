@@ -18,7 +18,7 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
  */
 abstract class TransformerTest(mRID: String = "") : IdentifiedObject(mRID) {
 
-    var basePower: Int = 0
-    var temperature: Double = 0.0
+    var basePower: Int? = null
+    var temperature: Double? = null
 
 }

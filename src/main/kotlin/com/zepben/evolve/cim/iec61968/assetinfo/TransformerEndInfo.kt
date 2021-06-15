@@ -41,14 +41,14 @@ import com.zepben.evolve.services.network.mergeIfIncomplete
 class TransformerEndInfo(mRID: String = "") : AssetInfo(mRID) {
 
     var connectionKind: WindingConnection = WindingConnection.UNKNOWN_WINDING
-    var emergencyS: Int = 0
+    var emergencyS: Int? = null
     var endNumber: Int = 0
-    var insulationU: Int = 0
-    var phaseAngleClock: Int = 0
-    var r: Double = 0.0
-    var ratedS: Int = 0
-    var ratedU: Int = 0
-    var shortTermS: Int = 0
+    var insulationU: Int? = null
+    var phaseAngleClock: Int? = null
+    var r: Double? = null
+    var ratedS: Int? = null
+    var ratedU: Int? = null
+    var shortTermS: Int? = null
 
     var transformerTankInfo: TransformerTankInfo? = null
     var transformerStarImpedance: TransformerStarImpedance? = null

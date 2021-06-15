@@ -9,8 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -30,14 +29,14 @@ internal class PerLengthSequenceImpedanceTest {
     internal fun accessorCoverage() {
         val perLengthSequenceImpedance = PerLengthSequenceImpedance()
 
-        assertThat(perLengthSequenceImpedance.r, equalTo(0.0))
-        assertThat(perLengthSequenceImpedance.x, equalTo(0.0))
-        assertThat(perLengthSequenceImpedance.bch, equalTo(0.0))
-        assertThat(perLengthSequenceImpedance.gch, equalTo(0.0))
-        assertThat(perLengthSequenceImpedance.r0, equalTo(0.0))
-        assertThat(perLengthSequenceImpedance.x0, equalTo(0.0))
-        assertThat(perLengthSequenceImpedance.b0ch, equalTo(0.0))
-        assertThat(perLengthSequenceImpedance.g0ch, equalTo(0.0))
+        assertThat(perLengthSequenceImpedance.r, nullValue())
+        assertThat(perLengthSequenceImpedance.x, nullValue())
+        assertThat(perLengthSequenceImpedance.bch, nullValue())
+        assertThat(perLengthSequenceImpedance.gch, nullValue())
+        assertThat(perLengthSequenceImpedance.r0, nullValue())
+        assertThat(perLengthSequenceImpedance.x0, nullValue())
+        assertThat(perLengthSequenceImpedance.b0ch, nullValue())
+        assertThat(perLengthSequenceImpedance.g0ch, nullValue())
 
         perLengthSequenceImpedance.r = 1.0
         perLengthSequenceImpedance.x = 2.0

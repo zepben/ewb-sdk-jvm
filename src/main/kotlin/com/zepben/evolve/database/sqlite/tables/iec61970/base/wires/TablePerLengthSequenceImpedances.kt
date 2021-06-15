@@ -8,19 +8,19 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.tables.Column
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 class TablePerLengthSequenceImpedances : TablePerLengthImpedances() {
 
-    val R = Column(++columnIndex, "r", "NUMBER", NOT_NULL)
-    val X = Column(++columnIndex, "x", "NUMBER", NOT_NULL)
-    val R0 = Column(++columnIndex, "r0", "NUMBER", NOT_NULL)
-    val X0 = Column(++columnIndex, "x0", "NUMBER", NOT_NULL)
-    val BCH = Column(++columnIndex, "bch", "NUMBER", NOT_NULL)
-    val GCH = Column(++columnIndex, "gch", "NUMBER", NOT_NULL)
-    val B0CH = Column(++columnIndex, "b0ch", "NUMBER", NOT_NULL)
-    val G0CH = Column(++columnIndex, "g0ch", "NUMBER", NOT_NULL)
+    val R = Column(++columnIndex, "r", "NUMBER", NULL)
+    val X = Column(++columnIndex, "x", "NUMBER", NULL)
+    val R0 = Column(++columnIndex, "r0", "NUMBER", NULL)
+    val X0 = Column(++columnIndex, "x0", "NUMBER", NULL)
+    val BCH = Column(++columnIndex, "bch", "NUMBER", NULL)
+    val GCH = Column(++columnIndex, "gch", "NUMBER", NULL)
+    val B0CH = Column(++columnIndex, "b0ch", "NUMBER", NULL)
+    val G0CH = Column(++columnIndex, "g0ch", "NUMBER", NULL)
 
     override fun name(): String {
         return "per_length_sequence_impedances"

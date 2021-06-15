@@ -12,8 +12,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -33,13 +32,13 @@ internal class PowerElectronicsConnectionTest {
     internal fun accessorCoverage() {
         val powerElectronicsConnection = PowerElectronicsConnection()
 
-        assertThat(powerElectronicsConnection.maxIFault, equalTo(0))
-        assertThat(powerElectronicsConnection.maxQ, equalTo(0.0))
-        assertThat(powerElectronicsConnection.minQ, equalTo(0.0))
-        assertThat(powerElectronicsConnection.p, equalTo(0.0))
-        assertThat(powerElectronicsConnection.q, equalTo(0.0))
-        assertThat(powerElectronicsConnection.ratedS, equalTo(0))
-        assertThat(powerElectronicsConnection.ratedU, equalTo(0))
+        assertThat(powerElectronicsConnection.maxIFault, nullValue())
+        assertThat(powerElectronicsConnection.maxQ, nullValue())
+        assertThat(powerElectronicsConnection.minQ, nullValue())
+        assertThat(powerElectronicsConnection.p, nullValue())
+        assertThat(powerElectronicsConnection.q, nullValue())
+        assertThat(powerElectronicsConnection.ratedS, nullValue())
+        assertThat(powerElectronicsConnection.ratedU, nullValue())
 
         powerElectronicsConnection.maxIFault = 1
         powerElectronicsConnection.maxQ = 2.0

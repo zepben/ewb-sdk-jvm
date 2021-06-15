@@ -31,7 +31,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 abstract class ShuntCompensator(mRID: String = "") : RegulatingCondEq(mRID) {
 
     var grounded: Boolean = false
-    var nomU: Int = 0
+    var nomU: Int? = null
     var phaseConnection: PhaseShuntConnectionKind = PhaseShuntConnectionKind.UNKNOWN
-    var sections: Double = 0.0
+    var sections: Double? = null
 }

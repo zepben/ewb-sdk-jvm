@@ -9,13 +9,14 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 abstract class TableShuntCompensators : TableRegulatingCondEq() {
 
     val GROUNDED = Column(++columnIndex, "grounded", "BOOLEAN", NOT_NULL)
-    val NOM_U = Column(++columnIndex, "nom_u", "INTEGER", NOT_NULL)
+    val NOM_U = Column(++columnIndex, "nom_u", "INTEGER", NULL)
     val PHASE_CONNECTION = Column(++columnIndex, "phase_connection", "TEXT", NOT_NULL)
-    val SECTIONS = Column(++columnIndex, "sections", "NUMBER", NOT_NULL)
+    val SECTIONS = Column(++columnIndex, "sections", "NUMBER", NULL)
 
 }

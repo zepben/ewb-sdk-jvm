@@ -34,8 +34,8 @@ internal class PowerElectronicsUnitTest {
         val powerElectronicsConnection = PowerElectronicsConnection()
 
         assertThat(powerElectronicsUnit.powerElectronicsConnection, nullValue())
-        assertThat(powerElectronicsUnit.maxP, equalTo(0))
-        assertThat(powerElectronicsUnit.minP, equalTo(0))
+        assertThat(powerElectronicsUnit.maxP, nullValue())
+        assertThat(powerElectronicsUnit.minP, nullValue())
 
         powerElectronicsUnit.apply {
             this.powerElectronicsConnection = powerElectronicsConnection

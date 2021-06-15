@@ -11,6 +11,7 @@ import com.zepben.evolve.cim.iec61968.common.Agreement
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.customers.*
 import com.zepben.evolve.services.common.Resolvers
+import com.zepben.evolve.services.common.UNKNOWN_INT
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.services.common.translator.toCim
 import com.zepben.evolve.services.customer.CustomerService
@@ -32,7 +33,7 @@ fun toCim(pb: PBCustomer, customerService: CustomerService): Customer =
         pb.customerAgreementMRIDsList.forEach { agreementMRID ->
             customerService.resolveOrDeferReference(Resolvers.agreements(this), agreementMRID)
         }
-        numEndDevices = pb.numEndDevices
+        numEndDevices = pb.numEndDevices.takeUnless { it == UNKNOWN_INT }
         toCim(pb.or, this, customerService)
     }
 

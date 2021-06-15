@@ -11,8 +11,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -33,7 +32,7 @@ internal class WireInfoTest {
         val wireInfo = object : WireInfo() {}
 
         assertThat(wireInfo.material, equalTo(WireMaterialKind.UNKNOWN))
-        assertThat(wireInfo.ratedCurrent, equalTo(0))
+        assertThat(wireInfo.ratedCurrent, nullValue())
 
         wireInfo.fillFields(NetworkService(), true)
 

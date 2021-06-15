@@ -10,7 +10,6 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
 import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.mergeIfIncomplete
 
@@ -28,36 +27,12 @@ import com.zepben.evolve.services.network.mergeIfIncomplete
  */
 class TransformerStarImpedance(mRID: String = "") : IdentifiedObject(mRID) {
 
-    var r: Double?
-        get() = _r.takeIf { it != UNKNOWN_DOUBLE }
-        set(value) {
-            _r = value ?: UNKNOWN_DOUBLE
-        }
-    var r0: Double?
-        get() = _r0.takeIf { it != UNKNOWN_DOUBLE }
-        set(value) {
-            _r0 = value ?: UNKNOWN_DOUBLE
-        }
-    var x: Double?
-        get() = _x.takeIf { it != UNKNOWN_DOUBLE }
-        set(value) {
-            _x = value ?: UNKNOWN_DOUBLE
-        }
-    var x0: Double?
-        get() = _x0.takeIf { it != UNKNOWN_DOUBLE }
-        set(value) {
-            _x0 = value ?: UNKNOWN_DOUBLE
-        }
+    var r: Double? = null
+    var r0: Double? = null
+    var x: Double? = null
+    var x0: Double? = null
 
     var transformerEndInfo: TransformerEndInfo? = null
-
-    //
-    // NOTE: These fields are using non null primitive backing types to save memory.
-    //
-    private var _r: Double = UNKNOWN_DOUBLE
-    private var _r0: Double = UNKNOWN_DOUBLE
-    private var _x: Double = UNKNOWN_DOUBLE
-    private var _x0: Double = UNKNOWN_DOUBLE
 
     /**
      * Get the [ResistanceReactance] for this [TransformerStarImpedance]. If any values are missing

@@ -31,7 +31,7 @@ internal class RatioTapChangerTest {
         val transformerEnd = object : TransformerEnd() {}
 
         assertThat(ratioTapChanger.transformerEnd, nullValue())
-        assertThat(ratioTapChanger.stepVoltageIncrement, equalTo(0.0))
+        assertThat(ratioTapChanger.stepVoltageIncrement, nullValue())
 
         ratioTapChanger.transformerEnd = transformerEnd
         ratioTapChanger.stepVoltageIncrement = 1.23

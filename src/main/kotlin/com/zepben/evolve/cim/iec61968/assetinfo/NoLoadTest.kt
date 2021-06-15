@@ -20,10 +20,10 @@ package com.zepben.evolve.cim.iec61968.assetinfo
  */
 class NoLoadTest(mRID: String = "") : TransformerTest(mRID) {
 
-    var energisedEndVoltage: Int = 0
-    var excitingCurrent: Double = 0.0
-    var excitingCurrentZero: Double = 0.0
-    var loss: Int = 0
-    var lossZero: Int = 0
+    var energisedEndVoltage: Int? = null
+    var excitingCurrent: Double? = null
+    var excitingCurrentZero: Double? = null
+    var loss: Int? = null
+    var lossZero: Int? = null
 
 }

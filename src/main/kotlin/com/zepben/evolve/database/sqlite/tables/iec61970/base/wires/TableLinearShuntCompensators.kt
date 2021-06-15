@@ -8,15 +8,15 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.tables.Column
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 class TableLinearShuntCompensators : TableShuntCompensators() {
 
-    val B0_PER_SECTION = Column(++columnIndex, "b0_per_section", "NUMBER", NOT_NULL)
-    val B_PER_SECTION = Column(++columnIndex, "b_per_section", "NUMBER", NOT_NULL)
-    val G0_PER_SECTION = Column(++columnIndex, "g0_per_section", "NUMBER", NOT_NULL)
-    val G_PER_SECTION = Column(++columnIndex, "g_per_section", "NUMBER", NOT_NULL)
+    val B0_PER_SECTION = Column(++columnIndex, "b0_per_section", "NUMBER", NULL)
+    val B_PER_SECTION = Column(++columnIndex, "b_per_section", "NUMBER", NULL)
+    val G0_PER_SECTION = Column(++columnIndex, "g0_per_section", "NUMBER", NULL)
+    val G_PER_SECTION = Column(++columnIndex, "g_per_section", "NUMBER", NULL)
 
     override fun name(): String {
         return "linear_shunt_compensators"

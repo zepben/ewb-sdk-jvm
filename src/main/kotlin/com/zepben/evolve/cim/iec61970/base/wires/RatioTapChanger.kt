@@ -16,5 +16,5 @@ package com.zepben.evolve.cim.iec61970.base.wires
 class RatioTapChanger @JvmOverloads constructor(mRID: String = "") : TapChanger(mRID) {
 
     var transformerEnd: TransformerEnd? = null
-    var stepVoltageIncrement: Double = 0.0
+    var stepVoltageIncrement: Double? = null
 }

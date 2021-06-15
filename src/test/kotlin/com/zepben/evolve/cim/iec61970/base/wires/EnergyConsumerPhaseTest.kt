@@ -32,10 +32,10 @@ internal class EnergyConsumerPhaseTest {
 
         assertThat(energyConsumerPhase.energyConsumer, nullValue())
         assertThat(energyConsumerPhase.phase, equalTo(SinglePhaseKind.X))
-        assertThat(energyConsumerPhase.p, equalTo(0.0))
-        assertThat(energyConsumerPhase.pFixed, equalTo(0.0))
-        assertThat(energyConsumerPhase.q, equalTo(0.0))
-        assertThat(energyConsumerPhase.qFixed, equalTo(0.0))
+        assertThat(energyConsumerPhase.p, nullValue())
+        assertThat(energyConsumerPhase.pFixed, nullValue())
+        assertThat(energyConsumerPhase.q, nullValue())
+        assertThat(energyConsumerPhase.qFixed, nullValue())
 
         energyConsumerPhase.apply {
             this.energyConsumer = energyConsumer

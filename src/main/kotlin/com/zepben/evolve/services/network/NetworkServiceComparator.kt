@@ -51,7 +51,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         ObjectDifference(source, target).apply {
             compareTransformerTest()
 
-            compareValues(NoLoadTest::energisedEndVoltage, NoLoadTest::excitingCurrent, NoLoadTest::excitingCurrentZero, NoLoadTest::loss, NoLoadTest::lossZero)
+            compareValues(NoLoadTest::energisedEndVoltage, NoLoadTest::loss, NoLoadTest::lossZero)
+            compareDoubles(NoLoadTest::excitingCurrent, NoLoadTest::excitingCurrentZero)
         }
 
     private fun compareOpenCircuitTest(source: OpenCircuitTest, target: OpenCircuitTest): ObjectDifference<OpenCircuitTest> =
@@ -62,9 +63,9 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 OpenCircuitTest::energisedEndStep,
                 OpenCircuitTest::energisedEndVoltage,
                 OpenCircuitTest::openEndStep,
-                OpenCircuitTest::openEndVoltage,
-                OpenCircuitTest::phaseShift
+                OpenCircuitTest::openEndVoltage
             )
+            compareDoubles(OpenCircuitTest::phaseShift)
         }
 
     private fun compareOverheadWireInfo(source: OverheadWireInfo, target: OverheadWireInfo): ObjectDifference<OverheadWireInfo> =
@@ -82,14 +83,16 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareTransformerTest()
 
             compareValues(
-                ShortCircuitTest::current,
                 ShortCircuitTest::energisedEndStep,
                 ShortCircuitTest::groundedEndStep,
-                ShortCircuitTest::leakageImpedance,
-                ShortCircuitTest::leakageImpedanceZero,
                 ShortCircuitTest::loss,
                 ShortCircuitTest::lossZero,
-                ShortCircuitTest::power,
+                ShortCircuitTest::power
+            )
+            compareDoubles(
+                ShortCircuitTest::current,
+                ShortCircuitTest::leakageImpedance,
+                ShortCircuitTest::leakageImpedanceZero,
                 ShortCircuitTest::voltage,
                 ShortCircuitTest::voltageOhmicPart
             )
@@ -113,11 +116,11 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 TransformerEndInfo::endNumber,
                 TransformerEndInfo::insulationU,
                 TransformerEndInfo::phaseAngleClock,
-                TransformerEndInfo::r,
                 TransformerEndInfo::ratedS,
                 TransformerEndInfo::ratedU,
                 TransformerEndInfo::shortTermS
             )
+            compareDoubles(TransformerEndInfo::r)
         }
 
     private fun compareTransformerTankInfo(source: TransformerTankInfo, target: TransformerTankInfo): ObjectDifference<TransformerTankInfo> =
@@ -131,7 +134,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         apply {
             compareIdentifiedObject()
 
-            compareValues(TransformerTest::basePower, TransformerTest::temperature)
+            compareValues(TransformerTest::basePower)
+            compareDoubles(TransformerTest::temperature)
         }
 
     private fun ObjectDifference<out WireInfo>.compareWireInfo(): ObjectDifference<out WireInfo> =
@@ -406,15 +410,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareEnergyConnection()
 
             compareIdReferenceCollections(EnergyConsumer::phases)
-            compareValues(
-                EnergyConsumer::customerCount,
-                EnergyConsumer::grounded,
-                EnergyConsumer::p,
-                EnergyConsumer::pFixed,
-                EnergyConsumer::phaseConnection,
-                EnergyConsumer::q,
-                EnergyConsumer::qFixed
-            )
+            compareValues(EnergyConsumer::customerCount, EnergyConsumer::grounded, EnergyConsumer::phaseConnection)
+            compareDoubles(EnergyConsumer::p, EnergyConsumer::pFixed, EnergyConsumer::q, EnergyConsumer::qFixed)
         }
 
     private fun compareEnergyConsumerPhase(source: EnergyConsumerPhase, target: EnergyConsumerPhase): ObjectDifference<EnergyConsumerPhase> =
@@ -422,13 +419,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             comparePowerSystemResource()
 
             compareIdReferences(EnergyConsumerPhase::energyConsumer)
-            compareValues(
-                EnergyConsumerPhase::phase,
-                EnergyConsumerPhase::p,
-                EnergyConsumerPhase::pFixed,
-                EnergyConsumerPhase::q,
-                EnergyConsumerPhase::qFixed
-            )
+            compareValues(EnergyConsumerPhase::phase)
+            compareDoubles(EnergyConsumerPhase::p, EnergyConsumerPhase::pFixed, EnergyConsumerPhase::q, EnergyConsumerPhase::qFixed)
         }
 
     private fun compareEnergySource(source: EnergySource, target: EnergySource): ObjectDifference<EnergySource> =
@@ -436,7 +428,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareEnergyConnection()
 
             compareIdReferenceCollections(EnergySource::phases)
-            compareValues(
+            compareDoubles(
                 EnergySource::activePower,
                 EnergySource::reactivePower,
                 EnergySource::voltageAngle,
@@ -478,7 +470,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         ObjectDifference(source, target).apply {
             compareShuntCompensator()
 
-            compareValues(
+            compareDoubles(
                 LinearShuntCompensator::b0PerSection,
                 LinearShuntCompensator::bPerSection,
                 LinearShuntCompensator::g0PerSection,
@@ -499,7 +491,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         ObjectDifference(source, target).apply {
             comparePerLengthImpedance()
 
-            compareValues(
+            compareDoubles(
                 PerLengthSequenceImpedance::r,
                 PerLengthSequenceImpedance::x,
                 PerLengthSequenceImpedance::bch,
@@ -519,15 +511,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareRegulatingCondEq()
 
             compareIdReferenceCollections(PowerElectronicsConnection::units, PowerElectronicsConnection::phases)
-            compareValues(
-                PowerElectronicsConnection::maxIFault,
-                PowerElectronicsConnection::maxQ,
-                PowerElectronicsConnection::minQ,
-                PowerElectronicsConnection::p,
-                PowerElectronicsConnection::q,
-                PowerElectronicsConnection::ratedS,
-                PowerElectronicsConnection::ratedU
-            )
+            compareValues(PowerElectronicsConnection::maxIFault, PowerElectronicsConnection::ratedS, PowerElectronicsConnection::ratedU)
+            compareDoubles(PowerElectronicsConnection::maxQ, PowerElectronicsConnection::minQ, PowerElectronicsConnection::p, PowerElectronicsConnection::q)
         }
 
     private fun comparePowerElectronicsConnectionPhase(
@@ -538,11 +523,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             comparePowerSystemResource()
 
             compareIdReferences(PowerElectronicsConnectionPhase::powerElectronicsConnection)
-            compareValues(
-                PowerElectronicsConnectionPhase::p,
-                PowerElectronicsConnectionPhase::phase,
-                PowerElectronicsConnectionPhase::q,
-            )
+            compareValues(PowerElectronicsConnectionPhase::phase)
+            compareDoubles(PowerElectronicsConnectionPhase::p, PowerElectronicsConnectionPhase::q)
         }
 
     private fun comparePowerTransformer(source: PowerTransformer, target: PowerTransformer): ObjectDifference<PowerTransformer> =
@@ -551,7 +533,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
 
             compareIdReferences(PowerTransformer::assetInfo)
             compareIndexedIdReferenceCollections(PowerTransformer::ends)
-            compareValues(PowerTransformer::vectorGroup, PowerTransformer::transformerUtilisation)
+            compareValues(PowerTransformer::vectorGroup)
+            compareDoubles(PowerTransformer::transformerUtilisation)
         }
 
     private fun comparePowerTransformerEnd(source: PowerTransformerEnd, target: PowerTransformerEnd): ObjectDifference<PowerTransformerEnd> =
@@ -559,9 +542,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareTransformerEnd()
 
             compareIdReferences(PowerTransformerEnd::powerTransformer)
-            compareValues(
-                PowerTransformerEnd::connectionKind,
-                PowerTransformerEnd::phaseAngleClock,
+            compareValues(PowerTransformerEnd::connectionKind, PowerTransformerEnd::phaseAngleClock, PowerTransformerEnd::ratedS, PowerTransformerEnd::ratedU)
+            compareDoubles(
                 PowerTransformerEnd::b,
                 PowerTransformerEnd::b0,
                 PowerTransformerEnd::g,
@@ -569,9 +551,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 PowerTransformerEnd::r,
                 PowerTransformerEnd::r0,
                 PowerTransformerEnd::x,
-                PowerTransformerEnd::x0,
-                PowerTransformerEnd::ratedS,
-                PowerTransformerEnd::ratedU
+                PowerTransformerEnd::x0
             )
         }
 
@@ -583,7 +563,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareTapChanger()
 
             compareIdReferences(RatioTapChanger::transformerEnd)
-            compareValues(RatioTapChanger::stepVoltageIncrement)
+            compareDoubles(RatioTapChanger::stepVoltageIncrement)
         }
 
     private fun compareRecloser(source: Recloser, target: Recloser): ObjectDifference<Recloser> =
@@ -600,7 +580,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         apply {
             compareRegulatingCondEq()
 
-            compareValues(ShuntCompensator::grounded, ShuntCompensator::nomU, ShuntCompensator::phaseConnection, ShuntCompensator::sections)
+            compareValues(ShuntCompensator::grounded, ShuntCompensator::nomU, ShuntCompensator::phaseConnection)
+            compareDoubles(ShuntCompensator::sections)
         }
 
     private fun ObjectDifference<out Switch>.compareSwitch(): ObjectDifference<out Switch> =
@@ -621,16 +602,17 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 TapChanger::highStep,
                 TapChanger::lowStep,
                 TapChanger::neutralStep,
-                TapChanger::normalStep,
-                TapChanger::step
+                TapChanger::normalStep
             )
+            compareDoubles(TapChanger::step)
         }
 
     private fun ObjectDifference<out TransformerEnd>.compareTransformerEnd(): ObjectDifference<out TransformerEnd> =
         apply {
             compareIdentifiedObject()
 
-            compareValues(TransformerEnd::grounded, TransformerEnd::rGround, TransformerEnd::xGround, TransformerEnd::endNumber)
+            compareValues(TransformerEnd::grounded, TransformerEnd::endNumber)
+            compareDoubles(TransformerEnd::rGround, TransformerEnd::xGround)
             compareIdReferences(TransformerEnd::baseVoltage, TransformerEnd::ratioTapChanger, TransformerEnd::terminal, TransformerEnd::starImpedance)
         }
 
@@ -641,7 +623,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         ObjectDifference(source, target).apply {
             compareIdentifiedObject()
 
-            compareValues(TransformerStarImpedance::r, TransformerStarImpedance::r0, TransformerStarImpedance::x, TransformerStarImpedance::x0)
+            compareDoubles(TransformerStarImpedance::r, TransformerStarImpedance::r0, TransformerStarImpedance::x, TransformerStarImpedance::x0)
             compareIdReferences(TransformerStarImpedance::transformerEndInfo)
         }
 

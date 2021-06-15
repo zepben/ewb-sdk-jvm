@@ -23,12 +23,12 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
     var kind: CustomerKind = CustomerKind.UNKNOWN
     private var _customerAgreements: MutableList<CustomerAgreement>? = null
 
-    var numEndDevices: Int = 0
+    var numEndDevices: Int? = null
 
     /**
      * @return True if this [Customer] has at least 1 EndDevice associated with it, false otherwise.
      */
-    fun hasEndDevices() = numEndDevices > 0
+    fun hasEndDevices() = numEndDevices?.let { it > 0 } ?: false
 
     /**
      * All agreements of this customer. The returned collection is read only.

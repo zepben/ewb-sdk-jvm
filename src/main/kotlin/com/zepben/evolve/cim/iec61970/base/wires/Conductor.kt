@@ -21,9 +21,9 @@ import java.lang.Double.isNaN
  */
 abstract class Conductor(mRID: String = "") : ConductingEquipment(mRID) {
 
-    var length: Double = 0.0
+    var length: Double? = null
         set(value) {
-            require((value >= 0) || isNaN(value)) { "Conductor length cannot be negative." }
+            require((value == null) || (value >= 0) || isNaN(value)) { "Conductor length cannot be negative." }
             field = value
         }
 

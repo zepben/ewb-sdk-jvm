@@ -30,35 +30,42 @@ abstract class TapChanger(mRID: String = "") : PowerSystemResource(mRID) {
 
     var controlEnabled: Boolean = true
 
-    var highStep: Int = 1
+    var highStep: Int? = null
         set(value) {
-            check(value > lowStep) { "high step [$value] must be greater than low step [$lowStep]." }
+            check((value == null) || (value > lowStep ?: Int.MIN_VALUE)) { "high step [$value] must be greater than low step [$lowStep]." }
             field = value
         }
 
-    var lowStep: Int = 0
+    var lowStep: Int? = null
         set(value) {
-            check(value < highStep) { "low step [$value] must be lower than high step [$highStep]." }
+            check((value == null) || (value < highStep ?: Int.MAX_VALUE)) { "low step [$value] must be lower than high step [$highStep]." }
             field = value
         }
 
-    var neutralStep: Int = 0
+    var neutralStep: Int? = null
         set(value) {
-            check(value in lowStep..highStep) { "neutral step [$value] must be between high step [$highStep] and low step [$lowStep]." }
+            check(isInRange(value)) { "neutral step [$value] must be between high step [$highStep] and low step [$lowStep]." }
             field = value
         }
 
-    var neutralU: Int = 0
+    var neutralU: Int? = null
 
-    var normalStep: Int = 0
+    var normalStep: Int? = null
         set(value) {
-            check(value in lowStep..highStep) { "normal step [$value] must be between high step [$highStep] and low step [$lowStep]." }
+            check(isInRange(value)) { "normal step [$value] must be between high step [$highStep] and low step [$lowStep]." }
             field = value
         }
 
-    var step: Double = 0.0
+    var step: Double? = null
         set(value) {
-            check(value >= lowStep && value <= highStep) { "step [$value] must be between high step [$highStep] and low step [$lowStep]." }
+            check(isInRange(value)) { "step [$value] must be between high step [$highStep] and low step [$lowStep]." }
             field = value
         }
+
+    private fun isInRange(value: Int?): Boolean =
+        (value == null) || ((value >= lowStep ?: Int.MIN_VALUE) && (value <= highStep ?: Int.MAX_VALUE))
+
+    private fun isInRange(value: Double?): Boolean =
+        (value == null) || ((value >= lowStep ?: Int.MIN_VALUE) && (value <= highStep ?: Int.MAX_VALUE))
+
 }

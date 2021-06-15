@@ -8,16 +8,16 @@
 package com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo
 
 import com.zepben.evolve.database.sqlite.tables.Column
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 class TableOpenCircuitTests : TableTransformerTest() {
 
-    val ENERGISED_END_STEP = Column(++columnIndex, "energised_end_step", "INTEGER", NOT_NULL)
-    val ENERGISED_END_VOLTAGE = Column(++columnIndex, "energised_end_voltage", "INTEGER", NOT_NULL)
-    val OPEN_END_STEP = Column(++columnIndex, "open_end_step", "INTEGER", NOT_NULL)
-    val OPEN_END_VOLTAGE = Column(++columnIndex, "open_end_voltage", "INTEGER", NOT_NULL)
-    val PHASE_SHIFT = Column(++columnIndex, "phase_shift", "NUMBER", NOT_NULL)
+    val ENERGISED_END_STEP = Column(++columnIndex, "energised_end_step", "INTEGER", NULL)
+    val ENERGISED_END_VOLTAGE = Column(++columnIndex, "energised_end_voltage", "INTEGER", NULL)
+    val OPEN_END_STEP = Column(++columnIndex, "open_end_step", "INTEGER", NULL)
+    val OPEN_END_VOLTAGE = Column(++columnIndex, "open_end_voltage", "INTEGER", NULL)
+    val PHASE_SHIFT = Column(++columnIndex, "phase_shift", "NUMBER", NULL)
 
     override fun name(): String {
         return "open_circuit_tests"

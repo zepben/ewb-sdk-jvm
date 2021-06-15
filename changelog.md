@@ -9,6 +9,7 @@
 * `NetworkConsumerClient` has been updated to use the async stub internally and has received a significant performance boost. This only has an impact if you are
   passing the stub directly to the client rather than a channel.
 * All SDK methods that retrieve objects with references will now request the network hierarchy first to provide a consistent result, regardless of call order.
+* Primitive values on CIM classes are now nullable to allow differentiation between missing and zero values.
 * Updated to use v0.15.0 gRPC protocols.
 
 ##### New Features

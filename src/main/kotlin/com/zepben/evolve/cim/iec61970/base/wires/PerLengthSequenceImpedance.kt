@@ -21,12 +21,12 @@ package com.zepben.evolve.cim.iec61970.base.wires
  */
 class PerLengthSequenceImpedance @JvmOverloads constructor(mRID: String = "") : PerLengthImpedance(mRID) {
 
-    var r: Double = 0.0
-    var x: Double = 0.0
-    var bch: Double = 0.0
-    var gch: Double = 0.0
-    var r0: Double = 0.0
-    var x0: Double = 0.0
-    var b0ch: Double = 0.0
-    var g0ch: Double = 0.0
+    var r: Double? = null
+    var x: Double? = null
+    var bch: Double? = null
+    var gch: Double? = null
+    var r0: Double? = null
+    var x0: Double? = null
+    var b0ch: Double? = null
+    var g0ch: Double? = null
 }

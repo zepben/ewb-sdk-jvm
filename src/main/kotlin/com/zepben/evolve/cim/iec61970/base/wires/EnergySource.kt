@@ -34,18 +34,18 @@ import com.zepben.evolve.services.common.extensions.validateReference
 class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnection(mRID) {
 
     private var _energySourcePhases: MutableList<EnergySourcePhase>? = null
-    var activePower: Double = 0.0
-    var reactivePower: Double = 0.0
-    var voltageAngle: Double = 0.0
-    var voltageMagnitude: Double = 0.0
-    var pMax: Double = 0.0
-    var pMin: Double = 0.0
-    var r: Double = 0.0
-    var r0: Double = 0.0
-    var rn: Double = 0.0
-    var x: Double = 0.0
-    var x0: Double = 0.0
-    var xn: Double = 0.0
+    var activePower: Double? = null
+    var reactivePower: Double? = null
+    var voltageAngle: Double? = null
+    var voltageMagnitude: Double? = null
+    var pMax: Double? = null
+    var pMin: Double? = null
+    var r: Double? = null
+    var r0: Double? = null
+    var rn: Double? = null
+    var x: Double? = null
+    var x0: Double? = null
+    var xn: Double? = null
 
     /**
      * The phases for this energy source. The returned collection is read only.

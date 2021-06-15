@@ -25,15 +25,15 @@ class ShortCircuitTest(mRID: String = "") : TransformerTest(mRID) {
      * @property voltageOhmicPart Short Circuit Voltage – Ohmic Part as a percentage.
      */
 
-    var current: Double = 0.0
-    var energisedEndStep: Int = 0
-    var groundedEndStep: Int = 0
-    var leakageImpedance: Double = 0.0
-    var leakageImpedanceZero: Double = 0.0
-    var loss: Int = 0
-    var lossZero: Int = 0
-    var power: Int = 0
-    var voltage: Double = 0.0
-    var voltageOhmicPart: Double = 0.0
+    var current: Double? = null
+    var energisedEndStep: Int? = null
+    var groundedEndStep: Int? = null
+    var leakageImpedance: Double? = null
+    var leakageImpedanceZero: Double? = null
+    var loss: Int? = null
+    var lossZero: Int? = null
+    var power: Int? = null
+    var voltage: Double? = null
+    var voltageOhmicPart: Double? = null
 
 }

@@ -27,6 +27,9 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.Resolvers
+import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
+import com.zepben.evolve.services.common.UNKNOWN_INT
+import com.zepben.evolve.services.common.UNKNOWN_LONG
 import com.zepben.evolve.services.common.extensions.internEmpty
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.services.common.translator.toCim
@@ -137,21 +140,21 @@ fun toCim(pb: PBOverheadWireInfo, networkService: NetworkService): OverheadWireI
 
 fun toCim(pb: PBNoLoadTest, networkService: NetworkService): NoLoadTest =
     NoLoadTest(pb.mRID()).apply {
-        energisedEndVoltage = pb.energisedEndVoltage
-        excitingCurrent = pb.excitingCurrent
-        excitingCurrentZero = pb.excitingCurrentZero
-        loss = pb.loss
-        lossZero = pb.lossZero
+        energisedEndVoltage = pb.energisedEndVoltage.takeUnless { it == UNKNOWN_INT }
+        excitingCurrent = pb.excitingCurrent.takeUnless { it == UNKNOWN_DOUBLE }
+        excitingCurrentZero = pb.excitingCurrentZero.takeUnless { it == UNKNOWN_DOUBLE }
+        loss = pb.loss.takeUnless { it == UNKNOWN_INT }
+        lossZero = pb.lossZero.takeUnless { it == UNKNOWN_INT }
         toCim(pb.tt, this, networkService)
     }
 
 fun toCim(pb: PBOpenCircuitTest, networkService: NetworkService): OpenCircuitTest =
     OpenCircuitTest(pb.mRID()).apply {
-        energisedEndStep = pb.energisedEndStep
-        energisedEndVoltage = pb.energisedEndVoltage
-        openEndStep = pb.openEndStep
-        openEndVoltage = pb.openEndVoltage
-        phaseShift = pb.phaseShift
+        energisedEndStep = pb.energisedEndStep.takeUnless { it == UNKNOWN_INT }
+        energisedEndVoltage = pb.energisedEndVoltage.takeUnless { it == UNKNOWN_INT }
+        openEndStep = pb.openEndStep.takeUnless { it == UNKNOWN_INT }
+        openEndVoltage = pb.openEndVoltage.takeUnless { it == UNKNOWN_INT }
+        phaseShift = pb.phaseShift.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.tt, this, networkService)
     }
 
@@ -165,30 +168,30 @@ fun toCim(pb: PBPowerTransformerInfo, networkService: NetworkService): PowerTran
 
 fun toCim(pb: PBShortCircuitTest, networkService: NetworkService): ShortCircuitTest =
     ShortCircuitTest(pb.mRID()).apply {
-        current = pb.current
-        energisedEndStep = pb.energisedEndStep
-        groundedEndStep = pb.groundedEndStep
-        leakageImpedance = pb.leakageImpedance
-        leakageImpedanceZero = pb.leakageImpedanceZero
-        loss = pb.loss
-        lossZero = pb.lossZero
-        power = pb.power
-        voltage = pb.voltage
-        voltageOhmicPart = pb.voltageOhmicPart
+        current = pb.current.takeUnless { it == UNKNOWN_DOUBLE }
+        energisedEndStep = pb.energisedEndStep.takeUnless { it == UNKNOWN_INT }
+        groundedEndStep = pb.groundedEndStep.takeUnless { it == UNKNOWN_INT }
+        leakageImpedance = pb.leakageImpedance.takeUnless { it == UNKNOWN_DOUBLE }
+        leakageImpedanceZero = pb.leakageImpedanceZero.takeUnless { it == UNKNOWN_DOUBLE }
+        loss = pb.loss.takeUnless { it == UNKNOWN_INT }
+        lossZero = pb.lossZero.takeUnless { it == UNKNOWN_INT }
+        power = pb.power.takeUnless { it == UNKNOWN_INT }
+        voltage = pb.voltage.takeUnless { it == UNKNOWN_DOUBLE }
+        voltageOhmicPart = pb.voltageOhmicPart.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.tt, this, networkService)
     }
 
 fun toCim(pb: PBTransformerEndInfo, networkService: NetworkService): TransformerEndInfo =
     TransformerEndInfo(pb.mRID()).apply {
         connectionKind = WindingConnection.valueOf(pb.connectionKind.name)
-        emergencyS = pb.emergencyS
+        emergencyS = pb.emergencyS.takeUnless { it == UNKNOWN_INT }
         endNumber = pb.endNumber
-        insulationU = pb.insulationU
-        phaseAngleClock = pb.phaseAngleClock
-        r = pb.r
-        ratedS = pb.ratedS
-        ratedU = pb.ratedU
-        shortTermS = pb.shortTermS
+        insulationU = pb.insulationU.takeUnless { it == UNKNOWN_INT }
+        phaseAngleClock = pb.phaseAngleClock.takeUnless { it == UNKNOWN_INT }
+        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedS = pb.ratedS.takeUnless { it == UNKNOWN_INT }
+        ratedU = pb.ratedU.takeUnless { it == UNKNOWN_INT }
+        shortTermS = pb.shortTermS.takeUnless { it == UNKNOWN_INT }
 
         networkService.resolveOrDeferReference(Resolvers.transformerTankInfo(this), pb.transformerTankInfoMRID)
         networkService.resolveOrDeferReference(Resolvers.transformerStarImpedance(this), pb.transformerStarImpedanceMRID)
@@ -212,14 +215,14 @@ fun toCim(pb: PBTransformerTankInfo, networkService: NetworkService): Transforme
 
 fun toCim(pb: PBTransformerTest, cim: TransformerTest, networkService: NetworkService): TransformerTest =
     cim.apply {
-        basePower = pb.basePower
-        temperature = pb.temperature
+        basePower = pb.basePower.takeUnless { it == UNKNOWN_INT }
+        temperature = pb.temperature.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.io, this, networkService)
     }
 
 fun toCim(pb: PBWireInfo, cim: WireInfo, networkService: NetworkService): WireInfo =
     cim.apply {
-        ratedCurrent = pb.ratedCurrent
+        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_INT }
         material = WireMaterialKind.valueOf(pb.material.name)
         toCim(pb.ai, this, networkService)
     }
@@ -261,7 +264,7 @@ fun toCim(pb: PBPole, networkService: NetworkService): Pole =
 fun toCim(pb: PBStreetlight, networkService: NetworkService): Streetlight =
     Streetlight(pb.mRID()).apply {
         lampKind = StreetlightLampKind.valueOf(pb.lampKind.name)
-        lightRating = pb.lightRating
+        lightRating = pb.lightRating.takeUnless { it == UNKNOWN_INT }
         networkService.resolveOrDeferReference(Resolvers.pole(this), pb.poleMRID)
         toCim(pb.at, this, networkService)
     }
@@ -526,16 +529,16 @@ fun toCim(pb: PBRemoteSource, networkService: NetworkService): RemoteSource =
 fun toCim(pb: PBPowerElectronicsUnit, cim: PowerElectronicsUnit, networkService: NetworkService): PowerElectronicsUnit =
     cim.apply {
         networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnection(this), pb.powerElectronicsConnectionMRID)
-        maxP = pb.maxP
-        minP = pb.minP
+        maxP = pb.maxP.takeUnless { it == UNKNOWN_INT }
+        minP = pb.minP.takeUnless { it == UNKNOWN_INT }
         toCim(pb.eq, this, networkService)
     }
 
 fun toCim(pb: PBBatteryUnit, networkService: NetworkService): BatteryUnit =
     BatteryUnit(pb.mRID()).apply {
         batteryState = BatteryStateKind.valueOf(pb.batteryState.name)
-        ratedE = pb.ratedE
-        storedE = pb.storedE
+        ratedE = pb.ratedE.takeUnless { it == UNKNOWN_LONG }
+        storedE = pb.storedE.takeUnless { it == UNKNOWN_LONG }
         toCim(pb.peu, this, networkService)
     }
 
@@ -572,7 +575,7 @@ fun toCim(pb: PBBusbarSection, networkService: NetworkService): BusbarSection =
 
 fun toCim(pb: PBConductor, cim: Conductor, networkService: NetworkService): Conductor =
     cim.apply {
-        length = pb.length
+        length = pb.length.takeUnless { it == UNKNOWN_DOUBLE }
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
         toCim(pb.ce, this, networkService)
     }
@@ -594,13 +597,13 @@ fun toCim(pb: PBEnergyConsumer, networkService: NetworkService): EnergyConsumer 
         pb.energyConsumerPhasesMRIDsList.forEach { energyConsumerPhasesMRID ->
             networkService.resolveOrDeferReference(Resolvers.phases(this), energyConsumerPhasesMRID)
         }
-        customerCount = pb.customerCount
+        customerCount = pb.customerCount.takeUnless { it == UNKNOWN_INT }
         grounded = pb.grounded
-        p = pb.p
-        pFixed = pb.pFixed
+        p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
+        pFixed = pb.pFixed.takeUnless { it == UNKNOWN_DOUBLE }
         phaseConnection = PhaseShuntConnectionKind.valueOf(pb.phaseConnection.name)
-        q = pb.q
-        qFixed = pb.qFixed
+        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
+        qFixed = pb.qFixed.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.ec, this, networkService)
     }
 
@@ -608,10 +611,10 @@ fun toCim(pb: PBEnergyConsumerPhase, networkService: NetworkService): EnergyCons
     EnergyConsumerPhase(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.energyConsumer(this), pb.energyConsumerMRID)
         phase = SinglePhaseKind.valueOf(pb.phase.name)
-        p = pb.p
-        pFixed = pb.pFixed
-        q = pb.q
-        qFixed = pb.qFixed
+        p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
+        pFixed = pb.pFixed.takeUnless { it == UNKNOWN_DOUBLE }
+        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
+        qFixed = pb.qFixed.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.psr, this, networkService)
     }
 
@@ -620,18 +623,18 @@ fun toCim(pb: PBEnergySource, networkService: NetworkService): EnergySource =
         pb.energySourcePhasesMRIDsList.forEach { energySourcePhasesMRID ->
             networkService.resolveOrDeferReference(Resolvers.phases(this), energySourcePhasesMRID)
         }
-        activePower = pb.activePower
-        reactivePower = pb.reactivePower
-        voltageAngle = pb.voltageAngle
-        voltageMagnitude = pb.voltageMagnitude
-        r = pb.r
-        x = pb.x
-        pMax = pb.pMax
-        pMin = pb.pMin
-        r0 = pb.r0
-        rn = pb.rn
-        x0 = pb.x0
-        xn = pb.xn
+        activePower = pb.activePower.takeUnless { it == UNKNOWN_DOUBLE }
+        reactivePower = pb.reactivePower.takeUnless { it == UNKNOWN_DOUBLE }
+        voltageAngle = pb.voltageAngle.takeUnless { it == UNKNOWN_DOUBLE }
+        voltageMagnitude = pb.voltageMagnitude.takeUnless { it == UNKNOWN_DOUBLE }
+        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
+        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
+        pMax = pb.pMax.takeUnless { it == UNKNOWN_DOUBLE }
+        pMin = pb.pMin.takeUnless { it == UNKNOWN_DOUBLE }
+        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
+        rn = pb.rn.takeUnless { it == UNKNOWN_DOUBLE }
+        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
+        xn = pb.xn.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.ec, this, networkService)
     }
 
@@ -662,10 +665,10 @@ fun toCim(pb: PBLine, cim: Line, networkService: NetworkService): Line =
 
 fun toCim(pb: PBLinearShuntCompensator, networkService: NetworkService): LinearShuntCompensator =
     LinearShuntCompensator(pb.mRID()).apply {
-        b0PerSection = pb.b0PerSection
-        bPerSection = pb.bPerSection
-        g0PerSection = pb.g0PerSection
-        gPerSection = pb.gPerSection
+        b0PerSection = pb.b0PerSection.takeUnless { it == UNKNOWN_DOUBLE }
+        bPerSection = pb.bPerSection.takeUnless { it == UNKNOWN_DOUBLE }
+        g0PerSection = pb.g0PerSection.takeUnless { it == UNKNOWN_DOUBLE }
+        gPerSection = pb.gPerSection.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.sc, this, networkService)
     }
 
@@ -677,14 +680,14 @@ fun toCim(pb: PBPerLengthImpedance, cim: PerLengthImpedance, networkService: Net
 
 fun toCim(pb: PBPerLengthSequenceImpedance, networkService: NetworkService): PerLengthSequenceImpedance =
     PerLengthSequenceImpedance(pb.mRID()).apply {
-        r = pb.r
-        x = pb.x
-        r0 = pb.r0
-        x0 = pb.x0
-        bch = pb.bch
-        gch = pb.gch
-        b0ch = pb.b0Ch
-        g0ch = pb.g0Ch
+        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
+        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
+        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
+        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
+        bch = pb.bch.takeUnless { it == UNKNOWN_DOUBLE }
+        gch = pb.gch.takeUnless { it == UNKNOWN_DOUBLE }
+        b0ch = pb.b0Ch.takeUnless { it == UNKNOWN_DOUBLE }
+        g0ch = pb.g0Ch.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.pli, this, networkService)
     }
 
@@ -696,22 +699,22 @@ fun toCim(pb: PBPowerElectronicsConnection, networkService: NetworkService): Pow
         pb.powerElectronicsConnectionPhaseMRIDsList.forEach { powerElectronicsConnectionPhaseMRID ->
             networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnectionPhase(this), powerElectronicsConnectionPhaseMRID)
         }
-        maxIFault = pb.maxIFault
-        maxQ = pb.maxQ
-        minQ = pb.minQ
-        p = pb.p
-        q = pb.q
-        ratedS = pb.ratedS
-        ratedU = pb.ratedU
+        maxIFault = pb.maxIFault.takeUnless { it == UNKNOWN_INT }
+        maxQ = pb.maxQ.takeUnless { it == UNKNOWN_DOUBLE }
+        minQ = pb.minQ.takeUnless { it == UNKNOWN_DOUBLE }
+        p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
+        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedS = pb.ratedS.takeUnless { it == UNKNOWN_INT }
+        ratedU = pb.ratedU.takeUnless { it == UNKNOWN_INT }
         toCim(pb.rce, this, networkService)
     }
 
 fun toCim(pb: PBPowerElectronicsConnectionPhase, networkService: NetworkService): PowerElectronicsConnectionPhase =
     PowerElectronicsConnectionPhase(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.powerElectronicsConnection(this), pb.powerElectronicsConnectionMRID)
-        p = pb.p
+        p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
         phase = SinglePhaseKind.valueOf(pb.phase.name)
-        q = pb.q
+        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.psr, this, networkService)
     }
 
@@ -721,7 +724,7 @@ fun toCim(pb: PBPowerTransformer, networkService: NetworkService): PowerTransfor
             networkService.resolveOrDeferReference(Resolvers.ends(this), endMRID)
         }
         vectorGroup = VectorGroup.valueOf(pb.vectorGroup.name)
-        transformerUtilisation = pb.transformerUtilisation
+        transformerUtilisation = pb.transformerUtilisation.takeUnless { it == UNKNOWN_DOUBLE }
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
         toCim(pb.ce, this, networkService)
     }
@@ -729,18 +732,18 @@ fun toCim(pb: PBPowerTransformer, networkService: NetworkService): PowerTransfor
 fun toCim(pb: PBPowerTransformerEnd, networkService: NetworkService): PowerTransformerEnd =
     PowerTransformerEnd(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.powerTransformer(this), pb.powerTransformerMRID)
-        ratedS = pb.ratedS
-        ratedU = pb.ratedU
-        r = pb.r
-        r0 = pb.r0
-        x = pb.x
-        x0 = pb.x0
+        ratedS = pb.ratedS.takeUnless { it == UNKNOWN_INT }
+        ratedU = pb.ratedU.takeUnless { it == UNKNOWN_INT }
+        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
+        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
+        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
+        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
         connectionKind = WindingConnection.valueOf(pb.connectionKind.name)
-        b = pb.b
-        b0 = pb.b0
-        g = pb.g
-        g0 = pb.g0
-        phaseAngleClock = pb.phaseAngleClock
+        b = pb.b.takeUnless { it == UNKNOWN_DOUBLE }
+        b0 = pb.b0.takeUnless { it == UNKNOWN_DOUBLE }
+        g = pb.g.takeUnless { it == UNKNOWN_DOUBLE }
+        g0 = pb.g0.takeUnless { it == UNKNOWN_DOUBLE }
+        phaseAngleClock = pb.phaseAngleClock.takeUnless { it == UNKNOWN_INT }
         toCim(pb.te, this, networkService)
     }
 
@@ -750,7 +753,7 @@ fun toCim(pb: PBProtectedSwitch, cim: ProtectedSwitch, networkService: NetworkSe
 fun toCim(pb: PBRatioTapChanger, networkService: NetworkService): RatioTapChanger =
     RatioTapChanger(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.transformerEnd(this), pb.transformerEndMRID)
-        stepVoltageIncrement = pb.stepVoltageIncrement
+        stepVoltageIncrement = pb.stepVoltageIncrement.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.tc, this, networkService)
     }
 
@@ -767,9 +770,9 @@ fun toCim(pb: PBRegulatingCondEq, cim: RegulatingCondEq, networkService: Network
 
 fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: NetworkService): ShuntCompensator =
     cim.apply {
-        sections = pb.sections
+        sections = pb.sections.takeUnless { it == UNKNOWN_DOUBLE }
         grounded = pb.grounded
-        nomU = pb.nomU
+        nomU = pb.nomU.takeUnless { it == UNKNOWN_INT }
         phaseConnection = PhaseShuntConnectionKind.valueOf(pb.phaseConnection.name)
         toCim(pb.rce, this, networkService)
     }
@@ -786,12 +789,12 @@ fun toCim(pb: PBSwitch, cim: Switch, networkService: NetworkService): Switch =
 
 fun toCim(pb: PBTapChanger, cim: TapChanger, networkService: NetworkService): TapChanger =
     cim.apply {
-        highStep = pb.highStep
-        lowStep = pb.lowStep
-        step = pb.step
-        neutralStep = pb.neutralStep
-        neutralU = pb.neutralU
-        normalStep = pb.normalStep
+        highStep = pb.highStep.takeUnless { it == UNKNOWN_INT }
+        lowStep = pb.lowStep.takeUnless { it == UNKNOWN_INT }
+        step = pb.step.takeUnless { it == UNKNOWN_DOUBLE }
+        neutralStep = pb.neutralStep.takeUnless { it == UNKNOWN_INT }
+        neutralU = pb.neutralU.takeUnless { it == UNKNOWN_INT }
+        normalStep = pb.normalStep.takeUnless { it == UNKNOWN_INT }
         controlEnabled = pb.controlEnabled
         toCim(pb.psr, this, networkService)
     }
@@ -804,18 +807,18 @@ fun toCim(pb: PBTransformerEnd, cim: TransformerEnd, networkService: NetworkServ
         networkService.resolveOrDeferReference(Resolvers.starImpedance(this), pb.starImpedanceMRID)
         endNumber = pb.endNumber
         grounded = pb.grounded
-        rGround = pb.rGround
-        xGround = pb.xGround
+        rGround = pb.rGround.takeUnless { it == UNKNOWN_DOUBLE }
+        xGround = pb.xGround.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.io, this, networkService)
     }
 
 fun toCim(pb: PBTransformerStarImpedance, networkService: NetworkService): TransformerStarImpedance =
     TransformerStarImpedance(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.transformerEndInfo(this), pb.transformerEndInfoMRID)
-        r = pb.r
-        r0 = pb.r0
-        x = pb.x
-        x0 = pb.x0
+        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
+        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
+        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
+        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.io, this, networkService)
     }
 

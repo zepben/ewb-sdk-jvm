@@ -20,7 +20,7 @@ class Streetlight(mRID: String = "") : Asset(mRID) {
     /**
      * Power rating of light
      */
-    var lightRating: Int = 0
+    var lightRating: Int? = null
 
     /**
      * The kind of lamp

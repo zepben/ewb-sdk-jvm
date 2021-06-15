@@ -11,8 +11,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -32,11 +31,11 @@ internal class OpenCircuitTestTest {
     internal fun accessorCoverage() {
         val transformerTest = OpenCircuitTest()
 
-        assertThat(transformerTest.energisedEndStep, equalTo(0))
-        assertThat(transformerTest.energisedEndVoltage, equalTo(0))
-        assertThat(transformerTest.openEndStep, equalTo(0))
-        assertThat(transformerTest.openEndVoltage, equalTo(0))
-        assertThat(transformerTest.phaseShift, equalTo(0.0))
+        assertThat(transformerTest.energisedEndStep, nullValue())
+        assertThat(transformerTest.energisedEndVoltage, nullValue())
+        assertThat(transformerTest.openEndStep, nullValue())
+        assertThat(transformerTest.openEndVoltage, nullValue())
+        assertThat(transformerTest.phaseShift, nullValue())
 
         transformerTest.fillFields(NetworkService(), true)
 

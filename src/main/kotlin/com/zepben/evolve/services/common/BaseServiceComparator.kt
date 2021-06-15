@@ -177,7 +177,7 @@ abstract class BaseServiceComparator {
     }
 
     fun <T> ObjectDifference<T>.compareDoubles(
-        vararg properties: KProperty1<in T, Double>
+        vararg properties: KProperty1<in T, Double?>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareDoubles(source, target)) }
         return this

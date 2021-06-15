@@ -35,8 +35,8 @@ class EnergyConsumerPhase @JvmOverloads constructor(mRID: String = "") : PowerSy
         }
 
     var phase: SinglePhaseKind = SinglePhaseKind.X
-    var p: Double = 0.0
-    var pFixed: Double = 0.0
-    var q: Double = 0.0
-    var qFixed: Double = 0.0
+    var p: Double? = null
+    var pFixed: Double? = null
+    var q: Double? = null
+    var qFixed: Double? = null
 }

@@ -33,8 +33,8 @@ import com.zepben.evolve.services.network.ResistanceReactance
 abstract class TransformerEnd(mRID: String = "") : IdentifiedObject(mRID) {
 
     var grounded: Boolean = false
-    var rGround: Double = 0.0
-    var xGround: Double = 0.0
+    var rGround: Double? = null
+    var xGround: Double? = null
     var baseVoltage: BaseVoltage? = null
     var ratioTapChanger: RatioTapChanger? = null
 

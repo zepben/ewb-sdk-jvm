@@ -29,7 +29,7 @@ class PowerElectronicsConnectionPhase @JvmOverloads constructor(mRID: String = "
                 if (field == null || field === value) value else throw IllegalStateException("powerElectronicsConnection has already been set to $field. Cannot set this field again")
         }
 
-    var p: Double = 0.0
+    var p: Double? = null
     var phase: SinglePhaseKind = SinglePhaseKind.X
-    var q: Double = 0.0
+    var q: Double? = null
 }

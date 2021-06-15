@@ -8,13 +8,13 @@
 package com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo
 
 import com.zepben.evolve.database.sqlite.tables.Column
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetInfo
 
 @Suppress("PropertyName")
 abstract class TableTransformerTest : TableAssetInfo() {
 
-    val BASE_POWER = Column(++columnIndex, "base_power", "INTEGER", NOT_NULL)
-    val TEMPERATURE = Column(++columnIndex, "temperature", "NUMBER", NOT_NULL)
+    val BASE_POWER = Column(++columnIndex, "base_power", "INTEGER", NULL)
+    val TEMPERATURE = Column(++columnIndex, "temperature", "NUMBER", NULL)
 
 }

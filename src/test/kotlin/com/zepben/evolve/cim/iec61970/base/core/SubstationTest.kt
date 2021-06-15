@@ -12,9 +12,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -35,7 +33,7 @@ internal class SubstationTest {
         val substation = Substation()
         val subGeographicalRegion = SubGeographicalRegion()
 
-        assertThat(substation.subGeographicalRegion, Matchers.nullValue())
+        assertThat(substation.subGeographicalRegion, nullValue())
 
         substation.subGeographicalRegion = subGeographicalRegion
 

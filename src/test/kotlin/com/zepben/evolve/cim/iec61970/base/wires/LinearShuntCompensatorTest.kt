@@ -9,8 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -30,10 +29,10 @@ internal class LinearShuntCompensatorTest {
     internal fun accessorCoverage() {
         val linearShuntCompensator = LinearShuntCompensator()
 
-        assertThat(linearShuntCompensator.b0PerSection, equalTo(0.0))
-        assertThat(linearShuntCompensator.bPerSection, equalTo(0.0))
-        assertThat(linearShuntCompensator.g0PerSection, equalTo(0.0))
-        assertThat(linearShuntCompensator.gPerSection, equalTo(0.0))
+        assertThat(linearShuntCompensator.b0PerSection, nullValue())
+        assertThat(linearShuntCompensator.bPerSection, nullValue())
+        assertThat(linearShuntCompensator.g0PerSection, nullValue())
+        assertThat(linearShuntCompensator.gPerSection, nullValue())
 
         linearShuntCompensator.b0PerSection = 1.1
         linearShuntCompensator.bPerSection = 2.2

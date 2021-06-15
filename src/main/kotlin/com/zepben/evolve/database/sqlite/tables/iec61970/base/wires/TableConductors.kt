@@ -14,7 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableConducti
 @Suppress("PropertyName")
 abstract class TableConductors : TableConductingEquipment() {
 
-    val LENGTH = Column(++columnIndex, "length", "NUMBER")
+    val LENGTH = Column(++columnIndex, "length", "NUMBER", NULL)
     val WIRE_INFO_MRID = Column(++columnIndex, "wire_info_mrid", "TEXT", NULL)
 
 }

@@ -34,8 +34,8 @@ internal class TransformerEndTest {
         val transformerEnd = object : TransformerEnd() {}
 
         assertThat(transformerEnd.grounded, equalTo(false))
-        assertThat(transformerEnd.rGround, equalTo(0.0))
-        assertThat(transformerEnd.xGround, equalTo(0.0))
+        assertThat(transformerEnd.rGround, nullValue())
+        assertThat(transformerEnd.xGround, nullValue())
         assertThat(transformerEnd.baseVoltage, nullValue())
         assertThat(transformerEnd.ratioTapChanger, nullValue())
         assertThat(transformerEnd.terminal, nullValue())

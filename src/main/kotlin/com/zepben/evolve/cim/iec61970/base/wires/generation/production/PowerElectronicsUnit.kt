@@ -26,6 +26,6 @@ abstract class PowerElectronicsUnit(mRID: String = "") : Equipment(mRID) {
                 if (field == null || field === value) value else throw IllegalStateException("powerElectronicsConnection has already been set to $field. Cannot set this field again")
         }
 
-    var maxP: Int = 0
-    var minP: Int = 0
+    var maxP: Int? = null
+    var minP: Int? = null
 }

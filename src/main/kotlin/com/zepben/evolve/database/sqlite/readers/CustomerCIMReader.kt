@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.readers
 
 import com.zepben.evolve.cim.iec61968.common.Agreement
 import com.zepben.evolve.cim.iec61968.customers.*
+import com.zepben.evolve.database.sqlite.extensions.getNullableInt
 import com.zepben.evolve.database.sqlite.tables.associations.TableCustomerAgreementsPricingStructures
 import com.zepben.evolve.database.sqlite.tables.associations.TablePricingStructuresTariffs
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableAgreements
@@ -34,7 +35,7 @@ class CustomerCIMReader(private val customerService: CustomerService) : BaseCIMR
     fun load(table: TableCustomers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val customer = Customer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             kind = CustomerKind.valueOf(resultSet.getString(table.KIND.queryIndex))
-            numEndDevices = resultSet.getInt(table.NUM_END_DEVICES.queryIndex)
+            numEndDevices = resultSet.getNullableInt(table.NUM_END_DEVICES.queryIndex)
         }
 
         return loadOrganisationRole(customer, table, resultSet) && customerService.addOrThrow(customer)

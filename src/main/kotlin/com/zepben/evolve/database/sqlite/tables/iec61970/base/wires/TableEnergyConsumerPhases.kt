@@ -9,6 +9,7 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TablePowerSystemResources
 
 @Suppress("PropertyName")
@@ -16,10 +17,10 @@ class TableEnergyConsumerPhases : TablePowerSystemResources() {
 
     val ENERGY_CONSUMER_MRID = Column(++columnIndex, "energy_consumer_mrid", "TEXT", NOT_NULL)
     val PHASE = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
-    val P = Column(++columnIndex, "p", "NUMBER", NOT_NULL)
-    val Q = Column(++columnIndex, "q", "NUMBER", NOT_NULL)
-    val P_FIXED = Column(++columnIndex, "p_fixed", "NUMBER", NOT_NULL)
-    val Q_FIXED = Column(++columnIndex, "q_fixed", "NUMBER", NOT_NULL)
+    val P = Column(++columnIndex, "p", "NUMBER", NULL)
+    val Q = Column(++columnIndex, "q", "NUMBER", NULL)
+    val P_FIXED = Column(++columnIndex, "p_fixed", "NUMBER", NULL)
+    val Q_FIXED = Column(++columnIndex, "q_fixed", "NUMBER", NULL)
 
     override fun name(): String {
         return "energy_consumer_phases"

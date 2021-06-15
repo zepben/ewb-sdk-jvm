@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
-import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
 import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.mergeIfIncomplete
 
@@ -57,43 +56,18 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
                 if (field == null || field === value) value else throw IllegalStateException("powerTransformer has already been set to $field. Cannot set this field again")
         }
 
-    var b: Double = 0.0
-    var b0: Double = 0.0
+    var b: Double? = null
+    var b0: Double? = null
     var connectionKind: WindingConnection = WindingConnection.UNKNOWN_WINDING
-    var g: Double = 0.0
-    var g0: Double = 0.0
-    var phaseAngleClock: Int = 0
-    var r: Double?
-        get() = _r.takeIf { it != UNKNOWN_DOUBLE }
-        set(value) {
-            _r = value ?: UNKNOWN_DOUBLE
-        }
-    var r0: Double?
-        get() = _r0.takeIf { it != UNKNOWN_DOUBLE }
-        set(value) {
-            _r0 = value ?: UNKNOWN_DOUBLE
-        }
-    var ratedS: Int = 0
-    var ratedU: Int = 0
-    var x: Double?
-        get() = _x.takeIf { it != UNKNOWN_DOUBLE }
-        set(value) {
-            _x = value ?: UNKNOWN_DOUBLE
-        }
-    var x0: Double?
-        get() = _x0.takeIf { it != UNKNOWN_DOUBLE }
-        set(value) {
-            _x0 = value ?: UNKNOWN_DOUBLE
-        }
-
-    //
-    // NOTE: These fields are using non null primitive backing types to save memory.
-    //
-    private var _r: Double = UNKNOWN_DOUBLE
-    private var _r0: Double = UNKNOWN_DOUBLE
-    private var _x: Double = UNKNOWN_DOUBLE
-    private var _x0: Double = UNKNOWN_DOUBLE
-
+    var g: Double? = null
+    var g0: Double? = null
+    var phaseAngleClock: Int? = null
+    var r: Double? = null
+    var r0: Double? = null
+    var ratedS: Int? = null
+    var ratedU: Int? = null
+    var x: Double? = null
+    var x0: Double? = null
 
     /**
      * Get the [ResistanceReactance] for this [PowerTransformerEnd] from either:

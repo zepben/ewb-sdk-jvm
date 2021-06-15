@@ -35,7 +35,7 @@ internal class PowerTransformerTest {
         val powerTransformer = PowerTransformer()
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.UNKNOWN))
-        assertThat(powerTransformer.transformerUtilisation, equalTo(Double.NaN))
+        assertThat(powerTransformer.transformerUtilisation, nullValue())
         assertThat(powerTransformer.assetInfo, nullValue())
 
         powerTransformer.vectorGroup = VectorGroup.DYN11
@@ -115,13 +115,13 @@ internal class PowerTransformerTest {
             ratedU = 25
         }
 
-        assertThat(pt.primaryVoltage, equalTo(0))
+        assertThat(pt.primaryVoltage, nullValue())
 
         pt.baseVoltage = BaseVoltage().apply { nominalVoltage = 5 }
         assertThat(pt.primaryVoltage, equalTo(5))
 
         pt.addEnd(e1).addEnd(e2)
-        assertThat(pt.primaryVoltage, equalTo(0))
+        assertThat(pt.primaryVoltage, nullValue())
 
         e1.ratedU = 15
         assertThat(pt.primaryVoltage, equalTo(15))
@@ -141,7 +141,7 @@ internal class PowerTransformerTest {
         tx.assetInfo = null
 
         val pti = PowerTransformerInfo()
-        expect { tx.assetInfo =  pti }
+        expect { tx.assetInfo = pti }
             .toThrow(IllegalArgumentException::class.java)
             .withMessage("Unable to use ${pti.typeNameAndMRID()} for ${tx.typeNameAndMRID()} because the following associated ends have a direct link to a star impedance: [${end.typeNameAndMRID()}].")
     }

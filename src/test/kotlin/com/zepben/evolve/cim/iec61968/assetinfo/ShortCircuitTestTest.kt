@@ -11,8 +11,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -32,16 +31,16 @@ internal class ShortCircuitTestTest {
     internal fun accessorCoverage() {
         val shortCircuitTest = ShortCircuitTest()
 
-        assertThat(shortCircuitTest.current, equalTo(0.0))
-        assertThat(shortCircuitTest.energisedEndStep, equalTo(0))
-        assertThat(shortCircuitTest.groundedEndStep, equalTo(0))
-        assertThat(shortCircuitTest.leakageImpedance, equalTo(0.0))
-        assertThat(shortCircuitTest.leakageImpedanceZero, equalTo(0.0))
-        assertThat(shortCircuitTest.loss, equalTo(0))
-        assertThat(shortCircuitTest.lossZero, equalTo(0))
-        assertThat(shortCircuitTest.power, equalTo(0))
-        assertThat(shortCircuitTest.voltage, equalTo(0.0))
-        assertThat(shortCircuitTest.voltageOhmicPart, equalTo(0.0))
+        assertThat(shortCircuitTest.current, nullValue())
+        assertThat(shortCircuitTest.energisedEndStep, nullValue())
+        assertThat(shortCircuitTest.groundedEndStep, nullValue())
+        assertThat(shortCircuitTest.leakageImpedance, nullValue())
+        assertThat(shortCircuitTest.leakageImpedanceZero, nullValue())
+        assertThat(shortCircuitTest.loss, nullValue())
+        assertThat(shortCircuitTest.lossZero, nullValue())
+        assertThat(shortCircuitTest.power, nullValue())
+        assertThat(shortCircuitTest.voltage, nullValue())
+        assertThat(shortCircuitTest.voltageOhmicPart, nullValue())
 
         shortCircuitTest.fillFields(NetworkService(), true)
 

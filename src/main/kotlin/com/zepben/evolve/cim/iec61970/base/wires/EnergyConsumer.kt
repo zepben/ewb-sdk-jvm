@@ -27,13 +27,13 @@ import com.zepben.evolve.services.common.extensions.validateReference
 class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnection(mRID) {
 
     private var _energyConsumerPhases: MutableList<EnergyConsumerPhase>? = null
-    var customerCount: Int = 0
+    var customerCount: Int? = null
     var grounded: Boolean = false
-    var p: Double = 0.0
-    var pFixed: Double = 0.0
+    var p: Double? = null
+    var pFixed: Double? = null
     var phaseConnection: PhaseShuntConnectionKind = PhaseShuntConnectionKind.D
-    var q: Double = 0.0
-    var qFixed: Double = 0.0
+    var q: Double? = null
+    var qFixed: Double? = null
 
     /**
      * The individual phase models for this energy consumer. The returned collection is read only.

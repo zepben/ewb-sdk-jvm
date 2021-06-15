@@ -10,8 +10,7 @@ package com.zepben.evolve.cim.iec61968.customers
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -32,7 +31,7 @@ internal class CustomerTest {
         val customer = Customer()
 
         assertThat(customer.kind, equalTo(CustomerKind.UNKNOWN))
-        assertThat(customer.numEndDevices, equalTo(0))
+        assertThat(customer.numEndDevices, nullValue())
 
         customer.apply {
             kind = CustomerKind.enterprise

@@ -11,8 +11,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -32,8 +31,8 @@ internal class TransformerTestTest {
     internal fun accessorCoverage() {
         val transformerTest = object : TransformerTest() {}
 
-        assertThat(transformerTest.basePower, equalTo(0))
-        assertThat(transformerTest.temperature, equalTo(0.0))
+        assertThat(transformerTest.basePower, nullValue())
+        assertThat(transformerTest.temperature, nullValue())
 
         transformerTest.fillFields(NetworkService(), true)
 

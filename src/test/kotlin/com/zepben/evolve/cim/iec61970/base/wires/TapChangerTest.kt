@@ -10,8 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -32,12 +31,12 @@ internal class TapChangerTest {
         val tapChanger = object : TapChanger() {}
 
         assertThat(tapChanger.controlEnabled, equalTo(true))
-        assertThat(tapChanger.highStep, equalTo(1))
-        assertThat(tapChanger.lowStep, equalTo(0))
-        assertThat(tapChanger.neutralStep, equalTo(0))
-        assertThat(tapChanger.neutralU, equalTo(0))
-        assertThat(tapChanger.normalStep, equalTo(0))
-        assertThat(tapChanger.step, equalTo(0.0))
+        assertThat(tapChanger.highStep, nullValue())
+        assertThat(tapChanger.lowStep, nullValue())
+        assertThat(tapChanger.neutralStep, nullValue())
+        assertThat(tapChanger.neutralU, nullValue())
+        assertThat(tapChanger.normalStep, nullValue())
+        assertThat(tapChanger.step, nullValue())
 
         tapChanger.controlEnabled = false
         tapChanger.highStep = 4

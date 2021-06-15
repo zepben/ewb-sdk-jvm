@@ -16,7 +16,7 @@ class TableStreetlights : TableAssets() {
 
     val POLE_MRID = Column(++columnIndex, "pole_mrid", "TEXT", NULL)
     val LAMP_KIND = Column(++columnIndex, "lamp_kind", "TEXT", NOT_NULL)
-    val LIGHT_RATING = Column(++columnIndex, "light_rating", "NUMBER", NOT_NULL)
+    val LIGHT_RATING = Column(++columnIndex, "light_rating", "NUMBER", NULL)
 
     override fun name(): String {
         return "streetlights"

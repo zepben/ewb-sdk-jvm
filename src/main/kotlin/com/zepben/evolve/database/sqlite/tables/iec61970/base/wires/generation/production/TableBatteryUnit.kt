@@ -9,13 +9,14 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.
 
 import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 class TableBatteryUnit : TablePowerElectronicsUnit() {
 
     val BATTERY_STATE = Column(++columnIndex, "battery_state", "TEXT", NOT_NULL)
-    val RATED_E = Column(++columnIndex, "rated_e", "INTEGER", NOT_NULL)
-    val STORED_E = Column(++columnIndex, "stored_e", "INTEGER", NOT_NULL)
+    val RATED_E = Column(++columnIndex, "rated_e", "INTEGER", NULL)
+    val STORED_E = Column(++columnIndex, "stored_e", "INTEGER", NULL)
 
     override fun name(): String {
         return "battery_unit"

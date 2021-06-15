@@ -29,6 +29,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
+import com.zepben.evolve.services.common.UNKNOWN_INT
+import com.zepben.evolve.services.common.UNKNOWN_LONG
 import com.zepben.evolve.services.common.translator.BaseCimToProto
 import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind
@@ -141,21 +143,21 @@ fun toPb(cim: OverheadWireInfo, pb: PBOverheadWireInfo.Builder): PBOverheadWireI
 
 fun toPb(cim: NoLoadTest, pb: PBNoLoadTest.Builder): PBNoLoadTest.Builder =
     pb.apply {
-        energisedEndVoltage = cim.energisedEndVoltage
-        excitingCurrent = cim.excitingCurrent
-        excitingCurrentZero = cim.excitingCurrentZero
-        loss = cim.loss
-        lossZero = cim.lossZero
+        energisedEndVoltage = cim.energisedEndVoltage ?: UNKNOWN_INT
+        excitingCurrent = cim.excitingCurrent ?: UNKNOWN_DOUBLE
+        excitingCurrentZero = cim.excitingCurrentZero ?: UNKNOWN_DOUBLE
+        loss = cim.loss ?: UNKNOWN_INT
+        lossZero = cim.lossZero ?: UNKNOWN_INT
         toPb(cim, ttBuilder)
     }
 
 fun toPb(cim: OpenCircuitTest, pb: PBOpenCircuitTest.Builder): PBOpenCircuitTest.Builder =
     pb.apply {
-        energisedEndStep = cim.energisedEndStep
-        energisedEndVoltage = cim.energisedEndVoltage
-        openEndStep = cim.openEndStep
-        openEndVoltage = cim.openEndVoltage
-        phaseShift = cim.phaseShift
+        energisedEndStep = cim.energisedEndStep ?: UNKNOWN_INT
+        energisedEndVoltage = cim.energisedEndVoltage ?: UNKNOWN_INT
+        openEndStep = cim.openEndStep ?: UNKNOWN_INT
+        openEndVoltage = cim.openEndVoltage ?: UNKNOWN_INT
+        phaseShift = cim.phaseShift ?: UNKNOWN_DOUBLE
         toPb(cim, ttBuilder)
     }
 
@@ -168,30 +170,30 @@ fun toPb(cim: PowerTransformerInfo, pb: PBPowerTransformerInfo.Builder): PBPower
 
 fun toPb(cim: ShortCircuitTest, pb: PBShortCircuitTest.Builder): PBShortCircuitTest.Builder =
     pb.apply {
-        current = cim.current
-        energisedEndStep = cim.energisedEndStep
-        groundedEndStep = cim.groundedEndStep
-        leakageImpedance = cim.leakageImpedance
-        leakageImpedanceZero = cim.leakageImpedanceZero
-        loss = cim.loss
-        lossZero = cim.lossZero
-        power = cim.power
-        voltage = cim.voltage
-        voltageOhmicPart = cim.voltageOhmicPart
+        current = cim.current ?: UNKNOWN_DOUBLE
+        energisedEndStep = cim.energisedEndStep ?: UNKNOWN_INT
+        groundedEndStep = cim.groundedEndStep ?: UNKNOWN_INT
+        leakageImpedance = cim.leakageImpedance ?: UNKNOWN_DOUBLE
+        leakageImpedanceZero = cim.leakageImpedanceZero ?: UNKNOWN_DOUBLE
+        loss = cim.loss ?: UNKNOWN_INT
+        lossZero = cim.lossZero ?: UNKNOWN_INT
+        power = cim.power ?: UNKNOWN_INT
+        voltage = cim.voltage ?: UNKNOWN_DOUBLE
+        voltageOhmicPart = cim.voltageOhmicPart ?: UNKNOWN_DOUBLE
         toPb(cim, ttBuilder)
     }
 
 fun toPb(cim: TransformerEndInfo, pb: PBTransformerEndInfo.Builder): PBTransformerEndInfo.Builder =
     pb.apply {
         connectionKind = WindingConnection.valueOf(cim.connectionKind.name)
-        emergencyS = cim.emergencyS
+        emergencyS = cim.emergencyS ?: UNKNOWN_INT
         endNumber = cim.endNumber
-        insulationU = cim.insulationU
-        phaseAngleClock = cim.phaseAngleClock
-        r = cim.r
-        ratedS = cim.ratedS
-        ratedU = cim.ratedU
-        shortTermS = cim.shortTermS
+        insulationU = cim.insulationU ?: UNKNOWN_INT
+        phaseAngleClock = cim.phaseAngleClock ?: UNKNOWN_INT
+        r = cim.r ?: UNKNOWN_DOUBLE
+        ratedS = cim.ratedS ?: UNKNOWN_INT
+        ratedU = cim.ratedU ?: UNKNOWN_INT
+        shortTermS = cim.shortTermS ?: UNKNOWN_INT
 
         cim.transformerTankInfo?.let { transformerTankInfoMRID = it.mRID } ?: clearTransformerTankInfoMRID()
         cim.transformerStarImpedance?.let { transformerStarImpedanceMRID = it.mRID } ?: clearTransformerStarImpedanceMRID()
@@ -214,14 +216,14 @@ fun toPb(cim: TransformerTankInfo, pb: PBTransformerTankInfo.Builder): PBTransfo
 
 fun toPb(cim: TransformerTest, pb: PBTransformerTest.Builder): PBTransformerTest.Builder =
     pb.apply {
-        basePower = cim.basePower
-        temperature = cim.temperature
+        basePower = cim.basePower ?: UNKNOWN_INT
+        temperature = cim.temperature ?: UNKNOWN_DOUBLE
         toPb(cim, ioBuilder)
     }
 
 fun toPb(cim: WireInfo, pb: PBWireInfo.Builder): PBWireInfo.Builder =
     pb.apply {
-        ratedCurrent = cim.ratedCurrent
+        ratedCurrent = cim.ratedCurrent ?: UNKNOWN_INT
         material = WireMaterialKind.valueOf(cim.material.name)
         toPb(cim, aiBuilder)
     }
@@ -258,7 +260,7 @@ fun toPb(cim: Pole, pb: PBPole.Builder): PBPole.Builder =
 
 fun toPb(cim: Streetlight, pb: PBStreetlight.Builder): PBStreetlight.Builder =
     pb.apply {
-        lightRating = cim.lightRating
+        lightRating = cim.lightRating ?: UNKNOWN_INT
         lampKind = PBStreetlightLampKind.valueOf(cim.lampKind.name)
         cim.pole?.let { poleMRID = it.mRID } ?: clearPoleMRID()
         toPb(cim, atBuilder)
@@ -452,16 +454,16 @@ fun toPb(cim: Terminal, pb: PBTerminal.Builder): PBTerminal.Builder =
 fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder) =
     pb.apply {
         cim.powerElectronicsConnection?.let { powerElectronicsConnectionMRID = it.mRID } ?: clearPowerElectronicsConnectionMRID()
-        maxP = cim.maxP
-        minP = cim.minP
+        maxP = cim.maxP ?: UNKNOWN_INT
+        minP = cim.minP ?: UNKNOWN_INT
         toPb(cim, eqBuilder)
     }
 
 fun toPb(cim: BatteryUnit, pb: PBBatteryUnit.Builder): PBBatteryUnit.Builder =
     pb.apply {
         batteryState = BatteryStateKind.valueOf(cim.batteryState.name)
-        ratedE = cim.ratedE
-        storedE = cim.storedE
+        ratedE = cim.ratedE ?: UNKNOWN_LONG
+        storedE = cim.storedE ?: UNKNOWN_LONG
         toPb(cim, peuBuilder)
     }
 
@@ -492,7 +494,7 @@ fun toPb(cim: BusbarSection, pb: PBBusbarSection.Builder): PBBusbarSection.Build
 
 fun toPb(cim: Conductor, pb: PBConductor.Builder): PBConductor.Builder =
     pb.apply {
-        length = cim.length
+        length = cim.length ?: UNKNOWN_DOUBLE
         toPb(cim, ceBuilder)
     }
 
@@ -509,13 +511,13 @@ fun toPb(cim: EnergyConsumer, pb: PBEnergyConsumer.Builder): PBEnergyConsumer.Bu
     pb.apply {
         clearEnergyConsumerPhasesMRIDs()
         cim.phases.forEach { addEnergyConsumerPhasesMRIDs(it.mRID) }
-        customerCount = cim.customerCount
+        customerCount = cim.customerCount ?: UNKNOWN_INT
         grounded = cim.grounded
-        p = cim.p
-        pFixed = cim.pFixed
+        p = cim.p ?: UNKNOWN_DOUBLE
+        pFixed = cim.pFixed ?: UNKNOWN_DOUBLE
         phaseConnection = PhaseShuntConnectionKind.Enum.valueOf(cim.phaseConnection.name)
-        q = cim.q
-        qFixed = cim.qFixed
+        q = cim.q ?: UNKNOWN_DOUBLE
+        qFixed = cim.qFixed ?: UNKNOWN_DOUBLE
         toPb(cim, ecBuilder)
     }
 
@@ -523,10 +525,10 @@ fun toPb(cim: EnergyConsumerPhase, pb: PBEnergyConsumerPhase.Builder): PBEnergyC
     pb.apply {
         cim.energyConsumer?.let { energyConsumerMRID = it.mRID } ?: clearEnergyConsumerMRID()
         phase = SinglePhaseKind.valueOf(cim.phase.name)
-        p = cim.p
-        pFixed = cim.pFixed
-        q = cim.q
-        qFixed = cim.qFixed
+        p = cim.p ?: UNKNOWN_DOUBLE
+        pFixed = cim.pFixed ?: UNKNOWN_DOUBLE
+        q = cim.q ?: UNKNOWN_DOUBLE
+        qFixed = cim.qFixed ?: UNKNOWN_DOUBLE
         toPb(cim, psrBuilder)
     }
 
@@ -534,18 +536,18 @@ fun toPb(cim: EnergySource, pb: PBEnergySource.Builder): PBEnergySource.Builder 
     pb.apply {
         clearEnergySourcePhasesMRIDs()
         cim.phases.forEach { addEnergySourcePhasesMRIDs(it.mRID) }
-        activePower = cim.activePower
-        reactivePower = cim.reactivePower
-        voltageAngle = cim.voltageAngle
-        voltageMagnitude = cim.voltageMagnitude
-        r = cim.r
-        x = cim.x
-        pMax = cim.pMax
-        pMin = cim.pMin
-        r0 = cim.r0
-        rn = cim.rn
-        x0 = cim.x0
-        xn = cim.xn
+        activePower = cim.activePower ?: UNKNOWN_DOUBLE
+        reactivePower = cim.reactivePower ?: UNKNOWN_DOUBLE
+        voltageAngle = cim.voltageAngle ?: UNKNOWN_DOUBLE
+        voltageMagnitude = cim.voltageMagnitude ?: UNKNOWN_DOUBLE
+        r = cim.r ?: UNKNOWN_DOUBLE
+        x = cim.x ?: UNKNOWN_DOUBLE
+        pMax = cim.pMax ?: UNKNOWN_DOUBLE
+        pMin = cim.pMin ?: UNKNOWN_DOUBLE
+        r0 = cim.r0 ?: UNKNOWN_DOUBLE
+        rn = cim.rn ?: UNKNOWN_DOUBLE
+        x0 = cim.x0 ?: UNKNOWN_DOUBLE
+        xn = cim.xn ?: UNKNOWN_DOUBLE
         toPb(cim, ecBuilder)
     }
 
@@ -570,10 +572,10 @@ fun toPb(cim: Line, pb: PBLine.Builder): PBLine.Builder =
 
 fun toPb(cim: LinearShuntCompensator, pb: PBLinearShuntCompensator.Builder): PBLinearShuntCompensator.Builder =
     pb.apply {
-        b0PerSection = cim.b0PerSection
-        bPerSection = cim.bPerSection
-        g0PerSection = cim.g0PerSection
-        gPerSection = cim.gPerSection
+        b0PerSection = cim.b0PerSection ?: UNKNOWN_DOUBLE
+        bPerSection = cim.bPerSection ?: UNKNOWN_DOUBLE
+        g0PerSection = cim.g0PerSection ?: UNKNOWN_DOUBLE
+        gPerSection = cim.gPerSection ?: UNKNOWN_DOUBLE
         toPb(cim, scBuilder)
     }
 
@@ -585,14 +587,14 @@ fun toPb(cim: PerLengthImpedance, pb: PBPerLengthImpedance.Builder): PBPerLength
 
 fun toPb(cim: PerLengthSequenceImpedance, pb: PBPerLengthSequenceImpedance.Builder): PBPerLengthSequenceImpedance.Builder =
     pb.apply {
-        r = cim.r
-        x = cim.x
-        r0 = cim.r0
-        x0 = cim.x0
-        bch = cim.bch
-        gch = cim.gch
-        b0Ch = cim.b0ch
-        g0Ch = cim.g0ch
+        r = cim.r ?: UNKNOWN_DOUBLE
+        x = cim.x ?: UNKNOWN_DOUBLE
+        r0 = cim.r0 ?: UNKNOWN_DOUBLE
+        x0 = cim.x0 ?: UNKNOWN_DOUBLE
+        bch = cim.bch ?: UNKNOWN_DOUBLE
+        gch = cim.gch ?: UNKNOWN_DOUBLE
+        b0Ch = cim.b0ch ?: UNKNOWN_DOUBLE
+        g0Ch = cim.g0ch ?: UNKNOWN_DOUBLE
         toPb(cim, pliBuilder)
     }
 
@@ -604,22 +606,22 @@ fun toPb(cim: PowerElectronicsConnection, pb: PBPowerElectronicsConnection.Build
         clearPowerElectronicsConnectionPhaseMRIDs()
         cim.phases.forEach { addPowerElectronicsConnectionPhaseMRIDs(it.mRID) }
 
-        maxIFault = cim.maxIFault
-        maxQ = cim.maxQ
-        minQ = cim.minQ
-        p = cim.p
-        q = cim.q
-        ratedS = cim.ratedS
-        ratedU = cim.ratedU
+        maxIFault = cim.maxIFault ?: UNKNOWN_INT
+        maxQ = cim.maxQ ?: UNKNOWN_DOUBLE
+        minQ = cim.minQ ?: UNKNOWN_DOUBLE
+        p = cim.p ?: UNKNOWN_DOUBLE
+        q = cim.q ?: UNKNOWN_DOUBLE
+        ratedS = cim.ratedS ?: UNKNOWN_INT
+        ratedU = cim.ratedU ?: UNKNOWN_INT
         toPb(cim, rceBuilder)
     }
 
 fun toPb(cim: PowerElectronicsConnectionPhase, pb: PBPowerElectronicsConnectionPhase.Builder): PBPowerElectronicsConnectionPhase.Builder =
     pb.apply {
         cim.powerElectronicsConnection?.let { powerElectronicsConnectionMRID = it.mRID } ?: clearPowerElectronicsConnectionMRID()
-        p = cim.p
+        p = cim.p ?: UNKNOWN_DOUBLE
         phase = SinglePhaseKind.valueOf(cim.phase.name)
-        q = cim.q
+        q = cim.q ?: UNKNOWN_DOUBLE
         toPb(cim, psrBuilder)
     }
 
@@ -628,25 +630,25 @@ fun toPb(cim: PowerTransformer, pb: PBPowerTransformer.Builder): PBPowerTransfor
         clearPowerTransformerEndMRIDs()
         cim.ends.forEach { addPowerTransformerEndMRIDs(it.mRID) }
         vectorGroup = VectorGroup.valueOf(cim.vectorGroup.name)
-        transformerUtilisation = cim.transformerUtilisation
+        transformerUtilisation = cim.transformerUtilisation ?: UNKNOWN_DOUBLE
         toPb(cim, ceBuilder)
     }
 
 fun toPb(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd.Builder): PBPowerTransformerEnd.Builder =
     pb.apply {
         cim.powerTransformer?.let { powerTransformerMRID = it.mRID } ?: clearPowerTransformerMRID()
-        ratedS = cim.ratedS
-        ratedU = cim.ratedU
+        ratedS = cim.ratedS ?: UNKNOWN_INT
+        ratedU = cim.ratedU ?: UNKNOWN_INT
         r = cim.r ?: UNKNOWN_DOUBLE
         r0 = cim.r0 ?: UNKNOWN_DOUBLE
         x = cim.x ?: UNKNOWN_DOUBLE
         x0 = cim.x0 ?: UNKNOWN_DOUBLE
         connectionKind = WindingConnection.valueOf(cim.connectionKind.name)
-        b = cim.b
-        b0 = cim.b0
-        g = cim.g
-        g0 = cim.g0
-        phaseAngleClock = cim.phaseAngleClock
+        b = cim.b ?: UNKNOWN_DOUBLE
+        b0 = cim.b0 ?: UNKNOWN_DOUBLE
+        g = cim.g ?: UNKNOWN_DOUBLE
+        g0 = cim.g0 ?: UNKNOWN_DOUBLE
+        phaseAngleClock = cim.phaseAngleClock ?: UNKNOWN_INT
         toPb(cim, teBuilder)
     }
 
@@ -656,7 +658,7 @@ fun toPb(cim: ProtectedSwitch, pb: PBProtectedSwitch.Builder): PBProtectedSwitch
 fun toPb(cim: RatioTapChanger, pb: PBRatioTapChanger.Builder): PBRatioTapChanger.Builder =
     pb.apply {
         cim.transformerEnd?.let { transformerEndMRID = it.mRID } ?: clearTransformerEndMRID()
-        stepVoltageIncrement = cim.stepVoltageIncrement
+        stepVoltageIncrement = cim.stepVoltageIncrement ?: UNKNOWN_DOUBLE
         toPb(cim, tcBuilder)
     }
 
@@ -672,9 +674,9 @@ fun toPb(cim: RegulatingCondEq, pb: PBRegulatingCondEq.Builder): PBRegulatingCon
 
 fun toPb(cim: ShuntCompensator, pb: PBShuntCompensator.Builder): PBShuntCompensator.Builder =
     pb.apply {
-        sections = cim.sections
+        sections = cim.sections ?: UNKNOWN_DOUBLE
         grounded = cim.grounded
-        nomU = cim.nomU
+        nomU = cim.nomU ?: UNKNOWN_INT
         phaseConnection = PhaseShuntConnectionKind.Enum.valueOf(cim.phaseConnection.name)
         toPb(cim, rceBuilder)
     }
@@ -691,12 +693,12 @@ fun toPb(cim: Switch, pb: PBSwitch.Builder): PBSwitch.Builder =
 
 fun toPb(cim: TapChanger, pb: PBTapChanger.Builder): PBTapChanger.Builder =
     pb.apply {
-        highStep = cim.highStep
-        lowStep = cim.lowStep
-        step = cim.step
-        neutralStep = cim.neutralStep
-        neutralU = cim.neutralU
-        normalStep = cim.normalStep
+        highStep = cim.highStep ?: UNKNOWN_INT
+        lowStep = cim.lowStep ?: UNKNOWN_INT
+        step = cim.step ?: UNKNOWN_DOUBLE
+        neutralStep = cim.neutralStep ?: UNKNOWN_INT
+        neutralU = cim.neutralU ?: UNKNOWN_INT
+        normalStep = cim.normalStep ?: UNKNOWN_INT
         controlEnabled = cim.controlEnabled
         toPb(cim, psrBuilder)
     }
@@ -709,8 +711,8 @@ fun toPb(cim: TransformerEnd, pb: PBTransformerEnd.Builder): PBTransformerEnd.Bu
         cim.starImpedance?.let { starImpedanceMRID = it.mRID } ?: clearStarImpedanceMRID()
         endNumber = cim.endNumber
         grounded = cim.grounded
-        rGround = cim.rGround
-        xGround = cim.xGround
+        rGround = cim.rGround ?: UNKNOWN_DOUBLE
+        xGround = cim.xGround ?: UNKNOWN_DOUBLE
         toPb(cim, ioBuilder)
     }
 

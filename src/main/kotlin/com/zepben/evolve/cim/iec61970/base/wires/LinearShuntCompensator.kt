@@ -16,8 +16,8 @@ package com.zepben.evolve.cim.iec61970.base.wires
  */
 class LinearShuntCompensator @JvmOverloads constructor(mRID: String = "") : ShuntCompensator(mRID) {
 
-    var b0PerSection: Double = 0.0
-    var bPerSection: Double = 0.0
-    var g0PerSection: Double = 0.0
-    var gPerSection: Double = 0.0
+    var b0PerSection: Double? = null
+    var bPerSection: Double? = null
+    var g0PerSection: Double? = null
+    var gPerSection: Double? = null
 }

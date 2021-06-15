@@ -10,8 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -31,18 +30,18 @@ internal class EnergySourceTest {
     internal fun accessorCoverage() {
         val energySource = EnergySource()
 
-        assertThat(energySource.activePower, equalTo(0.0))
-        assertThat(energySource.reactivePower, equalTo(0.0))
-        assertThat(energySource.voltageAngle, equalTo(0.0))
-        assertThat(energySource.voltageMagnitude, equalTo(0.0))
-        assertThat(energySource.pMax, equalTo(0.0))
-        assertThat(energySource.pMin, equalTo(0.0))
-        assertThat(energySource.r, equalTo(0.0))
-        assertThat(energySource.r0, equalTo(0.0))
-        assertThat(energySource.rn, equalTo(0.0))
-        assertThat(energySource.x, equalTo(0.0))
-        assertThat(energySource.x0, equalTo(0.0))
-        assertThat(energySource.xn, equalTo(0.0))
+        assertThat(energySource.activePower, nullValue())
+        assertThat(energySource.reactivePower, nullValue())
+        assertThat(energySource.voltageAngle, nullValue())
+        assertThat(energySource.voltageMagnitude, nullValue())
+        assertThat(energySource.pMax, nullValue())
+        assertThat(energySource.pMin, nullValue())
+        assertThat(energySource.r, nullValue())
+        assertThat(energySource.r0, nullValue())
+        assertThat(energySource.rn, nullValue())
+        assertThat(energySource.x, nullValue())
+        assertThat(energySource.x0, nullValue())
+        assertThat(energySource.xn, nullValue())
 
         energySource.activePower = 1.0
         energySource.reactivePower = 2.0

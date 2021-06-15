@@ -9,8 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -31,9 +30,9 @@ internal class ShuntCompensatorTest {
         val shuntCompensator = object : ShuntCompensator() {}
 
         assertThat(shuntCompensator.grounded, equalTo(false))
-        assertThat(shuntCompensator.nomU, equalTo(0))
+        assertThat(shuntCompensator.nomU, nullValue())
         assertThat(shuntCompensator.phaseConnection, equalTo(PhaseShuntConnectionKind.UNKNOWN))
-        assertThat(shuntCompensator.sections, equalTo(0.0))
+        assertThat(shuntCompensator.sections, nullValue())
 
         shuntCompensator.grounded = true
         shuntCompensator.nomU = 2

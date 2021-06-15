@@ -8,14 +8,13 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.tables.Column
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 class TableRatioTapChangers : TableTapChangers() {
 
     val TRANSFORMER_END_MRID = Column(++columnIndex, "transformer_end_mrid", "TEXT", NULL)
-    val STEP_VOLTAGE_INCREMENT = Column(++columnIndex, "step_voltage_increment", "NUMBER", NOT_NULL)
+    val STEP_VOLTAGE_INCREMENT = Column(++columnIndex, "step_voltage_increment", "NUMBER", NULL)
 
     override fun name(): String {
         return "ratio_tap_changers"

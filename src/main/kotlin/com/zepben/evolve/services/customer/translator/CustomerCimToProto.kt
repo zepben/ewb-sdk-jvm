@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
+import com.zepben.evolve.services.common.UNKNOWN_INT
 import com.zepben.evolve.services.common.translator.BaseCimToProto
 import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.protobuf.cim.iec61968.common.Agreement as PBAgreement
@@ -31,7 +32,7 @@ fun toPb(cim: Customer, pb: PBCustomer.Builder): PBCustomer.Builder =
         kind = PBCustomerKind.valueOf(cim.kind.name)
         clearCustomerAgreementMRIDs()
         cim.agreements.forEach { addCustomerAgreementMRIDs(it.mRID) }
-        numEndDevices = cim.numEndDevices
+        numEndDevices = cim.numEndDevices ?: UNKNOWN_INT
         toPb(cim, orBuilder)
     }
 

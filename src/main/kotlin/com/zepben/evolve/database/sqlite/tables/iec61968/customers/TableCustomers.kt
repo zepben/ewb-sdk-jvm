@@ -9,13 +9,14 @@ package com.zepben.evolve.database.sqlite.tables.iec61968.customers
 
 import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableOrganisationRoles
 
 @Suppress("PropertyName")
 class TableCustomers : TableOrganisationRoles() {
 
     val KIND = Column(++columnIndex, "kind", "TEXT", NOT_NULL)
-    val NUM_END_DEVICES = Column(++columnIndex, "num_end_devices", "INTEGER", NOT_NULL)
+    val NUM_END_DEVICES = Column(++columnIndex, "num_end_devices", "INTEGER", NULL)
 
     override fun name(): String {
         return "customers"

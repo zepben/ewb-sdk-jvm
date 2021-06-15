@@ -8,23 +8,23 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.tables.Column
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 class TableEnergySources : TableEnergyConnections() {
 
-    val ACTIVE_POWER = Column(++columnIndex, "active_power", "NUMBER", NOT_NULL)
-    val REACTIVE_POWER = Column(++columnIndex, "reactive_power", "NUMBER", NOT_NULL)
-    val VOLTAGE_ANGLE = Column(++columnIndex, "voltage_angle", "NUMBER", NOT_NULL)
-    val VOLTAGE_MAGNITUDE = Column(++columnIndex, "voltage_magnitude", "NUMBER", NOT_NULL)
-    val P_MAX = Column(++columnIndex, "p_max", "NUMBER", NOT_NULL)
-    val P_MIN = Column(++columnIndex, "p_min", "NUMBER", NOT_NULL)
-    val R = Column(++columnIndex, "r", "NUMBER", NOT_NULL)
-    val R0 = Column(++columnIndex, "r0", "NUMBER", NOT_NULL)
-    val RN = Column(++columnIndex, "rn", "NUMBER", NOT_NULL)
-    val X = Column(++columnIndex, "x", "NUMBER", NOT_NULL)
-    val X0 = Column(++columnIndex, "x0", "NUMBER", NOT_NULL)
-    val XN = Column(++columnIndex, "xn", "NUMBER", NOT_NULL)
+    val ACTIVE_POWER = Column(++columnIndex, "active_power", "NUMBER", NULL)
+    val REACTIVE_POWER = Column(++columnIndex, "reactive_power", "NUMBER", NULL)
+    val VOLTAGE_ANGLE = Column(++columnIndex, "voltage_angle", "NUMBER", NULL)
+    val VOLTAGE_MAGNITUDE = Column(++columnIndex, "voltage_magnitude", "NUMBER", NULL)
+    val P_MAX = Column(++columnIndex, "p_max", "NUMBER", NULL)
+    val P_MIN = Column(++columnIndex, "p_min", "NUMBER", NULL)
+    val R = Column(++columnIndex, "r", "NUMBER", NULL)
+    val R0 = Column(++columnIndex, "r0", "NUMBER", NULL)
+    val RN = Column(++columnIndex, "rn", "NUMBER", NULL)
+    val X = Column(++columnIndex, "x", "NUMBER", NULL)
+    val X0 = Column(++columnIndex, "x0", "NUMBER", NULL)
+    val XN = Column(++columnIndex, "xn", "NUMBER", NULL)
 
     override fun name(): String {
         return "energy_sources"

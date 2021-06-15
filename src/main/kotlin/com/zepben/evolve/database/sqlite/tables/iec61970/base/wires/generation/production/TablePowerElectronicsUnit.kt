@@ -8,7 +8,6 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production
 
 import com.zepben.evolve.database.sqlite.tables.Column
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableEquipment
 
@@ -16,8 +15,8 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableEquipmen
 abstract class TablePowerElectronicsUnit : TableEquipment() {
 
     val POWER_ELECTRONICS_CONNECTION_MRID = Column(++columnIndex, "power_electronics_connection_mrid", "TEXT", NULL)
-    val MAX_P = Column(++columnIndex, "max_p", "NUMBER", NOT_NULL)
-    val MIN_P = Column(++columnIndex, "min_p", "NUMBER", NOT_NULL)
+    val MAX_P = Column(++columnIndex, "max_p", "NUMBER", NULL)
+    val MIN_P = Column(++columnIndex, "min_p", "NUMBER", NULL)
 
     override fun uniqueIndexColumns(): MutableList<List<Column>> {
         val cols = super.uniqueIndexColumns()

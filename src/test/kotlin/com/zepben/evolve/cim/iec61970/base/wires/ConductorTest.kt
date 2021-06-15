@@ -13,9 +13,7 @@ import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -37,8 +35,8 @@ internal class ConductorTest {
         val conductor = object : Conductor() {}
         val wireInfo = object : WireInfo() {}
 
-        assertThat(conductor.assetInfo, Matchers.nullValue())
-        assertThat(conductor.length, equalTo(0.0))
+        assertThat(conductor.assetInfo, nullValue())
+        assertThat(conductor.length, nullValue())
 
         conductor.assetInfo = wireInfo
         conductor.length = 12.3

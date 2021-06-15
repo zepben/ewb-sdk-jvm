@@ -20,10 +20,10 @@ package com.zepben.evolve.cim.iec61968.assetinfo
  */
 class OpenCircuitTest(mRID: String = "") : TransformerTest(mRID) {
 
-    var energisedEndStep: Int = 0
-    var energisedEndVoltage: Int = 0
-    var openEndStep: Int = 0
-    var openEndVoltage: Int = 0
-    var phaseShift: Double = 0.0
+    var energisedEndStep: Int? = null
+    var energisedEndVoltage: Int? = null
+    var openEndStep: Int? = null
+    var openEndVoltage: Int? = null
+    var phaseShift: Double? = null
 
 }

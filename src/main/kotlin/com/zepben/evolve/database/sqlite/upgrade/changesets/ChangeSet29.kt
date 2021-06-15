@@ -10,8 +10,6 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
 
 internal fun changeSet29() = ChangeSet(29) {
-    //
-    // Add tables transformer_end_info, transformer_star_impedance and transformer_tank info
     listOf(
         *`Convert battery_unit rated_e and stored_e columns to integer`,
         *`Convert power_transformer_ends power_transformer_mrid, R, R0, X and X0 columns to be nullable`,

@@ -11,8 +11,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -32,11 +31,11 @@ internal class NoLoadTestTest {
     internal fun accessorCoverage() {
         val noLoadTest = NoLoadTest()
 
-        assertThat(noLoadTest.energisedEndVoltage, equalTo(0))
-        assertThat(noLoadTest.excitingCurrent, equalTo(0.0))
-        assertThat(noLoadTest.excitingCurrentZero, equalTo(0.0))
-        assertThat(noLoadTest.loss, equalTo(0))
-        assertThat(noLoadTest.lossZero, equalTo(0))
+        assertThat(noLoadTest.energisedEndVoltage, nullValue())
+        assertThat(noLoadTest.excitingCurrent, nullValue())
+        assertThat(noLoadTest.excitingCurrentZero, nullValue())
+        assertThat(noLoadTest.loss, nullValue())
+        assertThat(noLoadTest.lossZero, nullValue())
 
         noLoadTest.fillFields(NetworkService(), true)
 

@@ -9,9 +9,7 @@ package com.zepben.evolve.cim.iec61968.assets
 
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -32,9 +30,9 @@ internal class StreetlightTest {
         val streetlight = Streetlight()
         val pole = Pole("p")
 
-        assertThat(streetlight.pole, Matchers.nullValue())
+        assertThat(streetlight.pole, nullValue())
         assertThat(streetlight.lampKind, equalTo(StreetlightLampKind.UNKNOWN))
-        assertThat(streetlight.lightRating, equalTo(0))
+        assertThat(streetlight.lightRating, nullValue())
 
         streetlight.apply {
             lampKind = StreetlightLampKind.HIGH_PRESSURE_SODIUM

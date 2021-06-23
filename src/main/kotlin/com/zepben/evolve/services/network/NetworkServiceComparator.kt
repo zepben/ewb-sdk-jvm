@@ -41,7 +41,7 @@ import com.zepben.evolve.services.common.ValueDifference
 //       function, so make sure you check the code coverage
 //
 @Suppress("unused")
-class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all()) :
+class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()) :
     BaseServiceComparator() {
 
     private fun compareCableInfo(source: CableInfo, target: CableInfo): ObjectDifference<CableInfo> =

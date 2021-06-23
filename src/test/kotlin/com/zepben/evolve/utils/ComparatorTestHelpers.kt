@@ -10,7 +10,7 @@ package com.zepben.evolve.utils
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.services.common.*
-import com.zepben.evolve.services.network.NetworkServiceCompatatorOptions
+import com.zepben.evolve.services.network.NetworkServiceComparatorOptions
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import kotlin.reflect.KMutableProperty1
@@ -18,7 +18,7 @@ import kotlin.reflect.KProperty1
 
 class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
     val newService: () -> T,
-    val newComparator: (NetworkServiceCompatatorOptions) -> C
+    val newComparator: (NetworkServiceComparatorOptions) -> C
 ) {
 
     fun <T : IdentifiedObject> validateServiceOf(
@@ -27,7 +27,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         expectModification: ObjectDifference<out IdentifiedObject>? = null,
         expectMissingFromTarget: T? = null,
         expectMissingFromSource: T? = null,
-        options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all()
+        options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()
     ) {
         val diff = newComparator(options).compare(serviceOf(source), serviceOf(target))
 
@@ -55,7 +55,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         expectModification: ObjectDifference<NameType>? = null,
         expectMissingFromTarget: NameType? = null,
         expectMissingFromSource: NameType? = null,
-        options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all()
+        options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()
     ) {
         val diff = newComparator(options).compare(
             newService().apply { addNameType(source) },
@@ -71,10 +71,10 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         source: T,
         target: T,
         expectModification: ObjectDifference<T> = ObjectDifference(source, target),
-        options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all(),
+        options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false
     ) {
-        val diff: ObjectDifference<T> = newComparator(NetworkServiceCompatatorOptions.all()).compare(source, target)
+        val diff: ObjectDifference<T> = newComparator(NetworkServiceComparatorOptions.all()).compare(source, target)
         assertThat(diff, equalTo(expectModification))
 
         if (optionsStopCompare) {
@@ -88,7 +88,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createIdObj: (String) -> T,
         createValue: (T) -> R,
         createOtherValue: (T) -> R,
-        options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all(),
+        options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false
     ) {
         val subject = createIdObj("mRID").apply { property.set(this, createValue(this)) }
@@ -107,7 +107,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createIdObj: (id: String) -> T,
         changeState: (idObj: T, currentPropertyValue: R) -> Unit,
         otherChangeState: (idObj: T, currentPropertyValue: R) -> Unit,
-        options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all(),
+        options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false
     ) {
         val subject = createIdObj("mRID").apply { changeState(this, property.get(this)) }
@@ -127,7 +127,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createIdObj: (String) -> T,
         createItem: (T) -> R,
         createOtherItem: (T) -> R,
-        options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all(),
+        options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false
     ) {
         val sourceEmpty = createIdObj("mRID")
@@ -166,7 +166,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createItem: (T) -> R,
         createOtherItem: (T) -> R,
         setItemIdObj: (R, T) -> Unit = { _, _ -> },
-        options: NetworkServiceCompatatorOptions = NetworkServiceCompatatorOptions.all(),
+        options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false
     ) {
         val sourceEmpty = createIdObj("mRID")
@@ -219,7 +219,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         newService().apply { tryAdd(it) }
 
     private fun <T : IdentifiedObject> ObjectDifference<T>.validateExpected(
-        options: NetworkServiceCompatatorOptions,
+        options: NetworkServiceComparatorOptions,
         optionsStopCompare: Boolean = false
     ) {
         validateCompare(source, target, expectModification = this, options = options, optionsStopCompare = optionsStopCompare)

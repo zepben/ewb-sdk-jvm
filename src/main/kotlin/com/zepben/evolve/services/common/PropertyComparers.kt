@@ -18,7 +18,6 @@ fun <T, R> KProperty1<in T, R?>.compareValues(source: T?, target: T?): ValueDiff
     val tVal = target?.let { this.get(target) }
     if ((sVal is Double) || (tVal is Double))
         throw AssertionError("Using wrong comparator for ${instanceParameter?.type?.jvmErasure?.simpleName}::$name.")
-//        throw AssertionError("Using wrong comparator for ${instanceParameter}::$name, use `compareDoubles` instead.")
     return if (sVal == tVal) {
         null
     } else {

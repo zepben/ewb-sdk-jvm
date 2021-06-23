@@ -14,4 +14,5 @@ package com.zepben.evolve.services.common
 
 const val UNKNOWN_DOUBLE = Double.NEGATIVE_INFINITY
 const val UNKNOWN_INT = Int.MIN_VALUE
+const val UNKNOWN_UINT = -1
 const val UNKNOWN_LONG = Long.MIN_VALUE

@@ -26,10 +26,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
-import com.zepben.evolve.services.common.Resolvers
-import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
-import com.zepben.evolve.services.common.UNKNOWN_INT
-import com.zepben.evolve.services.common.UNKNOWN_LONG
+import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.common.extensions.internEmpty
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.services.common.translator.toCim
@@ -264,7 +261,7 @@ fun toCim(pb: PBPole, networkService: NetworkService): Pole =
 fun toCim(pb: PBStreetlight, networkService: NetworkService): Streetlight =
     Streetlight(pb.mRID()).apply {
         lampKind = StreetlightLampKind.valueOf(pb.lampKind.name)
-        lightRating = pb.lightRating.takeUnless { it == UNKNOWN_INT }
+        lightRating = pb.lightRating.takeUnless { it == UNKNOWN_UINT }
         networkService.resolveOrDeferReference(Resolvers.pole(this), pb.poleMRID)
         toCim(pb.at, this, networkService)
     }

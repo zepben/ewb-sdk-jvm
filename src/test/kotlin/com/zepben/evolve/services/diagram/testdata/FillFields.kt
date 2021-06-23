@@ -37,7 +37,7 @@ fun DiagramObject.fillFields(service: DiagramService, includeRuntime: Boolean = 
     diagram?.addDiagramObject(this)
 
     identifiedObjectMRID = "io_mrid"
-    style = DiagramObjectStyle.CONDUCTOR_UNKNOWN
+    style = "CONDUCTOR_UNKNOWN"
     rotation = 1.1
 
     for (i in 0..1)

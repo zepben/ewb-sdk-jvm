@@ -39,7 +39,7 @@ class DiagramCIMReader(private val diagramService: DiagramService) : BaseCIMRead
             diagram?.addDiagramObject(this)
 
             identifiedObjectMRID = resultSet.getNullableString(table.IDENTIFIED_OBJECT_MRID.queryIndex)
-            style = DiagramObjectStyle.valueOf(resultSet.getString(table.STYLE.queryIndex))
+            style = resultSet.getNullableString(table.STYLE.queryIndex)
             rotation = resultSet.getDouble(table.ROTATION.queryIndex)
         }
 

@@ -33,7 +33,7 @@ fun toCim(pb: PBDiagramObject, diagramService: DiagramService): DiagramObject =
         diagram?.addDiagramObject(this)
         rotation = pb.rotation
         identifiedObjectMRID = pb.identifiedObjectMRID.takeIf { it.isNotBlank() }
-        style = DiagramObjectStyle.valueOf(pb.diagramObjectStyle.name)
+        style = pb.diagramObjectStyle.takeIf { it.isNotBlank() }
         pb.diagramObjectPointsList.forEach { addPoint(toCim(it)) }
         toCim(pb.io, this, diagramService)
     }

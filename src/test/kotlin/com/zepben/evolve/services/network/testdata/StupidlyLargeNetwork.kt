@@ -22,7 +22,6 @@ import com.zepben.evolve.cim.iec61970.base.core.GeographicalRegion
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.SubGeographicalRegion
 import com.zepben.evolve.cim.iec61970.base.core.Substation
-import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObjectStyle
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
@@ -172,28 +171,28 @@ object StupidlyLargeNetwork {
         val diagram0 = createDiagram(diagramService, "0")
         val diagram1 = createDiagram(diagramService, "1")
 
-        diagramService.add(createDiagramObject(diagram0, sourceNode, DiagramObjectStyle.ENERGY_SOURCE, 5.0, 35.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment101, DiagramObjectStyle.CONDUCTOR_11000, 35.0, 32.0, 10.0, 32.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment101, DiagramObjectStyle.CONDUCTOR_11000, 35.0, 34.0, 10.0, 34.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment101, DiagramObjectStyle.CONDUCTOR_11000, 35.0, 36.0, 10.0, 36.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment101, DiagramObjectStyle.CONDUCTOR_11000, 35.0, 38.0, 10.0, 38.0))
-        diagramService.add(createDiagramObject(diagram0, aSwitch, DiagramObjectStyle.CB, 40.0, 35.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment202, DiagramObjectStyle.CONDUCTOR_UNKNOWN, 70.0, 32.0, 45.0, 32.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment202, DiagramObjectStyle.CONDUCTOR_UNKNOWN, 70.0, 34.0, 45.0, 34.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment202, DiagramObjectStyle.CONDUCTOR_UNKNOWN, 70.0, 36.0, 45.0, 36.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment202, DiagramObjectStyle.CONDUCTOR_UNKNOWN, 70.0, 38.0, 45.0, 38.0))
-        diagramService.add(createDiagramObject(diagram0, transformer, DiagramObjectStyle.DIST_TRANSFORMER, 75.0, 35.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment303, DiagramObjectStyle.CONDUCTOR_UNKNOWN, 100.0, 34.0, 80.0, 34.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment303, DiagramObjectStyle.CONDUCTOR_UNKNOWN, 105.0, 27.0, 100.0, 34.0))
-        diagramService.add(createDiagramObject(diagram0, acLineSegment303, DiagramObjectStyle.CONDUCTOR_UNKNOWN, 100.0, 36.0, 80.0, 36.0))
-        diagramService.add(createDiagramObject(diagram0, node1, DiagramObjectStyle.JUNCTION, 110.0, 27.0))
-        diagramService.add(createDiagramObject(diagram1, node1, DiagramObjectStyle.JUNCTION, 0.0, 0.0))
-        diagramService.add(createDiagramObject(diagram1, node1, DiagramObjectStyle.JUNCTION, 0.0, 0.0))
-        diagramService.add(createDiagramObject(diagram1, node1, DiagramObjectStyle.JUNCTION, 1000.0, 0.0))
-        diagramService.add(createDiagramObject(diagram1, node1, DiagramObjectStyle.JUNCTION, 1.5, 1001.1).apply { rotation = 22.5 })
-        diagramService.add(createDiagramObject(diagram1, acLineSegment101, DiagramObjectStyle.CONDUCTOR_11000, 2.0, 1002.0, 1.0, 1001.0))
-        diagramService.add(createDiagramObject(diagram1, acLineSegment101, DiagramObjectStyle.CONDUCTOR_11000, 2.0, 1002.0, 1.0, 1001.0))
-        diagramService.add(createDiagramObject(diagram1, acLineSegment101, DiagramObjectStyle.CONDUCTOR_11000, 2.4, 24.3, 1.5, 0.1))
+        diagramService.add(createDiagramObject(diagram0, sourceNode, "ENERGY_SOURCE", 5.0, 35.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment101, "CONDUCTOR_11000", 35.0, 32.0, 10.0, 32.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment101, "CONDUCTOR_11000", 35.0, 34.0, 10.0, 34.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment101, "CONDUCTOR_11000", 35.0, 36.0, 10.0, 36.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment101, "CONDUCTOR_11000", 35.0, 38.0, 10.0, 38.0))
+        diagramService.add(createDiagramObject(diagram0, aSwitch, "CB", 40.0, 35.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment202, "CONDUCTOR_UNKNOWN", 70.0, 32.0, 45.0, 32.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment202, "CONDUCTOR_UNKNOWN", 70.0, 34.0, 45.0, 34.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment202, "CONDUCTOR_UNKNOWN", 70.0, 36.0, 45.0, 36.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment202, "CONDUCTOR_UNKNOWN", 70.0, 38.0, 45.0, 38.0))
+        diagramService.add(createDiagramObject(diagram0, transformer, "DIST_TRANSFORMER", 75.0, 35.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment303, "CONDUCTOR_UNKNOWN", 100.0, 34.0, 80.0, 34.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment303, "CONDUCTOR_UNKNOWN", 105.0, 27.0, 100.0, 34.0))
+        diagramService.add(createDiagramObject(diagram0, acLineSegment303, "CONDUCTOR_UNKNOWN", 100.0, 36.0, 80.0, 36.0))
+        diagramService.add(createDiagramObject(diagram0, node1, "JUNCTION", 110.0, 27.0))
+        diagramService.add(createDiagramObject(diagram1, node1, "JUNCTION", 0.0, 0.0))
+        diagramService.add(createDiagramObject(diagram1, node1, "JUNCTION", 0.0, 0.0))
+        diagramService.add(createDiagramObject(diagram1, node1, "JUNCTION", 1000.0, 0.0))
+        diagramService.add(createDiagramObject(diagram1, node1, "JUNCTION", 1.5, 1001.1).apply { rotation = 22.5 })
+        diagramService.add(createDiagramObject(diagram1, acLineSegment101, "CONDUCTOR_11000", 2.0, 1002.0, 1.0, 1001.0))
+        diagramService.add(createDiagramObject(diagram1, acLineSegment101, "CONDUCTOR_11000", 2.0, 1002.0, 1.0, 1001.0))
+        diagramService.add(createDiagramObject(diagram1, acLineSegment101, "CONDUCTOR_11000", 2.4, 24.3, 1.5, 0.1))
 
         networkService.add(sourceNode)
         networkService.add(acLineSegment101)
@@ -264,11 +263,11 @@ object StupidlyLargeNetwork {
         val transformerWithTypeNonRevReg = PowerTransformer("transformerWithTypeNonRevReg")
         val transformerWithTypeZone = PowerTransformer("transformerWithTypeZone")
 
-        diagramService.add(createDiagramObject(diagram0, transformerWithTypeDist, DiagramObjectStyle.DIST_TRANSFORMER, 110.0, 27.0))
-        diagramService.add(createDiagramObject(diagram0, transformerWithTypeIso, DiagramObjectStyle.ISO_TRANSFORMER, 110.0, 27.0))
-        diagramService.add(createDiagramObject(diagram0, transformerWithTypeReg, DiagramObjectStyle.REVERSIBLE_REGULATOR, 110.0, 27.0))
-        diagramService.add(createDiagramObject(diagram0, transformerWithTypeNonRevReg, DiagramObjectStyle.NON_REVERSIBLE_REGULATOR, 110.0, 27.0))
-        diagramService.add(createDiagramObject(diagram0, transformerWithTypeZone, DiagramObjectStyle.ZONE_TRANSFORMER, 110.0, 27.0))
+        diagramService.add(createDiagramObject(diagram0, transformerWithTypeDist, "DIST_TRANSFORMER", 110.0, 27.0))
+        diagramService.add(createDiagramObject(diagram0, transformerWithTypeIso, "ISO_TRANSFORMER", 110.0, 27.0))
+        diagramService.add(createDiagramObject(diagram0, transformerWithTypeReg, "REVERSIBLE_REGULATOR", 110.0, 27.0))
+        diagramService.add(createDiagramObject(diagram0, transformerWithTypeNonRevReg, "NON_REVERSIBLE_REGULATOR", 110.0, 27.0))
+        diagramService.add(createDiagramObject(diagram0, transformerWithTypeZone, "ZONE_TRANSFORMER", 110.0, 27.0))
 
         networkService.add(transformerWithTypeNone)
         networkService.add(transformerWithTypeDist)
@@ -630,11 +629,11 @@ object StupidlyLargeNetwork {
 
         val diagram = createDiagram(diagramService, "100")
 
-        diagramService.add(createDiagramObject(diagram, faultIndicator1, DiagramObjectStyle.FAULT_INDICATOR, 1.0, 1.0))
-        diagramService.add(createDiagramObject(diagram, disconnector2, DiagramObjectStyle.DISCONNECTOR, 0.0, 0.0))
+        diagramService.add(createDiagramObject(diagram, faultIndicator1, "FAULT_INDICATOR", 1.0, 1.0))
+        diagramService.add(createDiagramObject(diagram, disconnector2, "DISCONNECTOR", 0.0, 0.0))
 
         assertThat(diagramService.getDiagramObjects(disconnector1.mRID), equalTo(emptyList()))
-        assertThat(diagramService.getDiagramObjects(disconnector2.mRID).first().style, equalTo(DiagramObjectStyle.DISCONNECTOR))
+        assertThat(diagramService.getDiagramObjects(disconnector2.mRID).first().style, equalTo("DISCONNECTOR"))
     }
 
     /*

@@ -31,6 +31,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
 import com.zepben.evolve.services.common.UNKNOWN_INT
 import com.zepben.evolve.services.common.UNKNOWN_LONG
+import com.zepben.evolve.services.common.UNKNOWN_UINT
 import com.zepben.evolve.services.common.translator.BaseCimToProto
 import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind
@@ -260,7 +261,7 @@ fun toPb(cim: Pole, pb: PBPole.Builder): PBPole.Builder =
 
 fun toPb(cim: Streetlight, pb: PBStreetlight.Builder): PBStreetlight.Builder =
     pb.apply {
-        lightRating = cim.lightRating ?: UNKNOWN_INT
+        lightRating = cim.lightRating ?: UNKNOWN_UINT
         lampKind = PBStreetlightLampKind.valueOf(cim.lampKind.name)
         cim.pole?.let { poleMRID = it.mRID } ?: clearPoleMRID()
         toPb(cim, atBuilder)

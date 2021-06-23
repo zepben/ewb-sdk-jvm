@@ -5,15 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.cim.iec61970.base.wires
+package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 
 import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection as PBWindingConnection
+import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind as PBBatteryStateKind
 
-internal class WindingConnectionTest {
+internal class BatteryStateKindTest {
 
     @JvmField
     @RegisterExtension
@@ -21,7 +21,7 @@ internal class WindingConnectionTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(WindingConnection.values(), PBWindingConnection.values())
+        validateEnum(BatteryStateKind.values(), PBBatteryStateKind.values())
     }
 
 }

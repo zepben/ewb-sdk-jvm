@@ -7,11 +7,11 @@
  */
 package com.zepben.evolve.cim.iec61968.customers
 
+import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import com.zepben.protobuf.cim.iec61968.customers.CustomerKind as PBCustomerKind
 
 internal class CustomerKindTest {
 
@@ -20,9 +20,8 @@ internal class CustomerKindTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    internal fun valueCoverage() {
-        CustomerKind.values().forEach {
-            assertThat(CustomerKind.valueOf(it.name), equalTo(it))
-        }
+    internal fun validateVsPb() {
+        validateEnum(CustomerKind.values(), PBCustomerKind.values())
     }
+
 }

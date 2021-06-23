@@ -149,7 +149,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateCollection(
             EndDevice::usagePoints, EndDevice::addUsagePoint, createEndDevice,
             { UsagePoint("up1") }, { UsagePoint("up2") },
-            NetworkServiceCompatatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
+            NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
         )
     }
 
@@ -166,13 +166,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateCollection(
             UsagePoint::endDevices, UsagePoint::addEndDevice, { UsagePoint(it) },
             { Meter("m1") }, { Meter("m2") },
-            NetworkServiceCompatatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
+            NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
         )
 
         comparatorValidator.validateCollection(
             UsagePoint::equipment, UsagePoint::addEquipment, { UsagePoint(it) },
             { Junction("j1") }, { Junction("j2") },
-            NetworkServiceCompatatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
+            NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
         )
     }
 
@@ -191,7 +191,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(
             AuxiliaryEquipment::terminal, createAuxiliaryEquipment,
             { Terminal("t1") }, { Terminal("t2") },
-            NetworkServiceCompatatorOptions.all().copy(compareTerminals = false), optionsStopCompare = true
+            NetworkServiceComparatorOptions.all().copy(compareTerminals = false), optionsStopCompare = true
         )
     }
 
@@ -221,7 +221,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { Terminal(mRID = "1").apply { conductingEquipment = it } },
             { Terminal(mRID = "2").apply { conductingEquipment = it } },
             Terminal::conductingEquipment.setter,
-            NetworkServiceCompatatorOptions.all().copy(compareTerminals = false), optionsStopCompare = true
+            NetworkServiceComparatorOptions.all().copy(compareTerminals = false), optionsStopCompare = true
         )
     }
 

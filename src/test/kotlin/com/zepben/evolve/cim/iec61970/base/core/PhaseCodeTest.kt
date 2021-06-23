@@ -7,14 +7,14 @@
  */
 package com.zepben.evolve.cim.iec61970.base.core
 
-import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
+import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 
 internal class PhaseCodeTest {
 
@@ -23,19 +23,8 @@ internal class PhaseCodeTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    internal fun constructorCoverage() {
-        val wireInfo = object : WireInfo() {}
-        assertThat(wireInfo.mRID, not(equalTo("")))
-
-        val wireInfoId = object : WireInfo("id") {}
-        assertThat(wireInfoId.mRID, equalTo("id"))
-    }
-
-    @Test
-    internal fun valueCoverage() {
-        PhaseCode.values().forEach {
-            assertThat(PhaseCode.valueOf(it.name), equalTo(it))
-        }
+    internal fun validateVsPb() {
+        validateEnum(PhaseCode.values(), PBPhaseCode.values())
     }
 
     @Test

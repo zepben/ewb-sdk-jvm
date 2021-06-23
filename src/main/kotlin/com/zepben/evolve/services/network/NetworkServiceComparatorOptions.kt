@@ -7,7 +7,7 @@
  */
 package com.zepben.evolve.services.network
 
-data class NetworkServiceCompatatorOptions(
+data class NetworkServiceComparatorOptions(
     val compareTerminals: Boolean,
     val compareTracedPhases: Boolean,
     val compareFeederEquipment: Boolean,
@@ -17,8 +17,8 @@ data class NetworkServiceCompatatorOptions(
 
     companion object {
         @JvmStatic
-        fun all(): NetworkServiceCompatatorOptions =
-            NetworkServiceCompatatorOptions(
+        fun all(): NetworkServiceComparatorOptions =
+            NetworkServiceComparatorOptions(
                 compareTerminals = true,
                 compareTracedPhases = true,
                 compareFeederEquipment = true,
@@ -27,8 +27,8 @@ data class NetworkServiceCompatatorOptions(
             )
 
         @JvmStatic
-        fun none(): NetworkServiceCompatatorOptions =
-            NetworkServiceCompatatorOptions(
+        fun none(): NetworkServiceComparatorOptions =
+            NetworkServiceComparatorOptions(
                 compareTerminals = false,
                 compareTracedPhases = false,
                 compareFeederEquipment = false,
@@ -71,8 +71,8 @@ data class NetworkServiceCompatatorOptions(
             return this
         }
 
-        fun build(): NetworkServiceCompatatorOptions {
-            return NetworkServiceCompatatorOptions(
+        fun build(): NetworkServiceComparatorOptions {
+            return NetworkServiceComparatorOptions(
                 compareTerminals,
                 comparePhases,
                 compareFeederEquipment,

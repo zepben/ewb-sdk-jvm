@@ -7,11 +7,11 @@
  */
 package com.zepben.evolve.cim.iec61970.base.diagramlayout
 
+import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import com.zepben.protobuf.cim.iec61970.base.diagramlayout.OrientationKind as PBOrientationKind
 
 internal class OrientationKindTest {
 
@@ -20,9 +20,8 @@ internal class OrientationKindTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    internal fun valueCoverage() {
-        OrientationKind.values().forEach {
-            assertThat(OrientationKind.valueOf(it.name), equalTo(it))
-        }
+    internal fun validateVsPb() {
+        validateEnum(OrientationKind.values(), PBOrientationKind.values())
     }
+
 }

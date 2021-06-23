@@ -7,11 +7,11 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import com.zepben.protobuf.cim.iec61970.base.wires.SinglePhaseKind as PBSinglePhaseKind
 
 internal class SinglePhaseKindTest {
 
@@ -20,9 +20,8 @@ internal class SinglePhaseKindTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    internal fun valueCoverage() {
-        SinglePhaseKind.values().forEach {
-            assertThat(SinglePhaseKind.valueOf(it.name), equalTo(it))
-        }
+    internal fun validateVsPb() {
+        validateEnum(SinglePhaseKind.values(), PBSinglePhaseKind.values())
     }
+
 }

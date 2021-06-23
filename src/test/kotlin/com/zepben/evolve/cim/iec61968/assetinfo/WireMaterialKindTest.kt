@@ -7,11 +7,11 @@
  */
 package com.zepben.evolve.cim.iec61968.assetinfo
 
+import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind as PBWireMaterialKind
 
 internal class WireMaterialKindTest {
 
@@ -20,9 +20,8 @@ internal class WireMaterialKindTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    internal fun valueCoverage() {
-        WireMaterialKind.values().forEach {
-            assertThat(WireMaterialKind.valueOf(it.name), equalTo(it))
-        }
+    internal fun validateVsPb() {
+        validateEnum(WireMaterialKind.values(), PBWireMaterialKind.values())
     }
+
 }

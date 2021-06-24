@@ -385,10 +385,7 @@ fun GeographicalRegion.fillFields(service: NetworkService, includeRuntime: Boole
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     for (i in 0..1)
-        addSubGeographicalRegion(SubGeographicalRegion().also {
-            it.geographicalRegion = this
-            service.add(it)
-        })
+        addSubGeographicalRegion(SubGeographicalRegion().also { service.add(it) })
 
     return this
 }
@@ -440,12 +437,8 @@ fun ConductingEquipment.fillFields(service: NetworkService, includeRuntime: Bool
 
     baseVoltage = BaseVoltage().also { service.add(it) }
 
-    for (i in 0..1) {
-        addTerminal(Terminal().also {
-            it.conductingEquipment = this
-            service.add(it)
-        })
-    }
+    for (i in 0..1)
+        addTerminal(Terminal().also { service.add(it) })
 
     return this
 }
@@ -463,12 +456,8 @@ fun SubGeographicalRegion.fillFields(service: NetworkService, includeRuntime: Bo
         service.add(it)
     }
 
-    for (i in 0..1) {
-        addSubstation(Substation().also {
-            it.subGeographicalRegion = this
-            service.add(it)
-        })
-    }
+    for (i in 0..1)
+        addSubstation(Substation().also { service.add(it) })
 
     return this
 }
@@ -482,10 +471,7 @@ fun Substation.fillFields(service: NetworkService, includeRuntime: Boolean = tru
     }
 
     for (i in 0..1) {
-        addFeeder(Feeder().also {
-            it.normalEnergizingSubstation = this
-            service.add(it)
-        })
+        addFeeder(Feeder().also { service.add(it) })
 
         addLoop(Loop().also {
             it.addSubstation(this)
@@ -710,7 +696,6 @@ fun EnergyConsumer.fillFields(service: NetworkService, includeRuntime: Boolean =
     for (i in 0..1) {
         addPhase(EnergyConsumerPhase().also {
             it.phase = SinglePhaseKind.get(i)
-            it.energyConsumer = this
             service.add(it)
         })
     }
@@ -749,7 +734,6 @@ fun EnergySource.fillFields(service: NetworkService, includeRuntime: Boolean = t
     for (i in 0..1) {
         addPhase(EnergySourcePhase().also {
             it.phase = SinglePhaseKind.get(i)
-            it.energySource = this
             service.add(it)
         })
     }

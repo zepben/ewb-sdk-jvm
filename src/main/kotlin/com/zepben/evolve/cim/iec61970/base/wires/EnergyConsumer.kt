@@ -9,6 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.extensions.validateReference
 
 /**
@@ -56,6 +57,13 @@ class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnec
     fun addPhase(phase: EnergyConsumerPhase): EnergyConsumer {
         if (validateReference(phase, ::getPhase, "An EnergyConsumerPhase"))
             return this
+
+        if (phase.energyConsumer == null)
+            phase.energyConsumer = this
+
+        require(phase.energyConsumer === this) {
+            "${phase.typeNameAndMRID()} `energyConsumer` property references ${phase.energyConsumer?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
 
         _energyConsumerPhases = _energyConsumerPhases ?: mutableListOf()
         _energyConsumerPhases!!.add(phase)

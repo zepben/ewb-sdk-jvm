@@ -111,6 +111,7 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
 
         if (end.endNumber == 0)
             end.endNumber = numEnds() + 1
+
         require(getEnd(end.endNumber) == null) { "Unable to add ${end.typeNameAndMRID()} to ${typeNameAndMRID()}. A ${getEnd(end.endNumber)!!.typeNameAndMRID()} already exists with endNumber ${end.endNumber}." }
 
         _powerTransformerEnds = _powerTransformerEnds ?: mutableListOf()
@@ -135,7 +136,12 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
         if (validateReference(end, ::getEnd, "A PowerTransformerEnd"))
             return true
 
-        require(end.powerTransformer === this) { "${end.typeNameAndMRID()} references another PowerTransformer ${end.powerTransformer}, expected ${this}." }
+        if (end.powerTransformer == null)
+            end.powerTransformer = this
+
+        require(end.powerTransformer === this) {
+            "${end.typeNameAndMRID()} `powerTransformer` property references ${end.powerTransformer?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
         return false
     }
 }

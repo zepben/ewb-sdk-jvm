@@ -11,6 +11,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.extensions.validateReference
 
 /**
@@ -104,6 +105,13 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
     fun addPhase(phase: PowerElectronicsConnectionPhase): PowerElectronicsConnection {
         if (validateReference(phase, ::getPhase, "An PowerElectronicsConnectionPhase"))
             return this
+
+        if (phase.powerElectronicsConnection == null)
+            phase.powerElectronicsConnection = this
+
+        require(phase.powerElectronicsConnection === this) {
+            "${phase.typeNameAndMRID()} `powerElectronicsConnection` property references ${phase.powerElectronicsConnection?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
 
         _powerElectronicsConnectionPhases = _powerElectronicsConnectionPhases ?: mutableListOf()
         _powerElectronicsConnectionPhases!!.add(phase)

@@ -50,6 +50,26 @@ internal class PowerTransformerTest {
     }
 
     @Test
+    internal fun assignsTransformerToEndIfMissing() {
+        val transformer = PowerTransformer()
+        val end = PowerTransformerEnd()
+
+        transformer.addEnd(end)
+        assertThat(end.powerTransformer, equalTo(transformer))
+    }
+
+    @Test
+    internal fun rejectsEndWithWrongTransformer() {
+        val tx1 = PowerTransformer()
+        val tx2 = PowerTransformer()
+        val end = PowerTransformerEnd().apply { powerTransformer = tx2 }
+
+        expect { tx1.addEnd(end) }
+            .toThrow(IllegalArgumentException::class.java)
+            .withMessage("${end.typeNameAndMRID()} `powerTransformer` property references ${tx2.typeNameAndMRID()}, expected ${tx1.typeNameAndMRID()}.")
+    }
+
+    @Test
     internal fun powerTransformerEnds() {
         PrivateCollectionValidator.validate(
             { PowerTransformer() },
@@ -65,27 +85,15 @@ internal class PowerTransformerTest {
     }
 
     @Test
-    internal fun `test addEnd`() {
+    internal fun `test addEnd end numbers`() {
         val pt = PowerTransformer()
         val e1 = PowerTransformerEnd()
-        val e2 = PowerTransformerEnd().apply {
-            powerTransformer = pt
-        }
-        val e3 = PowerTransformerEnd().apply {
-            powerTransformer = pt
-            endNumber = 4
-        }
+        val e2 = PowerTransformerEnd()
+        val e3 = PowerTransformerEnd().apply { endNumber = 4 }
 
-        // Test throws if missing ConductingEquipment
-        expect { pt.addEnd(e1) }.toThrow(IllegalArgumentException::class.java)
-            .withMessage("${e1.typeNameAndMRID()} references another PowerTransformer ${e1.powerTransformer}, expected $pt.")
-
-        e1.apply {
-            powerTransformer = pt
-        }
+        // Test order
         pt.addEnd(e1)
         pt.addEnd(e2)
-        // Test order
         assertThat(pt.ends, containsInRelativeOrder(e1, e2))
 
         // Test order maintained and sequenceNumber was set appropriately
@@ -96,7 +104,7 @@ internal class PowerTransformerTest {
         assertThat(pt.getEnd(4), equalTo(e3))
 
         // Test try to add terminal with same sequence number fails
-        val duplicatePowerTransformerEnd = PowerTransformerEnd().apply { powerTransformer = pt; endNumber = 1 }
+        val duplicatePowerTransformerEnd = PowerTransformerEnd().apply { endNumber = 1 }
         expect {
             pt.addEnd(duplicatePowerTransformerEnd)
         }.toThrow(IllegalArgumentException::class.java)

@@ -27,14 +27,14 @@ class ConnectivityResultTest {
 
     private val asset1: ConductingEquipment = Junction("asset1").apply {
         name = "asset 1"
-        addTerminal(Terminal().also { it.conductingEquipment = this; it.phases = PhaseCode.A })
-        addTerminal(Terminal().also { it.conductingEquipment = this; it.phases = PhaseCode.A })
+        addTerminal(Terminal().apply { phases = PhaseCode.A })
+        addTerminal(Terminal().apply { phases = PhaseCode.A })
     }
 
     private val asset2: ConductingEquipment = Junction("asset2").apply {
         name = "asset 2"
-        addTerminal(Terminal().also { it.conductingEquipment = this; it.phases = PhaseCode.A })
-        addTerminal(Terminal().also { it.conductingEquipment = this; it.phases = PhaseCode.A })
+        addTerminal(Terminal().apply { phases = PhaseCode.A })
+        addTerminal(Terminal().apply { phases = PhaseCode.A })
     }
 
     private val terminal11 = asset1.getTerminal(1)!!

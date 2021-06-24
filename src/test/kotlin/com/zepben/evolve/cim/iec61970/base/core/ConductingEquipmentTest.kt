@@ -43,6 +43,26 @@ internal class ConductingEquipmentTest {
     }
 
     @Test
+    internal fun assignsEquipmentToTerminalIfMissing() {
+        val conductingEquipment = object : ConductingEquipment() {}
+        val terminal = Terminal()
+
+        conductingEquipment.addTerminal(terminal)
+        assertThat(terminal.conductingEquipment, equalTo(conductingEquipment))
+    }
+
+    @Test
+    internal fun rejectsTerminalWithWrongEquipment() {
+        val ce1 = object : ConductingEquipment() {}
+        val ce2 = object : ConductingEquipment() {}
+        val terminal = Terminal().apply { conductingEquipment = ce2 }
+
+        expect { ce1.addTerminal(terminal) }
+            .toThrow(IllegalArgumentException::class.java)
+            .withMessage("${terminal.typeNameAndMRID()} `conductingEquipment` property references ${ce2.typeNameAndMRID()}, expected ${ce1.typeNameAndMRID()}.")
+    }
+
+    @Test
     internal fun terminals() {
         PrivateCollectionValidator.validate(
             { object : ConductingEquipment() {} },
@@ -59,27 +79,15 @@ internal class ConductingEquipmentTest {
     }
 
     @Test
-    internal fun `test addTerminal`() {
+    internal fun `test addTerminal sequence numbers`() {
         val ce = object : ConductingEquipment() {}
         val t1 = Terminal()
-        val t2 = Terminal().apply {
-            conductingEquipment = ce
-        }
-        val t3 = Terminal().apply {
-            conductingEquipment = ce
-            sequenceNumber = 4
-        }
+        val t2 = Terminal()
+        val t3 = Terminal().apply { sequenceNumber = 4 }
 
-        // Test throws if missing ConductingEquipment
-        expect { ce.addTerminal(t1) }.toThrow(IllegalArgumentException::class.java)
-            .withMessage("${t1.typeNameAndMRID()} references another piece of conducting equipment ${t1.conductingEquipment}, expected $ce.")
-
-        t1.apply {
-            conductingEquipment = ce
-        }
+        // Test order
         ce.addTerminal(t1)
         ce.addTerminal(t2)
-        // Test order
         assertThat(ce.terminals, containsInRelativeOrder(t1, t2))
 
         // Test order maintained and sequenceNumber was set appropriately
@@ -89,8 +97,8 @@ internal class ConductingEquipmentTest {
         assertThat(ce.getTerminal(2), equalTo(t2))
         assertThat(ce.getTerminal(4), equalTo(t3))
 
-        // Test try to add terminal with same sequence number fails
-        val duplicateTerminal = Terminal().apply { conductingEquipment = ce; sequenceNumber = 1 }
+        // Test add terminal with same sequence number fails
+        val duplicateTerminal = Terminal().apply { sequenceNumber = 1 }
         expect {
             ce.addTerminal(duplicateTerminal)
         }.toThrow(IllegalArgumentException::class.java)

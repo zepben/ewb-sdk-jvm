@@ -7,7 +7,9 @@
  */
 package com.zepben.evolve.cim.iec61970.base.core
 
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
+import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -25,6 +27,26 @@ internal class GeographicalRegionTest {
     internal fun constructorCoverage() {
         assertThat(GeographicalRegion().mRID, not(equalTo("")))
         assertThat(GeographicalRegion("id").mRID, equalTo("id"))
+    }
+
+    @Test
+    internal fun assignsGeographicalRegionToSubGeographicalRegionIfMissing() {
+        val geographicalRegion = GeographicalRegion()
+        val subGeographicalRegion = SubGeographicalRegion()
+
+        geographicalRegion.addSubGeographicalRegion(subGeographicalRegion)
+        assertThat(subGeographicalRegion.geographicalRegion, equalTo(geographicalRegion))
+    }
+
+    @Test
+    internal fun rejectsSubGeographicalRegionWithWrongGeographicalRegion() {
+        val geographicalRegion1 = GeographicalRegion()
+        val geographicalRegion2 = GeographicalRegion()
+        val subGeographicalRegion = SubGeographicalRegion().apply { geographicalRegion = geographicalRegion2 }
+
+        ExpectException.expect { geographicalRegion1.addSubGeographicalRegion(subGeographicalRegion) }
+            .toThrow(IllegalArgumentException::class.java)
+            .withMessage("${subGeographicalRegion.typeNameAndMRID()} `geographicalRegion` property references ${geographicalRegion2.typeNameAndMRID()}, expected ${geographicalRegion1.typeNameAndMRID()}.")
     }
 
     @Test

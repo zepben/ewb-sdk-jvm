@@ -20,12 +20,8 @@ fun Diagram.fillFields(service: DiagramService, includeRuntime: Boolean = true):
     diagramStyle = DiagramStyle.GEOGRAPHIC
     orientationKind = OrientationKind.NEGATIVE
 
-    for (i in 0..1) {
-        addDiagramObject(DiagramObject().also {
-            it.diagram = this
-            service.add(it)
-        })
-    }
+    for (i in 0..1)
+        addDiagramObject(DiagramObject().also { service.add(it) })
 
     return this
 }

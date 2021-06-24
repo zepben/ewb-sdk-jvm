@@ -320,7 +320,7 @@ class SetPhasesTest {
         fun createBreaker(id: String, sequenceNumber: Int): Breaker {
             return Breaker(id).apply {
                 name = id
-                addTerminal(Terminal().also { it.conductingEquipment = this; it.sequenceNumber = sequenceNumber })
+                addTerminal(Terminal().also { it.sequenceNumber = sequenceNumber })
                 addContainer(substation)
                 substation.addEquipment(this)
             }
@@ -518,7 +518,7 @@ class SetPhasesTest {
 
     private fun ConductingEquipment.addTerminals(count: Int, phases: PhaseCode = PhaseCode.ABC) {
         for (i in 1..count)
-            addTerminal(Terminal().also { it.conductingEquipment = this; it.phases = phases })
+            addTerminal(Terminal().also { it.phases = phases })
     }
 }
 

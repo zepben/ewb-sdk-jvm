@@ -286,7 +286,6 @@ class NetworkModelTestUtil {
             y2: Double? = null
         ): DiagramObject {
             return DiagramObject().apply {
-                this.diagram = diagram
                 diagram.addDiagramObject(this)
 
                 identifiedObjectMRID = identifiedObject.mRID

@@ -74,7 +74,7 @@ class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnecti
             phase.energySource = this
 
         require(phase.energySource === this) {
-            "${phase.typeNameAndMRID()} `energySource` property references ${phase.energySource?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            "${phase.typeNameAndMRID()} `energySource` property references ${phase.energySource!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
 
         _energySourcePhases = _energySourcePhases ?: mutableListOf()

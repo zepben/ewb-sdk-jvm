@@ -54,7 +54,7 @@ class Diagram @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mR
             diagramObject.diagram = this
 
         require(diagramObject.diagram === this) {
-            "${diagramObject.typeNameAndMRID()} `diagram` property references ${diagramObject.diagram?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            "${diagramObject.typeNameAndMRID()} `diagram` property references ${diagramObject.diagram!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
 
         _diagramObjects = _diagramObjects ?: mutableMapOf()

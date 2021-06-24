@@ -98,7 +98,7 @@ abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
             terminal.conductingEquipment = this
 
         require(terminal.conductingEquipment === this) {
-            "${terminal.typeNameAndMRID()} `conductingEquipment` property references ${terminal.conductingEquipment?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            "${terminal.typeNameAndMRID()} `conductingEquipment` property references ${terminal.conductingEquipment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
         return false
     }

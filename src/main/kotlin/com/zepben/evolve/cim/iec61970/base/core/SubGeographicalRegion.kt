@@ -48,7 +48,7 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
             substation.subGeographicalRegion = this
 
         require(substation.subGeographicalRegion === this) {
-            "${substation.typeNameAndMRID()} `subGeographicalRegion` property references ${substation.subGeographicalRegion?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            "${substation.typeNameAndMRID()} `subGeographicalRegion` property references ${substation.subGeographicalRegion!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
 
         _substations = _substations ?: mutableListOf()

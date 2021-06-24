@@ -62,7 +62,7 @@ class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnec
             phase.energyConsumer = this
 
         require(phase.energyConsumer === this) {
-            "${phase.typeNameAndMRID()} `energyConsumer` property references ${phase.energyConsumer?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            "${phase.typeNameAndMRID()} `energyConsumer` property references ${phase.energyConsumer!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
 
         _energyConsumerPhases = _energyConsumerPhases ?: mutableListOf()

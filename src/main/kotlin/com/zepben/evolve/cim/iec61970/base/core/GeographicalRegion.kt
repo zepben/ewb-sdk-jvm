@@ -46,7 +46,7 @@ class GeographicalRegion @JvmOverloads constructor(mRID: String = "") : Identifi
             subGeographicalRegion.geographicalRegion = this
 
         require(subGeographicalRegion.geographicalRegion === this) {
-            "${subGeographicalRegion.typeNameAndMRID()} `geographicalRegion` property references ${subGeographicalRegion.geographicalRegion?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            "${subGeographicalRegion.typeNameAndMRID()} `geographicalRegion` property references ${subGeographicalRegion.geographicalRegion!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
 
         _subGeographicalRegions = _subGeographicalRegions ?: mutableListOf()

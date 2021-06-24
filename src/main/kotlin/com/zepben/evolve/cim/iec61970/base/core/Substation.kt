@@ -55,7 +55,7 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
             feeder.normalEnergizingSubstation = this
 
         require(feeder.normalEnergizingSubstation === this) {
-            "${feeder.typeNameAndMRID()} `normalEnergizingSubstation` property references ${feeder.normalEnergizingSubstation?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            "${feeder.typeNameAndMRID()} `normalEnergizingSubstation` property references ${feeder.normalEnergizingSubstation!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
 
         _normalEnergizedFeeders = _normalEnergizedFeeders ?: mutableListOf()

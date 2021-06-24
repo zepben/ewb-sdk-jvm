@@ -140,7 +140,7 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
             end.powerTransformer = this
 
         require(end.powerTransformer === this) {
-            "${end.typeNameAndMRID()} `powerTransformer` property references ${end.powerTransformer?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            "${end.typeNameAndMRID()} `powerTransformer` property references ${end.powerTransformer!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
         return false
     }

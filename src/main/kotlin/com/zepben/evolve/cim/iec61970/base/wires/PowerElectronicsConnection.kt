@@ -110,7 +110,7 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
             phase.powerElectronicsConnection = this
 
         require(phase.powerElectronicsConnection === this) {
-            "${phase.typeNameAndMRID()} `powerElectronicsConnection` property references ${phase.powerElectronicsConnection?.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+            "${phase.typeNameAndMRID()} `powerElectronicsConnection` property references ${phase.powerElectronicsConnection!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
 
         _powerElectronicsConnectionPhases = _powerElectronicsConnectionPhases ?: mutableListOf()

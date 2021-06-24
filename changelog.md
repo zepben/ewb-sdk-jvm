@@ -28,6 +28,7 @@
   * ShortCircuitTest
 * Objects that belong to a parent object will now be automatically assigned if the parent is null when added. e.g. a `Terminal`
   with no `ConductingEquipment` will be automatically associated to any `ConductingEquipment` to which it is added.
+* Added a helper function to `Breaker` to identify if it is the head of a `Feeder`.
 
 ##### Enhancements
 

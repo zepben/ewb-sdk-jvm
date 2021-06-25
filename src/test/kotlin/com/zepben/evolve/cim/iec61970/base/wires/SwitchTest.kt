@@ -118,8 +118,8 @@ internal class SwitchTest {
     @Test
     internal fun `ignores terminal phases`() {
         val switch = object : Switch() {}.also {
-            it.addTerminal(Terminal().apply { conductingEquipment = it; phases = PhaseCode.A })
-            it.addTerminal(Terminal().apply { conductingEquipment = it; phases = PhaseCode.B })
+            it.addTerminal(Terminal().apply { phases = PhaseCode.A })
+            it.addTerminal(Terminal().apply { phases = PhaseCode.B })
         }
 
         switch.setOpen(true)

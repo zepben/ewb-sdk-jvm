@@ -9,7 +9,9 @@ package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
+import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -38,6 +40,26 @@ internal class SubstationTest {
         substation.subGeographicalRegion = subGeographicalRegion
 
         assertThat(substation.subGeographicalRegion, equalTo(subGeographicalRegion))
+    }
+
+    @Test
+    internal fun assignsSubstationToFeederIfMissing() {
+        val substation = Substation()
+        val feeder = Feeder()
+
+        substation.addFeeder(feeder)
+        assertThat(feeder.normalEnergizingSubstation, equalTo(substation))
+    }
+
+    @Test
+    internal fun rejectsFeederWithWrongSubstation() {
+        val substation1 = Substation()
+        val substation2 = Substation()
+        val feeder = Feeder().apply { normalEnergizingSubstation = substation2 }
+
+        ExpectException.expect { substation1.addFeeder(feeder) }
+            .toThrow(IllegalArgumentException::class.java)
+            .withMessage("${feeder.typeNameAndMRID()} `normalEnergizingSubstation` property references ${substation2.typeNameAndMRID()}, expected ${substation1.typeNameAndMRID()}.")
     }
 
     @Test

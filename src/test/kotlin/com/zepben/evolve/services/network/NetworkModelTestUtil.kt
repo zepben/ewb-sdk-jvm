@@ -20,7 +20,6 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObjectPoint
-import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObjectStyle
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
@@ -280,14 +279,13 @@ class NetworkModelTestUtil {
         fun createDiagramObject(
             diagram: Diagram,
             identifiedObject: IdentifiedObject,
-            diagramObjectStyle: DiagramObjectStyle,
+            diagramObjectStyle: String?,
             x: Double,
             y: Double,
             x2: Double? = null,
             y2: Double? = null
         ): DiagramObject {
             return DiagramObject().apply {
-                this.diagram = diagram
                 diagram.addDiagramObject(this)
 
                 identifiedObjectMRID = identifiedObject.mRID

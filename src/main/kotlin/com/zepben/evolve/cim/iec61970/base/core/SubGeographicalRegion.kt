@@ -7,10 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.core
 
-import com.zepben.evolve.services.common.extensions.asUnmodifiable
-import com.zepben.evolve.services.common.extensions.getByMRID
-import com.zepben.evolve.services.common.extensions.safeRemove
-import com.zepben.evolve.services.common.extensions.validateReference
+import com.zepben.evolve.services.common.extensions.*
 
 /**
  * A subset of a geographical region of a power system network model.
@@ -46,6 +43,13 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
     fun addSubstation(substation: Substation): SubGeographicalRegion {
         if (validateReference(substation, ::getSubstation, "A Substation"))
             return this
+
+        if (substation.subGeographicalRegion == null)
+            substation.subGeographicalRegion = this
+
+        require(substation.subGeographicalRegion === this) {
+            "${substation.typeNameAndMRID()} `subGeographicalRegion` property references ${substation.subGeographicalRegion!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
 
         _substations = _substations ?: mutableListOf()
         _substations!!.add(substation)

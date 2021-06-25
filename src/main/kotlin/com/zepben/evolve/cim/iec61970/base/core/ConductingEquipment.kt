@@ -94,7 +94,12 @@ abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
         if (validateReference(terminal, ::getTerminal, "A Terminal"))
             return true
 
-        require(terminal.conductingEquipment === this) { "${terminal.typeNameAndMRID()} references another piece of conducting equipment ${terminal.conductingEquipment}, expected ${this}." }
+        if (terminal.conductingEquipment == null)
+            terminal.conductingEquipment = this
+
+        require(terminal.conductingEquipment === this) {
+            "${terminal.typeNameAndMRID()} `conductingEquipment` property references ${terminal.conductingEquipment!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
         return false
     }
 }

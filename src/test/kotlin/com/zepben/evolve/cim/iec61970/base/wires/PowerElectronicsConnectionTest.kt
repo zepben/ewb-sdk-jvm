@@ -9,7 +9,9 @@
 package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
+import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -55,6 +57,26 @@ internal class PowerElectronicsConnectionTest {
         assertThat(powerElectronicsConnection.q, equalTo(5.0))
         assertThat(powerElectronicsConnection.ratedS, equalTo(6))
         assertThat(powerElectronicsConnection.ratedU, equalTo(7))
+    }
+
+    @Test
+    internal fun assignsPowerElectronicsConnectionToPowerElectronicsConnectionPhaseIfMissing() {
+        val powerElectronicsConnection = PowerElectronicsConnection()
+        val phase = PowerElectronicsConnectionPhase()
+
+        powerElectronicsConnection.addPhase(phase)
+        assertThat(phase.powerElectronicsConnection, equalTo(powerElectronicsConnection))
+    }
+
+    @Test
+    internal fun rejectsPowerElectronicsConnectionPhaseWithWrongPowerElectronicsConnection() {
+        val powerElectronicsConnection1 = PowerElectronicsConnection()
+        val powerElectronicsConnection2 = PowerElectronicsConnection()
+        val phase = PowerElectronicsConnectionPhase().apply { powerElectronicsConnection = powerElectronicsConnection2 }
+
+        ExpectException.expect { powerElectronicsConnection1.addPhase(phase) }
+            .toThrow(IllegalArgumentException::class.java)
+            .withMessage("${phase.typeNameAndMRID()} `powerElectronicsConnection` property references ${powerElectronicsConnection2.typeNameAndMRID()}, expected ${powerElectronicsConnection1.typeNameAndMRID()}.")
     }
 
     @Test

@@ -39,7 +39,7 @@ internal class DiagramServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(DiagramObject::diagram, { DiagramObject(it) }, { Diagram("d1") }, { Diagram("d2") })
         comparatorValidator.validateProperty(DiagramObject::identifiedObjectMRID, { DiagramObject(it) }, { "dio1" }, { "dio2" })
-        comparatorValidator.validateProperty(DiagramObject::style, { DiagramObject(it) }, { DiagramObjectStyle.JUNCTION }, { DiagramObjectStyle.CB })
+        comparatorValidator.validateProperty(DiagramObject::style, { DiagramObject(it) }, { "JUNCTION" }, { "CB" })
         comparatorValidator.validateProperty(DiagramObject::rotation, { DiagramObject(it) }, { 0.0 }, { 1.1 })
         comparatorValidator.validateIndexedCollection(
             DiagramObject::points, DiagramObject::addPoint,

@@ -15,7 +15,6 @@ import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.Diagram as PBDiagram
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObject as PBDiagramObject
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObjectPoint as PBDiagramObjectPoint
-import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObjectStyle as PBDiagramObjectStyle
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramStyle as PBDiagramStyle
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.OrientationKind as PBOrientationKind
 
@@ -33,7 +32,7 @@ fun toPb(cim: DiagramObject, pb: PBDiagramObject.Builder): PBDiagramObject.Build
     pb.apply {
         cim.diagram?.let { diagramMRID = it.mRID } ?: clearDiagramMRID()
         cim.identifiedObjectMRID?.let { identifiedObjectMRID = it } ?: clearIdentifiedObjectMRID()
-        diagramObjectStyle = PBDiagramObjectStyle.valueOf(cim.style.name)
+        cim.style?.let { diagramObjectStyle = it } ?: clearDiagramObjectStyle()
         rotation = cim.rotation
         clearDiagramObjectPoints()
         cim.points.forEach { point -> addDiagramObjectPoints(toPb(point, PBDiagramObjectPoint.newBuilder())) }
@@ -53,7 +52,7 @@ fun DiagramObject.toPb(): PBDiagramObject = toPb(this, PBDiagramObject.newBuilde
 
 /************ Class for Java friendly usage ************/
 
-class DiagramCimToProto() : BaseCimToProto() {
+class DiagramCimToProto : BaseCimToProto() {
     fun toPb(cim: Diagram): PBDiagram = cim.toPb()
     fun toPb(cim: DiagramObject): PBDiagramObject = cim.toPb()
 }

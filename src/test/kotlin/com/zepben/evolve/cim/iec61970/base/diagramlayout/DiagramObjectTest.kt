@@ -33,19 +33,19 @@ internal class DiagramObjectTest {
 
         assertThat(diagramObject.diagram, nullValue())
         assertThat(diagramObject.identifiedObjectMRID, nullValue())
-        assertThat(diagramObject.style, equalTo(DiagramObjectStyle.NONE))
+        assertThat(diagramObject.style, nullValue())
         assertThat(diagramObject.rotation, equalTo(0.0))
 
         diagramObject.apply {
             this.diagram = diagram
             identifiedObjectMRID = "identifiedObjectMRID"
-            style = DiagramObjectStyle.CONDUCTOR_132000
+            style = "my style"
             rotation = 34.5
         }
 
         assertThat(diagramObject.diagram, equalTo(diagram))
         assertThat(diagramObject.identifiedObjectMRID, equalTo("identifiedObjectMRID"))
-        assertThat(diagramObject.style, equalTo(DiagramObjectStyle.CONDUCTOR_132000))
+        assertThat(diagramObject.style, equalTo("my style"))
         assertThat(diagramObject.rotation, equalTo(34.5))
     }
 

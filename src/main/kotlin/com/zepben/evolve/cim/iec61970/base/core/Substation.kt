@@ -9,10 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
-import com.zepben.evolve.services.common.extensions.asUnmodifiable
-import com.zepben.evolve.services.common.extensions.getByMRID
-import com.zepben.evolve.services.common.extensions.safeRemove
-import com.zepben.evolve.services.common.extensions.validateReference
+import com.zepben.evolve.services.common.extensions.*
 
 /**
  * A collection of equipment for purposes other than generation or utilization, through which electric energy in bulk
@@ -53,6 +50,13 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     fun addFeeder(feeder: Feeder): Substation {
         if (validateReference(feeder, ::getFeeder, "A Feeder"))
             return this
+
+        if (feeder.normalEnergizingSubstation == null)
+            feeder.normalEnergizingSubstation = this
+
+        require(feeder.normalEnergizingSubstation === this) {
+            "${feeder.typeNameAndMRID()} `normalEnergizingSubstation` property references ${feeder.normalEnergizingSubstation!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
+        }
 
         _normalEnergizedFeeders = _normalEnergizedFeeders ?: mutableListOf()
         _normalEnergizedFeeders!!.add(feeder)

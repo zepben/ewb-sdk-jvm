@@ -31,7 +31,7 @@ class DiagramObject @JvmOverloads constructor(mRID: String = "") : IdentifiedObj
         }
 
     var identifiedObjectMRID: String? = null
-    var style: DiagramObjectStyle = DiagramObjectStyle.NONE
+    var style: String? = null
     var rotation: Double = 0.0
     private var _diagramObjectPoints: MutableList<DiagramObjectPoint>? = null
 

@@ -41,7 +41,7 @@ class DiagramCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
         insert.setNullableString(table.IDENTIFIED_OBJECT_MRID.queryIndex, diagramObject.identifiedObjectMRID)
         insert.setNullableString(table.DIAGRAM_MRID.queryIndex, diagramObject.diagram?.mRID)
-        insert.setNullableString(table.STYLE.queryIndex, diagramObject.style.name)
+        insert.setNullableString(table.STYLE.queryIndex, diagramObject.style)
         insert.setDouble(table.ROTATION.queryIndex, diagramObject.rotation)
 
         return status and saveIdentifiedObject(table, insert, diagramObject, "diagram object")

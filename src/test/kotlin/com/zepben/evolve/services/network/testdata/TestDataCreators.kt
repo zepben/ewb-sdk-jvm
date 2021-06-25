@@ -20,18 +20,16 @@ import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.network.NetworkService
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
-import java.util.function.Consumer
 
 fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode): EnergySource =
     EnergySource(id).apply {
-        phaseCode.singlePhases().forEach(Consumer { phase: SinglePhaseKind? ->
+        phaseCode.singlePhases().forEach { phase ->
             EnergySourcePhase().also {
-                it.energySource = this
-                it.phase = phase!!
+                it.phase = phase
                 addPhase(it)
                 network.add(it)
             }
-        })
+        }
 
         createTerminals(network, this, numTerminals, phaseCode)
         network.add(this)
@@ -116,22 +114,6 @@ fun createAcLineSegmentForConnecting(
         network.add(this)
     }
 
-fun createEnergyConsumer(network: NetworkService, id: String, numTerminals: Int, nominalPhases: PhaseCode): EnergyConsumer =
-    EnergyConsumer(id).apply {
-        name = id
-        createTerminals(network, this, numTerminals, nominalPhases)
-
-        network.add(this)
-    }
-
-fun createHvMeterNode(network: NetworkService, id: String, nominalPhases: PhaseCode): Junction =
-    Junction(id).apply {
-        name = id
-        createTerminals(network, this, 1, nominalPhases)
-
-        network.add(this)
-    }
-
 fun createMeter(network: NetworkService, id: String): Meter =
     Meter(id).apply {
         name = "companyMeterId$id"
@@ -157,15 +139,6 @@ fun createTerminals(network: NetworkService, condEq: ConductingEquipment, numTer
         createTerminal(network, condEq, nominalPhases, i)
 }
 
-fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment, phases: PhaseCode): Terminal =
-    Terminal().apply {
-        this.conductingEquipment = conductingEquipment
-        this.phases = phases
-        conductingEquipment.addTerminal(this)
-
-        MatcherAssert.assertThat(network.add(this), Matchers.equalTo(true))
-    }
-
 fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment?, phases: PhaseCode, sequenceNumber: Int) =
     conductingEquipment?.getTerminal(sequenceNumber) ?: Terminal().apply {
         this.conductingEquipment = conductingEquipment
@@ -176,35 +149,16 @@ fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquip
         MatcherAssert.assertThat(network.add(this), Matchers.equalTo(true))
     }
 
-fun createGeographicalRegion(networkService: NetworkService, mRID: String, name: String): GeographicalRegion =
-    GeographicalRegion(mRID).apply {
-        this.name = name
-
-        networkService.add(this)
-    }
-
-fun createSubGeographicalRegion(networkService: NetworkService, mRID: String, name: String, geographicalRegion: GeographicalRegion?) =
-    SubGeographicalRegion(mRID).apply {
-        this.name = name
-
-        if (geographicalRegion != null) {
-            this.geographicalRegion = geographicalRegion
-            geographicalRegion.addSubGeographicalRegion(this)
-        }
-
-        networkService.add(this)
-    }
-
 fun createSubstation(networkService: NetworkService, mRID: String, name: String, subGeographicalRegion: SubGeographicalRegion? = null): Substation =
-    Substation(mRID).apply {
-        this.name = name
+    Substation(mRID).also {
+        it.name = name
 
         if (subGeographicalRegion != null) {
-            this.subGeographicalRegion = subGeographicalRegion
-            subGeographicalRegion.addSubstation(this)
+            it.subGeographicalRegion = subGeographicalRegion
+            subGeographicalRegion.addSubstation(it)
         }
 
-        networkService.add(this)
+        networkService.add(it)
     }
 
 fun createFeeder(
@@ -240,26 +194,13 @@ fun createFeeder(networkService: NetworkService, mRID: String, name: String, sub
             }
         }
 
-fun createEnd(networkService: NetworkService, tx: PowerTransformer, bv: BaseVoltage?, endNumber: Int) =
-    PowerTransformerEnd().apply {
-        baseVoltage = bv
-        this.endNumber = endNumber
+fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int? = null, endNumber: Int = 0) =
+    PowerTransformerEnd().also {
+        it.ratedU = ratedU
+        it.endNumber = endNumber
 
-        powerTransformer = tx
-        tx.addEnd(this)
-
-        networkService.add(this)
-    }
-
-fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int, endNumber: Int) =
-    PowerTransformerEnd().apply {
-        this.ratedU = ratedU
-        this.endNumber = endNumber
-
-        powerTransformer = tx
-        tx.addEnd(this)
-
-        networkService.add(this)
+        tx.addEnd(it)
+        networkService.add(it)
     }
 
 fun createOperationalRestriction(networkService: NetworkService, mRID: String, name: String, vararg equipmentMRIDs: String) =

@@ -7,7 +7,9 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
+import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -68,6 +70,26 @@ internal class EnergySourceTest {
         assertThat(energySource.x, equalTo(10.0))
         assertThat(energySource.x0, equalTo(11.0))
         assertThat(energySource.xn, equalTo(12.0))
+    }
+
+    @Test
+    internal fun assignsEnergySourceToEnergySourcePhaseIfMissing() {
+        val energySource = EnergySource()
+        val phase = EnergySourcePhase()
+
+        energySource.addPhase(phase)
+        assertThat(phase.energySource, equalTo(energySource))
+    }
+
+    @Test
+    internal fun rejectsEnergySourcePhaseWithWrongEnergySource() {
+        val energySource1 = EnergySource()
+        val energySource2 = EnergySource()
+        val phase = EnergySourcePhase().apply { energySource = energySource2 }
+
+        ExpectException.expect { energySource1.addPhase(phase) }
+            .toThrow(IllegalArgumentException::class.java)
+            .withMessage("${phase.typeNameAndMRID()} `energySource` property references ${energySource2.typeNameAndMRID()}, expected ${energySource1.typeNameAndMRID()}.")
     }
 
     @Test

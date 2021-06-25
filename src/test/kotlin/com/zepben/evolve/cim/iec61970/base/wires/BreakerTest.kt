@@ -7,7 +7,9 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Substation
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -37,4 +39,19 @@ internal class BreakerTest {
 
         assertThat(breaker.isSubstationBreaker, equalTo(true))
     }
+
+    @Test
+    internal fun `is feeder head breaker when a terminal is a feeder head terminal`() {
+        val breaker = Breaker().apply { addTerminal(Terminal()); addTerminal(Terminal()) }
+        val feeder = Feeder().apply { normalHeadTerminal = Terminal() }
+
+        assertThat(breaker.isFeederHeadBreaker, equalTo(false))
+
+        breaker.addContainer(feeder)
+        assertThat(breaker.isFeederHeadBreaker, equalTo(false))
+
+        breaker.addTerminal(feeder.normalHeadTerminal!!)
+        assertThat(breaker.isFeederHeadBreaker, equalTo(true))
+    }
+
 }

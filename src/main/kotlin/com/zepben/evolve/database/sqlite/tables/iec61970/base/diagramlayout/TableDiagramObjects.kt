@@ -17,7 +17,7 @@ class TableDiagramObjects : TableIdentifiedObjects() {
 
     val IDENTIFIED_OBJECT_MRID = Column(++columnIndex, "identified_object_mrid", "TEXT", NULL)
     val DIAGRAM_MRID = Column(++columnIndex, "diagram_mrid", "TEXT", NULL)
-    val STYLE = Column(++columnIndex, "style", "TEXT", NOT_NULL)
+    val STYLE = Column(++columnIndex, "style", "TEXT", NULL)
     val ROTATION = Column(++columnIndex, "rotation", "NUMBER", NOT_NULL)
 
     override fun name(): String {

@@ -65,13 +65,7 @@ class TracingTest {
 
     @Test
     internal fun downstreamTraceWithTooManyPhases() {
-        val b1 = Breaker().apply {
-            addTerminal(Terminal().apply {
-                phases = PhaseCode.AB
-            }.also {
-                it.conductingEquipment = this
-            })
-        }
+        val b1 = Breaker().apply { addTerminal(Terminal().apply { phases = PhaseCode.AB }) }
 
         Tracing.normalDownstreamTrace()
             .run(PhaseStep.startAt(b1, PhaseCode.ABCN))

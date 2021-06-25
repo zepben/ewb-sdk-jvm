@@ -9,7 +9,6 @@ package com.zepben.evolve.cim.iec61970.base.diagramlayout
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
-import com.zepben.evolve.services.common.extensions.nameAndMRID
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.extensions.validateReference
 
@@ -51,11 +50,11 @@ class Diagram @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mR
         if (validateReference(diagramObject, ::getDiagramObject, "A DiagramObject"))
             return this
 
+        if (diagramObject.diagram == null)
+            diagramObject.diagram = this
+
         require(diagramObject.diagram === this) {
-            if (diagramObject.diagram == null)
-                "Diagram has not been set for ${diagramObject.typeNameAndMRID()}"
-            else
-                "${diagramObject.typeNameAndMRID()} references another Diagram ${diagramObject.diagram!!.nameAndMRID()}, expected ${nameAndMRID()}."
+            "${diagramObject.typeNameAndMRID()} `diagram` property references ${diagramObject.diagram!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
         }
 
         _diagramObjects = _diagramObjects ?: mutableMapOf()

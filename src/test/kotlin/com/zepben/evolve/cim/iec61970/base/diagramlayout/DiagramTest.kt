@@ -7,7 +7,9 @@
  */
 package com.zepben.evolve.cim.iec61970.base.diagramlayout
 
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
+import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -42,6 +44,26 @@ internal class DiagramTest {
     }
 
     @Test
+    internal fun assignsDiagramToObjectsIfMissing() {
+        val diagram = Diagram()
+        val diagramObject = DiagramObject()
+
+        diagram.addDiagramObject(diagramObject)
+        assertThat(diagramObject.diagram, equalTo(diagram))
+    }
+
+    @Test
+    internal fun rejectsObjectWithWrongDiagram() {
+        val d1 = Diagram()
+        val d2 = Diagram()
+        val obj = DiagramObject().apply { diagram = d2 }
+
+        ExpectException.expect { d1.addDiagramObject(obj) }
+            .toThrow(IllegalArgumentException::class.java)
+            .withMessage("${obj.typeNameAndMRID()} `diagram` property references ${d2.typeNameAndMRID()}, expected ${d1.typeNameAndMRID()}.")
+    }
+
+    @Test
     internal fun diagramObjects() {
         PrivateCollectionValidator.validate(
             { Diagram() },
@@ -54,4 +76,5 @@ internal class DiagramTest {
             Diagram::clearDiagramObjects
         )
     }
+
 }

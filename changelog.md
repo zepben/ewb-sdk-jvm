@@ -11,6 +11,7 @@
 * All SDK methods that retrieve objects with references will now request the network hierarchy first to provide a consistent result, regardless of call order.
 * Primitive values on CIM classes are now nullable to allow differentiation between missing and zero values.
 * Fixed typo in `NetworkServiceComparator`. Was previously `NetworkServiceCompatatorOptions`.
+* Changed `DiagramObject.style` to be a string and removed `DiagramObjectStyle` enum.
 * Updated to use v0.15.0 gRPC protocols.
 
 ##### New Features
@@ -25,6 +26,9 @@
   * NoLoadTest
   * OpenCircuitTest
   * ShortCircuitTest
+* Objects that belong to a parent object will now be automatically assigned if the parent is null when added. e.g. a `Terminal`
+  with no `ConductingEquipment` will be automatically associated to any `ConductingEquipment` to which it is added.
+* Added a helper function to `Breaker` to identify if it is the head of a `Feeder`.
 
 ##### Enhancements
 

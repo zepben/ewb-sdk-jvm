@@ -42,6 +42,7 @@
 * `getIdentifiedObjects` now adds unknown mRIDs to the failed collection.
 * Fixed an error in the typing for `GrpcResult` that allowed you to set a value to `null` without specifying a nullable type.
 * Fixed errors in the decoding fromm protobuf of optional reference mRIDs that were not assigned.
+* Corrected string conversion of `ServiceDifferences` with `NameType` differences.
 
 ##### Notes
 

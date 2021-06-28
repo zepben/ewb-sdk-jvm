@@ -8,11 +8,14 @@
 package com.zepben.evolve.services.common
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 
 class ServiceDifferences internal constructor(
-    private val sourceLookup: (mRID: String) -> IdentifiedObject?,
-    private val targetLookup: (mRID: String) -> IdentifiedObject?
+    private val sourceObjLookup: (mRID: String) -> IdentifiedObject?,
+    private val targetObjLookup: (mRID: String) -> IdentifiedObject?,
+    private val sourceNameTypeLookup: (mRID: String) -> NameType?,
+    private val targetNameTypeLookup: (mRID: String) -> NameType?
 ) {
 
     private val missingFromTarget = linkedSetOf<String>()
@@ -37,21 +40,18 @@ class ServiceDifferences internal constructor(
 
     override fun toString(): String {
         val sb = StringBuilder("Missing From Target:")
-        missingFromTarget.forEach { addIndentedLine(sb, sourceLookup(it).toString()) }
+        sb.indentEach(missingFromTarget) { "${sourceObjLookup(it) ?: sourceNameTypeLookup(it) ?: it}" }
 
         sb.append("\nMissing From Source:")
-        missingFromSource.forEach { addIndentedLine(sb, targetLookup(it).toString()) }
+        sb.indentEach(missingFromSource) { "${targetObjLookup(it) ?: targetNameTypeLookup(it) ?: it}" }
 
         sb.append("\nModifications:")
-        modifications.forEach { (k, v) -> addIndentedLine(sb, "$k: $v") }
+        sb.indentEach(modifications.entries) { (k, v) -> "$k: $v" }
 
         return sb.toString()
     }
 
-    companion object {
-        private fun addIndentedLine(sb: StringBuilder, line: String) = sb.append(indentedNewLine).append(line)
-
-        private val indentedNewLine = System.lineSeparator() + "   "
-    }
+    private fun <T> StringBuilder.indentEach(items: Iterable<T>, format: (T) -> String) =
+        items.forEach { append("\n   ").append(format(it)) }
 
 }

@@ -59,7 +59,7 @@ abstract class BaseServiceComparator {
         source: BaseService,
         target: BaseService
     ): ServiceDifferences {
-        val differences = ServiceDifferences({ source[it] }, { target[it] })
+        val differences = ServiceDifferences({ source[it] }, { target[it] }, { source.getNameType(it) }, { target.getNameType(it) })
 
         source.sequenceOf<IdentifiedObject>().forEach { s ->
             val difference = target.get<IdentifiedObject>(s.mRID)?.let { t ->

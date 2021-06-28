@@ -7,10 +7,9 @@
  */
 package com.zepben.evolve.services.common
 
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.cim.iec61970.base.wires.Recloser
-import com.zepben.evolve.services.network.testdata.DifferenceNetworks.createSourceNetwork
-import com.zepben.evolve.services.network.testdata.DifferenceNetworks.createTargetNetwork
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -25,29 +24,50 @@ class ServiceDifferencesTest {
 
     @Test
     fun accessors() {
-        val source = createSourceNetwork()
-        val target = createTargetNetwork()
-        val differences = ServiceDifferences({ source[it] }) { target[it] }
+        val s1 = Junction("s1").apply { name = "source-object-1" }
+        val t1 = Junction("t1").apply { name = "target-object-1" }
+        val s2 = NameType("s2").apply { description = "source-name-type-2" }
+        val t2 = NameType("t2").apply { description = "target-name-type-2" }
+        val modification1 = ObjectDifference(Junction("1"), Junction("1")).apply { differences["value"] = ValueDifference(1, 2) }
+        val modification2 = ObjectDifference(Recloser("1"), Recloser("1")).apply { differences["collection"] = IndexedDifference(1, ValueDifference("a", "b")) }
 
-        val modification6 = ObjectDifference(Junction("1"), Junction("1"))
-        modification6.differences["value"] = ValueDifference(1, 2)
+        val differences = ServiceDifferences(
+            { if (it == "s1") s1 else null },
+            { if (it == "t1") t1 else null },
+            { if (it == "s2") s2 else null },
+            { if (it == "t2") t2 else null }
+        )
 
-        val modification7 = ObjectDifference(Recloser("1"), Recloser("1"))
-        modification7.differences["collection"] = IndexedDifference(1, ValueDifference("a", "b"))
+        differences.addToMissingFromTarget("s1")
+        differences.addToMissingFromTarget("s2")
+        differences.addToMissingFromTarget("s3")
+        differences.addToMissingFromSource("t1")
+        differences.addToMissingFromSource("t2")
+        differences.addToMissingFromSource("t3")
+        differences.addModifications("m1", modification1)
+        differences.addModifications("m2", modification2)
 
-        differences.addToMissingFromTarget("1")
-        differences.addToMissingFromTarget("2")
-        differences.addToMissingFromTarget("3")
-        differences.addToMissingFromSource("4")
-        differences.addToMissingFromSource("5")
-        differences.addModifications("6", modification6)
-        differences.addModifications("7", modification7)
+        assertThat(differences.missingFromTarget(), contains("s1", "s2", "s3"))
+        assertThat(differences.missingFromSource(), contains("t1", "t2", "t3"))
+        assertThat(differences.modifications(), hasEntry("m1", modification1))
+        assertThat(differences.modifications(), hasEntry("m2", modification2))
 
-        assertThat(differences.missingFromTarget(), contains("1", "2", "3"))
-        assertThat(differences.missingFromSource(), contains("4", "5"))
-        assertThat(differences.modifications(), hasEntry("6", modification6))
-        assertThat(differences.modifications(), hasEntry("7", modification7))
-        assertThat(differences.toString(), not(emptyString()))
+        val expectedMessage =
+            """
+            Missing From Target:
+               $s1
+               $s2
+               s3
+            Missing From Source:
+               $t1
+               $t2
+               t3
+            Modifications:
+               m1: $modification1
+               m2: $modification2
+            """.trimIndent()
+
+        assertThat(differences.toString(), equalTo(expectedMessage))
     }
 
 }

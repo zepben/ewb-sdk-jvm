@@ -12,7 +12,7 @@ package com.zepben.evolve.cim.iec61970.base.core
  * relationships. For inter-object relationships instead use the object identification 'mRID'.
  *
  * @property name Any free text that name the object.
- * @property type [NameType] for the object
- * @property identifiedObject [IdentifiedObject] for the object
+ * @property type Type of this name.
+ * @property identifiedObject Identified object that this name designates.
  */
 data class Name(val name: String, val type: NameType, val identifiedObject: IdentifiedObject)

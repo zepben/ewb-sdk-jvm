@@ -19,6 +19,7 @@ import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramStyle as PBDia
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.OrientationKind as PBOrientationKind
 
 /************ IEC61970 DIAGRAM LAYOUT ************/
+
 fun toPb(cim: Diagram, pb: PBDiagram.Builder): PBDiagram.Builder =
     pb.apply {
         clearDiagramObjectMRIDs()
@@ -45,14 +46,15 @@ fun toPb(cim: DiagramObjectPoint, pb: PBDiagramObjectPoint.Builder): PBDiagramOb
         yPosition = cim.yPosition
     }
 
-/************ Extension ************/
-
 fun Diagram.toPb(): PBDiagram = toPb(this, PBDiagram.newBuilder()).build()
 fun DiagramObject.toPb(): PBDiagramObject = toPb(this, PBDiagramObject.newBuilder()).build()
 
 /************ Class for Java friendly usage ************/
 
 class DiagramCimToProto : BaseCimToProto() {
+
+    // IEC61970 DIAGRAM LAYOUT
     fun toPb(cim: Diagram): PBDiagram = cim.toPb()
     fun toPb(cim: DiagramObject): PBDiagramObject = cim.toPb()
+
 }

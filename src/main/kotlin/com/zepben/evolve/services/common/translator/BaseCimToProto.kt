@@ -21,6 +21,7 @@ import com.zepben.protobuf.cim.iec61970.base.core.Name as PBName
 import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 
 /************ IEC61968 COMMON ************/
+
 fun toPb(cim: Document, pb: PBDocument.Builder): PBDocument.Builder =
     pb.apply {
         title = cim.title
@@ -41,11 +42,17 @@ fun toPb(cim: OrganisationRole, pb: PBOrganisationRole.Builder): PBOrganisationR
         toPb(cim, ioBuilder)
     }
 
+fun Organisation.toPb(): PBOrganisation = toPb(this, PBOrganisation.newBuilder()).build()
+
 /************ IEC61970 CORE ************/
-fun toPb(cim: NameType, pb: PBNameType.Builder): PBNameType.Builder =
+
+fun toPb(cim: IdentifiedObject, pb: PBIdentifiedObject.Builder): PBIdentifiedObject.Builder =
     pb.apply {
+        pb.mrid = cim.mRID
         pb.name = cim.name
         pb.description = cim.description
+        pb.numDiagramObjects = cim.numDiagramObjects
+        cim.names.forEach { name -> addNamesBuilder().also { toPb(name, it) } }
     }
 
 fun toPb(cim: Name, pb: PBName.Builder): PBName.Builder =
@@ -54,27 +61,22 @@ fun toPb(cim: Name, pb: PBName.Builder): PBName.Builder =
         pb.type = cim.type.name
     }
 
-fun toPb(cim: IdentifiedObject, pb: PBIdentifiedObject.Builder): PBIdentifiedObject.Builder =
+fun toPb(cim: NameType, pb: PBNameType.Builder): PBNameType.Builder =
     pb.apply {
-        pb.mrid = cim.mRID
         pb.name = cim.name
         pb.description = cim.description
-        pb.numDiagramObjects = cim.numDiagramObjects
-        cim.names.forEach { name -> addNamesBuilder().apply { toPb(name, this) } }
     }
 
-/************ Extensions ************/
-
-fun Organisation.toPb(): PBOrganisation = toPb(this, PBOrganisation.newBuilder()).build()
 fun NameType.toPb(): PBNameType = toPb(this, PBNameType.newBuilder()).build()
-fun Name.toPb(): PBName = toPb(this, PBName.newBuilder()).build()
 
 /************ Class for Java friendly usage ************/
 
 abstract class BaseCimToProto {
 
+    // IEC61968 COMMON
     fun toPb(organisation: Organisation): PBOrganisation = organisation.toPb()
+
+    // IEC61970 CORE
     fun toPb(nameType: NameType): PBNameType = nameType.toPb()
-    fun toPb(name: Name): PBName = name.toPb()
 
 }

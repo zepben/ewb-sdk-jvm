@@ -9,13 +9,16 @@
 package com.zepben.evolve.services.diagram.translator
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
+import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.diagram.DiagramServiceComparator
 import com.zepben.evolve.services.diagram.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.anEmptyMap
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -34,6 +37,35 @@ internal class DiagramTranslatorTest {
         /************ IEC61970 BASE DIAGRAM LAYOUT ************/
         validate({ Diagram() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
         validate({ DiagramObject() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
+    }
+
+    //
+    // NOTE: NameType is not sent via any grpc messages at this stage, so test it separately
+    //
+
+    @Test
+    internal fun createsNewNameType() {
+        val pb = NameType("nt1 name").apply {
+            description = "nt1 desc"
+        }.toPb()
+
+        val cim = DiagramService().addFromPb(pb)
+
+        assertThat(cim.name, Matchers.equalTo(pb.name))
+        assertThat(cim.description, Matchers.equalTo(pb.description))
+    }
+
+    @Test
+    internal fun updatesExistingNameType() {
+        val pb = NameType("nt1 name").apply {
+            description = "nt1 desc"
+        }.toPb()
+
+        val nt = NameType("nt1 name")
+        val cim = DiagramService().apply { addNameType(nt) }.addFromPb(pb)
+
+        assertThat(cim, Matchers.sameInstance(nt))
+        assertThat(cim.description, Matchers.equalTo(pb.description))
     }
 
     private inline fun <reified T : IdentifiedObject> validate(creator: () -> T, filler: (DiagramService, T) -> Unit, adder: (DiagramService, T) -> T?) {

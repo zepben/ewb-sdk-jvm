@@ -69,6 +69,7 @@ import com.zepben.protobuf.cim.iec61970.base.core.Equipment as PBEquipment
 import com.zepben.protobuf.cim.iec61970.base.core.EquipmentContainer as PBEquipmentContainer
 import com.zepben.protobuf.cim.iec61970.base.core.Feeder as PBFeeder
 import com.zepben.protobuf.cim.iec61970.base.core.GeographicalRegion as PBGeographicalRegion
+import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 import com.zepben.protobuf.cim.iec61970.base.core.PowerSystemResource as PBPowerSystemResource
 import com.zepben.protobuf.cim.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.iec61970.base.core.SubGeographicalRegion as PBSubGeographicalRegion
@@ -224,6 +225,15 @@ fun toCim(pb: PBWireInfo, cim: WireInfo, networkService: NetworkService): WireIn
         toCim(pb.ai, this, networkService)
     }
 
+fun NetworkService.addFromPb(pb: PBCableInfo): CableInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBNoLoadTest): NoLoadTest? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBOpenCircuitTest): OpenCircuitTest? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBOverheadWireInfo): OverheadWireInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPowerTransformerInfo): PowerTransformerInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBShortCircuitTest): ShortCircuitTest? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = tryAddOrNull(toCim(pb, this))
+
 /************ IEC61968 ASSETS ************/
 
 fun toCim(pb: PBAsset, cim: Asset, networkService: NetworkService): Asset =
@@ -269,6 +279,10 @@ fun toCim(pb: PBStreetlight, networkService: NetworkService): Streetlight =
 fun toCim(pb: PBStructure, cim: Structure, networkService: NetworkService): Structure =
     cim.apply { toCim(pb.ac, this, networkService) }
 
+fun NetworkService.addFromPb(pb: PBAssetOwner): AssetOwner? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPole): Pole? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBStreetlight): Streetlight? = tryAddOrNull(toCim(pb, this))
+
 /************ IEC61968 COMMON ************/
 
 fun toCim(pb: PBLocation, networkService: NetworkService): Location =
@@ -286,6 +300,9 @@ fun toCim(pb: PBStreetAddress): StreetAddress =
 
 fun toCim(pb: PBTownDetail): TownDetail =
     TownDetail(pb.name.internEmpty(), pb.stateOrProvince.internEmpty())
+
+fun NetworkService.addFromPb(pb: PBOrganisation): Organisation? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb, this))
 
 /************ IEC61968 METERING ************/
 
@@ -319,12 +336,17 @@ fun toCim(pb: PBUsagePoint, networkService: NetworkService): UsagePoint =
         toCim(pb.io, this, networkService)
     }
 
+fun NetworkService.addFromPb(pb: PBMeter): Meter? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBUsagePoint): UsagePoint? = tryAddOrNull(toCim(pb, this))
+
 /************ IEC61968 OPERATIONS ************/
 
 fun toCim(pb: PBOperationalRestriction, networkService: NetworkService): OperationalRestriction =
     OperationalRestriction(pb.mRID()).apply {
         toCim(pb.doc, this, networkService)
     }
+
+fun NetworkService.addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = tryAddOrNull(toCim(pb, this))
 
 /************ IEC61970 AUXILIARY EQUIPMENT ************/
 
@@ -338,6 +360,8 @@ fun toCim(pb: PBFaultIndicator, networkService: NetworkService): FaultIndicator 
     FaultIndicator(pb.mRID()).apply {
         toCim(pb.ae, this, networkService)
     }
+
+fun NetworkService.addFromPb(pb: PBFaultIndicator): FaultIndicator? = tryAddOrNull(toCim(pb, this))
 
 /************ IEC61970 CORE ************/
 
@@ -465,6 +489,16 @@ fun toCim(pb: PBTerminal, networkService: NetworkService): Terminal =
         toCim(pb.ad, this, networkService)
     }
 
+fun NetworkService.addFromPb(pb: PBBaseVoltage): BaseVoltage? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBConnectivityNode): ConnectivityNode? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBFeeder): Feeder? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBGeographicalRegion): GeographicalRegion? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBNameType): NameType = toCim(pb, this) // Special case
+fun NetworkService.addFromPb(pb: PBSite): Site? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBSubGeographicalRegion): SubGeographicalRegion? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBSubstation): Substation? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBTerminal): Terminal? = tryAddOrNull(toCim(pb, this))
+
 /************ IEC61970 MEAS ************/
 
 fun toCim(pb: PBControl, networkService: NetworkService): Control =
@@ -504,6 +538,11 @@ fun toCim(pb: PBDiscrete, networkService: NetworkService): Discrete =
         toCim(pb.measurement, this, networkService)
     }
 
+fun NetworkService.addFromPb(pb: PBControl): Control? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBAnalog): Analog? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBAccumulator): Accumulator? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBDiscrete): Discrete? = tryAddOrNull(toCim(pb, this))
+
 /************ IEC61970 SCADA ************/
 
 fun toCim(pb: PBRemoteControl, networkService: NetworkService): RemoteControl =
@@ -521,7 +560,10 @@ fun toCim(pb: PBRemoteSource, networkService: NetworkService): RemoteSource =
         toCim(pb.rp, this, networkService)
     }
 
-/************ IEC61970 WIRES ************/
+fun NetworkService.addFromPb(pb: PBRemoteControl): RemoteControl? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBRemoteSource): RemoteSource? = tryAddOrNull(toCim(pb, this))
+
+/************ IEC61970 WIRES GENERATION PRODUCTION ************/
 
 fun toCim(pb: PBPowerElectronicsUnit, cim: PowerElectronicsUnit, networkService: NetworkService): PowerElectronicsUnit =
     cim.apply {
@@ -548,6 +590,12 @@ fun toCim(pb: PBPowerElectronicsWindUnit, networkService: NetworkService): Power
     PowerElectronicsWindUnit(pb.mRID()).apply {
         toCim(pb.peu, this, networkService)
     }
+
+fun NetworkService.addFromPb(pb: PBBatteryUnit): BatteryUnit? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPhotoVoltaicUnit): PhotoVoltaicUnit? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = tryAddOrNull(toCim(pb, this))
+
+/************ IEC61970 WIRES ************/
 
 fun toCim(pb: PBAcLineSegment, networkService: NetworkService): AcLineSegment =
     AcLineSegment(pb.mRID()).apply {
@@ -819,6 +867,28 @@ fun toCim(pb: PBTransformerStarImpedance, networkService: NetworkService): Trans
         toCim(pb.io, this, networkService)
     }
 
+fun NetworkService.addFromPb(pb: PBAcLineSegment): AcLineSegment? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBBreaker): Breaker? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBBusbarSection): BusbarSection? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBDisconnector): Disconnector? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBEnergyConsumer): EnergyConsumer? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBEnergyConsumerPhase): EnergyConsumerPhase? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBEnergySource): EnergySource? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBEnergySourcePhase): EnergySourcePhase? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBFuse): Fuse? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBJumper): Jumper? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBJunction): Junction? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensator? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBLoadBreakSwitch): LoadBreakSwitch? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPerLengthSequenceImpedance): PerLengthSequenceImpedance? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPowerElectronicsConnection): PowerElectronicsConnection? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPowerElectronicsConnectionPhase): PowerElectronicsConnectionPhase? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPowerTransformer): PowerTransformer? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBRecloser): Recloser? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = tryAddOrNull(toCim(pb, this))
+
 /************ IEC61970 InfIEC61970 Feeder ************/
 
 fun toCim(pb: PBCircuit, networkService: NetworkService): Circuit =
@@ -849,126 +919,93 @@ fun toCim(pb: PBLoop, networkService: NetworkService): Loop =
         toCim(pb.io, this, networkService)
     }
 
-/************ Extensions ************/
-
-fun NetworkService.addFromPb(pb: PBOrganisation): Organisation? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBCableInfo): CableInfo? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBOverheadWireInfo): OverheadWireInfo? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBPowerTransformerInfo): PowerTransformerInfo? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBMeter): Meter? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBAssetOwner): AssetOwner? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBPole): Pole? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBStreetlight): Streetlight? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBUsagePoint): UsagePoint? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBConnectivityNode): ConnectivityNode? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBBaseVoltage): BaseVoltage? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBJunction): Junction? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBAcLineSegment): AcLineSegment? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensator? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBEnergyConsumer): EnergyConsumer? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBEnergySource): EnergySource? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBPowerTransformer): PowerTransformer? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBDisconnector): Disconnector? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBFuse): Fuse? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBJumper): Jumper? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBRecloser): Recloser? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBBreaker): Breaker? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBLoadBreakSwitch): LoadBreakSwitch? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBBusbarSection): BusbarSection? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBFaultIndicator): FaultIndicator? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBFeeder): Feeder? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBSite): Site? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBSubstation): Substation? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBEnergySourcePhase): EnergySourcePhase? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBEnergyConsumerPhase): EnergyConsumerPhase? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBGeographicalRegion): GeographicalRegion? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBSubGeographicalRegion): SubGeographicalRegion? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBTerminal): Terminal? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBPerLengthSequenceImpedance): PerLengthSequenceImpedance? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBCircuit): Circuit? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLoop): Loop? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBControl): Control? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBAnalog): Analog? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBAccumulator): Accumulator? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBDiscrete): Discrete? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBRemoteControl): RemoteControl? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBRemoteSource): RemoteSource? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBBatteryUnit): BatteryUnit? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBPhotoVoltaicUnit): PhotoVoltaicUnit? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBPowerElectronicsConnection): PowerElectronicsConnection? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBPowerElectronicsConnectionPhase): PowerElectronicsConnectionPhase? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBNoLoadTest): NoLoadTest? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBOpenCircuitTest): OpenCircuitTest? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBShortCircuitTest): ShortCircuitTest? = tryAddOrNull(toCim(pb, this))
 
 /************ Class for Java friendly usage ************/
 
-class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim(networkService) {
+class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
 
-    fun addFromPb(pb: PBOrganisation): Organisation? = networkService.addFromPb(pb)
+    // IEC61968 ASSET INFO
     fun addFromPb(pb: PBCableInfo): CableInfo? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBNoLoadTest): NoLoadTest? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBOpenCircuitTest): OpenCircuitTest? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBOverheadWireInfo): OverheadWireInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerTransformerInfo): PowerTransformerInfo? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBMeter): Meter? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBShortCircuitTest): ShortCircuitTest? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = networkService.addFromPb(pb)
+
+    // IEC61968 ASSETS
     fun addFromPb(pb: PBAssetOwner): AssetOwner? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPole): Pole? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBStreetlight): Streetlight? = networkService.addFromPb(pb)
+
+    // IEC61968 COMMON
+    fun addFromPb(pb: PBOrganisation): Organisation? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBLocation): Location? = networkService.addFromPb(pb)
+
+    // IEC61968 METERING
+    fun addFromPb(pb: PBMeter): Meter? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBUsagePoint): UsagePoint? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBConnectivityNode): ConnectivityNode? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBBaseVoltage): BaseVoltage? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBJunction): Junction? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBAcLineSegment): AcLineSegment? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensator? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBEnergyConsumer): EnergyConsumer? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBEnergySource): EnergySource? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBPowerTransformer): PowerTransformer? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBDisconnector): Disconnector? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBFuse): Fuse? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBJumper): Jumper? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBRecloser): Recloser? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBBreaker): Breaker? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBLoadBreakSwitch): LoadBreakSwitch? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBBusbarSection): BusbarSection? = networkService.addFromPb(pb)
+
+    // IEC61968 OPERATIONS
+    fun addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = networkService.addFromPb(pb)
+
+    // IEC61970 AUXILIARY EQUIPMENT
     fun addFromPb(pb: PBFaultIndicator): FaultIndicator? = networkService.addFromPb(pb)
+
+    // IEC61970 CORE
+    fun addFromPb(pb: PBBaseVoltage): BaseVoltage? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBConnectivityNode): ConnectivityNode? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBFeeder): Feeder? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBSite): Site? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBSubstation): Substation? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBEnergySourcePhase): EnergySourcePhase? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBEnergyConsumerPhase): EnergyConsumerPhase? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBGeographicalRegion): GeographicalRegion? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBNameType): NameType = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBSite): Site? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBSubGeographicalRegion): SubGeographicalRegion? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBSubstation): Substation? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTerminal): Terminal? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBPerLengthSequenceImpedance): PerLengthSequenceImpedance? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBCircuit): Circuit? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBLoop): Loop? = networkService.addFromPb(pb)
+
+    // IEC61970 MEAS
     fun addFromPb(pb: PBControl): Control? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBAnalog): Analog? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBAccumulator): Accumulator? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBDiscrete): Discrete? = networkService.addFromPb(pb)
+
+    // IEC61970 SCADA
     fun addFromPb(pb: PBRemoteControl): RemoteControl? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRemoteSource): RemoteSource? = networkService.addFromPb(pb)
+
+    // IEC61970 WIRES GENERATION PRODUCTION
     fun addFromPb(pb: PBBatteryUnit): BatteryUnit? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPhotoVoltaicUnit): PhotoVoltaicUnit? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = networkService.addFromPb(pb)
+
+    // IEC61970 WIRES
+    fun addFromPb(pb: PBAcLineSegment): AcLineSegment? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBBreaker): Breaker? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBBusbarSection): BusbarSection? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBDisconnector): Disconnector? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBEnergyConsumer): EnergyConsumer? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBEnergyConsumerPhase): EnergyConsumerPhase? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBEnergySource): EnergySource? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBEnergySourcePhase): EnergySourcePhase? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBFuse): Fuse? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBJumper): Jumper? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBJunction): Junction? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensator? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBLoadBreakSwitch): LoadBreakSwitch? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPerLengthSequenceImpedance): PerLengthSequenceImpedance? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerElectronicsConnection): PowerElectronicsConnection? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerElectronicsConnectionPhase): PowerElectronicsConnectionPhase? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPowerTransformer): PowerTransformer? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBRecloser): Recloser? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBNoLoadTest): NoLoadTest? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBOpenCircuitTest): OpenCircuitTest? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBShortCircuitTest): ShortCircuitTest? = networkService.addFromPb(pb)
+
+    // IEC61970 InfIEC61970 Feeder
+    fun addFromPb(pb: PBCircuit): Circuit? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBLoop): Loop? = networkService.addFromPb(pb)
 
 }

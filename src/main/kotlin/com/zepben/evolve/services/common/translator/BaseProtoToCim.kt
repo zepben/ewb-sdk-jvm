@@ -23,7 +23,12 @@ import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject as PBIdentifi
 import com.zepben.protobuf.cim.iec61970.base.core.Name as PBName
 import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 
+//
+// NOTE: Do not add base level extensions here, add them to the overriding services directly otherwise you will have import issues.
+//
+
 /************ IEC61968 COMMON ************/
+
 fun toCim(pb: PBDocument, cim: Document, baseService: BaseService): Document =
     cim.apply {
         title = pb.title.internEmpty()
@@ -47,6 +52,7 @@ fun toCim(pb: PBOrganisationRole, cim: OrganisationRole, baseService: BaseServic
     }
 
 /************ IEC61970 CORE ************/
+
 @Suppress("UNUSED_PARAMETER")
 fun toCim(pb: PBIdentifiedObject, cim: IdentifiedObject, baseService: BaseService): IdentifiedObject =
     cim.apply {
@@ -56,16 +62,16 @@ fun toCim(pb: PBIdentifiedObject, cim: IdentifiedObject, baseService: BaseServic
         pb.namesList.forEach { addName(toCim(it, this, baseService)) }
     }
 
-fun toCim(pb: PBNameType): NameType =
-    NameType(pb.name).apply {
-        description = pb.description
-    }
-
-fun toCim(pb: PBName, cim: IdentifiedObject, baseService: BaseService): Name {
+fun toCim(pb: PBName, io: IdentifiedObject, baseService: BaseService): Name {
     val nameType = baseService.getNameType(pb.type) ?: NameType(pb.type).also { baseService.addNameType(it) }
-    return nameType.getOrAddName(pb.name, cim)
+    return nameType.getOrAddName(pb.name, io)
 }
 
-/************ Class for Java friendly usage ************/
+//
+// NOTE: We always update the description in case the name type was created from the name embedded in an IdentifiedObject.
+//
+fun toCim(pb: PBNameType, baseService: BaseService): NameType =
+    (baseService.getNameType(pb.name) ?: NameType(pb.name).also { baseService.addNameType(it) })
+        .apply { description = pb.description }
 
-abstract class BaseProtoToCim(private val baseService: BaseService)
+abstract class BaseProtoToCim

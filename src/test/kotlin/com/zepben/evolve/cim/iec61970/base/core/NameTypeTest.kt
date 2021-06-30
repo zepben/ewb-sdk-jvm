@@ -11,10 +11,8 @@ package com.zepben.evolve.cim.iec61970.base.core
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.Matchers.empty
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -26,101 +24,136 @@ internal class NameTypeTest {
 
     @Test
     fun constructorCoverage() {
-        assertThat(NameType("type").name, equalTo("type"))
+        assertThat(NameType("nt").name, equalTo("nt"))
     }
 
     @Test
-    fun nameAndDescription() {
-        val nameType = NameType("type")
+    fun accessors() {
+        val nt = NameType("nt")
+        assertThat(nt.description, equalTo(""))
 
-        assertThat(nameType.name, equalTo("type"))
-        assertThat(nameType.description, equalTo(""))
-
-        nameType.name = "name"
-        nameType.description = "description"
-
-        assertThat(nameType.name, equalTo("name"))
-        assertThat(nameType.description, equalTo("description"))
+        nt.description = "description"
+        assertThat(nt.description, equalTo("description"))
     }
 
     @Test
-    fun getsAddsNames() {
-        val nameType = NameType("type")
-        val idObj1 = Junction()
-        val name1 = nameType.getOrAddName("name1", idObj1)
-        assertThat(name1, sameInstance(nameType.getOrAddName("name1", idObj1)))
-        assertThat(nameType.hasName("name1"), equalTo(true))
+    fun getOrAddNames() {
+        val nt = NameType("nt")
+
+        val j1 = Junction()
+        val j2 = Junction()
+        val j3 = Junction()
+
+        val n1a = nt.getOrAddName("n1", j1)
+        val n1b = nt.getOrAddName("n1", j2)
+        val n1c = nt.getOrAddName("n1", j3)
+        val n2 = nt.getOrAddName("n2", j2)
+
+        assertThat(nt.hasName("n1"), equalTo(true))
+        assertThat(nt.hasName("n2"), equalTo(true))
+        assertThat(n1a, not(sameInstance(n1b)))
+        assertThat(n1a, not(sameInstance(n1c)))
+        assertThat(n1b, not(sameInstance(n1c)))
+
+        // test returns same instance if added again
+        assertThat(n1a, sameInstance(nt.getOrAddName("n1", j1)))
+        assertThat(n1b, sameInstance(nt.getOrAddName("n1", j2)))
+        assertThat(n1c, sameInstance(nt.getOrAddName("n1", j3)))
+        assertThat(n2, sameInstance(nt.getOrAddName("n2", j2)))
     }
 
     @Test
-    fun getNamesReturnsAllInstances() {
-        val nameType = NameType("type")
-        val idObj1 = Junction()
-        val idObj2 = Junction()
-        val idObj3 = Junction()
-        val name1 = nameType.getOrAddName("name1", idObj1)
-        val name2 = nameType.getOrAddName("name1", idObj2)
-        val name3 = nameType.getOrAddName("name1", idObj3)
-        val names = nameType.getNames("name1")
-        assertThat(names, containsInAnyOrder(name1, name2, name3))
+    fun names() {
+        val nt = NameType("nt")
+
+        val j1 = Junction()
+        val j2 = Junction()
+
+        val n1a = nt.getOrAddName("n1", j1)
+        val n1b = nt.getOrAddName("n1", j2)
+        val n2 = nt.getOrAddName("n2", j2)
+
+        assertThat(nt.names.toList(), containsInAnyOrder(n1a, n1b, n2))
     }
 
     @Test
-    fun returnsAllNames() {
-        val nameType = NameType("type")
-        val idObj1 = Junction()
-        val idObj2 = Junction()
-        val name1 = nameType.getOrAddName("name1", idObj1)
-        val name2 = nameType.getOrAddName("name1", idObj2)
-        val name3 = nameType.getOrAddName("name2", idObj2)
-        val names = nameType.names.toList()
-        assertThat(names, containsInAnyOrder(name1, name2, name3))
+    fun getNames() {
+        val nt = NameType("nt")
+
+        val j1 = Junction()
+        val j2 = Junction()
+
+        val n1a = nt.getOrAddName("n1", j1)
+        val n1b = nt.getOrAddName("n1", j2)
+        val n2 = nt.getOrAddName("n2", j2)
+
+        assertThat(nt.getNames("n1"), containsInAnyOrder(n1a, n1b))
+        assertThat(nt.getNames("n2"), containsInAnyOrder(n2))
+        assertThat(nt.getNames("n3"), empty())
     }
 
     @Test
     fun removesNames() {
-        val nameType = NameType("type")
-        val idObj1 = Junction()
-        val idObj2 = Junction()
-        val name1a = nameType.getOrAddName("name1", idObj1)
-        val name1b = nameType.getOrAddName("name1", idObj2)
-        val name2 = nameType.getOrAddName("name2", idObj2)
-        assertThat(nameType.getNames("name1"), containsInAnyOrder(name1a, name1b))
-        assertThat(nameType.getNames("name2"), containsInAnyOrder(name2))
+        val nt = NameType("nt")
 
-        assertThat(nameType.removeName(name1b), equalTo(true))
-        assertThat(nameType.getNames("name1"), containsInAnyOrder(name1a))
-        assertThat(nameType.getNames("name2"), containsInAnyOrder(name2))
+        val j1 = Junction()
+        val j2 = Junction()
 
-        assertThat(nameType.removeName(name1a), equalTo(true))
-        assertThat(nameType.getNames("name1"), empty())
-        assertThat(nameType.getNames("name2"), containsInAnyOrder(name2))
+        val n1a = nt.getOrAddName("n1", j1)
+        val n1b = nt.getOrAddName("n1", j2)
+        val n2 = nt.getOrAddName("n2", j2)
+
+        assertThat(nt.names.toList(), containsInAnyOrder(n1a, n1b, n2))
+
+        assertThat(nt.removeNames("n1"), equalTo(true))
+        assertThat(nt.names.toList(), containsInAnyOrder(n2))
+
+        assertThat(nt.removeNames("n2"), equalTo(true))
+        assertThat(nt.names.toList(), empty())
+
+        assertThat(nt.removeNames("n1"), equalTo(false))
     }
 
     @Test
-    internal fun removesNameInstance() {
-        val nameType = NameType("type")
-        val idObj1 = Junction()
-        val idObj2 = Junction()
-        val name1a = nameType.getOrAddName("name1", idObj1)
-        val name1b = nameType.getOrAddName("name1", idObj2)
-        assertThat(nameType.getNames("name1"), containsInAnyOrder(name1a, name1b))
+    fun removeName() {
+        val nt = NameType("nt")
 
-        assertThat(nameType.removeName(name1a), equalTo(true))
-        assertThat(nameType.getNames("name1"), containsInAnyOrder(name1b))
+        val j1 = Junction()
+        val j2 = Junction()
+
+        val n1a = nt.getOrAddName("n1", j1)
+        val n1b = nt.getOrAddName("n1", j2)
+        val n2 = nt.getOrAddName("n2", j2)
+        val n3 = Name("n3", NameType("other"), Junction())
+
+        assertThat(nt.names.toList(), containsInAnyOrder(n1a, n1b, n2))
+
+        assertThat(nt.removeName(n1b), equalTo(true))
+        assertThat(nt.names.toList(), containsInAnyOrder(n1a, n2))
+
+        assertThat(nt.removeName(n1a), equalTo(true))
+        assertThat(nt.names.toList(), containsInAnyOrder(n2))
+
+        assertThat(nt.removeName(n2), equalTo(true))
+        assertThat(nt.names.toList(), empty())
+
+        assertThat(nt.removeName(n1a), equalTo(false))
+        assertThat(nt.removeName(n3), equalTo(false))
     }
 
     @Test
-    fun clearsNames() {
-        val nameType = NameType("type")
-        val idObj1 = Junction()
-        val idObj2 = Junction()
-        val name1 = nameType.getOrAddName("name1", idObj1)
-        val name2 = nameType.getOrAddName("name2", idObj2)
-        assertThat(nameType.getNames("name1"), containsInAnyOrder(name1))
-        assertThat(nameType.getNames("name2"), containsInAnyOrder(name2))
+    fun clearNames() {
+        val nt = NameType("nt")
 
-        nameType.clearNames()
-        assertThat(nameType.names.toList(), empty())
+        val j1 = Junction()
+
+        val n1 = nt.getOrAddName("n1", j1)
+        val n2 = nt.getOrAddName("n2", j1)
+
+        assertThat(nt.names.toList(), containsInAnyOrder(n1, n2))
+
+        nt.clearNames()
+        assertThat(nt.names.toList(), empty())
     }
+
 }

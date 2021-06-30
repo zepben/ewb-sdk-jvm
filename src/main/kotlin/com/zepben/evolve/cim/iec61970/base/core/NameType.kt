@@ -20,7 +20,7 @@ import com.zepben.evolve.services.common.extensions.asUnmodifiable
  * @property name Name of the name type.
  * @property description Description of the name type.
  */
-class NameType(var name: String) {
+class NameType(val name: String) {
 
     private var namesIndex: MutableMap<String, Name> = mutableMapOf()
     private var namesMultiIndex: MutableMap<String, MutableList<Name>> = mutableMapOf()
@@ -28,7 +28,7 @@ class NameType(var name: String) {
     var description: String = ""
 
     /**
-     * The names for this name type.
+     * All names of this type.
      */
     val names: Sequence<Name> get() = namesMultiIndex.values.asSequence().flatten() + namesIndex.values.asSequence()
 

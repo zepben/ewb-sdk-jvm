@@ -37,7 +37,7 @@ import com.zepben.evolve.services.network.NetworkServiceComparator
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.anEmptyMap
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.fail
@@ -144,6 +144,35 @@ internal class NetworkTranslatorTest {
         /************ IEC61970 InfIEC61970 ************/
         validate({ Circuit() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
         validate({ Loop() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
+    }
+
+    //
+    // NOTE: NameType is not sent via any grpc messages at this stage, so test it separately
+    //
+
+    @Test
+    internal fun createsNewNameType() {
+        val pb = NameType("nt1 name").apply {
+            description = "nt1 desc"
+        }.toPb()
+
+        val cim = NetworkService().addFromPb(pb)
+
+        assertThat(cim.name, equalTo(pb.name))
+        assertThat(cim.description, equalTo(pb.description))
+    }
+
+    @Test
+    internal fun updatesExistingNameType() {
+        val pb = NameType("nt1 name").apply {
+            description = "nt1 desc"
+        }.toPb()
+
+        val nt = NameType("nt1 name")
+        val cim = NetworkService().apply { addNameType(nt) }.addFromPb(pb)
+
+        assertThat(cim, sameInstance(nt))
+        assertThat(cim.description, equalTo(pb.description))
     }
 
     private inline fun <reified T : IdentifiedObject> validate(creator: () -> T, filler: (NetworkService, T) -> Unit, adder: (NetworkService, T) -> T?) {

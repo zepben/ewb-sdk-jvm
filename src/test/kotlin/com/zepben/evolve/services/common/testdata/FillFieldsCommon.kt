@@ -64,12 +64,11 @@ fun IdentifiedObject.fillFieldsCommon(service: BaseService, @Suppress("UNUSED_PA
     numDiagramObjects = 2
 
     for (i in 0..1) {
-        val nameType = service.getNameType("name_type $i") ?: NameType("name_type $i").apply {
-            description = "name_type_${i}_description"
-        }
-        service.addNameType(nameType)
-        val name = nameType.getOrAddName("name_$i", this)
-        addName(name)
+        val nameType = service.getNameType("name_type $i")
+            ?: NameType("name_type $i")
+                .apply { description = "name_type_${i}_description" }
+                .also { service.addNameType(it) }
+        addName(nameType.getOrAddName("name_$i", this))
     }
 
     return this

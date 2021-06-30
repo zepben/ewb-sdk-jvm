@@ -23,10 +23,12 @@ import com.zepben.protobuf.cim.iec61968.customers.PricingStructure as PBPricingS
 import com.zepben.protobuf.cim.iec61968.customers.Tariff as PBTariff
 
 /************ IEC61968 COMMON ************/
+
 fun toPb(cim: Agreement, pb: PBAgreement.Builder): PBAgreement.Builder =
     pb.apply { toPb(cim, docBuilder) }
 
 /************ IEC61968 CUSTOMERS ************/
+
 fun toPb(cim: Customer, pb: PBCustomer.Builder): PBCustomer.Builder =
     pb.apply {
         kind = PBCustomerKind.valueOf(cim.kind.name)
@@ -54,8 +56,6 @@ fun toPb(cim: PricingStructure, pb: PBPricingStructure.Builder): PBPricingStruct
 fun toPb(cim: Tariff, pb: PBTariff.Builder): PBTariff.Builder =
     pb.apply { toPb(cim, docBuilder) }
 
-/************ Extension ************/
-
 fun Customer.toPb(): PBCustomer = toPb(this, PBCustomer.newBuilder()).build()
 fun CustomerAgreement.toPb(): PBCustomerAgreement = toPb(this, PBCustomerAgreement.newBuilder()).build()
 fun PricingStructure.toPb(): PBPricingStructure = toPb(this, PBPricingStructure.newBuilder()).build()
@@ -64,9 +64,12 @@ fun Tariff.toPb(): PBTariff = toPb(this, PBTariff.newBuilder()).build()
 /************ Class for Java friendly usage ************/
 
 class CustomerCimToProto() : BaseCimToProto() {
+
+    // IEC61968 CUSTOMERS
     fun toPb(cim: Customer): PBCustomer = cim.toPb()
     fun toPb(cim: CustomerAgreement): PBCustomerAgreement = cim.toPb()
     fun toPb(cim: PricingStructure): PBPricingStructure = cim.toPb()
     fun toPb(cim: Tariff): PBTariff = cim.toPb()
+
 }
 

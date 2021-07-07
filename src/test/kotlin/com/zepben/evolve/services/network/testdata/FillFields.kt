@@ -18,6 +18,8 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
@@ -513,6 +515,36 @@ fun Terminal.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     return this
 }
 
+/************ IEC61970 BASE EQUIVALENTS ************/
+
+fun EquivalentBranch.fillFields(service: NetworkService, includeRuntime: Boolean = true): EquivalentBranch {
+    (this as EquivalentEquipment).fillFields(service, includeRuntime)
+
+    negativeR12 = 1.1
+    negativeR21 = 2.2
+    negativeX12 = 3.3
+    negativeX21 = 4.4
+    positiveR12 = 5.5
+    positiveR21 = 6.6
+    positiveX12 = 7.7
+    positiveX21 = 8.8
+    r = 9.9
+    r21 = 10.01
+    x = 11.11
+    x21 = 12.21
+    zeroR12 = 13.31
+    zeroR21 = 14.41
+    zeroX12 = 15.51
+    zeroX21 = 16.61
+
+    return this
+}
+
+fun EquivalentEquipment.fillFields(service: NetworkService, includeRuntime: Boolean = true): EquivalentEquipment {
+    (this as ConductingEquipment).fillFields(service, includeRuntime)
+    return this
+}
+
 /************ IEC61970 BASE MEAS ************/
 
 fun Analog.fillFields(service: NetworkService, includeRuntime: Boolean = true): Analog {
@@ -677,6 +709,11 @@ fun Conductor.fillFields(service: NetworkService, includeRuntime: Boolean = true
     length = 1.1
     assetInfo = CableInfo().also { service.add(it) }
 
+    return this
+}
+
+fun Connector.fillFields(service: NetworkService, includeRuntime: Boolean = true): Connector {
+    (this as ConductingEquipment).fillFields(service, includeRuntime)
     return this
 }
 

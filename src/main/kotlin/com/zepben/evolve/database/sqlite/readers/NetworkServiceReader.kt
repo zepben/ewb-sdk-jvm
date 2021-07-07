@@ -22,6 +22,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoin
 import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperationalRestrictions
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAccumulators
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAnalogs
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableControls
@@ -70,6 +71,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableSubstations>("substations", reader::load)
         status = status and loadEach<TableSites>("sites", reader::load)
         status = status and loadEach<TablePerLengthSequenceImpedances>("per length sequence impedances", reader::load)
+        status = status and loadEach<TableEquivalentBranches>("equivalent branches", reader::load)
         status = status and loadEach<TablePowerElectronicsConnection>("power electronics connection", reader::load)
         status = status and loadEach<TablePowerElectronicsConnectionPhases>("power electronics connection phases", reader::load)
         status = status and loadEach<TableBatteryUnit>("battery unit", reader::load)

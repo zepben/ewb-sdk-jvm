@@ -18,11 +18,11 @@ import com.zepben.protobuf.cim.iec61970.base.diagramlayout.Diagram as PBDiagram
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObject as PBDiagramObject
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObjectPoint as PBDiagramObjectPoint
 
-/************ IEC61970 CORE ************/
+/************ IEC61970 BASE CORE ************/
 
 fun DiagramService.addFromPb(pb: PBNameType): NameType = toCim(pb, this)
 
-/************ IEC61970 DIAGRAM LAYOUT ************/
+/************ IEC61970 BASE DIAGRAM LAYOUT ************/
 
 fun toCim(pb: PBDiagram, diagramService: DiagramService): Diagram =
     Diagram(pb.mRID()).apply {

@@ -20,6 +20,8 @@ import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
@@ -47,6 +49,8 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperati
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableAuxiliaryEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
@@ -65,6 +69,7 @@ import java.sql.PreparedStatement
 class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseTables) {
 
     /************ IEC61968 ASSET INFO ************/
+
     fun save(cableInfo: CableInfo): Boolean {
         val table = databaseTables.getTable(TableCableInfo::class.java)
         val insert = databaseTables.getInsert(TableCableInfo::class.java)
@@ -177,6 +182,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61968 ASSETS ************/
+
     private fun saveAsset(table: TableAssets, insert: PreparedStatement, asset: Asset, description: String): Boolean {
         var status = true
 
@@ -234,6 +240,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61968 COMMON ************/
+
     fun save(location: Location): Boolean {
         val table = databaseTables.getTable(TableLocations::class.java)
         val insert = databaseTables.getInsert(TableLocations::class.java)
@@ -304,6 +311,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61968 METERING ************/
+
     private fun saveEndDevice(table: TableEndDevices, insert: PreparedStatement, endDevice: EndDevice, description: String): Boolean {
         insert.setNullableString(table.CUSTOMER_MRID.queryIndex, endDevice.customerMRID)
         insert.setNullableString(table.SERVICE_LOCATION_MRID.queryIndex, endDevice.serviceLocation?.mRID)
@@ -334,6 +342,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61968 OPERATIONS ************/
+
     fun save(operationalRestriction: OperationalRestriction): Boolean {
         val table = databaseTables.getTable(TableOperationalRestrictions::class.java)
         val insert = databaseTables.getInsert(TableOperationalRestrictions::class.java)
@@ -345,6 +354,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61970 AUXILIARY EQUIPMENT ************/
+
     private fun saveAuxiliaryEquipment(
         table: TableAuxiliaryEquipment,
         insert: PreparedStatement,
@@ -364,6 +374,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61970 CORE ************/
+
     private fun saveAcDcTerminal(table: TableAcDcTerminals, insert: PreparedStatement, acDcTerminal: AcDcTerminal, description: String): Boolean {
         return saveIdentifiedObject(table, insert, acDcTerminal, description)
     }
@@ -499,18 +510,40 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61970 WIRES ************/
-    fun savePowerElectronicsUnit(
-        table: TablePowerElectronicsUnit,
-        insert: PreparedStatement,
-        powerElectronicsUnit: PowerElectronicsUnit,
-        description: String
-    ): Boolean {
-        insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex, powerElectronicsUnit.powerElectronicsConnection?.mRID)
-        insert.setNullableInt(table.MAX_P.queryIndex, powerElectronicsUnit.maxP)
-        insert.setNullableInt(table.MIN_P.queryIndex, powerElectronicsUnit.minP)
 
-        return saveEquipment(table, insert, powerElectronicsUnit, description)
+    fun save(equivalentBranch: EquivalentBranch): Boolean {
+        val table = databaseTables.getTable(TableEquivalentBranches::class.java)
+        val insert = databaseTables.getInsert(TableEquivalentBranches::class.java)
+
+        insert.setNullableDouble(table.NEGATIVE_R12.queryIndex, equivalentBranch.negativeR12)
+        insert.setNullableDouble(table.NEGATIVE_R21.queryIndex, equivalentBranch.negativeR21)
+        insert.setNullableDouble(table.NEGATIVE_X12.queryIndex, equivalentBranch.negativeX12)
+        insert.setNullableDouble(table.NEGATIVE_X21.queryIndex, equivalentBranch.negativeX21)
+        insert.setNullableDouble(table.POSITIVE_R12.queryIndex, equivalentBranch.positiveR12)
+        insert.setNullableDouble(table.POSITIVE_R21.queryIndex, equivalentBranch.positiveR21)
+        insert.setNullableDouble(table.POSITIVE_X12.queryIndex, equivalentBranch.positiveX12)
+        insert.setNullableDouble(table.POSITIVE_X21.queryIndex, equivalentBranch.positiveX21)
+        insert.setNullableDouble(table.R.queryIndex, equivalentBranch.r)
+        insert.setNullableDouble(table.R21.queryIndex, equivalentBranch.r21)
+        insert.setNullableDouble(table.X.queryIndex, equivalentBranch.x)
+        insert.setNullableDouble(table.X21.queryIndex, equivalentBranch.x21)
+        insert.setNullableDouble(table.ZERO_R12.queryIndex, equivalentBranch.zeroR12)
+        insert.setNullableDouble(table.ZERO_R21.queryIndex, equivalentBranch.zeroR21)
+        insert.setNullableDouble(table.ZERO_X12.queryIndex, equivalentBranch.zeroX12)
+        insert.setNullableDouble(table.ZERO_X21.queryIndex, equivalentBranch.zeroX21)
+
+        return saveEquivalentEquipment(table, insert, equivalentBranch, "equivalent branch")
     }
+
+    fun saveEquivalentEquipment(
+        table: TableEquivalentEquipment,
+        insert: PreparedStatement,
+        equivalentEquipment: EquivalentEquipment,
+        description: String
+    ): Boolean =
+        saveConductingEquipment(table, insert, equivalentEquipment, description)
+
+    /************ IEC61970 WIRES GENERATION PRODUCTION************/
 
     fun save(batteryUnit: BatteryUnit): Boolean {
         val table = databaseTables.getTable(TableBatteryUnit::class.java)
@@ -530,12 +563,27 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerElectronicsUnit(table, insert, photoVoltaicUnit, "photo voltaic unit")
     }
 
+    fun savePowerElectronicsUnit(
+        table: TablePowerElectronicsUnit,
+        insert: PreparedStatement,
+        powerElectronicsUnit: PowerElectronicsUnit,
+        description: String
+    ): Boolean {
+        insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex, powerElectronicsUnit.powerElectronicsConnection?.mRID)
+        insert.setNullableInt(table.MAX_P.queryIndex, powerElectronicsUnit.maxP)
+        insert.setNullableInt(table.MIN_P.queryIndex, powerElectronicsUnit.minP)
+
+        return saveEquipment(table, insert, powerElectronicsUnit, description)
+    }
+
     fun save(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean {
         val table = databaseTables.getTable(TablePowerElectronicsWindUnit::class.java)
         val insert = databaseTables.getInsert(TablePowerElectronicsWindUnit::class.java)
 
         return savePowerElectronicsUnit(table, insert, powerElectronicsWindUnit, "power electronics wind unit")
     }
+
+    /************ IEC61970 WIRES ************/
 
     fun save(acLineSegment: AcLineSegment): Boolean {
         val table = databaseTables.getTable(TableAcLineSegments::class.java)

@@ -32,6 +32,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjects
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagrams
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAccumulators
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAnalogs
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableControls
@@ -110,6 +111,7 @@ class DatabaseTables {
         TableEquipmentEquipmentContainers(),
         TableEquipmentOperationalRestrictions(),
         TableEquipmentUsagePoints(),
+        TableEquivalentBranches(),
         TableFaultIndicators(),
         TableFeeders(),
         TableFuses(),

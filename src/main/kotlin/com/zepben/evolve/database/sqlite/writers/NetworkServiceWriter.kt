@@ -18,6 +18,7 @@ import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
@@ -63,6 +64,7 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<SubGeographicalRegion>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Substation>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Terminal>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<EquivalentBranch>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<BatteryUnit>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<PhotoVoltaicUnit>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<PowerElectronicsWindUnit>().forEach { status = status and validateSave(it, writer::save) }

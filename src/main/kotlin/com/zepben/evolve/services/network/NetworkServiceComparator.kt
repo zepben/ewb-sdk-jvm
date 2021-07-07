@@ -17,6 +17,8 @@ import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
@@ -43,6 +45,8 @@ import com.zepben.evolve.services.common.ValueDifference
 @Suppress("unused")
 class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()) :
     BaseServiceComparator() {
+
+    /************ IEC61968 ASSET INFO ************/
 
     private fun compareCableInfo(source: CableInfo, target: CableInfo): ObjectDifference<CableInfo> =
         ObjectDifference(source, target).apply { compareWireInfo() }
@@ -145,6 +149,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareValues(WireInfo::ratedCurrent, WireInfo::material)
         }
 
+    /************ IEC61968 ASSETS ************/
+
     private fun ObjectDifference<out Asset>.compareAsset(): ObjectDifference<out Asset> =
         apply {
             compareIdentifiedObject()
@@ -184,6 +190,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareIdReferences(Streetlight::pole)
         }
 
+    /************ IEC61968 COMMON ************/
+
     private fun compareLocation(source: Location, target: Location): ObjectDifference<Location> =
         ObjectDifference(source, target).apply {
             compareIdentifiedObject()
@@ -191,6 +199,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareValues(Location::mainAddress)
             compareIndexedValueCollections(Location::points)
         }
+
+    /************ IEC61968 METERING ************/
 
     private fun ObjectDifference<out EndDevice>.compareEndDevice(): ObjectDifference<out EndDevice> =
         apply {
@@ -218,12 +228,16 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 compareIdReferenceCollections(UsagePoint::endDevices)
         }
 
+    /************ IEC61968 OPERATIONS ************/
+
     private fun compareOperationalRestriction(source: OperationalRestriction, target: OperationalRestriction): ObjectDifference<OperationalRestriction> =
         ObjectDifference(source, target).apply {
             compareDocument()
 
             compareIdReferenceCollections(OperationalRestriction::equipment)
         }
+
+    /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 
     private fun ObjectDifference<out AuxiliaryEquipment>.compareAuxiliaryEquipment(): ObjectDifference<out AuxiliaryEquipment> =
         apply {
@@ -235,6 +249,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
 
     private fun compareFaultIndicator(source: FaultIndicator, target: FaultIndicator): ObjectDifference<FaultIndicator> =
         ObjectDifference(source, target).apply { compareAuxiliaryEquipment() }
+
+    /************ IEC61970 BASE CORE ************/
 
     private fun ObjectDifference<out AcDcTerminal>.compareAcDcTerminal(): ObjectDifference<out AcDcTerminal> =
         apply { compareIdentifiedObject() }
@@ -345,13 +361,93 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareValues(Terminal::phases, Terminal::tracedPhases, Terminal::sequenceNumber)
         }
 
-    private fun ObjectDifference<out PowerElectronicsUnit>.comparePowerElectronicsUnit(): ObjectDifference<out PowerElectronicsUnit> =
-        apply {
-            compareEquipment()
+    /************ IEC61970 BASE EQUIVALENTS ************/
 
-            compareIdReferences(PowerElectronicsUnit::powerElectronicsConnection)
-            compareValues(PowerElectronicsUnit::maxP, PowerElectronicsUnit::minP)
+    private fun compareEquivalentBranch(source: EquivalentBranch, target: EquivalentBranch): ObjectDifference<EquivalentBranch> =
+        ObjectDifference(source, target).apply {
+            compareEquivalentEquipment()
+
+            compareDoubles(
+                EquivalentBranch::negativeR12,
+                EquivalentBranch::negativeR21,
+                EquivalentBranch::negativeX12,
+                EquivalentBranch::negativeX21,
+                EquivalentBranch::positiveR12,
+                EquivalentBranch::positiveR21,
+                EquivalentBranch::positiveX12,
+                EquivalentBranch::positiveX21,
+                EquivalentBranch::r,
+                EquivalentBranch::r21,
+                EquivalentBranch::x,
+                EquivalentBranch::x21,
+                EquivalentBranch::zeroR12,
+                EquivalentBranch::zeroR21,
+                EquivalentBranch::zeroX12,
+                EquivalentBranch::zeroX21
+            )
         }
+
+    private fun ObjectDifference<out EquivalentEquipment>.compareEquivalentEquipment(): ObjectDifference<out EquivalentEquipment> =
+        apply { compareConductingEquipment() }
+
+    /************ IEC61970 BASE MEAS ************/
+
+    private fun compareAccumulator(source: Accumulator, target: Accumulator): ObjectDifference<Accumulator> =
+        ObjectDifference(source, target).apply {
+            compareMeasurement()
+        }
+
+    private fun compareAnalog(source: Analog, target: Analog): ObjectDifference<Analog> =
+        ObjectDifference(source, target).apply {
+            compareMeasurement()
+
+            compareValues(Analog::positiveFlowIn)
+        }
+
+    private fun compareControl(source: Control, target: Control): ObjectDifference<Control> =
+        ObjectDifference(source, target).apply {
+            compareIoPoint()
+
+            compareValues(Control::powerSystemResourceMRID)
+            compareIdReferences(Control::remoteControl)
+        }
+
+    private fun compareDiscrete(source: Discrete, target: Discrete): ObjectDifference<Discrete> =
+        ObjectDifference(source, target).apply {
+            compareMeasurement()
+        }
+
+    private fun ObjectDifference<out IoPoint>.compareIoPoint(): ObjectDifference<out IoPoint> =
+        apply { compareIdentifiedObject() }
+
+    private fun ObjectDifference<out Measurement>.compareMeasurement(): ObjectDifference<out Measurement> =
+        apply {
+            compareIdentifiedObject()
+
+            compareValues(Measurement::powerSystemResourceMRID, Measurement::unitSymbol, Measurement::phases, Measurement::terminalMRID)
+            compareIdReferences(Measurement::remoteSource)
+        }
+
+    /************ IEC61970 BASE SCADA ************/
+
+    private fun compareRemoteControl(source: RemoteControl, target: RemoteControl): ObjectDifference<RemoteControl> =
+        ObjectDifference(source, target).apply {
+            compareRemotePoint()
+
+            compareIdReferences(RemoteControl::control)
+        }
+
+    private fun ObjectDifference<out RemotePoint>.compareRemotePoint(): ObjectDifference<out RemotePoint> =
+        apply { compareIdentifiedObject() }
+
+    private fun compareRemoteSource(source: RemoteSource, target: RemoteSource): ObjectDifference<RemoteSource> =
+        ObjectDifference(source, target).apply {
+            compareRemotePoint()
+
+            compareIdReferences(RemoteSource::measurement)
+        }
+
+    /************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
 
     private fun compareBatteryUnit(source: BatteryUnit, target: BatteryUnit): ObjectDifference<BatteryUnit> =
         ObjectDifference(source, target).apply {
@@ -365,6 +461,14 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             comparePowerElectronicsUnit()
         }
 
+    private fun ObjectDifference<out PowerElectronicsUnit>.comparePowerElectronicsUnit(): ObjectDifference<out PowerElectronicsUnit> =
+        apply {
+            compareEquipment()
+
+            compareIdReferences(PowerElectronicsUnit::powerElectronicsConnection)
+            compareValues(PowerElectronicsUnit::maxP, PowerElectronicsUnit::minP)
+        }
+
     private fun comparePowerElectronicsWindUnit(
         source: PowerElectronicsWindUnit,
         target: PowerElectronicsWindUnit
@@ -372,6 +476,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         ObjectDifference(source, target).apply {
             comparePowerElectronicsUnit()
         }
+
+    /************ IEC61970 BASE WIRES ************/
 
     private fun compareAcLineSegment(source: AcLineSegment, target: AcLineSegment): ObjectDifference<AcLineSegment> =
         ObjectDifference(source, target).apply {
@@ -627,6 +733,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareIdReferences(TransformerStarImpedance::transformerEndInfo)
         }
 
+    /************ IEC61970 InfIEC61970 ************/
+
     private fun compareCircuit(source: Circuit, target: Circuit): ObjectDifference<Circuit> =
         ObjectDifference(source, target).apply {
             compareLine()
@@ -652,58 +760,5 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             null
         }
     }
-
-    private fun compareControl(source: Control, target: Control): ObjectDifference<Control> =
-        ObjectDifference(source, target).apply {
-            compareIoPoint()
-
-            compareValues(Control::powerSystemResourceMRID)
-            compareIdReferences(Control::remoteControl)
-        }
-
-    private fun ObjectDifference<out IoPoint>.compareIoPoint(): ObjectDifference<out IoPoint> =
-        apply { compareIdentifiedObject() }
-
-    private fun ObjectDifference<out Measurement>.compareMeasurement(): ObjectDifference<out Measurement> =
-        apply {
-            compareIdentifiedObject()
-
-            compareValues(Measurement::powerSystemResourceMRID, Measurement::unitSymbol, Measurement::phases, Measurement::terminalMRID)
-            compareIdReferences(Measurement::remoteSource)
-        }
-
-    private fun compareAnalog(source: Analog, target: Analog): ObjectDifference<Analog> =
-        ObjectDifference(source, target).apply {
-            compareMeasurement()
-
-            compareValues(Analog::positiveFlowIn)
-        }
-
-    private fun compareAccumulator(source: Accumulator, target: Accumulator): ObjectDifference<Accumulator> =
-        ObjectDifference(source, target).apply {
-            compareMeasurement()
-        }
-
-    private fun compareDiscrete(source: Discrete, target: Discrete): ObjectDifference<Discrete> =
-        ObjectDifference(source, target).apply {
-            compareMeasurement()
-        }
-
-    private fun compareRemoteControl(source: RemoteControl, target: RemoteControl): ObjectDifference<RemoteControl> =
-        ObjectDifference(source, target).apply {
-            compareRemotePoint()
-
-            compareIdReferences(RemoteControl::control)
-        }
-
-    private fun ObjectDifference<out RemotePoint>.compareRemotePoint(): ObjectDifference<out RemotePoint> =
-        apply { compareIdentifiedObject() }
-
-    private fun compareRemoteSource(source: RemoteSource, target: RemoteSource): ObjectDifference<RemoteSource> =
-        ObjectDifference(source, target).apply {
-            compareRemotePoint()
-
-            compareIdReferences(RemoteSource::measurement)
-        }
 
 }

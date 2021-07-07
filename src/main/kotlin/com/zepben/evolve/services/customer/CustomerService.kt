@@ -18,18 +18,28 @@ import com.zepben.evolve.services.common.BaseService
  * Maintains an in-memory model of customers and their organisations.
  */
 class CustomerService : BaseService("customer") {
+
+    // ###################
+    // # IEC61968 COMMON #
+    // ###################
+
+    fun add(organisation: Organisation): Boolean = super.add(organisation)
+    fun remove(organisation: Organisation): Boolean = super.remove(organisation)
+
+    // ######################
+    // # IEC61968 CUSTOMERS #
+    // ######################
+
     fun add(customer: Customer): Boolean = super.add(customer)
     fun remove(customer: Customer): Boolean = super.remove(customer)
 
     fun add(customerAgreement: CustomerAgreement): Boolean = super.add(customerAgreement)
     fun remove(customerAgreement: CustomerAgreement): Boolean = super.remove(customerAgreement)
 
-    fun add(organisation: Organisation): Boolean = super.add(organisation)
-    fun remove(organisation: Organisation): Boolean = super.remove(organisation)
-
     fun add(pricingStructure: PricingStructure): Boolean = super.add(pricingStructure)
     fun remove(pricingStructure: PricingStructure): Boolean = super.remove(pricingStructure)
 
     fun add(tariff: Tariff): Boolean = super.add(tariff)
     fun remove(tariff: Tariff): Boolean = super.remove(tariff)
+
 }

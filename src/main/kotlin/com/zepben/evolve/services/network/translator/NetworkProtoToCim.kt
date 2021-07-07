@@ -18,6 +18,8 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
@@ -75,6 +77,8 @@ import com.zepben.protobuf.cim.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.iec61970.base.core.SubGeographicalRegion as PBSubGeographicalRegion
 import com.zepben.protobuf.cim.iec61970.base.core.Substation as PBSubstation
 import com.zepben.protobuf.cim.iec61970.base.core.Terminal as PBTerminal
+import com.zepben.protobuf.cim.iec61970.base.equivalents.EquivalentBranch as PBEquivalentBranch
+import com.zepben.protobuf.cim.iec61970.base.equivalents.EquivalentEquipment as PBEquivalentEquipment
 import com.zepben.protobuf.cim.iec61970.base.meas.Accumulator as PBAccumulator
 import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
 import com.zepben.protobuf.cim.iec61970.base.meas.Control as PBControl
@@ -498,6 +502,34 @@ fun NetworkService.addFromPb(pb: PBSite): Site? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBSubGeographicalRegion): SubGeographicalRegion? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBSubstation): Substation? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTerminal): Terminal? = tryAddOrNull(toCim(pb, this))
+
+/************ IEC61970 BASE EQUIVALENTS ************/
+
+fun toCim(pb: PBEquivalentBranch, networkService: NetworkService): EquivalentBranch =
+    EquivalentBranch(pb.mRID()).apply {
+        negativeR12 = pb.negativeR12.takeUnless { it == UNKNOWN_DOUBLE }
+        negativeR21 = pb.negativeR21.takeUnless { it == UNKNOWN_DOUBLE }
+        negativeX12 = pb.negativeX12.takeUnless { it == UNKNOWN_DOUBLE }
+        negativeX21 = pb.negativeX21.takeUnless { it == UNKNOWN_DOUBLE }
+        positiveR12 = pb.positiveR12.takeUnless { it == UNKNOWN_DOUBLE }
+        positiveR21 = pb.positiveR21.takeUnless { it == UNKNOWN_DOUBLE }
+        positiveX12 = pb.positiveX12.takeUnless { it == UNKNOWN_DOUBLE }
+        positiveX21 = pb.positiveX21.takeUnless { it == UNKNOWN_DOUBLE }
+        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
+        r21 = pb.r21.takeUnless { it == UNKNOWN_DOUBLE }
+        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
+        x21 = pb.x21.takeUnless { it == UNKNOWN_DOUBLE }
+        zeroR12 = pb.zeroR12.takeUnless { it == UNKNOWN_DOUBLE }
+        zeroR21 = pb.zeroR21.takeUnless { it == UNKNOWN_DOUBLE }
+        zeroX12 = pb.zeroX12.takeUnless { it == UNKNOWN_DOUBLE }
+        zeroX21 = pb.zeroX21.takeUnless { it == UNKNOWN_DOUBLE }
+        toCim(pb.ee, this, networkService)
+    }
+
+fun toCim(pb: PBEquivalentEquipment, cim: EquivalentEquipment, networkService: NetworkService): EquivalentEquipment =
+    cim.apply { toCim(pb.ce, this, networkService) }
+
+fun NetworkService.addFromPb(pb: PBEquivalentBranch): EquivalentBranch? = tryAddOrNull(toCim(pb, this))
 
 /************ IEC61970 MEAS ************/
 
@@ -952,10 +984,10 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     // IEC61968 OPERATIONS
     fun addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = networkService.addFromPb(pb)
 
-    // IEC61970 AUXILIARY EQUIPMENT
+    // IEC61970 BASE AUXILIARY EQUIPMENT
     fun addFromPb(pb: PBFaultIndicator): FaultIndicator? = networkService.addFromPb(pb)
 
-    // IEC61970 CORE
+    // IEC61970 BASE CORE
     fun addFromPb(pb: PBBaseVoltage): BaseVoltage? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBConnectivityNode): ConnectivityNode? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBFeeder): Feeder? = networkService.addFromPb(pb)
@@ -966,22 +998,25 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBSubstation): Substation? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTerminal): Terminal? = networkService.addFromPb(pb)
 
-    // IEC61970 MEAS
+    // IEC61970 BASE BASE EQUIVALENTS
+    fun addFromPb(pb: PBEquivalentBranch): EquivalentBranch? = networkService.addFromPb(pb)
+
+    // IEC61970 BASE MEAS
     fun addFromPb(pb: PBControl): Control? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBAnalog): Analog? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBAccumulator): Accumulator? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBDiscrete): Discrete? = networkService.addFromPb(pb)
 
-    // IEC61970 SCADA
+    // IEC61970 BASE SCADA
     fun addFromPb(pb: PBRemoteControl): RemoteControl? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRemoteSource): RemoteSource? = networkService.addFromPb(pb)
 
-    // IEC61970 WIRES GENERATION PRODUCTION
+    // IEC61970 BASE WIRES GENERATION PRODUCTION
     fun addFromPb(pb: PBBatteryUnit): BatteryUnit? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPhotoVoltaicUnit): PhotoVoltaicUnit? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = networkService.addFromPb(pb)
 
-    // IEC61970 WIRES
+    // IEC61970 BASE WIRES
     fun addFromPb(pb: PBAcLineSegment): AcLineSegment? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBBreaker): Breaker? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBBusbarSection): BusbarSection? = networkService.addFromPb(pb)

@@ -22,6 +22,8 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
@@ -45,6 +47,8 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperati
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableAuxiliaryEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
@@ -187,29 +191,25 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadIdentifiedObject(asset, table, resultSet)
     }
 
-    private fun loadAssetContainer(assetContainer: AssetContainer, table: TableAssetContainers, resultSet: ResultSet): Boolean {
-        return loadAsset(assetContainer, table, resultSet)
-    }
+    private fun loadAssetContainer(assetContainer: AssetContainer, table: TableAssetContainers, resultSet: ResultSet): Boolean =
+        loadAsset(assetContainer, table, resultSet)
 
-    private fun loadAssetInfo(assetInfo: AssetInfo, table: TableAssetInfo, resultSet: ResultSet): Boolean {
-        return loadIdentifiedObject(assetInfo, table, resultSet)
-    }
+    private fun loadAssetInfo(assetInfo: AssetInfo, table: TableAssetInfo, resultSet: ResultSet): Boolean =
+        loadIdentifiedObject(assetInfo, table, resultSet)
 
     private fun loadAssetOrganisationRole(
         assetOrganisationRole: AssetOrganisationRole,
         table: TableAssetOrganisationRoles,
         resultSet: ResultSet
-    ): Boolean {
-        return loadOrganisationRole(assetOrganisationRole, table, resultSet)
-    }
+    ): Boolean =
+        loadOrganisationRole(assetOrganisationRole, table, resultSet)
 
     private fun loadStructure(
         structure: Structure,
         table: TableStructures,
         resultSet: ResultSet
-    ): Boolean {
-        return loadAssetContainer(structure, table, resultSet)
-    }
+    ): Boolean =
+        loadAssetContainer(structure, table, resultSet)
 
     fun load(table: TableAssetOwners, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val assetOwner = AssetOwner(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
@@ -276,12 +276,11 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return true
     }
 
-    private fun loadStreetAddress(table: TableStreetAddresses, resultSet: ResultSet): StreetAddress {
-        return StreetAddress(
+    private fun loadStreetAddress(table: TableStreetAddresses, resultSet: ResultSet): StreetAddress =
+        StreetAddress(
             resultSet.getString(table.POSTAL_CODE.queryIndex).emptyIfNull().internEmpty(),
             loadTownDetail(table, resultSet)
         )
-    }
 
     private fun loadTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? {
         val townName = resultSet.getNullableString(table.TOWN_NAME.queryIndex)
@@ -330,7 +329,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadDocument(operationalRestriction, table, resultSet) && networkService.addOrThrow(operationalRestriction)
     }
 
-    /************ IEC61970 AUXILIARY EQUIPMENT ************/
+    /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 
     private fun loadAuxiliaryEquipment(
         auxiliaryEquipment: AuxiliaryEquipment,
@@ -351,11 +350,10 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadAuxiliaryEquipment(faultIndicator, table, resultSet) && networkService.addOrThrow(faultIndicator)
     }
 
-    /************ IEC61970 CORE ************/
+    /************ IEC61970 BASE CORE ************/
 
-    private fun loadAcDcTerminal(acDcTerminal: AcDcTerminal, table: TableAcDcTerminals, resultSet: ResultSet): Boolean {
-        return loadIdentifiedObject(acDcTerminal, table, resultSet)
-    }
+    private fun loadAcDcTerminal(acDcTerminal: AcDcTerminal, table: TableAcDcTerminals, resultSet: ResultSet): Boolean =
+        loadIdentifiedObject(acDcTerminal, table, resultSet)
 
     fun load(table: TableBaseVoltages, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val baseVoltage = BaseVoltage(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
@@ -390,9 +388,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         connectivityNodeContainer: ConnectivityNodeContainer,
         table: TableConnectivityNodeContainers,
         resultSet: ResultSet
-    ): Boolean {
-        return loadPowerSystemResource(connectivityNodeContainer, table, resultSet)
-    }
+    ): Boolean =
+        loadPowerSystemResource(connectivityNodeContainer, table, resultSet)
 
     private fun loadEquipment(equipment: Equipment, table: TableEquipment, resultSet: ResultSet): Boolean {
         equipment.apply {
@@ -403,9 +400,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadPowerSystemResource(equipment, table, resultSet)
     }
 
-    private fun loadEquipmentContainer(equipmentContainer: EquipmentContainer, table: TableEquipmentContainers, resultSet: ResultSet): Boolean {
-        return loadConnectivityNodeContainer(equipmentContainer, table, resultSet)
-    }
+    private fun loadEquipmentContainer(equipmentContainer: EquipmentContainer, table: TableEquipmentContainers, resultSet: ResultSet): Boolean =
+        loadConnectivityNodeContainer(equipmentContainer, table, resultSet)
 
     fun load(table: TableFeeders, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val feeder = Feeder(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
@@ -493,21 +489,104 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadAcDcTerminal(terminal, table, resultSet) && networkService.addOrThrow(terminal)
     }
 
-    /************ IEC61970 WIRES ************/
-    fun loadPowerElectronicsUnit(powerElectronicsUnit: PowerElectronicsUnit, table: TablePowerElectronicsUnit, resultSet: ResultSet): Boolean {
-        powerElectronicsUnit.apply {
-            powerElectronicsConnection = networkService.ensureGet(
-                resultSet.getNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex),
-                typeNameAndMRID()
-            )
-            powerElectronicsConnection?.addUnit(this)
+    /************ IEC61970 BASE EQUIVALENTS ************/
 
-            maxP = resultSet.getNullableInt(table.MAX_P.queryIndex)
-            minP = resultSet.getNullableInt(table.MIN_P.queryIndex)
+    fun load(table: TableEquivalentBranches, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val equivalentBranch = EquivalentBranch(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            negativeR12 = resultSet.getNullableDouble(table.NEGATIVE_R12.queryIndex)
+            negativeR21 = resultSet.getNullableDouble(table.NEGATIVE_R21.queryIndex)
+            negativeX12 = resultSet.getNullableDouble(table.NEGATIVE_X12.queryIndex)
+            negativeX21 = resultSet.getNullableDouble(table.NEGATIVE_X21.queryIndex)
+            positiveR12 = resultSet.getNullableDouble(table.POSITIVE_R12.queryIndex)
+            positiveR21 = resultSet.getNullableDouble(table.POSITIVE_R21.queryIndex)
+            positiveX12 = resultSet.getNullableDouble(table.POSITIVE_X12.queryIndex)
+            positiveX21 = resultSet.getNullableDouble(table.POSITIVE_X21.queryIndex)
+            r = resultSet.getNullableDouble(table.R.queryIndex)
+            r21 = resultSet.getNullableDouble(table.R21.queryIndex)
+            x = resultSet.getNullableDouble(table.X.queryIndex)
+            x21 = resultSet.getNullableDouble(table.X21.queryIndex)
+            zeroR12 = resultSet.getNullableDouble(table.ZERO_R12.queryIndex)
+            zeroR21 = resultSet.getNullableDouble(table.ZERO_R21.queryIndex)
+            zeroX12 = resultSet.getNullableDouble(table.ZERO_X12.queryIndex)
+            zeroX21 = resultSet.getNullableDouble(table.ZERO_X21.queryIndex)
         }
 
-        return loadEquipment(powerElectronicsUnit, table, resultSet)
+        return loadEquivalentEquipment(equivalentBranch, table, resultSet) && networkService.addOrThrow(equivalentBranch)
     }
+
+    private fun loadEquivalentEquipment(equivalentEquipment: EquivalentEquipment, table: TableEquivalentEquipment, resultSet: ResultSet): Boolean =
+        loadConductingEquipment(equivalentEquipment, table, resultSet)
+
+    /************ IEC61970 BASE MEAS ************/
+
+    fun load(table: TableAccumulators, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val meas = Accumulator(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadMeasurement(meas, table, resultSet) && networkService.addOrThrow(meas)
+    }
+
+    fun load(table: TableAnalogs, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val meas = Analog(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            positiveFlowIn = resultSet.getBoolean(table.POSITIVE_FLOW_IN.queryIndex)
+        }
+
+        return loadMeasurement(meas, table, resultSet) && networkService.addOrThrow(meas)
+    }
+
+    fun load(table: TableControls, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val control = Control(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            powerSystemResourceMRID = resultSet.getNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex)
+        }
+
+        return loadIoPoint(control, table, resultSet) && networkService.addOrThrow(control)
+    }
+
+    fun load(table: TableDiscretes, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val meas = Discrete(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadMeasurement(meas, table, resultSet) && networkService.addOrThrow(meas)
+    }
+
+    private fun loadIoPoint(ioPoint: IoPoint, table: TableIoPoints, resultSet: ResultSet): Boolean =
+        loadIdentifiedObject(ioPoint, table, resultSet)
+
+    private fun loadMeasurement(measurement: Measurement, table: TableMeasurements, resultSet: ResultSet): Boolean {
+        measurement.apply {
+            powerSystemResourceMRID = resultSet.getNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex)
+            remoteSource = networkService.ensureGet(
+                resultSet.getNullableString(table.REMOTE_SOURCE_MRID.queryIndex),
+                typeNameAndMRID()
+            )
+            remoteSource?.measurement = this
+            terminalMRID = resultSet.getNullableString(table.TERMINAL_MRID.queryIndex)
+            phases = PhaseCode.valueOf(resultSet.getString(table.PHASES.queryIndex))
+            unitSymbol = UnitSymbol.valueOf(resultSet.getString(table.UNIT_SYMBOL.queryIndex))
+        }
+        return loadIdentifiedObject(measurement, table, resultSet)
+    }
+
+    /************ IEC61970 BASE SCADA ************/
+
+    fun load(table: TableRemoteControls, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val remoteControl = RemoteControl(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            control =
+                networkService.ensureGet(resultSet.getNullableString(table.CONTROL_MRID.queryIndex), typeNameAndMRID())
+            control?.remoteControl = this
+        }
+
+        return loadRemotePoint(remoteControl, table, resultSet) && networkService.addOrThrow(remoteControl)
+    }
+
+    private fun loadRemotePoint(remotePoint: RemotePoint, table: TableRemotePoints, resultSet: ResultSet): Boolean =
+        loadIdentifiedObject(remotePoint, table, resultSet)
+
+    fun load(table: TableRemoteSources, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val remoteSource = RemoteSource(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadRemotePoint(remoteSource, table, resultSet) && networkService.addOrThrow(remoteSource)
+    }
+
+    /************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
 
     fun load(table: TableBatteryUnit, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val batteryUnit = BatteryUnit(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
@@ -525,11 +604,28 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadPowerElectronicsUnit(photoVoltaicUnit, table, resultSet) && networkService.addOrThrow(photoVoltaicUnit)
     }
 
+    fun loadPowerElectronicsUnit(powerElectronicsUnit: PowerElectronicsUnit, table: TablePowerElectronicsUnit, resultSet: ResultSet): Boolean {
+        powerElectronicsUnit.apply {
+            powerElectronicsConnection = networkService.ensureGet(
+                resultSet.getNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex),
+                typeNameAndMRID()
+            )
+            powerElectronicsConnection?.addUnit(this)
+
+            maxP = resultSet.getNullableInt(table.MAX_P.queryIndex)
+            minP = resultSet.getNullableInt(table.MIN_P.queryIndex)
+        }
+
+        return loadEquipment(powerElectronicsUnit, table, resultSet)
+    }
+
     fun load(table: TablePowerElectronicsWindUnit, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val powerElectronicsWindUnit = PowerElectronicsWindUnit(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadPowerElectronicsUnit(powerElectronicsWindUnit, table, resultSet) && networkService.addOrThrow(powerElectronicsWindUnit)
     }
+
+    /************ IEC61970 BASE WIRES ************/
 
     fun load(table: TableAcLineSegments, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val acLineSegment = AcLineSegment(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
@@ -573,9 +669,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadConductingEquipment(conductor, table, resultSet)
     }
 
-    private fun loadConnector(connector: Connector, table: TableConnectors, resultSet: ResultSet): Boolean {
-        return loadConductingEquipment(connector, table, resultSet)
-    }
+    private fun loadConnector(connector: Connector, table: TableConnectors, resultSet: ResultSet): Boolean =
+        loadConductingEquipment(connector, table, resultSet)
 
     fun load(table: TableDisconnectors, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val disconnector = Disconnector(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
@@ -587,9 +682,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         energyConnection: EnergyConnection,
         table: TableEnergyConnections,
         resultSet: ResultSet
-    ): Boolean {
-        return loadConductingEquipment(energyConnection, table, resultSet)
-    }
+    ): Boolean =
+        loadConductingEquipment(energyConnection, table, resultSet)
 
     fun load(table: TableEnergyConsumers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val energyConsumer = EnergyConsumer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
@@ -674,9 +768,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadConnector(junction, table, resultSet) && networkService.addOrThrow(junction)
     }
 
-    private fun loadLine(line: Line, table: TableLines, resultSet: ResultSet): Boolean {
-        return loadEquipmentContainer(line, table, resultSet)
-    }
+    private fun loadLine(line: Line, table: TableLines, resultSet: ResultSet): Boolean =
+        loadEquipmentContainer(line, table, resultSet)
 
     fun load(table: TableLinearShuntCompensators, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val linearShuntCompensator =
@@ -692,13 +785,11 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         )
     }
 
-    private fun loadPerLengthImpedance(perLengthImpedance: PerLengthImpedance, table: TablePerLengthImpedances, resultSet: ResultSet): Boolean {
-        return loadPerLengthLineParameter(perLengthImpedance, table, resultSet)
-    }
+    private fun loadPerLengthImpedance(perLengthImpedance: PerLengthImpedance, table: TablePerLengthImpedances, resultSet: ResultSet): Boolean =
+        loadPerLengthLineParameter(perLengthImpedance, table, resultSet)
 
-    private fun loadPerLengthLineParameter(perLengthLineParameter: PerLengthLineParameter, table: TablePerLengthLineParameters, resultSet: ResultSet): Boolean {
-        return loadIdentifiedObject(perLengthLineParameter, table, resultSet)
-    }
+    private fun loadPerLengthLineParameter(perLengthLineParameter: PerLengthLineParameter, table: TablePerLengthLineParameters, resultSet: ResultSet): Boolean =
+        loadIdentifiedObject(perLengthLineParameter, table, resultSet)
 
     fun load(table: TablePerLengthSequenceImpedances, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val perLengthSequenceImpedance =
@@ -787,9 +878,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadTransformerEnd(powerTransformerEnd, table, resultSet) && networkService.addOrThrow(powerTransformerEnd)
     }
 
-    private fun loadProtectedSwitch(protectedSwitch: ProtectedSwitch, table: TableProtectedSwitches, resultSet: ResultSet): Boolean {
-        return loadSwitch(protectedSwitch, table, resultSet)
-    }
+    private fun loadProtectedSwitch(protectedSwitch: ProtectedSwitch, table: TableProtectedSwitches, resultSet: ResultSet): Boolean =
+        loadSwitch(protectedSwitch, table, resultSet)
 
     fun load(table: TableRatioTapChangers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val ratioTapChanger = RatioTapChanger(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
@@ -903,75 +993,6 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         val loop = Loop(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadIdentifiedObject(loop, table, resultSet) && networkService.addOrThrow(loop)
-    }
-
-    /************ IEC61970 MEAS ************/
-    fun load(table: TableControls, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val control = Control(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            powerSystemResourceMRID = resultSet.getNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex)
-        }
-
-        return loadIoPoint(control, table, resultSet) && networkService.addOrThrow(control)
-    }
-
-    private fun loadIoPoint(ioPoint: IoPoint, table: TableIoPoints, resultSet: ResultSet): Boolean {
-        return loadIdentifiedObject(ioPoint, table, resultSet)
-    }
-
-    private fun loadMeasurement(measurement: Measurement, table: TableMeasurements, resultSet: ResultSet): Boolean {
-        measurement.apply {
-            powerSystemResourceMRID = resultSet.getNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex)
-            remoteSource = networkService.ensureGet(
-                resultSet.getNullableString(table.REMOTE_SOURCE_MRID.queryIndex),
-                typeNameAndMRID()
-            )
-            remoteSource?.measurement = this
-            terminalMRID = resultSet.getNullableString(table.TERMINAL_MRID.queryIndex)
-            phases = PhaseCode.valueOf(resultSet.getString(table.PHASES.queryIndex))
-            unitSymbol = UnitSymbol.valueOf(resultSet.getString(table.UNIT_SYMBOL.queryIndex))
-        }
-        return loadIdentifiedObject(measurement, table, resultSet)
-    }
-
-    fun load(table: TableAnalogs, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val meas = Analog(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            positiveFlowIn = resultSet.getBoolean(table.POSITIVE_FLOW_IN.queryIndex)
-        }
-
-        return loadMeasurement(meas, table, resultSet) && networkService.addOrThrow(meas)
-    }
-
-    fun load(table: TableAccumulators, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val meas = Accumulator(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
-
-        return loadMeasurement(meas, table, resultSet) && networkService.addOrThrow(meas)
-    }
-
-    fun load(table: TableDiscretes, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val meas = Discrete(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
-
-        return loadMeasurement(meas, table, resultSet) && networkService.addOrThrow(meas)
-    }
-
-    /************ IEC61970 SCADA ************/
-    fun load(table: TableRemoteControls, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val remoteControl = RemoteControl(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            control =
-                networkService.ensureGet(resultSet.getNullableString(table.CONTROL_MRID.queryIndex), typeNameAndMRID())
-            control?.remoteControl = this
-        }
-
-        return loadRemotePoint(remoteControl, table, resultSet) && networkService.addOrThrow(remoteControl)
-    }
-
-    private fun loadRemotePoint(remotePoint: RemotePoint, table: TableRemotePoints, resultSet: ResultSet): Boolean {
-        return loadIdentifiedObject(remotePoint, table, resultSet)
-    }
-
-    fun load(table: TableRemoteSources, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val remoteSource = RemoteSource(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
-
-        return loadRemotePoint(remoteSource, table, resultSet) && networkService.addOrThrow(remoteSource)
     }
 
     /************ ASSOCIATIONS ************/

@@ -984,10 +984,10 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     // IEC61968 OPERATIONS
     fun addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = networkService.addFromPb(pb)
 
-    // IEC61970 AUXILIARY EQUIPMENT
+    // IEC61970 BASE AUXILIARY EQUIPMENT
     fun addFromPb(pb: PBFaultIndicator): FaultIndicator? = networkService.addFromPb(pb)
 
-    // IEC61970 CORE
+    // IEC61970 BASE CORE
     fun addFromPb(pb: PBBaseVoltage): BaseVoltage? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBConnectivityNode): ConnectivityNode? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBFeeder): Feeder? = networkService.addFromPb(pb)
@@ -998,22 +998,25 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBSubstation): Substation? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTerminal): Terminal? = networkService.addFromPb(pb)
 
-    // IEC61970 MEAS
+    // IEC61970 BASE BASE EQUIVALENTS
+    fun addFromPb(pb: PBEquivalentBranch): EquivalentBranch? = networkService.addFromPb(pb)
+
+    // IEC61970 BASE MEAS
     fun addFromPb(pb: PBControl): Control? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBAnalog): Analog? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBAccumulator): Accumulator? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBDiscrete): Discrete? = networkService.addFromPb(pb)
 
-    // IEC61970 SCADA
+    // IEC61970 BASE SCADA
     fun addFromPb(pb: PBRemoteControl): RemoteControl? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRemoteSource): RemoteSource? = networkService.addFromPb(pb)
 
-    // IEC61970 WIRES GENERATION PRODUCTION
+    // IEC61970 BASE WIRES GENERATION PRODUCTION
     fun addFromPb(pb: PBBatteryUnit): BatteryUnit? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPhotoVoltaicUnit): PhotoVoltaicUnit? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = networkService.addFromPb(pb)
 
-    // IEC61970 WIRES
+    // IEC61970 BASE WIRES
     fun addFromPb(pb: PBAcLineSegment): AcLineSegment? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBBreaker): Breaker? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBBusbarSection): BusbarSection? = networkService.addFromPb(pb)

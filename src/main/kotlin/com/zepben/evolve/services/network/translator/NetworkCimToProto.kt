@@ -874,7 +874,7 @@ fun RatioTapChanger.toPb(): PBRatioTapChanger = toPb(this, PBRatioTapChanger.new
 fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
 fun TransformerStarImpedance.toPb(): PBTransformerStarImpedance = toPb(this, PBTransformerStarImpedance.newBuilder()).build()
 
-/************ IEC61970 BASE InfIEC61970 Feeder ************/
+/************ IEC61970 InfIEC61970 Feeder ************/
 
 fun toPb(cim: Circuit, pb: PBCircuit.Builder): PBCircuit.Builder =
     pb.apply {
@@ -989,7 +989,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: Recloser): PBRecloser = cim.toPb()
     fun toPb(cim: TransformerStarImpedance): PBTransformerStarImpedance = cim.toPb()
 
-    // IEC61970 BASE InfIEC61970 Feeder
+    // IEC61970 InfIEC61970 Feeder
     fun toPb(cim: Circuit): PBCircuit = cim.toPb()
     fun toPb(cim: Loop): PBLoop = cim.toPb()
 

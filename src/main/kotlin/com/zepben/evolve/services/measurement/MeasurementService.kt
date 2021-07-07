@@ -20,6 +20,10 @@ import kotlin.reflect.full.isSuperclassOf
 class MeasurementService {
     private val _measurements = mutableListOf<MeasurementValue>()
 
+    // ######################
+    // # IEC61970 BASE MEAS #
+    // ######################
+
     fun add(accumulatorValue: AccumulatorValue): Boolean = _measurements.add(accumulatorValue)
     fun remove(accumulatorValue: AccumulatorValue): Boolean = _measurements.remove(accumulatorValue)
 

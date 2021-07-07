@@ -18,6 +18,7 @@ import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
@@ -109,6 +110,7 @@ internal class NetworkServiceUtilsTest {
         isNoLoadTest: (NoLoadTest) -> String,
         isOpenCircuitTest: (OpenCircuitTest) -> String,
         isShortCircuitTest: (ShortCircuitTest) -> String,
+        isEquivalentBranch: (EquivalentBranch) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -169,6 +171,7 @@ internal class NetworkServiceUtilsTest {
         isNoLoadTest = isNoLoadTest,
         isOpenCircuitTest = isOpenCircuitTest,
         isShortCircuitTest = isShortCircuitTest,
+        isEquivalentBranch = isEquivalentBranch,
         isOther = isOther
     )
 
@@ -231,6 +234,7 @@ internal class NetworkServiceUtilsTest {
         isNoLoadTest: InvokeChecker<NoLoadTest> = NeverInvokedChecker(),
         isOpenCircuitTest: InvokeChecker<OpenCircuitTest> = NeverInvokedChecker(),
         isShortCircuitTest: InvokeChecker<ShortCircuitTest> = NeverInvokedChecker(),
+        isEquivalentBranch: InvokeChecker<EquivalentBranch> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -292,6 +296,7 @@ internal class NetworkServiceUtilsTest {
             isNoLoadTest = isNoLoadTest,
             isOpenCircuitTest = isOpenCircuitTest,
             isShortCircuitTest = isShortCircuitTest,
+            isEquivalentBranch = isEquivalentBranch,
             isOther = isOther
         )
 
@@ -353,6 +358,7 @@ internal class NetworkServiceUtilsTest {
         isNoLoadTest.verifyInvoke()
         isOpenCircuitTest.verifyInvoke()
         isShortCircuitTest.verifyInvoke()
+        isEquivalentBranch.verifyInvoke()
         isOther.verifyInvoke()
     }
 
@@ -420,6 +426,7 @@ internal class NetworkServiceUtilsTest {
         NoLoadTest().also { whenNetworkServiceObjectTester(it, isNoLoadTest = InvokedChecker(it)) }
         OpenCircuitTest().also { whenNetworkServiceObjectTester(it, isOpenCircuitTest = InvokedChecker(it)) }
         ShortCircuitTest().also { whenNetworkServiceObjectTester(it, isShortCircuitTest = InvokedChecker(it)) }
+        EquivalentBranch().also { whenNetworkServiceObjectTester(it, isEquivalentBranch = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

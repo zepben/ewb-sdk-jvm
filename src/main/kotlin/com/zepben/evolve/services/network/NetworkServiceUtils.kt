@@ -22,6 +22,7 @@ import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
@@ -166,6 +167,7 @@ inline fun <R> whenNetworkServiceObject(
     isNoLoadTest: (NoLoadTest) -> R,
     isOpenCircuitTest: (OpenCircuitTest) -> R,
     isShortCircuitTest: (ShortCircuitTest) -> R,
+    isEquivalentBranch: (EquivalentBranch) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -227,5 +229,6 @@ inline fun <R> whenNetworkServiceObject(
     is NoLoadTest -> isNoLoadTest(identifiedObject)
     is OpenCircuitTest -> isOpenCircuitTest(identifiedObject)
     is ShortCircuitTest -> isShortCircuitTest(identifiedObject)
+    is EquivalentBranch -> isEquivalentBranch(identifiedObject)
     else -> isOther(identifiedObject)
 }

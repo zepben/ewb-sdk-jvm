@@ -5,12 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.cim.iec61970.base.wires
+package com.zepben.evolve.cim.iec61970.base.equivalents
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 
 /**
- * A conductor, or group of conductors, with negligible impedance, that serve to connect other conducting equipment
- * within a single substation and are modelled with a single logical terminal.
+ * The class represents equivalent objects that are the result of a network reduction. The class is the base for equivalent objects of different types.
  */
-abstract class Connector(mRID: String = "") : ConductingEquipment(mRID)
+abstract class EquivalentEquipment(mRID: String = "") : ConductingEquipment(mRID)

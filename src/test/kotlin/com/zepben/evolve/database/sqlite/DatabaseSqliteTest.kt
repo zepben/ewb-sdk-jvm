@@ -24,6 +24,7 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
@@ -174,6 +175,9 @@ class DatabaseSqliteTest {
         /************ IEC61970 BASE DIAGRAM LAYOUT ************/
         validateSchema(SchemaNetworks.diagramServicesOf(::Diagram, Diagram::fillFields))
         validateSchema(SchemaNetworks.diagramServicesOf(::DiagramObject, DiagramObject::fillFields))
+
+        /************ IEC61970 BASE EQUIVALENTS ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::EquivalentBranch, EquivalentBranch::fillFields))
 
         /************ IEC61970 BASE MEAS ************/
         validateSchema(SchemaNetworks.networkServicesOf(::Accumulator, Accumulator::fillFields))

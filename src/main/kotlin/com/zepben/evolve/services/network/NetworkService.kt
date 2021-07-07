@@ -18,6 +18,7 @@ import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -51,35 +52,176 @@ class NetworkService : BaseService("network") {
 
     private val _measurements: MutableMap<String, MutableList<Measurement>> = mutableMapOf()
 
-    fun add(acLineSegment: AcLineSegment): Boolean = super.add(acLineSegment)
-    fun remove(acLineSegment: AcLineSegment): Boolean = super.remove(acLineSegment)
-
-    fun add(assetOwner: AssetOwner): Boolean = super.add(assetOwner)
-    fun remove(assetOwner: AssetOwner): Boolean = super.remove(assetOwner)
-
-    fun add(baseVoltage: BaseVoltage): Boolean = super.add(baseVoltage)
-    fun remove(baseVoltage: BaseVoltage): Boolean = super.remove(baseVoltage)
-
-    fun add(breaker: Breaker): Boolean = super.add(breaker)
-    fun remove(breaker: Breaker): Boolean = super.remove(breaker)
-
-    fun add(loadBreakSwitch: LoadBreakSwitch): Boolean = super.add(loadBreakSwitch)
-    fun remove(loadBreakSwitch: LoadBreakSwitch): Boolean = super.remove(loadBreakSwitch)
-
-    fun add(busbarSection: BusbarSection): Boolean = super.add(busbarSection)
-    fun remove(busbarSection: BusbarSection): Boolean = super.remove(busbarSection)
+    // #######################
+    // # IEC61968 ASSET INFO #
+    // #######################
 
     fun add(cableInfo: CableInfo): Boolean = super.add(cableInfo)
     fun remove(cableInfo: CableInfo): Boolean = super.remove(cableInfo)
 
+    fun add(noLoadTest: NoLoadTest): Boolean = super.add(noLoadTest)
+    fun remove(noLoadTest: NoLoadTest): Boolean = super.remove(noLoadTest)
+
+    fun add(openCircuitTest: OpenCircuitTest): Boolean = super.add(openCircuitTest)
+    fun remove(openCircuitTest: OpenCircuitTest): Boolean = super.remove(openCircuitTest)
+
+    fun add(overheadWireInfo: OverheadWireInfo): Boolean = super.add(overheadWireInfo)
+    fun remove(overheadWireInfo: OverheadWireInfo): Boolean = super.remove(overheadWireInfo)
+
     fun add(powerTransformerInfo: PowerTransformerInfo): Boolean = super.add(powerTransformerInfo)
     fun remove(powerTransformerInfo: PowerTransformerInfo): Boolean = super.remove(powerTransformerInfo)
 
-    fun add(circuit: Circuit): Boolean = super.add(circuit)
-    fun remove(circuit: Circuit): Boolean = super.remove(circuit)
+    fun add(transformerEndInfo: TransformerEndInfo): Boolean = super.add(transformerEndInfo)
+    fun remove(transformerEndInfo: TransformerEndInfo): Boolean = super.remove(transformerEndInfo)
+
+    fun add(transformerTankInfo: TransformerTankInfo): Boolean = super.add(transformerTankInfo)
+    fun remove(transformerTankInfo: TransformerTankInfo): Boolean = super.remove(transformerTankInfo)
+
+    fun add(shortCircuitTest: ShortCircuitTest): Boolean = super.add(shortCircuitTest)
+    fun remove(shortCircuitTest: ShortCircuitTest): Boolean = super.remove(shortCircuitTest)
+
+    // ###################
+    // # IEC61968 ASSETS #
+    // ###################
+
+    fun add(assetOwner: AssetOwner): Boolean = super.add(assetOwner)
+    fun remove(assetOwner: AssetOwner): Boolean = super.remove(assetOwner)
+
+    fun add(pole: Pole): Boolean = super.add(pole)
+    fun remove(pole: Pole): Boolean = super.remove(pole)
+
+    fun add(streetlight: Streetlight): Boolean = super.add(streetlight)
+    fun remove(streetlight: Streetlight): Boolean = super.remove(streetlight)
+
+    // ###################
+    // # IEC61968 COMMON #
+    // ###################
+
+    fun add(location: Location): Boolean = super.add(location)
+    fun remove(location: Location): Boolean = super.remove(location)
+
+    fun add(organisation: Organisation): Boolean = super.add(organisation)
+    fun remove(organisation: Organisation): Boolean = super.remove(organisation)
+
+    // #####################
+    // # IEC61968 METERING #
+    // #####################
+
+    fun add(meter: Meter): Boolean = super.add(meter)
+    fun remove(meter: Meter): Boolean = super.remove(meter)
+
+    fun add(usagePoint: UsagePoint): Boolean = super.add(usagePoint)
+    fun remove(usagePoint: UsagePoint): Boolean = super.remove(usagePoint)
+
+    // #######################
+    // # IEC61968 OPERATIONS #
+    // #######################
+
+    fun add(operationalRestriction: OperationalRestriction): Boolean = super.add(operationalRestriction)
+    fun remove(operationalRestriction: OperationalRestriction): Boolean = super.remove(operationalRestriction)
+
+    // #####################################
+    // # IEC61970 BASE AUXILIARY EQUIPMENT #
+    // #####################################
+
+    fun add(faultIndicator: FaultIndicator): Boolean = super.add(faultIndicator)
+    fun remove(faultIndicator: FaultIndicator): Boolean = super.remove(faultIndicator)
+
+    // ######################
+    // # IEC61970 BASE CORE #
+    // ######################
+
+    fun add(baseVoltage: BaseVoltage): Boolean = super.add(baseVoltage)
+    fun remove(baseVoltage: BaseVoltage): Boolean = super.remove(baseVoltage)
 
     fun add(connectivityNode: ConnectivityNode): Boolean = super.add(connectivityNode)
     fun remove(connectivityNode: ConnectivityNode): Boolean = super.remove(connectivityNode)
+
+    fun add(feeder: Feeder): Boolean = super.add(feeder)
+    fun remove(feeder: Feeder): Boolean = super.remove(feeder)
+
+    fun add(geographicalRegion: GeographicalRegion): Boolean = super.add(geographicalRegion)
+    fun remove(geographicalRegion: GeographicalRegion): Boolean = super.remove(geographicalRegion)
+
+    fun add(site: Site): Boolean = super.add(site)
+    fun remove(site: Site): Boolean = super.remove(site)
+
+    fun add(subGeographicalRegion: SubGeographicalRegion): Boolean = super.add(subGeographicalRegion)
+    fun remove(subGeographicalRegion: SubGeographicalRegion): Boolean = super.remove(subGeographicalRegion)
+
+    fun add(substation: Substation): Boolean = super.add(substation)
+    fun remove(substation: Substation): Boolean = super.remove(substation)
+
+    fun add(terminal: Terminal): Boolean = super.add(terminal)
+    fun remove(terminal: Terminal): Boolean = super.remove(terminal)
+
+    // #############################
+    // # IEC61970 BASE EQUIVALENTS #
+    // #############################
+
+    fun add(equivalentBranch: EquivalentBranch): Boolean = super.add(equivalentBranch)
+    fun remove(equivalentBranch: EquivalentBranch): Boolean = super.remove(equivalentBranch)
+
+    // ######################
+    // # IEC61970 BASE MEAS #
+    // ######################
+
+    fun add(accumulator: Accumulator): Boolean = indexMeasurement(accumulator) && super.add(accumulator)
+    fun remove(accumulator: Accumulator): Boolean {
+        removeMeasurementIndex(accumulator)
+        return super.remove(accumulator)
+    }
+
+    fun add(analog: Analog): Boolean = indexMeasurement(analog) && super.add(analog)
+    fun remove(analog: Analog): Boolean {
+        removeMeasurementIndex(analog)
+        return super.remove(analog)
+    }
+
+    fun add(control: Control): Boolean = super.add(control)
+    fun remove(control: Control): Boolean = super.remove(control)
+
+    fun add(discrete: Discrete): Boolean = indexMeasurement(discrete) && super.add(discrete)
+    fun remove(discrete: Discrete): Boolean {
+        removeMeasurementIndex(discrete)
+        return super.remove(discrete)
+    }
+
+    // #######################
+    // # IEC61970 BASE SCADA #
+    // #######################
+
+    fun add(remoteControl: RemoteControl): Boolean = super.add(remoteControl)
+    fun remove(remoteControl: RemoteControl): Boolean = super.remove(remoteControl)
+
+    fun add(remoteSource: RemoteSource): Boolean = super.add(remoteSource)
+    fun remove(remoteSource: RemoteSource): Boolean = super.remove(remoteSource)
+
+    // #############################################
+    // # IEC61970 BASE WIRES GENERATION PRODUCTION #
+    // #############################################
+
+    fun add(batteryUnit: BatteryUnit): Boolean = super.add(batteryUnit)
+    fun remove(batteryUnit: BatteryUnit): Boolean = super.remove(batteryUnit)
+
+    fun add(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.add(photoVoltaicUnit)
+    fun remove(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.remove(photoVoltaicUnit)
+
+    fun add(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.add(powerElectronicsWindUnit)
+    fun remove(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.remove(powerElectronicsWindUnit)
+
+    // #######################
+    // # IEC61970 BASE WIRES #
+    // #######################
+
+    fun add(acLineSegment: AcLineSegment): Boolean = super.add(acLineSegment)
+    fun remove(acLineSegment: AcLineSegment): Boolean = super.remove(acLineSegment)
+
+    fun add(breaker: Breaker): Boolean = super.add(breaker)
+    fun remove(breaker: Breaker): Boolean = super.remove(breaker)
+
+    fun add(busbarSection: BusbarSection): Boolean = super.add(busbarSection)
+    fun remove(busbarSection: BusbarSection): Boolean = super.remove(busbarSection)
 
     fun add(disconnector: Disconnector): Boolean = super.add(disconnector)
     fun remove(disconnector: Disconnector): Boolean = super.remove(disconnector)
@@ -96,17 +238,8 @@ class NetworkService : BaseService("network") {
     fun add(energySourcePhase: EnergySourcePhase): Boolean = super.add(energySourcePhase)
     fun remove(energySourcePhase: EnergySourcePhase): Boolean = super.remove(energySourcePhase)
 
-    fun add(faultIndicator: FaultIndicator): Boolean = super.add(faultIndicator)
-    fun remove(faultIndicator: FaultIndicator): Boolean = super.remove(faultIndicator)
-
-    fun add(feeder: Feeder): Boolean = super.add(feeder)
-    fun remove(feeder: Feeder): Boolean = super.remove(feeder)
-
     fun add(fuse: Fuse): Boolean = super.add(fuse)
     fun remove(fuse: Fuse): Boolean = super.remove(fuse)
-
-    fun add(geographicalRegion: GeographicalRegion): Boolean = super.add(geographicalRegion)
-    fun remove(geographicalRegion: GeographicalRegion): Boolean = super.remove(geographicalRegion)
 
     fun add(jumper: Jumper): Boolean = super.add(jumper)
     fun remove(jumper: Jumper): Boolean = super.remove(jumper)
@@ -117,32 +250,8 @@ class NetworkService : BaseService("network") {
     fun add(linearShuntCompensator: LinearShuntCompensator): Boolean = super.add(linearShuntCompensator)
     fun remove(linearShuntCompensator: LinearShuntCompensator): Boolean = super.remove(linearShuntCompensator)
 
-    fun add(batteryUnit: BatteryUnit): Boolean = super.add(batteryUnit)
-    fun remove(batteryUnit: BatteryUnit): Boolean = super.remove(batteryUnit)
-
-    fun add(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.add(photoVoltaicUnit)
-    fun remove(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.remove(photoVoltaicUnit)
-
-    fun add(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.add(powerElectronicsWindUnit)
-    fun remove(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.remove(powerElectronicsWindUnit)
-
-    fun add(location: Location): Boolean = super.add(location)
-    fun remove(location: Location): Boolean = super.remove(location)
-
-    fun add(loop: Loop): Boolean = super.add(loop)
-    fun remove(loop: Loop): Boolean = super.remove(loop)
-
-    fun add(meter: Meter): Boolean = super.add(meter)
-    fun remove(meter: Meter): Boolean = super.remove(meter)
-
-    fun add(operationalRestriction: OperationalRestriction): Boolean = super.add(operationalRestriction)
-    fun remove(operationalRestriction: OperationalRestriction): Boolean = super.remove(operationalRestriction)
-
-    fun add(organisation: Organisation): Boolean = super.add(organisation)
-    fun remove(organisation: Organisation): Boolean = super.remove(organisation)
-
-    fun add(overheadWireInfo: OverheadWireInfo): Boolean = super.add(overheadWireInfo)
-    fun remove(overheadWireInfo: OverheadWireInfo): Boolean = super.remove(overheadWireInfo)
+    fun add(loadBreakSwitch: LoadBreakSwitch): Boolean = super.add(loadBreakSwitch)
+    fun remove(loadBreakSwitch: LoadBreakSwitch): Boolean = super.remove(loadBreakSwitch)
 
     fun add(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.add(perLengthSequenceImpedance)
     fun remove(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.remove(perLengthSequenceImpedance)
@@ -152,9 +261,6 @@ class NetworkService : BaseService("network") {
 
     fun add(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): Boolean = super.add(powerElectronicsConnectionPhase)
     fun remove(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): Boolean = super.remove(powerElectronicsConnectionPhase)
-
-    fun add(pole: Pole): Boolean = super.add(pole)
-    fun remove(pole: Pole): Boolean = super.remove(pole)
 
     fun add(powerTransformer: PowerTransformer): Boolean = super.add(powerTransformer)
     fun remove(powerTransformer: PowerTransformer): Boolean = super.remove(powerTransformer)
@@ -168,71 +274,18 @@ class NetworkService : BaseService("network") {
     fun add(recloser: Recloser): Boolean = super.add(recloser)
     fun remove(recloser: Recloser): Boolean = super.remove(recloser)
 
-    fun add(site: Site): Boolean = super.add(site)
-    fun remove(site: Site): Boolean = super.remove(site)
-
-    fun add(streetlight: Streetlight): Boolean = super.add(streetlight)
-    fun remove(streetlight: Streetlight): Boolean = super.remove(streetlight)
-
-    fun add(subGeographicalRegion: SubGeographicalRegion): Boolean = super.add(subGeographicalRegion)
-    fun remove(subGeographicalRegion: SubGeographicalRegion): Boolean = super.remove(subGeographicalRegion)
-
-    fun add(substation: Substation): Boolean = super.add(substation)
-    fun remove(substation: Substation): Boolean = super.remove(substation)
-
-    fun add(terminal: Terminal): Boolean = super.add(terminal)
-    fun remove(terminal: Terminal): Boolean = super.remove(terminal)
-
-    fun add(usagePoint: UsagePoint): Boolean = super.add(usagePoint)
-    fun remove(usagePoint: UsagePoint): Boolean = super.remove(usagePoint)
-
-    fun add(control: Control): Boolean = super.add(control)
-    fun remove(control: Control): Boolean = super.remove(control)
-
-    fun add(remoteControl: RemoteControl): Boolean = super.add(remoteControl)
-    fun remove(remoteControl: RemoteControl): Boolean = super.remove(remoteControl)
-
-    fun add(remoteSource: RemoteSource): Boolean = super.add(remoteSource)
-    fun remove(remoteSource: RemoteSource): Boolean = super.remove(remoteSource)
-
-    fun add(analog: Analog): Boolean = indexMeasurement(analog) && super.add(analog)
-
-    fun remove(analog: Analog): Boolean {
-        removeMeasurementIndex(analog)
-        return super.remove(analog)
-    }
-
-    fun add(accumulator: Accumulator): Boolean = indexMeasurement(accumulator) && super.add(accumulator)
-
-    fun remove(accumulator: Accumulator): Boolean {
-        removeMeasurementIndex(accumulator)
-        return super.remove(accumulator)
-    }
-
-    fun add(discrete: Discrete): Boolean = indexMeasurement(discrete) && super.add(discrete)
-
-    fun remove(discrete: Discrete): Boolean {
-        removeMeasurementIndex(discrete)
-        return super.remove(discrete)
-    }
-
-    fun add(transformerEndInfo: TransformerEndInfo): Boolean = super.add(transformerEndInfo)
-    fun remove(transformerEndInfo: TransformerEndInfo): Boolean = super.remove(transformerEndInfo)
-
     fun add(transformerStarImpedance: TransformerStarImpedance): Boolean = super.add(transformerStarImpedance)
     fun remove(transformerStarImpedance: TransformerStarImpedance): Boolean = super.remove(transformerStarImpedance)
 
-    fun add(transformerTankInfo: TransformerTankInfo): Boolean = super.add(transformerTankInfo)
-    fun remove(transformerTankInfo: TransformerTankInfo): Boolean = super.remove(transformerTankInfo)
+    // ###############################
+    // # IEC61970 InfIEC61970 FEEDER #
+    // ###############################
 
-    fun add(noLoadTest: NoLoadTest): Boolean = super.add(noLoadTest)
-    fun remove(noLoadTest: NoLoadTest): Boolean = super.remove(noLoadTest)
+    fun add(circuit: Circuit): Boolean = super.add(circuit)
+    fun remove(circuit: Circuit): Boolean = super.remove(circuit)
 
-    fun add(openCircuitTest: OpenCircuitTest): Boolean = super.add(openCircuitTest)
-    fun remove(openCircuitTest: OpenCircuitTest): Boolean = super.remove(openCircuitTest)
-
-    fun add(shortCircuitTest: ShortCircuitTest): Boolean = super.add(shortCircuitTest)
-    fun remove(shortCircuitTest: ShortCircuitTest): Boolean = super.remove(shortCircuitTest)
+    fun add(loop: Loop): Boolean = super.add(loop)
+    fun remove(loop: Loop): Boolean = super.remove(loop)
 
     /**
      * Get all measurements of type [T] associated with the given [mRID].
@@ -257,6 +310,7 @@ class NetworkService : BaseService("network") {
      * The [mRID] should be either a [PowerSystemResource] or a [Terminal] MRID that is assigned to the corresponding
      * fields on the measurements.
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun <T : Measurement> getMeasurements(mRID: String, measurementClass: Class<T>): List<T> =
         _measurements[mRID]?.filterIsInstance(measurementClass) ?: emptyList()
 

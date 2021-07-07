@@ -17,6 +17,8 @@ import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
@@ -85,6 +87,8 @@ import com.zepben.protobuf.cim.iec61970.base.core.SubGeographicalRegion as PBSub
 import com.zepben.protobuf.cim.iec61970.base.core.Substation as PBSubstation
 import com.zepben.protobuf.cim.iec61970.base.core.Terminal as PBTerminal
 import com.zepben.protobuf.cim.iec61970.base.domain.UnitSymbol as PBUnitSymbol
+import com.zepben.protobuf.cim.iec61970.base.equivalents.EquivalentBranch as PBEquivalentBranch
+import com.zepben.protobuf.cim.iec61970.base.equivalents.EquivalentEquipment as PBEquivalentEquipment
 import com.zepben.protobuf.cim.iec61970.base.meas.Accumulator as PBAccumulator
 import com.zepben.protobuf.cim.iec61970.base.meas.Analog as PBAnalog
 import com.zepben.protobuf.cim.iec61970.base.meas.Control as PBControl
@@ -349,7 +353,7 @@ fun toPb(cim: OperationalRestriction, pb: PBOperationalRestriction.Builder): PBO
 
 fun OperationalRestriction.toPb(): PBOperationalRestriction = toPb(this, PBOperationalRestriction.newBuilder()).build()
 
-/************ IEC61970 AUXILIARY EQUIPMENT ************/
+/************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 
 fun toPb(cim: AuxiliaryEquipment, pb: PBAuxiliaryEquipment.Builder): PBAuxiliaryEquipment.Builder =
     pb.apply {
@@ -363,7 +367,7 @@ fun toPb(cim: FaultIndicator, pb: PBFaultIndicator.Builder): PBFaultIndicator.Bu
 
 fun FaultIndicator.toPb(): PBFaultIndicator = toPb(this, PBFaultIndicator.newBuilder()).build()
 
-/************ IEC61970 CORE ************/
+/************ IEC61970 BASE CORE ************/
 
 fun toPb(cim: AcDcTerminal, pb: PBAcDcTerminal.Builder): PBAcDcTerminal.Builder =
     pb.apply { toPb(cim, ioBuilder) }
@@ -481,7 +485,35 @@ fun SubGeographicalRegion.toPb(): PBSubGeographicalRegion = toPb(this, PBSubGeog
 fun Substation.toPb(): PBSubstation = toPb(this, PBSubstation.newBuilder()).build()
 fun Terminal.toPb(): PBTerminal = toPb(this, PBTerminal.newBuilder()).build()
 
-/************ IEC61970 MEAS ************/
+/************ IEC61970 BASE EQUIVALENTS ************/
+
+fun toPb(cim: EquivalentBranch, pb: PBEquivalentBranch.Builder): PBEquivalentBranch.Builder =
+    pb.apply {
+        negativeR12 = cim.negativeR12 ?: UNKNOWN_DOUBLE
+        negativeR21 = cim.negativeR21 ?: UNKNOWN_DOUBLE
+        negativeX12 = cim.negativeX12 ?: UNKNOWN_DOUBLE
+        negativeX21 = cim.negativeX21 ?: UNKNOWN_DOUBLE
+        positiveR12 = cim.positiveR12 ?: UNKNOWN_DOUBLE
+        positiveR21 = cim.positiveR21 ?: UNKNOWN_DOUBLE
+        positiveX12 = cim.positiveX12 ?: UNKNOWN_DOUBLE
+        positiveX21 = cim.positiveX21 ?: UNKNOWN_DOUBLE
+        r = cim.r ?: UNKNOWN_DOUBLE
+        r21 = cim.r21 ?: UNKNOWN_DOUBLE
+        x = cim.x ?: UNKNOWN_DOUBLE
+        x21 = cim.x21 ?: UNKNOWN_DOUBLE
+        zeroR12 = cim.zeroR12 ?: UNKNOWN_DOUBLE
+        zeroR21 = cim.zeroR21 ?: UNKNOWN_DOUBLE
+        zeroX12 = cim.zeroX12 ?: UNKNOWN_DOUBLE
+        zeroX21 = cim.zeroX21 ?: UNKNOWN_DOUBLE
+        toPb(cim, eeBuilder)
+    }
+
+fun toPb(cim: EquivalentEquipment, pb: PBEquivalentEquipment.Builder): PBEquivalentEquipment.Builder =
+    pb.apply { toPb(cim, ceBuilder) }
+
+fun EquivalentBranch.toPb(): PBEquivalentBranch = toPb(this, PBEquivalentBranch.newBuilder()).build()
+
+/************ IEC61970 BASE MEAS ************/
 
 fun toPb(cim: Control, pb: PBControl.Builder): PBControl.Builder =
     pb.apply {
@@ -517,7 +549,7 @@ fun Analog.toPb(): PBAnalog = toPb(this, PBAnalog.newBuilder()).build()
 fun Control.toPb(): PBControl = toPb(this, PBControl.newBuilder()).build()
 fun Discrete.toPb(): PBDiscrete = toPb(this, PBDiscrete.newBuilder()).build()
 
-/************ IEC61970 SCADA ************/
+/************ IEC61970 BASE SCADA ************/
 
 fun toPb(cim: RemoteControl, pb: PBRemoteControl.Builder): PBRemoteControl.Builder =
     pb.apply {
@@ -537,7 +569,7 @@ fun toPb(cim: RemoteSource, pb: PBRemoteSource.Builder): PBRemoteSource.Builder 
 fun RemoteControl.toPb(): PBRemoteControl = toPb(this, PBRemoteControl.newBuilder()).build()
 fun RemoteSource.toPb(): PBRemoteSource = toPb(this, PBRemoteSource.newBuilder()).build()
 
-/************ IEC61970 WIRES GENERATION PRODUCTION ************/
+/************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
 
 fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder) =
     pb.apply {
@@ -569,7 +601,7 @@ fun BatteryUnit.toPb(): PBBatteryUnit = toPb(this, PBBatteryUnit.newBuilder()).b
 fun PhotoVoltaicUnit.toPb(): PBPhotoVoltaicUnit = toPb(this, PBPhotoVoltaicUnit.newBuilder()).build()
 fun PowerElectronicsWindUnit.toPb(): PBPowerElectronicsWindUnit = toPb(this, PBPowerElectronicsWindUnit.newBuilder()).build()
 
-/************ IEC61970 WIRES ************/
+/************ IEC61970 BASE WIRES ************/
 
 fun toPb(cim: AcLineSegment, pb: PBAcLineSegment.Builder): PBAcLineSegment.Builder =
     pb.apply {
@@ -842,7 +874,7 @@ fun RatioTapChanger.toPb(): PBRatioTapChanger = toPb(this, PBRatioTapChanger.new
 fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
 fun TransformerStarImpedance.toPb(): PBTransformerStarImpedance = toPb(this, PBTransformerStarImpedance.newBuilder()).build()
 
-/************ IEC61970 InfIEC61970 Feeder ************/
+/************ IEC61970 BASE InfIEC61970 Feeder ************/
 
 fun toPb(cim: Circuit, pb: PBCircuit.Builder): PBCircuit.Builder =
     pb.apply {
@@ -903,10 +935,10 @@ class NetworkCimToProto : BaseCimToProto() {
     // IEC61968 OPERATIONS
     fun toPb(cim: OperationalRestriction): PBOperationalRestriction = cim.toPb()
 
-    // IEC61970 AUXILIARY EQUIPMENT
+    // IEC61970 BASE AUXILIARY EQUIPMENT
     fun toPb(cim: FaultIndicator): PBFaultIndicator = cim.toPb()
 
-    // IEC61970 CORE
+    // IEC61970 BASE CORE
     fun toPb(cim: BaseVoltage): PBBaseVoltage = cim.toPb()
     fun toPb(cim: ConnectivityNode): PBConnectivityNode = cim.toPb()
     fun toPb(cim: Feeder): PBFeeder = cim.toPb()
@@ -916,22 +948,25 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: Substation): PBSubstation = cim.toPb()
     fun toPb(cim: Terminal): PBTerminal = cim.toPb()
 
-    // IEC61970 MEAS
+    // IEC61970 BASE EQUIVALENTS
+    fun toPb(cim: EquivalentBranch): PBEquivalentBranch = cim.toPb()
+
+    // IEC61970 BASE MEAS
     fun toPb(cim: Accumulator): PBAccumulator = cim.toPb()
     fun toPb(cim: Analog): PBAnalog = cim.toPb()
     fun toPb(cim: Control): PBControl = cim.toPb()
     fun toPb(cim: Discrete): PBDiscrete = cim.toPb()
 
-    // IEC61970 SCADA
+    // IEC61970 BASE SCADA
     fun toPb(cim: RemoteControl): PBRemoteControl = cim.toPb()
     fun toPb(cim: RemoteSource): PBRemoteSource = cim.toPb()
 
-    // IEC61970 WIRES GENERATION PRODUCTION
+    // IEC61970 BASE WIRES GENERATION PRODUCTION
     fun toPb(cim: BatteryUnit): PBBatteryUnit = cim.toPb()
     fun toPb(cim: PhotoVoltaicUnit): PBPhotoVoltaicUnit = cim.toPb()
     fun toPb(cim: PowerElectronicsWindUnit): PBPowerElectronicsWindUnit = cim.toPb()
 
-    // IEC61970 WIRES
+    // IEC61970 BASE WIRES
     fun toPb(cim: AcLineSegment): PBAcLineSegment = cim.toPb()
     fun toPb(cim: Breaker): PBBreaker = cim.toPb()
     fun toPb(cim: BusbarSection): PBBusbarSection = cim.toPb()
@@ -954,7 +989,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: Recloser): PBRecloser = cim.toPb()
     fun toPb(cim: TransformerStarImpedance): PBTransformerStarImpedance = cim.toPb()
 
-    // IEC61970 InfIEC61970 Feeder
+    // IEC61970 BASE InfIEC61970 Feeder
     fun toPb(cim: Circuit): PBCircuit = cim.toPb()
     fun toPb(cim: Loop): PBLoop = cim.toPb()
 

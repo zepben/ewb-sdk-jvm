@@ -19,6 +19,8 @@ import com.zepben.protobuf.cim.iec61968.operations.OperationalRestriction
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.protobuf.cim.iec61970.base.core.*
+import com.zepben.protobuf.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.protobuf.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.protobuf.cim.iec61970.base.meas.Control
 import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement
@@ -33,6 +35,8 @@ import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerEl
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop
 
+/************ IEC61968 ASSET INFO ************/
+
 fun CableInfo.mRID(): String = wi.mRID()
 fun OverheadWireInfo.mRID(): String = wi.mRID()
 fun NoLoadTest.mRID(): String = tt.mRID()
@@ -43,6 +47,9 @@ fun TransformerEndInfo.mRID(): String = ai.mRID()
 fun TransformerTankInfo.mRID(): String = ai.mRID()
 fun TransformerTest.mRID(): String = io.mrid
 fun WireInfo.mRID(): String = ai.mRID()
+
+/************ IEC61968 ASSETS ************/
+
 fun Asset.mRID(): String = io.mrid
 fun AssetContainer.mRID(): String = at.mRID()
 fun AssetInfo.mRID(): String = io.mrid
@@ -51,13 +58,28 @@ fun AssetOwner.mRID(): String = aor.mRID()
 fun Pole.mRID(): String = st.mRID()
 fun Streetlight.mRID(): String = at.mRID()
 fun Structure.mRID(): String = ac.mRID()
+
+/************ IEC61968 COMMON ************/
+
 fun Location.mRID(): String = io.mrid
+
+/************ IEC61968 METERING ************/
+
 fun EndDevice.mRID(): String = ac.mRID()
 fun Meter.mRID(): String = ed.mRID()
 fun UsagePoint.mRID(): String = io.mrid
+
+/************ IEC61968 OPERATIONS ************/
+
 fun OperationalRestriction.mRID(): String = doc.mRID()
+
+/************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
+
 fun AuxiliaryEquipment.mRID(): String = eq.mRID()
 fun FaultIndicator.mRID(): String = ae.mRID()
+
+/************ IEC61970 BASE CORE ************/
+
 fun AcDcTerminal.mRID(): String = io.mrid
 fun BaseVoltage.mRID(): String = io.mrid
 fun ConductingEquipment.mRID(): String = eq.mRID()
@@ -72,16 +94,43 @@ fun Site.mRID(): String = ec.mRID()
 fun SubGeographicalRegion.mRID(): String = io.mrid
 fun Substation.mRID(): String = ec.mRID()
 fun Terminal.mRID(): String = ad.mRID()
+
+fun AcDcTerminal.nameAndMRID(): String = io.nameAndMRID()
+fun ConnectivityNodeContainer.nameAndMRID(): String = psr.nameAndMRID()
+fun EquipmentContainer.nameAndMRID(): String = cnc.nameAndMRID()
+fun Feeder.nameAndMRID(): String = ec.nameAndMRID()
+fun PowerSystemResource.nameAndMRID(): String = io.nameAndMRID()
+fun Terminal.nameAndMRID(): String = ad.nameAndMRID()
+
+fun ConductingEquipment.assetInfoMRID(): String = eq.assetInfoMRID()
+fun Equipment.assetInfoMRID(): String = psr.assetInfoMRID
+
+/************ IEC61970 BASE EQUIVALENTS ************/
+
+fun EquivalentBranch.mRID(): String = ee.mRID()
+fun EquivalentEquipment.mRID(): String = ce.mRID()
+
+/************ IEC61970 BASE MEAS ************/
+
 fun Control.mRID(): String = ip.mRID()
 fun IoPoint.mRID(): String = io.mrid
 fun Measurement.mRID(): String = io.mrid
+
+/************ IEC61970 BASE SCADA ************/
+
 fun RemoteControl.mRID(): String = rp.mRID()
 fun RemotePoint.mRID(): String = io.mrid
 fun RemoteSource.mRID(): String = rp.mRID()
-fun PowerElectronicsUnit.mRID(): String = eq.mRID()
+
+/************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
+
 fun BatteryUnit.mRID(): String = peu.mRID()
 fun PhotoVoltaicUnit.mRID(): String = peu.mRID()
+fun PowerElectronicsUnit.mRID(): String = eq.mRID()
 fun PowerElectronicsWindUnit.mRID(): String = peu.mRID()
+
+/************ IEC61970 BASE WIRES ************/
+
 fun AcLineSegment.mRID(): String = cd.mRID()
 fun Breaker.mRID(): String = sw.mRID()
 fun LoadBreakSwitch.mRID(): String = ps.mRID()
@@ -115,21 +164,16 @@ fun Switch.mRID(): String = ce.mRID()
 fun TapChanger.mRID(): String = psr.mRID()
 fun TransformerEnd.mRID(): String = io.mrid
 fun TransformerStarImpedance.mRID(): String = io.mrid
-fun Circuit.mRID(): String = l.mRID()
-fun Loop.mRID(): String = io.mrid
 
-fun AcDcTerminal.nameAndMRID(): String = io.nameAndMRID()
-fun ConnectivityNodeContainer.nameAndMRID(): String = psr.nameAndMRID()
-fun EquipmentContainer.nameAndMRID(): String = cnc.nameAndMRID()
-fun Feeder.nameAndMRID(): String = ec.nameAndMRID()
-fun PowerSystemResource.nameAndMRID(): String = io.nameAndMRID()
-fun Terminal.nameAndMRID(): String = ad.nameAndMRID()
 fun EnergyConsumerPhase.nameAndMRID(): String = psr.nameAndMRID()
 fun EnergySourcePhase.nameAndMRID(): String = psr.nameAndMRID()
 fun PowerTransformerEnd.nameAndMRID(): String = te.nameAndMRID()
 fun TransformerEnd.nameAndMRID(): String = io.nameAndMRID()
 
-fun ConductingEquipment.assetInfoMRID(): String = eq.assetInfoMRID()
-fun Equipment.assetInfoMRID(): String = psr.assetInfoMRID
 fun Conductor.assetInfoMRID(): String = ce.assetInfoMRID()
 fun PowerTransformer.assetInfoMRID(): String = ce.assetInfoMRID()
+
+/************ IEC61970 InfIEC61970 ************/
+
+fun Circuit.mRID(): String = l.mRID()
+fun Loop.mRID(): String = io.mrid

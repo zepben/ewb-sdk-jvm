@@ -76,7 +76,7 @@
         <dependency>
             <groupId>com.zepben.protobuf</groupId>
             <artifactId>evolve-grpc</artifactId>
-            <version>0.15.0-SNAPSHOT7</version>
+            <version>0.15.0-SNAPSHOT8</version>
         </dependency>
 
         <!-- Kotlin -->

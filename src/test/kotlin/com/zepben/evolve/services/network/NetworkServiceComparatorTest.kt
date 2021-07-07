@@ -21,6 +21,8 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
@@ -45,9 +47,33 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         { options -> NetworkServiceComparator(options) }
     )
 
+    /************ IEC61968 ASSET INFO ************/
+
     @Test
     internal fun compareCableInfo() {
         compareWireInfo { CableInfo(mRID = it) }
+    }
+
+    @Test
+    internal fun compareNoLoadTest() {
+        compareTransformerTest { NoLoadTest(it) }
+
+        comparatorValidator.validateProperty(NoLoadTest::energisedEndVoltage, { NoLoadTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(NoLoadTest::excitingCurrent, { NoLoadTest(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(NoLoadTest::excitingCurrentZero, { NoLoadTest(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(NoLoadTest::loss, { NoLoadTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(NoLoadTest::lossZero, { NoLoadTest(it) }, { 1 }, { 2 })
+    }
+
+    @Test
+    internal fun compareOpenCircuitTest() {
+        compareTransformerTest { OpenCircuitTest(it) }
+
+        comparatorValidator.validateProperty(OpenCircuitTest::energisedEndStep, { OpenCircuitTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(OpenCircuitTest::energisedEndVoltage, { OpenCircuitTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(OpenCircuitTest::openEndStep, { OpenCircuitTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(OpenCircuitTest::openEndVoltage, { OpenCircuitTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(OpenCircuitTest::phaseShift, { OpenCircuitTest(it) }, { 1.0 }, { 2.0 })
     }
 
     @Test
@@ -64,8 +90,64 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             PowerTransformerInfo::addTransformerTankInfo,
             { PowerTransformerInfo(it) },
             { TransformerTankInfo("tti1") },
-            { TransformerTankInfo("tti2") }
+            { TransformerTankInfo("tti2") })
+    }
+
+    @Test
+    internal fun compareShortCircuitTest() {
+        compareTransformerTest { ShortCircuitTest(it) }
+
+        comparatorValidator.validateProperty(ShortCircuitTest::current, { ShortCircuitTest(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(ShortCircuitTest::energisedEndStep, { ShortCircuitTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(ShortCircuitTest::groundedEndStep, { ShortCircuitTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(ShortCircuitTest::leakageImpedance, { ShortCircuitTest(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(ShortCircuitTest::leakageImpedanceZero, { ShortCircuitTest(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(ShortCircuitTest::loss, { ShortCircuitTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(ShortCircuitTest::lossZero, { ShortCircuitTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(ShortCircuitTest::power, { ShortCircuitTest(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(ShortCircuitTest::voltage, { ShortCircuitTest(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(ShortCircuitTest::voltageOhmicPart, { ShortCircuitTest(it) }, { 1.0 }, { 2.0 })
+    }
+
+    @Test
+    internal fun compareTransformerEndInfo() {
+        compareAssetInfo { TransformerEndInfo(it) }
+
+        comparatorValidator.validateProperty(TransformerEndInfo::connectionKind, { TransformerEndInfo(it) }, { WindingConnection.D }, { WindingConnection.Y })
+        comparatorValidator.validateProperty(TransformerEndInfo::emergencyS, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::endNumber, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::insulationU, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::phaseAngleClock, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::r, { TransformerEndInfo(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(TransformerEndInfo::ratedS, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::ratedU, { TransformerEndInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerEndInfo::shortTermS, { TransformerEndInfo(it) }, { 1 }, { 2 })
+
+        comparatorValidator.validateProperty(
+            TransformerEndInfo::transformerStarImpedance,
+            { TransformerEndInfo(it) },
+            { TransformerStarImpedance("tsi1") },
+            { TransformerStarImpedance("tsi2") }
         )
+    }
+
+    @Test
+    internal fun compareTransformerTankInfo() {
+        compareAssetInfo { TransformerTankInfo(it) }
+
+        comparatorValidator.validateCollection(
+            TransformerTankInfo::transformerEndInfos,
+            TransformerTankInfo::addTransformerEndInfo,
+            { TransformerTankInfo(it) },
+            { TransformerEndInfo("tei1") },
+            { TransformerEndInfo("tei2") })
+    }
+
+    private fun compareTransformerTest(createTransformerTest: (String) -> TransformerTest) {
+        compareIdentifiedObject(createTransformerTest)
+
+        comparatorValidator.validateProperty(TransformerTest::basePower, createTransformerTest, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TransformerTest::temperature, createTransformerTest, { 1.0 }, { 2.0 })
     }
 
     private fun compareWireInfo(createWireInfo: (String) -> WireInfo) {
@@ -75,12 +157,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(WireInfo::material, createWireInfo, { WireMaterialKind.aluminum }, { WireMaterialKind.copperCadmium })
     }
 
+    /************ IEC61968 ASSETS ************/
+
     private fun compareAsset(createAsset: (String) -> Asset) {
         compareIdentifiedObject(createAsset)
 
-        comparatorValidator.validateCollection(
-            Asset::organisationRoles, Asset::addOrganisationRole, createAsset,
-            { AssetOwner("a1") }, { AssetOwner("a2") })
+        comparatorValidator.validateCollection(Asset::organisationRoles, Asset::addOrganisationRole, createAsset, { AssetOwner("a1") }, { AssetOwner("a2") })
         comparatorValidator.validateProperty(Asset::location, createAsset, { Location("l1") }, { Location("l2") })
     }
 
@@ -105,10 +187,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun comparePole() {
         compareStructure { Pole(mRID = it) }
         comparatorValidator.validateProperty(Pole::classification, { Pole(it) }, { "c1" }, { "c2" })
-        comparatorValidator.validateCollection(
-            Pole::streetlights, Pole::addStreetlight, { Pole(it) },
-            { Streetlight("sl1") }, { Streetlight("sl2") }
-        )
+        comparatorValidator.validateCollection(Pole::streetlights, Pole::addStreetlight, { Pole(it) }, { Streetlight("sl1") }, { Streetlight("sl2") })
     }
 
     @Test
@@ -128,18 +207,26 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareAssetContainer(createStructure)
     }
 
+    /************ IEC61968 COMMON ************/
+
     @Test
     internal fun compareLocation() {
         compareIdentifiedObject { Location(it) }
 
         comparatorValidator.validateProperty(
-            Location::mainAddress, { Location(it) },
-            { StreetAddress("1234", TownDetail("town", "state")) }, { StreetAddress("1234", TownDetail("other", "state")) })
-
+            Location::mainAddress,
+            { Location(it) },
+            { StreetAddress("1234", TownDetail("town", "state")) },
+            { StreetAddress("1234", TownDetail("other", "state")) })
         comparatorValidator.validateIndexedCollection(
-            Location::points, Location::addPoint, { Location(it) },
-            { PositionPoint(1.0, 2.0) }, { PositionPoint(3.0, 4.0) })
+            Location::points,
+            Location::addPoint,
+            { Location(it) },
+            { PositionPoint(1.0, 2.0) },
+            { PositionPoint(3.0, 4.0) })
     }
+
+    /************ IEC61968 METERING ************/
 
     private fun compareEndDevice(createEndDevice: (String) -> EndDevice) {
         compareAssetContainer(createEndDevice)
@@ -147,9 +234,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(EndDevice::customerMRID, createEndDevice, { "customer1" }, { "customer2" })
         comparatorValidator.validateProperty(EndDevice::serviceLocation, createEndDevice, { Location("l1") }, { Location("l2") })
         comparatorValidator.validateCollection(
-            EndDevice::usagePoints, EndDevice::addUsagePoint, createEndDevice,
-            { UsagePoint("up1") }, { UsagePoint("up2") },
-            NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
+            EndDevice::usagePoints,
+            EndDevice::addUsagePoint,
+            createEndDevice,
+            { UsagePoint("up1") },
+            { UsagePoint("up2") },
+            NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false),
+            optionsStopCompare = true
         )
     }
 
@@ -164,34 +255,52 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(UsagePoint::usagePointLocation, { UsagePoint(it) }, { Location("l1") }, { Location("l2") })
         comparatorValidator.validateCollection(
-            UsagePoint::endDevices, UsagePoint::addEndDevice, { UsagePoint(it) },
-            { Meter("m1") }, { Meter("m2") },
-            NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
+            UsagePoint::endDevices,
+            UsagePoint::addEndDevice,
+            { UsagePoint(it) },
+            { Meter("m1") },
+            { Meter("m2") },
+            NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false),
+            optionsStopCompare = true
         )
 
         comparatorValidator.validateCollection(
-            UsagePoint::equipment, UsagePoint::addEquipment, { UsagePoint(it) },
-            { Junction("j1") }, { Junction("j2") },
-            NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false), optionsStopCompare = true
+            UsagePoint::equipment,
+            UsagePoint::addEquipment,
+            { UsagePoint(it) },
+            { Junction("j1") },
+            { Junction("j2") },
+            NetworkServiceComparatorOptions.all().copy(compareLvSimplification = false),
+            optionsStopCompare = true
         )
     }
+
+    /************ IEC61968 OPERATIONS ************/
 
     @Test
     internal fun compareOperationalRestriction() {
         compareDocument { OperationalRestriction(it) }
 
         comparatorValidator.validateCollection(
-            OperationalRestriction::equipment, OperationalRestriction::addEquipment, { OperationalRestriction(it) },
-            { Junction("j1") }, { Junction("j2") })
+            OperationalRestriction::equipment,
+            OperationalRestriction::addEquipment,
+            { OperationalRestriction(it) },
+            { Junction("j1") },
+            { Junction("j2") })
     }
+
+    /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 
     private fun compareAuxiliaryEquipment(createAuxiliaryEquipment: (String) -> AuxiliaryEquipment) {
         compareEquipment(createAuxiliaryEquipment)
 
         comparatorValidator.validateProperty(
-            AuxiliaryEquipment::terminal, createAuxiliaryEquipment,
-            { Terminal("t1") }, { Terminal("t2") },
-            NetworkServiceComparatorOptions.all().copy(compareTerminals = false), optionsStopCompare = true
+            AuxiliaryEquipment::terminal,
+            createAuxiliaryEquipment,
+            { Terminal("t1") },
+            { Terminal("t2") },
+            NetworkServiceComparatorOptions.all().copy(compareTerminals = false),
+            optionsStopCompare = true
         )
     }
 
@@ -199,6 +308,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun compareFaultIndicator() {
         compareAuxiliaryEquipment { FaultIndicator(it) }
     }
+
+    /************ IEC61970 BASE CORE ************/
 
     private fun compareAcDcTerminal(createAcDcTerminal: (String) -> AcDcTerminal) {
         compareIdentifiedObject(createAcDcTerminal)
@@ -230,8 +341,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareIdentifiedObject { ConnectivityNode(it) }
 
         comparatorValidator.validateCollection(
-            ConnectivityNode::terminals, ConnectivityNode::addTerminal, { ConnectivityNode(it) },
-            { Terminal("1") }, { Terminal("2") })
+            ConnectivityNode::terminals,
+            ConnectivityNode::addTerminal,
+            { ConnectivityNode(it) },
+            { Terminal("1") },
+            { Terminal("2") })
     }
 
     private fun compareConnectivityNodeContainer(createConnectivityNodeContainer: (String) -> ConnectivityNodeContainer) {
@@ -243,29 +357,29 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(Equipment::inService, createEquipment, { true }, { false })
         comparatorValidator.validateProperty(Equipment::normallyInService, createEquipment, { true }, { false })
-        comparatorValidator.validateCollection(
-            Equipment::containers, Equipment::addContainer, createEquipment,
-            { Site("s1") }, { Site("s2") })
+        comparatorValidator.validateCollection(Equipment::containers, Equipment::addContainer, createEquipment, { Site("s1") }, { Site("s2") })
+
+        comparatorValidator.validateCollection(Equipment::usagePoints, Equipment::addUsagePoint, createEquipment, { UsagePoint("u1") }, { UsagePoint("u2") })
 
         comparatorValidator.validateCollection(
-            Equipment::usagePoints, Equipment::addUsagePoint, createEquipment,
-            { UsagePoint("u1") }, { UsagePoint("u2") })
+            Equipment::operationalRestrictions,
+            Equipment::addOperationalRestriction,
+            createEquipment,
+            { OperationalRestriction("o1") },
+            { OperationalRestriction("o2") })
 
-        comparatorValidator.validateCollection(
-            Equipment::operationalRestrictions, Equipment::addOperationalRestriction, createEquipment,
-            { OperationalRestriction("o1") }, { OperationalRestriction("o2") })
-
-        comparatorValidator.validateCollection(
-            Equipment::currentFeeders, Equipment::addCurrentFeeder, createEquipment,
-            { Feeder("f1") }, { Feeder("f2") })
+        comparatorValidator.validateCollection(Equipment::currentFeeders, Equipment::addCurrentFeeder, createEquipment, { Feeder("f1") }, { Feeder("f2") })
     }
 
     private fun compareEquipmentContainer(createEquipmentContainer: (String) -> EquipmentContainer) {
         compareConnectivityNodeContainer(createEquipmentContainer)
 
         comparatorValidator.validateCollection(
-            EquipmentContainer::equipment, EquipmentContainer::addEquipment, createEquipmentContainer,
-            { Junction("j1") }, { Junction("j2") })
+            EquipmentContainer::equipment,
+            EquipmentContainer::addEquipment,
+            createEquipmentContainer,
+            { Junction("j1") },
+            { Junction("j2") })
     }
 
     @Test
@@ -274,9 +388,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(Feeder::normalHeadTerminal, { Feeder(it) }, { Terminal("t1") }, { Terminal("t2") })
         comparatorValidator.validateProperty(Feeder::normalEnergizingSubstation, { Feeder(it) }, { Substation("s1") }, { Substation("s2") })
-        comparatorValidator.validateCollection(
-            Feeder::currentEquipment, Feeder::addCurrentEquipment, { Feeder(it) },
-            { Junction("j1") }, { Junction("j2") })
+        comparatorValidator.validateCollection(Feeder::currentEquipment, Feeder::addCurrentEquipment, { Feeder(it) }, { Junction("j1") }, { Junction("j2") })
     }
 
     @Test
@@ -284,8 +396,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareIdentifiedObject { GeographicalRegion(it) }
 
         comparatorValidator.validateCollection(
-            GeographicalRegion::subGeographicalRegions, GeographicalRegion::addSubGeographicalRegion, { GeographicalRegion(it) },
-            { SubGeographicalRegion("sg1") }, { SubGeographicalRegion("sg2") })
+            GeographicalRegion::subGeographicalRegions,
+            GeographicalRegion::addSubGeographicalRegion,
+            { GeographicalRegion(it) },
+            { SubGeographicalRegion("sg1") },
+            { SubGeographicalRegion("sg2") })
     }
 
     private fun comparePowerSystemResource(createPowerSystemResource: (String) -> PowerSystemResource) {
@@ -305,12 +420,17 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareIdentifiedObject { SubGeographicalRegion(it) }
 
         comparatorValidator.validateProperty(
-            SubGeographicalRegion::geographicalRegion, { SubGeographicalRegion(it) },
-            { GeographicalRegion("g1") }, { GeographicalRegion("g2") })
+            SubGeographicalRegion::geographicalRegion,
+            { SubGeographicalRegion(it) },
+            { GeographicalRegion("g1") },
+            { GeographicalRegion("g2") })
 
         comparatorValidator.validateCollection(
-            SubGeographicalRegion::substations, SubGeographicalRegion::addSubstation, { SubGeographicalRegion(it) },
-            { Substation("s1") }, { Substation("s2") })
+            SubGeographicalRegion::substations,
+            SubGeographicalRegion::addSubstation,
+            { SubGeographicalRegion(it) },
+            { Substation("s1") },
+            { Substation("s2") })
     }
 
     @Test
@@ -318,12 +438,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareEquipmentContainer { Substation(it) }
 
         comparatorValidator.validateProperty(
-            Substation::subGeographicalRegion, { Substation(it) },
-            { SubGeographicalRegion("sg1") }, { SubGeographicalRegion("sg2") })
+            Substation::subGeographicalRegion,
+            { Substation(it) },
+            { SubGeographicalRegion("sg1") },
+            { SubGeographicalRegion("sg2") })
 
-        comparatorValidator.validateCollection(
-            Substation::feeders, Substation::addFeeder, { Substation(it) },
-            { Feeder("f1") }, { Feeder("f2") })
+        comparatorValidator.validateCollection(Substation::feeders, Substation::addFeeder, { Substation(it) }, { Feeder("f1") }, { Feeder("f2") })
     }
 
     @Test
@@ -415,17 +535,87 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.IN, SinglePhaseKind.N) })
     }
 
-    private fun comparePowerElectronicsUnit(createPowerElectronicsUnit: (String) -> PowerElectronicsUnit) {
-        compareEquipment(createPowerElectronicsUnit)
+    /************ IEC61970 BASE EQUIVALENTS ************/
+
+    @Test
+    internal fun compareEquivalentBranch() {
+        compareEquivalentEquipment { EquivalentBranch(it) }
+
+        comparatorValidator.validateProperty(EquivalentBranch::negativeR12, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::negativeR21, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::negativeX12, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::negativeX21, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::positiveR12, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::positiveR21, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::positiveX12, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::positiveX21, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::r, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::r21, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::x, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::x21, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::zeroR12, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::zeroR21, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::zeroX12, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EquivalentBranch::zeroX21, { EquivalentBranch(it) }, { 1.0 }, { 2.0 })
+    }
+
+    private fun compareEquivalentEquipment(createEquivalentEquipment: (String) -> EquivalentEquipment) {
+        compareConductingEquipment(createEquivalentEquipment)
+    }
+
+    /************ IEC61970 BASE MEAS ************/
+
+    @Test
+    internal fun compareAccumulator() {
+        compareMeasurement { Accumulator(it) }
+    }
+
+    @Test
+    internal fun compareAnalog() {
+        compareMeasurement { Analog(it) }
+        comparatorValidator.validateProperty(Analog::positiveFlowIn, { Analog(it) }, { true }, { false })
+    }
+
+    @Test
+    internal fun compareDiscrete() {
+        compareMeasurement { Discrete(it) }
+    }
+
+    private fun compareMeasurement(createIdObj: (String) -> Measurement) {
+        compareIdentifiedObject { createIdObj(it) }
+
+        comparatorValidator.validateProperty(Measurement::powerSystemResourceMRID, { createIdObj(it) }, { "psr1" }, { "psr2" })
+        comparatorValidator.validateProperty(Measurement::terminalMRID, { createIdObj(it) }, { "terminal1" }, { "terminal2" })
+        comparatorValidator.validateProperty(Measurement::remoteSource, { createIdObj(it) }, { RemoteSource("rs1") }, { RemoteSource("rs2") })
+        comparatorValidator.validateProperty(Measurement::phases, { createIdObj(it) }, { PhaseCode.ABCN }, { PhaseCode.ABC })
+        comparatorValidator.validateProperty(Measurement::unitSymbol, { createIdObj(it) }, { UnitSymbol.HENRYS }, { UnitSymbol.HOURS })
+    }
+
+    /************ IEC61970 BASE SCADA ************/
+
+    @Test
+    internal fun compareRemoteControl() {
+        compareRemotePoint { RemoteControl(it) }
+
+        comparatorValidator.validateProperty(RemoteControl::control, { RemoteControl(it) }, { Control("c1") }, { Control("c2") })
+    }
+
+    private fun compareRemotePoint(createIdObj: (String) -> RemotePoint) {
+        compareIdentifiedObject { createIdObj(it) }
+    }
+
+    @Test
+    internal fun compareRemoteSource() {
+        compareRemotePoint { RemoteSource(it) }
 
         comparatorValidator.validateProperty(
-            PowerElectronicsUnit::powerElectronicsConnection,
-            createPowerElectronicsUnit,
-            { PowerElectronicsConnection("pec1") },
-            { PowerElectronicsConnection("pec2") })
-        comparatorValidator.validateProperty(PowerElectronicsUnit::maxP, createPowerElectronicsUnit, { 1 }, { 2 })
-        comparatorValidator.validateProperty(PowerElectronicsUnit::minP, createPowerElectronicsUnit, { 1 }, { 2 })
+            RemoteSource::measurement,
+            { RemoteSource(it) },
+            { object : Measurement("m1") {} },
+            { object : Measurement("m2") {} })
     }
+
+    /************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
 
     @Test
     internal fun compareBatteryUnit() {
@@ -441,18 +631,34 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparePowerElectronicsUnit { PhotoVoltaicUnit(it) }
     }
 
+    private fun comparePowerElectronicsUnit(createPowerElectronicsUnit: (String) -> PowerElectronicsUnit) {
+        compareEquipment(createPowerElectronicsUnit)
+
+        comparatorValidator.validateProperty(
+            PowerElectronicsUnit::powerElectronicsConnection,
+            createPowerElectronicsUnit,
+            { PowerElectronicsConnection("pec1") },
+            { PowerElectronicsConnection("pec2") })
+        comparatorValidator.validateProperty(PowerElectronicsUnit::maxP, createPowerElectronicsUnit, { 1 }, { 2 })
+        comparatorValidator.validateProperty(PowerElectronicsUnit::minP, createPowerElectronicsUnit, { 1 }, { 2 })
+    }
+
     @Test
     internal fun comparePowerElectronicsWindUnit() {
         comparePowerElectronicsUnit { PowerElectronicsWindUnit(it) }
     }
+
+    /************ IEC61970 BASE WIRES ************/
 
     @Test
     internal fun compareAcLineSegment() {
         compareConductor { AcLineSegment(it) }
 
         comparatorValidator.validateProperty(
-            AcLineSegment::perLengthSequenceImpedance, { AcLineSegment(it) },
-            { PerLengthSequenceImpedance("p1") }, { PerLengthSequenceImpedance("p2") })
+            AcLineSegment::perLengthSequenceImpedance,
+            { AcLineSegment(it) },
+            { PerLengthSequenceImpedance("p1") },
+            { PerLengthSequenceImpedance("p2") })
     }
 
     @Test
@@ -501,8 +707,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(EnergyConsumer::q, { EnergyConsumer(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(EnergyConsumer::qFixed, { EnergyConsumer(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateCollection(
-            EnergyConsumer::phases, EnergyConsumer::addPhase, { EnergyConsumer(it) },
-            { EnergyConsumerPhase("ecp1") }, { EnergyConsumerPhase("ecp2") })
+            EnergyConsumer::phases,
+            EnergyConsumer::addPhase,
+            { EnergyConsumer(it) },
+            { EnergyConsumerPhase("ecp1") },
+            { EnergyConsumerPhase("ecp2") })
     }
 
     @Test
@@ -510,8 +719,10 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparePowerSystemResource { EnergyConsumerPhase(it) }
 
         comparatorValidator.validateProperty(
-            EnergyConsumerPhase::energyConsumer, { EnergyConsumerPhase(it) },
-            { EnergyConsumer("ec1") }, { EnergyConsumer("ec2") })
+            EnergyConsumerPhase::energyConsumer,
+            { EnergyConsumerPhase(it) },
+            { EnergyConsumer("ec1") },
+            { EnergyConsumer("ec2") })
 
         comparatorValidator.validateProperty(EnergyConsumerPhase::phase, { EnergyConsumerPhase(it) }, { SinglePhaseKind.A }, { SinglePhaseKind.B })
         comparatorValidator.validateProperty(EnergyConsumerPhase::p, { EnergyConsumerPhase(it) }, { 1.0 }, { 2.0 })
@@ -537,8 +748,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(EnergySource::x0, { EnergySource(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(EnergySource::xn, { EnergySource(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateCollection(
-            EnergySource::phases, EnergySource::addPhase, { EnergySource(it) },
-            { EnergySourcePhase("ecp1") }, { EnergySourcePhase("ecp2") })
+            EnergySource::phases,
+            EnergySource::addPhase,
+            { EnergySource(it) },
+            { EnergySourcePhase("ecp1") },
+            { EnergySourcePhase("ecp2") })
     }
 
     @Test
@@ -606,11 +820,17 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareRegulatingCondEq { PowerElectronicsConnection(it) }
 
         comparatorValidator.validateCollection(
-            PowerElectronicsConnection::phases, PowerElectronicsConnection::addPhase, { PowerElectronicsConnection(it) },
-            { PowerElectronicsConnectionPhase("pecp1") }, { PowerElectronicsConnectionPhase("pecp2") })
+            PowerElectronicsConnection::phases,
+            PowerElectronicsConnection::addPhase,
+            { PowerElectronicsConnection(it) },
+            { PowerElectronicsConnectionPhase("pecp1") },
+            { PowerElectronicsConnectionPhase("pecp2") })
         comparatorValidator.validateCollection(
-            PowerElectronicsConnection::units, PowerElectronicsConnection::addUnit, { PowerElectronicsConnection(it) },
-            { object : PowerElectronicsUnit("peu1") {} }, { object : PowerElectronicsUnit("peu2") {} })
+            PowerElectronicsConnection::units,
+            PowerElectronicsConnection::addUnit,
+            { PowerElectronicsConnection(it) },
+            { object : PowerElectronicsUnit("peu1") {} },
+            { object : PowerElectronicsUnit("peu2") {} })
 
         comparatorValidator.validateProperty(PowerElectronicsConnection::maxIFault, { PowerElectronicsConnection(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(PowerElectronicsConnection::maxQ, { PowerElectronicsConnection(it) }, { 1.0 }, { 2.0 })
@@ -687,8 +907,10 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareTapChanger { RatioTapChanger(it) }
 
         comparatorValidator.validateProperty(
-            RatioTapChanger::transformerEnd, { RatioTapChanger(it) },
-            { PowerTransformerEnd("pte1") }, { PowerTransformerEnd("pte2") })
+            RatioTapChanger::transformerEnd,
+            { RatioTapChanger(it) },
+            { PowerTransformerEnd("pte1") },
+            { PowerTransformerEnd("pte2") })
 
         comparatorValidator.validateProperty(RatioTapChanger::stepVoltageIncrement, { RatioTapChanger(it) }, { 1.0 }, { 2.0 })
     }
@@ -761,8 +983,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             TransformerEnd::starImpedance,
             createTransformerEnd,
             { TransformerStarImpedance("tsi1") },
-            { TransformerStarImpedance("tsi2") }
-        )
+            { TransformerStarImpedance("tsi2") })
     }
 
     @Test
@@ -771,152 +992,23 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(Circuit::loop, { Circuit(it) }, { Loop("l1") }, { Loop("l2") })
 
-        comparatorValidator.validateCollection(
-            Circuit::endTerminals,
-            Circuit::addEndTerminal,
-            { Circuit(it) },
-            { Terminal("t1") },
-            { Terminal("t2") }
-        )
+        comparatorValidator.validateCollection(Circuit::endTerminals, Circuit::addEndTerminal, { Circuit(it) }, { Terminal("t1") }, { Terminal("t2") })
 
-        comparatorValidator.validateCollection(
-            Circuit::endSubstations,
-            Circuit::addEndSubstation,
-            { Circuit(it) },
-            { Substation("s1") },
-            { Substation("s2") })
+        comparatorValidator.validateCollection(Circuit::endSubstations, Circuit::addEndSubstation, { Circuit(it) }, { Substation("s1") }, { Substation("s2") })
     }
 
     @Test
     internal fun compareLoop() {
         compareIdentifiedObject { Loop(it) }
 
-        comparatorValidator.validateCollection(
-            Loop::circuits,
-            Loop::addCircuit,
-            { Loop(it) },
-            { Circuit("c1") },
-            { Circuit("c2") })
-
-        comparatorValidator.validateCollection(
-            Loop::substations,
-            Loop::addSubstation,
-            { Loop(it) },
-            { Substation("s1") },
-            { Substation("s2") })
-
+        comparatorValidator.validateCollection(Loop::circuits, Loop::addCircuit, { Loop(it) }, { Circuit("c1") }, { Circuit("c2") })
+        comparatorValidator.validateCollection(Loop::substations, Loop::addSubstation, { Loop(it) }, { Substation("s1") }, { Substation("s2") })
         comparatorValidator.validateCollection(
             Loop::energizingSubstations,
             Loop::addEnergizingSubstation,
             { Loop(it) },
             { Substation("s1") },
             { Substation("s2") })
-    }
-
-    private fun compareMeasurement(createIdObj: (String) -> Measurement) {
-        compareIdentifiedObject { createIdObj(it) }
-
-        comparatorValidator.validateProperty(Measurement::powerSystemResourceMRID, { createIdObj(it) }, { "psr1" }, { "psr2" })
-        comparatorValidator.validateProperty(Measurement::terminalMRID, { createIdObj(it) }, { "terminal1" }, { "terminal2" })
-        comparatorValidator.validateProperty(Measurement::remoteSource, { createIdObj(it) }, { RemoteSource("rs1") }, { RemoteSource("rs2") })
-        comparatorValidator.validateProperty(Measurement::phases, { createIdObj(it) }, { PhaseCode.ABCN }, { PhaseCode.ABC })
-        comparatorValidator.validateProperty(Measurement::unitSymbol, { createIdObj(it) }, { UnitSymbol.HENRYS }, { UnitSymbol.HOURS })
-    }
-
-    @Test
-    internal fun compareAnalog() {
-        compareMeasurement { Analog(it) }
-        comparatorValidator.validateProperty(Analog::positiveFlowIn, { Analog(it) }, { true }, { false })
-    }
-
-    @Test
-    internal fun compareAccumulator() {
-        compareMeasurement { Accumulator(it) }
-    }
-
-    @Test
-    internal fun compareDiscrete() {
-        compareMeasurement { Discrete(it) }
-    }
-
-    @Test
-    internal fun compareRemoteControl() {
-        compareRemotePoint { RemoteControl(it) }
-
-        comparatorValidator.validateProperty(RemoteControl::control, { RemoteControl(it) }, { Control("c1") }, { Control("c2") })
-    }
-
-    @Test
-    internal fun compareRemoteSource() {
-        compareRemotePoint { RemoteSource(it) }
-
-        comparatorValidator.validateProperty(
-            RemoteSource::measurement,
-            { RemoteSource(it) },
-            { object : Measurement("m1") {} },
-            { object : Measurement("m2") {} }
-        )
-    }
-
-    @Test
-    internal fun compareTransformerEndInfo() {
-        compareAssetInfo { TransformerEndInfo(it) }
-
-        comparatorValidator.validateProperty(TransformerEndInfo::connectionKind, { TransformerEndInfo(it) }, { WindingConnection.D }, { WindingConnection.Y })
-        comparatorValidator.validateProperty(TransformerEndInfo::emergencyS, { TransformerEndInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(TransformerEndInfo::endNumber, { TransformerEndInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(TransformerEndInfo::insulationU, { TransformerEndInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(TransformerEndInfo::phaseAngleClock, { TransformerEndInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(TransformerEndInfo::r, { TransformerEndInfo(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(TransformerEndInfo::ratedS, { TransformerEndInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(TransformerEndInfo::ratedU, { TransformerEndInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(TransformerEndInfo::shortTermS, { TransformerEndInfo(it) }, { 1 }, { 2 })
-
-        comparatorValidator.validateProperty(
-            TransformerEndInfo::transformerStarImpedance,
-            { TransformerEndInfo(it) },
-            { TransformerStarImpedance("tsi1") },
-            { TransformerStarImpedance("tsi2") }
-        )
-    }
-
-    @Test
-    internal fun compareTransformerStarImpedance() {
-        compareIdentifiedObject { TransformerStarImpedance(it) }
-
-        comparatorValidator.validateProperty(TransformerStarImpedance::r, { TransformerStarImpedance(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(TransformerStarImpedance::r0, { TransformerStarImpedance(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(TransformerStarImpedance::x, { TransformerStarImpedance(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(TransformerStarImpedance::x0, { TransformerStarImpedance(it) }, { 1.0 }, { 2.0 })
-
-        comparatorValidator.validateProperty(TransformerStarImpedance::r, { TransformerStarImpedance(it) }, { 1.0 }, { Double.NaN })
-        comparatorValidator.validateProperty(TransformerStarImpedance::r0, { TransformerStarImpedance(it) }, { 1.0 }, { Double.NaN })
-        comparatorValidator.validateProperty(TransformerStarImpedance::x, { TransformerStarImpedance(it) }, { 1.0 }, { Double.NaN })
-        comparatorValidator.validateProperty(TransformerStarImpedance::x0, { TransformerStarImpedance(it) }, { 1.0 }, { Double.NaN })
-
-        comparatorValidator.validateProperty(
-            TransformerStarImpedance::transformerEndInfo,
-            { TransformerStarImpedance(it) },
-            { TransformerEndInfo("tei1") },
-            { TransformerEndInfo("tei2") }
-        )
-    }
-
-    @Test
-    internal fun compareTransformerTankInfo() {
-        compareAssetInfo { TransformerTankInfo(it) }
-
-        comparatorValidator.validateCollection(
-            TransformerTankInfo::transformerEndInfos,
-            TransformerTankInfo::addTransformerEndInfo,
-            { TransformerTankInfo(it) },
-            { TransformerEndInfo("tei1") },
-            { TransformerEndInfo("tei2") }
-        )
-    }
-
-    private fun compareRemotePoint(createIdObj: (String) -> RemotePoint) {
-        compareIdentifiedObject { createIdObj(it) }
     }
 
 }

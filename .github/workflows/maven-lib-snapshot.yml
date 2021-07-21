@@ -19,20 +19,15 @@ jobs:
           path: /maven
           key: maven
 
-      # - name: Maven deploy to Central
-      #   id: build
-      #   uses: zepben/maven-deploy-central-action@main
-      #   with:
-      #     ZEPBEN_GPG_KEY: ${{ secrets.ZEPBEN_GPG_KEY_B64 }}
-      #     OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-      #     OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      #     GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-      #     GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
-
-      - name: Maven build and test
+      - name: Maven deploy to Central
         id: build
-        run: mvn clean test -P '!zepben-maven' -f pom.xml
-        shell: bash
+        uses: zepben/maven-deploy-central-action@main
+        with:
+          ZEPBEN_GPG_KEY: ${{ secrets.ZEPBEN_GPG_KEY_B64 }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
 
       - name: Upload coverage to Codecov
         if: steps.build.outcome == 'success'

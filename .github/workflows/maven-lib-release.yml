@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
   release-checks:
     runs-on: ubuntu-latest
-    container: zepben/pipeline-basic:5.0.0
+    container: zepben/pipeline-basic:5.5.0
     env:
       NEXUS_MAVEN_REPO: ${{ secrets.NEXUS_MAVEN_REPO }}
       NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
@@ -44,16 +44,20 @@ jobs:
           git checkout release
         shell: bash
 
-      - name: Maven deploy to Central
+      # - name: Maven deploy to Central
+      #   id: build
+      #   uses: zepben/maven-deploy-central-action@main
+      #   with:
+      #     ZEPBEN_GPG_KEY: ${{ secrets.ZEPBEN_GPG_KEY_B64 }}
+      #     OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      #     OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      #     GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+      #     GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
+      #   continue-on-error: true
+      - name: Maven build and test
         id: build
-        uses: zepben/maven-deploy-central-action@main
-        with:
-          ZEPBEN_GPG_KEY: ${{ secrets.ZEPBEN_GPG_KEY_B64 }}
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-          GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
-        continue-on-error: true
+        run: mvn clean test -P '!zepben-maven' -f pom.xml
+        shell: bash
 
       - name: Upload coverage to Codecov
         if: steps.build.outcome == 'success'
@@ -209,7 +213,7 @@ jobs:
   update-version:
     needs: create-release
     runs-on: ubuntu-latest
-    container: zepben/pipeline-basic:5.2.0
+    container: zepben/pipeline-basic:5.5.0
     env:
       NEXUS_MAVEN_REPO: ${{ secrets.NEXUS_MAVEN_REPO }}
       NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}

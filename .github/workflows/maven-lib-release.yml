@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
   release-checks:
     runs-on: ubuntu-latest
-    container: zepben/pipeline-basic:5.0.0
+    container: zepben/pipeline-basic:5.5.0
     env:
       NEXUS_MAVEN_REPO: ${{ secrets.NEXUS_MAVEN_REPO }}
       NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
@@ -209,7 +209,7 @@ jobs:
   update-version:
     needs: create-release
     runs-on: ubuntu-latest
-    container: zepben/pipeline-basic:5.2.0
+    container: zepben/pipeline-basic:5.5.0
     env:
       NEXUS_MAVEN_REPO: ${{ secrets.NEXUS_MAVEN_REPO }}
       NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}

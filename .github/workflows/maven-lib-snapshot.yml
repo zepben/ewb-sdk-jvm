@@ -32,3 +32,22 @@ jobs:
       - name: Upload coverage to Codecov
         if: steps.build.outcome == 'success'
         uses: codecov/codecov-action@v1
+
+  update-snapshot-version:
+    needs: [deploy-central]
+    container: zepben/pipeline-basic:5.5.0
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+      NEXUS_MAVEN_REPO: ${{ secrets.NEXUS_MAVEN_REPO }}
+      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      NEXUS_MAVEN_SNAPSHOT: ${{ secrets.NEXUS_MAVEN_SNAPSHOT }}
+      NEXUS_MAVEN_RELEASE: ${{ secrets.NEXUS_MAVEN_RELEASE }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update snapshot version
+        run: |
+          /scripts/update-version.sh --java --snapshot --maven pom.xml
+        shell: bash

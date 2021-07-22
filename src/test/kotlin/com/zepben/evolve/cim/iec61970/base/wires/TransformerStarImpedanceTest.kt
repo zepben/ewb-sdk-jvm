@@ -58,8 +58,8 @@ internal class TransformerStarImpedanceTest {
     internal fun populatesResistanceReactanceDirectlyIfAvailable() {
         val rr = TransformerStarImpedance().apply {
             r = 1.1
-            r0 = 1.2
-            x = 1.3
+            x = 1.2
+            r0 = 1.3
             x0 = 1.4
         }.resistanceReactance()
 

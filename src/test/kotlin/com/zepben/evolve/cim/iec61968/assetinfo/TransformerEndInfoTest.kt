@@ -80,8 +80,8 @@ internal class TransformerEndInfoTest {
         val info = spy(TransformerEndInfo().apply {
             transformerStarImpedance = TransformerStarImpedance().apply {
                 r = 1.1
-                r0 = 1.2
-                x = 1.3
+                x = 1.2
+                r0 = 1.3
                 x0 = 1.4
             }
         })
@@ -115,8 +115,53 @@ internal class TransformerEndInfoTest {
     internal fun calculatesResistanceReactanceOffEndInfoTestsIfAvailable() {
         val info = TransformerEndInfo()
 
-        // https://app.clickup.com/t/6929263/EWB-615 Add checks for calculating off tests
         assertThat(info.calculateResistanceReactanceFromTests(), nullValue())
     }
 
+    @Test
+    internal fun testCalculatesResistanceReactanceOfEndInfoTestsIfAvailable() {
+        val lossTest = ShortCircuitTest().apply { loss = 2020180; voltage = 11.85 }
+        val lossNoVoltageTest = ShortCircuitTest().apply { loss = 2020180 }
+        val ohmicTest = ShortCircuitTest().apply { voltageOhmicPart = 0.124; voltage = 11.85 }
+        val ohmicNoVoltageTest = ShortCircuitTest().apply { voltageOhmicPart = 0.124 }
+        val voltageOnlyTest = ShortCircuitTest().apply { voltage = 11.85 }
+
+        // check via loss
+        validateResistanceReactanceFromTest(400000, 1630000000, lossTest, lossTest, ResistanceReactance(0.12, 11.63, 0.12, 11.63))
+        validateResistanceReactanceFromTest(null, 1630000000, lossTest, lossTest, null)
+        validateResistanceReactanceFromTest(400000, null, lossTest, lossTest, null)
+        validateResistanceReactanceFromTest(400000, 1630000000, null, lossTest, ResistanceReactance(null, null, 0.12, 11.63))
+        validateResistanceReactanceFromTest(400000, 1630000000, lossTest, null, ResistanceReactance(0.12, 11.63, null, null))
+        validateResistanceReactanceFromTest(400000, 1630000000, lossNoVoltageTest, lossNoVoltageTest, ResistanceReactance(0.12, null, 0.12, null))
+
+        // check via ohmic part
+        validateResistanceReactanceFromTest(400000, 1630000000, ohmicTest, ohmicTest, ResistanceReactance(0.12, 11.63, 0.12, 11.63))
+        validateResistanceReactanceFromTest(null, 1630000000, ohmicTest, ohmicTest, null)
+        validateResistanceReactanceFromTest(400000, null, ohmicTest, ohmicTest, null)
+        validateResistanceReactanceFromTest(400000, 1630000000, null, ohmicTest, ResistanceReactance(null, null, 0.12, 11.63))
+        validateResistanceReactanceFromTest(400000, 1630000000, ohmicTest, null, ResistanceReactance(0.12, 11.63, null, null))
+        validateResistanceReactanceFromTest(400000, 1630000000, ohmicNoVoltageTest, ohmicNoVoltageTest, ResistanceReactance(0.12, null, 0.12, null))
+
+        // check invalid
+        validateResistanceReactanceFromTest(400000, 1630000000, voltageOnlyTest, voltageOnlyTest, null)
+    }
+
+    private fun validateResistanceReactanceFromTest(
+        ratedU: Int?,
+        ratedS: Int?,
+        energisedTest: ShortCircuitTest?,
+        groundedTest: ShortCircuitTest?,
+        expectedRr: ResistanceReactance?
+    ) {
+        val info = TransformerEndInfo().apply {
+            this.ratedU = ratedU
+            this.ratedS = ratedS
+            groundedEndShortCircuitTests = groundedTest
+            energisedEndShortCircuitTests = energisedTest
+        }
+
+        expectedRr?.let {
+            assertThat(info.calculateResistanceReactanceFromTests(), equalTo(expectedRr))
+        } ?: assertThat(info.calculateResistanceReactanceFromTests(), nullValue())
+    }
 }

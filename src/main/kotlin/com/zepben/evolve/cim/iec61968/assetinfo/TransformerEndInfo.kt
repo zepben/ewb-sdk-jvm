@@ -13,6 +13,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.TransformerStarImpedance
 import com.zepben.evolve.cim.iec61970.base.wires.WindingConnection
 import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.mergeIfIncomplete
+import kotlin.math.round
+import kotlin.math.sqrt
 
 /**
  * Transformer end data.
@@ -67,9 +69,38 @@ class TransformerEndInfo(mRID: String = "") : AssetInfo(mRID) {
             calculateResistanceReactanceFromTests()
         } ?: calculateResistanceReactanceFromTests()
 
-    // https://app.clickup.com/t/6929263/EWB-772
-    @Suppress("RedundantNullableReturnType")
-    internal fun calculateResistanceReactanceFromTests(): ResistanceReactance? =
-        null
+    private fun round2dp(value: Double): Double =
+        round(value * 100) / 100
+
+    internal fun calculateResistanceReactanceFromTests(): ResistanceReactance? {
+        // NOTE: The conversion to doubles below is to stop int overflow in the following maths.
+        val rU = ratedU?.toDouble() ?: return null
+        val rS = ratedS?.toDouble() ?: return null
+
+        fun calculateX(voltage: Double?, r: Double?): Double? {
+            voltage ?: return null
+            r ?: return null
+
+            val zMag: Double = (voltage / 100) * (rU * rU) / rS
+            return round2dp(sqrt((zMag * zMag) - (r * r)))
+        }
+
+        fun calculateRXFromTest(shortCircuitTest: ShortCircuitTest?): Pair<Double?, Double?> {
+            shortCircuitTest ?: return Pair(null, null)
+            val r = shortCircuitTest.voltageOhmicPart?.let {
+                round2dp((it * (rU * rU)) / (rS * 100))
+            } ?: shortCircuitTest.loss?.let {
+                val ratedR = (rU / rS)
+                round2dp(it * (ratedR * ratedR))
+            } ?: return Pair(null, null)
+
+            return Pair(r, calculateX(shortCircuitTest.voltage, r))
+        }
+
+        val (r, x) = calculateRXFromTest(energisedEndShortCircuitTests)
+        val (r0, x0) = calculateRXFromTest(groundedEndShortCircuitTests)
+
+        return ResistanceReactance(r, x, r0, x0).takeUnless { it.isEmpty() }
+    }
 
 }

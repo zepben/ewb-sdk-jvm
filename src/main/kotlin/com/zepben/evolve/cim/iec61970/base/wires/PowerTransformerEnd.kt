@@ -78,7 +78,7 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
      * If the data is not complete in any of the above it will merge in the missing values from the subsequent sources.
      */
     override fun resistanceReactance(): ResistanceReactance =
-        ResistanceReactance(r, r0, x, x0).mergeIfIncomplete {
+        ResistanceReactance(r, x, r0, x0).mergeIfIncomplete {
             starImpedance?.resistanceReactance()
         }.mergeIfIncomplete {
             powerTransformer?.assetInfo?.resistanceReactance(endNumber)

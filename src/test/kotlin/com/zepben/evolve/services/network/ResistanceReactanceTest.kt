@@ -21,6 +21,15 @@ internal class ResistanceReactanceTest {
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
     @Test
+    internal fun isEmpty() {
+        assertThat(ResistanceReactance(null, null, null, null).isEmpty(), equalTo(true))
+        assertThat(ResistanceReactance(1.1, null, null, null).isEmpty(), equalTo(false))
+        assertThat(ResistanceReactance(null, 2.2, null, null).isEmpty(), equalTo(false))
+        assertThat(ResistanceReactance(null, null, 3.3, null).isEmpty(), equalTo(false))
+        assertThat(ResistanceReactance(null, null, null, 4.4).isEmpty(), equalTo(false))
+    }
+
+    @Test
     internal fun isComplete() {
         assertThat(ResistanceReactance(1.1, 1.2, 1.3, 1.4).isComplete(), equalTo(true))
         assertThat(ResistanceReactance(null, 2.2, 2.3, 2.4).isComplete(), equalTo(false))
@@ -30,10 +39,10 @@ internal class ResistanceReactanceTest {
     }
 
     companion object {
-        fun validateResistanceReactance(rr: ResistanceReactance, r: Double?, r0: Double?, x: Double?, x0: Double?) {
+        fun validateResistanceReactance(rr: ResistanceReactance, r: Double?, x: Double?, r0: Double?, x0: Double?) {
             assertThat(rr.r, equalTo(r))
-            assertThat(rr.r0, equalTo(r0))
             assertThat(rr.x, equalTo(x))
+            assertThat(rr.r0, equalTo(r0))
             assertThat(rr.x0, equalTo(x0))
         }
     }

@@ -39,7 +39,7 @@ class TransformerStarImpedance(mRID: String = "") : IdentifiedObject(mRID) {
      * attempt to calculate them from the [TransformerEndInfo] tests.
      */
     fun resistanceReactance(): ResistanceReactance =
-        ResistanceReactance(r, r0, x, x0).mergeIfIncomplete {
+        ResistanceReactance(r, x, r0, x0).mergeIfIncomplete {
             transformerEndInfo?.calculateResistanceReactanceFromTests()
         }
 

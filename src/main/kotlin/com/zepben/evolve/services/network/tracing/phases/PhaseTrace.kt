@@ -10,8 +10,8 @@ package com.zepben.evolve.services.network.tracing.phases
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
-import com.zepben.evolve.services.network.tracing.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.OpenTest
+import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.phases.PhaseStep.Companion.continueAt
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue.Companion.processQueue

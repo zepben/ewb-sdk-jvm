@@ -8,6 +8,8 @@
 package com.zepben.evolve.services.network.tracing
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
+import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityTrace
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.phases.*
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
@@ -63,6 +65,40 @@ object Tracing {
      * @return The new traversal instance.
      */
     fun currentConnectedEquipmentTrace(): BasicTraversal<ConductingEquipment> = ConnectedEquipmentTrace.newCurrentConnectedEquipmentTrace()
+
+    /**
+     * Creates a new traversal that traces equipment that are connected. This ignores phases, open status etc.
+     * It is purely to trace equipment that are connected in any way.
+     *
+     * @return The new traversal instance.
+     */
+    @JvmStatic
+    fun connectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newConnectivityTrace()
+
+    /**
+     * Creates a new traversal that traces equipment that are connected. This ignores phases, open status etc.
+     * It is purely to trace equipment that are connected in any way.
+     *
+     * @return The new traversal instance.
+     */
+    @JvmStatic
+    fun connectivityBreadthTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newConnectivityBreadthTrace()
+
+    /**
+     * Creates a new traversal that traces equipment that are connected stopping at normally open points. This ignores phases etc.
+     * It is purely to trace equipment that are connected in any way.
+     *
+     * @return The new traversal instance.
+     */
+    fun normalConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newNormalConnectivityTrace()
+
+    /**
+     * Creates a new traversal that traces equipment that are connected stopping at currently open points. This ignores phases etc.
+     * It is purely to trace equipment that are connected in any way.
+     *
+     * @return The new traversal instance.
+     */
+    fun currentConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newCurrentConnectivityTrace()
 
     /**
      * Creates a new phase based trace ignoring the state of open phases

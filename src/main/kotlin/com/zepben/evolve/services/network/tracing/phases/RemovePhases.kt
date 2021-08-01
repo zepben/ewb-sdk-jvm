@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
-import com.zepben.evolve.services.network.tracing.ConnectivityResult
+import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
 import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue.Companion.branchQueue

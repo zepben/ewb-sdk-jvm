@@ -13,6 +13,8 @@
 * Fixed typo in `NetworkServiceComparator`. Was previously `NetworkServiceCompatatorOptions`.
 * Changed `DiagramObject.style` to be a string and removed `DiagramObjectStyle` enum.
 * Updated to use v0.15.0 gRPC protocols.
+* Moved `ConnectivityResult` from package `com.zepben.evolve.services.network.tracing` to
+  `com.zepben.evolve.services.network.tracing.connectivity`.
 
 ##### New Features
 
@@ -32,6 +34,7 @@
   with no `ConductingEquipment` will be automatically associated to any `ConductingEquipment` to which it is added.
 * Added a helper function to `Breaker` to identify if it is the head of a `Feeder`.
 * Added `isVirtual` and `connectionCategory` to `UsagePoint`
+* Created new traces for tracing connectivity using `ConnectivityResult`. These are available via `Tracing`.
 
 ##### Enhancements
 

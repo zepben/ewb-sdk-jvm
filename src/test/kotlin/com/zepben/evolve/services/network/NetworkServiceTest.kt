@@ -22,7 +22,7 @@ import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.evolve.services.network.testdata.SplitIndividualPhasesFromJunctionNetwork
 import com.zepben.evolve.services.network.testdata.SplitSinglePhasesFromJunctionNetwork
 import com.zepben.evolve.services.network.testdata.createNodeForConnecting
-import com.zepben.evolve.services.network.tracing.ConnectivityResult
+import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat

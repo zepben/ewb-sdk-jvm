@@ -19,8 +19,8 @@ import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths

@@ -48,9 +48,10 @@ object ConnectivityTrace {
         if (openTest.isOpen(to, null))
             return@QueueNext
 
-        NetworkService.connectedEquipment(to)
+        to.terminals
             .asSequence()
-            .filter { it.to != cr.from }
+            .filter { it != cr.toTerminal }
+            .flatMap { NetworkService.connectedTerminals(it) }
             .forEach { traversal.queue.add(it) }
     }
 

@@ -8,10 +8,6 @@
 
 package com.zepben.evolve.cim.iec61970.base.wires
 
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
 import com.zepben.evolve.cim.iec61968.assetinfo.TransformerEndInfo
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.ResistanceReactance
@@ -22,6 +18,10 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 
 internal class TransformerStarImpedanceTest {
 

@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.services.network.tracing.phases
 
-import com.nhaarman.mockitokotlin2.mock
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.testutils.junit.SystemLogExtension
@@ -16,6 +15,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.mock
 
 class PhaseStepTest {
 

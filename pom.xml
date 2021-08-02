@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.zepben.maven</groupId>
         <artifactId>evolve-super-pom</artifactId>
-        <version>0.9.0</version>
+        <version>0.11.0</version>
     </parent>
 
     <groupId>com.zepben</groupId>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>com.zepben.protobuf</groupId>
             <artifactId>evolve-grpc</artifactId>
-            <version>0.15.0-SNAPSHOT10</version>
+            <version>0.15.0</version>
         </dependency>
 
         <!-- Kotlin -->
@@ -106,10 +106,6 @@
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
-            <artifactId>grpc-kotlin-stub</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
             <artifactId>grpc-netty-shaded</artifactId>
         </dependency>
         <dependency>
@@ -117,6 +113,7 @@
             <artifactId>grpc-stub</artifactId>
         </dependency>
 
+        <!-- Misc -->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
@@ -150,20 +147,16 @@
             <artifactId>kotlin-test-junit</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.nhaarman.mockitokotlin2</groupId>
+            <groupId>org.mockito.kotlin</groupId>
             <artifactId>mockito-kotlin</artifactId>
         </dependency>
         <dependency>
             <groupId>com.marcinziolo</groupId>
             <artifactId>kotlin-wiremock</artifactId>
-            <version>1.0.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-testing</artifactId>
-            <version>${grpc.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

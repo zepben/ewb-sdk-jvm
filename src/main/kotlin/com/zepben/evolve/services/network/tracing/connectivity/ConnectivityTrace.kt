@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.connectivity
 
+import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
@@ -48,11 +49,23 @@ object ConnectivityTrace {
         if (openTest.isOpen(to, null))
             return@QueueNext
 
-        to.terminals
-            .asSequence()
-            .filter { it != cr.toTerminal }
-            .flatMap { NetworkService.connectedTerminals(it) }
-            .forEach { traversal.queue.add(it) }
+        if (to is BusbarSection)
+            to.terminals
+                .asSequence()
+                .flatMap { NetworkService.connectedTerminals(it) }
+                .filter { it.toTerminal != cr.fromTerminal }
+                .forEach { traversal.queue.add(it) }
+        else {
+            val connectivity = to.terminals
+                .filter { it != cr.toTerminal }
+                .flatMap { NetworkService.connectedTerminals(it) }
+
+            val busbars = connectivity.filter { it.to is BusbarSection }
+            if (busbars.isNotEmpty())
+                busbars.forEach { traversal.queue.add(it) }
+            else
+                connectivity.forEach { traversal.queue.add(it) }
+        }
     }
 
 }

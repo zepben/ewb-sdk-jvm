@@ -8,8 +8,6 @@
 
 package com.zepben.evolve.cim.iec61968.assetinfo
 
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.spy
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
@@ -23,6 +21,8 @@ import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.spy
 
 internal class TransformerTankInfoTest {
 

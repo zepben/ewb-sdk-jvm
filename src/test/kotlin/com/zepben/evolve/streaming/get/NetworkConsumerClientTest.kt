@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.streaming.get
 
-import com.nhaarman.mockitokotlin2.*
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.evolve.cim.iec61968.common.Location
@@ -41,6 +40,7 @@ import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.*
 import com.zepben.protobuf.nc.NetworkIdentifiedObject as NIO
 
 

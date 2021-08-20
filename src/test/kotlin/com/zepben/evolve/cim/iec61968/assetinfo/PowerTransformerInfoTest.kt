@@ -8,8 +8,6 @@
 
 package com.zepben.evolve.cim.iec61968.assetinfo
 
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.spy
 import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.ResistanceReactanceTest
 import com.zepben.evolve.utils.PrivateCollectionValidator
@@ -18,6 +16,8 @@ import org.hamcrest.Matchers
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.spy
 
 internal class PowerTransformerInfoTest {
 

@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.cim.iec61968.assetinfo
 
-import com.nhaarman.mockitokotlin2.*
 import com.zepben.evolve.cim.iec61970.base.wires.TransformerStarImpedance
 import com.zepben.evolve.cim.iec61970.base.wires.WindingConnection
 import com.zepben.evolve.services.network.NetworkService
@@ -21,6 +20,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.*
 
 internal class TransformerEndInfoTest {
 

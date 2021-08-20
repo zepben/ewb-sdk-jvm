@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
-import com.nhaarman.mockitokotlin2.*
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
@@ -21,6 +20,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito.times
+import org.mockito.kotlin.*
 
 internal class PowerTransformerEndTest {
 

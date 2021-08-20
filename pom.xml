@@ -98,21 +98,6 @@
             <version>${kotlin.serialization.version}</version>
         </dependency>
 
-
-        <!-- Protobuf/gRPC -->
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty-shaded</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-stub</artifactId>
-        </dependency>
-
         <!-- Misc -->
         <dependency>
             <groupId>org.xerial</groupId>

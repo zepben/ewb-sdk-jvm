@@ -15,7 +15,7 @@ class TableShuntCompensatorInfo : TableAssetInfo() {
 
     val MAX_POWER_LOSS = Column(++columnIndex, "max_power_loss", "INTEGER", NULL)
     val RATED_CURRENT = Column(++columnIndex, "rated_current", "INTEGER", NULL)
-    val RATED_REACTIVE_POWER = Column(++columnIndex, "rated_voltage", "INTEGER", NULL)
+    val RATED_REACTIVE_POWER = Column(++columnIndex, "rated_reactive_power", "INTEGER", NULL)
     val RATED_VOLTAGE = Column(++columnIndex, "rated_voltage", "INTEGER", NULL)
 
     override fun name(): String {

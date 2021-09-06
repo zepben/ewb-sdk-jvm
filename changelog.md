@@ -29,6 +29,7 @@
   * `NoLoadTest`
   * `OpenCircuitTest`
   * `ShortCircuitTest`
+  * `ShuntCompensatorInfo`
   * `TransformerTest`
 * Objects that belong to a parent object will now be automatically assigned if the parent is null when added. e.g. a `Terminal`
   with no `ConductingEquipment` will be automatically associated to any `ConductingEquipment` to which it is added.

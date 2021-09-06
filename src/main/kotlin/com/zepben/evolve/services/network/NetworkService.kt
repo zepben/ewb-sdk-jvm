@@ -80,6 +80,9 @@ class NetworkService : BaseService("network") {
     fun add(shortCircuitTest: ShortCircuitTest): Boolean = super.add(shortCircuitTest)
     fun remove(shortCircuitTest: ShortCircuitTest): Boolean = super.remove(shortCircuitTest)
 
+    fun add(shuntCompensatorInfo: ShuntCompensatorInfo): Boolean = super.add(shuntCompensatorInfo)
+    fun remove(shuntCompensatorInfo: ShuntCompensatorInfo): Boolean = super.remove(shuntCompensatorInfo)
+
     // ###################
     // # IEC61968 ASSETS #
     // ###################

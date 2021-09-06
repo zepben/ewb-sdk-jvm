@@ -15,6 +15,7 @@ import com.zepben.evolve.database.sqlite.DatabaseReader
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet28
 import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet30
+import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet36
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
@@ -155,6 +156,14 @@ class ChangeSetTest {
             // Test the these tables exist
             executeQuery("SELECT * FROM names")
             executeQuery("SELECT * FROM name_types")
+        }
+    }
+
+    @Test
+    internal fun `cs36 creates ShuntCompensatorInfo table`() {
+        validateChangeSet("src/test/data/changeset36.sql", changeSet36()) {
+            // Test the ShuntCompensatorInfo table exists
+            executeQuery("SELECT * FROM shunt_compensator_info")
         }
     }
 

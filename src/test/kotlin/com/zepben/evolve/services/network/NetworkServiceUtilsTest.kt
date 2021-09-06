@@ -111,6 +111,7 @@ internal class NetworkServiceUtilsTest {
         isOpenCircuitTest: (OpenCircuitTest) -> String,
         isShortCircuitTest: (ShortCircuitTest) -> String,
         isEquivalentBranch: (EquivalentBranch) -> String,
+        isShuntCompensatorInfo: (ShuntCompensatorInfo) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -172,6 +173,7 @@ internal class NetworkServiceUtilsTest {
         isOpenCircuitTest = isOpenCircuitTest,
         isShortCircuitTest = isShortCircuitTest,
         isEquivalentBranch = isEquivalentBranch,
+        isShuntCompensatorInfo = isShuntCompensatorInfo,
         isOther = isOther
     )
 
@@ -235,6 +237,7 @@ internal class NetworkServiceUtilsTest {
         isOpenCircuitTest: InvokeChecker<OpenCircuitTest> = NeverInvokedChecker(),
         isShortCircuitTest: InvokeChecker<ShortCircuitTest> = NeverInvokedChecker(),
         isEquivalentBranch: InvokeChecker<EquivalentBranch> = NeverInvokedChecker(),
+        isShuntCompensatorInfo: InvokeChecker<ShuntCompensatorInfo> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -297,6 +300,7 @@ internal class NetworkServiceUtilsTest {
             isOpenCircuitTest = isOpenCircuitTest,
             isShortCircuitTest = isShortCircuitTest,
             isEquivalentBranch = isEquivalentBranch,
+            isShuntCompensatorInfo = isShuntCompensatorInfo,
             isOther = isOther
         )
 
@@ -427,6 +431,7 @@ internal class NetworkServiceUtilsTest {
         OpenCircuitTest().also { whenNetworkServiceObjectTester(it, isOpenCircuitTest = InvokedChecker(it)) }
         ShortCircuitTest().also { whenNetworkServiceObjectTester(it, isShortCircuitTest = InvokedChecker(it)) }
         EquivalentBranch().also { whenNetworkServiceObjectTester(it, isEquivalentBranch = InvokedChecker(it)) }
+        ShuntCompensatorInfo().also { whenNetworkServiceObjectTester(it, isShuntCompensatorInfo = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

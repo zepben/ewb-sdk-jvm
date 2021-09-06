@@ -150,6 +150,7 @@ class DatabaseTables {
         TableRemoteControls(),
         TableRemoteSources(),
         TableShortCircuitTests(),
+        TableShuntCompensatorInfo(),
         TableSites(),
         TableStreetlights(),
         TableSubGeographicalRegions(),

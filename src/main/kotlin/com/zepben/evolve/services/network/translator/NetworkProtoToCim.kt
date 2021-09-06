@@ -39,6 +39,7 @@ import com.zepben.protobuf.cim.iec61968.assetinfo.OpenCircuitTest as PBOpenCircu
 import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverheadWireInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PBPowerTransformerInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.ShortCircuitTest as PBShortCircuitTest
+import com.zepben.protobuf.cim.iec61968.assetinfo.ShuntCompensatorInfo as PBShuntCompensatorInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerEndInfo as PBTransformerEndInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTankInfo as PBTransformerTankInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTest as PBTransformerTest
@@ -183,6 +184,17 @@ fun toCim(pb: PBShortCircuitTest, networkService: NetworkService): ShortCircuitT
         toCim(pb.tt, this, networkService)
     }
 
+
+fun toCim(pb: PBShuntCompensatorInfo, networkService: NetworkService): ShuntCompensatorInfo =
+    ShuntCompensatorInfo(pb.mRID()).apply {
+        maxPowerLoss = pb.maxPowerLoss.takeUnless { it == UNKNOWN_INT }
+        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_INT }
+        ratedReactivePower = pb.ratedReactivePower.takeUnless { it == UNKNOWN_INT }
+        ratedVoltage = pb.ratedVoltage.takeUnless { it == UNKNOWN_INT }
+
+        toCim(pb.ai, this, networkService)
+    }
+
 fun toCim(pb: PBTransformerEndInfo, networkService: NetworkService): TransformerEndInfo =
     TransformerEndInfo(pb.mRID()).apply {
         connectionKind = WindingConnection.valueOf(pb.connectionKind.name)
@@ -235,6 +247,7 @@ fun NetworkService.addFromPb(pb: PBOpenCircuitTest): OpenCircuitTest? = tryAddOr
 fun NetworkService.addFromPb(pb: PBOverheadWireInfo): OverheadWireInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPowerTransformerInfo): PowerTransformerInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBShortCircuitTest): ShortCircuitTest? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBShuntCompensatorInfo): ShuntCompensatorInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = tryAddOrNull(toCim(pb, this))
 
@@ -967,6 +980,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBOverheadWireInfo): OverheadWireInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerTransformerInfo): PowerTransformerInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBShortCircuitTest): ShortCircuitTest? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBShuntCompensatorInfo): ShuntCompensatorInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = networkService.addFromPb(pb)
 

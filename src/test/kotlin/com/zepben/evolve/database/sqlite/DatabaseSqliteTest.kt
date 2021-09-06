@@ -133,6 +133,7 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.networkServicesOf(::OverheadWireInfo, OverheadWireInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::PowerTransformerInfo, PowerTransformerInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::ShortCircuitTest, ShortCircuitTest::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::ShuntCompensatorInfo, ShuntCompensatorInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::TransformerEndInfo, TransformerEndInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::TransformerTankInfo, TransformerTankInfo::fillFields))
 

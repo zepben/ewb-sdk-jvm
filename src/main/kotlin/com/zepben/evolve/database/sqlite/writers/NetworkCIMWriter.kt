@@ -135,6 +135,18 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveTransformerTest(table, insert, shortCircuitTest, "short circuit test")
     }
 
+    fun save(shuntCompensatorInfo: ShuntCompensatorInfo): Boolean {
+        val table = databaseTables.getTable(TableShuntCompensatorInfo::class.java)
+        val insert = databaseTables.getInsert(TableShuntCompensatorInfo::class.java)
+
+        insert.setNullableInt(table.MAX_POWER_LOSS.queryIndex, shuntCompensatorInfo.maxPowerLoss)
+        insert.setNullableInt(table.RATED_CURRENT.queryIndex, shuntCompensatorInfo.ratedCurrent)
+        insert.setNullableInt(table.RATED_REACTIVE_POWER.queryIndex, shuntCompensatorInfo.ratedReactivePower)
+        insert.setNullableInt(table.RATED_VOLTAGE.queryIndex, shuntCompensatorInfo.ratedVoltage)
+
+        return saveAssetInfo(table, insert, shuntCompensatorInfo, "shunt compensator info")
+    }
+
     fun save(transformerEndInfo: TransformerEndInfo): Boolean {
         val table = databaseTables.getTable(TableTransformerEndInfo::class.java)
         val insert = databaseTables.getInsert(TableTransformerEndInfo::class.java)

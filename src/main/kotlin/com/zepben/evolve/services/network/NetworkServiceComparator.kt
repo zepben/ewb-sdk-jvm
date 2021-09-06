@@ -102,6 +102,18 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             )
         }
 
+    private fun compareShuntCompensatorInfo(source: ShuntCompensatorInfo, target: ShuntCompensatorInfo): ObjectDifference<ShuntCompensatorInfo> =
+        ObjectDifference(source, target).apply {
+            compareAssetInfo()
+
+            compareValues(
+                ShuntCompensatorInfo::maxPowerLoss,
+                ShuntCompensatorInfo::ratedCurrent,
+                ShuntCompensatorInfo::ratedReactivePower,
+                ShuntCompensatorInfo::ratedVoltage
+            )
+        }
+
     private fun compareTransformerEndInfo(source: TransformerEndInfo, target: TransformerEndInfo): ObjectDifference<TransformerEndInfo> =
         ObjectDifference(source, target).apply {
             compareAssetInfo()

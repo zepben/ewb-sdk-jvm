@@ -43,6 +43,7 @@ fun NoLoadTest.mRID(): String = tt.mRID()
 fun OpenCircuitTest.mRID(): String = tt.mRID()
 fun PowerTransformerInfo.mRID(): String = ai.mRID()
 fun ShortCircuitTest.mRID(): String = tt.mRID()
+fun ShuntCompensatorInfo.mRID(): String = ai.mRID()
 fun TransformerEndInfo.mRID(): String = ai.mRID()
 fun TransformerTankInfo.mRID(): String = ai.mRID()
 fun TransformerTest.mRID(): String = io.mrid

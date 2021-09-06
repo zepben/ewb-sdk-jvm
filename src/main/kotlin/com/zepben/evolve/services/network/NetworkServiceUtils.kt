@@ -105,6 +105,11 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isTransformerEndInfo Handler when the [identifiedObject] is a [TransformerEndInfo]
  * @param isTransformerStarImpedance Handler when the [identifiedObject] is a [TransformerStarImpedance]
  * @param isTransformerTankInfo Handler when the [identifiedObject] is a [TransformerTankInfo]
+ * @param isNoLoadTest Handler when the [identifiedObject] is a [NoLoadTest]
+ * @param isOpenCircuitTest Handler when the [identifiedObject] is a [OpenCircuitTest]
+ * @param isShortCircuitTest Handler when the [identifiedObject] is a [ShortCircuitTest]
+ * @param isEquivalentBranch Handler when the [identifiedObject] is a [EquivalentBranch]
+ * @param isShuntCompensatorInfo Handler when the [identifiedObject] is a [ShuntCompensatorInfo]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -168,6 +173,7 @@ inline fun <R> whenNetworkServiceObject(
     isOpenCircuitTest: (OpenCircuitTest) -> R,
     isShortCircuitTest: (ShortCircuitTest) -> R,
     isEquivalentBranch: (EquivalentBranch) -> R,
+    isShuntCompensatorInfo: (ShuntCompensatorInfo) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -230,5 +236,6 @@ inline fun <R> whenNetworkServiceObject(
     is OpenCircuitTest -> isOpenCircuitTest(identifiedObject)
     is ShortCircuitTest -> isShortCircuitTest(identifiedObject)
     is EquivalentBranch -> isEquivalentBranch(identifiedObject)
+    is ShuntCompensatorInfo -> isShuntCompensatorInfo(identifiedObject)
     else -> isOther(identifiedObject)
 }

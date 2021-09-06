@@ -128,6 +128,17 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadTransformerTest(shortCircuitTest, table, resultSet) && networkService.addOrThrow(shortCircuitTest)
     }
 
+    fun load(table: TableShuntCompensatorInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val shuntCompensatorInfo = ShuntCompensatorInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            maxPowerLoss = resultSet.getNullableInt(table.MAX_POWER_LOSS.queryIndex)
+            ratedCurrent = resultSet.getNullableInt(table.RATED_CURRENT.queryIndex)
+            ratedReactivePower = resultSet.getNullableInt(table.RATED_REACTIVE_POWER.queryIndex)
+            ratedVoltage = resultSet.getNullableInt(table.RATED_VOLTAGE.queryIndex)
+        }
+
+        return loadAssetInfo(shuntCompensatorInfo, table, resultSet) && networkService.addOrThrow(shuntCompensatorInfo)
+    }
+
     fun load(table: TableTransformerEndInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val transformerEndInfo = TransformerEndInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             connectionKind = WindingConnection.valueOf(resultSet.getString(table.CONNECTION_KIND.queryIndex))

@@ -72,6 +72,7 @@ internal class NetworkTranslatorTest {
         validate({ OverheadWireInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
         validate({ PowerTransformerInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
         validate({ ShortCircuitTest() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
+        validate({ ShuntCompensatorInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
         validate({ TransformerEndInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
         validate({ TransformerTankInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
 

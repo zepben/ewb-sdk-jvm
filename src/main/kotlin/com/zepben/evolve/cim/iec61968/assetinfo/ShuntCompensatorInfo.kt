@@ -19,10 +19,10 @@ import kotlin.math.sqrt
 /**
  * Properties of shunt capacitor, shunt reactor or switchable bank of shunt capacitor or reactor assets.
  *
- * @property maxPowerLoss Maximum allowed apparent power loss.
- * @property ratedCurrent Rated current.
- * @property ratedReactivePower Rated reactive power.
- * @property ratedVoltage Rated voltage.
+ * @property maxPowerLoss Maximum allowed apparent power loss in watts.
+ * @property ratedCurrent Rated current in amperes.
+ * @property ratedReactivePower Rated reactive power in volt-amperes reactive.
+ * @property ratedVoltage Rated voltage in volts.
  */
 class ShuntCompensatorInfo(mRID: String = "") : AssetInfo(mRID) {
 

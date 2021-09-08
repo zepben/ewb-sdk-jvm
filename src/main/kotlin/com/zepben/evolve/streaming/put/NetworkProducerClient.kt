@@ -262,7 +262,8 @@ class NetworkProducerClient(
             isNoLoadTest = { throw NotImplementedError() },
             isOpenCircuitTest = { throw NotImplementedError() },
             isShortCircuitTest = { throw NotImplementedError() },
-            isEquivalentBranch = { throw NotImplementedError() }
+            isEquivalentBranch = { throw NotImplementedError() },
+            isShuntCompensatorInfo = { throw NotImplementedError() }
         )
     }.throwOnUnhandledError()
 }

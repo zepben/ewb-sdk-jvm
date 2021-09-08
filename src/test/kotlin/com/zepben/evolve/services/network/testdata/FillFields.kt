@@ -105,6 +105,17 @@ fun ShortCircuitTest.fillFields(service: NetworkService, includeRuntime: Boolean
     return this
 }
 
+fun ShuntCompensatorInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): ShuntCompensatorInfo {
+    (this as AssetInfo).fillFields(service, includeRuntime)
+
+    maxPowerLoss = 1
+    ratedCurrent = 2
+    ratedReactivePower = 3
+    ratedVoltage = 4
+
+    return this
+}
+
 fun TransformerEndInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): TransformerEndInfo {
     (this as AssetInfo).fillFields(service, includeRuntime)
 

@@ -48,6 +48,7 @@ import com.zepben.protobuf.cim.iec61968.assetinfo.OpenCircuitTest as PBOpenCircu
 import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverheadWireInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PBPowerTransformerInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.ShortCircuitTest as PBShortCircuitTest
+import com.zepben.protobuf.cim.iec61968.assetinfo.ShuntCompensatorInfo as PBShuntCompensatorInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerEndInfo as PBTransformerEndInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTankInfo as PBTransformerTankInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTest as PBTransformerTest
@@ -188,6 +189,17 @@ fun toPb(cim: ShortCircuitTest, pb: PBShortCircuitTest.Builder): PBShortCircuitT
         toPb(cim, ttBuilder)
     }
 
+
+fun toPb(cim: ShuntCompensatorInfo, pb: PBShuntCompensatorInfo.Builder): PBShuntCompensatorInfo.Builder =
+    pb.apply {
+        maxPowerLoss = cim.maxPowerLoss ?: UNKNOWN_INT
+        ratedCurrent = cim.ratedCurrent ?: UNKNOWN_INT
+        ratedReactivePower = cim.ratedReactivePower ?: UNKNOWN_INT
+        ratedVoltage = cim.ratedVoltage ?: UNKNOWN_INT
+
+        toPb(cim, aiBuilder)
+    }
+
 fun toPb(cim: TransformerEndInfo, pb: PBTransformerEndInfo.Builder): PBTransformerEndInfo.Builder =
     pb.apply {
         connectionKind = WindingConnection.valueOf(cim.connectionKind.name)
@@ -239,6 +251,7 @@ fun OpenCircuitTest.toPb(): PBOpenCircuitTest = toPb(this, PBOpenCircuitTest.new
 fun OverheadWireInfo.toPb(): PBOverheadWireInfo = toPb(this, PBOverheadWireInfo.newBuilder()).build()
 fun PowerTransformerInfo.toPb(): PBPowerTransformerInfo = toPb(this, PBPowerTransformerInfo.newBuilder()).build()
 fun ShortCircuitTest.toPb(): PBShortCircuitTest = toPb(this, PBShortCircuitTest.newBuilder()).build()
+fun ShuntCompensatorInfo.toPb(): PBShuntCompensatorInfo = toPb(this, PBShuntCompensatorInfo.newBuilder()).build()
 fun TransformerEndInfo.toPb(): PBTransformerEndInfo = toPb(this, PBTransformerEndInfo.newBuilder()).build()
 fun TransformerTankInfo.toPb(): PBTransformerTankInfo = toPb(this, PBTransformerTankInfo.newBuilder()).build()
 

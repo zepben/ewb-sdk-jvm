@@ -572,6 +572,7 @@ class NetworkConsumerClient(
             OPENCIRCUITTEST -> extractResult(io.openCircuitTest.mRID()) { addFromPb(io.openCircuitTest) }
             SHORTCIRCUITTEST -> extractResult(io.shortCircuitTest.mRID()) { addFromPb(io.shortCircuitTest) }
             EQUIVALENTBRANCH -> extractResult(io.equivalentBranch.mRID()) { addFromPb(io.equivalentBranch) }
+            SHUNTCOMPENSATORINFO -> extractResult(io.shuntCompensatorInfo.mRID()) { addFromPb(io.shuntCompensatorInfo) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )

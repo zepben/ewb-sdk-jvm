@@ -55,6 +55,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableNoLoadTests>("no load tests", reader::load)
         status = status and loadEach<TableOpenCircuitTests>("open circuit tests", reader::load)
         status = status and loadEach<TableShortCircuitTests>("short circuit tests", reader::load)
+        status = status and loadEach<TableShuntCompensatorInfo>("shunt compensator info", reader::load)
         status = status and loadEach<TableTransformerEndInfo>("transformer end info", reader::load)
         status = status and loadEach<TableLocations>("locations", reader::load)
         status = status and loadEach<TableOrganisations>("organisations", reader::load)

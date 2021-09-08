@@ -8,39 +8,62 @@
 
 package com.zepben.evolve.database.sqlite.upgrade.changesets
 
-import java.sql.Connection
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import java.sql.ResultSet
+import java.sql.Statement
 
 
 interface ChangeSetValidator {
 
     /**
      * Set up prior to applying the ChangeSet.
-     * @param connection The connection to the database that the ChangeSet will be applied
+     * @return A list of statements to run on the database to which the ChangeSet will be applied.
      */
-    fun setUp(connection: Connection)
+    fun setUpStatements(): List<String>
+
+    /**
+     * Populate any tables or fields with data after applying the ChangeSet.
+     * @return A list of statements to run on the database to which the ChangeSet has been applied.
+     */
+    fun populateStatements(): List<String>
 
     /**
      * Validation after applying the ChangeSet
-     * @param connection The connection to the database that the ChangeSet will be applied
+     * @param statement A statement that can be used to run queries against the database to which the ChangeSet has been applied.
      */
-    fun validate(connection: Connection)
+    fun validate(statement: Statement)
 
     /**
      * Tear down after validating the ChangeSet.
-     * @param connection The connection to the database that the ChangeSet will be applied
+     * @return A list of statements to remove any data from the database to which the ChangeSet was applied.
      */
-    fun tearDown(connection: Connection)
+    fun tearDownStatements(): List<String>
+
+    /**
+     * Validate each row returned from a query.
+     * @param statement The statement used to run the query.
+     * @param sql The query string.
+     * @param validators A list of validators, one per expected row in the query.
+     */
+    fun validateRows(statement: Statement, sql: String, vararg validators: (ResultSet) -> Unit) {
+        statement.executeQuery(sql).use { rs ->
+            validators.forEach {
+                assertThat(rs.next(), equalTo(true))
+                it(rs)
+            }
+            assertThat(rs.next(), equalTo(false))
+        }
+    }
+
 }
 
+@Deprecated("Please do not use this, it's only to cover legacy cases where we've missed tests.")
+internal object TodoValidator : ChangeSetValidator {
 
-// Please do not use this, it's only to cover legacy cases where we've missed tests.
-internal object TodoValidator: ChangeSetValidator {
-    override fun setUp(connection: Connection) {
-    }
+    override fun setUpStatements(): List<String> = emptyList()
+    override fun populateStatements(): List<String> = emptyList()
+    override fun validate(statement: Statement) {}
+    override fun tearDownStatements(): List<String> = emptyList()
 
-    override fun validate(connection: Connection) {
-    }
-
-    override fun tearDown(connection: Connection) {
-    }
 }

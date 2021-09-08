@@ -25,7 +25,7 @@ class ChangeSetTest {
 
     // Add a ChangeSetValidator here for the corresponding number when testing a new ChangeSet.
     // Please do not use TodoValidator for any new ChangeSets.
-    val changeSetValidators = mapOf(
+    private val changeSetValidators = mapOf(
         20 to ChangeSet20Validator,
         21 to ChangeSet21Validator,
         22 to TodoValidator,
@@ -55,20 +55,28 @@ class ChangeSetTest {
             conn.prepareStatement(tableVersion.preparedUpdateSql()).use { versionUpdateStatement ->
                 runner.changeSets.filter { it.number > 19 }.forEach { cs ->
 
-                    changeSetValidators[cs.number]?.setUp(conn)
+                    val validator = changeSetValidators[cs.number]
                         ?: throw IllegalStateException("Validator for ${cs.number} missing. Have you added a ChangeSetValidator for your latest model update?")
+
+                    validator.setUpStatements().forEach {
+                        stmt.executeUpdate(it)
+                    }
 
                     stmt.executeUpdate("BEGIN TRANSACTION")
                     stmt.executeUpdate("PRAGMA foreign_keys=ON")
                     runner.runUpgrade(cs, stmt, versionUpdateStatement)
+                    validator.populateStatements().forEach {
+                        stmt.executeUpdate(it)
+                    }
                     stmt.executeUpdate("PRAGMA foreign_key_check")
                     stmt.executeUpdate("COMMIT")
 
-                    changeSetValidators[cs.number]!!.let { csv ->
-                        csv.validate(conn)
-                        csv.tearDown(conn)
+                    validator.let { csv ->
+                        csv.validate(stmt)
+                        csv.tearDownStatements().forEach {
+                            stmt.executeUpdate(it)
+                        }
                     }
-
                 }
             }
         }
@@ -77,7 +85,7 @@ class ChangeSetTest {
     /**
      * Creates an in memory sqlite database using the base schema (from version 19).
      */
-    internal fun createBaseDB(): Connection {
+    private fun createBaseDB(): Connection {
         val f = File("src/test/data/base-schema.sql")
         val lines = f.readLines()
         val conn = getConnection("jdbc:sqlite::memory:")
@@ -88,4 +96,5 @@ class ChangeSetTest {
         }
         return conn
     }
+
 }

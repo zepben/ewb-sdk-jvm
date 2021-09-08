@@ -10,48 +10,37 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import java.sql.Connection
+import java.sql.Statement
 import kotlin.test.fail
 
-
 object ChangeSet24Validator : ChangeSetValidator {
-    override fun setUp(connection: Connection) {
-        connection.createStatement().use { statement ->
-            listOf(
-                "INSERT INTO power_transformers VALUES('power_transformer_0','pt_0','description_0',1,NULL,0,0,0,0,NULL,'UNKNOWN',0)",
-                "INSERT INTO power_transformers VALUES('power_transformer_1','pt_1','description_1',1,NULL,0,0,0,0,NULL,'UNKNOWN',1.1999999999999999555)"
-            ).forEach {
-                statement.executeUpdate(it)
-            }
-        }
-    }
 
-    override fun validate(connection: Connection) {
-        // Ensure index was recreated, as changeset drops it to update numbers
-        connection.createStatement().use { statement ->
-            statement.executeQuery("pragma table_info('power_transformers');").use rs@{ rs ->
-                while (rs.next()) {
-                    if (rs.getString("name") == "transformer_utilisation") {
-                        assertThat(rs.getString("notnull"), equalTo("0"))
-                        return@rs
-                    }
+    override fun setUpStatements(): List<String> = listOf(
+        "INSERT INTO power_transformers VALUES('power_transformer_0','pt_0','description_0',1,NULL,0,0,0,0,NULL,'UNKNOWN',0)",
+        "INSERT INTO power_transformers VALUES('power_transformer_1','pt_1','description_1',1,NULL,0,0,0,0,NULL,'UNKNOWN',1.1999999999999999555)"
+    )
+
+    override fun populateStatements(): List<String> = emptyList()
+
+    override fun validate(statement: Statement) {
+        statement.executeQuery("pragma table_info('power_transformers');").use rs@{ rs ->
+            while (rs.next()) {
+                if (rs.getString("name") == "transformer_utilisation") {
+                    assertThat(rs.getString("notnull"), equalTo("0"))
+                    return@rs
                 }
-                fail()
             }
-            statement.executeQuery("select transformer_utilisation from power_transformers")!!.let { rs ->
-                rs.next()
-                assertThat(rs.getDouble("transformer_utilisation"), equalTo(0.0))
-                rs.next()
-                assertThat(rs.getDouble("transformer_utilisation"), equalTo(1.2))
-            }
+            fail()
         }
+
+        validateRows(statement, "select transformer_utilisation from power_transformers",
+            { assertThat(it.getDouble("transformer_utilisation"), equalTo(0.0)) },
+            { assertThat(it.getDouble("transformer_utilisation"), equalTo(1.2)) }
+        )
     }
 
-    override fun tearDown(connection: Connection) {
-        connection.createStatement().use { statement ->
-            statement.execute("DELETE FROM power_transformers")
-        }
-    }
+    override fun tearDownStatements(): List<String> = listOf(
+        "DELETE FROM power_transformers"
+    )
 
 }
-

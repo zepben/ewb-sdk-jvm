@@ -28,8 +28,8 @@ class ChangeSetTest {
     private val changeSetValidators = mapOf(
         20 to ChangeSet20Validator,
         21 to ChangeSet21Validator,
-        22 to TodoValidator,
-        23 to TodoValidator,
+        22 to ChangeSet22Validator,
+        23 to ChangeSet23Validator,
         24 to ChangeSet24Validator,
         25 to TodoValidator,
         26 to TodoValidator,
@@ -41,8 +41,9 @@ class ChangeSetTest {
         32 to TodoValidator,
         33 to TodoValidator,
         34 to TodoValidator,
-        35 to TodoValidator,
+        35 to ChangeSet35Validator,
         36 to ChangeSet36Validator,
+        37 to ChangeSet37Validator,
     )
 
     @Test

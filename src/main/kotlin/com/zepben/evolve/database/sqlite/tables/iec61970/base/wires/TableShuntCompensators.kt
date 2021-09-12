@@ -14,6 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 abstract class TableShuntCompensators : TableRegulatingCondEq() {
 
+    val SHUNT_COMPENSATOR_INFO_MRID = Column(++columnIndex, "shunt_compensator_info_mrid", "TEXT", NULL)
     val GROUNDED = Column(++columnIndex, "grounded", "BOOLEAN", NOT_NULL)
     val NOM_U = Column(++columnIndex, "nom_u", "INTEGER", NULL)
     val PHASE_CONNECTION = Column(++columnIndex, "phase_connection", "TEXT", NOT_NULL)

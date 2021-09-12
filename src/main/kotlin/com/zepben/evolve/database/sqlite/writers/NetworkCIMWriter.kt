@@ -886,6 +886,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         shuntCompensator: ShuntCompensator,
         description: String
     ): Boolean {
+        insert.setNullableString(table.SHUNT_COMPENSATOR_INFO_MRID.queryIndex, shuntCompensator.assetInfo?.mRID)
         insert.setBoolean(table.GROUNDED.queryIndex, shuntCompensator.grounded)
         insert.setNullableInt(table.NOM_U.queryIndex, shuntCompensator.nomU)
         insert.setNullableString(table.PHASE_CONNECTION.queryIndex, shuntCompensator.phaseConnection.name)

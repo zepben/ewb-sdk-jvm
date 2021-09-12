@@ -957,6 +957,8 @@ fun TapChanger.fillFields(service: NetworkService, includeRuntime: Boolean = tru
 fun ShuntCompensator.fillFields(service: NetworkService, includeRuntime: Boolean = true): ShuntCompensator {
     (this as RegulatingCondEq).fillFields(service, includeRuntime)
 
+    assetInfo = ShuntCompensatorInfo().also { service.add((it)) }
+
     grounded = true
     nomU = 1
     phaseConnection = PhaseShuntConnectionKind.I

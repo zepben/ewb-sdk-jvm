@@ -862,6 +862,7 @@ fun toCim(pb: PBRegulatingCondEq, cim: RegulatingCondEq, networkService: Network
 
 fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: NetworkService): ShuntCompensator =
     cim.apply {
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
         sections = pb.sections.takeUnless { it == UNKNOWN_DOUBLE }
         grounded = pb.grounded
         nomU = pb.nomU.takeUnless { it == UNKNOWN_INT }

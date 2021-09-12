@@ -931,6 +931,11 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         resultSet: ResultSet
     ): Boolean {
         shuntCompensator.apply {
+            assetInfo = networkService.ensureGet(
+                resultSet.getNullableString(table.SHUNT_COMPENSATOR_INFO_MRID.queryIndex),
+                typeNameAndMRID()
+            )
+
             grounded = resultSet.getBoolean(table.GROUNDED.queryIndex)
             nomU = resultSet.getNullableInt(table.NOM_U.queryIndex)
             phaseConnection = PhaseShuntConnectionKind.valueOf(resultSet.getString(table.PHASE_CONNECTION.queryIndex))

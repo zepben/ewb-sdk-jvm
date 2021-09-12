@@ -78,6 +78,10 @@ object Resolvers {
         BoundReferenceResolver(powerTransformer, PowerTransformerToPowerTransformerInfoResolver, null)
 
     @JvmStatic
+    fun assetInfo(shuntCompensator: ShuntCompensator): BoundReferenceResolver<ShuntCompensator, ShuntCompensatorInfo> =
+        BoundReferenceResolver(shuntCompensator, ShuntCompensatorToShuntCompensatorInfoResolver, null)
+
+    @JvmStatic
     fun streetlights(pole: Pole): BoundReferenceResolver<Pole, Streetlight> =
         BoundReferenceResolver(pole, PoleToStreetlightResolver, StreetlightToPoleResolver)
 
@@ -299,7 +303,11 @@ object Resolvers {
 
     @JvmStatic
     fun powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit): BoundReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> =
-        BoundReferenceResolver(powerElectronicsUnit, PowerElectronicsUnitToPowerElectronicsConnectionResolver, PowerElectronicsConnectionToPowerElectronicsUnitResolver)
+        BoundReferenceResolver(
+            powerElectronicsUnit,
+            PowerElectronicsUnitToPowerElectronicsConnectionResolver,
+            PowerElectronicsConnectionToPowerElectronicsUnitResolver
+        )
 
     @JvmStatic
     fun powerElectronicsConnection(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): BoundReferenceResolver<PowerElectronicsConnectionPhase, PowerElectronicsConnection> =

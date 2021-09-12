@@ -7,6 +7,9 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.assetinfo.ShuntCompensatorInfo
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -29,19 +32,20 @@ internal class ShuntCompensatorTest {
     internal fun accessorCoverage() {
         val shuntCompensator = object : ShuntCompensator() {}
 
+        assertThat(shuntCompensator.assetInfo, nullValue())
         assertThat(shuntCompensator.grounded, equalTo(false))
         assertThat(shuntCompensator.nomU, nullValue())
         assertThat(shuntCompensator.phaseConnection, equalTo(PhaseShuntConnectionKind.UNKNOWN))
         assertThat(shuntCompensator.sections, nullValue())
 
-        shuntCompensator.grounded = true
-        shuntCompensator.nomU = 2
-        shuntCompensator.phaseConnection = PhaseShuntConnectionKind.G
-        shuntCompensator.sections = 5.6
+        shuntCompensator.fillFields(NetworkService(), true)
 
+        assertThat(shuntCompensator.assetInfo, notNullValue())
+        assertThat(shuntCompensator.assetInfo, instanceOf(ShuntCompensatorInfo::class.java))
         assertThat(shuntCompensator.grounded, equalTo(true))
-        assertThat(shuntCompensator.nomU, equalTo(2))
-        assertThat(shuntCompensator.phaseConnection, equalTo(PhaseShuntConnectionKind.G))
-        assertThat(shuntCompensator.sections, equalTo(5.6))
+        assertThat(shuntCompensator.nomU, equalTo(1))
+        assertThat(shuntCompensator.phaseConnection, equalTo(PhaseShuntConnectionKind.I))
+        assertThat(shuntCompensator.sections, equalTo(2.2))
     }
+
 }

@@ -173,6 +173,7 @@ fun TransformerEnd.nameAndMRID(): String = io.nameAndMRID()
 
 fun Conductor.assetInfoMRID(): String = ce.assetInfoMRID()
 fun PowerTransformer.assetInfoMRID(): String = ce.assetInfoMRID()
+fun ShuntCompensator.assetInfoMRID(): String = rce.ec.ce.assetInfoMRID()
 
 /************ IEC61970 InfIEC61970 ************/
 

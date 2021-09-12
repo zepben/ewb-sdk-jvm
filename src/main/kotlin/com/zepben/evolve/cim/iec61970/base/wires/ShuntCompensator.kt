@@ -7,6 +7,8 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.assetinfo.ShuntCompensatorInfo
+
 /**
  * A shunt capacitor or reactor or switchable bank of shunt capacitors or reactors. A section of a shunt compensator is an individual
  * capacitor or reactor.  A negative value for reactivePerSection indicates that the compensator is a reactor. ShuntCompensator is a
@@ -29,6 +31,8 @@ package com.zepben.evolve.cim.iec61970.base.wires
  *                    There is no interpolation between NonlinearShuntCompensatorPoint-s.
  */
 abstract class ShuntCompensator(mRID: String = "") : RegulatingCondEq(mRID) {
+
+    override var assetInfo: ShuntCompensatorInfo? = null
 
     var grounded: Boolean = false
     var nomU: Int? = null

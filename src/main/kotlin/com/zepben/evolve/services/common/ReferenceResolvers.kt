@@ -81,6 +81,10 @@ internal object PowerTransformerToPowerTransformerInfoResolver : ReferenceResolv
     PowerTransformer::class, PowerTransformerInfo::class, PowerTransformer::assetInfo.setter
 )
 
+internal object ShuntCompensatorToShuntCompensatorInfoResolver : ReferenceResolver<ShuntCompensator, ShuntCompensatorInfo> by KReferenceResolver(
+    ShuntCompensator::class, ShuntCompensatorInfo::class, ShuntCompensator::assetInfo.setter
+)
+
 internal object ConnectivityNodeToTerminalResolver : ReferenceResolver<ConnectivityNode, Terminal> by KReferenceResolver(
     ConnectivityNode::class, Terminal::class, ConnectivityNode::addTerminal
 )

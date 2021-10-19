@@ -35,7 +35,7 @@ object PhaseSwapLoopNetwork {
         val node3 = createNodeForConnecting(network, "node3", 2, PhaseCode.AB)
         val node4 = createNodeForConnecting(network, "node4", 3, PhaseCode.XY)
         val node5 = createNodeForConnecting(network, "node5", 3, PhaseCode.XY)
-        val node6 = createSwitchForConnecting(network, "node6", 2, PhaseCode.XY, true, true)
+        val node6 = createSwitchForConnecting(network, "node6", 2, true, true, nominalPhases = PhaseCode.XY)
         val node7 = createNodeForConnecting(network, "node7", 2, PhaseCode.BC)
         val node8 = createNodeForConnecting(network, "node8", 1, PhaseCode.X)
         val node9 = createNodeForConnecting(network, "node9", 1, PhaseCode.Y)

@@ -21,7 +21,7 @@ object UngangedSwitchLongNetwork {
     fun create() = NetworkService().also { network ->
         val node0 = createSourceForConnecting(network, "node0", 1, PhaseCode.ABCN)
         val node1 = createNodeForConnecting(network, "node1", 2, PhaseCode.ABCN)
-        val node2 = createSwitchForConnecting(network, "node2", 2, PhaseCode.ABCN, true, false, true, false)
+        val node2 = createSwitchForConnecting(network, "node2", 2, true, false, true, false, nominalPhases = PhaseCode.ABCN)
         val node3 = createNodeForConnecting(network, "node3", 2, PhaseCode.ABCN)
         val node4 = createSourceForConnecting(network, "node4", 1, PhaseCode.ABCN)
 

@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.services.network.testdata
 
-import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Substation
 import com.zepben.evolve.services.network.NetworkService
 
@@ -22,9 +21,9 @@ object FeederToSubstationTransformerNetwork {
         val substation = Substation().also { networkService.add(it) }
 
         val fsp = createNodeForConnecting(networkService, "fsp", 1)
-        val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.A)
-        val tz = createPowerTransformerForConnecting(networkService, "tz", 2, PhaseCode.A, 0, 0)
-        val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.A)
+        val c1 = createAcLineSegmentForConnecting(networkService, "c1")
+        val tz = createPowerTransformerForConnecting(networkService, "tz", 2, 0, 0)
+        val c2 = createAcLineSegmentForConnecting(networkService, "c2")
 
         networkService.connect(c1.getTerminal(1)!!, fsp.getTerminal(1)!!)
         networkService.connect(c1.getTerminal(2)!!, tz.getTerminal(1)!!)

@@ -346,7 +346,7 @@ object StupidlyLargeNetwork {
         val energyConsumer1 = EnergyConsumer("id_energy_consumer").apply { name = "energy_consumer" }
         val usagePoint = UsagePoint(energyConsumer1.mRID + "-up").apply { name = energyConsumer1.name + " usage point" }
         val acme = createAssetOwner(networkService, customerService, "acme")
-        val hvLocation = locationOf(1234, "STATE", "locality", "nmi")
+        val hvLocation = locationOf(1234, "STATE", "locality")
         val hvMeter = Meter().apply {
             name = "acme_1111"
             addOrganisationRole(acme)

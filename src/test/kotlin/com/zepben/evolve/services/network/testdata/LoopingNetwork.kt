@@ -43,7 +43,7 @@ object LoopingNetwork {
         val node3 = createNodeForConnecting(network, "node3", 2, PhaseCode.ABCN)
         val node4 = createNodeForConnecting(network, "node4", 3, PhaseCode.ABCN)
         val node5 = createNodeForConnecting(network, "node5", 1, PhaseCode.ABCN)
-        val node6 = createSwitchForConnecting(network, "node6", 2, PhaseCode.ABCN, true, true, true, true)
+        val node6 = createSwitchForConnecting(network, "node6", 2, true, true, true, true, nominalPhases = PhaseCode.ABCN)
         val node7 = createNodeForConnecting(network, "node7", 3, PhaseCode.ABCN)
         val node8 = createNodeForConnecting(network, "node8", 2, PhaseCode.ABCN)
         val node9 = createNodeForConnecting(network, "node9", 2, PhaseCode.ABCN)

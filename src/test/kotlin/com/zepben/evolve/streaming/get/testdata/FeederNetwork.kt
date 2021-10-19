@@ -24,9 +24,9 @@ object FeederNetwork {
         val networkService = NetworkService()
 
         val source = createSourceForConnecting(networkService, "source", 1, PhaseCode.AB)
-        val fcb = createSwitchForConnecting(networkService, "fcb", 2, PhaseCode.AB)
+        val fcb = createSwitchForConnecting(networkService, "fcb", 2, nominalPhases = PhaseCode.AB)
         val fsp = createNodeForConnecting(networkService, "fsp", 2, PhaseCode.AB)
-        val tx = createPowerTransformerForConnecting(networkService, "tx", 2, PhaseCode.AB, 0, 0)
+        val tx = createPowerTransformerForConnecting(networkService, "tx", 2, 0, 0, PhaseCode.AB)
 
         val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.AB)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.AB)

@@ -21,7 +21,7 @@ import com.zepben.evolve.services.network.NetworkService
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 
-fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode): EnergySource =
+fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode = PhaseCode.A): EnergySource =
     EnergySource(id).apply {
         phaseCode.singlePhases().forEach { phase ->
             EnergySourcePhase().also {
@@ -35,7 +35,7 @@ fun createSourceForConnecting(network: NetworkService, id: String, numTerminals:
         network.add(this)
     }
 
-fun createNodeForConnecting(network: NetworkService, id: String, numTerminals: Int, nominalPhases: PhaseCode = PhaseCode.ABCN): Junction =
+fun createNodeForConnecting(network: NetworkService, id: String, numTerminals: Int, nominalPhases: PhaseCode = PhaseCode.A): Junction =
     Junction(id).apply {
         name = "test name"
         createTerminals(network, this, numTerminals, nominalPhases)
@@ -46,8 +46,8 @@ fun createSwitchForConnecting(
     network: NetworkService,
     id: String,
     numTerminals: Int,
-    nominalPhases: PhaseCode = PhaseCode.ABCN,
-    vararg openStatus: Boolean
+    vararg openStatus: Boolean,
+    nominalPhases: PhaseCode = PhaseCode.A
 ): Breaker =
     Breaker(id).apply {
         name = "test name"
@@ -65,9 +65,9 @@ fun createPowerTransformerForConnecting(
     network: NetworkService,
     id: String,
     numTerminals: Int,
-    nominalPhases: PhaseCode,
     numUsagePoints: Int,
-    numMeters: Int
+    numMeters: Int,
+    nominalPhases: PhaseCode = PhaseCode.A
 ): PowerTransformer =
     PowerTransformer(id).apply {
         name = "$id name"
@@ -96,7 +96,7 @@ fun createPowerTransformerForConnecting(
 fun createAcLineSegmentForConnecting(
     network: NetworkService,
     id: String,
-    nominalPhases: PhaseCode,
+    nominalPhases: PhaseCode = PhaseCode.A,
     length: Double = 0.0,
     perLengthSequenceImpedanceId: String = "perLengthSequenceImpedanceId",
     wireInfoId: String = "wireInfo"
@@ -134,12 +134,12 @@ fun createAssetOwner(network: NetworkService, customerService: CustomerService?,
         customerService?.add(org)
     }
 
-fun createTerminals(network: NetworkService, condEq: ConductingEquipment, numTerminals: Int, nominalPhases: PhaseCode) {
+fun createTerminals(network: NetworkService, condEq: ConductingEquipment, numTerminals: Int, nominalPhases: PhaseCode = PhaseCode.A) {
     for (i in 1..numTerminals)
         createTerminal(network, condEq, nominalPhases, i)
 }
 
-fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment?, phases: PhaseCode, sequenceNumber: Int) =
+fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment?, phases: PhaseCode = PhaseCode.A, sequenceNumber: Int) =
     conductingEquipment?.getTerminal(sequenceNumber) ?: Terminal().apply {
         this.conductingEquipment = conductingEquipment
         this.phases = phases

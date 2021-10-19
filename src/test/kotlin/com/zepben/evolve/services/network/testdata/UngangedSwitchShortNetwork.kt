@@ -20,7 +20,7 @@ object UngangedSwitchShortNetwork {
     //
     fun create() = NetworkService().also { network ->
         val node0 = createSourceForConnecting(network, "node0", 1, PhaseCode.ABCN)
-        val node1 = createSwitchForConnecting(network, "node1", 2, PhaseCode.ABCN, true, false, true, false)
+        val node1 = createSwitchForConnecting(network, "node1", 2, true, false, true, false, nominalPhases = PhaseCode.ABCN)
         val node2 = createSourceForConnecting(network, "node2", 1, PhaseCode.ABCN)
 
         val acLineSegment0 = createAcLineSegmentForConnecting(network, "acLineSegment0", PhaseCode.ABCN)

@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.services.network.testdata
 
-import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
 
@@ -18,8 +17,8 @@ object SingleTransformerNetwork {
     // s-tx
     //
     fun create(sequenceNumber: Int) = NetworkService().also { networkService ->
-        val source = createSourceForConnecting(networkService, "s", 1, PhaseCode.A)
-        val transformer = createPowerTransformerForConnecting(networkService, "tx", 1, PhaseCode.A, 1, 0)
+        val source = createSourceForConnecting(networkService, "s", 1)
+        val transformer = createPowerTransformerForConnecting(networkService, "tx", 1, 1, 0)
 
         source.terminals[0].sequenceNumber = sequenceNumber
         transformer.terminals[0].sequenceNumber = sequenceNumber

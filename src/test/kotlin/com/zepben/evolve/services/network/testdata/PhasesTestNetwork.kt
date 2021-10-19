@@ -45,7 +45,7 @@ object PhasesTestNetwork {
         }
 
         fun toSwitch(phases: PhaseCode, isOpen: Boolean): Builder {
-            val s: Breaker = createSwitchForConnecting(network, "s" + count++, 2, phases, isOpen, isOpen, isOpen)
+            val s: Breaker = createSwitchForConnecting(network, "s" + count++, 2, isOpen, isOpen, isOpen, nominalPhases = phases)
             network.connect(current.getTerminal(if (current is EnergySource) 1 else 2)!!, s.getTerminal(1)!!)
             current = s
             return this

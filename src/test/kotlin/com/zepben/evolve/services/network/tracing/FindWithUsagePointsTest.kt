@@ -9,11 +9,15 @@ package com.zepben.evolve.services.network.tracing
 
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.services.network.testdata.SingleTransformerNetwork
 import com.zepben.evolve.services.network.testdata.WithUsagePointsNetwork
 import com.zepben.evolve.services.network.tracing.FindWithUsagePoints.Result.Status.*
+import com.zepben.evolve.services.network.tracing.FindWithUsagePoints.VirtualUsagePointCondition.*
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -45,10 +49,10 @@ class FindWithUsagePointsTest {
     //                              |    |
     //                             tx7  tx8
     //
-    // sw1: normally close, currently open
+    // sw1: normally closed, currently open
     // sw2: normally open, currently closed
     //
-    private val network = WithUsagePointsNetwork.create()
+    private val network = WithUsagePointsNetwork.createLarge()
 
     private val es = ce("es")
     private val c1 = ce("c1")
@@ -140,21 +144,56 @@ class FindWithUsagePointsTest {
         validateSingleTransformerNetwork(2)
     }
 
+    @Test
+    internal fun noPathWithMissingTerminals() {
+        validate(findWithUsagePoints.runNormal(AcLineSegment(), AcLineSegment().apply { addTerminal(Terminal()) }), NO_PATH, emptyList())
+        validate(findWithUsagePoints.runNormal(AcLineSegment().apply { addTerminal(Terminal()) }, AcLineSegment()), NO_PATH, emptyList())
+    }
+
+    @Test
+    internal fun ignoresLvWhenAggregated() {
+        validateVirtualUsagePoints(LV_AGGREGATION_ONLY, listOf("tx", "ec2"), listOf("tx"), listOf("ec1", "ec2"))
+        validateVirtualUsagePoints(NO_LV_AGGREGATION, listOf("ec1", "ec2"), listOf("ec1", "ec2"), listOf("tx", "ec1", "ec2"))
+        validateVirtualUsagePoints(ALL, listOf("tx", "ec2"), listOf("tx"), listOf("tx", "ec1", "ec2"))
+        validateVirtualUsagePoints(NONE, listOf("ec1", "ec2"), listOf("ec1", "ec2"), listOf("ec1", "ec2"))
+    }
+
     private fun ce(mRID: String): ConductingEquipment {
         return network.get(ConductingEquipment::class.java, mRID)!!
     }
 
     private fun validate(result: FindWithUsagePoints.Result, expectedStatus: FindWithUsagePoints.Result.Status, expectedMRIDs: List<String>) {
-        assertThat(result.status(), equalTo(expectedStatus))
-        assertThat(result.conductingEquipment().keys, containsInAnyOrder(*expectedMRIDs.toTypedArray()))
+        assertThat(result.status, equalTo(expectedStatus))
+        assertThat(result.conductingEquipment.keys, containsInAnyOrder(*expectedMRIDs.toTypedArray()))
     }
 
     private fun validateMismatch(results: List<FindWithUsagePoints.Result>, expectedResults: Int) {
         assertThat(results.size, equalTo(expectedResults))
 
         results.forEach(Consumer { result: FindWithUsagePoints.Result ->
-            assertThat(result.status(), equalTo(MISMATCHED_FROM_TO))
-            assertThat(result.conductingEquipment().keys, empty())
+            assertThat(result.status, equalTo(MISMATCHED_FROM_TO))
+            assertThat(result.conductingEquipment.keys, empty())
         })
     }
+
+    private fun validateVirtualUsagePoints(
+        virtualUsagePointCondition: FindWithUsagePoints.VirtualUsagePointCondition,
+        expectedAclsMrids: List<String>,
+        expectedBranchMrids: List<String>,
+        expectedOtherMrids: List<String>
+    ) {
+        validateVirtualUsagePoints<AcLineSegment>(virtualUsagePointCondition, "LV_AGGREGATION", expectedAclsMrids)
+        validateVirtualUsagePoints<EquivalentBranch>(virtualUsagePointCondition, "LV_AGGREGATION", expectedBranchMrids)
+        validateVirtualUsagePoints<EquivalentBranch>(virtualUsagePointCondition, "OTHER", expectedOtherMrids)
+    }
+
+    private inline fun <reified T : ConductingEquipment> validateVirtualUsagePoints(
+        virtualUsagePointCondition: FindWithUsagePoints.VirtualUsagePointCondition,
+        virtualConnectionCategory: String,
+        expectedMrids: List<String>
+    ) {
+        val ns = WithUsagePointsNetwork.createTxWithVirtual<T>(virtualConnectionCategory)
+        validate(FindWithUsagePoints(virtualUsagePointCondition).runNormal(ns["es"]!!, null), NO_ERROR, expectedMrids)
+    }
+
 }

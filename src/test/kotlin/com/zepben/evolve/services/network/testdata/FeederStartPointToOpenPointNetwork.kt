@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.services.network.testdata
 
-import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Substation
 import com.zepben.evolve.services.network.NetworkService
 
@@ -22,9 +21,9 @@ object FeederStartPointToOpenPointNetwork {
         val substation = Substation().also { networkService.add(it) }
 
         val fsp = createNodeForConnecting(networkService, "fsp", 1)
-        val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.A)
-        val op = createSwitchForConnecting(networkService, "op", 2, PhaseCode.A)
-        val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.A)
+        val c1 = createAcLineSegmentForConnecting(networkService, "c1")
+        val op = createSwitchForConnecting(networkService, "op", 2)
+        val c2 = createAcLineSegmentForConnecting(networkService, "c2")
 
         op.setNormallyOpen(normallyOpen)
         op.setOpen(currentlyOpen)

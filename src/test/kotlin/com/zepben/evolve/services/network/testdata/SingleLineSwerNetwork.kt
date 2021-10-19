@@ -16,7 +16,7 @@ object SingleLineSwerNetwork {
     fun create() = NetworkService().also { networkService ->
         val source = createSourceForConnecting(networkService, "source", 1, PhaseCode.ABC)
         val line1 = createAcLineSegmentForConnecting(networkService, "line1", PhaseCode.ABC)
-        val isoTx = createPowerTransformerForConnecting(networkService, "isoTx", 2, PhaseCode.ABC, 0, 0)
+        val isoTx = createPowerTransformerForConnecting(networkService, "isoTx", 2, 0, 0, nominalPhases = PhaseCode.ABC)
         val line2 = createAcLineSegmentForConnecting(networkService, "line2", PhaseCode.X)
 
         networkService.connect(source.getTerminal(1)!!, line1.getTerminal(1)!!)

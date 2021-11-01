@@ -158,6 +158,18 @@ class FindWithUsagePointsTest {
         validateVirtualUsagePoints(NONE, listOf("ec1", "ec2"), listOf("ec1", "ec2"), listOf("ec1", "ec2"))
     }
 
+    @Test
+    internal fun includesTransformerAndDownstream() {
+        val ns = WithUsagePointsNetwork.createTxWithRealAndLv()
+        validate(FindWithUsagePoints().runNormal(ns["es"]!!, null), NO_ERROR, listOf("tx", "ec"))
+    }
+
+    @Test
+    internal fun lvAggregationExcludeLvNetwork() {
+        val ns = WithUsagePointsNetwork.createTxWithRealAndLv("LV_AGGREGATION")
+        validate(FindWithUsagePoints().runNormal(ns["es"]!!, null), NO_ERROR, listOf("tx"))
+    }
+
     private fun ce(mRID: String): ConductingEquipment {
         return network.get(ConductingEquipment::class.java, mRID)!!
     }

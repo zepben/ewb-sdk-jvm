@@ -154,4 +154,37 @@ object WithUsagePointsNetwork {
         Tracing.setPhases().run(network)
     }
 
+    //
+    //                 LV
+    // es - tx [cpi1] ---- ec [cpi2]
+    //
+    fun createTxWithRealAndLv(connectionCategory: String? = null) = NetworkService().also { network ->
+        val nameType = NameType("CPI").also { network.addNameType(it) }
+        val es = createSourceForConnecting(network, "es", 1)
+        val tx = PowerTransformer("tx").apply {
+            createTerminals(network, this, 2)
+            addUsagePoint(
+                UsagePoint().apply {
+                    this.connectionCategory = connectionCategory
+                    addName(nameType.getOrAddName("vcpi", this))
+                }.also { network.add(it) }
+            )
+        }.also { network.add(it) }
+        val ec = EnergyConsumer("ec").apply {
+            createTerminals(network, this, 1)
+            addUsagePoint(UsagePoint().apply { addName(nameType.getOrAddName("cpi1", this)) }.also { network.add(it) })
+        }.also { network.add(it) }
+
+        val lv = AcLineSegment().apply {
+            baseVoltage = BaseVoltage().apply { nominalVoltage = 415 }.also { network.add(it) }
+            createTerminals(network, this, 2)
+        }.also { network.add(it) }
+
+        network.connect(es.terminals[0], tx.terminals[0])
+        network.connect(tx.terminals[1], lv.terminals[0])
+        network.connect(lv.terminals[1], ec.terminals[0])
+
+        Tracing.setPhases().run(network)
+    }
+
 }

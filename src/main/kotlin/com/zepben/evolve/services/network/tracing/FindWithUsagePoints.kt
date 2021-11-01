@@ -93,7 +93,7 @@ class FindWithUsagePoints(
 
     private fun shouldExcludeLv(phaseStep: PhaseStep) =
         ((phaseStep.conductingEquipment.baseVoltageValue <= lvThreshold) || (phaseStep.conductingEquipment is EquivalentBranch))
-            && phaseStep.previous?.usagePoints?.any { it.isVirtual && (it.connectionCategory == "LV_AGGREGATION") } ?: false
+            && phaseStep.previous?.usagePoints?.any { it.connectionCategory == "LV_AGGREGATION" } ?: false
 
     private fun hasValidUsagePoints(conductingEquipment: ConductingEquipment): Boolean =
         conductingEquipment.usagePoints.any {

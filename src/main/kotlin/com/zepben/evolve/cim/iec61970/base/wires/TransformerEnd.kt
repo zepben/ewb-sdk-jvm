@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
@@ -30,7 +31,7 @@ import com.zepben.evolve.services.network.ResistanceReactance
  *
  * @property starImpedance (accurate for 2- or 3-winding transformers only) Pi-model impedances of this transformer end. By convention, for a two winding
  * transformer, the full values of the transformer should be entered on the high voltage end (endNumber=1).
- * When [starImpedance] is set here it indicates that impedance values are measured on the [TransformerEnd] itself rather than from the PowerTransformer data
+ * When [starImpedance] is set here it indicates that impedance values are measured on the [TransformerEnd] itself rather than from the [PowerTransformer] data
  * sheet, and thus the corresponding [PowerTransformer] for this end cannot have an associated [PowerTransformerInfo].
  */
 abstract class TransformerEnd(mRID: String = "") : IdentifiedObject(mRID) {

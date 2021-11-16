@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
@@ -25,10 +26,13 @@ import com.zepben.evolve.services.network.ResistanceReactance
  * @property ratioTapChanger Ratio tap changer associated with this transformer end.
  * @property terminal The terminal of the transformer that this end is associated with
  * @property endNumber Number for this transformer end, corresponding to the end's order in the power transformer vector group or phase angle clock number.
- *                     Highest voltage winding should be 1. Each end within a power transformer should have a unique subsequent end number. Note the
- *                     transformer end number need not match the terminal sequence number.
+ * Highest voltage winding should be 1. Each end within a power transformer should have a unique subsequent end number. Note the transformer end number need not
+ * match the terminal sequence number.
+ *
  * @property starImpedance (accurate for 2- or 3-winding transformers only) Pi-model impedances of this transformer end. By convention, for a two winding
- *                         transformer, the full values of the transformer should be entered on the high voltage end (endNumber=1).
+ * transformer, the full values of the transformer should be entered on the high voltage end (endNumber=1).
+ * When [starImpedance] is set here it indicates that impedance values are measured on the [TransformerEnd] itself rather than from the [PowerTransformer] data
+ * sheet, and thus the corresponding [PowerTransformer] for this end cannot have an associated [PowerTransformerInfo].
  */
 abstract class TransformerEnd(mRID: String = "") : IdentifiedObject(mRID) {
 

@@ -45,7 +45,7 @@ import com.zepben.evolve.services.common.extensions.*
  *
  * @property assetInfo Set of power transformer data, from an equipment library or data sheet. Note that when this is set to a [PowerTransformerInfo], the
  * corresponding [TransformerEnd]s cannot be associated directly with a [TransformerStarImpedance], as the existence of [assetInfo] indicates that impedance
- * values is calculated from the data sheet information.
+ * values are calculated from the data sheet information.
  */
 class PowerTransformer @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
 

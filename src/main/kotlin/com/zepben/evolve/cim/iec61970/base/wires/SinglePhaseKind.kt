@@ -19,6 +19,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
  * @property N Neutral.
  * @property X An unknown primary phase.
  * @property Y An unknown primary phase.
+ * @property s1 Secondary phase 1.
+ * @property s2 Secondary phase 2.
  * @property INVALID Invalid phase. Caused by trying to energise with multiple phases simultaneously.
  */
 enum class SinglePhaseKind(private val value: Int, private val maskIndex: Int) {
@@ -30,14 +32,16 @@ enum class SinglePhaseKind(private val value: Int, private val maskIndex: Int) {
     N(4, 3),
     X(5, 0),
     Y(6, 1),
-    INVALID(7, -1);
+    s1(7, 0),
+    s2(8, 1),
+    INVALID(9, -1);
 
     companion object {
         private val phasesByValues: List<SinglePhaseKind> = enumValues<SinglePhaseKind>().sortedBy { it.value }
 
         @JvmStatic
         fun get(value: Int): SinglePhaseKind {
-            return if (value < 0 || value > 6) INVALID else phasesByValues[value]
+            return if (value < 0 || value >= INVALID.value) INVALID else phasesByValues[value]
         }
     }
 

@@ -1156,4 +1156,36 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return true
     }
 
+    fun load(table: TablePowerElectronicsConnectionPECPhases, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val powerElectronicsConnectionMRID = setLastMRID(resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex))
+        setLastMRID("${powerElectronicsConnectionMRID}-to-UNKNOWN")
+
+        val powerElectronicsConnectionPhaseMRID = resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_PHASE_MRID.queryIndex)
+        val id = setLastMRID("${powerElectronicsConnectionMRID}-to-${powerElectronicsConnectionPhaseMRID}")
+
+        val typeNameAndMRID = "Power Electronics Connection to Power Electronics Connection Phase association $id"
+        val powerElectronicsConnection = networkService.getOrThrow<PowerElectronicsConnection>(powerElectronicsConnectionMRID, typeNameAndMRID)
+        val powerElectronicsConnectionPhase = networkService.getOrThrow<PowerElectronicsConnectionPhase>(powerElectronicsConnectionPhaseMRID, typeNameAndMRID)
+
+        powerElectronicsConnection.addPhase(powerElectronicsConnectionPhase)
+
+        return true
+    }
+
+    fun load(table: TablePowerElectronicsConnectionPEUnits, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val powerElectronicsConnectionMRID = setLastMRID(resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex))
+        setLastMRID("${powerElectronicsConnectionMRID}-to-UNKNOWN")
+
+        val powerElectronicsUnitMRID = resultSet.getString(table.POWER_ELECTRONICS_UNIT_MRID.queryIndex)
+        val id = setLastMRID("${powerElectronicsConnectionMRID}-to-${powerElectronicsUnitMRID}")
+
+        val typeNameAndMRID = "Power Electronics Connection to Power Electronics Connection Phase association $id"
+        val powerElectronicsConnection = networkService.getOrThrow<PowerElectronicsConnection>(powerElectronicsConnectionMRID, typeNameAndMRID)
+        val powerElectronicsUnit = networkService.getOrThrow<PowerElectronicsUnit>(powerElectronicsUnitMRID, typeNameAndMRID)
+
+        powerElectronicsConnection.addUnit(powerElectronicsUnit)
+
+        return true
+    }
+
 }

@@ -13,6 +13,8 @@ import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.PositionPoint
 import com.zepben.evolve.cim.iec61968.common.StreetAddress
 import com.zepben.evolve.cim.iec61968.common.TownDetail
+import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
+import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -1155,6 +1157,34 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             insert,
             "${loop.mRID}-to-${substation.mRID}",
             "loop to substation association"
+        )
+    }
+
+    private fun saveAssociation(powerElectronicsConnection: PowerElectronicsConnection, powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): Boolean {
+        val table = databaseTables.getTable(TablePowerElectronicsConnectionPECPhases::class.java)
+        val insert = databaseTables.getInsert(TablePowerElectronicsConnectionPECPhases::class.java)
+
+        insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex, powerElectronicsConnection.mRID)
+        insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_PHASE_MRID.queryIndex, powerElectronicsConnectionPhase.mRID)
+
+        return tryExecuteSingleUpdate(
+            insert,
+            "${powerElectronicsConnection.mRID}-to-${powerElectronicsConnectionPhase.mRID}",
+            "power electronics connection to power electronics connection phase association"
+        )
+    }
+
+    private fun saveAssociation(powerElectronicsConnection: PowerElectronicsConnection, powerElectronicsUnit: PowerElectronicsUnit): Boolean {
+        val table = databaseTables.getTable(TablePowerElectronicsConnectionPEUnits::class.java)
+        val insert = databaseTables.getInsert(TablePowerElectronicsConnectionPEUnits::class.java)
+
+        insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex, powerElectronicsConnection.mRID)
+        insert.setNullableString(table.POWER_ELECTRONICS_UNIT_MRID.queryIndex, powerElectronicsUnit.mRID)
+
+        return tryExecuteSingleUpdate(
+            insert,
+            "${powerElectronicsConnection.mRID}-to-${powerElectronicsUnit.mRID}",
+            "power electronics connection to power electronics unit association"
         )
     }
 }

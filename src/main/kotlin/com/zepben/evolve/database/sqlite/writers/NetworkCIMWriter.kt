@@ -803,6 +803,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableInt(table.RATED_S.queryIndex, powerElectronicsConnection.ratedS)
         insert.setNullableInt(table.RATED_U.queryIndex, powerElectronicsConnection.ratedU)
 
+        var status = true
+        powerElectronicsConnection.units.forEach { status = status and saveAssociation(powerElectronicsConnection, it) }
+        powerElectronicsConnection.phases.forEach { status = status and saveAssociation(powerElectronicsConnection, it) }
+
         return saveRegulatingCondEq(table, insert, powerElectronicsConnection, "power electronics connection")
     }
 

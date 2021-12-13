@@ -10,18 +10,15 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
 import java.sql.Statement
 
 object ChangeSet38Validator : ChangeSetValidator {
 
-    override fun setUpStatements(): List<String> = emptyList()
-
-    override fun populateStatements(): List<String> = listOf(
+    override fun setUpStatements(): List<String> = listOf(
         /************** insert into base_voltages ************/
         """
         INSERT INTO base_voltages (
-            mrid, name, description, num_diagram_objects, nominal_voltage
+            mrid, name, description, num_diagram_objects, base_voltage
         ) VALUES ( 
             'id', 'name', 'desc', 1, 2
         ) 
@@ -30,7 +27,7 @@ object ChangeSet38Validator : ChangeSetValidator {
         /************** insert into remote_controls ************/
         """
         INSERT INTO remote_controls (
-            mrid, name, description, num_diagram_objects, control_mrid
+            mrid, name, description, num_diagram_objects, power_system_resource_mrid
         ) VALUES ( 
             'id', 'name', 'desc', 1, 'control'
         ) 
@@ -39,24 +36,35 @@ object ChangeSet38Validator : ChangeSetValidator {
         /************** insert into remote_sources ************/
         """
         INSERT INTO remote_sources (
-            mrid, name, description, num_diagram_objects, measurement_mrid
+            mrid, name, description, num_diagram_objects, power_system_resource_mrid
         ) VALUES ( 
             'id', 'name', 'desc', 1, 'measurement'
         ) 
         """,
     )
 
+    override fun populateStatements(): List<String> = emptyList()
+
     override fun validate(statement: Statement) {
         // Ensure index was recreated, as changeset drops it to update columns
         statement.executeQuery("pragma index_info('base_voltages_mrid')").use { rs ->
+            assertThat(rs.next(), equalTo(true))
+        }
+        statement.executeQuery("pragma index_info('base_voltages_name')").use { rs ->
             assertThat(rs.next(), equalTo(true))
         }
 
         statement.executeQuery("pragma index_info('remote_controls_mrid')").use { rs ->
             assertThat(rs.next(), equalTo(true))
         }
+        statement.executeQuery("pragma index_info('remote_controls_name')").use { rs ->
+            assertThat(rs.next(), equalTo(true))
+        }
 
         statement.executeQuery("pragma index_info('remote_sources_mrid')").use { rs ->
+            assertThat(rs.next(), equalTo(true))
+        }
+        statement.executeQuery("pragma index_info('remote_sources_name')").use { rs ->
             assertThat(rs.next(), equalTo(true))
         }
 

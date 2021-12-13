@@ -13,7 +13,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 @Suppress("PropertyName")
 class TableBaseVoltages : TableIdentifiedObjects() {
 
-    val NOMINAL_VOLTAGE = Column(++columnIndex, "base_voltage", "INTEGER", NOT_NULL)
+    val NOMINAL_VOLTAGE = Column(++columnIndex, "nominal_voltage", "INTEGER", NOT_NULL)
 
     override fun name(): String {
         return "base_voltages"

@@ -13,7 +13,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableRemoteControls : TableRemotePoints() {
 
-    val CONTROL_MRID = Column(++columnIndex, "power_system_resource_mrid", "TEXT", NULL)
+    val CONTROL_MRID = Column(++columnIndex, "control_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "remote_controls"

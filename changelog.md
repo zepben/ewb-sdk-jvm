@@ -14,7 +14,7 @@
 
 ##### Fixes
 
-* None.
+* Column names fixed for TableBaseVoltages.NOMINAL_VOLTAGE, TableRemoteSources.MEASUREMENT_MRID, and TableControls.CONTROL_MRID - database upgrade path provided.
 
 ##### Notes
 

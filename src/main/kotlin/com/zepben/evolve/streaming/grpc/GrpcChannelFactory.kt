@@ -8,7 +8,6 @@
 package com.zepben.evolve.streaming.grpc
 
 import com.zepben.evolve.streaming.get.CimConsumerClient
-import com.zepben.evolve.streaming.put.CimProducerClient
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import java.io.File
@@ -18,8 +17,7 @@ data class BadConfigException(val msg: String) : Exception(msg)
 object GrpcChannelFactory {
 
     /**
-     * Create a gRPC Channel with the specified [config] that can be passed to a gRPC based [CimProducerClient] or
-     * [CimConsumerClient] implementation.
+     * Create a gRPC Channel with the specified [config] that can be passed to a gRPC based [CimConsumerClient] implementation.
      */
     @JvmStatic
     fun create(config: ConnectionConfig): GrpcChannel {

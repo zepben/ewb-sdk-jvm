@@ -43,6 +43,12 @@ import com.zepben.evolve.services.common.extensions.asUnmodifiable
  * @property XYN Two unknown non-neutral phases plus neutral.
  * @property Y Unknown non-neutral phase.
  * @property YN Unknown non-neutral phase plus neutral.
+ * @property s1 Secondary phase 1.
+ * @property s1N Secondary phase 1 and neutral.
+ * @property s12 Secondary phase 1 and 2.
+ * @property s12N Secondary phases 1, 2, and neutral.
+ * @property s2 Secondary phase 2.
+ * @property s2N Secondary phase 2 and neutral.
  */
 enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
 
@@ -67,7 +73,13 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
     XY(SinglePhaseKind.X, SinglePhaseKind.Y),
     XYN(SinglePhaseKind.X, SinglePhaseKind.Y, SinglePhaseKind.N),
     Y(SinglePhaseKind.Y),
-    YN(SinglePhaseKind.Y, SinglePhaseKind.N);
+    YN(SinglePhaseKind.Y, SinglePhaseKind.N),
+    s1(SinglePhaseKind.s1),
+    s1N(SinglePhaseKind.s1, SinglePhaseKind.N),
+    s12(SinglePhaseKind.s1, SinglePhaseKind.s2),
+    s12N(SinglePhaseKind.s1, SinglePhaseKind.s2, SinglePhaseKind.N),
+    s2(SinglePhaseKind.s2),
+    s2N(SinglePhaseKind.s2, SinglePhaseKind.N);
 
     private val singlePhases: List<SinglePhaseKind> = singlePhases.asList().asUnmodifiable()
 

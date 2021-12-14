@@ -32,15 +32,16 @@ internal class PhaseCodeTest {
         PhaseCode.values()
             .asSequence()
             .filter { it !== PhaseCode.NONE }
-            .forEach {
-                assertThat(it.singlePhases().size, equalTo(it.name.length))
+            .forEach { phaseCode ->
+                // We need to strip the 's' off secondary phases for the following checks to work correctly.
+                assertThat(phaseCode.singlePhases().size, equalTo(phaseCode.name.trimStart('s').length))
 
-                val singlePhases = it.singlePhases()
+                val singlePhases = phaseCode.singlePhases()
                     .asSequence()
-                    .map(SinglePhaseKind::name)
+                    .map { it.name.trimStart('s') }
                     .toSet()
 
-                val namePhases = it.name.toCharArray().map(Any::toString).toSet()
+                val namePhases = phaseCode.name.trimStart('s').toCharArray().map { it.toString() }.toSet()
 
                 assertThat(singlePhases.containsAll(namePhases), equalTo(true))
             }

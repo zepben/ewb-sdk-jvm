@@ -231,6 +231,27 @@ internal class BaseServiceTest {
     }
 
     @Test
+    fun `add returns true when object already in service`() {
+        val ns = NetworkService()
+
+        AcLineSegment("acls1").apply {
+            assertThat(ns.add(this), equalTo(true))
+            // Re-adding the same object should return true
+            assertThat(ns.add(this), equalTo(true))
+        }
+
+        // a new ACLS with the same mRID should fail
+        AcLineSegment("acls1").apply {
+            assertThat(ns.add(this), equalTo(false))
+        }
+
+        // A completely different object with the same mRID should fail
+        Junction("acls1").apply {
+            assertThat(ns.add(this), equalTo(false))
+        }
+    }
+
+    @Test
     internal fun `throws cast exception when getting wrong type`() {
         expect { service.get(Junction::class, breaker1.mRID) }.toThrow(ClassCastException::class.java)
     }

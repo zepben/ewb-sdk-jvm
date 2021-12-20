@@ -282,7 +282,7 @@ abstract class BaseService(
         }
 
         val map = objectsByType.computeIfAbsent(identifiedObject::class) { mutableMapOf() }
-        if (map.containsKey(identifiedObject.mRID)) return false
+        if (map.containsKey(identifiedObject.mRID)) return map[identifiedObject.mRID] == identifiedObject
 
         // Check all the other types to make sure this MRID is actually unique
         if (objectsByType.any { (_, v) -> v.containsKey(identifiedObject.mRID) })

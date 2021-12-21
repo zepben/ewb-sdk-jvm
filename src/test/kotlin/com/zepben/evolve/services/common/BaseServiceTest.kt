@@ -252,6 +252,17 @@ internal class BaseServiceTest {
     }
 
     @Test
+    fun `add only returns true when object is the same instance, not just equal`() {
+        val ms = MyService()
+        val obj1 = MyIdentifiedObject("1")
+        val obj1Dup = MyIdentifiedObject("1")
+
+        assertThat(ms.add(obj1), equalTo(true))
+        assertThat(ms.add(obj1), equalTo(true))
+        assertThat(ms.add(obj1Dup), equalTo(false))
+    }
+
+    @Test
     internal fun `throws cast exception when getting wrong type`() {
         expect { service.get(Junction::class, breaker1.mRID) }.toThrow(ClassCastException::class.java)
     }
@@ -281,4 +292,15 @@ internal class BaseServiceTest {
         service.sequenceOf<T>().filter(filter).forEach { visited.add(it) }
         assertThat(visited, containsInAnyOrder<Any>(*expected.toTypedArray()))
     }
+
+    private class MyIdentifiedObject(mrid: String) : IdentifiedObject(mrid) {
+        override fun equals(other: Any?): Boolean = true
+        override fun hashCode(): Int = 0
+    }
+
+    private class MyService : BaseService("") {
+        fun add(cableInfo: MyIdentifiedObject): Boolean = super.add(cableInfo)
+        fun remove(cableInfo: MyIdentifiedObject): Boolean = super.remove(cableInfo)
+    }
+
 }

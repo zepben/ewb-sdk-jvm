@@ -39,12 +39,13 @@ class ChangeSetTest {
         30 to ChangeSet30Validator,
         31 to TodoValidator,
         32 to TodoValidator,
-        33 to TodoValidator,
-        34 to TodoValidator,
+        33 to ChangeSet33Validator,
+        34 to ChangeSet34Validator,
         35 to ChangeSet35Validator,
         36 to ChangeSet36Validator,
         37 to ChangeSet37Validator,
         38 to ChangeSet38Validator,
+        39 to ChangeSet39Validator,
     )
 
     @Test

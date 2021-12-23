@@ -649,7 +649,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
 
             compareIdReferences(PowerTransformer::assetInfo)
             compareIndexedIdReferenceCollections(PowerTransformer::ends)
-            compareValues(PowerTransformer::vectorGroup)
+            compareValues(PowerTransformer::vectorGroup, PowerTransformer::constructionKind, PowerTransformer::function)
             compareDoubles(PowerTransformer::transformerUtilisation)
         }
 

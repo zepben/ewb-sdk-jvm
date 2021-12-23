@@ -8,6 +8,8 @@
 package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo.TransformerConstructionKind
+import com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
@@ -33,19 +35,25 @@ internal class PowerTransformerTest {
     @Test
     internal fun accessorCoverage() {
         val powerTransformer = PowerTransformer()
+        val powerTransformerInfo = PowerTransformerInfo()
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.UNKNOWN))
         assertThat(powerTransformer.transformerUtilisation, nullValue())
+        assertThat(powerTransformer.constructionKind, equalTo(TransformerConstructionKind.unknown))
+        assertThat(powerTransformer.function, equalTo(TransformerFunctionKind.other))
         assertThat(powerTransformer.assetInfo, nullValue())
+
 
         powerTransformer.vectorGroup = VectorGroup.DYN11
         powerTransformer.transformerUtilisation = 1.0
-
-        val powerTransformerInfo = PowerTransformerInfo()
+        powerTransformer.constructionKind = TransformerConstructionKind.padmounted
+        powerTransformer.function = TransformerFunctionKind.distributionTransformer
         powerTransformer.assetInfo = powerTransformerInfo
 
         assertThat(powerTransformer.vectorGroup, equalTo(VectorGroup.DYN11))
         assertThat(powerTransformer.transformerUtilisation, equalTo(1.0))
+        assertThat(powerTransformer.constructionKind, equalTo(TransformerConstructionKind.padmounted))
+        assertThat(powerTransformer.function, equalTo(TransformerFunctionKind.distributionTransformer))
         assertThat(powerTransformer.assetInfo, equalTo(powerTransformerInfo))
     }
 

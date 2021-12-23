@@ -8,6 +8,8 @@
 package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo.TransformerConstructionKind
+import com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.common.extensions.*
 
@@ -43,6 +45,10 @@ import com.zepben.evolve.services.common.extensions.*
  * @property transformerUtilisation The fraction of the transformer’s normal capacity (nameplate rating) that is in use. It may be expressed as the result of
  * the calculation S/Sn, where S = Load on Transformer (in VA), Sn = Transformer Nameplate Rating (in VA). A value of NaN signifies the data is missing/unknown.
  *
+ * @property primaryVoltage The construction kind of this transformer.
+ *
+ * @property primaryVoltage The function of this transformer.
+ *
  * @property assetInfo Set of power transformer data, from an equipment library or data sheet. Note that when this is set to a [PowerTransformerInfo], the
  * corresponding [TransformerEnd]s cannot be associated directly with a [TransformerStarImpedance], as the existence of [assetInfo] indicates that impedance
  * values are calculated from the data sheet information.
@@ -55,6 +61,8 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
     private var _powerTransformerEnds: MutableList<PowerTransformerEnd>? = null
     var vectorGroup: VectorGroup = VectorGroup.UNKNOWN
     var transformerUtilisation: Double? = null
+    var constructionKind: TransformerConstructionKind = TransformerConstructionKind.unknown
+    var function: TransformerFunctionKind = TransformerFunctionKind.other
 
     override var assetInfo: PowerTransformerInfo? = null
         set(value) {

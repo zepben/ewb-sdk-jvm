@@ -820,9 +820,11 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TablePowerTransformers::class.java)
         val insert = databaseTables.getInsert(TablePowerTransformers::class.java)
 
-        insert.setNullableString(table.VECTOR_GROUP.queryIndex, powerTransformer.vectorGroup.name)
+        insert.setString(table.VECTOR_GROUP.queryIndex, powerTransformer.vectorGroup.name)
         insert.setNullableDouble(table.TRANSFORMER_UTILISATION.queryIndex, powerTransformer.transformerUtilisation)
-        insert.setString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex, powerTransformer.assetInfo?.mRID)
+        insert.setString(table.CONSTRUCTION_KIND.queryIndex, powerTransformer.constructionKind.name)
+        insert.setString(table.FUNCTION.queryIndex, powerTransformer.function.name)
+        insert.setNullableString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex, powerTransformer.assetInfo?.mRID)
 
         return saveConductingEquipment(table, insert, powerTransformer, "power transformer")
     }

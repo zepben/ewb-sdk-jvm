@@ -28,9 +28,7 @@ object ChangeSet20Validator : ChangeSetValidator {
 
     override fun validate(statement: Statement) {
         // Ensure index was recreated, as changeset drops it to update numbers
-        statement.executeQuery("pragma index_info('power_transformer_ends_power_transformer_mrid_end_number')").use { rs ->
-            assertThat(rs.next(), equalTo(true))
-        }
+        ensureIndexes(statement, "power_transformer_ends_power_transformer_mrid_end_number")
 
         validateRows(statement, "select mrid, sequence_number as sn from terminals",
             { assertThat(it.getInt("sn"), equalTo(1)) },

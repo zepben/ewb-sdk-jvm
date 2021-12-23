@@ -56,6 +56,14 @@ interface ChangeSetValidator {
         }
     }
 
+    fun ensureIndexes(statement: Statement, vararg expectedIndexes: String) {
+        expectedIndexes.forEach {
+            statement.executeQuery("pragma index_info('$it')").use { rs ->
+                assertThat(rs.next(), equalTo(true))
+            }
+        }
+    }
+
 }
 
 @Deprecated("Please do not use this, it's only to cover legacy cases where we've missed tests.")

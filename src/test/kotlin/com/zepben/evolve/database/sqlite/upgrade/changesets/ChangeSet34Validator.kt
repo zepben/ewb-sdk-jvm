@@ -10,7 +10,6 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
 import java.sql.Statement
 
 object ChangeSet34Validator : ChangeSetValidator {
@@ -73,7 +72,7 @@ object ChangeSet34Validator : ChangeSetValidator {
             18.81
         )
         """
-        )
+    )
 
     override fun validate(statement: Statement) {
         ensureIndexes(statement, "equivalent_branches_mrid", "equivalent_branches_name")

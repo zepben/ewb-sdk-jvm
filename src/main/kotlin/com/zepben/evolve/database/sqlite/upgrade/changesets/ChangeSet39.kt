@@ -17,6 +17,6 @@ internal fun changeSet39() = ChangeSet(39) {
 
 @Suppress("ObjectPropertyName")
 private val `Add power transformer fields` = arrayOf(
-    "ALTER TABLE power_transformers ADD construction_kind TEXT NOT NULL",
-    "ALTER TABLE power_transformers ADD function TEXT NOT NULL"
+    "ALTER TABLE power_transformers ADD construction_kind TEXT NOT NULL DEFAULT 'unknown'",
+    "ALTER TABLE power_transformers ADD function TEXT NOT NULL DEFAULT 'other'"
 )

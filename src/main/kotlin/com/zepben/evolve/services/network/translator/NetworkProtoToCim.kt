@@ -10,8 +10,8 @@ package com.zepben.evolve.services.network.translator
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
-import com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo.TransformerConstructionKind
-import com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint

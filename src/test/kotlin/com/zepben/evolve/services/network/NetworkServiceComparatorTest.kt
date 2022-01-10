@@ -13,8 +13,8 @@ import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.PositionPoint
 import com.zepben.evolve.cim.iec61968.common.StreetAddress
 import com.zepben.evolve.cim.iec61968.common.TownDetail
-import com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo.TransformerConstructionKind
-import com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint

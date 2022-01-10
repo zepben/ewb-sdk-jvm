@@ -8,8 +8,8 @@
 package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo.TransformerConstructionKind
-import com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.common.extensions.*
 

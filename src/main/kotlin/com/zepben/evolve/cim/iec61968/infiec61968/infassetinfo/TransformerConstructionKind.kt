@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.cim.iec61968.infiec61868.infassetinfo
+package com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo
 
 /**
  * Kind of transformer construction.

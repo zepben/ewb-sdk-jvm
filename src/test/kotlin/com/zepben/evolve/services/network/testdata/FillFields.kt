@@ -655,6 +655,9 @@ fun PhotoVoltaicUnit.fillFields(service: NetworkService, includeRuntime: Boolean
 fun PowerElectronicsConnection.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerElectronicsConnection {
     (this as RegulatingCondEq).fillFields(service, includeRuntime)
 
+    addPhase(PowerElectronicsConnectionPhase().also { it.powerElectronicsConnection = this; service.add(it)})
+    addUnit(PhotoVoltaicUnit().also { it.powerElectronicsConnection = this; service.add(it)})
+
     maxIFault = 1
     maxQ = 2.0
     minQ = 3.0

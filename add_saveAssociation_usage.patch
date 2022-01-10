@@ -1,0 +1,19 @@
+Index: src/main/kotlin/com/zepben/evolve/database/sqlite/writers/NetworkCIMWriter.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/com/zepben/evolve/database/sqlite/writers/NetworkCIMWriter.kt b/src/main/kotlin/com/zepben/evolve/database/sqlite/writers/NetworkCIMWriter.kt
+--- a/src/main/kotlin/com/zepben/evolve/database/sqlite/writers/NetworkCIMWriter.kt	(revision 3ccd1ae1873934752a2ac83ffecea199db86a907)
++++ b/src/main/kotlin/com/zepben/evolve/database/sqlite/writers/NetworkCIMWriter.kt	(revision feb6386f80b5bb55cdc68095dbbb6aea8caf9934)
+@@ -803,6 +803,10 @@
+         insert.setNullableInt(table.RATED_S.queryIndex, powerElectronicsConnection.ratedS)
+         insert.setNullableInt(table.RATED_U.queryIndex, powerElectronicsConnection.ratedU)
+ 
++        var status = true
++        powerElectronicsConnection.units.forEach { status = status and saveAssociation(powerElectronicsConnection, it) }
++        powerElectronicsConnection.phases.forEach { status = status and saveAssociation(powerElectronicsConnection, it) }
++
+         return saveRegulatingCondEq(table, insert, powerElectronicsConnection, "power electronics connection")
+     }
+ 

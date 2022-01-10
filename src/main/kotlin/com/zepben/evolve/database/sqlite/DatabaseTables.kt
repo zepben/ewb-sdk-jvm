@@ -138,6 +138,8 @@ class DatabaseTables {
         TablePoles(),
         TablePositionPoints(),
         TablePowerElectronicsConnection(),
+        TablePowerElectronicsConnectionPECPhases(),
+        TablePowerElectronicsConnectionPEUnits(),
         TablePowerElectronicsConnectionPhases(),
         TablePowerElectronicsWindUnit(),
         TablePowerTransformerEnds(),

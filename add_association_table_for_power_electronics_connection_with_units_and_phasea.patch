@@ -1,0 +1,231 @@
+Index: src/main/kotlin/com/zepben/evolve/database/sqlite/DatabaseTables.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/com/zepben/evolve/database/sqlite/DatabaseTables.kt b/src/main/kotlin/com/zepben/evolve/database/sqlite/DatabaseTables.kt
+--- a/src/main/kotlin/com/zepben/evolve/database/sqlite/DatabaseTables.kt	(revision 2a9e6881b61dd3e64fcead46a00c79b91c87a68b)
++++ b/src/main/kotlin/com/zepben/evolve/database/sqlite/DatabaseTables.kt	(revision 3ccd1ae1873934752a2ac83ffecea199db86a907)
+@@ -138,6 +138,8 @@
+         TablePoles(),
+         TablePositionPoints(),
+         TablePowerElectronicsConnection(),
++        TablePowerElectronicsConnectionPECPhases(),
++        TablePowerElectronicsConnectionPEUnits(),
+         TablePowerElectronicsConnectionPhases(),
+         TablePowerElectronicsWindUnit(),
+         TablePowerTransformerEnds(),
+Index: src/main/kotlin/com/zepben/evolve/database/sqlite/readers/NetworkCIMReader.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/com/zepben/evolve/database/sqlite/readers/NetworkCIMReader.kt b/src/main/kotlin/com/zepben/evolve/database/sqlite/readers/NetworkCIMReader.kt
+--- a/src/main/kotlin/com/zepben/evolve/database/sqlite/readers/NetworkCIMReader.kt	(revision 2a9e6881b61dd3e64fcead46a00c79b91c87a68b)
++++ b/src/main/kotlin/com/zepben/evolve/database/sqlite/readers/NetworkCIMReader.kt	(revision 3ccd1ae1873934752a2ac83ffecea199db86a907)
+@@ -1156,4 +1156,36 @@
+         return true
+     }
+ 
++    fun load(table: TablePowerElectronicsConnectionPECPhases, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
++        val powerElectronicsConnectionMRID = setLastMRID(resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex))
++        setLastMRID("${powerElectronicsConnectionMRID}-to-UNKNOWN")
++
++        val powerElectronicsConnectionPhaseMRID = resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_PHASE_MRID.queryIndex)
++        val id = setLastMRID("${powerElectronicsConnectionMRID}-to-${powerElectronicsConnectionPhaseMRID}")
++
++        val typeNameAndMRID = "Power Electronics Connection to Power Electronics Connection Phase association $id"
++        val powerElectronicsConnection = networkService.getOrThrow<PowerElectronicsConnection>(powerElectronicsConnectionMRID, typeNameAndMRID)
++        val powerElectronicsConnectionPhase = networkService.getOrThrow<PowerElectronicsConnectionPhase>(powerElectronicsConnectionPhaseMRID, typeNameAndMRID)
++
++        powerElectronicsConnection.addPhase(powerElectronicsConnectionPhase)
++
++        return true
++    }
++
++    fun load(table: TablePowerElectronicsConnectionPEUnits, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
++        val powerElectronicsConnectionMRID = setLastMRID(resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex))
++        setLastMRID("${powerElectronicsConnectionMRID}-to-UNKNOWN")
++
++        val powerElectronicsUnitMRID = resultSet.getString(table.POWER_ELECTRONICS_UNIT_MRID.queryIndex)
++        val id = setLastMRID("${powerElectronicsConnectionMRID}-to-${powerElectronicsUnitMRID}")
++
++        val typeNameAndMRID = "Power Electronics Connection to Power Electronics Connection Phase association $id"
++        val powerElectronicsConnection = networkService.getOrThrow<PowerElectronicsConnection>(powerElectronicsConnectionMRID, typeNameAndMRID)
++        val powerElectronicsUnit = networkService.getOrThrow<PowerElectronicsUnit>(powerElectronicsUnitMRID, typeNameAndMRID)
++
++        powerElectronicsConnection.addUnit(powerElectronicsUnit)
++
++        return true
++    }
++
+ }
+Index: src/main/kotlin/com/zepben/evolve/database/sqlite/readers/NetworkServiceReader.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/com/zepben/evolve/database/sqlite/readers/NetworkServiceReader.kt b/src/main/kotlin/com/zepben/evolve/database/sqlite/readers/NetworkServiceReader.kt
+--- a/src/main/kotlin/com/zepben/evolve/database/sqlite/readers/NetworkServiceReader.kt	(revision 2a9e6881b61dd3e64fcead46a00c79b91c87a68b)
++++ b/src/main/kotlin/com/zepben/evolve/database/sqlite/readers/NetworkServiceReader.kt	(revision 3ccd1ae1873934752a2ac83ffecea199db86a907)
+@@ -75,6 +75,8 @@
+         status = status and loadEach<TableEquivalentBranches>("equivalent branches", reader::load)
+         status = status and loadEach<TablePowerElectronicsConnection>("power electronics connection", reader::load)
+         status = status and loadEach<TablePowerElectronicsConnectionPhases>("power electronics connection phases", reader::load)
++        status = status and loadEach<TablePowerElectronicsConnectionPECPhases>("power electronics connection to power electronics connection phases association", reader::load)
++        status = status and loadEach<TablePowerElectronicsConnectionPEUnits>("power electronics connection to power electronics units association", reader::load)
+         status = status and loadEach<TableBatteryUnit>("battery unit", reader::load)
+         status = status and loadEach<TablePhotoVoltaicUnit>("photo voltaic unit", reader::load)
+         status = status and loadEach<TablePowerElectronicsWindUnit>("power electronics wind unit", reader::load)
+Index: src/main/kotlin/com/zepben/evolve/database/sqlite/tables/associations/TablePowerElectronicsConnectionPECPhases.kt
+===================================================================
+diff --git a/src/main/kotlin/com/zepben/evolve/database/sqlite/tables/associations/TablePowerElectronicsConnectionPECPhases.kt b/src/main/kotlin/com/zepben/evolve/database/sqlite/tables/associations/TablePowerElectronicsConnectionPECPhases.kt
+new file mode 100644
+--- /dev/null	(revision 3ccd1ae1873934752a2ac83ffecea199db86a907)
++++ b/src/main/kotlin/com/zepben/evolve/database/sqlite/tables/associations/TablePowerElectronicsConnectionPECPhases.kt	(revision 3ccd1ae1873934752a2ac83ffecea199db86a907)
+@@ -0,0 +1,44 @@
++/*
++ * Copyright 2020 Zeppelin Bend Pty Ltd
++ *
++ * This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
++ */
++package com.zepben.evolve.database.sqlite.tables.associations
++
++import com.zepben.evolve.database.sqlite.tables.Column
++import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
++import com.zepben.evolve.database.sqlite.tables.SqliteTable
++
++@Suppress("PropertyName")
++class TablePowerElectronicsConnectionPECPhases : SqliteTable() {
++
++    val POWER_ELECTRONICS_CONNECTION_MRID = Column(++columnIndex, "power_electronics_connection_mrid", "TEXT", NOT_NULL)
++    val POWER_ELECTRONICS_CONNECTION_PHASE_MRID = Column(++columnIndex, "power_electronics_connection_phase_mrid", "TEXT", NOT_NULL)
++
++    override fun name(): String {
++        return "power_electronics_connections_power_electronics_connection_phases"
++    }
++
++    override fun uniqueIndexColumns(): MutableList<List<Column>> {
++        val cols = super.uniqueIndexColumns()
++
++        cols.add(listOf(POWER_ELECTRONICS_CONNECTION_MRID, POWER_ELECTRONICS_CONNECTION_PHASE_MRID))
++
++        return cols
++    }
++
++    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
++        val cols = super.nonUniqueIndexColumns()
++
++        cols.add(listOf(POWER_ELECTRONICS_CONNECTION_MRID))
++        cols.add(listOf(POWER_ELECTRONICS_CONNECTION_PHASE_MRID))
++
++        return cols
++    }
++
++    override val tableClass = this.javaClass
++    override val tableClassInstance = this
++
++}
+Index: src/main/kotlin/com/zepben/evolve/database/sqlite/tables/associations/TablePowerElectronicsConnectionPEUnits.kt
+===================================================================
+diff --git a/src/main/kotlin/com/zepben/evolve/database/sqlite/tables/associations/TablePowerElectronicsConnectionPEUnits.kt b/src/main/kotlin/com/zepben/evolve/database/sqlite/tables/associations/TablePowerElectronicsConnectionPEUnits.kt
+new file mode 100644
+--- /dev/null	(revision 3ccd1ae1873934752a2ac83ffecea199db86a907)
++++ b/src/main/kotlin/com/zepben/evolve/database/sqlite/tables/associations/TablePowerElectronicsConnectionPEUnits.kt	(revision 3ccd1ae1873934752a2ac83ffecea199db86a907)
+@@ -0,0 +1,44 @@
++/*
++ * Copyright 2020 Zeppelin Bend Pty Ltd
++ *
++ * This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
++ */
++package com.zepben.evolve.database.sqlite.tables.associations
++
++import com.zepben.evolve.database.sqlite.tables.Column
++import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
++import com.zepben.evolve.database.sqlite.tables.SqliteTable
++
++@Suppress("PropertyName")
++class TablePowerElectronicsConnectionPEUnits : SqliteTable() {
++
++    val POWER_ELECTRONICS_CONNECTION_MRID = Column(++columnIndex, "power_electronics_connection_mrid", "TEXT", NOT_NULL)
++    val POWER_ELECTRONICS_UNIT_MRID = Column(++columnIndex, "power_electronics_unit_mrid", "TEXT", NOT_NULL)
++
++    override fun name(): String {
++        return "power_electronics_connections_power_electronics_units"
++    }
++
++    override fun uniqueIndexColumns(): MutableList<List<Column>> {
++        val cols = super.uniqueIndexColumns()
++
++        cols.add(listOf(POWER_ELECTRONICS_CONNECTION_MRID, POWER_ELECTRONICS_UNIT_MRID))
++
++        return cols
++    }
++
++    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
++        val cols = super.nonUniqueIndexColumns()
++
++        cols.add(listOf(POWER_ELECTRONICS_CONNECTION_MRID))
++        cols.add(listOf(POWER_ELECTRONICS_UNIT_MRID))
++
++        return cols
++    }
++
++    override val tableClass = this.javaClass
++    override val tableClassInstance = this
++
++}
+Index: src/main/kotlin/com/zepben/evolve/database/sqlite/writers/NetworkCIMWriter.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/kotlin/com/zepben/evolve/database/sqlite/writers/NetworkCIMWriter.kt b/src/main/kotlin/com/zepben/evolve/database/sqlite/writers/NetworkCIMWriter.kt
+--- a/src/main/kotlin/com/zepben/evolve/database/sqlite/writers/NetworkCIMWriter.kt	(revision 2a9e6881b61dd3e64fcead46a00c79b91c87a68b)
++++ b/src/main/kotlin/com/zepben/evolve/database/sqlite/writers/NetworkCIMWriter.kt	(revision 3ccd1ae1873934752a2ac83ffecea199db86a907)
+@@ -13,6 +13,8 @@
+ import com.zepben.evolve.cim.iec61968.common.PositionPoint
+ import com.zepben.evolve.cim.iec61968.common.StreetAddress
+ import com.zepben.evolve.cim.iec61968.common.TownDetail
++import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
++import com.zepben.evolve.cim.iec61968.customers.PricingStructure
+ import com.zepben.evolve.cim.iec61968.metering.EndDevice
+ import com.zepben.evolve.cim.iec61968.metering.Meter
+ import com.zepben.evolve.cim.iec61968.metering.UsagePoint
+@@ -1157,4 +1159,32 @@
+             "loop to substation association"
+         )
+     }
++
++    private fun saveAssociation(powerElectronicsConnection: PowerElectronicsConnection, powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): Boolean {
++        val table = databaseTables.getTable(TablePowerElectronicsConnectionPECPhases::class.java)
++        val insert = databaseTables.getInsert(TablePowerElectronicsConnectionPECPhases::class.java)
++
++        insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex, powerElectronicsConnection.mRID)
++        insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_PHASE_MRID.queryIndex, powerElectronicsConnectionPhase.mRID)
++
++        return tryExecuteSingleUpdate(
++            insert,
++            "${powerElectronicsConnection.mRID}-to-${powerElectronicsConnectionPhase.mRID}",
++            "power electronics connection to power electronics connection phase association"
++        )
++    }
++
++    private fun saveAssociation(powerElectronicsConnection: PowerElectronicsConnection, powerElectronicsUnit: PowerElectronicsUnit): Boolean {
++        val table = databaseTables.getTable(TablePowerElectronicsConnectionPEUnits::class.java)
++        val insert = databaseTables.getInsert(TablePowerElectronicsConnectionPEUnits::class.java)
++
++        insert.setNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex, powerElectronicsConnection.mRID)
++        insert.setNullableString(table.POWER_ELECTRONICS_UNIT_MRID.queryIndex, powerElectronicsUnit.mRID)
++
++        return tryExecuteSingleUpdate(
++            insert,
++            "${powerElectronicsConnection.mRID}-to-${powerElectronicsUnit.mRID}",
++            "power electronics connection to power electronics unit association"
++        )
++    }
+ }

@@ -620,11 +620,6 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun loadPowerElectronicsUnit(powerElectronicsUnit: PowerElectronicsUnit, table: TablePowerElectronicsUnit, resultSet: ResultSet): Boolean {
         powerElectronicsUnit.apply {
-            powerElectronicsConnection = networkService.ensureGet(
-                resultSet.getNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex),
-                typeNameAndMRID()
-            )
-            powerElectronicsConnection?.addUnit(this)
 
             maxP = resultSet.getNullableInt(table.MAX_P.queryIndex)
             minP = resultSet.getNullableInt(table.MIN_P.queryIndex)
@@ -839,10 +834,6 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TablePowerElectronicsConnectionPhases, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val powerElectronicsConnectionPhase = PowerElectronicsConnectionPhase(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            powerElectronicsConnection =
-                networkService.ensureGet(resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex), typeNameAndMRID())
-            powerElectronicsConnection?.addPhase(this)
-
             phase = SinglePhaseKind.valueOf(resultSet.getString(table.PHASE.queryIndex))
             p = resultSet.getNullableDouble(table.P.queryIndex)
             phase = SinglePhaseKind.valueOf(resultSet.getString(table.PHASE.queryIndex))
@@ -1156,6 +1147,40 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
                 loop.addEnergizingSubstation(substation)
             }
         }
+
+        return true
+    }
+
+    fun load(table: TablePowerElectronicsConnectionPECPhases, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val powerElectronicsConnectionMRID = setLastMRID(resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex))
+        setLastMRID("${powerElectronicsConnectionMRID}-to-UNKNOWN")
+
+        val powerElectronicsConnectionPhaseMRID = resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_PHASE_MRID.queryIndex)
+        val id = setLastMRID("${powerElectronicsConnectionMRID}-to-${powerElectronicsConnectionPhaseMRID}")
+
+        val typeNameAndMRID = "Power Electronics Connection to Power Electronics Connection Phase association $id"
+        val powerElectronicsConnection = networkService.getOrThrow<PowerElectronicsConnection>(powerElectronicsConnectionMRID, typeNameAndMRID)
+        val powerElectronicsConnectionPhase = networkService.getOrThrow<PowerElectronicsConnectionPhase>(powerElectronicsConnectionPhaseMRID, typeNameAndMRID)
+
+        powerElectronicsConnectionPhase.powerElectronicsConnection = powerElectronicsConnection
+        powerElectronicsConnection.addPhase(powerElectronicsConnectionPhase)
+
+        return true
+    }
+
+    fun load(table: TablePowerElectronicsConnectionPEUnits, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val powerElectronicsConnectionMRID = setLastMRID(resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex))
+        setLastMRID("${powerElectronicsConnectionMRID}-to-UNKNOWN")
+
+        val powerElectronicsUnitMRID = resultSet.getString(table.POWER_ELECTRONICS_UNIT_MRID.queryIndex)
+        val id = setLastMRID("${powerElectronicsConnectionMRID}-to-${powerElectronicsUnitMRID}")
+
+        val typeNameAndMRID = "Power Electronics Connection to Power Electronics Connection Phase association $id"
+        val powerElectronicsConnection = networkService.getOrThrow<PowerElectronicsConnection>(powerElectronicsConnectionMRID, typeNameAndMRID)
+        val powerElectronicsUnit = networkService.getOrThrow<PowerElectronicsUnit>(powerElectronicsUnitMRID, typeNameAndMRID)
+
+        powerElectronicsUnit.powerElectronicsConnection = powerElectronicsConnection
+        powerElectronicsConnection.addUnit(powerElectronicsUnit)
 
         return true
     }

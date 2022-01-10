@@ -28,6 +28,7 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
@@ -59,6 +60,8 @@ internal class NetworkTranslatorTest {
         Equipment::class.java to { Junction(it) },
         EquipmentContainer::class.java to { Site(it) },
         Measurement::class.java to { Discrete(it) },
+        PowerElectronicsConnectionPhase::class.java to { PowerElectronicsConnectionPhase(it) },
+        PowerElectronicsUnit::class.java to { PhotoVoltaicUnit(it) },
         TransformerEnd::class.java to { PowerTransformerEnd(it) },
         WireInfo::class.java to { OverheadWireInfo(it) }
     )

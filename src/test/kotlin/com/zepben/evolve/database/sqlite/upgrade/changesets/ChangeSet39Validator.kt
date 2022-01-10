@@ -60,105 +60,54 @@ object ChangeSet39Validator : ChangeSetValidator {
 
     @Suppress("ObjectPropertyName")
     private val `insert existing power transformers` = arrayOf(
-        """
-        INSERT INTO power_transformers (
-            mrid, name, description, num_controls, vector_group
-        ) VALUES ( 
-            'unk', '', '', 0, 'unknown'
-        )
-        """,
-        """
-        INSERT INTO power_transformers (
-            mrid, name, description, num_controls, vector_group
-        ) VALUES ( 
-            'dist', '', '', 0, 'unknown'
-        )
-        """,
-        """
-        INSERT INTO power_transformers (
-            mrid, name, description, num_controls, vector_group
-        ) VALUES ( 
-            'r_reg', '', '', 0, 'unknown'
-        )
-        """,
-        """
-        INSERT INTO power_transformers (
-            mrid, name, description, num_controls, vector_group
-        ) VALUES ( 
-            'nr_reg', '', '', 0, 'unknown'
-        )
-        """,
-        """
-        INSERT INTO power_transformers (
-            mrid, name, description, num_controls, vector_group
-        ) VALUES ( 
-            'iso', '', '', 0, 'unknown'
-        )
-        """,
-        """
-        INSERT INTO power_transformers (
-            mrid, name, description, num_controls, vector_group
-        ) VALUES ( 
-            'zone', '', '', 0, 'unknown'
-        )
-        """
+        insertExistingPowerTransformer("unk"),
+        insertExistingPowerTransformer("dist"),
+        insertExistingPowerTransformer("r_reg"),
+        insertExistingPowerTransformer("nr_reg"),
+        insertExistingPowerTransformer("iso"),
+        insertExistingPowerTransformer("zone")
     )
 
     @Suppress("ObjectPropertyName")
     private val `insert diagram objects` = arrayOf(
-        """
-        INSERT INTO diagram_objects (
-            mrid, name, description, num_diagram_objects, identified_object_mrid, diagram_mrid, style, rotation
-        ) VALUES ( 
-            'dist-do', '', '', 0, 'dist', 'd', 'DIST_TRANSFORMER', 0
-        )
-        """,
-        """
-        INSERT INTO diagram_objects (
-            mrid, name, description, num_diagram_objects, identified_object_mrid, diagram_mrid, style, rotation
-        ) VALUES ( 
-            'r_reg-do', '', '', 0, 'r_reg', 'd', 'REVERSIBLE_REGULATOR', 0
-        )
-        """,
-        """
-        INSERT INTO diagram_objects (
-            mrid, name, description, num_diagram_objects, identified_object_mrid, diagram_mrid, style, rotation
-        ) VALUES ( 
-            'nr_reg-do', '', '', 0, 'nr_reg', 'd', 'NON_REVERSIBLE_REGULATOR', 0
-        )
-        """,
-        """
-        INSERT INTO diagram_objects (
-            mrid, name, description, num_diagram_objects, identified_object_mrid, diagram_mrid, style, rotation
-        ) VALUES ( 
-            'iso-do', '', '', 0, 'iso', 'd', 'ISO_TRANSFORMER', 0
-        )
-        """,
-        """
-        INSERT INTO diagram_objects (
-            mrid, name, description, num_diagram_objects, identified_object_mrid, diagram_mrid, style, rotation
-        ) VALUES ( 
-            'zone-do', '', '', 0, 'zone', 'd', 'ZONE_TRANSFORMER', 0
-        )
-        """
+        insertDiagramObject("dist", "DIST_TRANSFORMER"),
+        insertDiagramObject("r_reg", "REVERSIBLE_REGULATOR"),
+        insertDiagramObject("nr_reg", "NON_REVERSIBLE_REGULATOR"),
+        insertDiagramObject("iso", "ISO_TRANSFORMER"),
+        insertDiagramObject("zone", "ZONE_TRANSFORMER")
     )
 
     @Suppress("ObjectPropertyName")
     private val `insert new power transformers` = arrayOf(
-        """
-        INSERT INTO power_transformers (
-            mrid, name, description, num_controls, vector_group, construction_kind, function
-        ) VALUES ( 
-            'new1', '', '', 0, 'unknown', 'overhead', 'autotransformer'
-        )
-        """,
-        """
-        INSERT INTO power_transformers (
-            mrid, name, description, num_controls, vector_group, construction_kind, function
-        ) VALUES ( 
-            'new2', '', '', 0, 'unknown', 'underground', 'secondaryTransformer'
-        )
-        """
+        insertNewPowerTransformer("new1", overhead, autotransformer),
+        insertNewPowerTransformer("new2", underground, secondaryTransformer)
     )
+
+    private fun insertExistingPowerTransformer(mrid: String) =
+        """
+        INSERT INTO power_transformers (
+            mrid, name, description, num_controls, vector_group
+        ) VALUES ( 
+            '$mrid', '', '', 0, 'unknown'
+        )
+        """
+
+    private fun insertNewPowerTransformer(mrid: String, construction: TransformerConstructionKind, function: TransformerFunctionKind) =
+        """
+        INSERT INTO power_transformers (
+            mrid, name, description, num_controls, vector_group, construction_kind, function
+        ) VALUES ( 
+            '$mrid', '', '', 0, 'unknown', '$construction', '$function'
+        )
+        """
+
+    private fun insertDiagramObject(mrid: String, style: String) =
+        """
+        INSERT INTO diagram_objects (
+            mrid, name, description, num_diagram_objects, identified_object_mrid, diagram_mrid, style, rotation
+        ) VALUES ( 
+            '$mrid-do', '', '', 0, '$mrid', 'd', '$style', 0
+        )
+        """
 
 }

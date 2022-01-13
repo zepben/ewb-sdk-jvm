@@ -45,9 +45,9 @@ import com.zepben.evolve.services.common.extensions.*
  * @property transformerUtilisation The fraction of the transformer’s normal capacity (nameplate rating) that is in use. It may be expressed as the result of
  * the calculation S/Sn, where S = Load on Transformer (in VA), Sn = Transformer Nameplate Rating (in VA). A value of NaN signifies the data is missing/unknown.
  *
- * @property primaryVoltage The construction kind of this transformer.
+ * @property constructionKind The construction kind of this transformer.
  *
- * @property primaryVoltage The function of this transformer.
+ * @property function The function of this transformer.
  *
  * @property assetInfo Set of power transformer data, from an equipment library or data sheet. Note that when this is set to a [PowerTransformerInfo], the
  * corresponding [TransformerEnd]s cannot be associated directly with a [TransformerStarImpedance], as the existence of [assetInfo] indicates that impedance

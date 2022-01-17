@@ -13,6 +13,8 @@ import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.PositionPoint
 import com.zepben.evolve.cim.iec61968.common.StreetAddress
 import com.zepben.evolve.cim.iec61968.common.TownDetail
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -865,6 +867,18 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(PowerTransformer::vectorGroup, { PowerTransformer(it) }, { VectorGroup.DYN11 }, { VectorGroup.D0 })
         comparatorValidator.validateProperty(PowerTransformer::transformerUtilisation, { PowerTransformer(it) }, { 0.1 }, { 0.9 })
+        comparatorValidator.validateProperty(
+            PowerTransformer::constructionKind,
+            { PowerTransformer(it) },
+            { TransformerConstructionKind.padmounted },
+            { TransformerConstructionKind.overhead }
+        )
+        comparatorValidator.validateProperty(
+            PowerTransformer::function,
+            { PowerTransformer(it) },
+            { TransformerFunctionKind.distributionTransformer },
+            { TransformerFunctionKind.isolationTransformer }
+        )
 
         comparatorValidator.validateIndexedCollection(
             PowerTransformer::ends, PowerTransformer::addEnd, { PowerTransformer(it) },

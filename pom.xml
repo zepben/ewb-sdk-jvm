@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.zepben.maven</groupId>
         <artifactId>evolve-super-pom</artifactId>
-        <version>0.11.0</version>
+        <version>0.15.0</version>
     </parent>
 
     <groupId>com.zepben</groupId>
@@ -75,7 +75,7 @@
         <dependency>
             <groupId>com.zepben.protobuf</groupId>
             <artifactId>evolve-grpc</artifactId>
-            <version>0.19.0-SNAPSHOT2</version>
+            <version>0.19.0-SNAPSHOT3</version>
         </dependency>
 
         <!-- Kotlin -->
@@ -94,7 +94,6 @@
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-serialization-json</artifactId>
-            <version>${kotlin.serialization.version}</version>
         </dependency>
 
         <!-- Misc -->
@@ -148,6 +147,7 @@
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
+                <!--suppress MavenModelInspection -->
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <configuration>
                     <compilerPlugins>
@@ -158,6 +158,7 @@
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>
                         <artifactId>kotlin-maven-serialization</artifactId>
+                        <!--suppress MavenModelInspection -->
                         <version>${kotlin.version}</version>
                     </dependency>
                 </dependencies>

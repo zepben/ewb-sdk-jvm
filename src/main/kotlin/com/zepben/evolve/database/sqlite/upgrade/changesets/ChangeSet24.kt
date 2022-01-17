@@ -52,6 +52,6 @@ internal fun changeSet24() = ChangeSet(24) {
             " FROM power_transformers_old",
         "DROP TABLE IF EXISTS power_transformers_old",
         "CREATE TABLE power_transformer_info(mrid TEXT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, num_diagram_objects INTEGER NOT NULL)",
-        "ALTER TABLE power_transformers ADD power_transformer_info_mrid TEXT"
+        "ALTER TABLE power_transformers ADD power_transformer_info_mrid TEXT NULL"
     )
 }

@@ -46,29 +46,6 @@ object ChangeSet38Validator : ChangeSetValidator {
     override fun populateStatements(): List<String> = emptyList()
 
     override fun validate(statement: Statement) {
-        // Ensure index was recreated, as changeset drops it to update columns
-        statement.executeQuery("pragma index_info('base_voltages_mrid')").use { rs ->
-            assertThat(rs.next(), equalTo(true))
-        }
-        statement.executeQuery("pragma index_info('base_voltages_name')").use { rs ->
-            assertThat(rs.next(), equalTo(true))
-        }
-
-        statement.executeQuery("pragma index_info('remote_controls_mrid')").use { rs ->
-            assertThat(rs.next(), equalTo(true))
-        }
-        statement.executeQuery("pragma index_info('remote_controls_name')").use { rs ->
-            assertThat(rs.next(), equalTo(true))
-        }
-
-        statement.executeQuery("pragma index_info('remote_sources_mrid')").use { rs ->
-            assertThat(rs.next(), equalTo(true))
-        }
-        statement.executeQuery("pragma index_info('remote_sources_name')").use { rs ->
-            assertThat(rs.next(), equalTo(true))
-        }
-
-        // Validate entries
         validateRows(statement, "SELECT * FROM base_voltages", { rs ->
             assertThat(rs.getString("mrid"), equalTo("id"))
             assertThat(rs.getString("name"), equalTo("name"))

@@ -37,6 +37,8 @@ import com.zepben.evolve.services.common.UNKNOWN_UINT
 import com.zepben.evolve.services.common.translator.BaseCimToProto
 import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.protobuf.cim.iec61970.base.wires.PhaseShuntConnectionKind
 import com.zepben.protobuf.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
@@ -772,6 +774,8 @@ fun toPb(cim: PowerTransformer, pb: PBPowerTransformer.Builder): PBPowerTransfor
         cim.ends.forEach { addPowerTransformerEndMRIDs(it.mRID) }
         vectorGroup = VectorGroup.valueOf(cim.vectorGroup.name)
         transformerUtilisation = cim.transformerUtilisation ?: UNKNOWN_DOUBLE
+        constructionKind = TransformerConstructionKind.valueOf(cim.constructionKind.name)
+        function = TransformerFunctionKind.valueOf(cim.function.name)
         toPb(cim, ceBuilder)
     }
 

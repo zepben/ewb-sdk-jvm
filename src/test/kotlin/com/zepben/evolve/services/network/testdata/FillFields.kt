@@ -10,6 +10,8 @@ package com.zepben.evolve.services.network.testdata
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -881,8 +883,10 @@ fun PerLengthSequenceImpedance.fillFields(service: NetworkService, includeRuntim
 fun PowerTransformer.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerTransformer {
     (this as ConductingEquipment).fillFields(service, includeRuntime)
 
-    transformerUtilisation = 1.0
     vectorGroup = VectorGroup.DD0
+    transformerUtilisation = 1.0
+    constructionKind = TransformerConstructionKind.aerial
+    function = TransformerFunctionKind.voltageRegulator
     assetInfo = PowerTransformerInfo().also { service.add(it) }
 
     return this

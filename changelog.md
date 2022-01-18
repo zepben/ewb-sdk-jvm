@@ -19,6 +19,11 @@
 
 * Column names fixed for `TableBaseVoltages.NOMINAL_VOLTAGE`, `TableRemoteSources.MEASUREMENT_MRID`, and `TableControls.CONTROL_MRID` - database upgrade path
   provided.
+* Relaxed the constraint on `power_electronics_connection_mrid` (no longer unique) in the following tables:
+  * `battery_unit`
+  * `photo_voltaic_unit`
+  * `power_electronics_wind_unit`
+  * `power_electronics_connection_phase`
 
 ##### Notes
 

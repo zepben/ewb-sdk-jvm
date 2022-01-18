@@ -24,8 +24,8 @@ class TablePowerElectronicsConnectionPhases : TablePowerSystemResources() {
         return "power_electronics_connection_phase"
     }
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
+        val cols = super.nonUniqueIndexColumns()
         cols.add(listOf(POWER_ELECTRONICS_CONNECTION_MRID))
         return cols
     }

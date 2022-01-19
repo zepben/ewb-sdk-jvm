@@ -22,15 +22,18 @@ internal class StreetAddressTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(StreetAddress("", null), notNullValue())
+        assertThat(StreetAddress("", null, "", null), notNullValue())
     }
 
     @Test
     internal fun accessorCoverage() {
         val townDetail = TownDetail("", "")
-        val streetAddress = StreetAddress("postalCode", townDetail)
+        val streetDetail = StreetDetail("", "", "", "", "", "", "")
+        val streetAddress = StreetAddress("postalCode", townDetail, "poBox", streetDetail)
 
         assertThat(streetAddress.postalCode, equalTo("postalCode"))
         assertThat(streetAddress.townDetail, equalTo(townDetail))
+        assertThat(streetAddress.poBox, equalTo("poBox"))
+        assertThat(streetAddress.streetDetail, equalTo(streetDetail))
     }
 }

@@ -258,7 +258,7 @@ class NetworkModelTestUtil {
 
         fun locationOf(postcode: Int, state: String, locality: String) =
             Location().apply {
-                mainAddress = StreetAddress(postcode.toString(), TownDetail(locality, state))
+                mainAddress = StreetAddress(postcode.toString(), TownDetail(locality, state), "", null)
             }
 
         fun locationOf(vararg coords: Double) = Location().apply {

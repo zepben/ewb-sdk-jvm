@@ -10,10 +10,7 @@ package com.zepben.evolve.database.sqlite.readers
 
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
-import com.zepben.evolve.cim.iec61968.common.Location
-import com.zepben.evolve.cim.iec61968.common.PositionPoint
-import com.zepben.evolve.cim.iec61968.common.StreetAddress
-import com.zepben.evolve.cim.iec61968.common.TownDetail
+import com.zepben.evolve.cim.iec61968.common.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -292,7 +289,9 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     private fun loadStreetAddress(table: TableStreetAddresses, resultSet: ResultSet): StreetAddress =
         StreetAddress(
             resultSet.getString(table.POSTAL_CODE.queryIndex).emptyIfNull().internEmpty(),
-            loadTownDetail(table, resultSet)
+            loadTownDetail(table, resultSet),
+            resultSet.getString(table.PO_BOX.queryIndex).emptyIfNull().internEmpty(),
+            loadStreetDetail(table, resultSet)
         )
 
     private fun loadTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? {
@@ -303,6 +302,23 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             return null
 
         return TownDetail(townName ?: "", stateOrProvince ?: "")
+    }
+
+    private fun loadStreetDetail(table: TableStreetAddresses, resultSet: ResultSet): StreetDetail? {
+        val buildingName = resultSet.getNullableString(table.BUILDING_NAME.queryIndex)
+        val floorIdentification = resultSet.getNullableString(table.FLOOR_IDENTIFICATION.queryIndex)
+        val name = resultSet.getNullableString(table.NAME.queryIndex)
+        val number = resultSet.getNullableString(table.NUMBER.queryIndex)
+        val suiteNumber = resultSet.getNullableString(table.SUITE_NUMBER.queryIndex)
+        val type = resultSet.getNullableString(table.TYPE.queryIndex)
+        val displayAddress = resultSet.getNullableString(table.DISPLAY_ADDRESS.queryIndex)
+
+        if ((buildingName == null) && (floorIdentification == null) && (name == null) && (number == null) && (suiteNumber == null) && (type == null) &&
+            (displayAddress == null))
+            return null
+
+        return StreetDetail(buildingName ?: "", floorIdentification ?: "", name ?: "", number ?: "",
+            suiteNumber ?: "", type ?: "", displayAddress ?: "")
     }
 
     /************ IEC61968 METERING ************/

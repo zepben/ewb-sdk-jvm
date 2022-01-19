@@ -247,7 +247,7 @@ fun Structure.fillFields(service: NetworkService, includeRuntime: Boolean = true
 fun Location.fillFields(service: NetworkService, includeRuntime: Boolean = true): Location {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
-    mainAddress = StreetAddress("1234", null)
+    mainAddress = StreetAddress("1234", null, "5678", null)
     for (i in 0..1)
         addPoint(PositionPoint(i.toDouble(), i.toDouble()))
 

@@ -311,6 +311,14 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         description: String
     ): Boolean {
         insert.setNullableString(table.POSTAL_CODE.queryIndex, streetAddress.postalCode)
+        insert.setNullableString(table.PO_BOX.queryIndex, streetAddress.poBox)
+        insert.setNullableString(table.BUILDING_NAME.queryIndex, streetAddress.streetDetail?.buildingName ?: "")
+        insert.setNullableString(table.FLOOR_IDENTIFICATION.queryIndex, streetAddress.streetDetail?.floorIdentification ?: "")
+        insert.setNullableString(table.NAME.queryIndex, streetAddress.streetDetail?.name ?: "")
+        insert.setNullableString(table.NUMBER.queryIndex, streetAddress.streetDetail?.number ?: "")
+        insert.setNullableString(table.SUITE_NUMBER.queryIndex, streetAddress.streetDetail?.suiteNumber ?: "")
+        insert.setNullableString(table.TYPE.queryIndex, streetAddress.streetDetail?.type ?: "")
+        insert.setNullableString(table.DISPLAY_ADDRESS.queryIndex, streetAddress.streetDetail?.displayAddress ?: "")
 
         return saveTownDetail(table, insert, streetAddress.townDetail, id, description)
     }

@@ -9,10 +9,7 @@ package com.zepben.evolve.services.network
 
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
-import com.zepben.evolve.cim.iec61968.common.Location
-import com.zepben.evolve.cim.iec61968.common.PositionPoint
-import com.zepben.evolve.cim.iec61968.common.StreetAddress
-import com.zepben.evolve.cim.iec61968.common.TownDetail
+import com.zepben.evolve.cim.iec61968.common.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -218,8 +215,10 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(
             Location::mainAddress,
             { Location(it) },
-            { StreetAddress("1234", TownDetail("town", "state")) },
-            { StreetAddress("1234", TownDetail("other", "state")) })
+            { StreetAddress("1234", TownDetail("town", "state"), "5678",
+                StreetDetail("building","5", "name", "87", "2", "street", "displayed")) },
+            { StreetAddress("1234", TownDetail("other", "state"), "5678",
+                StreetDetail("building","5", "name", "87", "2", "street", "displayed")) })
         comparatorValidator.validateIndexedCollection(
             Location::points,
             Location::addPoint,

@@ -7,8 +7,6 @@
  */
 package com.zepben.evolve.cim.iec61968.common
 
-import com.google.protobuf.BoolValueOrBuilder
-
 /**
  * Street details, in the context of address.
  *

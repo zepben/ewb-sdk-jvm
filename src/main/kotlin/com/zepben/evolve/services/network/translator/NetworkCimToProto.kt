@@ -327,12 +327,6 @@ fun toPb(cim: StreetAddress, pb: PBStreetAddress.Builder): PBStreetAddress.Build
         cim.streetDetail?.let { toPb(it, streetDetailBuilder) } ?: clearStreetDetail()
     }
 
-fun toPb(cim: TownDetail, pb: PBTownDetail.Builder): PBTownDetail.Builder =
-    pb.apply {
-        name = cim.name
-        stateOrProvince = cim.stateOrProvince
-    }
-
 fun toPb(cim: StreetDetail, pb: PBStreetDetail.Builder): PBStreetDetail.Builder =
     pb.apply {
         buildingName = cim.buildingName
@@ -342,6 +336,12 @@ fun toPb(cim: StreetDetail, pb: PBStreetDetail.Builder): PBStreetDetail.Builder 
         suiteNumber = cim.suiteNumber
         type = cim.type
         displayAddress = cim.displayAddress
+    }
+
+fun toPb(cim: TownDetail, pb: PBTownDetail.Builder): PBTownDetail.Builder =
+    pb.apply {
+        name = cim.name
+        stateOrProvince = cim.stateOrProvince
     }
 
 fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()

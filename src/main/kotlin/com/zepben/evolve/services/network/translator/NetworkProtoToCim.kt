@@ -316,15 +316,26 @@ fun toCim(pb: PBPositionPoint): PositionPoint =
     PositionPoint(pb.xPosition, pb.yPosition)
 
 fun toCim(pb: PBStreetAddress): StreetAddress =
-    StreetAddress(pb.postalCode.internEmpty(), if (pb.hasTownDetail()) toCim(pb.townDetail) else null, pb.poBox.internEmpty(),
-        if (pb.hasStreetDetail()) toCim(pb.streetDetail) else null)
+    StreetAddress(
+        pb.postalCode.internEmpty(),
+        if (pb.hasTownDetail()) toCim(pb.townDetail) else null,
+        pb.poBox.internEmpty(),
+        if (pb.hasStreetDetail()) toCim(pb.streetDetail) else null
+    )
+
+fun toCim(pb: PBStreetDetail): StreetDetail =
+    StreetDetail(
+        pb.buildingName.internEmpty(),
+        pb.floorIdentification.internEmpty(),
+        pb.name.internEmpty(),
+        pb.number.internEmpty(),
+        pb.suiteNumber.internEmpty(),
+        pb.type.internEmpty(),
+        pb.displayAddress.internEmpty()
+    )
 
 fun toCim(pb: PBTownDetail): TownDetail =
     TownDetail(pb.name.internEmpty(), pb.stateOrProvince.internEmpty())
-
-fun toCim(pb: PBStreetDetail): StreetDetail =
-    StreetDetail(pb.buildingName.internEmpty(), pb.floorIdentification.internEmpty(), pb.name.internEmpty(), pb.number.internEmpty(),
-        pb.suiteNumber.internEmpty(), pb.type.internEmpty(), pb.displayAddress.internEmpty())
 
 fun NetworkService.addFromPb(pb: PBOrganisation): Organisation? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb, this))

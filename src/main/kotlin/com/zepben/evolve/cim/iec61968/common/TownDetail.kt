@@ -13,5 +13,7 @@ package com.zepben.evolve.cim.iec61968.common
  * @property name Town name.
  * @property stateOrProvince Name of the state or province.
  */
-data class TownDetail(val name: String, val stateOrProvince: String)
+data class TownDetail(val name: String, val stateOrProvince: String) {
+    fun allFieldsEmpty(): Boolean = name.isEmpty() && stateOrProvince.isEmpty()
+}
 

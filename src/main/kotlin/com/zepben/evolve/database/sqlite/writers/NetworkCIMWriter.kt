@@ -9,10 +9,7 @@ package com.zepben.evolve.database.sqlite.writers
 
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
-import com.zepben.evolve.cim.iec61968.common.Location
-import com.zepben.evolve.cim.iec61968.common.PositionPoint
-import com.zepben.evolve.cim.iec61968.common.StreetAddress
-import com.zepben.evolve.cim.iec61968.common.TownDetail
+import com.zepben.evolve.cim.iec61968.common.*
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -253,6 +250,21 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
     /************ IEC61968 COMMON ************/
 
+    private fun insertStreetDetail(table: TableStreetAddresses, insert: PreparedStatement, streetDetail: StreetDetail?) {
+        insert.setString(table.BUILDING_NAME.queryIndex, streetDetail?.buildingName ?: "")
+        insert.setString(table.FLOOR_IDENTIFICATION.queryIndex, streetDetail?.floorIdentification ?: "")
+        insert.setString(table.NAME.queryIndex, streetDetail?.name ?: "")
+        insert.setString(table.NUMBER.queryIndex, streetDetail?.number ?: "")
+        insert.setString(table.SUITE_NUMBER.queryIndex, streetDetail?.suiteNumber ?: "")
+        insert.setString(table.TYPE.queryIndex, streetDetail?.type ?: "")
+        insert.setString(table.DISPLAY_ADDRESS.queryIndex, streetDetail?.displayAddress ?: "")
+    }
+
+    private fun insertTownDetail(table: TableTownDetails, insert: PreparedStatement, townDetail: TownDetail?) {
+        insert.setString(table.TOWN_NAME.queryIndex, townDetail?.name)
+        insert.setString(table.STATE_OR_PROVINCE.queryIndex, townDetail?.stateOrProvince)
+    }
+
     fun save(location: Location): Boolean {
         val table = databaseTables.getTable(TableLocations::class.java)
         val insert = databaseTables.getInsert(TableLocations::class.java)
@@ -310,22 +322,11 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         id: String,
         description: String
     ): Boolean {
-        insert.setNullableString(table.POSTAL_CODE.queryIndex, streetAddress.postalCode)
-        insert.setNullableString(table.PO_BOX.queryIndex, streetAddress.poBox)
-        insert.setNullableString(table.BUILDING_NAME.queryIndex, streetAddress.streetDetail?.buildingName ?: "")
-        insert.setNullableString(table.FLOOR_IDENTIFICATION.queryIndex, streetAddress.streetDetail?.floorIdentification ?: "")
-        insert.setNullableString(table.NAME.queryIndex, streetAddress.streetDetail?.name ?: "")
-        insert.setNullableString(table.NUMBER.queryIndex, streetAddress.streetDetail?.number ?: "")
-        insert.setNullableString(table.SUITE_NUMBER.queryIndex, streetAddress.streetDetail?.suiteNumber ?: "")
-        insert.setNullableString(table.TYPE.queryIndex, streetAddress.streetDetail?.type ?: "")
-        insert.setNullableString(table.DISPLAY_ADDRESS.queryIndex, streetAddress.streetDetail?.displayAddress ?: "")
+        insert.setString(table.POSTAL_CODE.queryIndex, streetAddress.postalCode)
+        insert.setString(table.PO_BOX.queryIndex, streetAddress.poBox)
 
-        return saveTownDetail(table, insert, streetAddress.townDetail, id, description)
-    }
-
-    private fun saveTownDetail(table: TableTownDetails, insert: PreparedStatement, townDetail: TownDetail?, id: String, description: String): Boolean {
-        insert.setNullableString(table.TOWN_NAME.queryIndex, townDetail?.name)
-        insert.setNullableString(table.STATE_OR_PROVINCE.queryIndex, townDetail?.stateOrProvince)
+        insertTownDetail(table, insert, streetAddress.townDetail)
+        insertStreetDetail(table, insert, streetAddress.streetDetail)
 
         return tryExecuteSingleUpdate(insert, id, description)
     }

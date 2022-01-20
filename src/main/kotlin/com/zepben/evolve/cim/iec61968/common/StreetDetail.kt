@@ -7,6 +7,8 @@
  */
 package com.zepben.evolve.cim.iec61968.common
 
+import com.google.protobuf.BoolValueOrBuilder
+
 /**
  * Street details, in the context of address.
  *
@@ -19,5 +21,23 @@ package com.zepben.evolve.cim.iec61968.common
  * @property type Type of street. Examples include: street, circle, boulevard, avenue, road, drive, etc.
  * @property displayAddress The address as it should be displayed to a user.
  */
-data class StreetDetail (val buildingName: String, val floorIdentification: String, val name: String, val number: String, val suiteNumber: String,
-                         val type: String, val displayAddress: String)
+data class StreetDetail(
+    val buildingName: String,
+    val floorIdentification: String,
+    val name: String,
+    val number: String,
+    val suiteNumber: String,
+    val type: String,
+    val displayAddress: String
+) {
+    fun allFieldsEmpty(): Boolean = (
+        buildingName.isEmpty() &&
+        floorIdentification.isEmpty() &&
+        name.isEmpty() &&
+        number.isEmpty() &&
+        suiteNumber.isEmpty() &&
+        type.isEmpty() &&
+        displayAddress.isEmpty()
+    )
+}
+

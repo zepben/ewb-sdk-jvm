@@ -294,31 +294,23 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             loadStreetDetail(table, resultSet)
         )
 
-    private fun loadTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? {
-        val townName = resultSet.getNullableString(table.TOWN_NAME.queryIndex)
-        val stateOrProvince = resultSet.getNullableString(table.STATE_OR_PROVINCE.queryIndex)
+    private fun loadStreetDetail(table: TableStreetAddresses, resultSet: ResultSet): StreetDetail? {
+        val buildingName = resultSet.getString(table.BUILDING_NAME.queryIndex).emptyIfNull().internEmpty()
+        val floorIdentification = resultSet.getString(table.FLOOR_IDENTIFICATION.queryIndex).emptyIfNull().internEmpty()
+        val name = resultSet.getString(table.NAME.queryIndex).emptyIfNull().internEmpty()
+        val number = resultSet.getString(table.NUMBER.queryIndex).emptyIfNull().internEmpty()
+        val suiteNumber = resultSet.getString(table.SUITE_NUMBER.queryIndex).emptyIfNull().internEmpty()
+        val type = resultSet.getString(table.TYPE.queryIndex).emptyIfNull().internEmpty()
+        val displayAddress = resultSet.getString(table.DISPLAY_ADDRESS.queryIndex).emptyIfNull().internEmpty()
 
-        if ((townName == null) && (stateOrProvince == null))
-            return null
-
-        return TownDetail(townName ?: "", stateOrProvince ?: "")
+        return StreetDetail(buildingName, floorIdentification, name, number, suiteNumber, type, displayAddress).takeUnless { it.allFieldsEmpty() }
     }
 
-    private fun loadStreetDetail(table: TableStreetAddresses, resultSet: ResultSet): StreetDetail? {
-        val buildingName = resultSet.getNullableString(table.BUILDING_NAME.queryIndex)
-        val floorIdentification = resultSet.getNullableString(table.FLOOR_IDENTIFICATION.queryIndex)
-        val name = resultSet.getNullableString(table.NAME.queryIndex)
-        val number = resultSet.getNullableString(table.NUMBER.queryIndex)
-        val suiteNumber = resultSet.getNullableString(table.SUITE_NUMBER.queryIndex)
-        val type = resultSet.getNullableString(table.TYPE.queryIndex)
-        val displayAddress = resultSet.getNullableString(table.DISPLAY_ADDRESS.queryIndex)
+    private fun loadTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? {
+        val townName = resultSet.getString(table.TOWN_NAME.queryIndex).emptyIfNull().internEmpty()
+        val stateOrProvince = resultSet.getString(table.STATE_OR_PROVINCE.queryIndex).emptyIfNull().internEmpty()
 
-        if ((buildingName == null) && (floorIdentification == null) && (name == null) && (number == null) && (suiteNumber == null) && (type == null) &&
-            (displayAddress == null))
-            return null
-
-        return StreetDetail(buildingName ?: "", floorIdentification ?: "", name ?: "", number ?: "",
-            suiteNumber ?: "", type ?: "", displayAddress ?: "")
+        return TownDetail(townName, stateOrProvince).takeUnless { it.allFieldsEmpty() }
     }
 
     /************ IEC61968 METERING ************/

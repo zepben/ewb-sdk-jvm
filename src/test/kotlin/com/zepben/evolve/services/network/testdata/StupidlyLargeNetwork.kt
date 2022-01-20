@@ -679,14 +679,22 @@ object StupidlyLargeNetwork {
         CustomerAgreement().apply { this.customer = customer }.addPricingStructure(pricingStructure)
 
         val location = Location()
-        val locationN1A1 = Location().apply { name = "n1"; mainAddress = StreetAddress("a1", TownDetail("", ""), "",
-            StreetDetail("", "", "", "", "", "", "")) }
-        val locationN1A2 = Location().apply { name = "n1"; mainAddress = StreetAddress("a2", TownDetail("", ""), "",
-            StreetDetail("", "", "", "", "", "", "")) }
-        val locationN2 = Location().apply { name = "n2"; mainAddress = StreetAddress("", TownDetail("", ""), "",
-            StreetDetail("", "", "", "", "", "", "")) }
-        val locationN3 = Location().apply { name = "n3"; mainAddress = StreetAddress("", TownDetail("", ""), "",
-            StreetDetail("", "", "", "", "", "", "")) }
+        val locationN1A1 = Location().apply {
+            name = "n1";
+            mainAddress = StreetAddress("a1", TownDetail("", ""), "", StreetDetail("", "", "", "", "", "", ""))
+        }
+        val locationN1A2 = Location().apply {
+            name = "n1";
+            mainAddress = StreetAddress("a2", TownDetail("", ""), "", StreetDetail("", "", "", "", "", "", ""))
+        }
+        val locationN2 = Location().apply {
+            name = "n2";
+            mainAddress = StreetAddress("", TownDetail("", ""), "", StreetDetail("", "", "", "", "", "", ""))
+        }
+        val locationN3 = Location().apply {
+            name = "n3";
+            mainAddress = StreetAddress("", TownDetail("", ""), "", StreetDetail("", "", "", "", "", "", ""))
+        }
 
         val meter1: Meter = Meter("A").apply { name = "meter1"; addOrganisationRole(acme1); customerMRID = customer.mRID; serviceLocation = locationN1A1 }
         val meter2: Meter = Meter("B").apply { name = "meter2"; addOrganisationRole(acme1); customerMRID = customer.mRID; serviceLocation = locationN1A2 }

@@ -8,13 +8,13 @@
 package com.zepben.evolve.database.sqlite.tables.iec61968.common
 
 import com.zepben.evolve.database.sqlite.tables.Column
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
 
 @Suppress("PropertyName")
 abstract class TableTownDetails : SqliteTable() {
 
-    val TOWN_NAME = Column(++columnIndex, "town_name", "TEXT", NULL)
-    val STATE_OR_PROVINCE = Column(++columnIndex, "state_or_province", "TEXT", NULL)
+    val TOWN_NAME = Column(++columnIndex, "town_name", "TEXT", NOT_NULL)
+    val STATE_OR_PROVINCE = Column(++columnIndex, "state_or_province", "TEXT", NOT_NULL)
 
 }

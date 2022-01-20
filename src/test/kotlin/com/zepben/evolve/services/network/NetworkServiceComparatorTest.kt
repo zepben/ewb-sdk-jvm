@@ -215,10 +215,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(
             Location::mainAddress,
             { Location(it) },
-            { StreetAddress("1234", TownDetail("town", "state"), "5678",
-                StreetDetail("building","5", "name", "87", "2", "street", "displayed")) },
-            { StreetAddress("1234", TownDetail("other", "state"), "5678",
-                StreetDetail("building","5", "name", "87", "2", "street", "displayed")) })
+            { StreetAddress(townDetail = TownDetail("town", "state")) },
+            { StreetAddress(townDetail = TownDetail("other", "state")) })
         comparatorValidator.validateIndexedCollection(
             Location::points,
             Location::addPoint,

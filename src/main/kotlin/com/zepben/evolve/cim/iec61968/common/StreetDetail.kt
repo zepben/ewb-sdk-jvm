@@ -22,13 +22,13 @@ import com.google.protobuf.BoolValueOrBuilder
  * @property displayAddress The address as it should be displayed to a user.
  */
 data class StreetDetail(
-    val buildingName: String,
-    val floorIdentification: String,
-    val name: String,
-    val number: String,
-    val suiteNumber: String,
-    val type: String,
-    val displayAddress: String
+    val buildingName: String = "",
+    val floorIdentification: String = "",
+    val name: String = "",
+    val number: String = "",
+    val suiteNumber: String = "",
+    val type: String = "",
+    val displayAddress: String = ""
 ) {
     fun allFieldsEmpty(): Boolean = (
         buildingName.isEmpty() &&

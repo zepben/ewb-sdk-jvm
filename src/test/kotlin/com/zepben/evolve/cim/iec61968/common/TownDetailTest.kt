@@ -22,7 +22,7 @@ internal class TownDetailTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(TownDetail("", ""), notNullValue())
+        assertThat(TownDetail(), notNullValue())
     }
 
     @Test
@@ -31,5 +31,12 @@ internal class TownDetailTest {
 
         assertThat(townDetail.name, equalTo("name"))
         assertThat(townDetail.stateOrProvince, equalTo("stateOrProvince"))
+    }
+
+    @Test
+    internal fun testAllFieldsNullOrEmpty() {
+        assertThat(TownDetail("", "").allFieldsNullOrEmpty(), equalTo(true))
+        assertThat(TownDetail().allFieldsNullOrEmpty(), equalTo(true))
+        assertThat(TownDetail("a").allFieldsNullOrEmpty(), equalTo(false))
     }
 }

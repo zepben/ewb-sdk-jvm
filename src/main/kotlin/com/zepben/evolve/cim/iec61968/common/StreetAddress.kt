@@ -16,9 +16,9 @@ package com.zepben.evolve.cim.iec61968.common
  * @property streetDetail Street detail.
  */
 data class StreetAddress(
-    val postalCode: String = "1234",
-    val townDetail: TownDetail? = TownDetail("name", "stateOrProvince"),
-    val poBox: String = "5678",
-    val streetDetail: StreetDetail? = StreetDetail("buildingName", "floorIdentification", "name", "number", "suiteNumber", "type", "displayAddress")
+    val postalCode: String = "",
+    val townDetail: TownDetail? = null,
+    val poBox: String = "",
+    val streetDetail: StreetDetail? = null
 )
 

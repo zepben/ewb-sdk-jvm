@@ -681,19 +681,19 @@ object StupidlyLargeNetwork {
         val location = Location()
         val locationN1A1 = Location().apply {
             name = "n1";
-            mainAddress = StreetAddress("a1", TownDetail("", ""), "", StreetDetail("", "", "", "", "", "", ""))
+            mainAddress = StreetAddress("a1")
         }
         val locationN1A2 = Location().apply {
             name = "n1";
-            mainAddress = StreetAddress("a2", TownDetail("", ""), "", StreetDetail("", "", "", "", "", "", ""))
+            mainAddress = StreetAddress("a2")
         }
         val locationN2 = Location().apply {
             name = "n2";
-            mainAddress = StreetAddress("", TownDetail("", ""), "", StreetDetail("", "", "", "", "", "", ""))
+            mainAddress = StreetAddress("")
         }
         val locationN3 = Location().apply {
             name = "n3";
-            mainAddress = StreetAddress("", TownDetail("", ""), "", StreetDetail("", "", "", "", "", "", ""))
+            mainAddress = StreetAddress("")
         }
 
         val meter1: Meter = Meter("A").apply { name = "meter1"; addOrganisationRole(acme1); customerMRID = customer.mRID; serviceLocation = locationN1A1 }

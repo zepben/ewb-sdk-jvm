@@ -46,6 +46,12 @@
             <organization>Zeppelin Bend</organization>
             <organizationUrl>https://zepben.com</organizationUrl>
         </developer>
+        <developer>
+            <name>Marcus Koh</name>
+            <email>marcus.koh@zepben.com</email>
+            <organization>Zeppelin Bend</organization>
+            <organizationUrl>https://zepben.com</organizationUrl>
+        </developer>
     </developers>
 
     <scm>

@@ -251,18 +251,18 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     /************ IEC61968 COMMON ************/
 
     private fun insertStreetDetail(table: TableStreetAddresses, insert: PreparedStatement, streetDetail: StreetDetail?) {
-        insert.setString(table.BUILDING_NAME.queryIndex, streetDetail?.buildingName ?: "")
-        insert.setString(table.FLOOR_IDENTIFICATION.queryIndex, streetDetail?.floorIdentification ?: "")
-        insert.setString(table.NAME.queryIndex, streetDetail?.name ?: "")
-        insert.setString(table.NUMBER.queryIndex, streetDetail?.number ?: "")
-        insert.setString(table.SUITE_NUMBER.queryIndex, streetDetail?.suiteNumber ?: "")
-        insert.setString(table.TYPE.queryIndex, streetDetail?.type ?: "")
-        insert.setString(table.DISPLAY_ADDRESS.queryIndex, streetDetail?.displayAddress ?: "")
+        insert.setNullableString(table.BUILDING_NAME.queryIndex, streetDetail?.buildingName)
+        insert.setNullableString(table.FLOOR_IDENTIFICATION.queryIndex, streetDetail?.floorIdentification)
+        insert.setNullableString(table.STREET_NAME.queryIndex, streetDetail?.name)
+        insert.setNullableString(table.NUMBER.queryIndex, streetDetail?.number)
+        insert.setNullableString(table.SUITE_NUMBER.queryIndex, streetDetail?.suiteNumber)
+        insert.setNullableString(table.TYPE.queryIndex, streetDetail?.type)
+        insert.setNullableString(table.DISPLAY_ADDRESS.queryIndex, streetDetail?.displayAddress)
     }
 
     private fun insertTownDetail(table: TableTownDetails, insert: PreparedStatement, townDetail: TownDetail?) {
-        insert.setString(table.TOWN_NAME.queryIndex, townDetail?.name)
-        insert.setString(table.STATE_OR_PROVINCE.queryIndex, townDetail?.stateOrProvince)
+        insert.setNullableString(table.TOWN_NAME.queryIndex, townDetail?.name)
+        insert.setNullableString(table.STATE_OR_PROVINCE.queryIndex, townDetail?.stateOrProvince)
     }
 
     fun save(location: Location): Boolean {

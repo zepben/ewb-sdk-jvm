@@ -298,7 +298,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         StreetDetail(
             resultSet.getString(table.BUILDING_NAME.queryIndex).emptyIfNull().internEmpty(),
             resultSet.getString(table.FLOOR_IDENTIFICATION.queryIndex).emptyIfNull().internEmpty(),
-            resultSet.getString(table.NAME.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getString(table.STREET_NAME.queryIndex).emptyIfNull().internEmpty(),
             resultSet.getString(table.NUMBER.queryIndex).emptyIfNull().internEmpty(),
             resultSet.getString(table.SUITE_NUMBER.queryIndex).emptyIfNull().internEmpty(),
             resultSet.getString(table.TYPE.queryIndex).emptyIfNull().internEmpty(),

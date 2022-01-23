@@ -149,6 +149,8 @@
                 <!--suppress MavenModelInspection -->
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <configuration>
+                    <apiVersion>1.5</apiVersion>
+                    <languageVersion>1.5</languageVersion>
                     <compilerPlugins>
                         <plugin>kotlinx-serialization</plugin>
                     </compilerPlugins>

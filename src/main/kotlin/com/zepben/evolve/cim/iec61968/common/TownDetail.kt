@@ -17,6 +17,13 @@ data class TownDetail(
     val name: String? = null,
     val stateOrProvince: String? = null
 ) {
+
+    /**
+     * Check to see if all fields of this [TownDetail] are null or empty
+     *
+     * @return true if all fields are null or empty, otherwise false
+     */
     fun allFieldsNullOrEmpty(): Boolean = name.isNullOrEmpty() && stateOrProvince.isNullOrEmpty()
+
 }
 

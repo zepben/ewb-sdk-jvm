@@ -28,14 +28,21 @@ data class StreetDetail(
     val type: String = "",
     val displayAddress: String = ""
 ) {
+
+    /**
+     * Check to see if all fields of this [StreetDetail] are empty
+     *
+     * @return true if all fields are empty, otherwise false
+     */
     fun allFieldsEmpty(): Boolean = (
         buildingName.isEmpty() &&
-        floorIdentification.isEmpty() &&
-        name.isEmpty() &&
-        number.isEmpty() &&
-        suiteNumber.isEmpty() &&
-        type.isEmpty() &&
-        displayAddress.isEmpty()
-    )
+            floorIdentification.isEmpty() &&
+            name.isEmpty() &&
+            number.isEmpty() &&
+            suiteNumber.isEmpty() &&
+            type.isEmpty() &&
+            displayAddress.isEmpty()
+        )
+
 }
 

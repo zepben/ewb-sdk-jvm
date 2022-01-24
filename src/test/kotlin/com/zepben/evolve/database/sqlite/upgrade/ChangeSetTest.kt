@@ -58,7 +58,7 @@ class ChangeSetTest {
 
         conn.createStatement().use { stmt ->
             conn.prepareStatement(tableVersion.preparedUpdateSql()).use { versionUpdateStatement ->
-        runner.changeSets.filter { it.number > 19 }.forEach { cs ->
+                runner.changeSets.filter { it.number > 19 }.forEach { cs ->
 
                     val validator = changeSetValidators[cs.number]
                         ?: throw IllegalStateException("Validator for ${cs.number} missing. Have you added a ChangeSetValidator for your latest model update?")

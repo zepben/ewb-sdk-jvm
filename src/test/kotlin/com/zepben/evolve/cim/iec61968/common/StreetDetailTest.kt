@@ -41,6 +41,14 @@ internal class StreetDetailTest {
     @Test
     internal fun testAllFieldsEmpty() {
         assertThat(StreetDetail().allFieldsEmpty(), equalTo(true))
-        assertThat(StreetDetail("Sydney Opera House").allFieldsEmpty(), equalTo(false))
+
+        assertThat(StreetDetail(buildingName = "value").allFieldsEmpty(), equalTo(false))
+        assertThat(StreetDetail(floorIdentification = "value").allFieldsEmpty(), equalTo(false))
+        assertThat(StreetDetail(name = "value").allFieldsEmpty(), equalTo(false))
+        assertThat(StreetDetail(number = "value").allFieldsEmpty(), equalTo(false))
+        assertThat(StreetDetail(suiteNumber = "value").allFieldsEmpty(), equalTo(false))
+        assertThat(StreetDetail(type = "value").allFieldsEmpty(), equalTo(false))
+        assertThat(StreetDetail(displayAddress = "value").allFieldsEmpty(), equalTo(false))
     }
+
 }

@@ -4,16 +4,19 @@
 
 * Changed the `FindWithUsagePoints` trace to handle changes to the LV aggregation via virtual `UsagePoint` instances.
 * Updated database version.
+* `TownDetail` fields are now nullable.
 
 ##### New Features
 
 * Added the following CIM classes/enums:
   * `TransformerConstructionKind`
   * `TransformerFunctionKind`
+  * `StreetDetail`
 
 ##### Enhancements
 
 * Added fields to `PowerTransformer` to define `constructionKind` and `function`.
+* Added fields to `StreetAddress` to define `poBox` and `streetDetail`.
 
 ##### Fixes
 

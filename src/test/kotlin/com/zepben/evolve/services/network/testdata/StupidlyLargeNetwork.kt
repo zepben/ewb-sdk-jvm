@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.StreetAddress
+import com.zepben.evolve.cim.iec61968.common.StreetDetail
 import com.zepben.evolve.cim.iec61968.common.TownDetail
 import com.zepben.evolve.cim.iec61968.customers.*
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -678,10 +679,22 @@ object StupidlyLargeNetwork {
         CustomerAgreement().apply { this.customer = customer }.addPricingStructure(pricingStructure)
 
         val location = Location()
-        val locationN1A1 = Location().apply { name = "n1"; mainAddress = StreetAddress("a1", TownDetail("", "")) }
-        val locationN1A2 = Location().apply { name = "n1"; mainAddress = StreetAddress("a2", TownDetail("", "")) }
-        val locationN2 = Location().apply { name = "n2"; mainAddress = StreetAddress("", TownDetail("", "")) }
-        val locationN3 = Location().apply { name = "n3"; mainAddress = StreetAddress("", TownDetail("", "")) }
+        val locationN1A1 = Location().apply {
+            name = "n1";
+            mainAddress = StreetAddress("a1")
+        }
+        val locationN1A2 = Location().apply {
+            name = "n1";
+            mainAddress = StreetAddress("a2")
+        }
+        val locationN2 = Location().apply {
+            name = "n2";
+            mainAddress = StreetAddress("")
+        }
+        val locationN3 = Location().apply {
+            name = "n3";
+            mainAddress = StreetAddress("")
+        }
 
         val meter1: Meter = Meter("A").apply { name = "meter1"; addOrganisationRole(acme1); customerMRID = customer.mRID; serviceLocation = locationN1A1 }
         val meter2: Meter = Meter("B").apply { name = "meter2"; addOrganisationRole(acme1); customerMRID = customer.mRID; serviceLocation = locationN1A2 }

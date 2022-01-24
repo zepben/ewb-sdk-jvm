@@ -59,6 +59,7 @@ import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
 import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
+import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint as PBUsagePoint
@@ -315,7 +316,23 @@ fun toCim(pb: PBPositionPoint): PositionPoint =
     PositionPoint(pb.xPosition, pb.yPosition)
 
 fun toCim(pb: PBStreetAddress): StreetAddress =
-    StreetAddress(pb.postalCode.internEmpty(), if (pb.hasTownDetail()) toCim(pb.townDetail) else null)
+    StreetAddress(
+        pb.postalCode.internEmpty(),
+        if (pb.hasTownDetail()) toCim(pb.townDetail) else null,
+        pb.poBox.internEmpty(),
+        if (pb.hasStreetDetail()) toCim(pb.streetDetail) else null
+    )
+
+fun toCim(pb: PBStreetDetail): StreetDetail =
+    StreetDetail(
+        pb.buildingName.internEmpty(),
+        pb.floorIdentification.internEmpty(),
+        pb.name.internEmpty(),
+        pb.number.internEmpty(),
+        pb.suiteNumber.internEmpty(),
+        pb.type.internEmpty(),
+        pb.displayAddress.internEmpty()
+    )
 
 fun toCim(pb: PBTownDetail): TownDetail =
     TownDetail(pb.name.internEmpty(), pb.stateOrProvince.internEmpty())

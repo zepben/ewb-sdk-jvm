@@ -47,6 +47,7 @@ class ChangeSetTest {
         38 to ChangeSet38Validator,
         39 to ChangeSet39Validator,
         40 to ChangeSet40Validator,
+        41 to ChangeSet41Validator
     )
 
     @Test

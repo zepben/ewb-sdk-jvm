@@ -9,4 +9,8 @@ package com.zepben.evolve.services.common.extensions
 
 fun String?.emptyIfNull(): String = this ?: ""
 
+/**
+ * Most database drivers perform `new String()` on seeing an empty string, making each one take an additional reference.
+ * This extension function stops that from being a problem.
+ */
 fun String.internEmpty(): String = if (isEmpty()) "" else this

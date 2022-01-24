@@ -12,6 +12,13 @@ package com.zepben.evolve.cim.iec61968.common
  *
  * @property postalCode Postal code for the address.
  * @property townDetail Town detail.
+ * @property poBox Post office box.
+ * @property streetDetail Street detail.
  */
-data class StreetAddress(val postalCode: String, val townDetail: TownDetail?)
+data class StreetAddress(
+    val postalCode: String = "",
+    val townDetail: TownDetail? = null,
+    val poBox: String = "",
+    val streetDetail: StreetDetail? = null
+)
 

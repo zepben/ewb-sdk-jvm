@@ -10,10 +10,7 @@ package com.zepben.evolve.database.sqlite.readers
 
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
-import com.zepben.evolve.cim.iec61968.common.Location
-import com.zepben.evolve.cim.iec61968.common.PositionPoint
-import com.zepben.evolve.cim.iec61968.common.StreetAddress
-import com.zepben.evolve.cim.iec61968.common.TownDetail
+import com.zepben.evolve.cim.iec61968.common.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -292,18 +289,27 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     private fun loadStreetAddress(table: TableStreetAddresses, resultSet: ResultSet): StreetAddress =
         StreetAddress(
             resultSet.getString(table.POSTAL_CODE.queryIndex).emptyIfNull().internEmpty(),
-            loadTownDetail(table, resultSet)
+            loadTownDetail(table, resultSet),
+            resultSet.getString(table.PO_BOX.queryIndex).emptyIfNull().internEmpty(),
+            loadStreetDetail(table, resultSet)
         )
 
-    private fun loadTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? {
-        val townName = resultSet.getNullableString(table.TOWN_NAME.queryIndex)
-        val stateOrProvince = resultSet.getNullableString(table.STATE_OR_PROVINCE.queryIndex)
+    private fun loadStreetDetail(table: TableStreetAddresses, resultSet: ResultSet): StreetDetail? =
+        StreetDetail(
+            resultSet.getString(table.BUILDING_NAME.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getString(table.FLOOR_IDENTIFICATION.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getString(table.STREET_NAME.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getString(table.NUMBER.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getString(table.SUITE_NUMBER.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getString(table.TYPE.queryIndex).emptyIfNull().internEmpty(),
+            resultSet.getString(table.DISPLAY_ADDRESS.queryIndex).emptyIfNull().internEmpty()
+        ).takeUnless { it.allFieldsEmpty() }
 
-        if ((townName == null) && (stateOrProvince == null))
-            return null
-
-        return TownDetail(townName ?: "", stateOrProvince ?: "")
-    }
+    private fun loadTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? =
+        TownDetail(
+            resultSet.getString(table.TOWN_NAME.queryIndex)?.internEmpty(),
+            resultSet.getString(table.STATE_OR_PROVINCE.queryIndex)?.internEmpty()
+        ).takeUnless { it.allFieldsNullOrEmpty() }
 
     /************ IEC61968 METERING ************/
 

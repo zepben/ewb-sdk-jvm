@@ -68,6 +68,7 @@ import com.zepben.protobuf.cim.iec61968.common.Location as PBLocation
 import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
+import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint as PBUsagePoint
@@ -322,6 +323,19 @@ fun toPb(cim: StreetAddress, pb: PBStreetAddress.Builder): PBStreetAddress.Build
     pb.apply {
         postalCode = cim.postalCode
         cim.townDetail?.let { toPb(it, townDetailBuilder) } ?: clearTownDetail()
+        poBox = cim.poBox
+        cim.streetDetail?.let { toPb(it, streetDetailBuilder) } ?: clearStreetDetail()
+    }
+
+fun toPb(cim: StreetDetail, pb: PBStreetDetail.Builder): PBStreetDetail.Builder =
+    pb.apply {
+        buildingName = cim.buildingName
+        floorIdentification = cim.floorIdentification
+        name = cim.name
+        number = cim.number
+        suiteNumber = cim.suiteNumber
+        type = cim.type
+        displayAddress = cim.displayAddress
     }
 
 fun toPb(cim: TownDetail, pb: PBTownDetail.Builder): PBTownDetail.Builder =

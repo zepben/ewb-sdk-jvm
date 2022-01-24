@@ -8,12 +8,13 @@
 package com.zepben.evolve.database.sqlite.tables.iec61968.common
 
 import com.zepben.evolve.database.sqlite.tables.Column
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 abstract class TableStreetAddresses : TableTownDetails() {
 
-    val POSTAL_CODE = Column(++columnIndex, "postal_code", "TEXT", NULL)
+    val POSTAL_CODE = Column(++columnIndex, "postal_code", "TEXT", NOT_NULL)
     val PO_BOX = Column(++columnIndex, "po_box", "TEXT", NULL)
     val BUILDING_NAME = Column(++columnIndex, "building_name", "TEXT", NULL)
     val FLOOR_IDENTIFICATION = Column(++columnIndex, "floor_identification", "TEXT", NULL)

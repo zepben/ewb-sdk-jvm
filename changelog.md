@@ -4,6 +4,7 @@
 
 * Changed the `FindWithUsagePoints` trace to handle changes to the LV aggregation via virtual `UsagePoint` instances.
 * Updated database version.
+* `TownDetail` fields are now nullable.
 
 ##### New Features
 

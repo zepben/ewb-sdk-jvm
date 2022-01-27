@@ -31,6 +31,21 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * @property x Positive sequence Thevenin reactance.
  * @property x0 Zero sequence Thevenin reactance.
  * @property xn Negative sequence Thevenin reactance.
+ * @property isExternalGrid True if this energy source represents the higher-level power grid connection to an external grid that normally is modelled as the
+ *                          slack bus for power flow calculations.
+ * @property rMin Minimum positive sequence Thevenin resistance.
+ * @property rnMin Minimum negative sequence Thevenin resistance
+ * @property r0Min Minimum zero sequence Thevenin resistance.
+ * @property xMin Minimum positive sequence Thevenin reactance.
+ * @property xnMin Minimum negative sequence Thevenin reactance.
+ * @property x0Min Minimum zero sequence Thevenin reactance.
+ * @property rMax Maximum positive sequence Thevenin resistance.
+ * @property rnMax Maximum negative sequence Thevenin resistance.
+ * @property r0Max Maximum zero sequence Thevenin resistance.
+ * @property xMax Maximum positive sequence Thevenin reactance.
+ * @property xnMax Maximum negative sequence Thevenin resistance.
+ * @property x0Max Maximum zero sequence Thevenin reactance.
+
  */
 class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnection(mRID) {
 
@@ -47,6 +62,19 @@ class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnecti
     var x: Double? = null
     var x0: Double? = null
     var xn: Double? = null
+    var isExternalGrid: Boolean = false
+    var rMin: Double? = null
+    var rnMin: Double? = null
+    var r0Min: Double? = null
+    var xMin: Double? = null
+    var xnMin: Double? = null
+    var x0Min: Double? = null
+    var rMax: Double? = null
+    var rnMax: Double? = null
+    var r0Max: Double? = null
+    var xMax: Double? = null
+    var xnMax: Double? = null
+    var x0Max: Double? = null
 
     /**
      * The phases for this energy source. The returned collection is read only.

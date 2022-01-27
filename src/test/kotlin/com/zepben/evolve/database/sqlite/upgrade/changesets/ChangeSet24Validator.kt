@@ -16,8 +16,8 @@ import kotlin.test.fail
 object ChangeSet24Validator : ChangeSetValidator {
 
     override fun setUpStatements(): List<String> = listOf(
-        "INSERT INTO power_transformers VALUES('power_transformer_0','pt_0','description_0',1,NULL,0,0,0,0,NULL,'UNKNOWN',0)",
-        "INSERT INTO power_transformers VALUES('power_transformer_1','pt_1','description_1',1,NULL,0,0,0,0,NULL,'UNKNOWN',1.1999999999999999555)"
+        "INSERT INTO power_transformers VALUES('power_transformer_0','pt_0','description_0',1,NULL,0,0,0,NULL,'UNKNOWN',0)",
+        "INSERT INTO power_transformers VALUES('power_transformer_1','pt_1','description_1',1,NULL,0,0,0,NULL,'UNKNOWN',1.1999999999999999555)"
     )
 
     override fun populateStatements(): List<String> = emptyList()

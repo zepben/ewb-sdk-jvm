@@ -10,7 +10,7 @@ package com.zepben.evolve.services.network.tracing.phases
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.services.network.testdata.PhasesTestNetwork
 import com.zepben.evolve.services.network.tracing.Tracing
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection.*
+import com.zepben.evolve.services.network.tracing.phases.FeederDirection.*
 import com.zepben.evolve.services.network.tracing.phases.PhaseValidator.validatePhaseDirections
 import com.zepben.evolve.services.network.tracing.phases.PhaseValidator.validatePhases
 import com.zepben.testutils.junit.SystemLogExtension
@@ -306,7 +306,7 @@ class PhaseInferrerTest {
 
         validatePhaseDirections(network, "source0", listOf(BOTH, BOTH))
         validatePhaseDirections(network, "c1", listOf(BOTH, NONE, NONE, BOTH), listOf(BOTH, NONE, NONE, BOTH))
-        validatePhaseDirections(network, "source2", listOf(BOTH, BOTH), listOf(OUT, OUT))
+        validatePhaseDirections(network, "source2", listOf(BOTH, BOTH), listOf(DOWNSTREAM, DOWNSTREAM))
 
         phaseInferrer.run(network)
 
@@ -316,7 +316,7 @@ class PhaseInferrerTest {
 
         validatePhaseDirections(network, "source0", listOf(BOTH, BOTH))
         validatePhaseDirections(network, "c1", listOf(BOTH, BOTH, BOTH, BOTH), listOf(BOTH, BOTH, BOTH, BOTH))
-        validatePhaseDirections(network, "source2", listOf(BOTH, BOTH), listOf(OUT, OUT))
+        validatePhaseDirections(network, "source2", listOf(BOTH, BOTH), listOf(DOWNSTREAM, DOWNSTREAM))
 
         validateLog(correct = listOf("c1"))
     }

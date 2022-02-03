@@ -36,7 +36,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseServiceComparatorTest
 import com.zepben.evolve.services.common.ObjectDifference
 import com.zepben.evolve.services.common.ValueDifference
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
+import com.zepben.evolve.services.network.tracing.phases.FeederDirection
 import com.zepben.evolve.services.network.tracing.phases.TracedPhases
 import com.zepben.evolve.utils.ServiceComparatorValidator
 import org.junit.jupiter.api.Test
@@ -465,78 +465,78 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         val createAbcnTerminal = { id: String -> Terminal(id).apply { phases = PhaseCode.ABCN } }
         val initTracedPhases = { _: Terminal, tracedPhases: TracedPhases ->
             PhaseCode.ABCN.singlePhases().forEach {
-                tracedPhases.setNormal(it, PhaseDirection.BOTH, it)
-                tracedPhases.setCurrent(it, PhaseDirection.BOTH, it)
+                tracedPhases.setNormal(it, FeederDirection.BOTH, it)
+                tracedPhases.setCurrent(it, FeederDirection.BOTH, it)
             }
         }
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.BOTH, SinglePhaseKind.A) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.B, FeederDirection.BOTH, SinglePhaseKind.A) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.BOTH, SinglePhaseKind.A) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.B, FeederDirection.BOTH, SinglePhaseKind.A) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.A, FeederDirection.UPSTREAM, SinglePhaseKind.A) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.B, PhaseDirection.BOTH, SinglePhaseKind.A) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.B, FeederDirection.BOTH, SinglePhaseKind.A) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.OUT, SinglePhaseKind.A) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.A, FeederDirection.DOWNSTREAM, SinglePhaseKind.A) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.C, FeederDirection.BOTH, SinglePhaseKind.B) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.IN, SinglePhaseKind.B) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.B, FeederDirection.UPSTREAM, SinglePhaseKind.B) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.C, FeederDirection.BOTH, SinglePhaseKind.B) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.B) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.B, FeederDirection.DOWNSTREAM, SinglePhaseKind.B) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.C) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.N, FeederDirection.BOTH, SinglePhaseKind.C) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.C, PhaseDirection.OUT, SinglePhaseKind.C) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.C, FeederDirection.DOWNSTREAM, SinglePhaseKind.C) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.C) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.N, FeederDirection.BOTH, SinglePhaseKind.C) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.C, PhaseDirection.IN, SinglePhaseKind.C) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.C, FeederDirection.UPSTREAM, SinglePhaseKind.C) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.A, PhaseDirection.BOTH, SinglePhaseKind.N) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.A, FeederDirection.BOTH, SinglePhaseKind.N) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.OUT, SinglePhaseKind.N) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.N, FeederDirection.DOWNSTREAM, SinglePhaseKind.N) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.BOTH, SinglePhaseKind.N) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.A, FeederDirection.BOTH, SinglePhaseKind.N) })
 
         comparatorValidator.validateValProperty(
             Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.IN, SinglePhaseKind.N) })
+            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.N, FeederDirection.UPSTREAM, SinglePhaseKind.N) })
     }
 
     /************ IEC61970 BASE EQUIVALENTS ************/

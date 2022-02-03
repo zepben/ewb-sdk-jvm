@@ -28,16 +28,16 @@ fun interface PhaseSelector {
                 override val phase: SinglePhaseKind
                     get() = terminal.tracedPhases.phaseNormal(nominalPhase)
 
-                override val direction: PhaseDirection
+                override val direction: FeederDirection
                     get() = terminal.tracedPhases.directionNormal(nominalPhase)
 
-                override fun set(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
+                override fun set(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean =
                     terminal.tracedPhases.setNormal(singlePhaseKind, direction, nominalPhase)
 
-                override fun add(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
+                override fun add(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean =
                     terminal.tracedPhases.addNormal(singlePhaseKind, direction, nominalPhase)
 
-                override fun remove(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
+                override fun remove(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean =
                     terminal.tracedPhases.removeNormal(singlePhaseKind, direction, nominalPhase)
 
                 override fun remove(singlePhaseKind: SinglePhaseKind): Boolean =
@@ -51,16 +51,16 @@ fun interface PhaseSelector {
                 override val phase: SinglePhaseKind
                     get() = terminal.tracedPhases.phaseCurrent(nominalPhase)
 
-                override val direction: PhaseDirection
+                override val direction: FeederDirection
                     get() = terminal.tracedPhases.directionCurrent(nominalPhase)
 
-                override fun set(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
+                override fun set(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean =
                     terminal.tracedPhases.setCurrent(singlePhaseKind, direction, nominalPhase)
 
-                override fun add(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
+                override fun add(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean =
                     terminal.tracedPhases.addCurrent(singlePhaseKind, direction, nominalPhase)
 
-                override fun remove(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
+                override fun remove(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean =
                     terminal.tracedPhases.removeCurrent(singlePhaseKind, direction, nominalPhase)
 
                 override fun remove(singlePhaseKind: SinglePhaseKind): Boolean =

@@ -12,7 +12,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
 import com.zepben.evolve.services.network.tracing.OpenTest
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
+import com.zepben.evolve.services.network.tracing.phases.FeederDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseSelector
 import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
@@ -51,7 +51,7 @@ class DownstreamTree(
         val conductingEquipment = terminal.conductingEquipment!!
         for (phase in terminal.phases.singlePhases()) {
             if (!openTest.isOpen(conductingEquipment, phase)) {
-                if (phaseSelector.status(terminal, phase).direction.has(PhaseDirection.OUT))
+                if (phaseSelector.status(terminal, phase).direction.has(FeederDirection.DOWNSTREAM))
                     outPhases.add(phase)
             }
         }

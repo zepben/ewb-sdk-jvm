@@ -8,7 +8,7 @@
 package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection.Companion.from
+import com.zepben.evolve.services.network.tracing.phases.FeederDirection.Companion.from
 
 
 
@@ -60,23 +60,23 @@ class TracedPhasesBitManipulation {
         }
 
         @JvmStatic
-        fun direction(status: Int, nominalPhase: SinglePhaseKind): PhaseDirection {
+        fun direction(status: Int, nominalPhase: SinglePhaseKind): FeederDirection {
             val dirValue = (status ushr phase(status, nominalPhase).positionShift(nominalPhase)) and DIR_MASK
             return from(dirValue)
         }
 
         @JvmStatic
-        fun set(status: Int, singlePhaseKind: SinglePhaseKind, direction: PhaseDirection, nominalPhase: SinglePhaseKind): Int {
+        fun set(status: Int, singlePhaseKind: SinglePhaseKind, direction: FeederDirection, nominalPhase: SinglePhaseKind): Int {
             return (status and coreMasks[nominalPhase.maskIndex()].inv()) or direction.shiftedValue(singlePhaseKind, nominalPhase)
         }
 
         @JvmStatic
-        fun add(status: Int, singlePhaseKind: SinglePhaseKind, direction: PhaseDirection, nominalPhase: SinglePhaseKind): Int {
+        fun add(status: Int, singlePhaseKind: SinglePhaseKind, direction: FeederDirection, nominalPhase: SinglePhaseKind): Int {
             return status or direction.shiftedValue(singlePhaseKind, nominalPhase)
         }
 
         @JvmStatic
-        fun remove(status: Int, singlePhaseKind: SinglePhaseKind, direction: PhaseDirection, nominalPhase: SinglePhaseKind): Int {
+        fun remove(status: Int, singlePhaseKind: SinglePhaseKind, direction: FeederDirection, nominalPhase: SinglePhaseKind): Int {
             return status and direction.shiftedValue(singlePhaseKind, nominalPhase).inv()
         }
 
@@ -91,7 +91,7 @@ class TracedPhasesBitManipulation {
 
         private fun SinglePhaseKind.phaseSelector() = 2 * (value() - 1).coerceAtLeast(0)
 
-        private fun PhaseDirection.shiftedValue(singlePhaseKind: SinglePhaseKind, nominalPhase: SinglePhaseKind) =
+        private fun FeederDirection.shiftedValue(singlePhaseKind: SinglePhaseKind, nominalPhase: SinglePhaseKind) =
             value() shl singlePhaseKind.positionShift(nominalPhase)
     }
 }

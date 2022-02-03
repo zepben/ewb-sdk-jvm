@@ -64,7 +64,7 @@ class RemovePhases {
     }
 
     private fun ebbOutAndQueue(traversal: BranchRecursiveTraversal<EbbPhases>, current: EbbPhases?, phaseSelector: PhaseSelector) {
-        val processedNominalPhases = ebbPhases(current!!.terminal, current.nominalPhasesToEbb, PhaseDirection.OUT, phaseSelector)
+        val processedNominalPhases = ebbPhases(current!!.terminal, current.nominalPhasesToEbb, FeederDirection.DOWNSTREAM, phaseSelector)
         val connectedTerminals = connectedTerminals(current.terminal, processedNominalPhases)
 
         if (connectedTerminals.isEmpty())
@@ -94,7 +94,7 @@ class RemovePhases {
         })
 
         phasesByTerminalsToEbbAndQueue.forEach { (terminal: Terminal, phases: Set<SinglePhaseKind>) ->
-            val hadInPhases = ebbPhases(terminal, phases, PhaseDirection.IN, phaseSelector)
+            val hadInPhases = ebbPhases(terminal, phases, FeederDirection.UPSTREAM, phaseSelector)
             Objects.requireNonNull(terminal.conductingEquipment)!!.terminals.forEach(Consumer { t: Terminal ->
                 if (t != terminal) traversal.queue.add(
                     EbbPhases(
@@ -106,7 +106,7 @@ class RemovePhases {
         }
     }
 
-    private fun ebbPhases(terminal: Terminal, phases: Set<SinglePhaseKind>, direction: PhaseDirection, phaseSelector: PhaseSelector): Set<SinglePhaseKind> {
+    private fun ebbPhases(terminal: Terminal, phases: Set<SinglePhaseKind>, direction: FeederDirection, phaseSelector: PhaseSelector): Set<SinglePhaseKind> {
         val hadPhases: MutableSet<SinglePhaseKind> = mutableSetOf()
         phases.forEach(Consumer { phase: SinglePhaseKind ->
             val status = phaseSelector.status(terminal, phase)
@@ -130,7 +130,7 @@ class RemovePhases {
                         if (phaseSelector.status(
                                 cr.toTerminal,
                                 to
-                            ).direction.has(PhaseDirection.BOTH)
+                            ).direction.has(FeederDirection.BOTH)
                         ) otherFeedsByPhase.computeIfAbsent(from) { mutableSetOf() }
                             .add(cr)
                     })

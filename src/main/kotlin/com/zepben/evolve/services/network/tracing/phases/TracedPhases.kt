@@ -9,6 +9,7 @@ package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.evolve.services.network.tracing.phases.TracedPhasesBitManipulation.Companion.add
 import com.zepben.evolve.services.network.tracing.phases.TracedPhasesBitManipulation.Companion.direction
 import com.zepben.evolve.services.network.tracing.phases.TracedPhasesBitManipulation.Companion.phase
@@ -35,20 +36,20 @@ data class TracedPhases(
         return phase(currentStatus, nominalPhase)
     }
 
-    fun directionNormal(nominalPhase: SinglePhaseKind): PhaseDirection {
+    fun directionNormal(nominalPhase: SinglePhaseKind): FeederDirection {
         validPhaseCheck(nominalPhase)
         return direction(normalStatus, nominalPhase)
     }
 
-    fun directionCurrent(nominalPhase: SinglePhaseKind): PhaseDirection {
+    fun directionCurrent(nominalPhase: SinglePhaseKind): FeederDirection {
         validPhaseCheck(nominalPhase)
         return direction(currentStatus, nominalPhase)
     }
 
-    fun setNormal(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection, nominalPhase: SinglePhaseKind): Boolean {
+    fun setNormal(singlePhaseKind: SinglePhaseKind, direction: FeederDirection, nominalPhase: SinglePhaseKind): Boolean {
         validPhaseCheck(nominalPhase)
 
-        if (singlePhaseKind === SinglePhaseKind.NONE || direction === PhaseDirection.NONE) {
+        if (singlePhaseKind === NONE || direction === FeederDirection.NONE) {
             removeNormal(phaseNormal(nominalPhase), nominalPhase)
             return true
         }
@@ -60,10 +61,10 @@ data class TracedPhases(
         return true
     }
 
-    fun setCurrent(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection, nominalPhase: SinglePhaseKind): Boolean {
+    fun setCurrent(singlePhaseKind: SinglePhaseKind, direction: FeederDirection, nominalPhase: SinglePhaseKind): Boolean {
         validPhaseCheck(nominalPhase)
 
-        if (singlePhaseKind === SinglePhaseKind.NONE || direction === PhaseDirection.NONE) {
+        if (singlePhaseKind === NONE || direction === FeederDirection.NONE) {
             removeCurrent(phaseCurrent(nominalPhase), nominalPhase)
             return true
         }
@@ -75,12 +76,12 @@ data class TracedPhases(
         return true
     }
 
-    fun addNormal(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection, nominalPhase: SinglePhaseKind): Boolean {
+    fun addNormal(singlePhaseKind: SinglePhaseKind, direction: FeederDirection, nominalPhase: SinglePhaseKind): Boolean {
         validPhaseCheck(nominalPhase)
 
-        if (singlePhaseKind === SinglePhaseKind.NONE || direction === PhaseDirection.NONE)
+        if (singlePhaseKind === NONE || direction === FeederDirection.NONE)
             return false
-        if (phaseNormal(nominalPhase) !== SinglePhaseKind.NONE && singlePhaseKind !== phaseNormal(nominalPhase))
+        if (phaseNormal(nominalPhase) !== NONE && singlePhaseKind !== phaseNormal(nominalPhase))
             throw UnsupportedOperationException("Crossing Phases.")
         if (directionNormal(nominalPhase).has(direction))
             return false
@@ -89,12 +90,12 @@ data class TracedPhases(
         return true
     }
 
-    fun addCurrent(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection, nominalPhase: SinglePhaseKind): Boolean {
+    fun addCurrent(singlePhaseKind: SinglePhaseKind, direction: FeederDirection, nominalPhase: SinglePhaseKind): Boolean {
         validPhaseCheck(nominalPhase)
 
-        if (singlePhaseKind === SinglePhaseKind.NONE || direction === PhaseDirection.NONE)
+        if (singlePhaseKind === NONE || direction === FeederDirection.NONE)
             return false
-        if (phaseCurrent(nominalPhase) !== SinglePhaseKind.NONE && singlePhaseKind !== phaseCurrent(nominalPhase))
+        if (phaseCurrent(nominalPhase) !== NONE && singlePhaseKind !== phaseCurrent(nominalPhase))
             throw UnsupportedOperationException("Crossing Phases.")
         if (directionCurrent(nominalPhase).has(direction))
             return false
@@ -103,7 +104,7 @@ data class TracedPhases(
         return true
     }
 
-    fun removeNormal(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection?, nominalPhase: SinglePhaseKind): Boolean {
+    fun removeNormal(singlePhaseKind: SinglePhaseKind, direction: FeederDirection?, nominalPhase: SinglePhaseKind): Boolean {
         validPhaseCheck(nominalPhase)
 
         if (phaseNormal(nominalPhase) !== singlePhaseKind || !directionNormal(nominalPhase).has(direction!!))
@@ -113,7 +114,7 @@ data class TracedPhases(
         return true
     }
 
-    fun removeCurrent(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection?, nominalPhase: SinglePhaseKind): Boolean {
+    fun removeCurrent(singlePhaseKind: SinglePhaseKind, direction: FeederDirection?, nominalPhase: SinglePhaseKind): Boolean {
         validPhaseCheck(nominalPhase)
 
         if (phaseCurrent(nominalPhase) !== singlePhaseKind || !directionCurrent(nominalPhase).has(direction!!))
@@ -179,8 +180,8 @@ data class TracedPhases(
 
     private fun validPhaseCheck(phase: SinglePhaseKind) {
         when (phase) {
-            SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N, SinglePhaseKind.X, SinglePhaseKind.Y -> return
-            SinglePhaseKind.NONE, SinglePhaseKind.INVALID -> throw IllegalArgumentException(String.format("INTERNAL ERROR: Phase {%s} is invalid.", phase))
+            A, B, C, N, X, Y, s1, s2 -> return
+            NONE, INVALID -> throw IllegalArgumentException(String.format("INTERNAL ERROR: Phase {%s} is invalid.", phase))
         }
     }
 }

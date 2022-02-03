@@ -57,8 +57,8 @@ object PhaseValidator {
     fun validatePhaseDirections(
         network: NetworkService,
         id: String,
-        expectedDirectionT1: List<PhaseDirection>,
-        expectedDirectionT2: List<PhaseDirection> = listOf()
+        expectedDirectionT1: List<FeederDirection>,
+        expectedDirectionT2: List<FeederDirection> = listOf()
     ) {
         val asset = network.get<ConductingEquipment>(id)!!
         val t1 = if (expectedDirectionT1.isNotEmpty()) asset.terminals[0] else null

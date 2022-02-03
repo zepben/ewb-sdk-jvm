@@ -14,7 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
+import com.zepben.evolve.services.network.tracing.phases.FeederDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseStatus
 
 object DifferenceNetworks {
@@ -48,12 +48,12 @@ object DifferenceNetworks {
         createFeeder(network, "f006", n12, listOf(n13), listOf(n13))
         createFeeder(network, "f007", n12, listOf(n13), listOf(n13))
 
-        setPhases(n15, Terminal::normalPhases, SinglePhaseKind.A, PhaseDirection.IN)
-        setPhases(n16, Terminal::normalPhases, SinglePhaseKind.A, PhaseDirection.IN)
-        setPhases(n17, Terminal::normalPhases, SinglePhaseKind.A, PhaseDirection.IN)
-        setPhases(n18, Terminal::currentPhases, SinglePhaseKind.A, PhaseDirection.IN)
-        setPhases(n19, Terminal::currentPhases, SinglePhaseKind.A, PhaseDirection.IN)
-        setPhases(n20, Terminal::currentPhases, SinglePhaseKind.A, PhaseDirection.IN)
+        setPhases(n15, Terminal::normalPhases, SinglePhaseKind.A, FeederDirection.UPSTREAM)
+        setPhases(n16, Terminal::normalPhases, SinglePhaseKind.A, FeederDirection.UPSTREAM)
+        setPhases(n17, Terminal::normalPhases, SinglePhaseKind.A, FeederDirection.UPSTREAM)
+        setPhases(n18, Terminal::currentPhases, SinglePhaseKind.A, FeederDirection.UPSTREAM)
+        setPhases(n19, Terminal::currentPhases, SinglePhaseKind.A, FeederDirection.UPSTREAM)
+        setPhases(n20, Terminal::currentPhases, SinglePhaseKind.A, FeederDirection.UPSTREAM)
     }
 
     @JvmStatic
@@ -85,12 +85,12 @@ object DifferenceNetworks {
         createFeeder(network, "f006", n12, listOf(n14), listOf(n13))
         createFeeder(network, "f007", n12, listOf(n13), listOf(n14))
 
-        setPhases(n15, Terminal::normalPhases, SinglePhaseKind.A, PhaseDirection.IN)
-        setPhases(n16, Terminal::normalPhases, SinglePhaseKind.B, PhaseDirection.IN)
-        setPhases(n17, Terminal::normalPhases, SinglePhaseKind.A, PhaseDirection.OUT)
-        setPhases(n18, Terminal::currentPhases, SinglePhaseKind.A, PhaseDirection.IN)
-        setPhases(n19, Terminal::currentPhases, SinglePhaseKind.B, PhaseDirection.IN)
-        setPhases(n20, Terminal::currentPhases, SinglePhaseKind.A, PhaseDirection.OUT)
+        setPhases(n15, Terminal::normalPhases, SinglePhaseKind.A, FeederDirection.UPSTREAM)
+        setPhases(n16, Terminal::normalPhases, SinglePhaseKind.B, FeederDirection.UPSTREAM)
+        setPhases(n17, Terminal::normalPhases, SinglePhaseKind.A, FeederDirection.DOWNSTREAM)
+        setPhases(n18, Terminal::currentPhases, SinglePhaseKind.A, FeederDirection.UPSTREAM)
+        setPhases(n19, Terminal::currentPhases, SinglePhaseKind.B, FeederDirection.UPSTREAM)
+        setPhases(n20, Terminal::currentPhases, SinglePhaseKind.A, FeederDirection.DOWNSTREAM)
     }
 
     private fun createFeeder(
@@ -115,7 +115,7 @@ object DifferenceNetworks {
         node: Junction,
         phaseExtractor: (Terminal, SinglePhaseKind) -> PhaseStatus,
         singlePhaseKind: SinglePhaseKind,
-        direction: PhaseDirection
+        direction: FeederDirection
     ) = phaseExtractor(node.getTerminal(1)!!, SinglePhaseKind.A).set(singlePhaseKind, direction)
 
 }

@@ -21,8 +21,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.Tracing
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection.*
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection.NONE
+import com.zepben.evolve.services.network.tracing.phases.FeederDirection.*
+import com.zepben.evolve.services.network.tracing.phases.FeederDirection.NONE
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -53,24 +53,24 @@ class SetPhasesTest {
         doSetPhasesTrace(n)
 
         // Check various points to make sure phases have been applied during the trace.
-        checkExpectedPhases(getT(n, "acLineSegment0", 1), arrayOf(A, B, C, N), arrayOf(IN, IN, IN, IN))
-        checkExpectedPhases(getT(n, "acLineSegment0", 2), arrayOf(A, B, C, N), arrayOf(OUT, OUT, OUT, OUT))
-        checkExpectedPhases(getT(n, "acLineSegment1", 1), arrayOf(A, B, C, N), arrayOf(IN, IN, IN, IN))
-        checkExpectedPhases(getT(n, "acLineSegment4", 1), arrayOf(A, B), arrayOf(IN, IN))
-        checkExpectedPhases(getT(n, "node4", 1), arrayOf(A, B), arrayOf(IN, IN))
-        checkExpectedPhases(getT(n, "node4", 2), arrayOf(A, B), arrayOf(OUT, OUT))
-        checkExpectedPhases(getT(n, "node4", 3), arrayOf(A, B), arrayOf(OUT, OUT))
-        checkExpectedPhases(getT(n, "node8", 1), arrayOf(A), arrayOf(IN))
-        checkExpectedPhases(getT(n, "node5", 1), arrayOf(A, B), arrayOf(IN, IN))
-        checkExpectedPhases(getT(n, "node5", 2), arrayOf(A, B), arrayOf(OUT, OUT))
-        checkExpectedPhases(getT(n, "node5", 3), arrayOf(A, B), arrayOf(OUT, OUT))
-        checkExpectedPhases(getT(n, "node9", 1), arrayOf(B), arrayOf(IN))
-        checkExpectedPhases(getT(n, "node6", 1), arrayOf(A, B), arrayOf(IN, IN))
-        checkExpectedPhases(getT(n, "node6", 2), arrayOf(B, C), arrayOf(IN, IN))
-        checkExpectedPhases(getT(n, "acLineSegment2", 2), arrayOf(A, B, C, N), arrayOf(OUT, OUT, OUT, OUT))
-        checkExpectedPhases(getT(n, "acLineSegment3", 1), arrayOf(A, B, C, N), arrayOf(IN, IN, IN, IN))
-        checkExpectedPhases(getT(n, "acLineSegment9", 2), arrayOf(B, C), arrayOf(IN, IN))
-        checkExpectedPhases(getT(n, "node2", 1), arrayOf(A, B, C, N), arrayOf(IN, IN, IN, IN))
+        checkExpectedPhases(getT(n, "acLineSegment0", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "acLineSegment0", 2), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
+        checkExpectedPhases(getT(n, "acLineSegment1", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "acLineSegment4", 1), arrayOf(A, B), arrayOf(UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "node4", 1), arrayOf(A, B), arrayOf(UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "node4", 2), arrayOf(A, B), arrayOf(DOWNSTREAM, DOWNSTREAM))
+        checkExpectedPhases(getT(n, "node4", 3), arrayOf(A, B), arrayOf(DOWNSTREAM, DOWNSTREAM))
+        checkExpectedPhases(getT(n, "node8", 1), arrayOf(A), arrayOf(UPSTREAM))
+        checkExpectedPhases(getT(n, "node5", 1), arrayOf(A, B), arrayOf(UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "node5", 2), arrayOf(A, B), arrayOf(DOWNSTREAM, DOWNSTREAM))
+        checkExpectedPhases(getT(n, "node5", 3), arrayOf(A, B), arrayOf(DOWNSTREAM, DOWNSTREAM))
+        checkExpectedPhases(getT(n, "node9", 1), arrayOf(B), arrayOf(UPSTREAM))
+        checkExpectedPhases(getT(n, "node6", 1), arrayOf(A, B), arrayOf(UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "node6", 2), arrayOf(B, C), arrayOf(UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "acLineSegment2", 2), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
+        checkExpectedPhases(getT(n, "acLineSegment3", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "acLineSegment9", 2), arrayOf(B, C), arrayOf(UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "node2", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
     }
 
     @Test
@@ -87,14 +87,14 @@ class SetPhasesTest {
         doSetPhasesTrace(n)
 
         // Check various points to make sure phases have been applied during the trace.
-        checkExpectedPhases(getT(n, "node0", 1), arrayOf(A, B, C, N), arrayOf(OUT, BOTH, OUT, BOTH))
-        checkExpectedPhases(getT(n, "acLineSegment0", 1), arrayOf(A, B, C, N), arrayOf(IN, BOTH, IN, BOTH))
-        checkExpectedPhases(getT(n, "acLineSegment0", 2), arrayOf(A, B, C, N), arrayOf(OUT, BOTH, OUT, BOTH))
-        checkExpectedPhases(getT(n, "node1", 1), arrayOf(A, B, C, N), arrayOf(IN, BOTH, IN, BOTH))
-        checkExpectedPhases(getT(n, "node1", 2), arrayOf(A, B, C, N), arrayOf(IN, BOTH, IN, BOTH))
-        checkExpectedPhases(getT(n, "acLineSegment1", 1), arrayOf(A, B, C, N), arrayOf(OUT, BOTH, OUT, BOTH))
-        checkExpectedPhases(getT(n, "acLineSegment1", 2), arrayOf(A, B, C, N), arrayOf(IN, BOTH, IN, BOTH))
-        checkExpectedPhases(getT(n, "node2", 1), arrayOf(A, B, C, N), arrayOf(OUT, BOTH, OUT, BOTH))
+        checkExpectedPhases(getT(n, "node0", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, BOTH, DOWNSTREAM, BOTH))
+        checkExpectedPhases(getT(n, "acLineSegment0", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, BOTH, UPSTREAM, BOTH))
+        checkExpectedPhases(getT(n, "acLineSegment0", 2), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, BOTH, DOWNSTREAM, BOTH))
+        checkExpectedPhases(getT(n, "node1", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, BOTH, UPSTREAM, BOTH))
+        checkExpectedPhases(getT(n, "node1", 2), arrayOf(A, B, C, N), arrayOf(UPSTREAM, BOTH, UPSTREAM, BOTH))
+        checkExpectedPhases(getT(n, "acLineSegment1", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, BOTH, DOWNSTREAM, BOTH))
+        checkExpectedPhases(getT(n, "acLineSegment1", 2), arrayOf(A, B, C, N), arrayOf(UPSTREAM, BOTH, UPSTREAM, BOTH))
+        checkExpectedPhases(getT(n, "node2", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, BOTH, DOWNSTREAM, BOTH))
     }
 
     @Test
@@ -142,17 +142,17 @@ class SetPhasesTest {
 
         n0.terminals.forEach { t ->
             for (phase in t.phases.singlePhases()) {
-                t.normalPhases(phase).add(A, OUT)
-                t.currentPhases(phase).add(A, OUT)
+                t.normalPhases(phase).add(A, DOWNSTREAM)
+                t.currentPhases(phase).add(A, DOWNSTREAM)
             }
-            checkExpectedPhases(t, arrayOf(A), arrayOf(OUT))
+            checkExpectedPhases(t, arrayOf(A), arrayOf(DOWNSTREAM))
         }
 
         doSetPhasesTrace(n0)
-        checkExpectedPhases(getT(n, "n0", 1), arrayOf(A), arrayOf(OUT))
-        checkExpectedPhases(getT(n, "c0", 1), arrayOf(A), arrayOf(IN))
-        checkExpectedPhases(getT(n, "c0", 2), arrayOf(A), arrayOf(OUT))
-        checkExpectedPhases(getT(n, "n1", 1), arrayOf(A), arrayOf(IN))
+        checkExpectedPhases(getT(n, "n0", 1), arrayOf(A), arrayOf(DOWNSTREAM))
+        checkExpectedPhases(getT(n, "c0", 1), arrayOf(A), arrayOf(UPSTREAM))
+        checkExpectedPhases(getT(n, "c0", 2), arrayOf(A), arrayOf(DOWNSTREAM))
+        checkExpectedPhases(getT(n, "n1", 1), arrayOf(A), arrayOf(UPSTREAM))
         checkExpectedPhases(getT(n, "n1", 2), arrayOf(A), arrayOf(BOTH))
         checkExpectedPhases(getT(n, "c1", 1), arrayOf(A), arrayOf(BOTH))
         checkExpectedPhases(getT(n, "c1", 2), arrayOf(A), arrayOf(BOTH))
@@ -164,9 +164,9 @@ class SetPhasesTest {
         checkExpectedPhases(getT(n, "n3", 2), arrayOf(A), arrayOf(BOTH))
         checkExpectedPhases(getT(n, "c3", 1), arrayOf(A), arrayOf(BOTH))
         checkExpectedPhases(getT(n, "c3", 2), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "c4", 1), arrayOf(A), arrayOf(IN))
-        checkExpectedPhases(getT(n, "c4", 2), arrayOf(A), arrayOf(OUT))
-        checkExpectedPhases(getT(n, "n4", 1), arrayOf(A), arrayOf(IN))
+        checkExpectedPhases(getT(n, "c4", 1), arrayOf(A), arrayOf(UPSTREAM))
+        checkExpectedPhases(getT(n, "c4", 2), arrayOf(A), arrayOf(DOWNSTREAM))
+        checkExpectedPhases(getT(n, "n4", 1), arrayOf(A), arrayOf(UPSTREAM))
     }
 
     @Test
@@ -216,98 +216,98 @@ class SetPhasesTest {
 
         doSetPhasesTrace(n)
 
-        checkExpectedPhases(getT(n, "n0", 1), arrayOf(A, B, C, N), arrayOf(OUT, OUT, OUT, OUT))
-        checkExpectedPhases(getT(n, "c0", 1), arrayOf(A, B, C, N), arrayOf(IN, IN, IN, IN))
-        checkExpectedPhases(getT(n, "c0", 2), arrayOf(A, B, C, N), arrayOf(OUT, OUT, OUT, OUT))
-        checkExpectedPhases(getT(n, "f0", 1), arrayOf(A, B, C, N), arrayOf(IN, IN, IN, IN))
+        checkExpectedPhases(getT(n, "n0", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
+        checkExpectedPhases(getT(n, "c0", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "c0", 2), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
+        checkExpectedPhases(getT(n, "f0", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
         checkExpectedPhases(
             getT(n, "f0", 2),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(OUT, IN, OUT, NONE),
+            arrayOf(DOWNSTREAM, UPSTREAM, DOWNSTREAM, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "c1", 1),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(IN, OUT, IN, NONE),
+            arrayOf(UPSTREAM, DOWNSTREAM, UPSTREAM, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "c1", 2),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(OUT, IN, OUT, NONE),
+            arrayOf(DOWNSTREAM, UPSTREAM, DOWNSTREAM, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "f1", 1),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(IN, OUT, IN, NONE),
+            arrayOf(UPSTREAM, DOWNSTREAM, UPSTREAM, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "f1", 2),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(OUT, IN, BOTH, NONE),
+            arrayOf(DOWNSTREAM, UPSTREAM, BOTH, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "c2", 1),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(IN, OUT, BOTH, NONE),
+            arrayOf(UPSTREAM, DOWNSTREAM, BOTH, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "c2", 2),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(OUT, IN, BOTH, NONE),
+            arrayOf(DOWNSTREAM, UPSTREAM, BOTH, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "f2", 1),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(IN, OUT, BOTH, NONE),
+            arrayOf(UPSTREAM, DOWNSTREAM, BOTH, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "f2", 2),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(OUT, IN, IN, NONE),
+            arrayOf(DOWNSTREAM, UPSTREAM, UPSTREAM, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "c3", 1),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(IN, OUT, OUT, NONE),
+            arrayOf(UPSTREAM, DOWNSTREAM, DOWNSTREAM, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "c3", 2),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(OUT, IN, IN, NONE),
+            arrayOf(DOWNSTREAM, UPSTREAM, UPSTREAM, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
         checkExpectedPhases(
             getT(n, "f3", 1),
             arrayOf(A, B, C, P_NONE),
-            arrayOf(IN, OUT, OUT, NONE),
+            arrayOf(UPSTREAM, DOWNSTREAM, DOWNSTREAM, NONE),
             arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
             arrayOf(NONE, NONE, NONE, NONE)
         )
-        checkExpectedPhases(getT(n, "f3", 2), arrayOf(A, B, C, N), arrayOf(IN, IN, IN, IN))
-        checkExpectedPhases(getT(n, "c4", 1), arrayOf(A, B, C, N), arrayOf(OUT, OUT, OUT, OUT))
-        checkExpectedPhases(getT(n, "c4", 2), arrayOf(A, B, C, N), arrayOf(IN, IN, IN, IN))
-        checkExpectedPhases(getT(n, "n1", 1), arrayOf(A, B, C, N), arrayOf(OUT, OUT, OUT, OUT))
+        checkExpectedPhases(getT(n, "f3", 2), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "c4", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
+        checkExpectedPhases(getT(n, "c4", 2), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
+        checkExpectedPhases(getT(n, "n1", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
         checkExpectedPhases(getT(n, "f4", 1), arrayOf(P_NONE, P_NONE, P_NONE, P_NONE), arrayOf(NONE, NONE, NONE, NONE))
         checkExpectedPhases(getT(n, "f4", 2), arrayOf(P_NONE, P_NONE, P_NONE, P_NONE), arrayOf(NONE, NONE, NONE, NONE))
     }
@@ -484,7 +484,7 @@ class SetPhasesTest {
     private fun checkExpectedPhases(
         t: Terminal,
         phases: Array<SinglePhaseKind>,
-        directions: Array<PhaseDirection>
+        directions: Array<FeederDirection>
     ) {
         checkExpectedPhases(t, phases, directions, phases, directions)
     }
@@ -492,9 +492,9 @@ class SetPhasesTest {
     private fun checkExpectedPhases(
         t: Terminal,
         normalPhases: Array<SinglePhaseKind>,
-        normalDirections: Array<PhaseDirection>,
+        normalDirections: Array<FeederDirection>,
         currentPhases: Array<SinglePhaseKind>,
-        currentDirections: Array<PhaseDirection>
+        currentDirections: Array<FeederDirection>
     ) {
         checkExpectedPhases(t, normalPhases, normalDirections) { phase -> t.normalPhases(phase) }
         checkExpectedPhases(t, currentPhases, currentDirections) { phase -> t.currentPhases(phase) }
@@ -503,7 +503,7 @@ class SetPhasesTest {
     private fun checkExpectedPhases(
         t: Terminal?,
         singlePhaseKinds: Array<SinglePhaseKind>,
-        directions: Array<PhaseDirection>,
+        directions: Array<FeederDirection>,
         phaseStatusSelector: Function<SinglePhaseKind, PhaseStatus>
     ) {
         assertThat(t, notNullValue())

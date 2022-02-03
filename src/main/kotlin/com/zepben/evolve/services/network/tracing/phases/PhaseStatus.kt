@@ -23,7 +23,7 @@ interface PhaseStatus {
     /**
      * @return The direction added to this status.
      */
-    val direction: PhaseDirection
+    val direction: FeederDirection
 
     /**
      * Clears the phase and sets it to the specified phase and direction.
@@ -32,7 +32,7 @@ interface PhaseStatus {
      * @param singlePhaseKind The new phase to be set.
      * @param direction       The direction of the phase.
      */
-    operator fun set(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean
+    operator fun set(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean
 
     /**
      * Adds a phase to the status with the given direction.
@@ -41,7 +41,7 @@ interface PhaseStatus {
      * @param direction       The direction of the phase.
      * @return true if the phase or direction has been updated.
      */
-    fun add(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean
+    fun add(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean
 
     /**
      * Removes a phase from the status matching a specific direction.
@@ -50,7 +50,7 @@ interface PhaseStatus {
      * @param direction       The direction to match with the phase being removed.
      * @return true if the phase or direction has been updated.
      */
-    fun remove(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean
+    fun remove(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean
 
     /**
      * Removes a phase from the status in any direction.

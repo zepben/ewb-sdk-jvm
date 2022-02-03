@@ -118,7 +118,7 @@ class SetPhases {
     private fun runTerminal(start: Terminal, traversal: BranchRecursiveTraversal<Terminal>, phaseSelector: PhaseSelector) {
         val phasesToFlow = start.phases.singlePhases()
             .stream()
-            .filter { phase -> phaseSelector.status(start, phase).direction.has(PhaseDirection.OUT) }
+            .filter { phase -> phaseSelector.status(start, phase).direction.has(FeederDirection.DOWNSTREAM) }
             .collect(Collectors.toSet())
 
         runFromOutTerminal(traversal, start, phasesToFlow, phaseSelector)
@@ -198,8 +198,8 @@ class SetPhases {
 
         energySource.terminals.forEach { terminal ->
             terminal.phases.singlePhases().forEach { phase ->
-                terminal.normalPhases(phase).add(phase, PhaseDirection.OUT)
-                terminal.currentPhases(phase).add(phase, PhaseDirection.OUT)
+                terminal.normalPhases(phase).add(phase, FeederDirection.DOWNSTREAM)
+                terminal.currentPhases(phase).add(phase, FeederDirection.DOWNSTREAM)
             }
         }
     }
@@ -260,7 +260,7 @@ class SetPhases {
         var hasChanges = false
         phasesToFlow.forEach {
             hasChanges = try {
-                phaseSelector.status(outTerminal, it).add(phaseSelector.status(inTerminal, it).phase, PhaseDirection.OUT) || hasChanges
+                phaseSelector.status(outTerminal, it).add(phaseSelector.status(inTerminal, it).phase, FeederDirection.DOWNSTREAM) || hasChanges
             } catch (ex: UnsupportedOperationException) {
                 throw IllegalStateException(
                     "Attempted to apply more than one phase to ${outTerminal.conductingEquipment?.mRID ?: inTerminal.mRID} on nominal phase $it. " +
@@ -289,7 +289,7 @@ class SetPhases {
 
             for (oi in connectivityResult.nominalPhasePaths) {
                 try {
-                    if (phaseSelector.status(inTerminal, oi.to).add(phaseSelector.status(outTerminal, oi.from).phase, PhaseDirection.IN))
+                    if (phaseSelector.status(inTerminal, oi.to).add(phaseSelector.status(outTerminal, oi.from).phase, FeederDirection.UPSTREAM))
                         hasAdded = true
                 } catch (ex: UnsupportedOperationException) {
                     throw IllegalStateException(
@@ -303,7 +303,7 @@ class SetPhases {
             // The hasAdded check is to stop tracing network that has already had its phasing applied on a previous branch.
             // The visited check is to stop the trace applying phases back along the source path if there is a loop.
             if (hasAdded && !traversal.hasVisited(inTerminal)) {
-                if (connectivityResults.size > 1 || outTerminal.conductingEquipment?.numTerminals() ?: 0 > 2)
+                if (connectivityResults.size > 1 || (outTerminal.conductingEquipment?.numTerminals() ?: 0) > 2)
                     traversal.branchQueue.add(traversal.branchSupplier().setStart(inTerminal))
                 else
                     traversal.queue.add(inTerminal)
@@ -319,7 +319,7 @@ class SetPhases {
         val conductingEquipment: ConductingEquipment = terminal.conductingEquipment ?: return phasesToFlow
 
         for (phase in terminal.phases.singlePhases()) {
-            if (!openTest.isOpen(conductingEquipment, phase) && phaseSelector.status(terminal, phase).direction.has(PhaseDirection.IN))
+            if (!openTest.isOpen(conductingEquipment, phase) && phaseSelector.status(terminal, phase).direction.has(FeederDirection.UPSTREAM))
                 phasesToFlow.add(phase)
         }
 
@@ -335,13 +335,13 @@ class SetPhases {
 
             terminal.phases.singlePhases().forEach {
                 val phaseStatus = phaseSelector.status(terminal, it)
-                if (phaseStatus.direction === PhaseDirection.IN) {
+                if (phaseStatus.direction === FeederDirection.UPSTREAM) {
                     status.addInPhase(it)
                     if (!openTest.isOpen(feederCb, it))
                         status.addPhaseToFlow(it)
-                } else if (phaseStatus.direction === PhaseDirection.BOTH)
+                } else if (phaseStatus.direction === FeederDirection.BOTH)
                     status.addInOutPhase(it)
-                else if (phaseStatus.direction === PhaseDirection.NONE)
+                else if (phaseStatus.direction === FeederDirection.NONE)
                     status.addNonePhase(it)
             }
         }

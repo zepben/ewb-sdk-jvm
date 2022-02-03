@@ -12,10 +12,11 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
+import com.zepben.evolve.services.network.tracing.phases.FeederDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseStep
 import com.zepben.evolve.services.network.tracing.traversals.Traversal
 import com.zepben.testutils.junit.SystemLogExtension
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.junit.Assert
 import org.junit.jupiter.api.Test
@@ -57,7 +58,7 @@ class CoreTraceTest {
         var visited = currentDownstreamTrace(start, SinglePhaseKind.A)
 
         // node7, node9, acLineSegment8, acLineSegment9 and acLineSegment11 should not be traced.
-        Assert.assertThat(
+        assertThat(
             visited, Matchers.containsInAnyOrder(
                 createResultItem(n, "node0", SinglePhaseKind.A),
                 createResultItem(n, "node1", SinglePhaseKind.A),
@@ -108,7 +109,7 @@ class CoreTraceTest {
         val visited = normalDownstreamTrace(start, SinglePhaseKind.B, SinglePhaseKind.C)
 
         // node8 and acLineSegment10 should not be traced.
-        Assert.assertThat(
+        assertThat(
             visited, Matchers.containsInAnyOrder(
                 createResultItem(n, "node0", SinglePhaseKind.B, SinglePhaseKind.C),
                 createResultItem(n, "node1", SinglePhaseKind.B, SinglePhaseKind.C),
@@ -179,18 +180,14 @@ class CoreTraceTest {
 
         start.terminals.forEach { t ->
             for (phase in t.phases.singlePhases()) {
-                t.normalPhases(phase).add(phase, PhaseDirection.OUT)
-                t.currentPhases(phase).add(phase, PhaseDirection.OUT)
+                t.normalPhases(phase).add(phase, FeederDirection.DOWNSTREAM)
+                t.currentPhases(phase).add(phase, FeederDirection.DOWNSTREAM)
             }
         }
 
         start.terminals.forEach { t ->
             Tracing.setPhases().run(t, emptyList())
         }
-    }
-
-    private fun normalNonDirectionalTrace(start: ConductingEquipment, vararg phases: SinglePhaseKind): Set<PhaseStep> {
-        return runTrace(Tracing.normalPhaseTrace(), start, *phases)
     }
 
     private fun currentNonDirectionalTrace(start: ConductingEquipment, vararg phases: SinglePhaseKind): Set<PhaseStep> {

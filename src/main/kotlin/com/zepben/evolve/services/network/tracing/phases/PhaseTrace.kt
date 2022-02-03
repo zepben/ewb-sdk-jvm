@@ -90,7 +90,7 @@ object PhaseTrace {
 
             phaseStep.conductingEquipment.terminals.forEach(Consumer { terminal: Terminal ->
                 outPhases.clear()
-                getPhasesWithDirection(openTest, activePhases, terminal, phaseStep.phases, PhaseDirection.OUT, outPhases)
+                getPhasesWithDirection(openTest, activePhases, terminal, phaseStep.phases, FeederDirection.DOWNSTREAM, outPhases)
 
                 queueConnected(traversal, terminal, outPhases)
             })
@@ -110,12 +110,12 @@ object PhaseTrace {
 
             phaseStep.conductingEquipment.terminals.forEach { terminal ->
                 inPhases.clear()
-                getPhasesWithDirection(openTest, activePhases, terminal, phaseStep.phases, PhaseDirection.IN, inPhases)
+                getPhasesWithDirection(openTest, activePhases, terminal, phaseStep.phases, FeederDirection.UPSTREAM, inPhases)
                 if (inPhases.isNotEmpty()) {
                     connectedTerminals(terminal, inPhases).forEach { cr ->
                         // When going upstream, we only want to traverse to connected terminals that have an out direction
                         val outPhases = cr.toNominalPhases
-                            .filter { phase: SinglePhaseKind? -> activePhases.status(cr.toTerminal, phase!!).direction.has(PhaseDirection.OUT) }
+                            .filter { phase: SinglePhaseKind? -> activePhases.status(cr.toTerminal, phase!!).direction.has(FeederDirection.DOWNSTREAM) }
                             .toSet()
 
                         if (outPhases.isNotEmpty())
@@ -134,7 +134,7 @@ object PhaseTrace {
         activePhases: PhaseSelector,
         terminal: Terminal,
         candidatePhases: Set<SinglePhaseKind>,
-        direction: PhaseDirection,
+        direction: FeederDirection,
         matchedPhases: MutableSet<SinglePhaseKind>
     ) {
         val conductingEquipment = Objects.requireNonNull(terminal.conductingEquipment)!!

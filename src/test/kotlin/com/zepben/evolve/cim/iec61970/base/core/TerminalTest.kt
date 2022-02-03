@@ -8,7 +8,7 @@
 package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
+import com.zepben.evolve.services.network.tracing.phases.FeederDirection
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -71,21 +71,21 @@ internal class TerminalTest {
     internal fun tracedPhases() {
         val terminal = Terminal()
 
-        validatePhases(terminal, SinglePhaseKind.NONE, PhaseDirection.NONE, SinglePhaseKind.NONE, PhaseDirection.NONE)
+        validatePhases(terminal, SinglePhaseKind.NONE, FeederDirection.NONE, SinglePhaseKind.NONE, FeederDirection.NONE)
 
-        terminal.tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.A)
-        validatePhases(terminal, SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.NONE, PhaseDirection.NONE)
+        terminal.tracedPhases.setNormal(SinglePhaseKind.B, FeederDirection.DOWNSTREAM, SinglePhaseKind.A)
+        validatePhases(terminal, SinglePhaseKind.B, FeederDirection.DOWNSTREAM, SinglePhaseKind.NONE, FeederDirection.NONE)
 
-        terminal.tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A)
-        validatePhases(terminal, SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.A, PhaseDirection.IN)
+        terminal.tracedPhases.setCurrent(SinglePhaseKind.A, FeederDirection.UPSTREAM, SinglePhaseKind.A)
+        validatePhases(terminal, SinglePhaseKind.B, FeederDirection.DOWNSTREAM, SinglePhaseKind.A, FeederDirection.UPSTREAM)
     }
 
     private fun validatePhases(
         terminal: Terminal,
         normalPhase: SinglePhaseKind,
-        normalDirection: PhaseDirection,
+        normalDirection: FeederDirection,
         currentPhase: SinglePhaseKind,
-        currentDirection: PhaseDirection
+        currentDirection: FeederDirection
     ) {
         assertThat(terminal.normalPhases(SinglePhaseKind.A).phase, equalTo(normalPhase))
         assertThat(terminal.normalPhases(SinglePhaseKind.A).direction, equalTo(normalDirection))

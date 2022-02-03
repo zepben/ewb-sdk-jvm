@@ -556,8 +556,21 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 EnergySource::rn,
                 EnergySource::x,
                 EnergySource::x0,
-                EnergySource::xn
+                EnergySource::xn,
+                EnergySource::rMin,
+                EnergySource::rnMin,
+                EnergySource::r0Min,
+                EnergySource::xMin,
+                EnergySource::xnMin,
+                EnergySource::x0Min,
+                EnergySource::rMax,
+                EnergySource::rnMax,
+                EnergySource::r0Max,
+                EnergySource::xMax,
+                EnergySource::xnMax,
+                EnergySource::x0Max
             )
+            compareValues(EnergySource::isExternalGrid)
         }
 
     private fun compareEnergySourcePhase(source: EnergySourcePhase, target: EnergySourcePhase): ObjectDifference<EnergySourcePhase> =

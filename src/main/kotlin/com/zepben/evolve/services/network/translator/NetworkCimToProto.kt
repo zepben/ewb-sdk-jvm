@@ -67,8 +67,8 @@ import com.zepben.protobuf.cim.iec61968.assets.Structure as PBStructure
 import com.zepben.protobuf.cim.iec61968.common.Location as PBLocation
 import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
-import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
+import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint as PBUsagePoint
@@ -693,6 +693,7 @@ fun toPb(cim: EnergySource, pb: PBEnergySource.Builder): PBEnergySource.Builder 
     pb.apply {
         clearEnergySourcePhasesMRIDs()
         cim.phases.forEach { addEnergySourcePhasesMRIDs(it.mRID) }
+
         activePower = cim.activePower ?: UNKNOWN_DOUBLE
         reactivePower = cim.reactivePower ?: UNKNOWN_DOUBLE
         voltageAngle = cim.voltageAngle ?: UNKNOWN_DOUBLE
@@ -705,6 +706,20 @@ fun toPb(cim: EnergySource, pb: PBEnergySource.Builder): PBEnergySource.Builder 
         rn = cim.rn ?: UNKNOWN_DOUBLE
         x0 = cim.x0 ?: UNKNOWN_DOUBLE
         xn = cim.xn ?: UNKNOWN_DOUBLE
+        isExternalGrid = cim.isExternalGrid
+        rMin = cim.rMin ?: UNKNOWN_DOUBLE
+        rnMin = cim.rnMin ?: UNKNOWN_DOUBLE
+        r0Min = cim.r0Min ?: UNKNOWN_DOUBLE
+        xMin = cim.xMin ?: UNKNOWN_DOUBLE
+        xnMin = cim.xnMin ?: UNKNOWN_DOUBLE
+        x0Min = cim.x0Min ?: UNKNOWN_DOUBLE
+        rMax = cim.rMax ?: UNKNOWN_DOUBLE
+        rnMax = cim.rnMax ?: UNKNOWN_DOUBLE
+        r0Max = cim.r0Max ?: UNKNOWN_DOUBLE
+        xMax = cim.xMax ?: UNKNOWN_DOUBLE
+        xnMax = cim.xnMax ?: UNKNOWN_DOUBLE
+        x0Max = cim.x0Max ?: UNKNOWN_DOUBLE
+
         toPb(cim, ecBuilder)
     }
 

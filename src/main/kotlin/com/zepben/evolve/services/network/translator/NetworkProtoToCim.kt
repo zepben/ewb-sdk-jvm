@@ -58,8 +58,8 @@ import com.zepben.protobuf.cim.iec61968.common.Location as PBLocation
 import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
 import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
-import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
+import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint as PBUsagePoint
@@ -734,6 +734,7 @@ fun toCim(pb: PBEnergySource, networkService: NetworkService): EnergySource =
         pb.energySourcePhasesMRIDsList.forEach { energySourcePhasesMRID ->
             networkService.resolveOrDeferReference(Resolvers.phases(this), energySourcePhasesMRID)
         }
+
         activePower = pb.activePower.takeUnless { it == UNKNOWN_DOUBLE }
         reactivePower = pb.reactivePower.takeUnless { it == UNKNOWN_DOUBLE }
         voltageAngle = pb.voltageAngle.takeUnless { it == UNKNOWN_DOUBLE }
@@ -746,6 +747,20 @@ fun toCim(pb: PBEnergySource, networkService: NetworkService): EnergySource =
         rn = pb.rn.takeUnless { it == UNKNOWN_DOUBLE }
         x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
         xn = pb.xn.takeUnless { it == UNKNOWN_DOUBLE }
+        isExternalGrid = pb.isExternalGrid
+        rMin = pb.rMin.takeUnless { it == UNKNOWN_DOUBLE }
+        rnMin = pb.rnMin.takeUnless { it == UNKNOWN_DOUBLE }
+        r0Min = pb.r0Min.takeUnless { it == UNKNOWN_DOUBLE }
+        xMin = pb.xMin.takeUnless { it == UNKNOWN_DOUBLE }
+        xnMin = pb.xnMin.takeUnless { it == UNKNOWN_DOUBLE }
+        x0Min = pb.x0Min.takeUnless { it == UNKNOWN_DOUBLE }
+        rMax = pb.rMax.takeUnless { it == UNKNOWN_DOUBLE }
+        rnMax = pb.rnMax.takeUnless { it == UNKNOWN_DOUBLE }
+        r0Max = pb.r0Max.takeUnless { it == UNKNOWN_DOUBLE }
+        xMax = pb.xMax.takeUnless { it == UNKNOWN_DOUBLE }
+        xnMax = pb.xnMax.takeUnless { it == UNKNOWN_DOUBLE }
+        x0Max = pb.x0Max.takeUnless { it == UNKNOWN_DOUBLE }
+
         toCim(pb.ec, this, networkService)
     }
 

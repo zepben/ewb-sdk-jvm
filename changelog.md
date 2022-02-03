@@ -17,6 +17,7 @@
 
 * Added fields to `PowerTransformer` to define `constructionKind` and `function`.
 * Added fields to `StreetAddress` to define `poBox` and `streetDetail`.
+* Added fields to `EnergySource` to allow representation of a higher-level power grid connection modelled as a slack bus.
 
 ##### Fixes
 

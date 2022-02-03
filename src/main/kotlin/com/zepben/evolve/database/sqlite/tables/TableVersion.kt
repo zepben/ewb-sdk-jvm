@@ -14,7 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 @EverythingIsNonnullByDefault
 class TableVersion : SqliteTable() {
 
-    val SUPPORTED_VERSION = 41
+    val SUPPORTED_VERSION = 42
 
     val VERSION = Column(++columnIndex, "version", "TEXT", NOT_NULL)
 

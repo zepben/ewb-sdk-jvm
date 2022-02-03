@@ -12,6 +12,7 @@ import com.zepben.evolve.database.sqlite.upgrade.changesets.*
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.sql.Connection
 import java.sql.DriverManager.getConnection
@@ -22,6 +23,8 @@ class ChangeSetTest {
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     // Add a ChangeSetValidator here for the corresponding number when testing a new ChangeSet.
     // Please do not use TodoValidator for any new ChangeSets.
@@ -47,7 +50,8 @@ class ChangeSetTest {
         38 to ChangeSet38Validator,
         39 to ChangeSet39Validator,
         40 to ChangeSet40Validator,
-        41 to ChangeSet41Validator
+        41 to ChangeSet41Validator,
+        42 to ChangeSet42Validator
     )
 
     @Test
@@ -63,6 +67,7 @@ class ChangeSetTest {
                     val validator = changeSetValidators[cs.number]
                         ?: throw IllegalStateException("Validator for ${cs.number} missing. Have you added a ChangeSetValidator for your latest model update?")
 
+                    logger.info("Preparing for update ${cs.number}.")
                     validator.setUpStatements().forEach {
                         stmt.executeUpdate(it)
                     }
@@ -70,12 +75,15 @@ class ChangeSetTest {
                     stmt.executeUpdate("BEGIN TRANSACTION")
                     stmt.executeUpdate("PRAGMA foreign_keys=ON")
                     runner.runUpgrade(cs, stmt, versionUpdateStatement)
+
+                    logger.info("Populating after update ${cs.number}.")
                     validator.populateStatements().forEach {
                         stmt.executeUpdate(it)
                     }
                     stmt.executeUpdate("PRAGMA foreign_key_check")
                     stmt.executeUpdate("COMMIT")
 
+                    logger.info("Validating update ${cs.number}.")
                     validator.let { csv ->
                         csv.validate(stmt)
                         csv.tearDownStatements().forEach {

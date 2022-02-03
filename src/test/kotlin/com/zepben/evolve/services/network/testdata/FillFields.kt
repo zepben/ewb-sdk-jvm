@@ -799,9 +799,22 @@ fun EnergySource.fillFields(service: NetworkService, includeRuntime: Boolean = t
     r = 7.7
     r0 = 8.8
     rn = 9.9
-    x = 10.10
+    x = 10.01
     x0 = 11.11
-    xn = 12.12
+    xn = 12.21
+    isExternalGrid = true
+    rMin = 13.31
+    rnMin = 14.41
+    r0Min = 15.51
+    xMin = 16.61
+    xnMin = 17.71
+    x0Min = 18.81
+    rMax = 19.91
+    rnMax = 20.02
+    r0Max = 21.12
+    xMax = 22.22
+    xnMax = 23.32
+    x0Max = 24.42
 
     return this
 }

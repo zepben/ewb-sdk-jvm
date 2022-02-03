@@ -17,9 +17,9 @@ object ChangeSet23Validator : ChangeSetValidator {
     override fun setUpStatements(): List<String> = listOf(
         """
         INSERT INTO power_transformers (
-            mrid, name, description, num_diagram_objects, location_mrid, num_controls, num_measurements, normally_in_service, in_service, base_voltage_mrid, vector_group
+            mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, base_voltage_mrid, vector_group
         ) VALUES (
-            'id', 'name', 'desc', 1, 'loc', 2, 3, true, true, 'bv', 'Dyn11'
+            'id', 'name', 'desc', 1, 'loc', 2, true, true, 'bv', 'Dyn11'
         )
         """
     )
@@ -35,7 +35,6 @@ object ChangeSet23Validator : ChangeSetValidator {
                 assertThat(rs.getInt("num_diagram_objects"), equalTo(1))
                 assertThat(rs.getString("location_mrid"), equalTo("loc"))
                 assertThat(rs.getInt("num_controls"), equalTo(2))
-                assertThat(rs.getInt("num_measurements"), equalTo(3))
                 assertThat(rs.getBoolean("normally_in_service"), equalTo(true))
                 assertThat(rs.getBoolean("in_service"), equalTo(true))
                 assertThat(rs.getString("base_voltage_mrid"), equalTo("bv"))

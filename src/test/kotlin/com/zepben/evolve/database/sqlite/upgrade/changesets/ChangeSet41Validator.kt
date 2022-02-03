@@ -14,6 +14,7 @@ import java.sql.ResultSet
 import java.sql.Statement
 
 object ChangeSet41Validator : ChangeSetValidator {
+
     override fun setUpStatements(): List<String> = listOf(
         insertExistingLocationStreetAddress("loc1")
     )

@@ -11,13 +11,18 @@ import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
 
 internal fun changeSet41() = ChangeSet(41) {
     listOf(
-        "ALTER TABLE location_street_addresses ADD po_box TEXT DEFAULT NULL",
-        "ALTER TABLE location_street_addresses ADD building_name TEXT DEFAULT NULL",
-        "ALTER TABLE location_street_addresses ADD floor_identification TEXT DEFAULT NULL",
-        "ALTER TABLE location_street_addresses ADD name TEXT DEFAULT NULL",
-        "ALTER TABLE location_street_addresses ADD number TEXT DEFAULT NULL",
-        "ALTER TABLE location_street_addresses ADD suite_number TEXT DEFAULT NULL",
-        "ALTER TABLE location_street_addresses ADD type TEXT DEFAULT NULL",
-        "ALTER TABLE location_street_addresses ADD display_address TEXT DEFAULT NULL",
+        *`Add location street address fields`
     )
 }
+
+@Suppress("ObjectPropertyName")
+private val `Add location street address fields` = arrayOf(
+    "ALTER TABLE location_street_addresses ADD po_box TEXT DEFAULT NULL",
+    "ALTER TABLE location_street_addresses ADD building_name TEXT DEFAULT NULL",
+    "ALTER TABLE location_street_addresses ADD floor_identification TEXT DEFAULT NULL",
+    "ALTER TABLE location_street_addresses ADD name TEXT DEFAULT NULL",
+    "ALTER TABLE location_street_addresses ADD number TEXT DEFAULT NULL",
+    "ALTER TABLE location_street_addresses ADD suite_number TEXT DEFAULT NULL",
+    "ALTER TABLE location_street_addresses ADD type TEXT DEFAULT NULL",
+    "ALTER TABLE location_street_addresses ADD display_address TEXT DEFAULT NULL",
+)

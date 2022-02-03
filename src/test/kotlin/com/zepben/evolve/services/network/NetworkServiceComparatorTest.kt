@@ -9,7 +9,10 @@ package com.zepben.evolve.services.network
 
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
-import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.common.Location
+import com.zepben.evolve.cim.iec61968.common.PositionPoint
+import com.zepben.evolve.cim.iec61968.common.StreetAddress
+import com.zepben.evolve.cim.iec61968.common.TownDetail
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -748,6 +751,20 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(EnergySource::x, { EnergySource(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(EnergySource::x0, { EnergySource(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(EnergySource::xn, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::isExternalGrid, { EnergySource(it) }, { false }, { true })
+        comparatorValidator.validateProperty(EnergySource::rMin, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::rnMin, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::r0Min, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::xMin, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::xnMin, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::x0Min, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::rMax, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::rnMax, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::r0Max, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::xMax, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::xnMax, { EnergySource(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(EnergySource::x0Max, { EnergySource(it) }, { 1.0 }, { 2.0 })
+
         comparatorValidator.validateCollection(
             EnergySource::phases,
             EnergySource::addPhase,

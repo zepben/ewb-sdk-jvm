@@ -89,7 +89,7 @@ class NetworkModelTestUtil {
                 .apply {
                     this.name = name
                 }.also {
-                    phases.singlePhases().forEach { phase ->
+                    phases.singlePhases.forEach { phase ->
                         val energySourcePhase = EnergySourcePhase().apply { this.phase = phase; energySource = it; it.addPhase(this) }
                         assertThat(network.add(energySourcePhase), equalTo(true))
                         it.addPhase(energySourcePhase)

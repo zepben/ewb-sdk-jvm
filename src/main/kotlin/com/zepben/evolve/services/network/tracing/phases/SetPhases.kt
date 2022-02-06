@@ -116,7 +116,7 @@ class SetPhases {
     }
 
     private fun runTerminal(start: Terminal, traversal: BranchRecursiveTraversal<Terminal>, phaseSelector: PhaseSelector) {
-        val phasesToFlow = start.phases.singlePhases()
+        val phasesToFlow = start.phases.singlePhases
             .stream()
             .filter { phase -> phaseSelector.status(start, phase).direction.has(FeederDirection.DOWNSTREAM) }
             .collect(Collectors.toSet())
@@ -166,7 +166,7 @@ class SetPhases {
         flowThroughFeederCbAndQueue(statuses[1], statuses[0], traversal, phaseSelector, delayedFeederTraces, processedPhases)
 
         val nominalPhases = mutableSetOf<SinglePhaseKind>()
-        feederCb.terminals.forEach { terminal -> nominalPhases.addAll(terminal.phases.singlePhases()) }
+        feederCb.terminals.forEach { terminal -> nominalPhases.addAll(terminal.phases.singlePhases) }
 
         return when {
             processedPhases.size == nominalPhases.size -> FeederProcessingStatus.COMPLETE
@@ -187,7 +187,7 @@ class SetPhases {
         energySource.phases.forEach { energySourcePhases.add(it.phase) }
 
         val nominalPhases = mutableSetOf<SinglePhaseKind>()
-        energySource.terminals.forEach { terminal -> nominalPhases.addAll(terminal.phases.singlePhases()) }
+        energySource.terminals.forEach { terminal -> nominalPhases.addAll(terminal.phases.singlePhases) }
 
         if (energySourcePhases.size != nominalPhases.size) {
             logger.warn(
@@ -197,7 +197,7 @@ class SetPhases {
         }
 
         energySource.terminals.forEach { terminal ->
-            terminal.phases.singlePhases().forEach { phase ->
+            terminal.phases.singlePhases.forEach { phase ->
                 terminal.normalPhases(phase).add(phase, FeederDirection.DOWNSTREAM)
                 terminal.currentPhases(phase).add(phase, FeederDirection.DOWNSTREAM)
             }
@@ -231,7 +231,7 @@ class SetPhases {
             return
 
         val phasesToFlow = inTerminal.phasesToFlow.toMutableSet()
-        for (phase in inTerminal.terminal.phases.singlePhases()) {
+        for (phase in inTerminal.terminal.phases.singlePhases) {
             if (inTerminal.inPhases.contains(phase)) {
                 processedPhases.add(phase)
 
@@ -318,7 +318,7 @@ class SetPhases {
 
         val conductingEquipment: ConductingEquipment = terminal.conductingEquipment ?: return phasesToFlow
 
-        for (phase in terminal.phases.singlePhases()) {
+        for (phase in terminal.phases.singlePhases) {
             if (!openTest.isOpen(conductingEquipment, phase) && phaseSelector.status(terminal, phase).direction.has(FeederDirection.UPSTREAM))
                 phasesToFlow.add(phase)
         }
@@ -333,7 +333,7 @@ class SetPhases {
             val status = FeederCbTerminalPhasesByStatus(terminal)
             results.add(status)
 
-            terminal.phases.singlePhases().forEach {
+            terminal.phases.singlePhases.forEach {
                 val phaseStatus = phaseSelector.status(terminal, it)
                 if (phaseStatus.direction === FeederDirection.UPSTREAM) {
                     status.addInPhase(it)

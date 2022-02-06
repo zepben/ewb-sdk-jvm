@@ -179,7 +179,7 @@ class CoreTraceTest {
         val start = n.get<ConductingEquipment>("node0")!!
 
         start.terminals.forEach { t ->
-            for (phase in t.phases.singlePhases()) {
+            for (phase in t.phases.singlePhases) {
                 t.normalPhases(phase).add(phase, FeederDirection.DOWNSTREAM)
                 t.currentPhases(phase).add(phase, FeederDirection.DOWNSTREAM)
             }

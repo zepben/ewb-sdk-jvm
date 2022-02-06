@@ -64,7 +64,7 @@ class PhaseInferrer {
     }
 
     private fun hasXYPhases(terminal: Terminal): Boolean {
-        return terminal.phases.singlePhases().contains(SinglePhaseKind.Y) || terminal.phases.singlePhases().contains(SinglePhaseKind.X)
+        return terminal.phases.singlePhases.contains(SinglePhaseKind.Y) || terminal.phases.singlePhases.contains(SinglePhaseKind.X)
     }
 
     private fun findTerminalAtStartOfMissingPhases(terminals: List<Terminal>, phaseSelector: PhaseSelector): List<Terminal> {
@@ -73,14 +73,14 @@ class PhaseInferrer {
                 hasDirectionOf(FeederDirection.NONE, terminal, phaseSelector) &&
                     terminal.connectivityNode?.terminals
                         ?.filter { other -> other != terminal }
-                        ?.filter { other -> !other.phases.singlePhases().containsAll(terminal.phases.singlePhases()) }
+                        ?.filter { other -> !other.phases.singlePhases.containsAll(terminal.phases.singlePhases) }
                         ?.any { other -> hasDirectionOf(FeederDirection.DOWNSTREAM, other, phaseSelector) }
                     ?: false
             }
     }
 
     private fun hasDirectionOf(expectedDirection: FeederDirection, terminal: Terminal, phaseSelector: PhaseSelector): Boolean {
-        return terminal.phases.singlePhases()
+        return terminal.phases.singlePhases
             .any {
                 phaseSelector.status(terminal, it).direction.has(expectedDirection)
             }
@@ -89,7 +89,7 @@ class PhaseInferrer {
     private fun setMissingToNominal(breakers: List<Breaker>, terminals: List<Terminal>, phaseSelector: PhaseSelector): Boolean {
         val terminalsToTrace = mutableSetOf<Terminal>()
         terminals.forEach { terminal ->
-            terminal.phases.singlePhases().forEach { nominalPhase ->
+            terminal.phases.singlePhases.forEach { nominalPhase ->
                 val status = phaseSelector.status(terminal, nominalPhase)
                 if (status.direction === FeederDirection.NONE) {
                     if (nominalPhase != SinglePhaseKind.X && nominalPhase != SinglePhaseKind.Y) {
@@ -116,7 +116,7 @@ class PhaseInferrer {
 
         val conductingEquipment = terminal.conductingEquipment ?: return
 
-        terminal.phases.singlePhases().forEach {
+        terminal.phases.singlePhases.forEach {
             val status = phaseSelector.status(terminal, it)
             if (status.direction === FeederDirection.NONE)
                 none.add(status)

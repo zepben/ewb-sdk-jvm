@@ -31,6 +31,8 @@ import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.spy
 import java.util.function.Function
 
 class SetPhasesTest {
@@ -141,7 +143,7 @@ class SetPhasesTest {
         assertThat(n.connect(getT(n, "n4", 1), getT(n, "c4", 2)), equalTo(true))
 
         n0.terminals.forEach { t ->
-            for (phase in t.phases.singlePhases()) {
+            for (phase in t.phases.singlePhases) {
                 t.normalPhases(phase).add(A, DOWNSTREAM)
                 t.currentPhases(phase).add(A, DOWNSTREAM)
             }
@@ -182,7 +184,7 @@ class SetPhasesTest {
                 addTerminals(2, PhaseCode.ABCN)
                 setOpen(isOpen = open)
                 for (i in normallyOpen.indices)
-                    setNormallyOpen(normallyOpen[i], PhaseCode.ABCN.singlePhases()[i])
+                    setNormallyOpen(normallyOpen[i], PhaseCode.ABCN.singlePhases[i])
                 addContainer(Substation())
                 assertThat(this.isSubstationBreaker, equalTo(true))
             }
@@ -449,9 +451,9 @@ class SetPhasesTest {
 
         val network = builder.build()
 
-        PhaseValidator.validatePhases(network, "c1", A, B)
-        PhaseValidator.validatePhases(network, "c2", A, B)
-        PhaseValidator.validatePhases(network, "c3", A, B)
+        PhaseValidator.validatePhases(network, "c1", A, C)
+        PhaseValidator.validatePhases(network, "c2", A, C)
+        PhaseValidator.validatePhases(network, "c3", A, C)
     }
 
     @Test
@@ -463,6 +465,58 @@ class SetPhasesTest {
             builder.to(PhaseCode.XY)
 
         assertThat(builder.build(), notNullValue())
+    }
+
+    //
+    // s0 * 1----2 * 1----2 * 1----2 * 1----2 * 1----2 * 1----2 *
+    //        c1       c2       c3       c4   2   c5   1   c9
+    // ABC    ABC      XY       ABC      ABC  |   ABC  |   ABC
+    //                                     c8 |     c6 |
+    //                                     ABC|     ABC|
+    //                                        1        2
+    //                                        * 2----1 *
+    //                                            c7
+    //                                            XY
+    //
+    //todo
+    @Disabled
+    @Test
+    internal fun validateDirectionsWithDroppedPhasesLoop() {
+        val builder = PhasesTestNetwork
+            .from(PhaseCode.ABC) // s0
+            .to(PhaseCode.ABC) // c1
+            .to(PhaseCode.XY) // c2
+            .to(PhaseCode.ABC) // c3
+            .to(PhaseCode.ABC) // c4
+            .to(PhaseCode.ABC) // c5
+            .to(PhaseCode.ABC) // c6
+            .to(PhaseCode.XY) // c7
+            .to(PhaseCode.ABC) // c8
+            .splitFromTo("c5", PhaseCode.ABC) // c9
+
+        // Create a loop
+        builder.network.connect(
+            builder.network.get<ConductingEquipment>("c4")!!.getTerminal(2)!!,
+            builder.network.get<ConductingEquipment>("c8")!!.getTerminal(2)!!
+        )
+
+        val network = builder.build()
+
+        Tracing.phaseInferrer().run(spy(network).also { ns ->
+            doReturn(listOf(network["c6-t2"]!!, *network.listOf<Terminal> { it.mRID != "c6-t2" }.toTypedArray()))
+                .`when`(ns)
+                .listOf(Terminal::class.java)
+        })
+
+        PhaseValidator.validatePhaseDirections(network, "c1", UPSTREAM, DOWNSTREAM)
+        PhaseValidator.validatePhaseDirections(network, "c2", UPSTREAM, DOWNSTREAM)
+        PhaseValidator.validatePhaseDirections(network, "c3", UPSTREAM, DOWNSTREAM)
+        PhaseValidator.validatePhaseDirections(network, "c4", UPSTREAM, DOWNSTREAM)
+        PhaseValidator.validatePhaseDirections(network, "c5", BOTH, BOTH)
+        PhaseValidator.validatePhaseDirections(network, "c6", BOTH, BOTH)
+        PhaseValidator.validatePhaseDirections(network, "c7", BOTH, BOTH)
+        PhaseValidator.validatePhaseDirections(network, "c8", BOTH, BOTH)
+        PhaseValidator.validatePhaseDirections(network, "c9", UPSTREAM, DOWNSTREAM)
     }
 
     private fun doSetPhasesTrace(n: NetworkService) {
@@ -508,9 +562,9 @@ class SetPhasesTest {
     ) {
         assertThat(t, notNullValue())
         assertThat(directions.size, equalTo(singlePhaseKinds.size))
-        assertThat(t!!.phases.singlePhases().size, equalTo(singlePhaseKinds.size))
+        assertThat(t!!.phases.singlePhases.size, equalTo(singlePhaseKinds.size))
         for (i in singlePhaseKinds.indices) {
-            val ps = phaseStatusSelector.apply(t.phases.singlePhases()[i])
+            val ps = phaseStatusSelector.apply(t.phases.singlePhases[i])
             assertThat(ps.phase, equalTo(singlePhaseKinds[i]))
             assertThat(ps.direction, equalTo(directions[i]))
         }

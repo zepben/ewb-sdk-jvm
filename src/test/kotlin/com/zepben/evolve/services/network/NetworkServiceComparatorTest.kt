@@ -464,7 +464,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         val createAbcnTerminal = { id: String -> Terminal(id).apply { phases = PhaseCode.ABCN } }
         val initTracedPhases = { _: Terminal, tracedPhases: TracedPhases ->
-            PhaseCode.ABCN.singlePhases().forEach {
+            PhaseCode.ABCN.singlePhases.forEach {
                 tracedPhases.setNormal(it, FeederDirection.BOTH, it)
                 tracedPhases.setCurrent(it, FeederDirection.BOTH, it)
             }
@@ -977,12 +977,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         val difference = ObjectDifference(closedSwitch, openSwitch).apply {
             differences["isNormallyOpen"] = ValueDifference(
-                PhaseCode.ABCN.singlePhases().associateWith { false },
-                PhaseCode.ABCN.singlePhases().associateWith { true })
+                PhaseCode.ABCN.singlePhases.associateWith { false },
+                PhaseCode.ABCN.singlePhases.associateWith { true })
 
             differences["isOpen"] = ValueDifference(
-                PhaseCode.ABCN.singlePhases().associateWith { true },
-                PhaseCode.ABCN.singlePhases().associateWith { false })
+                PhaseCode.ABCN.singlePhases.associateWith { true },
+                PhaseCode.ABCN.singlePhases.associateWith { false })
         }
 
         comparatorValidator.validateCompare(closedSwitch, openSwitch, expectModification = difference)

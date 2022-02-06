@@ -445,12 +445,12 @@ internal class NetworkServiceTest {
         assertThat(network[mRID], equalTo(first))
     }
 
-    private fun PhaseCode.toSet(): Set<SinglePhaseKind> = singlePhases().toSet()
+    private fun PhaseCode.toSet(): Set<SinglePhaseKind> = singlePhases.toSet()
 
     private class PhasePathSet private constructor(private val fromPhases: PhaseCode) {
         fun to(toPhases: PhaseCode): Set<NominalPhasePath> {
-            return IntStream.range(0, fromPhases.singlePhases().size)
-                .mapToObj { i: Int -> NominalPhasePath(fromPhases.singlePhases()[i], toPhases.singlePhases()[i]) }
+            return IntStream.range(0, fromPhases.singlePhases.size)
+                .mapToObj { i: Int -> NominalPhasePath(fromPhases.singlePhases[i], toPhases.singlePhases[i]) }
                 .collect(Collectors.toSet())
         }
 
@@ -459,7 +459,7 @@ internal class NetworkServiceTest {
                 return PhasePathSet(fromPhases)
             }
 
-            fun implicit(phases: PhaseCode) = phases.singlePhases()
+            fun implicit(phases: PhaseCode) = phases.singlePhases
                 .asSequence()
                 .map { NominalPhasePath(it, it) }
                 .toSet()

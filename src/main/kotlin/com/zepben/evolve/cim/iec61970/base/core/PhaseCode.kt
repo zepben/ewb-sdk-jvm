@@ -81,7 +81,7 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
     s2(SinglePhaseKind.s2),
     s2N(SinglePhaseKind.s2, SinglePhaseKind.N);
 
-    private val singlePhases: List<SinglePhaseKind> = singlePhases.asList().asUnmodifiable()
+    val singlePhases: List<SinglePhaseKind> = singlePhases.asList().asUnmodifiable()
 
     fun numPhases(): Int {
         return when (this) {
@@ -90,19 +90,17 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
         }
     }
 
-    fun singlePhases(): List<SinglePhaseKind> {
-        return singlePhases
-    }
-
     fun withoutNeutral(): PhaseCode {
-        return if (!singlePhases().contains(SinglePhaseKind.N))
+        return if (!singlePhases.contains(SinglePhaseKind.N))
             this
         else
-            fromSinglePhases(singlePhases().filter { it != SinglePhaseKind.N })
+            fromSinglePhases(singlePhases.filter { it != SinglePhaseKind.N })
     }
 
+    operator fun contains(phase: SinglePhaseKind): Boolean = singlePhases.contains(phase)
+
     init {
-        byPhases[singlePhases().toSet()] = this
+        byPhases[singlePhases.toSet()] = this
     }
 
     companion object {

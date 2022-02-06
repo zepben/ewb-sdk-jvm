@@ -19,7 +19,7 @@ import org.hamcrest.Matchers.equalTo
 object PhaseValidator {
 
     fun validatePhases(network: NetworkService, id: String, phaseCode: PhaseCode) {
-        validatePhases(network, id, *phaseCode.singlePhases().toTypedArray())
+        validatePhases(network, id, *phaseCode.singlePhases.toTypedArray())
     }
 
     fun validatePhases(network: NetworkService, id: String, vararg expectedPhases: SinglePhaseKind) {
@@ -27,7 +27,7 @@ object PhaseValidator {
     }
 
     fun validatePhases(network: NetworkService, id: String, expectedPhasesT1: PhaseCode, expectedPhasesT2: PhaseCode) {
-        validatePhases(network, id, expectedPhasesT1.singlePhases(), expectedPhasesT2.singlePhases())
+        validatePhases(network, id, expectedPhasesT1.singlePhases, expectedPhasesT2.singlePhases)
     }
 
     fun validatePhases(network: NetworkService, id: String, expectedPhasesT1: List<SinglePhaseKind>, expectedPhasesT2: List<SinglePhaseKind>) {
@@ -41,16 +41,35 @@ object PhaseValidator {
             return
 
         if ((expectedPhases.size == 1) && (expectedPhases[0] == SinglePhaseKind.NONE)) {
-            terminal.phases.singlePhases().forEach {
+            terminal.phases.singlePhases.forEach {
                 assertThat(terminal.normalPhases(it).phase, equalTo(SinglePhaseKind.NONE))
             }
         } else {
             assertThat(terminal.phases.numPhases(), equalTo(expectedPhases.size))
 
             for (index in expectedPhases.indices) {
-                val nominalPhase = terminal.phases.singlePhases()[index]
+                val nominalPhase = terminal.phases.singlePhases[index]
                 assertThat(terminal.normalPhases(nominalPhase).phase, equalTo(expectedPhases[index]))
             }
+        }
+    }
+
+    fun validatePhaseDirections(
+        network: NetworkService,
+        id: String,
+        expectedDirectionT1: FeederDirection,
+        expectedDirectionT2: FeederDirection? = null
+    ) {
+        val asset = network.get<ConductingEquipment>(id)!!
+        val t1 = asset.terminals[0]
+        val t2 = expectedDirectionT2?.let { asset.terminals[1] }
+
+        t1.phases.singlePhases.forEach {
+            assertThat("check $t1 phase $it", t1.normalPhases(it).direction, equalTo(expectedDirectionT1))
+        }
+
+        t2?.phases?.singlePhases?.forEach {
+            assertThat("check $t2 phase $it", t2.normalPhases(it).direction, equalTo(expectedDirectionT2))
         }
     }
 
@@ -66,14 +85,14 @@ object PhaseValidator {
 
         if (t1 != null) {
             for (index in expectedDirectionT1.indices) {
-                val nominalPhase = t1.phases.singlePhases()[index]
+                val nominalPhase = t1.phases.singlePhases[index]
                 assertThat(t1.normalPhases(nominalPhase).direction, equalTo(expectedDirectionT1[index]))
             }
         }
 
         if (t2 != null) {
             for (index in expectedDirectionT2.indices) {
-                val nominalPhase = t2.phases.singlePhases()[index]
+                val nominalPhase = t2.phases.singlePhases[index]
                 assertThat(t2.normalPhases(nominalPhase).direction, equalTo(expectedDirectionT2[index]))
             }
         }

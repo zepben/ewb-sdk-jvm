@@ -774,8 +774,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         }
 
     private fun compareOpenStatus(source: Switch, target: Switch, openTest: (Switch, SinglePhaseKind) -> Boolean): ValueDifference? {
-        val sourceStatus = PhaseCode.ABCN.singlePhases().associateWith { openTest(source, it) }
-        val targetStatus = PhaseCode.ABCN.singlePhases().associateWith { openTest(target, it) }
+        val sourceStatus = PhaseCode.ABCN.singlePhases.associateWith { openTest(source, it) }
+        val targetStatus = PhaseCode.ABCN.singlePhases.associateWith { openTest(target, it) }
 
         return if (sourceStatus != targetStatus) {
             ValueDifference(sourceStatus, targetStatus)

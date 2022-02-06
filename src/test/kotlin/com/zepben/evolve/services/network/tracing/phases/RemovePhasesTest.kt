@@ -54,7 +54,7 @@ class RemovePhasesTest {
         PhaseLogger.trace(n["node0"])
         validateDirectionsSelected(n, DOWNSTREAM, BOTH, UPSTREAM, BOTH)
 
-        Tracing.removePhases().run(n.get<ConductingEquipment>("node1")!!, PhaseCode.AB.singlePhases().toSet())
+        Tracing.removePhases().run(n.get<ConductingEquipment>("node1")!!, PhaseCode.AB.singlePhases.toSet())
         PhaseLogger.trace(n["node0"])
         validateDirectionsSelected(n, NONE, DOWNSTREAM, NONE, UPSTREAM)
     }
@@ -122,7 +122,7 @@ class RemovePhasesTest {
         val downAndNone = listOf(DOWNSTREAM, NONE)
         val noneAndNone = listOf(NONE, NONE)
 
-        Tracing.removePhases().run(n.get<ConductingEquipment>("n1")!!, PhaseCode.AB.singlePhases().toSet())
+        Tracing.removePhases().run(n.get<ConductingEquipment>("n1")!!, PhaseCode.AB.singlePhases.toSet())
         PhaseLogger.trace(n["n1"])
 
         validateDirection(n, "n1", 1, upAndUp)
@@ -139,7 +139,7 @@ class RemovePhasesTest {
         validateDirection(n, "c4", 1, upAndUp)
         validateDirection(n, "c4", 2, downAndDown)
 
-        Tracing.removePhases().run(n.get<ConductingEquipment>("n2")!!, PhaseCode.AB.singlePhases().toSet())
+        Tracing.removePhases().run(n.get<ConductingEquipment>("n2")!!, PhaseCode.AB.singlePhases.toSet())
         PhaseLogger.trace(n["n1"])
 
         validateDirection(n, "n1", 1, upAndNone)
@@ -156,7 +156,7 @@ class RemovePhasesTest {
         validateDirection(n, "c4", 1, upAndNone)
         validateDirection(n, "c4", 2, downAndNone)
 
-        Tracing.removePhases().run(n.get<ConductingEquipment>("n3")!!, PhaseCode.A.singlePhases().toSet())
+        Tracing.removePhases().run(n.get<ConductingEquipment>("n3")!!, PhaseCode.A.singlePhases.toSet())
         PhaseLogger.trace(n["n1"])
 
         validateDirection(n, "n1", 1, noneAndNone)
@@ -175,7 +175,7 @@ class RemovePhasesTest {
 
         n = SinglePhaseJunctionNetwork.create()
 
-        Tracing.removePhases().run(n.get<ConductingEquipment>("c1")!!, PhaseCode.AB.singlePhases().toSet())
+        Tracing.removePhases().run(n.get<ConductingEquipment>("c1")!!, PhaseCode.AB.singlePhases.toSet())
         PhaseLogger.trace(n["n1"])
 
         validateDirection(n, "n1", 1, downAndDown)
@@ -192,7 +192,7 @@ class RemovePhasesTest {
         validateDirection(n, "c4", 1, upAndUp)
         validateDirection(n, "c4", 2, downAndDown)
 
-        Tracing.removePhases().run(n.get<ConductingEquipment>("c2")!!, PhaseCode.AB.singlePhases().toSet())
+        Tracing.removePhases().run(n.get<ConductingEquipment>("c2")!!, PhaseCode.AB.singlePhases.toSet())
         PhaseLogger.trace(n["n1"])
 
         validateDirection(n, "n1", 1, downAndDown)
@@ -209,7 +209,7 @@ class RemovePhasesTest {
         validateDirection(n, "c4", 1, upAndNone)
         validateDirection(n, "c4", 2, downAndNone)
 
-        Tracing.removePhases().run(n.get<ConductingEquipment>("c3")!!, PhaseCode.A.singlePhases().toSet())
+        Tracing.removePhases().run(n.get<ConductingEquipment>("c3")!!, PhaseCode.A.singlePhases.toSet())
         PhaseLogger.trace(n["n1"])
 
         validateDirection(n, "n1", 1, downAndDown)
@@ -278,7 +278,7 @@ class RemovePhasesTest {
     private fun validateDirection(network: NetworkService, id: String, terminalNo: Int, expectedDirections: List<FeederDirection>) {
         val terminal: Terminal = network.get<ConductingEquipment>(id)!!.getTerminal(terminalNo)!!
         for (index in expectedDirections.indices) MatcherAssert.assertThat(
-            terminal.normalPhases(terminal.phases.singlePhases()[index]).direction,
+            terminal.normalPhases(terminal.phases.singlePhases[index]).direction,
             Matchers.equalTo(expectedDirections[index])
         )
     }

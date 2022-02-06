@@ -139,7 +139,7 @@ object PhaseTrace {
     ) {
         val conductingEquipment = Objects.requireNonNull(terminal.conductingEquipment)!!
         for (phase in candidatePhases) {
-            if (terminal.phases.singlePhases().contains(phase) && !openTest.isOpen(conductingEquipment, phase)) {
+            if (terminal.phases.singlePhases.contains(phase) && !openTest.isOpen(conductingEquipment, phase)) {
                 if (activePhases.status(terminal, phase).direction.has(direction)) {
                     matchedPhases.add(phase)
                 }

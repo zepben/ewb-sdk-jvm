@@ -28,7 +28,7 @@ class PhaseSelectorTest {
     }
 
     private fun testPhaseSelector(t: Terminal, phaseSelector: PhaseSelector) {
-        PhaseCode.ABCN.singlePhases().forEach { phase ->
+        PhaseCode.ABCN.singlePhases.forEach { phase ->
             val ps = phaseSelector.status(t, phase)
 
             assertThat(ps.phase, equalTo(SinglePhaseKind.NONE))

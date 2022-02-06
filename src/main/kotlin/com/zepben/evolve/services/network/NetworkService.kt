@@ -30,9 +30,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
-import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
-import com.zepben.evolve.services.network.tracing.phases.XyPhaseStep
-import java.util.*
+import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivity
 import kotlin.reflect.KClass
 
 /**
@@ -430,165 +428,54 @@ class NetworkService : BaseService("network") {
     }
 
     companion object {
-        @JvmStatic
-        fun connectedEquipment(conductingEquipment: ConductingEquipment, phaseCode: PhaseCode): List<ConnectivityResult> {
-            return connectedEquipment(
-                conductingEquipment,
-                phaseCode.singlePhases().toSet()
-            )
-        }
 
+        /**
+         * Find the connected [ConductingEquipment] for each [Terminal] of [conductingEquipment] using only the phases of the specified [phaseCode].
+         *
+         * @param conductingEquipment The [ConductingEquipment] to process.
+         * @param phaseCode The [PhaseCode] specifying which phases should be used for the connectivity check.
+         * @return A list of [ConnectivityResult] specifying the connections between [conductingEquipment] and the connected [ConductingEquipment]
+         */
         @JvmStatic
-        @JvmOverloads
-        fun connectedEquipment(conductingEquipment: ConductingEquipment, phases: Set<SinglePhaseKind>? = null): List<ConnectivityResult> {
-            val results = mutableListOf<ConnectivityResult>()
-            conductingEquipment.terminals.forEach { terminal ->
-                results.addAll(connectedTerminals(terminal, phases ?: terminal.phases.singlePhases()))
-            }
-            return results
-        }
+        fun connectedEquipment(conductingEquipment: ConductingEquipment, phaseCode: PhaseCode): List<ConnectivityResult> =
+            connectedEquipment(conductingEquipment, phaseCode.singlePhases.toSet())
 
-        @JvmStatic
-        fun connectedTerminals(terminal: Terminal, phaseCode: PhaseCode): List<ConnectivityResult> {
-            return connectedTerminals(terminal, phaseCode.singlePhases())
-        }
-
+        /**
+         * Find the connected [ConductingEquipment] for each [Terminal] of [conductingEquipment] using only the specified [phases].
+         *
+         * @param conductingEquipment The [ConductingEquipment] to process.
+         * @param phases A collection of [SinglePhaseKind] specifying which phases should be used for the connectivity check. If omitted,
+         *               all valid phases will be used.
+         * @return A list of [ConnectivityResult] specifying the connections between [conductingEquipment] and the connected [ConductingEquipment]
+         */
         @JvmStatic
         @JvmOverloads
-        fun connectedTerminals(terminal: Terminal, phases: Iterable<SinglePhaseKind> = terminal.phases.singlePhases()): List<ConnectivityResult> {
-            val tracePhases = phases.intersect(terminal.phases.singlePhases())
-            val connectivityNode = terminal.connectivityNode ?: return emptyList()
+        fun connectedEquipment(conductingEquipment: ConductingEquipment, phases: Set<SinglePhaseKind>? = null): List<ConnectivityResult> =
+            conductingEquipment.terminals.flatMap { connectedTerminals(it, phases ?: it.phases.singlePhases) }
 
-            val results = mutableListOf<ConnectivityResult>()
-            connectivityNode.terminals.forEach { connectedTerminal ->
-                if (connectedTerminal != terminal) {
-                    val cr = terminalConnectivity(terminal, connectedTerminal, tracePhases)
-                    if (cr.nominalPhasePaths.isNotEmpty())
-                        results.add(cr)
-                }
-            }
-            return results
-        }
+        /**
+         * Find the connected [Terminal]s for the specified [terminal] using only the phases of the specified [phaseCode].
+         *
+         * @param terminal The [Terminal] to process.
+         * @param phaseCode The [PhaseCode] specifying which phases should be used for the connectivity check.
+         * @return A list of [ConnectivityResult] specifying the connections between [terminal] and the connected [Terminal]s
+         */
+        @JvmStatic
+        fun connectedTerminals(terminal: Terminal, phaseCode: PhaseCode): List<ConnectivityResult> =
+            connectedTerminals(terminal, phaseCode.singlePhases)
 
-        private fun terminalConnectivity(terminal: Terminal, connectedTerminal: Terminal, phases: Set<SinglePhaseKind>): ConnectivityResult {
-            val nominalPhasePaths = mutableListOf<NominalPhasePath>()
-            phases
-                .asSequence()
-                .filter { connectedTerminal.phases.singlePhases().contains(it) }
-                .forEach { nominalPhasePaths.add(NominalPhasePath(it, it)) }
-
-            if (nominalPhasePaths.isEmpty() || (nominalPhasePaths.size == 1 && nominalPhasePaths.all { it.from == SinglePhaseKind.N && it.to == SinglePhaseKind.N })) {
-                val xyPhases = terminal.phases.singlePhases()
-                    .asSequence()
-                    .filter { (it == SinglePhaseKind.X) || (it == SinglePhaseKind.Y) }
-                    .toList()
-
-                val connectedXyPhases = connectedTerminal.phases.singlePhases()
-                    .asSequence()
-                    .filter { (it == SinglePhaseKind.X) || (it == SinglePhaseKind.Y) }
-                    .toList()
-
-                tryProcessXyPhases(
-                    terminal,
-                    connectedTerminal,
-                    phases,
-                    xyPhases,
-                    connectedXyPhases,
-                    nominalPhasePaths
-                )
-            }
-
-            return ConnectivityResult.between(terminal, connectedTerminal, nominalPhasePaths)
-        }
-
-        private fun tryProcessXyPhases(
-            terminal: Terminal,
-            connectedTerminal: Terminal,
-            phases: Set<SinglePhaseKind>,
-            xyPhases: List<SinglePhaseKind>,
-            connectedXyPhases: List<SinglePhaseKind>,
-            nominalPhasePaths: MutableList<NominalPhasePath>
-        ) {
-            if ((xyPhases.isEmpty() && connectedXyPhases.isEmpty()) || (xyPhases.isNotEmpty() && connectedXyPhases.isNotEmpty()))
-                return
-
-            if (xyPhases.isNotEmpty()) {
-                if (xyPhases.size == connectedTerminal.phases.numPhases()) {
-                    for (index in xyPhases.indices) {
-                        val phase = xyPhases[index]
-                        if (phases.contains(phase))
-                            nominalPhasePaths.add(NominalPhasePath(phase, connectedTerminal.phases.singlePhases()[index]))
-                    }
-                    return
-                } else {
-                    for (index in xyPhases.indices) {
-                        val phase = xyPhases[index]
-                        if (phases.contains(phase)) {
-                            val usePhase = terminal.tracedPhases.phaseNormal(phase).let { if (it == SinglePhaseKind.NONE) phase else it }
-                            nominalPhasePaths.add(NominalPhasePath(phase, usePhase))
-                        }
-                    }
-                    return
-                }
-            } else {
-                if (connectedXyPhases.size == terminal.phases.numPhases()) {
-                    for (index in connectedXyPhases.indices) {
-                        val phase = terminal.phases.singlePhases()[index]
-                        if (phases.contains(phase))
-                            nominalPhasePaths.add(NominalPhasePath(phase, connectedXyPhases[index]))
-                    }
-                    return
-                } else {
-                    val downstreamPhases = getFirstKnownPhases(connectedTerminal, connectedTerminal.phases.withoutNeutral()) ?: terminal.phases.withoutNeutral()
-                    for (index in downstreamPhases.singlePhases().indices) {
-                        val phase = downstreamPhases.singlePhases()[index]
-                        if (phases.contains(phase) && (index < connectedXyPhases.size))
-                            nominalPhasePaths.add(NominalPhasePath(phase, connectedXyPhases[index]))
-                    }
-                }
-            }
-        }
-
-        private fun getFirstKnownPhases(terminal: Terminal, tracePhaseCode: PhaseCode): PhaseCode? {
-            val queue = LinkedList(listOf(XyPhaseStep(terminal, tracePhaseCode)))
-            val candidatePhases = mutableSetOf<SinglePhaseKind>()
-            val visited = mutableSetOf<XyPhaseStep>()
-
-            while (queue.isNotEmpty())
-                getFirstKnownPhases(queue.poll(), visited, queue, candidatePhases)
-
-            val candidate = PhaseCode.fromSinglePhases(candidatePhases)
-            return if (tracePhaseCode.numPhases() == candidate.numPhases())
-                candidate
-            else
-                null
-        }
-
-        private fun getFirstKnownPhases(
-            step: XyPhaseStep,
-            visited: MutableSet<XyPhaseStep>,
-            queue: Queue<XyPhaseStep>,
-            candidatePhases: MutableSet<SinglePhaseKind>
-        ) {
-            if (!visited.add(step))
-                return
-
-            val withoutNeutral = step.terminal.phases.withoutNeutral()
-            when {
-                withoutNeutral == step.phaseCode -> queueNext(step, queue, withoutNeutral)
-                step.phaseCode.singlePhases().containsAll(withoutNeutral.singlePhases()) -> queueNext(step, queue, withoutNeutral)
-                step.phaseCode.numPhases() >= withoutNeutral.numPhases() -> candidatePhases.addAll(withoutNeutral.singlePhases())
-            }
-        }
-
-        private fun queueNext(step: XyPhaseStep, queue: Queue<XyPhaseStep>, continueWith: PhaseCode) {
-            terminalsOnNextEquipment(step.terminal)
-                .forEach { queue.add(XyPhaseStep(it, continueWith)) }
-        }
-
-        private fun terminalsOnNextEquipment(terminal: Terminal): List<Terminal> = terminal.conductingEquipment?.terminals?.filter { it != terminal }
-            ?.flatMap { otherTerminal -> otherTerminal.connectivityNode?.terminals?.filter { ter -> ter != otherTerminal } ?: emptyList() }
-            ?: emptyList()
+        /**
+         * Find the connected [Terminal]s for the specified [terminal] using only the specified [phases].
+         *
+         * @param terminal The [Terminal] to process.
+         * @param phases A collection of [SinglePhaseKind] specifying which phases should be used for the connectivity check. If omitted,
+         *               all valid phases will be used.
+         * @return A list of [ConnectivityResult] specifying the connections between [terminal] and the connected [Terminal]s
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun connectedTerminals(terminal: Terminal, phases: Iterable<SinglePhaseKind> = terminal.phases.singlePhases): List<ConnectivityResult> =
+            TerminalConnectivity().connectedTerminals(terminal, phases)
 
     }
 

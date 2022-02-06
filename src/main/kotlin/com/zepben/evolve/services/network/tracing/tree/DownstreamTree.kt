@@ -49,7 +49,7 @@ class DownstreamTree(
     private fun getOutPhases(terminal: Terminal, outPhases: MutableSet<SinglePhaseKind>) {
         outPhases.clear()
         val conductingEquipment = terminal.conductingEquipment!!
-        for (phase in terminal.phases.singlePhases()) {
+        for (phase in terminal.phases.singlePhases) {
             if (!openTest.isOpen(conductingEquipment, phase)) {
                 if (phaseSelector.status(terminal, phase).direction.has(FeederDirection.DOWNSTREAM))
                     outPhases.add(phase)

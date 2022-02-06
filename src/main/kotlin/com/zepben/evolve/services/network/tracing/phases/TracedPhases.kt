@@ -173,8 +173,8 @@ data class TracedPhases(
         }
 
     override fun toString(): String {
-        val normal = PhaseCode.ABCN.singlePhases().joinToString(prefix = "{", postfix = "}") { "${phaseNormal(it)}:${directionNormal(it)}" }
-        val current = PhaseCode.ABCN.singlePhases().joinToString(prefix = "{", postfix = "}") { "${phaseCurrent(it)}:${directionCurrent(it)}" }
+        val normal = PhaseCode.ABCN.singlePhases.joinToString(prefix = "{", postfix = "}") { "${phaseNormal(it)}:${directionNormal(it)}" }
+        val current = PhaseCode.ABCN.singlePhases.joinToString(prefix = "{", postfix = "}") { "${phaseCurrent(it)}:${directionCurrent(it)}" }
         return "TracedPhases(normalStatus=$normal, currentStatus=$current)"
     }
 

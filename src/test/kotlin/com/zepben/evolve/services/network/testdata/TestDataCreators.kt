@@ -23,7 +23,7 @@ import org.hamcrest.Matchers
 
 fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode = PhaseCode.A): EnergySource =
     EnergySource(id).apply {
-        phaseCode.singlePhases().forEach { phase ->
+        phaseCode.singlePhases.forEach { phase ->
             EnergySourcePhase().also {
                 it.phase = phase
                 addPhase(it)
@@ -54,8 +54,8 @@ fun createSwitchForConnecting(
         createTerminals(network, this, numTerminals, nominalPhases)
 
         for (index in openStatus.indices) {
-            setNormallyOpen(openStatus[index], nominalPhases.singlePhases()[index])
-            setOpen(openStatus[index], nominalPhases.singlePhases()[index])
+            setNormallyOpen(openStatus[index], nominalPhases.singlePhases[index])
+            setOpen(openStatus[index], nominalPhases.singlePhases[index])
         }
 
         network.add(this)
@@ -140,7 +140,7 @@ fun createTerminals(network: NetworkService, condEq: ConductingEquipment, numTer
 }
 
 fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment?, phases: PhaseCode = PhaseCode.A, sequenceNumber: Int) =
-    conductingEquipment?.getTerminal(sequenceNumber) ?: Terminal().apply {
+    conductingEquipment?.getTerminal(sequenceNumber) ?: Terminal(conductingEquipment?.mRID?.let { "$it-t$sequenceNumber" } ?: "").apply {
         this.conductingEquipment = conductingEquipment
         this.phases = phases
         this.sequenceNumber = sequenceNumber

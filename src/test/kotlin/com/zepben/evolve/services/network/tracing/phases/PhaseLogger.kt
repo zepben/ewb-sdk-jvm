@@ -25,7 +25,7 @@ internal class PhaseLogger private constructor(asset: ConductingEquipment) : (Co
         a.terminals.forEach { t ->
             b.append("${a.mRID}-T${t.sequenceNumber}: ")
 
-            t.phases.singlePhases().forEach { phase ->
+            t.phases.singlePhases.forEach { phase ->
                 val nps = t.normalPhases(phase)
                 val cps = t.currentPhases(phase)
 

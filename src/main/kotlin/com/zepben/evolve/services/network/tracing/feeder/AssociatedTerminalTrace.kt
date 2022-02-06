@@ -60,7 +60,7 @@ internal object AssociatedTerminalTrace {
         return BasicTraversal.QueueNext { terminal, traversal ->
             terminal.conductingEquipment?.let { conductingEquipment ->
                 // Stop only if all phases are open.
-                if (terminal.phases.singlePhases().any { phase -> !openTest.isOpen(conductingEquipment, phase) }) {
+                if (terminal.phases.singlePhases.any { phase -> !openTest.isOpen(conductingEquipment, phase) }) {
                     conductingEquipment.terminals
                         .filter { it != terminal }
                         .forEach { queueAssociated(traversal, it) }

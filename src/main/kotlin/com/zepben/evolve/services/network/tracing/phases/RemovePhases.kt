@@ -51,7 +51,7 @@ class RemovePhases {
     }
 
     @JvmOverloads
-    fun run(terminal: Terminal, nominalPhasesToEbb: Set<SinglePhaseKind> = terminal.phases.singlePhases().toSet()) {
+    fun run(terminal: Terminal, nominalPhasesToEbb: Set<SinglePhaseKind> = terminal.phases.singlePhases.toSet()) {
         val start = EbbPhases(terminal, nominalPhasesToEbb)
 
         runFromOutTerminal(normalTraversal, start)

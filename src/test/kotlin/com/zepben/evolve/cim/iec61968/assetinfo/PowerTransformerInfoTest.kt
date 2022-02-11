@@ -12,9 +12,7 @@ import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.ResistanceReactanceTest
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.spy
@@ -55,7 +53,7 @@ internal class PowerTransformerInfoTest {
 
         ResistanceReactanceTest.validateResistanceReactance(txInfo.resistanceReactance(1)!!, 1.1, 1.2, 1.3, 1.4)
         ResistanceReactanceTest.validateResistanceReactance(txInfo.resistanceReactance(2)!!, 2.1, 2.2, 2.3, 2.4)
-        assertThat(txInfo.resistanceReactance(3), Matchers.nullValue())
+        assertThat(txInfo.resistanceReactance(3), nullValue())
     }
 
 }

@@ -9,8 +9,8 @@
 package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 

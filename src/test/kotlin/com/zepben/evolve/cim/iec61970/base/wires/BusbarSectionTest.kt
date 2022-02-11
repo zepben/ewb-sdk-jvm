@@ -10,8 +10,8 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -23,7 +23,7 @@ internal class BusbarSectionTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(BusbarSection().mRID, Matchers.not(equalTo("")))
+        assertThat(BusbarSection().mRID, not(equalTo("")))
         assertThat(BusbarSection("id").mRID, equalTo("id"))
     }
 

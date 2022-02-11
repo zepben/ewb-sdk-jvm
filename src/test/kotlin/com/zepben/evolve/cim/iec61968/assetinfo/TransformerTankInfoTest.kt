@@ -14,11 +14,8 @@ import com.zepben.evolve.services.network.ResistanceReactanceTest.Companion.vali
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.notNullValue
-import org.hamcrest.Matchers.nullValue
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.doReturn
@@ -32,8 +29,8 @@ internal class TransformerTankInfoTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(TransformerTankInfo().mRID, Matchers.not(CoreMatchers.equalTo("")))
-        assertThat(TransformerTankInfo("id").mRID, CoreMatchers.equalTo("id"))
+        assertThat(TransformerTankInfo().mRID, not(equalTo("")))
+        assertThat(TransformerTankInfo("id").mRID, equalTo("id"))
     }
 
     @Test

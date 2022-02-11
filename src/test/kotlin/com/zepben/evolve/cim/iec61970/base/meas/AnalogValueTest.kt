@@ -8,8 +8,9 @@
 package com.zepben.evolve.cim.iec61970.base.meas
 
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,14 +25,14 @@ internal class AnalogValueTest {
         val measValue = 2.3
         val measMRID = "measurement-mrid"
 
-        MatcherAssert.assertThat(mv.value, Matchers.`is`(0.0))
-        MatcherAssert.assertThat(mv.analogMRID, Matchers.nullValue())
+        assertThat(mv.value, equalTo(0.0))
+        assertThat(mv.analogMRID, nullValue())
 
         mv.apply {
             value = measValue
             analogMRID = measMRID
         }
-        MatcherAssert.assertThat(mv.value, Matchers.`is`(measValue))
-        MatcherAssert.assertThat(mv.analogMRID, Matchers.`is`(measMRID))
+        assertThat(mv.value, equalTo(measValue))
+        assertThat(mv.analogMRID, equalTo(measMRID))
     }
 }

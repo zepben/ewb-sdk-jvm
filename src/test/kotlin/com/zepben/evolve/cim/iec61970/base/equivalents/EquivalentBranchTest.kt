@@ -12,9 +12,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -26,7 +24,7 @@ internal class EquivalentBranchTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(EquivalentBranch().mRID, Matchers.not(equalTo("")))
+        assertThat(EquivalentBranch().mRID, not(equalTo("")))
         assertThat(EquivalentBranch("id").mRID, equalTo("id"))
     }
 

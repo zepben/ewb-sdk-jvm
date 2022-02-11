@@ -18,8 +18,7 @@ import com.zepben.evolve.services.diagram.DiagramServiceComparator
 import com.zepben.evolve.services.diagram.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.anEmptyMap
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.fail
@@ -51,8 +50,8 @@ internal class DiagramTranslatorTest {
 
         val cim = DiagramService().addFromPb(pb)
 
-        assertThat(cim.name, Matchers.equalTo(pb.name))
-        assertThat(cim.description, Matchers.equalTo(pb.description))
+        assertThat(cim.name, equalTo(pb.name))
+        assertThat(cim.description, equalTo(pb.description))
     }
 
     @Test
@@ -64,8 +63,8 @@ internal class DiagramTranslatorTest {
         val nt = NameType("nt1 name")
         val cim = DiagramService().apply { addNameType(nt) }.addFromPb(pb)
 
-        assertThat(cim, Matchers.sameInstance(nt))
-        assertThat(cim.description, Matchers.equalTo(pb.description))
+        assertThat(cim, sameInstance(nt))
+        assertThat(cim.description, equalTo(pb.description))
     }
 
     private inline fun <reified T : IdentifiedObject> validate(creator: () -> T, filler: (DiagramService, T) -> Unit, adder: (DiagramService, T) -> T?) {

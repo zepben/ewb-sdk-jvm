@@ -9,14 +9,13 @@
 package com.zepben.evolve.services.network.tracing.connectivity
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 internal class XyCandidatePhasePathsTest {
 
@@ -27,204 +26,204 @@ internal class XyCandidatePhasePathsTest {
     @Test
     internal fun usesKnownOverCandidates() {
         XyCandidatePhasePaths().apply {
-            addKnown(X, A)
-            addKnown(Y, B)
+            addKnown(SPK.X, SPK.A)
+            addKnown(SPK.Y, SPK.B)
 
-            addCandidates(X, listOf(B, B))
-            addCandidates(Y, listOf(C, C))
+            addCandidates(SPK.X, listOf(SPK.B, SPK.B))
+            addCandidates(SPK.Y, listOf(SPK.C, SPK.C))
 
-            validatePaths(A, B)
+            validatePaths(SPK.A, SPK.B)
         }
     }
 
     @Test
     internal fun handlesDuplicateKnown() {
         XyCandidatePhasePaths().apply {
-            addKnown(X, B)
-            addKnown(Y, B)
+            addKnown(SPK.X, SPK.B)
+            addKnown(SPK.Y, SPK.B)
 
-            validatePaths(B, NONE)
+            validatePaths(SPK.B, SPK.NONE)
         }
     }
 
     @Test
     internal fun usesCandidatesIfUnknown() {
         XyCandidatePhasePaths().apply {
-            addKnown(X, A)
-            addCandidates(Y, listOf(B, B, C))
+            addKnown(SPK.X, SPK.A)
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B, SPK.C))
 
-            validatePaths(A, B)
+            validatePaths(SPK.A, SPK.B)
         }
 
         XyCandidatePhasePaths().apply {
-            addKnown(X, B)
-            addCandidates(Y, listOf(B, B, C))
+            addKnown(SPK.X, SPK.B)
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B, SPK.C))
 
-            validatePaths(B, C)
+            validatePaths(SPK.B, SPK.C)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A))
-            addKnown(Y, B)
+            addCandidates(SPK.X, listOf(SPK.A))
+            addKnown(SPK.Y, SPK.B)
 
-            validatePaths(A, B)
+            validatePaths(SPK.A, SPK.B)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A))
-            addKnown(Y, A)
+            addCandidates(SPK.X, listOf(SPK.A))
+            addKnown(SPK.Y, SPK.A)
 
-            validatePaths(NONE, A)
+            validatePaths(SPK.NONE, SPK.A)
         }
     }
 
     @Test
     internal fun candidatesUseMostCommon() {
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A, A, A, B, B, C))
-            addCandidates(Y, listOf(B, B, C, C, C))
+            addCandidates(SPK.X, listOf(SPK.A, SPK.A, SPK.A, SPK.B, SPK.B, SPK.C))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B, SPK.C, SPK.C, SPK.C))
 
-            validatePaths(A, C)
+            validatePaths(SPK.A, SPK.C)
         }
     }
 
     @Test
     internal fun candidatesUsePriorityWithDuplicateMostCommon() {
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A, B, B, C, C))
+            addCandidates(SPK.X, listOf(SPK.A, SPK.B, SPK.B, SPK.C, SPK.C))
 
-            validatePaths(B, NONE)
+            validatePaths(SPK.B, SPK.NONE)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(Y, listOf(B, B, C, C))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B, SPK.C, SPK.C))
 
-            validatePaths(NONE, C)
+            validatePaths(SPK.NONE, SPK.C)
         }
     }
 
     @Test
     internal fun handlesNoCandidates() {
         XyCandidatePhasePaths().apply {
-            validatePaths(NONE, NONE)
+            validatePaths(SPK.NONE, SPK.NONE)
         }
 
         XyCandidatePhasePaths().apply {
-            addKnown(X, B)
+            addKnown(SPK.X, SPK.B)
 
-            validatePaths(B, NONE)
+            validatePaths(SPK.B, SPK.NONE)
         }
 
         XyCandidatePhasePaths().apply {
-            addKnown(Y, B)
+            addKnown(SPK.Y, SPK.B)
 
-            validatePaths(NONE, B)
+            validatePaths(SPK.NONE, SPK.B)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(B))
+            addCandidates(SPK.X, listOf(SPK.B))
 
-            validatePaths(B, NONE)
+            validatePaths(SPK.B, SPK.NONE)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(Y, listOf(B))
+            addCandidates(SPK.Y, listOf(SPK.B))
 
-            validatePaths(NONE, B)
+            validatePaths(SPK.NONE, SPK.B)
         }
     }
 
     @Test
     internal fun usesMostCommonCandidate() {
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A, B, B))
-            addCandidates(Y, listOf(B, C, C))
+            addCandidates(SPK.X, listOf(SPK.A, SPK.B, SPK.B))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.C, SPK.C))
 
-            validatePaths(B, C)
+            validatePaths(SPK.B, SPK.C)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A, B, B, B))
-            addCandidates(Y, listOf(B, B, C))
+            addCandidates(SPK.X, listOf(SPK.A, SPK.B, SPK.B, SPK.B))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B, SPK.C))
 
-            validatePaths(B, C)
+            validatePaths(SPK.B, SPK.C)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A, A, B, B, B))
-            addCandidates(Y, listOf(B, B, B, B, C))
+            addCandidates(SPK.X, listOf(SPK.A, SPK.A, SPK.B, SPK.B, SPK.B))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B, SPK.B, SPK.B, SPK.C))
 
-            validatePaths(A, B)
+            validatePaths(SPK.A, SPK.B)
         }
     }
 
     @Test
     internal fun duplicateCandidateOccurrencesBetweenXyResolvedByPriority() {
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A, A, B, B, B))
-            addCandidates(Y, listOf(B, B, B, C))
+            addCandidates(SPK.X, listOf(SPK.A, SPK.A, SPK.B, SPK.B, SPK.B))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B, SPK.B, SPK.C))
 
-            validatePaths(A, B)
+            validatePaths(SPK.A, SPK.B)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A, B, B, B, C, C))
-            addCandidates(Y, listOf(B, B, B, C, C))
+            addCandidates(SPK.X, listOf(SPK.A, SPK.B, SPK.B, SPK.B, SPK.C, SPK.C))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B, SPK.B, SPK.C, SPK.C))
 
-            validatePaths(B, C)
+            validatePaths(SPK.B, SPK.C)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A, B, C, C))
-            addCandidates(Y, listOf(B, C, C))
+            addCandidates(SPK.X, listOf(SPK.A, SPK.B, SPK.C, SPK.C))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.C, SPK.C))
 
-            validatePaths(A, C)
+            validatePaths(SPK.A, SPK.C)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(C, C))
-            addCandidates(Y, listOf(B, C, C))
+            addCandidates(SPK.X, listOf(SPK.C, SPK.C))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.C, SPK.C))
 
-            validatePaths(C, NONE)
+            validatePaths(SPK.C, SPK.NONE)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(B, B, C))
-            addCandidates(Y, listOf(B, B, C))
+            addCandidates(SPK.X, listOf(SPK.B, SPK.B, SPK.C))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B, SPK.C))
 
-            validatePaths(B, C)
+            validatePaths(SPK.B, SPK.C)
         }
 
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A, B, B))
-            addCandidates(Y, listOf(B, B, C))
+            addCandidates(SPK.X, listOf(SPK.A, SPK.B, SPK.B))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B, SPK.C))
 
-            validatePaths(B, C)
+            validatePaths(SPK.B, SPK.C)
         }
     }
 
     @Test
     internal fun onlyCandidatesTakePriorityOverOccurrences() {
         XyCandidatePhasePaths().apply {
-            addCandidates(X, listOf(A, B, B, B))
-            addCandidates(Y, listOf(B, B))
+            addCandidates(SPK.X, listOf(SPK.A, SPK.B, SPK.B, SPK.B))
+            addCandidates(SPK.Y, listOf(SPK.B, SPK.B))
 
-            validatePaths(A, B)
+            validatePaths(SPK.A, SPK.B)
         }
     }
 
     @Test
     internal fun onlyTracksXY() {
         XyCandidatePhasePaths().apply {
-            SinglePhaseKind.values().forEach {
+            SPK.values().forEach {
                 if (it in PhaseCode.XY) {
-                    addKnown(it, B)
-                    addCandidates(it, listOf(B))
+                    addKnown(it, SPK.B)
+                    addCandidates(it, listOf(SPK.B))
                 } else {
-                    expect { addKnown(it, B) }
+                    expect { addKnown(it, SPK.B) }
                         .toThrow(IllegalArgumentException::class.java)
                         .withMessage("Unable to track phase $it, expected X or Y.")
-                    expect { addCandidates(it, listOf(B)) }
+                    expect { addCandidates(it, listOf(SPK.B)) }
                         .toThrow(IllegalArgumentException::class.java)
                         .withMessage("Unable to track phase $it, expected X or Y.")
                 }
@@ -235,25 +234,25 @@ internal class XyCandidatePhasePathsTest {
     @Test
     internal fun validatesCandidatePhases() {
         XyCandidatePhasePaths().apply {
-            SinglePhaseKind.values().forEach {
+            SPK.values().forEach {
                 when (it) {
-                    A -> {
-                        addCandidates(X, listOf(it))
+                    SPK.A -> {
+                        addCandidates(SPK.X, listOf(it))
 
-                        expect { addCandidates(Y, listOf(it)) }
+                        expect { addCandidates(SPK.Y, listOf(it)) }
                             .toThrow(IllegalArgumentException::class.java)
                             .withMessage("Unable to use phase $it as a candidate, expected B or C.")
                     }
                     in PhaseCode.ABC -> {
-                        addCandidates(X, listOf(it))
-                        addCandidates(Y, listOf(it))
+                        addCandidates(SPK.X, listOf(it))
+                        addCandidates(SPK.Y, listOf(it))
                     }
                     else -> {
-                        expect { addCandidates(X, listOf(it)) }
+                        expect { addCandidates(SPK.X, listOf(it)) }
                             .toThrow(IllegalArgumentException::class.java)
                             .withMessage("Unable to use phase $it as a candidate, expected A, B or C.")
 
-                        expect { addCandidates(Y, listOf(it)) }
+                        expect { addCandidates(SPK.Y, listOf(it)) }
                             .toThrow(IllegalArgumentException::class.java)
                             .withMessage("Unable to use phase $it as a candidate, expected B or C.")
                     }
@@ -262,8 +261,8 @@ internal class XyCandidatePhasePathsTest {
         }
     }
 
-    private fun XyCandidatePhasePaths.validatePaths(expectedX: SinglePhaseKind, expectedY: SinglePhaseKind) {
-        assertThat(calculatePaths().map { (k, v) -> k to v }, containsInAnyOrder(X to expectedX, Y to expectedY))
+    private fun XyCandidatePhasePaths.validatePaths(expectedX: SPK, expectedY: SPK) {
+        assertThat(calculatePaths().map { (k, v) -> k to v }, containsInAnyOrder(SPK.X to expectedX, SPK.Y to expectedY))
     }
 
 }

@@ -8,7 +8,6 @@
 package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.testutils.junit.SystemLogExtension
 import com.zepben.testutils.mockito.DefaultAnswer
 import org.hamcrest.MatcherAssert.assertThat
@@ -16,6 +15,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 class PhaseStepTest {
 
@@ -26,10 +26,10 @@ class PhaseStepTest {
     @Test
     fun accessors() {
         val asset = mock<ConductingEquipment>()
-        val atoc = PhaseStep.startAt(asset, listOf(A, B, C, N, B, C, N))
+        val ps = PhaseStep.startAt(asset, listOf(SPK.A, SPK.B, SPK.C, SPK.N, SPK.B, SPK.C, SPK.N))
 
-        assertThat(atoc.conductingEquipment, equalTo(asset))
-        assertThat(atoc.phases, containsInAnyOrder(A, B, C, N))
+        assertThat(ps.conductingEquipment, equalTo(asset))
+        assertThat(ps.phases, containsInAnyOrder(SPK.A, SPK.B, SPK.C, SPK.N))
     }
 
     @Test
@@ -37,20 +37,20 @@ class PhaseStepTest {
         val asset1 = mock<ConductingEquipment>(defaultAnswer = DefaultAnswer.of(String::class.java, "asset1"))
         val asset2 = mock<ConductingEquipment>(defaultAnswer = DefaultAnswer.of(String::class.java, "asset2"))
 
-        val atoc1 = PhaseStep.startAt(asset1, listOf(A, B, C, N, B, C, N))
-        val atoc1Dup = PhaseStep.startAt(asset1, listOf(A, B, C, N, B, C, N))
-        val atoc2 = PhaseStep.startAt(asset2, listOf(A, B, C, N, B, C, N))
-        val atoc3 = PhaseStep.startAt(asset1, listOf(A, B))
+        val ps1 = PhaseStep.startAt(asset1, listOf(SPK.A, SPK.B, SPK.C, SPK.N, SPK.B, SPK.C, SPK.N))
+        val ps1Dup = PhaseStep.startAt(asset1, listOf(SPK.A, SPK.B, SPK.C, SPK.N, SPK.B, SPK.C, SPK.N))
+        val ps2 = PhaseStep.startAt(asset2, listOf(SPK.A, SPK.B, SPK.C, SPK.N, SPK.B, SPK.C, SPK.N))
+        val ps3 = PhaseStep.startAt(asset1, listOf(SPK.A, SPK.B))
 
-        assertThat(atoc1, equalTo(atoc1))
-        assertThat(atoc1, equalTo(atoc1Dup))
-        assertThat(atoc1, not(equalTo(null)))
-        assertThat(atoc1, not(equalTo(atoc2)))
-        assertThat(atoc1, not(equalTo(atoc3)))
+        assertThat(ps1, equalTo(ps1))
+        assertThat(ps1, equalTo(ps1Dup))
+        assertThat(ps1, not(equalTo(null)))
+        assertThat(ps1, not(equalTo(ps2)))
+        assertThat(ps1, not(equalTo(ps3)))
 
-        assertThat(atoc1.hashCode(), equalTo(atoc1Dup.hashCode()))
+        assertThat(ps1.hashCode(), equalTo(ps1Dup.hashCode()))
 
-        assertThat(atoc1.toString(), not((emptyString())))
+        assertThat(ps1.toString(), not(emptyString()))
     }
 
 }

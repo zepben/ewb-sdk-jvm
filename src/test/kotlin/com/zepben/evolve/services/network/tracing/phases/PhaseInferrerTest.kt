@@ -8,17 +8,18 @@
 package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.services.network.testdata.PhasesTestNetwork
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.tracing.Tracing
-import com.zepben.evolve.services.network.tracing.phases.FeederDirection.*
-import com.zepben.evolve.services.network.tracing.phases.PhaseValidator.validatePhaseDirections
 import com.zepben.evolve.services.network.tracing.phases.PhaseValidator.validatePhases
+import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.spy
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 @Suppress("SameParameterValue")
@@ -28,7 +29,7 @@ class PhaseInferrerTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val phaseInferrer = Tracing.phaseInferrer()
+    private val phaseInferrer = PhaseInferrer()
 
     //
     // nominal
@@ -41,16 +42,16 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABtoBCtoXYtoABC() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.AB)
-            .to(PhaseCode.BC)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.ABC)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.AB)
+            .toAcls(PhaseCode.BC)
+            .toAcls(PhaseCode.XY)
+            .toAcls(PhaseCode.ABC)
             .build()
 
-        validatePhases(network, "c1", SPK.B, SPK.NONE)
-        validatePhases(network, "c2", SPK.B, SPK.NONE)
-        validatePhases(network, "c3", SPK.NONE, SPK.B, SPK.NONE)
+        validatePhases(network, "c1", listOf(SPK.B, SPK.NONE))
+        validatePhases(network, "c2", listOf(SPK.B, SPK.NONE))
+        validatePhases(network, "c3", listOf(SPK.NONE, SPK.B, SPK.NONE))
 
         phaseInferrer.run(network)
 
@@ -72,16 +73,16 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABNtoBCNtoXYNtoABCN() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABN)
-            .to(PhaseCode.BCN)
-            .to(PhaseCode.XYN)
-            .to(PhaseCode.ABCN)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABN)
+            .toAcls(PhaseCode.BCN)
+            .toAcls(PhaseCode.XYN)
+            .toAcls(PhaseCode.ABCN)
             .build()
 
-        validatePhases(network, "c1", SPK.B, SPK.NONE, SPK.N)
-        validatePhases(network, "c2", SPK.B, SPK.NONE, SPK.N)
-        validatePhases(network, "c3", SPK.NONE, SPK.B, SPK.NONE, SPK.N)
+        validatePhases(network, "c1", listOf(SPK.B, SPK.NONE, SPK.N))
+        validatePhases(network, "c2", listOf(SPK.B, SPK.NONE, SPK.N))
+        validatePhases(network, "c3", listOf(SPK.NONE, SPK.B, SPK.NONE, SPK.N))
 
         phaseInferrer.run(network)
 
@@ -103,16 +104,16 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testBCtoACtoXYtoABC() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.BC)
-            .to(PhaseCode.AC)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.ABC)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.BC)
+            .toAcls(PhaseCode.AC)
+            .toAcls(PhaseCode.XY)
+            .toAcls(PhaseCode.ABC)
             .build()
 
-        validatePhases(network, "c1", SPK.NONE, SPK.C)
-        validatePhases(network, "c2", SPK.NONE, SPK.C)
-        validatePhases(network, "c3", SPK.NONE, SPK.NONE, SPK.C)
+        validatePhases(network, "c1", listOf(SPK.NONE, SPK.C))
+        validatePhases(network, "c2", listOf(SPK.NONE, SPK.C))
+        validatePhases(network, "c3", listOf(SPK.NONE, SPK.NONE, SPK.C))
 
         phaseInferrer.run(network)
 
@@ -135,14 +136,14 @@ class PhaseInferrerTest {
     @Test
     internal fun testABCtoXYNtoXYtoBC() {
         Tracing.normalPhaseTrace()
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.XYN)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.BC)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC)
+            .toAcls(PhaseCode.XYN)
+            .toAcls(PhaseCode.XY)
+            .toAcls(PhaseCode.BC)
             .build()
 
-        validatePhases(network, "c1", SPK.B, SPK.C, SPK.NONE)
+        validatePhases(network, "c1", listOf(SPK.B, SPK.C, SPK.NONE))
         validatePhases(network, "c2", PhaseCode.BC)
         validatePhases(network, "c3", PhaseCode.BC)
 
@@ -167,15 +168,15 @@ class PhaseInferrerTest {
     @Test
     internal fun testABCtoXYtoXYNtoBC() {
         Tracing.normalPhaseTrace()
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.XYN)
-            .to(PhaseCode.BC)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC)
+            .toAcls(PhaseCode.XY)
+            .toAcls(PhaseCode.XYN)
+            .toAcls(PhaseCode.BC)
             .build()
 
         validatePhases(network, "c1", PhaseCode.BC)
-        validatePhases(network, "c2", SPK.B, SPK.C, SPK.NONE)
+        validatePhases(network, "c2", listOf(SPK.B, SPK.C, SPK.NONE))
         validatePhases(network, "c3", PhaseCode.BC)
 
         phaseInferrer.run(network)
@@ -198,16 +199,16 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoNtoABCN() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.ABC)
-            .to(PhaseCode.N)
-            .to(PhaseCode.ABCN)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC)
+            .toAcls(PhaseCode.ABC)
+            .toAcls(PhaseCode.N)
+            .toAcls(PhaseCode.ABCN)
             .build()
 
         validatePhases(network, "c1", PhaseCode.ABC)
-        validatePhases(network, "c2", SPK.NONE)
-        validatePhases(network, "c3", SPK.NONE, SPK.NONE, SPK.NONE, SPK.NONE)
+        validatePhases(network, "c2", PhaseCode.NONE)
+        validatePhases(network, "c3", PhaseCode.NONE)
 
         phaseInferrer.run(network)
 
@@ -227,27 +228,59 @@ class PhaseInferrerTest {
     // infer nominal
     // ABC -> ABC -> B -> B?N
     // infer xy
-    // ABC -> ABC -> B -> BAN
-    // (warning with may not be correct)
+    // ABC -> ABC -> B -> BCN
     //
     @Test
     internal fun testABCtoBtoXYN() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.ABC)
-            .to(PhaseCode.B)
-            .to(PhaseCode.XYN)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC)
+            .toAcls(PhaseCode.ABC)
+            .toAcls(PhaseCode.B)
+            .toAcls(PhaseCode.XYN)
             .build()
 
         validatePhases(network, "c1", PhaseCode.ABC)
         validatePhases(network, "c2", PhaseCode.B)
-        validatePhases(network, "c3", SPK.B, SPK.NONE, SPK.NONE)
+        validatePhases(network, "c3", listOf(SPK.B, SPK.NONE, SPK.NONE))
 
         phaseInferrer.run(network)
 
         validatePhases(network, "c1", PhaseCode.ABC)
         validatePhases(network, "c2", PhaseCode.B)
-        validatePhases(network, "c3", SPK.B, SPK.A, SPK.N)
+        validatePhases(network, "c3", PhaseCode.BCN)
+
+        validateLog(suspect = listOf("c3"))
+    }
+
+    //
+    // nominal
+    // ABC -> ABC -> C -> XYN
+    // traced
+    // ABC -> ABC -> C -> C??
+    //
+    // infer nominal
+    // ABC -> ABC -> C -> C?N
+    // infer xy
+    // ABC -> ABC -> C -> C?N
+    //
+    @Test
+    internal fun testABCtoCtoXYN() {
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC)
+            .toAcls(PhaseCode.ABC)
+            .toAcls(PhaseCode.C)
+            .toAcls(PhaseCode.XYN)
+            .build()
+
+        validatePhases(network, "c1", PhaseCode.ABC)
+        validatePhases(network, "c2", PhaseCode.C)
+        validatePhases(network, "c3", listOf(SPK.C, SPK.NONE, SPK.NONE))
+
+        phaseInferrer.run(network)
+
+        validatePhases(network, "c1", PhaseCode.ABC)
+        validatePhases(network, "c2", PhaseCode.C)
+        validatePhases(network, "c3", listOf(SPK.C, SPK.NONE, SPK.N))
 
         validateLog(suspect = listOf("c3"))
     }
@@ -263,16 +296,16 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoAtoXN() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.ABC)
-            .to(PhaseCode.A)
-            .to(PhaseCode.XN)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC)
+            .toAcls(PhaseCode.ABC)
+            .toAcls(PhaseCode.A)
+            .toAcls(PhaseCode.XN)
             .build()
 
         validatePhases(network, "c1", PhaseCode.ABC)
         validatePhases(network, "c2", PhaseCode.A)
-        validatePhases(network, "c3", SPK.A, SPK.NONE)
+        validatePhases(network, "c3", listOf(SPK.A, SPK.NONE))
 
         phaseInferrer.run(network)
 
@@ -294,29 +327,21 @@ class PhaseInferrerTest {
     //
     @Test
     fun testDualFeedANtoABCN() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.AN)
-            .to(PhaseCode.ABCN)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.AN)
+            .toAcls(PhaseCode.ABCN)
             .toSource(PhaseCode.AN)
             .build()
 
-        validatePhases(network, "source0", PhaseCode.AN)
-        validatePhases(network, "c1", SPK.A, SPK.NONE, SPK.NONE, SPK.N)
-        validatePhases(network, "source2", PhaseCode.AN)
-
-        validatePhaseDirections(network, "source0", listOf(BOTH, BOTH))
-        validatePhaseDirections(network, "c1", listOf(BOTH, NONE, NONE, BOTH), listOf(BOTH, NONE, NONE, BOTH))
-        validatePhaseDirections(network, "source2", listOf(BOTH, BOTH), listOf(DOWNSTREAM, DOWNSTREAM))
+        validatePhases(network, "s0", PhaseCode.AN)
+        validatePhases(network, "c1", listOf(SPK.A, SPK.NONE, SPK.NONE, SPK.N))
+        validatePhases(network, "s2", PhaseCode.AN)
 
         phaseInferrer.run(network)
 
-        validatePhases(network, "source0", PhaseCode.AN)
+        validatePhases(network, "s0", PhaseCode.AN)
         validatePhases(network, "c1", PhaseCode.ABCN)
-        validatePhases(network, "source2", PhaseCode.AN)
-
-        validatePhaseDirections(network, "source0", listOf(BOTH, BOTH))
-        validatePhaseDirections(network, "c1", listOf(BOTH, BOTH, BOTH, BOTH), listOf(BOTH, BOTH, BOTH, BOTH))
-        validatePhaseDirections(network, "source2", listOf(BOTH, BOTH), listOf(DOWNSTREAM, DOWNSTREAM))
+        validatePhases(network, "s2", PhaseCode.AN)
 
         validateLog(correct = listOf("c1"))
     }
@@ -332,18 +357,18 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABCNtoNtoABtoXY() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABCN)
-            .to(PhaseCode.ABCN)
-            .to(PhaseCode.N)
-            .to(PhaseCode.AB)
-            .to(PhaseCode.XY)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABCN)
+            .toAcls(PhaseCode.ABCN)
+            .toAcls(PhaseCode.N)
+            .toAcls(PhaseCode.AB)
+            .toAcls(PhaseCode.XY)
             .build()
 
         validatePhases(network, "c1", PhaseCode.ABCN)
         validatePhases(network, "c2", PhaseCode.N)
-        validatePhases(network, "c3", SPK.NONE, SPK.NONE)
-        validatePhases(network, "c4", SPK.NONE, SPK.NONE)
+        validatePhases(network, "c3", PhaseCode.NONE)
+        validatePhases(network, "c4", PhaseCode.NONE)
 
         phaseInferrer.run(network)
 
@@ -366,24 +391,70 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testWithOpenSwitch() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.ABC)
-            .toSwitch(PhaseCode.ABC, true)
-            .to(PhaseCode.ABC)
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC)
+            .toAcls(PhaseCode.ABC)
+            .toBreaker(PhaseCode.ABC, isNormallyOpen = true)
+            .toAcls(PhaseCode.ABC)
             .build()
 
         validatePhases(network, "c1", PhaseCode.ABC)
-        validatePhases(network, "s2", PhaseCode.ABC, PhaseCode.NONE)
-        validatePhases(network, "c3", SPK.NONE, SPK.NONE, SPK.NONE)
+        validatePhases(network, "b2", PhaseCode.ABC, PhaseCode.NONE)
+        validatePhases(network, "c3", PhaseCode.NONE)
 
         phaseInferrer.run(network)
 
         validatePhases(network, "c1", PhaseCode.ABC)
-        validatePhases(network, "s2", PhaseCode.ABC, PhaseCode.NONE)
-        validatePhases(network, "c3", SPK.NONE, SPK.NONE, SPK.NONE)
+        validatePhases(network, "b2", PhaseCode.ABC, PhaseCode.NONE)
+        validatePhases(network, "c3", PhaseCode.NONE)
 
         validateLog()
+    }
+
+    //
+    // s0 * 1----2 * 1----2 * 1----2 * 1----2 * 1----2 * 1----2 *
+    //        c1       c2       c3       c4   2   c5   1   c9
+    // ABC    ABC      XY       ABC      ABC  |   ABC  |   ABC
+    //                                     c8 |     c6 |
+    //                                     ABC|     ABC|
+    //                                        1        2
+    //                                        * 2----1 *
+    //                                            c7
+    //                                            XY
+    //
+    @Test
+    internal fun validateDirectionsWithDroppedDirectionLoop() {
+        val network = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC) // s0
+            .toAcls(PhaseCode.ABC) // c1
+            .toAcls(PhaseCode.XY) // c2
+            .toAcls(PhaseCode.ABC) // c3
+            .toAcls(PhaseCode.ABC) // c4
+            .toAcls(PhaseCode.ABC) // c5
+            .toAcls(PhaseCode.ABC) // c6
+            .toAcls(PhaseCode.XY) // c7
+            .toAcls(PhaseCode.ABC) // c8
+            .connect("c8", "c4", 2, 2)
+            .splitFrom("c5")
+            .toAcls(PhaseCode.ABC) // c9
+            .addFeeder("s0")
+            .build()
+
+        // We need to make sure "c6-t2" is returned first to replicate the production data bug that this test is designed to replicate.
+        phaseInferrer.run(spy(network).also { ns ->
+            doReturn(listOf(network["c6-t2"]!!, *network.listOf<Terminal> { it.mRID != "c6-t2" }.toTypedArray()))
+                .`when`(ns)
+                .listOf(Terminal::class.java)
+        })
+
+        validatePhases(network, "c2", PhaseCode.AC, PhaseCode.AC)
+        validatePhases(network, "c3", PhaseCode.ABC, PhaseCode.ABC)
+        validatePhases(network, "c4", PhaseCode.ABC, PhaseCode.ABC)
+        validatePhases(network, "c5", PhaseCode.ABC, PhaseCode.ABC)
+        validatePhases(network, "c6", PhaseCode.ABC, PhaseCode.ABC)
+        validatePhases(network, "c7", PhaseCode.AC, PhaseCode.AC)
+        validatePhases(network, "c8", PhaseCode.ABC, PhaseCode.ABC)
+        validatePhases(network, "c9", PhaseCode.ABC, PhaseCode.ABC)
     }
 
     private fun validateLog(correct: List<String> = emptyList(), suspect: List<String> = emptyList()) {
@@ -399,9 +470,9 @@ class PhaseInferrerTest {
     }
 
     private fun correctMessage(id: String) =
-        "*** Action Required *** Inferred missing phase for '$id name' [$id] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
+        "*** Action Required *** Inferred missing phase for '' [$id] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
 
     private fun suspectMessage(id: String) =
-        "*** Action Required *** Inferred missing phases for '$id name' [$id] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
+        "*** Action Required *** Inferred missing phases for '' [$id] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
 
 }

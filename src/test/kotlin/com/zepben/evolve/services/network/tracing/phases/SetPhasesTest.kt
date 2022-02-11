@@ -11,29 +11,20 @@
 
 package com.zepben.evolve.services.network.tracing.phases
 
-import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.cim.iec61970.base.core.Substation
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.*
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.testdata.*
-import com.zepben.evolve.services.network.tracing.Tracing
-import com.zepben.evolve.services.network.tracing.phases.FeederDirection.*
-import com.zepben.evolve.services.network.tracing.phases.FeederDirection.NONE
+import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
+import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.spy
-import java.util.function.Function
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 class SetPhasesTest {
 
@@ -41,538 +32,195 @@ class SetPhasesTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    @Suppress("PrivatePropertyName")
-    private val P_NONE = SinglePhaseKind.NONE
-
     @Test
     internal fun setPhasesTest() {
         val n = PhaseSwapLoopNetwork.create()
 
-        val sw = n.get<Breaker>("node6")!!
-        assertThat(sw, notNullValue())
-        assertThat(sw.isOpen(X), equalTo(true))
-        assertThat(sw.isOpen(Y), equalTo(true))
-        doSetPhasesTrace(n)
+        SetPhases().run(n)
+        PhaseLogger.trace(n.listOf<EnergySource>())
 
         // Check various points to make sure phases have been applied during the trace.
-        checkExpectedPhases(getT(n, "acLineSegment0", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "acLineSegment0", 2), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
-        checkExpectedPhases(getT(n, "acLineSegment1", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "acLineSegment4", 1), arrayOf(A, B), arrayOf(UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "node4", 1), arrayOf(A, B), arrayOf(UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "node4", 2), arrayOf(A, B), arrayOf(DOWNSTREAM, DOWNSTREAM))
-        checkExpectedPhases(getT(n, "node4", 3), arrayOf(A, B), arrayOf(DOWNSTREAM, DOWNSTREAM))
-        checkExpectedPhases(getT(n, "node8", 1), arrayOf(A), arrayOf(UPSTREAM))
-        checkExpectedPhases(getT(n, "node5", 1), arrayOf(A, B), arrayOf(UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "node5", 2), arrayOf(A, B), arrayOf(DOWNSTREAM, DOWNSTREAM))
-        checkExpectedPhases(getT(n, "node5", 3), arrayOf(A, B), arrayOf(DOWNSTREAM, DOWNSTREAM))
-        checkExpectedPhases(getT(n, "node9", 1), arrayOf(B), arrayOf(UPSTREAM))
-        checkExpectedPhases(getT(n, "node6", 1), arrayOf(A, B), arrayOf(UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "node6", 2), arrayOf(B, C), arrayOf(UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "acLineSegment2", 2), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
-        checkExpectedPhases(getT(n, "acLineSegment3", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "acLineSegment9", 2), arrayOf(B, C), arrayOf(UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "node2", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
+        PhaseValidator.validatePhases(n.getT("acLineSegment0", 1), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
+        PhaseValidator.validatePhases(n.getT("acLineSegment0", 2), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
+        PhaseValidator.validatePhases(n.getT("acLineSegment1", 1), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
+        PhaseValidator.validatePhases(n.getT("acLineSegment4", 1), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("node4", 1), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("node4", 2), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("node4", 3), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("node8", 1), listOf(SPK.A))
+        PhaseValidator.validatePhases(n.getT("node5", 1), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("node5", 2), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("node5", 3), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("node9", 1), listOf(SPK.B))
+        PhaseValidator.validatePhases(n.getT("node6", 1), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("node6", 2), listOf(SPK.B, SPK.C))
+        PhaseValidator.validatePhases(n.getT("acLineSegment2", 2), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
+        PhaseValidator.validatePhases(n.getT("acLineSegment3", 1), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
+        PhaseValidator.validatePhases(n.getT("acLineSegment9", 2), listOf(SPK.B, SPK.C))
+        PhaseValidator.validatePhases(n.getT("node2", 1), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
     }
 
     @Test
-    internal fun setPhasesMultiSourceTest() {
-        val n = UngangedSwitchShortNetwork.create()
+    internal fun appliesPhasesFromSources() {
+        //
+        // s0 12--c1--21--c2--2
+        //             1--c3--2
+        //
+        // 1--c4--2
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABCN) // s0
+            .toAcls(PhaseCode.ABCN) // c1
+            .toAcls(PhaseCode.ABCN) // c2
+            .splitFrom("c1")
+            .toAcls(PhaseCode.AB) // c3
+            .fromAcls(PhaseCode.ABCN) // c4
+            .buildAndLog()
 
-        val sw = n.get<Breaker>("node1")!!
-        assertThat(sw, notNullValue())
-        assertThat(sw.isOpen(A), equalTo(true))
-        assertThat(sw.isOpen(B), equalTo(false))
-        assertThat(sw.isOpen(C), equalTo(true))
-        assertThat(sw.isOpen(N), equalTo(false))
-
-        doSetPhasesTrace(n)
-
-        // Check various points to make sure phases have been applied during the trace.
-        checkExpectedPhases(getT(n, "node0", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, BOTH, DOWNSTREAM, BOTH))
-        checkExpectedPhases(getT(n, "acLineSegment0", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, BOTH, UPSTREAM, BOTH))
-        checkExpectedPhases(getT(n, "acLineSegment0", 2), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, BOTH, DOWNSTREAM, BOTH))
-        checkExpectedPhases(getT(n, "node1", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, BOTH, UPSTREAM, BOTH))
-        checkExpectedPhases(getT(n, "node1", 2), arrayOf(A, B, C, N), arrayOf(UPSTREAM, BOTH, UPSTREAM, BOTH))
-        checkExpectedPhases(getT(n, "acLineSegment1", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, BOTH, DOWNSTREAM, BOTH))
-        checkExpectedPhases(getT(n, "acLineSegment1", 2), arrayOf(A, B, C, N), arrayOf(UPSTREAM, BOTH, UPSTREAM, BOTH))
-        checkExpectedPhases(getT(n, "node2", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, BOTH, DOWNSTREAM, BOTH))
+        PhaseValidator.validatePhases(n, "s0", PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "c1", PhaseCode.ABCN, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "c2", PhaseCode.ABCN, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "c3", PhaseCode.AB, PhaseCode.AB)
+        PhaseValidator.validatePhases(n, "c4", PhaseCode.NONE, PhaseCode.NONE)
     }
 
     @Test
-    internal fun setPhasesTestCrossPhases() {
-        val n = PhaseSwapLoopNetwork.create()
+    internal fun stopsAtOpenPoints() {
+        //
+        // s0 11 b1 21--c2--2
+        //
+        // s3 11 b4 21--c5--2
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABCN) // s0
+            .toBreaker(PhaseCode.ABCN, isNormallyOpen = true, isOpen = false) // b1
+            .toAcls(PhaseCode.ABCN) // c2
+            .fromSource(PhaseCode.ABCN) // s3
+            .toBreaker(PhaseCode.ABCN, isOpen = true) // b4
+            .toAcls(PhaseCode.ABCN) // c5
+            .buildAndLog()
 
-        val sw = n.get<Breaker>("node6")!!
-        assertThat(sw, notNullValue())
-        assertThat(sw.isOpen(X), equalTo(true))
-        sw.setOpen(false, Y)
-
-        expect { doSetPhasesTrace(n) }
-            .toThrow(IllegalStateException::class.java)
+        PhaseValidator.validatePhases(n, "s0-t1", PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "b1-t1", PhaseCode.ABCN, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "b1-t2", PhaseCode.NONE, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "c2-t1", PhaseCode.NONE, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "c2-t2", PhaseCode.NONE, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "s3-t1", PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "b4-t1", PhaseCode.ABCN, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "b4-t2", PhaseCode.ABCN, PhaseCode.NONE)
+        PhaseValidator.validatePhases(n, "c5-t1", PhaseCode.ABCN, PhaseCode.NONE)
+        PhaseValidator.validatePhases(n, "c5-t2", PhaseCode.ABCN, PhaseCode.NONE)
     }
 
-    // Build a small network with a closed loop and test tracing phases both ways
     @Test
-    internal fun setPhasesInClosedLoopTest() {
-        val n = NetworkService()
-
-        val n0 = createSourceForConnecting(n, "n0", 1, PhaseCode.A)
-        for (i in 0..4) {
-            val c = AcLineSegment("c$i").apply { name = "c"; addTerminals(2, PhaseCode.A) }
-            n.add(c)
-        }
-
-        for (i in 1..3) {
-            val bn = Junction("n$i").apply { addTerminals(2, PhaseCode.A) }
-            n.add(bn)
-        }
-
-        val n4 = Junction("n4").apply { addTerminal(createTerminal(n, this, PhaseCode.A, 1)) }
-        n.add(n4)
-
-        assertThat(n.connect(getT(n, "n0", 1), getT(n, "c0", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "c0", 2), getT(n, "n1", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "n1", 2), getT(n, "c1", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "c1", 2), getT(n, "n2", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "n2", 2), getT(n, "c2", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "c2", 2), getT(n, "n3", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "n3", 2), getT(n, "c3", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "c3", 2), getT(n, "n1", 2)), equalTo(true))
-        assertThat(n.connect(getT(n, "c4", 1), getT(n, "n3", 2)), equalTo(true))
-        assertThat(n.connect(getT(n, "n4", 1), getT(n, "c4", 2)), equalTo(true))
-
-        n0.terminals.forEach { t ->
-            for (phase in t.phases.singlePhases) {
-                t.normalPhases(phase).add(A, DOWNSTREAM)
-                t.currentPhases(phase).add(A, DOWNSTREAM)
+    internal fun tracesUnganged() {
+        //
+        // s0 11 b1 21--c2--1
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABCN) // s0
+            .toBreaker(PhaseCode.ABCN) {
+                it.setOpen(true, SPK.A)
+                it.setNormallyOpen(true, SPK.B)
             }
-            checkExpectedPhases(t, arrayOf(A), arrayOf(DOWNSTREAM))
-        }
+            .toAcls(PhaseCode.ABCN) // c2
+            .buildAndLog()
 
-        doSetPhasesTrace(n0)
-        checkExpectedPhases(getT(n, "n0", 1), arrayOf(A), arrayOf(DOWNSTREAM))
-        checkExpectedPhases(getT(n, "c0", 1), arrayOf(A), arrayOf(UPSTREAM))
-        checkExpectedPhases(getT(n, "c0", 2), arrayOf(A), arrayOf(DOWNSTREAM))
-        checkExpectedPhases(getT(n, "n1", 1), arrayOf(A), arrayOf(UPSTREAM))
-        checkExpectedPhases(getT(n, "n1", 2), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "c1", 1), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "c1", 2), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "n2", 1), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "n2", 2), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "c2", 1), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "c2", 2), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "n3", 1), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "n3", 2), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "c3", 1), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "c3", 2), arrayOf(A), arrayOf(BOTH))
-        checkExpectedPhases(getT(n, "c4", 1), arrayOf(A), arrayOf(UPSTREAM))
-        checkExpectedPhases(getT(n, "c4", 2), arrayOf(A), arrayOf(DOWNSTREAM))
-        checkExpectedPhases(getT(n, "n4", 1), arrayOf(A), arrayOf(UPSTREAM))
+        PhaseValidator.validatePhases(n, "s0", PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "b1-t1", PhaseCode.ABCN, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "b1-t2", listOf(SPK.A, SPK.NONE, SPK.C, SPK.N), listOf(SPK.NONE, SPK.B, SPK.C, SPK.N))
+        PhaseValidator.validatePhases(n, "c2-t1", listOf(SPK.A, SPK.NONE, SPK.C, SPK.N), listOf(SPK.NONE, SPK.B, SPK.C, SPK.N))
+        PhaseValidator.validatePhases(n, "c2-t2", listOf(SPK.A, SPK.NONE, SPK.C, SPK.N), listOf(SPK.NONE, SPK.B, SPK.C, SPK.N))
     }
 
     @Test
-    internal fun setPhasesThroughFeederCbs() {
-        val n = NetworkService()
+    internal fun canRunFromTerminal() {
+        //
+        // 1--c0--21--c1--21--c2--2
+        //
+        val n = TestNetworkBuilder
+            .startWithAcls(PhaseCode.ABCN) // c0
+            .toAcls(PhaseCode.ABCN) // c1
+            .toAcls(PhaseCode.ABCN) // c2
+            .buildAndLog()
 
-        createSourceForConnecting(n, "n0", 1, PhaseCode.ABCN)
-        createSourceForConnecting(n, "n1", 1, PhaseCode.ABCN)
+        SetPhases().run(n.getT("c1", 2))
 
-        fun createBreaker(id: String, open: Boolean, normallyOpen: Array<Boolean>): Breaker {
-            return Breaker(id).apply {
-                name = id
-                addTerminals(2, PhaseCode.ABCN)
-                setOpen(isOpen = open)
-                for (i in normallyOpen.indices)
-                    setNormallyOpen(normallyOpen[i], PhaseCode.ABCN.singlePhases[i])
-                addContainer(Substation())
-                assertThat(this.isSubstationBreaker, equalTo(true))
-            }
-        }
-
-        n.add(createBreaker("f0", true, arrayOf(false, true, false, true)))
-        n.add(createBreaker("f1", true, arrayOf(false, false, false, false)))
-        n.add(createBreaker("f2", true, arrayOf(false, false, false, false)))
-        n.add(createBreaker("f3", true, arrayOf(true, false, false, true)))
-        n.add(createBreaker("f4", false, arrayOf(false, false, false, false)))
-
-        val overheadWireInfo = OverheadWireInfo()
-        for (i in 0..5) {
-            n.add(AcLineSegment("c$i").apply {
-                name = "c$i"
-                assetInfo = overheadWireInfo
-                addTerminals(2, PhaseCode.ABCN)
-            })
-        }
-
-        assertThat(n.connect(getT(n, "n0", 1), getT(n, "c0", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "c0", 2), getT(n, "f0", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "f0", 2), getT(n, "c1", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "c1", 2), getT(n, "f1", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "f1", 2), getT(n, "c2", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "c2", 2), getT(n, "f2", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "f2", 2), getT(n, "c3", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "c3", 2), getT(n, "f3", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "f3", 2), getT(n, "c4", 1)), equalTo(true))
-        assertThat(n.connect(getT(n, "c4", 2), getT(n, "n1", 1)), equalTo(true))
-
-        doSetPhasesTrace(n)
-
-        checkExpectedPhases(getT(n, "n0", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
-        checkExpectedPhases(getT(n, "c0", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "c0", 2), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
-        checkExpectedPhases(getT(n, "f0", 1), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
-        checkExpectedPhases(
-            getT(n, "f0", 2),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(DOWNSTREAM, UPSTREAM, DOWNSTREAM, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "c1", 1),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(UPSTREAM, DOWNSTREAM, UPSTREAM, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "c1", 2),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(DOWNSTREAM, UPSTREAM, DOWNSTREAM, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "f1", 1),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(UPSTREAM, DOWNSTREAM, UPSTREAM, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "f1", 2),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(DOWNSTREAM, UPSTREAM, BOTH, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "c2", 1),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(UPSTREAM, DOWNSTREAM, BOTH, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "c2", 2),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(DOWNSTREAM, UPSTREAM, BOTH, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "f2", 1),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(UPSTREAM, DOWNSTREAM, BOTH, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "f2", 2),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(DOWNSTREAM, UPSTREAM, UPSTREAM, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "c3", 1),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(UPSTREAM, DOWNSTREAM, DOWNSTREAM, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "c3", 2),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(DOWNSTREAM, UPSTREAM, UPSTREAM, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(
-            getT(n, "f3", 1),
-            arrayOf(A, B, C, P_NONE),
-            arrayOf(UPSTREAM, DOWNSTREAM, DOWNSTREAM, NONE),
-            arrayOf(P_NONE, P_NONE, P_NONE, P_NONE),
-            arrayOf(NONE, NONE, NONE, NONE)
-        )
-        checkExpectedPhases(getT(n, "f3", 2), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "c4", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
-        checkExpectedPhases(getT(n, "c4", 2), arrayOf(A, B, C, N), arrayOf(UPSTREAM, UPSTREAM, UPSTREAM, UPSTREAM))
-        checkExpectedPhases(getT(n, "n1", 1), arrayOf(A, B, C, N), arrayOf(DOWNSTREAM, DOWNSTREAM, DOWNSTREAM, DOWNSTREAM))
-        checkExpectedPhases(getT(n, "f4", 1), arrayOf(P_NONE, P_NONE, P_NONE, P_NONE), arrayOf(NONE, NONE, NONE, NONE))
-        checkExpectedPhases(getT(n, "f4", 2), arrayOf(P_NONE, P_NONE, P_NONE, P_NONE), arrayOf(NONE, NONE, NONE, NONE))
+        PhaseValidator.validatePhases(n, "c0", PhaseCode.NONE, PhaseCode.NONE)
+        PhaseValidator.validatePhases(n, "c1", PhaseCode.NONE, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "c2", PhaseCode.ABCN, PhaseCode.ABCN)
     }
 
     @Test
-    internal fun canStartFromSingleTerminalFeederCbWithAnySequence() {
-        val n = NetworkService()
+    internal fun mustProvideTheCorrectNumberOfPhases() {
+        //
+        // 1--c0--21--c1--2
+        //
+        val n = TestNetworkBuilder
+            .startWithAcls(PhaseCode.A) // c0
+            .toAcls(PhaseCode.A) // c1
+            .buildAndLog()
 
-        val substation = Substation()
-        fun createBreaker(id: String, sequenceNumber: Int): Breaker {
-            return Breaker(id).apply {
-                name = id
-                addTerminal(Terminal().also { it.sequenceNumber = sequenceNumber })
-                addContainer(substation)
-                substation.addEquipment(this)
-            }
-        }
-
-        val fcb1: Breaker = createBreaker("f1", 1)
-        val fcb2: Breaker = createBreaker("f2", 2)
-        val energySource1 = createSourceForConnecting(n, "energySource1", 1, PhaseCode.ABC)
-        val energySource2 = createSourceForConnecting(n, "energySource2", 1, PhaseCode.ABC)
-
-        n.connect(fcb1.getTerminal(1)!!, energySource1.getTerminal(1)!!)
-        n.connect(fcb2.getTerminal(2)!!, energySource1.getTerminal(1)!!)
-
-        n.add(fcb1)
-        n.add(fcb2)
-        n.add(energySource1)
-        n.add(energySource2)
-
-        doSetPhasesTrace(n)
-    }
-
-    //
-    // nominal
-    // ABC -> XY -> XY -> BC
-    // traced
-    // ABC -> BC -> BC -> BC
-    //
-    @Test
-    internal fun tracesXyDownstreamForNominalPhases() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.BC)
-            .build()
-
-        PhaseValidator.validatePhases(network, "c1", B, C)
-        PhaseValidator.validatePhases(network, "c2", B, C)
-        PhaseValidator.validatePhases(network, "c3", B, C)
-    }
-
-    //
-    // nominal
-    // ABC -> XY -> X -> B
-    //           -> Y -> C
-    // traced
-    // ABC -> BC -> B -> B
-    //           -> C -> C
-    //
-    @Test
-    internal fun testABCtoXYtoSplitXYtoBC() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.X)
-            .to(PhaseCode.B)
-            .splitFromTo("c1", PhaseCode.Y)
-            .to(PhaseCode.C)
-            .build()
-
-        PhaseValidator.validatePhases(network, "c1", B, C)
-        PhaseValidator.validatePhases(network, "c2", B)
-        PhaseValidator.validatePhases(network, "c3", B)
-        PhaseValidator.validatePhases(network, "c4", C)
-        PhaseValidator.validatePhases(network, "c5", C)
-    }
-
-    //
-    // nominal
-    // ABC -> XY -> B
-    //           -> C
-    // traced
-    // ABC -> BC -> B
-    //           -> C
-    //
-    @Test
-    internal fun testABCtoXYtoSplitBC() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.B)
-            .splitFromTo("c1", PhaseCode.C)
-            .build()
-
-        PhaseValidator.validatePhases(network, "c1", B, C)
-        PhaseValidator.validatePhases(network, "c2", B)
-        PhaseValidator.validatePhases(network, "c3", C)
-    }
-
-    //
-    // nominal
-    // ABC -> XY -> AC
-    //           -> BC
-    // traced
-    // ABC -> AB -> AC
-    //           -> BC
-    //
-    @Test
-    @Disabled(value = "Use case not supported")
-    internal fun testABCtoXYtoConflictingACBC() {
-        val network = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.AC)
-            .splitFromTo("c1", PhaseCode.BC)
-            .build()
-
-        PhaseValidator.validatePhases(network, "c1", A, B)
-        PhaseValidator.validatePhases(network, "c2", A, C)
-        PhaseValidator.validatePhases(network, "c3", B, C)
+        expect {
+            SetPhases().run(n.getT("c0", 2), PhaseCode.AB)
+        }.toThrow(IllegalArgumentException::class.java)
+            .withMessage(
+                "Attempted to apply phases [A, B] to Terminal{id='c0-t2'} with nominal phases A. Number of phases to apply must match the number of " +
+                    "nominal phases. Found 2, expected 1"
+            )
     }
 
     @Test
-    internal fun processesXYLoop() {
-        val builder = PhasesTestNetwork
-            .from(PhaseCode.ABC)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.XY)
-            .to(PhaseCode.XY)
+    internal fun detectsCrossPhasingFlow() {
+        //
+        // 1--c0--21--c1--2
+        //
+        val n = TestNetworkBuilder
+            .startWithAcls(PhaseCode.A) { it.terminals[1].normalPhases[SPK.A] = SPK.A } // c0
+            .toAcls(PhaseCode.A) { it.terminals[1].normalPhases[SPK.A] = SPK.B } // c1
+            .buildAndLog()
 
-        // Create a loop
-        builder.network.connect(
-            builder.network.get<ConductingEquipment>("c1")!!.getTerminal(2)!!,
-            builder.network.get<ConductingEquipment>("c3")!!.getTerminal(2)!!
-        )
+        val c1: AcLineSegment = n["c1"]!!
 
-        val network = builder.build()
-
-        PhaseValidator.validatePhases(network, "c1", A, C)
-        PhaseValidator.validatePhases(network, "c2", A, C)
-        PhaseValidator.validatePhases(network, "c3", A, C)
+        expect {
+            SetPhases().run(n.getT("c0", 2))
+        }.toThrow(IllegalStateException::class.java)
+            .withMessage(
+                "Attempted to flow conflicting phase A onto B on nominal phase A. This occurred while flowing from " +
+                    "${c1.terminals[0]} to ${c1.terminals[1]} through ${c1.typeNameAndMRID()}. This is caused by missing open " +
+                    "points, or incorrect phases in upstream equipment that should be corrected in the source data."
+            )
     }
 
     @Test
-    internal fun processesLongXYChain() {
-        val builder = PhasesTestNetwork
-            .from(PhaseCode.ABC)
+    internal fun detectsCrossPhasingConnected() {
+        //
+        // 1--c0--21--c1--21--c2--2
+        //
+        val n = TestNetworkBuilder
+            .startWithAcls(PhaseCode.A) { it.terminals[1].normalPhases[SPK.A] = SPK.A } // c0
+            .toAcls(PhaseCode.A) // c1
+            .toAcls(PhaseCode.A) { it.terminals[0].normalPhases[SPK.A] = SPK.B } // c2
+            .buildAndLog()
 
-        for (i in 1..3000)
-            builder.to(PhaseCode.XY)
+        val c1: AcLineSegment = n["c1"]!!
+        val c2: AcLineSegment = n["c2"]!!
 
-        assertThat(builder.build(), notNullValue())
+        expect {
+            SetPhases().run(n.getT("c0", 2))
+        }.toThrow(IllegalStateException::class.java)
+            .withMessage(
+                "Attempted to flow conflicting phase A onto B on nominal phase path A to A. This occurred while flowing between " +
+                    "${c1.terminals[1]} on ${c1.typeNameAndMRID()} and ${c2.terminals[0]} on ${c2.typeNameAndMRID()}. This is caused by " +
+                    "missing open points, or incorrect phases in upstream equipment that should be corrected in the source data."
+            )
     }
 
-    //
-    // s0 * 1----2 * 1----2 * 1----2 * 1----2 * 1----2 * 1----2 *
-    //        c1       c2       c3       c4   2   c5   1   c9
-    // ABC    ABC      XY       ABC      ABC  |   ABC  |   ABC
-    //                                     c8 |     c6 |
-    //                                     ABC|     ABC|
-    //                                        1        2
-    //                                        * 2----1 *
-    //                                            c7
-    //                                            XY
-    //
-    //todo
-    @Disabled
-    @Test
-    internal fun validateDirectionsWithDroppedPhasesLoop() {
-        val builder = PhasesTestNetwork
-            .from(PhaseCode.ABC) // s0
-            .to(PhaseCode.ABC) // c1
-            .to(PhaseCode.XY) // c2
-            .to(PhaseCode.ABC) // c3
-            .to(PhaseCode.ABC) // c4
-            .to(PhaseCode.ABC) // c5
-            .to(PhaseCode.ABC) // c6
-            .to(PhaseCode.XY) // c7
-            .to(PhaseCode.ABC) // c8
-            .splitFromTo("c5", PhaseCode.ABC) // c9
-
-        // Create a loop
-        builder.network.connect(
-            builder.network.get<ConductingEquipment>("c4")!!.getTerminal(2)!!,
-            builder.network.get<ConductingEquipment>("c8")!!.getTerminal(2)!!
-        )
-
-        val network = builder.build()
-
-        Tracing.phaseInferrer().run(spy(network).also { ns ->
-            doReturn(listOf(network["c6-t2"]!!, *network.listOf<Terminal> { it.mRID != "c6-t2" }.toTypedArray()))
-                .`when`(ns)
-                .listOf(Terminal::class.java)
-        })
-
-        PhaseValidator.validatePhaseDirections(network, "c1", UPSTREAM, DOWNSTREAM)
-        PhaseValidator.validatePhaseDirections(network, "c2", UPSTREAM, DOWNSTREAM)
-        PhaseValidator.validatePhaseDirections(network, "c3", UPSTREAM, DOWNSTREAM)
-        PhaseValidator.validatePhaseDirections(network, "c4", UPSTREAM, DOWNSTREAM)
-        PhaseValidator.validatePhaseDirections(network, "c5", BOTH, BOTH)
-        PhaseValidator.validatePhaseDirections(network, "c6", BOTH, BOTH)
-        PhaseValidator.validatePhaseDirections(network, "c7", BOTH, BOTH)
-        PhaseValidator.validatePhaseDirections(network, "c8", BOTH, BOTH)
-        PhaseValidator.validatePhaseDirections(network, "c9", UPSTREAM, DOWNSTREAM)
+    private fun TestNetworkBuilder.buildAndLog() = build().apply {
+        PhaseLogger.trace(listOf<EnergySource>())
     }
 
-    private fun doSetPhasesTrace(n: NetworkService) {
-        Tracing.setPhases().run(n)
-        n.sequenceOf<EnergySource>().forEach { PhaseLogger.trace(it) }
-    }
+    private fun NetworkService.getT(ce: String, t: Int): Terminal =
+        get<ConductingEquipment>(ce)!!.getTerminal(t)!!
 
-    private fun doSetPhasesTrace(start: ConductingEquipment) {
-        assertThat(start.numTerminals(), equalTo(1))
-
-        Tracing.setPhases().run(start.getTerminal(1)!!, emptyList())
-        PhaseLogger.trace(start)
-    }
-
-    // Get a terminal from an asset in the network
-    private fun getT(n: NetworkService, id: String, terminalId: Int) =
-        n.get<ConductingEquipment>(id)!!.getTerminal(terminalId)!!
-
-    private fun checkExpectedPhases(
-        t: Terminal,
-        phases: Array<SinglePhaseKind>,
-        directions: Array<FeederDirection>
-    ) {
-        checkExpectedPhases(t, phases, directions, phases, directions)
-    }
-
-    private fun checkExpectedPhases(
-        t: Terminal,
-        normalPhases: Array<SinglePhaseKind>,
-        normalDirections: Array<FeederDirection>,
-        currentPhases: Array<SinglePhaseKind>,
-        currentDirections: Array<FeederDirection>
-    ) {
-        checkExpectedPhases(t, normalPhases, normalDirections) { phase -> t.normalPhases(phase) }
-        checkExpectedPhases(t, currentPhases, currentDirections) { phase -> t.currentPhases(phase) }
-    }
-
-    private fun checkExpectedPhases(
-        t: Terminal?,
-        singlePhaseKinds: Array<SinglePhaseKind>,
-        directions: Array<FeederDirection>,
-        phaseStatusSelector: Function<SinglePhaseKind, PhaseStatus>
-    ) {
-        assertThat(t, notNullValue())
-        assertThat(directions.size, equalTo(singlePhaseKinds.size))
-        assertThat(t!!.phases.singlePhases.size, equalTo(singlePhaseKinds.size))
-        for (i in singlePhaseKinds.indices) {
-            val ps = phaseStatusSelector.apply(t.phases.singlePhases[i])
-            assertThat(ps.phase, equalTo(singlePhaseKinds[i]))
-            assertThat(ps.direction, equalTo(directions[i]))
-        }
-    }
-
-    private fun ConductingEquipment.addTerminals(count: Int, phases: PhaseCode = PhaseCode.ABC) {
-        for (i in 1..count)
-            addTerminal(Terminal().also { it.phases = phases })
-    }
 }
-

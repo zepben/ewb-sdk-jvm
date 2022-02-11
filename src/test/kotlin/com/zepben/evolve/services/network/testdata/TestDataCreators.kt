@@ -18,8 +18,9 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.network.NetworkService
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import com.zepben.evolve.services.network.tracing.Tracing
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 
 fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode = PhaseCode.A): EnergySource =
     EnergySource(id).apply {
@@ -146,7 +147,7 @@ fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquip
         this.sequenceNumber = sequenceNumber
         conductingEquipment?.addTerminal(this)
 
-        MatcherAssert.assertThat(network.add(this), Matchers.equalTo(true))
+        assertThat(network.add(this), equalTo(true))
     }
 
 fun createSubstation(networkService: NetworkService, mRID: String, name: String, subGeographicalRegion: SubGeographicalRegion? = null): Substation =
@@ -216,3 +217,8 @@ fun createOperationalRestriction(networkService: NetworkService, mRID: String, n
             }
         }
     }
+
+inline fun <reified T : ConductingEquipment> T.addFeederDirections(terminal: Int = 1): T {
+    getTerminal(terminal)?.also { Tracing.setDirection().run(it) }
+    return this
+}

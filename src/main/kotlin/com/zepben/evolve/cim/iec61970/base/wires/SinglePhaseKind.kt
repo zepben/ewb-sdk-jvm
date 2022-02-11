@@ -7,8 +7,6 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
-
 /**
  * Enumeration of single phase identifiers. Allows designation of single phases for both transmission and distribution equipment, circuits and loads.
  *

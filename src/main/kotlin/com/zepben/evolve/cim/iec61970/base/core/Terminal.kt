@@ -7,7 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.core
 
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
+import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseSelector
 import com.zepben.evolve.services.network.tracing.phases.PhaseStatus
 import com.zepben.evolve.services.network.tracing.phases.TracedPhases
@@ -23,7 +23,9 @@ import java.lang.ref.WeakReference
  * @property sequenceNumber The orientation of the terminal connections for a multiple terminal conducting equipment.
  *                          The sequence numbering starts with 1 and additional terminals should follow in increasing order.
  *                          The first terminal is the "starting point" for a two terminal branch.
- * @property tracedPhases the phase object representing the traced phases in both the normal and current network. If
+ * @property normalFeederDirection Stores the direction of the feeder head relative to this [Terminal] in the normal state of the network.
+ * @property currentFeederDirection Stores the direction of the feeder head relative to this [Terminal] in the current state of the network.
+ * @property tracedPhases The phase object representing the traced phases in both the normal and current network. If
  *                        properly configured you would expect the normal state phases to match those in {@code phases}
  */
 class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID) {
@@ -36,6 +38,10 @@ class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID)
 
     var phases: PhaseCode = PhaseCode.ABC
     var sequenceNumber: Int = 0
+
+    var normalFeederDirection: FeederDirection = FeederDirection.NONE
+    var currentFeederDirection: FeederDirection = FeederDirection.NONE
+
     val tracedPhases: TracedPhases = TracedPhases()
 
     // The reference to the connectivity node is weak so if a Network object goes out of scope, holding a single conducting equipment
@@ -51,30 +57,28 @@ class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID)
     /**
      * @return The ID of the connectivity node to which this terminal connects with zero impedance.
      */
-    fun connectivityNodeId(): String? = connectivityNode?.mRID
+    val connectivityNodeId: String?; get() = connectivityNode?.mRID
 
     /**
      * Helper method for checking if the terminal is connected.
      *
      * @return true if the terminal is wired to a connectivity node.
      */
-    fun isConnected() = connectivityNode != null
+    val isConnected: Boolean; get() = connectivityNode != null
 
     /**
-     * Convenience method for accessing the normal phase status of a nominal phase.
+     * Convenience method for accessing the normal phases.
      *
-     * @param nominalPhase to get the phase status for.
-     * @return the phases status for the nominal phase in the normal state of the network.
+     * @return the [PhaseStatus] for the terminal in the normal state of the network.
      */
-    fun normalPhases(nominalPhase: SinglePhaseKind): PhaseStatus = PhaseSelector.NORMAL_PHASES.status(this, nominalPhase)
+    val normalPhases: PhaseStatus; get() = PhaseSelector.NORMAL_PHASES.phases(this)
 
     /**
-     * Convenience method for accessing the current phase status of a nominal phase.
+     * Convenience method for accessing the current phases.
      *
-     * @param nominalPhase to get the phase status for.
-     * @return the phases status for the nominal phase in the current state of the network.
+     * @return the [PhaseStatus] for the terminal in the normal state of the network.
      */
-    fun currentPhases(nominalPhase: SinglePhaseKind): PhaseStatus = PhaseSelector.CURRENT_PHASES.status(this, nominalPhase)
+    val currentPhases: PhaseStatus; get() = PhaseSelector.CURRENT_PHASES.phases(this)
 
     // NOTE: This is meant to be package private to prevent external linking of objects. Use the network
     //       to connect from outside this package.
@@ -94,4 +98,5 @@ class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID)
     companion object {
         private val NO_CONNECTIVITY_NODE = WeakReference<ConnectivityNode>(null)
     }
+
 }

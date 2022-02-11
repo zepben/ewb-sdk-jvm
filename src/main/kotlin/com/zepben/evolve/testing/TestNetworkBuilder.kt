@@ -15,13 +15,16 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
 
 /**
- *
+ * A class for building simple test networks, often used for unit testing.
  */
 class TestNetworkBuilder private constructor() {
+
+    private var currentTerminal: Int? = null
 
     /**
      * The network where objects are created for this [TestNetworkBuilder]. You should not be readily required to access the network via this property,
@@ -36,11 +39,61 @@ class TestNetworkBuilder private constructor() {
      * Start a new network island from an [EnergySource], updating the network pointer to the new [EnergySource].
      *
      * @param phases The [PhaseCode] for the new [EnergySource], used as both the nominal and energising phases. Must be a subset of [PhaseCode.ABCN].
+     * @param action An action that accepts the new [EnergySource] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
-    fun fromSource(phases: PhaseCode): TestNetworkBuilder {
-        current = network.createExternalSource(phases)
+    @JvmOverloads
+    fun fromSource(phases: PhaseCode = PhaseCode.ABC, action: (EnergySource) -> Unit = {}): TestNetworkBuilder {
+        current = network.createExternalSource(phases).also(action)
+        return this
+    }
+
+    /**
+     * Add a new [EnergySource] to the network and connect it to the current network pointer, updating the network pointer to the new [EnergySource].
+     *
+     * @param phases The [PhaseCode] for the new [EnergySource], used as both the nominal and energising phases. Must be a subset of [PhaseCode.ABCN].
+     * @param action An action that accepts the new [EnergySource] to allow for additional initialisation.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun toSource(phases: PhaseCode = PhaseCode.ABC, action: (EnergySource) -> Unit = {}): TestNetworkBuilder {
+        current = network.createExternalSource(phases).also {
+            connect(current!!, it)
+            action(it)
+        }
+        return this
+    }
+
+    /**
+     * Start a new network island from an [AcLineSegment], updating the network pointer to the new [AcLineSegment].
+     *
+     * @param nominalPhases The nominal phases for the new [AcLineSegment].
+     * @param action An action that accepts the new [AcLineSegment] to allow for additional initialisation.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun fromAcls(nominalPhases: PhaseCode = PhaseCode.ABC, action: (AcLineSegment) -> Unit = {}): TestNetworkBuilder {
+        current = network.createAcls(nominalPhases).also(action)
+        return this
+    }
+
+    /**
+     * Add a new [AcLineSegment] to the network and connect it to the current network pointer, updating the network pointer to the new [AcLineSegment].
+     *
+     * @param nominalPhases The nominal phases for the new [AcLineSegment].
+     * @param action An action that accepts the new [AcLineSegment] to allow for additional initialisation.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun toAcls(nominalPhases: PhaseCode = PhaseCode.ABC, action: (AcLineSegment) -> Unit = {}): TestNetworkBuilder {
+        current = network.createAcls(nominalPhases).also {
+            connect(current!!, it)
+            action(it)
+        }
         return this
     }
 
@@ -50,37 +103,18 @@ class TestNetworkBuilder private constructor() {
      * @param nominalPhases The nominal phases for the new [Breaker].
      * @param isNormallyOpen The normal state of the switch. Defaults to false.
      * @param isOpen The current state of the switch. Defaults to [isNormallyOpen].
+     * @param action An action that accepts the new [Breaker] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
-    fun fromBreaker(nominalPhases: PhaseCode, isNormallyOpen: Boolean = false, isOpen: Boolean? = null): TestNetworkBuilder {
-        current = network.createBreaker(nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen ?: isNormallyOpen)
-        return this
-    }
-
-    /**
-     * Start a new network island from an [AcLineSegment], updating the network pointer to the new [AcLineSegment].
-     *
-     * @param nominalPhases The nominal phases for the new [AcLineSegment].
-     *
-     * @return This [TestNetworkBuilder] to allow for fluent use.
-     */
-    fun fromAcls(nominalPhases: PhaseCode): TestNetworkBuilder {
-        current = network.createAcls(nominalPhases)
-        return this
-    }
-
-    /**
-     * Add a new [AcLineSegment] to the network and connect it to the current network pointer, updating the network pointer to the new [AcLineSegment].
-     *
-     * @param nominalPhases The nominal phases for the new [AcLineSegment].
-     *
-     * @return This [TestNetworkBuilder] to allow for fluent use.
-     */
-    fun toAcls(nominalPhases: PhaseCode): TestNetworkBuilder {
-        current = network.createAcls(nominalPhases).also {
-            connect(current!!, it)
-        }
+    @JvmOverloads
+    fun fromBreaker(
+        nominalPhases: PhaseCode = PhaseCode.ABC,
+        isNormallyOpen: Boolean = false,
+        isOpen: Boolean? = null,
+        action: (Breaker) -> Unit = {}
+    ): TestNetworkBuilder {
+        current = network.createBreaker(nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen ?: isNormallyOpen).also(action)
         return this
     }
 
@@ -90,26 +124,53 @@ class TestNetworkBuilder private constructor() {
      * @param nominalPhases The nominal phases for the new [Breaker].
      * @param isNormallyOpen The normal state of the switch. Defaults to false.
      * @param isOpen The current state of the switch. Defaults to [isNormallyOpen].
+     * @param action An action that accepts the new [Breaker] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
-    fun toBreaker(nominalPhases: PhaseCode, isNormallyOpen: Boolean = false, isOpen: Boolean? = null): TestNetworkBuilder {
+    @JvmOverloads
+    fun toBreaker(
+        nominalPhases: PhaseCode = PhaseCode.ABC,
+        isNormallyOpen: Boolean = false,
+        isOpen: Boolean? = null,
+        action: (Breaker) -> Unit = {}
+    ): TestNetworkBuilder {
         current = network.createBreaker(nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen ?: isNormallyOpen).also {
             connect(current!!, it)
+            action(it)
         }
         return this
     }
 
     /**
-     * Add a new [EnergySource] to the network and connect it to the current network pointer, updating the network pointer to the new [EnergySource].
+     * Start a new network island from a [Junction], updating the network pointer to the new [Junction].
      *
-     * @param phases The [PhaseCode] for the new [EnergySource], used as both the nominal and energising phases. Must be a subset of [PhaseCode.ABCN].
+     * @param nominalPhases The nominal phases for the new [Junction].
+     * @param numTerminals The number of terminals to create on the new [Junction]. Defaults to 2.
+     * @param action An action that accepts the new [Junction] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
-    fun toSource(phases: PhaseCode): TestNetworkBuilder {
-        current = network.createExternalSource(phases).also {
+    @JvmOverloads
+    fun fromJunction(nominalPhases: PhaseCode = PhaseCode.ABC, numTerminals: Int? = null, action: (Junction) -> Unit = {}): TestNetworkBuilder {
+        current = network.createJunction(nominalPhases, numTerminals).also(action)
+        return this
+    }
+
+    /**
+     * Add a new [Junction] to the network and connect it to the current network pointer, updating the network pointer to the new [Junction].
+     *
+     * @param nominalPhases The nominal phases for the new [Junction].
+     * @param numTerminals The number of terminals to create on the new [Junction]. Defaults to 2.
+     * @param action An action that accepts the new [Junction] to allow for additional initialisation.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun toJunction(nominalPhases: PhaseCode = PhaseCode.ABC, numTerminals: Int? = null, action: (Junction) -> Unit = {}): TestNetworkBuilder {
+        current = network.createJunction(nominalPhases, numTerminals).also {
             connect(current!!, it)
+            action(it)
         }
         return this
     }
@@ -121,8 +182,9 @@ class TestNetworkBuilder private constructor() {
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
-    fun splitFrom(from: String): TestNetworkBuilder {
+    fun splitFrom(from: String, terminal: Int? = null): TestNetworkBuilder {
         current = network[from]!!
+        currentTerminal = terminal
         return this
     }
 
@@ -145,10 +207,11 @@ class TestNetworkBuilder private constructor() {
      * Create a new feeder with the specified terminal as the head terminal.
      *
      * @param headMrid The mRID of the head [ConductingEquipment].
-     * @param sequenceNumber The [Terminal] sequence number of the head terminal. Defaults to
+     * @param sequenceNumber The [Terminal] sequence number of the head terminal. Defaults to last terminal.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
+    @JvmOverloads
     fun addFeeder(headMrid: String, sequenceNumber: Int? = null): TestNetworkBuilder {
         network.createFeeder(network[headMrid]!!, sequenceNumber)
         return this
@@ -161,8 +224,12 @@ class TestNetworkBuilder private constructor() {
      *
      * @return The [NetworkService] created by this [TestNetworkBuilder]
      */
-    fun build(): NetworkService {
+    fun build(applyDirectionsFromSources: Boolean = true): NetworkService {
         Tracing.setPhases().run(network)
+        Tracing.setDirection().run(network)
+
+        if (applyDirectionsFromSources)
+            network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach { Tracing.setDirection().run(it) }
         return network
     }
 
@@ -170,9 +237,10 @@ class TestNetworkBuilder private constructor() {
 
     private fun connect(from: ConductingEquipment, to: ConductingEquipment, fromTerminal: Int? = null, toTerminal: Int? = null) {
         network.connect(
-            from.getTerminal(fromTerminal ?: if (from is EnergySource) 1 else 2)!!,
+            from.getTerminal(fromTerminal ?: currentTerminal ?: from.numTerminals())!!,
             to.getTerminal(toTerminal ?: 1)!!
         )
+        currentTerminal = null
     }
 
     private fun NetworkService.createExternalSource(phaseCode: PhaseCode) =
@@ -194,7 +262,7 @@ class TestNetworkBuilder private constructor() {
             }.also { add(it) }
         }
 
-    private fun NetworkService.createBreaker(phaseCode: PhaseCode, isNormallyOpen: Boolean, isOpen: Boolean) =
+    private fun NetworkService.createBreaker(phaseCode: PhaseCode = PhaseCode.ABC, isNormallyOpen: Boolean, isOpen: Boolean) =
         nextId("b").let { id ->
             Breaker(id).apply {
                 setNormallyOpen(isNormallyOpen)
@@ -205,11 +273,24 @@ class TestNetworkBuilder private constructor() {
             }.also { add(it) }
         }
 
+    private fun NetworkService.createJunction(phaseCode: PhaseCode = PhaseCode.ABC, numTerminals: Int?) =
+        nextId("j").let { id ->
+            Junction(id).apply {
+                for (i in 1..(numTerminals ?: 2))
+                    addTerminal(Terminal("$id-t$i").apply { phases = phaseCode }.also { add(it) })
+            }.also { add(it) }
+        }
+
     private fun NetworkService.createFeeder(headEquipment: ConductingEquipment, sequenceNumber: Int?) =
         nextId("fdr").let { id ->
             Feeder(id).apply {
-                normalHeadTerminal = headEquipment.getTerminal(sequenceNumber ?: if (headEquipment is EnergySource) 1 else 2)!!
-            }.also { add(it) }
+                normalHeadTerminal = headEquipment.getTerminal(sequenceNumber ?: headEquipment.numTerminals())!!
+
+                addEquipment(headEquipment)
+            }.also {
+                headEquipment.addContainer(it)
+                add(it)
+            }
         }
 
     companion object {
@@ -218,26 +299,30 @@ class TestNetworkBuilder private constructor() {
          * Create a [TestNetworkBuilder] that starts with an [EnergySource].
          *
          * @param phases The nominal phases for the starting [Breaker].
+         * @param action An action that accepts the new [EnergySource] to allow for additional initialisation.
          *
          * @return The [TestNetworkBuilder] with the current network pointer assigned to the created [EnergySource].
          */
         @JvmStatic
-        fun startWithSource(phases: PhaseCode): TestNetworkBuilder =
+        @JvmOverloads
+        fun startWithSource(phases: PhaseCode = PhaseCode.ABC, action: (EnergySource) -> Unit = {}): TestNetworkBuilder =
             TestNetworkBuilder().apply {
-                fromSource(phases)
+                fromSource(phases, action)
             }
 
         /**
          * Create a [TestNetworkBuilder] that starts with an [AcLineSegment].
          *
          * @param nominalPhases The nominal phases for the starting [AcLineSegment].
+         * @param action An action that accepts the new [AcLineSegment] to allow for additional initialisation.
          *
          * @return The [TestNetworkBuilder] with the current network pointer assigned to the created [AcLineSegment].
          */
         @JvmStatic
-        fun startWithAcls(nominalPhases: PhaseCode): TestNetworkBuilder =
+        @JvmOverloads
+        fun startWithAcls(nominalPhases: PhaseCode = PhaseCode.ABC, action: (AcLineSegment) -> Unit = {}): TestNetworkBuilder =
             TestNetworkBuilder().apply {
-                fromAcls(nominalPhases)
+                fromAcls(nominalPhases, action)
             }
 
         /**
@@ -246,13 +331,36 @@ class TestNetworkBuilder private constructor() {
          * @param nominalPhases The nominal phases for the starting [Breaker].
          * @param isNormallyOpen The normal state of the switch. Defaults to false.
          * @param isOpen The current state of the switch. Defaults to [isNormallyOpen].
+         * @param action An action that accepts the new [Breaker] to allow for additional initialisation.
          *
          * @return The [TestNetworkBuilder] with the current network pointer assigned to the created [Breaker].
          */
         @JvmStatic
-        fun startWithBreaker(nominalPhases: PhaseCode, isNormallyOpen: Boolean = false, isOpen: Boolean? = null): TestNetworkBuilder =
+        @JvmOverloads
+        fun startWithBreaker(
+            nominalPhases: PhaseCode = PhaseCode.ABC,
+            isNormallyOpen: Boolean = false,
+            isOpen: Boolean? = null,
+            action: (Breaker) -> Unit = {}
+        ): TestNetworkBuilder =
             TestNetworkBuilder().apply {
-                fromBreaker(nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen)
+                fromBreaker(nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen, action)
+            }
+
+        /**
+         * Add a new [Junction] to the network and connect it to the current network pointer, updating the network pointer to the new [Junction].
+         *
+         * @param nominalPhases The nominal phases for the new [Junction].
+         * @param numTerminals The number of terminals to create on the new [Junction]. Defaults to 2.
+         * @param action An action that accepts the new [Junction] to allow for additional initialisation.
+         *
+         * @return This [TestNetworkBuilder] to allow for fluent use.
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun startWithJunction(nominalPhases: PhaseCode = PhaseCode.ABC, numTerminals: Int? = null, action: (Junction) -> Unit = {}): TestNetworkBuilder =
+            TestNetworkBuilder().apply {
+                fromJunction(nominalPhases, numTerminals, action)
             }
 
     }

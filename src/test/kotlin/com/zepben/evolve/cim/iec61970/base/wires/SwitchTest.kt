@@ -9,7 +9,6 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -18,6 +17,7 @@ import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.RegisterExtension
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 internal class SwitchTest {
 
@@ -59,43 +59,43 @@ internal class SwitchTest {
         val switch = object : Switch() {}
 
         // Test closing current
-        switch.setOpen(true, null).setOpen(false, A)
+        switch.setOpen(true, null).setOpen(false, SPK.A)
         testOpen(switch, aOpen = false, bOpen = true, cOpen = true, nOpen = true)
-        switch.setOpen(true, null).setOpen(false, B)
+        switch.setOpen(true, null).setOpen(false, SPK.B)
         testOpen(switch, aOpen = true, bOpen = false, cOpen = true, nOpen = true)
-        switch.setOpen(true, null).setOpen(false, C)
+        switch.setOpen(true, null).setOpen(false, SPK.C)
         testOpen(switch, aOpen = true, bOpen = true, cOpen = false, nOpen = true)
-        switch.setOpen(true, null).setOpen(false, N)
+        switch.setOpen(true, null).setOpen(false, SPK.N)
         testOpen(switch, aOpen = true, bOpen = true, cOpen = true, nOpen = false)
 
         // Test opening current
-        switch.setOpen(false, null).setOpen(true, A)
+        switch.setOpen(false, null).setOpen(true, SPK.A)
         testOpen(switch, aOpen = true, bOpen = false, cOpen = false, nOpen = false)
-        switch.setOpen(false, null).setOpen(true, B)
+        switch.setOpen(false, null).setOpen(true, SPK.B)
         testOpen(switch, aOpen = false, bOpen = true, cOpen = false, nOpen = false)
-        switch.setOpen(false, null).setOpen(true, C)
+        switch.setOpen(false, null).setOpen(true, SPK.C)
         testOpen(switch, aOpen = false, bOpen = false, cOpen = true, nOpen = false)
-        switch.setOpen(false, null).setOpen(true, N)
+        switch.setOpen(false, null).setOpen(true, SPK.N)
         testOpen(switch, aOpen = false, bOpen = false, cOpen = false, nOpen = true)
 
         // Test closing normal
-        switch.setNormallyOpen(true, null).setNormallyOpen(false, A)
+        switch.setNormallyOpen(true, null).setNormallyOpen(false, SPK.A)
         testNormallyOpen(switch, aOpen = false, bOpen = true, cOpen = true, nOpen = true)
-        switch.setNormallyOpen(true, null).setNormallyOpen(false, B)
+        switch.setNormallyOpen(true, null).setNormallyOpen(false, SPK.B)
         testNormallyOpen(switch, aOpen = true, bOpen = false, cOpen = true, nOpen = true)
-        switch.setNormallyOpen(true, null).setNormallyOpen(false, C)
+        switch.setNormallyOpen(true, null).setNormallyOpen(false, SPK.C)
         testNormallyOpen(switch, aOpen = true, bOpen = true, cOpen = false, nOpen = true)
-        switch.setNormallyOpen(true, null).setNormallyOpen(false, N)
+        switch.setNormallyOpen(true, null).setNormallyOpen(false, SPK.N)
         testNormallyOpen(switch, aOpen = true, bOpen = true, cOpen = true, nOpen = false)
 
         // Test opening normal
-        switch.setNormallyOpen(false, null).setNormallyOpen(true, A)
+        switch.setNormallyOpen(false, null).setNormallyOpen(true, SPK.A)
         testNormallyOpen(switch, aOpen = true, bOpen = false, cOpen = false, nOpen = false)
-        switch.setNormallyOpen(false, null).setNormallyOpen(true, B)
+        switch.setNormallyOpen(false, null).setNormallyOpen(true, SPK.B)
         testNormallyOpen(switch, aOpen = false, bOpen = true, cOpen = false, nOpen = false)
-        switch.setNormallyOpen(false, null).setNormallyOpen(true, C)
+        switch.setNormallyOpen(false, null).setNormallyOpen(true, SPK.C)
         testNormallyOpen(switch, aOpen = false, bOpen = false, cOpen = true, nOpen = false)
-        switch.setNormallyOpen(false, null).setNormallyOpen(true, N)
+        switch.setNormallyOpen(false, null).setNormallyOpen(true, SPK.N)
         testNormallyOpen(switch, aOpen = false, bOpen = false, cOpen = false, nOpen = true)
     }
 
@@ -105,13 +105,13 @@ internal class SwitchTest {
         switch.setOpen(false, null)
         assertThat(switch.isOpen(null), equalTo(false))
 
-        switch.setOpen(true, A)
+        switch.setOpen(true, SPK.A)
         assertThat(switch.isOpen(null), equalTo(true))
 
         switch.setNormallyOpen(false, null)
         assertThat(switch.isNormallyOpen(null), equalTo(false))
 
-        switch.setNormallyOpen(true, A)
+        switch.setNormallyOpen(true, SPK.A)
         assertThat(switch.isNormallyOpen(null), equalTo(true))
     }
 
@@ -123,41 +123,41 @@ internal class SwitchTest {
         }
 
         switch.setOpen(true)
-        switch.setOpen(false, C)
+        switch.setOpen(false, SPK.C)
         testOpen(switch, aOpen = true, bOpen = true, cOpen = false, nOpen = true)
 
         switch.setNormallyOpen(true)
-        switch.setNormallyOpen(false, C)
+        switch.setNormallyOpen(false, SPK.C)
         testNormallyOpen(switch, aOpen = true, bOpen = true, cOpen = false, nOpen = true)
     }
 
     @Test
     internal fun `throws on invalid phase`() {
         val switch = object : Switch() {}
-        expect { switch.setOpen(true, INVALID) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.setOpen(true, NONE) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.isOpen(INVALID) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.isOpen(NONE) }.toThrow(IllegalArgumentException::class.java)
+        expect { switch.setOpen(true, SPK.INVALID) }.toThrow(IllegalArgumentException::class.java)
+        expect { switch.setOpen(true, SPK.NONE) }.toThrow(IllegalArgumentException::class.java)
+        expect { switch.isOpen(SPK.INVALID) }.toThrow(IllegalArgumentException::class.java)
+        expect { switch.isOpen(SPK.NONE) }.toThrow(IllegalArgumentException::class.java)
 
-        expect { switch.setNormallyOpen(true, INVALID) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.setNormallyOpen(true, NONE) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.isNormallyOpen(INVALID) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.isNormallyOpen(NONE) }.toThrow(IllegalArgumentException::class.java)
+        expect { switch.setNormallyOpen(true, SPK.INVALID) }.toThrow(IllegalArgumentException::class.java)
+        expect { switch.setNormallyOpen(true, SPK.NONE) }.toThrow(IllegalArgumentException::class.java)
+        expect { switch.isNormallyOpen(SPK.INVALID) }.toThrow(IllegalArgumentException::class.java)
+        expect { switch.isNormallyOpen(SPK.NONE) }.toThrow(IllegalArgumentException::class.java)
     }
 
     private fun testOpen(switch: Switch, aOpen: Boolean, bOpen: Boolean, cOpen: Boolean, nOpen: Boolean) {
         assertAll("open states",
-            { assertThat("Phase A open", switch.isOpen(A), equalTo(aOpen)) },
-            { assertThat("Phase B open", switch.isOpen(B), equalTo(bOpen)) },
-            { assertThat("Phase C open", switch.isOpen(C), equalTo(cOpen)) },
-            { assertThat("Phase N open", switch.isOpen(N), equalTo(nOpen)) })
+            { assertThat("Phase A open", switch.isOpen(SPK.A), equalTo(aOpen)) },
+            { assertThat("Phase B open", switch.isOpen(SPK.B), equalTo(bOpen)) },
+            { assertThat("Phase C open", switch.isOpen(SPK.C), equalTo(cOpen)) },
+            { assertThat("Phase N open", switch.isOpen(SPK.N), equalTo(nOpen)) })
     }
 
     private fun testNormallyOpen(switch: Switch, aOpen: Boolean, bOpen: Boolean, cOpen: Boolean, nOpen: Boolean) {
         assertAll("normally open states",
-            { assertThat("Phase A normally open", switch.isNormallyOpen(A), equalTo(aOpen)) },
-            { assertThat("Phase B normally open", switch.isNormallyOpen(B), equalTo(bOpen)) },
-            { assertThat("Phase C normally open", switch.isNormallyOpen(C), equalTo(cOpen)) },
-            { assertThat("Phase N normally open", switch.isNormallyOpen(N), equalTo(nOpen)) })
+            { assertThat("Phase A normally open", switch.isNormallyOpen(SPK.A), equalTo(aOpen)) },
+            { assertThat("Phase B normally open", switch.isNormallyOpen(SPK.B), equalTo(bOpen)) },
+            { assertThat("Phase C normally open", switch.isNormallyOpen(SPK.C), equalTo(cOpen)) },
+            { assertThat("Phase N normally open", switch.isNormallyOpen(SPK.N), equalTo(nOpen)) })
     }
 }

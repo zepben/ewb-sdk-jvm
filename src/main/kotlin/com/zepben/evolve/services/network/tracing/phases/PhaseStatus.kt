@@ -16,48 +16,20 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 interface PhaseStatus {
 
     /**
-     * @return The phase added to this status.
-     */
-    val phase: SinglePhaseKind
-
-    /**
-     * @return The direction added to this status.
-     */
-    val direction: FeederDirection
-
-    /**
-     * Clears the phase and sets it to the specified phase and direction.
-     * If the passed in phase is NONE or the passed in direction is NONE, this will clear the phase status.
+     * Get the traced phase for the specified [nominalPhase].
      *
-     * @param singlePhaseKind The new phase to be set.
-     * @param direction       The direction of the phase.
+     * @param nominalPhase The nominal phase you are interested in querying.
      */
-    operator fun set(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean
+    operator fun get(nominalPhase: SinglePhaseKind): SinglePhaseKind
 
     /**
-     * Adds a phase to the status with the given direction.
+     * Set the traced phase for the specified [nominalPhase].
      *
-     * @param singlePhaseKind The phase to be added.
-     * @param direction       The direction of the phase.
-     * @return true if the phase or direction has been updated.
-     */
-    fun add(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean
-
-    /**
-     * Removes a phase from the status matching a specific direction.
+     * @param nominalPhase The nominal phase you are interested in updating.
+     * @param singlePhaseKind The phase you wish to set for this [nominalPhase]. Specify [SinglePhaseKind.NONE] to clear the phase.
      *
-     * @param singlePhaseKind The phase to be removed.
-     * @param direction       The direction to match with the phase being removed.
-     * @return true if the phase or direction has been updated.
+     * @return True if the phase is updated, otherwise false.
      */
-    fun remove(singlePhaseKind: SinglePhaseKind, direction: FeederDirection): Boolean
-
-    /**
-     * Removes a phase from the status in any direction.
-     *
-     * @param singlePhaseKind The phase to be removed.
-     * @return true if the phase or direction has been updated.
-     */
-    fun remove(singlePhaseKind: SinglePhaseKind): Boolean
+    operator fun set(nominalPhase: SinglePhaseKind, singlePhaseKind: SinglePhaseKind): Boolean
 
 }

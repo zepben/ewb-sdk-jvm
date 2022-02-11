@@ -613,8 +613,10 @@ internal class NetworkConsumerClientTest {
         consumerService.onGetCurrentEquipmentForFeeder = spy { request, response ->
             val objects = mutableListOf<IdentifiedObject>()
             val feeder = expectedService.get<Feeder>(request.mrid)!!
+
             if (invalidObject == Equipment::class.java)
                 throw expectedException!!
+
             feeder.currentEquipment.forEach { equip -> objects.add(equip) }
             currentEquipmentResponseOf(objects).forEach { response.onNext(it) }
         }

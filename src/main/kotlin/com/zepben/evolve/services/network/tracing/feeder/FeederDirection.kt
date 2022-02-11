@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2022 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.tracing.phases
+package com.zepben.evolve.services.network.tracing.feeder
 
 /***
  * Enumeration of directions along a feeder at a terminal.
@@ -47,4 +47,5 @@ enum class FeederDirection(private val value: Int) {
     operator fun minus(rhs: FeederDirection): FeederDirection {
         return directionsByValues[value - (value and rhs.value)]
     }
+
 }

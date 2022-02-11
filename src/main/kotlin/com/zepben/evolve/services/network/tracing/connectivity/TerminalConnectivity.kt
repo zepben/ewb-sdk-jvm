@@ -10,12 +10,11 @@ package com.zepben.evolve.services.network.tracing.connectivity
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.services.network.tracing.connectivity.PhasePaths.straightPhaseConnectivity
 import com.zepben.evolve.services.network.tracing.connectivity.PhasePaths.viableInferredPhaseConnectivity
 import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 class TerminalConnectivity @JvmOverloads constructor(
     private val createCandidatePhases: () -> XyCandidatePhasePaths = { XyCandidatePhasePaths() }
@@ -26,7 +25,7 @@ class TerminalConnectivity @JvmOverloads constructor(
     }
 
     @JvmOverloads
-    fun connectedTerminals(terminal: Terminal, phases: Iterable<SinglePhaseKind> = terminal.phases.singlePhases): List<ConnectivityResult> {
+    fun connectedTerminals(terminal: Terminal, phases: Iterable<SPK> = terminal.phases.singlePhases): List<ConnectivityResult> {
         val tracePhases = phases.intersect(terminal.phases.singlePhases.toSet())
         val connectivityNode = terminal.connectivityNode ?: return emptyList()
 
@@ -44,7 +43,7 @@ class TerminalConnectivity @JvmOverloads constructor(
     private fun terminalConnectivity(
         terminal: Terminal,
         connectedTerminal: Terminal,
-        tracedPhases: Set<SinglePhaseKind>
+        tracedPhases: Set<SPK>
     ): ConnectivityResult =
         ConnectivityResult.between(
             terminal,
@@ -67,8 +66,8 @@ class TerminalConnectivity @JvmOverloads constructor(
             return null
 
         val nominalPhasePaths = mutableListOf<NominalPhasePath>()
-        if (terminal.phases.contains(N) && connectedTerminal.phases.contains(N))
-            nominalPhasePaths.add(NominalPhasePath(N, N))
+        if (terminal.phases.contains(SPK.N) && connectedTerminal.phases.contains(SPK.N))
+            nominalPhasePaths.add(NominalPhasePath(SPK.N, SPK.N))
 
         if (xyPhases.isNotNone())
             findXyPhasePaths(terminal) { from, to -> nominalPhasePaths.add(NominalPhasePath(from, to)) }
@@ -78,10 +77,7 @@ class TerminalConnectivity @JvmOverloads constructor(
         return nominalPhasePaths
     }
 
-    private fun findXyPhasePaths(
-        terminal: Terminal,
-        addPath: (SinglePhaseKind, SinglePhaseKind) -> Unit
-    ) {
+    private fun findXyPhasePaths(terminal: Terminal, addPath: (SPK, SPK) -> Unit) {
         val cn = terminal.connectivityNode!!
 
         val xyPhases = cn.terminals.associateWith { it.findXyPhases() }.filterValues { it.isNotNone() }
@@ -90,16 +86,13 @@ class TerminalConnectivity @JvmOverloads constructor(
         findXyCandidatePhases(xyPhases, primaryPhases).apply {
             calculatePaths()
                 .asSequence()
-                .filter { (_, to) -> to != NONE }
+                .filter { (_, to) -> to != SPK.NONE }
                 .filter { (from, to) -> (from in terminal.phases.singlePhases) || (to in terminal.phases.singlePhases) }
                 .forEach { (from, to) -> addPath(from, to) }
         }
     }
 
-    private fun findXyCandidatePhases(
-        xyPhases: Map<Terminal, PhaseCode>,
-        primaryPhases: Map<Terminal, PhaseCode>
-    ): XyCandidatePhasePaths {
+    private fun findXyCandidatePhases(xyPhases: Map<Terminal, PhaseCode>, primaryPhases: Map<Terminal, PhaseCode>): XyCandidatePhasePaths {
         val queue = ArrayDeque<XyPhaseStep>()
         val visited = mutableSetOf<XyPhaseStep>()
         val candidatePhases = createCandidatePhases()
@@ -129,7 +122,7 @@ class TerminalConnectivity @JvmOverloads constructor(
             return
 
         val withoutNeutral = step.terminal.phases.withoutNeutral()
-        if (withoutNeutral.singlePhases.any { (it == X) || (it == Y) }) {
+        if (withoutNeutral.singlePhases.any { (it == SPK.X) || (it == SPK.Y) }) {
             if (!checkTracedPhases(step, candidatePhases))
                 queueNext(step.terminal, withoutNeutral, queue)
         } else {
@@ -142,12 +135,12 @@ class TerminalConnectivity @JvmOverloads constructor(
     private fun checkTracedPhases(step: XyPhaseStep, candidatePhases: XyCandidatePhasePaths): Boolean {
         var foundTraced = false
         step.terminal.tracedPhases.apply {
-            phaseNormal(X).takeIf { it != NONE }?.also {
-                candidatePhases.addKnown(X, it)
+            normal[SPK.X].takeIf { it != SPK.NONE }?.also {
+                candidatePhases.addKnown(SPK.X, it)
                 foundTraced = true
             }
-            phaseNormal(Y).takeIf { it != NONE }?.also {
-                candidatePhases.addKnown(Y, it)
+            normal[SPK.Y].takeIf { it != SPK.NONE }?.also {
+                candidatePhases.addKnown(SPK.Y, it)
                 foundTraced = true
             }
         }

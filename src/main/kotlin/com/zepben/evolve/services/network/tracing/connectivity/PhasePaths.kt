@@ -9,19 +9,18 @@
 package com.zepben.evolve.services.network.tracing.connectivity
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 object PhasePaths {
 
     private val straightPhasePaths = mapOf(
-        A to NominalPhasePath(A, A),
-        B to NominalPhasePath(B, B),
-        C to NominalPhasePath(C, C),
-        N to NominalPhasePath(N, N),
-        X to NominalPhasePath(X, X),
-        Y to NominalPhasePath(Y, Y),
+        SPK.A to NominalPhasePath(SPK.A, SPK.A),
+        SPK.B to NominalPhasePath(SPK.B, SPK.B),
+        SPK.C to NominalPhasePath(SPK.C, SPK.C),
+        SPK.N to NominalPhasePath(SPK.N, SPK.N),
+        SPK.X to NominalPhasePath(SPK.X, SPK.X),
+        SPK.Y to NominalPhasePath(SPK.Y, SPK.Y),
     )
 
     private val knownPhaseCodes = PhaseCode.values().filter { pc -> pc.singlePhases.any { it in PhaseCode.ABC.singlePhases } || (pc == PhaseCode.N) }
@@ -38,33 +37,33 @@ object PhasePaths {
             }
         }
 
-    val viableInferredPhaseConnectivity: Map<PhaseCode, Map<PhaseCode, Map<SinglePhaseKind, List<SinglePhaseKind>>>> = mapOf(
+    val viableInferredPhaseConnectivity: Map<PhaseCode, Map<PhaseCode, Map<SPK, List<SPK>>>> = mapOf(
         PhaseCode.XY to mapOf(
-            PhaseCode.ABC to mapOf(X to listOf(A, B, C), Y to listOf(B, C)),
-            PhaseCode.AB to mapOf(X to listOf(A, B), Y to listOf(B)),
-            PhaseCode.AC to mapOf(X to listOf(A, C), Y to listOf(C)),
-            PhaseCode.BC to mapOf(X to listOf(B, C), Y to listOf(B, C)),
-            PhaseCode.A to mapOf(X to listOf(A)),
-            PhaseCode.B to mapOf(X to listOf(B), Y to listOf(B)),
-            PhaseCode.C to mapOf(X to listOf(C), Y to listOf(C))
+            PhaseCode.ABC to mapOf(SPK.X to listOf(SPK.A, SPK.B, SPK.C), SPK.Y to listOf(SPK.B, SPK.C)),
+            PhaseCode.AB to mapOf(SPK.X to listOf(SPK.A, SPK.B), SPK.Y to listOf(SPK.B)),
+            PhaseCode.AC to mapOf(SPK.X to listOf(SPK.A, SPK.C), SPK.Y to listOf(SPK.C)),
+            PhaseCode.BC to mapOf(SPK.X to listOf(SPK.B, SPK.C), SPK.Y to listOf(SPK.B, SPK.C)),
+            PhaseCode.A to mapOf(SPK.X to listOf(SPK.A)),
+            PhaseCode.B to mapOf(SPK.X to listOf(SPK.B), SPK.Y to listOf(SPK.B)),
+            PhaseCode.C to mapOf(SPK.X to listOf(SPK.C), SPK.Y to listOf(SPK.C))
         ),
         PhaseCode.X to mapOf(
-            PhaseCode.ABC to mapOf(X to listOf(A, B, C)),
-            PhaseCode.AB to mapOf(X to listOf(A, B)),
-            PhaseCode.AC to mapOf(X to listOf(A, C)),
-            PhaseCode.BC to mapOf(X to listOf(B, C)),
-            PhaseCode.A to mapOf(X to listOf(A)),
-            PhaseCode.B to mapOf(X to listOf(B)),
-            PhaseCode.C to mapOf(X to listOf(C))
+            PhaseCode.ABC to mapOf(SPK.X to listOf(SPK.A, SPK.B, SPK.C)),
+            PhaseCode.AB to mapOf(SPK.X to listOf(SPK.A, SPK.B)),
+            PhaseCode.AC to mapOf(SPK.X to listOf(SPK.A, SPK.C)),
+            PhaseCode.BC to mapOf(SPK.X to listOf(SPK.B, SPK.C)),
+            PhaseCode.A to mapOf(SPK.X to listOf(SPK.A)),
+            PhaseCode.B to mapOf(SPK.X to listOf(SPK.B)),
+            PhaseCode.C to mapOf(SPK.X to listOf(SPK.C))
         ),
         PhaseCode.Y to mapOf(
-            PhaseCode.ABC to mapOf(Y to listOf(B, C)),
-            PhaseCode.AB to mapOf(Y to listOf(B)),
-            PhaseCode.AC to mapOf(Y to listOf(C)),
-            PhaseCode.BC to mapOf(Y to listOf(B, C)),
+            PhaseCode.ABC to mapOf(SPK.Y to listOf(SPK.B, SPK.C)),
+            PhaseCode.AB to mapOf(SPK.Y to listOf(SPK.B)),
+            PhaseCode.AC to mapOf(SPK.Y to listOf(SPK.C)),
+            PhaseCode.BC to mapOf(SPK.Y to listOf(SPK.B, SPK.C)),
             PhaseCode.A to mapOf(),
-            PhaseCode.B to mapOf(Y to listOf(B)),
-            PhaseCode.C to mapOf(Y to listOf(C))
+            PhaseCode.B to mapOf(SPK.Y to listOf(SPK.B)),
+            PhaseCode.C to mapOf(SPK.Y to listOf(SPK.C))
         )
     )
 

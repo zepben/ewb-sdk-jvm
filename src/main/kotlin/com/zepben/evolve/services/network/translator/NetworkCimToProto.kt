@@ -44,6 +44,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind
+import com.zepben.protobuf.network.model.FeederDirection
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.NoLoadTest as PBNoLoadTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.OpenCircuitTest as PBOpenCircuitTest
@@ -499,11 +500,12 @@ fun toPb(cim: Substation, pb: PBSubstation.Builder): PBSubstation.Builder =
 fun toPb(cim: Terminal, pb: PBTerminal.Builder): PBTerminal.Builder =
     pb.apply {
         cim.conductingEquipment?.let { conductingEquipmentMRID = it.mRID } ?: clearConductingEquipmentMRID()
-        cim.connectivityNodeId()?.let { connectivityNodeMRID = it } ?: clearConnectivityNodeMRID()
+        cim.connectivityNodeId?.let { connectivityNodeMRID = it } ?: clearConnectivityNodeMRID()
         phases = com.zepben.protobuf.cim.iec61970.base.core.PhaseCode.valueOf(cim.phases.name)
-        tracedPhasesBuilder.normalStatus = cim.tracedPhases.normalStatusInternal
-        tracedPhasesBuilder.currentStatus = cim.tracedPhases.currentStatusInternal
         sequenceNumber = cim.sequenceNumber
+        normalFeederDirection = FeederDirection.valueOf(cim.normalFeederDirection.name)
+        currentFeederDirection = FeederDirection.valueOf(cim.currentFeederDirection.name)
+        tracedPhases = cim.tracedPhases.phaseStatusInternal.toInt()
         toPb(cim, adBuilder)
     }
 

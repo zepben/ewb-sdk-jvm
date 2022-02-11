@@ -368,7 +368,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareAcDcTerminal()
 
             compareIdReferences(Terminal::conductingEquipment, Terminal::connectivityNode)
-            compareValues(Terminal::phases, Terminal::tracedPhases, Terminal::sequenceNumber)
+            compareValues(Terminal::phases, Terminal::sequenceNumber, Terminal::normalFeederDirection, Terminal::currentFeederDirection, Terminal::tracedPhases)
         }
 
     /************ IEC61970 BASE EQUIVALENTS ************/

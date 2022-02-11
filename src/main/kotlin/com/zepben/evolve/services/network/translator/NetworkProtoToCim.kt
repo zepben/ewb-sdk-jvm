@@ -35,6 +35,7 @@ import com.zepben.evolve.services.common.extensions.internEmpty
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.services.common.translator.toCim
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.NoLoadTest as PBNoLoadTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.OpenCircuitTest as PBOpenCircuitTest
@@ -517,13 +518,17 @@ fun toCim(pb: PBSubstation, networkService: NetworkService): Substation =
 
 fun toCim(pb: PBTerminal, networkService: NetworkService): Terminal =
     Terminal(pb.mRID()).apply {
-        sequenceNumber = pb.sequenceNumber
-        networkService.resolveOrDeferReference(Resolvers.conductingEquipment(this), pb.conductingEquipmentMRID)
 
         phases = PhaseCode.valueOf(pb.phases.name)
-        tracedPhases.normalStatusInternal = pb.tracedPhases.normalStatus
-        tracedPhases.currentStatusInternal = pb.tracedPhases.currentStatus
+        sequenceNumber = pb.sequenceNumber
+        normalFeederDirection = FeederDirection.valueOf(pb.normalFeederDirection.name)
+        currentFeederDirection = FeederDirection.valueOf(pb.currentFeederDirection.name)
+        tracedPhases.phaseStatusInternal = pb.tracedPhases.toUInt()
+
+        // Sequence number must be set before adding the terminal to the conducting equipment to prevent it from being auto set
+        networkService.resolveOrDeferReference(Resolvers.conductingEquipment(this), pb.conductingEquipmentMRID)
         networkService.resolveOrDeferReference(Resolvers.connectivityNode(this), pb.connectivityNodeMRID)
+
         toCim(pb.ad, this, networkService)
     }
 

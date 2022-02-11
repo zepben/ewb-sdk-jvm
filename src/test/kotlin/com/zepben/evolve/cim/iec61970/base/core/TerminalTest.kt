@@ -7,8 +7,11 @@
  */
 package com.zepben.evolve.cim.iec61970.base.core
 
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.tracing.phases.FeederDirection
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -30,19 +33,24 @@ internal class TerminalTest {
     @Test
     internal fun accessorCoverage() {
         val terminal = Terminal()
-        val conductingEquipment = object : ConductingEquipment() {}
 
         assertThat(terminal.conductingEquipment, nullValue())
         assertThat(terminal.phases, equalTo(PhaseCode.ABC))
-        assertThat(terminal.tracedPhases, notNullValue())
+        assertThat(terminal.sequenceNumber, equalTo(0))
+        assertThat(terminal.connectivityNode, nullValue())
+        assertThat(terminal.tracedPhases.phaseStatusInternal, equalTo(0u))
+        assertThat(terminal.normalFeederDirection, equalTo(FeederDirection.NONE))
+        assertThat(terminal.currentFeederDirection, equalTo(FeederDirection.NONE))
 
-        terminal.apply {
-            this.conductingEquipment = conductingEquipment
-            phases = PhaseCode.AB
-        }
+        terminal.fillFields(NetworkService())
 
-        assertThat(terminal.conductingEquipment, equalTo(conductingEquipment))
-        assertThat(terminal.phases, equalTo(PhaseCode.AB))
+        assertThat(terminal.conductingEquipment, instanceOf(Junction::class.java))
+        assertThat(terminal.phases, equalTo(PhaseCode.X))
+        assertThat(terminal.sequenceNumber, equalTo(1))
+        assertThat(terminal.connectivityNode, notNullValue())
+        assertThat(terminal.tracedPhases.phaseStatusInternal, equalTo(2u))
+        assertThat(terminal.normalFeederDirection, equalTo(FeederDirection.UPSTREAM))
+        assertThat(terminal.currentFeederDirection, equalTo(FeederDirection.DOWNSTREAM))
     }
 
     @Test
@@ -51,45 +59,60 @@ internal class TerminalTest {
         val connectivityNode = ConnectivityNode()
 
         assertThat(terminal.connectivityNode, nullValue())
-        assertThat(terminal.connectivityNodeId(), nullValue())
-        assertThat(terminal.isConnected(), equalTo(false))
+        assertThat(terminal.connectivityNodeId, nullValue())
+        assertThat(terminal.isConnected, equalTo(false))
 
         terminal.connect(connectivityNode)
 
         assertThat(terminal.connectivityNode, equalTo(connectivityNode))
-        assertThat(terminal.connectivityNodeId(), equalTo(connectivityNode.mRID))
-        assertThat(terminal.isConnected(), equalTo(true))
+        assertThat(terminal.connectivityNodeId, equalTo(connectivityNode.mRID))
+        assertThat(terminal.isConnected, equalTo(true))
 
         terminal.disconnect()
 
         assertThat(terminal.connectivityNode, nullValue())
-        assertThat(terminal.connectivityNodeId(), nullValue())
-        assertThat(terminal.isConnected(), equalTo(false))
+        assertThat(terminal.connectivityNodeId, nullValue())
+        assertThat(terminal.isConnected, equalTo(false))
     }
 
     @Test
     internal fun tracedPhases() {
         val terminal = Terminal()
 
-        validatePhases(terminal, SinglePhaseKind.NONE, FeederDirection.NONE, SinglePhaseKind.NONE, FeederDirection.NONE)
+        validatePhases(terminal, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
 
-        terminal.tracedPhases.setNormal(SinglePhaseKind.B, FeederDirection.DOWNSTREAM, SinglePhaseKind.A)
-        validatePhases(terminal, SinglePhaseKind.B, FeederDirection.DOWNSTREAM, SinglePhaseKind.NONE, FeederDirection.NONE)
+        terminal.tracedPhases.setNormal(SinglePhaseKind.A, SinglePhaseKind.B)
+        validatePhases(terminal, SinglePhaseKind.B, SinglePhaseKind.NONE)
 
-        terminal.tracedPhases.setCurrent(SinglePhaseKind.A, FeederDirection.UPSTREAM, SinglePhaseKind.A)
-        validatePhases(terminal, SinglePhaseKind.B, FeederDirection.DOWNSTREAM, SinglePhaseKind.A, FeederDirection.UPSTREAM)
+        terminal.tracedPhases.setCurrent(SinglePhaseKind.A, SinglePhaseKind.A)
+        validatePhases(terminal, SinglePhaseKind.B, SinglePhaseKind.A)
+    }
+
+    @Test
+    internal fun tracedPhasesOperators() {
+        val terminal = Terminal()
+
+        validatePhases(terminal, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
+
+        terminal.tracedPhases.normal[SinglePhaseKind.A] = SinglePhaseKind.B
+        validatePhases(terminal, SinglePhaseKind.B, SinglePhaseKind.NONE)
+
+        terminal.tracedPhases.current[SinglePhaseKind.A] = SinglePhaseKind.A
+        validatePhases(terminal, SinglePhaseKind.B, SinglePhaseKind.A)
     }
 
     private fun validatePhases(
         terminal: Terminal,
         normalPhase: SinglePhaseKind,
-        normalDirection: FeederDirection,
         currentPhase: SinglePhaseKind,
-        currentDirection: FeederDirection
     ) {
-        assertThat(terminal.normalPhases(SinglePhaseKind.A).phase, equalTo(normalPhase))
-        assertThat(terminal.normalPhases(SinglePhaseKind.A).direction, equalTo(normalDirection))
-        assertThat(terminal.currentPhases(SinglePhaseKind.A).phase, equalTo(currentPhase))
-        assertThat(terminal.currentPhases(SinglePhaseKind.A).direction, equalTo(currentDirection))
+        assertThat(terminal.normalPhases[SinglePhaseKind.A], equalTo(normalPhase))
+        assertThat(terminal.tracedPhases.normal[SinglePhaseKind.A], equalTo(normalPhase))
+        assertThat(terminal.tracedPhases.normal(SinglePhaseKind.A), equalTo(normalPhase))
+
+        assertThat(terminal.currentPhases[SinglePhaseKind.A], equalTo(currentPhase))
+        assertThat(terminal.tracedPhases.current[SinglePhaseKind.A], equalTo(currentPhase))
+        assertThat(terminal.tracedPhases.current(SinglePhaseKind.A), equalTo(currentPhase))
     }
+
 }

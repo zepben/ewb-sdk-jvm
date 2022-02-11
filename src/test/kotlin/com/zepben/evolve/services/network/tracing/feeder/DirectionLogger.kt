@@ -1,23 +1,23 @@
 /*
- * Copyright 2021 Zeppelin Bend Pty Ltd
+ * Copyright 2022 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.tracing.phases
+package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.tracing.Tracing
 import org.slf4j.LoggerFactory
 
-// Logs all the phases of assets, terminals and nominal phases. Useful for debugging.
-internal class PhaseLogger private constructor(asset: ConductingEquipment) : (ConductingEquipment, Boolean?) -> Unit {
+// Logs all the feeder directions of assets and terminals. Useful for debugging.
+internal class DirectionLogger private constructor(asset: ConductingEquipment) : (ConductingEquipment, Boolean?) -> Unit {
 
     private val b: StringBuilder = StringBuilder()
         .append("\n###############################")
-        .append("\nTracing phases from: ${asset.typeNameAndMRID()}")
+        .append("\nTracing directions from: ${asset.typeNameAndMRID()}")
         .append("\n")
         .append("\n")
 
@@ -25,12 +25,10 @@ internal class PhaseLogger private constructor(asset: ConductingEquipment) : (Co
         a.terminals.forEach { t ->
             b.append("${a.mRID}-T${t.sequenceNumber}: ")
 
-            t.phases.singlePhases.forEach { phase ->
-                val nps = t.normalPhases[phase]
-                val cps = t.currentPhases[phase]
+            val n = t.normalFeederDirection
+            val c = t.currentFeederDirection
 
-                b.append("{$phase: n:$nps, c:$cps}, ")
-            }
+            b.append("{n:$n, c:$c}, ")
 
             clearLastComma(b)
             b.append("\n")
@@ -49,16 +47,16 @@ internal class PhaseLogger private constructor(asset: ConductingEquipment) : (Co
 
     companion object {
 
-        private val logger = LoggerFactory.getLogger(PhaseLogger::class.java)
+        private val logger = LoggerFactory.getLogger(DirectionLogger::class.java)
 
         fun trace(asset: ConductingEquipment?) {
-            trace(listOf(asset!!))
+            trace(listOf(asset))
         }
 
         @Suppress("MemberVisibilityCanBePrivate")
         fun trace(assets: Collection<ConductingEquipment?>) {
             assets.forEach { asset ->
-                val pl = PhaseLogger(asset!!)
+                val pl = DirectionLogger(asset!!)
 
                 Tracing.connectedEquipmentTrace()
                     .addStepAction(pl)

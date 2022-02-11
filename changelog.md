@@ -6,8 +6,16 @@
 * Updated database version.
 * `TownDetail` fields are now nullable.
 * Renamed `PhaseDirection` to `FeederDirection`:
-  * 'IN' renamed to 'UPSTREAM'
-  * 'OUT' renamed to 'DOWNSTREAM'
+  * `IN` renamed to `UPSTREAM`
+  * `OUT` renamed to `DOWNSTREAM`
+* Separated feeder direction from phase.
+  * Direction has been removed from `TracedPhases` and is now accessed directly off the `Terminal`.
+  * Direction has been removed from `PhaseStatus` and is now accessed via `DirectionStatus`.
+* The following `Terminal` fields are now Kotlin properties rather than accessor functions:
+  * `connectivityNodeId`
+  * `isConnected`
+  * `normalPhases`
+  * `currentPhases`
 
 ##### New Features
 
@@ -15,12 +23,14 @@
   * `TransformerConstructionKind`
   * `TransformerFunctionKind`
   * `StreetDetail`
+* Added `TestNetworkBuilder` which can be used to create simple test networks.
 
 ##### Enhancements
 
 * Added fields to `PowerTransformer` to define `constructionKind` and `function`.
 * Added fields to `StreetAddress` to define `poBox` and `streetDetail`.
 * Added fields to `EnergySource` to allow representation of a higher-level power grid connection modelled as a slack bus.
+* Reworked phase connectivity to better handle unknown primary phases (X/Y).
 
 ##### Fixes
 

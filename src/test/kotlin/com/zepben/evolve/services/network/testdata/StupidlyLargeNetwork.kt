@@ -12,8 +12,6 @@ import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.StreetAddress
-import com.zepben.evolve.cim.iec61968.common.StreetDetail
-import com.zepben.evolve.cim.iec61968.common.TownDetail
 import com.zepben.evolve.cim.iec61968.customers.*
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -277,6 +275,7 @@ object StupidlyLargeNetwork {
         networkService.add(transformerWithTypeNonRevReg)
         networkService.add(transformerWithTypeZone)
 
+        Tracing.setDirection().run(networkService)
         Tracing.setPhases().run(networkService)
         Tracing.assignEquipmentContainersToFeeders().run(networkService)
 
@@ -318,7 +317,7 @@ object StupidlyLargeNetwork {
         val switch3 = createSwitch(networkService, 3, true, true, site2)
         val switch4 = createSwitch(networkService, 4, true, false, site6)
 
-        val primarySource = createEnergySource(networkService, "primary_source", "primary source")
+        val primarySource = createEnergySource(networkService, "primary_source", "primary source").apply { isExternalGrid = true }
         networkService.connect(createTerminal(networkService, primarySource, PhaseCode.A, 1), createTerminal(networkService, switch4, PhaseCode.A, 1))
 
         val geographicalRegion = GeographicalRegion()
@@ -680,19 +679,19 @@ object StupidlyLargeNetwork {
 
         val location = Location()
         val locationN1A1 = Location().apply {
-            name = "n1";
+            name = "n1"
             mainAddress = StreetAddress("a1")
         }
         val locationN1A2 = Location().apply {
-            name = "n1";
+            name = "n1"
             mainAddress = StreetAddress("a2")
         }
         val locationN2 = Location().apply {
-            name = "n2";
+            name = "n2"
             mainAddress = StreetAddress("")
         }
         val locationN3 = Location().apply {
-            name = "n3";
+            name = "n3"
             mainAddress = StreetAddress("")
         }
 

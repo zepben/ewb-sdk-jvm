@@ -166,7 +166,7 @@ class DatabaseSqliteTest {
         /************ IEC61970 BASE CORE ************/
         validateSchema(SchemaNetworks.networkServicesOf(::BaseVoltage, BaseVoltage::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::ConnectivityNode, ConnectivityNode::fillFields))
-        validateSchema(SchemaNetworks.networkServicesOf(::Feeder, Feeder::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Feeder, Feeder::fillFields).apply { Tracing.setDirection().run(networkService) })
         validateSchema(SchemaNetworks.networkServicesOf(::GeographicalRegion, GeographicalRegion::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::Site, Site::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::SubGeographicalRegion, SubGeographicalRegion::fillFields))

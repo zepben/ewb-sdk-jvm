@@ -71,14 +71,14 @@ class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID)
      *
      * @return the [PhaseStatus] for the terminal in the normal state of the network.
      */
-    val normalPhases: PhaseStatus; get() = PhaseSelector.NORMAL_PHASES.phases(this)
+    val normalPhases: PhaseStatus = PhaseSelector.NORMAL_PHASES.phases(this)
 
     /**
      * Convenience method for accessing the current phases.
      *
      * @return the [PhaseStatus] for the terminal in the normal state of the network.
      */
-    val currentPhases: PhaseStatus; get() = PhaseSelector.CURRENT_PHASES.phases(this)
+    val currentPhases: PhaseStatus = PhaseSelector.CURRENT_PHASES.phases(this)
 
     // NOTE: This is meant to be package private to prevent external linking of objects. Use the network
     //       to connect from outside this package.

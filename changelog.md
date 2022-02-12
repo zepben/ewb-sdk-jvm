@@ -16,6 +16,7 @@
   * `isConnected`
   * `normalPhases`
   * `currentPhases`
+* `PhaseCode.singlePhases` is now a Kotlin read-only property rather than an accessor function.
 
 ##### New Features
 

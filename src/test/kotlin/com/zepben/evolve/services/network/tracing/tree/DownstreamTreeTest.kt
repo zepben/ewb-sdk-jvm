@@ -9,7 +9,9 @@ package com.zepben.evolve.services.network.tracing.tree
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.network.testdata.LoopingNetwork
+import com.zepben.evolve.services.network.testdata.addFeederDirections
 import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.tracing.feeder.DirectionLogger
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
@@ -22,6 +24,7 @@ class DownstreamTreeTest {
         val n = LoopingNetwork.create()
 
         Tracing.setPhases().run(n)
+        n.get<ConductingEquipment>("node0")!!.addFeederDirections().also { DirectionLogger.trace(it) }
 
         val start: ConductingEquipment = n["node1"]!!
         assertThat(start, notNullValue())

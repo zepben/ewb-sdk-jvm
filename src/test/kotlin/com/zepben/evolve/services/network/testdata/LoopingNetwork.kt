@@ -13,28 +13,35 @@ import com.zepben.evolve.services.network.NetworkService
 object LoopingNetwork {
 
     //
-    // n0  ac0  n1  ac1  n2  ac2  n3
-    // *--------*--------*--------*
-    //          |                 |
-    //      ac3 |                 | ac4
-    //          |  ac5            |
-    //       n4 *--------* n5     * n6 (open)
-    //          |                 |
-    //      ac6 |                 | ac7
-    //          |  ac8   n8  ac9  |
-    //       n7 *--------*--------* n9
-    //          |
-    //          |  ac11
-    //          |   /----* n11
-    //     ac10 |  /     | ac13
-    //          | /      |
-    //          |/  ac12 |  ac14
-    //      n10 *--------*--------* n13
-    //           \       |n12
-    //            \      |
-    //             \     | ac16
-    //              \----* n14
-    //             ac15
+    // n0   ac0   n1   ac1   n2   ac2   n3
+    // *11------21*21------21*21------21*
+    //            3                     2
+    //            1                     1
+    //        ac3 |                     | ac4
+    //            2                     2
+    //            1  ac5                1
+    //         n4 *21------21* n5       * n6 (open)
+    //            3                     2
+    //            1                     1
+    //        ac6 |                     | ac7
+    //            2                     2
+    //            1    ac8   n8   ac9   2
+    //         n7 *21------21*21------21* n9
+    //            3
+    //            1    ac11
+    //            |      /--21* n11
+    //       ac10 |     /     2
+    //            |    /      1
+    //            2   /       | ac13
+    //            1  /        2
+    //        n10 *21 ac12    2   ac14
+    //            31--------21*31------21* n13
+    //             1        2 n12
+    //              \       |
+    //               \      1 ac16
+    //                \     2
+    //                 \--21* n14
+    //               ac15
     //
     fun create() = NetworkService().also { network ->
         val node0 = createSourceForConnecting(network, "node0", 1, PhaseCode.ABCN)

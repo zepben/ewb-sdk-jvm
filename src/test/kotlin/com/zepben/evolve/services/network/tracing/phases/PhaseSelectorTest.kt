@@ -7,111 +7,81 @@
  */
 package com.zepben.evolve.services.network.tracing.phases
 
-import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.testutils.exception.ExpectException.expect
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 
 class PhaseSelectorTest {
 
-    @Test
-    fun testPhaseSelectors() {
-        val j = Junction("test")
-        val t = Terminal().apply { conductingEquipment = j }
+    private val normal = mock<PhaseStatus>()
+    private val current = mock<PhaseStatus>()
+    private val tracedPhases = mock<TracedPhases>().also {
+        doReturn(normal).`when`(it).normal
+        doReturn(current).`when`(it).current
+    }
+    private val terminal = mock<Terminal>().also { doReturn(tracedPhases).`when`(it).tracedPhases }
 
-        testPhaseSelector(t, Terminal::normalPhases)
-        testPhaseSelector(t, Terminal::currentPhases)
+    @Test
+    fun testNormalPhaseSelectorGet() {
+        val ps = PhaseSelector.NORMAL_PHASES.phases(terminal)
+
+        ps[SinglePhaseKind.A]
+
+        verify(terminal).tracedPhases
+        verify(tracedPhases).normal
+        verify(normal)[SinglePhaseKind.A]
+
+        verifyDone()
     }
 
-    private fun testPhaseSelector(t: Terminal, phaseSelector: PhaseSelector) {
-        PhaseCode.ABCN.singlePhases().forEach { phase ->
-            val ps = phaseSelector.status(t, phase)
+    @Test
+    fun testNormalPhaseSelectorSet() {
+        val ps = PhaseSelector.NORMAL_PHASES.phases(terminal)
 
-            assertThat(ps.phase, equalTo(SinglePhaseKind.NONE))
+        ps[SinglePhaseKind.B] = SinglePhaseKind.C
 
-            // Can't add a phase with no direction
-            ps.add(SinglePhaseKind.A, PhaseDirection.NONE)
-            assertThat(ps.phase, equalTo(SinglePhaseKind.NONE))
+        verify(terminal).tracedPhases
+        verify(tracedPhases).normal
+        verify(normal)[SinglePhaseKind.B] = SinglePhaseKind.C
 
-            // Add an A phase IN
-            assertThat(ps.add(SinglePhaseKind.A, PhaseDirection.IN), equalTo(true))
-            assertThat(ps.add(SinglePhaseKind.A, PhaseDirection.IN), equalTo(false))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.A))
-            assertThat(ps.direction.has(PhaseDirection.IN), equalTo(true))
-            assertThat(ps.direction.has(PhaseDirection.BOTH), equalTo(false))
-            assertThat(ps.direction.has(PhaseDirection.OUT), equalTo(false))
+        verifyDone()
+    }
 
-            // Adding NONE phase returns false
-            assertThat(ps.add(SinglePhaseKind.NONE, PhaseDirection.NONE), equalTo(false))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.A))
-            assertThat(ps.direction.has(PhaseDirection.IN), equalTo(true))
-            assertThat(ps.direction.has(PhaseDirection.BOTH), equalTo(false))
-            assertThat(ps.direction.has(PhaseDirection.OUT), equalTo(false))
+    @Test
+    fun testCurrentPhaseSelectorGet() {
+        val ps = PhaseSelector.CURRENT_PHASES.phases(terminal)
 
-            // Add OUT to the A phase
-            assertThat(ps.add(SinglePhaseKind.A, PhaseDirection.OUT), equalTo(true))
-            assertThat(ps.add(SinglePhaseKind.A, PhaseDirection.OUT), equalTo(false))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.A))
-            assertThat(ps.direction.has(PhaseDirection.IN), equalTo(true))
-            assertThat(ps.direction.has(PhaseDirection.BOTH), equalTo(true))
-            assertThat(ps.direction.has(PhaseDirection.OUT), equalTo(true))
+        ps[SinglePhaseKind.X]
 
-            // Remove IN from the A Phase
-            assertThat(ps.remove(SinglePhaseKind.A, PhaseDirection.IN), equalTo(true))
-            assertThat(ps.remove(SinglePhaseKind.A, PhaseDirection.IN), equalTo(false))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.A))
-            assertThat(ps.direction.has(PhaseDirection.IN), equalTo(false))
-            assertThat(ps.direction.has(PhaseDirection.BOTH), equalTo(false))
-            assertThat(ps.direction.has(PhaseDirection.OUT), equalTo(true))
+        verify(terminal).tracedPhases
+        verify(tracedPhases).current
+        verify(current)[SinglePhaseKind.X]
 
-            // Remove A Phase
-            assertThat(ps.remove(SinglePhaseKind.A), equalTo(true))
-            assertThat(ps.remove(SinglePhaseKind.A), equalTo(false))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.NONE))
-            assertThat(ps.direction, equalTo(PhaseDirection.NONE))
+        verifyDone()
+    }
 
-            // Add a B phase BOTH
-            assertThat(ps.add(SinglePhaseKind.B, PhaseDirection.BOTH), equalTo(true))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.B))
-            assertThat(ps.direction.has(PhaseDirection.IN), equalTo(true))
-            assertThat(ps.direction.has(PhaseDirection.BOTH), equalTo(true))
-            assertThat(ps.direction.has(PhaseDirection.OUT), equalTo(true))
+    @Test
+    fun testCurrentPhaseSelectorSet() {
+        val ps = PhaseSelector.CURRENT_PHASES.phases(terminal)
 
-            //Set a N phase BOTH
-            assertThat(ps.set(SinglePhaseKind.N, PhaseDirection.BOTH), equalTo(true))
-            assertThat(ps.set(SinglePhaseKind.N, PhaseDirection.BOTH), equalTo(false))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.N))
-            assertThat(ps.direction, equalTo(PhaseDirection.BOTH))
+        ps[SinglePhaseKind.Y] = SinglePhaseKind.N
 
-            // Setting NONE to the direction clears the whole phase
-            ps[SinglePhaseKind.N] = PhaseDirection.NONE
-            assertThat(ps.direction, equalTo(PhaseDirection.NONE))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.NONE))
+        verify(terminal).tracedPhases
+        verify(tracedPhases).current
+        verify(current)[SinglePhaseKind.Y] = SinglePhaseKind.N
 
-            //Set a A phase IN
-            assertThat(ps.set(SinglePhaseKind.A, PhaseDirection.IN), equalTo(true))
-            assertThat(ps.set(SinglePhaseKind.A, PhaseDirection.IN), equalTo(false))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.A))
-            assertThat(ps.direction, equalTo(PhaseDirection.IN))
+        verifyDone()
+    }
 
-            // Setting NONE to the phase clears the whole phase
-            assertThat(ps.set(SinglePhaseKind.NONE, PhaseDirection.BOTH), equalTo(true))
-            assertThat(ps.direction, equalTo(PhaseDirection.NONE))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.NONE))
-
-            //Set a N phase BOTH
-            assertThat(ps.set(SinglePhaseKind.N, PhaseDirection.OUT), equalTo(true))
-            assertThat(ps.set(SinglePhaseKind.N, PhaseDirection.OUT), equalTo(false))
-            assertThat(ps.phase, equalTo(SinglePhaseKind.N))
-            assertThat(ps.direction, equalTo(PhaseDirection.OUT))
-
-            expect { ps.add(SinglePhaseKind.B, PhaseDirection.BOTH) }
-                .toThrow(UnsupportedOperationException::class.java)
-        }
+    private fun verifyDone() {
+        verifyNoMoreInteractions(terminal)
+        verifyNoMoreInteractions(tracedPhases)
+        verifyNoMoreInteractions(normal)
+        verifyNoMoreInteractions(current)
     }
 
 }

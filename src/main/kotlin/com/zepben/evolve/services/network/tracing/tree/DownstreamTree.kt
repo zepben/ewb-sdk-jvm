@@ -12,14 +12,14 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
 import com.zepben.evolve.services.network.tracing.OpenTest
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
-import com.zepben.evolve.services.network.tracing.phases.PhaseSelector
+import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
+import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
 
 class DownstreamTree(
     private val openTest: OpenTest,
-    private val phaseSelector: PhaseSelector
+    private val directionSelector: DirectionSelector
 ) {
 
     private val traversal = BranchRecursiveTraversal(
@@ -37,45 +37,46 @@ class DownstreamTree(
 
     private fun addAndQueueNext(current: TreeNode?, traversal: BranchRecursiveTraversal<TreeNode>) {
         // Loop through each of the terminals on the current conducting equipment
-        val outPhases = mutableSetOf<SinglePhaseKind>()
-        current?.conductingEquipment?.terminals?.forEach { outTerminal: Terminal ->
+        current?.conductingEquipment?.terminals?.forEach { downTerminal: Terminal ->
             // Find all the nominal phases which are going out
-            getOutPhases(outTerminal, outPhases)
-            if (outPhases.size > 0)
-                queueConnectedTerminals(traversal, current, outTerminal, outPhases)
+            val downPhases = getDownPhases(downTerminal)
+            if (downPhases.isNotEmpty())
+                queueConnectedTerminals(traversal, current, downTerminal, downPhases)
         }
     }
 
-    private fun getOutPhases(terminal: Terminal, outPhases: MutableSet<SinglePhaseKind>) {
-        outPhases.clear()
+    private fun getDownPhases(terminal: Terminal): Set<SinglePhaseKind> {
+        val direction = directionSelector.select(terminal).value
+        if (!direction.has(FeederDirection.DOWNSTREAM))
+            return mutableSetOf()
+
         val conductingEquipment = terminal.conductingEquipment!!
-        for (phase in terminal.phases.singlePhases()) {
-            if (!openTest.isOpen(conductingEquipment, phase)) {
-                if (phaseSelector.status(terminal, phase).direction.has(PhaseDirection.OUT))
-                    outPhases.add(phase)
-            }
-        }
+        return terminal.phases.singlePhases
+            .asSequence()
+            .filter { !openTest.isOpen(conductingEquipment, it) }
+            .toSet()
     }
 
     private fun queueConnectedTerminals(
         traversal: BranchRecursiveTraversal<TreeNode>,
         current: TreeNode,
-        outTerminal: Terminal,
-        outPhases: Set<SinglePhaseKind>
+        downTerminal: Terminal,
+        downPhases: Set<SinglePhaseKind>
     ) {
         // Get all the terminals connected to terminals with phases going out
-        val inTerminals = connectedTerminals(outTerminal, outPhases)
+        val upTerminals = connectedTerminals(downTerminal, downPhases)
 
         // Make sure we do not loop back out the incoming terminal if its direction is both.
-        if (inTerminals.any { it.to == current.parent?.conductingEquipment })
+        if (upTerminals.any { it.to == current.parent?.conductingEquipment })
             return
 
-        val queueNext = if (inTerminals.size > 1 || outTerminal.conductingEquipment!!.numTerminals() > 2)
+        val queueNext = if (upTerminals.size > 1 || downTerminal.conductingEquipment!!.numTerminals() > 2)
             { next: TreeNode -> traversal.branchQueue.add(traversal.branchSupplier().setStart(next)) }
         else
             { next: TreeNode -> traversal.queue.add(next) }
 
-        inTerminals
+        upTerminals
+            .asSequence()
             .mapNotNull { it.to }
             .forEach {
                 val next = TreeNode(it, current)

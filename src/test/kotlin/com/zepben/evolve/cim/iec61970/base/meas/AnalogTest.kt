@@ -8,8 +8,9 @@
 package com.zepben.evolve.cim.iec61970.base.meas
 
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -20,18 +21,18 @@ internal class AnalogTest {
 
     @Test
     internal fun constructorCoverage() {
-        MatcherAssert.assertThat(Analog().mRID, Matchers.not(Matchers.equalTo("")))
-        MatcherAssert.assertThat(Analog("id").mRID, Matchers.equalTo("id"))
+        assertThat(Analog().mRID, not(equalTo("")))
+        assertThat(Analog("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
         val measurement = Analog()
-        MatcherAssert.assertThat(measurement.positiveFlowIn, Matchers.`is`(false))
+        assertThat(measurement.positiveFlowIn, equalTo(false))
 
         measurement.positiveFlowIn = true
 
-        MatcherAssert.assertThat(measurement.positiveFlowIn, Matchers.`is`(true))
+        assertThat(measurement.positiveFlowIn, equalTo(true))
 
     }
 }

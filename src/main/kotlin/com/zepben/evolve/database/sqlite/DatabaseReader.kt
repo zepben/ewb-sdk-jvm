@@ -21,6 +21,10 @@ import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
+import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
+import com.zepben.evolve.services.network.tracing.feeder.SetDirection
+import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
+import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
@@ -39,7 +43,11 @@ class DatabaseReader @JvmOverloads constructor(
     private val databaseFile: String,
     private val getConnection: (String) -> Connection = DriverManager::getConnection,
     private val getStatement: (Connection) -> Statement = Connection::createStatement,
-    private val upgradeRunner: UpgradeRunner = UpgradeRunner()
+    private val upgradeRunner: UpgradeRunner = UpgradeRunner(),
+    private val setDirection: SetDirection = Tracing.setDirection(),
+    private val setPhases: SetPhases = Tracing.setPhases(),
+    private val phaseInferrer: PhaseInferrer = Tracing.phaseInferrer(),
+    private val assignToFeeders: AssignToFeeders = Tracing.assignEquipmentContainersToFeeders()
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -110,13 +118,17 @@ class DatabaseReader @JvmOverloads constructor(
     }
 
     private fun postLoad(networkService: NetworkService): Boolean {
+        logger.info("Applying feeder direction to network...")
+        setDirection.run(networkService)
+        logger.info("Feeder direction applied to network.")
+
         logger.info("Applying phases to network...")
-        Tracing.setPhases().run(networkService)
-        Tracing.phaseInferrer().run(networkService)
+        setPhases.run(networkService)
+        phaseInferrer.run(networkService)
         logger.info("Phasing applied to network.")
 
         logger.info("Assigning equipment to feeders...")
-        Tracing.assignEquipmentContainersToFeeders().run(networkService)
+        assignToFeeders.run(networkService)
         logger.info("Equipment assigned to feeders.")
 
         logger.info("Validating primary sources vs feeders...")
@@ -135,7 +147,7 @@ class DatabaseReader @JvmOverloads constructor(
             .toSet()
 
         val hasBeenAssignedToFeeder = { energySource: EnergySource ->
-            (energySource.numPhases() > 0)
+            energySource.isExternalGrid
                 && energySource.isOnFeeder()
                 && Collections.disjoint(
                 feederStartPoints,
@@ -150,7 +162,7 @@ class DatabaseReader @JvmOverloads constructor(
             .filter(hasBeenAssignedToFeeder)
             .forEach { es ->
                 logger.warn(
-                    "Primary source ${es.nameAndMRID()} has been assigned to the following feeders: normal [${es.normalFeeders.joinToString { it.mRID }}], " +
+                    "External grid source ${es.nameAndMRID()} has been assigned to the following feeders: normal [${es.normalFeeders.joinToString { it.mRID }}], " +
                         "current [${es.currentFeeders.joinToString { it.mRID }}]"
                 )
             }

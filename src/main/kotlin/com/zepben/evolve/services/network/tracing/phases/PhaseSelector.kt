@@ -8,65 +8,23 @@
 package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 
 /**
- * Functional interface that can be used by traces to specify which phase status to use.
- * See [SetPhases] for example usage.
+ * Functional interface that can be used by traces to specify which [PhaseStatus] to use.
+ * See [SetPhases] or [RemovePhases] for example usage.
  */
 fun interface PhaseSelector {
 
-    fun status(terminal: Terminal, nominalPhase: SinglePhaseKind): PhaseStatus
+    fun phases(terminal: Terminal): PhaseStatus
 
-    // Constant common implements of ActivePhaseSelector
+    // Constant common implements of PhaseSelector
     companion object {
 
         @JvmField
-        val NORMAL_PHASES: PhaseSelector = PhaseSelector { terminal: Terminal, nominalPhase: SinglePhaseKind ->
-            object : PhaseStatus {
-
-                override val phase: SinglePhaseKind
-                    get() = terminal.tracedPhases.phaseNormal(nominalPhase)
-
-                override val direction: PhaseDirection
-                    get() = terminal.tracedPhases.directionNormal(nominalPhase)
-
-                override fun set(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
-                    terminal.tracedPhases.setNormal(singlePhaseKind, direction, nominalPhase)
-
-                override fun add(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
-                    terminal.tracedPhases.addNormal(singlePhaseKind, direction, nominalPhase)
-
-                override fun remove(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
-                    terminal.tracedPhases.removeNormal(singlePhaseKind, direction, nominalPhase)
-
-                override fun remove(singlePhaseKind: SinglePhaseKind): Boolean =
-                    terminal.tracedPhases.removeNormal(singlePhaseKind, nominalPhase)
-            }
-        }
+        val NORMAL_PHASES: PhaseSelector = PhaseSelector { terminal -> terminal.tracedPhases.normal }
 
         @JvmField
-        val CURRENT_PHASES: PhaseSelector = PhaseSelector { terminal: Terminal, nominalPhase: SinglePhaseKind ->
-            object : PhaseStatus {
-                override val phase: SinglePhaseKind
-                    get() = terminal.tracedPhases.phaseCurrent(nominalPhase)
-
-                override val direction: PhaseDirection
-                    get() = terminal.tracedPhases.directionCurrent(nominalPhase)
-
-                override fun set(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
-                    terminal.tracedPhases.setCurrent(singlePhaseKind, direction, nominalPhase)
-
-                override fun add(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
-                    terminal.tracedPhases.addCurrent(singlePhaseKind, direction, nominalPhase)
-
-                override fun remove(singlePhaseKind: SinglePhaseKind, direction: PhaseDirection): Boolean =
-                    terminal.tracedPhases.removeCurrent(singlePhaseKind, direction, nominalPhase)
-
-                override fun remove(singlePhaseKind: SinglePhaseKind): Boolean =
-                    terminal.tracedPhases.removeCurrent(singlePhaseKind, nominalPhase)
-            }
-        }
+        val CURRENT_PHASES: PhaseSelector = PhaseSelector { terminal -> terminal.tracedPhases.current }
 
     }
 

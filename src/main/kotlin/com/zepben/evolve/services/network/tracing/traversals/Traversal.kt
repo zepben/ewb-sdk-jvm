@@ -7,6 +7,8 @@
  */
 package com.zepben.evolve.services.network.tracing.traversals
 
+import java.util.function.Consumer
+
 /**
  *
  * Base class that provides some common functionality for traversals. This includes things like registering callbacks
@@ -90,6 +92,28 @@ abstract class Traversal<T> {
      */
     fun addStepAction(action: StepAction<T>): Traversal<T> {
         stepActions.add(action)
+        return this
+    }
+
+    /**
+     * Add a callback which is called for every item in the traversal (including the starting item).
+     *
+     * @param action Action to be called on each item in the traversal, without passing if the trace will stop on this step.
+     * @return this traversal instance.
+     */
+    fun addStepAction(action: Consumer<T>): Traversal<T> {
+        stepActions.add { it, _ -> action.accept(it) }
+        return this
+    }
+
+    /**
+     * Add a callback which is called for every item in the traversal (including the starting item).
+     *
+     * @param action Action to be called on each item in the traversal, without passing if the trace will stop on this step.
+     * @return this traversal instance.
+     */
+    fun addStepAction(action: (T) -> Unit): Traversal<T> {
+        stepActions.add { it, _ -> action(it) }
         return this
     }
 

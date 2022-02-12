@@ -8,8 +8,9 @@
 package com.zepben.evolve.cim.iec61970.base.meas
 
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,14 +25,14 @@ internal class DiscreteValueTest {
         val measValue = 23
         val measMRID = "measurement-mrid"
 
-        MatcherAssert.assertThat(mv.value, Matchers.`is`(0))
-        MatcherAssert.assertThat(mv.discreteMRID, Matchers.nullValue())
+        assertThat(mv.value, equalTo(0))
+        assertThat(mv.discreteMRID, nullValue())
 
         mv.apply {
             value = measValue
             discreteMRID = measMRID
         }
-        MatcherAssert.assertThat(mv.value, Matchers.`is`(measValue))
-        MatcherAssert.assertThat(mv.discreteMRID, Matchers.`is`(measMRID))
+        assertThat(mv.value, equalTo(measValue))
+        assertThat(mv.discreteMRID, equalTo(measMRID))
     }
 }

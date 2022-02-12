@@ -20,8 +20,7 @@ import com.zepben.evolve.services.customer.CustomerServiceComparator
 import com.zepben.evolve.services.customer.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.anEmptyMap
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.fail
@@ -55,8 +54,8 @@ internal class CustomerTranslatorTest {
 
         val cim = CustomerService().addFromPb(pb)
 
-        assertThat(cim.name, Matchers.equalTo(pb.name))
-        assertThat(cim.description, Matchers.equalTo(pb.description))
+        assertThat(cim.name, equalTo(pb.name))
+        assertThat(cim.description, equalTo(pb.description))
     }
 
     @Test
@@ -68,8 +67,8 @@ internal class CustomerTranslatorTest {
         val nt = NameType("nt1 name")
         val cim = CustomerService().apply { addNameType(nt) }.addFromPb(pb)
 
-        assertThat(cim, Matchers.sameInstance(nt))
-        assertThat(cim.description, Matchers.equalTo(pb.description))
+        assertThat(cim, sameInstance(nt))
+        assertThat(cim.description, equalTo(pb.description))
     }
 
     private inline fun <reified T : IdentifiedObject> validate(creator: () -> T, filler: (CustomerService, T) -> Unit, adder: (CustomerService, T) -> T?) {

@@ -526,7 +526,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
         insert.setNullableString(table.CONDUCTING_EQUIPMENT_MRID.queryIndex, terminal.conductingEquipment?.mRID)
         insert.setInt(table.SEQUENCE_NUMBER.queryIndex, terminal.sequenceNumber)
-        insert.setNullableString(table.CONNECTIVITY_NODE_MRID.queryIndex, terminal.connectivityNodeId())
+        insert.setNullableString(table.CONNECTIVITY_NODE_MRID.queryIndex, terminal.connectivityNodeId)
         insert.setNullableString(table.PHASES.queryIndex, terminal.phases.name)
 
         return saveAcDcTerminal(table, insert, terminal, "terminal")

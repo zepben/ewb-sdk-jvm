@@ -36,8 +36,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseServiceComparatorTest
 import com.zepben.evolve.services.common.ObjectDifference
 import com.zepben.evolve.services.common.ValueDifference
-import com.zepben.evolve.services.network.tracing.phases.PhaseDirection
-import com.zepben.evolve.services.network.tracing.phases.TracedPhases
+import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.utils.ServiceComparatorValidator
 import org.junit.jupiter.api.Test
 
@@ -461,82 +460,27 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { terminal, _ -> terminal.connect(ConnectivityNode("c1")) }, { terminal, _ -> terminal.connect(ConnectivityNode("c2")) })
 
         comparatorValidator.validateProperty(Terminal::conductingEquipment, { Terminal(it) }, { Junction("j1") }, { Junction("j2") })
+        comparatorValidator.validateProperty(Terminal::normalFeederDirection, { Terminal(it) }, { FeederDirection.UPSTREAM }, { FeederDirection.DOWNSTREAM })
+        comparatorValidator.validateProperty(Terminal::currentFeederDirection, { Terminal(it) }, { FeederDirection.UPSTREAM }, { FeederDirection.DOWNSTREAM })
 
-        val createAbcnTerminal = { id: String -> Terminal(id).apply { phases = PhaseCode.ABCN } }
-        val initTracedPhases = { _: Terminal, tracedPhases: TracedPhases ->
-            PhaseCode.ABCN.singlePhases().forEach {
-                tracedPhases.setNormal(it, PhaseDirection.BOTH, it)
-                tracedPhases.setCurrent(it, PhaseDirection.BOTH, it)
-            }
+        sequenceOf(
+            0x00000001 to 0x00000002,
+            0x00000010 to 0x00000020,
+            0x00000100 to 0x00000200,
+            0x00001000 to 0x00002000,
+            0x00010000 to 0x00020000,
+            0x00100000 to 0x00200000,
+            0x01000000 to 0x02000000,
+            0x10000000 to 0x20000000,
+        ).forEach { (first, second) ->
+            comparatorValidator.validateValProperty(
+                Terminal::tracedPhases,
+                { Terminal(it) },
+                { _, tracedPhases -> tracedPhases.phaseStatusInternal = first.toUInt() },
+                { _, tracedPhases -> tracedPhases.phaseStatusInternal = second.toUInt() }
+            )
         }
 
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.BOTH, SinglePhaseKind.A) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.BOTH, SinglePhaseKind.A) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.A, PhaseDirection.IN, SinglePhaseKind.A) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.B, PhaseDirection.BOTH, SinglePhaseKind.A) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.OUT, SinglePhaseKind.A) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.B, PhaseDirection.IN, SinglePhaseKind.B) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.C, PhaseDirection.BOTH, SinglePhaseKind.B) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.B, PhaseDirection.OUT, SinglePhaseKind.B) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.C) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.C, PhaseDirection.OUT, SinglePhaseKind.C) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.BOTH, SinglePhaseKind.C) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.C, PhaseDirection.IN, SinglePhaseKind.C) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.A, PhaseDirection.BOTH, SinglePhaseKind.N) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setNormal(SinglePhaseKind.N, PhaseDirection.OUT, SinglePhaseKind.N) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.A, PhaseDirection.BOTH, SinglePhaseKind.N) })
-
-        comparatorValidator.validateValProperty(
-            Terminal::tracedPhases, createAbcnTerminal,
-            initTracedPhases, { _, tracedPhases -> tracedPhases.setCurrent(SinglePhaseKind.N, PhaseDirection.IN, SinglePhaseKind.N) })
     }
 
     /************ IEC61970 BASE EQUIVALENTS ************/
@@ -977,12 +921,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         val difference = ObjectDifference(closedSwitch, openSwitch).apply {
             differences["isNormallyOpen"] = ValueDifference(
-                PhaseCode.ABCN.singlePhases().associateWith { false },
-                PhaseCode.ABCN.singlePhases().associateWith { true })
+                PhaseCode.ABCN.singlePhases.associateWith { false },
+                PhaseCode.ABCN.singlePhases.associateWith { true })
 
             differences["isOpen"] = ValueDifference(
-                PhaseCode.ABCN.singlePhases().associateWith { true },
-                PhaseCode.ABCN.singlePhases().associateWith { false })
+                PhaseCode.ABCN.singlePhases.associateWith { true },
+                PhaseCode.ABCN.singlePhases.associateWith { false })
         }
 
         comparatorValidator.validateCompare(closedSwitch, openSwitch, expectModification = difference)

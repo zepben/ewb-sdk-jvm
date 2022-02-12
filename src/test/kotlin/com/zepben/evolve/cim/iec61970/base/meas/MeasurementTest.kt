@@ -35,8 +35,8 @@ internal class MeasurementTest {
         assertThat(measurement.powerSystemResourceMRID, nullValue())
         assertThat(measurement.remoteSource, nullValue())
         assertThat(measurement.terminalMRID, nullValue())
-        assertThat(measurement.phases, `is`(PhaseCode.ABC))
-        assertThat(measurement.unitSymbol, `is`(UnitSymbol.NONE))
+        assertThat(measurement.phases, equalTo(PhaseCode.ABC))
+        assertThat(measurement.unitSymbol, equalTo(UnitSymbol.NONE))
 
         measurement.powerSystemResourceMRID = "powerSystemResourceMRID"
         measurement.remoteSource = remoteSource
@@ -47,7 +47,7 @@ internal class MeasurementTest {
         assertThat(measurement.powerSystemResourceMRID, equalTo("powerSystemResourceMRID"))
         assertThat(measurement.remoteSource, equalTo(remoteSource))
         assertThat(measurement.terminalMRID, equalTo("terminalMRID"))
-        assertThat(measurement.phases, `is`(PhaseCode.XYN))
-        assertThat(measurement.unitSymbol, `is`(UnitSymbol.BAR))
+        assertThat(measurement.phases, equalTo(PhaseCode.XYN))
+        assertThat(measurement.unitSymbol, equalTo(UnitSymbol.BAR))
     }
 }

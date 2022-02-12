@@ -26,6 +26,7 @@ object SingleTransformerNetwork {
         networkService.connect(source.getTerminal(sequenceNumber)!!, transformer.getTerminal(sequenceNumber)!!)
 
         Tracing.setPhases().run(networkService)
+        source.addFeederDirections(sequenceNumber)
     }
 
 }

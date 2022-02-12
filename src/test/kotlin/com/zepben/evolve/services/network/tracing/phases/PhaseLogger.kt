@@ -12,12 +12,12 @@ import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.tracing.Tracing
 import org.slf4j.LoggerFactory
 
-// Logs all the phases of assets, terminal and cores. Useful for debugging.
+// Logs all the phases of assets, terminals and nominal phases. Useful for debugging.
 internal class PhaseLogger private constructor(asset: ConductingEquipment) : (ConductingEquipment, Boolean?) -> Unit {
 
     private val b: StringBuilder = StringBuilder()
         .append("\n###############################")
-        .append("\nTracing from: ${asset.typeNameAndMRID()}")
+        .append("\nTracing phases from: ${asset.typeNameAndMRID()}")
         .append("\n")
         .append("\n")
 
@@ -25,11 +25,11 @@ internal class PhaseLogger private constructor(asset: ConductingEquipment) : (Co
         a.terminals.forEach { t ->
             b.append("${a.mRID}-T${t.sequenceNumber}: ")
 
-            t.phases.singlePhases().forEach { phase ->
-                val nps = t.normalPhases(phase)
-                val cps = t.currentPhases(phase)
+            t.phases.singlePhases.forEach { phase ->
+                val nps = t.normalPhases[phase]
+                val cps = t.currentPhases[phase]
 
-                b.append("{$phase: n:${nps.phase}:${nps.direction}, c:${cps.phase}:${cps.direction}}, ")
+                b.append("{$phase: n:$nps, c:$cps}, ")
             }
 
             clearLastComma(b)

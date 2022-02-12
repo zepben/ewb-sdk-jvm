@@ -11,6 +11,8 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityTrace
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
+import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
+import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.phases.*
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
@@ -169,6 +171,14 @@ object Tracing {
     fun setPhases(): SetPhases = SetPhases()
 
     /**
+     * Returns an instance of [SetDirection] convenience class for setting feeder directions on a network.
+     *
+     * @return A new traversal instance.
+     */
+    @JvmStatic
+    fun setDirection(): SetDirection = SetDirection()
+
+    /**
      * Returns an instance of [PhaseInferrer] convenience class for inferring phases on a network.
      *
      * @return A new traversal instance.
@@ -200,7 +210,7 @@ object Tracing {
      * @return A new traversal instance.
      */
     @JvmStatic
-    fun normalDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.NORMALLY_OPEN, PhaseSelector.NORMAL_PHASES)
+    fun normalDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION)
 
     /**
      * Returns an instance of [DownstreamTree] convenience class for tracing using the
@@ -209,7 +219,7 @@ object Tracing {
      * @return A new traversal instance.
      */
     @JvmStatic
-    fun currentDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.CURRENTLY_OPEN, PhaseSelector.CURRENT_PHASES)
+    fun currentDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
 
     /**
      * Returns an instance of [FindWithUsagePoints] convenience class for finding conducting equipment with attached usage points.

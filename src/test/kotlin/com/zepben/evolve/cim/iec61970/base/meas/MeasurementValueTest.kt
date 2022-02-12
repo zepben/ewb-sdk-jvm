@@ -8,8 +8,9 @@
 package com.zepben.evolve.cim.iec61970.base.meas
 
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.time.Instant
@@ -25,9 +26,9 @@ internal class MeasurementValueTest {
         val mv = object : MeasurementValue() {}
         val timeStamp = Instant.now()
 
-        MatcherAssert.assertThat(mv.timeStamp, Matchers.nullValue())
+        assertThat(mv.timeStamp, nullValue())
 
         mv.timeStamp = timeStamp
-        MatcherAssert.assertThat(mv.timeStamp, Matchers.`is`(timeStamp))
+        assertThat(mv.timeStamp, equalTo(timeStamp))
     }
 }

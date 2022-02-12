@@ -10,6 +10,7 @@ package com.zepben.evolve.services.network.tracing.traversals
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import java.util.function.Consumer
 
 class BasicTraversalTest {
 
@@ -80,6 +81,19 @@ class BasicTraversalTest {
             .addStopCondition { i -> stopCalls[0] = i; true }
             .addStopCondition { i -> stopCalls[1] = i; true }
             .addStopCondition { i -> stopCalls[2] = i; true }
+            .run(1, true)
+
+        assertThat(stopCalls, contains(1, 1, 1))
+    }
+
+    @Test
+    internal fun runsAllStepActions() {
+        val stopCalls = mutableListOf(0, 0, 0)
+
+        BasicTraversal<Int>({ _, _ -> }, BasicQueue.depthFirst(), BasicTracker())
+            .addStepAction { i, _ -> stopCalls[0] = i }
+            .addStepAction(Consumer { i -> stopCalls[1] = i })
+            .addStepAction { i -> stopCalls[2] = i }
             .run(1, true)
 
         assertThat(stopCalls, contains(1, 1, 1))

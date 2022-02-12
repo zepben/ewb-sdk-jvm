@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.services.network.testdata
 
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.services.network.NetworkService
 
@@ -52,6 +53,8 @@ object PhaseSwapLoopNetwork {
         val acLineSegment9 = createAcLineSegmentForConnecting(network, "acLineSegment9", PhaseCode.BC)
         val acLineSegment10 = createAcLineSegmentForConnecting(network, "acLineSegment10", PhaseCode.X)
         val acLineSegment11 = createAcLineSegmentForConnecting(network, "acLineSegment11", PhaseCode.Y)
+
+        Feeder("fdr").apply { normalHeadTerminal = node0.getTerminal(1)!! }.also { network.add(it) }
 
         // Connect up a network so we can check connectivity.
         network.connect(node0.getTerminal(1)!!, "cn_0")

@@ -12,11 +12,11 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
+import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
+import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseStep.Companion.continueAt
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue.Companion.processQueue
-import java.util.*
-import java.util.function.Consumer
 
 /**
  * A class that creates commonly used phase based traces. You can add custom step actions and stop conditions
@@ -42,109 +42,105 @@ object PhaseTrace {
     /**
      * @return a traversal that traces along phases in a downstream direction stopping at normally open points.
      */
-    fun newNormalDownstreamTrace(): BasicTraversal<PhaseStep> = newDownstreamTrace(OpenTest.NORMALLY_OPEN, PhaseSelector.NORMAL_PHASES)
+    fun newNormalDownstreamTrace(): BasicTraversal<PhaseStep> =
+        newDownstreamTrace(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION)
 
     /**
      * @return a traversal that traces along phases in a downstream direction stopping at currently open points.
      */
-    fun newCurrentDownstreamTrace(): BasicTraversal<PhaseStep> = newDownstreamTrace(OpenTest.CURRENTLY_OPEN, PhaseSelector.CURRENT_PHASES)
+    fun newCurrentDownstreamTrace(): BasicTraversal<PhaseStep> =
+        newDownstreamTrace(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
 
     /**
-     * @return a traversal that traces along phases in a upstream direction stopping at normally open points.
+     * @return a traversal that traces along phases in an upstream direction stopping at normally open points.
      */
-    fun newNormalUpstreamTrace(): BasicTraversal<PhaseStep> = newUpstreamTrace(OpenTest.NORMALLY_OPEN, PhaseSelector.NORMAL_PHASES)
+    fun newNormalUpstreamTrace(): BasicTraversal<PhaseStep> =
+        newUpstreamTrace(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION)
 
     /**
-     * @return a traversal that traces along phases in a upstream direction stopping at currently open points.
+     * @return a traversal that traces along phases in an upstream direction stopping at currently open points.
      */
-    fun newCurrentUpstreamTrace(): BasicTraversal<PhaseStep> = newUpstreamTrace(OpenTest.CURRENTLY_OPEN, PhaseSelector.CURRENT_PHASES)
+    fun newCurrentUpstreamTrace(): BasicTraversal<PhaseStep> =
+        newUpstreamTrace(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
 
     private fun newTrace(isOpenTest: OpenTest): BasicTraversal<PhaseStep> =
         BasicTraversal(queueNext(isOpenTest), processQueue { it.phases.size }, PhaseStepTracker())
 
-    private fun newDownstreamTrace(isOpenTest: OpenTest, activePhases: PhaseSelector): BasicTraversal<PhaseStep> =
-        BasicTraversal(queueNextDownstream(isOpenTest, activePhases), processQueue { it.phases.size }, PhaseStepTracker())
+    private fun newDownstreamTrace(isOpenTest: OpenTest, activeDirection: DirectionSelector): BasicTraversal<PhaseStep> =
+        BasicTraversal(queueNextDownstream(isOpenTest, activeDirection), processQueue { it.phases.size }, PhaseStepTracker())
 
-    private fun newUpstreamTrace(isOpenTest: OpenTest, activePhases: PhaseSelector): BasicTraversal<PhaseStep> =
-        BasicTraversal(queueNextUpstream(isOpenTest, activePhases), processQueue { it.phases.size }, PhaseStepTracker())
+    private fun newUpstreamTrace(isOpenTest: OpenTest, activeDirection: DirectionSelector): BasicTraversal<PhaseStep> =
+        BasicTraversal(queueNextUpstream(isOpenTest, activeDirection), processQueue { it.phases.size }, PhaseStepTracker())
 
     private fun queueNext(openTest: OpenTest): BasicTraversal.QueueNext<PhaseStep> =
         BasicTraversal.QueueNext { phaseStep, traversal ->
-            val outPhases = mutableSetOf<SinglePhaseKind>()
+            val downPhases = mutableSetOf<SinglePhaseKind>()
 
             phaseStep.conductingEquipment.terminals.forEach {
-                outPhases.clear()
+                downPhases.clear()
                 for (phase in phaseStep.phases) {
                     if (!openTest.isOpen(phaseStep.conductingEquipment, phase)) {
-                        outPhases.add(phase)
+                        downPhases.add(phase)
                     }
                 }
 
-                queueConnected(traversal, it, outPhases)
+                queueConnected(traversal, it, downPhases)
             }
         }
 
-    private fun queueNextDownstream(openTest: OpenTest, activePhases: PhaseSelector): BasicTraversal.QueueNext<PhaseStep> =
+    private fun queueNextDownstream(openTest: OpenTest, activeDirection: DirectionSelector): BasicTraversal.QueueNext<PhaseStep> =
         BasicTraversal.QueueNext { phaseStep, traversal ->
-            val outPhases = mutableSetOf<SinglePhaseKind>()
-
-            phaseStep.conductingEquipment.terminals.forEach(Consumer { terminal: Terminal ->
-                outPhases.clear()
-                getPhasesWithDirection(openTest, activePhases, terminal, phaseStep.phases, PhaseDirection.OUT, outPhases)
-
-                queueConnected(traversal, terminal, outPhases)
-            })
+            phaseStep.conductingEquipment.terminals.forEach {
+                queueConnected(traversal, it, getPhasesWithDirection(openTest, activeDirection, it, phaseStep.phases, FeederDirection.DOWNSTREAM))
+            }
         }
 
-    private fun queueConnected(traversal: BasicTraversal<PhaseStep>, terminal: Terminal, outPhases: Set<SinglePhaseKind>) {
-        if (outPhases.isNotEmpty()) {
-            connectedTerminals(terminal, outPhases).forEach {
+    private fun queueConnected(traversal: BasicTraversal<PhaseStep>, terminal: Terminal, downPhases: Set<SinglePhaseKind>) {
+        if (downPhases.isNotEmpty()) {
+            connectedTerminals(terminal, downPhases).forEach {
                 tryQueue(traversal, it, it.toNominalPhases)
             }
         }
     }
 
-    private fun queueNextUpstream(openTest: OpenTest, activePhases: PhaseSelector): BasicTraversal.QueueNext<PhaseStep> =
+    private fun queueNextUpstream(openTest: OpenTest, activeDirection: DirectionSelector): BasicTraversal.QueueNext<PhaseStep> =
         BasicTraversal.QueueNext { phaseStep, traversal ->
-            val inPhases = mutableSetOf<SinglePhaseKind>()
 
             phaseStep.conductingEquipment.terminals.forEach { terminal ->
-                inPhases.clear()
-                getPhasesWithDirection(openTest, activePhases, terminal, phaseStep.phases, PhaseDirection.IN, inPhases)
-                if (inPhases.isNotEmpty()) {
-                    connectedTerminals(terminal, inPhases).forEach { cr ->
-                        // When going upstream, we only want to traverse to connected terminals that have an out direction
-                        val outPhases = cr.toNominalPhases
-                            .filter { phase: SinglePhaseKind? -> activePhases.status(cr.toTerminal, phase!!).direction.has(PhaseDirection.OUT) }
-                            .toSet()
-
-                        if (outPhases.isNotEmpty())
-                            tryQueue(traversal, cr, outPhases)
+                val upPhases = getPhasesWithDirection(openTest, activeDirection, terminal, phaseStep.phases, FeederDirection.UPSTREAM)
+                if (upPhases.isNotEmpty()) {
+                    connectedTerminals(terminal, upPhases).forEach { cr ->
+                        // When going upstream, we only want to traverse to connected terminals that have a DOWNSTREAM direction
+                        if (activeDirection.select(cr.toTerminal).value.has(FeederDirection.DOWNSTREAM))
+                            tryQueue(traversal, cr, cr.toNominalPhases)
                     }
                 }
             }
         }
 
-    private fun tryQueue(traversal: BasicTraversal<PhaseStep>, cr: ConnectivityResult, outPhases: Collection<SinglePhaseKind>) {
-        cr.to?.let { traversal.queue.add(continueAt(it, outPhases, cr.from)) }
+    private fun tryQueue(traversal: BasicTraversal<PhaseStep>, cr: ConnectivityResult, downPhases: Collection<SinglePhaseKind>) {
+        cr.to?.let { traversal.queue.add(continueAt(it, downPhases, cr.from)) }
     }
 
     private fun getPhasesWithDirection(
         openTest: OpenTest,
-        activePhases: PhaseSelector,
+        activeDirection: DirectionSelector,
         terminal: Terminal,
         candidatePhases: Set<SinglePhaseKind>,
-        direction: PhaseDirection,
-        matchedPhases: MutableSet<SinglePhaseKind>
-    ) {
-        val conductingEquipment = Objects.requireNonNull(terminal.conductingEquipment)!!
+        direction: FeederDirection
+    ): Set<SinglePhaseKind> {
+        val matchedPhases = mutableSetOf<SinglePhaseKind>()
+
+        if (!activeDirection.select(terminal).value.has(direction))
+            return matchedPhases
+
+        val conductingEquipment = terminal.conductingEquipment!!
         for (phase in candidatePhases) {
-            if (terminal.phases.singlePhases().contains(phase) && !openTest.isOpen(conductingEquipment, phase)) {
-                if (activePhases.status(terminal, phase).direction.has(direction)) {
-                    matchedPhases.add(phase)
-                }
-            }
+            if (terminal.phases.singlePhases.contains(phase) && !openTest.isOpen(conductingEquipment, phase))
+                matchedPhases.add(phase)
         }
+
+        return matchedPhases
     }
 
 }

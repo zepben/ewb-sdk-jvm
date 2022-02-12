@@ -8,8 +8,9 @@
 package com.zepben.evolve.cim.iec61970.base.meas
 
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,14 +25,14 @@ internal class AccumulatorValueTest {
         val measValue = 23u
         val measMRID = "measurement-mrid"
 
-        MatcherAssert.assertThat(mv.value, Matchers.`is`(0u))
-        MatcherAssert.assertThat(mv.accumulatorMRID, Matchers.nullValue())
+        assertThat(mv.value, equalTo(0u))
+        assertThat(mv.accumulatorMRID, nullValue())
 
         mv.apply {
             value = measValue
             accumulatorMRID = measMRID
         }
-        MatcherAssert.assertThat(mv.value, Matchers.`is`(measValue))
-        MatcherAssert.assertThat(mv.accumulatorMRID, Matchers.`is`(measMRID))
+        assertThat(mv.value, equalTo(measValue))
+        assertThat(mv.accumulatorMRID, equalTo(measMRID))
     }
 }

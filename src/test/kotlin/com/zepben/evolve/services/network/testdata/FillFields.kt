@@ -34,6 +34,7 @@ import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createRemoteSource
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locationOf
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import java.util.*
 
 /************ IEC61968 ASSET INFO ************/
@@ -523,8 +524,9 @@ fun Terminal.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     }
 
     if (includeRuntime) {
-        tracedPhases.normalStatusInternal = 2
-        tracedPhases.currentStatusInternal = 3
+        tracedPhases.phaseStatusInternal = 2u
+        normalFeederDirection = FeederDirection.UPSTREAM
+        currentFeederDirection = FeederDirection.DOWNSTREAM
     }
 
     return this

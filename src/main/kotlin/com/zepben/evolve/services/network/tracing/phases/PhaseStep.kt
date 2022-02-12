@@ -50,7 +50,7 @@ class PhaseStep private constructor(
 
         @JvmStatic
         fun startAt(conductingEquipment: ConductingEquipment, phaseCode: PhaseCode): PhaseStep =
-            startAt(conductingEquipment, phaseCode.singlePhases())
+            startAt(conductingEquipment, phaseCode.singlePhases)
 
         @JvmStatic
         fun continueAt(conductingEquipment: ConductingEquipment, phases: Collection<SinglePhaseKind>, previous: ConductingEquipment?): PhaseStep =
@@ -58,7 +58,7 @@ class PhaseStep private constructor(
 
         @JvmStatic
         fun continueAt(conductingEquipment: ConductingEquipment, phaseCode: PhaseCode, previous: ConductingEquipment?): PhaseStep =
-            continueAt(conductingEquipment, phaseCode.singlePhases(), previous)
+            continueAt(conductingEquipment, phaseCode.singlePhases, previous)
 
     }
 

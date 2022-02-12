@@ -95,15 +95,16 @@ object WithUsagePointsNetwork {
         network.connect(c14.getTerminal(2)!!, tx7.getTerminal(1)!!)
         network.connect(c15.getTerminal(2)!!, tx8.getTerminal(1)!!)
 
-        network.connect(c6.getTerminal(1)!!, Objects.requireNonNull(c0.getTerminal(2)!!.connectivityNodeId()))
-        network.connect(c7.getTerminal(1)!!, Objects.requireNonNull(c1.getTerminal(2)!!.connectivityNodeId()))
-        network.connect(c8.getTerminal(1)!!, Objects.requireNonNull(c2.getTerminal(2)!!.connectivityNodeId()))
-        network.connect(c9.getTerminal(1)!!, Objects.requireNonNull(c3.getTerminal(2)!!.connectivityNodeId()))
-        network.connect(c10.getTerminal(1)!!, Objects.requireNonNull(c4.getTerminal(2)!!.connectivityNodeId()))
-        network.connect(c14.getTerminal(1)!!, Objects.requireNonNull(c11.getTerminal(2)!!.connectivityNodeId()))
-        network.connect(c15.getTerminal(1)!!, Objects.requireNonNull(c12.getTerminal(2)!!.connectivityNodeId()))
+        network.connect(c6.getTerminal(1)!!, Objects.requireNonNull(c0.getTerminal(2)!!.connectivityNodeId))
+        network.connect(c7.getTerminal(1)!!, Objects.requireNonNull(c1.getTerminal(2)!!.connectivityNodeId))
+        network.connect(c8.getTerminal(1)!!, Objects.requireNonNull(c2.getTerminal(2)!!.connectivityNodeId))
+        network.connect(c9.getTerminal(1)!!, Objects.requireNonNull(c3.getTerminal(2)!!.connectivityNodeId))
+        network.connect(c10.getTerminal(1)!!, Objects.requireNonNull(c4.getTerminal(2)!!.connectivityNodeId))
+        network.connect(c14.getTerminal(1)!!, Objects.requireNonNull(c11.getTerminal(2)!!.connectivityNodeId))
+        network.connect(c15.getTerminal(1)!!, Objects.requireNonNull(c12.getTerminal(2)!!.connectivityNodeId))
 
         Tracing.setPhases().run(network)
+        es.addFeederDirections()
     }
 
     //
@@ -152,6 +153,7 @@ object WithUsagePointsNetwork {
         network.connect(hv.terminals[1], ec2.terminals[0])
 
         Tracing.setPhases().run(network)
+        es.addFeederDirections()
     }
 
     //
@@ -185,6 +187,7 @@ object WithUsagePointsNetwork {
         network.connect(lv.terminals[1], ec.terminals[0])
 
         Tracing.setPhases().run(network)
+        es.addFeederDirections()
     }
 
 }

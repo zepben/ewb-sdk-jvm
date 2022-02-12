@@ -120,7 +120,7 @@ class DatabaseSqliteTest {
 
         assertThat(
             systemErr.log,
-            containsString("Primary source 'primary source' [primary_source] has been assigned to the following feeders: normal [f1], current [f2]")
+            containsString("External grid source 'primary source' [primary_source] has been assigned to the following feeders: normal [f1], current [f2]")
         )
     }
 

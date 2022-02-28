@@ -10,7 +10,7 @@ package com.zepben.evolve.services.network.tracing.tree
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
+import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
@@ -64,7 +64,7 @@ class DownstreamTree(
         downPhases: Set<SinglePhaseKind>
     ) {
         // Get all the terminals connected to terminals with phases going out
-        val upTerminals = connectedTerminals(downTerminal, downPhases)
+        val upTerminals = NetworkService.connectedTerminals(downTerminal, downPhases)
 
         // Make sure we do not loop back out the incoming terminal if its direction is both.
         if (upTerminals.any { it.to == current.parent?.conductingEquipment })

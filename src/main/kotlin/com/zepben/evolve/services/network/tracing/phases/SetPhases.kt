@@ -13,7 +13,6 @@ import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
 import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
@@ -225,7 +224,7 @@ class SetPhases {
         phasesToFlow: Set<SinglePhaseKind>
     ) {
         val fromPhases = phaseSelector.phases(fromTerminal)
-        val connectivityResults = connectedTerminals(fromTerminal, phasesToFlow)
+        val connectivityResults = NetworkService.connectedTerminals(fromTerminal, phasesToFlow)
 
         val useBranchQueue = (connectivityResults.size > 1) || ((fromTerminal.conductingEquipment?.numTerminals() ?: 0) > 2)
 

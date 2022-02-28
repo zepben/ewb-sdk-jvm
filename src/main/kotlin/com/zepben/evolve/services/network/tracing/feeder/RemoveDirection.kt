@@ -10,7 +10,6 @@ package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
 import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue.Companion.branchQueue
@@ -81,7 +80,7 @@ class RemoveDirection {
         if (!directionSelector.select(current.terminal).remove(current.directionToEbb))
             return
 
-        val otherTerminals = connectedTerminals(current.terminal).map { it.toTerminal }
+        val otherTerminals = current.terminal.connectivityNode?.let { cn -> cn.terminals.filter { it != current.terminal } } ?: emptyList()
 
         if (current.directionToEbb == FeederDirection.BOTH) {
             otherTerminals

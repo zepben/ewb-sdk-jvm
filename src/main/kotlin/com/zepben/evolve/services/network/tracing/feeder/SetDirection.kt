@@ -11,7 +11,6 @@ package com.zepben.evolve.services.network.tracing.feeder
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
 import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
@@ -87,11 +86,11 @@ class SetDirection {
         if ((direction.value != FeederDirection.BOTH) && !direction.add(FeederDirection.DOWNSTREAM))
             return
 
-        val connected = connectedTerminals(terminal)
+        val connected = terminal.connectivityNode?.let { cn -> cn.terminals.filter { it != terminal } } ?: emptyList()
         val processor = ::flowUpstreamAndQueueNextStraight.takeIf { connected.size == 1 } ?: ::flowUpstreamAndQueueNextBranch
 
         connected.forEach {
-            processor(traversal, it.toTerminal, openTest, directionSelector)
+            processor(traversal, it, openTest, directionSelector)
         }
     }
 

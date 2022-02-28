@@ -303,6 +303,27 @@ class SetDirectionTest {
         n.getT("c12", 2).validateDirections(BOTH)
     }
 
+    @Test
+    internal fun ignoresPhasePathing() {
+        //
+        // j0 11--c1--21--c2--2
+        //
+        val n = TestNetworkBuilder
+            .startWithJunction(numTerminals = 1, nominalPhases = PhaseCode.AB) // j0
+            .toAcls(nominalPhases = PhaseCode.B) // c1
+            .toAcls(nominalPhases = PhaseCode.A) // c2
+            .network
+
+        SetDirection().run(n.getT("j0", 1))
+        DirectionLogger.trace(n["j0"])
+
+        n.getT("j0", 1).validateDirections(DOWNSTREAM)
+        n.getT("c1", 1).validateDirections(UPSTREAM)
+        n.getT("c1", 2).validateDirections(DOWNSTREAM)
+        n.getT("c2", 1).validateDirections(UPSTREAM)
+        n.getT("c2", 2).validateDirections(DOWNSTREAM)
+    }
+
     private fun doSetDirectionTrace(n: NetworkService) {
         SetDirection().run(n)
         n.sequenceOf<Feeder>().forEach { DirectionLogger.trace(it.normalHeadTerminal!!.conductingEquipment!!) }

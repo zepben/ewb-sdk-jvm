@@ -9,7 +9,7 @@ package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
+import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
@@ -97,7 +97,7 @@ object PhaseTrace {
 
     private fun queueConnected(traversal: BasicTraversal<PhaseStep>, terminal: Terminal, downPhases: Set<SinglePhaseKind>) {
         if (downPhases.isNotEmpty()) {
-            connectedTerminals(terminal, downPhases).forEach {
+            NetworkService.connectedTerminals(terminal, downPhases).forEach {
                 tryQueue(traversal, it, it.toNominalPhases)
             }
         }
@@ -109,7 +109,7 @@ object PhaseTrace {
             phaseStep.conductingEquipment.terminals.forEach { terminal ->
                 val upPhases = getPhasesWithDirection(openTest, activeDirection, terminal, phaseStep.phases, FeederDirection.UPSTREAM)
                 if (upPhases.isNotEmpty()) {
-                    connectedTerminals(terminal, upPhases).forEach { cr ->
+                    NetworkService.connectedTerminals(terminal, upPhases).forEach { cr ->
                         // When going upstream, we only want to traverse to connected terminals that have a DOWNSTREAM direction
                         if (activeDirection.select(cr.toTerminal).value.has(FeederDirection.DOWNSTREAM))
                             tryQueue(traversal, cr, cr.toNominalPhases)

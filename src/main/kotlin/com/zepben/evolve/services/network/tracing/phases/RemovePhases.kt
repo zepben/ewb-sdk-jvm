@@ -12,7 +12,6 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.NetworkService.Companion.connectedTerminals
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
 import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
@@ -88,7 +87,7 @@ class RemovePhases {
     private fun ebbAndQueue(traversal: BranchRecursiveTraversal<EbbPhases>, ebbPhases: EbbPhases, phaseSelector: PhaseSelector) {
         val ebbedPhases = ebb(ebbPhases.terminal, ebbPhases.nominalPhases, phaseSelector)
 
-        connectedTerminals(ebbPhases.terminal, ebbPhases.nominalPhases).forEach { cr ->
+        NetworkService.connectedTerminals(ebbPhases.terminal, ebbPhases.nominalPhases).forEach { cr ->
             queueThroughEquipment(traversal, cr.to, cr.toTerminal, ebbFromConnectedTerminal(ebbedPhases, cr, phaseSelector))
         }
     }

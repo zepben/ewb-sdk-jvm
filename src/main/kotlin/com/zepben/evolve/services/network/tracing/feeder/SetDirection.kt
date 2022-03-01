@@ -83,7 +83,7 @@ class SetDirection {
         directionSelector: DirectionSelector
     ) {
         val direction = directionSelector.select(terminal)
-        if ((direction.value != FeederDirection.BOTH) && !direction.add(FeederDirection.DOWNSTREAM))
+        if (!direction.add(FeederDirection.DOWNSTREAM))
             return
 
         val connected = terminal.connectivityNode?.let { cn -> cn.terminals.filter { it != terminal } } ?: emptyList()
@@ -138,7 +138,7 @@ class SetDirection {
         queue: (Terminal) -> Unit
     ) {
         val direction = directionSelector.select(terminal)
-        if ((direction.value != FeederDirection.BOTH) && !direction.add(FeederDirection.UPSTREAM))
+        if (!direction.add(FeederDirection.UPSTREAM))
             return
 
         if (isFeederHeadTerminal(terminal))

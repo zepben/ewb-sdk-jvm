@@ -206,11 +206,15 @@ class SetDirectionTest {
         SetDirection().run(n.getT("j0", 1))
         DirectionLogger.trace(n["j0"])
 
+        // To avoid reprocessing all BOTH loops in larger networks we do not process anything with a direction already set. This means this test will apply
+        // a standard UP/DOWN path through j2-t2 through to j6-t2 and then a BOTH loop around the c9/j4 loop which will stop the reverse UP/DOWN path
+        // ever being processed from j6-t2 via j2-t3.
+
         n.getT("j0", 1).validateDirections(DOWNSTREAM)
         n.getT("c1", 1).validateDirections(UPSTREAM)
         n.getT("c1", 2).validateDirections(DOWNSTREAM)
         n.getT("j2", 1).validateDirections(UPSTREAM)
-        n.getT("j2", 2).validateDirections(BOTH)
+        n.getT("j2", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
         n.getT("j2", 3).validateDirections(BOTH)
         n.getT("c3", 1).validateDirections(BOTH)
         n.getT("c3", 2).validateDirections(BOTH)
@@ -218,20 +222,20 @@ class SetDirectionTest {
         n.getT("j4", 2).validateDirections(BOTH)
         n.getT("c5", 1).validateDirections(BOTH)
         n.getT("c5", 2).validateDirections(BOTH)
-        n.getT("j6", 1).validateDirections(BOTH)
-        n.getT("j6", 2).validateDirections(BOTH)
+        n.getT("j6", 1).validateDirections(DOWNSTREAM)  // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("j6", 2).validateDirections(UPSTREAM)  // Would have been BOTH if the intermediate loop was reprocessed.
         n.getT("j6", 3).validateDirections(DOWNSTREAM)
         n.getT("c7", 1).validateDirections(UPSTREAM)
         n.getT("c7", 2).validateDirections(DOWNSTREAM)
         n.getT("j8", 1).validateDirections(UPSTREAM)
         n.getT("c9", 1).validateDirections(BOTH)
         n.getT("c9", 2).validateDirections(BOTH)
-        n.getT("c10", 1).validateDirections(BOTH)
-        n.getT("c10", 2).validateDirections(BOTH)
-        n.getT("j11", 1).validateDirections(BOTH)
-        n.getT("j11", 2).validateDirections(BOTH)
-        n.getT("c12", 1).validateDirections(BOTH)
-        n.getT("c12", 2).validateDirections(BOTH)
+        n.getT("c10", 1).validateDirections(UPSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("c10", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("j11", 1).validateDirections(UPSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("j11", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("c12", 1).validateDirections(UPSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("c12", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
     }
 
     @Test
@@ -275,11 +279,15 @@ class SetDirectionTest {
         SetDirection().run(n.getT("j0", 1))
         DirectionLogger.trace(n["j0"])
 
+        // To avoid reprocessing all BOTH loops in larger networks we do not process anything with a direction already set. This means this test will apply
+        // a UP/DOWN path through j2-t2 directly into a BOTH loop around the c9/j11 loop which will stop the reverse UP/DOWN path
+        // ever being processed from j6-t2 via j2-t3.
+
         n.getT("j0", 1).validateDirections(DOWNSTREAM)
         n.getT("c1", 1).validateDirections(UPSTREAM)
         n.getT("c1", 2).validateDirections(DOWNSTREAM)
         n.getT("j2", 1).validateDirections(UPSTREAM)
-        n.getT("j2", 2).validateDirections(BOTH)
+        n.getT("j2", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
         n.getT("j2", 3).validateDirections(BOTH)
         n.getT("c3", 1).validateDirections(BOTH)
         n.getT("c3", 2).validateDirections(BOTH)

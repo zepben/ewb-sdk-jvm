@@ -79,12 +79,12 @@ class DownstreamTreeTest {
         assertThat(findNodes(root, "acLineSegment9").size, equalTo(1))
         assertThat(findNodes(root, "node10").size, equalTo(1))
         assertThat(findNodes(root, "acLineSegment10").size, equalTo(1))
-        assertThat(findNodes(root, "node11").size, equalTo(3))
-        assertThat(findNodes(root, "acLineSegment11").size, equalTo(3))
+        assertThat(findNodes(root, "node11").size, equalTo(1)) // Would have been 3 if the intermediate loop was reprocessed.
+        assertThat(findNodes(root, "acLineSegment11").size, equalTo(1)) // Would have been 3 if the intermediate loop was reprocessed.
         assertThat(findNodes(root, "node12").size, equalTo(3))
         assertThat(findNodes(root, "acLineSegment12").size, equalTo(4))
         assertThat(findNodes(root, "node13").size, equalTo(3))
-        assertThat(findNodes(root, "acLineSegment13").size, equalTo(3))
+        assertThat(findNodes(root, "acLineSegment13").size, equalTo(1)) // Would have been 3 if the intermediate loop was reprocessed.
         assertThat(findNodes(root, "node14").size, equalTo(4))
         assertThat(findNodes(root, "acLineSegment14").size, equalTo(3))
         assertThat(findNodes(root, "acLineSegment15").size, equalTo(4))
@@ -112,12 +112,12 @@ class DownstreamTreeTest {
         assertThat(findNodeDepths(root, "acLineSegment9"), equalTo(listOf(7)))
         assertThat(findNodeDepths(root, "node10"), equalTo(listOf(6)))
         assertThat(findNodeDepths(root, "acLineSegment10"), equalTo(listOf(5)))
-        assertThat(findNodeDepths(root, "node11"), equalTo(listOf(8, 10, 12)))
-        assertThat(findNodeDepths(root, "acLineSegment11"), equalTo(listOf(7, 11, 13)))
+        assertThat(findNodeDepths(root, "node11"), equalTo(listOf(8))) // Would have been 8, 10, 12 if the intermediate loop was reprocessed.
+        assertThat(findNodeDepths(root, "acLineSegment11"), equalTo(listOf(7))) // Would have been 7, 11, 13 if the intermediate loop was reprocessed.
         assertThat(findNodeDepths(root, "node12"), equalTo(listOf(8, 10, 10)))
         assertThat(findNodeDepths(root, "acLineSegment12"), equalTo(listOf(7, 10, 11, 14)))
         assertThat(findNodeDepths(root, "node13"), equalTo(listOf(10, 12, 12)))
-        assertThat(findNodeDepths(root, "acLineSegment13"), equalTo(listOf(9, 9, 11)))
+        assertThat(findNodeDepths(root, "acLineSegment13"), equalTo(listOf(9))) // Would have been 9, 9, 11 if the intermediate loop was reprocessed.
         assertThat(findNodeDepths(root, "node14"), equalTo(listOf(8, 9, 12, 13)))
         assertThat(findNodeDepths(root, "acLineSegment14"), equalTo(listOf(9, 11, 11)))
         assertThat(findNodeDepths(root, "acLineSegment15"), equalTo(listOf(7, 10, 12, 13)))

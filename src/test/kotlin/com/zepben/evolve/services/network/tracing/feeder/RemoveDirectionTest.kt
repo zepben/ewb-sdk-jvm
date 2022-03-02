@@ -116,7 +116,7 @@ class RemoveDirectionTest {
         //           --c5--
         //
         val n = nb
-            .splitFrom("c1")
+            .branchFrom("c1")
             .toAcls(PhaseCode.A) // c4
             .toAcls(PhaseCode.A) // c5
             .addFeeder("j0")
@@ -149,7 +149,7 @@ class RemoveDirectionTest {
         //           --c5--
         //
         val n = nb
-            .splitFrom("c1")
+            .branchFrom("c1")
             .toAcls(PhaseCode.A) // c4
             .toAcls(PhaseCode.A) // c5
             .addFeeder("j0")
@@ -184,7 +184,7 @@ class RemoveDirectionTest {
         // j6 --c7--
         //
         val n = nb
-            .splitFrom("c1")
+            .branchFrom("c1")
             .toAcls(PhaseCode.A) // c4
             .toAcls(PhaseCode.A) // c5
             .fromJunction(PhaseCode.A, 1) // j6

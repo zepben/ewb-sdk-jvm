@@ -12,17 +12,14 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
-import com.zepben.evolve.cim.iec61970.base.wires.Breaker
-import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
-import com.zepben.evolve.cim.iec61970.base.wires.Junction
+import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
 
 /**
  * A class for building simple test networks, often used for unit testing.
  */
-class TestNetworkBuilder private constructor() {
+open class TestNetworkBuilder private constructor() {
 
     private var currentTerminal: Int? = null
 
@@ -44,7 +41,7 @@ class TestNetworkBuilder private constructor() {
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun fromSource(phases: PhaseCode = PhaseCode.ABC, action: (EnergySource) -> Unit = {}): TestNetworkBuilder {
+    fun fromSource(phases: PhaseCode = PhaseCode.ABC, action: EnergySource.() -> Unit = {}): TestNetworkBuilder {
         current = network.createExternalSource(phases).also(action)
         return this
     }
@@ -58,7 +55,7 @@ class TestNetworkBuilder private constructor() {
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun toSource(phases: PhaseCode = PhaseCode.ABC, action: (EnergySource) -> Unit = {}): TestNetworkBuilder {
+    fun toSource(phases: PhaseCode = PhaseCode.ABC, action: EnergySource.() -> Unit = {}): TestNetworkBuilder {
         current = network.createExternalSource(phases).also {
             connect(current!!, it)
             action(it)
@@ -75,7 +72,7 @@ class TestNetworkBuilder private constructor() {
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun fromAcls(nominalPhases: PhaseCode = PhaseCode.ABC, action: (AcLineSegment) -> Unit = {}): TestNetworkBuilder {
+    fun fromAcls(nominalPhases: PhaseCode = PhaseCode.ABC, action: AcLineSegment.() -> Unit = {}): TestNetworkBuilder {
         current = network.createAcls(nominalPhases).also(action)
         return this
     }
@@ -89,7 +86,7 @@ class TestNetworkBuilder private constructor() {
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun toAcls(nominalPhases: PhaseCode = PhaseCode.ABC, action: (AcLineSegment) -> Unit = {}): TestNetworkBuilder {
+    fun toAcls(nominalPhases: PhaseCode = PhaseCode.ABC, action: AcLineSegment.() -> Unit = {}): TestNetworkBuilder {
         current = network.createAcls(nominalPhases).also {
             connect(current!!, it)
             action(it)
@@ -112,7 +109,7 @@ class TestNetworkBuilder private constructor() {
         nominalPhases: PhaseCode = PhaseCode.ABC,
         isNormallyOpen: Boolean = false,
         isOpen: Boolean? = null,
-        action: (Breaker) -> Unit = {}
+        action: Breaker.() -> Unit = {}
     ): TestNetworkBuilder {
         current = network.createBreaker(nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen ?: isNormallyOpen).also(action)
         return this
@@ -133,7 +130,7 @@ class TestNetworkBuilder private constructor() {
         nominalPhases: PhaseCode = PhaseCode.ABC,
         isNormallyOpen: Boolean = false,
         isOpen: Boolean? = null,
-        action: (Breaker) -> Unit = {}
+        action: Breaker.() -> Unit = {}
     ): TestNetworkBuilder {
         current = network.createBreaker(nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen ?: isNormallyOpen).also {
             connect(current!!, it)
@@ -152,7 +149,7 @@ class TestNetworkBuilder private constructor() {
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun fromJunction(nominalPhases: PhaseCode = PhaseCode.ABC, numTerminals: Int? = null, action: (Junction) -> Unit = {}): TestNetworkBuilder {
+    fun fromJunction(nominalPhases: PhaseCode = PhaseCode.ABC, numTerminals: Int? = null, action: Junction.() -> Unit = {}): TestNetworkBuilder {
         current = network.createJunction(nominalPhases, numTerminals).also(action)
         return this
     }
@@ -167,7 +164,7 @@ class TestNetworkBuilder private constructor() {
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun toJunction(nominalPhases: PhaseCode = PhaseCode.ABC, numTerminals: Int? = null, action: (Junction) -> Unit = {}): TestNetworkBuilder {
+    fun toJunction(nominalPhases: PhaseCode = PhaseCode.ABC, numTerminals: Int? = null, action: Junction.() -> Unit = {}): TestNetworkBuilder {
         current = network.createJunction(nominalPhases, numTerminals).also {
             connect(current!!, it)
             action(it)
@@ -176,13 +173,91 @@ class TestNetworkBuilder private constructor() {
     }
 
     /**
-     * Move the current network pointer to the specified [from] allowing branching of the network. This has the effect of changing the current network pointer.
+     * Start a new network island from a [PowerTransformer], updating the network pointer to the new [PowerTransformer].
      *
-     * @param from The mRID of the [ConductingEquipment] to split from.
+     * @param nominalPhases The nominal phases for each end of the new [PowerTransformer]. Defaults to two [PhaseCode.ABC] ends.
+     * @param endActions Actions that accepts the new [PowerTransformerEnd] to allow for additional initialisation.
+     * @param action An action that accepts the new [PowerTransformer] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
-    fun splitFrom(from: String, terminal: Int? = null): TestNetworkBuilder {
+    @JvmOverloads
+    fun fromPowerTransformer(
+        nominalPhases: List<PhaseCode> = listOf(PhaseCode.ABC, PhaseCode.ABC),
+        endActions: List<PowerTransformerEnd.() -> Unit>? = null,
+        action: PowerTransformer.() -> Unit = {}
+    ): TestNetworkBuilder {
+        current = network.createPowerTransformer(nominalPhases).also {
+            endActions?.forEachIndexed { index, endAction ->
+                endAction(it.ends[index])
+            }
+            action(it)
+        }
+        return this
+    }
+
+    /**
+     * Add a new [PowerTransformer] to the network and connect it to the current network pointer, updating the network pointer to the new [PowerTransformer].
+     *
+     * @param nominalPhases The nominal phases for each end of the new [PowerTransformer]. Defaults to two [PhaseCode.ABC] ends.
+     * @param endActions Actions that accepts the new [PowerTransformerEnd] to allow for additional initialisation.
+     * @param action An action that accepts the new [PowerTransformer] to allow for additional initialisation.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun toPowerTransformer(
+        nominalPhases: List<PhaseCode> = listOf(PhaseCode.ABC, PhaseCode.ABC),
+        endActions: List<PowerTransformerEnd.() -> Unit>? = null,
+        action: PowerTransformer.() -> Unit = {}
+    ): TestNetworkBuilder {
+        current = network.createPowerTransformer(nominalPhases).also {
+            connect(current!!, it)
+            endActions?.forEachIndexed { index, endAction ->
+                endAction(it.ends[index])
+            }
+            action(it)
+        }
+        return this
+    }
+
+    /**
+     * Start a new network island from [start], updating the network pointer.
+     *
+     * @param start The [ConductingEquipment] to start the new island with. To connect other objects to [start], it must have terminals created.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    fun fromOther(start: ConductingEquipment): TestNetworkBuilder {
+        current = start.apply { terminals.forEach { network.add(it) } }.also { network.tryAdd(it) }
+        ++count
+        return this
+    }
+
+    /**
+     * Add [next] to the network and connect it to the current network pointer, updating the network pointer to [next].
+     *
+     * @param next The [ConductingEquipment] to add to [network]. To connect other objects to [next], it must have terminals created.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    fun toOther(next: ConductingEquipment): TestNetworkBuilder {
+        current = next.apply { terminals.forEach { network.add(it) } }.also {
+            connect(current!!, it)
+            network.tryAdd(it)
+        }
+        ++count
+        return this
+    }
+
+    /**
+     * Move the current network pointer to the specified [from] allowing branching of the network. This has the effect of changing the current network pointer.
+     *
+     * @param from The mRID of the [ConductingEquipment] to branch from.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    fun branchFrom(from: String, terminal: Int? = null): TestNetworkBuilder {
         current = network[from]!!
         currentTerminal = terminal
         return this
@@ -281,6 +356,18 @@ class TestNetworkBuilder private constructor() {
             }.also { add(it) }
         }
 
+    private fun NetworkService.createPowerTransformer(nominalPhases: List<PhaseCode>) =
+        nextId("tx").let { id ->
+            PowerTransformer(id).apply {
+                nominalPhases.forEachIndexed { i, phaseCode ->
+                    val t = Terminal("$id-t${i + 1}").apply { phases = phaseCode }.also { add(it) }
+
+                    addTerminal(t)
+                    addEnd(PowerTransformerEnd("$id-e${i + 1}").apply { terminal = t }.also { add(it) })
+                }
+            }.also { add(it) }
+        }
+
     private fun NetworkService.createFeeder(headEquipment: ConductingEquipment, sequenceNumber: Int?) =
         nextId("fdr").let { id ->
             Feeder(id).apply {
@@ -305,7 +392,7 @@ class TestNetworkBuilder private constructor() {
          */
         @JvmStatic
         @JvmOverloads
-        fun startWithSource(phases: PhaseCode = PhaseCode.ABC, action: (EnergySource) -> Unit = {}): TestNetworkBuilder =
+        fun startWithSource(phases: PhaseCode = PhaseCode.ABC, action: EnergySource.() -> Unit = {}): TestNetworkBuilder =
             TestNetworkBuilder().apply {
                 fromSource(phases, action)
             }
@@ -320,7 +407,7 @@ class TestNetworkBuilder private constructor() {
          */
         @JvmStatic
         @JvmOverloads
-        fun startWithAcls(nominalPhases: PhaseCode = PhaseCode.ABC, action: (AcLineSegment) -> Unit = {}): TestNetworkBuilder =
+        fun startWithAcls(nominalPhases: PhaseCode = PhaseCode.ABC, action: AcLineSegment.() -> Unit = {}): TestNetworkBuilder =
             TestNetworkBuilder().apply {
                 fromAcls(nominalPhases, action)
             }
@@ -341,14 +428,14 @@ class TestNetworkBuilder private constructor() {
             nominalPhases: PhaseCode = PhaseCode.ABC,
             isNormallyOpen: Boolean = false,
             isOpen: Boolean? = null,
-            action: (Breaker) -> Unit = {}
+            action: Breaker.() -> Unit = {}
         ): TestNetworkBuilder =
             TestNetworkBuilder().apply {
                 fromBreaker(nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen, action)
             }
 
         /**
-         * Add a new [Junction] to the network and connect it to the current network pointer, updating the network pointer to the new [Junction].
+         * Create a [TestNetworkBuilder] that starts with a [Junction].
          *
          * @param nominalPhases The nominal phases for the new [Junction].
          * @param numTerminals The number of terminals to create on the new [Junction]. Defaults to 2.
@@ -358,9 +445,42 @@ class TestNetworkBuilder private constructor() {
          */
         @JvmStatic
         @JvmOverloads
-        fun startWithJunction(nominalPhases: PhaseCode = PhaseCode.ABC, numTerminals: Int? = null, action: (Junction) -> Unit = {}): TestNetworkBuilder =
+        fun startWithJunction(nominalPhases: PhaseCode = PhaseCode.ABC, numTerminals: Int? = null, action: Junction.() -> Unit = {}): TestNetworkBuilder =
             TestNetworkBuilder().apply {
                 fromJunction(nominalPhases, numTerminals, action)
+            }
+
+        /**
+         * Create a [TestNetworkBuilder] that starts with a [PowerTransformer].
+         *
+         * @param nominalPhases The nominal phases for each end of the new [PowerTransformer]. Defaults to two [PhaseCode.ABC] ends.
+         * @param endActions Actions that accepts the new [PowerTransformerEnd] to allow for additional initialisation.
+         * @param action An action that accepts the new [PowerTransformer] to allow for additional initialisation.
+         *
+         * @return This [TestNetworkBuilder] to allow for fluent use.
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun startWithPowerTransformer(
+            nominalPhases: List<PhaseCode> = listOf(PhaseCode.ABC, PhaseCode.ABC),
+            endActions: List<PowerTransformerEnd.() -> Unit>? = null,
+            action: PowerTransformer.() -> Unit = {}
+        ): TestNetworkBuilder =
+            TestNetworkBuilder().apply {
+                fromPowerTransformer(nominalPhases, endActions, action)
+            }
+
+        /**
+         * Create a [TestNetworkBuilder] that starts with the specified [start].
+         *
+         * @param start The [ConductingEquipment] to start with. To connect other objects to [start], it must have terminals created.
+         *
+         * @return This [TestNetworkBuilder] to allow for fluent use.
+         */
+        @JvmStatic
+        fun startWithOther(start: ConductingEquipment): TestNetworkBuilder =
+            TestNetworkBuilder().apply {
+                fromOther(start)
             }
 
     }

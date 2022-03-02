@@ -36,7 +36,7 @@ class RemovePhasesTest {
         .startWithSource(PhaseCode.ABCN) // s0
         .toAcls(PhaseCode.ABCN) // c1
         .toAcls(PhaseCode.ABCN) // c2
-        .splitFrom("c1")
+        .branchFrom("c1")
         .toAcls(PhaseCode.AB) // c3
         .fromSource(PhaseCode.ABCN) // s4
         .toAcls(PhaseCode.ABCN) // c5

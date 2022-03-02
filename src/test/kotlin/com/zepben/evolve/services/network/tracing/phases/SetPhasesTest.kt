@@ -72,7 +72,7 @@ class SetPhasesTest {
             .startWithSource(PhaseCode.ABCN) // s0
             .toAcls(PhaseCode.ABCN) // c1
             .toAcls(PhaseCode.ABCN) // c2
-            .splitFrom("c1")
+            .branchFrom("c1")
             .toAcls(PhaseCode.AB) // c3
             .fromAcls(PhaseCode.ABCN) // c4
             .buildAndLog()
@@ -120,8 +120,8 @@ class SetPhasesTest {
         val n = TestNetworkBuilder
             .startWithSource(PhaseCode.ABCN) // s0
             .toBreaker(PhaseCode.ABCN) {
-                it.setOpen(true, SPK.A)
-                it.setNormallyOpen(true, SPK.B)
+                setOpen(true, SPK.A)
+                setNormallyOpen(true, SPK.B)
             }
             .toAcls(PhaseCode.ABCN) // c2
             .buildAndLog()
@@ -176,8 +176,8 @@ class SetPhasesTest {
         // 1--c0--21--c1--2
         //
         val n = TestNetworkBuilder
-            .startWithAcls(PhaseCode.A) { it.terminals[1].normalPhases[SPK.A] = SPK.A } // c0
-            .toAcls(PhaseCode.A) { it.terminals[1].normalPhases[SPK.A] = SPK.B } // c1
+            .startWithAcls(PhaseCode.A) { terminals[1].normalPhases[SPK.A] = SPK.A } // c0
+            .toAcls(PhaseCode.A) { terminals[1].normalPhases[SPK.A] = SPK.B } // c1
             .buildAndLog()
 
         val c1: AcLineSegment = n["c1"]!!
@@ -198,9 +198,9 @@ class SetPhasesTest {
         // 1--c0--21--c1--21--c2--2
         //
         val n = TestNetworkBuilder
-            .startWithAcls(PhaseCode.A) { it.terminals[1].normalPhases[SPK.A] = SPK.A } // c0
+            .startWithAcls(PhaseCode.A) { terminals[1].normalPhases[SPK.A] = SPK.A } // c0
             .toAcls(PhaseCode.A) // c1
-            .toAcls(PhaseCode.A) { it.terminals[0].normalPhases[SPK.A] = SPK.B } // c2
+            .toAcls(PhaseCode.A) { terminals[0].normalPhases[SPK.A] = SPK.B } // c2
             .buildAndLog()
 
         val c1: AcLineSegment = n["c1"]!!

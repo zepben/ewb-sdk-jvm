@@ -13,6 +13,9 @@ import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
+import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
@@ -64,7 +67,7 @@ internal class TestNetworkBuilderTest {
             .startWithAcls(PhaseCode.ABC) // c0
             .toBreaker(PhaseCode.ABC, isNormallyOpen = true) // b1
             .toAcls(PhaseCode.AB) // c2
-            .splitFrom("c0")
+            .branchFrom("c0")
             .toBreaker(PhaseCode.ABC, isOpen = true) // b3
             .toAcls(PhaseCode.AB) // c4
             .fromAcls(PhaseCode.AB) // c5
@@ -136,6 +139,34 @@ internal class TestNetworkBuilderTest {
     }
 
     @Test
+    internal fun sampleNetworkStartingWithPowerTransformer() {
+        //
+        // 1 tx0 21--c1--21 tx2 2
+        //
+        // 1 tx3 31--c4--2
+        //    2
+        //
+        TestNetworkBuilder
+            .startWithPowerTransformer() // tx0
+            .toAcls(PhaseCode.ABC) // c1
+            .toPowerTransformer(listOf(PhaseCode.ABC)) // tx2
+            .fromPowerTransformer(listOf(PhaseCode.AB, PhaseCode.AB, PhaseCode.AN)) // tx3
+            .toAcls(PhaseCode.AN) // c4
+            .build()
+            .apply {
+                validateConnections("tx0", emptyList(), listOf("c1-t1"))
+                validateConnections("c1", listOf("tx0-t2"), listOf("tx2-t1"))
+                validateConnections("tx2", listOf("c1-t2"))
+                validateConnections("tx3", emptyList(), emptyList(), listOf("c4-t1"))
+                validateConnections("c4", listOf("tx3-t3"), emptyList())
+
+                validateEnds("tx0", listOf(PhaseCode.ABC, PhaseCode.ABC))
+                validateEnds("tx2", listOf(PhaseCode.ABC))
+                validateEnds("tx3", listOf(PhaseCode.AB, PhaseCode.AB, PhaseCode.AN))
+            }
+    }
+
+    @Test
     internal fun canStartWithOpenPoints() {
         //
         // 1 b0 2
@@ -158,7 +189,7 @@ internal class TestNetworkBuilderTest {
     }
 
     @Test
-    internal fun canSplitFromJunction() {
+    internal fun canBranchFromJunction() {
         //
         //           2
         //           |
@@ -177,11 +208,11 @@ internal class TestNetworkBuilderTest {
         TestNetworkBuilder
             .startWithJunction(PhaseCode.A, 4) // j0
             .toAcls(PhaseCode.A) // c1
-            .splitFrom("j0", 1)
+            .branchFrom("j0", 1)
             .toAcls(PhaseCode.A) // c2
-            .splitFrom("j0", 2)
+            .branchFrom("j0", 2)
             .toAcls(PhaseCode.A) // c3
-            .splitFrom("j0", 3)
+            .branchFrom("j0", 3)
             .toAcls(PhaseCode.A) // c4
             .toAcls(PhaseCode.A) // c5
             .build()
@@ -211,6 +242,48 @@ internal class TestNetworkBuilderTest {
             .withMessage("EnergySource phases must be a subset of ABCN")
     }
 
+    @Test
+    internal fun canInitialiseEnds() {
+        //
+        // 1 tx0 21 tx1
+        //
+        // 1 tx3 3
+        //    2
+        //
+        TestNetworkBuilder
+            .startWithPowerTransformer(listOf(PhaseCode.ABC, PhaseCode.ABC), listOf({ ratedU = 1 }, { ratedU = 2 })) // tx0
+            .toPowerTransformer(listOf(PhaseCode.ABC), listOf { ratedS = 3 }) // tx1
+            .fromPowerTransformer(listOf(PhaseCode.AB, PhaseCode.AB, PhaseCode.AN), listOf({ b = 4.0 }, { b = 5.0 }, { b = 6.0 })) // tx2
+            .build()
+            .apply {
+                assertThat(get<PowerTransformerEnd>("tx0-e1")!!.ratedU, equalTo(1))
+                assertThat(get<PowerTransformerEnd>("tx0-e2")!!.ratedU, equalTo(2))
+                assertThat(get<PowerTransformerEnd>("tx1-e1")!!.ratedS, equalTo(3))
+                assertThat(get<PowerTransformerEnd>("tx2-e1")!!.b, equalTo(4.0))
+                assertThat(get<PowerTransformerEnd>("tx2-e2")!!.b, equalTo(5.0))
+                assertThat(get<PowerTransformerEnd>("tx2-e3")!!.b, equalTo(6.0))
+            }
+    }
+
+    @Test
+    internal fun sampleNetworkWithGenerics() {
+        //
+        // o1 11 o2
+        //
+        // o3
+        //
+        TestNetworkBuilder
+            .startWithOther(Junction("o0").apply { addTerminal(Terminal("o0-t1")) }) // o0
+            .toOther(Junction("o1").apply { addTerminal(Terminal("o1-t1")) }) // o1
+            .fromOther(Junction("o2")) // o2
+            .build()
+            .apply {
+                validateConnections("o0", listOf("o1-t1"))
+                validateConnections("o1", listOf("o0-t1"))
+                validateConnections("o2")
+            }
+    }
+
     private fun NetworkService.validateConnections(mRID: String, vararg expectedTerms: List<String>) {
         assertThat(get<ConductingEquipment>(mRID)!!.numTerminals(), equalTo(expectedTerms.size))
         expectedTerms.forEachIndexed { index, expected ->
@@ -233,6 +306,17 @@ internal class TestNetworkBuilderTest {
 
     private fun NetworkService.validateFeeder(mRID: String, headTerminal: String) {
         assertThat(get<Feeder>(mRID)!!.normalHeadTerminal, equalTo(get(headTerminal)))
+    }
+
+    private fun NetworkService.validateEnds(mRID: String, expectedEnds: List<PhaseCode>) {
+        get<PowerTransformer>(mRID)!!.apply {
+            assertThat(numTerminals(), equalTo(expectedEnds.size))
+            assertThat(numEnds(), equalTo(expectedEnds.size))
+
+            ends.forEachIndexed { index, end ->
+                assertThat(end.terminal, equalTo(terminals[index]))
+            }
+        }
     }
 
 }

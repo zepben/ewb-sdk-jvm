@@ -435,7 +435,7 @@ class PhaseInferrerTest {
             .toAcls(PhaseCode.XY) // c7
             .toAcls(PhaseCode.ABC) // c8
             .connect("c8", "c4", 2, 2)
-            .splitFrom("c5")
+            .branchFrom("c5")
             .toAcls(PhaseCode.ABC) // c9
             .addFeeder("s0")
             .build()

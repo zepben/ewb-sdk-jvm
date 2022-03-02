@@ -68,7 +68,7 @@ class SetDirectionTest {
             .startWithAcls() // c0
             .toBreaker(isNormallyOpen = true, isOpen = false) // b1
             .toAcls() // c2
-            .splitFrom("c0")
+            .branchFrom("c0")
             .toBreaker(isOpen = true) // b3
             .toAcls() // c4
             .network
@@ -137,7 +137,7 @@ class SetDirectionTest {
             .toJunction(PhaseCode.A) // j6
             .toAcls(PhaseCode.A) // c7
             .toJunction(PhaseCode.A, 1) // j8
-            .splitFrom("j2")
+            .branchFrom("j2")
             .toAcls(PhaseCode.A) // c9
             .connect("c9", "j6", 2, 1)
             .addFeeder("s0")

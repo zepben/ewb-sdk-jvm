@@ -12,6 +12,7 @@ import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResul
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityTrace
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
+import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.phases.*
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
@@ -193,6 +194,14 @@ object Tracing {
      */
     @JvmStatic
     fun removePhases(): RemovePhases = RemovePhases()
+
+    /**
+     * Returns an instance of [RemoveDirection] convenience class for removing feeder directions from a network.
+     *
+     * @return A new traversal instance.
+     */
+    @JvmStatic
+    fun removeDirection(): RemoveDirection = RemoveDirection()
 
     /**
      * Returns an instance of [AssignToFeeders] convenience class for assigning equipment containers to feeders on a network.

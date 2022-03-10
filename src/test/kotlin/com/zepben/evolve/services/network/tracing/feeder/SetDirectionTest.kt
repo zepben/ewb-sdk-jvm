@@ -332,6 +332,30 @@ class SetDirectionTest {
         n.getT("c2", 2).validateDirections(DOWNSTREAM)
     }
 
+    @Test
+    internal fun worksWithoutPhase() {
+        //
+        // j0 11--c1--21--c2--2
+        //
+        val n = TestNetworkBuilder
+            .startWithJunction(numTerminals = 1, nominalPhases = PhaseCode.NONE) // j0
+            .toAcls(nominalPhases = PhaseCode.NONE) // c1
+            .toBreaker(PhaseCode.NONE, isNormallyOpen = true)
+            .toAcls(nominalPhases = PhaseCode.NONE) // c2
+            .network
+
+        SetDirection().run(n.getT("j0", 1))
+        DirectionLogger.trace(n["j0"])
+
+        n.getT("j0", 1).validateDirections(DOWNSTREAM)
+        n.getT("c1", 1).validateDirections(UPSTREAM)
+        n.getT("c1", 2).validateDirections(DOWNSTREAM)
+        n.getT("b2", 1).validateDirections(UPSTREAM)
+        n.getT("b2", 2).validateDirections(NONE)
+        n.getT("c3", 1).validateDirections(NONE)
+        n.getT("c3", 2).validateDirections(NONE)
+    }
+
     private fun doSetDirectionTrace(n: NetworkService) {
         SetDirection().run(n)
         n.sequenceOf<Feeder>().forEach { DirectionLogger.trace(it.normalHeadTerminal!!.conductingEquipment!!) }

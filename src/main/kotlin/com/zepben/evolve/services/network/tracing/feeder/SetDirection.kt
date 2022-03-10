@@ -145,7 +145,7 @@ class SetDirection {
             return
 
         val ce = terminal.conductingEquipment ?: return
-        if (terminal.phases.singlePhases.all { openTest.isOpen(ce, it) })
+        if (openTest.isOpen(ce, null))
             return
 
         ce.terminals

@@ -8,7 +8,7 @@
 * None.
 
 ##### Fixes
-* None.
+* `SetDirection` now correctly handles `Switch` instances without phases.
 
 ##### Notes
 * None.

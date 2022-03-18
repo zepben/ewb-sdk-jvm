@@ -280,6 +280,22 @@ class SetPhasesTest {
         PhaseValidator.validatePhases(n, "c2", PhaseCode.CN, PhaseCode.CN)
     }
 
+    @Test
+    internal fun appliesPhasesOntoSwer() {
+        //
+        // s0 11--tx1--21--c2--2
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.AC) // s0
+            .toPowerTransformer(listOf(PhaseCode.AC, PhaseCode.X)) // tx1
+            .toAcls(PhaseCode.X) // c2
+            .buildAndLog()
+
+        PhaseValidator.validatePhases(n, "s0", PhaseCode.AC)
+        PhaseValidator.validatePhases(n, "tx1", PhaseCode.AC, PhaseCode.C)
+        PhaseValidator.validatePhases(n, "c2", PhaseCode.C, PhaseCode.C)
+    }
+
     private fun TestNetworkBuilder.buildAndLog() = build().apply {
         PhaseLogger.trace(listOf<EnergySource>())
     }

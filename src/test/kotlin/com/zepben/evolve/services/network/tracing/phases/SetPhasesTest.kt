@@ -210,10 +210,74 @@ class SetPhasesTest {
             SetPhases().run(n.getT("c0", 2))
         }.toThrow(IllegalStateException::class.java)
             .withMessage(
-                "Attempted to flow conflicting phase A onto B on nominal phase path A to A. This occurred while flowing between " +
+                "Attempted to flow conflicting phase A onto B on nominal phase A. This occurred while flowing between " +
                     "${c1.terminals[1]} on ${c1.typeNameAndMRID()} and ${c2.terminals[0]} on ${c2.typeNameAndMRID()}. This is caused by " +
                     "missing open points, or incorrect phases in upstream equipment that should be corrected in the source data."
             )
+    }
+
+    @Test
+    internal fun addsNeutralThroughTransformers() {
+        //
+        // s0 11--tx1--21--c2--2
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC) // s0
+            .toPowerTransformer(listOf(PhaseCode.ABC, PhaseCode.ABCN)) // tx1
+            .toAcls(PhaseCode.ABCN) // c2
+            .buildAndLog()
+
+        PhaseValidator.validatePhases(n, "s0", PhaseCode.ABC)
+        PhaseValidator.validatePhases(n, "tx1", PhaseCode.ABC, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "c2", PhaseCode.ABCN, PhaseCode.ABCN)
+    }
+
+    @Test
+    internal fun appliesUnknownPhasesThroughTransformers() {
+        //
+        // s0 11--tx1--21--c2--2
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.BC) // s0
+            .toPowerTransformer(listOf(PhaseCode.BC, PhaseCode.XN)) // tx1
+            .toAcls(PhaseCode.XN) // c2
+            .buildAndLog()
+
+        PhaseValidator.validatePhases(n, "s0", PhaseCode.BC)
+        PhaseValidator.validatePhases(n, "tx1", PhaseCode.BC, PhaseCode.BN)
+        PhaseValidator.validatePhases(n, "c2", PhaseCode.BN, PhaseCode.BN)
+    }
+
+    @Test
+    internal fun appliesPhasesToUnknownHv() {
+        //
+        // s0 11--c1--21--c2--2
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.BC) // s0
+            .toAcls(PhaseCode.BC) // c1
+            .toAcls(PhaseCode.XY) // c2
+            .buildAndLog()
+
+        PhaseValidator.validatePhases(n, "s0", PhaseCode.BC)
+        PhaseValidator.validatePhases(n, "c1", PhaseCode.BC, PhaseCode.BC)
+        PhaseValidator.validatePhases(n, "c2", PhaseCode.BC, PhaseCode.BC)
+    }
+
+    @Test
+    internal fun appliesPhasesToUnknownLv() {
+        //
+        // s0 11--c1--21--c2--2
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.CN) // s0
+            .toAcls(PhaseCode.CN) // c1
+            .toAcls(PhaseCode.XN) // c2
+            .buildAndLog()
+
+        PhaseValidator.validatePhases(n, "s0", PhaseCode.CN)
+        PhaseValidator.validatePhases(n, "c1", PhaseCode.CN, PhaseCode.CN)
+        PhaseValidator.validatePhases(n, "c2", PhaseCode.CN, PhaseCode.CN)
     }
 
     private fun TestNetworkBuilder.buildAndLog() = build().apply {

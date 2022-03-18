@@ -16,7 +16,7 @@ import com.zepben.evolve.services.network.tracing.connectivity.PhasePaths.viable
 import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
-class TerminalConnectivity @JvmOverloads constructor(
+class TerminalConnectivityConnected @JvmOverloads constructor(
     private val createCandidatePhases: () -> XyCandidatePhasePaths = { XyCandidatePhasePaths() }
 ) {
 
@@ -26,13 +26,13 @@ class TerminalConnectivity @JvmOverloads constructor(
 
     @JvmOverloads
     fun connectedTerminals(terminal: Terminal, phases: Iterable<SPK> = terminal.phases.singlePhases): List<ConnectivityResult> {
-        val tracePhases = phases.intersect(terminal.phases.singlePhases.toSet())
+        val includePhases = phases.intersect(terminal.phases.singlePhases.toSet())
         val connectivityNode = terminal.connectivityNode ?: return emptyList()
 
         val results = mutableListOf<ConnectivityResult>()
         connectivityNode.terminals.forEach { connectedTerminal ->
             if (connectedTerminal != terminal) {
-                val cr = terminalConnectivity(terminal, connectedTerminal, tracePhases)
+                val cr = terminalConnectivity(terminal, connectedTerminal, includePhases)
                 if (cr.nominalPhasePaths.isNotEmpty())
                     results.add(cr)
             }
@@ -43,7 +43,7 @@ class TerminalConnectivity @JvmOverloads constructor(
     private fun terminalConnectivity(
         terminal: Terminal,
         connectedTerminal: Terminal,
-        tracedPhases: Set<SPK>
+        includePhases: Set<SPK>
     ): ConnectivityResult =
         ConnectivityResult.between(
             terminal,
@@ -51,7 +51,7 @@ class TerminalConnectivity @JvmOverloads constructor(
             (findStraightPhasePaths(terminal, connectedTerminal)
                 ?: findXyPhasePaths(terminal, connectedTerminal)
                 ?: emptyList())
-                .filter { it.from in tracedPhases }
+                .filter { it.from in includePhases }
                 .filter { it.to in connectedTerminal.phases }
         )
 

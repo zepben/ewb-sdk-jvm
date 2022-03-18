@@ -30,7 +30,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
-import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivity
+import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
 import kotlin.reflect.KClass
 
 /**
@@ -475,7 +475,7 @@ class NetworkService : BaseService("network") {
         @JvmStatic
         @JvmOverloads
         fun connectedTerminals(terminal: Terminal, phases: Iterable<SinglePhaseKind> = terminal.phases.singlePhases): List<ConnectivityResult> =
-            TerminalConnectivity().connectedTerminals(terminal, phases)
+            TerminalConnectivityConnected().connectedTerminals(terminal, phases)
 
     }
 

@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
-internal class TerminalConnectivityTest {
+internal class TerminalConnectivityConnectedTest {
 
     @JvmField
     @RegisterExtension

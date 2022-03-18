@@ -91,7 +91,7 @@ class DatabaseSqliteTest {
     @Disabled
     fun checkMemoryUsage() {
         systemErr.unmute()
-        val databaseFileName = "C:\\Working\\ewb\\data\\np\\prod\\2022-01-17\\2022-01-17-network-model.sqlite"
+        val databaseFileName = "C:\\Working\\ewb\\data\\local\\2022-03-18\\2022-03-18-network-model.sqlite"
 
         assertThat(Files.exists(Paths.get(databaseFileName)), equalTo(true))
 

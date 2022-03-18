@@ -14,6 +14,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.OpenTest
+import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
+import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityInternal
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
 import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
@@ -22,7 +24,9 @@ import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQue
  * Convenience class that provides methods for setting phases on a [NetworkService]
  * This class is backed by a [BranchRecursiveTraversal].
  */
-class SetPhases {
+class SetPhases(
+    private val terminalConnectivityInternal: TerminalConnectivityInternal = TerminalConnectivityInternal()
+) {
 
     /**
      * The [BranchRecursiveTraversal] used when tracing the normal state of the network.
@@ -127,7 +131,7 @@ class SetPhases {
      * @param phasesToFlow The nominal phases on which to spread phases.
      * @param phaseSelector The selector to use to spread the phases.
      *
-     * @return True if any phases were spread, otherwise false.
+     * @return A set of [SinglePhaseKind] that were updated. This will be empty if there were no updates.
      */
     @JvmOverloads
     fun spreadPhases(
@@ -135,24 +139,9 @@ class SetPhases {
         toTerminal: Terminal,
         phaseSelector: PhaseSelector,
         phasesToFlow: Set<SinglePhaseKind> = fromTerminal.phases.singlePhases.toSet()
-    ): Boolean {
-        val fromPhases = phaseSelector.phases(fromTerminal)
-        val toPhases = phaseSelector.phases(toTerminal)
-
-        var hasChanges = false
-        phasesToFlow.forEach {
-            try {
-                hasChanges = toPhases.set(it, fromPhases[it]) || hasChanges
-            } catch (ex: UnsupportedOperationException) {
-                throw IllegalStateException(
-                    "Attempted to flow conflicting phase ${fromPhases[it]} onto ${toPhases[it]} on nominal phase $it. This occurred while flowing from " +
-                        "$fromTerminal to $toTerminal through ${toTerminal.conductingEquipment?.typeNameAndMRID()}. This is caused by missing open " +
-                        "points, or incorrect phases in upstream equipment that should be corrected in the source data."
-                )
-            }
-        }
-
-        return hasChanges
+    ): Set<SinglePhaseKind> {
+        val cr = terminalConnectivityInternal.between(fromTerminal, toTerminal, phasesToFlow)
+        return flowViaPaths(cr, phaseSelector)
     }
 
     private fun applyPhases(terminal: Terminal, phaseSelector: PhaseSelector, phases: List<SinglePhaseKind>) {
@@ -198,8 +187,11 @@ class SetPhases {
         val phasesToFlow = getPhasesToFlow(current, openTest)
 
         current.conductingEquipment?.terminals?.forEach {
-            if ((it != current) && flowThroughEquipment(traversal, current, it, phaseSelector, phasesToFlow))
-                flowToConnectedTerminalsAndQueue(traversal, it, phaseSelector, phasesToFlow)
+            if (it != current) {
+                val phasesFlowed = flowThroughEquipment(traversal, current, it, phaseSelector, phasesToFlow)
+                if (phasesFlowed.isNotEmpty())
+                    flowToConnectedTerminalsAndQueue(traversal, it, phaseSelector, phasesFlowed)
+            }
         }
     }
 
@@ -209,7 +201,7 @@ class SetPhases {
         toTerminal: Terminal,
         phaseSelector: PhaseSelector,
         phasesToFlow: Set<SinglePhaseKind>
-    ): Boolean {
+    ): Set<SinglePhaseKind> {
         traversal.tracker.visit(toTerminal)
         return spreadPhases(fromTerminal, toTerminal, phaseSelector, phasesToFlow)
     }
@@ -223,35 +215,54 @@ class SetPhases {
         phaseSelector: PhaseSelector,
         phasesToFlow: Set<SinglePhaseKind>
     ) {
-        val fromPhases = phaseSelector.phases(fromTerminal)
         val connectivityResults = NetworkService.connectedTerminals(fromTerminal, phasesToFlow)
 
         val useBranchQueue = (connectivityResults.size > 1) || ((fromTerminal.conductingEquipment?.numTerminals() ?: 0) > 2)
 
         connectivityResults.forEach { cr ->
-            val toPhases = phaseSelector.phases(cr.toTerminal)
-
-            var hasChanges = false
-            for (path in cr.nominalPhasePaths) {
-                try {
-                    hasChanges = toPhases.set(path.to, fromPhases[path.from]) || hasChanges
-                } catch (ex: UnsupportedOperationException) {
-                    throw IllegalStateException(
-                        "Attempted to flow conflicting phase ${fromPhases[path.from]} onto ${toPhases[path.to]} on nominal phase path ${path.from} to " +
-                            "${path.to}. This occurred while flowing between $fromTerminal on ${fromTerminal.conductingEquipment?.typeNameAndMRID()} and " +
-                            "${cr.toTerminal} on ${cr.to?.typeNameAndMRID()}. This is caused by missing open points, or incorrect phases in upstream " +
-                            "equipment that should be corrected in the source data."
-                    )
-                }
-            }
-
-            if (hasChanges) {
+            if (flowViaPaths(cr, phaseSelector).isNotEmpty()) {
                 if (useBranchQueue)
                     traversal.branchQueue.add(traversal.branchSupplier().setStart(cr.toTerminal))
                 else
                     traversal.queue.add(cr.toTerminal)
             }
         }
+    }
+
+    private fun flowViaPaths(cr: ConnectivityResult, phaseSelector: PhaseSelector): Set<SinglePhaseKind> {
+        val fromPhases = phaseSelector.phases(cr.fromTerminal)
+        val toPhases = phaseSelector.phases(cr.toTerminal)
+
+        val changedPhases = mutableSetOf<SinglePhaseKind>()
+        for (path in cr.nominalPhasePaths) {
+            try {
+                // If the path comes from NONE, then we want to apply the `to phase`.
+                val phase = if (path.from != SinglePhaseKind.NONE)
+                    fromPhases[path.from]
+                else
+                    path.to
+
+                if (toPhases.set(path.to, phase))
+                    changedPhases.add(path.to)
+            } catch (ex: UnsupportedOperationException) {
+                val phaseDesc = if (path.from == path.to)
+                    "${path.from}"
+                else
+                    "path ${path.from} to ${path.to}"
+
+                val terminalDesc = if (cr.from == cr.to)
+                    "from ${cr.fromTerminal} to ${cr.toTerminal} through ${cr.from?.typeNameAndMRID()}"
+                else
+                    "between ${cr.fromTerminal} on ${cr.from?.typeNameAndMRID()} and ${cr.toTerminal} on ${cr.to?.typeNameAndMRID()}"
+
+                throw IllegalStateException(
+                    "Attempted to flow conflicting phase ${fromPhases[path.from]} onto ${toPhases[path.to]} on nominal phase $phaseDesc. This occurred while " +
+                        "flowing $terminalDesc. This is caused by missing open points, or incorrect phases in upstream equipment that should be " +
+                        "corrected in the source data."
+                )
+            }
+        }
+        return changedPhases
     }
 
     private fun getPhasesToFlow(terminal: Terminal, openTest: OpenTest): MutableSet<SinglePhaseKind> =

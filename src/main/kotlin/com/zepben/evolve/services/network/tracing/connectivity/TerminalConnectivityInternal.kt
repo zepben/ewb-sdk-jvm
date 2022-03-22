@@ -28,10 +28,11 @@ class TerminalConnectivityInternal {
      * @return The connectivity between [terminal] and [otherTerminal]. If the conducting equipment is a power transformer the nominal phase paths may
      *         contain an entry with the 'from' phase set to NONE and the 'to' phase set to N, indicating a neutral has been added by the transformer1.
      */
+    @JvmOverloads
     fun between(
         terminal: Terminal,
         otherTerminal: Terminal,
-        includePhases: Set<SPK>
+        includePhases: Set<SPK> = terminal.phases.singlePhases.toSet()
     ): ConnectivityResult =
         if (terminal.conductingEquipment is PowerTransformer)
             transformerTerminalConnectivity(terminal, otherTerminal, includePhases)

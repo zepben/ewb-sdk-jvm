@@ -7,20 +7,21 @@
  */
 package com.zepben.evolve.services.network.tracing.phases
 
+import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 
 /**
  * Interface to query or set the phase for a core on a [Terminal].
  */
-interface PhaseStatus {
+abstract class PhaseStatus(private val terminal: Terminal) {
 
     /**
      * Get the traced phase for the specified [nominalPhase].
      *
      * @param nominalPhase The nominal phase you are interested in querying.
      */
-    operator fun get(nominalPhase: SinglePhaseKind): SinglePhaseKind
+    abstract operator fun get(nominalPhase: SinglePhaseKind): SinglePhaseKind
 
     /**
      * Set the traced phase for the specified [nominalPhase].
@@ -30,6 +31,23 @@ interface PhaseStatus {
      *
      * @return True if the phase is updated, otherwise false.
      */
-    operator fun set(nominalPhase: SinglePhaseKind, singlePhaseKind: SinglePhaseKind): Boolean
+    abstract operator fun set(nominalPhase: SinglePhaseKind, singlePhaseKind: SinglePhaseKind): Boolean
+
+    /**
+     * Get the traced phase for each nominal phase as a [PhaseCode].
+     *
+     * @return The [PhaseCode] if the combination of phases makes sense, otherwise null.
+     */
+    fun asPhaseCode(): PhaseCode? {
+        val tracedPhases = terminal.phases.singlePhases.map { get(it) }
+        val phases = tracedPhases.toSet()
+
+        return if (SinglePhaseKind.NONE in phases)
+            PhaseCode.NONE.takeIf { phases.size == 1 }
+        else if (phases.size == tracedPhases.size)
+            PhaseCode.fromSinglePhases(phases)
+        else
+            null
+    }
 
 }

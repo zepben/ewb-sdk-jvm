@@ -33,8 +33,7 @@ class MeasurementServiceComparator : BaseServiceComparator() {
         ObjectDifference(source, target).apply {
             compareMeasurementValue()
 
-            compareValues(AnalogValue::analogMRID)
-            compareDoubles(AnalogValue::value)
+            compareValues(AnalogValue::value, AnalogValue::analogMRID)
         }
 
     private fun compare(source: DiscreteValue, target: DiscreteValue): ObjectDifference<DiscreteValue> =

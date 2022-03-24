@@ -33,8 +33,7 @@ class DiagramServiceComparator : BaseServiceComparator() {
             compareIdentifiedObject()
 
             compareIdReferences(DiagramObject::diagram)
-            compareValues(DiagramObject::identifiedObjectMRID, DiagramObject::style)
-            compareDoubles(DiagramObject::rotation)
+            compareValues(DiagramObject::identifiedObjectMRID, DiagramObject::style, DiagramObject::rotation)
             compareIndexedValueCollections(DiagramObject::points)
         }
 

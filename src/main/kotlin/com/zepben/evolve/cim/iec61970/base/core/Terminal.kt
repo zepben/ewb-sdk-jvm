@@ -42,7 +42,7 @@ class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID)
     var normalFeederDirection: FeederDirection = FeederDirection.NONE
     var currentFeederDirection: FeederDirection = FeederDirection.NONE
 
-    val tracedPhases: TracedPhases = TracedPhases()
+    val tracedPhases: TracedPhases = TracedPhases(terminal = this)
 
     // The reference to the connectivity node is weak so if a Network object goes out of scope, holding a single conducting equipment
     // reference does not cause everything connected to it in the network to stay in memory.

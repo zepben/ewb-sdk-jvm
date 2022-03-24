@@ -10,15 +10,17 @@ package com.zepben.evolve.services.common
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.Name
 import kotlin.reflect.KProperty1
-import kotlin.reflect.full.instanceParameter
-import kotlin.reflect.jvm.jvmErasure
 
 fun <T, R> KProperty1<in T, R?>.compareValues(source: T?, target: T?): ValueDifference? {
     val sVal = source?.let { this.get(source) }
     val tVal = target?.let { this.get(target) }
-    if ((sVal is Double) || (tVal is Double))
-        throw AssertionError("Using wrong comparator for ${instanceParameter?.type?.jvmErasure?.simpleName}::$name.")
-    return if (sVal == tVal) {
+    return if (sVal is Double) {
+        if ((tVal is Double) && ((sVal == tVal) || (sVal.isNaN() && tVal.isNaN()))) {
+            null
+        } else {
+            ValueDifference(sVal, tVal)
+        }
+    } else if (sVal == tVal) {
         null
     } else {
         ValueDifference(sVal, tVal)
@@ -31,19 +33,7 @@ fun <T, R, C> KProperty1<in T, R?>.compareValues(source: T?, target: T?, toCompa
 
     val sValComp = sVal?.let(toComparable)
     val tValComp = tVal?.let(toComparable)
-    if ((sValComp is Double) || (tValComp is Double))
-        throw AssertionError("Using wrong comparator for ${instanceParameter?.type?.jvmErasure?.simpleName}::$name.")
     return if (sValComp == tValComp) {
-        null
-    } else {
-        ValueDifference(sVal, tVal)
-    }
-}
-
-fun <T> KProperty1<in T, Double?>.compareDoubles(source: T?, target: T): ValueDifference? {
-    val sVal = source?.let { this.get(source) }
-    val tVal = target?.let { this.get(target) }
-    return if ((sVal == tVal) || ((sVal?.isNaN() == true) && (tVal?.isNaN() == true))) {
         null
     } else {
         ValueDifference(sVal, tVal)

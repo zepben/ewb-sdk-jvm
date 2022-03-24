@@ -82,7 +82,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun testAsPhaseCodesThree() {
+    fun testAsPhaseCodeThree() {
         val terminal = Terminal().apply { phases = PhaseCode.ABCN }
         val normalPhases = terminal.normalPhases
         val currentPhases = terminal.currentPhases
@@ -116,7 +116,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun testAsPhaseCodesSingle() {
+    fun testAsPhaseCodeSingle() {
         val terminal = Terminal().apply { phases = PhaseCode.BC }
         val normalPhases = terminal.normalPhases
         val currentPhases = terminal.currentPhases
@@ -144,7 +144,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun testAsPhaseCodesChangingTerminalPhases() {
+    fun asPhaseCodeHandlesChangingTerminalPhases() {
         val terminal = Terminal().apply { phases = PhaseCode.BC }
         val normalPhases = terminal.normalPhases
 
@@ -156,6 +156,17 @@ class PhaseSelectorTest {
 
         terminal.phases = PhaseCode.AC
         assertThat(normalPhases.asPhaseCode(), equalTo(PhaseCode.AC))
+    }
+
+    @Test
+    fun asPhaseCodeDoesNotDropPhases() {
+        val terminal = Terminal().apply { phases = PhaseCode.BC }
+        val normalPhases = terminal.normalPhases
+
+        normalPhases[SinglePhaseKind.B] = SinglePhaseKind.A
+        normalPhases[SinglePhaseKind.C] = SinglePhaseKind.A
+
+        assertThat(normalPhases.asPhaseCode(), nullValue())
     }
 
     private fun verifyDone() {

@@ -7,6 +7,8 @@
  */
 package com.zepben.evolve.services.network.tracing.phases
 
+import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -21,7 +23,7 @@ class TracedPhasesTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val tracedPhases = TracedPhases()
+    private val tracedPhases = TracedPhases(terminal = Terminal().apply { phases = PhaseCode.ABCN })
 
     @Test
     fun testSetAndGet() {

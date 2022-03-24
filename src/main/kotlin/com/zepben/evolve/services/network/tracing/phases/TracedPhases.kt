@@ -8,6 +8,7 @@
 package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.tracing.phases.TracedPhasesBitManipulation.get
 import com.zepben.evolve.services.network.tracing.phases.TracedPhasesBitManipulation.set
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
@@ -29,8 +30,9 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
  *                               data structure to store the status could change at any time (and thus be a breaking change).
  *                               Use at your own risk.
  */
-data class TracedPhases(
-    internal var phaseStatusInternal: UInt = 0u
+class TracedPhases(
+    internal var phaseStatusInternal: UInt = 0u,
+    terminal: Terminal
 ) {
 
     private val normalMask: UInt = 0x0000ffff.toUInt()
@@ -40,7 +42,7 @@ data class TracedPhases(
     /**
      * The traced phases in the normal state of the network.
      */
-    val normal: PhaseStatus = object : PhaseStatus {
+    val normal: PhaseStatus = object : PhaseStatus(terminal) {
         override operator fun get(nominalPhase: SPK): SPK = normal(nominalPhase)
         override operator fun set(nominalPhase: SPK, singlePhaseKind: SPK): Boolean = setNormal(nominalPhase, singlePhaseKind)
     }
@@ -48,7 +50,7 @@ data class TracedPhases(
     /**
      * The traced phases in the current state of the network.
      */
-    val current: PhaseStatus = object : PhaseStatus {
+    val current: PhaseStatus = object : PhaseStatus(terminal) {
         override operator fun get(nominalPhase: SPK): SPK = current(nominalPhase)
         override operator fun set(nominalPhase: SPK, singlePhaseKind: SPK): Boolean = setCurrent(nominalPhase, singlePhaseKind)
     }

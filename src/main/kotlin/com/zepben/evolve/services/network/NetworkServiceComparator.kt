@@ -33,6 +33,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseServiceComparator
 import com.zepben.evolve.services.common.ObjectDifference
 import com.zepben.evolve.services.common.ValueDifference
+import com.zepben.evolve.services.common.compareValues
 
 /**
  * @param options Indicates which optional checks to perform
@@ -368,7 +369,10 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareAcDcTerminal()
 
             compareIdReferences(Terminal::conductingEquipment, Terminal::connectivityNode)
-            compareValues(Terminal::phases, Terminal::sequenceNumber, Terminal::normalFeederDirection, Terminal::currentFeederDirection, Terminal::tracedPhases)
+            compareValues(Terminal::phases, Terminal::sequenceNumber, Terminal::normalFeederDirection, Terminal::currentFeederDirection)
+
+            // TracedPhases is not comparable directly
+            addIfDifferent(Terminal::tracedPhases.name, Terminal::tracedPhases.compareValues(source, target) { it.phaseStatusInternal })
         }
 
     /************ IEC61970 BASE EQUIVALENTS ************/

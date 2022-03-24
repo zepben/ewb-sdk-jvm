@@ -25,6 +25,21 @@ fun <T, R> KProperty1<in T, R?>.compareValues(source: T?, target: T?): ValueDiff
     }
 }
 
+fun <T, R, C> KProperty1<in T, R?>.compareValues(source: T?, target: T?, toComparable: (R) -> C): ValueDifference? {
+    val sVal = source?.let { this.get(source) }
+    val tVal = target?.let { this.get(target) }
+
+    val sValComp = sVal?.let(toComparable)
+    val tValComp = tVal?.let(toComparable)
+    if ((sValComp is Double) || (tValComp is Double))
+        throw AssertionError("Using wrong comparator for ${instanceParameter?.type?.jvmErasure?.simpleName}::$name.")
+    return if (sValComp == tValComp) {
+        null
+    } else {
+        ValueDifference(sVal, tVal)
+    }
+}
+
 fun <T> KProperty1<in T, Double?>.compareDoubles(source: T?, target: T): ValueDifference? {
     val sVal = source?.let { this.get(source) }
     val tVal = target?.let { this.get(target) }

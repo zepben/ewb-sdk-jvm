@@ -300,8 +300,8 @@ open class TestNetworkBuilder private constructor() {
      * @return The [NetworkService] created by this [TestNetworkBuilder]
      */
     fun build(applyDirectionsFromSources: Boolean = true): NetworkService {
-        Tracing.setPhases().run(network)
         Tracing.setDirection().run(network)
+        Tracing.setPhases().run(network)
 
         if (applyDirectionsFromSources)
             network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach { Tracing.setDirection().run(it) }

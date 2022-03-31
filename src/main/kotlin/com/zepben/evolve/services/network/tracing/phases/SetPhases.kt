@@ -242,7 +242,7 @@ class SetPhases(
                 else
                     path.to
 
-                if (toPhases.set(path.to, phase))
+                if ((phase != SinglePhaseKind.NONE) && toPhases.set(path.to, phase))
                     changedPhases.add(path.to)
             } catch (ex: UnsupportedOperationException) {
                 val phaseDesc = if (path.from == path.to)

@@ -312,6 +312,33 @@ class SetPhasesTest {
         PhaseValidator.validatePhases(n, "c2", PhaseCode.CN, PhaseCode.CN)
     }
 
+    @Test
+    internal fun doesNotRemovePhasesWhenApplyingSubsetOutOfLoop() {
+        //
+        // s0 12-----c5------1
+        //    1              2
+        //   tx1            tx4
+        //    2              1
+        //    1--c2--21--c3--2
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC) // s0
+            .toPowerTransformer(listOf(PhaseCode.ABC, PhaseCode.ABCN)) // tx1
+            .toAcls(PhaseCode.ABCN) // c2
+            .toAcls(PhaseCode.CN) // c3
+            .toPowerTransformer(listOf(PhaseCode.CN, PhaseCode.AC)) // tx4
+            .toAcls(PhaseCode.ABC) // c5
+            .connect("c5", "s0", 2, 1)
+            .buildAndLog()
+
+        PhaseValidator.validatePhases(n, "s0", PhaseCode.ABC)
+        PhaseValidator.validatePhases(n, "tx1", PhaseCode.ABC, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "c2", PhaseCode.ABCN, PhaseCode.ABCN)
+        PhaseValidator.validatePhases(n, "c3", PhaseCode.CN, PhaseCode.CN)
+        PhaseValidator.validatePhases(n, "tx4", PhaseCode.CN, PhaseCode.AC)
+        PhaseValidator.validatePhases(n, "c5", PhaseCode.ABC, PhaseCode.ABC)
+    }
+
     private fun TestNetworkBuilder.buildAndLog() = build().apply {
         PhaseLogger.trace(listOf<EnergySource>())
     }

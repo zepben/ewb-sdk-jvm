@@ -98,6 +98,13 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
     }
 
     operator fun contains(phase: SinglePhaseKind): Boolean = singlePhases.contains(phase)
+    fun <R> map(transform: (SinglePhaseKind) -> R): List<R> = singlePhases.map(transform)
+    fun any(predicate: (SinglePhaseKind) -> Boolean): Boolean = singlePhases.any(predicate)
+    fun all(predicate: (SinglePhaseKind) -> Boolean): Boolean = singlePhases.all(predicate)
+
+    fun forEach(action: (SinglePhaseKind) -> Unit) {
+        for (element in singlePhases) action(element)
+    }
 
     init {
         byPhases[singlePhases.toSet()] = this

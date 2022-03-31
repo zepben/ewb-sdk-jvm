@@ -11,6 +11,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -66,6 +67,47 @@ internal class PhaseCodeTest {
 
         assertThat(PhaseCode.fromSinglePhases(listOf(SinglePhaseKind.A, SinglePhaseKind.B)), equalTo(PhaseCode.AB))
         assertThat(PhaseCode.fromSinglePhases(setOf(SinglePhaseKind.B, SinglePhaseKind.C)), equalTo(PhaseCode.BC))
+    }
+
+    @Test
+    internal fun contains() {
+        assertThat("Contains A", PhaseCode.ABCN.contains(SinglePhaseKind.A))
+        assertThat("Contains B", PhaseCode.ABCN.contains(SinglePhaseKind.B))
+        assertThat("Contains C", PhaseCode.ABCN.contains(SinglePhaseKind.C))
+        assertThat("Contains N", PhaseCode.ABCN.contains(SinglePhaseKind.N))
+        assertThat("Does not contain X", PhaseCode.ABCN.contains(SinglePhaseKind.X))
+        assertThat("Does not contain Y", PhaseCode.ABCN.contains(SinglePhaseKind.Y))
+
+        assertThat("Does not contain A", PhaseCode.XY.contains(SinglePhaseKind.A))
+        assertThat("Does not contain B", PhaseCode.XY.contains(SinglePhaseKind.B))
+        assertThat("Does not contain C", PhaseCode.XY.contains(SinglePhaseKind.C))
+        assertThat("Does not contain N", PhaseCode.XY.contains(SinglePhaseKind.A))
+        assertThat("Contains X", PhaseCode.XY.contains(SinglePhaseKind.X))
+        assertThat("Contains Y", PhaseCode.XY.contains(SinglePhaseKind.Y))
+    }
+
+    @Test
+    internal fun singlePhaseHelpers() {
+        assertThat(PhaseCode.ABC.map { "$it-$it" }.toList(), contains("A-A", "B-B", "C-C"))
+
+        assertThat("any uses single phases", PhaseCode.ABC.any { it == SinglePhaseKind.A })
+        assertThat("any uses single phases", PhaseCode.ABC.any { it == SinglePhaseKind.B })
+        assertThat("any uses single phases", PhaseCode.ABC.any { it == SinglePhaseKind.C })
+        assertThat("any uses single phases", !PhaseCode.ABC.any { it == SinglePhaseKind.N })
+
+        assertThat("all uses single phases", !PhaseCode.ABC.all { it != SinglePhaseKind.A })
+        assertThat("all uses single phases", !PhaseCode.ABC.all { it != SinglePhaseKind.B })
+        assertThat("all uses single phases", !PhaseCode.ABC.all { it != SinglePhaseKind.C })
+        assertThat("all uses single phases", PhaseCode.ABC.all { it != SinglePhaseKind.N })
+
+    }
+
+    @Test
+    internal fun forEach() {
+        val phases = mutableListOf<SinglePhaseKind>()
+        PhaseCode.ABCN.forEach { phases.add(it) }
+
+        assertThat(phases, contains(SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N))
     }
 
 }

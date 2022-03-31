@@ -16,6 +16,7 @@
 ##### Fixes
 
 * `SetDirection` now correctly handles `Switch` instances without phases.
+* `SetPhases` no longer removes phases when there is an LV loop with mixed single and 3-phase.
 
 ##### Notes
 

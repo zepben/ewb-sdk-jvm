@@ -2,6 +2,7 @@
 
 | Version | Released |
 | --- | --- |
+|[0.9.0](#v090)| `05 April 2022` |
 |[0.8.0](#v080)| `03 March 2022` |
 |[0.7.0](#v070)| `22 September 2021` |
 |[0.6.0](#v060)| `06 April 2021` |
@@ -14,6 +15,32 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+##### Breaking Changes
+
+* None.
+
+##### New Features
+
+* None.
+
+##### Enhancements
+
+* Phases are now set through transformers allowing for phase changes. Only valid phase mappings are currently supported. If a valid mapping has been missed,
+  please contact Zepben.
+* You can now translate `TracedPhases` to a `PhaseCode` if the individual phases make sense.
+* Added `PhaseCode` helper methods `forEach`, `map`, `any` and `all`.
+
+##### Fixes
+
+* `SetDirection` now correctly handles `Switch` instances without phases.
+* `SetPhases` no longer removes phases when there is an LV loop with mixed single and 3-phase.
+
+##### Notes
+
+* None.
 
 ---
 

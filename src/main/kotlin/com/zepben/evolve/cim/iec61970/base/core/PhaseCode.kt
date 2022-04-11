@@ -10,6 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.core
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode.*
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
+import java.util.function.Consumer
 
 /**
  * An unordered enumeration of phase identifiers.  Allows designation of phases for both transmission and distribution equipment,
@@ -104,6 +105,13 @@ enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
 
     fun forEach(action: (SinglePhaseKind) -> Unit) {
         for (element in singlePhases) action(element)
+    }
+
+    /**
+     * Java interop version to prevent a `return null` or `return Unit.INSTANCE`
+     */
+    fun forEach(action: Consumer<SinglePhaseKind>) {
+        for (element in singlePhases) action.accept(element)
     }
 
     init {

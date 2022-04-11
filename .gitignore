@@ -65,3 +65,4 @@ site.7z
 **/node_modules/
 **/.docusaurus/
 docs/build
+/src/test/resources/test-database.txt

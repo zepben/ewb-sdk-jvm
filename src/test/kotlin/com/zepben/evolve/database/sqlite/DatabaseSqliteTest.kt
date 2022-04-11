@@ -67,6 +67,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 
 class DatabaseSqliteTest {
@@ -89,9 +90,11 @@ class DatabaseSqliteTest {
 
     @Test
     @Disabled
-    fun checkMemoryUsage() {
+    fun loadRealFile() {
         systemErr.unmute()
-        val databaseFileName = "C:\\Working\\ewb\\data\\local\\2022-03-18\\2022-03-18-network-model.sqlite"
+
+        // Put the name of the database you want to load in src/test/resources/text-database.txt
+        val databaseFileName = Files.readString(Path.of("src", "test", "resources", "test-database.txt")).trim().trim('"')
 
         assertThat(Files.exists(Paths.get(databaseFileName)), equalTo(true))
 

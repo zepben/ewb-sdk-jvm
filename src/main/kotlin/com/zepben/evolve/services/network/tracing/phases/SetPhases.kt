@@ -239,8 +239,10 @@ class SetPhases(
                 // If the path comes from NONE, then we want to apply the `to phase`.
                 val phase = if (path.from != SinglePhaseKind.NONE)
                     fromPhases[path.from]
-                else
+                else if (path.to !in PhaseCode.XY)
                     path.to
+                else
+                    toPhases[path.to]
 
                 if ((phase != SinglePhaseKind.NONE) && toPhases.set(path.to, phase))
                     changedPhases.add(path.to)

@@ -1,14 +1,19 @@
 ##### Breaking Changes
+
 * None.
 
 ##### New Features
+
 * None.
 
 ##### Enhancements
+
 * None.
 
 ##### Fixes
-* None.
+
+* `SetPhases` now supports setting backwards through XN/XY transformers.
 
 ##### Notes
+
 * None.

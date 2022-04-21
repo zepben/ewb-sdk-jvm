@@ -27,46 +27,73 @@ internal class FeederDirectionTest {
     }
 
     @Test
-    internal fun testPhaseDirection() {
-        assertThat(FeederDirection.NONE.has(FeederDirection.NONE), equalTo(true))
-        assertThat(FeederDirection.NONE.has(FeederDirection.UPSTREAM), equalTo(false))
-        assertThat(FeederDirection.NONE.has(FeederDirection.DOWNSTREAM), equalTo(false))
-        assertThat(FeederDirection.NONE.has(FeederDirection.BOTH), equalTo(false))
+    internal fun testHas() {
+        assertThat("NONE has NONE", FeederDirection.NONE.has(FeederDirection.NONE))
+        assertThat("NONE does not have UPSTREAM", !FeederDirection.NONE.has(FeederDirection.UPSTREAM))
+        assertThat("NONE does not have DOWNSTREAM", !FeederDirection.NONE.has(FeederDirection.DOWNSTREAM))
+        assertThat("NONE does not have BOTH", !FeederDirection.NONE.has(FeederDirection.BOTH))
 
-        assertThat(FeederDirection.UPSTREAM.has(FeederDirection.NONE), equalTo(false))
-        assertThat(FeederDirection.UPSTREAM.has(FeederDirection.UPSTREAM), equalTo(true))
-        assertThat(FeederDirection.UPSTREAM.has(FeederDirection.DOWNSTREAM), equalTo(false))
-        assertThat(FeederDirection.UPSTREAM.has(FeederDirection.BOTH), equalTo(false))
+        assertThat("UPSTREAM does not have NONE", !FeederDirection.UPSTREAM.has(FeederDirection.NONE))
+        assertThat("UPSTREAM has UPSTREAM", FeederDirection.UPSTREAM.has(FeederDirection.UPSTREAM))
+        assertThat("UPSTREAM does not have DOWNSTREAM", !FeederDirection.UPSTREAM.has(FeederDirection.DOWNSTREAM))
+        assertThat("UPSTREAM does not have BOTH", !FeederDirection.UPSTREAM.has(FeederDirection.BOTH))
 
-        assertThat(FeederDirection.DOWNSTREAM.has(FeederDirection.NONE), equalTo(false))
-        assertThat(FeederDirection.DOWNSTREAM.has(FeederDirection.UPSTREAM), equalTo(false))
-        assertThat(FeederDirection.DOWNSTREAM.has(FeederDirection.DOWNSTREAM), equalTo(true))
-        assertThat(FeederDirection.DOWNSTREAM.has(FeederDirection.BOTH), equalTo(false))
+        assertThat("DOWNSTREAM does not have NONE", !FeederDirection.DOWNSTREAM.has(FeederDirection.NONE))
+        assertThat("DOWNSTREAM does not have UPSTREAM", !FeederDirection.DOWNSTREAM.has(FeederDirection.UPSTREAM))
+        assertThat("DOWNSTREAM has DOWNSTREAM", FeederDirection.DOWNSTREAM.has(FeederDirection.DOWNSTREAM))
+        assertThat("DOWNSTREAM does not have BOTH", !FeederDirection.DOWNSTREAM.has(FeederDirection.BOTH))
 
-        assertThat(FeederDirection.BOTH.has(FeederDirection.NONE), equalTo(false))
-        assertThat(FeederDirection.BOTH.has(FeederDirection.UPSTREAM), equalTo(true))
-        assertThat(FeederDirection.BOTH.has(FeederDirection.DOWNSTREAM), equalTo(true))
-        assertThat(FeederDirection.BOTH.has(FeederDirection.BOTH), equalTo(true))
-
-        var direction: FeederDirection = FeederDirection.NONE
-        assertThat(direction, equalTo(FeederDirection.NONE))
-        direction += FeederDirection.UPSTREAM
-        assertThat(direction, equalTo(FeederDirection.UPSTREAM))
-        direction += FeederDirection.DOWNSTREAM
-        assertThat(direction, equalTo(FeederDirection.BOTH))
-        direction -= FeederDirection.UPSTREAM
-        assertThat(direction, equalTo(FeederDirection.DOWNSTREAM))
-        direction += FeederDirection.BOTH
-        assertThat(direction, equalTo(FeederDirection.BOTH))
-        direction -= FeederDirection.BOTH
-        assertThat(direction, equalTo(FeederDirection.NONE))
-        direction += FeederDirection.BOTH
-        assertThat(direction, equalTo(FeederDirection.BOTH))
-        direction -= FeederDirection.DOWNSTREAM
-        assertThat(direction, equalTo(FeederDirection.UPSTREAM))
-        direction -= FeederDirection.NONE
-        assertThat(direction, equalTo(FeederDirection.UPSTREAM))
-        direction += FeederDirection.NONE
-        assertThat(direction, equalTo(FeederDirection.UPSTREAM))
+        assertThat("BOTH does not have NONE", !FeederDirection.BOTH.has(FeederDirection.NONE))
+        assertThat("BOTH has UPSTREAM", FeederDirection.BOTH.has(FeederDirection.UPSTREAM))
+        assertThat("BOTH has DOWNSTREAM", FeederDirection.BOTH.has(FeederDirection.DOWNSTREAM))
+        assertThat("BOTH has BOTH", FeederDirection.BOTH.has(FeederDirection.BOTH))
     }
+
+    @Test
+    internal fun testPlus() {
+        assertThat(FeederDirection.NONE + FeederDirection.NONE, equalTo(FeederDirection.NONE))
+        assertThat(FeederDirection.NONE + FeederDirection.UPSTREAM, equalTo(FeederDirection.UPSTREAM))
+        assertThat(FeederDirection.NONE + FeederDirection.DOWNSTREAM, equalTo(FeederDirection.DOWNSTREAM))
+        assertThat(FeederDirection.NONE + FeederDirection.BOTH, equalTo(FeederDirection.BOTH))
+
+        assertThat(FeederDirection.UPSTREAM + FeederDirection.NONE, equalTo(FeederDirection.UPSTREAM))
+        assertThat(FeederDirection.UPSTREAM + FeederDirection.UPSTREAM, equalTo(FeederDirection.UPSTREAM))
+        assertThat(FeederDirection.UPSTREAM + FeederDirection.DOWNSTREAM, equalTo(FeederDirection.BOTH))
+        assertThat(FeederDirection.UPSTREAM + FeederDirection.BOTH, equalTo(FeederDirection.BOTH))
+
+        assertThat(FeederDirection.DOWNSTREAM + FeederDirection.NONE, equalTo(FeederDirection.DOWNSTREAM))
+        assertThat(FeederDirection.DOWNSTREAM + FeederDirection.UPSTREAM, equalTo(FeederDirection.BOTH))
+        assertThat(FeederDirection.DOWNSTREAM + FeederDirection.DOWNSTREAM, equalTo(FeederDirection.DOWNSTREAM))
+        assertThat(FeederDirection.DOWNSTREAM + FeederDirection.BOTH, equalTo(FeederDirection.BOTH))
+
+        assertThat(FeederDirection.BOTH + FeederDirection.NONE, equalTo(FeederDirection.BOTH))
+        assertThat(FeederDirection.BOTH + FeederDirection.UPSTREAM, equalTo(FeederDirection.BOTH))
+        assertThat(FeederDirection.BOTH + FeederDirection.DOWNSTREAM, equalTo(FeederDirection.BOTH))
+        assertThat(FeederDirection.BOTH + FeederDirection.BOTH, equalTo(FeederDirection.BOTH))
+    }
+
+    @Test
+    internal fun testMinus() {
+        assertThat(FeederDirection.NONE - FeederDirection.NONE, equalTo(FeederDirection.NONE))
+        assertThat(FeederDirection.NONE - FeederDirection.UPSTREAM, equalTo(FeederDirection.NONE))
+        assertThat(FeederDirection.NONE - FeederDirection.DOWNSTREAM, equalTo(FeederDirection.NONE))
+        assertThat(FeederDirection.NONE - FeederDirection.BOTH, equalTo(FeederDirection.NONE))
+
+        assertThat(FeederDirection.UPSTREAM - FeederDirection.NONE, equalTo(FeederDirection.UPSTREAM))
+        assertThat(FeederDirection.UPSTREAM - FeederDirection.UPSTREAM, equalTo(FeederDirection.NONE))
+        assertThat(FeederDirection.UPSTREAM - FeederDirection.DOWNSTREAM, equalTo(FeederDirection.UPSTREAM))
+        assertThat(FeederDirection.UPSTREAM - FeederDirection.BOTH, equalTo(FeederDirection.NONE))
+
+        assertThat(FeederDirection.DOWNSTREAM - FeederDirection.NONE, equalTo(FeederDirection.DOWNSTREAM))
+        assertThat(FeederDirection.DOWNSTREAM - FeederDirection.UPSTREAM, equalTo(FeederDirection.DOWNSTREAM))
+        assertThat(FeederDirection.DOWNSTREAM - FeederDirection.DOWNSTREAM, equalTo(FeederDirection.NONE))
+        assertThat(FeederDirection.DOWNSTREAM - FeederDirection.BOTH, equalTo(FeederDirection.NONE))
+
+        assertThat(FeederDirection.BOTH - FeederDirection.NONE, equalTo(FeederDirection.BOTH))
+        assertThat(FeederDirection.BOTH - FeederDirection.UPSTREAM, equalTo(FeederDirection.DOWNSTREAM))
+        assertThat(FeederDirection.BOTH - FeederDirection.DOWNSTREAM, equalTo(FeederDirection.UPSTREAM))
+        assertThat(FeederDirection.BOTH - FeederDirection.BOTH, equalTo(FeederDirection.NONE))
+
+    }
+
 }

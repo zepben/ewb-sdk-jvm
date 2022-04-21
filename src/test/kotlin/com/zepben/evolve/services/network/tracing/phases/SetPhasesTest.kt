@@ -339,6 +339,45 @@ class SetPhasesTest {
         PhaseValidator.validatePhases(n, "c5", PhaseCode.ABC, PhaseCode.ABC)
     }
 
+    @Test
+    internal fun canBackTraceThroughXnXyTransformerLoop() {
+        //
+        //    1 tx1 21--\
+        // s0 1         c2
+        //    2 tx3 12--/
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC) // s0
+            .toPowerTransformer(listOf(PhaseCode.XY, PhaseCode.XN)) // tx1
+            .toAcls(PhaseCode.XN) // c2
+            .toPowerTransformer(listOf(PhaseCode.XN, PhaseCode.XY)) // tx3
+            .connect("tx3", "s0", 2, 1)
+            .buildAndLog()
+
+        PhaseValidator.validatePhases(n, "s0", PhaseCode.ABC)
+        PhaseValidator.validatePhases(n, "tx1", PhaseCode.AC, PhaseCode.AN)
+        PhaseValidator.validatePhases(n, "c2", PhaseCode.AN, PhaseCode.AN)
+        PhaseValidator.validatePhases(n, "tx3", PhaseCode.AN, PhaseCode.AC)
+    }
+
+    @Test
+    internal fun canBackTraceThroughXnXyTransformerSpur() {
+        //
+        // s0 11 tx1 21--c2--21 tx3 2
+        //
+        val n = TestNetworkBuilder
+            .startWithSource(PhaseCode.ABC) // s0
+            .toPowerTransformer(listOf(PhaseCode.XY, PhaseCode.XN)) // tx1
+            .toAcls(PhaseCode.XN) // c2
+            .toPowerTransformer(listOf(PhaseCode.XN, PhaseCode.XY)) // tx3
+            .buildAndLog()
+
+        PhaseValidator.validatePhases(n, "s0", PhaseCode.ABC)
+        PhaseValidator.validatePhases(n, "tx1", PhaseCode.AC, PhaseCode.AN)
+        PhaseValidator.validatePhases(n, "c2", PhaseCode.AN, PhaseCode.AN)
+        PhaseValidator.validatePhases(n, "tx3", PhaseCode.AN.singlePhases, listOf(SPK.A, SPK.NONE))
+    }
+
     private fun TestNetworkBuilder.buildAndLog() = build().apply {
         PhaseLogger.trace(listOf<EnergySource>())
     }

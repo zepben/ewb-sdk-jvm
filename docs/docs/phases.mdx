@@ -6,6 +6,8 @@ title: Phases and Feeder Directions
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+## This is a title
+
 There are three different types of phases stored/calculated by the SDK:
 
 | Phase Type | SDK Field                                                   | Field Type  | Description                                                                                                                                                                                                                |
@@ -40,6 +42,7 @@ There are two methods for accessing the traced phases:
     ]
 }>
 <TabItem value="java">
+
 ```java
 class PhaseLogger {
     void logPhases(Terminal terminal) {
@@ -55,8 +58,10 @@ class PhaseLogger {
     }
 }
 ```
+
 </TabItem>
 <TabItem value="kotlin">
+
 ```kotlin
 class PhaseLogger {
     fun logPhases(terminal: Terminal) {
@@ -72,6 +77,7 @@ class PhaseLogger {
     }
 }
 ```
+
 </TabItem>
 </Tabs>
 
@@ -98,6 +104,7 @@ trace in the direction specified. A direction of `BOTH` can be formed from some 
     ]
 }>
 <TabItem value="java">
+
 ```java
 class DirectionLogger {
     void logDirection(Terminal terminal) {
@@ -105,8 +112,10 @@ class DirectionLogger {
     }
 }
 ```
+
 </TabItem>
 <TabItem value="kotlin">
+
 ```kotlin
 class DirectionLogger {
     fun logDirection(terminal: Terminal) {
@@ -114,6 +123,7 @@ class DirectionLogger {
     }
 }
 ```
+
 </TabItem>
 </Tabs>
 
@@ -131,6 +141,7 @@ the old format to the current:
     ]
 }>
 <TabItem value="java">
+
 ```java
 // Old
 class PhaseAndDirectionLoggerOld {
@@ -155,8 +166,10 @@ class PhaseAndDirectionLoggerOld {
     }
 }
 ```
+
 </TabItem>
 <TabItem value="kotlin">
+
 ```kotlin
 // Old
 class PhaseAndDirectionLoggerOld {
@@ -181,5 +194,6 @@ internal class PhaseAndDirectionLoggerOld {
     }
 }
 ```
+
 </TabItem>
 </Tabs>

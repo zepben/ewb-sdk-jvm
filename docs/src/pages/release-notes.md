@@ -2,6 +2,7 @@
 
 | Version | Released |
 | --- | --- |
+|[0.10.0](#v0100)| `27 April 2022` |
 |[0.9.0](#v090)| `05 April 2022` |
 |[0.8.0](#v080)| `03 March 2022` |
 |[0.7.0](#v070)| `22 September 2021` |
@@ -17,6 +18,32 @@
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
 
 ---
+
+### v0.10.0
+
+##### Breaking Changes
+
+* None.
+
+##### New Features
+
+* None.
+
+##### Enhancements
+
+* None.
+
+##### Fixes
+
+* `SetPhases` now supports setting backwards through XN/XY transformers.
+
+##### Notes
+
+* None.
+
+---
+
+### v0.9.0
 
 ##### Breaking Changes
 

@@ -76,6 +76,44 @@ internal class TerminalTest {
     }
 
     @Test
+    internal fun connectedTerminals() {
+        val terminal1 = Terminal()
+        val terminal2 = Terminal()
+        val terminal3 = Terminal()
+        val networkService = NetworkService()
+
+        assertThat(terminal1.connectedTerminals().toList(), empty())
+
+        networkService.connect(terminal1, "cn1")
+        assertThat(terminal1.connectedTerminals().toList(), empty())
+
+        networkService.connect(terminal2, "cn1")
+        assertThat(terminal1.connectedTerminals().toList(), containsInAnyOrder(terminal2))
+
+        networkService.connect(terminal3, "cn1")
+        assertThat(terminal1.connectedTerminals().toList(), containsInAnyOrder(terminal2, terminal3))
+    }
+
+    @Test
+    internal fun otherTerminals() {
+        val terminal1 = Terminal()
+        val terminal2 = Terminal()
+        val terminal3 = Terminal()
+        val ce = Junction()
+
+        assertThat(terminal1.otherTerminals().toList(), empty())
+
+        ce.addTerminal(terminal1)
+        assertThat(terminal1.otherTerminals().toList(), empty())
+
+        ce.addTerminal(terminal2)
+        assertThat(terminal1.otherTerminals().toList(), containsInAnyOrder(terminal2))
+
+        ce.addTerminal(terminal3)
+        assertThat(terminal1.otherTerminals().toList(), containsInAnyOrder(terminal2, terminal3))
+    }
+
+    @Test
     internal fun tracedPhases() {
         val terminal = Terminal()
 

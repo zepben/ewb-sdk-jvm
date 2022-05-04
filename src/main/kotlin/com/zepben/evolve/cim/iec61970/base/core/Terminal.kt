@@ -80,10 +80,26 @@ class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID)
      */
     val currentPhases: PhaseStatus = PhaseSelector.CURRENT_PHASES.phases(this)
 
+    /**
+     * Get the terminals that are connected to this [Terminal].
+     *
+     * @return A [Sequence] of terminals that are connected to this [Terminal].
+     */
+    fun connectedTerminals(): Sequence<Terminal> =
+        connectivityNode?.terminals?.asSequence()?.filter { other -> other != this } ?: emptySequence()
+
+    /**
+     * Get the terminals that share the same [ConductingEquipment] as this [Terminal].
+     *
+     * @return A [Sequence] of terminals that share the same [ConductingEquipment] as this [Terminal].
+     */
+    fun otherTerminals(): Sequence<Terminal> =
+        conductingEquipment?.terminals?.asSequence()?.filter { other -> other != this } ?: emptySequence()
+
     // NOTE: This is meant to be package private to prevent external linking of objects. Use the network
     //       to connect from outside this package.
     //
-    fun connect(connectivityNode: ConnectivityNode) {
+    internal fun connect(connectivityNode: ConnectivityNode) {
         this._connectivityNode = WeakReference(connectivityNode)
     }
 
@@ -91,7 +107,7 @@ class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID)
     // NOTE: This is meant to be package private to prevent external linking of objects. Use the network
     //       to disconnect from outside this package. It could be made 'internal' when all other classes are ported to Kotlin
     //
-    fun disconnect() {
+    internal fun disconnect() {
         _connectivityNode = NO_CONNECTIVITY_NODE
     }
 

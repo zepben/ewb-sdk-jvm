@@ -2,7 +2,8 @@
 
 ##### Breaking Changes
 
-* None.
+* Made `Terminal` methods `connect` and `disconnect` internal as they were always meant to be. If you have been incorrectly using them, you will need to swap to
+  using the methods from `NetworkService` instead.
 
 ##### New Features
 
@@ -10,7 +11,7 @@
 
 ##### Enhancements
 
-* None.
+* Added `connectedTerminals` and `otherTerminals` helper methods to `Terminal`.
 
 ##### Fixes
 

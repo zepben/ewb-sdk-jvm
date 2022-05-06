@@ -1,0 +1,44 @@
+name: Test
+
+on: 
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact: docs
+    container: node:12-alpine
+    steps:
+      - name: Install Git
+        run: |
+          apk add git
+
+      - name: Work around permission issue
+        run: git config --global --add safe.directory /__w/evolve-sdk-jvm/evolve-sdk-jvm
+
+      - uses: actions/checkout@v2
+
+      - name: Cache nodejs deps
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: npm
+
+      - name: Build docusaurus
+        id: build
+        uses: zepben/docusaurus-action@main
+        with:
+          VERSION: ${{ 0.8.0 }}
+          NPM_REPO: ${{ secrets.NPM_REPO }}
+          NPM_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Fail build
+        if: steps.build.outcome == 'failure'
+        run: |
+          git push origin -d release
+          echo "There was an error in the docusaurus build above."
+          exit 1
+        shell: sh

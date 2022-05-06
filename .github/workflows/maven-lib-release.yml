@@ -84,6 +84,9 @@ jobs:
         run: |
           apk add git
 
+      - name: Work around permission issue
+        run: git config --global --add safe.directory /__w/evolve-sdk-jvm/evolve-sdk-jvm
+
       - uses: actions/checkout@v2
 
       - name: Cache nodejs deps

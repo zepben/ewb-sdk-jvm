@@ -16,7 +16,7 @@ jobs:
           apk add git
 
       - name: Work around permission issue
-        run: git config --global --add safe.directory /__w/evolve-sdk-jvm/evolve-sdk-jvm
+        run: git config --global --add safe.directory ..
 
       - uses: actions/checkout@v2
 

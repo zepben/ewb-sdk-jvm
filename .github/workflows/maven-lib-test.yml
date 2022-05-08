@@ -17,8 +17,7 @@ jobs:
 
       - name: Work around permission issue
         run:
-          P = pwd
-          git config --global --add safe.directory $P
+          git config --global --add safe.directory ${{github.workspace}}
 
       - uses: actions/checkout@v2
 

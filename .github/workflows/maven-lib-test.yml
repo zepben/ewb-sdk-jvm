@@ -4,9 +4,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-
-
 jobs:
   build-docs:
     runs-on: ubuntu-latest

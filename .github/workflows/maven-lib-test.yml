@@ -17,7 +17,7 @@ jobs:
 
       - name: Work around permission issue
         run: |
-          dname=$(echo ${{github.repository}} | cut -d'/' -f2
+          dname=$(echo ${{github.repository}} | cut -d'/' -f2)
           git config --global --add safe.directory /__w/$dname/$dname
 
       - uses: actions/checkout@v2

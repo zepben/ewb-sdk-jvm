@@ -16,7 +16,9 @@ jobs:
           apk add git
 
       - name: Work around permission issue
-        run: git config --global --add safe.directory ..
+        run:
+          P = pwd
+          git config --global --add safe.directory $P
 
       - uses: actions/checkout@v2
 

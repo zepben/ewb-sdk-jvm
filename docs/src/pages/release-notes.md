@@ -2,6 +2,7 @@
 
 | Version | Released |
 | --- | --- |
+|[0.11.0](#v0110)| `09 May 2022` |
 |[0.10.0](#v0100)| `27 April 2022` |
 |[0.9.0](#v090)| `05 April 2022` |
 |[0.8.0](#v080)| `03 March 2022` |
@@ -16,6 +17,31 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+### v0.11.0
+
+##### Breaking Changes
+
+* Made `Terminal` methods `connect` and `disconnect` internal as they were always meant to be. If you have been incorrectly using them, you will need to swap to
+  using the methods from `NetworkService` instead.
+
+##### New Features
+
+* None.
+
+##### Enhancements
+
+* Added `connectedTerminals` and `otherTerminals` helper methods to `Terminal`.
+
+##### Fixes
+
+* `SetPhases` now supports setting backwards through XN/XY transformers.
+
+##### Notes
+
+* None.
 
 ---
 

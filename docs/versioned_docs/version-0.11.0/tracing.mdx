@@ -1,0 +1,233 @@
+---
+id: sdk-tracing
+title: Tracing
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Once you have a connected network model you can start following the connectivity to do some interesting analyses, from
+simple tasks such as adding up cable lengths along a line to advanced functions like a full load flow analysis.
+
+The Evolve SDK provides an API to make following connectivity (what we will call tracing) less cumbersome and more
+productive. It provides a variety of use-case specific traces out of the box, but also a generic mechanism to write
+your own traces in an easy to use manner. The
+[Tracing](https://github.com/zepben/evolve-sdk-jvm/blob/main/src/main/java/com/zepben/cimbend/network/tracing/Tracing.java)
+package is a great place to get an overview of the kind of tools we provide as part of the SDK.
+
+## Basic Connectivity 
+
+So, let's start at the absolute basic use case. "What is directly connected to this piece of equipment?".
+Obviously we provide a function to let you to find out. Let's see it in code:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+Breaker switch = network.get("aSwitch);
+List<ConnectivityResult> connectivity = Tracing.connectedEquipment(switch, PhaseCode.ABCN);
+connectivity.forEach(cr -> {
+    println(String.format(
+        "%s is connected to %s " +
+        "via terminals %s -> ${it.toTerminal()} " +
+        "through phases %s",
+        it.from(),
+        it.to(),
+        it.fromTerminal(),
+        it.toTerminal(),
+        it.nominalPhasePaths().stream().map(path -> "${path.from()}:${path.to()}" }).collect(joining())
+    ));
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val switch: Breaker = network.get("aSwitch)
+val connectivity: List<ConnectivityResult> = Tracing.connectedEquipment(switch, PhaseCode.ABCN)
+connectivity.forEach {
+    println(
+        "${it.from()} is connected to ${it.to()} " +
+        "via terminals ${it.fromTerminal()} -> ${it.toTerminal()} " +
+        """through phases ${it.nominalPhasePaths().map { path -> "${path.from()}:${path.to()}" }}"""
+    )
+}
+```
+
+</TabItem>
+</Tabs>
+
+Sometimes you want to be a bit more specific about your connectivity, such as "what is connected only to one side of the
+equipment?". You can do this by using specific terminals:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+Breaker switch = network.get("aSwitch);
+List<ConnectivityResult> connectivity = Tracing.connectedTerminals(switch, PhaseCode.ABCN);
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val switch: Breaker = network.get("aSwitch)
+val connectivity: List<ConnectivityResult> = Tracing.connectedTerminals(switch, PhaseCode.ABCN)
+```
+
+</TabItem>
+</Tabs>
+
+This will produce a subset of the result above, with just the equipment connected to the given terminal. The 
+connectivity result instances in the subset will be exactly the same as the previous example.
+
+## Tracing
+
+### Basic Traversal
+
+To trace a network, we obviously need to repeat the above process for each piece of equipment in the connectivity result
+list. In computer science, stepping between nodes in a data structure like this is known as a traversal. Conveniently, 
+the SDK provides a [Traversal](https://github.com/zepben/evolve-sdk-jvm/blob/main/src/main/java/com/zepben/traversals/Traversal.java) 
+interface with a number of implementations also provided for different use cases.
+
+The most common type you will use is the 
+[BasicTraversal](https://github.com/zepben/evolve-sdk-jvm/blob/main/src/main/java/com/zepben/traversals/BasicTraversal.java).
+In a nutshell, this class lets you easily specify how to step to connected objects, add custom actions to perform at
+each step to an object, and conditions on which the tracing should stop. It has some more advanced features, such as 
+allowing you to specify how to queue steps (for breadth, or depth or priority traversals) as well as custom tracking
+of objects. See the code docs for more details.
+
+There are a number of traces which we have identified as being frequently required. So, the SDK provides a number of 
+preconfigured BasicTraversal creators for these common use cases. These can be found in the 
+[tracing package](https://github.com/zepben/evolve-sdk-jvm/blob/main/src/main/java/com/zepben/cimbend/network/tracing/Tracing.java).
+
+To get started, lets take a look at the `Tracing.connectedEquipmentTrace()`. This returns a `BasicTraversal` that is
+preconfigured to continously step to equipment that is connected in any way. Under the covers it uses the 
+`Tracing.connectedEquipment` function we looked at above to continously step to connected objects. Now, say we wanted to
+identify the nearest circuit breakers to a piece of equipment, capturing all equipment between those breakers. We can do
+that with the following:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+NetworkService network = new NetworkService();
+
+// Populate network service with your network
+
+AcLineSegment acLineSeg = network.get("my conductor", AcLineSegment.class);
+if (acLineSeg == null) 
+    return;
+
+List<Breaker> breakers = new ArrayList<>();
+List<ConductingEquipment> equipmentBetweenBreakers = ArrayList<>();
+Tracing.connectedEquipmentTrace()
+    .addStopCondition(equipment -> equipment instanceof Breaker)
+    .addStepAction((equipment, isStopping) -> {
+        if (equipment instanceof Breaker) {
+            breakers.add((Breaker) equipment);
+        } else if (!isStopping) {
+            equipmentBetweenBreakers.add(equipment);
+        }
+    })
+    .run(acLineSeg);
+
+System.out.println("The closest circuit breakers are: " + breakers);
+System.out.println("The equipment between the above breakers: " + equipmentBetweenBreakers);
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val network = NetworkService()
+
+// Populate network service with your network
+
+val acLineSeg = network.get<AcLineSegment>("my conductor") ?: return
+
+val breakers = mutableListOf<Breaker>()
+val equipmentBetweenBreakers = mutableListOf<ConductingEquipment>()
+Tracing.connectedEquipmentTrace()
+    .addStopCondition { it is Breaker }
+    .addStepAction { equipment, isStopping ->
+        if (equipment is Breaker) {
+            breakers.add(equipment)
+        } else if (!isStopping) {
+            equipmentBetweenBreakers.add(equipment)
+        }
+    }
+    .run(acLineSeg)
+
+println("The closest circuit breakers are: $breakers")
+println("The equipment between the above breakers: $equipmentBetweenBreakers")
+```
+
+</TabItem>
+</Tabs>
+
+Let's break down what is happening with the trace:
+- `addStopCondition` is returning true if the equipment at the current step is a `Breaker`. This will make the trace
+  stop at the current step if the equipment is a breaker. Note that this will not terminate the trace, it simply stops
+  any more traversing from the current step. That is, no more equipment will be queued to be stepped to from the equipment
+  at this step. If there are other paths / branches in the trace in the queue, they will still be stepped to.
+- `addStepAction` is capturing the equipment as a breaker if it is a breaker, otherwise it captures the equipment as 
+   between breakers equipment if it is not stopping (as stopping happens on the breaker).
+
+As you can see this provides an extremely simple but powerful way to perform useful traces over your network. 
+
+### Useful traces
+
+There are a number of traces that will be common between all networks. We have identified numerous of these and 
+provide an easy way to instantiate them.
+
+#### Set phases trace
+
+`Tracing.setPhases()` returns a `SetPhases` instance. This provides a way to dynamically set phases at runtime based
+on a network's energy sources and the nominal phase connectivity within the network.
+
+#### Phase traces 
+
+There are numerous traces to trace based on various types of phasing data. These traces will ignore 
+- `Tracing.phaseTrace()` will trace based on nominal phase connectivity, ignoring open switches or in service flags.
+- `Tracing.normalPhaseTrace()` will trace based on nominal phase connectivity, stopping at normally open switches or 
+  equipment flagged as not normally in service. 
+- `Tracing.currentPhaseTrace()` will trace based on nominal phase connectivity, stopping at currently open switches or 
+  equipment flagged as not currently in service. 
+
+#### Downstream / Upstream traces 
+
+There are traces configured to find all upstream or downstream equipment from any piece of equipment that is on a feeder:
+- `Tracing.normalDownstreamTrace()` will trace downstream of the start equipment based on the normal state of the network.
+- `Tracing.currentDownstreamTrace()` will trace downstream of the start equipment based on the current state of the network.
+- `Tracing.normalUpstreamTrace()` will trace upstream of the start equipment based on the normal state of the network.
+- `Tracing.currentUpstreamTrace()` will trace upstream of the start equipment based on the current state of the network.
+
+#### Other traces
+
+There are other useful but less common traces available. See the 
+[code](https://github.com/zepben/evolve-sdk-jvm/blob/main/src/main/java/com/zepben/cimbend/network/tracing/Tracing.java)
+for all the available traces.

@@ -1,0 +1,297 @@
+---
+id: sdk-consumer
+title: Requesting Models
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+:::warning
+The API for consuming data from the Evolve data server is currently in alpha and very likely to experience breaking changes 
+in the future. Please provide any feedback about this API to [Zepben](www.zepben.com).
+:::
+
+The SDK provides a client to request models to a remote data server via [gRPC](https://grpc.io/). The service and proto 
+definitions for this API can be found [here](https://github.com/zepben/evolve-grpc). An implementation of the consumer 
+server is provided with the Evolve platform data services.
+
+When working with models, it is often impractical to load a whole model to a client due to the size of the data. This 
+is generally not a problem however, as most use cases only operate on a small subsection of the model at a time. So, the 
+consumer API provides the ability to request smaller portions of the model quickly and easily. The other benefit to this
+is you can set up many clients in parallel operating on different chunks of the model to reduce the amount of time to
+run any analytics you may wish to perform across the whole model.
+
+## Connecting to a server
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// Insecure
+try (GrpcChannel channel = GrpcChannelFactory.create(new ConnectionConfig("localhost", 50051))) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    NetworkService ns = new NetworkService();
+    GrpcResult result = client.getFeeder(ns).throwOnError();
+}
+
+// With SSL
+try (GrpcChannel channel = GrpcChannelFactory.create(new ConnectionConfig("localhost", 50051, true, "ca.cert"))) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    NetworkService ns = new NetworkService();
+    GrpcResult result = client.getFeeder(ns).throwOnError();
+}
+
+// With SSL and OAuth2. Note that you should never connect to a non-SSL server while using OAuth2, as you will be vulnerable to MITM attacks.
+try (GrpcChannel channel = GrpcChannelFactory.create(new ConnectionConfig("localhost", 50051, true, "ca.cert"))) {}
+    // Create CallCredentials using a configuration URL. This configuration endpoint will often be provided by the service you are connecting to.
+    JwtCredentials creds = EvolveCallCredentials.create(
+        "<client_id>",
+        "<client_secret>",
+        "<ewb_auth_config_URL>"
+    );
+
+    // Or create them with an AuthConfig if a configuration endpoint doesn't exist.
+    JwtCredentials creds = EvolveCallCredentials.create(
+        "<client_id>",
+        "<client_secret>",
+        new AuthConfig(tokenUrl="https://zepben.au.auth0.com/oauth/token", audience="https://evolve/", authType=AuthType.AUTH0)
+    );
+
+    NetworkConsumerClient client = new NetworkConsumerClient(channel, creds);
+    NetworkService ns = new NetworkService();
+    GrpcResult result = client.getFeeder(ns).throwOnError();
+}
+
+// With SSL and client authentication
+try (GrpcChannel channel = GrpcChannelFactory.create(new ConnectionConfig("localhost", 50051, true, "ca.cert", "path/to/signed.cert", "path/to/private.key"))) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    NetworkService ns = new NetworkService();
+    GrpcResult result = client.getFeeder(ns).throwOnError();
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+// Insecure
+GrpcChannelFactory.create(ConnectionConfig("localhost", 50051)).use { client ->
+    val client = NetworkConsumerClient(channel)
+    val ns = NetworkService()
+    val result = client.getFeeder(ns).throwOnError()
+}
+
+// With just SSL
+GrpcChannelFactory.create(ConnectionConfig("localhost", 50051, true, trustCertPath = "path/to/zepben/ca.cert")).use { channel ->
+    val client = NetworkConsumerClient(channel)
+    val ns = NetworkService()
+    val result = client.getFeeder(ns).throwOnError()
+}
+
+// With SSL and OAuth2. Note that you should never connect to a non-SSL server while using OAuth2, as you will be vulnerable to MITM attacks.
+GrpcChannelFactory.create(ConnectionConfig("localhost", 50051, true, trustCertPath = "path/to/zepben/ca.cert")).use { channel ->
+    // Create CallCredentials using a configuration URL. This configuration endpoint will often be provided by the service you are connecting to.
+    val creds = EvolveCallCredentials.create(
+        "<client_id>",
+        "<client_secret>",
+        "<ewb_auth_config_URL>"
+    )
+
+    // Or create them with an AuthConfig if a configuration endpoint doesn't exist.
+    val creds = EvolveCallCredentials.create(
+        "<client_id>",
+        "<client_secret>",
+        AuthConfig(tokenUrl="https://zepben.au.auth0.com/oauth/token", audience="https://evolve/", authType=AuthType.AUTH0)
+    )
+
+    val client = NetworkConsumerClient(channel, creds)
+    val ns = NetworkService()
+    val result = client.getFeeder(ns).throwOnError()
+}
+
+// With SSL and client authentication
+GrpcChannelFactory.create(ConnectionConfig("localhost", 50051, true, trustCertPath = "path/to/zepben/ca.cert", authCertPath = "path/to/signed.cert", authKeyPath = "path/to/private.key")).use { channel ->
+    val client = NetworkConsumerClient(channel)
+    val ns = NetworkService()
+    val result = client.getFeeder(ns).throwOnError()
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Network Hierarchy
+
+The network can be built with a hierarchy as discussed earlier [here](datamodel.mdx#network-hierarchy). This allows you
+to easily identify and request smaller chunks of the network so you can focus on areas of concern. Here is an example
+of how to request the network hierarchy and print it out as a tree to the console.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+void printNetworkHierarchy(NetworkConsumerClient client) {
+    NetworkHierarchy hierarchy = client.getNetworkHierarchy().getResult();
+    if (hierarchy == null)
+        return;
+
+    hierarchy.getGeographicalRegions().values().forEach(region -> {
+        System.out.println(String.format("- %s [%s]", region.getName(), region.getMRID()));
+        region.getSubGeographicalRegions().values().forEach(subRegion -> {
+            System.out.println(String.format("  |- %s [%s]", subRegion.getName(), subRegion.getMRID()));
+            subRegion.getSubstations().values().forEach(substation -> {
+                System.out.println(String.format("    |- %s [%s]", substation.getName(), substation.getMRID()));
+                substation.getFeeders().values().forEach(feeder -> {}
+                    System.out.println(String.format("      |- %s [%s]", feeder.getName(), feeder.getMRID()));
+                });
+            });
+        });
+    });
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+fun printNetworkHierarchy(client: NetworkConsumerClient) {
+    val hierarchy: NetworkHierarchy = client.getNetworkHierarchy().result ?: return
+    hierarchy.geographicalRegions.values.forEach { region ->
+        println("- ${region.name} [${region.mRID}]")
+        region.subGeographicalRegions.values.forEach { subRegion ->
+            println("  |- ${subRegion.name} [${subRegion.mRID}]")
+            subRegion.substations.values.forEach { substation ->
+                println("    |- ${substation.name} [${substation.mRID}]")
+                substation.feeders.values.forEach { feeder ->
+                    println("      |- ${feeder.name} [${feeder.mRID}]")
+                }
+            }
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+Each item from the hierarchy result contains an identified object mRID and it's name. This simplified data structure
+enables you to do things like easily build a suitable UI component allowing a user to select a portion of the network
+they wish to use, without needing to pull back large amounts of full object data.
+
+## Requesting Identififed Objects
+
+:::warning
+The *ConsumerClient APIs will take care of this for you, and you typically only need these functions if you're
+developing the consumer client APIs themselves. Make sure what you want to achieve isn't already covered by the
+API before delving into this code.
+:::
+
+Identified objects can be requested to build a model client side. When identified objects are loaded, any referenced
+objects that have not been previously requested need to be requested explicitly.
+
+To find the mRIDs of any references that need to be requested you can use the [deferred reference](services.mdx#deferred-references) 
+functions on the service provided when requesting identified objects.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+void getWithBaseVoltage(NetworkService service, NetworkConsumerClient client, String mrid) {
+    IdentifiedObject equipment = client.getIdentifiedObject(service, mrid).getResult();
+    if (equipment == null || !(equipment instanceof ConductingEquipment)) {
+        return;
+    }
+    
+    Set<String> mrids = service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(equipment));
+    if (!mrids.isEmpty()) {
+        client.getIdentifiedObject(service, mrids.iterator().next());
+    }
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+fun getWithBaseVoltage(service: NetworkService, client: NetworkConsumerClient, mrid: String) {
+    val equipment = client.getIdentifiedObject(service, mrid).result
+    if (equipment == null || equipment !is ConductingEquipment) {
+        return
+    }
+
+    service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(equipment)).firstOrNull()
+        ?.let { client.getIdentifiedObject(service, it) }
+}
+```
+
+</TabItem>
+</Tabs>
+
+You can also query the services UnresolvedReferences in the following ways:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+String mrid = "feeder1";
+
+// To get unresolved references pointing from `equipment` to other objects
+List<UnresolvedReferences> references = service.getUnresolvedReferencesFrom(mrid);
+
+for (UnresolvedReference ref: references) {
+    client.getIdentifiedObject(service, ref.toMrid)
+}
+
+// To get unresolved references pointing to `equipment`
+references = service.getUnresolvedReferencesFrom(mrid);
+
+for (UnresolvedReference ref: references) {
+    client.getIdentifiedObject(service, ref.from.mRID)
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val mrid = "feeder1"
+
+service.getUnresolvedReferencesFrom(mrid).forEach {
+    client.getIdentifiedObject(service, ref.toMrid)
+}
+
+service.getUnresolvedReferencesTo(mrid).forEach {
+    client.getIdentifiedObject(service, ref.from.mRID)
+}
+```
+
+</TabItem>
+</Tabs>

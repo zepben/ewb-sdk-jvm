@@ -37,7 +37,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ##### Fixes
 
-* `SetPhases` now supports setting backwards through XN/XY transformers.
+* None.
 
 ##### Notes
 

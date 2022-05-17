@@ -68,8 +68,8 @@ class SetPhasesTest {
         //
         // 1--c4--2
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABCN) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABCN) // s0
             .toAcls(PhaseCode.ABCN) // c1
             .toAcls(PhaseCode.ABCN) // c2
             .branchFrom("c1")
@@ -91,8 +91,8 @@ class SetPhasesTest {
         //
         // s3 11 b4 21--c5--2
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABCN) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABCN) // s0
             .toBreaker(PhaseCode.ABCN, isNormallyOpen = true, isOpen = false) // b1
             .toAcls(PhaseCode.ABCN) // c2
             .fromSource(PhaseCode.ABCN) // s3
@@ -117,8 +117,8 @@ class SetPhasesTest {
         //
         // s0 11 b1 21--c2--1
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABCN) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABCN) // s0
             .toBreaker(PhaseCode.ABCN) {
                 setOpen(true, SPK.A)
                 setNormallyOpen(true, SPK.B)
@@ -138,8 +138,8 @@ class SetPhasesTest {
         //
         // 1--c0--21--c1--21--c2--2
         //
-        val n = TestNetworkBuilder
-            .startWithAcls(PhaseCode.ABCN) // c0
+        val n = TestNetworkBuilder()
+            .fromAcls(PhaseCode.ABCN) // c0
             .toAcls(PhaseCode.ABCN) // c1
             .toAcls(PhaseCode.ABCN) // c2
             .buildAndLog()
@@ -156,8 +156,8 @@ class SetPhasesTest {
         //
         // 1--c0--21--c1--2
         //
-        val n = TestNetworkBuilder
-            .startWithAcls(PhaseCode.A) // c0
+        val n = TestNetworkBuilder()
+            .fromAcls(PhaseCode.A) // c0
             .toAcls(PhaseCode.A) // c1
             .buildAndLog()
 
@@ -175,8 +175,8 @@ class SetPhasesTest {
         //
         // 1--c0--21--c1--2
         //
-        val n = TestNetworkBuilder
-            .startWithAcls(PhaseCode.A) { terminals[1].normalPhases[SPK.A] = SPK.A } // c0
+        val n = TestNetworkBuilder()
+            .fromAcls(PhaseCode.A) { terminals[1].normalPhases[SPK.A] = SPK.A } // c0
             .toAcls(PhaseCode.A) { terminals[1].normalPhases[SPK.A] = SPK.B } // c1
             .buildAndLog()
 
@@ -197,8 +197,8 @@ class SetPhasesTest {
         //
         // 1--c0--21--c1--21--c2--2
         //
-        val n = TestNetworkBuilder
-            .startWithAcls(PhaseCode.A) { terminals[1].normalPhases[SPK.A] = SPK.A } // c0
+        val n = TestNetworkBuilder()
+            .fromAcls(PhaseCode.A) { terminals[1].normalPhases[SPK.A] = SPK.A } // c0
             .toAcls(PhaseCode.A) // c1
             .toAcls(PhaseCode.A) { terminals[0].normalPhases[SPK.A] = SPK.B } // c2
             .buildAndLog()
@@ -221,8 +221,8 @@ class SetPhasesTest {
         //
         // s0 11--tx1--21--c2--2
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC) // s0
             .toPowerTransformer(listOf(PhaseCode.ABC, PhaseCode.ABCN)) // tx1
             .toAcls(PhaseCode.ABCN) // c2
             .buildAndLog()
@@ -237,8 +237,8 @@ class SetPhasesTest {
         //
         // s0 11--tx1--21--c2--2
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.BC) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.BC) // s0
             .toPowerTransformer(listOf(PhaseCode.BC, PhaseCode.XN)) // tx1
             .toAcls(PhaseCode.XN) // c2
             .buildAndLog()
@@ -253,8 +253,8 @@ class SetPhasesTest {
         //
         // s0 11--c1--21--c2--2
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.BC) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.BC) // s0
             .toAcls(PhaseCode.BC) // c1
             .toAcls(PhaseCode.XY) // c2
             .buildAndLog()
@@ -269,8 +269,8 @@ class SetPhasesTest {
         //
         // s0 11--c1--21--c2--2
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.CN) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.CN) // s0
             .toAcls(PhaseCode.CN) // c1
             .toAcls(PhaseCode.XN) // c2
             .buildAndLog()
@@ -285,8 +285,8 @@ class SetPhasesTest {
         //
         // s0 11--tx1--21--c2--2
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.AC) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.AC) // s0
             .toPowerTransformer(listOf(PhaseCode.AC, PhaseCode.X)) // tx1
             .toAcls(PhaseCode.X) // c2
             .buildAndLog()
@@ -301,8 +301,8 @@ class SetPhasesTest {
         //
         // s0 11--tx1--21--c2--2
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.AC) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.AC) // s0
             .toPowerTransformer(listOf(PhaseCode.AC, PhaseCode.CN)) // tx1
             .toAcls(PhaseCode.CN) // c2
             .buildAndLog()
@@ -321,8 +321,8 @@ class SetPhasesTest {
         //    2              1
         //    1--c2--21--c3--2
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC) // s0
             .toPowerTransformer(listOf(PhaseCode.ABC, PhaseCode.ABCN)) // tx1
             .toAcls(PhaseCode.ABCN) // c2
             .toAcls(PhaseCode.CN) // c3
@@ -346,8 +346,8 @@ class SetPhasesTest {
         // s0 1         c2
         //    2 tx3 12--/
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC) // s0
             .toPowerTransformer(listOf(PhaseCode.XY, PhaseCode.XN)) // tx1
             .toAcls(PhaseCode.XN) // c2
             .toPowerTransformer(listOf(PhaseCode.XN, PhaseCode.XY)) // tx3
@@ -365,8 +365,8 @@ class SetPhasesTest {
         //
         // s0 11 tx1 21--c2--21 tx3 2
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC) // s0
             .toPowerTransformer(listOf(PhaseCode.XY, PhaseCode.XN)) // tx1
             .toAcls(PhaseCode.XN) // c2
             .toPowerTransformer(listOf(PhaseCode.XN, PhaseCode.XY)) // tx3

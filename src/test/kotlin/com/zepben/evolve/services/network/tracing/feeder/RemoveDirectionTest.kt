@@ -27,8 +27,8 @@ class RemoveDirectionTest {
     //
     // j0 --c1-- --c2-- j3
     //
-    private val nb = TestNetworkBuilder
-        .startWithJunction(PhaseCode.A, 1) // j0
+    private val nb = TestNetworkBuilder()
+        .fromJunction(PhaseCode.A, 1) // j0
         .toAcls(PhaseCode.A) // c1
         .toAcls(PhaseCode.A) // c2
         .toJunction(PhaseCode.A, 1) // j3
@@ -229,8 +229,8 @@ class RemoveDirectionTest {
         //               1
         //               j6
         //
-        val n = TestNetworkBuilder
-            .startWithJunction(PhaseCode.A, 1)
+        val n = TestNetworkBuilder()
+            .fromJunction(PhaseCode.A, 1)
             .toAcls(PhaseCode.A) // c1
             .toJunction(PhaseCode.A, 3) // j2
             .toAcls(PhaseCode.A) // c3

@@ -32,8 +32,8 @@ class RemovePhasesTest {
     //
     // s4 --c5--
     //
-    val n = TestNetworkBuilder
-        .startWithSource(PhaseCode.ABCN) // s0
+    val n = TestNetworkBuilder()
+        .fromSource(PhaseCode.ABCN) // s0
         .toAcls(PhaseCode.ABCN) // c1
         .toAcls(PhaseCode.ABCN) // c2
         .branchFrom("c1")

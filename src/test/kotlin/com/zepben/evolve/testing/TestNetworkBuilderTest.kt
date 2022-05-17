@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
-import com.zepben.evolve.cim.iec61970.base.wires.Junction
+import com.zepben.evolve.cim.iec61970.base.wires.Fuse
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.evolve.services.network.NetworkService
@@ -37,8 +37,8 @@ internal class TestNetworkBuilderTest {
         //
         // s4 11--c5--2
         //
-        TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC) // s0
+        TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC) // s0
             .toAcls(PhaseCode.ABC) // c1
             .toBreaker(PhaseCode.ABC) // b2
             .toSource(PhaseCode.ABC) // s3
@@ -63,8 +63,8 @@ internal class TestNetworkBuilderTest {
         //
         // 1--c5--21--c6--2
         //
-        TestNetworkBuilder
-            .startWithAcls(PhaseCode.ABC) // c0
+        TestNetworkBuilder()
+            .fromAcls(PhaseCode.ABC) // c0
             .toBreaker(PhaseCode.ABC, isNormallyOpen = true) // b1
             .toAcls(PhaseCode.AB) // c2
             .branchFrom("c0")
@@ -92,8 +92,8 @@ internal class TestNetworkBuilderTest {
         //
         // 1 b5*21--c6--2
         //
-        TestNetworkBuilder
-            .startWithBreaker(PhaseCode.ABC) // b0
+        TestNetworkBuilder()
+            .fromBreaker(PhaseCode.ABC) // b0
             .toAcls(PhaseCode.ABC) // c1
             .toAcls(PhaseCode.ABC) // c2
             .addFeeder("b0") // fdr3
@@ -122,8 +122,8 @@ internal class TestNetworkBuilderTest {
         // 1 j3 31--c4--2
         //   2
         //
-        TestNetworkBuilder
-            .startWithJunction(PhaseCode.ABC) // j0
+        TestNetworkBuilder()
+            .fromJunction(PhaseCode.ABC) // j0
             .toAcls(PhaseCode.ABC) // c1
             .toJunction(PhaseCode.ABC) // j2
             .fromJunction(PhaseCode.AB, 3) // j3
@@ -146,8 +146,8 @@ internal class TestNetworkBuilderTest {
         // 1 tx3 31--c4--2
         //    2
         //
-        TestNetworkBuilder
-            .startWithPowerTransformer() // tx0
+        TestNetworkBuilder()
+            .fromPowerTransformer() // tx0
             .toAcls(PhaseCode.ABC) // c1
             .toPowerTransformer(listOf(PhaseCode.ABC)) // tx2
             .fromPowerTransformer(listOf(PhaseCode.AB, PhaseCode.AB, PhaseCode.AN)) // tx3
@@ -174,8 +174,8 @@ internal class TestNetworkBuilderTest {
         // 1 b2 2
         // 1 b3 2
         //
-        TestNetworkBuilder
-            .startWithBreaker(PhaseCode.A, isNormallyOpen = true, isOpen = false) // b0
+        TestNetworkBuilder()
+            .fromBreaker(PhaseCode.A, isNormallyOpen = true, isOpen = false) // b0
             .fromBreaker(PhaseCode.B, isNormallyOpen = true, isOpen = false) // b1
             .fromBreaker(PhaseCode.B) // b2
             .fromBreaker(PhaseCode.B, isNormallyOpen = true) // b3
@@ -205,8 +205,8 @@ internal class TestNetworkBuilderTest {
         //           |
         //           2
         //
-        TestNetworkBuilder
-            .startWithJunction(PhaseCode.A, 4) // j0
+        TestNetworkBuilder()
+            .fromJunction(PhaseCode.A, 4) // j0
             .toAcls(PhaseCode.A) // c1
             .branchFrom("j0", 1)
             .toAcls(PhaseCode.A) // c2
@@ -229,14 +229,14 @@ internal class TestNetworkBuilderTest {
     @Test
     internal fun mustUseValidSourcePhases() {
         expect {
-            TestNetworkBuilder
-                .startWithSource(PhaseCode.XYN)
+            TestNetworkBuilder()
+                .fromSource(PhaseCode.XYN)
         }.toThrow(IllegalArgumentException::class.java)
             .withMessage("EnergySource phases must be a subset of ABCN")
 
         expect {
-            TestNetworkBuilder
-                .startWithSource(PhaseCode.ABC)
+            TestNetworkBuilder()
+                .fromSource(PhaseCode.ABC)
                 .fromSource(PhaseCode.XYN)
         }.toThrow(IllegalArgumentException::class.java)
             .withMessage("EnergySource phases must be a subset of ABCN")
@@ -250,8 +250,8 @@ internal class TestNetworkBuilderTest {
         // 1 tx3 3
         //    2
         //
-        TestNetworkBuilder
-            .startWithPowerTransformer(listOf(PhaseCode.ABC, PhaseCode.ABC), listOf({ ratedU = 1 }, { ratedU = 2 })) // tx0
+        TestNetworkBuilder()
+            .fromPowerTransformer(listOf(PhaseCode.ABC, PhaseCode.ABC), listOf({ ratedU = 1 }, { ratedU = 2 })) // tx0
             .toPowerTransformer(listOf(PhaseCode.ABC), listOf { ratedS = 3 }) // tx1
             .fromPowerTransformer(listOf(PhaseCode.AB, PhaseCode.AB, PhaseCode.AN), listOf({ b = 4.0 }, { b = 5.0 }, { b = 6.0 })) // tx2
             .build()
@@ -266,21 +266,26 @@ internal class TestNetworkBuilderTest {
     }
 
     @Test
-    internal fun sampleNetworkWithGenerics() {
+    internal fun canCreateOtherTypes() {
         //
         // o1 11 o2
         //
         // o3
         //
-        TestNetworkBuilder
-            .startWithOther(Junction("o0").apply { addTerminal(Terminal("o0-t1")) }) // o0
-            .toOther(Junction("o1").apply { addTerminal(Terminal("o1-t1")) }) // o1
-            .fromOther(Junction("o2")) // o2
+        TestNetworkBuilder()
+            .fromOther(::Fuse, numTerminals = 1) // o0
+            .toOther(
+                {
+                    assertThat(it, equalTo("o1"))
+                    Fuse("my-id")
+                }, numTerminals = 1
+            ) // o1
+            .fromOther(::Fuse) // o2
             .build()
             .apply {
-                validateConnections("o0", listOf("o1-t1"))
-                validateConnections("o1", listOf("o0-t1"))
-                validateConnections("o2")
+                validateConnections("o0", listOf("my-id-t1"))
+                validateConnections("my-id", listOf("o0-t1"))
+                validateConnections("o2", emptyList(), emptyList())
             }
     }
 

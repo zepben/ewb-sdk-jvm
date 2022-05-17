@@ -64,8 +64,8 @@ class SetDirectionTest {
         // 1--c0--21 b1 21--c2--2
         //         1 b3 21--c4--2
         //
-        val n = TestNetworkBuilder
-            .startWithAcls() // c0
+        val n = TestNetworkBuilder()
+            .fromAcls() // c0
             .toBreaker(isNormallyOpen = true, isOpen = false) // b1
             .toAcls() // c2
             .branchFrom("c0")
@@ -95,8 +95,8 @@ class SetDirectionTest {
         //
         // * = feeder start
         //
-        val n = TestNetworkBuilder
-            .startWithAcls() // c0
+        val n = TestNetworkBuilder()
+            .fromAcls() // c0
             .toJunction() // j1
             .toAcls() // c2
             .toJunction() // j3
@@ -127,8 +127,8 @@ class SetDirectionTest {
         //                |__________________|
         //                         c9
         //
-        val n = TestNetworkBuilder
-            .startWithSource(PhaseCode.A) // s0
+        val n = TestNetworkBuilder()
+            .fromSource(PhaseCode.A) // s0
             .toAcls(PhaseCode.A) // c1
             .toJunction(PhaseCode.A) // j2
             .toAcls(PhaseCode.A) // c3
@@ -183,8 +183,8 @@ class SetDirectionTest {
         //               |                   |
         //               \-c3--21 j4 21---c5-/
         //
-        val n = TestNetworkBuilder
-            .startWithJunction(numTerminals = 1) // j0
+        val n = TestNetworkBuilder()
+            .fromJunction(numTerminals = 1) // j0
             .toAcls() // c1
             .toJunction(numTerminals = 3) // j2
             .toAcls() // c3
@@ -256,8 +256,8 @@ class SetDirectionTest {
         //               |                   |
         //               \-c10-21 j11 21-c12-/
         //
-        val n = TestNetworkBuilder
-            .startWithJunction(numTerminals = 1) // j0
+        val n = TestNetworkBuilder()
+            .fromJunction(numTerminals = 1) // j0
             .toAcls() // c1
             .toJunction(numTerminals = 3) // j2
             .toAcls() // c3
@@ -316,8 +316,8 @@ class SetDirectionTest {
         //
         // j0 11--c1--21--c2--2
         //
-        val n = TestNetworkBuilder
-            .startWithJunction(numTerminals = 1, nominalPhases = PhaseCode.AB) // j0
+        val n = TestNetworkBuilder()
+            .fromJunction(numTerminals = 1, nominalPhases = PhaseCode.AB) // j0
             .toAcls(nominalPhases = PhaseCode.B) // c1
             .toAcls(nominalPhases = PhaseCode.A) // c2
             .network
@@ -337,8 +337,8 @@ class SetDirectionTest {
         //
         // j0 11--c1--21--c2--2
         //
-        val n = TestNetworkBuilder
-            .startWithJunction(numTerminals = 1, nominalPhases = PhaseCode.NONE) // j0
+        val n = TestNetworkBuilder()
+            .fromJunction(numTerminals = 1, nominalPhases = PhaseCode.NONE) // j0
             .toAcls(nominalPhases = PhaseCode.NONE) // c1
             .toBreaker(PhaseCode.NONE, isNormallyOpen = true)
             .toAcls(nominalPhases = PhaseCode.NONE) // c2

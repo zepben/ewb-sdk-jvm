@@ -42,8 +42,8 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABtoBCtoXYtoABC() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.AB)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.AB)
             .toAcls(PhaseCode.BC)
             .toAcls(PhaseCode.XY)
             .toAcls(PhaseCode.ABC)
@@ -73,8 +73,8 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABNtoBCNtoXYNtoABCN() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABN)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABN)
             .toAcls(PhaseCode.BCN)
             .toAcls(PhaseCode.XYN)
             .toAcls(PhaseCode.ABCN)
@@ -104,8 +104,8 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testBCtoACtoXYtoABC() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.BC)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.BC)
             .toAcls(PhaseCode.AC)
             .toAcls(PhaseCode.XY)
             .toAcls(PhaseCode.ABC)
@@ -136,8 +136,8 @@ class PhaseInferrerTest {
     @Test
     internal fun testABCtoXYNtoXYtoBC() {
         Tracing.normalPhaseTrace()
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.XYN)
             .toAcls(PhaseCode.XY)
             .toAcls(PhaseCode.BC)
@@ -168,8 +168,8 @@ class PhaseInferrerTest {
     @Test
     internal fun testABCtoXYtoXYNtoBC() {
         Tracing.normalPhaseTrace()
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.XY)
             .toAcls(PhaseCode.XYN)
             .toAcls(PhaseCode.BC)
@@ -199,8 +199,8 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoNtoABCN() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.ABC)
             .toAcls(PhaseCode.N)
             .toAcls(PhaseCode.ABCN)
@@ -232,8 +232,8 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoBtoXYN() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.ABC)
             .toAcls(PhaseCode.B)
             .toAcls(PhaseCode.XYN)
@@ -265,8 +265,8 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoCtoXYN() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.ABC)
             .toAcls(PhaseCode.C)
             .toAcls(PhaseCode.XYN)
@@ -296,8 +296,8 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoAtoXN() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.ABC)
             .toAcls(PhaseCode.A)
             .toAcls(PhaseCode.XN)
@@ -327,8 +327,8 @@ class PhaseInferrerTest {
     //
     @Test
     fun testDualFeedANtoABCN() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.AN)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.AN)
             .toAcls(PhaseCode.ABCN)
             .toSource(PhaseCode.AN)
             .build()
@@ -357,8 +357,8 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testABCNtoNtoABtoXY() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABCN)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABCN)
             .toAcls(PhaseCode.ABCN)
             .toAcls(PhaseCode.N)
             .toAcls(PhaseCode.AB)
@@ -391,8 +391,8 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun testWithOpenSwitch() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC)
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.ABC)
             .toBreaker(PhaseCode.ABC, isNormallyOpen = true)
             .toAcls(PhaseCode.ABC)
@@ -424,8 +424,8 @@ class PhaseInferrerTest {
     //
     @Test
     internal fun validateDirectionsWithDroppedDirectionLoop() {
-        val network = TestNetworkBuilder
-            .startWithSource(PhaseCode.ABC) // s0
+        val network = TestNetworkBuilder()
+            .fromSource(PhaseCode.ABC) // s0
             .toAcls(PhaseCode.ABC) // c1
             .toAcls(PhaseCode.XY) // c2
             .toAcls(PhaseCode.ABC) // c3

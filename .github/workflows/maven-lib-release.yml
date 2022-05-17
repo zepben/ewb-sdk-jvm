@@ -87,7 +87,8 @@ jobs:
       - name: Work around git permission issue
         run: |
           dname=$(echo ${{github.repository}} | cut -d'/' -f2)
-￼         git config --global --add safe.directory /__w/$dname/$dname
+          git config --global --add safe.directory /__w/$dname/$dname
+        shell: bash
 ￼
 
       - uses: actions/checkout@v2

@@ -7,6 +7,8 @@
  */
 package com.zepben.evolve.services.network.tracing.tree
 
+import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -49,6 +51,18 @@ class TreeNodeTest {
         val treeNodes = listOf(treeNode0, treeNode1, treeNode2, treeNode3, treeNode4, treeNode5, treeNode6, treeNode7, treeNode8, treeNode9)
         assertChildren(treeNodes, intArrayOf(3, 0, 0, 2, 0, 1, 1, 1, 1, 0))
         assertParents(treeNodes, intArrayOf(-1, 0, 0, 0, 3, 3, 5, 6, 7, 8))
+    }
+
+    @Test
+    fun sortWeight() {
+        val treeNode0 = TreeNode(Junction("node0"), null)
+        val treeNode1 = TreeNode(
+            Junction("node1").apply { addTerminal(Terminal().apply { phases = PhaseCode.AB }) },
+            null
+        )
+
+        assertThat(treeNode0.sortWeight, equalTo(1))
+        assertThat(treeNode1.sortWeight, equalTo(2))
     }
 
     private fun assertChildren(treeNodes: List<TreeNode>, childCounts: IntArray) {

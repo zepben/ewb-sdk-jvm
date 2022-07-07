@@ -23,7 +23,7 @@ class TreeNode(
     val children: List<TreeNode>
         get() = _children.asUnmodifiable()
 
-    val sortWeight: Int by lazy { max(1, conductingEquipment.terminals.maxOf { it.phases.singlePhases.size }) }
+    val sortWeight: Int by lazy { conductingEquipment.terminals.maxOfOrNull { it.phases.singlePhases.size } ?: 1 }
 
     private val _parent: WeakReference<TreeNode?> = WeakReference(parent)
     private val _children = mutableListOf<TreeNode>()

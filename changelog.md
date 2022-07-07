@@ -16,7 +16,7 @@
 
 ##### Fixes
 
-* None.
+* `TreeNode().sortWeight` no longer throws an error when evaluated on nodes for equipment without terminals.
 
 ##### Notes
 

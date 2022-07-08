@@ -23,7 +23,7 @@ internal class PhaseStepTrackerTest {
         val phaseStep = PhaseStep.startAt(ce, PhaseCode.AB)
 
         assertThat("hasVisited returns false for unvisited equipment", not(tracker.hasVisited(phaseStep)))
-        assertThat("Visiting phases on non-visited equipment returns true", tracker.visit(phaseStep))
+        assertThat("Visiting phases on unvisited equipment returns true", tracker.visit(phaseStep))
         assertThat("hasVisited returns true for visited phase set", tracker.hasVisited(phaseStep))
         assertThat("Revisiting visited phases returns false", not(tracker.visit(phaseStep)))
     }

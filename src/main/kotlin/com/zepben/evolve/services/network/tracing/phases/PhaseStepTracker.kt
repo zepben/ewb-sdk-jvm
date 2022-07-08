@@ -26,7 +26,7 @@ class PhaseStepTracker : Tracker<PhaseStep> {
 
     private val visited = mutableMapOf<ConductingEquipment, MutableSet<SinglePhaseKind>>()
 
-    override fun hasVisited(item: PhaseStep): Boolean = item.phases.containsAll(visited.getOrDefault(item.conductingEquipment, emptySet()))
+    override fun hasVisited(item: PhaseStep): Boolean = visited.getOrDefault(item.conductingEquipment, emptySet()).containsAll(item.phases)
 
     override fun visit(item: PhaseStep): Boolean = visited.computeIfAbsent(item.conductingEquipment) { mutableSetOf() }.addAll(item.phases)
 

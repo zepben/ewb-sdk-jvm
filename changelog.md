@@ -17,6 +17,7 @@
 ##### Fixes
 
 * `TreeNode().sortWeight` no longer throws an error when evaluated on nodes for equipment without terminals.
+* `PhaseStepTracker` now reports strict subsets of visited phases as visited.
 
 ##### Notes
 

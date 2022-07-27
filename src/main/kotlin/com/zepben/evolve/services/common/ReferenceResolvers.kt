@@ -140,8 +140,12 @@ internal object EnergySourcePhaseToEnergySourceResolver : ReferenceResolver<Ener
     EnergySourcePhase::class, EnergySource::class, EnergySourcePhase::energySource.setter
 )
 
+internal object EquipmentToCurrentContainersResolver : ReferenceResolver<Equipment, EquipmentContainer> by KReferenceResolver(
+    Equipment::class, EquipmentContainer::class, Equipment::addCurrentContainer
+)
+
 internal object EquipmentToCurrentFeedersResolver : ReferenceResolver<Equipment, Feeder> by KReferenceResolver(
-    Equipment::class, Feeder::class, Equipment::addCurrentFeeder
+    Equipment::class, Feeder::class, Equipment::addCurrentContainer
 )
 
 internal object EquipmentToEquipmentContainerResolver : ReferenceResolver<Equipment, EquipmentContainer> by KReferenceResolver(

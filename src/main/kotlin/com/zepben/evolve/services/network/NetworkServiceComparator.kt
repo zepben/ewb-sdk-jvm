@@ -303,7 +303,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareIdReferenceCollections(Equipment::operationalRestrictions)
 
             if (options.compareEquipmentContainers)
-                compareIdReferenceCollections(Equipment::currentFeeders)
+                compareIdReferenceCollections(Equipment::currentContainers)
         }
 
     private fun ObjectDifference<out EquipmentContainer>.compareEquipmentContainer(): ObjectDifference<out EquipmentContainer> =

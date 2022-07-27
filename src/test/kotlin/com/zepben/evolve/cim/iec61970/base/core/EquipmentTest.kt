@@ -86,16 +86,16 @@ internal class EquipmentTest {
     }
 
     @Test
-    internal fun currentFeeders() {
+    internal fun currentContainers() {
         PrivateCollectionValidator.validate(
             { object : Equipment() {} },
-            { id, _ -> Feeder(id) },
-            Equipment::numCurrentFeeders,
-            Equipment::getCurrentFeeder,
-            Equipment::currentFeeders,
-            Equipment::addCurrentFeeder,
-            Equipment::removeCurrentFeeder,
-            Equipment::clearCurrentFeeders
+            { id, _ -> object : EquipmentContainer(id) {} },
+            Equipment::numCurrentContainers,
+            Equipment::getCurrentContainer,
+            Equipment::currentContainers,
+            Equipment::addCurrentContainer,
+            Equipment::removeCurrentContainer,
+            Equipment::clearCurrentContainers
         )
     }
 
@@ -118,12 +118,12 @@ internal class EquipmentTest {
         equipment.addContainer(substation1)
         equipment.addContainer(substation2)
 
-        equipment.addCurrentFeeder(feeder3)
-        equipment.addCurrentFeeder(feeder4)
+        equipment.addCurrentContainer(feeder3)
+        equipment.addCurrentContainer(feeder4)
 
         assertThat(equipment.sites, containsInAnyOrder(site1, site2))
         assertThat(equipment.normalFeeders, containsInAnyOrder(feeder1, feeder2))
-        assertThat(equipment.currentFeeders, containsInAnyOrder(feeder3, feeder4))
+        assertThat(equipment.currentContainers, containsInAnyOrder(feeder3, feeder4))
         assertThat(equipment.substations, containsInAnyOrder(substation1, substation2))
     }
 }

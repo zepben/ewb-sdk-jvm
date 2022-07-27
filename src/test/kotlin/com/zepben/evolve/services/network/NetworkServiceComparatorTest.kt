@@ -371,7 +371,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { OperationalRestriction("o1") },
             { OperationalRestriction("o2") })
 
-        comparatorValidator.validateCollection(Equipment::currentFeeders, Equipment::addCurrentFeeder, createEquipment, { Feeder("f1") }, { Feeder("f2") })
+        comparatorValidator.validateCollection(Equipment::currentContainers, Equipment::addCurrentContainer, createEquipment, { Feeder("f1") }, { Feeder("f2") })
     }
 
     private fun compareEquipmentContainer(createEquipmentContainer: (String) -> EquipmentContainer) {

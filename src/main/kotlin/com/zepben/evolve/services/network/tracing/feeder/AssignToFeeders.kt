@@ -78,7 +78,7 @@ class AssignToFeeders {
         process(terminal.conductingEquipment, ConductingEquipment::addContainer, Feeder::addEquipment, isStopping)
 
     private fun processCurrent(terminal: Terminal, isStopping: Boolean): Unit =
-        process(terminal.conductingEquipment, ConductingEquipment::addCurrentFeeder, Feeder::addCurrentEquipment, isStopping)
+        process(terminal.conductingEquipment, ConductingEquipment::addCurrentContainer, Feeder::addCurrentEquipment, isStopping)
 
     private fun process(
         conductingEquipment: ConductingEquipment?,

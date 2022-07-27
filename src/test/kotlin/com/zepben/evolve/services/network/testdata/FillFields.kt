@@ -388,7 +388,7 @@ fun Feeder.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
     if (includeRuntime) {
         for (i in 0..1)
             addCurrentEquipment(Junction().also {
-                it.addCurrentFeeder(this)
+                it.addCurrentContainer(this)
                 service.add(it)
             })
     } else {
@@ -440,7 +440,7 @@ fun Equipment.fillFields(service: NetworkService, includeRuntime: Boolean = true
         })
 
         if (includeRuntime) {
-            addCurrentFeeder(Feeder().also {
+            addCurrentContainer(Feeder().also {
                 it.addEquipment(this)
                 service.add(it)
             })

@@ -163,12 +163,12 @@ class DatabaseReader @JvmOverloads constructor(
             .forEach { es ->
                 logger.warn(
                     "External grid source ${es.nameAndMRID()} has been assigned to the following feeders: normal [${es.normalFeeders.joinToString { it.mRID }}], " +
-                        "current [${es.currentFeeders.joinToString { it.mRID }}]"
+                        "current [${es.currentContainers.joinToString { it.mRID }}]"
                 )
             }
     }
 
     private fun EnergySource.isOnFeeder(): Boolean {
-        return normalFeeders.isNotEmpty() || currentFeeders.isNotEmpty()
+        return normalFeeders.isNotEmpty() || currentContainers.isNotEmpty()
     }
 }

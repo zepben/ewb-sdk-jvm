@@ -439,7 +439,7 @@ fun toPb(cim: Equipment, pb: PBEquipment.Builder): PBEquipment.Builder =
         cim.operationalRestrictions.forEach { addOperationalRestrictionMRIDs(it.mRID) }
 
         clearCurrentFeederMRIDs()
-        cim.currentFeeders.forEach { addCurrentFeederMRIDs(it.mRID) }
+        cim.currentContainers.forEach { addCurrentFeederMRIDs(it.mRID) }
 
         toPb(cim, psrBuilder)
     }

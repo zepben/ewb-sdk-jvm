@@ -130,6 +130,10 @@ object Resolvers {
         BoundReferenceResolver(equipment, EquipmentToEquipmentContainerResolver, EquipmentContainerToEquipmentResolver)
 
     @JvmStatic
+    fun currentContainers(equipment: Equipment): BoundReferenceResolver<Equipment, EquipmentContainer> =
+        BoundReferenceResolver(equipment, EquipmentToCurrentContainersResolver, EquipmentContainerToEquipmentResolver)
+
+    @JvmStatic
     fun currentFeeders(equipment: Equipment): BoundReferenceResolver<Equipment, Feeder> =
         BoundReferenceResolver(equipment, EquipmentToCurrentFeedersResolver, CurrentFeederToEquipmentResolver)
 

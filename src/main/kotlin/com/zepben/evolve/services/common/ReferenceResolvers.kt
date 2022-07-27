@@ -34,6 +34,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import kotlin.reflect.KClass
 
 
@@ -148,6 +149,10 @@ internal object EquipmentToCurrentFeedersResolver : ReferenceResolver<Equipment,
     Equipment::class, Feeder::class, Equipment::addCurrentContainer
 )
 
+internal object EquipmentToCurrentLvFeedersResolver : ReferenceResolver<Equipment, LvFeeder> by KReferenceResolver(
+    Equipment::class, LvFeeder::class, Equipment::addCurrentContainer
+)
+
 internal object EquipmentToEquipmentContainerResolver : ReferenceResolver<Equipment, EquipmentContainer> by KReferenceResolver(
     Equipment::class, EquipmentContainer::class, Equipment::addContainer
 )
@@ -164,7 +169,11 @@ internal object EquipmentContainerToEquipmentResolver : ReferenceResolver<Equipm
     EquipmentContainer::class, Equipment::class, EquipmentContainer::addEquipment
 )
 
-internal object CurrentFeederToEquipmentResolver : ReferenceResolver<Feeder, Equipment> by KReferenceResolver(
+internal object EquipmentContainerToCurrentEquipmentResolver : ReferenceResolver<EquipmentContainer, Equipment> by KReferenceResolver(
+    EquipmentContainer::class, Equipment::class, EquipmentContainer::tryAddCurrentEquipment
+)
+
+internal object FeederToCurrentEquipmentResolver : ReferenceResolver<Feeder, Equipment> by KReferenceResolver(
     Feeder::class, Equipment::class, Feeder::addCurrentEquipment
 )
 
@@ -174,6 +183,10 @@ internal object FeederToNormalEnergizingSubstationResolver : ReferenceResolver<F
 
 internal object FeederToNormalHeadTerminalResolver : ReferenceResolver<Feeder, Terminal> by KReferenceResolver(
     Feeder::class, Terminal::class, Feeder::normalHeadTerminal.setter
+)
+
+internal object FeederToNormalEnergizedLvFeedersResolver : ReferenceResolver<Feeder, LvFeeder> by KReferenceResolver(
+    Feeder::class, LvFeeder::class, Feeder::addNormalEnergizedLvFeeder
 )
 
 internal object GeographicalRegionToSubGeographicalRegionResolver : ReferenceResolver<GeographicalRegion, SubGeographicalRegion> by KReferenceResolver(
@@ -306,6 +319,18 @@ internal object LoopToSubstationResolver : ReferenceResolver<Loop, Substation> b
 
 internal object LoopToEnergizingSubstationResolver : ReferenceResolver<Loop, Substation> by KReferenceResolver(
     Loop::class, Substation::class, Loop::addEnergizingSubstation
+)
+
+internal object LvFeederToNormalHeadTerminalResolver : ReferenceResolver<LvFeeder, Terminal> by KReferenceResolver(
+    LvFeeder::class, Terminal::class, LvFeeder::normalHeadTerminal.setter
+)
+
+internal object LvFeederToNormalEnergizingFeedersResolver : ReferenceResolver<LvFeeder, Feeder> by KReferenceResolver(
+    LvFeeder::class, Feeder::class, LvFeeder::addNormalEnergizingFeeder
+)
+
+internal object LvFeederToCurrentEquipmentResolver : ReferenceResolver<LvFeeder, Equipment> by KReferenceResolver(
+    LvFeeder::class, Equipment::class, LvFeeder::addCurrentEquipment
 )
 
 internal object PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver :

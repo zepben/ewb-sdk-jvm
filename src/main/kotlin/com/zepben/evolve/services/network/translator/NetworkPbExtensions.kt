@@ -34,6 +34,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerEl
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder
 
 /************ IEC61968 ASSET INFO ************/
 
@@ -179,3 +180,4 @@ fun ShuntCompensator.assetInfoMRID(): String = rce.ec.ce.assetInfoMRID()
 
 fun Circuit.mRID(): String = l.mRID()
 fun Loop.mRID(): String = io.mrid
+fun LvFeeder.mRID(): String = ec.mRID()

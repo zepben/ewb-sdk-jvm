@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.core
 
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.validateReference
 
@@ -85,5 +86,18 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
         val ret = mutableSetOf<Feeder>()
         _equipmentById?.values?.forEach { equip -> ret.addAll(equip.currentFeeders) }
         return ret
+    }
+
+    /**
+     * Convenience function to add an equipment in the current network state. Works if this is a [Feeder] or an [LvFeeder].
+     * TODO: This is kinda hack-y, and is caused by the fact that Equipment::currentContainers can contain any type of
+     *       EquipmentContainer but only Feeder and LvFeeder have currentEquipment.
+     */
+    fun tryAddCurrentEquipment(equipment: Equipment): EquipmentContainer {
+        when (this) {
+            is Feeder -> addCurrentEquipment(equipment)
+            is LvFeeder -> addCurrentEquipment(equipment)
+        }
+        return this
     }
 }

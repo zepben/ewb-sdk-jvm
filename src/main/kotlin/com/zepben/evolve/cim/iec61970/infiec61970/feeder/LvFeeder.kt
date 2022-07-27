@@ -28,18 +28,18 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
                 if ((equipment.isEmpty() && currentEquipment.isEmpty()) || normalHeadTerminal == null) value else throw IllegalStateException("Feeder $mRID has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
         }
 
-    private var _currentEquipmentById: MutableMap<String?, Equipment>? = null
     private var _normalEnergizingFeedersById: MutableMap<String?, Feeder>? = null
-
-    /**
-     * Contained equipment using the current state of the network. The returned collection is read only.
-     */
-    val currentEquipment: Collection<Equipment> get() = _currentEquipmentById?.values.asUnmodifiable()
+    private var _currentEquipmentById: MutableMap<String?, Equipment>? = null
 
     /**
      * The HV/MV feeders that energize this LV feeder. The returned collection is read only.
      */
     val normalEnergizingFeeders: Collection<Feeder> get() = _normalEnergizingFeedersById?.values.asUnmodifiable()
+
+    /**
+     * Contained equipment using the current state of the network. The returned collection is read only.
+     */
+    val currentEquipment: Collection<Equipment> get() = _currentEquipmentById?.values.asUnmodifiable()
 
     /**
      * Get the number of entries in the normal [Feeder] collection.
@@ -55,7 +55,7 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
     fun getNormalEnergizingFeeder(mRID: String) = _normalEnergizingFeedersById?.get(mRID)
 
     /**
-     * @param feeder the HV/MV feeder to associate with this equipment container in the normal state of the network.
+     * @param feeder the HV/MV feeder to associate with this LV feeder in the normal state of the network.
      */
     fun addNormalEnergizingFeeder(feeder: Feeder): LvFeeder {
         if (validateReference(feeder, ::getNormalEnergizingFeeder, "A normal energizing Feeder"))
@@ -78,6 +78,46 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
 
     fun clearNormalEnergizingFeeders(): LvFeeder {
         _normalEnergizingFeedersById = null
+        return this
+    }
+
+    /**
+     * Get the number of entries in the current [Equipment] collection.
+     */
+    fun numCurrentEquipment() = _currentEquipmentById?.size ?: 0
+
+    /**
+     * Contained equipment using the current state of the network.
+     *
+     * @param mRID the mRID of the required current [Equipment]
+     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getCurrentEquipment(mRID: String) = _currentEquipmentById?.get(mRID)
+
+    /**
+     * @param equipment the equipment to associate with this LV feeder in the current state of the network.
+     */
+    fun addCurrentEquipment(equipment: Equipment): LvFeeder {
+        if (validateReference(equipment, ::getNormalEnergizingFeeder, "A current Equipment"))
+            return this
+
+        _currentEquipmentById = _currentEquipmentById ?: mutableMapOf()
+        _currentEquipmentById!!.putIfAbsent(equipment.mRID, equipment)
+
+        return this
+    }
+
+    /**
+     * @param equipment the equipment to disassociate with this LV feeder in the current state of the network.
+     */
+    fun removeCurrentEquipment(equipment: Equipment?): Boolean {
+        val ret = _currentEquipmentById?.remove(equipment?.mRID)
+        if (_currentEquipmentById.isNullOrEmpty()) _currentEquipmentById = null
+        return ret != null
+    }
+
+    fun clearCurrentEquipment(): LvFeeder {
+        _currentEquipmentById = null
         return this
     }
 

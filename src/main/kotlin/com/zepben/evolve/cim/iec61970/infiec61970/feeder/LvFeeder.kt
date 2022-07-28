@@ -25,7 +25,10 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
     var normalHeadTerminal: Terminal? = null
         set(value) {
             field =
-                if ((equipment.isEmpty() && currentEquipment.isEmpty()) || normalHeadTerminal == null) value else throw IllegalStateException("Feeder $mRID has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
+                if ((equipment.isEmpty() && currentEquipment.isEmpty()) || normalHeadTerminal == null) value
+                else throw IllegalStateException(
+                    "LvFeeder $mRID has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned."
+                )
         }
 
     private var _normalEnergizingFeedersById: MutableMap<String?, Feeder>? = null
@@ -58,7 +61,7 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
      * @param feeder the HV/MV feeder to associate with this LV feeder in the normal state of the network.
      */
     fun addNormalEnergizingFeeder(feeder: Feeder): LvFeeder {
-        if (validateReference(feeder, ::getNormalEnergizingFeeder, "A normal energizing Feeder"))
+        if (validateReference(feeder, ::getNormalEnergizingFeeder, "A Feeder"))
             return this
 
         _normalEnergizingFeedersById = _normalEnergizingFeedersById ?: mutableMapOf()
@@ -98,7 +101,7 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
      * @param equipment the equipment to associate with this LV feeder in the current state of the network.
      */
     fun addCurrentEquipment(equipment: Equipment): LvFeeder {
-        if (validateReference(equipment, ::getNormalEnergizingFeeder, "A current Equipment"))
+        if (validateReference(equipment, ::getCurrentEquipment, "A current Equipment"))
             return this
 
         _currentEquipmentById = _currentEquipmentById ?: mutableMapOf()

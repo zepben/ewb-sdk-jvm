@@ -101,7 +101,7 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
      * @param lvFeeder the LV feeder to associate with this equipment container in the normal state of the network.
      */
     fun addNormalEnergizedLvFeeder(lvFeeder: LvFeeder): Feeder {
-        if (validateReference(lvFeeder, ::getNormalEnergizedLvFeeder, "A normal energized LvFeeder"))
+        if (validateReference(lvFeeder, ::getNormalEnergizedLvFeeder, "An LvFeeder"))
             return this
 
         _normalEnergizedLvFeedersById = _normalEnergizedLvFeedersById ?: mutableMapOf()

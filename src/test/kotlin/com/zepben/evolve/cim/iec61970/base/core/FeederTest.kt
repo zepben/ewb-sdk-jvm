@@ -8,6 +8,7 @@
 package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
@@ -58,6 +59,20 @@ internal class FeederTest {
             Feeder::addCurrentEquipment,
             Feeder::removeCurrentEquipment,
             Feeder::clearCurrentEquipment
+        )
+    }
+
+    @Test
+    internal fun normalEnergizedLvFeeders() {
+        PrivateCollectionValidator.validate(
+            { Feeder() },
+            { id, _ -> LvFeeder(id) },
+            Feeder::numNormalEnergizedLvFeeders,
+            Feeder::getNormalEnergizedLvFeeder,
+            Feeder::normalEnergizedLvFeeders,
+            Feeder::addNormalEnergizedLvFeeder,
+            Feeder::removeNormalEnergizedLvFeeder,
+            Feeder::clearNormalEnergizedLvFeeders
         )
     }
 

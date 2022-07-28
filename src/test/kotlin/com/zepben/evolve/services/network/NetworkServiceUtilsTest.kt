@@ -31,6 +31,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVolt
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.InvokeChecker
 import com.zepben.evolve.services.common.InvokedChecker
 import com.zepben.evolve.services.common.NeverInvokedChecker
@@ -79,6 +80,7 @@ internal class NetworkServiceUtilsTest {
         isLinearShuntCompensator: (LinearShuntCompensator) -> String,
         isLocation: (Location) -> String,
         isLoop: (Loop) -> String,
+        isLvFeeder: (LvFeeder) -> String,
         isMeter: (Meter) -> String,
         isOperationalRestriction: (OperationalRestriction) -> String,
         isOrganisation: (Organisation) -> String,
@@ -141,6 +143,7 @@ internal class NetworkServiceUtilsTest {
         isLinearShuntCompensator = isLinearShuntCompensator,
         isLocation = isLocation,
         isLoop = isLoop,
+        isLvFeeder = isLvFeeder,
         isMeter = isMeter,
         isOperationalRestriction = isOperationalRestriction,
         isOrganisation = isOrganisation,
@@ -205,6 +208,7 @@ internal class NetworkServiceUtilsTest {
         isLinearShuntCompensator: InvokeChecker<LinearShuntCompensator> = NeverInvokedChecker(),
         isLocation: InvokeChecker<Location> = NeverInvokedChecker(),
         isLoop: InvokeChecker<Loop> = NeverInvokedChecker(),
+        isLvFeeder: InvokeChecker<LvFeeder> = NeverInvokedChecker(),
         isMeter: InvokeChecker<Meter> = NeverInvokedChecker(),
         isOperationalRestriction: InvokeChecker<OperationalRestriction> = NeverInvokedChecker(),
         isOrganisation: InvokeChecker<Organisation> = NeverInvokedChecker(),
@@ -268,6 +272,7 @@ internal class NetworkServiceUtilsTest {
             isLinearShuntCompensator = isLinearShuntCompensator,
             isLocation = isLocation,
             isLoop = isLoop,
+            isLvFeeder = isLvFeeder,
             isMeter = isMeter,
             isOperationalRestriction = isOperationalRestriction,
             isOrganisation = isOrganisation,

@@ -30,6 +30,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.BaseServiceComparator
 import com.zepben.evolve.services.common.ObjectDifference
 import com.zepben.evolve.services.common.ValueDifference
@@ -318,6 +319,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareEquipmentContainer()
 
             compareIdReferences(Feeder::normalHeadTerminal, Feeder::normalEnergizingSubstation)
+            compareIdReferenceCollections(Feeder::normalEnergizedLvFeeders)
             if (options.compareFeederEquipment)
                 compareIdReferenceCollections(Feeder::currentEquipment)
         }
@@ -788,6 +790,16 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareIdentifiedObject()
 
             compareIdReferenceCollections(Loop::circuits, Loop::substations, Loop::energizingSubstations)
+        }
+
+    private fun compareLvFeeder(source: LvFeeder, target: LvFeeder): ObjectDifference<LvFeeder> =
+        ObjectDifference(source, target).apply {
+            compareEquipmentContainer()
+
+            compareIdReferences(LvFeeder::normalHeadTerminal)
+            compareIdReferenceCollections(LvFeeder::normalEnergizingFeeders)
+            if (options.compareFeederEquipment)
+                compareIdReferenceCollections(LvFeeder::currentEquipment)
         }
 
     private fun compareOpenStatus(source: Switch, target: Switch, openTest: (Switch, SinglePhaseKind) -> Boolean): ValueDifference? {

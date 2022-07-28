@@ -28,6 +28,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVolt
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
@@ -287,6 +288,9 @@ class NetworkService : BaseService("network") {
 
     fun add(loop: Loop): Boolean = super.add(loop)
     fun remove(loop: Loop): Boolean = super.remove(loop)
+
+    fun add(lvFeeder: LvFeeder): Boolean = super.add(lvFeeder)
+    fun remove(lvFeeder: LvFeeder): Boolean = super.add(lvFeeder)
 
     /**
      * Get all measurements of type [T] associated with the given [mRID].

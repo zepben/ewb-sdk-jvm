@@ -30,6 +30,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.database.sqlite.DatabaseTables
 import com.zepben.evolve.database.sqlite.extensions.setNullableDouble
 import com.zepben.evolve.database.sqlite.extensions.setNullableInt
@@ -59,6 +60,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.p
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
 import java.sql.PreparedStatement
 
 
@@ -470,7 +472,12 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             feeder.normalEnergizingSubstation?.mRID
         )
 
-        return saveEquipmentContainer(table, insert, feeder, "feeder")
+        var status = true
+        feeder.normalEnergizedLvFeeders.forEach {
+            status = status and saveAssociation(feeder, it)
+        }
+
+        return status and saveEquipmentContainer(table, insert, feeder, "feeder")
     }
 
     fun save(geographicalRegion: GeographicalRegion): Boolean {
@@ -994,6 +1001,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and saveIdentifiedObject(table, insert, loop, "loop")
     }
 
+    fun save(lvFeeder: LvFeeder): Boolean {
+        val table = databaseTables.getTable(TableLvFeeders::class.java)
+        val insert = databaseTables.getInsert(TableLvFeeders::class.java)
+
+        insert.setNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex, lvFeeder.normalHeadTerminal?.mRID)
+
+        return saveEquipmentContainer(table, insert, lvFeeder, "lv feeder")
+    }
+
     /************ IEC61970 MEAS ************/
     private fun saveMeasurement(
         table: TableMeasurements,
@@ -1136,6 +1152,20 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             insert,
             "${equipment.mRID}-to-${equipmentContainer.mRID}",
             "equipment to equipment container association"
+        )
+    }
+
+    private fun saveAssociation(feeder: Feeder, lvFeeder: LvFeeder): Boolean {
+        val table = databaseTables.getTable(TableFeederLvFeeders::class.java)
+        val insert = databaseTables.getInsert(TableFeederLvFeeders::class.java)
+
+        insert.setNullableString(table.FEEDER_MRID.queryIndex, feeder.mRID)
+        insert.setNullableString(table.LV_FEEDER_MRID.queryIndex, lvFeeder.mRID)
+
+        return tryExecuteSingleUpdate(
+            insert,
+            "${feeder.mRID}-to-${lvFeeder.mRID}",
+            "feeder to lv feeder association"
         )
     }
 

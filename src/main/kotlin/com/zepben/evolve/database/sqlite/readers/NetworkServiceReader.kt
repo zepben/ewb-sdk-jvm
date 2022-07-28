@@ -35,6 +35,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.p
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.Statement
 
@@ -100,6 +101,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableFaultIndicators>("fault indicators", reader::load)
         status = status and loadEach<TableFeeders>("feeders", reader::load)
         status = status and loadEach<TableLoops>("loops", reader::load)
+        status = status and loadEach<TableLvFeeders>("lv feeders", reader::load)
         status = status and loadEach<TableCircuits>("circuits", reader::load)
         status = status and loadEach<TablePositionPoints>("position points", reader::load)
         status = status and loadEach<TableLocationStreetAddresses>("location street addresses", reader::load)
@@ -108,6 +110,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableEquipmentUsagePoints>("equipment to usage point associations", reader::load)
         status = status and loadEach<TableEquipmentOperationalRestrictions>("equipment to operational restriction associations", reader::load)
         status = status and loadEach<TableEquipmentEquipmentContainers>("equipment to equipment container associations", reader::load)
+        status = status and loadEach<TableFeederLvFeeders>("feeder to lv feeder associations", reader::load)
         status = status and loadEach<TableCircuitsSubstations>("circuit to substation associations", reader::load)
         status = status and loadEach<TableCircuitsTerminals>("circuit to terminal associations", reader::load)
         status = status and loadEach<TableLoopsSubstations>("loop to substation associations", reader::load)

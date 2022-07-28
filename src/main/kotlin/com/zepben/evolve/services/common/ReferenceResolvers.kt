@@ -145,10 +145,6 @@ internal object EquipmentToCurrentContainersResolver : ReferenceResolver<Equipme
     Equipment::class, EquipmentContainer::class, Equipment::addCurrentContainer
 )
 
-internal object EquipmentToCurrentFeedersResolver : ReferenceResolver<Equipment, Feeder> by KReferenceResolver(
-    Equipment::class, Feeder::class, Equipment::addCurrentContainer
-)
-
 internal object EquipmentToCurrentLvFeedersResolver : ReferenceResolver<Equipment, LvFeeder> by KReferenceResolver(
     Equipment::class, LvFeeder::class, Equipment::addCurrentContainer
 )

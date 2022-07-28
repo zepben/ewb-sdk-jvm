@@ -163,10 +163,6 @@ object Resolvers {
         BoundReferenceResolver(energySourcePhase, EnergySourcePhaseToEnergySourceResolver, EnergySourceToEnergySourcePhaseResolver)
 
     @JvmStatic
-    fun currentEquipment(feeder: Feeder): BoundReferenceResolver<Feeder, Equipment> =
-        BoundReferenceResolver(feeder, FeederToCurrentEquipmentResolver, EquipmentToCurrentFeedersResolver)
-
-    @JvmStatic
     fun normalEnergizingSubstation(feeder: Feeder): BoundReferenceResolver<Feeder, Substation> =
         BoundReferenceResolver(feeder, FeederToNormalEnergizingSubstationResolver, SubstationToNormalEnergizingFeedersResolver)
 

@@ -31,6 +31,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.database.sqlite.extensions.getNullableDouble
 import com.zepben.evolve.database.sqlite.extensions.getNullableInt
 import com.zepben.evolve.database.sqlite.extensions.getNullableLong
@@ -59,6 +60,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.p
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
 import com.zepben.evolve.services.common.extensions.*
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.ResultSet
@@ -1035,6 +1037,17 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadIdentifiedObject(loop, table, resultSet) && networkService.addOrThrow(loop)
     }
 
+    fun load(table: TableLvFeeders, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val lvFeeder = LvFeeder(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            normalHeadTerminal = networkService.ensureGet(
+                resultSet.getNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex),
+                typeNameAndMRID()
+            )
+        }
+
+        return loadEquipmentContainer(lvFeeder, table, resultSet) && networkService.addOrThrow(lvFeeder)
+    }
+
     /************ ASSOCIATIONS ************/
 
     fun load(table: TableAssetOrganisationRolesAssets, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
@@ -1100,6 +1113,23 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
         usagePoint.addEquipment(equipment)
         equipment.addUsagePoint(usagePoint)
+
+        return true
+    }
+
+    fun load(table: TableFeederLvFeeders, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val feederMRID = setLastMRID(resultSet.getString(table.FEEDER_MRID.queryIndex))
+        setLastMRID("${feederMRID}-to-UNKNOWN")
+
+        val lvFeederMRID = resultSet.getString(table.LV_FEEDER_MRID.queryIndex)
+        val id = setLastMRID("${feederMRID}-to${lvFeederMRID}")
+
+        val typeNameAndMRID = "Feeder to LvFeeder association $id"
+        val feeder = networkService.getOrThrow<Feeder>(feederMRID, typeNameAndMRID)
+        val lvFeeder = networkService.getOrThrow<LvFeeder>(lvFeederMRID, typeNameAndMRID)
+
+        feeder.addNormalEnergizedLvFeeder(lvFeeder)
+        lvFeeder.addNormalEnergizingFeeder(feeder)
 
         return true
     }

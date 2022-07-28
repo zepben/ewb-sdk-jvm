@@ -31,6 +31,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVolt
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.evolve.services.network.NetworkService
@@ -149,6 +150,7 @@ internal class NetworkTranslatorTest {
         /************ IEC61970 InfIEC61970 FEEDER ************/
         validate({ Circuit() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
         validate({ Loop() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
+        validate({ LvFeeder() }, { ns, it -> it.fillFields(ns)}, { ns, it -> ns.addFromPb(it.toPb()) })
     }
 
     //

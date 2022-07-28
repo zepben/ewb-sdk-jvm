@@ -10,3 +10,4 @@ jobs:
       product-key: "jvm-sdk"
       licencecheck: true
     secrets: inherit
+

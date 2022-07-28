@@ -42,6 +42,11 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     val containers: Collection<EquipmentContainer> get() = _equipmentContainers.asUnmodifiable()
 
     /**
+     * The equipment containers this equipment belongs to in the current network state. The returned collection is read only.
+     */
+    val currentContainers: Collection<EquipmentContainer> get() = _currentContainers.asUnmodifiable()
+
+    /**
      * Get the number of entries in the [EquipmentContainer] collection.
      */
     fun numContainers() = _equipmentContainers?.size ?: 0
@@ -86,8 +91,6 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
         _equipmentContainers = null
         return this
     }
-
-    val currentContainers: Collection<EquipmentContainer> get() = _currentContainers.asUnmodifiable()
 
     /**
      * Get the number of entries in the current [EquipmentContainer] collection.

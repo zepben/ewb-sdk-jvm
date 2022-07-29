@@ -31,6 +31,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVolt
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 
 class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) :
@@ -92,6 +93,7 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<TransformerStarImpedance>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Circuit>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Loop>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<LvFeeder>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Analog>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Accumulator>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Discrete>().forEach { status = status and validateSave(it, writer::save) }

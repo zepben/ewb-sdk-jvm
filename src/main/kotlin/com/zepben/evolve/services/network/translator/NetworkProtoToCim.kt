@@ -1021,9 +1021,6 @@ fun toCim(pb: PBLvFeeder, networkService: NetworkService): LvFeeder =
         pb.normalEnergizingFeederMRIDsList.forEach { normalEnergizingFeederMRID ->
             networkService.resolveOrDeferReference(Resolvers.normalEnergizingFeeders(this), normalEnergizingFeederMRID)
         }
-        pb.currentEquipmentMRIDsList.forEach { currentEquipmentMRID ->
-            networkService.resolveOrDeferReference(Resolvers.currentEquipment(this), currentEquipmentMRID)
-        }
         toCim(pb.ec, this, networkService)
     }
 

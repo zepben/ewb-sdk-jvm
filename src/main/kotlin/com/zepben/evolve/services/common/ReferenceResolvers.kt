@@ -145,10 +145,6 @@ internal object EquipmentToCurrentContainersResolver : ReferenceResolver<Equipme
     Equipment::class, EquipmentContainer::class, Equipment::addCurrentContainer
 )
 
-internal object EquipmentToCurrentLvFeedersResolver : ReferenceResolver<Equipment, LvFeeder> by KReferenceResolver(
-    Equipment::class, LvFeeder::class, Equipment::addCurrentContainer
-)
-
 internal object EquipmentToEquipmentContainerResolver : ReferenceResolver<Equipment, EquipmentContainer> by KReferenceResolver(
     Equipment::class, EquipmentContainer::class, Equipment::addContainer
 )
@@ -323,10 +319,6 @@ internal object LvFeederToNormalHeadTerminalResolver : ReferenceResolver<LvFeede
 
 internal object LvFeederToNormalEnergizingFeedersResolver : ReferenceResolver<LvFeeder, Feeder> by KReferenceResolver(
     LvFeeder::class, Feeder::class, LvFeeder::addNormalEnergizingFeeder
-)
-
-internal object LvFeederToCurrentEquipmentResolver : ReferenceResolver<LvFeeder, Equipment> by KReferenceResolver(
-    LvFeeder::class, Equipment::class, LvFeeder::addCurrentEquipment
 )
 
 internal object PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver :

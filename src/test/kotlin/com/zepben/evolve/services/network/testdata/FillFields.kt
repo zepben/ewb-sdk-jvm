@@ -1088,13 +1088,14 @@ fun LvFeeder.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     (this as EquipmentContainer).fillFields(service, includeRuntime)
 
     normalHeadTerminal = Terminal().also { service.add(it) }
-    for (i in 0..1)
-        addNormalEnergizingFeeder(Feeder().also {
-            it.addNormalEnergizedLvFeeder(this)
-            service.add(it)
-        })
 
     if (includeRuntime) {
+        for (i in 0..1)
+            addNormalEnergizingFeeder(Feeder().also {
+                it.addNormalEnergizedLvFeeder(this)
+                service.add(it)
+            })
+
         for (i in 0..1)
             addCurrentEquipment(Junction().also {
                 it.addCurrentContainer(this)

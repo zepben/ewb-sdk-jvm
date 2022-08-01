@@ -206,6 +206,9 @@ internal class NetworkTranslatorTest {
 
         if (cim is ConnectivityNode)
             cim.clearTerminals()
+
+        if (cim is LvFeeder)
+            cim.clearCurrentEquipment()
     }
 
     private inline fun <reified T : IdentifiedObject> addWithUnresolvedReferences(cim: T, adder: (NetworkService, T) -> T?): T {

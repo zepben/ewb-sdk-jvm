@@ -311,10 +311,6 @@ object Resolvers {
         BoundReferenceResolver(lvFeeder, LvFeederToNormalEnergizingFeedersResolver, FeederToNormalEnergizedLvFeedersResolver)
 
     @JvmStatic
-    fun currentEquipment(lvFeeder: LvFeeder): BoundReferenceResolver<LvFeeder, Equipment> =
-        BoundReferenceResolver(lvFeeder, LvFeederToCurrentEquipmentResolver, EquipmentToCurrentLvFeedersResolver)
-
-    @JvmStatic
     fun powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit): BoundReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> =
         BoundReferenceResolver(
             powerElectronicsUnit,

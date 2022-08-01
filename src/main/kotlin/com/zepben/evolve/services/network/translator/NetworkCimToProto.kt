@@ -983,6 +983,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: OverheadWireInfo): PBOverheadWireInfo = cim.toPb()
     fun toPb(cim: PowerTransformerInfo): PBPowerTransformerInfo = cim.toPb()
     fun toPb(cim: ShortCircuitTest): PBShortCircuitTest = cim.toPb()
+    fun toPb(cim: ShuntCompensatorInfo): PBShuntCompensatorInfo = cim.toPb()
     fun toPb(cim: TransformerEndInfo): PBTransformerEndInfo = cim.toPb()
     fun toPb(cim: TransformerTankInfo): PBTransformerTankInfo = cim.toPb()
 

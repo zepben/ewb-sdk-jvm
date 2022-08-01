@@ -67,7 +67,7 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     }
 
     /**
-     * Convenience function to find all of the normal feeders of the equipment associated with this equipment container.
+     * Convenience function to find all of the normal [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
      *
      * @return the normal feeders for all associated feeders
      */
@@ -78,13 +78,35 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     }
 
     /**
-     * Convenience function to find all of the current feeders of the equipment associated with this equipment container.
+     * Convenience function to find all of the current [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
      *
      * @return the current feeders for all associated feeders
      */
     fun currentFeeders(): Set<Feeder> {
         val ret = mutableSetOf<Feeder>()
         _equipmentById?.values?.forEach { equip -> ret.addAll(equip.currentFeeders) }
+        return ret
+    }
+
+    /**
+     * Convenience function to find all of the normal [LvFeeder]'s of the [Equipment] associated with this [EquipmentContainer].
+     *
+     * @return the normal feeders for all associated feeders
+     */
+    fun normalLvFeeders(): Set<LvFeeder> {
+        val ret = mutableSetOf<LvFeeder>()
+        _equipmentById?.values?.forEach { equip -> ret.addAll(equip.normalLvFeeders) }
+        return ret
+    }
+
+    /**
+     * Convenience function to find all of the current [LvFeeder] of the [Equipment] associated with this [EquipmentContainer].
+     *
+     * @return the current feeders for all associated feeders
+     */
+    fun currentLvFeeders(): Set<LvFeeder> {
+        val ret = mutableSetOf<LvFeeder>()
+        _equipmentById?.values?.forEach { equip -> ret.addAll(equip.currentLvFeeders) }
         return ret
     }
 

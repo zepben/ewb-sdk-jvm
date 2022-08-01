@@ -9,6 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
 import com.zepben.evolve.services.common.extensions.validateReference
@@ -34,6 +35,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     val sites: List<Site> get() = _equipmentContainers.ofType()
     val normalFeeders: List<Feeder> get() = _equipmentContainers.ofType()
     val currentFeeders: List<Feeder> get() = _currentContainers.ofType()
+    val normalLvFeeders: List<LvFeeder> get() = _equipmentContainers.ofType()
+    val currentLvFeeders: List<LvFeeder> get() = _currentContainers.ofType()
     val substations: List<Substation> get() = _equipmentContainers.ofType()
 
     /**

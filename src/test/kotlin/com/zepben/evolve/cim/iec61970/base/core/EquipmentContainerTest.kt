@@ -75,4 +75,39 @@ internal class EquipmentContainerTest {
         assertThat(equipmentContainer.normalFeeders(), empty())
         assertThat(equipmentContainer.currentFeeders(), containsInAnyOrder(fdr1, fdr2, fdr3))
     }
+
+    @Test
+    internal fun normalLvFeeders() {
+        val lvFdr1 = LvFeeder()
+        val lvFdr2 = LvFeeder()
+        val lvFdr3 = LvFeeder()
+        val substation = Substation()
+        val fdr = Feeder()
+
+        val eq1 = object : Equipment() {}.addContainer(lvFdr1).addContainer(lvFdr2).addContainer(substation)
+        val eq2 = object : Equipment() {}.addContainer(lvFdr2).addContainer(lvFdr3).addContainer(fdr)
+
+        val equipmentContainer = object : EquipmentContainer() {}.addEquipment(eq1).addEquipment(eq2)
+
+        assertThat(equipmentContainer.normalLvFeeders(), containsInAnyOrder(lvFdr1, lvFdr2, lvFdr3))
+        assertThat(equipmentContainer.currentLvFeeders(), empty())
+    }
+
+    @Test
+    internal fun currentLvFeeders() {
+        val lvFdr1 = LvFeeder()
+        val lvFdr2 = LvFeeder()
+        val lvFdr3 = LvFeeder()
+        val substation = Substation()
+        val fdr = Feeder()
+
+        val eq1 = object : Equipment() {}.addCurrentContainer(lvFdr1).addCurrentContainer(lvFdr2).addCurrentContainer(substation)
+        val eq2 = object : Equipment() {}.addCurrentContainer(lvFdr2).addCurrentContainer(lvFdr3).addCurrentContainer(fdr)
+
+        val equipmentContainer = object : EquipmentContainer() {}.addEquipment(eq1).addEquipment(eq2)
+
+        assertThat(equipmentContainer.normalLvFeeders(), empty())
+        assertThat(equipmentContainer.currentLvFeeders(), containsInAnyOrder(lvFdr1, lvFdr2, lvFdr3))
+    }
+
 }

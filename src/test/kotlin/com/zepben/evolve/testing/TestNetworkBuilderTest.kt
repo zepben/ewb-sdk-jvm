@@ -268,9 +268,9 @@ internal class TestNetworkBuilderTest {
     @Test
     internal fun canCreateOtherTypes() {
         //
-        // o1 11 o2
+        // o0 11 my-id[o1]
         //
-        // o3
+        // 1 o2 21 o3 2
         //
         TestNetworkBuilder()
             .fromOther(::Fuse, numTerminals = 1) // o0
@@ -280,12 +280,14 @@ internal class TestNetworkBuilderTest {
                     Fuse("my-id")
                 }, numTerminals = 1
             ) // o1
-            .fromOther(::Fuse) // o2
+            .fromOther(::Fuse, PhaseCode.AB) // o2
+            .toOther(::Fuse, PhaseCode.AB) // o3
             .build()
             .apply {
                 validateConnections("o0", listOf("my-id-t1"))
                 validateConnections("my-id", listOf("o0-t1"))
-                validateConnections("o2", emptyList(), emptyList())
+                validateConnections("o2", emptyList(), listOf("o3-t1"))
+                validateConnections("o3", listOf("o2-t2"), emptyList())
             }
     }
 

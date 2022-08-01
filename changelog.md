@@ -12,7 +12,7 @@
 
 ##### Enhancements
 
-* None.
+* `TestNetworkBuilder.build()` will now assign equipment to feeders if feeders were added to the network.
 
 ##### Fixes
 

@@ -37,11 +37,6 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
     val currentEquipment: Collection<Equipment> get() = _currentEquipmentById?.values.asUnmodifiable()
 
     /**
-     * The LV feeders that are normally energized by the feeder. The returned collection is read only.
-     */
-    val normalEnergizedLvFeeders: Collection<LvFeeder> get() = _normalEnergizedLvFeedersById?.values.asUnmodifiable()
-
-    /**
      * Get the number of entries in the current [Equipment] collection.
      */
     fun numCurrentEquipment() = _currentEquipmentById?.size ?: 0
@@ -83,6 +78,11 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
         _currentEquipmentById = null
         return this
     }
+
+    /**
+     * The LV feeders that are normally energized by the feeder. The returned collection is read only.
+     */
+    val normalEnergizedLvFeeders: Collection<LvFeeder> get() = _normalEnergizedLvFeedersById?.values.asUnmodifiable()
 
     /**
      * Get the number of entries in the normal [LvFeeder] collection.

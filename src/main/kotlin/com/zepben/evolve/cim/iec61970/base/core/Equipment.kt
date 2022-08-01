@@ -18,8 +18,8 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * @property normallyInService If true, the equipment is _normally_ in service.
  *
  * @property sites [Site]'s this equipment belongs to.
- * @property normalFeeders [Feeder]'- that represent the normal feeders of the equipment.
- * @property currentContainers [EquipmentContainer]'s that represent the current containers of the equipment.
+ * @property normalFeeders [Feeder]'s that represent the normal feeders of the equipment.
+ * @property currentFeeders [Feeder]'s that represent the current feeders of the equipment.
  * @property substations [Substation]'s that represent the substation of the equipment.
  */
 abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
@@ -31,20 +31,15 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     private var _operationalRestrictions: MutableList<OperationalRestriction>? = null
     private var _currentContainers: MutableList<EquipmentContainer>? = null
 
-    val sites: List<Site> get() = equipmentContainersOfType()
-    val normalFeeders: List<Feeder> get() = equipmentContainersOfType()
-    val currentFeeders: List<Feeder> get() = currentEquipmentContainersOfType()
-    val substations: List<Substation> get() = equipmentContainersOfType()
+    val sites: List<Site> get() = _equipmentContainers.ofType()
+    val normalFeeders: List<Feeder> get() = _equipmentContainers.ofType()
+    val currentFeeders: List<Feeder> get() = _currentContainers.ofType()
+    val substations: List<Substation> get() = _equipmentContainers.ofType()
 
     /**
      * The equipment containers this equipment belongs to. The returned collection is read only.
      */
     val containers: Collection<EquipmentContainer> get() = _equipmentContainers.asUnmodifiable()
-
-    /**
-     * The equipment containers this equipment belongs to in the current network state. The returned collection is read only.
-     */
-    val currentContainers: Collection<EquipmentContainer> get() = _currentContainers.asUnmodifiable()
 
     /**
      * Get the number of entries in the [EquipmentContainer] collection.
@@ -91,6 +86,11 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
         _equipmentContainers = null
         return this
     }
+
+    /**
+     * The equipment containers this equipment belongs to in the current network state. The returned collection is read only.
+     */
+    val currentContainers: Collection<EquipmentContainer> get() = _currentContainers.asUnmodifiable()
 
     /**
      * Get the number of entries in the current [EquipmentContainer] collection.
@@ -245,11 +245,5 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
         return this
     }
 
-    private inline fun <reified T : EquipmentContainer> equipmentContainersOfType(): List<T> {
-        return _equipmentContainers?.filterIsInstance(T::class.java) ?: emptyList()
-    }
-
-    private inline fun <reified T : EquipmentContainer> currentEquipmentContainersOfType(): List<T> {
-        return _currentContainers?.filterIsInstance(T::class.java) ?: emptyList()
-    }
+    private inline fun <reified T : EquipmentContainer> List<*>?.ofType(): List<T> = this?.filterIsInstance(T::class.java) ?: emptyList()
 }

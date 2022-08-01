@@ -40,11 +40,6 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
     val normalEnergizingFeeders: Collection<Feeder> get() = _normalEnergizingFeedersById?.values.asUnmodifiable()
 
     /**
-     * Contained equipment using the current state of the network. The returned collection is read only.
-     */
-    val currentEquipment: Collection<Equipment> get() = _currentEquipmentById?.values.asUnmodifiable()
-
-    /**
      * Get the number of entries in the normal [Feeder] collection.
      */
     fun numNormalEnergizingFeeders() = _normalEnergizingFeedersById?.size ?: 0
@@ -58,7 +53,10 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
     fun getNormalEnergizingFeeder(mRID: String) = _normalEnergizingFeedersById?.get(mRID)
 
     /**
+     * Associate this [LvFeeder] with a [Feeder] in the normal state of the network.
+     *
      * @param feeder the HV/MV feeder to associate with this LV feeder in the normal state of the network.
+     * @return This [LvFeeder] for fluent use.
      */
     fun addNormalEnergizingFeeder(feeder: Feeder): LvFeeder {
         if (validateReference(feeder, ::getNormalEnergizingFeeder, "A Feeder"))
@@ -71,7 +69,10 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
     }
 
     /**
+     * Disassociate this [LvFeeder] from a [Feeder] in the normal state of the network.
+     *
      * @param feeder the HV/MV feeder to disassociate from this LV feeder in the normal state of the network.
+     * @return true if a matching feeder is removed from the collection.
      */
     fun removeNormalEnergizingFeeder(feeder: Feeder?): Boolean {
         val ret = _normalEnergizingFeedersById?.remove(feeder?.mRID)
@@ -79,10 +80,20 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
         return ret != null
     }
 
+    /**
+     * Clear all [Feeder]'s associated with this [LvFeeder] in the normal state of the network.
+     *
+     * @return This [LvFeeder] for fluent use.
+     */
     fun clearNormalEnergizingFeeders(): LvFeeder {
         _normalEnergizingFeedersById = null
         return this
     }
+
+    /**
+     * Contained equipment using the current state of the network. The returned collection is read only.
+     */
+    val currentEquipment: Collection<Equipment> get() = _currentEquipmentById?.values.asUnmodifiable()
 
     /**
      * Get the number of entries in the current [Equipment] collection.
@@ -98,6 +109,8 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
     fun getCurrentEquipment(mRID: String) = _currentEquipmentById?.get(mRID)
 
     /**
+     * Associate this [LvFeeder] with an [Equipment] in the current state of the network.
+     *
      * @param equipment the equipment to associate with this LV feeder in the current state of the network.
      */
     fun addCurrentEquipment(equipment: Equipment): LvFeeder {
@@ -111,6 +124,8 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
     }
 
     /**
+     * Disassociate this [LvFeeder] from an [Equipment] in the current state of the network.
+     *
      * @param equipment the equipment to disassociate with this LV feeder in the current state of the network.
      */
     fun removeCurrentEquipment(equipment: Equipment?): Boolean {
@@ -119,6 +134,9 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
         return ret != null
     }
 
+    /**
+     * Clear all [Equipment] associated with this [LvFeeder].
+     */
     fun clearCurrentEquipment(): LvFeeder {
         _currentEquipmentById = null
         return this

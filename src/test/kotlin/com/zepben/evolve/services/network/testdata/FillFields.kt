@@ -386,13 +386,13 @@ fun Feeder.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
         service.add(it)
     }
 
-    for (i in 0..1)
-        addNormalEnergizedLvFeeder(LvFeeder().also {
-            it.addNormalEnergizingFeeder(this)
-            service.add(it)
-        })
-
     if (includeRuntime) {
+        for (i in 0..1)
+            addNormalEnergizedLvFeeder(LvFeeder().also {
+                it.addNormalEnergizingFeeder(this)
+                service.add(it)
+            })
+
         for (i in 0..1)
             addCurrentEquipment(Junction().also {
                 it.addCurrentContainer(this)

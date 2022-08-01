@@ -123,7 +123,7 @@ internal class EquipmentTest {
 
         assertThat(equipment.sites, containsInAnyOrder(site1, site2))
         assertThat(equipment.normalFeeders, containsInAnyOrder(feeder1, feeder2))
-        assertThat(equipment.currentContainers, containsInAnyOrder(feeder3, feeder4))
+        assertThat(equipment.currentFeeders, containsInAnyOrder(feeder3, feeder4))
         assertThat(equipment.substations, containsInAnyOrder(substation1, substation2))
     }
 }

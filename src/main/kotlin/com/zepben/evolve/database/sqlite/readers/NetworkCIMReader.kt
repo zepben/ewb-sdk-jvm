@@ -1117,23 +1117,6 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return true
     }
 
-    fun load(table: TableFeederLvFeeders, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val feederMRID = setLastMRID(resultSet.getString(table.FEEDER_MRID.queryIndex))
-        setLastMRID("${feederMRID}-to-UNKNOWN")
-
-        val lvFeederMRID = resultSet.getString(table.LV_FEEDER_MRID.queryIndex)
-        val id = setLastMRID("${feederMRID}-to${lvFeederMRID}")
-
-        val typeNameAndMRID = "Feeder to LvFeeder association $id"
-        val feeder = networkService.getOrThrow<Feeder>(feederMRID, typeNameAndMRID)
-        val lvFeeder = networkService.getOrThrow<LvFeeder>(lvFeederMRID, typeNameAndMRID)
-
-        feeder.addNormalEnergizedLvFeeder(lvFeeder)
-        lvFeeder.addNormalEnergizingFeeder(feeder)
-
-        return true
-    }
-
     fun load(table: TableUsagePointsEndDevices, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val usagePointMRID = setLastMRID(resultSet.getString(table.USAGE_POINT_MRID.queryIndex))
         setLastMRID("${usagePointMRID}-to-UNKNOWN")

@@ -115,7 +115,6 @@ class DatabaseTables {
         TableEquivalentBranches(),
         TableFaultIndicators(),
         TableFeeders(),
-        TableFeederLvFeeders(),
         TableFuses(),
         TableGeographicalRegions(),
         TableJumpers(),

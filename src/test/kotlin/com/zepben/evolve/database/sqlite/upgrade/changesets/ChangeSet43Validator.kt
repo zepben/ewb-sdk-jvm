@@ -9,25 +9,29 @@
 package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
+import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
 
 object ChangeSet43Validator : ChangeSetValidator {
     override fun setUpStatements(): List<String> = emptyList()
 
     override fun populateStatements(): List<String> = listOf(
-        "INSERT INTO lv_feeders (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normal_head_terminal_mrid) VALUES ('id1', '', '', 0, null, 0, null)",
-        "INSERT INTO feeder_lv_feeders (feeder_mrid, lv_feeder_mrid) VALUES ('id2', 'id1')"
+        "INSERT INTO lv_feeders (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normal_head_terminal_mrid) VALUES ('id', 'name', 'desc', 1, 'loc', 2, 'terminal')"
     )
 
     override fun validate(statement: Statement) {
-        validateRows(statement,"SELECT feeder_mrid FROM lv_feeders JOIN feeder_lv_feeders ON mrid = lv_feeder_mrid", { rs ->
-            assertThat(rs.getString("feeder_mrid"), Matchers.equalTo("id2"))
+        validateRows(statement,"SELECT * FROM lv_feeders", { rs ->
+            assertThat(rs.getString("mrid"), equalTo("id"))
+            assertThat(rs.getString("name"), equalTo("name"))
+            assertThat(rs.getString("description"), equalTo("desc"))
+            assertThat(rs.getInt("num_diagram_objects"), equalTo(1))
+            assertThat(rs.getString("location_mrid"), equalTo("loc"))
+            assertThat(rs.getInt("num_controls"), equalTo(2))
+            assertThat(rs.getString("normal_head_terminal_mrid"), equalTo("terminal"))
         })
     }
 
     override fun tearDownStatements(): List<String> = listOf(
-        "DELETE FROM feeder_lv_feeders",
         "DELETE FROM lv_feeders"
     )
 }

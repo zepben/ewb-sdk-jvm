@@ -110,7 +110,6 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableEquipmentUsagePoints>("equipment to usage point associations", reader::load)
         status = status and loadEach<TableEquipmentOperationalRestrictions>("equipment to operational restriction associations", reader::load)
         status = status and loadEach<TableEquipmentEquipmentContainers>("equipment to equipment container associations", reader::load)
-        status = status and loadEach<TableFeederLvFeeders>("feeder to lv feeder associations", reader::load)
         status = status and loadEach<TableCircuitsSubstations>("circuit to substation associations", reader::load)
         status = status and loadEach<TableCircuitsTerminals>("circuit to terminal associations", reader::load)
         status = status and loadEach<TableLoopsSubstations>("loop to substation associations", reader::load)

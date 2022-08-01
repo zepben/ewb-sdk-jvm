@@ -472,12 +472,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             feeder.normalEnergizingSubstation?.mRID
         )
 
-        var status = true
-        feeder.normalEnergizedLvFeeders.forEach {
-            status = status and saveAssociation(feeder, it)
-        }
-
-        return status and saveEquipmentContainer(table, insert, feeder, "feeder")
+        return saveEquipmentContainer(table, insert, feeder, "feeder")
     }
 
     fun save(geographicalRegion: GeographicalRegion): Boolean {
@@ -1152,20 +1147,6 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             insert,
             "${equipment.mRID}-to-${equipmentContainer.mRID}",
             "equipment to equipment container association"
-        )
-    }
-
-    private fun saveAssociation(feeder: Feeder, lvFeeder: LvFeeder): Boolean {
-        val table = databaseTables.getTable(TableFeederLvFeeders::class.java)
-        val insert = databaseTables.getInsert(TableFeederLvFeeders::class.java)
-
-        insert.setNullableString(table.FEEDER_MRID.queryIndex, feeder.mRID)
-        insert.setNullableString(table.LV_FEEDER_MRID.queryIndex, lvFeeder.mRID)
-
-        return tryExecuteSingleUpdate(
-            insert,
-            "${feeder.mRID}-to-${lvFeeder.mRID}",
-            "feeder to lv feeder association"
         )
     }
 

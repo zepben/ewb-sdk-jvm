@@ -11,8 +11,7 @@ import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
 
 internal fun changeSet43() = ChangeSet(43) {
     listOf(
-        *`Add lv feeder table`,
-        *`Add feeder to lv feeder association table`
+        *`Add lv feeder table`
     )
 }
 
@@ -27,16 +26,6 @@ private val `Add lv feeder table` = arrayOf(
         location_mrid TEXT NULL,
         num_controls INTEGER NOT NULL,
         normal_head_terminal_mrid TEXT NULL
-    )
-    """
-)
-
-@Suppress("ObjectPropertyName")
-private val `Add feeder to lv feeder association table` = arrayOf(
-    """
-    CREATE TABLE feeder_lv_feeders (
-        feeder_mrid TEXT NOT NULL,
-        lv_feeder_mrid TEXT NOT NULL
     )
     """
 )

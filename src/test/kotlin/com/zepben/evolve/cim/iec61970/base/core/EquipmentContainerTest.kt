@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.core
 
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -46,9 +47,11 @@ internal class EquipmentContainerTest {
         val fdr1 = Feeder()
         val fdr2 = Feeder()
         val fdr3 = Feeder()
+        val substation = Substation()
+        val lvFdr = LvFeeder()
 
-        val eq1 = object : Equipment() {}.addContainer(fdr1).addContainer(fdr2)
-        val eq2 = object : Equipment() {}.addContainer(fdr2).addContainer(fdr3)
+        val eq1 = object : Equipment() {}.addContainer(fdr1).addContainer(fdr2).addContainer(substation)
+        val eq2 = object : Equipment() {}.addContainer(fdr2).addContainer(fdr3).addContainer(lvFdr)
 
         val equipmentContainer = object : EquipmentContainer() {}.addEquipment(eq1).addEquipment(eq2)
 
@@ -61,13 +64,15 @@ internal class EquipmentContainerTest {
         val fdr1 = Feeder()
         val fdr2 = Feeder()
         val fdr3 = Feeder()
+        val substation = Substation()
+        val lvFdr = LvFeeder()
 
-        val eq1 = object : Equipment() {}.addCurrentContainer(fdr1).addCurrentContainer(fdr2)
-        val eq2 = object : Equipment() {}.addCurrentContainer(fdr2).addCurrentContainer(fdr3)
+        val eq1 = object : Equipment() {}.addCurrentContainer(fdr1).addCurrentContainer(fdr2).addCurrentContainer(substation)
+        val eq2 = object : Equipment() {}.addCurrentContainer(fdr2).addCurrentContainer(fdr3).addCurrentContainer(lvFdr)
 
         val equipmentContainer = object : EquipmentContainer() {}.addEquipment(eq1).addEquipment(eq2)
 
-        assertThat(equipmentContainer.currentFeeders(), containsInAnyOrder(fdr1, fdr2, fdr3))
         assertThat(equipmentContainer.normalFeeders(), empty())
+        assertThat(equipmentContainer.currentFeeders(), containsInAnyOrder(fdr1, fdr2, fdr3))
     }
 }

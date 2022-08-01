@@ -26,7 +26,7 @@ package com.zepben.evolve.services.network.tracing.traversals
  * @param queue     The item queue to be used by this traversal.
  * @param tracker   The tracker that tracks items during the traversal.
  */
-class BasicTraversal<T>(
+open class BasicTraversal<T>(
     private val queueNext: QueueNext<T>,
     val queue: TraversalQueue<T>,
     override val tracker: Tracker<T>

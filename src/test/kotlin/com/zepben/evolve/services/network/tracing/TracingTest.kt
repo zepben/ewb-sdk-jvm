@@ -23,7 +23,6 @@ import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
-import org.junit.Assert
 import org.junit.jupiter.api.Test
 import java.util.function.Supplier
 
@@ -35,10 +34,11 @@ class TracingTest {
         val n = PhaseSwapLoopNetwork.create()
         val expected = n.setOf<ConductingEquipment>()
         val visited = mutableSetOf<ConductingEquipment>()
-        val start = n.get<ConductingEquipment>("node0")!!
-        val trace = Tracing.connectedEquipmentTrace().addStepAction { ce, _ -> visited.add(ce) }
-        trace.run(start)
-        Assert.assertEquals(expected, visited)
+
+        Tracing.connectedEquipmentTrace().apply { addStepAction { (ce, _) -> visited.add(ce) } }
+            .run(n["node0"]!!)
+
+        assertThat(expected, equalTo(visited))
     }
 
     @Test

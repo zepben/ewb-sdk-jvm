@@ -7,10 +7,7 @@
  */
 package com.zepben.evolve.services.network.tracing
 
-import com.zepben.evolve.services.network.tracing.connectivity.ConnectedEquipmentTrace
-import com.zepben.evolve.services.network.tracing.connectivity.ConnectedEquipmentTraversal
-import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
-import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityTrace
+import com.zepben.evolve.services.network.tracing.connectivity.*
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
 import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
@@ -40,7 +37,7 @@ object Tracing {
      * Creates a new traversal that traces equipment that are connected. This ignores phases, open status etc.
      * It is purely to trace equipment that are connected in any way.
      *
-     * @return The new traversal instance.
+     * @return The new [ConnectedEquipmentTraversal] instance.
      */
     @JvmStatic
     fun connectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newConnectedEquipmentTrace()
@@ -49,7 +46,7 @@ object Tracing {
      * Creates a new traversal that traces equipment that are connected. This ignores phases, open status etc.
      * It is purely to trace equipment that are connected in any way.
      *
-     * @return The new traversal instance.
+     * @return The new [ConnectedEquipmentTraversal] instance.
      */
     @JvmStatic
     fun connectedEquipmentBreadthTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newConnectedEquipmentBreadthTrace()
@@ -58,7 +55,7 @@ object Tracing {
      * Creates a new traversal that traces equipment that are connected stopping at normally open points. This ignores phases etc.
      * It is purely to trace equipment that are connected in any way.
      *
-     * @return The new traversal instance.
+     * @return The new [ConnectedEquipmentTraversal] instance.
      */
     fun normalConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newNormalConnectedEquipmentTrace()
 
@@ -66,9 +63,30 @@ object Tracing {
      * Creates a new traversal that traces equipment that are connected stopping at currently open points. This ignores phases etc.
      * It is purely to trace equipment that are connected in any way.
      *
-     * @return The new traversal instance.
+     * @return The new [ConnectedEquipmentTraversal] instance.
      */
     fun currentConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newCurrentConnectedEquipmentTrace()
+
+
+    /**
+     * Creates a new limited traversal that traces equipment that are connected stopping at normally open points. This ignores phases etc.
+     * It is purely to trace equipment that are connected in any way.
+     *
+     * The trace can be limited by the number of steps, or the feeder direction.
+     *
+     * @return The new [LimitedConnectedEquipmentTrace] instance.
+     */
+    fun normalLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace = ConnectedEquipmentTrace.newNormalLimitedConnectedEquipmentTrace()
+
+    /**
+     * Creates a new limited traversal that traces equipment that are connected stopping at normally open points. This ignores phases etc.
+     * It is purely to trace equipment that are connected in any way.
+     *
+     * The trace can be limited by the number of steps, or the feeder direction.
+     *
+     * @return The new [LimitedConnectedEquipmentTrace] instance.
+     */
+    fun currentLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace = ConnectedEquipmentTrace.newCurrentLimitedConnectedEquipmentTrace()
 
     /**
      * Creates a new traversal that traces equipment that are connected. This ignores phases, open status etc.

@@ -27,6 +27,8 @@ class ConnectedEquipmentTraversal(
      *
      * @param conductingEquipment THe [ConductingEquipment] to start from.
      */
-    fun run(conductingEquipment: ConductingEquipment) = run(ConductingEquipmentStep(conductingEquipment))
+    @JvmOverloads
+    fun run(conductingEquipment: ConductingEquipment, canStopOnStartItem: Boolean = true) =
+        run(ConductingEquipmentStep(conductingEquipment), canStopOnStartItem)
 
 }

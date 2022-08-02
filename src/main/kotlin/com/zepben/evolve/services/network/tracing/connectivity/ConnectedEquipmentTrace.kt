@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.connectivity
 
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
@@ -41,6 +42,18 @@ object ConnectedEquipmentTrace {
      */
     fun newCurrentConnectedEquipmentTrace(): ConnectedEquipmentTraversal =
         ConnectedEquipmentTraversal(queueNext(OpenTest.CURRENTLY_OPEN), BasicQueue.depthFirst(), ConductingEquipmentStepTracker())
+
+    /**
+     * @return a limited connected equipment trace that traces equipment on the normal state of the network.
+     */
+    fun newNormalLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace =
+        LimitedConnectedEquipmentTrace(::newNormalConnectedEquipmentTrace, Terminal::normalFeederDirection)
+
+    /**
+     * @return a limited connected equipment trace that traces equipment on the current state of the network.
+     */
+    fun newCurrentLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace =
+        LimitedConnectedEquipmentTrace(::newCurrentConnectedEquipmentTrace, Terminal::currentFeederDirection)
 
     private fun queueNext(openTest: OpenTest): BasicTraversal.QueueNext<ConductingEquipmentStep> =
         BasicTraversal.QueueNext { (conductingEquipment, step), traversal ->

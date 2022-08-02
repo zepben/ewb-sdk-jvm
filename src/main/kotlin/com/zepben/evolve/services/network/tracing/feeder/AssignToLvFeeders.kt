@@ -9,9 +9,7 @@
 package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
@@ -72,28 +70,23 @@ class AssignToLvFeeders {
     private val reachedEquipment: (Set<ConductingEquipment>) -> (Terminal) -> Boolean = { { terminal: Terminal -> it.contains(terminal.conductingEquipment) } }
 
     private val reachedHv: (Terminal) -> Boolean = { terminal ->
-        when (val ec = terminal.conductingEquipment) {
-            null -> false
-            is PowerTransformer -> {
-                ec.ends.any { end -> (end.baseVoltage?.nominalVoltage ?: end.ratedU ?: Int.MAX_VALUE) >= 1000 }
-            }
-            else -> {
-                ec.baseVoltage?.let { it.nominalVoltage >= 1000 } ?: false
-            }
-        }
+        terminal.conductingEquipment?.baseVoltage?.let { it.nominalVoltage >= 1000 } ?: false
     }
 
-    private fun processNormal(terminal: Terminal, isStopping: Boolean): Unit =
-        process(terminal.conductingEquipment, ConductingEquipment::addContainer, LvFeeder::addEquipment, isStopping)
+    private fun processNormal(terminal: Terminal, isStopping: Boolean) {
+        if (!isStopping || !reachedHv(terminal))
+            process(terminal.conductingEquipment, ConductingEquipment::addContainer, LvFeeder::addEquipment)
+    }
 
-    private fun processCurrent(terminal: Terminal, isStopping: Boolean): Unit =
-        process(terminal.conductingEquipment, ConductingEquipment::addCurrentContainer, LvFeeder::addCurrentEquipment, isStopping)
+    private fun processCurrent(terminal: Terminal, isStopping: Boolean) {
+        if (!isStopping || !reachedHv(terminal))
+            process(terminal.conductingEquipment, ConductingEquipment::addCurrentContainer, LvFeeder::addCurrentEquipment)
+    }
 
     private fun process(
         conductingEquipment: ConductingEquipment?,
         assignFeederToEquipment: (ConductingEquipment, LvFeeder) -> Unit,
-        assignEquipmentToFeeder: (LvFeeder, ConductingEquipment) -> Unit,
-        isStopping: Boolean
+        assignEquipmentToFeeder: (LvFeeder, ConductingEquipment) -> Unit
     ) {
         conductingEquipment?.let {
             assignFeederToEquipment(it, activeLvFeeder)

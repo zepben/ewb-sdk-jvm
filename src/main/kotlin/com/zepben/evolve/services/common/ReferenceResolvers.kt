@@ -162,11 +162,7 @@ internal object EquipmentContainerToEquipmentResolver : ReferenceResolver<Equipm
 )
 
 internal object EquipmentContainerToCurrentEquipmentResolver : ReferenceResolver<EquipmentContainer, Equipment> by KReferenceResolver(
-    EquipmentContainer::class, Equipment::class, EquipmentContainer::tryAddCurrentEquipment
-)
-
-internal object FeederToCurrentEquipmentResolver : ReferenceResolver<Feeder, Equipment> by KReferenceResolver(
-    Feeder::class, Equipment::class, Feeder::addCurrentEquipment
+    EquipmentContainer::class, Equipment::class, EquipmentContainer::addCurrentEquipment
 )
 
 internal object FeederToNormalEnergizingSubstationResolver : ReferenceResolver<Feeder, Substation> by KReferenceResolver(

@@ -8,10 +8,7 @@
 
 package com.zepben.evolve.cim.iec61970.infiec61970.feeder
 
-import com.zepben.evolve.cim.iec61970.base.core.Equipment
-import com.zepben.evolve.cim.iec61970.base.core.EquipmentContainer
-import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.validateReference
 
@@ -93,12 +90,12 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
     /**
      * Contained equipment using the current state of the network. The returned collection is read only.
      */
-    val currentEquipment: Collection<Equipment> get() = _currentEquipmentById?.values.asUnmodifiable()
+    override val currentEquipment: Collection<Equipment> get() = _currentEquipmentById?.values.asUnmodifiable()
 
     /**
      * Get the number of entries in the current [Equipment] collection.
      */
-    fun numCurrentEquipment() = _currentEquipmentById?.size ?: 0
+    override fun numCurrentEquipment() = _currentEquipmentById?.size ?: 0
 
     /**
      * Contained equipment using the current state of the network.
@@ -106,14 +103,14 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
      * @param mRID the mRID of the required current [Equipment]
      * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
      */
-    fun getCurrentEquipment(mRID: String) = _currentEquipmentById?.get(mRID)
+    override fun getCurrentEquipment(mRID: String) = _currentEquipmentById?.get(mRID)
 
     /**
      * Associate this [LvFeeder] with an [Equipment] in the current state of the network.
      *
      * @param equipment the equipment to associate with this LV feeder in the current state of the network.
      */
-    fun addCurrentEquipment(equipment: Equipment): LvFeeder {
+    override fun addCurrentEquipment(equipment: Equipment): LvFeeder {
         if (validateReference(equipment, ::getCurrentEquipment, "A current Equipment"))
             return this
 
@@ -128,7 +125,7 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
      *
      * @param equipment the equipment to disassociate with this LV feeder in the current state of the network.
      */
-    fun removeCurrentEquipment(equipment: Equipment?): Boolean {
+    override fun removeCurrentEquipment(equipment: Equipment?): Boolean {
         val ret = _currentEquipmentById?.remove(equipment?.mRID)
         if (_currentEquipmentById.isNullOrEmpty()) _currentEquipmentById = null
         return ret != null
@@ -137,7 +134,7 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
     /**
      * Clear all [Equipment] associated with this [LvFeeder].
      */
-    fun clearCurrentEquipment(): LvFeeder {
+    override fun clearCurrentEquipment(): LvFeeder {
         _currentEquipmentById = null
         return this
     }

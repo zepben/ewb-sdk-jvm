@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.services.network.tracing.feeder
 
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
@@ -15,7 +16,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 
 /**
- * Convenience class that provides methods for assigning feeders on a [NetworkService].
+ * Convenience class that provides methods for assigning HV/MV feeders on a [NetworkService].
  * Requires that a Feeder have a normalHeadTerminal with associated ConductingEquipment.
  * This class is backed by a [BasicTraversal].
  */
@@ -31,7 +32,7 @@ class AssignToFeeders {
     }
 
     fun run(network: NetworkService) {
-        val feederStartPoints = network.sequenceOf(Feeder::class)
+        val feederStartPoints = network.sequenceOf<Feeder>()
             .mapNotNull { it.normalHeadTerminal }
             .mapNotNull { it.conductingEquipment }
             .toSet()
@@ -65,6 +66,7 @@ class AssignToFeeders {
         traversal.clearStopConditions()
         traversal.addStopCondition(reachedEquipment(feederStartPoints))
         traversal.addStopCondition(reachedSubstationTransformer)
+        traversal.addStopCondition(reachedLv)
     }
 
     private val reachedEquipment: (Set<ConductingEquipment>) -> (Terminal) -> Boolean = { { terminal: Terminal -> it.contains(terminal.conductingEquipment) } }
@@ -74,21 +76,25 @@ class AssignToFeeders {
         ce is PowerTransformer && ce.substations.isNotEmpty()
     }
 
-    private fun processNormal(terminal: Terminal, isStopping: Boolean): Unit =
-        process(terminal.conductingEquipment, ConductingEquipment::addContainer, Feeder::addEquipment, isStopping)
+    private val reachedLv: (Terminal) -> Boolean = { terminal ->
+        terminal.conductingEquipment?.baseVoltage?.let { it.nominalVoltage < 1000 } ?: false
+    }
 
-    private fun processCurrent(terminal: Terminal, isStopping: Boolean): Unit =
-        process(terminal.conductingEquipment, ConductingEquipment::addCurrentContainer, Feeder::addCurrentEquipment, isStopping)
+    private fun processNormal(terminal: Terminal, isStopping: Boolean) {
+        if (!isStopping || !reachedLv(terminal) && !reachedSubstationTransformer(terminal))
+            process(terminal.conductingEquipment, ConductingEquipment::addContainer, Feeder::addEquipment)
+    }
+
+    private fun processCurrent(terminal: Terminal, isStopping: Boolean) {
+        if (!isStopping || !reachedLv(terminal) && !reachedSubstationTransformer(terminal))
+            process(terminal.conductingEquipment, ConductingEquipment::addCurrentContainer, Feeder::addCurrentEquipment)
+    }
 
     private fun process(
         conductingEquipment: ConductingEquipment?,
         assignFeederToEquipment: (ConductingEquipment, Feeder) -> Unit,
         assignEquipmentToFeeder: (Feeder, ConductingEquipment) -> Unit,
-        isStopping: Boolean
     ) {
-        if (isStopping && conductingEquipment is PowerTransformer)
-            return
-
         conductingEquipment?.let {
             assignFeederToEquipment(it, activeFeeder)
             assignEquipmentToFeeder(activeFeeder, it)

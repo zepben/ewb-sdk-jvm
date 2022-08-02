@@ -22,6 +22,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
+import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
@@ -47,7 +48,8 @@ class DatabaseReader @JvmOverloads constructor(
     private val setDirection: SetDirection = Tracing.setDirection(),
     private val setPhases: SetPhases = Tracing.setPhases(),
     private val phaseInferrer: PhaseInferrer = Tracing.phaseInferrer(),
-    private val assignToFeeders: AssignToFeeders = Tracing.assignEquipmentContainersToFeeders()
+    private val assignToFeeders: AssignToFeeders = Tracing.assignEquipmentContainersToFeeders(),
+    private val assignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentContainersToLvFeeders()
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -130,6 +132,10 @@ class DatabaseReader @JvmOverloads constructor(
         logger.info("Assigning equipment to feeders...")
         assignToFeeders.run(networkService)
         logger.info("Equipment assigned to feeders.")
+
+        logger.info("Assigning equipment to LV feeders...")
+        assignToLvFeeders.run(networkService)
+        logger.info("Equipment assigned to LV feeders.")
 
         logger.info("Validating primary sources vs feeders...")
         validateSources(networkService)

@@ -13,6 +13,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
 
 /**
  * A modeling construct to provide a root class for containing equipment.
+ * Unless overridden, all functions operating on currentEquipment simply operate on the equipment collection. i.e. currentEquipment = equipment
  */
 abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer(mRID) {
 
@@ -111,15 +112,35 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     }
 
     /**
-     * Convenience function to add an equipment in the current network state. Works if this is a [Feeder] or an [LvFeeder].
-     * TODO: This is kinda hack-y, and is caused by the fact that Equipment::currentContainers can contain any type of
-     *       EquipmentContainer but only Feeder and LvFeeder have currentEquipment.
+     * Contained equipment using the current state of the network. The returned collection is read only.
      */
-    fun tryAddCurrentEquipment(equipment: Equipment): EquipmentContainer {
-        when (this) {
-            is Feeder -> addCurrentEquipment(equipment)
-            is LvFeeder -> addCurrentEquipment(equipment)
-        }
-        return this
-    }
+    open val currentEquipment: Collection<Equipment> get() = equipment
+
+    /**
+     * Get the number of entries in the current [Equipment] collection.
+     */
+    open fun numCurrentEquipment(): Int = numEquipment()
+
+    /**
+     * Contained equipment using the current state of the network.
+     *
+     * @param mRID the mRID of the required current [Equipment]
+     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
+     */
+    open fun getCurrentEquipment(mRID: String): Equipment? = getEquipment(mRID)
+
+    /**
+     * @param equipment the equipment to associate with this equipment container in the current state of the network.
+     */
+    open fun addCurrentEquipment(equipment: Equipment): EquipmentContainer = addEquipment(equipment)
+
+    /**
+     * @param equipment the equipment to disassociate from this equipment container in the current state of the network.
+     */
+    open fun removeCurrentEquipment(equipment: Equipment?): Boolean = removeEquipment(equipment)
+
+    /**
+     * Clear all Equipment associated with this [Feeder]
+     */
+    open fun clearCurrentEquipment(): EquipmentContainer = clearEquipment()
 }

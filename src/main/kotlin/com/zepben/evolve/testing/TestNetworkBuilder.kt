@@ -13,8 +13,10 @@ import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
+import org.junit.jupiter.api.Test
 
 /**
  * A class for building simple test networks, often used for unit testing.
@@ -295,7 +297,7 @@ open class TestNetworkBuilder {
     }
 
     /**
-     * Create a new feeder with the specified terminal as the head terminal.
+     * Create a new HV/MV feeder with the specified terminal as the head terminal.
      *
      * @param headMrid The mRID of the head [ConductingEquipment].
      * @param sequenceNumber The [Terminal] sequence number of the head terminal. Defaults to last terminal.
@@ -305,6 +307,19 @@ open class TestNetworkBuilder {
     @JvmOverloads
     fun addFeeder(headMrid: String, sequenceNumber: Int? = null): TestNetworkBuilder {
         network.createFeeder(network[headMrid]!!, sequenceNumber)
+        return this
+    }
+
+    /**
+     * Create a new LV feeder with the specified terminal as the head terminal.
+     *
+     * @param headMrid The mRID of the head [ConductingEquipment].
+     * @param sequenceNumber The [Terminal] sequence number of the head terminal. Defaults to last terminal.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    fun addLvFeeder(headMrid: String, sequenceNumber: Int? = null): TestNetworkBuilder {
+        network.createLvFeeder(network[headMrid]!!, sequenceNumber)
         return this
     }
 
@@ -402,6 +417,18 @@ open class TestNetworkBuilder {
     private fun NetworkService.createFeeder(headEquipment: ConductingEquipment, sequenceNumber: Int?) =
         nextId("fdr").let { id ->
             Feeder(id).apply {
+                normalHeadTerminal = headEquipment.getTerminal(sequenceNumber ?: headEquipment.numTerminals())!!
+
+                addEquipment(headEquipment)
+            }.also {
+                headEquipment.addContainer(it)
+                add(it)
+            }
+        }
+
+    private fun NetworkService.createLvFeeder(headEquipment: ConductingEquipment, sequenceNumber: Int?) =
+        nextId("lvf").let { id ->
+            LvFeeder(id).apply {
                 normalHeadTerminal = headEquipment.getTerminal(sequenceNumber ?: headEquipment.numTerminals())!!
 
                 addEquipment(headEquipment)

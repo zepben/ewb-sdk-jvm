@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
@@ -98,6 +99,14 @@ class AssignToFeedersTest {
         Tracing.assignEquipmentContainersToFeeders().run(network)
 
         validateEquipment(feeder.equipment, "fcb", "acls1", "acls2", "acls3", "iso", "acls4", "tx")
+    }
+
+    @Test
+    fun stopsAtLvEquipment() {
+        val network = HvLvNetwork.create()
+        val feeder: Feeder = network["fdr12"]!!
+        Tracing.assignEquipmentContainersToFeeders().run(network)
+        validateEquipment(feeder.equipment, "b0", "c1", "j2", "c4", "j5", "c6", "tx7", "c9", "tx10")
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

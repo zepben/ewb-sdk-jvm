@@ -112,49 +112,6 @@ class AssignToFeedersTest {
         validateEquipment(feeder.equipment, "b0", "c1", "c3", "c4", "tx5", "c7", "tx8")
     }
 
-    @Test
-    fun ignoresNonHeadEquipmentForLvFeeders() {
-        val network = HvLvFeederIntersectionNetwork.create()
-        val feeder: Feeder = network["fdr5"]!!
-        val lvFeeder: LvFeeder = network["lvf6"]!!
-
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
-        Tracing.assignEquipmentContainersToFeeders().run(network)
-
-        assertThat(feeder.normalEnergizedLvFeeders, empty())
-        assertThat(lvFeeder.normalEnergizingFeeders, empty())
-    }
-
-    @Test
-    fun singleFeederPowersMultipleLvFeeders() {
-        val network = OneFeederToManyLvFeedersNetwork.create()
-        val feeder: Feeder = network["fdr8"]!!
-        val lvFeeder1: LvFeeder = network["lvf9"]!!
-        val lvFeeder2: LvFeeder = network["lvf10"]!!
-
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
-        Tracing.assignEquipmentContainersToFeeders().run(network)
-
-        assertThat(feeder.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder1, lvFeeder2))
-        assertThat(lvFeeder1.normalEnergizingFeeders, containsInAnyOrder(feeder))
-        assertThat(lvFeeder2.normalEnergizingFeeders, containsInAnyOrder(feeder))
-    }
-
-    @Test
-    fun multipleFeedersPowerSingleLvFeeder() {
-        val network = ManyFeedersToOneLvFeederNetwork.create()
-        val feeder1: Feeder = network["fdr7"]!!
-        val feeder2: Feeder = network["fdr8"]!!
-        val lvFeeder: LvFeeder = network["lvf9"]!!
-
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
-        Tracing.assignEquipmentContainersToFeeders().run(network)
-
-        assertThat(feeder1.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
-        assertThat(feeder2.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
-        assertThat(lvFeeder.normalEnergizingFeeders, containsInAnyOrder(feeder1, feeder2))
-    }
-
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {
         assertThat(equipment.map { it.mRID }.toList(), containsInAnyOrder(*expectedMRIDs))
     }

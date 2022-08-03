@@ -32,8 +32,14 @@ class AssignToLvFeeders {
 
     fun run(network: NetworkService) {
         val lvFeederStartPoints = network.sequenceOf(LvFeeder::class)
-            .mapNotNull { it.normalHeadTerminal }
-            .mapNotNull { it.conductingEquipment }
+            .mapNotNull { lvFeeder ->
+                lvFeeder.normalHeadTerminal?.conductingEquipment.also { headEquipment ->
+                    headEquipment?.normalFeeders?.forEach { feeder ->
+                        feeder.addNormalEnergizedLvFeeder(lvFeeder)
+                        lvFeeder.addNormalEnergizingFeeder(feeder)
+                    }
+                }
+            }
             .toSet()
 
         configureStopConditions(normalTraversal, lvFeederStartPoints)

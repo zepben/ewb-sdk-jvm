@@ -11,6 +11,7 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 
@@ -81,25 +82,23 @@ class AssignToFeeders {
 
     private fun processNormal(terminal: Terminal, isStopping: Boolean) {
         if (!isStopping || !reachedLv(terminal) && !reachedSubstationTransformer(terminal))
-            terminal.conductingEquipment?.let { ce ->
-                ce.addContainer(activeFeeder)
-                activeFeeder.addEquipment(ce)
-
-                ce.normalLvFeeders
-                    .filter { it.normalHeadTerminal?.conductingEquipment == ce }
-                    .forEach { lvFeeder ->
-                        lvFeeder.addNormalEnergizingFeeder(activeFeeder)
-                        activeFeeder.addNormalEnergizedLvFeeder(lvFeeder)
-                    }
-            }
+            process(terminal.conductingEquipment, ConductingEquipment::addContainer, Feeder::addEquipment)
     }
 
     private fun processCurrent(terminal: Terminal, isStopping: Boolean) {
         if (!isStopping || !reachedLv(terminal) && !reachedSubstationTransformer(terminal))
-            terminal.conductingEquipment?.let { ce ->
-                ce.addCurrentContainer(activeFeeder)
-                activeFeeder.addCurrentEquipment(ce)
-            }
+            process(terminal.conductingEquipment, ConductingEquipment::addCurrentContainer, Feeder::addCurrentEquipment)
+    }
+
+    private fun process(
+        conductingEquipment: ConductingEquipment?,
+        assignFeederToEquipment: (ConductingEquipment, Feeder) -> Unit,
+        assignEquipmentToFeeder: (Feeder, ConductingEquipment) -> Unit
+    ) {
+        conductingEquipment?.let {
+            assignFeederToEquipment(it, activeFeeder)
+            assignEquipmentToFeeder(activeFeeder, it)
+        }
     }
 
 }

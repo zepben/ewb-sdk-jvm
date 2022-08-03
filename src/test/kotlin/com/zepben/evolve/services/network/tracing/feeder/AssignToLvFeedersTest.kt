@@ -15,6 +15,7 @@ import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -97,6 +98,49 @@ class AssignToLvFeedersTest {
         val lvFeeder: LvFeeder = network["lvf11"]!!
         Tracing.assignEquipmentContainersToLvFeeders().run(network)
         validateEquipment(lvFeeder.equipment, "b0", "c1", "c3", "c4", "tx5", "c7", "tx8")
+    }
+
+    @Test
+    fun onlyPoweredViaHeadEquipment() {
+        val network = HvLvFeederIntersectionNetwork.create()
+        val feeder: Feeder = network["fdr5"]!!
+        val lvFeeder: LvFeeder = network["lvf6"]!!
+
+        Tracing.assignEquipmentContainersToFeeders().run(network)
+        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+
+        assertThat(feeder.normalEnergizedLvFeeders, Matchers.empty())
+        assertThat(lvFeeder.normalEnergizingFeeders, Matchers.empty())
+    }
+
+    @Test
+    fun singleFeederPowersMultipleLvFeeders() {
+        val network = OneFeederToManyLvFeedersNetwork.create()
+        val feeder: Feeder = network["fdr8"]!!
+        val lvFeeder1: LvFeeder = network["lvf9"]!!
+        val lvFeeder2: LvFeeder = network["lvf10"]!!
+
+        Tracing.assignEquipmentContainersToFeeders().run(network)
+        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+
+        assertThat(feeder.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder1, lvFeeder2))
+        assertThat(lvFeeder1.normalEnergizingFeeders, containsInAnyOrder(feeder))
+        assertThat(lvFeeder2.normalEnergizingFeeders, containsInAnyOrder(feeder))
+    }
+
+    @Test
+    fun multipleFeedersPowerSingleLvFeeder() {
+        val network = ManyFeedersToOneLvFeederNetwork.create()
+        val feeder1: Feeder = network["fdr7"]!!
+        val feeder2: Feeder = network["fdr8"]!!
+        val lvFeeder: LvFeeder = network["lvf9"]!!
+
+        Tracing.assignEquipmentContainersToFeeders().run(network)
+        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+
+        assertThat(feeder1.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
+        assertThat(feeder2.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
+        assertThat(lvFeeder.normalEnergizingFeeders, containsInAnyOrder(feeder1, feeder2))
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

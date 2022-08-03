@@ -321,6 +321,9 @@ open class TestNetworkBuilder {
 
         if (applyDirectionsFromSources)
             network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach { Tracing.setDirection().run(it) }
+
+        Tracing.assignEquipmentContainersToFeeders().run(network)
+
         return network
     }
 

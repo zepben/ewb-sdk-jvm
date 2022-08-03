@@ -10,8 +10,8 @@ package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
-import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 
 internal class PhaseStepTrackerTest {
@@ -80,4 +80,5 @@ internal class PhaseStepTrackerTest {
         assertThat("hasVisited returns false for same phases on different equipment", not(tracker.hasVisited(phaseStep2)))
         assertThat("Visiting same phases on different equipment returns true", tracker.visit(phaseStep2))
     }
+
 }

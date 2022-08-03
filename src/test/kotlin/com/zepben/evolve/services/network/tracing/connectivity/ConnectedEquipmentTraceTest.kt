@@ -1,19 +1,20 @@
 /*
- * Copyright 2021 Zeppelin Bend Pty Ltd
+ * Copyright 2022 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network.tracing
+package com.zepben.evolve.services.network.tracing.connectivity
 
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.network.testdata.ConnectedEquipmentNetwork
+import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.instanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -40,9 +41,16 @@ internal class ConnectedEquipmentTraceTest {
         validateRun(Tracing.currentConnectedEquipmentTrace(), "start", "s1", "s2", "s3")
     }
 
-    private fun validateRun(t: BasicTraversal<ConductingEquipment>, vararg expected: String) {
-        t.addStepAction { ce, _ -> visited.add(ce.mRID) }
-            .run(ConnectedEquipmentNetwork.create()["start"]!!)
+    @Test
+    internal fun limitedTraceCoverage() {
+        // These traces are implemented and tested in a separate class, so just do a simple type check coverage test.
+        assertThat(Tracing.normalLimitedConnectedEquipmentTrace(), instanceOf(LimitedConnectedEquipmentTrace::class.java))
+        assertThat(Tracing.currentLimitedConnectedEquipmentTrace(), instanceOf(LimitedConnectedEquipmentTrace::class.java))
+    }
+
+    private fun validateRun(t: BasicTraversal<ConductingEquipmentStep>, vararg expected: String) {
+        t.addStepAction { (ce, _), _ -> visited.add(ce.mRID) }
+            .run(ConductingEquipmentStep(ConnectedEquipmentNetwork.create()["start"]!!))
 
         assertThat(visited, containsInAnyOrder(*expected))
     }

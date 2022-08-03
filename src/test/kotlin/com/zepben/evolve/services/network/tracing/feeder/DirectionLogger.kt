@@ -10,10 +10,11 @@ package com.zepben.evolve.services.network.tracing.feeder
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.tracing.connectivity.ConductingEquipmentStep
 import org.slf4j.LoggerFactory
 
 // Logs all the feeder directions of assets and terminals. Useful for debugging.
-internal class DirectionLogger private constructor(asset: ConductingEquipment) : (ConductingEquipment, Boolean?) -> Unit {
+internal class DirectionLogger private constructor(asset: ConductingEquipment) : (ConductingEquipmentStep, Boolean?) -> Unit {
 
     private val b: StringBuilder = StringBuilder()
         .append("\n###############################")
@@ -21,9 +22,9 @@ internal class DirectionLogger private constructor(asset: ConductingEquipment) :
         .append("\n")
         .append("\n")
 
-    override fun invoke(a: ConductingEquipment, isStopping: Boolean?) {
-        a.terminals.forEach { t ->
-            b.append("${a.mRID}-T${t.sequenceNumber}: ")
+    override fun invoke(a: ConductingEquipmentStep, isStopping: Boolean?) {
+        a.conductingEquipment.terminals.forEach { t ->
+            b.append("${a.conductingEquipment.mRID}-T${t.sequenceNumber}: ")
 
             val n = t.normalFeederDirection
             val c = t.currentFeederDirection
@@ -58,8 +59,7 @@ internal class DirectionLogger private constructor(asset: ConductingEquipment) :
             assets.forEach { asset ->
                 val pl = DirectionLogger(asset!!)
 
-                Tracing.connectedEquipmentTrace()
-                    .addStepAction(pl)
+                Tracing.connectedEquipmentTrace().apply { addStepAction(pl) }
                     .run(asset)
 
                 pl.log()

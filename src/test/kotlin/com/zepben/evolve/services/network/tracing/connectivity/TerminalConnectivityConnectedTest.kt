@@ -16,8 +16,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.Matchers.empty
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
@@ -29,6 +28,7 @@ internal class TerminalConnectivityConnectedTest {
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
     val networkService = NetworkService()
+    val connectivity = TerminalConnectivityConnected()
 
     @Test
     internal fun straightConnections() {
@@ -78,15 +78,15 @@ internal class TerminalConnectivityConnectedTest {
         }
 
         createConnectedTerminals(PhaseCode.XYN, PhaseCode.BCN, PhaseCode.ABCN).also { (t1, t2, t3) ->
-            validateConnection(t1, listOf(listOf(SPK.B, SPK.C, SPK.N), listOf(SPK.B, SPK.C, SPK.N)))
-            validateConnection(t2, listOf(listOf(SPK.X, SPK.Y, SPK.N), listOf(SPK.B, SPK.C, SPK.N)))
-            validateConnection(t3, listOf(listOf(SPK.NONE, SPK.X, SPK.Y, SPK.N), listOf(SPK.NONE, SPK.B, SPK.C, SPK.N)))
+            validateConnection(t1, listOf(t2 to listOf(SPK.B, SPK.C, SPK.N), t3 to listOf(SPK.B, SPK.C, SPK.N)))
+            validateConnection(t2, listOf(t1 to listOf(SPK.X, SPK.Y, SPK.N), t3 to listOf(SPK.B, SPK.C, SPK.N)))
+            validateConnection(t3, listOf(t1 to listOf(SPK.NONE, SPK.X, SPK.Y, SPK.N), t2 to listOf(SPK.NONE, SPK.B, SPK.C, SPK.N)))
         }
 
         createConnectedTerminals(PhaseCode.XYN, PhaseCode.YN, PhaseCode.ABCN).also { (t1, t2, t3) ->
-            validateConnection(t1, listOf(listOf(SPK.NONE, SPK.Y, SPK.N), listOf(SPK.A, SPK.C, SPK.N)))
-            validateConnection(t2, listOf(listOf(SPK.Y, SPK.N), listOf(SPK.C, SPK.N)))
-            validateConnection(t3, listOf(listOf(SPK.X, SPK.NONE, SPK.Y, SPK.N), listOf(SPK.NONE, SPK.NONE, SPK.Y, SPK.N)))
+            validateConnection(t1, listOf(t2 to listOf(SPK.NONE, SPK.Y, SPK.N), t3 to listOf(SPK.A, SPK.C, SPK.N)))
+            validateConnection(t2, listOf(t1 to listOf(SPK.Y, SPK.N), t3 to listOf(SPK.C, SPK.N)))
+            validateConnection(t3, listOf(t1 to listOf(SPK.X, SPK.NONE, SPK.Y, SPK.N), t2 to listOf(SPK.NONE, SPK.NONE, SPK.Y, SPK.N)))
         }
     }
 
@@ -113,9 +113,9 @@ internal class TerminalConnectivityConnectedTest {
         }
 
         createConnectedTerminals(PhaseCode.XN, PhaseCode.BN, PhaseCode.ABCN).also { (t1, t2, t3) ->
-            validateConnection(t1, listOf(listOf(SPK.B, SPK.N), listOf(SPK.B, SPK.N)))
-            validateConnection(t2, listOf(listOf(SPK.X, SPK.N), listOf(SPK.B, SPK.N)))
-            validateConnection(t3, listOf(listOf(SPK.NONE, SPK.X, SPK.NONE, SPK.N), listOf(SPK.NONE, SPK.B, SPK.NONE, SPK.N)))
+            validateConnection(t1, listOf(t2 to listOf(SPK.B, SPK.N), t3 to listOf(SPK.B, SPK.N)))
+            validateConnection(t2, listOf(t1 to listOf(SPK.X, SPK.N), t3 to listOf(SPK.B, SPK.N)))
+            validateConnection(t3, listOf(t1 to listOf(SPK.NONE, SPK.X, SPK.NONE, SPK.N), t2 to listOf(SPK.NONE, SPK.B, SPK.NONE, SPK.N)))
         }
     }
 
@@ -138,30 +138,30 @@ internal class TerminalConnectivityConnectedTest {
         }
 
         createConnectedTerminals(PhaseCode.YN, PhaseCode.AN, PhaseCode.ABCN).also { (t1, t2, t3) ->
-            validateConnection(t1, listOf(listOf(SPK.NONE, SPK.N), listOf(SPK.C, SPK.N)))
-            validateConnection(t2, listOf(listOf(SPK.NONE, SPK.N), listOf(SPK.A, SPK.N)))
-            validateConnection(t3, listOf(listOf(SPK.NONE, SPK.NONE, SPK.Y, SPK.N), listOf(SPK.A, SPK.NONE, SPK.NONE, SPK.N)))
+            validateConnection(t1, listOf(t2 to listOf(SPK.NONE, SPK.N), t3 to listOf(SPK.C, SPK.N)))
+            validateConnection(t2, listOf(t1 to listOf(SPK.NONE, SPK.N), t3 to listOf(SPK.A, SPK.N)))
+            validateConnection(t3, listOf(t1 to listOf(SPK.NONE, SPK.NONE, SPK.Y, SPK.N), t2 to listOf(SPK.A, SPK.NONE, SPK.NONE, SPK.N)))
         }
     }
 
     @Test
     internal fun singlePhaseXyPriorityConnectivity() {
         createConnectedTerminals(PhaseCode.X, PhaseCode.Y, PhaseCode.A).also { (t1, t2, t3) ->
-            validateConnection(t1, listOf(listOf(SPK.NONE), listOf(SPK.A)))
-            validateConnection(t2, listOf(listOf(SPK.NONE), listOf(SPK.NONE)))
-            validateConnection(t3, listOf(listOf(SPK.X), listOf(SPK.NONE)))
+            validateConnection(t1, listOf(t3 to listOf(SPK.A)))
+            validateConnection(t2)
+            validateConnection(t3, listOf(t1 to listOf(SPK.X)))
         }
 
         createConnectedTerminals(PhaseCode.X, PhaseCode.Y, PhaseCode.B).also { (t1, t2, t3) ->
-            validateConnection(t1, listOf(listOf(SPK.NONE), listOf(SPK.B)))
-            validateConnection(t2, listOf(listOf(SPK.NONE), listOf(SPK.NONE)))
-            validateConnection(t3, listOf(listOf(SPK.X), listOf(SPK.NONE)))
+            validateConnection(t1, listOf(t3 to listOf(SPK.B)))
+            validateConnection(t2)
+            validateConnection(t3, listOf(t1 to listOf(SPK.X)))
         }
 
         createConnectedTerminals(PhaseCode.X, PhaseCode.Y, PhaseCode.C).also { (t1, t2, t3) ->
-            validateConnection(t1, listOf(listOf(SPK.NONE), listOf(SPK.C)))
-            validateConnection(t2, listOf(listOf(SPK.NONE), listOf(SPK.NONE)))
-            validateConnection(t3, listOf(listOf(SPK.X), listOf(SPK.NONE)))
+            validateConnection(t1, listOf(t3 to listOf(SPK.C)))
+            validateConnection(t2)
+            validateConnection(t3, listOf(t1 to listOf(SPK.X)))
         }
     }
 
@@ -173,6 +173,7 @@ internal class TerminalConnectivityConnectedTest {
 
             validateConnection(t11, SPK.A, SPK.B, SPK.N)
             validateConnection(t12, SPK.X, SPK.Y, SPK.N)
+
             validateConnection(t21, SPK.A, SPK.B, SPK.N)
             validateConnection(t22, SPK.X, SPK.Y, SPK.NONE, SPK.N)
         }
@@ -183,6 +184,7 @@ internal class TerminalConnectivityConnectedTest {
 
             validateConnection(t11, SPK.A, SPK.C, SPK.N)
             validateConnection(t12, SPK.X, SPK.Y, SPK.N)
+
             validateConnection(t21, SPK.A, SPK.C, SPK.N)
             validateConnection(t22, SPK.X, SPK.NONE, SPK.Y, SPK.N)
         }
@@ -193,6 +195,7 @@ internal class TerminalConnectivityConnectedTest {
 
             validateConnection(t11, SPK.B, SPK.C, SPK.N)
             validateConnection(t12, SPK.X, SPK.Y, SPK.N)
+
             validateConnection(t21, SPK.B, SPK.C, SPK.N)
             validateConnection(t22, SPK.NONE, SPK.X, SPK.Y, SPK.N)
         }
@@ -203,30 +206,39 @@ internal class TerminalConnectivityConnectedTest {
 
             validateConnection(t11, SPK.B, SPK.C, SPK.N)
             validateConnection(t12, SPK.X, SPK.Y, SPK.N)
-            validateConnection(t21, listOf(listOf(SPK.B, SPK.C, SPK.N), listOf(SPK.B, SPK.NONE, SPK.N)))
-            validateConnection(t22, listOf(listOf(SPK.NONE, SPK.X, SPK.Y, SPK.N), listOf(SPK.A, SPK.B, SPK.NONE, SPK.N)))
-            validateConnection(t23, listOf(listOf(SPK.NONE, SPK.X, SPK.N), listOf(SPK.A, SPK.B, SPK.N)))
+
+            validateConnection(t21, listOf(t22 to listOf(SPK.B, SPK.C, SPK.N), t23 to listOf(SPK.B, SPK.NONE, SPK.N)))
+            validateConnection(t22, listOf(t21 to listOf(SPK.NONE, SPK.X, SPK.Y, SPK.N), t23 to listOf(SPK.A, SPK.B, SPK.NONE, SPK.N)))
+            validateConnection(t23, listOf(t21 to listOf(SPK.NONE, SPK.X, SPK.N), t22 to listOf(SPK.A, SPK.B, SPK.N)))
         }
     }
 
     @Test
     internal fun xyToSplitConnectivity() {
         createConnectedTerminals(PhaseCode.XY, PhaseCode.A, PhaseCode.B).also { (t1, t2, t3) ->
-            validateConnection(t1, listOf(listOf(SPK.A, SPK.NONE), listOf(SPK.NONE, SPK.B)))
-            validateConnection(t2, listOf(listOf(SPK.X), listOf(SPK.NONE)))
-            validateConnection(t3, listOf(listOf(SPK.NONE), listOf(SPK.Y)))
+            validateConnection(t1, listOf(t2 to listOf(SPK.A, SPK.NONE), t3 to listOf(SPK.NONE, SPK.B)))
+            validateConnection(t2, listOf(t1 to listOf(SPK.X)))
+            validateConnection(t3, listOf(t1 to listOf(SPK.Y)))
         }
 
         createConnectedTerminals(PhaseCode.XY, PhaseCode.A, PhaseCode.C).also { (t1, t2, t3) ->
-            validateConnection(t1, listOf(listOf(SPK.A, SPK.NONE), listOf(SPK.NONE, SPK.C)))
-            validateConnection(t2, listOf(listOf(SPK.X), listOf(SPK.NONE)))
-            validateConnection(t3, listOf(listOf(SPK.NONE), listOf(SPK.Y)))
+            validateConnection(t1, listOf(t2 to listOf(SPK.A, SPK.NONE), t3 to listOf(SPK.NONE, SPK.C)))
+            validateConnection(t2, listOf(t1 to listOf(SPK.X)))
+            validateConnection(t3, listOf(t1 to listOf(SPK.Y)))
         }
 
         createConnectedTerminals(PhaseCode.XY, PhaseCode.B, PhaseCode.C).also { (t1, t2, t3) ->
-            validateConnection(t1, listOf(listOf(SPK.B, SPK.NONE), listOf(SPK.NONE, SPK.C)))
-            validateConnection(t2, listOf(listOf(SPK.X), listOf(SPK.NONE)))
-            validateConnection(t3, listOf(listOf(SPK.NONE), listOf(SPK.Y)))
+            validateConnection(t1, listOf(t2 to listOf(SPK.B, SPK.NONE), t3 to listOf(SPK.NONE, SPK.C)))
+            validateConnection(t2, listOf(t1 to listOf(SPK.X)))
+            validateConnection(t3, listOf(t1 to listOf(SPK.Y)))
+        }
+    }
+
+    @Test
+    internal fun secondaryPhasesAreNotConnected() {
+        createConnectedTerminals(PhaseCode.s1, PhaseCode.s1).also { (t1, t2) ->
+            validateConnection(t1)
+            validateConnection(t2)
         }
     }
 
@@ -255,23 +267,23 @@ internal class TerminalConnectivityConnectedTest {
             .filter { it.to != SPK.NONE }
 
         if (expected.isNotEmpty())
-            assertThat(NetworkService.connectedTerminals(t)[0].nominalPhasePaths, containsInAnyOrder(*expected.toTypedArray()))
+            assertThat(connectivity.connectedTerminals(t)[0].nominalPhasePaths, containsInAnyOrder(*expected.toTypedArray()))
         else
-            assertThat(NetworkService.connectedTerminals(t), empty())
+            assertThat(connectivity.connectedTerminals(t), empty())
     }
 
-    private fun validateConnection(t: Terminal, expectedPhases: List<List<SPK>>) {
-        val expected = expectedPhases.map { phases ->
-            phases
-                .mapIndexed { index, phase -> NominalPhasePath(t.phases.singlePhases[index], phase) }
-                .filter { it.to != SPK.NONE }
-        }.filter { it.isNotEmpty() }
+    private fun validateConnection(t: Terminal, expectedPhases: List<Pair<Terminal, List<SPK>>>) {
+        val connected = connectivity.connectedTerminals(t).associateBy { it.toTerminal }
 
-        expected.forEachIndexed { crIndex, phases ->
-            if (phases.isNotEmpty())
-                assertThat(NetworkService.connectedTerminals(t)[crIndex].nominalPhasePaths, containsInAnyOrder(*phases.toTypedArray()))
-            else
-                assertThat(NetworkService.connectedTerminals(t), empty())
+        assertThat(connected.size, equalTo(expectedPhases.size))
+        expectedPhases.forEach { (toTerminal, phases) ->
+            assertThat(
+                connected[toTerminal]!!.nominalPhasePaths,
+                containsInAnyOrder(*phases
+                    .mapIndexed { index, phase -> NominalPhasePath(t.phases.singlePhases[index], phase) }
+                    .filter { it.to != SPK.NONE }
+                    .toTypedArray())
+            )
         }
     }
 

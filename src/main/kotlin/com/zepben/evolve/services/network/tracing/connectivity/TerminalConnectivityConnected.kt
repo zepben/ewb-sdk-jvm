@@ -20,12 +20,11 @@ class TerminalConnectivityConnected @JvmOverloads constructor(
     private val createCandidatePhases: () -> XyCandidatePhasePaths = { XyCandidatePhasePaths() }
 ) {
 
-    fun connectedTerminals(terminal: Terminal, phaseCode: PhaseCode): List<ConnectivityResult> {
-        return connectedTerminals(terminal, phaseCode.singlePhases)
-    }
-
     @JvmOverloads
-    fun connectedTerminals(terminal: Terminal, phases: Iterable<SPK> = terminal.phases.singlePhases): List<ConnectivityResult> {
+    fun connectedTerminals(terminal: Terminal, phaseCode: PhaseCode = terminal.phases): List<ConnectivityResult> =
+        connectedTerminals(terminal, phaseCode.singlePhases)
+
+    fun connectedTerminals(terminal: Terminal, phases: Iterable<SPK>): List<ConnectivityResult> {
         val includePhases = phases.intersect(terminal.phases.singlePhases.toSet())
         val connectivityNode = terminal.connectivityNode ?: return emptyList()
 
@@ -49,8 +48,7 @@ class TerminalConnectivityConnected @JvmOverloads constructor(
             terminal,
             connectedTerminal,
             (findStraightPhasePaths(terminal, connectedTerminal)
-                ?: findXyPhasePaths(terminal, connectedTerminal)
-                ?: emptyList())
+                ?: findXyPhasePaths(terminal, connectedTerminal))
                 .filter { it.from in includePhases }
                 .filter { it.to in connectedTerminal.phases }
         )
@@ -58,12 +56,8 @@ class TerminalConnectivityConnected @JvmOverloads constructor(
     private fun findStraightPhasePaths(terminal: Terminal, connectedTerminal: Terminal): Collection<NominalPhasePath>? =
         straightPhaseConnectivity[terminal.phases]?.get(connectedTerminal.phases)
 
-    private fun findXyPhasePaths(terminal: Terminal, connectedTerminal: Terminal): Collection<NominalPhasePath>? {
+    private fun findXyPhasePaths(terminal: Terminal, connectedTerminal: Terminal): Collection<NominalPhasePath> {
         val xyPhases = terminal.findXyPhases()
-        val connectedXyPhases = connectedTerminal.findXyPhases()
-
-        if ((xyPhases.isNone() && connectedXyPhases.isNone()) || (xyPhases.isNotNone() && connectedXyPhases.isNotNone()))
-            return null
 
         val nominalPhasePaths = mutableListOf<NominalPhasePath>()
         if (terminal.phases.contains(SPK.N) && connectedTerminal.phases.contains(SPK.N))
@@ -179,10 +173,6 @@ class TerminalConnectivityConnected @JvmOverloads constructor(
             PhaseCode.C, PhaseCode.CN -> PhaseCode.C
             else -> PhaseCode.NONE
         }
-
-    private fun PhaseCode.isNone(): Boolean {
-        return this == PhaseCode.NONE
-    }
 
     private fun PhaseCode.isNotNone(): Boolean {
         return this != PhaseCode.NONE

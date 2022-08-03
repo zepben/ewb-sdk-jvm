@@ -24,21 +24,21 @@ internal class ConnectedEquipmentTraceTest {
     @RegisterExtension
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
-    private val visited = mutableSetOf<String>()
+    private val network = ConnectedEquipmentNetwork.create()
 
     @Test
     internal fun connectedEquipmentTraceIgnoresOpenState() {
-        validateRun(Tracing.connectedEquipmentTrace(), "start", "s1", "s2", "n1", "s3", "s4", "n2")
+        Tracing.connectedEquipmentTrace().validateRun("start", "s1", "s2", "n1", "s3", "s4", "n2")
     }
 
     @Test
     internal fun normalConnectedEquipmentTraceUsesOpenState() {
-        validateRun(Tracing.normalConnectedEquipmentTrace(), "start", "s1", "s3", "s4")
+        Tracing.normalConnectedEquipmentTrace().validateRun("start", "s1", "s3", "s4")
     }
 
     @Test
     internal fun currentConnectedEquipmentTraceUsesOpenState() {
-        validateRun(Tracing.currentConnectedEquipmentTrace(), "start", "s1", "s2", "s3")
+        Tracing.currentConnectedEquipmentTrace().validateRun("start", "s1", "s2", "s3")
     }
 
     @Test
@@ -48,11 +48,19 @@ internal class ConnectedEquipmentTraceTest {
         assertThat(Tracing.currentLimitedConnectedEquipmentTrace(), instanceOf(LimitedConnectedEquipmentTrace::class.java))
     }
 
-    private fun validateRun(t: BasicTraversal<ConductingEquipmentStep>, vararg expected: String) {
-        t.addStepAction { (ce, _), _ -> visited.add(ce.mRID) }
-            .run(ConductingEquipmentStep(ConnectedEquipmentNetwork.create()["start"]!!))
+    @Test
+    internal fun canStartOnOpenSwitch() {
+        Tracing.normalConnectedEquipmentTrace().validateRun("s2", "n1", "s1")
+        Tracing.currentConnectedEquipmentTrace().validateRun("s4", "s3", "n2")
+    }
 
-        assertThat(visited, containsInAnyOrder(*expected))
+    private fun BasicTraversal<ConductingEquipmentStep>.validateRun(start: String, vararg expected: String) {
+        val visited = mutableSetOf<String>()
+
+        addStepAction { (ce, _), _ -> visited.add(ce.mRID) }
+            .run(ConductingEquipmentStep(network[start]!!))
+
+        assertThat(visited, containsInAnyOrder(start, *expected))
     }
 
 }

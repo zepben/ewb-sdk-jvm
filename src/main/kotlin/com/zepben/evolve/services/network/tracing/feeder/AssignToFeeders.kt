@@ -81,23 +81,25 @@ class AssignToFeeders {
 
     private fun processNormal(terminal: Terminal, isStopping: Boolean) {
         if (!isStopping || !reachedLv(terminal) && !reachedSubstationTransformer(terminal))
-            process(terminal.conductingEquipment, ConductingEquipment::addContainer, Feeder::addEquipment)
+            terminal.conductingEquipment?.let { ce ->
+                ce.addContainer(activeFeeder)
+                activeFeeder.addEquipment(ce)
+
+                ce.normalLvFeeders
+                    .filter { it.normalHeadTerminal?.conductingEquipment == ce }
+                    .forEach { lvFeeder ->
+                        lvFeeder.addNormalEnergizingFeeder(activeFeeder)
+                        activeFeeder.addNormalEnergizedLvFeeder(lvFeeder)
+                    }
+            }
     }
 
     private fun processCurrent(terminal: Terminal, isStopping: Boolean) {
         if (!isStopping || !reachedLv(terminal) && !reachedSubstationTransformer(terminal))
-            process(terminal.conductingEquipment, ConductingEquipment::addCurrentContainer, Feeder::addCurrentEquipment)
-    }
-
-    private fun process(
-        conductingEquipment: ConductingEquipment?,
-        assignFeederToEquipment: (ConductingEquipment, Feeder) -> Unit,
-        assignEquipmentToFeeder: (Feeder, ConductingEquipment) -> Unit,
-    ) {
-        conductingEquipment?.let {
-            assignFeederToEquipment(it, activeFeeder)
-            assignEquipmentToFeeder(activeFeeder, it)
-        }
+            terminal.conductingEquipment?.let { ce ->
+                ce.addCurrentContainer(activeFeeder)
+                activeFeeder.addCurrentEquipment(ce)
+            }
     }
 
 }

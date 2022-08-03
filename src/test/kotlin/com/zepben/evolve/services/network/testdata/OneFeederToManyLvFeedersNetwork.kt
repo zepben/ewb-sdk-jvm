@@ -12,52 +12,40 @@ import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.testing.TestNetworkBuilder
 
-object HvLvNetwork {
+object OneFeederToManyLvFeedersNetwork {
 
     //
     // - or |: LV line
     // = or #: HV line
     //
-    //  b0   c1   j2   c4   j5   c9  tx10  c11
-    // 1*21=====21*21=====21*21=====21*21------2
-    //   ^        3         3          ^
-    // fdr12      1         1        lvf14
-    //            |         #
-    //         c3 |      c6 #
-    //            |         #
-    //            2         2
-    //                      1    c8
-    //                  tx7 *21-----2
-    //                       ^
-    //                     lvf13
+    //      c1     c2         c4
+    // b0 ======+====== tx3 ------
+    //          #
+    //       c5 #
+    //          #
+    //         tx6 ------+
+    //               c7
     //
+    // fdr8 head terminal is b0-t2
+    // lvf9 head terminal is tx3-t2
+    // lvf10 head terminal is tx6-t2
     fun create(): NetworkService {
         val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 1000 }
         val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 999 }
 
-        val network = TestNetworkBuilder()
-            .fromBreaker { baseVoltage = hvBaseVoltage}
+        return TestNetworkBuilder()
+            .fromBreaker { baseVoltage = hvBaseVoltage }
             .toAcls { baseVoltage = hvBaseVoltage }
-            .toJunction(numTerminals = 3) { baseVoltage = hvBaseVoltage }
-            .toAcls { baseVoltage = lvBaseVoltage }
-            .branchFrom("j2", 2)
-            .toAcls { baseVoltage = hvBaseVoltage }
-            .toJunction(numTerminals = 3) { baseVoltage = hvBaseVoltage }
             .toAcls { baseVoltage = hvBaseVoltage }
             .toPowerTransformer(endActions = listOf({ baseVoltage = hvBaseVoltage }, { baseVoltage = lvBaseVoltage }))
             .toAcls { baseVoltage = lvBaseVoltage }
-            .branchFrom("j5", 2)
+            .branchFrom("c1")
             .toAcls { baseVoltage = hvBaseVoltage }
-            .toPowerTransformer(endActions = listOf({ ratedU = 1000 }, { ratedU = 999 }))
+            .toPowerTransformer(endActions = listOf({ baseVoltage = hvBaseVoltage }, { baseVoltage = lvBaseVoltage }))
             .toAcls { baseVoltage = lvBaseVoltage }
             .addFeeder("b0")
-            .addLvFeeder("tx7")
-            .addLvFeeder("tx10")
+            .addLvFeeder("tx3")
+            .addLvFeeder("tx6")
             .build()
-
-        network.add(hvBaseVoltage)
-        network.add(lvBaseVoltage)
-
-        return network
     }
 }

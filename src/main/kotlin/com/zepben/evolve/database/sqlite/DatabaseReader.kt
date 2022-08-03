@@ -129,13 +129,13 @@ class DatabaseReader @JvmOverloads constructor(
         phaseInferrer.run(networkService)
         logger.info("Phasing applied to network.")
 
-        logger.info("Assigning equipment to feeders...")
-        assignToFeeders.run(networkService)
-        logger.info("Equipment assigned to feeders.")
-
         logger.info("Assigning equipment to LV feeders...")
         assignToLvFeeders.run(networkService)
         logger.info("Equipment assigned to LV feeders.")
+
+        logger.info("Assigning equipment to feeders...")
+        assignToFeeders.run(networkService)
+        logger.info("Equipment assigned to feeders.")
 
         logger.info("Validating primary sources vs feeders...")
         validateSources(networkService)

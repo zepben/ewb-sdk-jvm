@@ -509,7 +509,7 @@ fun toCim(pb: PBSubstation, networkService: NetworkService): Substation =
     Substation(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.subGeographicalRegion(this), pb.subGeographicalRegionMRID)
         pb.normalEnergizedFeederMRIDsList.forEach { normalEnergizedFeederMRID ->
-            networkService.resolveOrDeferReference(Resolvers.normalEnergizingFeeders(this), normalEnergizedFeederMRID)
+            networkService.resolveOrDeferReference(Resolvers.normalEnergizedFeeders(this), normalEnergizedFeederMRID)
         }
         pb.loopMRIDsList.forEach { loopMRID ->
             networkService.resolveOrDeferReference(Resolvers.loops(this), loopMRID)

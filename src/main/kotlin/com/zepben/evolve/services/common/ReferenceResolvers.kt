@@ -233,7 +233,7 @@ internal object SubGeographicalRegionToSubstationResolver : ReferenceResolver<Su
     SubGeographicalRegion::class, Substation::class, SubGeographicalRegion::addSubstation
 )
 
-internal object SubstationToNormalEnergizingFeedersResolver : ReferenceResolver<Substation, Feeder> by KReferenceResolver(
+internal object SubstationToNormalEnergizedFeedersResolver : ReferenceResolver<Substation, Feeder> by KReferenceResolver(
     Substation::class, Feeder::class, Substation::addFeeder
 )
 

@@ -164,7 +164,7 @@ object Resolvers {
 
     @JvmStatic
     fun normalEnergizingSubstation(feeder: Feeder): BoundReferenceResolver<Feeder, Substation> =
-        BoundReferenceResolver(feeder, FeederToNormalEnergizingSubstationResolver, SubstationToNormalEnergizingFeedersResolver)
+        BoundReferenceResolver(feeder, FeederToNormalEnergizingSubstationResolver, SubstationToNormalEnergizedFeedersResolver)
 
     @JvmStatic
     fun normalHeadTerminal(feeder: Feeder): BoundReferenceResolver<Feeder, Terminal> =
@@ -227,8 +227,8 @@ object Resolvers {
         BoundReferenceResolver(subGeographicalRegion, SubGeographicalRegionToSubstationResolver, SubstationToSubGeographicalRegionResolver)
 
     @JvmStatic
-    fun normalEnergizingFeeders(substation: Substation): BoundReferenceResolver<Substation, Feeder> =
-        BoundReferenceResolver(substation, SubstationToNormalEnergizingFeedersResolver, FeederToNormalEnergizingSubstationResolver)
+    fun normalEnergizedFeeders(substation: Substation): BoundReferenceResolver<Substation, Feeder> =
+        BoundReferenceResolver(substation, SubstationToNormalEnergizedFeedersResolver, FeederToNormalEnergizingSubstationResolver)
 
     @JvmStatic
     fun subGeographicalRegion(substation: Substation): BoundReferenceResolver<Substation, SubGeographicalRegion> =

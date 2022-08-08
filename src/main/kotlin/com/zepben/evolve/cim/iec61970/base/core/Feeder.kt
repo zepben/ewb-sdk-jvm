@@ -50,7 +50,7 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
     override fun getCurrentEquipment(mRID: String) = _currentEquipmentById?.get(mRID)
 
     /**
-     * @param equipment the equipment to associate with this equipment container in the current state of the network.
+     * @param equipment the equipment to associate with this feeder in the current state of the network.
      */
     override fun addCurrentEquipment(equipment: Equipment): Feeder {
         if (validateReference(equipment, ::getCurrentEquipment, "A current Equipment"))
@@ -63,7 +63,7 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
     }
 
     /**
-     * @param equipment the equipment to disassociate from this equipment container in the current state of the network.
+     * @param equipment the equipment to disassociate from this feeder in the current state of the network.
      */
     override fun removeCurrentEquipment(equipment: Equipment?): Boolean {
         val ret = _currentEquipmentById?.remove(equipment?.mRID)
@@ -98,7 +98,7 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
     fun getNormalEnergizedLvFeeder(mRID: String) = _normalEnergizedLvFeedersById?.get(mRID)
 
     /**
-     * @param lvFeeder the LV feeder to associate with this equipment container in the normal state of the network.
+     * @param lvFeeder the LV feeder to associate with this feeder in the normal state of the network.
      */
     fun addNormalEnergizedLvFeeder(lvFeeder: LvFeeder): Feeder {
         if (validateReference(lvFeeder, ::getNormalEnergizedLvFeeder, "An LvFeeder"))

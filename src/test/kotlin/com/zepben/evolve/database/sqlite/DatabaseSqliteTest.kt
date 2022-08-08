@@ -37,6 +37,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVolt
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.BaseServiceComparator
@@ -228,6 +229,7 @@ class DatabaseSqliteTest {
         /************ IEC61970 InfIEC61970 ************/
         validateSchema(SchemaNetworks.networkServicesOf(::Circuit, Circuit::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::Loop, Loop::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::LvFeeder, LvFeeder::fillFields))
     }
 
     @Test

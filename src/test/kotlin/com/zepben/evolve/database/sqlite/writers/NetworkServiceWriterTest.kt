@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
@@ -35,8 +36,8 @@ internal class NetworkServiceWriterTest {
 
         networkServiceWriter.save(serviceOf(circuit1, circuit2), networkCIMWriter)
 
-        verify(networkCIMWriter, times(1)).save(circuit1)
-        verify(networkCIMWriter, times(1)).save(circuit2)
+        verify(networkCIMWriter).save(circuit1)
+        verify(networkCIMWriter).save(circuit2)
     }
 
     @Test
@@ -46,8 +47,19 @@ internal class NetworkServiceWriterTest {
 
         networkServiceWriter.save(serviceOf(loop1, loop2), networkCIMWriter)
 
-        verify(networkCIMWriter, times(1)).save(loop1)
-        verify(networkCIMWriter, times(1)).save(loop2)
+        verify(networkCIMWriter).save(loop1)
+        verify(networkCIMWriter).save(loop2)
+    }
+    
+    @Test
+    internal fun savesLvFeeders() {
+        val lvFeeder1 = LvFeeder()
+        val lvFeeder2 = LvFeeder()
+        
+        networkServiceWriter.save(serviceOf(lvFeeder1, lvFeeder2), networkCIMWriter)
+        
+        verify(networkCIMWriter).save(lvFeeder1)
+        verify(networkCIMWriter).save(lvFeeder2)
     }
 
     @Test
@@ -57,8 +69,8 @@ internal class NetworkServiceWriterTest {
 
         networkServiceWriter.save(serviceOf(pole1, pole2), networkCIMWriter)
 
-        verify(networkCIMWriter, times(1)).save(pole1)
-        verify(networkCIMWriter, times(1)).save(pole2)
+        verify(networkCIMWriter).save(pole1)
+        verify(networkCIMWriter).save(pole2)
     }
 
     @Test
@@ -68,8 +80,8 @@ internal class NetworkServiceWriterTest {
 
         networkServiceWriter.save(serviceOf(streetlight1, streetlight2), networkCIMWriter)
 
-        verify(networkCIMWriter, times(1)).save(streetlight1)
-        verify(networkCIMWriter, times(1)).save(streetlight2)
+        verify(networkCIMWriter).save(streetlight1)
+        verify(networkCIMWriter).save(streetlight2)
     }
 
     private fun serviceOf(io1: IdentifiedObject, io2: IdentifiedObject): NetworkService {

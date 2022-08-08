@@ -34,10 +34,11 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
 
     val sites: List<Site> get() = _equipmentContainers.ofType()
     val normalFeeders: List<Feeder> get() = _equipmentContainers.ofType()
-    val currentFeeders: List<Feeder> get() = _currentContainers.ofType()
     val normalLvFeeders: List<LvFeeder> get() = _equipmentContainers.ofType()
-    val currentLvFeeders: List<LvFeeder> get() = _currentContainers.ofType()
     val substations: List<Substation> get() = _equipmentContainers.ofType()
+
+    val currentFeeders: List<Feeder> get() = _currentContainers.ofType()
+    val currentLvFeeders: List<LvFeeder> get() = _currentContainers.ofType()
 
     /**
      * The equipment containers this equipment belongs to. The returned collection is read only.

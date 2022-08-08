@@ -10,6 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -108,6 +109,10 @@ internal class EquipmentTest {
         val feeder2 = Feeder()
         val feeder3 = Feeder()
         val feeder4 = Feeder()
+        val lvFeeder1 = LvFeeder()
+        val lvFeeder2 = LvFeeder()
+        val lvFeeder3 = LvFeeder()
+        val lvFeeder4 = LvFeeder()
         val substation1 = Substation()
         val substation2 = Substation()
 
@@ -115,15 +120,21 @@ internal class EquipmentTest {
         equipment.addContainer(site2)
         equipment.addContainer(feeder1)
         equipment.addContainer(feeder2)
+        equipment.addContainer(lvFeeder1)
+        equipment.addContainer(lvFeeder2)
         equipment.addContainer(substation1)
         equipment.addContainer(substation2)
 
         equipment.addCurrentContainer(feeder3)
         equipment.addCurrentContainer(feeder4)
+        equipment.addCurrentContainer(lvFeeder3)
+        equipment.addCurrentContainer(lvFeeder4)
 
         assertThat(equipment.sites, containsInAnyOrder(site1, site2))
         assertThat(equipment.normalFeeders, containsInAnyOrder(feeder1, feeder2))
         assertThat(equipment.currentFeeders, containsInAnyOrder(feeder3, feeder4))
+        assertThat(equipment.normalLvFeeders, containsInAnyOrder(lvFeeder1, lvFeeder2))
+        assertThat(equipment.currentLvFeeders, containsInAnyOrder(lvFeeder3, lvFeeder4))
         assertThat(equipment.substations, containsInAnyOrder(substation1, substation2))
     }
 }

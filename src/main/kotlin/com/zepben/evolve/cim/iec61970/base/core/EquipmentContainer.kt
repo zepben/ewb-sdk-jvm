@@ -90,28 +90,6 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     }
 
     /**
-     * Convenience function to find all of the normal [LvFeeder]'s of the [Equipment] associated with this [EquipmentContainer].
-     *
-     * @return the normal feeders for all associated feeders
-     */
-    fun normalLvFeeders(): Set<LvFeeder> {
-        val ret = mutableSetOf<LvFeeder>()
-        _equipmentById?.values?.forEach { equip -> ret.addAll(equip.normalLvFeeders) }
-        return ret
-    }
-
-    /**
-     * Convenience function to find all of the current [LvFeeder] of the [Equipment] associated with this [EquipmentContainer].
-     *
-     * @return the current feeders for all associated feeders
-     */
-    fun currentLvFeeders(): Set<LvFeeder> {
-        val ret = mutableSetOf<LvFeeder>()
-        _equipmentById?.values?.forEach { equip -> ret.addAll(equip.currentLvFeeders) }
-        return ret
-    }
-
-    /**
      * Contained equipment using the current state of the network. The returned collection is read only.
      */
     open val currentEquipment: Collection<Equipment> get() = equipment

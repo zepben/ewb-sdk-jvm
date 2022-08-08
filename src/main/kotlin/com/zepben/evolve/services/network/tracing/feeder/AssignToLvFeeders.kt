@@ -80,23 +80,24 @@ class AssignToLvFeeders {
     }
 
     private fun processNormal(terminal: Terminal, isStopping: Boolean) {
-        if (!isStopping || !reachedHv(terminal))
-            process(terminal.conductingEquipment, ConductingEquipment::addContainer, LvFeeder::addEquipment)
+        process(terminal, ConductingEquipment::addContainer, LvFeeder::addEquipment, isStopping)
     }
 
     private fun processCurrent(terminal: Terminal, isStopping: Boolean) {
-        if (!isStopping || !reachedHv(terminal))
-            process(terminal.conductingEquipment, ConductingEquipment::addCurrentContainer, LvFeeder::addCurrentEquipment)
+        process(terminal, ConductingEquipment::addCurrentContainer, LvFeeder::addCurrentEquipment, isStopping)
     }
 
     private fun process(
-        conductingEquipment: ConductingEquipment?,
-        assignFeederToEquipment: (ConductingEquipment, LvFeeder) -> Unit,
-        assignEquipmentToFeeder: (LvFeeder, ConductingEquipment) -> Unit
+        terminal: Terminal,
+        assignLvFeederToEquipment: (ConductingEquipment, LvFeeder) -> Unit,
+        assignEquipmentToLvFeeder: (LvFeeder, ConductingEquipment) -> Unit,
+        isStopping: Boolean
     ) {
-        conductingEquipment?.let {
-            assignFeederToEquipment(it, activeLvFeeder)
-            assignEquipmentToFeeder(activeLvFeeder, it)
+        if (!isStopping || !reachedHv(terminal)) {
+            terminal.conductingEquipment?.let {
+                assignLvFeederToEquipment(it, activeLvFeeder)
+                assignEquipmentToLvFeeder(activeLvFeeder, it)
+            }
         }
     }
 

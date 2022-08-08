@@ -9,6 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.utils.PrivateCollectionValidator
+import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -40,6 +41,33 @@ internal class EquipmentContainerTest {
             EquipmentContainer::removeEquipment,
             EquipmentContainer::clearEquipment
         )
+    }
+
+    @Test
+    internal fun currentEquipment() {
+        PrivateCollectionValidator.validate(
+            { object: EquipmentContainer() {} },
+            { id, _ -> object : Equipment(id) {} },
+            EquipmentContainer::numCurrentEquipment,
+            EquipmentContainer::getCurrentEquipment,
+            EquipmentContainer::currentEquipment,
+            EquipmentContainer::addCurrentEquipment,
+            EquipmentContainer::removeCurrentEquipment,
+            EquipmentContainer::clearCurrentEquipment
+        )
+    }
+
+    @Test
+    internal fun currentEquipmentMirrorsNormalEquipment() {
+        val ec = object : EquipmentContainer() {}
+        val eq1 = object : Equipment("eq1") {}
+        val eq2 = object : Equipment("eq2") {}
+
+        ec.addEquipment(eq1)
+        assertThat(ec.getCurrentEquipment("eq1"), equalTo(eq1))
+
+        ec.addCurrentEquipment(eq2)
+        assertThat(ec.getEquipment("eq2"), equalTo(eq2))
     }
 
     @Test

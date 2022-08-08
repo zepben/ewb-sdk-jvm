@@ -324,7 +324,7 @@ open class TestNetworkBuilder {
     }
 
     /**
-     * Get the [NetworkService] after apply traced phasing and feeder directions.
+     * Get the [NetworkService] after apply traced phasing, feeder directions, and HV/LV feeder assignment.
      *
      * Does not infer phasing.
      *
@@ -338,6 +338,7 @@ open class TestNetworkBuilder {
             network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach { Tracing.setDirection().run(it) }
 
         Tracing.assignEquipmentContainersToFeeders().run(network)
+        Tracing.assignEquipmentContainersToLvFeeders().run(network)
 
         return network
     }

@@ -49,7 +49,7 @@ object LvEquipmentBelowFeederHeadNetwork {
             .toAcls { baseVoltage = lvBaseVoltage }
             .toAcls { baseVoltage = hvBaseVoltage }
             .addFeeder("b0")
-            .build()
+            .network
             .apply {
                 add(hvBaseVoltage)
                 add(lvBaseVoltage)

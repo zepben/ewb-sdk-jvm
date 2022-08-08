@@ -43,6 +43,6 @@ object HvLvFeederIntersectionNetwork {
             .connect("c1", "c3", 2, 2)
             .addFeeder("b0")
             .addLvFeeder("b2", 2)
-            .build()
+            .network
     }
 }

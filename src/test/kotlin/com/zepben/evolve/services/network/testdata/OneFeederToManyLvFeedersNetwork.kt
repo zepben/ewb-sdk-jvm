@@ -46,6 +46,6 @@ object OneFeederToManyLvFeedersNetwork {
             .addFeeder("b0")
             .addLvFeeder("tx3")
             .addLvFeeder("tx6")
-            .build()
+            .network
     }
 }

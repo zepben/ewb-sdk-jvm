@@ -31,7 +31,7 @@ class AssignToLvFeedersTest {
         val network = FeederStartPointBetweenConductorsNetwork.create(makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
 
         validateEquipment(lvFeeder.equipment, "fsp", "c2")
     }
@@ -41,7 +41,7 @@ class AssignToLvFeedersTest {
         val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = true, currentlyOpen = false, makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
 
         validateEquipment(lvFeeder.equipment, "fsp", "c1", "op")
         validateEquipment(lvFeeder.currentEquipment, "fsp", "c1", "op", "c2")
@@ -52,7 +52,7 @@ class AssignToLvFeedersTest {
         val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = false, currentlyOpen = true, makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
 
         validateEquipment(lvFeeder.equipment, "fsp", "c1", "op", "c2")
         validateEquipment(lvFeeder.currentEquipment, "fsp", "c1", "op")
@@ -64,7 +64,7 @@ class AssignToLvFeedersTest {
         val lvFeeder1: LvFeeder = network["f1"]!!
         val lvFeeder2: LvFeeder = network["f2"]!!
 
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
 
         validateEquipment(lvFeeder1.equipment, "fsp1", "c2", "fsp2")
         validateEquipment(lvFeeder2.equipment, "fsp1", "c2", "fsp2")
@@ -76,7 +76,7 @@ class AssignToLvFeedersTest {
         val lvFeeder1: LvFeeder = network["f1"]!!
         val lvFeeder2: LvFeeder = network["f2"]!!
 
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
 
         validateEquipment(lvFeeder1.equipment, "fsp1", "c2", "fsp2")
         validateEquipment(lvFeeder2.equipment, "fsp2", "c3")
@@ -87,7 +87,7 @@ class AssignToLvFeedersTest {
         val network = DroppedPhasesNetwork.create(makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
 
         validateEquipment(lvFeeder.equipment, "fcb", "acls1", "acls2", "acls3", "iso", "acls4", "tx")
     }
@@ -96,7 +96,7 @@ class AssignToLvFeedersTest {
     fun stopsAtHvEquipment() {
         val network = HvEquipmentBelowLvFeederHeadNetwork.create()
         val lvFeeder: LvFeeder = network["lvf11"]!!
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
         validateEquipment(lvFeeder.equipment, "b0", "c1", "c3", "c4", "tx5", "c7", "tx8")
     }
 
@@ -106,8 +106,8 @@ class AssignToLvFeedersTest {
         val feeder: Feeder = network["fdr5"]!!
         val lvFeeder: LvFeeder = network["lvf6"]!!
 
-        Tracing.assignEquipmentContainersToFeeders().run(network)
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
 
         assertThat(feeder.normalEnergizedLvFeeders, Matchers.empty())
         assertThat(lvFeeder.normalEnergizingFeeders, Matchers.empty())
@@ -120,8 +120,8 @@ class AssignToLvFeedersTest {
         val lvFeeder1: LvFeeder = network["lvf9"]!!
         val lvFeeder2: LvFeeder = network["lvf10"]!!
 
-        Tracing.assignEquipmentContainersToFeeders().run(network)
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
 
         assertThat(feeder.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder1, lvFeeder2))
         assertThat(lvFeeder1.normalEnergizingFeeders, containsInAnyOrder(feeder))
@@ -135,8 +135,8 @@ class AssignToLvFeedersTest {
         val feeder2: Feeder = network["fdr8"]!!
         val lvFeeder: LvFeeder = network["lvf9"]!!
 
-        Tracing.assignEquipmentContainersToFeeders().run(network)
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
 
         assertThat(feeder1.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
         assertThat(feeder2.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))

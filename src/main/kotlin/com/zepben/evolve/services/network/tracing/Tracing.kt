@@ -225,7 +225,7 @@ object Tracing {
      * @return A new traversal instance.
      */
     @JvmStatic
-    fun assignEquipmentContainersToFeeders(): AssignToFeeders = AssignToFeeders()
+    fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
 
     /**
      * Returns an instance of [AssignToFeeders] convenience class for assigning equipment containers to LV feeders on a network.
@@ -233,7 +233,7 @@ object Tracing {
      * @return A new traversal instance.
      */
     @JvmStatic
-    fun assignEquipmentContainersToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
+    fun assignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
 
     /**
      * Returns an instance of [DownstreamTree] convenience class for tracing using the

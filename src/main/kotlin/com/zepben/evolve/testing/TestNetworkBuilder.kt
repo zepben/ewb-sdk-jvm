@@ -16,7 +16,6 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
-import org.junit.jupiter.api.Test
 
 /**
  * A class for building simple test networks, often used for unit testing.
@@ -337,8 +336,8 @@ open class TestNetworkBuilder {
         if (applyDirectionsFromSources)
             network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach { Tracing.setDirection().run(it) }
 
-        Tracing.assignEquipmentContainersToFeeders().run(network)
-        Tracing.assignEquipmentContainersToLvFeeders().run(network)
+        Tracing.assignEquipmentToFeeders().run(network)
+        Tracing.assignEquipmentToLvFeeders().run(network)
 
         return network
     }

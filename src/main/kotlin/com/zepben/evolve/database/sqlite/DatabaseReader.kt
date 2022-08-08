@@ -48,8 +48,8 @@ class DatabaseReader @JvmOverloads constructor(
     private val setDirection: SetDirection = Tracing.setDirection(),
     private val setPhases: SetPhases = Tracing.setPhases(),
     private val phaseInferrer: PhaseInferrer = Tracing.phaseInferrer(),
-    private val assignToFeeders: AssignToFeeders = Tracing.assignEquipmentContainersToFeeders(),
-    private val assignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentContainersToLvFeeders()
+    private val assignToFeeders: AssignToFeeders = Tracing.assignEquipmentToFeeders(),
+    private val assignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders()
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)

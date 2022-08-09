@@ -22,8 +22,8 @@ import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
  */
 class AssignToFeeders {
 
-    private val normalTraversal: BasicTraversal<Terminal> = AssociatedTerminalTrace.newNormalTrace()
-    private val currentTraversal: BasicTraversal<Terminal> = AssociatedTerminalTrace.newCurrentTrace()
+    private val normalTraversal = AssociatedTerminalTrace.newNormalTrace()
+    private val currentTraversal = AssociatedTerminalTrace.newCurrentTrace()
     private lateinit var activeFeeder: Feeder
 
     init {

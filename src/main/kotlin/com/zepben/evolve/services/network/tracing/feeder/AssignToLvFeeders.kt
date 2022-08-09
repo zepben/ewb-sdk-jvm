@@ -21,8 +21,8 @@ import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
  */
 class AssignToLvFeeders {
 
-    private val normalTraversal: BasicTraversal<Terminal> = AssociatedTerminalTrace.newNormalTrace()
-    private val currentTraversal: BasicTraversal<Terminal> = AssociatedTerminalTrace.newCurrentTrace()
+    private val normalTraversal = AssociatedTerminalTrace.newNormalTrace()
+    private val currentTraversal = AssociatedTerminalTrace.newCurrentTrace()
     private lateinit var activeLvFeeder: LvFeeder
 
     init {
@@ -31,10 +31,10 @@ class AssignToLvFeeders {
     }
 
     fun run(network: NetworkService) {
-        val lvFeederStartPoints = network.sequenceOf(LvFeeder::class)
+        val lvFeederStartPoints = network.sequenceOf<LvFeeder>()
             .mapNotNull { lvFeeder ->
-                lvFeeder.normalHeadTerminal?.conductingEquipment.also { headEquipment ->
-                    headEquipment?.normalFeeders?.forEach { feeder ->
+                lvFeeder.normalHeadTerminal?.conductingEquipment?.also { headEquipment ->
+                    headEquipment.normalFeeders.forEach { feeder ->
                         feeder.addNormalEnergizedLvFeeder(lvFeeder)
                         lvFeeder.addNormalEnergizingFeeder(feeder)
                     }

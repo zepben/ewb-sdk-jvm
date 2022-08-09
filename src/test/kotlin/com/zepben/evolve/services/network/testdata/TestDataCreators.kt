@@ -196,19 +196,6 @@ fun createFeeder(networkService: NetworkService, mRID: String, name: String, sub
             }
         }
 
-fun createLvFeeder(
-    networkService: NetworkService,
-    mRID: String,
-    name: String,
-    headTerminal: Terminal? = null
-): LvFeeder =
-    LvFeeder(mRID).apply {
-        this.name = name
-        normalHeadTerminal = headTerminal
-
-        networkService.add(this)
-    }
-
 fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int? = null, endNumber: Int = 0) =
     PowerTransformerEnd().also {
         it.ratedU = ratedU

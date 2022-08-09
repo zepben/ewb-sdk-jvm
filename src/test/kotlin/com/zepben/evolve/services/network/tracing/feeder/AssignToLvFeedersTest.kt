@@ -124,9 +124,9 @@ class AssignToLvFeedersTest {
     @Test
     fun singleFeederPowersMultipleLvFeeders() {
         val network = OneFeederToManyLvFeedersNetwork.create()
-        val feeder: Feeder = network["fdr8"]!!
-        val lvFeeder1: LvFeeder = network["lvf9"]!!
-        val lvFeeder2: LvFeeder = network["lvf10"]!!
+        val feeder: Feeder = network["fdr1"]!!
+        val lvFeeder1: LvFeeder = network["lvf2"]!!
+        val lvFeeder2: LvFeeder = network["lvf3"]!!
 
         Tracing.assignEquipmentToFeeders().run(network)
         Tracing.assignEquipmentToLvFeeders().run(network)
@@ -139,9 +139,9 @@ class AssignToLvFeedersTest {
     @Test
     fun multipleFeedersPowerSingleLvFeeder() {
         val network = ManyFeedersToOneLvFeederNetwork.create()
-        val feeder1: Feeder = network["fdr7"]!!
-        val feeder2: Feeder = network["fdr8"]!!
-        val lvFeeder: LvFeeder = network["lvf9"]!!
+        val feeder1: Feeder = network["fdr1"]!!
+        val feeder2: Feeder = network["fdr2"]!!
+        val lvFeeder: LvFeeder = network["lvf3"]!!
 
         Tracing.assignEquipmentToFeeders().run(network)
         Tracing.assignEquipmentToLvFeeders().run(network)

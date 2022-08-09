@@ -9,6 +9,7 @@
 package com.zepben.evolve.services.network.testdata
 
 import com.zepben.evolve.cim.iec61970.base.core.Substation
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 
 object FeederStartPointToOpenPointNetwork {
@@ -31,7 +32,7 @@ object FeederStartPointToOpenPointNetwork {
         networkService.connect(c2.getTerminal(1)!!, op.getTerminal(2)!!)
 
         if (makeFeederLv) {
-            createLvFeeder(networkService, "f", "f", fsp.getTerminal(1))
+            LvFeeder("f").apply { normalHeadTerminal = fsp.getTerminal(1) }.also { networkService.add(it) }
         } else {
             val substation = Substation().also { networkService.add(it) }
             createFeeder(networkService, "f", "f", substation, fsp, fsp.getTerminal(1))

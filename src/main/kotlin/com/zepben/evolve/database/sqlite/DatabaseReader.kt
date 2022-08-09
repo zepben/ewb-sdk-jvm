@@ -9,6 +9,7 @@
 package com.zepben.evolve.database.sqlite
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.database.sqlite.readers.*
@@ -137,12 +138,26 @@ class DatabaseReader @JvmOverloads constructor(
         assignToLvFeeders.run(networkService)
         logger.info("Equipment assigned to LV feeders.")
 
+        logger.info("Validating that each equipment is assigned to a container...")
+        validateEquipmentContainers(networkService)
+        logger.info("Equipment containers validated.")
+
         logger.info("Validating primary sources vs feeders...")
         validateSources(networkService)
         logger.info("Sources vs feeders validated.")
 
         closeConnection()
         return true
+    }
+
+    private fun validateEquipmentContainers(networkService: NetworkService) {
+        networkService.sequenceOf<Equipment>()
+            .filter { it.containers.isEmpty() }
+            .forEach { equipment ->
+                logger.warn(
+                    "Equipment ${equipment.nameAndMRID()} was not assigned to any equipment container."
+                )
+            }
     }
 
     private fun validateSources(networkService: NetworkService) {

@@ -20,7 +20,17 @@ object ChangeSet43Validator : ChangeSetValidator {
     )
 
     override fun validate(statement: Statement) {
-        validateRows(statement,"SELECT * FROM lv_feeders", { rs ->
+        ensureIndexes(
+            statement,
+            "lv_feeders_name",
+            "lv_feeders_description",
+            "lv_feeders_num_diagram_objects",
+            "lv_feeders_location_mrid",
+            "lv_feeders_num_controls",
+            "lv_feeders_normal_head_mrid"
+        )
+
+        validateRows(statement, "SELECT * FROM lv_feeders", { rs ->
             assertThat(rs.getString("mrid"), equalTo("id"))
             assertThat(rs.getString("name"), equalTo("name"))
             assertThat(rs.getString("description"), equalTo("desc"))

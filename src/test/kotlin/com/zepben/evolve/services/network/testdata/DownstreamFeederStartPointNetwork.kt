@@ -33,7 +33,7 @@ object DownstreamFeederStartPointNetwork {
 
         if (makeFeedersLv) {
             LvFeeder("f1").apply { normalHeadTerminal = fsp1.getTerminal(2) }.also { networkService.add(it) }
-            LvFeeder("f2").apply { normalHeadTerminal = fsp1.getTerminal(fsp2Terminal) }.also { networkService.add(it) }
+            LvFeeder("f2").apply { normalHeadTerminal = fsp2.getTerminal(fsp2Terminal) }.also { networkService.add(it) }
         } else {
             val substation = Substation().also { networkService.add(it) }
             createFeeder(networkService, "f1", "f1", substation, fsp1, fsp1.getTerminal(2))

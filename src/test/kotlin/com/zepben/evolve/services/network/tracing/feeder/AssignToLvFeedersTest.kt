@@ -111,8 +111,8 @@ class AssignToLvFeedersTest {
     @Test
     fun onlyPoweredViaHeadEquipment() {
         val network = HvLvFeederIntersectionNetwork.create()
-        val feeder: Feeder = network["fdr5"]!!
-        val lvFeeder: LvFeeder = network["lvf6"]!!
+        val feeder: Feeder = network["fdr4"]!!
+        val lvFeeder: LvFeeder = network["lvf5"]!!
 
         Tracing.assignEquipmentToFeeders().run(network)
         Tracing.assignEquipmentToLvFeeders().run(network)

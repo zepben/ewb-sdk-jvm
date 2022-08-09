@@ -21,8 +21,8 @@ object HvLvFeederIntersectionNetwork {
     //      c1     c3
     // b0 ======+------ b2
     //
-    // fdr5 head terminal is b0-t2
-    // lvf6 head terminal is b2-t2
+    // fdr4 head terminal is b0-t2
+    // lvf5 head terminal is b2-t2
     //
     fun create(): NetworkService {
         val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }

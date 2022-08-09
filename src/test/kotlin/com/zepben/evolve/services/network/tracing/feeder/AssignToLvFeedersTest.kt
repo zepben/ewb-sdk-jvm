@@ -8,11 +8,13 @@
 
 package com.zepben.evolve.services.network.tracing.feeder
 
+import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
@@ -94,7 +96,20 @@ class AssignToLvFeedersTest {
 
     @Test
     fun stopsAtHvEquipment() {
-        val network = HvEquipmentBelowLvFeederHeadNetwork.create()
+        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
+        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
+
+        val network = TestNetworkBuilder()
+            .fromBreaker { baseVoltage = lvBaseVoltage} // b0
+            .toAcls { baseVoltage = lvBaseVoltage } // c1
+            .toAcls { baseVoltage = hvBaseVoltage } // c2
+            .addLvFeeder("b0")
+            .network
+            .apply {
+                add(hvBaseVoltage)
+                add(lvBaseVoltage)
+            }
+
         val lvFeeder: LvFeeder = network["lvf3"]!!
         Tracing.assignEquipmentToLvFeeders().run(network)
         validateEquipment(lvFeeder.equipment, "b0", "c1")
@@ -102,7 +117,21 @@ class AssignToLvFeedersTest {
 
     @Test
     fun includesTransformers() {
-        val network = LvFeederHeadToTxToHvEquipmentNetwork.create()
+        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
+        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
+
+        val network = TestNetworkBuilder()
+            .fromBreaker { baseVoltage = lvBaseVoltage} // b0
+            .toAcls { baseVoltage = lvBaseVoltage } // c1
+            .toPowerTransformer(endActions = listOf({ baseVoltage = lvBaseVoltage }, { baseVoltage = hvBaseVoltage })) // tx2
+            .toAcls { baseVoltage = hvBaseVoltage } // c3
+            .addLvFeeder("b0")
+            .network
+            .apply {
+                add(hvBaseVoltage)
+                add(lvBaseVoltage)
+            }
+
         val lvFeeder: LvFeeder = network["lvf4"]!!
         Tracing.assignEquipmentToLvFeeders().run(network)
         validateEquipment(lvFeeder.equipment, "b0", "c1", "tx2")
@@ -110,7 +139,19 @@ class AssignToLvFeedersTest {
 
     @Test
     fun onlyPoweredViaHeadEquipment() {
-        val network = HvLvFeederIntersectionNetwork.create()
+        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
+        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
+
+        val network = TestNetworkBuilder()
+            .fromBreaker { baseVoltage = hvBaseVoltage } // b0
+            .toAcls { baseVoltage = hvBaseVoltage } // c1
+            .fromBreaker { baseVoltage = lvBaseVoltage } // b2
+            .toAcls { baseVoltage = lvBaseVoltage } // b3
+            .connect("c1", "c3", 2, 2)
+            .addFeeder("b0")
+            .addLvFeeder("b2")
+            .network
+
         val feeder: Feeder = network["fdr4"]!!
         val lvFeeder: LvFeeder = network["lvf5"]!!
 
@@ -123,7 +164,13 @@ class AssignToLvFeedersTest {
 
     @Test
     fun singleFeederPowersMultipleLvFeeders() {
-        val network = OneFeederToManyLvFeedersNetwork.create()
+        val network = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .addFeeder("b0") // fdr1
+            .addLvFeeder("b0") // lvf2
+            .addLvFeeder("b0") // lvf3
+            .network
+
         val feeder: Feeder = network["fdr1"]!!
         val lvFeeder1: LvFeeder = network["lvf2"]!!
         val lvFeeder2: LvFeeder = network["lvf3"]!!
@@ -138,7 +185,13 @@ class AssignToLvFeedersTest {
 
     @Test
     fun multipleFeedersPowerSingleLvFeeder() {
-        val network = ManyFeedersToOneLvFeederNetwork.create()
+        val network = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .addFeeder("b0") // fdr1
+            .addFeeder("b0") // fdr2
+            .addLvFeeder("b0") // lvf3
+            .network
+
         val feeder1: Feeder = network["fdr1"]!!
         val feeder2: Feeder = network["fdr2"]!!
         val lvFeeder: LvFeeder = network["lvf3"]!!

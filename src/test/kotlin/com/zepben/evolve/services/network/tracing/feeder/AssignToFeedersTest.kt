@@ -8,10 +8,12 @@
 
 package com.zepben.evolve.services.network.tracing.feeder
 
+import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
@@ -102,7 +104,20 @@ class AssignToFeedersTest {
 
     @Test
     fun stopsAtLvEquipment() {
-        val network = LvEquipmentBelowFeederHeadNetwork.create()
+        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
+        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
+
+        val network = TestNetworkBuilder()
+            .fromBreaker { baseVoltage = hvBaseVoltage} // b0
+            .toAcls { baseVoltage = hvBaseVoltage } // c1
+            .toAcls { baseVoltage = lvBaseVoltage } // c2
+            .addFeeder("b0")
+            .network
+            .apply {
+                add(hvBaseVoltage)
+                add(lvBaseVoltage)
+            }
+
         val feeder: Feeder = network["fdr3"]!!
 
         Tracing.assignEquipmentToFeeders().run(network)
@@ -112,7 +127,21 @@ class AssignToFeedersTest {
 
     @Test
     fun includesTransformers() {
-        val network = FeederHeadToTxToLvEquipmentNetwork.create()
+        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
+        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
+
+        val network = TestNetworkBuilder()
+            .fromBreaker { baseVoltage = hvBaseVoltage} // b0
+            .toAcls { baseVoltage = hvBaseVoltage } // c1
+            .toPowerTransformer(endActions = listOf({ baseVoltage = hvBaseVoltage }, { baseVoltage = lvBaseVoltage })) // tx2
+            .toAcls { baseVoltage = lvBaseVoltage } // c3
+            .addFeeder("b0")
+            .network
+            .apply {
+                add(hvBaseVoltage)
+                add(lvBaseVoltage)
+            }
+
         val feeder: Feeder = network["fdr4"]!!
 
         Tracing.assignEquipmentToFeeders().run(network)

@@ -25,8 +25,8 @@ object HvLvFeederIntersectionNetwork {
     // lvf6 head terminal is b2-t2
     //
     fun create(): NetworkService {
-        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 1000 }
-        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 999 }
+        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
+        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
         return TestNetworkBuilder()
             .fromBreaker { baseVoltage = hvBaseVoltage } // b0

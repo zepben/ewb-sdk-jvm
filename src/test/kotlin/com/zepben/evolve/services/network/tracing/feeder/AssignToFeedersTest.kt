@@ -103,11 +103,21 @@ class AssignToFeedersTest {
     @Test
     fun stopsAtLvEquipment() {
         val network = LvEquipmentBelowFeederHeadNetwork.create()
-        val feeder: Feeder = network["fdr11"]!!
+        val feeder: Feeder = network["fdr3"]!!
 
         Tracing.assignEquipmentToFeeders().run(network)
 
-        validateEquipment(feeder.equipment, "b0", "c1", "c3", "c4", "tx5", "c7", "tx8")
+        validateEquipment(feeder.equipment, "b0", "c1")
+    }
+
+    @Test
+    fun includesTransformers() {
+        val network = FeederHeadToTxToLvEquipmentNetwork.create()
+        val feeder: Feeder = network["fdr4"]!!
+
+        Tracing.assignEquipmentToFeeders().run(network)
+
+        validateEquipment(feeder.equipment, "b0", "c1", "tx2")
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

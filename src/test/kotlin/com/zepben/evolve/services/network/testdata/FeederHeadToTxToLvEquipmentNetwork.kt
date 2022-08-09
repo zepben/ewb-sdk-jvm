@@ -12,31 +12,31 @@ import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.testing.TestNetworkBuilder
 
-object HvLvFeederIntersectionNetwork {
+object FeederHeadToTxToLvEquipmentNetwork {
 
     //
     // - or |: LV line
     // = or #: HV line
     //
-    //      c1     c3
-    // b0 ======+------ b2
+    //      c1         c3
+    // b0 ====== tx2 ------
     //
-    // fdr5 head terminal is b0-t2
-    // lvf6 head terminal is b2-t2
+    // fdr4 head terminal is b0-t2
     //
     fun create(): NetworkService {
-        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 1000 }
-        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 999 }
+        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
+        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
         return TestNetworkBuilder()
-            .fromBreaker { baseVoltage = hvBaseVoltage } // b0
+            .fromBreaker { baseVoltage = hvBaseVoltage} // b0
             .toAcls { baseVoltage = hvBaseVoltage } // c1
-            .fromBreaker { baseVoltage = lvBaseVoltage } // b2
-            .toAcls { baseVoltage = lvBaseVoltage } // b3
-            .connect("c1", "c3", 2, 2)
+            .toPowerTransformer(endActions = listOf({ baseVoltage = hvBaseVoltage }, { baseVoltage = lvBaseVoltage })) // tx2
+            .toAcls { baseVoltage = lvBaseVoltage } // c3
             .addFeeder("b0")
-            .addLvFeeder("b2")
             .network
+            .apply {
+                add(hvBaseVoltage)
+                add(lvBaseVoltage)
+            }
     }
-
 }

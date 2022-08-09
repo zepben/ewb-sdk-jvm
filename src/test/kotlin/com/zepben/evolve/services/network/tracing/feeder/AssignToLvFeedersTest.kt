@@ -95,9 +95,17 @@ class AssignToLvFeedersTest {
     @Test
     fun stopsAtHvEquipment() {
         val network = HvEquipmentBelowLvFeederHeadNetwork.create()
-        val lvFeeder: LvFeeder = network["lvf11"]!!
+        val lvFeeder: LvFeeder = network["lvf3"]!!
         Tracing.assignEquipmentToLvFeeders().run(network)
-        validateEquipment(lvFeeder.equipment, "b0", "c1", "c3", "c4", "tx5", "c7", "tx8")
+        validateEquipment(lvFeeder.equipment, "b0", "c1")
+    }
+
+    @Test
+    fun includesTransformers() {
+        val network = LvFeederHeadToTxToHvEquipmentNetwork.create()
+        val lvFeeder: LvFeeder = network["lvf4"]!!
+        Tracing.assignEquipmentToLvFeeders().run(network)
+        validateEquipment(lvFeeder.equipment, "b0", "c1", "tx2")
     }
 
     @Test

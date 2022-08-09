@@ -18,36 +18,19 @@ object HvEquipmentBelowLvFeederHeadNetwork {
     // - or |: LV line
     // = or #: HV line
     //
-    //      c1     c3     c7         c9     c10
-    // b0 ------+------+------ tx8 ======+------
-    //          #      |
-    //       c2 #   c4 |
-    //          #      |
-    //                tx5
-    //                 #
-    //              c6 #
-    //                 #
+    //      c1     c2
+    // b0 ------+======
     //
-    // lvf11 head terminal is b0-t2
+    // lvf3 head terminal is b0-t2
     //
     fun create(): NetworkService {
-        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 1000 }
-        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 999 }
+        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
+        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
         return TestNetworkBuilder()
-            .fromBreaker { baseVoltage = lvBaseVoltage}
-            .toAcls { baseVoltage = lvBaseVoltage }
-            .toAcls { baseVoltage = hvBaseVoltage }
-            .branchFrom("c1")
-            .toAcls { baseVoltage = lvBaseVoltage }
-            .toAcls { baseVoltage = lvBaseVoltage }
-            .toPowerTransformer(endActions = listOf({ baseVoltage = lvBaseVoltage }, { baseVoltage = hvBaseVoltage }))
-            .toAcls { baseVoltage = hvBaseVoltage }
-            .branchFrom("c3")
-            .toAcls { baseVoltage = lvBaseVoltage }
-            .toPowerTransformer(endActions = listOf({ ratedU = 999 }, { ratedU = 1000 }))
-            .toAcls { baseVoltage = hvBaseVoltage }
-            .toAcls { baseVoltage = lvBaseVoltage }
+            .fromBreaker { baseVoltage = lvBaseVoltage} // b0
+            .toAcls { baseVoltage = lvBaseVoltage } // c1
+            .toAcls { baseVoltage = hvBaseVoltage } // c2
             .addLvFeeder("b0")
             .network
             .apply {
@@ -55,4 +38,5 @@ object HvEquipmentBelowLvFeederHeadNetwork {
                 add(lvBaseVoltage)
             }
     }
+
 }

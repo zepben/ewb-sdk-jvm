@@ -29,10 +29,5 @@ private val `Add lv feeder table` = arrayOf(
     )
     """,
     "CREATE UNIQUE INDEX lv_feeders_mrid ON lv_feeders (mrid)",
-    "CREATE INDEX lv_feeders_name ON lv_feeders (name)",
-    "CREATE INDEX lv_feeders_description ON lv_feeders (description)",
-    "CREATE INDEX lv_feeders_num_diagram_objects ON lv_feeders (num_diagram_objects)",
-    "CREATE INDEX lv_feeders_location_mrid ON lv_feeders (location_mrid)",
-    "CREATE INDEX lv_feeders_num_controls ON lv_feeders (num_controls)",
-    "CREATE INDEX lv_feeders_normal_head_mrid ON lv_feeders (normal_head_terminal_mrid)"
+    "CREATE INDEX lv_feeders_name ON lv_feeders (name)"
 )

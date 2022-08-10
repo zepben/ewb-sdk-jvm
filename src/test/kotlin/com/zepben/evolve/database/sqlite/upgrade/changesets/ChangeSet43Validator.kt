@@ -22,12 +22,8 @@ object ChangeSet43Validator : ChangeSetValidator {
     override fun validate(statement: Statement) {
         ensureIndexes(
             statement,
-            "lv_feeders_name",
-            "lv_feeders_description",
-            "lv_feeders_num_diagram_objects",
-            "lv_feeders_location_mrid",
-            "lv_feeders_num_controls",
-            "lv_feeders_normal_head_mrid"
+            "lv_feeders_mrid",
+            "lv_feeders_name"
         )
 
         validateRows(statement, "SELECT * FROM lv_feeders", { rs ->

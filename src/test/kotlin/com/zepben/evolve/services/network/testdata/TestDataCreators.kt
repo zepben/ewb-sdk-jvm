@@ -16,7 +16,6 @@ import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
-import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing

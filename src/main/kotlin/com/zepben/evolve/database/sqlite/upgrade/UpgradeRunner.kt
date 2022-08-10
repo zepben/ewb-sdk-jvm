@@ -10,8 +10,6 @@ package com.zepben.evolve.database.sqlite.upgrade
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.tables.TableVersion
-import com.zepben.evolve.database.sqlite.upgrade.changesets.*
-import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -24,38 +22,13 @@ class UpgradeRunner constructor(
     private val getStatement: (Connection) -> Statement = Connection::createStatement,
     private val getPreparedStatement: (Connection, String) -> PreparedStatement = Connection::prepareStatement,
     private val createBackup: (databaseFilename: Path, backupFilename: Path, copyOption: CopyOption) -> Unit = { f, b, o -> Files.copy(f, b, o) },
-    internal val changeSets: List<ChangeSet> =
-        listOf(
-            changeSet15(),
-            changeSet16(),
-            changeSet17(),
-            changeSet18(),
-            changeSet19(),
-            changeSet20(),
-            changeSet21(),
-            changeSet22(),
-            changeSet23(),
-            changeSet24(),
-            changeSet25(),
-            changeSet26(),
-            changeSet27(),
-            changeSet28(),
-            changeSet29(),
-            changeSet30(),
-            changeSet31(),
-            changeSet32(),
-            changeSet33(),
-            changeSet34(),
-            changeSet35(),
-            changeSet36(),
-            changeSet37(),
-            changeSet38(),
-            changeSet39(),
-            changeSet40(),
-            changeSet41(),
-            changeSet42(),
-            changeSet43()
-        ).asUnmodifiable()
+    /*
+     * After implementing changeSet(44), replace emptyList() with
+     * listOf(
+     *     changeSet(44)
+     * ).asUnmodifiable()
+     */
+    internal val changeSets: List<ChangeSet> = emptyList()
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -70,7 +43,7 @@ class UpgradeRunner constructor(
             }
         }
 
-        require(changeSets.last().number == tableVersion.SUPPORTED_VERSION) {
+        require(changeSets.isEmpty() || changeSets.last().number == tableVersion.SUPPORTED_VERSION) {
             if (changeSets.last().number > tableVersion.SUPPORTED_VERSION)
                 "The last registered change set is newer than the supported version. Did you forget to bump the supported version number?"
             else
@@ -117,17 +90,22 @@ class UpgradeRunner constructor(
         val versionResult = getVersion(statement)
         val databaseVersion = when {
             versionResult.versionNumber != null -> versionResult.versionNumber
-            versionResult.requiresVersionTableUpgrdae -> {
+            versionResult.requiresVersionTableUpgrade -> {
+                logger.info("Old version of database detected.")
                 val version = getVersionOldSchema(statement) ?: throw UpgradeException("No version number found in database.")
-                doBackup(version)
-                upgradeVersionTable(statement, version)
+                if (changeSets.isEmpty()) {
+                    logger.warn("Database upgrade failed due to missing change sets.")
+                } else {
+                    doBackup(version)
+                    upgradeVersionTable(statement, version)
+                }
                 version
             }
             else -> throw UpgradeException("No version number found in database.")
         }
 
         when {
-            databaseVersion < 14 -> throw UpgradeException("Upgrading a database before v14 is unsupported. Please generate a new database from the source system.")
+            databaseVersion < 43 -> throw UpgradeException("Upgrading a database before v43 is unsupported. Please generate a new database from the source system.")
             databaseVersion > tableVersion.SUPPORTED_VERSION -> throw SQLException("Selected database is a newer version [v$databaseVersion] than the supported version [${tableVersion.SUPPORTED_VERSION}].")
             databaseVersion < tableVersion.SUPPORTED_VERSION -> {
                 doBackup(databaseVersion)
@@ -138,6 +116,7 @@ class UpgradeRunner constructor(
                         .forEach { runUpgrade(it, statement, versionUpdateStatement) }
                 }
             }
+            else -> logger.info("Selected database is the newest supported version.")
         }
     }
 
@@ -215,5 +194,5 @@ class UpgradeRunner constructor(
     class ConnectionResult(val connection: Connection, val version: Int)
     class UpgradeException(message: String?, cause: Throwable? = null) : Exception(message, cause)
 
-    private data class VersionResult(val versionNumber: Int?, val requiresVersionTableUpgrdae: Boolean = false)
+    private data class VersionResult(val versionNumber: Int?, val requiresVersionTableUpgrade: Boolean = false)
 }

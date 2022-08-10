@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.database.sqlite.upgrade
 
+import com.zepben.evolve.database.sqlite.DatabaseTables
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.*
 import com.zepben.testutils.junit.SystemLogExtension
@@ -28,32 +29,7 @@ class ChangeSetTest {
 
     // Add a ChangeSetValidator here for the corresponding number when testing a new ChangeSet.
     // Please do not use TodoValidator for any new ChangeSets.
-    private val changeSetValidators = mapOf(
-        20 to ChangeSet20Validator,
-        21 to ChangeSet21Validator,
-        22 to ChangeSet22Validator,
-        23 to ChangeSet23Validator,
-        24 to ChangeSet24Validator,
-        25 to TodoValidator,
-        26 to TodoValidator,
-        27 to TodoValidator,
-        28 to ChangeSet28Validator,
-        29 to TodoValidator,
-        30 to ChangeSet30Validator,
-        31 to TodoValidator,
-        32 to TodoValidator,
-        33 to ChangeSet33Validator,
-        34 to ChangeSet34Validator,
-        35 to ChangeSet35Validator,
-        36 to ChangeSet36Validator,
-        37 to ChangeSet37Validator,
-        38 to ChangeSet38Validator,
-        39 to ChangeSet39Validator,
-        40 to ChangeSet40Validator,
-        41 to ChangeSet41Validator,
-        42 to ChangeSet42Validator,
-        43 to ChangeSet43Validator
-    )
+    private val changeSetValidators: Map<Int, ChangeSetValidator> = emptyMap() // Replace with mapOf(44 -> ChangeSetValidator44) when updating database version
 
     @Test
     internal fun `test change sets`() {
@@ -97,7 +73,7 @@ class ChangeSetTest {
     }
 
     /**
-     * Creates an in memory sqlite database using the base schema (from version 19).
+     * Creates an in memory sqlite database using the base schema (from version 43).
      */
     private fun createBaseDB(): Connection {
         val f = File("src/test/data/base-schema.sql")

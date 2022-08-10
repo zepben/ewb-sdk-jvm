@@ -46,7 +46,7 @@ class UpgradeRunnerTest {
     @Test
     @Throws(Exception::class)
     fun runsUpgrades() {
-        configureDatabaseVersion(14)
+        configureDatabaseVersion(43)
         val connectionResult = upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
         assertThat(connectionResult.connection, equalTo(connection))
         assertThat(connectionResult.version, equalTo(tableVersion.SUPPORTED_VERSION))
@@ -54,7 +54,9 @@ class UpgradeRunnerTest {
         verify(connectionProvider, times(1)).invoke("driver:database")
 
         verify(statementProvider, times(2)).invoke(connection)
-        verify(preparedStatementProvider, times(1)).invoke(connection, tableVersion.preparedUpdateSql())
+
+        val expectedTimesTableVersionUpdated = if (expectedChangeSets.isEmpty()) never() else times(1)
+        verify(preparedStatementProvider, expectedTimesTableVersionUpdated).invoke(connection, tableVersion.preparedUpdateSql())
 
         verify(statement, times(1)).executeUpdate("PRAGMA journal_mode = OFF")
         verify(statement, times(1)).executeUpdate("PRAGMA synchronous = OFF")
@@ -67,11 +69,18 @@ class UpgradeRunnerTest {
         verify(preparedStatement, times(expectedChangeSets.size)).setInt(eq(tableVersion.VERSION.queryIndex), anyInt())
         verify(preparedStatement, times(expectedChangeSets.size)).executeUpdate()
 
-        assertThat(
-            systemErr.log,
-            containsString("Upgrading database 'database' from v14 to v${tableVersion.SUPPORTED_VERSION}")
-        )
-        verify(createBackup, times(1)).invoke(Paths.get("database"), Paths.get("database-v14"), StandardCopyOption.REPLACE_EXISTING)
+        if (expectedChangeSets.isEmpty()) {
+            assertThat(
+                systemErr.log,
+                containsString("Selected database is the newest supported version.")
+            )
+        } else {
+            assertThat(
+                systemErr.log,
+                containsString("Upgrading database 'database' from v43 to v${tableVersion.SUPPORTED_VERSION}")
+            )
+            verify(createBackup, times(1)).invoke(Paths.get("database"), Paths.get("database-v43"), StandardCopyOption.REPLACE_EXISTING)
+        }
 
         for (changeSet in expectedChangeSets) {
             assertThat(systemErr.log, containsString("Applying database change set ${changeSet.number}"))
@@ -83,16 +92,17 @@ class UpgradeRunnerTest {
     @Test
     @Throws(Exception::class)
     fun createAppropriatelyNamedBackup() {
-        configureDatabaseVersion(14)
+        configureDatabaseVersion(43)
 
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database.db"))
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("with/path/database.sqlite"))
 
-        verify(createBackup, times(1)).invoke(Paths.get("database"), Paths.get("database-v14"), StandardCopyOption.REPLACE_EXISTING)
-        verify(createBackup, times(1)).invoke(Paths.get("database.db"), Paths.get("database-v14.db"), StandardCopyOption.REPLACE_EXISTING)
-        verify(createBackup, times(1))
-            .invoke(Paths.get("with/path/database.sqlite"), Paths.get("with/path/database-v14.sqlite"), StandardCopyOption.REPLACE_EXISTING)
+        val expectedTimesBackupCreated = if (expectedChangeSets.isEmpty()) never() else times(1)
+        verify(createBackup, expectedTimesBackupCreated).invoke(Paths.get("database"), Paths.get("database-v43"), StandardCopyOption.REPLACE_EXISTING)
+        verify(createBackup, expectedTimesBackupCreated).invoke(Paths.get("database.db"), Paths.get("database-v43.db"), StandardCopyOption.REPLACE_EXISTING)
+        verify(createBackup, expectedTimesBackupCreated)
+            .invoke(Paths.get("with/path/database.sqlite"), Paths.get("with/path/database-v43.sqlite"), StandardCopyOption.REPLACE_EXISTING)
     }
 
     @Test
@@ -118,7 +128,7 @@ class UpgradeRunnerTest {
         configureDatabaseVersion(1)
         validateException(
             true,
-            "Failed to execute upgrade scripts. Upgrading a database before v14 is unsupported. Please generate a new database from the source system."
+            "Failed to execute upgrade scripts. Upgrading a database before v43 is unsupported. Please generate a new database from the source system."
         )
 
         configureDatabaseVersion(1234567)
@@ -132,15 +142,18 @@ class UpgradeRunnerTest {
     fun `migrates version table`() {
         doThrow(SQLException()).`when`(statement).executeQuery(tableVersion.selectSql())
         doReturn(true).`when`(resultSet).next()
-        doReturn(14).`when`(resultSet).getInt(1)
+        doReturn(43).`when`(resultSet).getInt(1)
 
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
 
         val inOrder = inOrder(statement)
         inOrder.verify(statement).executeQuery("SELECT major FROM version")
-        inOrder.verify(statement).execute("DROP TABLE version")
-        inOrder.verify(statement).execute(tableVersion.createTableSql())
-        inOrder.verify(statement).executeUpdate("INSERT into ${tableVersion.name()} VALUES (14)")
+
+        if (expectedChangeSets.isNotEmpty()) {
+            inOrder.verify(statement).execute("DROP TABLE version")
+            inOrder.verify(statement).execute(tableVersion.createTableSql())
+            inOrder.verify(statement).executeUpdate("INSERT into ${tableVersion.name()} VALUES (43)")
+        }
     }
 
     @Disabled

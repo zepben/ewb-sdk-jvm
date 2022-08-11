@@ -93,11 +93,12 @@ class AssignToLvFeeders {
         assignEquipmentToLvFeeder: (LvFeeder, ConductingEquipment) -> Unit,
         isStopping: Boolean
     ) {
-        if (!isStopping || !reachedHv(terminal)) {
-            terminal.conductingEquipment?.let {
-                assignLvFeederToEquipment(it, activeLvFeeder)
-                assignEquipmentToLvFeeder(activeLvFeeder, it)
-            }
+        if (isStopping && reachedHv(terminal))
+            return
+
+        terminal.conductingEquipment?.let {
+            assignLvFeederToEquipment(it, activeLvFeeder)
+            assignEquipmentToLvFeeder(activeLvFeeder, it)
         }
     }
 

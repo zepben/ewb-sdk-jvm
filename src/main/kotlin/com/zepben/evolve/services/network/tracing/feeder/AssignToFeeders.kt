@@ -11,7 +11,6 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 
@@ -94,11 +93,12 @@ class AssignToFeeders {
         assignEquipmentToFeeder: (Feeder, ConductingEquipment) -> Unit,
         isStopping: Boolean
     ) {
-        if (!isStopping || (!reachedLv(terminal) && !reachedSubstationTransformer(terminal))) {
-            terminal.conductingEquipment?.let {
-                assignFeederToEquipment(it, activeFeeder)
-                assignEquipmentToFeeder(activeFeeder, it)
-            }
+        if (isStopping && (reachedLv(terminal) || reachedSubstationTransformer(terminal)))
+            return
+
+        terminal.conductingEquipment?.let {
+            assignFeederToEquipment(it, activeFeeder)
+            assignEquipmentToFeeder(activeFeeder, it)
         }
     }
 

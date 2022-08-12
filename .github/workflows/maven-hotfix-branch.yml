@@ -1,0 +1,14 @@
+name: Create Hotfix Branch
+
+on: 
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Major.Minor version to create next hotfix patch for (e.g. 2.5)'
+        required: true
+jobs:
+  hotfix:
+    uses: zepben/.github/.github/workflows/maven-hotfix-branch.yml@main
+    with:
+      version: ${{ inputs.version }}
+    secrets: inherit

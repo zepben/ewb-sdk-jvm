@@ -1,53 +1,16 @@
-name: Deploy Snapshot
+name: Maven Library Snapshot
 
 on:
   push:
     branches:
       - main
+      - LTS/*
+      - hotfix/*
   workflow_dispatch:
 
 jobs:
-  deploy-central:
-    runs-on: ubuntu-latest
-    container: zepben/pipeline-java
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache maven deps
-        uses: actions/cache@v2
-        with:
-          path: /maven
-          key: maven
-
-      - name: Maven deploy to Central
-        id: build
-        uses: zepben/maven-deploy-central-action@main
-        with:
-          ZEPBEN_GPG_KEY: ${{ secrets.ZEPBEN_GPG_KEY_B64 }}
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-          GPG_KEY_PASSWORD: ${{ secrets.GPG_KEY_PASSWORD }}
-
-      - name: Upload coverage to Codecov
-        if: steps.build.outcome == 'success'
-        uses: codecov/codecov-action@v1
-
-  update-snapshot-version:
-    needs: [deploy-central]
-    container: zepben/pipeline-basic:5.5.0
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
-      NEXUS_MAVEN_REPO: ${{ secrets.NEXUS_MAVEN_REPO }}
-      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
-      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-      NEXUS_MAVEN_SNAPSHOT: ${{ secrets.NEXUS_MAVEN_SNAPSHOT }}
-      NEXUS_MAVEN_RELEASE: ${{ secrets.NEXUS_MAVEN_RELEASE }}
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Update snapshot version
-        run: |
-          /scripts/update-version.sh --java --snapshot --maven pom.xml
-        shell: bash
+  snapshot:
+    uses: zepben/.github/.github/workflows/maven-lib-snapshot.yml@main
+    with:
+      private: false
+    secrets: inherit

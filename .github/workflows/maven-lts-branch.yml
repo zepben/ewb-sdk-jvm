@@ -1,0 +1,14 @@
+name: Create LTS Branch
+
+on: 
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Major.Minor version to create the LTS branch for (e.g. 2.5)'
+        required: true
+jobs:
+  lts:
+    uses: zepben/.github/.github/workflows/maven-lts-branch.yml@main
+    with:
+      version: ${{ inputs.version }}
+    secrets: inherit

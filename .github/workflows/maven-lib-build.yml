@@ -1,38 +1,11 @@
-name: Build
+name: Maven Build OSS
 
 on: 
   pull_request:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    container: zepben/pipeline-java
-    steps:
-      - uses: actions/checkout@v2
+  build:
+    uses: zepben/.github/.github/workflows/maven-build-oss.yml@main
+    secrets: inherit
 
-      - name: Cache licence-check
-        uses: actions/cache@v2
-        with:
-          path: /lc
-          key: lcc
-          
-      - name: Check licence
-        uses: zepben/licence-check-action@main
-        with:
-          LC_URL: ${{ secrets.LC_URL }}
-
-      - name: Cache maven deps
-        uses: actions/cache@v2
-        with:
-          path: /maven
-          key: maven
-
-      - name: Maven build and test
-        id: build
-        run: mvn clean test -P '!zepben-maven' -f pom.xml
-        shell: bash
-
-      - name: Upload coverage to Codecov
-        if: steps.build.outcome == 'success'
-        uses: codecov/codecov-action@v1

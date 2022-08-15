@@ -65,13 +65,3 @@ interface ChangeSetValidator {
     }
 
 }
-
-@Deprecated("Please do not use this, it's only to cover legacy cases where we've missed tests.")
-internal object TodoValidator : ChangeSetValidator {
-
-    override fun setUpStatements(): List<String> = emptyList()
-    override fun populateStatements(): List<String> = emptyList()
-    override fun validate(statement: Statement) {}
-    override fun tearDownStatements(): List<String> = emptyList()
-
-}

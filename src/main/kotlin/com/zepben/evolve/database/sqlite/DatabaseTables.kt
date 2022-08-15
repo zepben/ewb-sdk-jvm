@@ -45,6 +45,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.p
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
 import java.sql.Connection
 import java.sql.PreparedStatement
 
@@ -124,6 +125,7 @@ class DatabaseTables {
         TableLocations(),
         TableLoops(),
         TableLoopsSubstations(),
+        TableLvFeeders(),
         TableMetadataDataSources(),
         TableMeters(),
         TableNameTypes(),

@@ -64,7 +64,7 @@ object FeederNetworkWithCurrent {
         networkService.connect(c4.getTerminal(2)!!, tx2.getTerminal(1)!!)
 
         Tracing.setPhases().run(networkService)
-        Tracing.assignEquipmentContainersToFeeders().run(networkService)
+        Tracing.assignEquipmentToFeeders().run(networkService)
 
         return networkService
     }

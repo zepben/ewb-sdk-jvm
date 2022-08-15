@@ -8,10 +8,7 @@
 package com.zepben.evolve.services.network.tracing
 
 import com.zepben.evolve.services.network.tracing.connectivity.*
-import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
-import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
-import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
-import com.zepben.evolve.services.network.tracing.feeder.SetDirection
+import com.zepben.evolve.services.network.tracing.feeder.*
 import com.zepben.evolve.services.network.tracing.phases.*
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
@@ -223,12 +220,20 @@ object Tracing {
     fun removeDirection(): RemoveDirection = RemoveDirection()
 
     /**
-     * Returns an instance of [AssignToFeeders] convenience class for assigning equipment containers to feeders on a network.
+     * Returns an instance of [AssignToFeeders] convenience class for assigning equipment containers to HV/MV feeders on a network.
      *
      * @return A new traversal instance.
      */
     @JvmStatic
-    fun assignEquipmentContainersToFeeders(): AssignToFeeders = AssignToFeeders()
+    fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
+
+    /**
+     * Returns an instance of [AssignToFeeders] convenience class for assigning equipment containers to LV feeders on a network.
+     *
+     * @return A new traversal instance.
+     */
+    @JvmStatic
+    fun assignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
 
     /**
      * Returns an instance of [DownstreamTree] convenience class for tracing using the

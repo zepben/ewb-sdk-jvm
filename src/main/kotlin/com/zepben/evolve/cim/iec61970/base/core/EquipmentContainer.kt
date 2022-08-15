@@ -7,11 +7,13 @@
  */
 package com.zepben.evolve.cim.iec61970.base.core
 
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.validateReference
 
 /**
  * A modeling construct to provide a root class for containing equipment.
+ * Unless overridden, all functions operating on currentEquipment simply operate on the equipment collection. i.e. currentEquipment = equipment
  */
 abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer(mRID) {
 
@@ -66,7 +68,7 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     }
 
     /**
-     * Convenience function to find all of the normal feeders of the equipment associated with this equipment container.
+     * Convenience function to find all of the normal [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
      *
      * @return the normal feeders for all associated feeders
      */
@@ -77,7 +79,7 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     }
 
     /**
-     * Convenience function to find all of the current feeders of the equipment associated with this equipment container.
+     * Convenience function to find all of the current [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
      *
      * @return the current feeders for all associated feeders
      */
@@ -86,4 +88,37 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
         _equipmentById?.values?.forEach { equip -> ret.addAll(equip.currentFeeders) }
         return ret
     }
+
+    /**
+     * Contained equipment using the current state of the network. The returned collection is read only.
+     */
+    open val currentEquipment: Collection<Equipment> get() = equipment
+
+    /**
+     * Get the number of entries in the current [Equipment] collection.
+     */
+    open fun numCurrentEquipment(): Int = numEquipment()
+
+    /**
+     * Contained equipment using the current state of the network.
+     *
+     * @param mRID the mRID of the required current [Equipment]
+     * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
+     */
+    open fun getCurrentEquipment(mRID: String): Equipment? = getEquipment(mRID)
+
+    /**
+     * @param equipment the equipment to associate with this equipment container in the current state of the network.
+     */
+    open fun addCurrentEquipment(equipment: Equipment): EquipmentContainer = addEquipment(equipment)
+
+    /**
+     * @param equipment the equipment to disassociate from this equipment container in the current state of the network.
+     */
+    open fun removeCurrentEquipment(equipment: Equipment?): Boolean = removeEquipment(equipment)
+
+    /**
+     * Clear all Equipment associated with this [Feeder]
+     */
+    open fun clearCurrentEquipment(): EquipmentContainer = clearEquipment()
 }

@@ -9,6 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
 import com.zepben.evolve.services.common.extensions.validateReference
@@ -18,7 +19,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * @property normallyInService If true, the equipment is _normally_ in service.
  *
  * @property sites [Site]'s this equipment belongs to.
- * @property normalFeeders [Feeder]'- that represent the normal feeders of the equipment.
+ * @property normalFeeders [Feeder]'s that represent the normal feeders of the equipment.
  * @property currentFeeders [Feeder]'s that represent the current feeders of the equipment.
  * @property substations [Substation]'s that represent the substation of the equipment.
  */
@@ -29,11 +30,15 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     private var _equipmentContainers: MutableList<EquipmentContainer>? = null
     private var _usagePoints: MutableList<UsagePoint>? = null
     private var _operationalRestrictions: MutableList<OperationalRestriction>? = null
-    private var _currentFeeders: MutableList<Feeder>? = null
+    private var _currentContainers: MutableList<EquipmentContainer>? = null
 
-    val sites: List<Site> get() = equipmentContainersOfType()
-    val normalFeeders: List<Feeder> get() = equipmentContainersOfType()
-    val substations: List<Substation> get() = equipmentContainersOfType()
+    val sites: List<Site> get() = _equipmentContainers.ofType()
+    val normalFeeders: List<Feeder> get() = _equipmentContainers.ofType()
+    val normalLvFeeders: List<LvFeeder> get() = _equipmentContainers.ofType()
+    val substations: List<Substation> get() = _equipmentContainers.ofType()
+
+    val currentFeeders: List<Feeder> get() = _currentContainers.ofType()
+    val currentLvFeeders: List<LvFeeder> get() = _currentContainers.ofType()
 
     /**
      * The equipment containers this equipment belongs to. The returned collection is read only.
@@ -86,42 +91,45 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
         return this
     }
 
-    val currentFeeders: Collection<Feeder> get() = _currentFeeders.asUnmodifiable()
-
     /**
-     * Get the number of entries in the current [Feeder] collection.
+     * The equipment containers this equipment belongs to in the current network state. The returned collection is read only.
      */
-    fun numCurrentFeeders() = _currentFeeders?.size ?: 0
+    val currentContainers: Collection<EquipmentContainer> get() = _currentContainers.asUnmodifiable()
 
     /**
-     * [Feeder]'s that represent the current feeders of the equipment.
+     * Get the number of entries in the current [EquipmentContainer] collection.
+     */
+    fun numCurrentContainers() = _currentContainers?.size ?: 0
+
+    /**
+     * [EquipmentContainer]'s that represent the current containers of the equipment.
      *
-     * @param mRID the mRID of the required current [Feeder]
-     * @return The current [Feeder] with the specified [mRID] if it exists, otherwise null
+     * @param mRID the mRID of the required current [EquipmentContainer]
+     * @return The current [EquipmentContainer] with the specified [mRID] if it exists, otherwise null
      */
-    fun getCurrentFeeder(mRID: String) = _currentFeeders.getByMRID(mRID)
+    fun getCurrentContainer(mRID: String) = _currentContainers.getByMRID(mRID)
 
     /**
-     * @param feeder the equipment container to associate with this equipment.
+     * @param equipmentContainer the equipment container to associate with this equipment.
      * @return A reference to this [Equipment] to allow fluent use.
      */
-    fun addCurrentFeeder(feeder: Feeder): Equipment {
-        if (validateReference(feeder, ::getCurrentFeeder, "A current Feeder"))
+    fun addCurrentContainer(equipmentContainer: EquipmentContainer): Equipment {
+        if (validateReference(equipmentContainer, ::getCurrentContainer, "A current EquipmentContainer"))
             return this
 
-        _currentFeeders = _currentFeeders ?: mutableListOf()
-        _currentFeeders!!.add(feeder)
+        _currentContainers = _currentContainers ?: mutableListOf()
+        _currentContainers!!.add(equipmentContainer)
 
         return this
     }
 
     /**
-     * @param feeder the equipment container to disassociate with this equipment.
-     * @return `true` if [feeder] has been successfully removed; `false` if it was not present in the set.
+     * @param equipmentContainer the equipment container to disassociate with this equipment.
+     * @return `true` if [equipmentContainer] has been successfully removed; `false` if it was not present in the set.
      */
-    fun removeCurrentFeeder(feeder: Feeder?): Boolean {
-        val ret = _currentFeeders?.remove(feeder) == true
-        if (_currentFeeders.isNullOrEmpty()) _currentFeeders = null
+    fun removeCurrentContainer(equipmentContainer: EquipmentContainer?): Boolean {
+        val ret = _currentContainers?.remove(equipmentContainer) == true
+        if (_currentContainers.isNullOrEmpty()) _currentContainers = null
         return ret
     }
 
@@ -129,8 +137,8 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
      * Clear this [Equipment]'s associated current [EquipmentContainer]'s
      * @return this [Equipment]
      */
-    fun clearCurrentFeeders(): Equipment {
-        _currentFeeders = null
+    fun clearCurrentContainers(): Equipment {
+        _currentContainers = null
         return this
     }
 
@@ -241,7 +249,5 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
         return this
     }
 
-    private inline fun <reified T : EquipmentContainer> equipmentContainersOfType(): List<T> {
-        return _equipmentContainers?.filterIsInstance(T::class.java) ?: emptyList()
-    }
+    private inline fun <reified T : EquipmentContainer> List<*>?.ofType(): List<T> = this?.filterIsInstance(T::class.java) ?: emptyList()
 }

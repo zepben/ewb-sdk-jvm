@@ -9,6 +9,7 @@
 package com.zepben.evolve.database.sqlite
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.database.sqlite.readers.*
@@ -22,6 +23,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
+import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
@@ -47,7 +49,8 @@ class DatabaseReader @JvmOverloads constructor(
     private val setDirection: SetDirection = Tracing.setDirection(),
     private val setPhases: SetPhases = Tracing.setPhases(),
     private val phaseInferrer: PhaseInferrer = Tracing.phaseInferrer(),
-    private val assignToFeeders: AssignToFeeders = Tracing.assignEquipmentContainersToFeeders()
+    private val assignToFeeders: AssignToFeeders = Tracing.assignEquipmentToFeeders(),
+    private val assignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders()
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -131,12 +134,30 @@ class DatabaseReader @JvmOverloads constructor(
         assignToFeeders.run(networkService)
         logger.info("Equipment assigned to feeders.")
 
+        logger.info("Assigning equipment to LV feeders...")
+        assignToLvFeeders.run(networkService)
+        logger.info("Equipment assigned to LV feeders.")
+
+        logger.info("Validating that each equipment is assigned to a container...")
+        validateEquipmentContainers(networkService)
+        logger.info("Equipment containers validated.")
+
         logger.info("Validating primary sources vs feeders...")
         validateSources(networkService)
         logger.info("Sources vs feeders validated.")
 
         closeConnection()
         return true
+    }
+
+    private fun validateEquipmentContainers(networkService: NetworkService) {
+        networkService.sequenceOf<Equipment>()
+            .filter { it.containers.isEmpty() }
+            .forEach { equipment ->
+                logger.warn(
+                    "Equipment ${equipment.nameAndMRID()} was not assigned to any equipment container."
+                )
+            }
     }
 
     private fun validateSources(networkService: NetworkService) {

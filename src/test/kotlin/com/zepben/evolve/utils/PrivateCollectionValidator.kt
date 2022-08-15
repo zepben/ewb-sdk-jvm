@@ -70,6 +70,10 @@ internal class PrivateCollectionValidator {
             add(it, other1)
             assertThat(num(it), equalTo(1))
 
+            // Make sure adding an already-added item does not change the collection
+            add(it, other1)
+            assertThat(num(it), equalTo(1))
+
             remove(it, other1)
             assertThat(num(it), equalTo(0))
 

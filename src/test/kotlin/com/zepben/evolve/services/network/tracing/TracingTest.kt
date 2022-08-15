@@ -61,7 +61,7 @@ class TracingTest {
         validate({ Tracing.phaseInferrer() }, PhaseInferrer::class.java)
         validate({ Tracing.removePhases() }, RemovePhases::class.java)
         validate({ Tracing.removeDirection() }, RemoveDirection::class.java)
-        validate({ Tracing.assignEquipmentContainersToFeeders() }, AssignToFeeders::class.java)
+        validate({ Tracing.assignEquipmentToFeeders() }, AssignToFeeders::class.java)
         validate({ Tracing.normalDownstreamTree() }, DownstreamTree::class.java)
         validate({ Tracing.currentDownstreamTree() }, DownstreamTree::class.java)
         validate({ Tracing.findWithUsagePoints() }, FindWithUsagePoints::class.java)

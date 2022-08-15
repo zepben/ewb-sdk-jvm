@@ -16,6 +16,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.Fuse
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
@@ -90,7 +91,7 @@ internal class TestNetworkBuilderTest {
         //
         // 1 b0*21--c1--21--c2--21--c4--2
         //
-        // 1 b5*21--c6--2
+        // 1 b5*21--c6--21 tx7+21--c8--2
         //
         TestNetworkBuilder()
             .fromBreaker(PhaseCode.ABC) // b0
@@ -100,7 +101,10 @@ internal class TestNetworkBuilderTest {
             .toAcls(PhaseCode.ABC) // c4
             .fromBreaker(PhaseCode.AB) // b5
             .toAcls(PhaseCode.AB) // c6
-            .addFeeder("b5", 1) // fdr7
+            .toPowerTransformer(listOf(PhaseCode.AB, PhaseCode.A)) // tx7
+            .toAcls(PhaseCode.A) // c8
+            .addFeeder("b5", 1) // fdr9
+            .addLvFeeder("tx7") // lvf10
             .build()
             .apply {
                 validateConnections("b0", emptyList(), listOf("c1-t1"))
@@ -109,8 +113,11 @@ internal class TestNetworkBuilderTest {
                 validateFeeder("fdr3", "b0-t2")
                 validateConnections("c4", listOf("c2-t2"), emptyList())
                 validateConnections("b5", emptyList(), listOf("c6-t1"))
-                validateConnections("c6", listOf("b5-t2"), emptyList())
-                validateFeeder("fdr7", "b5-t1")
+                validateConnections("c6", listOf("b5-t2"), listOf("tx7-t1"))
+                validateConnections("tx7", listOf("c6-t2"), listOf("c8-t1"))
+                validateConnections("c8", listOf("tx7-t2"), emptyList())
+                validateFeeder("fdr9", "b5-t1")
+                validateLvFeeder("lvf10", "tx7-t2")
             }
     }
 
@@ -313,6 +320,10 @@ internal class TestNetworkBuilderTest {
 
     private fun NetworkService.validateFeeder(mRID: String, headTerminal: String) {
         assertThat(get<Feeder>(mRID)!!.normalHeadTerminal, equalTo(get(headTerminal)))
+    }
+
+    private fun NetworkService.validateLvFeeder(mRID: String, headTerminal: String) {
+        assertThat(get<LvFeeder>(mRID)!!.normalHeadTerminal, equalTo(get(headTerminal)))
     }
 
     private fun NetworkService.validateEnds(mRID: String, expectedEnds: List<PhaseCode>) {

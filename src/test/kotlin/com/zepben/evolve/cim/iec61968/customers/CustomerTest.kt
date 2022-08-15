@@ -21,6 +21,18 @@ internal class CustomerTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
+    internal fun hasEndDevicesReflectsNumEndDevices() {
+        val customer = Customer()
+        assertThat("Customer has no end devices by default", not(customer.hasEndDevices()))
+
+        customer.numEndDevices = 1
+        assertThat("Customer with 1 end device has end devices", customer.hasEndDevices())
+
+        customer.numEndDevices = 0
+        assertThat("Customer with 0 end devices has no end devices", not(customer.hasEndDevices()))
+    }
+
+    @Test
     internal fun constructorCoverage() {
         assertThat(Customer().mRID, not(equalTo("")))
         assertThat(Customer("id").mRID, equalTo("id"))

@@ -34,6 +34,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 
 /**
  * These should be used to access [ReferenceResolver] instances for use with [BaseService.resolveOrDeferReference] and
@@ -130,8 +131,8 @@ object Resolvers {
         BoundReferenceResolver(equipment, EquipmentToEquipmentContainerResolver, EquipmentContainerToEquipmentResolver)
 
     @JvmStatic
-    fun currentFeeders(equipment: Equipment): BoundReferenceResolver<Equipment, Feeder> =
-        BoundReferenceResolver(equipment, EquipmentToCurrentFeedersResolver, CurrentFeederToEquipmentResolver)
+    fun currentContainers(equipment: Equipment): BoundReferenceResolver<Equipment, EquipmentContainer> =
+        BoundReferenceResolver(equipment, EquipmentToCurrentContainersResolver, EquipmentContainerToCurrentEquipmentResolver)
 
     @JvmStatic
     fun operationalRestrictions(equipment: Equipment): BoundReferenceResolver<Equipment, OperationalRestriction> =
@@ -162,16 +163,16 @@ object Resolvers {
         BoundReferenceResolver(energySourcePhase, EnergySourcePhaseToEnergySourceResolver, EnergySourceToEnergySourcePhaseResolver)
 
     @JvmStatic
-    fun currentEquipment(feeder: Feeder): BoundReferenceResolver<Feeder, Equipment> =
-        BoundReferenceResolver(feeder, CurrentFeederToEquipmentResolver, EquipmentToCurrentFeedersResolver)
-
-    @JvmStatic
     fun normalEnergizingSubstation(feeder: Feeder): BoundReferenceResolver<Feeder, Substation> =
-        BoundReferenceResolver(feeder, FeederToNormalEnergizingSubstationResolver, SubstationToNormalEnergizingFeedersResolver)
+        BoundReferenceResolver(feeder, FeederToNormalEnergizingSubstationResolver, SubstationToNormalEnergizedFeedersResolver)
 
     @JvmStatic
     fun normalHeadTerminal(feeder: Feeder): BoundReferenceResolver<Feeder, Terminal> =
         BoundReferenceResolver(feeder, FeederToNormalHeadTerminalResolver, null)
+    
+    @JvmStatic
+    fun normalEnergizedLvFeeders(feeder: Feeder): BoundReferenceResolver<Feeder, LvFeeder> =
+        BoundReferenceResolver(feeder, FeederToNormalEnergizedLvFeedersResolver, LvFeederToNormalEnergizingFeedersResolver)
 
     @JvmStatic
     fun subGeographicalRegions(geographicalRegion: GeographicalRegion): BoundReferenceResolver<GeographicalRegion, SubGeographicalRegion> =
@@ -226,8 +227,8 @@ object Resolvers {
         BoundReferenceResolver(subGeographicalRegion, SubGeographicalRegionToSubstationResolver, SubstationToSubGeographicalRegionResolver)
 
     @JvmStatic
-    fun normalEnergizingFeeders(substation: Substation): BoundReferenceResolver<Substation, Feeder> =
-        BoundReferenceResolver(substation, SubstationToNormalEnergizingFeedersResolver, FeederToNormalEnergizingSubstationResolver)
+    fun normalEnergizedFeeders(substation: Substation): BoundReferenceResolver<Substation, Feeder> =
+        BoundReferenceResolver(substation, SubstationToNormalEnergizedFeedersResolver, FeederToNormalEnergizingSubstationResolver)
 
     @JvmStatic
     fun subGeographicalRegion(substation: Substation): BoundReferenceResolver<Substation, SubGeographicalRegion> =
@@ -300,6 +301,14 @@ object Resolvers {
     @JvmStatic
     fun normalEnergizingSubstations(loop: Loop): BoundReferenceResolver<Loop, Substation> =
         BoundReferenceResolver(loop, LoopToEnergizingSubstationResolver, SubstationToEnergizedLoopResolver)
+
+    @JvmStatic
+    fun normalHeadTerminal(lvFeeder: LvFeeder): BoundReferenceResolver<LvFeeder, Terminal> =
+        BoundReferenceResolver(lvFeeder, LvFeederToNormalHeadTerminalResolver, null)
+
+    @JvmStatic
+    fun normalEnergizingFeeders(lvFeeder: LvFeeder): BoundReferenceResolver<LvFeeder, Feeder> =
+        BoundReferenceResolver(lvFeeder, LvFeederToNormalEnergizingFeedersResolver, FeederToNormalEnergizedLvFeedersResolver)
 
     @JvmStatic
     fun powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit): BoundReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> =

@@ -243,7 +243,7 @@ class NetworkModelTestUtil {
 
         fun setCurrentFeeder(feeder: Feeder, vararg assets: ConductingEquipment) =
             assets.forEach {
-                it.addCurrentFeeder(feeder)
+                it.addCurrentContainer(feeder)
                 feeder.addCurrentEquipment(it)
             }
 

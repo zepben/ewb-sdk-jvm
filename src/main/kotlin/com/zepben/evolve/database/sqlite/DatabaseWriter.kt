@@ -156,6 +156,7 @@ class DatabaseWriter @JvmOverloads constructor(
                 }
 
                 saveConnection.commit()
+                logger.info("Database saved.")
             }
         } catch (e: SQLException) {
             logger.error("Failed to create database schema: " + e.message)

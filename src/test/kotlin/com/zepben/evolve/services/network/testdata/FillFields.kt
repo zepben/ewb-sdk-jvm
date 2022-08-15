@@ -30,6 +30,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createRemoteSource
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locationOf
@@ -387,8 +388,14 @@ fun Feeder.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
 
     if (includeRuntime) {
         for (i in 0..1)
+            addNormalEnergizedLvFeeder(LvFeeder().also {
+                it.addNormalEnergizingFeeder(this)
+                service.add(it)
+            })
+
+        for (i in 0..1)
             addCurrentEquipment(Junction().also {
-                it.addCurrentFeeder(this)
+                it.addCurrentContainer(this)
                 service.add(it)
             })
     } else {
@@ -440,7 +447,7 @@ fun Equipment.fillFields(service: NetworkService, includeRuntime: Boolean = true
         })
 
         if (includeRuntime) {
-            addCurrentFeeder(Feeder().also {
+            addCurrentContainer(Feeder().also {
                 it.addEquipment(this)
                 service.add(it)
             })
@@ -1072,6 +1079,31 @@ fun Loop.fillFields(service: NetworkService, includeRuntime: Boolean = true): Lo
             it.addEnergizedLoop(this)
             service.add(it)
         })
+    }
+
+    return this
+}
+
+fun LvFeeder.fillFields(service: NetworkService, includeRuntime: Boolean = true): LvFeeder {
+    (this as EquipmentContainer).fillFields(service, includeRuntime)
+
+    normalHeadTerminal = Terminal().also { service.add(it) }
+
+    if (includeRuntime) {
+        for (i in 0..1)
+            addNormalEnergizingFeeder(Feeder().also {
+                it.addNormalEnergizedLvFeeder(this)
+                service.add(it)
+            })
+
+        for (i in 0..1)
+            addCurrentEquipment(Junction().also {
+                it.addCurrentContainer(this)
+                service.add(it)
+            })
+    } else {
+        equipment.forEach { it.removeContainer(this) }
+        clearEquipment()
     }
 
     return this

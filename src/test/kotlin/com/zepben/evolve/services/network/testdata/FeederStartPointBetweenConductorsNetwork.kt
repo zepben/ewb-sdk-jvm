@@ -10,6 +10,7 @@ package com.zepben.evolve.services.network.testdata
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Substation
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 
 object FeederStartPointBetweenConductorsNetwork {
@@ -18,9 +19,7 @@ object FeederStartPointBetweenConductorsNetwork {
     //  c1       c2
     // ---- fsp ----
     //
-    fun create() = NetworkService().also { networkService ->
-        val substation = Substation().also { networkService.add(it) }
-
+    fun create(makeFeederLv: Boolean = false) = NetworkService().also { networkService ->
         val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.A)
         val fsp = createNodeForConnecting(networkService, "fsp", 2)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.A)
@@ -28,7 +27,12 @@ object FeederStartPointBetweenConductorsNetwork {
         networkService.connect(c1.getTerminal(2)!!, fsp.getTerminal(1)!!)
         networkService.connect(c2.getTerminal(1)!!, fsp.getTerminal(2)!!)
 
-        createFeeder(networkService, "f", "f", substation, fsp, fsp.getTerminal(2))
+        if (makeFeederLv) {
+            LvFeeder("f").apply { normalHeadTerminal = fsp.getTerminal(2) }.also { networkService.add(it) }
+        } else {
+            val substation = Substation().also { networkService.add(it) }
+            createFeeder(networkService, "f", "f", substation, fsp, fsp.getTerminal(2))
+        }
     }
 
 }

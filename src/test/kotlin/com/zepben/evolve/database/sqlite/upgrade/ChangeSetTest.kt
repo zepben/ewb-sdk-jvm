@@ -8,7 +8,7 @@
 package com.zepben.evolve.database.sqlite.upgrade
 
 import com.zepben.evolve.database.sqlite.tables.TableVersion
-import com.zepben.evolve.database.sqlite.upgrade.changesets.*
+import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -27,31 +27,8 @@ class ChangeSetTest {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     // Add a ChangeSetValidator here for the corresponding number when testing a new ChangeSet.
-    // Please do not use TodoValidator for any new ChangeSets.
-    private val changeSetValidators = mapOf(
-        20 to ChangeSet20Validator,
-        21 to ChangeSet21Validator,
-        22 to ChangeSet22Validator,
-        23 to ChangeSet23Validator,
-        24 to ChangeSet24Validator,
-        25 to TodoValidator,
-        26 to TodoValidator,
-        27 to TodoValidator,
-        28 to ChangeSet28Validator,
-        29 to TodoValidator,
-        30 to ChangeSet30Validator,
-        31 to TodoValidator,
-        32 to TodoValidator,
-        33 to ChangeSet33Validator,
-        34 to ChangeSet34Validator,
-        35 to ChangeSet35Validator,
-        36 to ChangeSet36Validator,
-        37 to ChangeSet37Validator,
-        38 to ChangeSet38Validator,
-        39 to ChangeSet39Validator,
-        40 to ChangeSet40Validator,
-        41 to ChangeSet41Validator,
-        42 to ChangeSet42Validator
+    private val changeSetValidators = mapOf<Int, ChangeSetValidator>(
+//        44 to ChangeSet44Validator
     )
 
     @Test
@@ -62,7 +39,7 @@ class ChangeSetTest {
 
         conn.createStatement().use { stmt ->
             conn.prepareStatement(tableVersion.preparedUpdateSql()).use { versionUpdateStatement ->
-                runner.changeSets.filter { it.number > 19 }.forEach { cs ->
+                runner.changeSets.forEach { cs ->
 
                     val validator = changeSetValidators[cs.number]
                         ?: throw IllegalStateException("Validator for ${cs.number} missing. Have you added a ChangeSetValidator for your latest model update?")
@@ -96,7 +73,7 @@ class ChangeSetTest {
     }
 
     /**
-     * Creates an in memory sqlite database using the base schema (from version 19).
+     * Creates an in memory sqlite database using the base schema (from version 43).
      */
     private fun createBaseDB(): Connection {
         val f = File("src/test/data/base-schema.sql")

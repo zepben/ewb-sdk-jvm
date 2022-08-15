@@ -7,17 +7,21 @@
  */
 package com.zepben.evolve.database.sqlite.upgrade
 
+import com.zepben.evolve.database.sqlite.extensions.configureBatch
+import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
+import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.TableVersion
-import com.zepben.testutils.exception.ExpectException
+import com.zepben.testutils.exception.ExpectException.expect
 import com.zepben.testutils.junit.SystemLogExtension
-import com.zepben.testutils.mockito.DefaultAnswer
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.containsString
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.AdditionalAnswers
-import org.mockito.Mockito.*
+import org.mockito.InOrder
+import org.mockito.kotlin.*
+import java.io.IOException
 import java.nio.file.CopyOption
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -30,117 +34,225 @@ class UpgradeRunnerTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val resultSet = mock(ResultSet::class.java)
-    private val statement = mock(Statement::class.java, DefaultAnswer.of(ResultSet::class.java, resultSet))
-    private val preparedStatement = mock(PreparedStatement::class.java, DefaultAnswer.of(ResultSet::class.java, resultSet))
-    private val connection = mock(Connection::class.java)
-    private val connectionProvider = spyLambda<Function1<String, Connection>> { connection }
-    private val statementProvider = spyLambda<Function1<Connection, Statement>> { statement }
-    private val preparedStatementProvider = spyLambda<Function2<Connection, String, PreparedStatement>> { _, _ -> preparedStatement }
-    private val createBackup = spyLambda<Function3<Path, Path, CopyOption, Unit>> { _, _, _ -> }
+    private val resultSet = mock<ResultSet>()
+    private val statement = mock<Statement>().also { doReturn(resultSet).`when`(it).executeQuery(any()) }
+    private val preparedStatement = mock<PreparedStatement>().also { doReturn(resultSet).`when`(it).executeQuery(any()) }
+    private val connection = mock<Connection>()
+    private val connectionProvider = spy<(String) -> Connection>(value = { connection })
+    private val statementProvider = spy<(Connection) -> Statement>(value = { statement })
+    private val preparedStatementProvider = spy<(Connection, String) -> PreparedStatement>(value = { _, _ -> preparedStatement })
+    private val createBackup = spy<(Path, Path, CopyOption) -> Unit>(value = { _, _, _ -> })
 
-    private val upgradeRunner = UpgradeRunner(connectionProvider, statementProvider, preparedStatementProvider, createBackup)
-    private val expectedChangeSets: List<ChangeSet> = upgradeRunner.changeSets
-    private val tableVersion = TableVersion()
+    private val changeSet1 = mock<ChangeSet>().also { doReturn(1).`when`(it).number }
+    private val changeSet2 = mock<ChangeSet>().also { doReturn(2).`when`(it).number }
+    private val changeSets = listOf(changeSet1, changeSet2)
+
+    private val column = mock<Column>().also { doReturn(1).`when`(it).queryIndex }
+    private val tableVersion = mock<TableVersion>().also {
+        doReturn(2).`when`(it).SUPPORTED_VERSION
+        doReturn(column).`when`(it).VERSION
+        doReturn("select version").`when`(it).selectSql()
+        doReturn("update statement").`when`(it).preparedUpdateSql()
+    }
+
+    private val upgradeRunner = UpgradeRunner(connectionProvider, statementProvider, preparedStatementProvider, createBackup, changeSets, tableVersion)
 
     @Test
-    @Throws(Exception::class)
-    fun runsUpgrades() {
-        configureDatabaseVersion(14)
-        val connectionResult = upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
-        assertThat(connectionResult.connection, equalTo(connection))
-        assertThat(connectionResult.version, equalTo(tableVersion.SUPPORTED_VERSION))
+    internal fun hasChangeSetsForEachSupportedVersionInOrder() {
+        val actualChangeSets = UpgradeRunner().changeSets
 
-        verify(connectionProvider, times(1)).invoke("driver:database")
-
-        verify(statementProvider, times(2)).invoke(connection)
-        verify(preparedStatementProvider, times(1)).invoke(connection, tableVersion.preparedUpdateSql())
-
-        verify(statement, times(1)).executeUpdate("PRAGMA journal_mode = OFF")
-        verify(statement, times(1)).executeUpdate("PRAGMA synchronous = OFF")
-        verify(statement, times(expectedChangeSets.size)).executeUpdate("PRAGMA foreign_keys=OFF")
-        verify(statement, times(expectedChangeSets.size)).executeUpdate("PRAGMA foreign_key_check")
-        verify(statement, times(expectedChangeSets.size)).executeUpdate("COMMIT")
-        verify(statement, times(expectedChangeSets.size)).executeUpdate("BEGIN TRANSACTION")
-        verify(statement, times(expectedChangeSets.size)).executeUpdate("PRAGMA foreign_keys=ON")
-
-        verify(preparedStatement, times(expectedChangeSets.size)).setInt(eq(tableVersion.VERSION.queryIndex), anyInt())
-        verify(preparedStatement, times(expectedChangeSets.size)).executeUpdate()
-
-        assertThat(
-            systemErr.log,
-            containsString("Upgrading database 'database' from v14 to v${tableVersion.SUPPORTED_VERSION}")
-        )
-        verify(createBackup, times(1)).invoke(Paths.get("database"), Paths.get("database-v14"), StandardCopyOption.REPLACE_EXISTING)
-
-        for (changeSet in expectedChangeSets) {
-            assertThat(systemErr.log, containsString("Applying database change set ${changeSet.number}"))
-            val inOrder = inOrder(statement)
-            changeSet.commands().forEach { inOrder.verify(statement).executeUpdate(it) }
-        }
+        // If upgrades are supported, make sure they are all registered in the correct order.
+        if (actualChangeSets.isNotEmpty())
+            assertThat(actualChangeSets.map { it.number }, equalTo((changeSets.minOf { it.number }..TableVersion().SUPPORTED_VERSION).toList()))
     }
 
     @Test
-    @Throws(Exception::class)
+    internal fun configuresConnectionForBatchProcessing() {
+        configureDatabaseVersion(2)
+
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+
+        verify(connectionProvider).invoke("driver:database")
+        verify(connection).configureBatch(statementProvider)
+    }
+
+
+    @Test
+    fun runsEachChangeSetInTransactions() {
+        configureDatabaseVersion(0)
+        doReturn(listOf("1-1", "1-2")).`when`(changeSet1).commands()
+        doReturn(listOf("2-1", "2-2")).`when`(changeSet2).commands()
+
+        val connectionResult = upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+
+        assertThat(connectionResult.connection, equalTo(connection))
+        assertThat(connectionResult.version, equalTo(2))
+
+        assertThat(systemErr.log, containsString("Upgrading database 'database' from v0 to v2"))
+
+        val inOrder = inOrder(createBackup, statement, preparedStatement, preparedStatementProvider)
+
+        inOrder.verify(createBackup).invoke(any(), any(), any())
+        inOrder.verify(preparedStatementProvider).invoke(connection, tableVersion.preparedUpdateSql())
+
+        validateChangeSetExecuted(inOrder, changeSet1)
+        validateChangeSetExecuted(inOrder, changeSet2)
+    }
+
+    @Test
+    internal fun doesntRunUpgradeIfCurrentVersion() {
+        configureDatabaseVersion(2)
+        changeSets.forEach { clearInvocations(it) }
+
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+
+        verifyNoMoreInteractions(createBackup)
+        changeSets.forEach { verifyNoMoreInteractions(it) }
+    }
+
+    @Test
+    internal fun onlyRunsChangeSetsIfRequired() {
+        configureDatabaseVersion(1)
+        changeSets.forEach { clearInvocations(it) }
+
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+
+        verify(createBackup).invoke(any(), any(), any())
+
+        verify(changeSet1, atLeastOnce()).number
+        verifyNoMoreInteractions(changeSet1)
+
+        verify(changeSet2, atLeastOnce()).number
+        verify(changeSet2).preCommandsHook(any())
+        verify(changeSet2).commands()
+        verify(changeSet2).postCommandsHook(any())
+        verifyNoMoreInteractions(changeSet2)
+    }
+
+    @Test
+    internal fun reportsObsoleteDatabaseVersion() {
+        configureDatabaseVersion(-2)
+
+        expect {
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+        }.toThrow(UpgradeRunner.UpgradeException::class.java)
+            .withMessage(
+                "Failed to execute upgrade scripts. Unable to upgrade obsolete database version [v-2], upgrading a database before v0 is " +
+                    "unsupported. Please generate a new database from the source system using an updated migrator."
+            )
+
+        verify(statement).executeConfiguredQuery("select version")
+        verify(statement, never()).executeQuery("SELECT major FROM version")
+    }
+
+    @Test
+    internal fun reportsFuturisticDatabaseVersion() {
+        configureDatabaseVersion(3)
+
+        expect {
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+        }.toThrow(UpgradeRunner.UpgradeException::class.java)
+            .withMessage(
+                "Failed to execute upgrade scripts. Selected database is a newer version [v3] than the supported version [v2]. Either update the " +
+                    "version of the server you are using, or downgrade the migrator."
+            )
+
+        verify(statement).executeConfiguredQuery("select version")
+    }
+
+    @Test
+    internal fun reportsMissingVersionNumbers() {
+        doAnswer { throw Exception() }.`when`(resultSet).getInt(1)
+
+        expect {
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+        }.toThrow(UpgradeRunner.UpgradeException::class.java)
+            .withMessage(
+                "Failed to execute upgrade scripts. Invalid EWB database detected, unable to read the version number from the database. Please " +
+                    "ensure you only have databases in the EWB data directory that have been generated by a working migrator."
+            )
+
+        verify(statement).executeConfiguredQuery("select version")
+    }
+
+    @Test
+    internal fun reportsDatabaseConnectionIssues() {
+        val exception = SQLException("some error")
+        doAnswer { throw exception }.`when`(connectionProvider).invoke(any())
+
+        expect {
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+        }.toThrow(UpgradeRunner.UpgradeException::class.java)
+            .withMessage(exception.message)
+            .exception().apply {
+                assertThat(cause, equalTo(exception))
+            }
+    }
+
+    @Test
+    internal fun reportsSqlExceptions() {
+        val exception = SQLException("sql message")
+        doAnswer { throw exception }.`when`(preparedStatementProvider).invoke(any(), any())
+
+        configureDatabaseVersion(0)
+
+        expect {
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+        }.toThrow(UpgradeRunner.UpgradeException::class.java)
+            .withMessage("Failed to execute upgrade scripts. sql message")
+    }
+
+    @Test
     fun createAppropriatelyNamedBackup() {
-        configureDatabaseVersion(14)
+        configureDatabaseVersion(1)
 
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database.db"))
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("with/path/database.sqlite"))
 
-        verify(createBackup, times(1)).invoke(Paths.get("database"), Paths.get("database-v14"), StandardCopyOption.REPLACE_EXISTING)
-        verify(createBackup, times(1)).invoke(Paths.get("database.db"), Paths.get("database-v14.db"), StandardCopyOption.REPLACE_EXISTING)
-        verify(createBackup, times(1))
-            .invoke(Paths.get("with/path/database.sqlite"), Paths.get("with/path/database-v14.sqlite"), StandardCopyOption.REPLACE_EXISTING)
+        verify(createBackup).invoke(Paths.get("database"), Paths.get("database-v1"), StandardCopyOption.REPLACE_EXISTING)
+        verify(createBackup).invoke(Paths.get("database.db"), Paths.get("database-v1.db"), StandardCopyOption.REPLACE_EXISTING)
+        verify(createBackup).invoke(Paths.get("with/path/database.sqlite"), Paths.get("with/path/database-v1.sqlite"), StandardCopyOption.REPLACE_EXISTING)
+        verifyNoMoreInteractions(createBackup)
     }
 
     @Test
-    @Throws(Exception::class)
-    fun onlyRunsVersionsIfRequired() {
-        configureDatabaseVersion(tableVersion.SUPPORTED_VERSION)
-        upgradeRunner.connectAndUpgrade("database", Paths.get("filename"))
+    internal fun reportsDatabaseBackupIOErrors() {
+        configureDatabaseVersion(0)
 
-        verify(statement, times(2)).executeUpdate(any())
-        verify(statement, times(1)).executeUpdate("PRAGMA journal_mode = OFF")
-        verify(statement, times(1)).executeUpdate("PRAGMA synchronous = OFF")
+        val exception = IOException("io error")
+        doAnswer { throw exception }.`when`(createBackup).invoke(any(), any(), any())
+
+        expect {
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+        }.toThrow(UpgradeRunner.UpgradeException::class.java)
+            .withMessage("Failed to create database backup. io error")
     }
 
     @Test
-    @Throws(Exception::class)
-    fun warnsAboutUnsupportedVersions() {
-        doAnswer { throw SQLException("Unable to connect to database [missing-database].") }.`when`(connectionProvider).invoke("missing-database")
-        validateException(false, "Unable to connect to database [missing-database].")
+    internal fun reportsDatabaseBackupSecurityExceptions() {
+        configureDatabaseVersion(0)
 
-        doReturn(false).`when`(resultSet).next()
-        validateException(true, "Failed to execute upgrade scripts. No version number found in database.")
+        val exception = SecurityException("security error")
+        doAnswer { throw exception }.`when`(createBackup).invoke(any(), any(), any())
 
-        configureDatabaseVersion(1)
-        validateException(
-            true,
-            "Failed to execute upgrade scripts. Upgrading a database before v14 is unsupported. Please generate a new database from the source system."
-        )
-
-        configureDatabaseVersion(1234567)
-        validateException(
-            true,
-            "Failed to execute upgrade scripts. Selected database is a newer version [v1234567] than the supported version [${tableVersion.SUPPORTED_VERSION}]."
-        )
+        expect {
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+        }.toThrow(UpgradeRunner.UpgradeException::class.java)
+            .withMessage("Failed to create database backup. security error")
     }
 
     @Test
-    fun `migrates version table`() {
-        doThrow(SQLException()).`when`(statement).executeQuery(tableVersion.selectSql())
-        doReturn(true).`when`(resultSet).next()
-        doReturn(14).`when`(resultSet).getInt(1)
+    internal fun propagatesUnknownExceptions() {
+        val exception = Exception("unknown exception")
+        doAnswer { throw exception }.`when`(preparedStatementProvider).invoke(any(), any())
+        configureDatabaseVersion(0)
 
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
-
-        val inOrder = inOrder(statement)
-        inOrder.verify(statement).executeQuery("SELECT major FROM version")
-        inOrder.verify(statement).execute("DROP TABLE version")
-        inOrder.verify(statement).execute(tableVersion.createTableSql())
-        inOrder.verify(statement).executeUpdate("INSERT into ${tableVersion.name()} VALUES (14)")
+        expect {
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
+        }.toThrow().exception().also {
+            assertThat(it, equalTo(exception))
+        }
     }
 
     @Disabled
@@ -153,32 +265,23 @@ class UpgradeRunnerTest {
         upgradeRunner.connectAndUpgrade("jdbc:sqlite:$databaseFile", Paths.get(databaseFile))
     }
 
-    @Throws(SQLException::class)
     private fun configureDatabaseVersion(version: Int) {
         doReturn(true).`when`(resultSet).next()
-        doReturn(version).`when`(resultSet).getInt(tableVersion.VERSION.queryIndex)
+        doReturn(version).`when`(resultSet).getInt(1)
     }
 
-    @Throws(SQLException::class)
-    private fun validateException(validDatabaseConnection: Boolean, expectedMessage: String) {
-        clearInvocations(connection)
-        ExpectException.expect {
-            upgradeRunner.connectAndUpgrade(
-                if (validDatabaseConnection) "database" else "missing-database",
-                Paths.get("filename")
-            )
-        }
-            .toThrow(UpgradeRunner.UpgradeException::class.java)
-            .withMessage(expectedMessage)
-        verify(connection, times(if (validDatabaseConnection) 1 else 0)).close()
+    private fun validateChangeSetExecuted(inOrder: InOrder, changeSet: ChangeSet) {
+        inOrder.verify(statement).executeUpdate("PRAGMA foreign_keys=OFF")
+
+        changeSet.commands().forEach { inOrder.verify(statement).executeUpdate(it) }
+
+        inOrder.verify(preparedStatement).setInt(tableVersion.VERSION.queryIndex, changeSet.number)
+        inOrder.verify(preparedStatement).executeUpdate()
+
+        inOrder.verify(statement).executeUpdate("PRAGMA foreign_key_check")
+        inOrder.verify(statement).executeUpdate("COMMIT")
+        inOrder.verify(statement).executeUpdate("BEGIN TRANSACTION")
+        inOrder.verify(statement).executeUpdate("PRAGMA foreign_keys=ON")
     }
 
-    companion object {
-        @Suppress("UNCHECKED_CAST")
-        fun <T : Any> spyLambda(lambda: T): T {
-            val interfaces = lambda.javaClass.interfaces
-            assertThat(interfaces, arrayWithSize(1))
-            return mock(interfaces[0] as Class<T>, AdditionalAnswers.delegatesTo<Any>(lambda))
-        }
-    }
 }

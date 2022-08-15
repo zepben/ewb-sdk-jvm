@@ -277,7 +277,7 @@ object StupidlyLargeNetwork {
 
         Tracing.setDirection().run(networkService)
         Tracing.setPhases().run(networkService)
-        Tracing.assignEquipmentContainersToFeeders().run(networkService)
+        Tracing.assignEquipmentToFeeders().run(networkService)
 
         networkService.add(OperationalRestriction("OperationalRestriction2").apply {
             name = "Operational Restriction 2"

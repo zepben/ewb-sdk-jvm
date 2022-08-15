@@ -30,6 +30,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
 import com.zepben.evolve.services.common.UNKNOWN_INT
 import com.zepben.evolve.services.common.UNKNOWN_LONG
@@ -142,6 +143,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerEl
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit as PBPowerElectronicsWindUnit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
+import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
 
 /************ IEC61968 ASSET INFO ************/
 
@@ -438,8 +440,8 @@ fun toPb(cim: Equipment, pb: PBEquipment.Builder): PBEquipment.Builder =
         clearOperationalRestrictionMRIDs()
         cim.operationalRestrictions.forEach { addOperationalRestrictionMRIDs(it.mRID) }
 
-        clearCurrentFeederMRIDs()
-        cim.currentFeeders.forEach { addCurrentFeederMRIDs(it.mRID) }
+        clearCurrentContainerMRIDs()
+        cim.currentContainers.forEach { addCurrentContainerMRIDs(it.mRID) }
 
         toPb(cim, psrBuilder)
     }
@@ -453,6 +455,9 @@ fun toPb(cim: Feeder, pb: PBFeeder.Builder): PBFeeder.Builder =
     pb.apply {
         cim.normalHeadTerminal?.let { normalHeadTerminalMRID = it.mRID } ?: clearNormalHeadTerminalMRID()
         cim.normalEnergizingSubstation?.let { normalEnergizingSubstationMRID = it.mRID } ?: clearNormalEnergizingSubstationMRID()
+
+        clearNormalEnergizedLvFeederMRIDs()
+        cim.normalEnergizedLvFeeders.forEach { addNormalEnergizedLvFeederMRIDs(it.mRID) }
 
         toPb(cim, ecBuilder)
     }
@@ -953,8 +958,19 @@ fun toPb(cim: Loop, pb: PBLoop.Builder): PBLoop.Builder =
         toPb(cim, ioBuilder)
     }
 
+fun toPb(cim: LvFeeder, pb: PBLvFeeder.Builder): PBLvFeeder.Builder =
+    pb.apply {
+        cim.normalHeadTerminal?.let { normalHeadTerminalMRID = it.mRID } ?: clearNormalHeadTerminalMRID()
+
+        clearNormalEnergizingFeederMRIDs()
+        cim.normalEnergizingFeeders.forEach { addNormalEnergizingFeederMRIDs(it.mRID) }
+
+        toPb(cim, ecBuilder)
+    }
+
 fun Circuit.toPb(): PBCircuit = toPb(this, PBCircuit.newBuilder()).build()
 fun Loop.toPb(): PBLoop = toPb(this, PBLoop.newBuilder()).build()
+fun LvFeeder.toPb(): PBLvFeeder = toPb(this, PBLvFeeder.newBuilder()).build()
 
 /************ Class for Java friendly usage ************/
 
@@ -967,6 +983,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: OverheadWireInfo): PBOverheadWireInfo = cim.toPb()
     fun toPb(cim: PowerTransformerInfo): PBPowerTransformerInfo = cim.toPb()
     fun toPb(cim: ShortCircuitTest): PBShortCircuitTest = cim.toPb()
+    fun toPb(cim: ShuntCompensatorInfo): PBShuntCompensatorInfo = cim.toPb()
     fun toPb(cim: TransformerEndInfo): PBTransformerEndInfo = cim.toPb()
     fun toPb(cim: TransformerTankInfo): PBTransformerTankInfo = cim.toPb()
 
@@ -1042,5 +1059,6 @@ class NetworkCimToProto : BaseCimToProto() {
     // IEC61970 InfIEC61970 Feeder
     fun toPb(cim: Circuit): PBCircuit = cim.toPb()
     fun toPb(cim: Loop): PBLoop = cim.toPb()
+    fun toPb(cim: LvFeeder): PBLvFeeder = cim.toPb()
 
 }

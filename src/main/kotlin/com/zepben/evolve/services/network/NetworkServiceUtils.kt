@@ -35,6 +35,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVolt
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.customer.CustomerService
 
 /**
@@ -141,6 +142,7 @@ inline fun <R> whenNetworkServiceObject(
     isLinearShuntCompensator: (LinearShuntCompensator) -> R,
     isLocation: (Location) -> R,
     isLoop: (Loop) -> R,
+    isLvFeeder: (LvFeeder) -> R,
     isMeter: (Meter) -> R,
     isOperationalRestriction: (OperationalRestriction) -> R,
     isOrganisation: (Organisation) -> R,
@@ -204,6 +206,7 @@ inline fun <R> whenNetworkServiceObject(
     is LinearShuntCompensator -> isLinearShuntCompensator(identifiedObject)
     is Location -> isLocation(identifiedObject)
     is Loop -> isLoop(identifiedObject)
+    is LvFeeder -> isLvFeeder(identifiedObject)
     is Meter -> isMeter(identifiedObject)
     is OperationalRestriction -> isOperationalRestriction(identifiedObject)
     is Organisation -> isOrganisation(identifiedObject)

@@ -31,6 +31,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.database.sqlite.extensions.getNullableDouble
 import com.zepben.evolve.database.sqlite.extensions.getNullableInt
 import com.zepben.evolve.database.sqlite.extensions.getNullableLong
@@ -59,6 +60,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.p
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
 import com.zepben.evolve.services.common.extensions.*
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.ResultSet
@@ -1033,6 +1035,17 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         val loop = Loop(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadIdentifiedObject(loop, table, resultSet) && networkService.addOrThrow(loop)
+    }
+
+    fun load(table: TableLvFeeders, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val lvFeeder = LvFeeder(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            normalHeadTerminal = networkService.ensureGet(
+                resultSet.getNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex),
+                typeNameAndMRID()
+            )
+        }
+
+        return loadEquipmentContainer(lvFeeder, table, resultSet) && networkService.addOrThrow(lvFeeder)
     }
 
     /************ ASSOCIATIONS ************/

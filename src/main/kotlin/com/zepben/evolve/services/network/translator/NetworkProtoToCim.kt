@@ -30,6 +30,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.common.extensions.internEmpty
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
@@ -132,6 +133,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerEl
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit as PBPowerElectronicsWindUnit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
+import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
 
 /************ IEC61968 ASSET INFO ************/
 
@@ -447,8 +449,8 @@ fun toCim(pb: PBEquipment, cim: Equipment, networkService: NetworkService): Equi
             networkService.resolveOrDeferReference(Resolvers.operationalRestrictions(this), operationalRestrictionMRID)
         }
 
-        pb.currentFeederMRIDsList.forEach { currentFeederMRID ->
-            networkService.resolveOrDeferReference(Resolvers.currentFeeders(this), currentFeederMRID)
+        pb.currentContainerMRIDsList.forEach { currentContainerMRID ->
+            networkService.resolveOrDeferReference(Resolvers.currentContainers(this), currentContainerMRID)
         }
 
         toCim(pb.psr, this, networkService)
@@ -463,6 +465,11 @@ fun toCim(pb: PBFeeder, networkService: NetworkService): Feeder =
     Feeder(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.normalHeadTerminal(this), pb.normalHeadTerminalMRID)
         networkService.resolveOrDeferReference(Resolvers.normalEnergizingSubstation(this), pb.normalEnergizingSubstationMRID)
+
+        pb.normalEnergizedLvFeederMRIDsList.forEach { normalEnergizedLvFeederMRID ->
+            networkService.resolveOrDeferReference(Resolvers.normalEnergizedLvFeeders(this), normalEnergizedLvFeederMRID)
+        }
+
         toCim(pb.ec, this, networkService)
     }
 
@@ -502,7 +509,7 @@ fun toCim(pb: PBSubstation, networkService: NetworkService): Substation =
     Substation(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.subGeographicalRegion(this), pb.subGeographicalRegionMRID)
         pb.normalEnergizedFeederMRIDsList.forEach { normalEnergizedFeederMRID ->
-            networkService.resolveOrDeferReference(Resolvers.normalEnergizingFeeders(this), normalEnergizedFeederMRID)
+            networkService.resolveOrDeferReference(Resolvers.normalEnergizedFeeders(this), normalEnergizedFeederMRID)
         }
         pb.loopMRIDsList.forEach { loopMRID ->
             networkService.resolveOrDeferReference(Resolvers.loops(this), loopMRID)
@@ -1008,8 +1015,18 @@ fun toCim(pb: PBLoop, networkService: NetworkService): Loop =
         toCim(pb.io, this, networkService)
     }
 
+fun toCim(pb: PBLvFeeder, networkService: NetworkService): LvFeeder =
+    LvFeeder(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.normalHeadTerminal(this), pb.normalHeadTerminalMRID)
+        pb.normalEnergizingFeederMRIDsList.forEach { normalEnergizingFeederMRID ->
+            networkService.resolveOrDeferReference(Resolvers.normalEnergizingFeeders(this), normalEnergizingFeederMRID)
+        }
+        toCim(pb.ec, this, networkService)
+    }
+
 fun NetworkService.addFromPb(pb: PBCircuit): Circuit? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLoop): Loop? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBLvFeeder): LvFeeder? = tryAddOrNull(toCim(pb, this))
 
 /************ Class for Java friendly usage ************/
 
@@ -1100,5 +1117,6 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     // IEC61970 InfIEC61970 Feeder
     fun addFromPb(pb: PBCircuit): Circuit? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBLoop): Loop? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBLvFeeder): LvFeeder? = networkService.addFromPb(pb)
 
 }

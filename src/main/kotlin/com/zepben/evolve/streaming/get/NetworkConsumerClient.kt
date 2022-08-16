@@ -80,8 +80,11 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForContainer(equipmentContainer: EquipmentContainer): GrpcResult<MultiObjectResult> =
-        getEquipmentForContainer(equipmentContainer.mRID)
+    fun getEquipmentForContainer(
+        equipmentContainer: EquipmentContainer,
+        includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+    ): GrpcResult<MultiObjectResult> = getEquipmentForContainer(equipmentContainer.mRID, includeEnergizingContainers, includeEnergizedContainers)
 
     /**
      * Retrieve the [Equipment] for the [EquipmentContainer] represented by [mRID]
@@ -96,8 +99,11 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForContainer(mRID: String): GrpcResult<MultiObjectResult> =
-        getEquipmentForContainers(sequenceOf(mRID))
+    fun getEquipmentForContainer(
+        mRID: String,
+        includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+    ): GrpcResult<MultiObjectResult> = getEquipmentForContainers(sequenceOf(mRID), includeEnergizingContainers, includeEnergizedContainers)
 
     /**
      * Retrieve the [Equipment] for all [EquipmentContainer]s represented by [mRIDs]
@@ -112,7 +118,11 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForContainers(mRIDs: Iterable<String>): GrpcResult<MultiObjectResult> = getEquipmentForContainers(mRIDs.asSequence())
+    fun getEquipmentForContainers(
+        mRIDs: Iterable<String>,
+        includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+    ): GrpcResult<MultiObjectResult> = getEquipmentForContainers(mRIDs.asSequence(), includeEnergizingContainers, includeEnergizedContainers)
 
     /**
      * Retrieve the [Equipment] for all [EquipmentContainer]s represented by [mRIDs]
@@ -127,7 +137,13 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForContainers(mRIDs: Sequence<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC { processEquipmentForContainers(mRIDs) }
+    fun getEquipmentForContainers(
+        mRIDs: Sequence<String>,
+        includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+    ): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
+        processEquipmentForContainers(mRIDs, includeEnergizingContainers, includeEnergizedContainers)
+    }
 
     /**
      * Retrieve the [Equipment] for [operationalRestriction].
@@ -449,7 +465,11 @@ class NetworkConsumerClient(
         return extractResults.asSequence()
     }
 
-    private fun processEquipmentForContainers(mRIDs: Sequence<String>): Sequence<ExtractResult> {
+    private fun processEquipmentForContainers(
+        mRIDs: Sequence<String>,
+        includeEnergizingContainers: IncludedEnergizingContainers,
+        includeEnergizedContainers: IncludedEnergizedContainers
+    ): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetEquipmentForContainersResponse> { response ->
             response.identifiedObjectsList.forEach {
@@ -465,6 +485,9 @@ class NetworkConsumerClient(
                 request.onNext(builder.build())
             builder.clearMrids()
         }
+
+        builder.includeEnergizingContainers = includeEnergizingContainers
+        builder.includeEnergizedContainers = includeEnergizedContainers
 
         request.onCompleted()
         streamObserver.await()

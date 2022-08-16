@@ -15,7 +15,6 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
-import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
@@ -34,7 +33,6 @@ import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.StatusRuntimeException
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
-import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcCleanupRule
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -43,8 +41,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.*
-import java.util.concurrent.Executors
 import com.zepben.protobuf.nc.NetworkIdentifiedObject as NIO
+import kotlin.math.exp
 
 
 internal class NetworkConsumerClientTest {
@@ -532,7 +530,7 @@ internal class NetworkConsumerClientTest {
         val operationalRestriction = OperationalRestriction()
         val connectivityNode = ConnectivityNode()
 
-        doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(feeder.mRID))
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(feeder.mRID), any(), any())
         doReturn(expectedResult).`when`(consumerClient).getEquipmentForRestriction(eq(operationalRestriction.mRID))
         doReturn(expectedResult).`when`(consumerClient).getCurrentEquipmentForFeeder(eq(feeder.mRID))
         doReturn(expectedResult).`when`(consumerClient).getTerminalsForConnectivityNode(eq(connectivityNode.mRID))
@@ -541,6 +539,20 @@ internal class NetworkConsumerClientTest {
         assertThat(consumerClient.getEquipmentForRestriction(operationalRestriction), equalTo(expectedResult))
         assertThat(consumerClient.getCurrentEquipmentForFeeder(feeder), equalTo(expectedResult))
         assertThat(consumerClient.getTerminalsForConnectivityNode(connectivityNode), equalTo(expectedResult))
+    }
+
+    @Test
+    internal fun `iterable mrids variant coverage`() {
+        val expectedResult = mock<GrpcResult<MultiObjectResult>>()
+
+        val feeder1 = Feeder()
+        val feeder2 = Feeder()
+
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainers(eq(listOf(feeder1.mRID, feeder2.mRID)), any())
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainers(eq(listOf(feeder1.mRID, feeder2.mRID)), any(), any())
+
+        assertThat(consumerClient.getEquipmentContainers(listOf(feeder1.mRID, feeder2.mRID)), equalTo(expectedResult))
+        assertThat(consumerClient.getEquipmentForContainers(listOf(feeder1.mRID, feeder2.mRID)), equalTo(expectedResult))
     }
 
     @Test

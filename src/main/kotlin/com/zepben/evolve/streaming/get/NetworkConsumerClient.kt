@@ -631,7 +631,7 @@ class NetworkConsumerClient(
         return GrpcResult(mor)
     }
 
-    private fun resolveReferences(mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
+    internal fun resolveReferences(mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
         var res = mor
         do {
             val toResolve = res.objects.keys

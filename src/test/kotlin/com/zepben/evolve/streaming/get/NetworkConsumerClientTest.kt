@@ -15,6 +15,7 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
@@ -33,6 +34,7 @@ import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.StatusRuntimeException
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
+import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcCleanupRule
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -41,6 +43,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.*
+import java.util.concurrent.Executors
 import com.zepben.protobuf.nc.NetworkIdentifiedObject as NIO
 
 
@@ -59,8 +62,9 @@ internal class NetworkConsumerClientTest {
     private val consumerService = TestNetworkConsumerService()
 
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
+    private val stub = spy(NetworkConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()))
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val consumerClient = spy(NetworkConsumerClient(channel).apply { addErrorHandler(onErrorHandler) })
+    private val consumerClient = spy(NetworkConsumerClient(stub).apply { addErrorHandler(onErrorHandler) })
     private val service = consumerClient.service
 
     private val serverException = IllegalStateException("custom message")
@@ -68,6 +72,48 @@ internal class NetworkConsumerClientTest {
     @BeforeEach
     internal fun beforeEach() {
         grpcCleanup.register(InProcessServerBuilder.forName(serverName).directExecutor().addService(consumerService).build().start())
+    }
+
+    @Test
+    internal fun `resolving references in future batches does not cause concurrent modifications`() {
+        //
+        // NOTE: There was a bug that caused a concurrent modification when you had a set of unresolved references that was large enough to require a batch
+        //       send, and one of those references was resolved by processing the response of an earlier part of the batch before the later part was sent. This
+        //       is a race condition between the processing of the references and the sending of requests.
+        //
+        val feeder = Feeder().also { service.add(it) }
+
+        // We create a set of references that will require a batch send, and one that will be resolved by the first half of the batch.
+        (0..1000).onEach { service.resolveOrDeferReference(Resolvers.equipment(feeder), "b$it") }
+        service.resolveOrDeferReference(Resolvers.normalHeadTerminal(feeder), "b1-t1")
+
+        // This is a convoluted way of getting the requests to have a delay after sending to allow responses to be processed mid-batch.
+        doAnswer { getIdentifiedObjectsInv ->
+            @Suppress("UNCHECKED_CAST")
+            spy(getIdentifiedObjectsInv.callRealMethod() as StreamObserver<GetIdentifiedObjectsRequest>).also {
+                doAnswer { onNextInv ->
+                    onNextInv.callRealMethod()
+                    // Go to sleep to delay the processing of the next batch. This is done to make sure that the previous responses are processed before the
+                    // remainder of the batch is sent to check for concurrent modification.
+                    Thread.sleep(100)
+                }.`when`(it).onNext(any())
+            }
+        }.`when`(stub).getIdentifiedObjects(any())
+
+        // Send back the requested equipment, plus the terminals, in order to resolve more references than just those requested.
+        consumerService.onGetIdentifiedObjects = spy { request, resp ->
+            batchedResponseOf(request.mridsList.flatMap {
+                listOf(Breaker(it), Terminal("$it-t1"), Terminal("$it-t1"))
+            }).forEach {
+                resp.onNext(it)
+            }
+        }
+
+        consumerClient.resolveReferences(MultiObjectResult(mutableMapOf(feeder.mRID to feeder)))
+
+        onErrorHandler.lastError?.printStackTrace()
+        assertThat("Unexpected error: ${onErrorHandler.lastError}", onErrorHandler.count, equalTo(0))
+        assertThat(feeder.normalHeadTerminal, notNullValue())
     }
 
     @Test
@@ -667,6 +713,24 @@ internal class NetworkConsumerClientTest {
         objects.forEach {
             responses.add(GetIdentifiedObjectsResponse.newBuilder().apply { buildNIO(it, addIdentifiedObjectsBuilder()) }.build())
         }
+        return responses.iterator()
+    }
+
+    private fun batchedResponseOf(objects: List<IdentifiedObject>): MutableIterator<GetIdentifiedObjectsResponse> {
+        assertThat(objects, not(empty()))
+        val responses = mutableListOf<GetIdentifiedObjectsResponse>()
+
+        var builder = GetIdentifiedObjectsResponse.newBuilder()
+        objects.forEachIndexed { index, obj ->
+            if ((index % 1000 == 0) && (builder.identifiedObjectsCount > 0)) {
+                responses.add(builder.build())
+                builder = GetIdentifiedObjectsResponse.newBuilder()
+            }
+
+            buildNIO(obj, builder.addIdentifiedObjectsBuilder())
+        }
+        responses.add(builder.build())
+
         return responses.iterator()
     }
 

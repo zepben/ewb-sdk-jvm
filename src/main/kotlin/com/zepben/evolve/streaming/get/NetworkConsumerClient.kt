@@ -632,7 +632,7 @@ class NetworkConsumerClient(
         return GrpcResult(mor)
     }
 
-    private fun resolveReferences(mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
+    internal fun resolveReferences(mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
         var res = mor
         do {
             val toResolve = res.objects.keys
@@ -640,6 +640,7 @@ class NetworkConsumerClient(
                 .flatMap { service.getUnresolvedReferencesFrom(it) }
                 .map { it.toMrid }
                 .distinct()
+                .toList()
 
             res = getIdentifiedObjects(toResolve).onError { thrown, wasHandled ->
                 return GrpcResult.ofError(thrown, wasHandled)

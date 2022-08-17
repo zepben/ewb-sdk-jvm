@@ -42,7 +42,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.*
 import com.zepben.protobuf.nc.NetworkIdentifiedObject as NIO
-import kotlin.math.exp
 
 
 internal class NetworkConsumerClientTest {

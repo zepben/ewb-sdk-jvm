@@ -635,6 +635,7 @@ class NetworkConsumerClient(
         var res = mor
         do {
             val toResolve = res.objects.keys
+                .asSequence()
                 .flatMap { service.getUnresolvedReferencesFrom(it) }
                 .map { it.toMrid }
                 .distinct()

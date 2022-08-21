@@ -80,6 +80,7 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
+    @JvmOverloads
     fun getEquipmentForContainer(
         equipmentContainer: EquipmentContainer,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
@@ -99,6 +100,7 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
+    @JvmOverloads
     fun getEquipmentForContainer(
         mRID: String,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
@@ -118,6 +120,7 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
+    @JvmOverloads
     fun getEquipmentForContainers(
         mRIDs: Iterable<String>,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
@@ -137,6 +140,7 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
+    @JvmOverloads
     fun getEquipmentForContainers(
         mRIDs: Sequence<String>,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,

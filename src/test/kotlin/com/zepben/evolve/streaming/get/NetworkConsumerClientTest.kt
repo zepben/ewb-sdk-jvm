@@ -152,28 +152,19 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `server receives linked container options`() {
-        var counter = 0
-        val builder = NIO.newBuilder()
-
-        forEachBuilder(builder) {
-            val mRID = "id" + ++counter
-            val response = createEquipmentForContainersResponse(builder, it, mRID)
-
-            consumerService.onGetEquipmentForContainers = spy { request, resp ->
-                assertThat(request.mridsList, containsInAnyOrder(mRID))
-                assertThat(request.includeEnergizingContainers, equalTo(IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS))
-                assertThat(request.includeEnergizedContainers, equalTo(IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS))
-                resp.onNext(response)
-            }
-
-            consumerClient.getEquipmentForContainer(
-                mRID,
-                includeEnergizingContainers = IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
-                includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
-            )
-
-            verify(consumerService.onGetEquipmentForContainers).invoke(any(), any())
+        consumerService.onGetEquipmentForContainers = spy { request, resp ->
+            assertThat(request.mridsList, containsInAnyOrder("id"))
+            assertThat(request.includeEnergizingContainers, equalTo(IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS))
+            assertThat(request.includeEnergizedContainers, equalTo(IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS))
         }
+
+        consumerClient.getEquipmentForContainer(
+            "id",
+            includeEnergizingContainers = IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
+            includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+        )
+
+        verify(consumerService.onGetEquipmentForContainers).invoke(any(), any())
     }
 
     @Test

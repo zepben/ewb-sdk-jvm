@@ -123,7 +123,7 @@ internal class NetworkConsumerClientTest {
 
         forEachBuilder(builder) {
             val mRID = "id" + ++counter
-            val response = createResponse(builder, it, mRID)
+            val response = createIdentifiedObjectsResponse(builder, it, mRID)
 
             consumerService.onGetIdentifiedObjects = spy { request, resp ->
                 assertThat(request.mridsList, containsInAnyOrder(mRID))
@@ -147,6 +147,32 @@ internal class NetworkConsumerClientTest {
             }
 
             verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
+        }
+    }
+
+    @Test
+    internal fun `server receives linked container options`() {
+        var counter = 0
+        val builder = NIO.newBuilder()
+
+        forEachBuilder(builder) {
+            val mRID = "id" + ++counter
+            val response = createEquipmentForContainersResponse(builder, it, mRID)
+
+            consumerService.onGetEquipmentForContainers = spy { request, resp ->
+                assertThat(request.mridsList, containsInAnyOrder(mRID))
+                assertThat(request.includeEnergizingContainers, equalTo(IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS))
+                assertThat(request.includeEnergizedContainers, equalTo(IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS))
+                resp.onNext(response)
+            }
+
+            consumerClient.getEquipmentForContainer(
+                mRID,
+                includeEnergizingContainers = IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
+                includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+            )
+
+            verify(consumerService.onGetEquipmentForContainers).invoke(any(), any())
         }
     }
 
@@ -194,9 +220,9 @@ internal class NetworkConsumerClientTest {
         val mRIDs = listOf("id1", "id2", "id3")
 
         consumerService.onGetIdentifiedObjects = spy { _, response ->
-            response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
-            response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[1]))
-            response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getBreakerBuilder, mRIDs[2]))
+            response.onNext(createIdentifiedObjectsResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
+            response.onNext(createIdentifiedObjectsResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[1]))
+            response.onNext(createIdentifiedObjectsResponse(NIO.newBuilder(), NIO.Builder::getBreakerBuilder, mRIDs[2]))
         }
 
         val result = consumerClient.getIdentifiedObjects(mRIDs.asSequence())
@@ -210,7 +236,7 @@ internal class NetworkConsumerClientTest {
         verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
     }
 
-    private fun createResponse(
+    private fun createIdentifiedObjectsResponse(
         identifiedObjectBuilder: NIO.Builder,
         subClassBuilder: Any,
         mRID: String
@@ -219,6 +245,21 @@ internal class NetworkConsumerClientTest {
         println(identifiedObjectBuilder)
 
         val responseBuilder = GetIdentifiedObjectsResponse.newBuilder()
+
+        responseBuilder.addIdentifiedObjects(identifiedObjectBuilder.build())
+
+        return responseBuilder.build()
+    }
+
+    private fun createEquipmentForContainersResponse(
+        identifiedObjectBuilder: NIO.Builder,
+        subClassBuilder: Any,
+        mRID: String
+    ): GetEquipmentForContainersResponse {
+        buildFromBuilder(subClassBuilder, mRID)
+        println(identifiedObjectBuilder)
+
+        val responseBuilder = GetEquipmentForContainersResponse.newBuilder()
 
         responseBuilder.addIdentifiedObjects(identifiedObjectBuilder.build())
 
@@ -440,7 +481,7 @@ internal class NetworkConsumerClientTest {
         val mRIDs = listOf("id1", "id2")
 
         consumerService.onGetIdentifiedObjects = spy { _, response ->
-            response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
+            response.onNext(createIdentifiedObjectsResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
         }
 
         val result = consumerClient.getIdentifiedObjects(mRIDs)
@@ -460,9 +501,9 @@ internal class NetworkConsumerClientTest {
         service.add(acls)
 
         consumerService.onGetIdentifiedObjects = spy { _, response ->
-            response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
-            response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[1]))
-            response.onNext(createResponse(NIO.newBuilder(), NIO.Builder::getBreakerBuilder, mRIDs[2]))
+            response.onNext(createIdentifiedObjectsResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[0]))
+            response.onNext(createIdentifiedObjectsResponse(NIO.newBuilder(), NIO.Builder::getAcLineSegmentBuilder, mRIDs[1]))
+            response.onNext(createIdentifiedObjectsResponse(NIO.newBuilder(), NIO.Builder::getBreakerBuilder, mRIDs[2]))
         }
 
         val result = consumerClient.getIdentifiedObjects(mRIDs)
@@ -616,12 +657,12 @@ internal class NetworkConsumerClientTest {
             .withMessage("Unable to extract Circuit networks from [${expectedService.get<Feeder>("f001")?.typeNameAndMRID()}].")
     }
 
-    private fun createResponse(
+    private fun createIdentifiedObjectsResponse(
         identifiedObjectBuilder: NIO.Builder,
         subClassBuilder: (NIO.Builder) -> Any,
         mRID: String
     ): GetIdentifiedObjectsResponse {
-        return createResponse(identifiedObjectBuilder, subClassBuilder(identifiedObjectBuilder), mRID)
+        return createIdentifiedObjectsResponse(identifiedObjectBuilder, subClassBuilder(identifiedObjectBuilder), mRID)
     }
 
     private fun validateNetworkHierarchy(actual: NetworkHierarchy, expected: NetworkHierarchy) {

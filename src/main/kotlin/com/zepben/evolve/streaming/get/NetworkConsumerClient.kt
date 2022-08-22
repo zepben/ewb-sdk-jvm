@@ -484,14 +484,14 @@ class NetworkConsumerClient(
         val request = stub.getEquipmentForContainers(streamObserver)
         val builder = GetEquipmentForContainersRequest.newBuilder()
 
+        builder.includeEnergizingContainers = includeEnergizingContainers
+        builder.includeEnergizedContainers = includeEnergizedContainers
+
         batchSend(mRIDs, builder::addMrids) {
             if (builder.mridsList.isNotEmpty())
                 request.onNext(builder.build())
             builder.clearMrids()
         }
-
-        builder.includeEnergizingContainers = includeEnergizingContainers
-        builder.includeEnergizedContainers = includeEnergizedContainers
 
         request.onCompleted()
         streamObserver.await()

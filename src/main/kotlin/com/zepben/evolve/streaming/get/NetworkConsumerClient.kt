@@ -77,7 +77,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     @JvmOverloads
@@ -97,7 +97,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     @JvmOverloads
@@ -117,7 +117,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     @JvmOverloads
@@ -137,7 +137,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     @JvmOverloads
@@ -158,7 +158,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getEquipmentForRestriction(operationalRestriction: OperationalRestriction): GrpcResult<MultiObjectResult> =
@@ -173,7 +173,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getEquipmentForRestriction(mRID: String): GrpcResult<MultiObjectResult> =
@@ -189,7 +189,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getCurrentEquipmentForFeeder(feeder: Feeder): GrpcResult<MultiObjectResult> =
@@ -205,7 +205,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getCurrentEquipmentForFeeder(mRID: String): GrpcResult<MultiObjectResult> =
@@ -220,7 +220,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getTerminalsForConnectivityNode(connectivityNode: ConnectivityNode): GrpcResult<MultiObjectResult> =
@@ -235,7 +235,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getTerminalsForConnectivityNode(mRID: String): GrpcResult<MultiObjectResult> =
@@ -270,7 +270,7 @@ class NetworkConsumerClient(
     /***
      * Retrieve the feeder network for the specified [mRID] and store the results in the [service].
      *
-     * This is a convenience method that will fetch the feeder object and all of the equipment referenced by the feeder (normal state), along with
+     * This is a convenience method that will fetch the feeder object and all the equipment referenced by the feeder (normal state), along with
      * all references. This should entail a complete connectivity model for the feeder, however not the connectivity between multiple feeders.
      *
      * @param mRID The mRID of the [Feeder] to fetch equipment for.
@@ -294,7 +294,7 @@ class NetworkConsumerClient(
     /***
      * Retrieve the equipment container network for the specified [mRID] and store the results in the [service].
      *
-     * This is a convenience method that will fetch the container object and all of the equipment contained, along with all subsequent
+     * This is a convenience method that will fetch the container object and all the equipment contained, along with all subsequent
      * references. This should entail a complete connectivity model for the container, however not the connectivity between multiple containers.
      *
      * @param mRID The mRID of the [EquipmentContainer] to fetch.
@@ -323,7 +323,7 @@ class NetworkConsumerClient(
     /***
      * Retrieve the equipment container networks for the specified [mRID]s and store the results in the [service].
      *
-     * This is a convenience method that will fetch the container objects and all of the equipment contained, along with all subsequent
+     * This is a convenience method that will fetch the container objects and all the equipment contained, along with all subsequent
      * references. This should entail a complete connectivity model for the containers, however not the connectivity between multiple containers.
      *
      * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch.
@@ -343,7 +343,7 @@ class NetworkConsumerClient(
     /***
      * Retrieve the equipment container networks for the specified [mRID]s and store the results in the [service].
      *
-     * This is a convenience method that will fetch the container objects and all of the equipment contained, along with all subsequent
+     * This is a convenience method that will fetch the container objects and all the equipment contained, along with all subsequent
      * references. This should entail a complete connectivity model for the containers, however not the connectivity between multiple containers.
      *
      * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch.
@@ -376,7 +376,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getEquipmentForLoop(loop: Loop): GrpcResult<MultiObjectResult> =
@@ -392,7 +392,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getEquipmentForLoop(mRID: String): GrpcResult<MultiObjectResult> =
@@ -417,7 +417,7 @@ class NetworkConsumerClient(
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown].
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getAllLoops(): GrpcResult<MultiObjectResult> {

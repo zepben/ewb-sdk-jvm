@@ -37,7 +37,7 @@ class LimitedConnectedEquipmentTrace(
 ) {
 
     /**
-     * Run the trace from teh [startingEquipment].
+     * Run the trace from the [startingEquipment].
      *
      * @param startingEquipment The [ConductingEquipment] to start tracing from.
      * @param maximumSteps The maximum number of steps to trace out [1..100]. Defaults to 1.

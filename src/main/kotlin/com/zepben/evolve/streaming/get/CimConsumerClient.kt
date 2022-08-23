@@ -52,7 +52,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim> : GrpcClie
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], the item found, accessible via [GrpcResult.value].
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the the object, accessible via [GrpcResult.thrown]. One of:
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown]. One of:
      *    - [NoSuchElementException] if the object could not be found.
      *    - The gRPC error that occurred while retrieving the object
      */

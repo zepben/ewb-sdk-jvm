@@ -151,6 +151,23 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
+    internal fun `server receives linked container options`() {
+        consumerService.onGetEquipmentForContainers = spy { request, _ ->
+            assertThat(request.mridsList, containsInAnyOrder("id"))
+            assertThat(request.includeEnergizingContainers, equalTo(IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS))
+            assertThat(request.includeEnergizedContainers, equalTo(IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS))
+        }
+
+        consumerClient.getEquipmentForContainer(
+            "id",
+            includeEnergizingContainers = IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
+            includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+        )
+
+        verify(consumerService.onGetEquipmentForContainers).invoke(any(), any())
+    }
+
+    @Test
     internal fun `returns error when object is not found`() {
         val mRID = "unknown"
         consumerService.onGetIdentifiedObjects = spy { _, _ -> }
@@ -209,24 +226,6 @@ internal class NetworkConsumerClientTest {
 
         verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
     }
-
-    private fun createResponse(
-        identifiedObjectBuilder: NIO.Builder,
-        subClassBuilder: Any,
-        mRID: String
-    ): GetIdentifiedObjectsResponse {
-        buildFromBuilder(subClassBuilder, mRID)
-        println(identifiedObjectBuilder)
-
-        val responseBuilder = GetIdentifiedObjectsResponse.newBuilder()
-
-        responseBuilder.addIdentifiedObjects(identifiedObjectBuilder.build())
-
-        return responseBuilder.build()
-    }
-
-    private fun isSupported(type: NIO.IdentifiedObjectCase): Boolean =
-        type != NIO.IdentifiedObjectCase.OTHER
 
     @Test
     internal fun `calls error handler when getting multiple IdentifiedObject throws`() {
@@ -532,7 +531,7 @@ internal class NetworkConsumerClientTest {
         val operationalRestriction = OperationalRestriction()
         val connectivityNode = ConnectivityNode()
 
-        doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(feeder.mRID))
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(feeder.mRID), any(), any())
         doReturn(expectedResult).`when`(consumerClient).getEquipmentForRestriction(eq(operationalRestriction.mRID))
         doReturn(expectedResult).`when`(consumerClient).getCurrentEquipmentForFeeder(eq(feeder.mRID))
         doReturn(expectedResult).`when`(consumerClient).getTerminalsForConnectivityNode(eq(connectivityNode.mRID))
@@ -541,6 +540,21 @@ internal class NetworkConsumerClientTest {
         assertThat(consumerClient.getEquipmentForRestriction(operationalRestriction), equalTo(expectedResult))
         assertThat(consumerClient.getCurrentEquipmentForFeeder(feeder), equalTo(expectedResult))
         assertThat(consumerClient.getTerminalsForConnectivityNode(connectivityNode), equalTo(expectedResult))
+    }
+
+    @Test
+    internal fun `iterable mrids variant coverage`() {
+        val result1 = mock<GrpcResult<MultiObjectResult>>()
+        val result2 = mock<GrpcResult<MultiObjectResult>>()
+
+        doReturn(result1).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any())
+        doReturn(result2).`when`(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any())
+
+        assertThat(consumerClient.getEquipmentContainers(listOf("id")), equalTo(result1))
+        assertThat(consumerClient.getEquipmentForContainers(listOf("id")), equalTo(result2))
+
+        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any())
+        verify(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any())
     }
 
     @Test
@@ -606,9 +620,26 @@ internal class NetworkConsumerClientTest {
         identifiedObjectBuilder: NIO.Builder,
         subClassBuilder: (NIO.Builder) -> Any,
         mRID: String
+    ): GetIdentifiedObjectsResponse =
+        createResponse(identifiedObjectBuilder, subClassBuilder(identifiedObjectBuilder), mRID)
+
+    private fun createResponse(
+        identifiedObjectBuilder: NIO.Builder,
+        subClassBuilder: Any,
+        mRID: String
     ): GetIdentifiedObjectsResponse {
-        return createResponse(identifiedObjectBuilder, subClassBuilder(identifiedObjectBuilder), mRID)
+        buildFromBuilder(subClassBuilder, mRID)
+        println(identifiedObjectBuilder)
+
+        val responseBuilder = GetIdentifiedObjectsResponse.newBuilder()
+
+        responseBuilder.addIdentifiedObjects(identifiedObjectBuilder.build())
+
+        return responseBuilder.build()
     }
+
+    private fun isSupported(type: NIO.IdentifiedObjectCase): Boolean =
+        type != NIO.IdentifiedObjectCase.OTHER
 
     private fun validateNetworkHierarchy(actual: NetworkHierarchy, expected: NetworkHierarchy) {
         validateMap(actual.geographicalRegions, expected.geographicalRegions)

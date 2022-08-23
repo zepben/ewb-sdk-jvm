@@ -562,16 +562,18 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `iterable mrids variant coverage`() {
-        val expectedResult = mock<GrpcResult<MultiObjectResult>>()
+        consumerService.onGetEquipmentForContainers = spy { request, _ ->
+            assertThat(request.mridsList, containsInAnyOrder("id"))
+            assertThat(request.includeEnergizingContainers, equalTo(IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS))
+            assertThat(request.includeEnergizedContainers, equalTo(IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS))
+        }
+        consumerService.onGetNetworkHierarchy = spy {}
 
-        val feeder1 = Feeder()
-        val feeder2 = Feeder()
+        consumerClient.getEquipmentForContainers(listOf("id"))
+        consumerClient.getEquipmentContainers(listOf("id"))
 
-        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainers(eq(listOf(feeder1.mRID, feeder2.mRID)), any())
-        doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainers(eq(listOf(feeder1.mRID, feeder2.mRID)), any(), any())
-
-        assertThat(consumerClient.getEquipmentContainers(listOf(feeder1.mRID, feeder2.mRID)), equalTo(expectedResult))
-        assertThat(consumerClient.getEquipmentForContainers(listOf(feeder1.mRID, feeder2.mRID)), equalTo(expectedResult))
+        verify(consumerService.onGetEquipmentForContainers).invoke(any(), any())
+        verify(consumerService.onGetNetworkHierarchy).invoke(any(), any())
     }
 
     @Test

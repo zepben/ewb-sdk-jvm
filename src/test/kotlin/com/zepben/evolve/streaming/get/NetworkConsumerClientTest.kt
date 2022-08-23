@@ -544,18 +544,17 @@ internal class NetworkConsumerClientTest {
 
     @Test
     internal fun `iterable mrids variant coverage`() {
-        consumerService.onGetEquipmentForContainers = spy { request, _ ->
-            assertThat(request.mridsList, containsInAnyOrder("id"))
-            assertThat(request.includeEnergizingContainers, equalTo(IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS))
-            assertThat(request.includeEnergizedContainers, equalTo(IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS))
-        }
-        consumerService.onGetNetworkHierarchy = spy {}
+        val result1 = mock<GrpcResult<MultiObjectResult>>()
+        val result2 = mock<GrpcResult<MultiObjectResult>>()
 
-        consumerClient.getEquipmentForContainers(listOf("id"))
-        consumerClient.getEquipmentContainers(listOf("id"))
+        doReturn(result1).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any())
+        doReturn(result2).`when`(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any())
 
-        verify(consumerService.onGetEquipmentForContainers).invoke(any(), any())
-        verify(consumerService.onGetNetworkHierarchy).invoke(any(), any())
+        assertThat(consumerClient.getEquipmentContainers(listOf("id")), equalTo(result1))
+        assertThat(consumerClient.getEquipmentForContainers(listOf("id")), equalTo(result2))
+
+        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any())
+        verify(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any())
     }
 
     @Test

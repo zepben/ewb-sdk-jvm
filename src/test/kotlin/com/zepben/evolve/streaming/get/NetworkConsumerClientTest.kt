@@ -227,24 +227,6 @@ internal class NetworkConsumerClientTest {
         verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addAllMrids(mRIDs).build()), any())
     }
 
-    private fun createResponse(
-        identifiedObjectBuilder: NIO.Builder,
-        subClassBuilder: Any,
-        mRID: String
-    ): GetIdentifiedObjectsResponse {
-        buildFromBuilder(subClassBuilder, mRID)
-        println(identifiedObjectBuilder)
-
-        val responseBuilder = GetIdentifiedObjectsResponse.newBuilder()
-
-        responseBuilder.addIdentifiedObjects(identifiedObjectBuilder.build())
-
-        return responseBuilder.build()
-    }
-
-    private fun isSupported(type: NIO.IdentifiedObjectCase): Boolean =
-        type != NIO.IdentifiedObjectCase.OTHER
-
     @Test
     internal fun `calls error handler when getting multiple IdentifiedObject throws`() {
         val mRIDs = listOf("id1", "id2", "id3")
@@ -639,9 +621,26 @@ internal class NetworkConsumerClientTest {
         identifiedObjectBuilder: NIO.Builder,
         subClassBuilder: (NIO.Builder) -> Any,
         mRID: String
+    ): GetIdentifiedObjectsResponse =
+        createResponse(identifiedObjectBuilder, subClassBuilder(identifiedObjectBuilder), mRID)
+
+    private fun createResponse(
+        identifiedObjectBuilder: NIO.Builder,
+        subClassBuilder: Any,
+        mRID: String
     ): GetIdentifiedObjectsResponse {
-        return createResponse(identifiedObjectBuilder, subClassBuilder(identifiedObjectBuilder), mRID)
+        buildFromBuilder(subClassBuilder, mRID)
+        println(identifiedObjectBuilder)
+
+        val responseBuilder = GetIdentifiedObjectsResponse.newBuilder()
+
+        responseBuilder.addIdentifiedObjects(identifiedObjectBuilder.build())
+
+        return responseBuilder.build()
     }
+
+    private fun isSupported(type: NIO.IdentifiedObjectCase): Boolean =
+        type != NIO.IdentifiedObjectCase.OTHER
 
     private fun validateNetworkHierarchy(actual: NetworkHierarchy, expected: NetworkHierarchy) {
         validateMap(actual.geographicalRegions, expected.geographicalRegions)

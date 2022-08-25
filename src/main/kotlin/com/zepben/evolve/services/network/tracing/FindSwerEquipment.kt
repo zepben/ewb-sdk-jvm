@@ -84,7 +84,10 @@ class FindSwerEquipment(
             .filter { it.phases.numPhases() == 1 }
             .flatMap { it.connectedTerminals() }
             .mapNotNull { it.conductingEquipment }
-            .forEach { trace.run(it) }
+            .forEach {
+                trace.reset()
+                trace.run(it)
+            }
     }
 
     private fun traceLvFrom(transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
@@ -99,7 +102,10 @@ class FindSwerEquipment(
             .flatMap { it.connectedTerminals() }
             .mapNotNull { it.conductingEquipment }
             .filter { it.baseVoltageValue in 1..1000 }
-            .forEach { trace.run(it) }
+            .forEach {
+                trace.reset()
+                trace.run(it)
+            }
     }
 
     private val ConductingEquipmentStep.hasSwerTerminal: Boolean get() = conductingEquipment.hasSwerTerminal

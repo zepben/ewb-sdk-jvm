@@ -67,7 +67,7 @@ internal class FindSwerEquipmentTest {
             .toAcls(PhaseCode.A) // c4
             .toAcls(PhaseCode.A) // c5
             .toPowerTransformer(listOf(PhaseCode.A, PhaseCode.AN)) // tx6
-            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } }// c7
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c7
             .addFeeder("b0") // fdr8
             .build()
         doReturn(trace1, trace2, trace1, trace2, null).`when`(createTrace).invoke()
@@ -190,6 +190,22 @@ internal class FindSwerEquipmentTest {
         verify(trace2).addStepAction(any<(ConductingEquipmentStep) -> Unit>())
     }
 
+    @Test
+    internal fun `runs off multiple terminals`() {
+        val ns = TestNetworkBuilder()
+            .fromPowerTransformer(listOf(PhaseCode.A, PhaseCode.A, PhaseCode.AN, PhaseCode.AN)) // tx0
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c1
+            .branchFrom("tx0", 1)
+            .toAcls(PhaseCode.A) // c2
+            .branchFrom("tx0", 2)
+            .toAcls(PhaseCode.A) // c3
+            .branchFrom("tx0", 3)
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c4
+            .addFeeder("tx0") // fdr5
+            .build()
+
+        FindSwerEquipment().find(ns["fdr5"]!!)
+    }
 
     private fun NetworkService.createContainsInAnyOrder(vararg mRIDs: String): Matcher<Iterable<ConductingEquipment>?>? =
         containsInAnyOrder(*mRIDs.map { get<ConductingEquipment>(it) }.toTypedArray())

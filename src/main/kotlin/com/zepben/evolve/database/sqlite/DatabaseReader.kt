@@ -96,7 +96,7 @@ class DatabaseReader @JvmOverloads constructor(
             return false
         }
 
-        return status and postLoad(networkService)
+        return status && postLoad(networkService)
     }
 
     private fun preLoad(): Int? {

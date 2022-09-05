@@ -85,18 +85,18 @@ class DatabaseReader @JvmOverloads constructor(
         }
 
         logger.info("Loading from database version v$databaseVersion")
-        val status = try {
+        return try {
             MetadataCollectionReader { getStatement(loadConnection) }.load(metadataReader)
                 && NetworkServiceReader { getStatement(loadConnection) }.load(networkServiceReader)
                 && DiagramServiceReader { getStatement(loadConnection) }.load(diagramServiceReader)
                 && CustomerServiceReader { getStatement(loadConnection) }.load(customerServiceReader)
+                && postLoad(networkService)
         } catch (e: MissingTableConfigException) {
             logger.error("Unable to load database: " + e.message)
+            false
+        } finally {
             closeConnection()
-            return false
         }
-
-        return status && postLoad(networkService)
     }
 
     private fun preLoad(): Int? {
@@ -146,7 +146,6 @@ class DatabaseReader @JvmOverloads constructor(
         validateSources(networkService)
         logger.info("Sources vs feeders validated.")
 
-        closeConnection()
         return true
     }
 

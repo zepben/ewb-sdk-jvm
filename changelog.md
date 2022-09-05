@@ -27,7 +27,7 @@
 * None.
 
 ##### Fixes
-* None.
+* Failure when reading in database tables will now cause a short-circuit failure when all tables are loaded rather than after post load processing.
 
 ##### Notes
 * None.

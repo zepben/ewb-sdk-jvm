@@ -616,6 +616,29 @@ internal class NetworkConsumerClientTest {
             .withMessage("Unable to extract Circuit networks from [${expectedService.get<Feeder>("f001")?.typeNameAndMRID()}].")
     }
 
+    @Test
+    internal fun `generic get equipment container calls java interop`() {
+        val result = mock<GrpcResult<MultiObjectResult>>()
+
+        doReturn(result).`when`(consumerClient).getEquipmentContainer(any(), any(), any(), any())
+
+        assertThat(
+            consumerClient.getEquipmentContainer<Feeder>(
+                "fdr",
+                IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
+                IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+            ),
+            equalTo(result)
+        )
+
+        verify(consumerClient).getEquipmentContainer(
+            "fdr",
+            Feeder::class.java,
+            IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
+            IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+        )
+    }
+
     private fun createResponse(
         identifiedObjectBuilder: NIO.Builder,
         subClassBuilder: (NIO.Builder) -> Any,

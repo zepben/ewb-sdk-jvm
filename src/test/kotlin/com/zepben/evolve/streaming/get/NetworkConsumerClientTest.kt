@@ -435,16 +435,6 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
-    internal fun `get equipment containers sequence variant coverage`() {
-        val expectedResult = mock<GrpcResult<MultiObjectResult>>()
-        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
-
-        assertThat(consumerClient.getEquipmentContainers(sequenceOf("f001")), equalTo(expectedResult))
-
-        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
-    }
-
-    @Test
     internal fun `getIdentifiedObjects returns failed mRID when an mRID is not found`() {
         val mRIDs = listOf("id1", "id2")
 
@@ -542,11 +532,13 @@ internal class NetworkConsumerClientTest {
         val connectivityNode = ConnectivityNode()
 
         doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(feeder.mRID), any(), any())
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainer(eq(feeder.mRID), any(), any(), any())
         doReturn(expectedResult).`when`(consumerClient).getEquipmentForRestriction(eq(operationalRestriction.mRID))
         doReturn(expectedResult).`when`(consumerClient).getCurrentEquipmentForFeeder(eq(feeder.mRID))
         doReturn(expectedResult).`when`(consumerClient).getTerminalsForConnectivityNode(eq(connectivityNode.mRID))
 
         assertThat(consumerClient.getEquipmentForContainer(feeder), equalTo(expectedResult))
+        assertThat(consumerClient.getEquipmentContainer(feeder.mRID), equalTo(expectedResult))
         assertThat(consumerClient.getEquipmentForRestriction(operationalRestriction), equalTo(expectedResult))
         assertThat(consumerClient.getCurrentEquipmentForFeeder(feeder), equalTo(expectedResult))
         assertThat(consumerClient.getTerminalsForConnectivityNode(connectivityNode), equalTo(expectedResult))

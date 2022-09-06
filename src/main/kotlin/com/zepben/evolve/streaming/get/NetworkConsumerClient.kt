@@ -704,7 +704,6 @@ class NetworkConsumerClient(
 
 }
 
-@JvmOverloads
 inline fun <reified T : EquipmentContainer> NetworkConsumerClient.getEquipmentContainer(
     mRID: String,
     includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,

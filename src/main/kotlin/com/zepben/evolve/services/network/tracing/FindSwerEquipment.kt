@@ -47,20 +47,21 @@ class FindSwerEquipment(
     fun find(feeder: Feeder): List<ConductingEquipment> {
         val swerEquipment = mutableSetOf<ConductingEquipment>()
 
+        // We will add all the SWER transformers to the swerEquipment list before starting any traces to prevent tracing though them by accident. In
+        // order to do this, we collect the sequence to a list to change the iteration order.
         feeder.equipment
             .asSequence()
             .filterIsInstance<PowerTransformer>()
             .filter { it.hasSwerTerminal }
             .filter { it.hasNonSwerTerminal }
+            .toList()
+            .onEach { swerEquipment.add(it) }
             .forEach { traceFrom(it, swerEquipment) }
 
         return swerEquipment.toList()
     }
 
     private fun traceFrom(transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
-        // We will start from the equipment attached to this transformer rather than the transformer itself, so add it to the SWER equipment.
-        swerEquipment.add(transformer)
-
         // Trace from any SWER terminals.
         traceSwerFrom(transformer, swerEquipment)
 
@@ -79,6 +80,7 @@ class FindSwerEquipment(
             }
         }
 
+        // We start from the connected equipment to prevent tracing in the wrong direction, as we are using the connected equipment trace.
         transformer.terminals
             .asSequence()
             .filter { it.phases.numPhases() == 1 }
@@ -96,6 +98,7 @@ class FindSwerEquipment(
             addStepAction { swerEquipment.add(it.conductingEquipment) }
         }
 
+        // We start from the connected equipment to prevent tracing in the wrong direction, as we are using the connected equipment trace.
         transformer.terminals
             .asSequence()
             .filter { it.phases.numPhases() > 1 }

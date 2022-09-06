@@ -352,6 +352,7 @@ class NetworkConsumerClient(
      * In addition to normal gRPC errors, you may also receive an unsuccessful [GrpcResult] with the following errors:
      * - [ClassCastException] if the requested object was of the wrong type.
      */
+    @JvmOverloads
     fun getEquipmentContainers(
         mRIDs: Iterable<String>,
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java,
@@ -376,6 +377,7 @@ class NetworkConsumerClient(
      * In addition to normal gRPC errors, you may also receive an unsuccessful [GrpcResult] with the following errors:
      * - [ClassCastException] if the requested object was of the wrong type.
      */
+    @JvmOverloads
     fun getEquipmentContainers(
         mRIDs: Sequence<String>,
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java,
@@ -702,6 +704,7 @@ class NetworkConsumerClient(
 
 }
 
+@JvmOverloads
 inline fun <reified T : EquipmentContainer> NetworkConsumerClient.getEquipmentContainer(
     mRID: String,
     includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,

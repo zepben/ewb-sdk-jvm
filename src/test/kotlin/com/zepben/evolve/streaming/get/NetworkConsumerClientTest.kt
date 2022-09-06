@@ -547,13 +547,13 @@ internal class NetworkConsumerClientTest {
         val result1 = mock<GrpcResult<MultiObjectResult>>()
         val result2 = mock<GrpcResult<MultiObjectResult>>()
 
-        doReturn(result1).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any())
+        doReturn(result1).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
         doReturn(result2).`when`(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any())
 
         assertThat(consumerClient.getEquipmentContainers(listOf("id")), equalTo(result1))
         assertThat(consumerClient.getEquipmentForContainers(listOf("id")), equalTo(result2))
 
-        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any())
+        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
         verify(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any())
     }
 

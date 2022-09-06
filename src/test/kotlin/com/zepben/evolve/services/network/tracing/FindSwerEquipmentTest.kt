@@ -207,6 +207,24 @@ internal class FindSwerEquipmentTest {
         FindSwerEquipment().find(ns["fdr5"]!!)
     }
 
+    @Test
+    internal fun `does not loop back out of swer from LV`() {
+        val ns = TestNetworkBuilder()
+            .fromJunction(numTerminals = 1) // j0
+            .toAcls() // c1
+            .toAcls(PhaseCode.A) // c2
+            .toPowerTransformer(listOf(PhaseCode.A, PhaseCode.AN)) // tx3
+            .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c4
+            .toPowerTransformer(listOf(PhaseCode.AN, PhaseCode.A)) // tx5
+            .toAcls(PhaseCode.A) // c6
+            .connect("c6", "c1", 2, 1)
+            .addFeeder("j0") // fdr7
+            .build()
+
+        // We need to run the actual trace rather than a mock to make sure it does not loop back through the LV.
+        assertThat(FindSwerEquipment().find(ns), ns.createContainsInAnyOrder("c2", "tx3", "c4", "tx5", "c6"))
+    }
+
     private fun NetworkService.createContainsInAnyOrder(vararg mRIDs: String): Matcher<Iterable<ConductingEquipment>?>? =
         containsInAnyOrder(*mRIDs.map { get<ConductingEquipment>(it) }.toTypedArray())
 

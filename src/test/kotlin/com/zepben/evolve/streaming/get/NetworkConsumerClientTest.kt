@@ -435,6 +435,16 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
+    internal fun `get equipment containers sequence variant coverage`() {
+        val expectedResult = mock<GrpcResult<MultiObjectResult>>()
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
+
+        assertThat(consumerClient.getEquipmentContainers(sequenceOf("f001")), equalTo(expectedResult))
+
+        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
+    }
+
+    @Test
     internal fun `getIdentifiedObjects returns failed mRID when an mRID is not found`() {
         val mRIDs = listOf("id1", "id2")
 

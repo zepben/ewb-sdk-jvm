@@ -30,10 +30,10 @@ internal class PhaseCodeTest {
 
     @Test
     internal fun singlePhases() {
-        PhaseCode.values()
-            .asSequence()
-            .filter { it !== PhaseCode.NONE }
-            .forEach { phaseCode ->
+        PhaseCode.values().forEach { phaseCode ->
+            if (phaseCode === PhaseCode.NONE)
+                assertThat(phaseCode.singlePhases, contains(SinglePhaseKind.NONE))
+            else {
                 // We need to strip the 's' off secondary phases for the following checks to work correctly.
                 assertThat(phaseCode.singlePhases.size, equalTo(phaseCode.name.trimStart('s').length))
 
@@ -46,6 +46,17 @@ internal class PhaseCodeTest {
 
                 assertThat(singlePhases.containsAll(namePhases), equalTo(true))
             }
+        }
+    }
+
+    @Test
+    internal fun numPhases() {
+        PhaseCode.values().forEach { phaseCode ->
+            if (phaseCode === PhaseCode.NONE)
+                assertThat(phaseCode.numPhases(), equalTo(0))
+            else
+                assertThat(phaseCode.numPhases(), equalTo(phaseCode.singlePhases.size))
+        }
     }
 
     @Test
@@ -81,7 +92,7 @@ internal class PhaseCodeTest {
         assertThat("Does not contain A", !PhaseCode.XY.contains(SinglePhaseKind.A))
         assertThat("Does not contain B", !PhaseCode.XY.contains(SinglePhaseKind.B))
         assertThat("Does not contain C", !PhaseCode.XY.contains(SinglePhaseKind.C))
-        assertThat("Does not contain N", !PhaseCode.XY.contains(SinglePhaseKind.A))
+        assertThat("Does not contain N", !PhaseCode.XY.contains(SinglePhaseKind.N))
         assertThat("Contains X", PhaseCode.XY.contains(SinglePhaseKind.X))
         assertThat("Contains Y", PhaseCode.XY.contains(SinglePhaseKind.Y))
     }

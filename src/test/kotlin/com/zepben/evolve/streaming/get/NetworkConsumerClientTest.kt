@@ -435,6 +435,16 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
+    internal fun `get equipment containers sequence variant coverage`() {
+        val expectedResult = mock<GrpcResult<MultiObjectResult>>()
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
+
+        assertThat(consumerClient.getEquipmentContainers(sequenceOf("f001")), equalTo(expectedResult))
+
+        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
+    }
+
+    @Test
     internal fun `getIdentifiedObjects returns failed mRID when an mRID is not found`() {
         val mRIDs = listOf("id1", "id2")
 
@@ -532,11 +542,13 @@ internal class NetworkConsumerClientTest {
         val connectivityNode = ConnectivityNode()
 
         doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(feeder.mRID), any(), any())
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainer(eq(feeder.mRID), any(), any(), any())
         doReturn(expectedResult).`when`(consumerClient).getEquipmentForRestriction(eq(operationalRestriction.mRID))
         doReturn(expectedResult).`when`(consumerClient).getCurrentEquipmentForFeeder(eq(feeder.mRID))
         doReturn(expectedResult).`when`(consumerClient).getTerminalsForConnectivityNode(eq(connectivityNode.mRID))
 
         assertThat(consumerClient.getEquipmentForContainer(feeder), equalTo(expectedResult))
+        assertThat(consumerClient.getEquipmentContainer(feeder.mRID), equalTo(expectedResult))
         assertThat(consumerClient.getEquipmentForRestriction(operationalRestriction), equalTo(expectedResult))
         assertThat(consumerClient.getCurrentEquipmentForFeeder(feeder), equalTo(expectedResult))
         assertThat(consumerClient.getTerminalsForConnectivityNode(connectivityNode), equalTo(expectedResult))
@@ -547,13 +559,13 @@ internal class NetworkConsumerClientTest {
         val result1 = mock<GrpcResult<MultiObjectResult>>()
         val result2 = mock<GrpcResult<MultiObjectResult>>()
 
-        doReturn(result1).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any())
+        doReturn(result1).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
         doReturn(result2).`when`(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any())
 
         assertThat(consumerClient.getEquipmentContainers(listOf("id")), equalTo(result1))
         assertThat(consumerClient.getEquipmentForContainers(listOf("id")), equalTo(result2))
 
-        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any())
+        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
         verify(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any())
     }
 
@@ -614,6 +626,29 @@ internal class NetworkConsumerClientTest {
         expect { throw result.thrown }
             .toThrow(ClassCastException::class.java)
             .withMessage("Unable to extract Circuit networks from [${expectedService.get<Feeder>("f001")?.typeNameAndMRID()}].")
+    }
+
+    @Test
+    internal fun `generic get equipment container calls java interop`() {
+        val result = mock<GrpcResult<MultiObjectResult>>()
+
+        doReturn(result).`when`(consumerClient).getEquipmentContainer(any(), any(), any(), any())
+
+        assertThat(
+            consumerClient.getEquipmentContainer<Feeder>(
+                "fdr",
+                IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
+                IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+            ),
+            equalTo(result)
+        )
+
+        verify(consumerClient).getEquipmentContainer(
+            "fdr",
+            Feeder::class.java,
+            IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
+            IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+        )
     }
 
     private fun createResponse(

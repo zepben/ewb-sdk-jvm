@@ -8,7 +8,7 @@
 
 ##### New Features
 * Added `LvFeeder`, a branch of LV network starting at a distribution substation and continuing until the end of the LV network.
-* Added the following optional arguments to `NetworkConsumerClient().getEquipmentForContainers`:
+* Added the following optional arguments to `NetworkConsumerClient().getEquipment(For)Container(s)`:
   * `includeEnergizingContainers`: Specifies whether to include equipment from containers energizing the ones listed in
     `mRIDs`. This is of the enum type `IncludedEnergizingContainers`, which has three possible values:
     * `EXCLUDE_ENERGIZING_CONTAINERS`: No additional effect (default).

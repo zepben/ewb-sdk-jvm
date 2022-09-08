@@ -47,8 +47,8 @@ internal class FindSwerEquipmentTest {
         val j3 = Junction().also { networkService.add(it) }
 
         val findSwerEquipment = spy<FindSwerEquipment>().also {
-            doReturn(listOf(j1, j2)).`when`(it).find(feeder1)
-            doReturn(listOf(j2, j3)).`when`(it).find(feeder2)
+            doReturn(setOf(j1, j2)).`when`(it).find(feeder1)
+            doReturn(setOf(j2, j3)).`when`(it).find(feeder2)
         }
 
         assertThat(findSwerEquipment.find(networkService), containsInAnyOrder(j1, j2, j3))

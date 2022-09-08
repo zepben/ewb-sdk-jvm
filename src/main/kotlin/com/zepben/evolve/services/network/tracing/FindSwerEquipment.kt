@@ -29,22 +29,21 @@ class FindSwerEquipment(
      *
      * @param networkService The [NetworkService] to process.
      *
-     * @return A [List] of [ConductingEquipment] on any [Feeder] in [networkService] that is SWER, or energised via SWER.
+     * @return A [Set] of [ConductingEquipment] on any [Feeder] in [networkService] that is SWER, or energised via SWER.
      */
-    fun find(networkService: NetworkService): List<ConductingEquipment> =
+    fun find(networkService: NetworkService): Set<ConductingEquipment> =
         networkService.sequenceOf<Feeder>()
             .flatMap { find(it) }
-            .distinct()
-            .toList()
+            .toSet()
 
     /**
      * Find the [ConductingEquipment] on a [Feeder] which is SWER. This will include any equipment on the LV network that is energised via SWER.
      *
      * @param feeder The [Feeder] to process.
      *
-     * @return A [List] of [ConductingEquipment] on [feeder] that is SWER, or energised via SWER.
+     * @return A [Set] of [ConductingEquipment] on [feeder] that is SWER, or energised via SWER.
      */
-    fun find(feeder: Feeder): List<ConductingEquipment> {
+    fun find(feeder: Feeder): Set<ConductingEquipment> {
         val swerEquipment = mutableSetOf<ConductingEquipment>()
 
         // We will add all the SWER transformers to the swerEquipment list before starting any traces to prevent tracing though them by accident. In
@@ -58,7 +57,7 @@ class FindSwerEquipment(
             .onEach { swerEquipment.add(it) }
             .forEach { traceFrom(it, swerEquipment) }
 
-        return swerEquipment.toList()
+        return swerEquipment.toSet()
     }
 
     private fun traceFrom(transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {

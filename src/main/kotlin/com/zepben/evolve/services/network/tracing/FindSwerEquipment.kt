@@ -34,7 +34,6 @@ class FindSwerEquipment(
     fun find(networkService: NetworkService): Set<ConductingEquipment> =
         networkService.sequenceOf<Feeder>()
             .flatMap { find(it) }
-            .distinct()
             .toSet()
 
     /**

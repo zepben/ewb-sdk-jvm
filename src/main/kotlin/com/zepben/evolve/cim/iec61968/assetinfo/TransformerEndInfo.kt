@@ -77,24 +77,29 @@ class TransformerEndInfo(mRID: String = "") : AssetInfo(mRID) {
         val rU = ratedU?.toDouble() ?: return null
         val rS = ratedS?.toDouble() ?: return null
 
-        fun calculateX(voltage: Double?, r: Double?): Double? {
-            voltage ?: return null
-            r ?: return null
-
-            val zMag: Double = (voltage / 100) * (rU * rU) / rS
-            return round2dp(sqrt((zMag * zMag) - (r * r)))
-        }
-
         fun calculateRXFromTest(shortCircuitTest: ShortCircuitTest?): Pair<Double?, Double?> {
-            shortCircuitTest ?: return Pair(null, null)
-            val r = shortCircuitTest.voltageOhmicPart?.let {
-                round2dp((it * (rU * rU)) / (rS * 100))
-            } ?: shortCircuitTest.loss?.let {
-                val ratedR = (rU / rS)
-                round2dp(it * (ratedR * ratedR))
+            // Given a short circuit test that reaches the rated apparent power rS,
+            // only the wattmeter reading and either the voltmeter or ampmeter reading is needed for all calculations.
+            val (voltage, current) = shortCircuitTest?.voltage?.let {
+                val v = (it / 100) * rU
+                v to rS / v
+            } ?: shortCircuitTest?.current?.let {
+                rS / it to it
             } ?: return Pair(null, null)
 
-            return Pair(r, calculateX(shortCircuitTest.voltage, r))
+            val r = shortCircuitTest?.voltageOhmicPart?.let {
+                // active voltage = copper loss (i.e. wattmeter reading) / current (i.e. ampmeter reading)
+                // R = copper loss / current^2 = active voltage / current
+                val activeVoltage = (it / 100) * rU
+                activeVoltage / current
+            } ?: shortCircuitTest?.loss?.let {
+                // R = copper loss / current^2
+                it / (current * current)
+            } ?: return Pair(null, null)
+
+            val zMag = voltage / current
+            val x = sqrt((zMag * zMag) - (r * r))
+            return Pair(round2dp(r), round2dp(x))
         }
 
         val (r, x) = calculateRXFromTest(energisedEndShortCircuitTests)

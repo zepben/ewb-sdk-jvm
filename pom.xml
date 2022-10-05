@@ -84,6 +84,12 @@
             <version>0.22.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.zepben.evolve</groupId>
+            <artifactId>evolve-conn</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+
         <!-- Kotlin -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

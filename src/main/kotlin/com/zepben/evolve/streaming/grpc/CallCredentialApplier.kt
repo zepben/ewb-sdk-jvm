@@ -9,13 +9,11 @@
 package com.zepben.evolve.streaming.grpc
 
 import io.grpc.*
-import io.grpc.CallCredentials.RequestInfo
-import io.grpc.ForwardingClientCall.SimpleForwardingClientCall
 
 class CallCredentialApplier(private val callCredentials: CallCredentials): ClientInterceptor {
     override fun <ReqT, RespT> interceptCall(
-        methodDescriptor: MethodDescriptor<ReqT, RespT>?,
-        callOptions: CallOptions?,
-        channel: Channel?
-    ): ClientCall<ReqT, RespT> = channel!!.newCall(methodDescriptor, callOptions!!.withCallCredentials(callCredentials))
+        methodDescriptor: MethodDescriptor<ReqT, RespT>,
+        callOptions: CallOptions,
+        channel: Channel
+    ): ClientCall<ReqT, RespT> = channel.newCall(methodDescriptor, callOptions.withCallCredentials(callCredentials))
 }

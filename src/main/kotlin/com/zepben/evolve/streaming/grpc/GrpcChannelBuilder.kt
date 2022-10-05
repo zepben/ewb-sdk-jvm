@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.streaming.grpc
 
+import com.zepben.auth.client.ZepbenTokenFetcher
 import io.grpc.CallCredentials
 import io.grpc.ChannelCredentials
 import io.grpc.TlsChannelCredentials
@@ -32,7 +33,7 @@ class GrpcChannelBuilder {
         } ?: NettyChannelBuilder.forAddress(_host, _port).build()
     )
 
-    fun socketAddress(
+    fun forAddress(
         host: String,
         port: Int
     ): GrpcChannelBuilder {
@@ -65,6 +66,11 @@ class GrpcChannelBuilder {
             channelCredentialsBuilder = channelCredentialsBuilder.keyManager(certificateChain, privateKey)
         }
         _channelCredentials = channelCredentialsBuilder.build()
+        return this
+    }
+
+    fun withTokenFetcher(tokenFetcher: ZepbenTokenFetcher): GrpcChannelBuilder {
+        _callCredentials = TokenCallCredentials(tokenFetcher::fetchToken)
         return this
     }
 

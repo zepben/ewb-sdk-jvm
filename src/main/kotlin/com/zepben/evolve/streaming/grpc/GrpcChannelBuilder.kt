@@ -17,6 +17,10 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
 
+/**
+ * Builder class for GrpcChannel. Allows easy specification of channel credentials via SSL/TLS
+ * and call credentials via a ZepbenTokenFetcher.
+ */
 class GrpcChannelBuilder {
 
     private var _host: String = "localhost"

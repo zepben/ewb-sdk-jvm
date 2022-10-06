@@ -12,7 +12,9 @@ import io.grpc.Channel
 import io.grpc.ManagedChannel
 import java.util.concurrent.TimeUnit
 
-
+/**
+ * Wrapper class for gRPC channels that closes the channel at the end of a try-with-resources block.
+ */
 class GrpcChannel(val channel: Channel) : AutoCloseable {
     override fun close() {
         if (channel is ManagedChannel) {

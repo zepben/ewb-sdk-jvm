@@ -10,10 +10,15 @@ package com.zepben.evolve.streaming.grpc
 
 import io.grpc.*
 
+/**
+ * This client interceptor applies a call credential to each client call for a gRPC channel.
+ */
 class CallCredentialApplier(private val callCredentials: CallCredentials): ClientInterceptor {
+
     override fun <ReqT, RespT> interceptCall(
         methodDescriptor: MethodDescriptor<ReqT, RespT>,
         callOptions: CallOptions,
         channel: Channel
     ): ClientCall<ReqT, RespT> = channel.newCall(methodDescriptor, callOptions.withCallCredentials(callCredentials))
+
 }

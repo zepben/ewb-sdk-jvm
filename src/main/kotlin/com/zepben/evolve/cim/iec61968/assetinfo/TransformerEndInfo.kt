@@ -82,9 +82,9 @@ class TransformerEndInfo(mRID: String = "") : AssetInfo(mRID) {
             // only the wattmeter reading and either the voltmeter or ampmeter reading is needed for all calculations.
             val (voltage, current) = shortCircuitTest?.voltage?.let {
                 val v = (it / 100) * rU
-                v to rS / v
+                Pair(v, rS / v)
             } ?: shortCircuitTest?.current?.let {
-                rS / it to it
+                Pair(rS / it, it)
             } ?: return Pair(null, null)
 
             val r = shortCircuitTest?.voltageOhmicPart?.let {

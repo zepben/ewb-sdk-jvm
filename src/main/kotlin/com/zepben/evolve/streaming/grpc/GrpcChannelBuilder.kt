@@ -14,8 +14,6 @@ import io.grpc.ChannelCredentials
 import io.grpc.TlsChannelCredentials
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStream
 
 /**
  * Builder class for GrpcChannel. Allows easy specification of channel credentials via SSL/TLS
@@ -50,17 +48,6 @@ class GrpcChannelBuilder {
         rootCertificates: File? = null,
         privateKey: File? = null,
         certificateChain: File? = null
-    ): GrpcChannelBuilder =
-        makeSecure(
-            rootCertificates = rootCertificates?.let { FileInputStream(it) },
-            privateKey = privateKey?.let { FileInputStream(it) },
-            certificateChain = certificateChain?.let { FileInputStream(it) }
-        )
-
-    fun makeSecure(
-        rootCertificates: InputStream? = null,
-        privateKey: InputStream? = null,
-        certificateChain: InputStream? = null
     ): GrpcChannelBuilder {
         var channelCredentialsBuilder = TlsChannelCredentials.newBuilder()
         if (rootCertificates != null) {

@@ -50,6 +50,31 @@ internal class TerminalConnectivityInternalTest {
     }
 
     @Test
+    internal fun pathsThroughHv2Lv2Tx() {
+        validateTxPaths(PhaseCode.AB, PhaseCode.ABN)
+        validateTxPaths(PhaseCode.AB, PhaseCode.XYN)
+
+        validateTxPaths(PhaseCode.AC, PhaseCode.ACN)
+        validateTxPaths(PhaseCode.AC, PhaseCode.XYN)
+
+        validateTxPaths(PhaseCode.BC, PhaseCode.BCN)
+        validateTxPaths(PhaseCode.BC, PhaseCode.XYN)
+
+        validateTxPaths(PhaseCode.XY, PhaseCode.XYN)
+    }
+
+    @Test
+    internal fun pathsThroughLv2Hv2Tx() {
+        validateTxPaths(PhaseCode.ABN, PhaseCode.AB)
+
+        validateTxPaths(PhaseCode.ACN, PhaseCode.AC)
+
+        validateTxPaths(PhaseCode.BCN, PhaseCode.BC)
+
+        validateTxPaths(PhaseCode.XYN, PhaseCode.XY)
+    }
+
+    @Test
     internal fun pathsThroughHv1Lv1Tx() {
         validateTxPaths(PhaseCode.AB, PhaseCode.AN)
         validateTxPaths(PhaseCode.AB, PhaseCode.BN, PhaseCode.NONE)

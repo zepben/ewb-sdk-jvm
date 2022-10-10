@@ -25,11 +25,11 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun forAddress() {
-        mockStatic(NettyChannelBuilder::class.java).use { dummyNettyChannelBuilder ->
+        mockStatic(NettyChannelBuilder::class.java).use { mockedStatic ->
             val insecureChannelBuilder = mock<NettyChannelBuilder>()
             val insecureChannel = mock<ManagedChannel>()
 
-            dummyNettyChannelBuilder
+            mockedStatic
                 .`when`<NettyChannelBuilder> { NettyChannelBuilder.forAddress(eq("hostname"), eq(1234)) }
                 .doReturn(insecureChannelBuilder)
             doReturn(insecureChannel).`when`(insecureChannelBuilder).build()
@@ -41,11 +41,11 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun makeSecure() {
-        mockStatic(NettyChannelBuilder::class.java).use { dummyNettyChannelBuilder ->
+        mockStatic(NettyChannelBuilder::class.java).use { mockedStatic ->
             val secureChannelBuilder = mock<NettyChannelBuilder>()
             val secureChannel = mock<ManagedChannel>()
 
-            dummyNettyChannelBuilder
+            mockedStatic
                 .`when`<NettyChannelBuilder> { NettyChannelBuilder.forAddress(eq("hostname"), eq(1234), any()) }
                 .thenReturn(secureChannelBuilder)
             doReturn(secureChannel).`when`(secureChannelBuilder).build()
@@ -57,12 +57,12 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun withTokenFetcher() {
-        mockStatic(NettyChannelBuilder::class.java).use { dummyNettyChannelBuilder ->
+        mockStatic(NettyChannelBuilder::class.java).use { mockedStatic ->
             val secureChannelBuilder = mock<NettyChannelBuilder>()
             val authenticatedChannelBuilder = mock<NettyChannelBuilder>()
             val authenticatedChannel = mock<ManagedChannel>()
 
-            dummyNettyChannelBuilder
+            mockedStatic
                 .`when`<NettyChannelBuilder> { NettyChannelBuilder.forAddress(eq("hostname"), eq(1234), any()) }
                 .thenReturn(secureChannelBuilder)
             doReturn(authenticatedChannelBuilder).`when`(secureChannelBuilder).intercept(any<CallCredentialApplier>())

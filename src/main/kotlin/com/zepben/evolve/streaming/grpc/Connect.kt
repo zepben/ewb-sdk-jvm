@@ -14,7 +14,7 @@ import com.zepben.auth.common.AuthMethod
 import java.io.File
 
 /**
- * A collection of functions that return a resource-managed channel that connects to Evolve's gRPC service, given address and authentication details.
+ * A collection of functions that return a channel that connects to Evolve's gRPC service, given address and authentication details.
  */
 object Connect {
 

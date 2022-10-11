@@ -152,6 +152,11 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-testing</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk-jvm</artifactId>
+            <version>1.13.2</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -127,6 +127,7 @@ internal class TransformerEndInfoTest {
         val ohmicAndCurrentTest = ShortCircuitTest().apply { voltageOhmicPart = 0.147; current = 34388.19 }
         val ohmicNoVoltageOrCurrentTest = ShortCircuitTest().apply { voltageOhmicPart = 0.147 }
         val voltageOnlyTest = ShortCircuitTest().apply { voltage = 11.85 }
+        val currentOnlyTest = ShortCircuitTest().apply { current = 34388.19 }
 
         // check via loss
         validateResistanceReactanceFromTest(400000, 1630000000, lossAndVoltageTest, lossAndVoltageTest, ResistanceReactance(0.02, 1.38, 0.02, 1.38))
@@ -160,6 +161,7 @@ internal class TransformerEndInfoTest {
 
         // check invalid
         validateResistanceReactanceFromTest(400000, 1630000000, voltageOnlyTest, voltageOnlyTest, null)
+        validateResistanceReactanceFromTest(400000, 1630000000, currentOnlyTest, currentOnlyTest, null)
     }
 
     private fun validateResistanceReactanceFromTest(

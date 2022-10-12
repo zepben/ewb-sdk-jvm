@@ -35,8 +35,22 @@ object Connect {
         clientId: String,
         clientSecret: String,
         confAddress: String,
-        confCAFilename: String? = null,
-        authCAFilename: String? = null,
+        host: String = "localhost",
+        rpcPort: Int = 50051,
+        ca: File? = null
+    ): GrpcChannel {
+        val tokenFetcher = createTokenFetcher(confAddress)
+            ?: return connectTls(host, rpcPort, ca)
+
+        return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, ca)
+    }
+
+    fun connectWithSecret(
+        clientId: String,
+        clientSecret: String,
+        confAddress: String,
+        confCAFilename: String,
+        authCAFilename: String,
         host: String = "localhost",
         rpcPort: Int = 50051,
         ca: File? = null
@@ -67,8 +81,23 @@ object Connect {
         username: String,
         password: String,
         confAddress: String,
-        confCAFilename: String? = null,
-        authCAFilename: String? = null,
+        host: String = "localhost",
+        rpcPort: Int = 50051,
+        ca: File? = null
+    ): GrpcChannel {
+        val tokenFetcher = createTokenFetcher(confAddress)
+            ?: return connectTls(host, rpcPort, ca)
+
+        return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, ca)
+    }
+
+    fun connectWithPassword(
+        clientId: String,
+        username: String,
+        password: String,
+        confAddress: String,
+        confCAFilename: String,
+        authCAFilename: String,
         host: String = "localhost",
         rpcPort: Int = 50051,
         ca: File? = null

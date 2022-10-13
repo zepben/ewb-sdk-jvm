@@ -7,6 +7,7 @@
 * Changed the minimum supported database version to v43.
 
 ##### New Features
+* Added support for YYN single phase transformers when determining phases.
 * Added `LvFeeder`, a branch of LV network starting at a distribution substation and continuing until the end of the LV network.
 * Added the following optional arguments to `NetworkConsumerClient().getEquipment(For)Container(s)`:
   * `includeEnergizingContainers`: Specifies whether to include equipment from containers energizing the ones listed in

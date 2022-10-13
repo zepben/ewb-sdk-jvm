@@ -50,28 +50,26 @@ internal class TerminalConnectivityInternalTest {
     }
 
     @Test
-    internal fun pathsThroughHv2Lv2Tx() {
+    internal fun pathsThroughHv1Lv2Tx() {
         validateTxPaths(PhaseCode.AB, PhaseCode.ABN)
+        validateTxPaths(PhaseCode.AB, PhaseCode.BCN, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.AB, PhaseCode.ACN, PhaseCode.NONE)
         validateTxPaths(PhaseCode.AB, PhaseCode.XYN)
 
+        validateTxPaths(PhaseCode.BC, PhaseCode.ABN, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.BC, PhaseCode.BCN)
+        validateTxPaths(PhaseCode.BC, PhaseCode.ACN, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.BC, PhaseCode.XYN)
+
+        validateTxPaths(PhaseCode.AC, PhaseCode.ABN, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.AC, PhaseCode.BCN, PhaseCode.NONE)
         validateTxPaths(PhaseCode.AC, PhaseCode.ACN)
         validateTxPaths(PhaseCode.AC, PhaseCode.XYN)
 
-        validateTxPaths(PhaseCode.BC, PhaseCode.BCN)
-        validateTxPaths(PhaseCode.BC, PhaseCode.XYN)
-
+        validateTxPaths(PhaseCode.XY, PhaseCode.ABN)
+        validateTxPaths(PhaseCode.XY, PhaseCode.ACN)
+        validateTxPaths(PhaseCode.XY, PhaseCode.BCN)
         validateTxPaths(PhaseCode.XY, PhaseCode.XYN)
-    }
-
-    @Test
-    internal fun pathsThroughLv2Hv2Tx() {
-        validateTxPaths(PhaseCode.ABN, PhaseCode.AB)
-
-        validateTxPaths(PhaseCode.ACN, PhaseCode.AC)
-
-        validateTxPaths(PhaseCode.BCN, PhaseCode.BC)
-
-        validateTxPaths(PhaseCode.XYN, PhaseCode.XY)
     }
 
     @Test
@@ -95,6 +93,45 @@ internal class TerminalConnectivityInternalTest {
         validateTxPaths(PhaseCode.XY, PhaseCode.BN)
         validateTxPaths(PhaseCode.XY, PhaseCode.CN)
         validateTxPaths(PhaseCode.XY, PhaseCode.XN)
+    }
+
+    @Test
+    internal fun pathsThroughLv2Lv2Tx() {
+        validateTxPaths(PhaseCode.ABN, PhaseCode.ABN)
+        validateTxPaths(PhaseCode.BCN, PhaseCode.BCN)
+        validateTxPaths(PhaseCode.ACN, PhaseCode.ACN)
+
+        validateTxPaths(PhaseCode.ABN, PhaseCode.XYN)
+        validateTxPaths(PhaseCode.BCN, PhaseCode.XYN)
+        validateTxPaths(PhaseCode.ACN, PhaseCode.XYN)
+
+        validateTxPaths(PhaseCode.XYN, PhaseCode.ABN)
+        validateTxPaths(PhaseCode.XYN, PhaseCode.BCN)
+        validateTxPaths(PhaseCode.XYN, PhaseCode.ACN)
+        validateTxPaths(PhaseCode.XYN, PhaseCode.XYN)
+    }
+
+    @Test
+    internal fun pathsThroughLv2Hv1Tx() {
+        validateTxPaths(PhaseCode.ABN, PhaseCode.AB)
+        validateTxPaths(PhaseCode.ABN, PhaseCode.BC, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.ABN, PhaseCode.AC, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.ABN, PhaseCode.XY)
+
+        validateTxPaths(PhaseCode.BCN, PhaseCode.AB, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.BCN, PhaseCode.BC)
+        validateTxPaths(PhaseCode.BCN, PhaseCode.AC, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.BCN, PhaseCode.XY)
+
+        validateTxPaths(PhaseCode.ACN, PhaseCode.AB, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.ACN, PhaseCode.BC, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.ACN, PhaseCode.AC)
+        validateTxPaths(PhaseCode.ACN, PhaseCode.XY)
+
+        validateTxPaths(PhaseCode.XYN, PhaseCode.AB)
+        validateTxPaths(PhaseCode.XYN, PhaseCode.BC)
+        validateTxPaths(PhaseCode.XYN, PhaseCode.AC)
+        validateTxPaths(PhaseCode.XYN, PhaseCode.XY)
     }
 
     @Test

@@ -32,7 +32,7 @@ class GrpcChannelBuilder {
             _callCredentials?.let { callCreds ->
                 channelBuilder.intercept(CallCredentialApplier(callCreds)).build()
             } ?: channelBuilder.build()
-        } ?: NettyChannelBuilder.forAddress(_host, _port).build()
+        } ?: NettyChannelBuilder.forAddress(_host, _port).usePlaintext().build()
     )
 
     fun forAddress(

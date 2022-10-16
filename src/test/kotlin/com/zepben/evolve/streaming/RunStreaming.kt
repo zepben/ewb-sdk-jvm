@@ -12,9 +12,8 @@ import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.streaming.get.NetworkConsumerClient
 import com.zepben.evolve.streaming.get.getEquipmentContainer
-import com.zepben.evolve.streaming.grpc.Connect.connectWithPassword
+import com.zepben.evolve.streaming.grpc.Connect.connectInsecure
 import org.slf4j.LoggerFactory
-import java.io.File
 
 private val logger = LoggerFactory.getLogger("main")
 private var indentLevel = 0
@@ -23,10 +22,7 @@ private var indent = 3
 fun main() {
     // NOTE: There is something stopping this from exiting but it appears the client
     //       channel is shutdown correctly so not sure what it is.
-    connectWithPassword("oSI1gsphdpK5twLFhOqyfo2KLuynBvFQ", "auth0-test@zepben.com", "Vd3BHfnd7cgeUm3",
-        "https://ewb.local:9000/ewb/auth", confCAFilename = "C:/Users/Marcus/ewb/ewb.local.cer",
-        host = "ewb.local", rpcPort =  50052,
-        ca = File("C:/Users/Marcus/ewb/ewb.local.cer")).use { channel ->
+    connectInsecure("localhost", 9001).use { channel ->
         val client = NetworkConsumerClient(channel)
 
         time("streaming") {
@@ -58,7 +54,7 @@ private fun runRetrieve(client: NetworkConsumerClient) {
 }
 
 private fun runFeeder(client: NetworkConsumerClient) {
-    val result = client.getEquipmentContainer<Feeder>("_LATHAM_8TB_LWMLNGLOW")
+    val result = client.getEquipmentContainer<Feeder>("CTN005")
     result.throwOnError()
     log("Num unresolved: ${client.service.numUnresolvedReferences()}")
     log("Num objects: ${client.service.num<IdentifiedObject>()}")

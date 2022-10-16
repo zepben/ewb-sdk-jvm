@@ -11,6 +11,7 @@ package com.zepben.evolve.streaming.grpc
 import io.grpc.CallCredentials
 import io.grpc.Metadata
 import io.grpc.Metadata.ASCII_STRING_MARSHALLER
+import io.grpc.Status
 import java.util.concurrent.Executor
 
 internal val AUTHORISATION_METADATA_KEY: Metadata.Key<String> = Metadata.Key.of("Authorization", ASCII_STRING_MARSHALLER)
@@ -23,9 +24,13 @@ internal val AUTHORISATION_METADATA_KEY: Metadata.Key<String> = Metadata.Key.of(
 class TokenCallCredentials(private val getToken: () -> String): CallCredentials() {
 
     override fun applyRequestMetadata(requestInfo: RequestInfo, executor: Executor, applier: MetadataApplier) {
-        val headers = Metadata()
-        headers.put(AUTHORISATION_METADATA_KEY, getToken())
-        applier.apply(headers)
+        try {
+            val headers = Metadata()
+            headers.put(AUTHORISATION_METADATA_KEY, getToken())
+            applier.apply(headers)
+        } catch (e: Exception) {
+            applier.fail(Status.fromThrowable(e))
+        }
     }
 
     override fun thisUsesUnstableApi() {}

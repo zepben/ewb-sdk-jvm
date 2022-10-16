@@ -35,22 +35,8 @@ object Connect {
         clientId: String,
         clientSecret: String,
         confAddress: String,
-        host: String = "localhost",
-        rpcPort: Int = 50051,
-        ca: File? = null
-    ): GrpcChannel {
-        val tokenFetcher = createTokenFetcher(confAddress)
-            ?: return connectTls(host, rpcPort, ca)
-
-        return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, ca)
-    }
-
-    fun connectWithSecret(
-        clientId: String,
-        clientSecret: String,
-        confAddress: String,
-        confCAFilename: String,
-        authCAFilename: String,
+        confCAFilename: String? = null,
+        authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
         ca: File? = null
@@ -67,11 +53,12 @@ object Connect {
         audience: String,
         issuerDomain: String,
         authMethod: AuthMethod,
+        authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
         ca: File? = null
     ): GrpcChannel {
-        val tokenFetcher = ZepbenTokenFetcher(audience = audience, issuerDomain = issuerDomain, authMethod = authMethod)
+        val tokenFetcher = ZepbenTokenFetcher(audience = audience, issuerDomain = issuerDomain, authMethod = authMethod, caFilename = authCAFilename)
 
         return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, ca)
     }
@@ -81,23 +68,8 @@ object Connect {
         username: String,
         password: String,
         confAddress: String,
-        host: String = "localhost",
-        rpcPort: Int = 50051,
-        ca: File? = null
-    ): GrpcChannel {
-        val tokenFetcher = createTokenFetcher(confAddress)
-            ?: return connectTls(host, rpcPort, ca)
-
-        return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, ca)
-    }
-
-    fun connectWithPassword(
-        clientId: String,
-        username: String,
-        password: String,
-        confAddress: String,
-        confCAFilename: String,
-        authCAFilename: String,
+        confCAFilename: String? = null,
+        authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
         ca: File? = null
@@ -115,11 +87,12 @@ object Connect {
         audience: String,
         issuerDomain: String,
         authMethod: AuthMethod,
+        authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
         ca: File? = null
     ): GrpcChannel {
-        val tokenFetcher = ZepbenTokenFetcher(audience = audience, issuerDomain = issuerDomain, authMethod = authMethod)
+        val tokenFetcher = ZepbenTokenFetcher(audience = audience, issuerDomain = issuerDomain, authMethod = authMethod, caFilename = authCAFilename)
 
         return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, ca)
     }

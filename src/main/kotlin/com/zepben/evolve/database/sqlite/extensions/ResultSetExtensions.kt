@@ -18,7 +18,7 @@ internal fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
     // Annoyingly getDouble will return 0.0 for string values, so we need to check all 0.0's for NaN.
     val dbl = getDouble(queryIndex).takeUnless { wasNull() }
     return if (dbl == 0.0) {
-        when (getString(queryIndex).toUpperCase()) {
+        when (getString(queryIndex).uppercase()) {
             "NAN" -> Double.NaN
             else -> dbl
         }

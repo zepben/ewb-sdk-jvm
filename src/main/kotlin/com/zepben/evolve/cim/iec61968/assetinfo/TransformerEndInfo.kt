@@ -77,30 +77,27 @@ class TransformerEndInfo(mRID: String = "") : AssetInfo(mRID) {
         val rU = ratedU?.toDouble() ?: return null
         val rS = ratedS?.toDouble() ?: return null
 
-        fun calculateRXFromTest(shortCircuitTest: ShortCircuitTest?): Pair<Double?, Double?> {
-            // Given a short circuit test that reaches the rated apparent power rS,
-            // only the wattmeter reading and either the voltmeter or ampmeter reading is needed for all calculations.
-            val (voltage, current) = shortCircuitTest?.voltage?.let {
-                val v = (it / 100) * rU
-                Pair(v, rS / v)
-            } ?: shortCircuitTest?.current?.let {
-                Pair(rS / it, it)
-            } ?: return Pair(null, null)
+        fun calculateRXFromTest(shortCircuitTest: ShortCircuitTest?): Pair<Double?, Double?> = shortCircuitTest?.run {
+            val amps = current ?: (rS / rU)
 
-            val r = shortCircuitTest?.voltageOhmicPart?.let {
+            val r = voltageOhmicPart?.let {
                 // active voltage = copper loss (i.e. wattmeter reading) / current (i.e. ampmeter reading)
                 // R = copper loss / current^2 = active voltage / current
                 val activeVoltage = (it / 100) * rU
-                activeVoltage / current
-            } ?: shortCircuitTest?.loss?.let {
+                activeVoltage / amps
+            } ?: loss?.let {
                 // R = copper loss / current^2
-                it / (current * current)
+                it / (amps * amps)
             } ?: return Pair(null, null)
 
-            val zMag = voltage / current
-            val x = sqrt((zMag * zMag) - (r * r))
-            return Pair(round2dp(r), round2dp(x))
-        }
+            val roundedX = voltage?.let { (it / 100) * rU }?.let { volts ->
+                val zMag = volts / amps
+                val x = sqrt((zMag * zMag) - (r * r))
+                round2dp(x)
+            }
+
+            Pair(round2dp(r), roundedX)
+        } ?: Pair(null, null)
 
         val (r, x) = calculateRXFromTest(energisedEndShortCircuitTests)
         val (r0, x0) = calculateRXFromTest(groundedEndShortCircuitTests)

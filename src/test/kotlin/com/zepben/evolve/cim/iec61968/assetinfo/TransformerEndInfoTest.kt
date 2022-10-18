@@ -120,48 +120,34 @@ internal class TransformerEndInfoTest {
 
     @Test
     internal fun testCalculatesResistanceReactanceOfEndInfoTestsIfAvailable() {
-        val lossAndVoltageTest = ShortCircuitTest().apply { loss = 20201800; voltage = 11.85 }
-        val lossAndCurrentTest = ShortCircuitTest().apply { loss = 20201800; current = 34388.19 }
-        val lossNoVoltageOrCurrentTest = ShortCircuitTest().apply { loss = 20201800 }
-        val ohmicAndVoltageTest = ShortCircuitTest().apply { voltageOhmicPart = 0.147; voltage = 11.85 }
-        val ohmicAndCurrentTest = ShortCircuitTest().apply { voltageOhmicPart = 0.147; current = 34388.19 }
-        val ohmicNoVoltageOrCurrentTest = ShortCircuitTest().apply { voltageOhmicPart = 0.147 }
+        val lossTest = ShortCircuitTest().apply { loss = 2020180; voltage = 11.85 }
+        val lossNoVoltageTest = ShortCircuitTest().apply { loss = 2020180 }
+        val lossTestWithCurrent = ShortCircuitTest().apply { loss = 2020180; voltage = 11.85; current = 4075.0 }
+        val ohmicTest = ShortCircuitTest().apply { voltageOhmicPart = 0.124; voltage = 11.85 }
+        val ohmicNoVoltageTest = ShortCircuitTest().apply { voltageOhmicPart = 0.124 }
+        val ohmicTestWithCurrent = ShortCircuitTest().apply { voltageOhmicPart = 0.124; voltage = 11.85; current = 4075.0 }
         val voltageOnlyTest = ShortCircuitTest().apply { voltage = 11.85 }
-        val currentOnlyTest = ShortCircuitTest().apply { current = 34388.19 }
 
         // check via loss
-        validateResistanceReactanceFromTest(400000, 1630000000, lossAndVoltageTest, lossAndVoltageTest, ResistanceReactance(0.02, 1.38, 0.02, 1.38))
-        validateResistanceReactanceFromTest(null, 1630000000, lossAndVoltageTest, lossAndVoltageTest, null)
-        validateResistanceReactanceFromTest(400000, null, lossAndVoltageTest, lossAndVoltageTest, null)
-        validateResistanceReactanceFromTest(400000, 1630000000, null, lossAndVoltageTest, ResistanceReactance(r=null, x=null, r0=0.02, x0=1.38))
-        validateResistanceReactanceFromTest(400000, 1630000000, lossAndVoltageTest, null, ResistanceReactance(0.02, 1.38, null, null))
-
-        validateResistanceReactanceFromTest(400000, 1630000000, lossAndCurrentTest, lossAndCurrentTest, ResistanceReactance(0.02, 1.38, 0.02, 1.38))
-        validateResistanceReactanceFromTest(null, 1630000000, lossAndCurrentTest, lossAndCurrentTest, null)
-        validateResistanceReactanceFromTest(400000, null, lossAndCurrentTest, lossAndCurrentTest, null)
-        validateResistanceReactanceFromTest(400000, 1630000000, null, lossAndCurrentTest, ResistanceReactance(r=null, x=null, r0=0.02, x0=1.38))
-        validateResistanceReactanceFromTest(400000, 1630000000, lossAndCurrentTest, null, ResistanceReactance(0.02, 1.38, null, null))
-
-        validateResistanceReactanceFromTest(400000, 1630000000, lossNoVoltageOrCurrentTest, lossNoVoltageOrCurrentTest, null)
+        validateResistanceReactanceFromTest(400000, 1630000000, lossTest, lossTest, ResistanceReactance(0.12, 11.63, 0.12, 11.63))
+        validateResistanceReactanceFromTest(null, 1630000000, lossTest, lossTest, null)
+        validateResistanceReactanceFromTest(400000, null, lossTest, lossTest, null)
+        validateResistanceReactanceFromTest(400000, 1630000000, null, lossTest, ResistanceReactance(null, null, 0.12, 11.63))
+        validateResistanceReactanceFromTest(400000, 1630000000, lossTest, null, ResistanceReactance(0.12, 11.63, null, null))
+        validateResistanceReactanceFromTest(400000, 1630000000, lossNoVoltageTest, lossNoVoltageTest, ResistanceReactance(0.12, null, 0.12, null))
+        validateResistanceReactanceFromTest(400000, 2000000000, lossTestWithCurrent, lossTestWithCurrent, ResistanceReactance(0.12, 11.63, 0.12, 11.63))
 
         // check via ohmic part
-        validateResistanceReactanceFromTest(400000, 1630000000, ohmicAndVoltageTest, ohmicAndVoltageTest, ResistanceReactance(0.02, 1.38, 0.02, 1.38))
-        validateResistanceReactanceFromTest(null, 1630000000, ohmicAndVoltageTest, ohmicAndVoltageTest, null)
-        validateResistanceReactanceFromTest(400000, null, ohmicAndVoltageTest, ohmicAndVoltageTest, null)
-        validateResistanceReactanceFromTest(400000, 1630000000, null, ohmicAndVoltageTest, ResistanceReactance(r=null, x=null, r0=0.02, x0=1.38))
-        validateResistanceReactanceFromTest(400000, 1630000000, ohmicAndVoltageTest, null, ResistanceReactance(0.02, 1.38, null, null))
-
-        validateResistanceReactanceFromTest(400000, 1630000000, ohmicAndCurrentTest, ohmicAndCurrentTest, ResistanceReactance(0.02, 1.38, 0.02, 1.38))
-        validateResistanceReactanceFromTest(null, 1630000000, ohmicAndCurrentTest, ohmicAndCurrentTest, null)
-        validateResistanceReactanceFromTest(400000, null, ohmicAndCurrentTest, ohmicAndCurrentTest, null)
-        validateResistanceReactanceFromTest(400000, 1630000000, null, ohmicAndCurrentTest, ResistanceReactance(r=null, x=null, r0=0.02, x0=1.38))
-        validateResistanceReactanceFromTest(400000, 1630000000, ohmicAndCurrentTest, null, ResistanceReactance(0.02, 1.38, null, null))
-
-        validateResistanceReactanceFromTest(400000, 1630000000, ohmicNoVoltageOrCurrentTest, ohmicNoVoltageOrCurrentTest, null)
+        validateResistanceReactanceFromTest(400000, 1630000000, ohmicTest, ohmicTest, ResistanceReactance(0.12, 11.63, 0.12, 11.63))
+        validateResistanceReactanceFromTest(null, 1630000000, ohmicTest, ohmicTest, null)
+        validateResistanceReactanceFromTest(400000, null, ohmicTest, ohmicTest, null)
+        validateResistanceReactanceFromTest(400000, 1630000000, null, ohmicTest, ResistanceReactance(null, null, 0.12, 11.63))
+        validateResistanceReactanceFromTest(400000, 1630000000, ohmicTest, null, ResistanceReactance(0.12, 11.63, null, null))
+        validateResistanceReactanceFromTest(400000, 1630000000, ohmicNoVoltageTest, ohmicNoVoltageTest, ResistanceReactance(0.12, null, 0.12, null))
+        validateResistanceReactanceFromTest(400000, 2000000000, ohmicTestWithCurrent, ohmicTestWithCurrent, ResistanceReactance(0.12, 11.63, 0.12, 11.63))
 
         // check invalid
         validateResistanceReactanceFromTest(400000, 1630000000, voltageOnlyTest, voltageOnlyTest, null)
-        validateResistanceReactanceFromTest(400000, 1630000000, currentOnlyTest, currentOnlyTest, null)
     }
 
     private fun validateResistanceReactanceFromTest(

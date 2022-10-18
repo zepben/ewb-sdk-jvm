@@ -45,16 +45,24 @@ class GrpcChannelBuilder {
     }
 
     fun makeSecure(
-        rootCertificates: File? = null,
-        privateKey: File? = null,
-        certificateChain: File? = null
+        rootCertificates: File? = null
     ): GrpcChannelBuilder {
         var channelCredentialsBuilder = TlsChannelCredentials.newBuilder()
         if (rootCertificates != null) {
             channelCredentialsBuilder = channelCredentialsBuilder.trustManager(rootCertificates)
         }
-        if (privateKey != null && certificateChain != null) {
-            channelCredentialsBuilder = channelCredentialsBuilder.keyManager(certificateChain, privateKey)
+        _channelCredentials = channelCredentialsBuilder.build()
+        return this
+    }
+
+    fun makeSecure(
+        rootCertificates: File? = null,
+        certificateChain: File,
+        privateKey: File
+    ): GrpcChannelBuilder {
+        var channelCredentialsBuilder = TlsChannelCredentials.newBuilder().keyManager(certificateChain, privateKey)
+        if (rootCertificates != null) {
+            channelCredentialsBuilder = channelCredentialsBuilder.trustManager(rootCertificates)
         }
         _channelCredentials = channelCredentialsBuilder.build()
         return this

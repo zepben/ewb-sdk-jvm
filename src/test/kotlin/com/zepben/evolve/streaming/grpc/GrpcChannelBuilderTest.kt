@@ -10,7 +10,9 @@ package com.zepben.evolve.streaming.grpc
 
 import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.common.AuthMethod
+import io.grpc.ChannelCredentials
 import io.grpc.ManagedChannel
+import io.grpc.TlsChannelCredentials
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -20,6 +22,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
+import java.io.File
 
 internal class GrpcChannelBuilderTest {
 
@@ -41,12 +44,35 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun makeSecure() {
+        val caFile = mock<File>()
+        val channelCredentials = mock<ChannelCredentials>()
         val secureChannel = mock<ManagedChannel>()
 
-        mockkStatic(NettyChannelBuilder::class)
-        every { NettyChannelBuilder.forAddress("hostname", 1234, any()).build() } returns secureChannel
+        mockkStatic(TlsChannelCredentials::class)
+        every { TlsChannelCredentials.newBuilder().trustManager(caFile).build() } returns channelCredentials
 
-        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure().build()
+        mockkStatic(NettyChannelBuilder::class)
+        every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).build() } returns secureChannel
+
+        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(caFile).build()
+        assertThat(grpcChannel.channel, equalTo(secureChannel))
+    }
+
+    @Test
+    internal fun makeSecureWithClientAuthentication() {
+        val caFile = mock<File>()
+        val pkFile = mock<File>()
+        val certChainFile = mock<File>()
+        val channelCredentials = mock<ChannelCredentials>()
+        val secureChannel = mock<ManagedChannel>()
+
+        mockkStatic(TlsChannelCredentials::class)
+        every { TlsChannelCredentials.newBuilder().keyManager(certChainFile, pkFile).trustManager(caFile).build() } returns channelCredentials
+
+        mockkStatic(NettyChannelBuilder::class)
+        every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).build() } returns secureChannel
+
+        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(caFile, certChainFile, pkFile).build()
         assertThat(grpcChannel.channel, equalTo(secureChannel))
     }
 

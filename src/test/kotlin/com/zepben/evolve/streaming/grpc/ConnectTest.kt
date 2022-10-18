@@ -21,7 +21,6 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.any
 import org.mockito.Mockito.mockConstruction
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -43,7 +42,7 @@ internal class ConnectTest {
     private val tokenRequestData = JsonObject()
 
     init {
-        doReturn(gcbWithTls).`when`(gcbWithAddress).makeSecure(eq(caFile), any(), any())
+        doReturn(gcbWithTls).`when`(gcbWithAddress).makeSecure(eq(caFile))
         doReturn(gcbWithAuth).`when`(gcbWithTls).withTokenFetcher(eq(tokenFetcher))
 
         doReturn(grpcChannel).`when`(gcbWithAddress).build()

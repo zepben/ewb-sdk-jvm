@@ -12,9 +12,8 @@ import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.streaming.get.NetworkConsumerClient
 import com.zepben.evolve.streaming.get.getEquipmentContainer
-import com.zepben.evolve.streaming.grpc.Connect.connectWithSecret
+import com.zepben.evolve.streaming.grpc.Connect.connectInsecure
 import org.slf4j.LoggerFactory
-import java.io.File
 
 private val logger = LoggerFactory.getLogger("main")
 private var indentLevel = 0
@@ -23,10 +22,7 @@ private var indent = 3
 fun main() {
     // NOTE: There is something stopping this from exiting but it appears the client
     //       channel is shutdown correctly so not sure what it is.
-    connectWithSecret("rAFAmVo5goW5ZSApsZ6RrB5kfCPRZiwX", "yVfQPBa8MSMDJdNE087RNSoAj1TTj0RcSayZdWWysZw2giehY3tIuBqCe1hrCaSt",
-        "https://ewb.local:9000/ewb/auth", confCAFilename = "C:/Users/Marcus/ewb/ewb.local.cer",
-        host = "ewb.local", rpcPort =  50052,
-        ca = File("C:/Users/Marcus/ewb/ewb.local.cer")).use { channel ->
+    connectInsecure(host = "ewb.local", rpcPort = 9001).use { channel ->
         val client = NetworkConsumerClient(channel)
 
         time("streaming") {

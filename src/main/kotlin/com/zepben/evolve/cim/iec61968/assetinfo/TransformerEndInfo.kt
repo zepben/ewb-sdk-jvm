@@ -77,25 +77,27 @@ class TransformerEndInfo(mRID: String = "") : AssetInfo(mRID) {
         val rU = ratedU?.toDouble() ?: return null
         val rS = ratedS?.toDouble() ?: return null
 
-        fun calculateX(voltage: Double?, r: Double?): Double? {
-            voltage ?: return null
-            r ?: return null
+        fun calculateRXFromTest(shortCircuitTest: ShortCircuitTest?): Pair<Double?, Double?> = shortCircuitTest?.run {
+            val amps = current ?: (rS / rU)
 
-            val zMag: Double = (voltage / 100) * (rU * rU) / rS
-            return round2dp(sqrt((zMag * zMag) - (r * r)))
-        }
-
-        fun calculateRXFromTest(shortCircuitTest: ShortCircuitTest?): Pair<Double?, Double?> {
-            shortCircuitTest ?: return Pair(null, null)
-            val r = shortCircuitTest.voltageOhmicPart?.let {
-                round2dp((it * (rU * rU)) / (rS * 100))
-            } ?: shortCircuitTest.loss?.let {
-                val ratedR = (rU / rS)
-                round2dp(it * (ratedR * ratedR))
+            val r = voltageOhmicPart?.let {
+                // active voltage = copper loss (i.e. wattmeter reading) / current (i.e. ampmeter reading)
+                // R = copper loss / current^2 = active voltage / current
+                val activeVoltage = (it / 100) * rU
+                activeVoltage / amps
+            } ?: loss?.let {
+                // R = copper loss / current^2
+                it / (amps * amps)
             } ?: return Pair(null, null)
 
-            return Pair(r, calculateX(shortCircuitTest.voltage, r))
-        }
+            val roundedX = voltage?.let { (it / 100) * rU }?.let { volts ->
+                val zMag = volts / amps
+                val x = sqrt((zMag * zMag) - (r * r))
+                round2dp(x)
+            }
+
+            Pair(round2dp(r), roundedX)
+        } ?: Pair(null, null)
 
         val (r, x) = calculateRXFromTest(energisedEndShortCircuitTests)
         val (r0, x0) = calculateRXFromTest(groundedEndShortCircuitTests)

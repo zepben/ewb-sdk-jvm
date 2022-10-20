@@ -29,6 +29,7 @@
 
 ##### Fixes
 * Failure when reading in database tables will now cause a short-circuit failure when all tables are loaded rather than after post load processing.
+* Corrected function that calculates the equivalent impedance of a transformer from the results of a short circuit test.
 
 ##### Notes
 * None.

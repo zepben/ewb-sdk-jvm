@@ -23,7 +23,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ---
 
-### v0.13.0-SNAPSHOT1
+### v0.13.0
 
 ##### Breaking Changes
 * Replaced `Equipment().currentFeeders` with `Equipment().currentContainers`, which yields a `Collection<EquipmentContainer>` instead of a `Collection<Feeder>`.

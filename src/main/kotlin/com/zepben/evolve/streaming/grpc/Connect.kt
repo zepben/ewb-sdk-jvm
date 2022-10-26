@@ -34,14 +34,14 @@ object Connect {
     fun connectWithSecret(
         clientId: String,
         clientSecret: String,
-        confAddress: String,
+        confAddress: String? = null,
         confCAFilename: String? = null,
         authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
         ca: File? = null
     ): GrpcChannel {
-        val tokenFetcher = createTokenFetcher(confAddress, confCAFilename = confCAFilename, authCAFilename = authCAFilename)
+        val tokenFetcher = createTokenFetcher(confAddress ?: "https://$host/ewb/auth", confCAFilename = confCAFilename, authCAFilename = authCAFilename)
             ?: return connectTls(host, rpcPort, ca)
 
         return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, ca)
@@ -67,14 +67,14 @@ object Connect {
         clientId: String,
         username: String,
         password: String,
-        confAddress: String,
+        confAddress: String? = null,
         confCAFilename: String? = null,
         authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
         ca: File? = null
     ): GrpcChannel {
-        val tokenFetcher = createTokenFetcher(confAddress, confCAFilename = confCAFilename, authCAFilename = authCAFilename)
+        val tokenFetcher = createTokenFetcher(confAddress ?: "https://$host/ewb/auth", confCAFilename = confCAFilename, authCAFilename = authCAFilename)
             ?: return connectTls(host, rpcPort, ca)
 
         return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, ca)

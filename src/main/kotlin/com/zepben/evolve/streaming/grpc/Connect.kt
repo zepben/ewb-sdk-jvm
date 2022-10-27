@@ -18,12 +18,14 @@ import java.io.File
  */
 object Connect {
 
+    @JvmStatic
     fun connectInsecure(
         host: String = "localhost",
         rpcPort: Int = 50051
     ): GrpcChannel =
         GrpcChannelBuilder().forAddress(host, rpcPort).build()
 
+    @JvmStatic
     fun connectTls(
         host: String = "localhost",
         rpcPort: Int = 50051,
@@ -31,6 +33,7 @@ object Connect {
     ): GrpcChannel =
         GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = ca).build()
 
+    @JvmStatic
     fun connectWithSecret(
         clientId: String,
         clientSecret: String,
@@ -47,6 +50,7 @@ object Connect {
         return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, ca)
     }
 
+    @JvmStatic
     fun connectWithSecret(
         clientId: String,
         clientSecret: String,
@@ -63,6 +67,7 @@ object Connect {
         return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, ca)
     }
 
+    @JvmStatic
     fun connectWithPassword(
         clientId: String,
         username: String,
@@ -80,6 +85,7 @@ object Connect {
         return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, ca)
     }
 
+    @JvmStatic
     fun connectWithPassword(
         clientId: String,
         username: String,

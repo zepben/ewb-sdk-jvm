@@ -11,7 +11,6 @@ package com.zepben.evolve.streaming.grpc
 import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.client.createTokenFetcher
 import com.zepben.auth.common.AuthMethod
-import java.io.File
 
 /**
  * A collection of functions that return a channel that connects to Evolve's gRPC service, given address and authentication details.
@@ -29,9 +28,9 @@ object Connect {
     fun connectTls(
         host: String = "localhost",
         rpcPort: Int = 50051,
-        ca: File? = null
+        caFilename: String? = null
     ): GrpcChannel =
-        GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = ca).build()
+        GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).build()
 
     @JvmStatic
     fun connectWithSecret(
@@ -42,12 +41,12 @@ object Connect {
         authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
-        ca: File? = null
+        caFilename: String? = null
     ): GrpcChannel {
         val tokenFetcher = createTokenFetcher(confAddress ?: "https://$host/ewb/auth", confCAFilename = confCAFilename, authCAFilename = authCAFilename)
-            ?: return connectTls(host, rpcPort, ca)
+            ?: return connectTls(host, rpcPort, caFilename)
 
-        return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, ca)
+        return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, caFilename)
     }
 
     @JvmStatic
@@ -60,11 +59,11 @@ object Connect {
         authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
-        ca: File? = null
+        caFilename: String? = null
     ): GrpcChannel {
         val tokenFetcher = ZepbenTokenFetcher(audience = audience, issuerDomain = issuerDomain, authMethod = authMethod, caFilename = authCAFilename)
 
-        return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, ca)
+        return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, caFilename)
     }
 
     @JvmStatic
@@ -77,12 +76,12 @@ object Connect {
         authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
-        ca: File? = null
+        caFilename: String? = null
     ): GrpcChannel {
         val tokenFetcher = createTokenFetcher(confAddress ?: "https://$host/ewb/auth", confCAFilename = confCAFilename, authCAFilename = authCAFilename)
-            ?: return connectTls(host, rpcPort, ca)
+            ?: return connectTls(host, rpcPort, caFilename)
 
-        return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, ca)
+        return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, caFilename)
     }
 
     @JvmStatic
@@ -96,11 +95,11 @@ object Connect {
         authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
-        ca: File? = null
+        caFilename: String? = null
     ): GrpcChannel {
         val tokenFetcher = ZepbenTokenFetcher(audience = audience, issuerDomain = issuerDomain, authMethod = authMethod, caFilename = authCAFilename)
 
-        return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, ca)
+        return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, caFilename)
     }
 
     private fun connectWithSecretUsingTokenFetcher(
@@ -109,13 +108,13 @@ object Connect {
         clientSecret: String,
         host: String = "localhost",
         rpcPort: Int = 50051,
-        ca: File? = null
+        caFilename: String? = null
     ): GrpcChannel {
         tokenFetcher.tokenRequestData.put("client_id", clientId)
         tokenFetcher.tokenRequestData.put("client_secret", clientSecret)
         tokenFetcher.tokenRequestData.put("grant_type", "client_credentials")
 
-        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = ca).withTokenFetcher(tokenFetcher).build()
+        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build()
     }
 
     private fun connectWithPasswordUsingTokenFetcher(
@@ -125,7 +124,7 @@ object Connect {
         password: String,
         host: String = "localhost",
         rpcPort: Int = 50051,
-        ca: File? = null
+        caFilename: String? = null
     ): GrpcChannel {
         tokenFetcher.tokenRequestData.put("client_id", clientId)
         tokenFetcher.tokenRequestData.put("username", username)
@@ -133,7 +132,7 @@ object Connect {
         tokenFetcher.tokenRequestData.put("grant_type", "password")
         tokenFetcher.tokenRequestData.put("scope", "offline_access")
 
-        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = ca).withTokenFetcher(tokenFetcher).build()
+        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build()
     }
 
 }

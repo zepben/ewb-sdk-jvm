@@ -12,7 +12,6 @@ import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.client.createTokenFetcher
 import com.zepben.auth.common.AuthMethod
 import io.mockk.every
-import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.vertx.core.json.JsonObject
@@ -25,7 +24,6 @@ import org.mockito.Mockito.mockConstruction
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import java.io.File
 
 internal class ConnectTest {
 
@@ -37,12 +35,11 @@ internal class ConnectTest {
     private val grpcChannelWithTls = mock<GrpcChannel>()
     private val grpcChannelWithAuth = mock<GrpcChannel>()
 
-    private val caFile = mock<File>()
     private val tokenFetcher = mock<ZepbenTokenFetcher>()
     private val tokenRequestData = JsonObject()
 
     init {
-        doReturn(gcbWithTls).`when`(gcbWithAddress).makeSecure(eq(caFile))
+        doReturn(gcbWithTls).`when`(gcbWithAddress).makeSecure(eq("caFilename"))
         doReturn(gcbWithAuth).`when`(gcbWithTls).withTokenFetcher(eq(tokenFetcher))
 
         doReturn(grpcChannel).`when`(gcbWithAddress).build()
@@ -76,7 +73,7 @@ internal class ConnectTest {
         mockConstruction(GrpcChannelBuilder::class.java) { gcbBase, _ ->
             doReturn(gcbWithAddress).`when`(gcbBase).forAddress(eq("hostname"), eq(1234))
         }.use {
-            assertThat(Connect.connectTls("hostname", 1234, caFile), equalTo(grpcChannelWithTls))
+            assertThat(Connect.connectTls("hostname", 1234, "caFilename"), equalTo(grpcChannelWithTls))
         }
     }
 
@@ -84,7 +81,7 @@ internal class ConnectTest {
     fun connectWithSecret() {
         mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
         every {
-            createTokenFetcher("confAddress", any(), any(), any(), "confCAFilename", "authCAFilename")
+            createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
         } returns tokenFetcher
 
         mockConstruction(GrpcChannelBuilder::class.java) { gcbBase, _ ->
@@ -98,7 +95,7 @@ internal class ConnectTest {
                 "authCAFilename",
                 "hostname",
                 1234,
-                caFile
+                "caFilename"
             )
 
             assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
@@ -118,16 +115,16 @@ internal class ConnectTest {
     fun connectWithSecretConnectsWithTlsIfNoAuth() {
         mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
         every {
-            createTokenFetcher("confAddress", any(), any(), any(), "confCAFilename", "authCAFilename")
+            createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
         } returns null
 
-        mockkObject(Connect)
+        mockkStatic(Connect::class)
         every {
-            Connect.connectTls("hostname", 1234, caFile)
+            Connect.connectTls("hostname", 1234, "caFilename")
         } returns grpcChannelWithTls
 
         assertThat(
-            Connect.connectWithSecret("clientId", "clientSecret", "confAddress", "confCAFilename", "authCAFilename", "hostname", 1234, caFile),
+            Connect.connectWithSecret("clientId", "clientSecret", "confAddress", "confCAFilename", "authCAFilename", "hostname", 1234, "caFilename"),
             equalTo(grpcChannelWithTls)
         )
     }
@@ -153,7 +150,7 @@ internal class ConnectTest {
                     AuthMethod.AUTH0,
                     host = "hostname",
                     rpcPort = 1234,
-                    ca = caFile
+                    caFilename = "caFilename"
                 )
 
                 assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
@@ -178,7 +175,7 @@ internal class ConnectTest {
     fun connectWithPassword() {
         mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
         every {
-            createTokenFetcher("confAddress", any(), any(), any(), "confCAFilename", "authCAFilename")
+            createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
         } returns tokenFetcher
 
         mockConstruction(GrpcChannelBuilder::class.java) { gcbBase, _ ->
@@ -193,7 +190,7 @@ internal class ConnectTest {
                 "authCAFilename",
                 "hostname",
                 1234,
-                caFile
+                "caFilename"
             )
 
             assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
@@ -215,16 +212,16 @@ internal class ConnectTest {
     fun connectWithPasswordConnectsWithTlsIfNoAuth() {
         mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
         every {
-            createTokenFetcher("confAddress", any(), any(), any(), "confCAFilename", "authCAFilename")
+            createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
         } returns null
 
-        mockkObject(Connect)
+        mockkStatic(Connect::class)
         every {
-            Connect.connectTls("hostname", 1234, caFile)
+            Connect.connectTls("hostname", 1234, "caFilename")
         } returns grpcChannel
 
         assertThat(
-            Connect.connectWithPassword("clientId", "username", "password", "confAddress", "confCAFilename", "authCAFilename", "hostname", 1234, caFile),
+            Connect.connectWithPassword("clientId", "username", "password", "confAddress", "confCAFilename", "authCAFilename", "hostname", 1234, "caFilename"),
             equalTo(grpcChannel)
         )
     }
@@ -251,7 +248,7 @@ internal class ConnectTest {
                     AuthMethod.AUTH0,
                     host = "hostname",
                     rpcPort = 1234,
-                    ca = caFile
+                    caFilename = "caFilename"
                 )
 
                 assertThat(grpcChannel, equalTo(grpcChannelWithAuth))

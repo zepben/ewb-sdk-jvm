@@ -42,7 +42,7 @@ try (GrpcChannel channel = Connect.connectInsecure("localhost", 50051)) {
 }
 
 // With SSL
-try (GrpcChannel channel = Connect.connectTls("localhost", 50051, new File("ca.cert"))) {
+try (GrpcChannel channel = Connect.connectTls("localhost", 50051, "ca.cert")) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
     GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
     NetworkService ns = client.getService();
@@ -57,7 +57,7 @@ try (GrpcChannel channel = Connect.connectWithSecret(
     "auth_CA_filename", // set to null to use system CAs for fetching access tokens
     "localhost", // rpc hostname
     50051, // rpc port
-    new File("path/to/zepben/ca.cert"))
+    "path/to/zepben/ca.cert")
 ) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
     GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
@@ -74,7 +74,7 @@ try (GrpcChannel channel = Connect.connectWithSecret(
     "auth_CA_filename", // set to null to use system CAs for fetching access tokens
     "localhost", // rpc hostname
     50051, // rpc port
-    new File("path/to/zepben/ca.cert"))
+    "path/to/zepben/ca.cert")
 ) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
     GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
@@ -83,7 +83,7 @@ try (GrpcChannel channel = Connect.connectWithSecret(
 
 // With SSL and client authentication
 try (GrpcChannel channel = new GrpcChannelBuilder().forAddress("localhost", 50051)
-    .makeSecure(new File("ca.cert"), new File("certchain.pem"), new File("private_key")).build()) {
+    .makeSecure("ca.cert", "certchain.pem", "private_key").build()) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
     GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
     NetworkService ns = client.getService();
@@ -102,7 +102,7 @@ Connect.connectInsecure("localhost", 50051).use { channel ->
 }
 
 // With just SSL
-Connect.connectTls("localhost", 50051, ca = File("path/to/zepben/ca.cert")).use { channel ->
+Connect.connectTls("localhost", 50051, "path/to/zepben/ca.cert").use { channel ->
     val client = NetworkConsumerClient(channel)
     val result = client.getEquipmentContainer("container_mrid").throwOnError()
     val ns = client.service
@@ -117,7 +117,7 @@ Connect.connectWithSecret(
     "auth_CA_filename", // set to null to use system CAs for fetching access tokens
     "localhost", // rpc hostname
     50051, // rpc port
-    ca = File("path/to/zepben/ca.cert")
+    "path/to/zepben/ca.cert"
 ).use { channel ->
     val client = NetworkConsumerClient(channel)
     val result = client.getEquipmentContainer("container_mrid").throwOnError()
@@ -134,7 +134,7 @@ Connect.connectWithSecret(
     "auth_CA_filename", // set to null to use system CAs for fetching access tokens
     "localhost", // rpc hostname
     50051, // rpc port
-    File("path/to/zepben/ca.cert")
+    "path/to/zepben/ca.cert"
 ).use { channel ->
     val client = NetworkConsumerClient(channel)
     val result = client.getEquipmentContainer("container_mrid").throwOnError()
@@ -142,7 +142,7 @@ Connect.connectWithSecret(
 }
 
 // With SSL and client authentication
-GrpcChannelBuilder().forAddress("localhost", 50051).makeSecure(File("ca.cert"), File("certchain.pem"), File("private_key")).build().use { channel ->
+GrpcChannelBuilder().forAddress("localhost", 50051).makeSecure("ca.cert", "certchain.pem", "private_key").build().use { channel ->
     val client = NetworkConsumerClient(channel)
     val result = client.getEquipmentContainer("container_mrid").throwOnError()
     val ns = client.service

@@ -59,6 +59,21 @@ internal class GrpcChannelBuilderTest {
     }
 
     @Test
+    internal fun makeSecureWithDefaultTrust() {
+        val channelCredentials = mock<ChannelCredentials>()
+        val secureChannel = mock<ManagedChannel>()
+
+        mockkStatic(TlsChannelCredentials::class)
+        every { TlsChannelCredentials.create() } returns channelCredentials
+
+        mockkStatic(NettyChannelBuilder::class)
+        every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).build() } returns secureChannel
+
+        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure().build()
+        assertThat(grpcChannel.channel, equalTo(secureChannel))
+    }
+
+    @Test
     internal fun makeSecureWithClientAuthentication() {
         val caFile = mock<File>()
         val pkFile = mock<File>()

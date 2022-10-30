@@ -38,39 +38,43 @@ class GrpcChannelBuilder {
     fun forAddress(
         host: String,
         port: Int
-    ): GrpcChannelBuilder {
+    ): GrpcChannelBuilder = apply {
         _host = host
         _port = port
-        return this
     }
 
     fun makeSecure(
-        rootCertificates: File? = null
-    ): GrpcChannelBuilder {
-        var channelCredentialsBuilder = TlsChannelCredentials.newBuilder()
-        if (rootCertificates != null) {
-            channelCredentialsBuilder = channelCredentialsBuilder.trustManager(rootCertificates)
-        }
-        _channelCredentials = channelCredentialsBuilder.build()
-        return this
+        rootCertificates: File
+    ): GrpcChannelBuilder = apply {
+        _channelCredentials = TlsChannelCredentials.newBuilder().trustManager(rootCertificates).build()
+    }
+
+    fun makeSecure(rootCertificates: String? = null): GrpcChannelBuilder = rootCertificates?.let {
+        makeSecure(File(rootCertificates))
+    } ?: apply {
+        _channelCredentials = TlsChannelCredentials.create()
     }
 
     fun makeSecure(
         rootCertificates: File? = null,
         certificateChain: File,
         privateKey: File
-    ): GrpcChannelBuilder {
+    ): GrpcChannelBuilder = apply {
         var channelCredentialsBuilder = TlsChannelCredentials.newBuilder().keyManager(certificateChain, privateKey)
         if (rootCertificates != null) {
             channelCredentialsBuilder = channelCredentialsBuilder.trustManager(rootCertificates)
         }
         _channelCredentials = channelCredentialsBuilder.build()
-        return this
     }
 
-    fun withTokenFetcher(tokenFetcher: ZepbenTokenFetcher): GrpcChannelBuilder {
+    fun makeSecure(
+        rootCertificates: String? = null,
+        certificateChain: String,
+        privateKey: String
+    ) = makeSecure(rootCertificates?.let { File(it) }, File(certificateChain), File(privateKey))
+
+    fun withTokenFetcher(tokenFetcher: ZepbenTokenFetcher): GrpcChannelBuilder = apply {
         _callCredentials = TokenCallCredentials(tokenFetcher::fetchToken)
-        return this
     }
 
 }

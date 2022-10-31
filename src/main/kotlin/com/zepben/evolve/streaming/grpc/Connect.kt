@@ -17,6 +17,13 @@ import com.zepben.auth.common.AuthMethod
  */
 object Connect {
 
+    /**
+     * Create a `GrpcChannel` that communicates with the gRPC service over plaintext.
+     *
+     * @param host The hostname where the gRPC service is hosted
+     * @param rpcPort The port of the gRPC service
+     * @return A plaintext connection to the gRPC service
+     */
     @JvmStatic
     fun connectInsecure(
         host: String = "localhost",
@@ -24,6 +31,15 @@ object Connect {
     ): GrpcChannel =
         GrpcChannelBuilder().forAddress(host, rpcPort).build()
 
+    /**
+     * Create a `GrpcChannel` that communicates with the gRPC service using SSL/TLS transport security.
+     *
+     * @param host The hostname where the gRPC service is hosted
+     * @param rpcPort The port of the gRPC service
+     * @param caFilename The filename of a truststore containing additional trusted root certificates. This parameter is optional
+     *                   and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @return An encrypted connection to the gRPC service
+     */
     @JvmStatic
     fun connectTls(
         host: String = "localhost",
@@ -32,6 +48,24 @@ object Connect {
     ): GrpcChannel =
         GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).build()
 
+    /**
+     * Create a `GrpcChannel` that communicates with the gRPC service using SSL/TLS transport security and the OAuth client credentials flow.
+     * The OAuth provider's domain and the "audience" parameter of the token request are fetched as JSON from a specified URL.
+     *
+     * @param clientId The client ID of the OAuth application to authenticate for
+     * @param clientSecret The client secret of the OAuth application to authenticate for
+     * @param confAddress The address of the authentication configuration
+     * @param confCAFilename The filename of a truststore containing additional trusted root certificates for fetching the authentication configuration.
+     *                       This parameter is optional and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @param authCAFilename The filename of a truststore containing additional trusted root certificates for fetching the OAuth tokens.
+     *                       This parameter is optional and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @param host The hostname where the gRPC service is hosted
+     * @param rpcPort The port of the gRPC service
+     * @param caFilename The filename of a truststore containing additional trusted root certificates. This parameter is optional
+     *                   and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @return An Auth0-authenticated, encrypted connection to the gRPC service. If the authentication configuration specifies that no authentication is
+     *         required, a non-authenticated, encrypted connection is returned instead.
+     */
     @JvmStatic
     fun connectWithSecret(
         clientId: String,
@@ -49,13 +83,29 @@ object Connect {
         return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, caFilename)
     }
 
+    /**
+     * Create a `GrpcChannel` that communicates with the gRPC service using SSL/TLS transport security and the OAuth client credentials flow.
+     *
+     * @param clientId The client ID of the OAuth application to authenticate for
+     * @param clientSecret The client secret of the OAuth application to authenticate for
+     * @param audience The audience parameter to be sent in token requests. This specifies the API to grant access for.
+     * @param authMethod The authentication method to use. Defaults to AuthMethod.OAUTH.
+     * @param issuerDomain The domain of the OAuth issuer. "/oauth/token" will be used as the path to request tokens from.
+     * @param authCAFilename The filename of a truststore containing additional trusted root certificates for fetching the OAuth tokens.
+     *                       This parameter is optional and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @param host The hostname where the gRPC service is hosted
+     * @param rpcPort The port of the gRPC service
+     * @param caFilename The filename of a truststore containing additional trusted root certificates. This parameter is optional
+     *                   and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @return An Auth0-authenticated, encrypted connection to the gRPC service
+     */
     @JvmStatic
     fun connectWithSecret(
         clientId: String,
         clientSecret: String,
         audience: String,
         issuerDomain: String,
-        authMethod: AuthMethod,
+        authMethod: AuthMethod = AuthMethod.OAUTH,
         authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
@@ -66,6 +116,24 @@ object Connect {
         return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, caFilename)
     }
 
+    /**
+     * Create a `GrpcChannel` that communicates with the gRPC service using SSL/TLS transport security and the OAuth password grant flow.
+     *
+     * @param clientId The client ID of the OAuth application to authenticate for
+     * @param username The username of the account registered with the OAuth application
+     * @param password The password of the account registered with the OAuth application
+     * @param confAddress The address of the authentication configuration
+     * @param confCAFilename The filename of a truststore containing additional trusted root certificates for fetching the authentication configuration.
+     *                       This parameter is optional and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @param authCAFilename The filename of a truststore containing additional trusted root certificates for fetching the OAuth tokens.
+     *                       This parameter is optional and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @param host The hostname where the gRPC service is hosted
+     * @param rpcPort The port of the gRPC service
+     * @param caFilename The filename of a truststore containing additional trusted root certificates. This parameter is optional
+     *                   and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @return An Auth0-authenticated, encrypted connection to the gRPC service. If the authentication configuration specifies that no authentication is
+     *         required, a non-authenticated, encrypted connection is returned instead.
+     */
     @JvmStatic
     fun connectWithPassword(
         clientId: String,
@@ -84,6 +152,23 @@ object Connect {
         return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, caFilename)
     }
 
+    /**
+     * Create a `GrpcChannel` that communicates with the gRPC service using SSL/TLS transport security and the OAuth client credentials flow.
+     *
+     * @param clientId The client ID of the OAuth application to authenticate for
+     * @param username The username of the account registered with the OAuth application
+     * @param password The password of the account registered with the OAuth application
+     * @param audience The audience parameter to be sent in token requests. This specifies the API to grant access for.
+     * @param authMethod The authentication method to use. Defaults to AuthMethod.OAUTH.
+     * @param issuerDomain The domain of the OAuth issuer. "/oauth/token" will be used as the path to request tokens from.
+     * @param authCAFilename The filename of a truststore containing additional trusted root certificates for fetching the OAuth tokens.
+     *                       This parameter is optional and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @param host The hostname where the gRPC service is hosted
+     * @param rpcPort The port of the gRPC service
+     * @param caFilename The filename of a truststore containing additional trusted root certificates. This parameter is optional
+     *                   and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @return An Auth0-authenticated, encrypted connection to the gRPC service
+     */
     @JvmStatic
     fun connectWithPassword(
         clientId: String,
@@ -91,7 +176,7 @@ object Connect {
         password: String,
         audience: String,
         issuerDomain: String,
-        authMethod: AuthMethod,
+        authMethod: AuthMethod = AuthMethod.OAUTH,
         authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,

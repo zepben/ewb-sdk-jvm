@@ -13,37 +13,21 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 
 /**
  * Properties of potential transformer asset.
+ *
+ * @property accuracyClass PT accuracy classification.
+ * @property nominalRatio Nominal ratio between the primary and secondary voltage.
+ * @property primaryRatio Ratio for the primary winding tap changer (numerator).
+ * @property ptClass Potential transformer (PT) classification covering burden.
+ * @property ratedVoltage Rated voltage on the primary side in Volts.
+ * @property secondaryRatio Ratio for the secondary winding tap changer (denominator).
  */
 class PotentialTransformerInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
 
-    /**
-     * PT accuracy classification.
-     */
     var accuracyClass: String? = null
-
-    /**
-     * Nominal ratio between the primary and secondary voltage.
-     */
     var nominalRatio: Ratio? = null
-
-    /**
-     * Ratio for the primary winding tap changer (numerator).
-     */
     var primaryRatio: Double? = null
-
-    /**
-     * Potential transformer (PT) classification covering burden.
-     */
     var ptClass: String? = null
-
-    /**
-     * Rated voltage on the primary side in Volts.
-     */
     var ratedVoltage: Int? = null
-
-    /**
-     * Ratio for the secondary winding tap changer (denominator).
-     */
     var secondaryRatio: Double? = null
 
 }

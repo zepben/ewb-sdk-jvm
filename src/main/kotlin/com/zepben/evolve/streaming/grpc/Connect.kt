@@ -25,6 +25,7 @@ object Connect {
      * @return A plaintext connection to the gRPC service
      */
     @JvmStatic
+    @JvmOverloads
     fun connectInsecure(
         host: String = "localhost",
         rpcPort: Int = 50051
@@ -41,6 +42,7 @@ object Connect {
      * @return An encrypted connection to the gRPC service
      */
     @JvmStatic
+    @JvmOverloads
     fun connectTls(
         host: String = "localhost",
         rpcPort: Int = 50051,
@@ -67,6 +69,7 @@ object Connect {
      *         required, a non-authenticated, encrypted connection is returned instead.
      */
     @JvmStatic
+    @JvmOverloads
     fun connectWithSecret(
         clientId: String,
         clientSecret: String,
@@ -89,7 +92,7 @@ object Connect {
      * @param clientId The client ID of the OAuth application to authenticate for
      * @param clientSecret The client secret of the OAuth application to authenticate for
      * @param audience The audience parameter to be sent in token requests. This specifies the API to grant access for.
-     * @param authMethod The authentication method to use. Defaults to AuthMethod.OAUTH.
+     * @param authMethod The authentication method to use
      * @param issuerDomain The domain of the OAuth issuer. "/oauth/token" will be used as the path to request tokens from.
      * @param authCAFilename The filename of a truststore containing additional trusted root certificates for fetching the OAuth tokens.
      *                       This parameter is optional and defaults to null, in which case only the system CAs are used to verify certificates.
@@ -100,12 +103,13 @@ object Connect {
      * @return An Auth0-authenticated, encrypted connection to the gRPC service
      */
     @JvmStatic
+    @JvmOverloads
     fun connectWithSecret(
         clientId: String,
         clientSecret: String,
         audience: String,
         issuerDomain: String,
-        authMethod: AuthMethod = AuthMethod.OAUTH,
+        authMethod: AuthMethod,
         authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
@@ -135,6 +139,7 @@ object Connect {
      *         required, a non-authenticated, encrypted connection is returned instead.
      */
     @JvmStatic
+    @JvmOverloads
     fun connectWithPassword(
         clientId: String,
         username: String,
@@ -159,7 +164,7 @@ object Connect {
      * @param username The username of the account registered with the OAuth application
      * @param password The password of the account registered with the OAuth application
      * @param audience The audience parameter to be sent in token requests. This specifies the API to grant access for.
-     * @param authMethod The authentication method to use. Defaults to AuthMethod.OAUTH.
+     * @param authMethod The authentication method to use
      * @param issuerDomain The domain of the OAuth issuer. "/oauth/token" will be used as the path to request tokens from.
      * @param authCAFilename The filename of a truststore containing additional trusted root certificates for fetching the OAuth tokens.
      *                       This parameter is optional and defaults to null, in which case only the system CAs are used to verify certificates.
@@ -170,13 +175,14 @@ object Connect {
      * @return An Auth0-authenticated, encrypted connection to the gRPC service
      */
     @JvmStatic
+    @JvmOverloads
     fun connectWithPassword(
         clientId: String,
         username: String,
         password: String,
         audience: String,
         issuerDomain: String,
-        authMethod: AuthMethod = AuthMethod.OAUTH,
+        authMethod: AuthMethod,
         authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,

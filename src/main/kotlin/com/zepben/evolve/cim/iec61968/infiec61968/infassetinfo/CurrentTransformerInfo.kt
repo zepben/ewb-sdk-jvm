@@ -14,7 +14,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 /**
  * Properties of current transformer asset.
  */
-class CurrentTransformerInfo(mRID: String = "") : AssetInfo(mRID) {
+class CurrentTransformerInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
 
     /**
      * CT accuracy classification.

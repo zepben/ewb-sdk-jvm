@@ -11,47 +11,42 @@ package com.zepben.evolve.streaming.grpc
 import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.client.createTokenFetcher
 import com.zepben.auth.common.AuthMethod
-import io.mockk.every
-import io.mockk.mockkStatic
-import io.mockk.unmockkAll
+import io.mockk.*
 import io.vertx.core.json.JsonObject
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mockConstruction
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
 
 internal class ConnectTest {
 
-    private val gcbWithAddress = mock<GrpcChannelBuilder>()
-    private val gcbWithTls = mock<GrpcChannelBuilder>()
-    private val gcbWithAuth = mock<GrpcChannelBuilder>()
+    private val gcbWithAddress = mockk<GrpcChannelBuilder>()
+    private val gcbWithTls = mockk<GrpcChannelBuilder>()
+    private val gcbWithAuth = mockk<GrpcChannelBuilder>()
 
-    private val grpcChannel = mock<GrpcChannel>()
-    private val grpcChannelWithTls = mock<GrpcChannel>()
-    private val grpcChannelWithAuth = mock<GrpcChannel>()
+    private val grpcChannel = mockk<GrpcChannel>()
+    private val grpcChannelWithTls = mockk<GrpcChannel>()
+    private val grpcChannelWithAuth = mockk<GrpcChannel>()
 
-    private val tokenFetcher = mock<ZepbenTokenFetcher>()
+    private val tokenFetcher = mockk<ZepbenTokenFetcher>()
     private val tokenRequestData = JsonObject()
 
-    init {
-        doReturn(gcbWithTls).`when`(gcbWithAddress).makeSecure(eq("caFilename"))
-        doReturn(gcbWithAuth).`when`(gcbWithTls).withTokenFetcher(eq(tokenFetcher))
-
-        doReturn(grpcChannel).`when`(gcbWithAddress).build()
-        doReturn(grpcChannelWithTls).`when`(gcbWithTls).build()
-        doReturn(grpcChannelWithAuth).`when`(gcbWithAuth).build()
-
-        doReturn(tokenRequestData).`when`(tokenFetcher).tokenRequestData
-    }
-
     @BeforeEach
-    fun clearTokenRequestData() {
+    fun beforeEach() {
         tokenRequestData.clear()
+
+        every { gcbWithAddress.makeSecure("caFilename") } returns gcbWithTls
+        every { gcbWithTls.withTokenFetcher(tokenFetcher) } returns gcbWithAuth
+
+        every { gcbWithAddress.build() } returns grpcChannel
+        every { gcbWithTls.build() } returns grpcChannelWithTls
+        every { gcbWithAuth.build() } returns grpcChannelWithAuth
+
+        every { tokenFetcher.tokenRequestData } returns tokenRequestData
+
+        mockkConstructor(GrpcChannelBuilder::class)
+        every { constructedWith<GrpcChannelBuilder>().forAddress("hostname", 1234) } returns gcbWithAddress
     }
 
     @AfterEach
@@ -61,20 +56,12 @@ internal class ConnectTest {
 
     @Test
     fun connectInsecure() {
-        mockConstruction(GrpcChannelBuilder::class.java) { gcbBase, _ ->
-            doReturn(gcbWithAddress).`when`(gcbBase).forAddress(eq("hostname"), eq(1234))
-        }.use {
-            assertThat(Connect.connectInsecure("hostname", 1234), equalTo(grpcChannel))
-        }
+        assertThat(Connect.connectInsecure("hostname", 1234), equalTo(grpcChannel))
     }
 
     @Test
     fun connectTls() {
-        mockConstruction(GrpcChannelBuilder::class.java) { gcbBase, _ ->
-            doReturn(gcbWithAddress).`when`(gcbBase).forAddress(eq("hostname"), eq(1234))
-        }.use {
-            assertThat(Connect.connectTls("hostname", 1234, "caFilename"), equalTo(grpcChannelWithTls))
-        }
+        assertThat(Connect.connectTls("hostname", 1234, "caFilename"), equalTo(grpcChannelWithTls))
     }
 
     @Test
@@ -84,31 +71,27 @@ internal class ConnectTest {
             createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
         } returns tokenFetcher
 
-        mockConstruction(GrpcChannelBuilder::class.java) { gcbBase, _ ->
-            doReturn(gcbWithAddress).`when`(gcbBase).forAddress(eq("hostname"), eq(1234))
-        }.use {
-            val grpcChannel = Connect.connectWithSecret(
-                "clientId",
-                "clientSecret",
-                "confAddress",
-                "confCAFilename",
-                "authCAFilename",
-                "hostname",
-                1234,
-                "caFilename"
-            )
+        val grpcChannel = Connect.connectWithSecret(
+            "clientId",
+            "clientSecret",
+            "confAddress",
+            "confCAFilename",
+            "authCAFilename",
+            "hostname",
+            1234,
+            "caFilename"
+        )
 
-            assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
-            assertThat(tokenRequestData, equalTo(
-                JsonObject("""
-                    {
-                        "client_id": "clientId",
-                        "client_secret": "clientSecret",
-                        "grant_type": "client_credentials"
-                    }
-                """.trimIndent())
-            ))
-        }
+        assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
+        assertThat(tokenRequestData, equalTo(
+            JsonObject("""
+                {
+                    "client_id": "clientId",
+                    "client_secret": "clientSecret",
+                    "grant_type": "client_credentials"
+                }
+            """.trimIndent())
+        ))
     }
 
     @Test
@@ -131,44 +114,41 @@ internal class ConnectTest {
 
     @Test
     fun connectWithSecretWithKnownTokenFetcherConfig() {
-        mockConstruction(ZepbenTokenFetcher::class.java) { tf, context ->
-            val arguments = context.arguments()
-            assertThat(arguments[0], equalTo("audience"))
-            assertThat(arguments[1], equalTo("issuerDomain"))
-            assertThat(arguments[2], equalTo(AuthMethod.AUTH0))
-            doReturn(tokenRequestData).`when`(tf).tokenRequestData
-            doReturn(gcbWithAuth).`when`(gcbWithTls).withTokenFetcher(tf)
-        }.use {
-            mockConstruction(GrpcChannelBuilder::class.java) { gcbBase, _ ->
-                doReturn(gcbWithAddress).`when`(gcbBase).forAddress(eq("hostname"), eq(1234))
-            }.use {
-                val grpcChannel = Connect.connectWithSecret(
-                    "clientId",
-                    "clientSecret",
-                    "audience",
-                    "issuerDomain",
-                    AuthMethod.AUTH0,
-                    host = "hostname",
-                    rpcPort = 1234,
-                    caFilename = "caFilename"
-                )
+        mockkConstructor(ZepbenTokenFetcher::class)
+        every {
+            constructedWith<ZepbenTokenFetcher>(
+                EqMatcher("audience"), EqMatcher("issuerDomain"), EqMatcher(AuthMethod.OAUTH), AllAnyMatcher<String?>(),
+                AllAnyMatcher<String>(), AllAnyMatcher<String>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<String?>()
+            ).tokenRequestData
+        } returns tokenRequestData
 
-                assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
-                assertThat(
-                    tokenRequestData, equalTo(
-                        JsonObject(
-                            """
-                                {
-                                    "client_id": "clientId",
-                                    "client_secret": "clientSecret",
-                                    "grant_type": "client_credentials"
-                                }
-                            """.trimIndent()
-                        )
-                    )
+        every { gcbWithTls.withTokenFetcher(any()) } returns gcbWithAuth
+
+        val grpcChannel = Connect.connectWithSecret(
+            "clientId",
+            "clientSecret",
+            "audience",
+            "issuerDomain",
+            AuthMethod.OAUTH,
+            host = "hostname",
+            rpcPort = 1234,
+            caFilename = "caFilename"
+        )
+
+        assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
+        assertThat(
+            tokenRequestData, equalTo(
+                JsonObject(
+                    """
+                        {
+                            "client_id": "clientId",
+                            "client_secret": "clientSecret",
+                            "grant_type": "client_credentials"
+                        }
+                    """.trimIndent()
                 )
-            }
-        }
+            )
+        )
     }
 
     @Test
@@ -178,34 +158,30 @@ internal class ConnectTest {
             createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
         } returns tokenFetcher
 
-        mockConstruction(GrpcChannelBuilder::class.java) { gcbBase, _ ->
-            doReturn(gcbWithAddress).`when`(gcbBase).forAddress(eq("hostname"), eq(1234))
-        }.use {
-            val grpcChannel = Connect.connectWithPassword(
-                "clientId",
-                "username",
-                "password",
-                "confAddress",
-                "confCAFilename",
-                "authCAFilename",
-                "hostname",
-                1234,
-                "caFilename"
-            )
+        val grpcChannel = Connect.connectWithPassword(
+            "clientId",
+            "username",
+            "password",
+            "confAddress",
+            "confCAFilename",
+            "authCAFilename",
+            "hostname",
+            1234,
+            "caFilename"
+        )
 
-            assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
-            assertThat(tokenRequestData, equalTo(
-                JsonObject("""
-                    {
-                        "client_id": "clientId",
-                        "username": "username",
-                        "password": "password",
-                        "grant_type": "password",
-                        "scope": "offline_access"
-                    }
-                """.trimIndent())
-            ))
-        }
+        assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
+        assertThat(tokenRequestData, equalTo(
+            JsonObject("""
+                {
+                    "client_id": "clientId",
+                    "username": "username",
+                    "password": "password",
+                    "grant_type": "password",
+                    "scope": "offline_access"
+                }
+            """.trimIndent())
+        ))
     }
 
     @Test
@@ -228,46 +204,44 @@ internal class ConnectTest {
 
     @Test
     fun connectWithPasswordWithKnownTokenFetcherConfig() {
-        mockConstruction(ZepbenTokenFetcher::class.java) { tf, context ->
-            val arguments = context.arguments()
-            assertThat(arguments[0], equalTo("audience"))
-            assertThat(arguments[1], equalTo("issuerDomain"))
-            assertThat(arguments[2], equalTo(AuthMethod.AUTH0))
-            doReturn(tokenRequestData).`when`(tf).tokenRequestData
-            doReturn(gcbWithAuth).`when`(gcbWithTls).withTokenFetcher(tf)
-        }.use {
-            mockConstruction(GrpcChannelBuilder::class.java) { gcbBase, _ ->
-                doReturn(gcbWithAddress).`when`(gcbBase).forAddress(eq("hostname"), eq(1234))
-            }.use {
-                val grpcChannel = Connect.connectWithPassword(
-                    "clientId",
-                    "username",
-                    "password",
-                    "audience",
-                    "issuerDomain",
-                    AuthMethod.AUTH0,
-                    host = "hostname",
-                    rpcPort = 1234,
-                    caFilename = "caFilename"
-                )
+        mockkConstructor(ZepbenTokenFetcher::class)
+        every {
+            constructedWith<ZepbenTokenFetcher>(
+                EqMatcher("audience"), EqMatcher("issuerDomain"), EqMatcher(AuthMethod.OAUTH), AllAnyMatcher<String?>(),
+                AllAnyMatcher<String>(), AllAnyMatcher<String>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<String?>()
+            ).tokenRequestData
+        } returns tokenRequestData
 
-                assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
-                assertThat(
-                    tokenRequestData, equalTo(
-                        JsonObject(
-                            """
-                                {
-                                    "client_id": "clientId",
-                                    "username": "username",
-                                    "password": "password",
-                                    "grant_type": "password",
-                                    "scope": "offline_access"
-                                }
-                            """.trimIndent()
-                        )
-                    )
+        every { gcbWithTls.withTokenFetcher(any()) } returns gcbWithAuth
+
+        val grpcChannel = Connect.connectWithPassword(
+            "clientId",
+            "username",
+            "password",
+            "audience",
+            "issuerDomain",
+            AuthMethod.OAUTH,
+            host = "hostname",
+            rpcPort = 1234,
+            caFilename = "caFilename"
+        )
+
+        assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
+        assertThat(
+            tokenRequestData, equalTo(
+                JsonObject(
+                    """
+                        {
+                            "client_id": "clientId",
+                            "username": "username",
+                            "password": "password",
+                            "grant_type": "password",
+                            "scope": "offline_access"
+                        }
+                    """.trimIndent()
                 )
-            }
-        }
+            )
+        )
     }
+
 }

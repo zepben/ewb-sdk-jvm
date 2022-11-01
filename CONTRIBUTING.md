@@ -33,7 +33,7 @@ Our main style requirements are:
 1. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required.
 1. Database:
     1. Table class(es) updated. - `com.zepben.evolve.database.sqlite.tables`
-    1. New tables added to DatabaseTables - `DatabseTables.kt`
+    1. New tables added to DatabaseTables - `DatabaseTables.kt`
     1. Writer updated. - `com.zepben.evolve.database.sqlite.writers`
     1. Reader updated. - `com.zepben.evolve.database.sqlite.readers`
     1. ServiceReader updated if a new class was added. - `com.zepben.evolve.database.sqlite.readers.*ServiceReader`

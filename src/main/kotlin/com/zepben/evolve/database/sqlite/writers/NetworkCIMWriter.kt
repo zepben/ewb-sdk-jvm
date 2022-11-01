@@ -10,12 +10,13 @@ package com.zepben.evolve.database.sqlite.writers
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
@@ -32,20 +33,18 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.database.sqlite.DatabaseTables
-import com.zepben.evolve.database.sqlite.extensions.setNullableDouble
-import com.zepben.evolve.database.sqlite.extensions.setNullableInt
-import com.zepben.evolve.database.sqlite.extensions.setNullableLong
-import com.zepben.evolve.database.sqlite.extensions.setNullableString
+import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableEndDevices
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
 import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperationalRestrictions
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableAuxiliaryEquipment
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentEquipment
@@ -378,6 +377,42 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and saveDocument(table, insert, operationalRestriction, "operational restriction")
     }
 
+    /************ IEC61968 infIEC61968 ************/
+
+    fun save(currentTransformerInfo: CurrentTransformerInfo): Boolean {
+        val table = databaseTables.getTable(TableCurrentTransformerInfo::class.java)
+        val insert = databaseTables.getInsert(TableCurrentTransformerInfo::class.java)
+
+        insert.setNullableString(table.ACCURACY_CLASS.queryIndex, currentTransformerInfo.accuracyClass)
+        insert.setNullableDouble(table.ACCURACY_LIMIT.queryIndex, currentTransformerInfo.accuracyLimit)
+        insert.setNullableInt(table.CORE_COUNT.queryIndex, currentTransformerInfo.coreCount)
+        insert.setNullableString(table.CT_CLASS.queryIndex, currentTransformerInfo.ctClass)
+        insert.setNullableInt(table.KNEE_POINT_VOLTAGE.queryIndex, currentTransformerInfo.kneePointVoltage)
+        insert.setNullableRatio(table.MAX_RATIO_NUMERATOR.queryIndex, table.MAX_RATIO_DENOMINATOR.queryIndex, currentTransformerInfo.maxRatio)
+        insert.setNullableRatio(table.NOMINAL_RATIO_DENOMINATOR.queryIndex, table.NOMINAL_RATIO_DENOMINATOR.queryIndex, currentTransformerInfo.nominalRatio)
+        insert.setNullableDouble(table.PRIMARY_RATIO.queryIndex, currentTransformerInfo.primaryRatio)
+        insert.setNullableInt(table.RATED_CURRENT.queryIndex, currentTransformerInfo.ratedCurrent)
+        insert.setNullableInt(table.SECONDARY_FLS_RATING.queryIndex, currentTransformerInfo.secondaryFlsRating)
+        insert.setNullableDouble(table.SECONDARY_RATIO.queryIndex, currentTransformerInfo.secondaryRatio)
+        insert.setNullableString(table.USAGE.queryIndex, currentTransformerInfo.usage)
+
+        return saveAssetInfo(table, insert, currentTransformerInfo, "current transformer info")
+    }
+
+    fun save(potentialTransformerInfo: PotentialTransformerInfo): Boolean {
+        val table = databaseTables.getTable(TablePotentialTransformerInfo::class.java)
+        val insert = databaseTables.getInsert(TablePotentialTransformerInfo::class.java)
+
+        insert.setNullableString(table.ACCURACY_CLASS.queryIndex, potentialTransformerInfo.accuracyClass)
+        insert.setNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_NUMERATOR.queryIndex, potentialTransformerInfo.nominalRatio)
+        insert.setNullableDouble(table.PRIMARY_RATIO.queryIndex, potentialTransformerInfo.primaryRatio)
+        insert.setNullableString(table.PT_CLASS.queryIndex, potentialTransformerInfo.ptClass)
+        insert.setNullableInt(table.RATED_VOLTAGE.queryIndex, potentialTransformerInfo.ratedVoltage)
+        insert.setNullableDouble(table.SECONDARY_RATIO.queryIndex, potentialTransformerInfo.secondaryRatio)
+
+        return saveAssetInfo(table, insert, potentialTransformerInfo, "potential transformer info")
+    }
+
     /************ IEC61970 AUXILIARY EQUIPMENT ************/
 
     private fun saveAuxiliaryEquipment(
@@ -391,11 +426,32 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquipment(table, insert, auxiliaryEquipment, description)
     }
 
+    private fun saveSensor(table: TableSensors, insert: PreparedStatement, sensor: Sensor, description: String): Boolean =
+        saveAuxiliaryEquipment(table, insert, sensor, description)
+
+    fun save(currentTransformer: CurrentTransformer): Boolean {
+        val table = databaseTables.getTable(TableCurrentTransformers::class.java)
+        val insert = databaseTables.getInsert(TableCurrentTransformers::class.java)
+
+        insert.setNullableInt(table.CORE_BURDEN.queryIndex, currentTransformer.coreBurden)
+
+        return saveSensor(table, insert, currentTransformer, "current transformer")
+    }
+
     fun save(faultIndicator: FaultIndicator): Boolean {
         val table = databaseTables.getTable(TableFaultIndicators::class.java)
         val insert = databaseTables.getInsert(TableFaultIndicators::class.java)
 
         return saveAuxiliaryEquipment(table, insert, faultIndicator, "fault indicator")
+    }
+
+    fun save(potentialTransformer: PotentialTransformer): Boolean {
+        val table = databaseTables.getTable(TablePotentialTransformers::class.java)
+        val insert = databaseTables.getInsert(TablePotentialTransformers::class.java)
+
+        insert.setNullableString(table.TYPE.queryIndex, potentialTransformer.type.name)
+
+        return saveSensor(table, insert, potentialTransformer, "current transformer")
     }
 
     /************ IEC61970 CORE ************/

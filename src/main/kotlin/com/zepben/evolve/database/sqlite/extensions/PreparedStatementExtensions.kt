@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.database.sqlite.extensions
 
+import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import java.lang.Double.isNaN
 import java.security.AccessController
 import java.security.PrivilegedActionException
@@ -49,6 +50,16 @@ internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
     when (value) {
         null -> setNull(queryIndex, Types.VARCHAR)
         else -> setString(queryIndex, value.toString())
+    }
+}
+
+internal fun PreparedStatement.setNullableRatio(numeratorIndex: Int, denominatorIndex: Int, value: Ratio?) {
+    if (value == null) {
+        this.setNull(denominatorIndex, Types.DOUBLE)
+        this.setNull(numeratorIndex, Types.DOUBLE)
+    } else {
+        this.setDouble(denominatorIndex, value.denominator)
+        this.setDouble(numeratorIndex, value.numerator)
     }
 }
 

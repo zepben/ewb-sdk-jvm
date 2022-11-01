@@ -11,14 +11,15 @@ package com.zepben.evolve.database.sqlite.readers
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
@@ -32,20 +33,18 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
-import com.zepben.evolve.database.sqlite.extensions.getNullableDouble
-import com.zepben.evolve.database.sqlite.extensions.getNullableInt
-import com.zepben.evolve.database.sqlite.extensions.getNullableLong
-import com.zepben.evolve.database.sqlite.extensions.getNullableString
+import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableEndDevices
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
 import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperationalRestrictions
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableAuxiliaryEquipment
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentEquipment
@@ -351,6 +350,40 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadDocument(operationalRestriction, table, resultSet) && networkService.addOrThrow(operationalRestriction)
     }
 
+    /************ IEC61968 infIEC61968 ************/
+
+    fun load(table: TableCurrentTransformerInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val currentTransformerInfo = CurrentTransformerInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            accuracyClass = resultSet.getNullableString(table.ACCURACY_CLASS.queryIndex)
+            accuracyLimit = resultSet.getNullableDouble(table.ACCURACY_LIMIT.queryIndex)
+            coreCount = resultSet.getNullableInt(table.CORE_COUNT.queryIndex)
+            ctClass = resultSet.getNullableString(table.CT_CLASS.queryIndex)
+            kneePointVoltage = resultSet.getNullableInt(table.KNEE_POINT_VOLTAGE.queryIndex)
+            maxRatio = resultSet.getNullableRatio(table.MAX_RATIO_NUMERATOR.queryIndex, table.MAX_RATIO_DENOMINATOR.queryIndex)
+            nominalRatio = resultSet.getNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_NUMERATOR.queryIndex)
+            primaryRatio = resultSet.getNullableDouble(table.PRIMARY_RATIO.queryIndex)
+            ratedCurrent = resultSet.getNullableInt(table.RATED_CURRENT.queryIndex)
+            secondaryFlsRating = resultSet.getNullableInt(table.SECONDARY_FLS_RATING.queryIndex)
+            secondaryRatio = resultSet.getNullableDouble(table.SECONDARY_RATIO.queryIndex)
+            usage = resultSet.getNullableString(table.USAGE.queryIndex)
+        }
+
+        return loadAssetInfo(currentTransformerInfo, table, resultSet) && networkService.addOrThrow(currentTransformerInfo)
+    }
+
+    fun load(table: TablePotentialTransformerInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val potentialTransformerInfo = PotentialTransformerInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            accuracyClass = resultSet.getNullableString(table.ACCURACY_CLASS.queryIndex)
+            nominalRatio = resultSet.getNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_NUMERATOR.queryIndex)
+            primaryRatio = resultSet.getNullableDouble(table.PRIMARY_RATIO.queryIndex)
+            ptClass = resultSet.getNullableString(table.PT_CLASS.queryIndex)
+            ratedVoltage = resultSet.getNullableInt(table.RATED_VOLTAGE.queryIndex)
+            secondaryRatio = resultSet.getNullableDouble(table.SECONDARY_RATIO.queryIndex)
+        }
+
+        return loadAssetInfo(potentialTransformerInfo, table, resultSet) && networkService.addOrThrow(potentialTransformerInfo)
+    }
+
     /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 
     private fun loadAuxiliaryEquipment(
@@ -366,10 +399,29 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadEquipment(auxiliaryEquipment, table, resultSet)
     }
 
+    private fun loadSensor(sensor: Sensor, table: TableSensors, resultSet: ResultSet): Boolean =
+        loadAuxiliaryEquipment(sensor, table, resultSet)
+
+    fun load(table: TableCurrentTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val currentTransformer = CurrentTransformer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            coreBurden = resultSet.getNullableInt(table.CORE_BURDEN.queryIndex)
+        }
+
+        return loadSensor(currentTransformer, table, resultSet) && networkService.addOrThrow(currentTransformer)
+    }
+
     fun load(table: TableFaultIndicators, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val faultIndicator = FaultIndicator(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadAuxiliaryEquipment(faultIndicator, table, resultSet) && networkService.addOrThrow(faultIndicator)
+    }
+
+    fun load(table: TablePotentialTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val potentialTransformer = PotentialTransformer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            type = PotentialTransformerKind.valueOf(resultSet.getString(table.TYPE.queryIndex))
+        }
+
+        return loadSensor(potentialTransformer, table, resultSet) && networkService.addOrThrow(potentialTransformer)
     }
 
     /************ IEC61970 BASE CORE ************/

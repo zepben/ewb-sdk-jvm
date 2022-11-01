@@ -10,8 +10,11 @@ package com.zepben.evolve.services.network.testdata
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -40,13 +43,32 @@ import java.util.*
 
 /************ IEC61968 ASSET INFO ************/
 
+fun AssetInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): AssetInfo {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+    return this
+}
+
 fun CableInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CableInfo {
     (this as WireInfo).fillFields(service, includeRuntime)
     return this
 }
 
-fun AssetInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): AssetInfo {
-    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+fun CurrentTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentTransformerInfo {
+    (this as AssetInfo).fillFields(service, includeRuntime)
+
+    accuracyClass = "accuracyClass"
+    accuracyLimit = 1.1
+    coreCount = 2
+    ctClass = "ctClass"
+    kneePointVoltage = 3
+    maxRatio = Ratio(4.4, 5.5)
+    nominalRatio = Ratio(6.6, 7.7)
+    primaryRatio = 8.8
+    ratedCurrent = 9
+    secondaryFlsRating = 10
+    secondaryRatio = 11.11
+    usage = "usage"
+
     return this
 }
 
@@ -76,6 +98,19 @@ fun OpenCircuitTest.fillFields(service: NetworkService, includeRuntime: Boolean 
 
 fun OverheadWireInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): OverheadWireInfo {
     (this as WireInfo).fillFields(service, includeRuntime)
+    return this
+}
+
+fun PotentialTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): PotentialTransformerInfo {
+    (this as AssetInfo).fillFields(service, includeRuntime)
+
+    accuracyClass = "accuracyClass"
+    nominalRatio = Ratio(1.1, 2.2)
+    primaryRatio = 3.3
+    ptClass = "ptClass"
+    ratedVoltage = 4
+    secondaryRatio = 5.5
+
     return this
 }
 

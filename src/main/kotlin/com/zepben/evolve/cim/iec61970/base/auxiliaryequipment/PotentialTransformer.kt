@@ -17,6 +17,6 @@ package com.zepben.evolve.cim.iec61970.base.auxiliaryequipment
  */
 class PotentialTransformer @JvmOverloads constructor(mRID: String = "") : Sensor(mRID) {
 
-    var type: PotentialTransformerKind? = null
+    var type: PotentialTransformerKind = PotentialTransformerKind.UNKNOWN
 
 }

@@ -629,6 +629,7 @@ class NetworkConsumerClient(
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )
+            else -> throw NotImplementedError("Implement addFromPb for type ${io.identifiedObjectCase}")
         }
     }
 

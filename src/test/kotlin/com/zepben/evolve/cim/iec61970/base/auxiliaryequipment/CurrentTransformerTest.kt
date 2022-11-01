@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.cim.iec61970.base.auxiliaryequipment
 
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
@@ -34,7 +36,7 @@ internal class CurrentTransformerTest {
 
         assertThat(currentTransformer.coreBurden, Matchers.nullValue())
 
-        currentTransformer.coreBurden = 1
+        currentTransformer.fillFields(NetworkService(), true)
 
         assertThat(currentTransformer.coreBurden, equalTo(1))
     }

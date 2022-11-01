@@ -19,8 +19,7 @@ import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
@@ -363,7 +362,28 @@ fun AuxiliaryEquipment.fillFields(service: NetworkService, includeRuntime: Boole
     return this
 }
 
+fun CurrentTransformer.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentTransformer {
+    (this as Sensor).fillFields(service, includeRuntime)
+
+    coreBurden = 1
+
+    return this
+}
+
 fun FaultIndicator.fillFields(service: NetworkService, includeRuntime: Boolean = true): FaultIndicator {
+    (this as AuxiliaryEquipment).fillFields(service, includeRuntime)
+    return this
+}
+
+fun PotentialTransformer.fillFields(service: NetworkService, includeRuntime: Boolean = true): PotentialTransformer {
+    (this as Sensor).fillFields(service, includeRuntime)
+
+    type = PotentialTransformerKind.capacitiveCoupling
+
+    return this
+}
+
+fun Sensor.fillFields(service: NetworkService, includeRuntime: Boolean = true): Sensor {
     (this as AuxiliaryEquipment).fillFields(service, includeRuntime)
     return this
 }

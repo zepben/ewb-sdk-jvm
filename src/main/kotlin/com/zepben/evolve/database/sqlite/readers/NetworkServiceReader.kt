@@ -17,10 +17,14 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableLocationStr
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableLocations
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableOrganisations
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TablePositionPoints
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
 import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperationalRestrictions
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableCurrentTransformers
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TablePotentialTransformers
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAccumulators
@@ -119,6 +123,10 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableAnalogs>("analogs", reader::load)
         status = status and loadEach<TableAccumulators>("accumulators", reader::load)
         status = status and loadEach<TableDiscretes>("discretes", reader::load)
+        status = status and loadEach<TableCurrentTransformerInfo>("current transformer info", reader::load)
+        status = status and loadEach<TablePotentialTransformerInfo>("potential transformer info", reader::load)
+        status = status and loadEach<TableCurrentTransformers>("current transformers", reader::load)
+        status = status and loadEach<TablePotentialTransformers>("potential transformers", reader::load)
 
         status = status and loadNames(reader)
 

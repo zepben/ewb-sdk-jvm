@@ -13,10 +13,14 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
@@ -114,6 +118,10 @@ internal class NetworkServiceUtilsTest {
         isShortCircuitTest: (ShortCircuitTest) -> String,
         isEquivalentBranch: (EquivalentBranch) -> String,
         isShuntCompensatorInfo: (ShuntCompensatorInfo) -> String,
+        isCurrentTransformerInfo: (CurrentTransformerInfo) -> String,
+        isPotentialTransformerInfo: (PotentialTransformerInfo) -> String,
+        isCurrentTransformer: (CurrentTransformer) -> String,
+        isPotentialTransformer: (PotentialTransformer) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -177,6 +185,10 @@ internal class NetworkServiceUtilsTest {
         isShortCircuitTest = isShortCircuitTest,
         isEquivalentBranch = isEquivalentBranch,
         isShuntCompensatorInfo = isShuntCompensatorInfo,
+        isCurrentTransformerInfo = isCurrentTransformerInfo,
+        isPotentialTransformerInfo = isPotentialTransformerInfo,
+        isCurrentTransformer = isCurrentTransformer,
+        isPotentialTransformer = isPotentialTransformer,
         isOther = isOther
     )
 
@@ -242,6 +254,10 @@ internal class NetworkServiceUtilsTest {
         isShortCircuitTest: InvokeChecker<ShortCircuitTest> = NeverInvokedChecker(),
         isEquivalentBranch: InvokeChecker<EquivalentBranch> = NeverInvokedChecker(),
         isShuntCompensatorInfo: InvokeChecker<ShuntCompensatorInfo> = NeverInvokedChecker(),
+        isCurrentTransformerInfo: InvokeChecker<CurrentTransformerInfo> = NeverInvokedChecker(),
+        isPotentialTransformerInfo: InvokeChecker<PotentialTransformerInfo> = NeverInvokedChecker(),
+        isCurrentTransformer: InvokeChecker<CurrentTransformer> = NeverInvokedChecker(),
+        isPotentialTransformer: InvokeChecker<PotentialTransformer> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -306,6 +322,10 @@ internal class NetworkServiceUtilsTest {
             isShortCircuitTest = isShortCircuitTest,
             isEquivalentBranch = isEquivalentBranch,
             isShuntCompensatorInfo = isShuntCompensatorInfo,
+            isCurrentTransformerInfo = isCurrentTransformerInfo,
+            isPotentialTransformerInfo = isPotentialTransformerInfo,
+            isCurrentTransformer = isCurrentTransformer,
+            isPotentialTransformer = isPotentialTransformer,
             isOther = isOther
         )
 

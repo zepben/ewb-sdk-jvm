@@ -49,7 +49,7 @@ internal class CurrentTransformerInfoTest {
         currentTransformerInfo.fillFields(NetworkService(), true)
 
         assertThat(currentTransformerInfo.accuracyClass, equalTo("accuracyClass"))
-        assertThat(currentTransformerInfo.accuracyLimit, equalTo(1))
+        assertThat(currentTransformerInfo.accuracyLimit, equalTo(1.1))
         assertThat(currentTransformerInfo.coreCount, equalTo(2))
         assertThat(currentTransformerInfo.ctClass, equalTo("ctClass"))
         assertThat(currentTransformerInfo.kneePointVoltage, equalTo(3.3))

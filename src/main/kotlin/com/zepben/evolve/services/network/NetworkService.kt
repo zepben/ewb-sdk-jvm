@@ -21,7 +21,6 @@ import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
@@ -145,9 +144,6 @@ class NetworkService : BaseService("network") {
 
     fun add(potentialTransformer: PotentialTransformer): Boolean = super.add(potentialTransformer)
     fun remove(potentialTransformer: PotentialTransformer): Boolean = super.remove(potentialTransformer)
-
-    fun add(sensor: Sensor): Boolean = super.add(sensor)
-    fun remove(sensor: Sensor): Boolean = super.remove(sensor)
 
     // ######################
     // # IEC61970 BASE CORE #

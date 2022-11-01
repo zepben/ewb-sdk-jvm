@@ -17,10 +17,14 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
@@ -176,6 +180,10 @@ inline fun <R> whenNetworkServiceObject(
     isShortCircuitTest: (ShortCircuitTest) -> R,
     isEquivalentBranch: (EquivalentBranch) -> R,
     isShuntCompensatorInfo: (ShuntCompensatorInfo) -> R,
+    isCurrentTransformerInfo: (CurrentTransformerInfo) -> R,
+    isPotentialTransformerInfo: (PotentialTransformerInfo) -> R,
+    isCurrentTransformer: (CurrentTransformer) -> R,
+    isPotentialTransformer: (PotentialTransformer) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -240,5 +248,9 @@ inline fun <R> whenNetworkServiceObject(
     is ShortCircuitTest -> isShortCircuitTest(identifiedObject)
     is EquivalentBranch -> isEquivalentBranch(identifiedObject)
     is ShuntCompensatorInfo -> isShuntCompensatorInfo(identifiedObject)
+    is CurrentTransformerInfo -> isCurrentTransformerInfo(identifiedObject)
+    is PotentialTransformerInfo -> isPotentialTransformerInfo(identifiedObject)
+    is CurrentTransformer -> isCurrentTransformer(identifiedObject)
+    is PotentialTransformer -> isPotentialTransformer(identifiedObject)
     else -> isOther(identifiedObject)
 }

@@ -52,11 +52,11 @@ try (GrpcChannel channel = Connect.connectTls("localhost", 50051, "ca.cert")) {
 try (GrpcChannel channel = Connect.connectWithSecret(
     "client_id",
     "client_secret",
+    "localhost", // rpc hostname
+    50051, // rpc port
     "config_address", // set to null to fetch configuration from "https://{rpc hostname}/ewb/auth"
     "config_CA_filename", // set to null to use system CAs for fetching configuration
     "auth_CA_filename", // set to null to use system CAs for fetching access tokens
-    "localhost", // rpc hostname
-    50051, // rpc port
     "path/to/zepben/ca.cert")
 ) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
@@ -70,10 +70,10 @@ try (GrpcChannel channel = Connect.connectWithSecret(
     "client_secret",
     "https://evolve-ewb/",
     "zepben.au.auth0.com",
-    AuthMethod.Auth0,
-    "auth_CA_filename", // set to null to use system CAs for fetching access tokens
     "localhost", // rpc hostname
     50051, // rpc port
+    AuthMethod.Auth0,
+    "auth_CA_filename", // set to null to use system CAs for fetching access tokens
     "path/to/zepben/ca.cert")
 ) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
@@ -112,11 +112,11 @@ Connect.connectTls("localhost", 50051, "path/to/zepben/ca.cert").use { channel -
 Connect.connectWithSecret(
     "client_id",
     "client_secret",
+    "localhost", // rpc hostname
+    50051, // rpc port
     "config_address", // set to null to fetch configuration from "https://{rpc hostname}/ewb/auth"
     "config_CA_filename", // set to null to use system CAs for fetching configuration
     "auth_CA_filename", // set to null to use system CAs for fetching access tokens
-    "localhost", // rpc hostname
-    50051, // rpc port
     "path/to/zepben/ca.cert"
 ).use { channel ->
     val client = NetworkConsumerClient(channel)
@@ -130,10 +130,10 @@ Connect.connectWithSecret(
     "client_secret",
     "https://evolve-ewb/",
     "zepben.au.auth0.com",
-    AuthMethod.Auth0,
-    "auth_CA_filename", // set to null to use system CAs for fetching access tokens
     "localhost", // rpc hostname
     50051, // rpc port
+    AuthMethod.Auth0,
+    "auth_CA_filename", // set to null to use system CAs for fetching access tokens
     "path/to/zepben/ca.cert"
 ).use { channel ->
     val client = NetworkConsumerClient(channel)

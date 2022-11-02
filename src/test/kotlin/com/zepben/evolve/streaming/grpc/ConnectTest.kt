@@ -74,11 +74,11 @@ internal class ConnectTest {
         val grpcChannel = Connect.connectWithSecret(
             "clientId",
             "clientSecret",
+            "hostname",
+            1234,
             "confAddress",
             "confCAFilename",
             "authCAFilename",
-            "hostname",
-            1234,
             "caFilename"
         )
 
@@ -107,7 +107,7 @@ internal class ConnectTest {
         } returns grpcChannelWithTls
 
         assertThat(
-            Connect.connectWithSecret("clientId", "clientSecret", "confAddress", "confCAFilename", "authCAFilename", "hostname", 1234, "caFilename"),
+            Connect.connectWithSecret("clientId", "clientSecret", "hostname", 1234, "confAddress", "confCAFilename", "authCAFilename", "caFilename"),
             equalTo(grpcChannelWithTls)
         )
     }
@@ -129,9 +129,9 @@ internal class ConnectTest {
             "clientSecret",
             "audience",
             "issuerDomain",
+            "hostname",
+            1234,
             AuthMethod.OAUTH,
-            host = "hostname",
-            rpcPort = 1234,
             caFilename = "caFilename"
         )
 
@@ -162,11 +162,11 @@ internal class ConnectTest {
             "clientId",
             "username",
             "password",
+            "hostname",
+            1234,
             "confAddress",
             "confCAFilename",
             "authCAFilename",
-            "hostname",
-            1234,
             "caFilename"
         )
 
@@ -197,7 +197,7 @@ internal class ConnectTest {
         } returns grpcChannel
 
         assertThat(
-            Connect.connectWithPassword("clientId", "username", "password", "confAddress", "confCAFilename", "authCAFilename", "hostname", 1234, "caFilename"),
+            Connect.connectWithPassword("clientId", "username", "password", "hostname", 1234, "confAddress", "confCAFilename", "authCAFilename", "caFilename"),
             equalTo(grpcChannel)
         )
     }
@@ -220,9 +220,9 @@ internal class ConnectTest {
             "password",
             "audience",
             "issuerDomain",
-            AuthMethod.OAUTH,
             host = "hostname",
             rpcPort = 1234,
+            AuthMethod.OAUTH,
             caFilename = "caFilename"
         )
 

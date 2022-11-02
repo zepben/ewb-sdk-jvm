@@ -73,11 +73,11 @@ object Connect {
     fun connectWithSecret(
         clientId: String,
         clientSecret: String,
+        host: String = "localhost",
+        rpcPort: Int = 50051,
         confAddress: String? = null,
         confCAFilename: String? = null,
         authCAFilename: String? = null,
-        host: String = "localhost",
-        rpcPort: Int = 50051,
         caFilename: String? = null
     ): GrpcChannel {
         val tokenFetcher = createTokenFetcher(confAddress ?: "https://$host/ewb/auth", confCAFilename = confCAFilename, authCAFilename = authCAFilename)
@@ -109,10 +109,10 @@ object Connect {
         clientSecret: String,
         audience: String,
         issuerDomain: String,
-        authMethod: AuthMethod,
-        authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
+        authMethod: AuthMethod = AuthMethod.OAUTH,
+        authCAFilename: String? = null,
         caFilename: String? = null
     ): GrpcChannel {
         val tokenFetcher = ZepbenTokenFetcher(audience = audience, issuerDomain = issuerDomain, authMethod = authMethod, caFilename = authCAFilename)
@@ -144,11 +144,11 @@ object Connect {
         clientId: String,
         username: String,
         password: String,
+        host: String = "localhost",
+        rpcPort: Int = 50051,
         confAddress: String? = null,
         confCAFilename: String? = null,
         authCAFilename: String? = null,
-        host: String = "localhost",
-        rpcPort: Int = 50051,
         caFilename: String? = null
     ): GrpcChannel {
         val tokenFetcher = createTokenFetcher(confAddress ?: "https://$host/ewb/auth", confCAFilename = confCAFilename, authCAFilename = authCAFilename)
@@ -182,10 +182,10 @@ object Connect {
         password: String,
         audience: String,
         issuerDomain: String,
-        authMethod: AuthMethod,
-        authCAFilename: String? = null,
         host: String = "localhost",
         rpcPort: Int = 50051,
+        authMethod: AuthMethod = AuthMethod.OAUTH,
+        authCAFilename: String? = null,
         caFilename: String? = null
     ): GrpcChannel {
         val tokenFetcher = ZepbenTokenFetcher(audience = audience, issuerDomain = issuerDomain, authMethod = authMethod, caFilename = authCAFilename)

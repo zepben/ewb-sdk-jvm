@@ -10,12 +10,13 @@ package com.zepben.evolve.services.network
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
@@ -245,6 +246,45 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareIdReferenceCollections(OperationalRestriction::equipment)
         }
 
+    /************ IEC61968 infIEC61968 ************/
+
+    private fun compareCurrentTransformerInfo(source: CurrentTransformerInfo, target: CurrentTransformerInfo): ObjectDifference<CurrentTransformerInfo> =
+        ObjectDifference(source, target).apply {
+            compareAssetInfo()
+
+            compareValues(
+                CurrentTransformerInfo::accuracyClass,
+                CurrentTransformerInfo::accuracyLimit,
+                CurrentTransformerInfo::coreCount,
+                CurrentTransformerInfo::ctClass,
+                CurrentTransformerInfo::kneePointVoltage,
+                CurrentTransformerInfo::maxRatio,
+                CurrentTransformerInfo::nominalRatio,
+                CurrentTransformerInfo::primaryRatio,
+                CurrentTransformerInfo::ratedCurrent,
+                CurrentTransformerInfo::secondaryFlsRating,
+                CurrentTransformerInfo::secondaryRatio,
+                CurrentTransformerInfo::usage
+            )
+        }
+
+    private fun comparePotentialTransformerInfo(
+        source: PotentialTransformerInfo,
+        target: PotentialTransformerInfo
+    ): ObjectDifference<PotentialTransformerInfo> =
+        ObjectDifference(source, target).apply {
+            compareAssetInfo()
+
+            compareValues(
+                PotentialTransformerInfo::accuracyClass,
+                PotentialTransformerInfo::nominalRatio,
+                PotentialTransformerInfo::primaryRatio,
+                PotentialTransformerInfo::ptClass,
+                PotentialTransformerInfo::ratedVoltage,
+                PotentialTransformerInfo::secondaryRatio
+            )
+        }
+
     /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 
     private fun ObjectDifference<out AuxiliaryEquipment>.compareAuxiliaryEquipment(): ObjectDifference<out AuxiliaryEquipment> =
@@ -255,8 +295,25 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 compareIdReferences(AuxiliaryEquipment::terminal)
         }
 
+    private fun compareCurrentTransformer(source: CurrentTransformer, target: CurrentTransformer): ObjectDifference<CurrentTransformer> =
+        ObjectDifference(source, target).apply {
+            compareSensor()
+
+            compareValues(CurrentTransformer::coreBurden)
+        }
+
     private fun compareFaultIndicator(source: FaultIndicator, target: FaultIndicator): ObjectDifference<FaultIndicator> =
         ObjectDifference(source, target).apply { compareAuxiliaryEquipment() }
+
+    private fun comparePotentialTransformer(source: PotentialTransformer, target: PotentialTransformer): ObjectDifference<PotentialTransformer> =
+        ObjectDifference(source, target).apply {
+            compareSensor()
+
+            compareValues(PotentialTransformer::type)
+        }
+
+    private fun ObjectDifference<out Sensor>.compareSensor(): ObjectDifference<out Sensor> =
+        apply { compareAuxiliaryEquipment() }
 
     /************ IEC61970 BASE CORE ************/
 

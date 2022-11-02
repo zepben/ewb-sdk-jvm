@@ -13,14 +13,16 @@ import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.PositionPoint
 import com.zepben.evolve.cim.iec61968.common.StreetAddress
 import com.zepben.evolve.cim.iec61968.common.TownDetail
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
@@ -292,6 +294,38 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { Junction("j2") })
     }
 
+    /************ IEC61968 infIEC61970 ************/
+
+    @Test
+    internal fun compareCurrentTransformerInfo() {
+        compareAssetInfo { CurrentTransformerInfo(it) }
+
+        comparatorValidator.validateProperty(CurrentTransformerInfo::accuracyClass, { CurrentTransformerInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::accuracyLimit, { CurrentTransformerInfo(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::coreCount, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::ctClass, { CurrentTransformerInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::kneePointVoltage, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::maxRatio, { CurrentTransformerInfo(it) }, { Ratio(1.0, 1.0) }, { Ratio(2.0, 2.0) })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::nominalRatio, { CurrentTransformerInfo(it) }, { Ratio(1.0, 1.0) }, { Ratio(2.0, 2.0) })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::primaryRatio, { CurrentTransformerInfo(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::ratedCurrent, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::secondaryFlsRating, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::secondaryRatio, { CurrentTransformerInfo(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::usage, { CurrentTransformerInfo(it) }, { "first" }, { "second" })
+    }
+
+    @Test
+    internal fun comparePotentialTransformerInfo() {
+        compareAssetInfo { PotentialTransformerInfo(it) }
+
+        comparatorValidator.validateProperty(PotentialTransformerInfo::accuracyClass, { PotentialTransformerInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(PotentialTransformerInfo::nominalRatio, { PotentialTransformerInfo(it) }, { Ratio(1.0, 1.0) }, { Ratio(2.0, 2.0) })
+        comparatorValidator.validateProperty(PotentialTransformerInfo::primaryRatio, { PotentialTransformerInfo(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(PotentialTransformerInfo::ptClass, { PotentialTransformerInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(PotentialTransformerInfo::ratedVoltage, { PotentialTransformerInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(PotentialTransformerInfo::secondaryRatio, { PotentialTransformerInfo(it) }, { 1.0 }, { 2.0 })
+    }
+
     /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 
     private fun compareAuxiliaryEquipment(createAuxiliaryEquipment: (String) -> AuxiliaryEquipment) {
@@ -308,8 +342,31 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     }
 
     @Test
+    internal fun compareCurrentTransformer() {
+        compareSensor { CurrentTransformer(it) }
+
+        comparatorValidator.validateProperty(CurrentTransformer::coreBurden, { CurrentTransformer(it) }, { 1 }, { 2 })
+    }
+
+    @Test
     internal fun compareFaultIndicator() {
         compareAuxiliaryEquipment { FaultIndicator(it) }
+    }
+
+    @Test
+    internal fun comparePotentialTransformer() {
+        compareSensor { PotentialTransformer(it) }
+
+        comparatorValidator.validateProperty(
+            PotentialTransformer::type,
+            { PotentialTransformer(it) },
+            { PotentialTransformerKind.capacitiveCoupling },
+            { PotentialTransformerKind.inductive }
+        )
+    }
+
+    private fun compareSensor(createSensor: (String) -> Sensor) {
+        compareAuxiliaryEquipment(createSensor)
     }
 
     /************ IEC61970 BASE CORE ************/

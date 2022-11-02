@@ -17,10 +17,14 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
@@ -165,8 +169,14 @@ class DatabaseSqliteTest {
         /************ IEC61968 OPERATIONS ************/
         validateSchema(SchemaNetworks.networkServicesOf(::OperationalRestriction, OperationalRestriction::fillFields))
 
+        /************ IEC61968 InfIEC61968 ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::CurrentTransformerInfo, CurrentTransformerInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PotentialTransformerInfo, PotentialTransformerInfo::fillFields))
+
         /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::CurrentTransformer, CurrentTransformer::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::FaultIndicator, FaultIndicator::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PotentialTransformer, PotentialTransformer::fillFields))
 
         /************ IEC61970 BASE CORE ************/
         validateSchema(SchemaNetworks.networkServicesOf(::BaseVoltage, BaseVoltage::fillFields))

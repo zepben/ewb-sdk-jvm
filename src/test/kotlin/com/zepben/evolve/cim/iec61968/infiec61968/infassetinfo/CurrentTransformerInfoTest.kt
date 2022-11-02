@@ -52,7 +52,7 @@ internal class CurrentTransformerInfoTest {
         assertThat(currentTransformerInfo.accuracyLimit, equalTo(1.1))
         assertThat(currentTransformerInfo.coreCount, equalTo(2))
         assertThat(currentTransformerInfo.ctClass, equalTo("ctClass"))
-        assertThat(currentTransformerInfo.kneePointVoltage, equalTo(3.3))
+        assertThat(currentTransformerInfo.kneePointVoltage, equalTo(3))
         assertThat(currentTransformerInfo.maxRatio, equalTo(Ratio(4.4, 5.5)))
         assertThat(currentTransformerInfo.nominalRatio, equalTo(Ratio(6.6, 7.7)))
         assertThat(currentTransformerInfo.primaryRatio, equalTo(8.8))

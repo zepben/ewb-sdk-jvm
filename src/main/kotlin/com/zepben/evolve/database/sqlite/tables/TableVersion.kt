@@ -19,7 +19,7 @@ class TableVersion : SqliteTable() {
     //
     // (Remove this comment after doing so)
     //
-    val SUPPORTED_VERSION = 43
+    val SUPPORTED_VERSION = 44
 
     val VERSION = Column(++columnIndex, "version", "TEXT", NOT_NULL)
 

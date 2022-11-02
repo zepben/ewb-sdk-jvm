@@ -63,7 +63,7 @@ class UpgradeRunnerTest {
 
         // If upgrades are supported, make sure they are all registered in the correct order.
         if (actualChangeSets.isNotEmpty())
-            assertThat(actualChangeSets.map { it.number }, equalTo((changeSets.minOf { it.number }..TableVersion().SUPPORTED_VERSION).toList()))
+            assertThat(actualChangeSets.map { it.number }, equalTo((actualChangeSets.minOf { it.number }..TableVersion().SUPPORTED_VERSION).toList()))
     }
 
     @Test

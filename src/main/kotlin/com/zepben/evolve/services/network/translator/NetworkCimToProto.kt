@@ -10,12 +10,14 @@ package com.zepben.evolve.services.network.translator
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
@@ -40,6 +42,7 @@ import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.PotentialTransformerKind
 import com.zepben.protobuf.cim.iec61970.base.wires.PhaseShuntConnectionKind
 import com.zepben.protobuf.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
@@ -71,12 +74,18 @@ import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infcommon.Ratio as PBRatio
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint as PBUsagePoint
 import com.zepben.protobuf.cim.iec61968.operations.OperationalRestriction as PBOperationalRestriction
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment as PBAuxiliaryEquipment
+import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.CurrentTransformer as PBCurrentTransformer
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.FaultIndicator as PBFaultIndicator
+import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.PotentialTransformer as PBPotentialTransformer
+import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.Sensor as PBSensor
 import com.zepben.protobuf.cim.iec61970.base.core.AcDcTerminal as PBAcDcTerminal
 import com.zepben.protobuf.cim.iec61970.base.core.BaseVoltage as PBBaseVoltage
 import com.zepben.protobuf.cim.iec61970.base.core.ConductingEquipment as PBConductingEquipment
@@ -343,8 +352,8 @@ fun toPb(cim: StreetDetail, pb: PBStreetDetail.Builder): PBStreetDetail.Builder 
 
 fun toPb(cim: TownDetail, pb: PBTownDetail.Builder): PBTownDetail.Builder =
     pb.apply {
-        name = cim.name
-        stateOrProvince = cim.stateOrProvince
+        cim.name?.let { name = it } ?: clearName()
+        cim.stateOrProvince?.let { stateOrProvince = it } ?: clearStateOrProvince()
     }
 
 fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()
@@ -387,6 +396,47 @@ fun toPb(cim: OperationalRestriction, pb: PBOperationalRestriction.Builder): PBO
 
 fun OperationalRestriction.toPb(): PBOperationalRestriction = toPb(this, PBOperationalRestriction.newBuilder()).build()
 
+/************ IEC61968 infIEC61968 ASSET INFO ************/
+
+fun toPb(cim: CurrentTransformerInfo, pb: PBCurrentTransformerInfo.Builder): PBCurrentTransformerInfo.Builder =
+    pb.apply {
+        cim.accuracyClass?.let { accuracyClass = it } ?: clearAccuracyClass()
+        accuracyLimit = cim.accuracyLimit ?: UNKNOWN_DOUBLE
+        coreCount = cim.coreCount ?: UNKNOWN_INT
+        cim.ctClass?.let { ctClass = it } ?: clearCtClass()
+        kneePointVoltage = cim.kneePointVoltage ?: UNKNOWN_INT
+        cim.maxRatio?.let { toPb(it, maxRatioBuilder) } ?: clearMaxRatio()
+        cim.nominalRatio?.let { toPb(it, nominalRatioBuilder) } ?: clearNominalRatio()
+        primaryRatio = cim.primaryRatio ?: UNKNOWN_DOUBLE
+        ratedCurrent = cim.ratedCurrent ?: UNKNOWN_INT
+        secondaryFlsRating = cim.secondaryFlsRating ?: UNKNOWN_INT
+        secondaryRatio = cim.secondaryRatio ?: UNKNOWN_DOUBLE
+        cim.usage?.let { accuracyClass = it } ?: clearUsage()
+        pb.apply { toPb(cim, aiBuilder) }
+    }
+
+fun toPb(cim: PotentialTransformerInfo, pb: PBPotentialTransformerInfo.Builder): PBPotentialTransformerInfo.Builder =
+    pb.apply {
+        cim.accuracyClass?.let { accuracyClass = it } ?: clearAccuracyClass()
+        cim.nominalRatio?.let { toPb(it, nominalRatioBuilder) } ?: clearNominalRatio()
+        primaryRatio = cim.primaryRatio ?: UNKNOWN_DOUBLE
+        cim.ptClass?.let { ptClass = it } ?: clearPtClass()
+        ratedVoltage = cim.ratedVoltage ?: UNKNOWN_INT
+        secondaryRatio = cim.secondaryRatio ?: UNKNOWN_DOUBLE
+        pb.apply { toPb(cim, aiBuilder) }
+    }
+
+fun CurrentTransformerInfo.toPb(): PBCurrentTransformerInfo = toPb(this, PBCurrentTransformerInfo.newBuilder()).build()
+fun PotentialTransformerInfo.toPb(): PBPotentialTransformerInfo = toPb(this, PBPotentialTransformerInfo.newBuilder()).build()
+
+/************ IEC61968 infIEC61968 COMMON ************/
+
+fun toPb(cim: Ratio, pb: PBRatio.Builder): PBRatio.Builder =
+    pb.apply {
+        denominator = cim.denominator
+        numerator = cim.numerator
+    }
+
 /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 
 fun toPb(cim: AuxiliaryEquipment, pb: PBAuxiliaryEquipment.Builder): PBAuxiliaryEquipment.Builder =
@@ -395,11 +445,27 @@ fun toPb(cim: AuxiliaryEquipment, pb: PBAuxiliaryEquipment.Builder): PBAuxiliary
         toPb(cim, eqBuilder)
     }
 
+fun toPb(cim: CurrentTransformer, pb: PBCurrentTransformer.Builder): PBCurrentTransformer.Builder =
+    pb.apply {
+        coreBurden = cim.coreBurden ?: UNKNOWN_INT
+        toPb(cim, snBuilder)
+    }
+
 fun toPb(cim: FaultIndicator, pb: PBFaultIndicator.Builder): PBFaultIndicator.Builder =
     pb.apply { toPb(cim, aeBuilder) }
 
+fun toPb(cim: PotentialTransformer, pb: PBPotentialTransformer.Builder): PBPotentialTransformer.Builder =
+    pb.apply {
+        type = PotentialTransformerKind.valueOf(cim.type.name)
+        toPb(cim, snBuilder)
+    }
 
+fun toPb(cim: Sensor, pb: PBSensor.Builder): PBSensor.Builder =
+    pb.apply { toPb(cim, aeBuilder) }
+
+fun CurrentTransformer.toPb(): PBCurrentTransformer = toPb(this, PBCurrentTransformer.newBuilder()).build()
 fun FaultIndicator.toPb(): PBFaultIndicator = toPb(this, PBFaultIndicator.newBuilder()).build()
+fun PotentialTransformer.toPb(): PBPotentialTransformer = toPb(this, PBPotentialTransformer.newBuilder()).build()
 
 /************ IEC61970 BASE CORE ************/
 
@@ -1002,8 +1068,14 @@ class NetworkCimToProto : BaseCimToProto() {
     // IEC61968 OPERATIONS
     fun toPb(cim: OperationalRestriction): PBOperationalRestriction = cim.toPb()
 
+    // IEC61968 InfIEC61968 ASSET INFO
+    fun toPb(cim: CurrentTransformerInfo): PBCurrentTransformerInfo = cim.toPb()
+    fun toPb(cim: PotentialTransformerInfo): PBPotentialTransformerInfo = cim.toPb()
+
     // IEC61970 BASE AUXILIARY EQUIPMENT
+    fun toPb(cim: CurrentTransformer): PBCurrentTransformer = cim.toPb()
     fun toPb(cim: FaultIndicator): PBFaultIndicator = cim.toPb()
+    fun toPb(cim: PotentialTransformer): PBPotentialTransformer = cim.toPb()
 
     // IEC61970 BASE CORE
     fun toPb(cim: BaseVoltage): PBBaseVoltage = cim.toPb()

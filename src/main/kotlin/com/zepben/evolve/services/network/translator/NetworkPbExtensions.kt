@@ -12,12 +12,13 @@ import com.zepben.evolve.services.common.translator.nameAndMRID
 import com.zepben.protobuf.cim.iec61968.assetinfo.*
 import com.zepben.protobuf.cim.iec61968.assets.*
 import com.zepben.protobuf.cim.iec61968.common.Location
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint
 import com.zepben.protobuf.cim.iec61968.operations.OperationalRestriction
-import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
-import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.protobuf.cim.iec61970.base.core.*
 import com.zepben.protobuf.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.protobuf.cim.iec61970.base.equivalents.EquivalentEquipment
@@ -75,10 +76,18 @@ fun UsagePoint.mRID(): String = io.mrid
 
 fun OperationalRestriction.mRID(): String = doc.mRID()
 
+/************ IEC61968 infIEC61968 ASSET INFO ************/
+
+fun CurrentTransformerInfo.mRID(): String = ai.mRID()
+fun PotentialTransformerInfo.mRID(): String = ai.mRID()
+
 /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 
 fun AuxiliaryEquipment.mRID(): String = eq.mRID()
+fun CurrentTransformer.mRID(): String = sn.mRID()
 fun FaultIndicator.mRID(): String = ae.mRID()
+fun PotentialTransformer.mRID(): String = sn.mRID()
+fun Sensor.mRID(): String = ae.mRID()
 
 /************ IEC61970 BASE CORE ************/
 

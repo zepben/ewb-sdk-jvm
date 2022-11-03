@@ -6,11 +6,23 @@
 
 ### New Features
 * Added methods for connecting to the gRPC service in a utility object named `Connect`:
-  * `Connect.connectInsecure`: Used to connect to a gRPC service that does not use SSL/TLS.
-  * `Connect.connectTls`: Used to connect to a gRPC service that uses SSL/TLS, without user authentication.
-  * `Connect.connectWithSecret`: Used to connect to a gRPC service that uses SSL/TLS, using the OAuth 2.0 client credential flow.
-  * `Connect.connectWithPassword`: Used to connect to a gRPC service that uses SSL/TLS, using the OAuth 2.0 password grant flow.
-
+    * `Connect.connectInsecure`: Used to connect to a gRPC service that does not use SSL/TLS.
+    * `Connect.connectTls`: Used to connect to a gRPC service that uses SSL/TLS, without user authentication.
+    * `Connect.connectWithSecret`: Used to connect to a gRPC service that uses SSL/TLS, using the OAuth 2.0 client credential flow.
+    * `Connect.connectWithPassword`: Used to connect to a gRPC service that uses SSL/TLS, using the OAuth 2.0 password grant flow.
+* Added support for current transformers and power transformers with the following classes in `com.zepben.evolve.cim.*`:
+  * In `com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo`:
+    * `CurrentTransformerInfo`: Properties of current transformer asset.
+    * `PotentialTransformerInfo`: Properties of potential transformer asset.
+  * In `com.zepben.evolve.cim.iec61968.infiec61968.infcommon`:
+    * `Ratio`: Fraction specified explicitly with a numerator and denominator, which can be used to calculate the quotient.
+  * In `com.zepben.evolve.cim.iec61970.base.auxiliaryequipment`:
+    * `CurrentTransformer`: Instrument transformer used to measure electrical qualities of the circuit that is being protected and/or monitored.
+    * `PotentialTransformer`: Instrument transformer (also known as Voltage Transformer) used to measure electrical qualities of the circuit that
+                              is being protected and/or monitored.
+    * `PotentialTransformerKind`: The construction kind of the potential transformer. (Enum)
+    * `Sensor`: This class describes devices that transform a measured quantity into signals that can be presented at displays,
+                used in control or be recorded.
 
 ### Enhancements
 * None.

@@ -32,7 +32,8 @@ internal class RatioTest {
 
     @Test
     internal fun throwsExceptionOnZeroDenominator() {
-        expect { Ratio(42.0, 0.0) }
+        val invalidRatio = Ratio(42.0, 0.0)
+        expect { invalidRatio.quotient }
             .toThrow(IllegalArgumentException::class.java)
             .withMessage("Ratio cannot have a denominator of zero.")
     }

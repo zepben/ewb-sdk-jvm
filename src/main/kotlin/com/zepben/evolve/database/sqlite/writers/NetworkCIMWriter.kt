@@ -426,8 +426,9 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquipment(table, insert, auxiliaryEquipment, description)
     }
 
-    private fun saveSensor(table: TableSensors, insert: PreparedStatement, sensor: Sensor, description: String): Boolean =
-        saveAuxiliaryEquipment(table, insert, sensor, description)
+    private fun saveSensor(table: TableSensors, insert: PreparedStatement, sensor: Sensor, description: String): Boolean {
+        return saveAuxiliaryEquipment(table, insert, sensor, description)
+    }
 
     fun save(currentTransformer: CurrentTransformer): Boolean {
         val table = databaseTables.getTable(TableCurrentTransformers::class.java)
@@ -449,9 +450,9 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TablePotentialTransformers::class.java)
         val insert = databaseTables.getInsert(TablePotentialTransformers::class.java)
 
-        insert.setNullableString(table.TYPE.queryIndex, potentialTransformer.type.name)
+        insert.setString(table.TYPE.queryIndex, potentialTransformer.type.name)
 
-        return saveSensor(table, insert, potentialTransformer, "current transformer")
+        return saveSensor(table, insert, potentialTransformer, "potential transformer")
     }
 
     /************ IEC61970 CORE ************/

@@ -21,11 +21,11 @@ data class Ratio(
     val denominator: Double
 ) {
 
-    init {
+    val quotient : Double by lazy {
         if (denominator == 0.0)
             throw IllegalArgumentException("Ratio cannot have a denominator of zero.")
-    }
 
-    val quotient = numerator / denominator
+        numerator / denominator
+    }
 
 }

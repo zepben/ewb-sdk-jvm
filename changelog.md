@@ -10,7 +10,8 @@
 * None.
 
 ### Fixes
-* None.
+* remove lvfeeder function fixed (previously still adds)
+* remove component test updated to contain another check
 
 ### Notes
 * None.

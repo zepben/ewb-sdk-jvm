@@ -14,7 +14,9 @@ import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -27,37 +29,16 @@ class CustomerServiceTest {
     private val service = CustomerService()
 
     @Test
-    internal fun supportsCustomer() {
-        val customer = Customer()
-        assertThat(service.add(customer), equalTo(true))
-        assertThat(service.remove(customer), equalTo(true))
+    internal fun `can add and remove supported types`() {
+        service.supportedClasses
+            .asSequence()
+            .map { it.getDeclaredConstructor().newInstance() }
+            .forEach {
+                assertThat(service.tryAdd(it), equalTo(true))
+                assertThat(service[it.mRID], equalTo(it))
+                assertThat(service.tryRemove(it), equalTo(true))
+                assertThat(service[it.mRID], nullValue())
+            }
     }
 
-    @Test
-    internal fun supportsCustomerAgreement() {
-        val customerAgreement = CustomerAgreement()
-        assertThat(service.add(customerAgreement), equalTo(true))
-        assertThat(service.remove(customerAgreement), equalTo(true))
-    }
-
-    @Test
-    internal fun supportsOrganisation() {
-        val organisation = Organisation()
-        assertThat(service.add(organisation), equalTo(true))
-        assertThat(service.remove(organisation), equalTo(true))
-    }
-
-    @Test
-    internal fun supportsPricingStructure() {
-        val pricingStructure = PricingStructure()
-        assertThat(service.add(pricingStructure), equalTo(true))
-        assertThat(service.remove(pricingStructure), equalTo(true))
-    }
-
-    @Test
-    internal fun supportsTariff() {
-        val tariff = Tariff()
-        assertThat(service.add(tariff), equalTo(true))
-        assertThat(service.remove(tariff), equalTo(true))
-    }
 }

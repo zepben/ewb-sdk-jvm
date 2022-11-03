@@ -49,6 +49,7 @@ internal class NetworkServiceTest {
                 assertThat(service.tryAdd(it), equalTo(true))
                 assertThat(service[it.mRID], equalTo(it))
                 assertThat(service.tryRemove(it), equalTo(true))
+                assertThat(service[it.mRID], nullValue())
             }
     }
 

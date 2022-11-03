@@ -10,6 +10,7 @@ package com.zepben.evolve.services.diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 
@@ -17,18 +18,18 @@ class DiagramServiceTest {
 
     private val service = DiagramService()
 
-    @Test
-    internal fun supportsDiagram() {
-        val diagram = Diagram()
-        assertThat(service.add(diagram), equalTo(true))
-        assertThat(service.remove(diagram), equalTo(true))
-    }
 
     @Test
-    internal fun supportsDiagramObject() {
-        val diagramObject = DiagramObject()
-        assertThat(service.add(diagramObject), equalTo(true))
-        assertThat(service.remove(diagramObject), equalTo(true))
+    internal fun `can add and remove supported types`() {
+        service.supportedClasses
+            .asSequence()
+            .map { it.getDeclaredConstructor().newInstance() }
+            .forEach {
+                assertThat(service.tryAdd(it), equalTo(true))
+                assertThat(service[it.mRID], equalTo(it))
+                assertThat(service.tryRemove(it), equalTo(true))
+                assertThat(service[it.mRID], nullValue())
+            }
     }
 
     @Test

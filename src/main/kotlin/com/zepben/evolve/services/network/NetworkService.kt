@@ -290,7 +290,7 @@ class NetworkService : BaseService("network") {
     fun remove(loop: Loop): Boolean = super.remove(loop)
 
     fun add(lvFeeder: LvFeeder): Boolean = super.add(lvFeeder)
-    fun remove(lvFeeder: LvFeeder): Boolean = super.add(lvFeeder)
+    fun remove(lvFeeder: LvFeeder): Boolean = super.remove(lvFeeder)
 
     /**
      * Get all measurements of type [T] associated with the given [mRID].

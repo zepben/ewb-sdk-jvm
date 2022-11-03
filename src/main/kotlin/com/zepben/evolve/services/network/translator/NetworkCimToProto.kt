@@ -411,7 +411,7 @@ fun toPb(cim: CurrentTransformerInfo, pb: PBCurrentTransformerInfo.Builder): PBC
         ratedCurrent = cim.ratedCurrent ?: UNKNOWN_INT
         secondaryFlsRating = cim.secondaryFlsRating ?: UNKNOWN_INT
         secondaryRatio = cim.secondaryRatio ?: UNKNOWN_DOUBLE
-        cim.usage?.let { accuracyClass = it } ?: clearUsage()
+        cim.usage?.let { usage = it } ?: clearUsage()
         pb.apply { toPb(cim, aiBuilder) }
     }
 

@@ -14,6 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TablePotentialTransformers : TableSensors() {
 
+    val POTENTIAL_TRANSFORMER_INFO_MRID = Column(++columnIndex, "potential_transformer_info_mrid", "TEXT", NULL)
     val TYPE = Column(++columnIndex, "type", "TEXT", NULL)
 
     override fun name(): String {

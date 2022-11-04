@@ -14,6 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableCurrentTransformers : TableSensors() {
 
+    val CURRENT_TRANSFORMER_INFO_MRID = Column(++columnIndex, "current_transformer_info_mrid", "TEXT", NULL)
     val CORE_BURDEN = Column(++columnIndex, "core_burden", "INTEGER", NULL)
 
     override fun name(): String {

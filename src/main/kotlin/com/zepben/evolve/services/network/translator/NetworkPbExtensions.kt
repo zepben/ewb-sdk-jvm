@@ -89,6 +89,9 @@ fun FaultIndicator.mRID(): String = ae.mRID()
 fun PotentialTransformer.mRID(): String = sn.mRID()
 fun Sensor.mRID(): String = ae.mRID()
 
+fun CurrentTransformer.assetInfoMRID(): String = sn.ae.eq.assetInfoMRID()
+fun PotentialTransformer.assetInfoMRID(): String = sn.ae.eq.assetInfoMRID()
+
 /************ IEC61970 BASE CORE ************/
 
 fun AcDcTerminal.mRID(): String = io.mrid

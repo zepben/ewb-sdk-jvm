@@ -434,6 +434,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableCurrentTransformers::class.java)
         val insert = databaseTables.getInsert(TableCurrentTransformers::class.java)
 
+        insert.setNullableString(table.CURRENT_TRANSFORMER_INFO_MRID.queryIndex, currentTransformer.assetInfo?.mRID)
         insert.setNullableInt(table.CORE_BURDEN.queryIndex, currentTransformer.coreBurden)
 
         return saveSensor(table, insert, currentTransformer, "current transformer")
@@ -450,6 +451,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TablePotentialTransformers::class.java)
         val insert = databaseTables.getInsert(TablePotentialTransformers::class.java)
 
+        insert.setNullableString(table.POTENTIAL_TRANSFORMER_INFO_MRID.queryIndex, potentialTransformer.assetInfo?.mRID)
         insert.setString(table.TYPE.queryIndex, potentialTransformer.type.name)
 
         return saveSensor(table, insert, potentialTransformer, "potential transformer")

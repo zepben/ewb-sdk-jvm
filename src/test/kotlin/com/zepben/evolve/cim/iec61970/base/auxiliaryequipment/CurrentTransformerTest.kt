@@ -8,13 +8,12 @@
 
 package com.zepben.evolve.cim.iec61970.base.auxiliaryequipment
 
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -34,10 +33,12 @@ internal class CurrentTransformerTest {
     internal fun accessorCoverage() {
         val currentTransformer = CurrentTransformer()
 
-        assertThat(currentTransformer.coreBurden, Matchers.nullValue())
+        assertThat(currentTransformer.assetInfo, nullValue())
+        assertThat(currentTransformer.coreBurden, nullValue())
 
         currentTransformer.fillFields(NetworkService(), true)
 
+        assertThat(currentTransformer.assetInfo, instanceOf(CurrentTransformerInfo::class.java))
         assertThat(currentTransformer.coreBurden, equalTo(1))
     }
 

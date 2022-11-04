@@ -404,6 +404,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TableCurrentTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val currentTransformer = CurrentTransformer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            assetInfo = networkService.ensureGet(resultSet.getNullableString(table.CURRENT_TRANSFORMER_INFO_MRID.queryIndex), typeNameAndMRID())
             coreBurden = resultSet.getNullableInt(table.CORE_BURDEN.queryIndex)
         }
 
@@ -418,6 +419,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TablePotentialTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val potentialTransformer = PotentialTransformer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            assetInfo = networkService.ensureGet(resultSet.getNullableString(table.POTENTIAL_TRANSFORMER_INFO_MRID.queryIndex), typeNameAndMRID())
             type = PotentialTransformerKind.valueOf(resultSet.getString(table.TYPE.queryIndex))
         }
 

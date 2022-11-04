@@ -445,6 +445,7 @@ fun toCim(pb: PBAuxiliaryEquipment, cim: AuxiliaryEquipment, networkService: Net
 
 fun toCim(pb: PBCurrentTransformer, networkService: NetworkService): CurrentTransformer =
     CurrentTransformer(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
         coreBurden = pb.coreBurden.takeUnless { it == UNKNOWN_INT }
         toCim(pb.sn, this, networkService)
     }
@@ -456,6 +457,7 @@ fun toCim(pb: PBFaultIndicator, networkService: NetworkService): FaultIndicator 
 
 fun toCim(pb: PBPotentialTransformer, networkService: NetworkService): PotentialTransformer =
     PotentialTransformer(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
         type = PotentialTransformerKind.valueOf(pb.type.name)
         toCim(pb.sn, this, networkService)
     }

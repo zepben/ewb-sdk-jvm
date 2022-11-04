@@ -19,10 +19,14 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
@@ -76,6 +80,14 @@ internal object ConductingEquipmentToTerminalsResolver : ReferenceResolver<Condu
 
 internal object ConductorToWireInfoResolver : ReferenceResolver<Conductor, WireInfo> by KReferenceResolver(
     Conductor::class, WireInfo::class, Conductor::assetInfo.setter
+)
+
+internal object CurrentTransformerToCurrentTransformerInfoResolver : ReferenceResolver<CurrentTransformer, CurrentTransformerInfo> by KReferenceResolver(
+    CurrentTransformer::class, CurrentTransformerInfo::class, CurrentTransformer::assetInfo.setter
+)
+
+internal object PotentialTransformerToPotentialTransformerInfoResolver : ReferenceResolver<PotentialTransformer, PotentialTransformerInfo> by KReferenceResolver(
+    PotentialTransformer::class, PotentialTransformerInfo::class, PotentialTransformer::assetInfo.setter
 )
 
 internal object PowerTransformerToPowerTransformerInfoResolver : ReferenceResolver<PowerTransformer, PowerTransformerInfo> by KReferenceResolver(

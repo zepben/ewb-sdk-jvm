@@ -367,6 +367,9 @@ fun AuxiliaryEquipment.fillFields(service: NetworkService, includeRuntime: Boole
 fun CurrentTransformer.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentTransformer {
     (this as Sensor).fillFields(service, includeRuntime)
 
+    assetInfo = CurrentTransformerInfo().also {
+        service.add(it)
+    }
     coreBurden = 1
 
     return this
@@ -380,6 +383,9 @@ fun FaultIndicator.fillFields(service: NetworkService, includeRuntime: Boolean =
 fun PotentialTransformer.fillFields(service: NetworkService, includeRuntime: Boolean = true): PotentialTransformer {
     (this as Sensor).fillFields(service, includeRuntime)
 
+    assetInfo = PotentialTransformerInfo().also {
+        service.add(it)
+    }
     type = PotentialTransformerKind.capacitiveCoupling
 
     return this

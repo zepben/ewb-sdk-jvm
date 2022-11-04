@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.cim.iec61970.base.auxiliaryequipment
 
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+
 /**
  * Instrument transformer used to measure electrical qualities of the circuit that is being protected and/or monitored.
  * Typically used as current transducer for the purpose of metering or protection.
@@ -16,6 +18,11 @@ package com.zepben.evolve.cim.iec61970.base.auxiliaryequipment
  * @property coreBurden Power burden of the CT core in watts.
  */
 class CurrentTransformer @JvmOverloads constructor(mRID: String = "") : Sensor(mRID) {
+
+    /**
+     * Strengthen type of assetInfo to var CurrentTransformerInfo?
+     */
+    override var assetInfo: CurrentTransformerInfo? = null
 
     var coreBurden: Int? = null
 

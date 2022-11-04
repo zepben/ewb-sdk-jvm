@@ -14,6 +14,10 @@ internal fun changeSet44() = ChangeSet(44) {
     listOf(
         """
         CREATE TABLE current_transformer_info (
+            mrid TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            num_diagram_objects INTEGER NOT NULL,
             accuracy_class TEXT NULL,
             accuracy_limit NUMBER NULL,
             core_count INTEGER NULL,
@@ -30,8 +34,14 @@ internal fun changeSet44() = ChangeSet(44) {
             usage TEXT NULL
         );
         """.trimIndent(),
+        "CREATE UNIQUE INDEX current_transformer_info_mrid ON current_transformer_info (mrid);",
+        "CREATE INDEX current_transformer_info_name ON current_transformer_info (name);",
         """
         CREATE TABLE potential_transformer_info (
+            mrid TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            num_diagram_objects INTEGER NOT NULL,
             accuracy_class TEXT NULL,
             nominal_ratio_denominator NUMBER NULL,
             nominal_ratio_numerator NUMBER NULL,
@@ -41,15 +51,41 @@ internal fun changeSet44() = ChangeSet(44) {
             secondary_ratio NUMBER NULL
         );
         """.trimIndent(),
+        "CREATE UNIQUE INDEX potential_transformer_info_mrid ON potential_transformer_info (mrid);",
+        "CREATE INDEX potential_transformer_info_name ON potential_transformer_info (name);",
         """
         CREATE TABLE current_transformers (
+            mrid TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            num_diagram_objects INTEGER NOT NULL,
+            location_mrid TEXT NULL,
+            num_controls INTEGER NOT NULL,
+            normally_in_service BOOLEAN,
+            in_service BOOLEAN,
+            terminal_mrid TEXT NULL,
+            current_transformer_info_mrid TEXT NULL,
             core_burden INTEGER NULL
         );
         """.trimIndent(),
+        "CREATE UNIQUE INDEX current_transformer_mrid ON current_transformers (mrid);",
+        "CREATE INDEX current_transformer_name ON current_transformers (name);",
         """
         CREATE TABLE potential_transformers (
+            mrid TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            num_diagram_objects INTEGER NOT NULL,
+            location_mrid TEXT NULL,
+            num_controls INTEGER NOT NULL,
+            normally_in_service BOOLEAN,
+            in_service BOOLEAN,
+            terminal_mrid TEXT NULL,
+            potential_transformer_info_mrid TEXT NULL,
             type TEXT NOT NULL
         );
-        """.trimIndent()
+        """.trimIndent(),
+        "CREATE UNIQUE INDEX potential_transformer_mrid ON potential_transformers (mrid);",
+        "CREATE INDEX potential_transformer_name ON potential_transformers (name);"
     )
 }

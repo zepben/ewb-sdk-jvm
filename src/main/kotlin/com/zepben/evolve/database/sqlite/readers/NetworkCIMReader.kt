@@ -399,9 +399,6 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadEquipment(auxiliaryEquipment, table, resultSet)
     }
 
-    private fun loadSensor(sensor: Sensor, table: TableSensors, resultSet: ResultSet): Boolean =
-        loadAuxiliaryEquipment(sensor, table, resultSet)
-
     fun load(table: TableCurrentTransformers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val currentTransformer = CurrentTransformer(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             assetInfo = networkService.ensureGet(resultSet.getNullableString(table.CURRENT_TRANSFORMER_INFO_MRID.queryIndex), typeNameAndMRID())
@@ -425,6 +422,9 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
         return loadSensor(potentialTransformer, table, resultSet) && networkService.addOrThrow(potentialTransformer)
     }
+
+    private fun loadSensor(sensor: Sensor, table: TableSensors, resultSet: ResultSet): Boolean =
+        loadAuxiliaryEquipment(sensor, table, resultSet)
 
     /************ IEC61970 BASE CORE ************/
 

@@ -73,7 +73,7 @@ internal class EnergyConsumerTest {
         val phase = EnergyConsumerPhase().apply { energyConsumer = energyConsumer2 }
 
         ExpectException.expect { energyConsumer1.addPhase(phase) }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("${phase.typeNameAndMRID()} `energyConsumer` property references ${energyConsumer2.typeNameAndMRID()}, expected ${energyConsumer1.typeNameAndMRID()}.")
     }
 

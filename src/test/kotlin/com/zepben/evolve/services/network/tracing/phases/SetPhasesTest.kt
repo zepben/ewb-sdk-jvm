@@ -20,7 +20,7 @@ import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.evolve.testing.TestNetworkBuilder
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -163,7 +163,7 @@ class SetPhasesTest {
 
         expect {
             SetPhases().run(n.getT("c0", 2), PhaseCode.AB)
-        }.toThrow(IllegalArgumentException::class.java)
+        }.toThrow<IllegalArgumentException>()
             .withMessage(
                 "Attempted to apply phases [A, B] to Terminal{id='c0-t2'} with nominal phases A. Number of phases to apply must match the number of " +
                     "nominal phases. Found 2, expected 1"
@@ -184,7 +184,7 @@ class SetPhasesTest {
 
         expect {
             SetPhases().run(n.getT("c0", 2))
-        }.toThrow(IllegalStateException::class.java)
+        }.toThrow<IllegalStateException>()
             .withMessage(
                 "Attempted to flow conflicting phase A onto B on nominal phase A. This occurred while flowing from " +
                     "${c1.terminals[0]} to ${c1.terminals[1]} through ${c1.typeNameAndMRID()}. This is caused by missing open " +
@@ -208,7 +208,7 @@ class SetPhasesTest {
 
         expect {
             SetPhases().run(n.getT("c0", 2))
-        }.toThrow(IllegalStateException::class.java)
+        }.toThrow<IllegalStateException>()
             .withMessage(
                 "Attempted to flow conflicting phase A onto B on nominal phase A. This occurred while flowing between " +
                     "${c1.terminals[1]} on ${c1.typeNameAndMRID()} and ${c2.terminals[0]} on ${c2.typeNameAndMRID()}. This is caused by " +

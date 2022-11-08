@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFuncti
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -73,7 +73,7 @@ internal class PowerTransformerTest {
         val end = PowerTransformerEnd().apply { powerTransformer = tx2 }
 
         expect { tx1.addEnd(end) }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("${end.typeNameAndMRID()} `powerTransformer` property references ${tx2.typeNameAndMRID()}, expected ${tx1.typeNameAndMRID()}.")
     }
 
@@ -115,7 +115,7 @@ internal class PowerTransformerTest {
         val duplicatePowerTransformerEnd = PowerTransformerEnd().apply { endNumber = 1 }
         expect {
             pt.addEnd(duplicatePowerTransformerEnd)
-        }.toThrow(IllegalArgumentException::class.java)
+        }.toThrow<IllegalArgumentException>()
             .withMessage("Unable to add ${duplicatePowerTransformerEnd.typeNameAndMRID()} to ${pt.typeNameAndMRID()}. A ${e1.typeNameAndMRID()} already exists with endNumber 1.")
     }
 
@@ -158,7 +158,7 @@ internal class PowerTransformerTest {
 
         val pti = PowerTransformerInfo()
         expect { tx.assetInfo = pti }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("Unable to use ${pti.typeNameAndMRID()} for ${tx.typeNameAndMRID()} because the following associated ends have a direct link to a star impedance: [${end.typeNameAndMRID()}].")
     }
 

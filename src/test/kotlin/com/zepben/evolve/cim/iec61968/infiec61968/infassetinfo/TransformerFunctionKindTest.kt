@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind as PBTransformerFunctionKind
 
 internal class TransformerFunctionKindTest {
 
@@ -21,7 +22,7 @@ internal class TransformerFunctionKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(TransformerFunctionKind.values(), com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind.values())
+        validateEnum(TransformerFunctionKind.values(), PBTransformerFunctionKind.values())
     }
 
 }

@@ -229,6 +229,38 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { PositionPoint(3.0, 4.0) })
     }
 
+    /************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+    @Test
+    internal fun compareCurrentTransformerInfo() {
+        compareAssetInfo { CurrentTransformerInfo(it) }
+
+        comparatorValidator.validateProperty(CurrentTransformerInfo::accuracyClass, { CurrentTransformerInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::accuracyLimit, { CurrentTransformerInfo(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::coreCount, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::ctClass, { CurrentTransformerInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::kneePointVoltage, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::maxRatio, { CurrentTransformerInfo(it) }, { Ratio(1.0, 1.0) }, { Ratio(2.0, 2.0) })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::nominalRatio, { CurrentTransformerInfo(it) }, { Ratio(1.0, 1.0) }, { Ratio(2.0, 2.0) })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::primaryRatio, { CurrentTransformerInfo(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::ratedCurrent, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::secondaryFlsRating, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::secondaryRatio, { CurrentTransformerInfo(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(CurrentTransformerInfo::usage, { CurrentTransformerInfo(it) }, { "first" }, { "second" })
+    }
+
+    @Test
+    internal fun comparePotentialTransformerInfo() {
+        compareAssetInfo { PotentialTransformerInfo(it) }
+
+        comparatorValidator.validateProperty(PotentialTransformerInfo::accuracyClass, { PotentialTransformerInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(PotentialTransformerInfo::nominalRatio, { PotentialTransformerInfo(it) }, { Ratio(1.0, 1.0) }, { Ratio(2.0, 2.0) })
+        comparatorValidator.validateProperty(PotentialTransformerInfo::primaryRatio, { PotentialTransformerInfo(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(PotentialTransformerInfo::ptClass, { PotentialTransformerInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(PotentialTransformerInfo::ratedVoltage, { PotentialTransformerInfo(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(PotentialTransformerInfo::secondaryRatio, { PotentialTransformerInfo(it) }, { 1.0 }, { 2.0 })
+    }
+
     /************ IEC61968 METERING ************/
 
     private fun compareEndDevice(createEndDevice: (String) -> EndDevice) {
@@ -292,38 +324,6 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { OperationalRestriction(it) },
             { Junction("j1") },
             { Junction("j2") })
-    }
-
-    /************ IEC61968 infIEC61970 ************/
-
-    @Test
-    internal fun compareCurrentTransformerInfo() {
-        compareAssetInfo { CurrentTransformerInfo(it) }
-
-        comparatorValidator.validateProperty(CurrentTransformerInfo::accuracyClass, { CurrentTransformerInfo(it) }, { "first" }, { "second" })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::accuracyLimit, { CurrentTransformerInfo(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::coreCount, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::ctClass, { CurrentTransformerInfo(it) }, { "first" }, { "second" })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::kneePointVoltage, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::maxRatio, { CurrentTransformerInfo(it) }, { Ratio(1.0, 1.0) }, { Ratio(2.0, 2.0) })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::nominalRatio, { CurrentTransformerInfo(it) }, { Ratio(1.0, 1.0) }, { Ratio(2.0, 2.0) })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::primaryRatio, { CurrentTransformerInfo(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::ratedCurrent, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::secondaryFlsRating, { CurrentTransformerInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::secondaryRatio, { CurrentTransformerInfo(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(CurrentTransformerInfo::usage, { CurrentTransformerInfo(it) }, { "first" }, { "second" })
-    }
-
-    @Test
-    internal fun comparePotentialTransformerInfo() {
-        compareAssetInfo { PotentialTransformerInfo(it) }
-
-        comparatorValidator.validateProperty(PotentialTransformerInfo::accuracyClass, { PotentialTransformerInfo(it) }, { "first" }, { "second" })
-        comparatorValidator.validateProperty(PotentialTransformerInfo::nominalRatio, { PotentialTransformerInfo(it) }, { Ratio(1.0, 1.0) }, { Ratio(2.0, 2.0) })
-        comparatorValidator.validateProperty(PotentialTransformerInfo::primaryRatio, { PotentialTransformerInfo(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(PotentialTransformerInfo::ptClass, { PotentialTransformerInfo(it) }, { "first" }, { "second" })
-        comparatorValidator.validateProperty(PotentialTransformerInfo::ratedVoltage, { PotentialTransformerInfo(it) }, { 1 }, { 2 })
-        comparatorValidator.validateProperty(PotentialTransformerInfo::secondaryRatio, { PotentialTransformerInfo(it) }, { 1.0 }, { 2.0 })
     }
 
     /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/

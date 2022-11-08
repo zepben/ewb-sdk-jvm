@@ -56,7 +56,7 @@ internal class SubGeographicalRegionTest {
         val substation = Substation().apply { subGeographicalRegion = subGeographicalRegion2 }
 
         ExpectException.expect { subGeographicalRegion1.addSubstation(substation) }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("${substation.typeNameAndMRID()} `subGeographicalRegion` property references ${subGeographicalRegion2.typeNameAndMRID()}, expected ${subGeographicalRegion1.typeNameAndMRID()}.")
     }
 

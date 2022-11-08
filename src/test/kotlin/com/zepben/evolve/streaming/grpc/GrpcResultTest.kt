@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.streaming.grpc
 
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -152,12 +152,12 @@ internal class GrpcResultTest {
         expect {
             GrpcResult.ofError<Any>(IllegalStateException(), true)
                 .throwOnError()
-        }.toThrow(RuntimeException::class.java)
+        }.toThrow<RuntimeException>()
 
         expect {
             GrpcResult.ofError<Any>(IllegalArgumentException(), false)
                 .throwOnError()
-        }.toThrow(IllegalArgumentException::class.java)
+        }.toThrow<IllegalArgumentException>()
     }
 
     @Test
@@ -171,7 +171,7 @@ internal class GrpcResultTest {
         expect {
             GrpcResult.ofError<Any>(IllegalArgumentException(), false)
                 .throwOnUnhandledError()
-        }.toThrow(IllegalArgumentException::class.java)
+        }.toThrow<IllegalArgumentException>()
     }
 
     @Test

@@ -133,7 +133,7 @@
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>test-utils</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

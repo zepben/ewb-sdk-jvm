@@ -21,7 +21,7 @@ import com.zepben.evolve.services.common.exceptions.UnsupportedIdentifiedObjectE
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.translator.addFromPb
 import com.zepben.evolve.services.network.translator.toPb
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -73,8 +73,8 @@ internal class BaseServiceTest {
         val junction = Junction()
         assertThat(service.tryAdd(junction), equalTo(true))
         assertThat(service.tryRemove(junction), equalTo(true))
-        expect { service.tryAdd(CableInfo()) }.toThrow(UnsupportedIdentifiedObjectException::class.java)
-        expect { service.tryRemove(CableInfo()) }.toThrow(UnsupportedIdentifiedObjectException::class.java)
+        expect { service.tryAdd(CableInfo()) }.toThrow<UnsupportedIdentifiedObjectException>()
+        expect { service.tryRemove(CableInfo()) }.toThrow<UnsupportedIdentifiedObjectException>()
     }
 
     @Test
@@ -264,7 +264,7 @@ internal class BaseServiceTest {
 
     @Test
     internal fun `throws cast exception when getting wrong type`() {
-        expect { service.get(Junction::class, breaker1.mRID) }.toThrow(ClassCastException::class.java)
+        expect { service.get(Junction::class, breaker1.mRID) }.toThrow<ClassCastException>()
     }
 
     @Test

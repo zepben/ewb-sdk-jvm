@@ -9,7 +9,7 @@ package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -64,7 +64,7 @@ class TracedPhasesTest {
     @Test
     fun testInvalidNominalPhaseNormal() {
         expect { tracedPhases.normal[SPK.INVALID] }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("INTERNAL ERROR: Phase INVALID is invalid.")
     }
 
@@ -73,14 +73,14 @@ class TracedPhasesTest {
         expect {
             tracedPhases.setNormal(SPK.A, SPK.A)
             tracedPhases.setNormal(SPK.A, SPK.B)
-        }.toThrow(UnsupportedOperationException::class.java)
+        }.toThrow<UnsupportedOperationException>()
             .withMessage("Crossing Phases.")
     }
 
     @Test
     fun testInvalidNominalPhaseCurrent() {
         expect { tracedPhases.current[SPK.INVALID] }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
     }
 
     @Test
@@ -88,7 +88,7 @@ class TracedPhasesTest {
         expect {
             tracedPhases.setCurrent(SPK.A, SPK.A)
             tracedPhases.setCurrent(SPK.A, SPK.B)
-        }.toThrow(UnsupportedOperationException::class.java)
+        }.toThrow<UnsupportedOperationException>()
     }
 
 }

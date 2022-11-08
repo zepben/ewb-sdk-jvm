@@ -56,6 +56,6 @@ internal class PowerElectronicsUnitTest {
 
         powerElectronicsUnit.apply { this.powerElectronicsConnection = powerElectronicsConnection1 }
         ExpectException.expect { powerElectronicsUnit.powerElectronicsConnection = powerElectronicsConnection2 }
-            .toThrow(IllegalStateException::class.java)
+            .toThrow<IllegalStateException>()
     }
 }

@@ -102,7 +102,7 @@ internal class DiagramConsumerClientTest {
         verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
         assertThat(result.wasFailure, equalTo(true))
         ExpectException.expect { throw result.thrown }
-            .toThrow(NoSuchElementException::class.java)
+            .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID $mRID could be found.")
     }
 

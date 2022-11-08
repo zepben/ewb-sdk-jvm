@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.cim.iec61968.infiec61968.infcommon
 
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -34,8 +34,8 @@ internal class RatioTest {
     internal fun throwsExceptionOnZeroDenominator() {
         val invalidRatio = Ratio(42.0, 0.0)
         expect { invalidRatio.quotient }
-            .toThrow(IllegalArgumentException::class.java)
-            .withMessage("Ratio cannot have a denominator of zero.")
+            .toThrow<IllegalArgumentException>()
+            .withMessage("Cannot calculate the quotient of a Ratio with a denominator of zero.")
     }
 
 }

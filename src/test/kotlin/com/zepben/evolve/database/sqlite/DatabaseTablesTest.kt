@@ -11,7 +11,7 @@ package com.zepben.evolve.database.sqlite
 import com.google.common.reflect.ClassPath
 import com.zepben.evolve.database.sqlite.tables.MissingTableConfigException
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.junit.jupiter.api.Test
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
@@ -22,7 +22,7 @@ internal class DatabaseTablesTest {
 
     @Test
     fun `has all tables`() {
-        expect { tables.getTable(MissingTable::class.java) }.toThrow(MissingTableConfigException::class.java)
+        expect { tables.getTable(MissingTable::class.java) }.toThrow<MissingTableConfigException>()
 
         ClassPath.from(ClassLoader.getSystemClassLoader())
             .getTopLevelClassesRecursive("com.zepben.evolve.database.sqlite.tables")

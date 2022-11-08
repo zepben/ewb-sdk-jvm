@@ -258,6 +258,40 @@ fun Location.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     return this
 }
 
+/************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+fun CurrentTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentTransformerInfo {
+    (this as AssetInfo).fillFields(service, includeRuntime)
+
+    accuracyClass = "accuracyClass"
+    accuracyLimit = 1.1
+    coreCount = 2
+    ctClass = "ctClass"
+    kneePointVoltage = 3
+    maxRatio = Ratio(4.4, 5.5)
+    nominalRatio = Ratio(6.6, 7.7)
+    primaryRatio = 8.8
+    ratedCurrent = 9
+    secondaryFlsRating = 10
+    secondaryRatio = 11.11
+    usage = "usage"
+
+    return this
+}
+
+fun PotentialTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): PotentialTransformerInfo {
+    (this as AssetInfo).fillFields(service, includeRuntime)
+
+    accuracyClass = "accuracyClass"
+    nominalRatio = Ratio(1.1, 2.2)
+    primaryRatio = 3.3
+    ptClass = "ptClass"
+    ratedVoltage = 4
+    secondaryRatio = 5.5
+
+    return this
+}
+
 /************ IEC61968 METERING ************/
 
 fun EndDevice.fillFields(service: NetworkService, includeRuntime: Boolean = true): EndDevice {
@@ -314,40 +348,6 @@ fun OperationalRestriction.fillFields(service: NetworkService, includeRuntime: B
             service.add(it)
         })
     }
-
-    return this
-}
-
-/************ IEC61968 infIEC 61968 ************/
-
-fun CurrentTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentTransformerInfo {
-    (this as AssetInfo).fillFields(service, includeRuntime)
-
-    accuracyClass = "accuracyClass"
-    accuracyLimit = 1.1
-    coreCount = 2
-    ctClass = "ctClass"
-    kneePointVoltage = 3
-    maxRatio = Ratio(4.4, 5.5)
-    nominalRatio = Ratio(6.6, 7.7)
-    primaryRatio = 8.8
-    ratedCurrent = 9
-    secondaryFlsRating = 10
-    secondaryRatio = 11.11
-    usage = "usage"
-
-    return this
-}
-
-fun PotentialTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): PotentialTransformerInfo {
-    (this as AssetInfo).fillFields(service, includeRuntime)
-
-    accuracyClass = "accuracyClass"
-    nominalRatio = Ratio(1.1, 2.2)
-    primaryRatio = 3.3
-    ptClass = "ptClass"
-    ratedVoltage = 4
-    secondaryRatio = 5.5
 
     return this
 }

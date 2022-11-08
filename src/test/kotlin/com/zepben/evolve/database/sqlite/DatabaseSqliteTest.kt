@@ -158,8 +158,8 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.customerServicesOf(::Tariff, Tariff::fillFields))
 
         /************ IEC61968 infIEC61968 InfAssetInfo ************/
-        validateSchema(SchemaNetworks.networkServicesOf(com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo::CurrentTransformerInfo, CurrentTransformerInfo::fillFields))
-        validateSchema(SchemaNetworks.networkServicesOf(com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo::PotentialTransformerInfo, PotentialTransformerInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::CurrentTransformerInfo, CurrentTransformerInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PotentialTransformerInfo, PotentialTransformerInfo::fillFields))
 
         /************ IEC61968 METERING ************/
         validateSchema(SchemaNetworks.networkServicesOf(::Meter, Meter::fillFields))

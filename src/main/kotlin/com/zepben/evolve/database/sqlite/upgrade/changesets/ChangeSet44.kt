@@ -15,7 +15,7 @@ internal fun changeSet44() = ChangeSet(44) {
         *`Create current_transformer_info table`,
         *`Create potential_transformer_info table`,
         *`Create current_transformers table`,
-        *`Create potential_transformers table`
+        *`Create potential_transformers table`,
     )
 }
 

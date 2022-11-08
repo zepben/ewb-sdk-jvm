@@ -62,9 +62,6 @@ class NetworkService : BaseService("network") {
     fun add(cableInfo: CableInfo): Boolean = super.add(cableInfo)
     fun remove(cableInfo: CableInfo): Boolean = super.remove(cableInfo)
 
-    fun add(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.add(currentTransformerInfo)
-    fun remove(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.remove(currentTransformerInfo)
-
     fun add(noLoadTest: NoLoadTest): Boolean = super.add(noLoadTest)
     fun remove(noLoadTest: NoLoadTest): Boolean = super.remove(noLoadTest)
 
@@ -73,9 +70,6 @@ class NetworkService : BaseService("network") {
 
     fun add(overheadWireInfo: OverheadWireInfo): Boolean = super.add(overheadWireInfo)
     fun remove(overheadWireInfo: OverheadWireInfo): Boolean = super.remove(overheadWireInfo)
-
-    fun add(potentialTransformerInfo: PotentialTransformerInfo): Boolean = super.add(potentialTransformerInfo)
-    fun remove(potentialTransformerInfo: PotentialTransformerInfo): Boolean = super.remove(potentialTransformerInfo)
 
     fun add(powerTransformerInfo: PowerTransformerInfo): Boolean = super.add(powerTransformerInfo)
     fun remove(powerTransformerInfo: PowerTransformerInfo): Boolean = super.remove(powerTransformerInfo)
@@ -114,6 +108,16 @@ class NetworkService : BaseService("network") {
 
     fun add(organisation: Organisation): Boolean = super.add(organisation)
     fun remove(organisation: Organisation): Boolean = super.remove(organisation)
+
+    // #####################################
+    // # IEC61968 infIEC61968 InfAssetInfo #
+    // #####################################
+
+    fun add(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.add(currentTransformerInfo)
+    fun remove(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.remove(currentTransformerInfo)
+
+    fun add(potentialTransformerInfo: PotentialTransformerInfo): Boolean = super.add(potentialTransformerInfo)
+    fun remove(potentialTransformerInfo: PotentialTransformerInfo): Boolean = super.remove(potentialTransformerInfo)
 
     // #####################
     // # IEC61968 METERING #

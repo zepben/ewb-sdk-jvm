@@ -66,6 +66,11 @@ fun Structure.mRID(): String = ac.mRID()
 
 fun Location.mRID(): String = io.mrid
 
+/************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+fun CurrentTransformerInfo.mRID(): String = ai.mRID()
+fun PotentialTransformerInfo.mRID(): String = ai.mRID()
+
 /************ IEC61968 METERING ************/
 
 fun EndDevice.mRID(): String = ac.mRID()
@@ -75,11 +80,6 @@ fun UsagePoint.mRID(): String = io.mrid
 /************ IEC61968 OPERATIONS ************/
 
 fun OperationalRestriction.mRID(): String = doc.mRID()
-
-/************ IEC61968 infIEC61968 ASSET INFO ************/
-
-fun CurrentTransformerInfo.mRID(): String = ai.mRID()
-fun PotentialTransformerInfo.mRID(): String = ai.mRID()
 
 /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 

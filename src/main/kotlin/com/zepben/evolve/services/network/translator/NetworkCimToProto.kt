@@ -358,6 +358,47 @@ fun toPb(cim: TownDetail, pb: PBTownDetail.Builder): PBTownDetail.Builder =
 
 fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()
 
+/************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+fun toPb(cim: CurrentTransformerInfo, pb: PBCurrentTransformerInfo.Builder): PBCurrentTransformerInfo.Builder =
+    pb.apply {
+        cim.accuracyClass?.let { accuracyClass = it } ?: clearAccuracyClass()
+        accuracyLimit = cim.accuracyLimit ?: UNKNOWN_DOUBLE
+        coreCount = cim.coreCount ?: UNKNOWN_INT
+        cim.ctClass?.let { ctClass = it } ?: clearCtClass()
+        kneePointVoltage = cim.kneePointVoltage ?: UNKNOWN_INT
+        cim.maxRatio?.let { toPb(it, maxRatioBuilder) } ?: clearMaxRatio()
+        cim.nominalRatio?.let { toPb(it, nominalRatioBuilder) } ?: clearNominalRatio()
+        primaryRatio = cim.primaryRatio ?: UNKNOWN_DOUBLE
+        ratedCurrent = cim.ratedCurrent ?: UNKNOWN_INT
+        secondaryFlsRating = cim.secondaryFlsRating ?: UNKNOWN_INT
+        secondaryRatio = cim.secondaryRatio ?: UNKNOWN_DOUBLE
+        cim.usage?.let { usage = it } ?: clearUsage()
+        pb.apply { toPb(cim, aiBuilder) }
+    }
+
+fun toPb(cim: PotentialTransformerInfo, pb: PBPotentialTransformerInfo.Builder): PBPotentialTransformerInfo.Builder =
+    pb.apply {
+        cim.accuracyClass?.let { accuracyClass = it } ?: clearAccuracyClass()
+        cim.nominalRatio?.let { toPb(it, nominalRatioBuilder) } ?: clearNominalRatio()
+        primaryRatio = cim.primaryRatio ?: UNKNOWN_DOUBLE
+        cim.ptClass?.let { ptClass = it } ?: clearPtClass()
+        ratedVoltage = cim.ratedVoltage ?: UNKNOWN_INT
+        secondaryRatio = cim.secondaryRatio ?: UNKNOWN_DOUBLE
+        pb.apply { toPb(cim, aiBuilder) }
+    }
+
+fun CurrentTransformerInfo.toPb(): PBCurrentTransformerInfo = toPb(this, PBCurrentTransformerInfo.newBuilder()).build()
+fun PotentialTransformerInfo.toPb(): PBPotentialTransformerInfo = toPb(this, PBPotentialTransformerInfo.newBuilder()).build()
+
+/************ IEC61968 infIEC61968 InfCommon ************/
+
+fun toPb(cim: Ratio, pb: PBRatio.Builder): PBRatio.Builder =
+    pb.apply {
+        denominator = cim.denominator
+        numerator = cim.numerator
+    }
+
 /************ IEC61968 METERING ************/
 
 fun toPb(cim: EndDevice, pb: PBEndDevice.Builder): PBEndDevice.Builder =
@@ -395,47 +436,6 @@ fun toPb(cim: OperationalRestriction, pb: PBOperationalRestriction.Builder): PBO
     pb.apply { toPb(cim, docBuilder) }
 
 fun OperationalRestriction.toPb(): PBOperationalRestriction = toPb(this, PBOperationalRestriction.newBuilder()).build()
-
-/************ IEC61968 infIEC61968 ASSET INFO ************/
-
-fun toPb(cim: CurrentTransformerInfo, pb: PBCurrentTransformerInfo.Builder): PBCurrentTransformerInfo.Builder =
-    pb.apply {
-        cim.accuracyClass?.let { accuracyClass = it } ?: clearAccuracyClass()
-        accuracyLimit = cim.accuracyLimit ?: UNKNOWN_DOUBLE
-        coreCount = cim.coreCount ?: UNKNOWN_INT
-        cim.ctClass?.let { ctClass = it } ?: clearCtClass()
-        kneePointVoltage = cim.kneePointVoltage ?: UNKNOWN_INT
-        cim.maxRatio?.let { toPb(it, maxRatioBuilder) } ?: clearMaxRatio()
-        cim.nominalRatio?.let { toPb(it, nominalRatioBuilder) } ?: clearNominalRatio()
-        primaryRatio = cim.primaryRatio ?: UNKNOWN_DOUBLE
-        ratedCurrent = cim.ratedCurrent ?: UNKNOWN_INT
-        secondaryFlsRating = cim.secondaryFlsRating ?: UNKNOWN_INT
-        secondaryRatio = cim.secondaryRatio ?: UNKNOWN_DOUBLE
-        cim.usage?.let { usage = it } ?: clearUsage()
-        pb.apply { toPb(cim, aiBuilder) }
-    }
-
-fun toPb(cim: PotentialTransformerInfo, pb: PBPotentialTransformerInfo.Builder): PBPotentialTransformerInfo.Builder =
-    pb.apply {
-        cim.accuracyClass?.let { accuracyClass = it } ?: clearAccuracyClass()
-        cim.nominalRatio?.let { toPb(it, nominalRatioBuilder) } ?: clearNominalRatio()
-        primaryRatio = cim.primaryRatio ?: UNKNOWN_DOUBLE
-        cim.ptClass?.let { ptClass = it } ?: clearPtClass()
-        ratedVoltage = cim.ratedVoltage ?: UNKNOWN_INT
-        secondaryRatio = cim.secondaryRatio ?: UNKNOWN_DOUBLE
-        pb.apply { toPb(cim, aiBuilder) }
-    }
-
-fun CurrentTransformerInfo.toPb(): PBCurrentTransformerInfo = toPb(this, PBCurrentTransformerInfo.newBuilder()).build()
-fun PotentialTransformerInfo.toPb(): PBPotentialTransformerInfo = toPb(this, PBPotentialTransformerInfo.newBuilder()).build()
-
-/************ IEC61968 infIEC61968 COMMON ************/
-
-fun toPb(cim: Ratio, pb: PBRatio.Builder): PBRatio.Builder =
-    pb.apply {
-        denominator = cim.denominator
-        numerator = cim.numerator
-    }
 
 /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
 
@@ -1061,16 +1061,16 @@ class NetworkCimToProto : BaseCimToProto() {
     // IEC61968 COMMON
     fun toPb(cim: Location): PBLocation = cim.toPb()
 
+    // IEC61968 infIEC61968 InfAssetInfo
+    fun toPb(cim: CurrentTransformerInfo): PBCurrentTransformerInfo = cim.toPb()
+    fun toPb(cim: PotentialTransformerInfo): PBPotentialTransformerInfo = cim.toPb()
+
     // IEC61968 METERING
     fun toPb(cim: Meter): PBMeter = cim.toPb()
     fun toPb(cim: UsagePoint): PBUsagePoint = cim.toPb()
 
     // IEC61968 OPERATIONS
     fun toPb(cim: OperationalRestriction): PBOperationalRestriction = cim.toPb()
-
-    // IEC61968 InfIEC61968 ASSET INFO
-    fun toPb(cim: CurrentTransformerInfo): PBCurrentTransformerInfo = cim.toPb()
-    fun toPb(cim: PotentialTransformerInfo): PBPotentialTransformerInfo = cim.toPb()
 
     // IEC61970 BASE AUXILIARY EQUIPMENT
     fun toPb(cim: CurrentTransformer): PBCurrentTransformer = cim.toPb()

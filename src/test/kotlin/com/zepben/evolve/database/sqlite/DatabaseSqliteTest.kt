@@ -157,6 +157,10 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.customerServicesOf(::PricingStructure, PricingStructure::fillFields))
         validateSchema(SchemaNetworks.customerServicesOf(::Tariff, Tariff::fillFields))
 
+        /************ IEC61968 infIEC61968 InfAssetInfo ************/
+        validateSchema(SchemaNetworks.networkServicesOf(com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo::CurrentTransformerInfo, CurrentTransformerInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo::PotentialTransformerInfo, PotentialTransformerInfo::fillFields))
+
         /************ IEC61968 METERING ************/
         validateSchema(SchemaNetworks.networkServicesOf(::Meter, Meter::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::UsagePoint, UsagePoint::fillFields))
@@ -168,10 +172,6 @@ class DatabaseSqliteTest {
 
         /************ IEC61968 OPERATIONS ************/
         validateSchema(SchemaNetworks.networkServicesOf(::OperationalRestriction, OperationalRestriction::fillFields))
-
-        /************ IEC61968 InfIEC61968 ************/
-        validateSchema(SchemaNetworks.networkServicesOf(::CurrentTransformerInfo, CurrentTransformerInfo::fillFields))
-        validateSchema(SchemaNetworks.networkServicesOf(::PotentialTransformerInfo, PotentialTransformerInfo::fillFields))
 
         /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
         validateSchema(SchemaNetworks.networkServicesOf(::CurrentTransformer, CurrentTransformer::fillFields))

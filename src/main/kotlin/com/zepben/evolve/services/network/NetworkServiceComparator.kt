@@ -211,42 +211,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareIndexedValueCollections(Location::points)
         }
 
-    /************ IEC61968 METERING ************/
-
-    private fun ObjectDifference<out EndDevice>.compareEndDevice(): ObjectDifference<out EndDevice> =
-        apply {
-            compareAssetContainer()
-
-            if (options.compareLvSimplification)
-                compareIdReferenceCollections(EndDevice::usagePoints)
-
-            compareValues(EndDevice::customerMRID)
-            compareIdReferences(EndDevice::serviceLocation)
-        }
-
-    private fun compareMeter(source: Meter, target: Meter): ObjectDifference<Meter> =
-        ObjectDifference(source, target).apply { compareEndDevice() }
-
-    private fun compareUsagePoint(source: UsagePoint, target: UsagePoint): ObjectDifference<UsagePoint> =
-        ObjectDifference(source, target).apply {
-            compareIdentifiedObject()
-
-            compareIdReferences(UsagePoint::usagePointLocation)
-            compareValues(UsagePoint::isVirtual, UsagePoint::connectionCategory)
-            if (options.compareLvSimplification)
-                compareIdReferenceCollections(UsagePoint::equipment, UsagePoint::endDevices)
-        }
-
-    /************ IEC61968 OPERATIONS ************/
-
-    private fun compareOperationalRestriction(source: OperationalRestriction, target: OperationalRestriction): ObjectDifference<OperationalRestriction> =
-        ObjectDifference(source, target).apply {
-            compareDocument()
-
-            compareIdReferenceCollections(OperationalRestriction::equipment)
-        }
-
-    /************ IEC61968 infIEC61968 ************/
+    /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
     private fun compareCurrentTransformerInfo(source: CurrentTransformerInfo, target: CurrentTransformerInfo): ObjectDifference<CurrentTransformerInfo> =
         ObjectDifference(source, target).apply {
@@ -283,6 +248,41 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 PotentialTransformerInfo::ratedVoltage,
                 PotentialTransformerInfo::secondaryRatio
             )
+        }
+
+    /************ IEC61968 METERING ************/
+
+    private fun ObjectDifference<out EndDevice>.compareEndDevice(): ObjectDifference<out EndDevice> =
+        apply {
+            compareAssetContainer()
+
+            if (options.compareLvSimplification)
+                compareIdReferenceCollections(EndDevice::usagePoints)
+
+            compareValues(EndDevice::customerMRID)
+            compareIdReferences(EndDevice::serviceLocation)
+        }
+
+    private fun compareMeter(source: Meter, target: Meter): ObjectDifference<Meter> =
+        ObjectDifference(source, target).apply { compareEndDevice() }
+
+    private fun compareUsagePoint(source: UsagePoint, target: UsagePoint): ObjectDifference<UsagePoint> =
+        ObjectDifference(source, target).apply {
+            compareIdentifiedObject()
+
+            compareIdReferences(UsagePoint::usagePointLocation)
+            compareValues(UsagePoint::isVirtual, UsagePoint::connectionCategory)
+            if (options.compareLvSimplification)
+                compareIdReferenceCollections(UsagePoint::equipment, UsagePoint::endDevices)
+        }
+
+    /************ IEC61968 OPERATIONS ************/
+
+    private fun compareOperationalRestriction(source: OperationalRestriction, target: OperationalRestriction): ObjectDifference<OperationalRestriction> =
+        ObjectDifference(source, target).apply {
+            compareDocument()
+
+            compareIdReferenceCollections(OperationalRestriction::equipment)
         }
 
     /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/

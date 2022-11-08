@@ -92,16 +92,16 @@ internal class NetworkTranslatorTest {
         validate({ Location() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Organisation() }, { ns, it -> it.fillFieldsCommon(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
+        /************ IEC61968 infIEC61968 InfAssetInfo ************/
+        validate({ CurrentTransformerInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ PotentialTransformerInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+
         /************ IEC61968 METERING ************/
         validate({ Meter() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ UsagePoint() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
         /************ IEC61968 OPERATIONS ************/
         validate({ OperationalRestriction() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
-
-        /************ IEC61968 infIEC61968 ASSET INFO ************/
-        validate({ CurrentTransformerInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
-        validate({ PotentialTransformerInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
         /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
         validate({ CurrentTransformer() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })

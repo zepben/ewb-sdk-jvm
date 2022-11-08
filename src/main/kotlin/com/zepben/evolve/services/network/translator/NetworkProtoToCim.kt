@@ -351,6 +351,44 @@ fun toCim(pb: PBTownDetail): TownDetail =
 fun NetworkService.addFromPb(pb: PBOrganisation): Organisation? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb, this))
 
+/************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+fun toCim(pb: PBCurrentTransformerInfo, networkService: NetworkService): CurrentTransformerInfo =
+    CurrentTransformerInfo(pb.mRID()).apply {
+        accuracyClass = pb.accuracyClass.takeIf { it.isNotBlank() }
+        accuracyLimit = pb.accuracyLimit.takeUnless { it == UNKNOWN_DOUBLE }
+        coreCount = pb.coreCount.takeUnless { it == UNKNOWN_INT }
+        ctClass = pb.ctClass.takeIf { it.isNotBlank() }
+        kneePointVoltage = pb.kneePointVoltage.takeUnless { it == UNKNOWN_INT }
+        maxRatio = if (pb.hasMaxRatio()) toCim(pb.maxRatio) else null
+        nominalRatio = if (pb.hasNominalRatio()) toCim(pb.nominalRatio) else null
+        primaryRatio = pb.primaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_INT }
+        secondaryFlsRating = pb.secondaryFlsRating.takeUnless { it == UNKNOWN_INT }
+        secondaryRatio = pb.secondaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
+        usage = pb.usage.takeIf { it.isNotBlank() }
+        toCim(pb.ai, this, networkService)
+    }
+
+fun toCim(pb: PBPotentialTransformerInfo, networkService: NetworkService): PotentialTransformerInfo =
+    PotentialTransformerInfo(pb.mRID()).apply {
+        accuracyClass = pb.accuracyClass.takeIf { it.isNotBlank() }
+        nominalRatio = if (pb.hasNominalRatio()) toCim(pb.nominalRatio) else null
+        primaryRatio = pb.primaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
+        ptClass = pb.ptClass.takeIf { it.isNotBlank() }
+        ratedVoltage = pb.ratedVoltage.takeUnless { it == UNKNOWN_INT }
+        secondaryRatio = pb.secondaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
+        toCim(pb.ai, this, networkService)
+    }
+
+fun NetworkService.addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = tryAddOrNull(toCim(pb, this))
+
+/************ IEC61968 infIEC61968 InfCommon ************/
+
+fun toCim(pb: PBRatio): Ratio =
+    Ratio(pb.numerator, pb.denominator)
+
 /************ IEC61968 METERING ************/
 
 fun toCim(pb: PBEndDevice, cim: EndDevice, networkService: NetworkService): EndDevice =
@@ -396,44 +434,6 @@ fun toCim(pb: PBOperationalRestriction, networkService: NetworkService): Operati
     }
 
 fun NetworkService.addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = tryAddOrNull(toCim(pb, this))
-
-/************ IEC61968 infIEC61968 ASSET INFO ************/
-
-fun toCim(pb: PBCurrentTransformerInfo, networkService: NetworkService): CurrentTransformerInfo =
-    CurrentTransformerInfo(pb.mRID()).apply {
-        accuracyClass = pb.accuracyClass.takeIf { it.isNotBlank() }
-        accuracyLimit = pb.accuracyLimit.takeUnless { it == UNKNOWN_DOUBLE }
-        coreCount = pb.coreCount.takeUnless { it == UNKNOWN_INT }
-        ctClass = pb.ctClass.takeIf { it.isNotBlank() }
-        kneePointVoltage = pb.kneePointVoltage.takeUnless { it == UNKNOWN_INT }
-        maxRatio = if (pb.hasMaxRatio()) toCim(pb.maxRatio) else null
-        nominalRatio = if (pb.hasNominalRatio()) toCim(pb.nominalRatio) else null
-        primaryRatio = pb.primaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
-        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_INT }
-        secondaryFlsRating = pb.secondaryFlsRating.takeUnless { it == UNKNOWN_INT }
-        secondaryRatio = pb.secondaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
-        usage = pb.usage.takeIf { it.isNotBlank() }
-        toCim(pb.ai, this, networkService)
-    }
-
-fun toCim(pb: PBPotentialTransformerInfo, networkService: NetworkService): PotentialTransformerInfo =
-    PotentialTransformerInfo(pb.mRID()).apply {
-        accuracyClass = pb.accuracyClass.takeIf { it.isNotBlank() }
-        nominalRatio = if (pb.hasNominalRatio()) toCim(pb.nominalRatio) else null
-        primaryRatio = pb.primaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
-        ptClass = pb.ptClass.takeIf { it.isNotBlank() }
-        ratedVoltage = pb.ratedVoltage.takeUnless { it == UNKNOWN_INT }
-        secondaryRatio = pb.secondaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
-        toCim(pb.ai, this, networkService)
-    }
-
-fun NetworkService.addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = tryAddOrNull(toCim(pb, this))
-
-/************ IEC61968 infIEC61968 COMMON ************/
-
-fun toCim(pb: PBRatio): Ratio =
-    Ratio(pb.numerator, pb.denominator)
 
 /************ IEC61970 AUXILIARY EQUIPMENT ************/
 
@@ -1117,16 +1117,16 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBOrganisation): Organisation? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBLocation): Location? = networkService.addFromPb(pb)
 
+    // IEC61968 infIEC61968 InfAssetInfo
+    fun addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = networkService.addFromPb(pb)
+
     // IEC61968 METERING
     fun addFromPb(pb: PBMeter): Meter? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBUsagePoint): UsagePoint? = networkService.addFromPb(pb)
 
     // IEC61968 OPERATIONS
     fun addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = networkService.addFromPb(pb)
-
-    // IEC61968 infIEC61968 ASSET INFO
-    fun addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = networkService.addFromPb(pb)
 
     // IEC61970 BASE AUXILIARY EQUIPMENT
     fun addFromPb(pb: PBCurrentTransformer): CurrentTransformer? = networkService.addFromPb(pb)

@@ -332,6 +332,42 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return tryExecuteSingleUpdate(insert, id, description)
     }
 
+    /************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+    fun save(currentTransformerInfo: CurrentTransformerInfo): Boolean {
+        val table = databaseTables.getTable(TableCurrentTransformerInfo::class.java)
+        val insert = databaseTables.getInsert(TableCurrentTransformerInfo::class.java)
+
+        insert.setNullableString(table.ACCURACY_CLASS.queryIndex, currentTransformerInfo.accuracyClass)
+        insert.setNullableDouble(table.ACCURACY_LIMIT.queryIndex, currentTransformerInfo.accuracyLimit)
+        insert.setNullableInt(table.CORE_COUNT.queryIndex, currentTransformerInfo.coreCount)
+        insert.setNullableString(table.CT_CLASS.queryIndex, currentTransformerInfo.ctClass)
+        insert.setNullableInt(table.KNEE_POINT_VOLTAGE.queryIndex, currentTransformerInfo.kneePointVoltage)
+        insert.setNullableRatio(table.MAX_RATIO_NUMERATOR.queryIndex, table.MAX_RATIO_DENOMINATOR.queryIndex, currentTransformerInfo.maxRatio)
+        insert.setNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_DENOMINATOR.queryIndex, currentTransformerInfo.nominalRatio)
+        insert.setNullableDouble(table.PRIMARY_RATIO.queryIndex, currentTransformerInfo.primaryRatio)
+        insert.setNullableInt(table.RATED_CURRENT.queryIndex, currentTransformerInfo.ratedCurrent)
+        insert.setNullableInt(table.SECONDARY_FLS_RATING.queryIndex, currentTransformerInfo.secondaryFlsRating)
+        insert.setNullableDouble(table.SECONDARY_RATIO.queryIndex, currentTransformerInfo.secondaryRatio)
+        insert.setNullableString(table.USAGE.queryIndex, currentTransformerInfo.usage)
+
+        return saveAssetInfo(table, insert, currentTransformerInfo, "current transformer info")
+    }
+
+    fun save(potentialTransformerInfo: PotentialTransformerInfo): Boolean {
+        val table = databaseTables.getTable(TablePotentialTransformerInfo::class.java)
+        val insert = databaseTables.getInsert(TablePotentialTransformerInfo::class.java)
+
+        insert.setNullableString(table.ACCURACY_CLASS.queryIndex, potentialTransformerInfo.accuracyClass)
+        insert.setNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_DENOMINATOR.queryIndex, potentialTransformerInfo.nominalRatio)
+        insert.setNullableDouble(table.PRIMARY_RATIO.queryIndex, potentialTransformerInfo.primaryRatio)
+        insert.setNullableString(table.PT_CLASS.queryIndex, potentialTransformerInfo.ptClass)
+        insert.setNullableInt(table.RATED_VOLTAGE.queryIndex, potentialTransformerInfo.ratedVoltage)
+        insert.setNullableDouble(table.SECONDARY_RATIO.queryIndex, potentialTransformerInfo.secondaryRatio)
+
+        return saveAssetInfo(table, insert, potentialTransformerInfo, "potential transformer info")
+    }
+
     /************ IEC61968 METERING ************/
 
     private fun saveEndDevice(table: TableEndDevices, insert: PreparedStatement, endDevice: EndDevice, description: String): Boolean {
@@ -377,42 +413,6 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and saveDocument(table, insert, operationalRestriction, "operational restriction")
     }
 
-    /************ IEC61968 infIEC61968 ************/
-
-    fun save(currentTransformerInfo: CurrentTransformerInfo): Boolean {
-        val table = databaseTables.getTable(TableCurrentTransformerInfo::class.java)
-        val insert = databaseTables.getInsert(TableCurrentTransformerInfo::class.java)
-
-        insert.setNullableString(table.ACCURACY_CLASS.queryIndex, currentTransformerInfo.accuracyClass)
-        insert.setNullableDouble(table.ACCURACY_LIMIT.queryIndex, currentTransformerInfo.accuracyLimit)
-        insert.setNullableInt(table.CORE_COUNT.queryIndex, currentTransformerInfo.coreCount)
-        insert.setNullableString(table.CT_CLASS.queryIndex, currentTransformerInfo.ctClass)
-        insert.setNullableInt(table.KNEE_POINT_VOLTAGE.queryIndex, currentTransformerInfo.kneePointVoltage)
-        insert.setNullableRatio(table.MAX_RATIO_NUMERATOR.queryIndex, table.MAX_RATIO_DENOMINATOR.queryIndex, currentTransformerInfo.maxRatio)
-        insert.setNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_DENOMINATOR.queryIndex, currentTransformerInfo.nominalRatio)
-        insert.setNullableDouble(table.PRIMARY_RATIO.queryIndex, currentTransformerInfo.primaryRatio)
-        insert.setNullableInt(table.RATED_CURRENT.queryIndex, currentTransformerInfo.ratedCurrent)
-        insert.setNullableInt(table.SECONDARY_FLS_RATING.queryIndex, currentTransformerInfo.secondaryFlsRating)
-        insert.setNullableDouble(table.SECONDARY_RATIO.queryIndex, currentTransformerInfo.secondaryRatio)
-        insert.setNullableString(table.USAGE.queryIndex, currentTransformerInfo.usage)
-
-        return saveAssetInfo(table, insert, currentTransformerInfo, "current transformer info")
-    }
-
-    fun save(potentialTransformerInfo: PotentialTransformerInfo): Boolean {
-        val table = databaseTables.getTable(TablePotentialTransformerInfo::class.java)
-        val insert = databaseTables.getInsert(TablePotentialTransformerInfo::class.java)
-
-        insert.setNullableString(table.ACCURACY_CLASS.queryIndex, potentialTransformerInfo.accuracyClass)
-        insert.setNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_DENOMINATOR.queryIndex, potentialTransformerInfo.nominalRatio)
-        insert.setNullableDouble(table.PRIMARY_RATIO.queryIndex, potentialTransformerInfo.primaryRatio)
-        insert.setNullableString(table.PT_CLASS.queryIndex, potentialTransformerInfo.ptClass)
-        insert.setNullableInt(table.RATED_VOLTAGE.queryIndex, potentialTransformerInfo.ratedVoltage)
-        insert.setNullableDouble(table.SECONDARY_RATIO.queryIndex, potentialTransformerInfo.secondaryRatio)
-
-        return saveAssetInfo(table, insert, potentialTransformerInfo, "potential transformer info")
-    }
-
     /************ IEC61970 AUXILIARY EQUIPMENT ************/
 
     private fun saveAuxiliaryEquipment(
@@ -424,10 +424,6 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableString(table.TERMINAL_MRID.queryIndex, auxiliaryEquipment.terminal?.mRID)
 
         return saveEquipment(table, insert, auxiliaryEquipment, description)
-    }
-
-    private fun saveSensor(table: TableSensors, insert: PreparedStatement, sensor: Sensor, description: String): Boolean {
-        return saveAuxiliaryEquipment(table, insert, sensor, description)
     }
 
     fun save(currentTransformer: CurrentTransformer): Boolean {
@@ -455,6 +451,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.TYPE.queryIndex, potentialTransformer.type.name)
 
         return saveSensor(table, insert, potentialTransformer, "potential transformer")
+    }
+
+    private fun saveSensor(table: TableSensors, insert: PreparedStatement, sensor: Sensor, description: String): Boolean {
+        return saveAuxiliaryEquipment(table, insert, sensor, description)
     }
 
     /************ IEC61970 CORE ************/
@@ -619,7 +619,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquivalentEquipment(table, insert, equivalentBranch, "equivalent branch")
     }
 
-    fun saveEquivalentEquipment(
+    private fun saveEquivalentEquipment(
         table: TableEquivalentEquipment,
         insert: PreparedStatement,
         equivalentEquipment: EquivalentEquipment,
@@ -647,7 +647,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerElectronicsUnit(table, insert, photoVoltaicUnit, "photo voltaic unit")
     }
 
-    fun savePowerElectronicsUnit(
+    private fun savePowerElectronicsUnit(
         table: TablePowerElectronicsUnit,
         insert: PreparedStatement,
         powerElectronicsUnit: PowerElectronicsUnit,

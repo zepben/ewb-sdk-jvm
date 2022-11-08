@@ -312,6 +312,40 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             resultSet.getString(table.STATE_OR_PROVINCE.queryIndex)?.internEmpty()
         ).takeUnless { it.allFieldsNullOrEmpty() }
 
+    /************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+    fun load(table: TableCurrentTransformerInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val currentTransformerInfo = CurrentTransformerInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            accuracyClass = resultSet.getNullableString(table.ACCURACY_CLASS.queryIndex)
+            accuracyLimit = resultSet.getNullableDouble(table.ACCURACY_LIMIT.queryIndex)
+            coreCount = resultSet.getNullableInt(table.CORE_COUNT.queryIndex)
+            ctClass = resultSet.getNullableString(table.CT_CLASS.queryIndex)
+            kneePointVoltage = resultSet.getNullableInt(table.KNEE_POINT_VOLTAGE.queryIndex)
+            maxRatio = resultSet.getNullableRatio(table.MAX_RATIO_NUMERATOR.queryIndex, table.MAX_RATIO_DENOMINATOR.queryIndex)
+            nominalRatio = resultSet.getNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_DENOMINATOR.queryIndex)
+            primaryRatio = resultSet.getNullableDouble(table.PRIMARY_RATIO.queryIndex)
+            ratedCurrent = resultSet.getNullableInt(table.RATED_CURRENT.queryIndex)
+            secondaryFlsRating = resultSet.getNullableInt(table.SECONDARY_FLS_RATING.queryIndex)
+            secondaryRatio = resultSet.getNullableDouble(table.SECONDARY_RATIO.queryIndex)
+            usage = resultSet.getNullableString(table.USAGE.queryIndex)
+        }
+
+        return loadAssetInfo(currentTransformerInfo, table, resultSet) && networkService.addOrThrow(currentTransformerInfo)
+    }
+
+    fun load(table: TablePotentialTransformerInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val potentialTransformerInfo = PotentialTransformerInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            accuracyClass = resultSet.getNullableString(table.ACCURACY_CLASS.queryIndex)
+            nominalRatio = resultSet.getNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_DENOMINATOR.queryIndex)
+            primaryRatio = resultSet.getNullableDouble(table.PRIMARY_RATIO.queryIndex)
+            ptClass = resultSet.getNullableString(table.PT_CLASS.queryIndex)
+            ratedVoltage = resultSet.getNullableInt(table.RATED_VOLTAGE.queryIndex)
+            secondaryRatio = resultSet.getNullableDouble(table.SECONDARY_RATIO.queryIndex)
+        }
+
+        return loadAssetInfo(potentialTransformerInfo, table, resultSet) && networkService.addOrThrow(potentialTransformerInfo)
+    }
+
     /************ IEC61968 METERING ************/
 
     private fun loadEndDevice(endDevice: EndDevice, table: TableEndDevices, resultSet: ResultSet): Boolean {
@@ -348,40 +382,6 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         val operationalRestriction = OperationalRestriction(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
         return loadDocument(operationalRestriction, table, resultSet) && networkService.addOrThrow(operationalRestriction)
-    }
-
-    /************ IEC61968 infIEC61968 ************/
-
-    fun load(table: TableCurrentTransformerInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val currentTransformerInfo = CurrentTransformerInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            accuracyClass = resultSet.getNullableString(table.ACCURACY_CLASS.queryIndex)
-            accuracyLimit = resultSet.getNullableDouble(table.ACCURACY_LIMIT.queryIndex)
-            coreCount = resultSet.getNullableInt(table.CORE_COUNT.queryIndex)
-            ctClass = resultSet.getNullableString(table.CT_CLASS.queryIndex)
-            kneePointVoltage = resultSet.getNullableInt(table.KNEE_POINT_VOLTAGE.queryIndex)
-            maxRatio = resultSet.getNullableRatio(table.MAX_RATIO_NUMERATOR.queryIndex, table.MAX_RATIO_DENOMINATOR.queryIndex)
-            nominalRatio = resultSet.getNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_DENOMINATOR.queryIndex)
-            primaryRatio = resultSet.getNullableDouble(table.PRIMARY_RATIO.queryIndex)
-            ratedCurrent = resultSet.getNullableInt(table.RATED_CURRENT.queryIndex)
-            secondaryFlsRating = resultSet.getNullableInt(table.SECONDARY_FLS_RATING.queryIndex)
-            secondaryRatio = resultSet.getNullableDouble(table.SECONDARY_RATIO.queryIndex)
-            usage = resultSet.getNullableString(table.USAGE.queryIndex)
-        }
-
-        return loadAssetInfo(currentTransformerInfo, table, resultSet) && networkService.addOrThrow(currentTransformerInfo)
-    }
-
-    fun load(table: TablePotentialTransformerInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val potentialTransformerInfo = PotentialTransformerInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            accuracyClass = resultSet.getNullableString(table.ACCURACY_CLASS.queryIndex)
-            nominalRatio = resultSet.getNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_DENOMINATOR.queryIndex)
-            primaryRatio = resultSet.getNullableDouble(table.PRIMARY_RATIO.queryIndex)
-            ptClass = resultSet.getNullableString(table.PT_CLASS.queryIndex)
-            ratedVoltage = resultSet.getNullableInt(table.RATED_VOLTAGE.queryIndex)
-            secondaryRatio = resultSet.getNullableDouble(table.SECONDARY_RATIO.queryIndex)
-        }
-
-        return loadAssetInfo(potentialTransformerInfo, table, resultSet) && networkService.addOrThrow(potentialTransformerInfo)
     }
 
     /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/

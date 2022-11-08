@@ -1029,7 +1029,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, transformerStarImpedance, "transformer star impedance")
     }
 
-    /************ IEC61970 InfIEC61970 ************/
+    /************ IEC61970 InfIEC61970 Feeder ************/
 
     fun save(circuit: Circuit): Boolean {
         val table = databaseTables.getTable(TableCircuits::class.java)

@@ -1102,7 +1102,7 @@ fun TransformerStarImpedance.fillFields(service: NetworkService, includeRuntime:
     return this
 }
 
-/************ IEC61970 InfIEC61970 ************/
+/************ IEC61970 InfIEC61970 Feeder ************/
 
 fun Circuit.fillFields(service: NetworkService, includeRuntime: Boolean = true): Circuit {
     (this as Line).fillFields(service, includeRuntime)

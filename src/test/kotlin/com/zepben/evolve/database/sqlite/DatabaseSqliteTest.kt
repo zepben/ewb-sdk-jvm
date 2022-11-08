@@ -236,7 +236,7 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.networkServicesOf(::Recloser, Recloser::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::TransformerStarImpedance, TransformerStarImpedance::fillFields))
 
-        /************ IEC61970 InfIEC61970 ************/
+        /************ IEC61970 InfIEC61970 Feeder ************/
         validateSchema(SchemaNetworks.networkServicesOf(::Circuit, Circuit::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::Loop, Loop::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::LvFeeder, LvFeeder::fillFields))

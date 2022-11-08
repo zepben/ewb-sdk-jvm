@@ -159,7 +159,7 @@ internal class NetworkTranslatorTest {
         validate({ Recloser() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ TransformerStarImpedance() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
-        /************ IEC61970 InfIEC61970 FEEDER ************/
+        /************ IEC61970 InfIEC61970 Feeder ************/
         validate({ Circuit() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Loop() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ LvFeeder() }, { ns, it -> it.fillFields(ns)}, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })

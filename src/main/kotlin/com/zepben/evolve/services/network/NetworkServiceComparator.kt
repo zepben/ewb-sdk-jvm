@@ -832,7 +832,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareIdReferences(TransformerStarImpedance::transformerEndInfo)
         }
 
-    /************ IEC61970 InfIEC61970 ************/
+    /************ IEC61970 InfIEC61970 Feeder ************/
 
     private fun compareCircuit(source: Circuit, target: Circuit): ObjectDifference<Circuit> =
         ObjectDifference(source, target).apply {

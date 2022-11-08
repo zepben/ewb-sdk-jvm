@@ -1074,7 +1074,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadIdentifiedObject(transformerStarImpedance, table, resultSet) && networkService.addOrThrow(transformerStarImpedance)
     }
 
-    /************ IEC61970 InfIEC61970 ************/
+    /************ IEC61970 InfIEC61970 Feeder ************/
 
     fun load(table: TableCircuits, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val circuit = Circuit(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {

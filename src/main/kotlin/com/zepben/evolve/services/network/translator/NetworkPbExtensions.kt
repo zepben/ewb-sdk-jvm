@@ -188,7 +188,7 @@ fun Conductor.assetInfoMRID(): String = ce.assetInfoMRID()
 fun PowerTransformer.assetInfoMRID(): String = ce.assetInfoMRID()
 fun ShuntCompensator.assetInfoMRID(): String = rce.ec.ce.assetInfoMRID()
 
-/************ IEC61970 InfIEC61970 ************/
+/************ IEC61970 InfIEC61970 Feeder ************/
 
 fun Circuit.mRID(): String = l.mRID()
 fun Loop.mRID(): String = io.mrid

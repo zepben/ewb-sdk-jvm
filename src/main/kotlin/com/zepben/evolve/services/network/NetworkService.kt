@@ -300,7 +300,7 @@ class NetworkService : BaseService("network") {
     fun remove(transformerStarImpedance: TransformerStarImpedance): Boolean = super.remove(transformerStarImpedance)
 
     // ###############################
-    // # IEC61970 InfIEC61970 FEEDER #
+    // # IEC61970 InfIEC61970 Feeder #
     // ###############################
 
     fun add(circuit: Circuit): Boolean = super.add(circuit)

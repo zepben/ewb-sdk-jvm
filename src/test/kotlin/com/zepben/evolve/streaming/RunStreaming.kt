@@ -12,8 +12,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.streaming.get.NetworkConsumerClient
 import com.zepben.evolve.streaming.get.getEquipmentContainer
-import com.zepben.evolve.streaming.grpc.ConnectionConfig
-import com.zepben.evolve.streaming.grpc.GrpcChannelFactory.create
+import com.zepben.evolve.streaming.grpc.Connect.connectInsecure
 import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("main")
@@ -23,7 +22,7 @@ private var indent = 3
 fun main() {
     // NOTE: There is something stopping this from exiting but it appears the client
     //       channel is shutdown correctly so not sure what it is.
-    create(ConnectionConfig("localhost", 9001)).use { channel ->
+    connectInsecure(host = "ewb.local", rpcPort = 9001).use { channel ->
         val client = NetworkConsumerClient(channel)
 
         time("streaming") {
@@ -55,7 +54,7 @@ private fun runRetrieve(client: NetworkConsumerClient) {
 }
 
 private fun runFeeder(client: NetworkConsumerClient) {
-    val result = client.getEquipmentContainer<Feeder>("CTN005")
+    val result = client.getEquipmentContainer<Feeder>("_LATHAM_8TB_LWMLNGLOW")
     result.throwOnError()
     log("Num unresolved: ${client.service.numUnresolvedReferences()}")
     log("Num objects: ${client.service.num<IdentifiedObject>()}")

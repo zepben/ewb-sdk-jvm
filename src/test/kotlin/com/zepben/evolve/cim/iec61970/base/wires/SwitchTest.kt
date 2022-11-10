@@ -9,7 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -134,15 +134,15 @@ internal class SwitchTest {
     @Test
     internal fun `throws on invalid phase`() {
         val switch = object : Switch() {}
-        expect { switch.setOpen(true, SPK.INVALID) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.setOpen(true, SPK.NONE) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.isOpen(SPK.INVALID) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.isOpen(SPK.NONE) }.toThrow(IllegalArgumentException::class.java)
+        expect { switch.setOpen(true, SPK.INVALID) }.toThrow<IllegalArgumentException>()
+        expect { switch.setOpen(true, SPK.NONE) }.toThrow<IllegalArgumentException>()
+        expect { switch.isOpen(SPK.INVALID) }.toThrow<IllegalArgumentException>()
+        expect { switch.isOpen(SPK.NONE) }.toThrow<IllegalArgumentException>()
 
-        expect { switch.setNormallyOpen(true, SPK.INVALID) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.setNormallyOpen(true, SPK.NONE) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.isNormallyOpen(SPK.INVALID) }.toThrow(IllegalArgumentException::class.java)
-        expect { switch.isNormallyOpen(SPK.NONE) }.toThrow(IllegalArgumentException::class.java)
+        expect { switch.setNormallyOpen(true, SPK.INVALID) }.toThrow<IllegalArgumentException>()
+        expect { switch.setNormallyOpen(true, SPK.NONE) }.toThrow<IllegalArgumentException>()
+        expect { switch.isNormallyOpen(SPK.INVALID) }.toThrow<IllegalArgumentException>()
+        expect { switch.isNormallyOpen(SPK.NONE) }.toThrow<IllegalArgumentException>()
     }
 
     private fun testOpen(switch: Switch, aOpen: Boolean, bOpen: Boolean, cOpen: Boolean, nOpen: Boolean) {

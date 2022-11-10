@@ -9,7 +9,7 @@
 package com.zepben.evolve.cim
 
 import com.google.protobuf.ProtocolMessageEnum
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 
@@ -24,7 +24,7 @@ fun <T : Enum<T>, U : Enum<U>> validateEnum(cimEnum: Array<T>, pbEnum: Array<U>)
     assertThat(pbUnrecognized.name, equalTo("UNRECOGNIZED"))
     assertThat(pbUnrecognized.ordinal, equalTo(cimEnum.size))
     expect { (pbUnrecognized as ProtocolMessageEnum).number }
-        .toThrow(IllegalArgumentException::class.java)
+        .toThrow<IllegalArgumentException>()
         .withMessage("Can't get the number of an unknown enum value.")
 
     cimEnum.forEach { cim ->

@@ -7,7 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61968.common
 
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -60,8 +60,8 @@ internal class PositionPointTest {
 
     private fun validateErrors(longitude: Double, latitude: Double, error: String) {
         expect { PositionPoint(longitude, latitude) }
-            .toThrow(IllegalArgumentException::class.java)
-            .exception().also {
+            .toThrow<IllegalArgumentException>()
+            .exception.also {
                 assertThat(it.message, containsString(error))
             }
     }

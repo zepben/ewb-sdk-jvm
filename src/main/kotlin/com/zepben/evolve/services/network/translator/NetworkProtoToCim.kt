@@ -10,14 +10,16 @@ package com.zepben.evolve.services.network.translator
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
@@ -62,12 +64,18 @@ import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infcommon.Ratio as PBRatio
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint as PBUsagePoint
 import com.zepben.protobuf.cim.iec61968.operations.OperationalRestriction as PBOperationalRestriction
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment as PBAuxiliaryEquipment
+import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.CurrentTransformer as PBCurrentTransformer
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.FaultIndicator as PBFaultIndicator
+import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.PotentialTransformer as PBPotentialTransformer
+import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.Sensor as PBSensor
 import com.zepben.protobuf.cim.iec61970.base.core.AcDcTerminal as PBAcDcTerminal
 import com.zepben.protobuf.cim.iec61970.base.core.BaseVoltage as PBBaseVoltage
 import com.zepben.protobuf.cim.iec61970.base.core.ConductingEquipment as PBConductingEquipment
@@ -343,6 +351,44 @@ fun toCim(pb: PBTownDetail): TownDetail =
 fun NetworkService.addFromPb(pb: PBOrganisation): Organisation? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb, this))
 
+/************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+fun toCim(pb: PBCurrentTransformerInfo, networkService: NetworkService): CurrentTransformerInfo =
+    CurrentTransformerInfo(pb.mRID()).apply {
+        accuracyClass = pb.accuracyClass.takeIf { it.isNotBlank() }
+        accuracyLimit = pb.accuracyLimit.takeUnless { it == UNKNOWN_DOUBLE }
+        coreCount = pb.coreCount.takeUnless { it == UNKNOWN_INT }
+        ctClass = pb.ctClass.takeIf { it.isNotBlank() }
+        kneePointVoltage = pb.kneePointVoltage.takeUnless { it == UNKNOWN_INT }
+        maxRatio = if (pb.hasMaxRatio()) toCim(pb.maxRatio) else null
+        nominalRatio = if (pb.hasNominalRatio()) toCim(pb.nominalRatio) else null
+        primaryRatio = pb.primaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_INT }
+        secondaryFlsRating = pb.secondaryFlsRating.takeUnless { it == UNKNOWN_INT }
+        secondaryRatio = pb.secondaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
+        usage = pb.usage.takeIf { it.isNotBlank() }
+        toCim(pb.ai, this, networkService)
+    }
+
+fun toCim(pb: PBPotentialTransformerInfo, networkService: NetworkService): PotentialTransformerInfo =
+    PotentialTransformerInfo(pb.mRID()).apply {
+        accuracyClass = pb.accuracyClass.takeIf { it.isNotBlank() }
+        nominalRatio = if (pb.hasNominalRatio()) toCim(pb.nominalRatio) else null
+        primaryRatio = pb.primaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
+        ptClass = pb.ptClass.takeIf { it.isNotBlank() }
+        ratedVoltage = pb.ratedVoltage.takeUnless { it == UNKNOWN_INT }
+        secondaryRatio = pb.secondaryRatio.takeUnless { it == UNKNOWN_DOUBLE }
+        toCim(pb.ai, this, networkService)
+    }
+
+fun NetworkService.addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = tryAddOrNull(toCim(pb, this))
+
+/************ IEC61968 infIEC61968 InfCommon ************/
+
+fun toCim(pb: PBRatio): Ratio =
+    Ratio(pb.numerator, pb.denominator)
+
 /************ IEC61968 METERING ************/
 
 fun toCim(pb: PBEndDevice, cim: EndDevice, networkService: NetworkService): EndDevice =
@@ -397,12 +443,31 @@ fun toCim(pb: PBAuxiliaryEquipment, cim: AuxiliaryEquipment, networkService: Net
         toCim(pb.eq, this, networkService)
     }
 
+fun toCim(pb: PBCurrentTransformer, networkService: NetworkService): CurrentTransformer =
+    CurrentTransformer(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
+        coreBurden = pb.coreBurden.takeUnless { it == UNKNOWN_INT }
+        toCim(pb.sn, this, networkService)
+    }
+
 fun toCim(pb: PBFaultIndicator, networkService: NetworkService): FaultIndicator =
     FaultIndicator(pb.mRID()).apply {
         toCim(pb.ae, this, networkService)
     }
 
+fun toCim(pb: PBPotentialTransformer, networkService: NetworkService): PotentialTransformer =
+    PotentialTransformer(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
+        type = PotentialTransformerKind.valueOf(pb.type.name)
+        toCim(pb.sn, this, networkService)
+    }
+
+fun toCim(pb: PBSensor, cim: Sensor, networkService: NetworkService): Sensor =
+    cim.apply { toCim(pb.ae, this, networkService) }
+
+fun NetworkService.addFromPb(pb: PBCurrentTransformer): CurrentTransformer? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBFaultIndicator): FaultIndicator? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPotentialTransformer): PotentialTransformer? = tryAddOrNull(toCim(pb, this))
 
 /************ IEC61970 CORE ************/
 
@@ -1052,6 +1117,10 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBOrganisation): Organisation? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBLocation): Location? = networkService.addFromPb(pb)
 
+    // IEC61968 infIEC61968 InfAssetInfo
+    fun addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = networkService.addFromPb(pb)
+
     // IEC61968 METERING
     fun addFromPb(pb: PBMeter): Meter? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBUsagePoint): UsagePoint? = networkService.addFromPb(pb)
@@ -1060,7 +1129,9 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBOperationalRestriction): OperationalRestriction? = networkService.addFromPb(pb)
 
     // IEC61970 BASE AUXILIARY EQUIPMENT
+    fun addFromPb(pb: PBCurrentTransformer): CurrentTransformer? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBFaultIndicator): FaultIndicator? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPotentialTransformer): PotentialTransformer? = networkService.addFromPb(pb)
 
     // IEC61970 BASE CORE
     fun addFromPb(pb: PBBaseVoltage): BaseVoltage? = networkService.addFromPb(pb)

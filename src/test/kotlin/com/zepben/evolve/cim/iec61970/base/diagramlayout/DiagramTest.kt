@@ -59,7 +59,7 @@ internal class DiagramTest {
         val obj = DiagramObject().apply { diagram = d2 }
 
         ExpectException.expect { d1.addDiagramObject(obj) }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("${obj.typeNameAndMRID()} `diagram` property references ${d2.typeNameAndMRID()}, expected ${d1.typeNameAndMRID()}.")
     }
 

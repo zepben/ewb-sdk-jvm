@@ -7,7 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -67,35 +67,35 @@ internal class TapChangerTest {
         }
 
         expect { tapChanger.highStep = -4 }
-            .toThrow(IllegalStateException::class.java)
+            .toThrow<IllegalStateException>()
             .withMessage("high step [-4] must be greater than low step [-3].")
 
         expect { tapChanger.lowStep = 6 }
-            .toThrow(IllegalStateException::class.java)
+            .toThrow<IllegalStateException>()
             .withMessage("low step [6] must be lower than high step [3].")
 
         expect { tapChanger.neutralStep = -4 }
-            .toThrow(IllegalStateException::class.java)
+            .toThrow<IllegalStateException>()
             .withMessage("neutral step [-4] must be between high step [3] and low step [-3].")
 
         expect { tapChanger.neutralStep = 4 }
-            .toThrow(IllegalStateException::class.java)
+            .toThrow<IllegalStateException>()
             .withMessage("neutral step [4] must be between high step [3] and low step [-3].")
 
         expect { tapChanger.normalStep = -5 }
-            .toThrow(IllegalStateException::class.java)
+            .toThrow<IllegalStateException>()
             .withMessage("normal step [-5] must be between high step [3] and low step [-3].")
 
         expect { tapChanger.normalStep = 5 }
-            .toThrow(IllegalStateException::class.java)
+            .toThrow<IllegalStateException>()
             .withMessage("normal step [5] must be between high step [3] and low step [-3].")
 
         expect { tapChanger.step = -4.0 }
-            .toThrow(IllegalStateException::class.java)
+            .toThrow<IllegalStateException>()
             .withMessage("step [-4.0] must be between high step [3] and low step [-3].")
 
         expect { tapChanger.step = 4.0 }
-            .toThrow(IllegalStateException::class.java)
+            .toThrow<IllegalStateException>()
             .withMessage("step [4.0] must be between high step [3] and low step [-3].")
     }
 }

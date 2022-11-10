@@ -56,7 +56,7 @@ internal class TransformerEndTest {
     internal fun throwsOnUnknownEndType() {
         val end = object : TransformerEnd() {}
         ExpectException.expect { end.resistanceReactance() }
-            .toThrow(NotImplementedError::class.java)
+            .toThrow<NotImplementedError>()
             .withMessage("Unknown transformer end leaf type: ${end.typeNameAndMRID()}. Add support which should at least include `starImpedance?.resistanceReactance() ?: ResistanceReactance()`.")
     }
 

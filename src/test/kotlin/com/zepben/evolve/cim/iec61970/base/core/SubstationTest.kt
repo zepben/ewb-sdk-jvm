@@ -58,7 +58,7 @@ internal class SubstationTest {
         val feeder = Feeder().apply { normalEnergizingSubstation = substation2 }
 
         ExpectException.expect { substation1.addFeeder(feeder) }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("${feeder.typeNameAndMRID()} `normalEnergizingSubstation` property references ${substation2.typeNameAndMRID()}, expected ${substation1.typeNameAndMRID()}.")
     }
 

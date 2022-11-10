@@ -13,10 +13,14 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
@@ -70,17 +74,17 @@ class NetworkService : BaseService("network") {
     fun add(powerTransformerInfo: PowerTransformerInfo): Boolean = super.add(powerTransformerInfo)
     fun remove(powerTransformerInfo: PowerTransformerInfo): Boolean = super.remove(powerTransformerInfo)
 
-    fun add(transformerEndInfo: TransformerEndInfo): Boolean = super.add(transformerEndInfo)
-    fun remove(transformerEndInfo: TransformerEndInfo): Boolean = super.remove(transformerEndInfo)
-
-    fun add(transformerTankInfo: TransformerTankInfo): Boolean = super.add(transformerTankInfo)
-    fun remove(transformerTankInfo: TransformerTankInfo): Boolean = super.remove(transformerTankInfo)
-
     fun add(shortCircuitTest: ShortCircuitTest): Boolean = super.add(shortCircuitTest)
     fun remove(shortCircuitTest: ShortCircuitTest): Boolean = super.remove(shortCircuitTest)
 
     fun add(shuntCompensatorInfo: ShuntCompensatorInfo): Boolean = super.add(shuntCompensatorInfo)
     fun remove(shuntCompensatorInfo: ShuntCompensatorInfo): Boolean = super.remove(shuntCompensatorInfo)
+
+    fun add(transformerEndInfo: TransformerEndInfo): Boolean = super.add(transformerEndInfo)
+    fun remove(transformerEndInfo: TransformerEndInfo): Boolean = super.remove(transformerEndInfo)
+
+    fun add(transformerTankInfo: TransformerTankInfo): Boolean = super.add(transformerTankInfo)
+    fun remove(transformerTankInfo: TransformerTankInfo): Boolean = super.remove(transformerTankInfo)
 
     // ###################
     // # IEC61968 ASSETS #
@@ -105,6 +109,16 @@ class NetworkService : BaseService("network") {
     fun add(organisation: Organisation): Boolean = super.add(organisation)
     fun remove(organisation: Organisation): Boolean = super.remove(organisation)
 
+    // #####################################
+    // # IEC61968 infIEC61968 InfAssetInfo #
+    // #####################################
+
+    fun add(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.add(currentTransformerInfo)
+    fun remove(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.remove(currentTransformerInfo)
+
+    fun add(potentialTransformerInfo: PotentialTransformerInfo): Boolean = super.add(potentialTransformerInfo)
+    fun remove(potentialTransformerInfo: PotentialTransformerInfo): Boolean = super.remove(potentialTransformerInfo)
+
     // #####################
     // # IEC61968 METERING #
     // #####################
@@ -126,8 +140,14 @@ class NetworkService : BaseService("network") {
     // # IEC61970 BASE AUXILIARY EQUIPMENT #
     // #####################################
 
+    fun add(currentTransformer: CurrentTransformer): Boolean = super.add(currentTransformer)
+    fun remove(currentTransformer: CurrentTransformer): Boolean = super.remove(currentTransformer)
+
     fun add(faultIndicator: FaultIndicator): Boolean = super.add(faultIndicator)
     fun remove(faultIndicator: FaultIndicator): Boolean = super.remove(faultIndicator)
+
+    fun add(potentialTransformer: PotentialTransformer): Boolean = super.add(potentialTransformer)
+    fun remove(potentialTransformer: PotentialTransformer): Boolean = super.remove(potentialTransformer)
 
     // ######################
     // # IEC61970 BASE CORE #
@@ -280,7 +300,7 @@ class NetworkService : BaseService("network") {
     fun remove(transformerStarImpedance: TransformerStarImpedance): Boolean = super.remove(transformerStarImpedance)
 
     // ###############################
-    // # IEC61970 InfIEC61970 FEEDER #
+    // # IEC61970 InfIEC61970 Feeder #
     // ###############################
 
     fun add(circuit: Circuit): Boolean = super.add(circuit)

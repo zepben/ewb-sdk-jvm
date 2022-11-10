@@ -19,10 +19,14 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
@@ -73,6 +77,12 @@ object Resolvers {
     @JvmStatic
     fun assetInfo(conductor: Conductor): BoundReferenceResolver<Conductor, WireInfo> =
         BoundReferenceResolver(conductor, ConductorToWireInfoResolver, null)
+
+    fun assetInfo(currentTransformer: CurrentTransformer): BoundReferenceResolver<CurrentTransformer, CurrentTransformerInfo> =
+        BoundReferenceResolver(currentTransformer, CurrentTransformerToCurrentTransformerInfoResolver, null)
+
+    fun assetInfo(potentialTransformer: PotentialTransformer): BoundReferenceResolver<PotentialTransformer, PotentialTransformerInfo> =
+        BoundReferenceResolver(potentialTransformer, PotentialTransformerToPotentialTransformerInfoResolver, null)
 
     @JvmStatic
     fun assetInfo(powerTransformer: PowerTransformer): BoundReferenceResolver<PowerTransformer, PowerTransformerInfo> =

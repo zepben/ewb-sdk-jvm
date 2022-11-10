@@ -9,7 +9,7 @@ package com.zepben.evolve.utils
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import java.util.regex.Pattern
@@ -49,7 +49,7 @@ internal class PrivateCollectionValidator {
             add(it, other3)
             assertThat(num(it), equalTo(3))
             expect { add(it, duplicate1) }
-                .toThrow(IllegalArgumentException::class.java)
+                .toThrow<IllegalArgumentException>()
                 .withMessage(Pattern.compile("An? (current )?${getName(other1.javaClass)} with mRID ${other1.mRID} already exists in ${it.typeNameAndMRID()}."))
 
             assertThat(num(it), equalTo(3))
@@ -114,7 +114,7 @@ internal class PrivateCollectionValidator {
             assertThat(num(it), equalTo(2))
 
             expect { add(it, duplicate1) }
-                .toThrow(IllegalArgumentException::class.java)
+                .toThrow<IllegalArgumentException>()
                 .withMessage(Pattern.compile("An? (current )?${getName(other1.javaClass)} with mRID ${other1.mRID} already exists in ${it.typeNameAndMRID()}."))
 
             assertThat(num(it), equalTo(2))
@@ -141,7 +141,7 @@ internal class PrivateCollectionValidator {
             assertThat(num(it), equalTo(1))
 
             expect { add(it, other2) }
-                .toThrow()
+                .toThrowAny()
                 .withMessage(
                     Pattern.compile(
                         "Unable to add ${other2.typeNameAndMRID()} to ${it.typeNameAndMRID()}. A ${other1.typeNameAndMRID()} already exists with \\w+ \\d+."
@@ -215,7 +215,7 @@ internal class PrivateCollectionValidator {
             assertThat(num(it), equalTo(1))
 
             expect { addWithIndex(it, other3, 20) }
-                .toThrow()
+                .toThrowAny()
                 .withMessage(
                     Pattern.compile(
                         "Unable to add ${other3.javaClass.simpleName} to ${it.typeNameAndMRID()}. " +

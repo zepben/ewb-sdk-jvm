@@ -29,7 +29,7 @@ import com.zepben.evolve.streaming.get.testservices.TestNetworkConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.nc.*
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.StatusRuntimeException
 import io.grpc.inprocess.InProcessChannelBuilder
@@ -177,7 +177,7 @@ internal class NetworkConsumerClientTest {
         verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
         assertThat(result.wasFailure, equalTo(true))
         expect { throw result.thrown }
-            .toThrow(NoSuchElementException::class.java)
+            .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID $mRID could be found.")
     }
 
@@ -328,7 +328,7 @@ internal class NetworkConsumerClientTest {
 
         assertThat(result.wasSuccessful, equalTo(false))
         expect { throw result.thrown }
-            .toThrow(NoSuchElementException::class.java)
+            .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID f002 could be found.")
 
         validateFeederNetwork(service, NetworkHierarchyAllTypes.createService())
@@ -624,7 +624,7 @@ internal class NetworkConsumerClientTest {
 
         assertThat(result.wasSuccessful, equalTo(false))
         expect { throw result.thrown }
-            .toThrow(ClassCastException::class.java)
+            .toThrow<ClassCastException>()
             .withMessage("Unable to extract Circuit networks from [${expectedService.get<Feeder>("f001")?.typeNameAndMRID()}].")
     }
 

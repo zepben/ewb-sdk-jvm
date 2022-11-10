@@ -10,14 +10,16 @@ package com.zepben.evolve.services.network.testdata
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
@@ -40,13 +42,13 @@ import java.util.*
 
 /************ IEC61968 ASSET INFO ************/
 
-fun CableInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CableInfo {
-    (this as WireInfo).fillFields(service, includeRuntime)
+fun AssetInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): AssetInfo {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
     return this
 }
 
-fun AssetInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): AssetInfo {
-    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+fun CableInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CableInfo {
+    (this as WireInfo).fillFields(service, includeRuntime)
     return this
 }
 
@@ -256,6 +258,40 @@ fun Location.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     return this
 }
 
+/************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+fun CurrentTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentTransformerInfo {
+    (this as AssetInfo).fillFields(service, includeRuntime)
+
+    accuracyClass = "accuracyClass"
+    accuracyLimit = 1.1
+    coreCount = 2
+    ctClass = "ctClass"
+    kneePointVoltage = 3
+    maxRatio = Ratio(4.4, 5.5)
+    nominalRatio = Ratio(6.6, 7.7)
+    primaryRatio = 8.8
+    ratedCurrent = 9
+    secondaryFlsRating = 10
+    secondaryRatio = 11.11
+    usage = "usage"
+
+    return this
+}
+
+fun PotentialTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): PotentialTransformerInfo {
+    (this as AssetInfo).fillFields(service, includeRuntime)
+
+    accuracyClass = "accuracyClass"
+    nominalRatio = Ratio(1.1, 2.2)
+    primaryRatio = 3.3
+    ptClass = "ptClass"
+    ratedVoltage = 4
+    secondaryRatio = 5.5
+
+    return this
+}
+
 /************ IEC61968 METERING ************/
 
 fun EndDevice.fillFields(service: NetworkService, includeRuntime: Boolean = true): EndDevice {
@@ -328,7 +364,34 @@ fun AuxiliaryEquipment.fillFields(service: NetworkService, includeRuntime: Boole
     return this
 }
 
+fun CurrentTransformer.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentTransformer {
+    (this as Sensor).fillFields(service, includeRuntime)
+
+    assetInfo = CurrentTransformerInfo().also {
+        service.add(it)
+    }
+    coreBurden = 1
+
+    return this
+}
+
 fun FaultIndicator.fillFields(service: NetworkService, includeRuntime: Boolean = true): FaultIndicator {
+    (this as AuxiliaryEquipment).fillFields(service, includeRuntime)
+    return this
+}
+
+fun PotentialTransformer.fillFields(service: NetworkService, includeRuntime: Boolean = true): PotentialTransformer {
+    (this as Sensor).fillFields(service, includeRuntime)
+
+    assetInfo = PotentialTransformerInfo().also {
+        service.add(it)
+    }
+    type = PotentialTransformerKind.capacitiveCoupling
+
+    return this
+}
+
+fun Sensor.fillFields(service: NetworkService, includeRuntime: Boolean = true): Sensor {
     (this as AuxiliaryEquipment).fillFields(service, includeRuntime)
     return this
 }
@@ -1039,7 +1102,7 @@ fun TransformerStarImpedance.fillFields(service: NetworkService, includeRuntime:
     return this
 }
 
-/************ IEC61970 InfIEC61970 ************/
+/************ IEC61970 InfIEC61970 Feeder ************/
 
 fun Circuit.fillFields(service: NetworkService, includeRuntime: Boolean = true): Circuit {
     (this as Line).fillFields(service, includeRuntime)

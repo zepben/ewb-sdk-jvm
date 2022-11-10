@@ -75,7 +75,7 @@ internal class PowerElectronicsConnectionTest {
         val phase = PowerElectronicsConnectionPhase().apply { powerElectronicsConnection = powerElectronicsConnection2 }
 
         ExpectException.expect { powerElectronicsConnection1.addPhase(phase) }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("${phase.typeNameAndMRID()} `powerElectronicsConnection` property references ${powerElectronicsConnection2.typeNameAndMRID()}, expected ${powerElectronicsConnection1.typeNameAndMRID()}.")
     }
 

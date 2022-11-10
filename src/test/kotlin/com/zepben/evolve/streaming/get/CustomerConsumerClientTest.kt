@@ -16,7 +16,7 @@ import com.zepben.evolve.streaming.get.testservices.TestCustomerConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.cc.GetIdentifiedObjectsResponse
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.StatusRuntimeException
 import io.grpc.inprocess.InProcessChannelBuilder
@@ -102,7 +102,7 @@ internal class CustomerConsumerClientTest {
         verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
         assertThat(result.wasFailure, equalTo(true))
         expect { throw result.thrown }
-            .toThrow(NoSuchElementException::class.java)
+            .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID $mRID could be found.")
     }
 

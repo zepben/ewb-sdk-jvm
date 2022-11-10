@@ -114,7 +114,7 @@ class LvFeederTest {
             addEquipment(PowerTransformer())
         }
 
-        ExpectException.expect { lvFeeder.normalHeadTerminal = Terminal() }.toThrow()
+        ExpectException.expect { lvFeeder.normalHeadTerminal = Terminal() }.toThrowAny()
             .withMessage("LvFeeder ${lvFeeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
     }
 
@@ -125,7 +125,7 @@ class LvFeederTest {
             addCurrentEquipment(PowerTransformer())
         }
 
-        ExpectException.expect { lvFeeder.normalHeadTerminal = Terminal() }.toThrow()
+        ExpectException.expect { lvFeeder.normalHeadTerminal = Terminal() }.toThrowAny()
             .withMessage("LvFeeder ${lvFeeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
     }
 

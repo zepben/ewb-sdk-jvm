@@ -9,7 +9,7 @@ package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -58,7 +58,7 @@ internal class ConductingEquipmentTest {
         val terminal = Terminal().apply { conductingEquipment = ce2 }
 
         expect { ce1.addTerminal(terminal) }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("${terminal.typeNameAndMRID()} `conductingEquipment` property references ${ce2.typeNameAndMRID()}, expected ${ce1.typeNameAndMRID()}.")
     }
 
@@ -101,7 +101,7 @@ internal class ConductingEquipmentTest {
         val duplicateTerminal = Terminal().apply { sequenceNumber = 1 }
         expect {
             ce.addTerminal(duplicateTerminal)
-        }.toThrow(IllegalArgumentException::class.java)
+        }.toThrow<IllegalArgumentException>()
             .withMessage("Unable to add ${duplicateTerminal.typeNameAndMRID()} to ${ce.typeNameAndMRID()}. A ${t1.typeNameAndMRID()} already exists with sequenceNumber 1.")
     }
 

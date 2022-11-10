@@ -81,7 +81,7 @@
         <dependency>
             <groupId>com.zepben.protobuf</groupId>
             <artifactId>evolve-grpc</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0-SNAPSHOT1</version>
         </dependency>
 
         <dependency>
@@ -133,7 +133,7 @@
         <dependency>
             <groupId>com.zepben</groupId>
             <artifactId>test-utils</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

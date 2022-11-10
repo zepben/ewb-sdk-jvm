@@ -79,7 +79,7 @@ internal class PowerTransformerEndTest {
         val end = PowerTransformerEnd().apply { powerTransformer = tx }.also { tx.addEnd(it) }
 
         ExpectException.expect { end.starImpedance = TransformerStarImpedance() }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("Unable to use a star impedance for ${end.typeNameAndMRID()} directly because ${tx.typeNameAndMRID()} references ${tx.assetInfo?.typeNameAndMRID()}.")
     }
 

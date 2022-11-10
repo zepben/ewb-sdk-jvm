@@ -10,7 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -52,7 +52,7 @@ internal class ConductorTest {
         conductor.length = 0.0
         conductor.length = Double.NaN
         expect { conductor.length = -1.0 }
-            .toThrow(IllegalArgumentException::class.java)
+            .toThrow<IllegalArgumentException>()
             .withMessage("Conductor length cannot be negative.")
     }
 

@@ -17,10 +17,14 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
@@ -153,6 +157,10 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.customerServicesOf(::PricingStructure, PricingStructure::fillFields))
         validateSchema(SchemaNetworks.customerServicesOf(::Tariff, Tariff::fillFields))
 
+        /************ IEC61968 infIEC61968 InfAssetInfo ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::CurrentTransformerInfo, CurrentTransformerInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PotentialTransformerInfo, PotentialTransformerInfo::fillFields))
+
         /************ IEC61968 METERING ************/
         validateSchema(SchemaNetworks.networkServicesOf(::Meter, Meter::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::UsagePoint, UsagePoint::fillFields))
@@ -166,7 +174,9 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.networkServicesOf(::OperationalRestriction, OperationalRestriction::fillFields))
 
         /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::CurrentTransformer, CurrentTransformer::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::FaultIndicator, FaultIndicator::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::PotentialTransformer, PotentialTransformer::fillFields))
 
         /************ IEC61970 BASE CORE ************/
         validateSchema(SchemaNetworks.networkServicesOf(::BaseVoltage, BaseVoltage::fillFields))
@@ -226,7 +236,7 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.networkServicesOf(::Recloser, Recloser::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::TransformerStarImpedance, TransformerStarImpedance::fillFields))
 
-        /************ IEC61970 InfIEC61970 ************/
+        /************ IEC61970 InfIEC61970 Feeder ************/
         validateSchema(SchemaNetworks.networkServicesOf(::Circuit, Circuit::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::Loop, Loop::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::LvFeeder, LvFeeder::fillFields))

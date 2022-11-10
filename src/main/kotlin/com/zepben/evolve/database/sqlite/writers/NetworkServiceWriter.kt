@@ -13,10 +13,14 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
@@ -100,6 +104,10 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<Control>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<RemoteControl>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<RemoteSource>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<CurrentTransformerInfo>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<PotentialTransformerInfo>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<CurrentTransformer>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<PotentialTransformer>().forEach { status = status and validateSave(it, writer::save) }
 
         return status
     }

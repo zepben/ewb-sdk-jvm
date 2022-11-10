@@ -18,7 +18,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -238,14 +238,14 @@ internal class TestNetworkBuilderTest {
         expect {
             TestNetworkBuilder()
                 .fromSource(PhaseCode.XYN)
-        }.toThrow(IllegalArgumentException::class.java)
+        }.toThrow<IllegalArgumentException>()
             .withMessage("EnergySource phases must be a subset of ABCN")
 
         expect {
             TestNetworkBuilder()
                 .fromSource(PhaseCode.ABC)
                 .fromSource(PhaseCode.XYN)
-        }.toThrow(IllegalArgumentException::class.java)
+        }.toThrow<IllegalArgumentException>()
             .withMessage("EnergySource phases must be a subset of ABCN")
     }
 

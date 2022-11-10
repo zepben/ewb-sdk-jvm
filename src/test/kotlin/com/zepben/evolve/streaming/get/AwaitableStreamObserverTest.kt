@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.streaming.get
 
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -52,7 +52,7 @@ internal class AwaitableStreamObserverTest {
         streamObserver.onError(throwable)
 
         assertThat(streamObserver.latch.count, equalTo(0))
-        assertThat(expect { streamObserver.await() }.toThrow().exception(), equalTo(throwable))
+        assertThat(expect { streamObserver.await() }.toThrowAny().exception, equalTo(throwable))
     }
 
 

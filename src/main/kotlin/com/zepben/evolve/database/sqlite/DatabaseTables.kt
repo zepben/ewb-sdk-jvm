@@ -24,10 +24,14 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableCustomer
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableCustomers
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TablePricingStructures
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableTariffs
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
 import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperationalRestrictions
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableCurrentTransformers
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TablePotentialTransformers
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjects
@@ -97,6 +101,8 @@ class DatabaseTables {
         TableCircuitsTerminals(),
         TableConnectivityNodes(),
         TableControls(),
+        TableCurrentTransformerInfo(),
+        TableCurrentTransformers(),
         TableCustomerAgreements(),
         TableCustomerAgreementsPricingStructures(),
         TableCustomers(),
@@ -139,6 +145,8 @@ class DatabaseTables {
         TablePhotoVoltaicUnit(),
         TablePoles(),
         TablePositionPoints(),
+        TablePotentialTransformerInfo(),
+        TablePotentialTransformers(),
         TablePowerElectronicsConnection(),
         TablePowerElectronicsConnectionPhases(),
         TablePowerElectronicsWindUnit(),

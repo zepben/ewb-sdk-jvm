@@ -9,7 +9,7 @@
 package com.zepben.evolve.services.network.tracing.connectivity
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
@@ -221,10 +221,10 @@ internal class XyCandidatePhasePathsTest {
                     addCandidates(it, listOf(SPK.B))
                 } else {
                     expect { addKnown(it, SPK.B) }
-                        .toThrow(IllegalArgumentException::class.java)
+                        .toThrow<IllegalArgumentException>()
                         .withMessage("Unable to track phase $it, expected X or Y.")
                     expect { addCandidates(it, listOf(SPK.B)) }
-                        .toThrow(IllegalArgumentException::class.java)
+                        .toThrow<IllegalArgumentException>()
                         .withMessage("Unable to track phase $it, expected X or Y.")
                 }
             }
@@ -240,7 +240,7 @@ internal class XyCandidatePhasePathsTest {
                         addCandidates(SPK.X, listOf(it))
 
                         expect { addCandidates(SPK.Y, listOf(it)) }
-                            .toThrow(IllegalArgumentException::class.java)
+                            .toThrow<IllegalArgumentException>()
                             .withMessage("Unable to use phase $it as a candidate, expected B or C.")
                     }
                     in PhaseCode.ABC -> {
@@ -249,11 +249,11 @@ internal class XyCandidatePhasePathsTest {
                     }
                     else -> {
                         expect { addCandidates(SPK.X, listOf(it)) }
-                            .toThrow(IllegalArgumentException::class.java)
+                            .toThrow<IllegalArgumentException>()
                             .withMessage("Unable to use phase $it as a candidate, expected A, B or C.")
 
                         expect { addCandidates(SPK.Y, listOf(it)) }
-                            .toThrow(IllegalArgumentException::class.java)
+                            .toThrow<IllegalArgumentException>()
                             .withMessage("Unable to use phase $it as a candidate, expected B or C.")
                     }
                 }

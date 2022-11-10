@@ -10,7 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.core
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException.expect
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -115,7 +115,7 @@ internal class FeederTest {
             addEquipment(PowerTransformer())
         }
 
-        expect { feeder.normalHeadTerminal = Terminal() }.toThrow()
+        expect { feeder.normalHeadTerminal = Terminal() }.toThrowAny()
             .withMessage("Feeder ${feeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
     }
 
@@ -126,7 +126,7 @@ internal class FeederTest {
             addCurrentEquipment(PowerTransformer())
         }
 
-        expect { feeder.normalHeadTerminal = Terminal() }.toThrow()
+        expect { feeder.normalHeadTerminal = Terminal() }.toThrowAny()
             .withMessage("Feeder ${feeder.mRID} has equipment assigned to it. Cannot update normalHeadTerminal on a feeder with equipment assigned.")
     }
 

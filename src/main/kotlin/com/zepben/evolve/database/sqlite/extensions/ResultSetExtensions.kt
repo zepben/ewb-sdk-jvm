@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.database.sqlite.extensions
 
+import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import java.sql.ResultSet
 import java.time.Instant
 
@@ -34,3 +35,8 @@ internal fun ResultSet.getNullableLong(queryIndex: Int): Long? =
 
 internal fun ResultSet.getInstant(queryIndex: Int): Instant? =
     getString(queryIndex).takeUnless { wasNull() }?.let { Instant.parse(it) }
+
+internal fun ResultSet.getNullableRatio(numeratorIndex: Int, denominatorIndex: Int): Ratio? =
+    getNullableDouble(denominatorIndex)?.let { denominator ->
+        getNullableDouble(numeratorIndex)?.let { numerator -> Ratio(numerator, denominator) }
+    }

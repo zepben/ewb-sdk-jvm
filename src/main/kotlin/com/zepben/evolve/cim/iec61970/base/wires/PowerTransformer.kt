@@ -11,6 +11,7 @@ import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.common.extensions.*
 
 /**
@@ -83,7 +84,7 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
     /**
      * Get the number of entries in the [PowerTransformerEnd] collection.
      */
-    fun numEnds() = _powerTransformerEnds?.size ?: 0
+    fun numEnds(): Int = _powerTransformerEnds?.size ?: 0
 
     /**
      * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [PowerTransformerEnd.mRID]
@@ -91,7 +92,7 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
      * @param mRID the mRID of the required [PowerTransformerEnd]
      * @return The [PowerTransformerEnd] with the specified [mRID] if it exists, otherwise null
      */
-    fun getEnd(mRID: String) = _powerTransformerEnds.getByMRID(mRID)
+    fun getEnd(mRID: String): PowerTransformerEnd? = _powerTransformerEnds.getByMRID(mRID)
 
     /**
      * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [PowerTransformerEnd.endNumber]
@@ -99,7 +100,15 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
      * @param endNumber the end number of the required [PowerTransformerEnd]
      * @return The [PowerTransformerEnd] with the specified [endNumber] if it exists, otherwise null
      */
-    fun getEnd(endNumber: Int) = _powerTransformerEnds?.firstOrNull { it.endNumber == endNumber }
+    fun getEnd(endNumber: Int): PowerTransformerEnd? = _powerTransformerEnds?.firstOrNull { it.endNumber == endNumber }
+
+    /**
+     * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [PowerTransformerEnd.terminal]
+     *
+     * @param terminal the terminal of the required [PowerTransformerEnd]
+     * @return The [PowerTransformerEnd] with the specified [terminal] if it exists, otherwise null
+     */
+    fun getEnd(terminal: Terminal): PowerTransformerEnd? = _powerTransformerEnds?.firstOrNull { it.terminal == terminal }
 
     /**
      * Add a [PowerTransformerEnd] to this [PowerTransformer]

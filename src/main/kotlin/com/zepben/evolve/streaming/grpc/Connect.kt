@@ -197,9 +197,9 @@ object Connect {
         tokenFetcher: ZepbenTokenFetcher,
         clientId: String,
         clientSecret: String,
-        host: String = "localhost",
-        rpcPort: Int = 50051,
-        caFilename: String? = null
+        host: String,
+        rpcPort: Int,
+        caFilename: String?
     ): GrpcChannel {
         tokenFetcher.tokenRequestData.put("client_id", clientId)
         tokenFetcher.tokenRequestData.put("client_secret", clientSecret)
@@ -213,9 +213,9 @@ object Connect {
         clientId: String,
         username: String,
         password: String,
-        host: String = "localhost",
-        rpcPort: Int = 50051,
-        caFilename: String? = null
+        host: String,
+        rpcPort: Int,
+        caFilename: String?
     ): GrpcChannel {
         tokenFetcher.tokenRequestData.put("client_id", clientId)
         tokenFetcher.tokenRequestData.put("username", username)

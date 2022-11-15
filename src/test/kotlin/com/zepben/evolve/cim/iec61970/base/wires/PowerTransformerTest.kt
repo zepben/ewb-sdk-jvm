@@ -11,6 +11,7 @@ import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -90,6 +91,26 @@ internal class PowerTransformerTest {
             PowerTransformer::removeEnd,
             PowerTransformer::clearEnds
         )
+    }
+
+    @Test
+    internal fun getEndByTerminal() {
+        val t1 = Terminal()
+        val t2 = Terminal()
+        val t3 = Terminal()
+        val e1 = PowerTransformerEnd().apply { terminal = t3 }
+        val e2 = PowerTransformerEnd().apply { terminal = t1 }
+        val pt = PowerTransformer().apply {
+            addTerminal(t1)
+            addTerminal(t2)
+            addTerminal(t3)
+            addEnd(e1)
+            addEnd(e2)
+        }
+
+        assertThat(pt.getEnd(t1), equalTo(e2))
+        assertThat(pt.getEnd(t2), nullValue())
+        assertThat(pt.getEnd(t3), equalTo(e1))
     }
 
     @Test

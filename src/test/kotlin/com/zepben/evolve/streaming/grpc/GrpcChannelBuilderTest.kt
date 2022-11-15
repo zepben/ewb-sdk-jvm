@@ -14,10 +14,7 @@ import io.grpc.ChannelCredentials
 import io.grpc.ManagedChannel
 import io.grpc.TlsChannelCredentials
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.unmockkAll
+import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
@@ -83,12 +80,26 @@ internal class GrpcChannelBuilderTest {
 
         mockkStatic(TlsChannelCredentials::class)
         every { TlsChannelCredentials.newBuilder().keyManager(certChainFile, pkFile).trustManager(caFile).build() } returns channelCredentials
+        every { TlsChannelCredentials.newBuilder().keyManager(certChainFile, pkFile).build() } returns channelCredentials
 
         mockkStatic(NettyChannelBuilder::class)
         every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).build() } returns secureChannel
 
-        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(caFile, certChainFile, pkFile).build()
-        assertThat(grpcChannel.channel, equalTo(secureChannel))
+        assertThat(GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(caFile, certChainFile, pkFile).build().channel, equalTo(secureChannel))
+        assertThat(GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(certificateChain = certChainFile, privateKey = pkFile).build().channel, equalTo(secureChannel))
+    }
+
+    @Test
+    internal fun makeSecureWithFilenamesCoverage() {
+        // There's no way of stubbing constructors themselves AFAIK, which would be useful in ensuring that the filename overload calls the original with
+        // the File(...) of each filename.
+        val secureGrpcChannel = mockk<GrpcChannel>()
+
+        mockkConstructor(GrpcChannelBuilder::class)
+        every { constructedWith<GrpcChannelBuilder>().makeSecure(null, "certChainFilename", "pkFilename").build() } returns secureGrpcChannel
+
+        assertThat(GrpcChannelBuilder().makeSecure(null, "certChainFilename", "pkFilename").build(), equalTo(secureGrpcChannel))
+        assertThat(GrpcChannelBuilder().makeSecure(certificateChain = "certChainFilename", privateKey = "pkFilename").build(), equalTo(secureGrpcChannel))
     }
 
     @Test

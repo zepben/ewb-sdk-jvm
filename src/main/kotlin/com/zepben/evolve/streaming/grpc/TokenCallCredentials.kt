@@ -14,7 +14,7 @@ import io.grpc.Metadata.ASCII_STRING_MARSHALLER
 import io.grpc.Status
 import java.util.concurrent.Executor
 
-internal val AUTHORISATION_METADATA_KEY: Metadata.Key<String> = Metadata.Key.of("Authorization", ASCII_STRING_MARSHALLER)
+internal val AUTHORIZATION_METADATA_KEY: Metadata.Key<String> = Metadata.Key.of("Authorization", ASCII_STRING_MARSHALLER)
 
 /**
  * Call credentials that sets the "Authorization" metadata header to a token string.
@@ -26,7 +26,7 @@ class TokenCallCredentials(private val getToken: () -> String): CallCredentials(
     override fun applyRequestMetadata(requestInfo: RequestInfo, executor: Executor, applier: MetadataApplier) {
         try {
             val headers = Metadata()
-            headers.put(AUTHORISATION_METADATA_KEY, getToken())
+            headers.put(AUTHORIZATION_METADATA_KEY, getToken())
             applier.apply(headers)
         } catch (e: Exception) {
             applier.fail(Status.fromThrowable(e))

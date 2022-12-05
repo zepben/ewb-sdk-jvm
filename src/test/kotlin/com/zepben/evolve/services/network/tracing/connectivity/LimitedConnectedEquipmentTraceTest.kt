@@ -11,6 +11,7 @@ package com.zepben.evolve.services.network.tracing.connectivity
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
+import com.zepben.evolve.services.network.tracing.Tracing.normalConnectedEquipmentTrace
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
@@ -246,6 +247,23 @@ internal class LimitedConnectedEquipmentTraceTest {
 
         assertThat(results, aMapWithSize(1))
         assertThat(results[ns["j0"]], equalTo(0))
+    }
+
+    @Test
+    internal fun withDirectionCanStopOnStartItem() {
+        val ns = TestNetworkBuilder()
+            .fromJunction(numTerminals = 1) // j0
+            .toAcls() // c1
+            .toJunction(numTerminals = 1) // j2
+            .addFeeder("j0")
+            .build()
+
+        val lcet = LimitedConnectedEquipmentTrace({ normalConnectedEquipmentTrace() }) { it.normalFeederDirection }
+        val results = lcet.run(listOf(ns["j0"]!!), 1, FeederDirection.DOWNSTREAM)
+
+        assertThat(results, aMapWithSize(2))
+        assertThat(results[ns["j0"]], equalTo(0))
+        assertThat(results[ns["c1"]], equalTo(1))
     }
 
     @Test

@@ -31,6 +31,7 @@
 ### Fixes
 * remove lvfeeder function fixed (previously still adds)
 * remove component test updated to contain another check
+* Fixed bug where limited connected traces with `maximumSteps = 1` could include equipment 2 steps away.
 
 ### Notes
 * None.

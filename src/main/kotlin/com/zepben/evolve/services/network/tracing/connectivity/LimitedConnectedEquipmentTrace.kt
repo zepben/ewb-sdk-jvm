@@ -75,7 +75,7 @@ class LimitedConnectedEquipmentTrace(
                     addStopCondition { (ce, _) -> ce.terminals.none { getTerminalDirection(it) == feederDirection } }
                     addStepAction { matchingEquipment.add(ConductingEquipmentStep(it.conductingEquipment, it.step + 1)) }
 
-                    run(start, false)
+                    run(start)
                 }
             }
 

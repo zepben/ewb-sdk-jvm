@@ -10,6 +10,7 @@
 
 ### New Features
 
+* Added EquivalentNetworkUtils class that contains utility methods to add equivalent networks to the edges of gRPC requested network services.
 * Added methods for connecting to the gRPC service in a utility object named `Connect`:
     * `Connect.connectInsecure`: Used to connect to a gRPC service that does not use SSL/TLS.
     * `Connect.connectTls`: Used to connect to a gRPC service that uses SSL/TLS, without user authentication.

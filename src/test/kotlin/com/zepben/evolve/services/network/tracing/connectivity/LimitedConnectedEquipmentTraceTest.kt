@@ -142,7 +142,7 @@ internal class LimitedConnectedEquipmentTraceTest {
         trace.run(listOf(simpleNs["b2"]!!), 2, FeederDirection.DOWNSTREAM)
 
         verify(traversal).run(any<ConductingEquipment>(), any())
-        verify(traversal).run(simpleNs["c3"]!!, false)
+        verify(traversal).run(simpleNs["c3"]!!)
     }
 
     @Test
@@ -150,7 +150,7 @@ internal class LimitedConnectedEquipmentTraceTest {
         trace.run(listOf(simpleNs["b2"]!!), 2, FeederDirection.UPSTREAM)
 
         verify(traversal).run(any<ConductingEquipment>(), any())
-        verify(traversal).run(simpleNs["c1"]!!, false)
+        verify(traversal).run(simpleNs["c1"]!!)
     }
 
     @Test
@@ -171,8 +171,8 @@ internal class LimitedConnectedEquipmentTraceTest {
         trace.run(listOf(ns["j2"]!!), 2, FeederDirection.BOTH)
 
         verify(traversal, times(2)).run(any<ConductingEquipment>(), any())
-        verify(traversal).run(ns["c1"]!!, false)
-        verify(traversal).run(ns["c5"]!!, false)
+        verify(traversal).run(ns["c1"]!!)
+        verify(traversal).run(ns["c5"]!!)
     }
 
     @Test
@@ -194,7 +194,7 @@ internal class LimitedConnectedEquipmentTraceTest {
         trace.run(listOf(ns["j2"]!!), 2, FeederDirection.NONE)
 
         verify(traversal).run(any<ConductingEquipment>(), any())
-        verify(traversal).run(ns["c5"]!!, false)
+        verify(traversal).run(ns["c5"]!!)
     }
 
     @Test

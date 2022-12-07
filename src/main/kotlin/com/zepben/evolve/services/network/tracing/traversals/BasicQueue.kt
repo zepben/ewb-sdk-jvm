@@ -61,7 +61,7 @@ open class BasicQueue<T> protected constructor(
          * @return The new instance.
          */
         @JvmStatic
-        fun <T> breadFirstSupplier(): Supplier<TraversalQueue<T>> {
+        fun <T> breadthFirstSupplier(): Supplier<TraversalQueue<T>> {
             return Supplier { breadthFirst() }
         }
 

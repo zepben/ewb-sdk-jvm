@@ -26,7 +26,7 @@ public class BranchRecursiveTraversalJavaTest {
 
     @Test
     void simpleTest() {
-        new BranchRecursiveTraversal<>(this::queueNext, BasicQueue.depthFirstSupplier(), BasicTracker::new, BasicQueue.breadFirstSupplier())
+        new BranchRecursiveTraversal<>(this::queueNext, BasicQueue.depthFirstSupplier(), BasicTracker::new, BasicQueue.breadthFirstSupplier())
             .addStepAction((i, isStopping) -> visitOrder.add(i))
             .addStopCondition((i) -> {
                 ++stopCount;

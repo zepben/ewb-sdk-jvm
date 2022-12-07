@@ -7,6 +7,7 @@
 * Renamed `FeederDirection.has` to `FeederDirection.contains`, which can be used via its operator version `in`. e.g. `BOTH.has(DOWNSTREAM)` can be replaced with
   `BOTH.contains(DOWNSTREAM)` or `DOWNSTREAM in BOTH`
 * Removed deprecated function `NetworkConsumerClient.getFeeder`.
+* Renamed function 'breadFirstSupplier' to 'breadthFirstSupplier' in 'BasicQueue' class.
 
 ### New Features
 

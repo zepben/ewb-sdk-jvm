@@ -138,7 +138,7 @@ internal class ConnectivityTraceTest {
     }
 
     private fun validateRun(t: BasicTraversal<ConnectivityResult>, vararg expected: String) {
-        NetworkService.connectedEquipment(ConnectedEquipmentNetwork.create()["start"]!!).forEach { t.queue.add(it) }
+        NetworkService.connectedEquipment(ConnectedEquipmentNetwork.createStraight()["start"]!!).forEach { t.queue.add(it) }
 
         t.addStepAction { cr, _ -> visited.add(cr.to!!.mRID) }
             .run()

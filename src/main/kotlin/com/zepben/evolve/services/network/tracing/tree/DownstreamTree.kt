@@ -47,7 +47,7 @@ class DownstreamTree(
 
     private fun getDownPhases(terminal: Terminal): Set<SinglePhaseKind> {
         val direction = directionSelector.select(terminal).value
-        if (!direction.has(FeederDirection.DOWNSTREAM))
+        if (FeederDirection.DOWNSTREAM !in direction)
             return mutableSetOf()
 
         val conductingEquipment = terminal.conductingEquipment!!

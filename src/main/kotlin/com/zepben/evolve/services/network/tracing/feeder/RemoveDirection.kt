@@ -95,7 +95,7 @@ class RemoveDirection {
             //    2+: do not queue or remove anything else as everything is still valid.
             //
             val oppositeDirection = current.directionToEbb.findOpposite()
-            val matchingTerminals = otherTerminals.filter { directionSelector.select(it).value.has(current.directionToEbb) }
+            val matchingTerminals = otherTerminals.filter { current.directionToEbb in directionSelector.select(it).value }
             when (matchingTerminals.size) {
                 0 -> {
                     otherTerminals
@@ -134,7 +134,7 @@ class RemoveDirection {
             //    2+: do not queue or remove anything else as everything is still valid.
             //
             val oppositeDirection = directionEbbed.findOpposite()
-            val matchingTerminals = otherTerminals.filter { directionSelector.select(it).value.has(directionEbbed) }
+            val matchingTerminals = otherTerminals.filter { directionEbbed in directionSelector.select(it).value }
             when (matchingTerminals.size) {
                 0 -> otherTerminals.forEach { traversal.queue.add(TerminalDirection(it, oppositeDirection)) }
                 1 -> traversal.queue.add(TerminalDirection(matchingTerminals.first(), oppositeDirection))

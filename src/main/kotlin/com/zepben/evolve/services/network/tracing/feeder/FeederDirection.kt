@@ -27,25 +27,23 @@ enum class FeederDirection(private val value: Int) {
         private val directionsByValues: Array<FeederDirection> = enumValues<FeederDirection>().sortedBy { it.value }.toTypedArray()
 
         @JvmStatic
-        fun from(value: Int): FeederDirection {
-            return if (value <= 0 || value > 3) NONE else directionsByValues[value]
+        fun from(value: Int): FeederDirection = if (value <= 0 || value > 3) NONE else directionsByValues[value]
+    }
+
+    fun value(): Int = value
+
+    operator fun contains(other: FeederDirection): Boolean = if (this == BOTH) other != NONE else this == other
+
+    operator fun plus(rhs: FeederDirection): FeederDirection = directionsByValues[value or rhs.value]
+
+    operator fun minus(rhs: FeederDirection): FeederDirection = directionsByValues[value - (value and rhs.value)]
+
+    operator fun not(): FeederDirection =
+        when (this) {
+            UPSTREAM -> DOWNSTREAM
+            DOWNSTREAM -> UPSTREAM
+            BOTH -> NONE
+            NONE -> BOTH
         }
-    }
-
-    fun value(): Int {
-        return value
-    }
-
-    fun has(other: FeederDirection): Boolean {
-        return if (this == BOTH) other != NONE else this == other
-    }
-
-    operator fun plus(rhs: FeederDirection): FeederDirection {
-        return directionsByValues[value or rhs.value]
-    }
-
-    operator fun minus(rhs: FeederDirection): FeederDirection {
-        return directionsByValues[value - (value and rhs.value)]
-    }
 
 }

@@ -86,7 +86,7 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
     /**
      * All [ProtectionEquipment]s operating this [ProtectedSwitch]. Collection is read-only.
      *
-     * @return A read-only [Collection] of [ProtectionEquipment]s attached to this [ProtectedSwitch].
+     * @return A read-only [Collection] of [ProtectionEquipment]s operating this [ProtectedSwitch].
      */
     val operatedByProtectionEquipment: Collection<ProtectionEquipment> get() = _operatedByProtectionEquipment.asUnmodifiable()
 
@@ -108,7 +108,7 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
     /**
      * Associate this [ProtectedSwitch] with a [ProtectionEquipment] operating it.
      *
-     * @param protectionEquipment The [RecloseSequence] to associate with this [ProtectedSwitch].
+     * @param protectionEquipment The [ProtectionEquipment] to associate with this [ProtectedSwitch].
      * @return A reference to this [ProtectedSwitch] for fluent use.
      */
     fun addOperatedByProtectionEquipment(protectionEquipment: ProtectionEquipment): ProtectedSwitch {
@@ -135,6 +135,8 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
 
     /**
      * Disassociate all [ProtectionEquipment]s from this [ProtectedSwitch].
+     *
+     * @return A reference to this [ProtectedSwitch] for fluent use.
      */
     fun clearOperatedByProtectionEquipment(): ProtectedSwitch {
         _operatedByProtectionEquipment = null

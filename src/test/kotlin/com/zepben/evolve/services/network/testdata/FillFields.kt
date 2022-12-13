@@ -10,10 +10,7 @@ package com.zepben.evolve.services.network.testdata
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -25,6 +22,8 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -33,6 +32,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createRemoteSource
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locationOf
@@ -118,6 +118,14 @@ fun ShuntCompensatorInfo.fillFields(service: NetworkService, includeRuntime: Boo
     ratedCurrent = 2
     ratedReactivePower = 3
     ratedVoltage = 4
+
+    return this
+}
+
+fun SwitchInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): SwitchInfo {
+    (this as AssetInfo).fillFields(service, includeRuntime)
+
+    ratedInterruptingTime = 1.1
 
     return this
 }
@@ -259,6 +267,14 @@ fun Location.fillFields(service: NetworkService, includeRuntime: Boolean = true)
 }
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+fun CurrentRelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentRelayInfo {
+    (this as AssetInfo).fillFields(service, includeRuntime)
+
+    curveSetting = "curveSetting"
+
+    return this
+}
 
 fun CurrentTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentTransformerInfo {
     (this as AssetInfo).fillFields(service, includeRuntime)
@@ -674,6 +690,26 @@ fun Measurement.fillFields(service: NetworkService, includeRuntime: Boolean = tr
     terminalMRID = Terminal().mRID
     phases = PhaseCode.ABCN
     unitSymbol = UnitSymbol.HENRYS
+
+    return this
+}
+
+/************ IEC61970 Base Protection ************/
+
+fun ProtectionEquipment.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionEquipment {
+    (this as Equipment).fillFields(service, includeRuntime)
+
+    relayDelayTime = 1.1
+    protectionKind = ProtectionKind.IEF
+
+    return this
+}
+
+fun RecloseSequence.fillFields(service: NetworkService, includeRuntime: Boolean = true): RecloseSequence {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+
+    recloseDelay = 1.1
+    recloseStep = 2
 
     return this
 }

@@ -17,6 +17,6 @@ import com.zepben.evolve.cim.iec61968.assets.AssetInfo
  */
 class CurrentRelayInfo(mRID: String = "") : AssetInfo(mRID) {
 
-    val curveSetting: String? = null
+    var curveSetting: String? = null
 
 }

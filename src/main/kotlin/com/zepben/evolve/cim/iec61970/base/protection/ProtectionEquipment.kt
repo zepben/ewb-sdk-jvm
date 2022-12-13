@@ -27,7 +27,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
 abstract class ProtectionEquipment(mRID: String = "") : Equipment(mRID) {
 
     var relayDelayTime: Double? = null
-    var protectionKind: ProtectionKind? = null
+    var protectionKind: ProtectionKind = ProtectionKind.UNKNOWN
     private var _protectedSwitches: MutableList<ProtectedSwitch>? = null
 
     /**

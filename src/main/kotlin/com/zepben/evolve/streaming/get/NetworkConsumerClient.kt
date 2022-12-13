@@ -276,30 +276,6 @@ class NetworkConsumerClient(
     }
 
     /***
-     * Retrieve the feeder network for the specified [mRID] and store the results in the [service].
-     *
-     * This is a convenience method that will fetch the feeder object and all the equipment referenced by the feeder (normal state), along with
-     * all references. This should entail a complete connectivity model for the feeder, however not the connectivity between multiple feeders.
-     *
-     * @param mRID The mRID of the [Feeder] to fetch equipment for.
-     *
-     * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item couldn't be added to
-     * [service], its mRID will be present in [MultiObjectResult.failed].
-     *
-     * In addition to normal gRPC errors, you may also receive an unsuccessful [GrpcResult] with the following errors:
-     * - [NoSuchElementException] if the requested object was not found.
-     * - [ClassCastException] if the requested object was of the wrong type.
-     */
-    @Deprecated(
-        "prefer the more generic getEquipmentContainer",
-        replaceWith = ReplaceWith(
-            "this.getEquipmentContainer<Feeder>(mRID)",
-            "com.zepben.evolve.cim.iec61970.base.core.Feeder"
-        )
-    )
-    fun getFeeder(mRID: String): GrpcResult<MultiObjectResult> = getEquipmentContainer(mRID, Feeder::class.java)
-
-    /***
      * Retrieve the equipment container network for the specified [mRID] and store the results in the [service].
      *
      * This is a convenience method that will fetch the container object and all the equipment contained, along with all subsequent

@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.assetinfo.SwitchInfo
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 
 /**
@@ -21,8 +22,11 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
  * @property normalOpen The attribute is used in cases when no Measurement for the status value is present. If the Switch has a status measurement
  *                      the Discrete.normalValue is expected to match with the Switch.normalOpen.
  * @property open The attribute tells if the switch is considered open when used as input to topology processing.
+ * @property assetInfo Datasheet information for this Switch.
  */
 abstract class Switch(mRID: String = "") : ConductingEquipment(mRID) {
+
+    override var assetInfo: SwitchInfo? = null
 
     var ratedCurrent: Int? = null
     internal var normalOpen: Int = 0

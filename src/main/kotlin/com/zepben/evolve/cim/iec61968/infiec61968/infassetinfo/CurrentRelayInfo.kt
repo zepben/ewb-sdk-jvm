@@ -8,12 +8,14 @@
 
 package com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo
 
+import com.zepben.evolve.cim.iec61968.assets.AssetInfo
+
 /**
  * Current Relay Datasheet Information.
  *
  * @property curveSetting The type of curve used for the Current Relay.
  */
-class CurrentRelayInfo {
+class CurrentRelayInfo(mRID: String = "") : AssetInfo(mRID) {
 
     val curveSetting: String? = null
 

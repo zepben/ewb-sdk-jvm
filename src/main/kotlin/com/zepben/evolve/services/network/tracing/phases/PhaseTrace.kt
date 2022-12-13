@@ -111,7 +111,7 @@ object PhaseTrace {
                 if (upPhases.isNotEmpty()) {
                     NetworkService.connectedTerminals(terminal, upPhases).forEach { cr ->
                         // When going upstream, we only want to traverse to connected terminals that have a DOWNSTREAM direction
-                        if (activeDirection.select(cr.toTerminal).value.has(FeederDirection.DOWNSTREAM))
+                        if (FeederDirection.DOWNSTREAM in activeDirection.select(cr.toTerminal).value)
                             tryQueue(traversal, cr, cr.toNominalPhases)
                     }
                 }
@@ -131,7 +131,7 @@ object PhaseTrace {
     ): Set<SinglePhaseKind> {
         val matchedPhases = mutableSetOf<SinglePhaseKind>()
 
-        if (!activeDirection.select(terminal).value.has(direction))
+        if (direction !in activeDirection.select(terminal).value)
             return matchedPhases
 
         val conductingEquipment = terminal.conductingEquipment!!

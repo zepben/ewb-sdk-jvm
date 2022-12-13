@@ -7,12 +7,15 @@
  */
 package com.zepben.evolve.services.network.tracing
 
+import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.evolve.services.network.tracing.connectivity.*
 import com.zepben.evolve.services.network.tracing.feeder.*
 import com.zepben.evolve.services.network.tracing.phases.*
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
+import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
 
 /**
@@ -84,6 +87,54 @@ object Tracing {
      * @return The new [LimitedConnectedEquipmentTrace] instance.
      */
     fun currentLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace = ConnectedEquipmentTrace.newCurrentLimitedConnectedEquipmentTrace()
+
+    /**
+     * Create a new [BasicTraversal] that traverses in the downstream direction using the normal state of the network. The trace works on [ConductingEquipment],
+     * and ignores phase connectivity, instead considering things to be connected if they share a [ConnectivityNode].
+     *
+     * @param queue An optional parameter to allow you to change the queue being used for the traversal. The default value is a LIFO queue.
+     * @return The [BasicTraversal].
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun normalDownstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = BasicQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
+        ConnectedEquipmentTrace.newNormalDownstreamEquipmentTrace(queue)
+
+    /**
+     * Create a new [BasicTraversal] that traverses in the downstream direction using the current state of the network. The trace works on [ConductingEquipment],
+     * and ignores phase connectivity, instead considering things to be connected if they share a [ConnectivityNode].
+     *
+     * @param queue An optional parameter to allow you to change the queue being used for the traversal. The default value is a LIFO queue.
+     * @return The [BasicTraversal].
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun currentDownstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = BasicQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
+        ConnectedEquipmentTrace.newCurrentDownstreamEquipmentTrace(queue)
+
+    /**
+     * Create a new [BasicTraversal] that traverses in the upstream direction using the normal state of the network. The trace works on [ConductingEquipment],
+     * and ignores phase connectivity, instead considering things to be connected if they share a [ConnectivityNode].
+     *
+     * @param queue An optional parameter to allow you to change the queue being used for the traversal. The default value is a LIFO queue.
+     * @return The [BasicTraversal].
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun normalUpstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = BasicQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
+        ConnectedEquipmentTrace.newNormalUpstreamEquipmentTrace(queue)
+
+    /**
+     * Create a new [BasicTraversal] that traverses in the upstream direction using the current state of the network. The trace works on [ConductingEquipment],
+     * and ignores phase connectivity, instead considering things to be connected if they share a [ConnectivityNode].
+     *
+     * @param queue An optional parameter to allow you to change the queue being used for the traversal. The default value is a LIFO queue.
+     * @return The [BasicTraversal].
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun currentUpstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = BasicQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
+        ConnectedEquipmentTrace.newCurrentUpstreamEquipmentTrace(queue)
 
     /**
      * Creates a new traversal that traces equipment that are connected. This ignores phases, open status etc.

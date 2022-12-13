@@ -78,11 +78,11 @@ class PhaseInferrer {
     private fun List<Terminal>.missingFromDownToUp(phaseSelector: PhaseSelector, directionSelector: DirectionSelector): List<Terminal> =
         filter { terminal ->
             hasNonePhase(terminal, phaseSelector) &&
-                directionSelector.select(terminal).value.has(FeederDirection.UPSTREAM) &&
+                FeederDirection.UPSTREAM in directionSelector.select(terminal).value &&
                 terminal.connectivityNode!!.terminals
                     .asSequence()
                     .filter { it != terminal }
-                    .filter { directionSelector.select(it).value.has(FeederDirection.DOWNSTREAM) }
+                    .filter { FeederDirection.DOWNSTREAM in directionSelector.select(it).value }
                     .any { !hasNonePhase(it, phaseSelector) }
         }
 
@@ -92,7 +92,7 @@ class PhaseInferrer {
                 terminal.connectivityNode!!.terminals
                     .asSequence()
                     .filter { it != terminal }
-                    .filter { directionSelector.select(it).value.has(FeederDirection.DOWNSTREAM) }
+                    .filter { FeederDirection.DOWNSTREAM in directionSelector.select(it).value }
                     .any { !hasNonePhase(it, phaseSelector) }
         }
 

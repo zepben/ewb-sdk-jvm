@@ -31,33 +31,31 @@ Obviously we provide a function to let you to find out. Let's see it in code:
 <TabItem value="java">
 
 ```java
-Breaker switch = network.get("aSwitch);
-List<ConnectivityResult> connectivity = Tracing.connectedEquipment(switch, PhaseCode.ABCN);
+Breaker aSwitch = network.get(Breaker.class, "aSwitch");
+List<ConnectivityResult> connectivity = NetworkService.connectedEquipment(aSwitch, PhaseCode.ABCN);
 connectivity.forEach(cr -> {
-    println(String.format(
-        "%s is connected to %s " +
-        "via terminals %s -> ${it.toTerminal()} " +
-        "through phases %s",
-        it.from(),
-        it.to(),
-        it.fromTerminal(),
-        it.toTerminal(),
-        it.nominalPhasePaths().stream().map(path -> "${path.from()}:${path.to()}" }).collect(joining())
-    ));
-}
+    System.out.printf(
+        "%s is connected to %s via terminals %s -> %s through phases %s%n",
+        cr.getFrom(),
+        cr.getTo(),
+        cr.getFromTerminal(),
+        cr.getToTerminal(),
+        cr.getNominalPhasePaths().stream().map(path -> String.format("%s:%s", path.getFrom(), path.getTo())).collect(joining())
+    );
+});
 ```
 
 </TabItem>
 <TabItem  value="kotlin">
 
 ```kotlin
-val switch: Breaker = network.get("aSwitch)
-val connectivity: List<ConnectivityResult> = Tracing.connectedEquipment(switch, PhaseCode.ABCN)
+val aSwitch = network.get<Breaker>("aSwitch")
+val connectivity = NetworkService.connectedEquipment(aSwitch, PhaseCode.ABCN)
 connectivity.forEach {
     println(
-        "${it.from()} is connected to ${it.to()} " +
-        "via terminals ${it.fromTerminal()} -> ${it.toTerminal()} " +
-        """through phases ${it.nominalPhasePaths().map { path -> "${path.from()}:${path.to()}" }}"""
+        "${it.from} is connected to ${it.to} " +
+            "via terminals ${it.fromTerminal} -> ${it.toTerminal} " +
+            """through phases ${it.nominalPhasePaths.map { path -> "${path.from}:${path.to}" }}"""
     )
 }
 ```
@@ -79,16 +77,16 @@ equipment?". You can do this by using specific terminals:
 <TabItem value="java">
 
 ```java
-Breaker switch = network.get("aSwitch);
-List<ConnectivityResult> connectivity = Tracing.connectedTerminals(switch, PhaseCode.ABCN);
+Breaker aSwitch = network.get(Breaker.class, "aSwitch");
+List<ConnectivityResult> connectivity = NetworkService.connectedTerminals(aSwitch.getTerminal(1), PhaseCode.ABCN);
 ```
 
 </TabItem>
 <TabItem  value="kotlin">
 
 ```kotlin
-val switch: Breaker = network.get("aSwitch)
-val connectivity: List<ConnectivityResult> = Tracing.connectedTerminals(switch, PhaseCode.ABCN)
+val aSwitch = network.get<Breaker>("aSwitch")
+val connectivity = NetworkService.connectedTerminals(aSwitch.getTerminal(1), PhaseCode.ABCN)
 ```
 
 </TabItem>
@@ -97,7 +95,46 @@ val connectivity: List<ConnectivityResult> = Tracing.connectedTerminals(switch, 
 This will produce a subset of the result above, with just the equipment connected to the given terminal. The 
 connectivity result instances in the subset will be exactly the same as the previous example.
 
+Sometimes you do not care about the phase connectivity at all, and are just interested in terminals that share a connectivity node:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+Breaker aSwitch = network.get(Breaker.class, "aSwitch");
+Iterator<Terminal> iter = aSwitch.getTerminal(1).connectedTerminals().iterator();
+while (iter.hasNext()) {
+    System.out.println(iter.next());
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val aSwitch = network.get<Breaker>("aSwitch")
+aSwitch.getTerminal(1)!!.connectedTerminals().forEach { println(it) }
+```
+
+</TabItem>
+</Tabs>
+
+This will return a `Sequence` of all the terminals that share the same `ConnectivityNode`, regardless of any phase connectivity.
+
 ## Tracing
+
+### Feeder Direction
+
+`UPSTREAM` and `DOWNSTREAM` are concepts that only apply to equipment on feeders (HV or LV). These directions are purely for finding the feeder head, and have
+not been calculated with any power flow analysis. There is also a concept of `BOTH` if the feeder head can be found in either direction. e.g. in a loop or dual
+feed situation
 
 ### Basic Traversal
 
@@ -138,22 +175,24 @@ NetworkService network = new NetworkService();
 
 // Populate network service with your network
 
-AcLineSegment acLineSeg = network.get("my conductor", AcLineSegment.class);
-if (acLineSeg == null) 
+AcLineSegment acLineSeg = network.get(AcLineSegment.class, "my conductor");
+if (acLineSeg == null)
     return;
 
+ConnectedEquipmentTraversal trace = Tracing.connectedEquipmentTrace();
+
 List<Breaker> breakers = new ArrayList<>();
-List<ConductingEquipment> equipmentBetweenBreakers = ArrayList<>();
-Tracing.connectedEquipmentTrace()
-    .addStopCondition(equipment -> equipment instanceof Breaker)
-    .addStepAction((equipment, isStopping) -> {
-        if (equipment instanceof Breaker) {
-            breakers.add((Breaker) equipment);
+List<ConductingEquipment> equipmentBetweenBreakers = new ArrayList<>();
+trace.addStopCondition(step -> step.getConductingEquipment() instanceof Breaker)
+    .addStepAction((step, isStopping) -> {
+        if (step.getConductingEquipment() instanceof Breaker) {
+            breakers.add((Breaker) step.getConductingEquipment());
         } else if (!isStopping) {
-            equipmentBetweenBreakers.add(equipment);
+            equipmentBetweenBreakers.add(step.getConductingEquipment());
         }
-    })
-    .run(acLineSeg);
+    });
+
+trace.run(acLineSeg);
 
 System.out.println("The closest circuit breakers are: " + breakers);
 System.out.println("The equipment between the above breakers: " + equipmentBetweenBreakers);
@@ -171,16 +210,16 @@ val acLineSeg = network.get<AcLineSegment>("my conductor") ?: return
 
 val breakers = mutableListOf<Breaker>()
 val equipmentBetweenBreakers = mutableListOf<ConductingEquipment>()
-Tracing.connectedEquipmentTrace()
-    .addStopCondition { it is Breaker }
-    .addStepAction { equipment, isStopping ->
-        if (equipment is Breaker) {
-            breakers.add(equipment)
+Tracing.connectedEquipmentTrace().apply {
+    addStopCondition { (ce) -> ce is Breaker }
+    addStepAction { (ce), isStopping ->
+        if (ce is Breaker) {
+            breakers.add(ce)
         } else if (!isStopping) {
-            equipmentBetweenBreakers.add(equipment)
+            equipmentBetweenBreakers.add(ce)
         }
     }
-    .run(acLineSeg)
+}.run(acLineSeg)
 
 println("The closest circuit breakers are: $breakers")
 println("The equipment between the above breakers: $equipmentBetweenBreakers")
@@ -199,34 +238,44 @@ Let's break down what is happening with the trace:
 
 As you can see this provides an extremely simple but powerful way to perform useful traces over your network. 
 
-### Useful traces
+### Useful Traces
 
 There are a number of traces that will be common between all networks. We have identified numerous of these and 
 provide an easy way to instantiate them.
 
-#### Set phases trace
+#### Set Phases Trace
 
 `Tracing.setPhases()` returns a `SetPhases` instance. This provides a way to dynamically set phases at runtime based
 on a network's energy sources and the nominal phase connectivity within the network.
 
-#### Phase traces 
+#### Phase Traces
 
-There are numerous traces to trace based on various types of phasing data. These traces will ignore 
+The following traces all use phase based connectivity. This means that equipment that share connectivity nodes, but not phases, will not be considered
+connected, and when a phase is dropped, it will no longer be considered for future connectivity. Each of these traces will use different aspects of the network
+to limit the scope of the trace:
 - `Tracing.phaseTrace()` will trace based on nominal phase connectivity, ignoring open switches or in service flags.
 - `Tracing.normalPhaseTrace()` will trace based on nominal phase connectivity, stopping at normally open switches or 
   equipment flagged as not normally in service. 
 - `Tracing.currentPhaseTrace()` will trace based on nominal phase connectivity, stopping at currently open switches or 
-  equipment flagged as not currently in service. 
-
-#### Downstream / Upstream traces 
-
-There are traces configured to find all upstream or downstream equipment from any piece of equipment that is on a feeder:
+  equipment flagged as not currently in service.
 - `Tracing.normalDownstreamTrace()` will trace downstream of the start equipment based on the normal state of the network.
 - `Tracing.currentDownstreamTrace()` will trace downstream of the start equipment based on the current state of the network.
 - `Tracing.normalUpstreamTrace()` will trace upstream of the start equipment based on the normal state of the network.
 - `Tracing.currentUpstreamTrace()` will trace upstream of the start equipment based on the current state of the network.
 
-#### Other traces
+#### Equipment Connectivity Traces
+
+The following work on `ConductingEquipment`, and ignores phase connectivity, instead considering things to be connected if they share a `ConnectivityNode`:
+- `Tracing.normalDownstreamEquipmentTrace()` will trace in the downstream direction, stopping at normally open switches, or equipment flagged as not normally in
+  service.
+- `Tracing.currentDownstreamEquipmentTrace()` will trace in the downstream direction, stopping at currently open switches, or equipment flagged as not normally
+  in service.
+- `Tracing.normalUpstreamEquipmentTrace()` will trace in the upstream direction, stopping at normally open switches, or equipment flagged as not normally in
+  service.
+- `Tracing.currentUpstreamEquipmentTrace()` will trace in the upstream direction, stopping at currently open switches, or equipment flagged as not normally in
+  service.
+
+#### Other Traces
 
 There are other useful but less common traces available. See the 
 [code](https://github.com/zepben/evolve-sdk-jvm/blob/main/src/main/java/com/zepben/cimbend/network/tracing/Tracing.java)

@@ -27,26 +27,26 @@ internal class FeederDirectionTest {
     }
 
     @Test
-    internal fun testHas() {
-        assertThat("NONE has NONE", FeederDirection.NONE.has(FeederDirection.NONE))
-        assertThat("NONE does not have UPSTREAM", !FeederDirection.NONE.has(FeederDirection.UPSTREAM))
-        assertThat("NONE does not have DOWNSTREAM", !FeederDirection.NONE.has(FeederDirection.DOWNSTREAM))
-        assertThat("NONE does not have BOTH", !FeederDirection.NONE.has(FeederDirection.BOTH))
+    internal fun testContains() {
+        assertThat("NONE has NONE", FeederDirection.NONE in FeederDirection.NONE)
+        assertThat("NONE does not have UPSTREAM", FeederDirection.UPSTREAM !in FeederDirection.NONE)
+        assertThat("NONE does not have DOWNSTREAM", FeederDirection.DOWNSTREAM !in FeederDirection.NONE)
+        assertThat("NONE does not have BOTH", FeederDirection.BOTH !in FeederDirection.NONE)
 
-        assertThat("UPSTREAM does not have NONE", !FeederDirection.UPSTREAM.has(FeederDirection.NONE))
-        assertThat("UPSTREAM has UPSTREAM", FeederDirection.UPSTREAM.has(FeederDirection.UPSTREAM))
-        assertThat("UPSTREAM does not have DOWNSTREAM", !FeederDirection.UPSTREAM.has(FeederDirection.DOWNSTREAM))
-        assertThat("UPSTREAM does not have BOTH", !FeederDirection.UPSTREAM.has(FeederDirection.BOTH))
+        assertThat("UPSTREAM does not have NONE", FeederDirection.NONE !in FeederDirection.UPSTREAM)
+        assertThat("UPSTREAM has UPSTREAM", FeederDirection.UPSTREAM in FeederDirection.UPSTREAM)
+        assertThat("UPSTREAM does not have DOWNSTREAM", FeederDirection.DOWNSTREAM !in FeederDirection.UPSTREAM)
+        assertThat("UPSTREAM does not have BOTH", FeederDirection.BOTH !in FeederDirection.UPSTREAM)
 
-        assertThat("DOWNSTREAM does not have NONE", !FeederDirection.DOWNSTREAM.has(FeederDirection.NONE))
-        assertThat("DOWNSTREAM does not have UPSTREAM", !FeederDirection.DOWNSTREAM.has(FeederDirection.UPSTREAM))
-        assertThat("DOWNSTREAM has DOWNSTREAM", FeederDirection.DOWNSTREAM.has(FeederDirection.DOWNSTREAM))
-        assertThat("DOWNSTREAM does not have BOTH", !FeederDirection.DOWNSTREAM.has(FeederDirection.BOTH))
+        assertThat("DOWNSTREAM does not have NONE", FeederDirection.NONE !in FeederDirection.DOWNSTREAM)
+        assertThat("DOWNSTREAM does not have UPSTREAM", FeederDirection.UPSTREAM !in FeederDirection.DOWNSTREAM)
+        assertThat("DOWNSTREAM has DOWNSTREAM", FeederDirection.DOWNSTREAM in FeederDirection.DOWNSTREAM)
+        assertThat("DOWNSTREAM does not have BOTH", FeederDirection.BOTH !in FeederDirection.DOWNSTREAM)
 
-        assertThat("BOTH does not have NONE", !FeederDirection.BOTH.has(FeederDirection.NONE))
-        assertThat("BOTH has UPSTREAM", FeederDirection.BOTH.has(FeederDirection.UPSTREAM))
-        assertThat("BOTH has DOWNSTREAM", FeederDirection.BOTH.has(FeederDirection.DOWNSTREAM))
-        assertThat("BOTH has BOTH", FeederDirection.BOTH.has(FeederDirection.BOTH))
+        assertThat("BOTH does not have NONE", FeederDirection.NONE !in FeederDirection.BOTH)
+        assertThat("BOTH has UPSTREAM", FeederDirection.UPSTREAM in FeederDirection.BOTH)
+        assertThat("BOTH has DOWNSTREAM", FeederDirection.DOWNSTREAM in FeederDirection.BOTH)
+        assertThat("BOTH has BOTH", FeederDirection.BOTH in FeederDirection.BOTH)
     }
 
     @Test
@@ -93,7 +93,14 @@ internal class FeederDirectionTest {
         assertThat(FeederDirection.BOTH - FeederDirection.UPSTREAM, equalTo(FeederDirection.DOWNSTREAM))
         assertThat(FeederDirection.BOTH - FeederDirection.DOWNSTREAM, equalTo(FeederDirection.UPSTREAM))
         assertThat(FeederDirection.BOTH - FeederDirection.BOTH, equalTo(FeederDirection.NONE))
+    }
 
+    @Test
+    internal fun testNot() {
+        assertThat(!FeederDirection.NONE, equalTo(FeederDirection.BOTH))
+        assertThat(!FeederDirection.UPSTREAM, equalTo(FeederDirection.DOWNSTREAM))
+        assertThat(!FeederDirection.DOWNSTREAM, equalTo(FeederDirection.UPSTREAM))
+        assertThat(!FeederDirection.BOTH, equalTo(FeederDirection.NONE))
     }
 
 }

@@ -711,7 +711,7 @@ fun NetworkService.addFromPb(pb: PBDiscrete): Discrete? = tryAddOrNull(toCim(pb,
 fun toCim(pb: PBCurrentRelay, networkService: NetworkService): CurrentRelay =
     CurrentRelay(pb.mRID()).apply {
         currentLimit1 = pb.currentLimit1.takeUnless { it == UNKNOWN_DOUBLE }
-        inverseTimeFlag = pb.inverseTimeFlag // TODO: Either make this a non-null boolean or figure out how to express null boolean in protobuf
+        inverseTimeFlag = pb.inverseTimeFlag.takeIf { pb.hasField(pb.descriptorForType.findFieldByName("inverseTimeFlag")) }
         timeDelay1 = pb.timeDelay1.takeUnless { it == UNKNOWN_DOUBLE }
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
         toCim(pb.pe, this, networkService)

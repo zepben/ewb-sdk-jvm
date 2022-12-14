@@ -120,7 +120,7 @@ class NetworkService : BaseService("network") {
     // #####################################
 
     fun add(currentRelayInfo: CurrentRelayInfo): Boolean = super.add(currentRelayInfo)
-    fun remove(currentRelayInfo: CurrentRelayInfo): Boolean = super.add(currentRelayInfo)
+    fun remove(currentRelayInfo: CurrentRelayInfo): Boolean = super.remove(currentRelayInfo)
 
     fun add(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.add(currentTransformerInfo)
     fun remove(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.remove(currentTransformerInfo)

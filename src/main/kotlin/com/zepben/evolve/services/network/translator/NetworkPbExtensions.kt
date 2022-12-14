@@ -12,6 +12,7 @@ import com.zepben.evolve.services.common.translator.nameAndMRID
 import com.zepben.protobuf.cim.iec61968.assetinfo.*
 import com.zepben.protobuf.cim.iec61968.assets.*
 import com.zepben.protobuf.cim.iec61968.common.Location
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice
@@ -68,6 +69,7 @@ fun Location.mRID(): String = io.mrid
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
+fun CurrentRelayInfo.mRID(): String = ai.mRID()
 fun CurrentTransformerInfo.mRID(): String = ai.mRID()
 fun PotentialTransformerInfo.mRID(): String = ai.mRID()
 

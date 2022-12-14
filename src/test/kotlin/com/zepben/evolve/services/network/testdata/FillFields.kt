@@ -832,7 +832,7 @@ fun AcLineSegment.fillFields(service: NetworkService, includeRuntime: Boolean = 
 fun Breaker.fillFields(service: NetworkService, includeRuntime: Boolean = true): Breaker {
     (this as ProtectedSwitch).fillFields(service, includeRuntime)
 
-    inTransitTime = 1
+    inTransitTime = 1.1
 
     return this
 }

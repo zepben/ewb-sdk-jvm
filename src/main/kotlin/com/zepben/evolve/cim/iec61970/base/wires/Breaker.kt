@@ -16,7 +16,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
  */
 class Breaker @JvmOverloads constructor(mRID: String = "") : ProtectedSwitch(mRID) {
 
-    var inTransitTime: Int? = null
+    var inTransitTime: Double? = null
 
     /**
      * @return convenience function for detecting if this breaker is part of a substation.

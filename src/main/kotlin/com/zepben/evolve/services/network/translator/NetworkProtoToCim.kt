@@ -10,10 +10,7 @@ package com.zepben.evolve.services.network.translator
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -64,6 +61,7 @@ import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo as PBCurrentRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infcommon.Ratio as PBRatio
@@ -353,6 +351,12 @@ fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb,
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
+fun toCim(pb: PBCurrentRelayInfo, networkService: NetworkService): CurrentRelayInfo =
+    CurrentRelayInfo(pb.mRID()).apply {
+        curveSetting = pb.curveSetting.takeIf { it.isNotBlank() }
+        toCim(pb.ai, this, networkService)
+    }
+
 fun toCim(pb: PBCurrentTransformerInfo, networkService: NetworkService): CurrentTransformerInfo =
     CurrentTransformerInfo(pb.mRID()).apply {
         accuracyClass = pb.accuracyClass.takeIf { it.isNotBlank() }
@@ -381,6 +385,7 @@ fun toCim(pb: PBPotentialTransformerInfo, networkService: NetworkService): Poten
         toCim(pb.ai, this, networkService)
     }
 
+fun NetworkService.addFromPb(pb: PBCurrentRelayInfo): CurrentRelayInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = tryAddOrNull(toCim(pb, this))
 
@@ -1118,6 +1123,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBLocation): Location? = networkService.addFromPb(pb)
 
     // IEC61968 infIEC61968 InfAssetInfo
+    fun addFromPb(pb: PBCurrentRelayInfo): CurrentRelayInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = networkService.addFromPb(pb)
 

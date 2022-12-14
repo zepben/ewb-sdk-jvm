@@ -40,7 +40,7 @@ internal class BreakerTest {
 
         breaker.fillFields(NetworkService())
 
-        assertThat(breaker.inTransitTime, equalTo(1))
+        assertThat(breaker.inTransitTime, equalTo(1.1))
     }
 
     @Test

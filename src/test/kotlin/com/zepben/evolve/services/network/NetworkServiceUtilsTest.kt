@@ -13,6 +13,7 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -27,6 +28,8 @@ import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -122,6 +125,10 @@ internal class NetworkServiceUtilsTest {
         isPotentialTransformerInfo: (PotentialTransformerInfo) -> String,
         isCurrentTransformer: (CurrentTransformer) -> String,
         isPotentialTransformer: (PotentialTransformer) -> String,
+        isSwitchInfo: (SwitchInfo) -> String,
+        isCurrentRelayInfo: (CurrentRelayInfo) -> String,
+        isCurrentRelay: (CurrentRelay) -> String,
+        isRecloseSequence: (RecloseSequence) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -189,6 +196,10 @@ internal class NetworkServiceUtilsTest {
         isPotentialTransformerInfo = isPotentialTransformerInfo,
         isCurrentTransformer = isCurrentTransformer,
         isPotentialTransformer = isPotentialTransformer,
+        isSwitchInfo = isSwitchInfo,
+        isCurrentRelayInfo = isCurrentRelayInfo,
+        isCurrentRelay = isCurrentRelay,
+        isRecloseSequence = isRecloseSequence,
         isOther = isOther
     )
 
@@ -258,6 +269,10 @@ internal class NetworkServiceUtilsTest {
         isPotentialTransformerInfo: InvokeChecker<PotentialTransformerInfo> = NeverInvokedChecker(),
         isCurrentTransformer: InvokeChecker<CurrentTransformer> = NeverInvokedChecker(),
         isPotentialTransformer: InvokeChecker<PotentialTransformer> = NeverInvokedChecker(),
+        isSwitchInfo: InvokeChecker<SwitchInfo> = NeverInvokedChecker(),
+        isCurrentRelayInfo: InvokeChecker<CurrentRelayInfo> = NeverInvokedChecker(),
+        isCurrentRelay: InvokeChecker<CurrentRelay> = NeverInvokedChecker(),
+        isRecloseSequence: InvokeChecker<RecloseSequence> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -326,6 +341,10 @@ internal class NetworkServiceUtilsTest {
             isPotentialTransformerInfo = isPotentialTransformerInfo,
             isCurrentTransformer = isCurrentTransformer,
             isPotentialTransformer = isPotentialTransformer,
+            isSwitchInfo = isSwitchInfo,
+            isCurrentRelayInfo = isCurrentRelayInfo,
+            isCurrentRelay = isCurrentRelay,
+            isRecloseSequence = isRecloseSequence,
             isOther = isOther
         )
 
@@ -356,6 +375,7 @@ internal class NetworkServiceUtilsTest {
         isLinearShuntCompensator.verifyInvoke()
         isLocation.verifyInvoke()
         isLoop.verifyInvoke()
+        isLvFeeder.verifyInvoke()
         isMeter.verifyInvoke()
         isOperationalRestriction.verifyInvoke()
         isOrganisation.verifyInvoke()
@@ -388,6 +408,15 @@ internal class NetworkServiceUtilsTest {
         isOpenCircuitTest.verifyInvoke()
         isShortCircuitTest.verifyInvoke()
         isEquivalentBranch.verifyInvoke()
+        isShuntCompensatorInfo.verifyInvoke()
+        isCurrentTransformerInfo.verifyInvoke()
+        isPotentialTransformerInfo.verifyInvoke()
+        isCurrentTransformer.verifyInvoke()
+        isPotentialTransformer.verifyInvoke()
+        isSwitchInfo.verifyInvoke()
+        isCurrentRelayInfo.verifyInvoke()
+        isCurrentRelay.verifyInvoke()
+        isRecloseSequence.verifyInvoke()
         isOther.verifyInvoke()
     }
 
@@ -424,6 +453,7 @@ internal class NetworkServiceUtilsTest {
         LinearShuntCompensator().also { whenNetworkServiceObjectTester(it, isLinearShuntCompensator = InvokedChecker(it)) }
         Location().also { whenNetworkServiceObjectTester(it, isLocation = InvokedChecker(it)) }
         Loop().also { whenNetworkServiceObjectTester(it, isLoop = InvokedChecker(it)) }
+        LvFeeder().also { whenNetworkServiceObjectTester(it, isLvFeeder = InvokedChecker(it)) }
         Meter().also { whenNetworkServiceObjectTester(it, isMeter = InvokedChecker(it)) }
         OperationalRestriction().also { whenNetworkServiceObjectTester(it, isOperationalRestriction = InvokedChecker(it)) }
         Organisation().also { whenNetworkServiceObjectTester(it, isOrganisation = InvokedChecker(it)) }
@@ -457,6 +487,14 @@ internal class NetworkServiceUtilsTest {
         ShortCircuitTest().also { whenNetworkServiceObjectTester(it, isShortCircuitTest = InvokedChecker(it)) }
         EquivalentBranch().also { whenNetworkServiceObjectTester(it, isEquivalentBranch = InvokedChecker(it)) }
         ShuntCompensatorInfo().also { whenNetworkServiceObjectTester(it, isShuntCompensatorInfo = InvokedChecker(it)) }
+        CurrentTransformerInfo().also { whenNetworkServiceObjectTester(it, isCurrentTransformerInfo = InvokedChecker(it)) }
+        PotentialTransformerInfo().also { whenNetworkServiceObjectTester(it, isPotentialTransformerInfo = InvokedChecker(it)) }
+        CurrentTransformer().also { whenNetworkServiceObjectTester(it, isCurrentTransformer = InvokedChecker(it)) }
+        PotentialTransformer().also { whenNetworkServiceObjectTester(it, isPotentialTransformer = InvokedChecker(it)) }
+        SwitchInfo().also { whenNetworkServiceObjectTester(it, isSwitchInfo = InvokedChecker(it)) }
+        CurrentRelayInfo().also { whenNetworkServiceObjectTester(it, isCurrentRelayInfo = InvokedChecker(it)) }
+        CurrentRelay().also { whenNetworkServiceObjectTester(it, isCurrentRelay = InvokedChecker(it)) }
+        RecloseSequence().also { whenNetworkServiceObjectTester(it, isRecloseSequence = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

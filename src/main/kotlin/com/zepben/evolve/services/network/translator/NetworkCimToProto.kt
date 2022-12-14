@@ -23,6 +23,8 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -112,6 +114,8 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint as PBIoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay as PBCurrentRelay
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionEquipment as PBProtectionEquipment
+import com.zepben.protobuf.cim.iec61970.base.protection.RecloseSequence as PBRecloseSequence
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
@@ -155,6 +159,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerEl
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
+import com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind as PBProtectionKind
 
 /************ IEC61968 ASSET INFO ************/
 
@@ -662,9 +667,25 @@ fun toPb(cim: CurrentRelay, pb: PBCurrentRelay.Builder): PBCurrentRelay.Builder 
         pb.currentLimit1 = cim.currentLimit1 ?: UNKNOWN_DOUBLE
         cim.inverseTimeFlag?.let { inverseTimeFlag = it } ?: clearInverseTimeFlag()
         pb.timeDelay1 = cim.timeDelay1 ?: UNKNOWN_DOUBLE
+        toPb(cim, peBuilder)
+    }
+
+fun toPb(cim: ProtectionEquipment, pb: PBProtectionEquipment.Builder): PBProtectionEquipment.Builder =
+    pb.apply {
+        pb.relayDelayTime = cim.relayDelayTime ?: UNKNOWN_DOUBLE
+        pb.protectionKind = PBProtectionKind.valueOf(cim.protectionKind.name)
+        toPb(cim, eqBuilder)
+    }
+
+fun toPb(cim: RecloseSequence, pb: PBRecloseSequence.Builder): PBRecloseSequence.Builder =
+    pb.apply {
+        pb.recloseDelay = cim.recloseDelay ?: UNKNOWN_DOUBLE
+        pb.recloseStep = cim.recloseStep ?: UNKNOWN_INT
+        toPb(cim, ioBuilder)
     }
 
 fun CurrentRelay.toPb(): PBCurrentRelay = toPb(this, PBCurrentRelay.newBuilder()).build()
+fun RecloseSequence.toPb(): PBRecloseSequence = toPb(this, PBRecloseSequence.newBuilder()).build()
 
 /************ IEC61970 BASE SCADA ************/
 

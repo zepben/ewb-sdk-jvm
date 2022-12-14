@@ -1130,6 +1130,10 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: Control): PBControl = cim.toPb()
     fun toPb(cim: Discrete): PBDiscrete = cim.toPb()
 
+    // IEC61970 Base Protection
+    fun toPb(cim: CurrentRelay): PBCurrentRelay = cim.toPb()
+    fun toPb(cim: RecloseSequence): PBRecloseSequence = cim.toPb()
+
     // IEC61970 BASE SCADA
     fun toPb(cim: RemoteControl): PBRemoteControl = cim.toPb()
     fun toPb(cim: RemoteSource): PBRemoteSource = cim.toPb()

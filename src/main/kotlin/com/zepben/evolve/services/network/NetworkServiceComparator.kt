@@ -777,7 +777,6 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         ObjectDifference(source, target).apply {
             compareConductingEquipment()
 
-            compareIdReferences(PowerTransformer::assetInfo)
             compareIndexedIdReferenceCollections(PowerTransformer::ends)
             compareValues(
                 PowerTransformer::vectorGroup,

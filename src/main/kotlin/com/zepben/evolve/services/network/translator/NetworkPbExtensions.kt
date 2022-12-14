@@ -26,6 +26,9 @@ import com.zepben.protobuf.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.protobuf.cim.iec61970.base.meas.Control
 import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement
+import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.protobuf.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource
@@ -47,6 +50,7 @@ fun OpenCircuitTest.mRID(): String = tt.mRID()
 fun PowerTransformerInfo.mRID(): String = ai.mRID()
 fun ShortCircuitTest.mRID(): String = tt.mRID()
 fun ShuntCompensatorInfo.mRID(): String = ai.mRID()
+fun SwitchInfo.mRID(): String = ai.mRID()
 fun TransformerEndInfo.mRID(): String = ai.mRID()
 fun TransformerTankInfo.mRID(): String = ai.mRID()
 fun TransformerTest.mRID(): String = io.mrid
@@ -132,6 +136,14 @@ fun Control.mRID(): String = ip.mRID()
 fun IoPoint.mRID(): String = io.mrid
 fun Measurement.mRID(): String = io.mrid
 
+/************ IEC61970 Base Protection ************/
+
+fun CurrentRelay.mRID(): String = pe.mRID()
+fun ProtectionEquipment.mRID(): String = eq.mRID()
+fun RecloseSequence.mRID(): String = io.mrid
+
+fun CurrentRelay.assetInfoMRID(): String = pe.eq.assetInfoMRID()
+
 /************ IEC61970 BASE SCADA ************/
 
 fun RemoteControl.mRID(): String = rp.mRID()
@@ -189,6 +201,7 @@ fun TransformerEnd.nameAndMRID(): String = io.nameAndMRID()
 fun Conductor.assetInfoMRID(): String = ce.assetInfoMRID()
 fun PowerTransformer.assetInfoMRID(): String = ce.assetInfoMRID()
 fun ShuntCompensator.assetInfoMRID(): String = rce.ec.ce.assetInfoMRID()
+fun Switch.assetInfoMRID(): String = ce.assetInfoMRID()
 
 /************ IEC61970 InfIEC61970 Feeder ************/
 

@@ -606,10 +606,10 @@ class NetworkConsumerClient(
             POTENTIALTRANSFORMER -> extractResult(io.potentialTransformer.mRID()) { addFromPb(io.potentialTransformer) }
             CURRENTTRANSFORMERINFO -> extractResult(io.currentTransformerInfo.mRID()) { addFromPb(io.currentTransformerInfo) }
             POTENTIALTRANSFORMERINFO -> extractResult(io.potentialTransformerInfo.mRID()) { addFromPb(io.potentialTransformerInfo) }
-            SWITCHINFO -> throw UnsupportedOperationException() // TODO
-            CURRENTRELAYINFO -> throw UnsupportedOperationException() // TODO
-            RECLOSESEQUENCE -> throw UnsupportedOperationException() // TODO
-            CURRENTRELAY -> throw UnsupportedOperationException() // TODO
+            SWITCHINFO -> extractResult(io.switchInfo.mRID()) { addFromPb(io.switchInfo) }
+            CURRENTRELAYINFO -> extractResult(io.currentRelayInfo.mRID()) { addFromPb(io.currentRelayInfo) }
+            CURRENTRELAY -> extractResult(io.currentRelay.mRID()) { addFromPb(io.currentRelay) }
+            RECLOSESEQUENCE -> extractResult(io.recloseSequence.mRID()) { addFromPb(io.recloseSequence) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )

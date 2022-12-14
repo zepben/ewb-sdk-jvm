@@ -69,7 +69,7 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
      * @param recloseSequence The [RecloseSequence] to remove from this [ProtectedSwitch].
      * @return true if the [RecloseSequence] was removed.
      */
-    fun removeRecloseSequence(recloseSequence: RecloseSequence): Boolean {
+    fun removeRecloseSequence(recloseSequence: RecloseSequence?): Boolean {
         val ret = _recloseSequences.safeRemove(recloseSequence)
         if (_recloseSequences.isNullOrEmpty()) _recloseSequences = null
         return ret
@@ -127,7 +127,7 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
      * @param protectionEquipment The [ProtectionEquipment] to disassociate from this [ProtectedSwitch].
      * @return true if the [ProtectionEquipment] was disassociated.
      */
-    fun removeOperatedByProtectionEquipment(protectionEquipment: ProtectionEquipment): Boolean {
+    fun removeOperatedByProtectionEquipment(protectionEquipment: ProtectionEquipment?): Boolean {
         val ret = _operatedByProtectionEquipment.safeRemove(protectionEquipment)
         if (_operatedByProtectionEquipment.isNullOrEmpty()) _operatedByProtectionEquipment = null
         return ret

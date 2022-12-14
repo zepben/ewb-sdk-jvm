@@ -8,9 +8,11 @@
 
 package com.zepben.evolve.cim.iec61970.base.protection
 
+import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
@@ -34,6 +36,20 @@ internal class ProtectionEquipmentTest {
 
         assertThat(protectionEquipment.relayDelayTime, equalTo(1.1))
         assertThat(protectionEquipment.protectionKind, equalTo(ProtectionKind.IEF))
+    }
+
+    @Test
+    internal fun protectedSwitches() {
+        PrivateCollectionValidator.validate(
+            { object : ProtectionEquipment() {} },
+            { id, _ -> object : ProtectedSwitch(id) {} },
+            ProtectionEquipment::numProtectedSwitches,
+            ProtectionEquipment::getProtectedSwitch,
+            ProtectionEquipment::protectedSwitches,
+            ProtectionEquipment::addProtectedSwitch,
+            ProtectionEquipment::removeProtectedSwitch,
+            ProtectionEquipment::clearProtectedSwitches
+        )
     }
 
 }

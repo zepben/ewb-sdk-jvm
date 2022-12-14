@@ -74,7 +74,7 @@ abstract class ProtectionEquipment(mRID: String = "") : Equipment(mRID) {
      * @param protectedSwitch The [ProtectedSwitch] to disassociate from this [ProtectionEquipment].
      * @return true if the [ProtectedSwitch] was disassociated.
      */
-    fun removeProtectedSwitch(protectedSwitch: ProtectedSwitch): Boolean {
+    fun removeProtectedSwitch(protectedSwitch: ProtectedSwitch?): Boolean {
         val ret = _protectedSwitches.safeRemove(protectedSwitch)
         if (_protectedSwitches.isNullOrEmpty()) _protectedSwitches = null
         return ret

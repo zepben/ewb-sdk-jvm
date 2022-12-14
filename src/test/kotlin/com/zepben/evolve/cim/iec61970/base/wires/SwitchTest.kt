@@ -7,13 +7,15 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.assetinfo.SwitchInfo
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -29,6 +31,19 @@ internal class SwitchTest {
     internal fun constructorCoverage() {
         assertThat(object : Switch() {}.mRID, not(equalTo("")))
         assertThat(object : Switch("id") {}.mRID, equalTo("id"))
+    }
+
+    @Test
+    internal fun accessorCoverage() {
+        val switch = object : Switch() {}
+
+        assertThat(switch.assetInfo, nullValue())
+        assertThat(switch.ratedCurrent, nullValue())
+
+        switch.fillFields(NetworkService())
+
+        assertThat(switch.assetInfo, notNullValue())
+        assertThat(switch.assetInfo, instanceOf(SwitchInfo::class.java))
     }
 
     @Test

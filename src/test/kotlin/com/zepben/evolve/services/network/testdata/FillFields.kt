@@ -22,6 +22,7 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
 import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
@@ -696,6 +697,18 @@ fun Measurement.fillFields(service: NetworkService, includeRuntime: Boolean = tr
 
 /************ IEC61970 Base Protection ************/
 
+fun CurrentRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentRelay {
+    (this as ProtectionEquipment).fillFields(service, includeRuntime)
+
+    assetInfo = CurrentRelayInfo().also { service.add(it) }
+
+    currentLimit1 = 1.1
+    inverseTimeFlag = true
+    timeDelay1 = 2.2
+
+    return this
+}
+
 fun ProtectionEquipment.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionEquipment {
     (this as Equipment).fillFields(service, includeRuntime)
 
@@ -818,6 +831,9 @@ fun AcLineSegment.fillFields(service: NetworkService, includeRuntime: Boolean = 
 
 fun Breaker.fillFields(service: NetworkService, includeRuntime: Boolean = true): Breaker {
     (this as ProtectedSwitch).fillFields(service, includeRuntime)
+
+    inTransitTime = 1
+
     return this
 }
 
@@ -1037,6 +1053,9 @@ fun PowerTransformerEnd.fillFields(service: NetworkService, includeRuntime: Bool
 
 fun ProtectedSwitch.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectedSwitch {
     (this as Switch).fillFields(service, includeRuntime)
+
+    breakingCapacity = 1
+
     return this
 }
 
@@ -1095,11 +1114,14 @@ fun ShuntCompensator.fillFields(service: NetworkService, includeRuntime: Boolean
 fun Switch.fillFields(service: NetworkService, includeRuntime: Boolean = true): Switch {
     (this as ConductingEquipment).fillFields(service, includeRuntime)
 
+    assetInfo = SwitchInfo().also { service.add(it) }
+    ratedCurrent = 1
+
     setNormallyOpen(true)
     setOpen(true)
     // when unganged support is added to protobuf
-    //    normalOpen = 1
-    //    open = 2
+    //    normalOpen = 2
+    //    open = 3
 
     return this
 }

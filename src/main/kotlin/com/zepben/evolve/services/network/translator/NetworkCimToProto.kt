@@ -22,6 +22,7 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -110,6 +111,7 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Control as PBControl
 import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint as PBIoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
+import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay as PBCurrentRelay
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
@@ -652,6 +654,17 @@ fun Accumulator.toPb(): PBAccumulator = toPb(this, PBAccumulator.newBuilder()).b
 fun Analog.toPb(): PBAnalog = toPb(this, PBAnalog.newBuilder()).build()
 fun Control.toPb(): PBControl = toPb(this, PBControl.newBuilder()).build()
 fun Discrete.toPb(): PBDiscrete = toPb(this, PBDiscrete.newBuilder()).build()
+
+/************ IEC61970 Base Protection ************/
+
+fun toPb(cim: CurrentRelay, pb: PBCurrentRelay.Builder): PBCurrentRelay.Builder =
+    pb.apply {
+        pb.currentLimit1 = cim.currentLimit1 ?: UNKNOWN_DOUBLE
+        cim.inverseTimeFlag?.let { inverseTimeFlag = it } ?: clearInverseTimeFlag()
+        pb.timeDelay1 = cim.timeDelay1 ?: UNKNOWN_DOUBLE
+    }
+
+fun CurrentRelay.toPb(): PBCurrentRelay = toPb(this, PBCurrentRelay.newBuilder()).build()
 
 /************ IEC61970 BASE SCADA ************/
 

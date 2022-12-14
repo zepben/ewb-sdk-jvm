@@ -13,10 +13,7 @@ import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.PositionPoint
 import com.zepben.evolve.cim.iec61968.common.StreetAddress
 import com.zepben.evolve.cim.iec61968.common.TownDetail
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -28,6 +25,9 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -35,6 +35,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.common.BaseServiceComparatorTest
 import com.zepben.evolve.services.common.ObjectDifference
 import com.zepben.evolve.services.common.ValueDifference
@@ -232,6 +233,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
     @Test
+    internal fun compareCurrentRelayInfo() {
+        compareAssetInfo { CurrentRelayInfo(it) }
+
+        comparatorValidator.validateProperty(CurrentRelayInfo::curveSetting, { CurrentRelayInfo(it) }, { "first" }, { "second" })
+    }
+
+    @Test
     internal fun compareCurrentTransformerInfo() {
         compareAssetInfo { CurrentTransformerInfo(it) }
 
@@ -345,6 +353,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun compareCurrentTransformer() {
         compareSensor { CurrentTransformer(it) }
 
+        comparatorValidator.validateProperty(
+            CurrentTransformer::assetInfo,
+            { CurrentTransformer(it) },
+            { CurrentTransformerInfo("cti1") },
+            { CurrentTransformerInfo("cti2") }
+        )
         comparatorValidator.validateProperty(CurrentTransformer::coreBurden, { CurrentTransformer(it) }, { 1 }, { 2 })
     }
 
@@ -357,6 +371,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun comparePotentialTransformer() {
         compareSensor { PotentialTransformer(it) }
 
+        comparatorValidator.validateProperty(
+            PotentialTransformer::assetInfo,
+            { PotentialTransformer(it) },
+            { PotentialTransformerInfo("vti1") },
+            { PotentialTransformerInfo("vti2") }
+        )
         comparatorValidator.validateProperty(
             PotentialTransformer::type,
             { PotentialTransformer(it) },
@@ -586,14 +606,47 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareMeasurement { Discrete(it) }
     }
 
-    private fun compareMeasurement(createIdObj: (String) -> Measurement) {
-        compareIdentifiedObject { createIdObj(it) }
+    private fun compareMeasurement(createMeasurement: (String) -> Measurement) {
+        compareIdentifiedObject { createMeasurement(it) }
 
-        comparatorValidator.validateProperty(Measurement::powerSystemResourceMRID, { createIdObj(it) }, { "psr1" }, { "psr2" })
-        comparatorValidator.validateProperty(Measurement::terminalMRID, { createIdObj(it) }, { "terminal1" }, { "terminal2" })
-        comparatorValidator.validateProperty(Measurement::remoteSource, { createIdObj(it) }, { RemoteSource("rs1") }, { RemoteSource("rs2") })
-        comparatorValidator.validateProperty(Measurement::phases, { createIdObj(it) }, { PhaseCode.ABCN }, { PhaseCode.ABC })
-        comparatorValidator.validateProperty(Measurement::unitSymbol, { createIdObj(it) }, { UnitSymbol.HENRYS }, { UnitSymbol.HOURS })
+        comparatorValidator.validateProperty(Measurement::powerSystemResourceMRID, { createMeasurement(it) }, { "psr1" }, { "psr2" })
+        comparatorValidator.validateProperty(Measurement::terminalMRID, { createMeasurement(it) }, { "terminal1" }, { "terminal2" })
+        comparatorValidator.validateProperty(Measurement::remoteSource, { createMeasurement(it) }, { RemoteSource("rs1") }, { RemoteSource("rs2") })
+        comparatorValidator.validateProperty(Measurement::phases, { createMeasurement(it) }, { PhaseCode.ABCN }, { PhaseCode.ABC })
+        comparatorValidator.validateProperty(Measurement::unitSymbol, { createMeasurement(it) }, { UnitSymbol.HENRYS }, { UnitSymbol.HOURS })
+    }
+
+    /************ IEC61970 Base Protection ************/
+
+    @Test
+    internal fun compareCurrentRelay() {
+        compareProtectionEquipment { CurrentRelay(it) }
+
+        comparatorValidator.validateProperty(CurrentRelay::currentLimit1, { CurrentRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(CurrentRelay::inverseTimeFlag, { CurrentRelay(it) }, { false }, { true })
+        comparatorValidator.validateProperty(CurrentRelay::timeDelay1, { CurrentRelay(it) }, { 1.1 }, { 2.2 })
+    }
+
+    private fun compareProtectionEquipment(createProtectionEquipment: (String) -> ProtectionEquipment) {
+        compareEquipment(createProtectionEquipment)
+
+        comparatorValidator.validateProperty(ProtectionEquipment::relayDelayTime, createProtectionEquipment, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(ProtectionEquipment::protectionKind, createProtectionEquipment, { ProtectionKind.EF }, { ProtectionKind.IEF })
+        comparatorValidator.validateCollection(
+            ProtectionEquipment::protectedSwitches,
+            ProtectionEquipment::addProtectedSwitch,
+            createProtectionEquipment,
+            { object : ProtectedSwitch("ps1") {} },
+            { object : ProtectedSwitch("ps2") {} }
+        )
+    }
+
+    @Test
+    internal fun compareRecloseSequence() {
+        compareIdentifiedObject { RecloseSequence(it) }
+
+        comparatorValidator.validateProperty(RecloseSequence::recloseDelay, { RecloseSequence(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(RecloseSequence::recloseStep, { RecloseSequence(it) }, { 1 }, { 2 })
     }
 
     /************ IEC61970 BASE SCADA ************/
@@ -669,6 +722,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     @Test
     internal fun compareBreaker() {
         compareProtectedSwitch { Breaker(it) }
+
+        comparatorValidator.validateProperty(Breaker::inTransitTime, { Breaker(it) }, { 1.1 }, { 2.2 })
     }
 
     @Test
@@ -931,6 +986,22 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
     private fun compareProtectedSwitch(createProtectedSwitch: (String) -> ProtectedSwitch) {
         compareSwitch(createProtectedSwitch)
+
+        comparatorValidator.validateProperty(ProtectedSwitch::breakingCapacity, createProtectedSwitch, { 1 }, { 2 })
+        comparatorValidator.validateCollection(
+            ProtectedSwitch::recloseSequences,
+            ProtectedSwitch::addRecloseSequence,
+            createProtectedSwitch,
+            { RecloseSequence("rs1") },
+            { RecloseSequence("rs2") }
+        )
+        comparatorValidator.validateCollection(
+            ProtectedSwitch::operatedByProtectionEquipment,
+            ProtectedSwitch::addOperatedByProtectionEquipment,
+            createProtectedSwitch,
+            { object : ProtectionEquipment("pe1") {} },
+            { object : ProtectionEquipment("pe2") {} }
+        )
     }
 
     @Test
@@ -960,6 +1031,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     private fun compareShuntCompensator(createShuntCompensator: (String) -> ShuntCompensator) {
         compareRegulatingCondEq(createShuntCompensator)
 
+        comparatorValidator.validateProperty(
+            ShuntCompensator::assetInfo,
+            createShuntCompensator,
+            { ShuntCompensatorInfo("sci1") },
+            { ShuntCompensatorInfo("sci2") }
+        )
         comparatorValidator.validateProperty(ShuntCompensator::grounded, createShuntCompensator, { false }, { true })
         comparatorValidator.validateProperty(ShuntCompensator::nomU, createShuntCompensator, { 1 }, { 2 })
         comparatorValidator.validateProperty(
@@ -972,6 +1049,9 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
     private fun compareSwitch(createSwitch: (String) -> Switch) {
         compareConductingEquipment(createSwitch)
+
+        comparatorValidator.validateProperty(Switch::assetInfo, createSwitch, { SwitchInfo("si1") }, { SwitchInfo("si2") })
+        comparatorValidator.validateProperty(Switch::ratedCurrent, createSwitch, { 1 }, { 2 })
 
         val closedSwitch = createSwitch("mRID").apply { setNormallyOpen(false); setOpen(true) }
         val openSwitch = createSwitch("mRID").apply { setNormallyOpen(true); setOpen(false) }

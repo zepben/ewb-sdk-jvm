@@ -683,7 +683,7 @@ fun Discrete.toPb(): PBDiscrete = toPb(this, PBDiscrete.newBuilder()).build()
 fun toPb(cim: CurrentRelay, pb: PBCurrentRelay.Builder): PBCurrentRelay.Builder =
     pb.apply {
         currentLimit1 = cim.currentLimit1 ?: UNKNOWN_DOUBLE
-        cim.inverseTimeFlag?.let { set = it } ?: setNull(NullValue.NULL_VALUE)
+        cim.inverseTimeFlag?.let { inverseTimeFlagSet = it } ?: run { inverseTimeFlagNull = NullValue.NULL_VALUE }
         timeDelay1 = cim.timeDelay1 ?: UNKNOWN_DOUBLE
         toPb(cim, peBuilder)
     }

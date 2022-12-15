@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.writers
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -21,6 +22,9 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -38,6 +42,7 @@ import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableEndDevices
@@ -49,6 +54,9 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableProtectionEquipment
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableRecloseSequences
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
@@ -143,6 +151,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableInt(table.RATED_VOLTAGE.queryIndex, shuntCompensatorInfo.ratedVoltage)
 
         return saveAssetInfo(table, insert, shuntCompensatorInfo, "shunt compensator info")
+    }
+
+    fun save(switchInfo: SwitchInfo): Boolean {
+        val table = databaseTables.getTable(TableSwitchInfo::class.java)
+        val insert = databaseTables.getInsert(TableSwitchInfo::class.java)
+
+        insert.setNullableDouble(table.RATED_INTERRUPTING_TIME.queryIndex, switchInfo.ratedInterruptingTime)
+
+        return saveAssetInfo(table, insert, switchInfo, "switch info")
     }
 
     fun save(transformerEndInfo: TransformerEndInfo): Boolean {
@@ -333,6 +350,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+    fun save(currentRelayInfo: CurrentRelayInfo): Boolean {
+        val table = databaseTables.getTable(TableCurrentRelayInfo::class.java)
+        val insert = databaseTables.getInsert(TableCurrentRelayInfo::class.java)
+
+        insert.setNullableString(table.CURVE_SETTING.queryIndex, currentRelayInfo.curveSetting)
+
+        return saveAssetInfo(table, insert, currentRelayInfo, "current relay info")
+    }
 
     fun save(currentTransformerInfo: CurrentTransformerInfo): Boolean {
         val table = databaseTables.getTable(TableCurrentTransformerInfo::class.java)
@@ -685,6 +711,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableBreakers::class.java)
         val insert = databaseTables.getInsert(TableBreakers::class.java)
 
+        insert.setNullableDouble(table.IN_TRANSIT_TIME.queryIndex, breaker.inTransitTime)
+
         return saveProtectedSwitch(table, insert, breaker, "breaker")
     }
 
@@ -934,7 +962,13 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     private fun saveProtectedSwitch(table: TableProtectedSwitches, insert: PreparedStatement, protectedSwitch: ProtectedSwitch, description: String): Boolean {
-        return saveSwitch(table, insert, protectedSwitch, description)
+        insert.setNullableInt(table.BREAKING_CAPACITY.queryIndex, protectedSwitch.breakingCapacity)
+
+        var status = true
+        protectedSwitch.recloseSequences.forEach { status = status and saveRecloseSequence(protectedSwitch, it) }
+        protectedSwitch.operatedByProtectionEquipment.forEach { status = status and saveAssociation(it, protectedSwitch) }
+
+        return status and saveSwitch(table, insert, protectedSwitch, description)
     }
 
     fun save(ratioTapChanger: RatioTapChanger): Boolean {
@@ -983,6 +1017,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     private fun saveSwitch(table: TableSwitches, insert: PreparedStatement, switch: Switch, description: String): Boolean {
         insert.setInt(table.NORMAL_OPEN.queryIndex, switch.normalOpen)
         insert.setInt(table.OPEN.queryIndex, switch.open)
+        insert.setNullableInt(table.RATED_CURRENT.queryIndex, switch.ratedCurrent)
+        insert.setNullableString(table.SWITCH_INFO_MRID.queryIndex, switch.assetInfo?.mRID)
 
         return saveConductingEquipment(table, insert, switch, description)
     }
@@ -1115,6 +1151,43 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, ioPoint, description)
     }
 
+    /************ IEC61970 Base Protection ************/
+
+    fun save(currentRelay: CurrentRelay): Boolean {
+        val table = databaseTables.getTable(TableCurrentRelays::class.java)
+        val insert = databaseTables.getInsert(TableCurrentRelays::class.java)
+
+        insert.setNullableDouble(table.CURRENT_LIMIT_1.queryIndex, currentRelay.currentLimit1)
+        insert.setNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex, currentRelay.inverseTimeFlag)
+        insert.setNullableDouble(table.TIME_DELAY_1.queryIndex, currentRelay.timeDelay1)
+        insert.setNullableString(table.CURRENT_RELAY_INFO_MRID.queryIndex, currentRelay.assetInfo?.mRID)
+
+        return saveProtectionEquipment(table, insert, currentRelay, "current relay")
+    }
+
+    private fun saveProtectionEquipment(
+        table: TableProtectionEquipment,
+        insert: PreparedStatement,
+        protectionEquipment: ProtectionEquipment,
+        description: String
+    ): Boolean {
+        insert.setNullableDouble(table.RELAY_DELAY_TIME.queryIndex, protectionEquipment.relayDelayTime)
+        insert.setString(table.PROTECTION_KIND.queryIndex, protectionEquipment.protectionKind.name)
+
+        return saveEquipment(table, insert, protectionEquipment, description)
+    }
+
+    private fun saveRecloseSequence(protectedSwitch: ProtectedSwitch, recloseSequence: RecloseSequence): Boolean {
+        val table = databaseTables.getTable(TableRecloseSequences::class.java)
+        val insert = databaseTables.getInsert(TableRecloseSequences::class.java)
+
+        insert.setString(table.PROTECTED_SWITCH_MRID.queryIndex, protectedSwitch.mRID)
+        insert.setNullableDouble(table.RECLOSE_DELAY.queryIndex, recloseSequence.recloseDelay)
+        insert.setNullableInt(table.RECLOSE_STEP.queryIndex, recloseSequence.recloseStep)
+
+        return saveIdentifiedObject(table, insert, recloseSequence, "reclose sequence")
+    }
+
     /************ IEC61970 SCADA ************/
     fun save(remoteControl: RemoteControl): Boolean {
         val table = databaseTables.getTable(TableRemoteControls::class.java)
@@ -1143,8 +1216,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableAssetOrganisationRolesAssets::class.java)
         val insert = databaseTables.getInsert(TableAssetOrganisationRolesAssets::class.java)
 
-        insert.setNullableString(table.ASSET_ORGANISATION_ROLE_MRID.queryIndex, assetOrganisationRole.mRID)
-        insert.setNullableString(table.ASSET_MRID.queryIndex, asset.mRID)
+        insert.setString(table.ASSET_ORGANISATION_ROLE_MRID.queryIndex, assetOrganisationRole.mRID)
+        insert.setString(table.ASSET_MRID.queryIndex, asset.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
@@ -1157,8 +1230,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableUsagePointsEndDevices::class.java)
         val insert = databaseTables.getInsert(TableUsagePointsEndDevices::class.java)
 
-        insert.setNullableString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
-        insert.setNullableString(table.END_DEVICE_MRID.queryIndex, endDevice.mRID)
+        insert.setString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
+        insert.setString(table.END_DEVICE_MRID.queryIndex, endDevice.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
@@ -1171,8 +1244,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableEquipmentUsagePoints::class.java)
         val insert = databaseTables.getInsert(TableEquipmentUsagePoints::class.java)
 
-        insert.setNullableString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
-        insert.setNullableString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
+        insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
+        insert.setString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
@@ -1185,8 +1258,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableEquipmentOperationalRestrictions::class.java)
         val insert = databaseTables.getInsert(TableEquipmentOperationalRestrictions::class.java)
 
-        insert.setNullableString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
-        insert.setNullableString(table.OPERATIONAL_RESTRICTION_MRID.queryIndex, operationalRestriction.mRID)
+        insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
+        insert.setString(table.OPERATIONAL_RESTRICTION_MRID.queryIndex, operationalRestriction.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
@@ -1199,8 +1272,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableEquipmentEquipmentContainers::class.java)
         val insert = databaseTables.getInsert(TableEquipmentEquipmentContainers::class.java)
 
-        insert.setNullableString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
-        insert.setNullableString(table.EQUIPMENT_CONTAINER_MRID.queryIndex, equipmentContainer.mRID)
+        insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
+        insert.setString(table.EQUIPMENT_CONTAINER_MRID.queryIndex, equipmentContainer.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
@@ -1213,8 +1286,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableCircuitsSubstations::class.java)
         val insert = databaseTables.getInsert(TableCircuitsSubstations::class.java)
 
-        insert.setNullableString(table.CIRCUIT_MRID.queryIndex, circuit.mRID)
-        insert.setNullableString(table.SUBSTATION_MRID.queryIndex, substation.mRID)
+        insert.setString(table.CIRCUIT_MRID.queryIndex, circuit.mRID)
+        insert.setString(table.SUBSTATION_MRID.queryIndex, substation.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
@@ -1227,8 +1300,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableCircuitsTerminals::class.java)
         val insert = databaseTables.getInsert(TableCircuitsTerminals::class.java)
 
-        insert.setNullableString(table.CIRCUIT_MRID.queryIndex, circuit.mRID)
-        insert.setNullableString(table.TERMINAL_MRID.queryIndex, terminal.mRID)
+        insert.setString(table.CIRCUIT_MRID.queryIndex, circuit.mRID)
+        insert.setString(table.TERMINAL_MRID.queryIndex, terminal.mRID)
 
         return tryExecuteSingleUpdate(
             insert,
@@ -1241,9 +1314,9 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableLoopsSubstations::class.java)
         val insert = databaseTables.getInsert(TableLoopsSubstations::class.java)
 
-        insert.setNullableString(table.LOOP_MRID.queryIndex, loop.mRID)
-        insert.setNullableString(table.SUBSTATION_MRID.queryIndex, substation.mRID)
-        insert.setNullableString(table.RELATIONSHIP.queryIndex, relationship.name)
+        insert.setString(table.LOOP_MRID.queryIndex, loop.mRID)
+        insert.setString(table.SUBSTATION_MRID.queryIndex, substation.mRID)
+        insert.setString(table.RELATIONSHIP.queryIndex, relationship.name)
 
         return tryExecuteSingleUpdate(
             insert,
@@ -1251,4 +1324,19 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             "loop to substation association"
         )
     }
+
+    private fun saveAssociation(protectionEquipment: ProtectionEquipment, protectedSwitch: ProtectedSwitch): Boolean {
+        val table = databaseTables.getTable(TableProtectionEquipmentProtectedSwitches::class.java)
+        val insert = databaseTables.getInsert(TableProtectionEquipmentProtectedSwitches::class.java)
+
+        insert.setString(table.PROTECTION_EQUIPMENT_MRID.queryIndex, protectionEquipment.mRID)
+        insert.setString(table.PROTECTED_SWITCH_MRID.queryIndex, protectedSwitch.mRID)
+
+        return tryExecuteSingleUpdate(
+            insert,
+            "${protectionEquipment.mRID}-to-${protectedSwitch.mRID}",
+            "protection equipment to protected switch"
+        )
+    }
+
 }

@@ -13,6 +13,7 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -27,6 +28,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -52,6 +54,7 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<OpenCircuitTest>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<ShortCircuitTest>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<ShuntCompensatorInfo>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<SwitchInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<TransformerEndInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<AssetOwner>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<Pole>().forEach { status = status and validateSave(it, writer::save) }
@@ -108,6 +111,12 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<PotentialTransformerInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<CurrentTransformer>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<PotentialTransformer>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<CurrentRelayInfo>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<CurrentRelay>().forEach { status = status and validateSave(it, writer::save) }
+        /**
+         * Excluded:
+         *  - RecloseSequence: Saved via saveProtectedSwitch
+         */
 
         return status
     }

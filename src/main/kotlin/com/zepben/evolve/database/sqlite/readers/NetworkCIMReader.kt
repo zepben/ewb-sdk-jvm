@@ -11,10 +11,7 @@ package com.zepben.evolve.database.sqlite.readers
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.*
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -25,6 +22,9 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -33,11 +33,13 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableEndDevices
@@ -49,6 +51,9 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableProtectionEquipment
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableRecloseSequences
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
@@ -137,6 +142,14 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         }
 
         return loadAssetInfo(shuntCompensatorInfo, table, resultSet) && networkService.addOrThrow(shuntCompensatorInfo)
+    }
+
+    fun load(table: TableSwitchInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val switchInfo = SwitchInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            ratedInterruptingTime = resultSet.getNullableDouble(table.RATED_INTERRUPTING_TIME.queryIndex)
+        }
+
+        return loadAssetInfo(switchInfo, table, resultSet) && networkService.addOrThrow(switchInfo)
     }
 
     fun load(table: TableTransformerEndInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
@@ -313,6 +326,14 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         ).takeUnless { it.allFieldsNullOrEmpty() }
 
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
+
+    fun load(table: TableCurrentRelayInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val currentRelayInfo = CurrentRelayInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            curveSetting = resultSet.getNullableString(table.CURVE_SETTING.queryIndex)
+        }
+
+        return loadAssetInfo(currentRelayInfo, table, resultSet) && networkService.addOrThrow(currentRelayInfo)
+    }
 
     fun load(table: TableCurrentTransformerInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val currentTransformerInfo = CurrentTransformerInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
@@ -641,6 +662,46 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadIdentifiedObject(measurement, table, resultSet)
     }
 
+    /************ IEC61970 Base Protection ************/
+
+    fun load(table: TableCurrentRelays, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val currentRelay = CurrentRelay(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            assetInfo = networkService.ensureGet(
+                resultSet.getNullableString(table.CURRENT_RELAY_INFO_MRID.queryIndex),
+                typeNameAndMRID()
+            )
+            currentLimit1 = resultSet.getNullableDouble(table.CURRENT_LIMIT_1.queryIndex)
+            inverseTimeFlag = resultSet.getNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex)
+        }
+
+        return loadProtectionEquipment(currentRelay, table, resultSet)
+    }
+
+    private fun loadProtectionEquipment(protectionEquipment: ProtectionEquipment, table: TableProtectionEquipment, resultSet: ResultSet): Boolean {
+        protectionEquipment.apply {
+            relayDelayTime = resultSet.getNullableDouble(table.RELAY_DELAY_TIME.queryIndex)
+            protectionKind = ProtectionKind.valueOf(resultSet.getString(table.PROTECTION_KIND.queryIndex))
+        }
+
+        return loadEquipment(protectionEquipment, table, resultSet)
+    }
+
+    fun load(table: TableRecloseSequences, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val recloseSequenceId = setLastMRID(resultSet.getString(table.MRID.queryIndex))
+        val recloseSequence = RecloseSequence(recloseSequenceId).apply {
+            recloseDelay = resultSet.getNullableDouble(table.RECLOSE_DELAY.queryIndex)
+            recloseStep = resultSet.getNullableInt(table.RECLOSE_STEP.queryIndex)
+        }
+
+        val protectedSwitchId = resultSet.getString(table.PROTECTED_SWITCH_MRID.queryIndex)
+        val id = "$protectedSwitchId-to-$recloseSequenceId"
+        val protectedSwitch = networkService.getOrThrow<ProtectedSwitch>(protectedSwitchId, "ProtectedSwitch to RecloseSequence association $id")
+
+        protectedSwitch.addRecloseSequence(recloseSequence)
+
+        return loadIdentifiedObject(recloseSequence, table, resultSet)
+    }
+
     /************ IEC61970 BASE SCADA ************/
 
     fun load(table: TableRemoteControls, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
@@ -716,7 +777,9 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     }
 
     fun load(table: TableBreakers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val breaker = Breaker(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+        val breaker = Breaker(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            inTransitTime = resultSet.getNullableDouble(table.IN_TRANSIT_TIME.queryIndex)
+        }
 
         return loadProtectedSwitch(breaker, table, resultSet) && networkService.addOrThrow(breaker)
     }
@@ -969,8 +1032,13 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadTransformerEnd(powerTransformerEnd, table, resultSet) && networkService.addOrThrow(powerTransformerEnd)
     }
 
-    private fun loadProtectedSwitch(protectedSwitch: ProtectedSwitch, table: TableProtectedSwitches, resultSet: ResultSet): Boolean =
-        loadSwitch(protectedSwitch, table, resultSet)
+    private fun loadProtectedSwitch(protectedSwitch: ProtectedSwitch, table: TableProtectedSwitches, resultSet: ResultSet): Boolean {
+        protectedSwitch.apply {
+            breakingCapacity = resultSet.getNullableInt(table.BREAKING_CAPACITY.queryIndex)
+        }
+
+        return loadSwitch(protectedSwitch, table, resultSet)
+    }
 
     fun load(table: TableRatioTapChangers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val ratioTapChanger = RatioTapChanger(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
@@ -1026,6 +1094,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     private fun loadSwitch(switch: Switch, table: TableSwitches, resultSet: ResultSet): Boolean {
         switch.apply {
+            assetInfo = networkService.ensureGet(resultSet.getNullableString(table.SWITCH_INFO_MRID.queryIndex), typeNameAndMRID())
+            ratedCurrent = resultSet.getNullableInt(table.RATED_CURRENT.queryIndex)
             normalOpen = resultSet.getInt(table.NORMAL_OPEN.queryIndex)
             open = resultSet.getInt(table.OPEN.queryIndex)
         }
@@ -1242,6 +1312,23 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
                 loop.addEnergizingSubstation(substation)
             }
         }
+
+        return true
+    }
+
+    fun load(table: TableProtectionEquipmentProtectedSwitches, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val protectionEquipmentMRID = setLastMRID(resultSet.getString(table.PROTECTION_EQUIPMENT_MRID.queryIndex))
+        setLastMRID("${protectionEquipmentMRID}-to-UNKNOWN")
+
+        val protectedSwitchMRID = resultSet.getString(table.PROTECTED_SWITCH_MRID.queryIndex)
+        val id = setLastMRID("${protectionEquipmentMRID}-to-${protectedSwitchMRID}")
+
+        val typeNameAndMRID = "ProtectionEquipment to ProtectedSwitch association $id"
+        val protectionEquipment = networkService.getOrThrow<ProtectionEquipment>(protectionEquipmentMRID, typeNameAndMRID)
+        val protectedSwitch = networkService.getOrThrow<ProtectedSwitch>(protectedSwitchMRID, typeNameAndMRID)
+
+        protectedSwitch.addOperatedByProtectionEquipment(protectionEquipment)
+        protectionEquipment.addProtectedSwitch(protectedSwitch)
 
         return true
     }

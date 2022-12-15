@@ -9,13 +9,14 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.protection
 
 import com.zepben.evolve.database.sqlite.tables.Column
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects
 
 @Suppress("PropertyName")
 class TableRecloseSequences : TableIdentifiedObjects() {
 
-    val PROTECTED_SWITCH_MRID = Column(++columnIndex, "protected_switch_mrid", "TEXT", NULL)
+    val PROTECTED_SWITCH_MRID = Column(++columnIndex, "protected_switch_mrid", "TEXT", NOT_NULL)
     val RECLOSE_DELAY = Column(++columnIndex, "reclose_delay", "NUMBER", NULL)
     val RECLOSE_STEP = Column(++columnIndex, "reclose_step", "INTEGER", NULL)
 

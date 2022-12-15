@@ -14,8 +14,16 @@ import java.security.PrivilegedActionException
 import java.security.PrivilegedExceptionAction
 import java.sql.PreparedStatement
 import java.sql.Types
+import java.sql.Types.BOOLEAN
 import java.sql.Types.DOUBLE
 import java.time.Instant
+
+internal fun PreparedStatement.setNullableBoolean(queryIndex: Int, value: Boolean?) {
+    if (value == null)
+        setNull(queryIndex, BOOLEAN)
+    else
+        setBoolean(queryIndex, value)
+}
 
 internal fun PreparedStatement.setNullableString(queryIndex: Int, value: String?) {
     when (value) {

@@ -94,6 +94,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableBreakers>("breakers", reader::load)
         status = status and loadEach<TableLoadBreakSwitches>("load break switches", reader::load)
         status = status and loadEach<TableBusbarSections>("busbar sections", reader::load)
+        status = status and loadEach<TableCurrentRelays>("current relays", reader::load)
         status = status and loadEach<TableDisconnectors>("disconnectors", reader::load)
         status = status and loadEach<TableEnergyConsumers>("energy consumers", reader::load)
         status = status and loadEach<TableEnergyConsumerPhases>("energy consumer phases", reader::load)
@@ -123,6 +124,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableEquipmentUsagePoints>("equipment to usage point associations", reader::load)
         status = status and loadEach<TableEquipmentOperationalRestrictions>("equipment to operational restriction associations", reader::load)
         status = status and loadEach<TableEquipmentEquipmentContainers>("equipment to equipment container associations", reader::load)
+        status = status and loadEach<TableProtectionEquipmentProtectedSwitches>("protection equipment to protected switch associations", reader::load)
         status = status and loadEach<TableCircuitsSubstations>("circuit to substation associations", reader::load)
         status = status and loadEach<TableCircuitsTerminals>("circuit to terminal associations", reader::load)
         status = status and loadEach<TableLoopsSubstations>("loop to substation associations", reader::load)
@@ -132,9 +134,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableAnalogs>("analogs", reader::load)
         status = status and loadEach<TableAccumulators>("accumulators", reader::load)
         status = status and loadEach<TableDiscretes>("discretes", reader::load)
-        status = status and loadEach<TableCurrentRelays>("current relays", reader::load)
         status = status and loadEach<TableRecloseSequences>("reclose sequences", reader::load)
-        status = status and loadEach<TableProtectionEquipmentProtectedSwitches>("protection equipment to protected switches", reader::load)
 
         status = status and loadNames(reader)
 

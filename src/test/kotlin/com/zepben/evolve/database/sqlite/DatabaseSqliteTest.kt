@@ -17,6 +17,7 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -33,6 +34,8 @@ import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -143,6 +146,7 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.networkServicesOf(::PowerTransformerInfo, PowerTransformerInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::ShortCircuitTest, ShortCircuitTest::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::ShuntCompensatorInfo, ShuntCompensatorInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::SwitchInfo, SwitchInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::TransformerEndInfo, TransformerEndInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::TransformerTankInfo, TransformerTankInfo::fillFields))
 
@@ -158,6 +162,7 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.customerServicesOf(::Tariff, Tariff::fillFields))
 
         /************ IEC61968 infIEC61968 InfAssetInfo ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::CurrentRelayInfo, CurrentRelayInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::CurrentTransformerInfo, CurrentTransformerInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::PotentialTransformerInfo, PotentialTransformerInfo::fillFields))
 
@@ -203,6 +208,10 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.networkServicesOf(::Control, Control::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::Discrete, Discrete::fillFields))
         // validateSchema(SchemaNetworks.measurementServicesOf(::DiscreteValue, DiscreteValue::fillFields))
+
+        /************ IEC61970 Base Protection ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::CurrentRelay, CurrentRelay::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::RecloseSequence, RecloseSequence::fillFields))
 
         /************ IEC61970 BASE SCADA ************/
         validateSchema(SchemaNetworks.networkServicesOf(::RemoteControl, RemoteControl::fillFields))

@@ -724,6 +724,12 @@ fun RecloseSequence.fillFields(service: NetworkService, includeRuntime: Boolean 
     recloseDelay = 1.1
     recloseStep = 2
 
+    // Reclose sequences are not saved unless a protected switch references it.
+    Breaker().also {
+        it.addRecloseSequence(this)
+        service.add(it)
+    }
+
     return this
 }
 

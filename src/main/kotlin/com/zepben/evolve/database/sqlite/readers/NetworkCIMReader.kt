@@ -672,9 +672,10 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             )
             currentLimit1 = resultSet.getNullableDouble(table.CURRENT_LIMIT_1.queryIndex)
             inverseTimeFlag = resultSet.getNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex)
+            timeDelay1 = resultSet.getNullableDouble(table.TIME_DELAY_1.queryIndex)
         }
 
-        return loadProtectionEquipment(currentRelay, table, resultSet)
+        return loadProtectionEquipment(currentRelay, table, resultSet) && networkService.addOrThrow(currentRelay)
     }
 
     private fun loadProtectionEquipment(protectionEquipment: ProtectionEquipment, table: TableProtectionEquipment, resultSet: ResultSet): Boolean {
@@ -699,7 +700,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
         protectedSwitch.addRecloseSequence(recloseSequence)
 
-        return loadIdentifiedObject(recloseSequence, table, resultSet)
+        return loadIdentifiedObject(recloseSequence, table, resultSet) && networkService.addOrThrow(recloseSequence)
     }
 
     /************ IEC61970 BASE SCADA ************/

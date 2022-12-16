@@ -67,7 +67,7 @@ private val `Create current_relay_info table` = arrayOf(
         name TEXT NOT NULL,
         description TEXT NOT NULL,
         num_diagram_objects INTEGER NOT NULL,
-        curve_setting TEXT 
+        curve_setting TEXT NULL
     );
     """.trimIndent(),
     "CREATE UNIQUE INDEX current_relay_info_mrid ON current_relay_info (mrid);",

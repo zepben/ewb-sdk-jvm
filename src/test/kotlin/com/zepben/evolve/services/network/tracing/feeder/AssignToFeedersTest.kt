@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.services.network.tracing.feeder
 
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
@@ -108,7 +110,7 @@ class AssignToFeedersTest {
         val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
         val network = TestNetworkBuilder()
-            .fromBreaker { baseVoltage = hvBaseVoltage} // b0
+            .fromBreaker { baseVoltage = hvBaseVoltage } // b0
             .toAcls { baseVoltage = hvBaseVoltage } // c1
             .toAcls { baseVoltage = lvBaseVoltage } // c2
             .addFeeder("b0")
@@ -131,7 +133,7 @@ class AssignToFeedersTest {
         val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
         val network = TestNetworkBuilder()
-            .fromBreaker { baseVoltage = hvBaseVoltage} // b0
+            .fromBreaker { baseVoltage = hvBaseVoltage } // b0
             .toAcls { baseVoltage = hvBaseVoltage } // c1
             .toPowerTransformer(endActions = listOf({ baseVoltage = hvBaseVoltage }, { baseVoltage = lvBaseVoltage })) // tx2
             .toAcls { baseVoltage = lvBaseVoltage } // c3
@@ -147,6 +149,25 @@ class AssignToFeedersTest {
         Tracing.assignEquipmentToFeeders().run(network)
 
         validateEquipment(feeder.equipment, "b0", "c1", "tx2")
+    }
+
+    @Test
+    fun `assigns AuxiliaryEquipment to Feeder`() {
+        val network = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .toAcls() // c1
+            .addFeeder("b0")
+            .network
+            .apply {
+                add(CurrentTransformer("a1").apply { terminal = get("c1-t1") })
+                add(FaultIndicator("a2").apply { terminal = get("c1-t1") })
+            }
+
+        val feeder: Feeder = network["fdr2"]!!
+
+        Tracing.assignEquipmentToFeeders().run(network)
+
+        validateEquipment(feeder.equipment, "b0", "c1", "a1", "a2")
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

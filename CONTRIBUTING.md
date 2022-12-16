@@ -53,5 +53,5 @@ Our main style requirements are:
 NOTE: Do not update the StupidlyLargeNetwork file, this will be phased out.
 
 1. *ServiceComparator(s) updated and tested.
-1. Exhaustive when functions in *ServiceUtils updated if a new class is added.
+1. Exhaustive when functions in *ServiceUtils updated if a new class is added. Update *ServiceUtilsTest to match.
 1. Release notes updated.

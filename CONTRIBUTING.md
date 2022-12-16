@@ -26,8 +26,8 @@ Our main style requirements are:
 
 ## Checklist for model change ##
 
-1. Update `pom.xml` to import the correct version of `evolve-grpc`.
-1. Model updated and tested.
+1. Update `pom.xml` to import the correct version of `evolve-grpc`. /
+1. Model updated and tested. /
 1. Add/remove methods added to *Service class if new class was added.
 1. Descriptions copied from CIM and added as doc comments to new changes (on class, property etc)
 1. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required.

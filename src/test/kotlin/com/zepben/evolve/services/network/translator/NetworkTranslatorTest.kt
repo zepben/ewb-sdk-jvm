@@ -29,6 +29,7 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
 import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -68,7 +69,9 @@ internal class NetworkTranslatorTest {
         EquipmentContainer::class.java to { Site(it) },
         Measurement::class.java to { Discrete(it) },
         TransformerEnd::class.java to { PowerTransformerEnd(it) },
-        WireInfo::class.java to { OverheadWireInfo(it) }
+        WireInfo::class.java to { OverheadWireInfo(it) },
+        ProtectionEquipment::class.java to { CurrentRelay(it) },
+        ProtectedSwitch::class.java to { Breaker(it) }
     )
 
     @Test

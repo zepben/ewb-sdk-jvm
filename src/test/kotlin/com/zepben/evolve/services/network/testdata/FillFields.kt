@@ -715,6 +715,11 @@ fun ProtectionEquipment.fillFields(service: NetworkService, includeRuntime: Bool
     relayDelayTime = 1.1
     protectionKind = ProtectionKind.IEF
 
+    addProtectedSwitch(Breaker().also {
+        it.addOperatedByProtectionEquipment(this)
+        service.add(it)
+    })
+
     return this
 }
 
@@ -1061,6 +1066,14 @@ fun ProtectedSwitch.fillFields(service: NetworkService, includeRuntime: Boolean 
     (this as Switch).fillFields(service, includeRuntime)
 
     breakingCapacity = 1
+
+    addRecloseSequence(RecloseSequence().also {
+        service.add(it)
+    })
+    addOperatedByProtectionEquipment(CurrentRelay().also {
+        it.addProtectedSwitch(this)
+        service.add(it)
+    })
 
     return this
 }

@@ -13,6 +13,7 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -24,6 +25,8 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransform
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -80,6 +83,9 @@ class NetworkService : BaseService("network") {
     fun add(shuntCompensatorInfo: ShuntCompensatorInfo): Boolean = super.add(shuntCompensatorInfo)
     fun remove(shuntCompensatorInfo: ShuntCompensatorInfo): Boolean = super.remove(shuntCompensatorInfo)
 
+    fun add(switchInfo: SwitchInfo): Boolean = super.add(switchInfo)
+    fun remove(switchInfo: SwitchInfo): Boolean = super.remove(switchInfo)
+
     fun add(transformerEndInfo: TransformerEndInfo): Boolean = super.add(transformerEndInfo)
     fun remove(transformerEndInfo: TransformerEndInfo): Boolean = super.remove(transformerEndInfo)
 
@@ -112,6 +118,9 @@ class NetworkService : BaseService("network") {
     // #####################################
     // # IEC61968 infIEC61968 InfAssetInfo #
     // #####################################
+
+    fun add(currentRelayInfo: CurrentRelayInfo): Boolean = super.add(currentRelayInfo)
+    fun remove(currentRelayInfo: CurrentRelayInfo): Boolean = super.remove(currentRelayInfo)
 
     fun add(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.add(currentTransformerInfo)
     fun remove(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.remove(currentTransformerInfo)
@@ -208,6 +217,16 @@ class NetworkService : BaseService("network") {
         removeMeasurementIndex(discrete)
         return super.remove(discrete)
     }
+
+    // ############################
+    // # IEC61970 Base Protection #
+    // ############################
+
+    fun add(currentRelay: CurrentRelay): Boolean = super.add(currentRelay)
+    fun remove(currentRelay: CurrentRelay): Boolean = super.remove(currentRelay)
+
+    fun add(recloseSequence: RecloseSequence): Boolean = super.add(recloseSequence)
+    fun remove(recloseSequence: RecloseSequence): Boolean = super.remove(recloseSequence)
 
     // #######################
     // # IEC61970 BASE SCADA #

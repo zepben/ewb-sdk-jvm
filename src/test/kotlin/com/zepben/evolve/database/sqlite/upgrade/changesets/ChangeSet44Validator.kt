@@ -33,7 +33,17 @@ object ChangeSet44Validator : ChangeSetValidator {
     )
 
     override fun validate(statement: Statement) {
-        ensureIndexes(statement)
+        ensureIndexes(
+            statement,
+            "current_transformer_info_mrid",
+            "current_transformer_info_name",
+            "potential_transformer_info_mrid",
+            "potential_transformer_info_name",
+            "current_transformers_mrid",
+            "current_transformers_name",
+            "potential_transformers_mrid",
+            "potential_transformers_name"
+        )
         validateRows(statement, "SELECT * FROM current_transformer_info", { rs ->
             assertThat(rs.getString("mrid"), equalTo("id"))
             assertThat(rs.getString("name"), equalTo("name"))

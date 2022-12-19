@@ -41,7 +41,8 @@ Our main style requirements are:
     1. DB version updated. - `TableVersion.kt`
     1. Migration written. - `com.zepben.evolve.database.sqlite.upgrade`
        1. ChangeSet added to UpgradeRunner. - `com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner`
-       1. Test written for ChangeSet. - `com.zepben.evolve.database.sqlite.upgrade.ChangeSetTest`
+       1. ChangeSetValidator written for ChangeSet. - `com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet*Validator`
+       1. ChangeSetValidator added to changeSetValidators. - `com.zepben.evolve.database.sqlite.upgrade.ChangeSetTest`
    1. Add schema tests - `DatabaseSqliteTest.kt`
 1. Reference resolver(s) added (if new associations).
 1. Protobuf/gRPC
@@ -52,5 +53,5 @@ Our main style requirements are:
 NOTE: Do not update the StupidlyLargeNetwork file, this will be phased out.
 
 1. *ServiceComparator(s) updated and tested.
-1. Exhaustive when functions in *ServiceUtils updated if a new class is added.
+1. Exhaustive when functions in *ServiceUtils updated if a new class is added. Update *ServiceUtilsTest to match.
 1. Release notes updated.

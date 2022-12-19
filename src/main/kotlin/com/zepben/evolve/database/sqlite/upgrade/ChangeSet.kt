@@ -10,26 +10,30 @@ package com.zepben.evolve.database.sqlite.upgrade
 import java.sql.Statement
 
 abstract class ChangeSet {
+
     abstract val number: Int
+    abstract val commands: List<String>
 
     abstract fun preCommandsHook(statement: Statement)
 
     abstract fun postCommandsHook(statement: Statement)
 
-    abstract fun commands(): List<String>
-
     companion object {
+
         operator fun invoke(
             number: Int,
-            preCommandsHook: (Statement) -> Unit = { _ -> },
-            postCommandsHook: (Statement) -> Unit = { _ -> },
-            commands: () -> List<String>
+            vararg commands: List<String>,
+            preCommandsHook: (Statement) -> Unit = { },
+            postCommandsHook: (Statement) -> Unit = { }
         ): ChangeSet = object : ChangeSet() {
-            override val number: Int get() = number
+
+            override val number = number
+            override val commands: List<String> = commands.toList().flatten()
             override fun preCommandsHook(statement: Statement) = preCommandsHook(statement)
             override fun postCommandsHook(statement: Statement) = postCommandsHook(statement)
-            override fun commands(): List<String> = commands()
-        }
-    }
-}
 
+        }
+
+    }
+
+}

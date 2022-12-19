@@ -17,6 +17,7 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -31,6 +32,8 @@ import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -59,8 +62,8 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isBatteryUnit Handler when the [identifiedObject] is a [BatteryUnit]
  * @param isPhotoVoltaicUnit Handler when the [identifiedObject] is a [PhotoVoltaicUnit]
  * @param isPowerElectronicsWindUnit Handler when the [identifiedObject] is a [PowerElectronicsWindUnit]
- * @param isAcLineSegment Handler when the [identifiedObject] is a [AcLineSegment]
- * @param isAssetOwner Handler when the [identifiedObject] is a [AssetOwner]
+ * @param isAcLineSegment Handler when the [identifiedObject] is an [AcLineSegment]
+ * @param isAssetOwner Handler when the [identifiedObject] is an [AssetOwner]
  * @param isBaseVoltage Handler when the [identifiedObject] is a [BaseVoltage]
  * @param isBreaker Handler when the [identifiedObject] is a [Breaker]
  * @param isLoadBreakSwitch Handler when the [identifiedObject] is a [LoadBreakSwitch]
@@ -69,10 +72,10 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isCircuit Handler when the [identifiedObject] is a [Circuit]
  * @param isConnectivityNode Handler when the [identifiedObject] is a [ConnectivityNode]
  * @param isDisconnector Handler when the [identifiedObject] is a [Disconnector]
- * @param isEnergyConsumer Handler when the [identifiedObject] is a [EnergyConsumer]
- * @param isEnergyConsumerPhase Handler when the [identifiedObject] is a [EnergyConsumerPhase]
- * @param isEnergySource Handler when the [identifiedObject] is a [EnergySource]
- * @param isEnergySourcePhase Handler when the [identifiedObject] is a [EnergySourcePhase]
+ * @param isEnergyConsumer Handler when the [identifiedObject] is an [EnergyConsumer]
+ * @param isEnergyConsumerPhase Handler when the [identifiedObject] is an [EnergyConsumerPhase]
+ * @param isEnergySource Handler when the [identifiedObject] is an [EnergySource]
+ * @param isEnergySourcePhase Handler when the [identifiedObject] is an [EnergySourcePhase]
  * @param isFaultIndicator Handler when the [identifiedObject] is a [FaultIndicator]
  * @param isFeeder Handler when the [identifiedObject] is a [Feeder]
  * @param isFuse Handler when the [identifiedObject] is a [Fuse]
@@ -81,11 +84,12 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isJunction Handler when the [identifiedObject] is a [Junction]
  * @param isLinearShuntCompensator Handler when the [identifiedObject] is a [LinearShuntCompensator]
  * @param isLocation Handler when the [identifiedObject] is a [Location]
+ * @param isLvFeeder Handler when the [identifiedObject] is an [LvFeeder]
  * @param isLoop Handler when the [identifiedObject] is a [Loop]
  * @param isMeter Handler when the [identifiedObject] is a [Meter]
- * @param isOperationalRestriction Handler when the [identifiedObject] is a [OperationalRestriction]
- * @param isOrganisation Handler when the [identifiedObject] is a [Organisation]
- * @param isOverheadWireInfo Handler when the [identifiedObject] is a [OverheadWireInfo]
+ * @param isOperationalRestriction Handler when the [identifiedObject] is an [OperationalRestriction]
+ * @param isOrganisation Handler when the [identifiedObject] is an [Organisation]
+ * @param isOverheadWireInfo Handler when the [identifiedObject] is an [OverheadWireInfo]
  * @param isPerLengthSequenceImpedance Handler when the [identifiedObject] is a [PerLengthSequenceImpedance]
  * @param isPole Handler when the [identifiedObject] is a [Pole]
  * @param isPowerElectronicsConnection Handler when the [identifiedObject] is a [PowerElectronicsConnection]
@@ -111,10 +115,18 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isTransformerStarImpedance Handler when the [identifiedObject] is a [TransformerStarImpedance]
  * @param isTransformerTankInfo Handler when the [identifiedObject] is a [TransformerTankInfo]
  * @param isNoLoadTest Handler when the [identifiedObject] is a [NoLoadTest]
- * @param isOpenCircuitTest Handler when the [identifiedObject] is a [OpenCircuitTest]
+ * @param isOpenCircuitTest Handler when the [identifiedObject] is an [OpenCircuitTest]
  * @param isShortCircuitTest Handler when the [identifiedObject] is a [ShortCircuitTest]
- * @param isEquivalentBranch Handler when the [identifiedObject] is a [EquivalentBranch]
+ * @param isEquivalentBranch Handler when the [identifiedObject] is an [EquivalentBranch]
  * @param isShuntCompensatorInfo Handler when the [identifiedObject] is a [ShuntCompensatorInfo]
+ * @param isCurrentTransformerInfo Handler when the [identifiedObject] is a [CurrentTransformerInfo]
+ * @param isPotentialTransformerInfo Handler when the [identifiedObject] is a [PotentialTransformerInfo]
+ * @param isCurrentTransformer Handler when the [identifiedObject] is a [CurrentTransformer]
+ * @param isPotentialTransformer Handler when the [identifiedObject] is a [PotentialTransformer]
+ * @param isSwitchInfo Handler when the [identifiedObject] is a [SwitchInfo]
+ * @param isCurrentRelayInfo Handler when the [identifiedObject] is a [CurrentRelayInfo]
+ * @param isCurrentRelay Handler when the [identifiedObject] is a [CurrentRelay]
+ * @param isRecloseSequence Handler when the [identifiedObject] is a [RecloseSequence]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -184,6 +196,10 @@ inline fun <R> whenNetworkServiceObject(
     isPotentialTransformerInfo: (PotentialTransformerInfo) -> R,
     isCurrentTransformer: (CurrentTransformer) -> R,
     isPotentialTransformer: (PotentialTransformer) -> R,
+    isSwitchInfo: (SwitchInfo) -> R,
+    isCurrentRelayInfo: (CurrentRelayInfo) -> R,
+    isCurrentRelay: (CurrentRelay) -> R,
+    isRecloseSequence: (RecloseSequence) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -252,5 +268,9 @@ inline fun <R> whenNetworkServiceObject(
     is PotentialTransformerInfo -> isPotentialTransformerInfo(identifiedObject)
     is CurrentTransformer -> isCurrentTransformer(identifiedObject)
     is PotentialTransformer -> isPotentialTransformer(identifiedObject)
+    is SwitchInfo -> isSwitchInfo(identifiedObject)
+    is CurrentRelayInfo -> isCurrentRelayInfo(identifiedObject)
+    is CurrentRelay -> isCurrentRelay(identifiedObject)
+    is RecloseSequence -> isRecloseSequence(identifiedObject)
     else -> isOther(identifiedObject)
 }

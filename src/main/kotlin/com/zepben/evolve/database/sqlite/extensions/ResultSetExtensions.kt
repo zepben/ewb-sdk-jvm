@@ -12,6 +12,9 @@ import java.sql.ResultSet
 import java.time.Instant
 
 
+internal fun ResultSet.getNullableBoolean(queryIndex: Int): Boolean? =
+    getBoolean(queryIndex).takeUnless { wasNull() }
+
 internal fun ResultSet.getNullableString(queryIndex: Int): String? =
     getString(queryIndex).takeUnless { wasNull() }
 

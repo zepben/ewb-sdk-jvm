@@ -10,8 +10,11 @@ package com.zepben.evolve.cim.iec61970.base.wires
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Substation
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
@@ -27,6 +30,17 @@ internal class BreakerTest {
     internal fun constructorCoverage() {
         assertThat(Breaker().mRID, not(equalTo("")))
         assertThat(Breaker("id").mRID, equalTo("id"))
+    }
+
+    @Test
+    internal fun accessorCoverage() {
+        val breaker = Breaker()
+
+        assertThat(breaker.inTransitTime, Matchers.nullValue())
+
+        breaker.fillFields(NetworkService())
+
+        assertThat(breaker.inTransitTime, equalTo(1.1))
     }
 
     @Test

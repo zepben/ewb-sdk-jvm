@@ -7,7 +7,13 @@
  */
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
+import com.zepben.evolve.database.sqlite.tables.Column
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
+
+@Suppress("PropertyName")
 class TableBreakers : TableProtectedSwitches() {
+
+    val IN_TRANSIT_TIME = Column(++columnIndex, "in_transit_time", "NUMBER", NULL)
 
     override fun name(): String {
         return "breakers"

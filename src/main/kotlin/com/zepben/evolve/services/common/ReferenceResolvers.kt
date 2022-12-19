@@ -19,6 +19,7 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -32,6 +33,9 @@ import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -82,6 +86,10 @@ internal object ConductorToWireInfoResolver : ReferenceResolver<Conductor, WireI
     Conductor::class, WireInfo::class, Conductor::assetInfo.setter
 )
 
+internal object CurrentRelayToCurrentRelayInfoResolver : ReferenceResolver<CurrentRelay, CurrentRelayInfo> by KReferenceResolver(
+    CurrentRelay::class, CurrentRelayInfo::class, CurrentRelay::assetInfo.setter
+)
+
 internal object CurrentTransformerToCurrentTransformerInfoResolver : ReferenceResolver<CurrentTransformer, CurrentTransformerInfo> by KReferenceResolver(
     CurrentTransformer::class, CurrentTransformerInfo::class, CurrentTransformer::assetInfo.setter
 )
@@ -96,6 +104,10 @@ internal object PowerTransformerToPowerTransformerInfoResolver : ReferenceResolv
 
 internal object ShuntCompensatorToShuntCompensatorInfoResolver : ReferenceResolver<ShuntCompensator, ShuntCompensatorInfo> by KReferenceResolver(
     ShuntCompensator::class, ShuntCompensatorInfo::class, ShuntCompensator::assetInfo.setter
+)
+
+internal object SwitchToSwitchInfoResolver : ReferenceResolver<Switch, SwitchInfo> by KReferenceResolver(
+    Switch::class, SwitchInfo::class, Switch::assetInfo.setter
 )
 
 internal object ConnectivityNodeToTerminalResolver : ReferenceResolver<ConnectivityNode, Terminal> by KReferenceResolver(
@@ -395,6 +407,18 @@ internal object TransformerEndInfoToOpenEndOpenCircuitTestResolver : ReferenceRe
 
 internal object TransformerEndInfoToEnergisedEndOpenCircuitTestResolver : ReferenceResolver<TransformerEndInfo, OpenCircuitTest> by KReferenceResolver(
     TransformerEndInfo::class, OpenCircuitTest::class, TransformerEndInfo::energisedEndOpenCircuitTests.setter
+)
+
+internal object ProtectionEquipmentToProtectedSwitchResolver : ReferenceResolver<ProtectionEquipment, ProtectedSwitch> by KReferenceResolver(
+    ProtectionEquipment::class, ProtectedSwitch::class, ProtectionEquipment::addProtectedSwitch
+)
+
+internal object ProtectedSwitchToProtectionEquipmentResolver : ReferenceResolver<ProtectedSwitch, ProtectionEquipment> by KReferenceResolver(
+    ProtectedSwitch::class, ProtectionEquipment::class, ProtectedSwitch::addOperatedByProtectionEquipment
+)
+
+internal object ProtectedSwitchToRecloseSequenceResolver : ReferenceResolver<ProtectedSwitch, RecloseSequence> by KReferenceResolver(
+    ProtectedSwitch::class, RecloseSequence::class, ProtectedSwitch::addRecloseSequence
 )
 
 //-------------------------------------------//

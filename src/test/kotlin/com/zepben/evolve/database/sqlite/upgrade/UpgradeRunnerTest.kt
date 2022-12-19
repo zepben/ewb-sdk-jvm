@@ -80,8 +80,8 @@ class UpgradeRunnerTest {
     @Test
     fun runsEachChangeSetInTransactions() {
         configureDatabaseVersion(0)
-        doReturn(listOf("1-1", "1-2")).`when`(changeSet1).commands()
-        doReturn(listOf("2-1", "2-2")).`when`(changeSet2).commands()
+        doReturn(listOf("1-1", "1-2")).`when`(changeSet1).commands
+        doReturn(listOf("2-1", "2-2")).`when`(changeSet2).commands
 
         val connectionResult = upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
 
@@ -124,7 +124,7 @@ class UpgradeRunnerTest {
 
         verify(changeSet2, atLeastOnce()).number
         verify(changeSet2).preCommandsHook(any())
-        verify(changeSet2).commands()
+        verify(changeSet2).commands
         verify(changeSet2).postCommandsHook(any())
         verifyNoMoreInteractions(changeSet2)
     }
@@ -274,7 +274,7 @@ class UpgradeRunnerTest {
     private fun validateChangeSetExecuted(inOrder: InOrder, changeSet: ChangeSet) {
         inOrder.verify(statement).executeUpdate("PRAGMA foreign_keys=OFF")
 
-        changeSet.commands().forEach { inOrder.verify(statement).executeUpdate(it) }
+        changeSet.commands.forEach { inOrder.verify(statement).executeUpdate(it) }
 
         inOrder.verify(preparedStatement).setInt(tableVersion.VERSION.queryIndex, changeSet.number)
         inOrder.verify(preparedStatement).executeUpdate()

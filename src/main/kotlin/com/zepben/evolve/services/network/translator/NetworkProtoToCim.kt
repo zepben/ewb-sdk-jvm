@@ -10,10 +10,7 @@ package com.zepben.evolve.services.network.translator
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -25,6 +22,9 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -33,6 +33,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.common.extensions.internEmpty
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
@@ -46,6 +47,7 @@ import com.zepben.protobuf.cim.iec61968.assetinfo.OverheadWireInfo as PBOverhead
 import com.zepben.protobuf.cim.iec61968.assetinfo.PowerTransformerInfo as PBPowerTransformerInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.ShortCircuitTest as PBShortCircuitTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.ShuntCompensatorInfo as PBShuntCompensatorInfo
+import com.zepben.protobuf.cim.iec61968.assetinfo.SwitchInfo as PBSwitchInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerEndInfo as PBTransformerEndInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTankInfo as PBTransformerTankInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTest as PBTransformerTest
@@ -64,6 +66,7 @@ import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo as PBCurrentRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infcommon.Ratio as PBRatio
@@ -99,6 +102,9 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Control as PBControl
 import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint as PBIoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
+import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay as PBCurrentRelay
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionEquipment as PBProtectionEquipment
+import com.zepben.protobuf.cim.iec61970.base.protection.RecloseSequence as PBRecloseSequence
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
@@ -209,6 +215,12 @@ fun toCim(pb: PBShuntCompensatorInfo, networkService: NetworkService): ShuntComp
         toCim(pb.ai, this, networkService)
     }
 
+fun toCim(pb: PBSwitchInfo, networkService: NetworkService): SwitchInfo =
+    SwitchInfo(pb.mRID()).apply {
+        ratedInterruptingTime = pb.ratedInterruptingTime.takeUnless { it == UNKNOWN_DOUBLE }
+        toCim(pb.ai, this, networkService)
+    }
+
 fun toCim(pb: PBTransformerEndInfo, networkService: NetworkService): TransformerEndInfo =
     TransformerEndInfo(pb.mRID()).apply {
         connectionKind = WindingConnection.valueOf(pb.connectionKind.name)
@@ -262,6 +274,7 @@ fun NetworkService.addFromPb(pb: PBOverheadWireInfo): OverheadWireInfo? = tryAdd
 fun NetworkService.addFromPb(pb: PBPowerTransformerInfo): PowerTransformerInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBShortCircuitTest): ShortCircuitTest? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBShuntCompensatorInfo): ShuntCompensatorInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBSwitchInfo): SwitchInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = tryAddOrNull(toCim(pb, this))
 
@@ -353,6 +366,12 @@ fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb,
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
+fun toCim(pb: PBCurrentRelayInfo, networkService: NetworkService): CurrentRelayInfo =
+    CurrentRelayInfo(pb.mRID()).apply {
+        curveSetting = pb.curveSetting.takeIf { it.isNotBlank() }
+        toCim(pb.ai, this, networkService)
+    }
+
 fun toCim(pb: PBCurrentTransformerInfo, networkService: NetworkService): CurrentTransformerInfo =
     CurrentTransformerInfo(pb.mRID()).apply {
         accuracyClass = pb.accuracyClass.takeIf { it.isNotBlank() }
@@ -381,6 +400,7 @@ fun toCim(pb: PBPotentialTransformerInfo, networkService: NetworkService): Poten
         toCim(pb.ai, this, networkService)
     }
 
+fun NetworkService.addFromPb(pb: PBCurrentRelayInfo): CurrentRelayInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = tryAddOrNull(toCim(pb, this))
 
@@ -686,6 +706,37 @@ fun NetworkService.addFromPb(pb: PBAnalog): Analog? = tryAddOrNull(toCim(pb, thi
 fun NetworkService.addFromPb(pb: PBAccumulator): Accumulator? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBDiscrete): Discrete? = tryAddOrNull(toCim(pb, this))
 
+/************ IEC61970 Base Protection ************/
+
+fun toCim(pb: PBCurrentRelay, networkService: NetworkService): CurrentRelay =
+    CurrentRelay(pb.mRID()).apply {
+        currentLimit1 = pb.currentLimit1.takeUnless { it == UNKNOWN_DOUBLE }
+        inverseTimeFlag = pb.inverseTimeFlagSet.takeUnless { pb.hasInverseTimeFlagNull() }
+        timeDelay1 = pb.timeDelay1.takeUnless { it == UNKNOWN_DOUBLE }
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
+        toCim(pb.pe, this, networkService)
+    }
+
+fun toCim(pb: PBProtectionEquipment, cim: ProtectionEquipment, networkService: NetworkService): ProtectionEquipment =
+    cim.apply {
+        pb.protectedSwitchMRIDsList.forEach { protectedSwitchMRID ->
+            networkService.resolveOrDeferReference(Resolvers.protectedSwitches(this), protectedSwitchMRID)
+        }
+        relayDelayTime = pb.relayDelayTime.takeUnless { it == UNKNOWN_DOUBLE }
+        protectionKind = ProtectionKind.valueOf(pb.protectionKind.name)
+        toCim(pb.eq, this, networkService)
+    }
+
+fun toCim(pb: PBRecloseSequence, networkService: NetworkService): RecloseSequence =
+    RecloseSequence(pb.mRID()).apply {
+        recloseDelay = pb.recloseDelay.takeUnless { it == UNKNOWN_DOUBLE }
+        recloseStep = pb.recloseStep.takeUnless { it == UNKNOWN_INT }
+        toCim(pb.io, this, networkService)
+    }
+
+fun NetworkService.addFromPb(pb: PBCurrentRelay): CurrentRelay? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBRecloseSequence): RecloseSequence? = tryAddOrNull(toCim(pb, this))
+
 /************ IEC61970 SCADA ************/
 
 fun toCim(pb: PBRemoteControl, networkService: NetworkService): RemoteControl =
@@ -748,6 +799,7 @@ fun toCim(pb: PBAcLineSegment, networkService: NetworkService): AcLineSegment =
 
 fun toCim(pb: PBBreaker, networkService: NetworkService): Breaker =
     Breaker(pb.mRID()).apply {
+        inTransitTime = pb.inTransitTime.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.sw, this, networkService)
     }
 
@@ -953,7 +1005,16 @@ fun toCim(pb: PBPowerTransformerEnd, networkService: NetworkService): PowerTrans
     }
 
 fun toCim(pb: PBProtectedSwitch, cim: ProtectedSwitch, networkService: NetworkService): ProtectedSwitch =
-    cim.apply { toCim(pb.sw, this, networkService) }
+    cim.apply {
+        pb.recloseSequenceMRIDsList.forEach { recloseSequenceMRID ->
+            networkService.resolveOrDeferReference(Resolvers.recloseSequences(this), recloseSequenceMRID)
+        }
+        pb.operatedByProtectionEquipmentMRIDsList.forEach { protectionEquipmentMRID ->
+            networkService.resolveOrDeferReference(Resolvers.operatedByProtectionEquipment(this), protectionEquipmentMRID)
+        }
+        breakingCapacity = pb.breakingCapacity.takeUnless { it == UNKNOWN_INT }
+        toCim(pb.sw, this, networkService)
+    }
 
 fun toCim(pb: PBRatioTapChanger, networkService: NetworkService): RatioTapChanger =
     RatioTapChanger(pb.mRID()).apply {
@@ -985,6 +1046,8 @@ fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: Network
 
 fun toCim(pb: PBSwitch, cim: Switch, networkService: NetworkService): Switch =
     cim.apply {
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
+        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_UINT }
         setNormallyOpen(pb.normalOpen)
         setOpen(pb.open)
         // when unganged support is added to protobuf
@@ -1105,6 +1168,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBPowerTransformerInfo): PowerTransformerInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBShortCircuitTest): ShortCircuitTest? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBShuntCompensatorInfo): ShuntCompensatorInfo? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBSwitchInfo): SwitchInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerEndInfo): TransformerEndInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerTankInfo): TransformerTankInfo? = networkService.addFromPb(pb)
 
@@ -1118,6 +1182,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBLocation): Location? = networkService.addFromPb(pb)
 
     // IEC61968 infIEC61968 InfAssetInfo
+    fun addFromPb(pb: PBCurrentRelayInfo): CurrentRelayInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = networkService.addFromPb(pb)
 
@@ -1152,6 +1217,10 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBAnalog): Analog? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBAccumulator): Accumulator? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBDiscrete): Discrete? = networkService.addFromPb(pb)
+
+    // IEC61970 Base Protection
+    fun addFromPb(pb: PBCurrentRelay): CurrentRelay? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBRecloseSequence): RecloseSequence? = networkService.addFromPb(pb)
 
     // IEC61970 BASE SCADA
     fun addFromPb(pb: PBRemoteControl): RemoteControl? = networkService.addFromPb(pb)

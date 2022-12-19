@@ -7,4 +7,12 @@
  */
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
-abstract class TableProtectedSwitches : TableSwitches()
+import com.zepben.evolve.database.sqlite.tables.Column
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
+
+@Suppress("PropertyName")
+abstract class TableProtectedSwitches : TableSwitches() {
+
+    val BREAKING_CAPACITY = Column(++columnIndex, "breaking_capacity", "INTEGER", NULL)
+
+}

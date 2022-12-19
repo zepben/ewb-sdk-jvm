@@ -10,17 +10,16 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
 
-internal fun changeSet44() = ChangeSet(44) {
-    listOf(
-        *`Create current_transformer_info table`,
-        *`Create potential_transformer_info table`,
-        *`Create current_transformers table`,
-        *`Create potential_transformers table`,
-    )
-}
+internal fun changeSet44() = ChangeSet(
+    44,
+    `Create current_transformer_info table`,
+    `Create potential_transformer_info table`,
+    `Create current_transformers table`,
+    `Create potential_transformers table`,
+)
 
 @Suppress("ObjectPropertyName")
-private val `Create current_transformer_info table` = arrayOf(
+private val `Create current_transformer_info table` = listOf(
     """
     CREATE TABLE current_transformer_info (
         mrid TEXT NOT NULL,
@@ -50,7 +49,7 @@ private val `Create current_transformer_info table` = arrayOf(
 )
 
 @Suppress("ObjectPropertyName")
-private val `Create potential_transformer_info table` = arrayOf(
+private val `Create potential_transformer_info table` = listOf(
     """
     CREATE TABLE potential_transformer_info (
         mrid TEXT NOT NULL,
@@ -71,7 +70,7 @@ private val `Create potential_transformer_info table` = arrayOf(
 )
 
 @Suppress("ObjectPropertyName")
-private val `Create current_transformers table` = arrayOf(
+private val `Create current_transformers table` = listOf(
     """
     CREATE TABLE current_transformers (
         mrid TEXT NOT NULL,
@@ -92,7 +91,7 @@ private val `Create current_transformers table` = arrayOf(
 )
 
 @Suppress("ObjectPropertyName")
-private val `Create potential_transformers table` = arrayOf(
+private val `Create potential_transformers table` = listOf(
     """
     CREATE TABLE potential_transformers (
         mrid TEXT NOT NULL,

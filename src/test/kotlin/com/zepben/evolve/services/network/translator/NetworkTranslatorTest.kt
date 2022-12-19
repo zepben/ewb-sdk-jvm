@@ -15,6 +15,7 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -27,6 +28,9 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransform
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
+import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -65,7 +69,9 @@ internal class NetworkTranslatorTest {
         EquipmentContainer::class.java to { Site(it) },
         Measurement::class.java to { Discrete(it) },
         TransformerEnd::class.java to { PowerTransformerEnd(it) },
-        WireInfo::class.java to { OverheadWireInfo(it) }
+        WireInfo::class.java to { OverheadWireInfo(it) },
+        ProtectionEquipment::class.java to { CurrentRelay(it) },
+        ProtectedSwitch::class.java to { Breaker(it) }
     )
 
     @Test
@@ -80,6 +86,7 @@ internal class NetworkTranslatorTest {
         validate({ PowerTransformerInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ ShortCircuitTest() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ ShuntCompensatorInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ SwitchInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ TransformerEndInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ TransformerTankInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
@@ -93,6 +100,7 @@ internal class NetworkTranslatorTest {
         validate({ Organisation() }, { ns, it -> it.fillFieldsCommon(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
         /************ IEC61968 infIEC61968 InfAssetInfo ************/
+        validate({ CurrentRelayInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ CurrentTransformerInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ PotentialTransformerInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
@@ -126,6 +134,10 @@ internal class NetworkTranslatorTest {
         validate({ Analog() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Control() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Discrete() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+
+        /************ IEC61970 Base Protection ************/
+        validate({ CurrentRelay() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ RecloseSequence() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
         /************ IEC61970 BASE SCADA ************/
         validate({ RemoteControl() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })

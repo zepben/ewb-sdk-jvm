@@ -17,6 +17,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableLocationStr
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableLocations
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableOrganisations
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TablePositionPoints
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
@@ -31,6 +32,8 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAccumula
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAnalogs
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableDiscretes
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableRecloseSequences
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
@@ -61,9 +64,11 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableOpenCircuitTests>("open circuit tests", reader::load)
         status = status and loadEach<TableShortCircuitTests>("short circuit tests", reader::load)
         status = status and loadEach<TableShuntCompensatorInfo>("shunt compensator info", reader::load)
+        status = status and loadEach<TableSwitchInfo>("switch info", reader::load)
         status = status and loadEach<TableTransformerEndInfo>("transformer end info", reader::load)
         status = status and loadEach<TableCurrentTransformerInfo>("current transformer info", reader::load)
         status = status and loadEach<TablePotentialTransformerInfo>("potential transformer info", reader::load)
+        status = status and loadEach<TableCurrentRelayInfo>("current relay info", reader::load)
         status = status and loadEach<TableLocations>("locations", reader::load)
         status = status and loadEach<TableOrganisations>("organisations", reader::load)
         status = status and loadEach<TableAssetOwners>("asset owners", reader::load)
@@ -89,6 +94,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableBreakers>("breakers", reader::load)
         status = status and loadEach<TableLoadBreakSwitches>("load break switches", reader::load)
         status = status and loadEach<TableBusbarSections>("busbar sections", reader::load)
+        status = status and loadEach<TableCurrentRelays>("current relays", reader::load)
         status = status and loadEach<TableDisconnectors>("disconnectors", reader::load)
         status = status and loadEach<TableEnergyConsumers>("energy consumers", reader::load)
         status = status and loadEach<TableEnergyConsumerPhases>("energy consumer phases", reader::load)
@@ -118,6 +124,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableEquipmentUsagePoints>("equipment to usage point associations", reader::load)
         status = status and loadEach<TableEquipmentOperationalRestrictions>("equipment to operational restriction associations", reader::load)
         status = status and loadEach<TableEquipmentEquipmentContainers>("equipment to equipment container associations", reader::load)
+        status = status and loadEach<TableProtectionEquipmentProtectedSwitches>("protection equipment to protected switch associations", reader::load)
         status = status and loadEach<TableCircuitsSubstations>("circuit to substation associations", reader::load)
         status = status and loadEach<TableCircuitsTerminals>("circuit to terminal associations", reader::load)
         status = status and loadEach<TableLoopsSubstations>("loop to substation associations", reader::load)
@@ -127,6 +134,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableAnalogs>("analogs", reader::load)
         status = status and loadEach<TableAccumulators>("accumulators", reader::load)
         status = status and loadEach<TableDiscretes>("discretes", reader::load)
+        status = status and loadEach<TableRecloseSequences>("reclose sequences", reader::load)
 
         status = status and loadNames(reader)
 

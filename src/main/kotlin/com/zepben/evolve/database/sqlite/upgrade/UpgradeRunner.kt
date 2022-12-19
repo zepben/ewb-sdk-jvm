@@ -93,8 +93,7 @@ class UpgradeRunner constructor(
 
         changeSet.preCommandsHook(statement)
 
-        for (sql in changeSet.commands())
-            statement.executeUpdate(sql)
+        changeSet.commands.forEach { statement.executeUpdate(it) }
 
         changeSet.postCommandsHook(statement)
 

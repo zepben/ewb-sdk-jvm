@@ -10,19 +10,18 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
 
-internal fun changeSet45() = ChangeSet(45) {
-    listOf(
-        *`Create new columns on existing tables`,
-        *`Create switch_info table`,
-        *`Create current_relay_info table`,
-        *`Create current_relays table`,
-        *`Create reclose_sequences table`,
-        *`Create protection_equipment_protected_switches table`,
-    )
-}
+internal fun changeSet45() = ChangeSet(
+    45,
+    `Create new columns on existing tables`,
+    `Create switch_info table`,
+    `Create current_relay_info table`,
+    `Create current_relays table`,
+    `Create reclose_sequences table`,
+    `Create protection_equipment_protected_switches table`,
+)
 
 @Suppress("ObjectPropertyName")
-private val `Create new columns on existing tables` = arrayOf(
+private val `Create new columns on existing tables` = listOf(
     "ALTER TABLE breakers ADD switch_info_mrid TEXT NULL;",
     "ALTER TABLE disconnectors ADD switch_info_mrid TEXT NULL;",
     "ALTER TABLE fuses ADD switch_info_mrid TEXT NULL;",
@@ -45,7 +44,7 @@ private val `Create new columns on existing tables` = arrayOf(
 )
 
 @Suppress("ObjectPropertyName")
-private val `Create switch_info table` = arrayOf(
+private val `Create switch_info table` = listOf(
     """
     CREATE TABLE switch_info (
         mrid TEXT NOT NULL,
@@ -60,7 +59,7 @@ private val `Create switch_info table` = arrayOf(
 )
 
 @Suppress("ObjectPropertyName")
-private val `Create current_relay_info table` = arrayOf(
+private val `Create current_relay_info table` = listOf(
     """
     CREATE TABLE current_relay_info (
         mrid TEXT NOT NULL,
@@ -75,7 +74,7 @@ private val `Create current_relay_info table` = arrayOf(
 )
 
 @Suppress("ObjectPropertyName")
-private val `Create current_relays table` = arrayOf(
+private val `Create current_relays table` = listOf(
     """
     CREATE TABLE current_relays (
         mrid TEXT NOT NULL,
@@ -99,7 +98,7 @@ private val `Create current_relays table` = arrayOf(
 )
 
 @Suppress("ObjectPropertyName")
-private val `Create reclose_sequences table` = arrayOf(
+private val `Create reclose_sequences table` = listOf(
     """
     CREATE TABLE reclose_sequences (
         mrid TEXT NOT NULL,
@@ -116,7 +115,7 @@ private val `Create reclose_sequences table` = arrayOf(
 )
 
 @Suppress("ObjectPropertyName")
-private val `Create protection_equipment_protected_switches table` = arrayOf(
+private val `Create protection_equipment_protected_switches table` = listOf(
     """
     CREATE TABLE protection_equipment_protected_switches (
         protection_equipment_mrid TEXT NOT NULL,

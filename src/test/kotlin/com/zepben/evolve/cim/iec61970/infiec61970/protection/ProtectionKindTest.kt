@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind as PBProtectionKind
 
 internal class ProtectionKindTest {
 
@@ -21,7 +22,7 @@ internal class ProtectionKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(ProtectionKind.values(), com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind.values())
+        validateEnum(ProtectionKind.values(), PBProtectionKind.values())
     }
 
 }

@@ -8,11 +8,16 @@
 
 package com.zepben.evolve.services.network.tracing.feeder
 
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
-import com.zepben.evolve.services.network.testdata.*
+import com.zepben.evolve.services.network.testdata.DownstreamFeederStartPointNetwork
+import com.zepben.evolve.services.network.testdata.DroppedPhasesNetwork
+import com.zepben.evolve.services.network.testdata.FeederStartPointBetweenConductorsNetwork
+import com.zepben.evolve.services.network.testdata.FeederStartPointToOpenPointNetwork
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
@@ -100,7 +105,7 @@ class AssignToLvFeedersTest {
         val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
         val network = TestNetworkBuilder()
-            .fromBreaker { baseVoltage = lvBaseVoltage} // b0
+            .fromBreaker { baseVoltage = lvBaseVoltage } // b0
             .toAcls { baseVoltage = lvBaseVoltage } // c1
             .toAcls { baseVoltage = hvBaseVoltage } // c2
             .addLvFeeder("b0")
@@ -121,7 +126,7 @@ class AssignToLvFeedersTest {
         val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
         val network = TestNetworkBuilder()
-            .fromBreaker { baseVoltage = lvBaseVoltage} // b0
+            .fromBreaker { baseVoltage = lvBaseVoltage } // b0
             .toAcls { baseVoltage = lvBaseVoltage } // c1
             .toPowerTransformer(endActions = listOf({ baseVoltage = lvBaseVoltage }, { baseVoltage = hvBaseVoltage })) // tx2
             .toAcls { baseVoltage = hvBaseVoltage } // c3
@@ -202,6 +207,25 @@ class AssignToLvFeedersTest {
         assertThat(feeder1.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
         assertThat(feeder2.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
         assertThat(lvFeeder.normalEnergizingFeeders, containsInAnyOrder(feeder1, feeder2))
+    }
+
+    @Test
+    fun `assigns AuxiliaryEquipment to Feeder`() {
+        val network = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .toAcls() // c1
+            .addLvFeeder("b0")
+            .network
+            .apply {
+                add(CurrentTransformer("a1").apply { terminal = get("c1-t1") })
+                add(FaultIndicator("a2").apply { terminal = get("c1-t1") })
+            }
+
+        val lvFeeder: LvFeeder = network["lvf2"]!!
+
+        Tracing.assignEquipmentToLvFeeders().run(network)
+
+        validateEquipment(lvFeeder.equipment, "b0", "c1", "a1", "a2")
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

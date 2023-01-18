@@ -13,6 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 
@@ -89,13 +90,51 @@ class AssignToFeeders {
         terminal.conductingEquipment?.baseVoltage?.let { it.nominalVoltage < 1000 } ?: false
     }
 
-    private fun processNormal(terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>): (Terminal, Boolean) -> Unit =
-        { terminal, isStopping -> process(terminal, Equipment::addContainer, Feeder::addEquipment, isStopping, terminalToAuxEquipment) }
+    private fun processNormal(
+        terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
+    ): (Terminal, Boolean) -> Unit =
+        { terminal, isStopping ->
+            process(
+                terminal,
+                { ce, feeder ->
+                    ce.addContainer(feeder)
+                    when (ce) {
+                        is ProtectedSwitch -> ce.operatedByProtectionEquipment.forEach { pe -> pe.addContainer(feeder) }
+                    }
+                },
+                { feeder, ce ->
+                    feeder.addEquipment(ce)
+                    when (ce) {
+                        is ProtectedSwitch -> ce.operatedByProtectionEquipment.forEach { pe -> feeder.addEquipment(pe) }
+                    }
+                },
+                isStopping,
+                terminalToAuxEquipment
+            )
+        }
 
     private fun processCurrent(
         terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
     ): (Terminal, Boolean) -> Unit =
-        { terminal, isStopping -> process(terminal, Equipment::addCurrentContainer, Feeder::addCurrentEquipment, isStopping, terminalToAuxEquipment) }
+        { terminal, isStopping ->
+            process(
+                terminal,
+                { ce, feeder ->
+                    ce.addCurrentContainer(feeder)
+                    when (ce) {
+                        is ProtectedSwitch -> ce.operatedByProtectionEquipment.forEach { pe -> pe.addCurrentContainer(feeder) }
+                    }
+                },
+                { feeder, ce ->
+                    feeder.addCurrentEquipment(ce)
+                    when (ce) {
+                        is ProtectedSwitch -> ce.operatedByProtectionEquipment.forEach { pe -> feeder.addCurrentEquipment(pe) }
+                    }
+                },
+                isStopping,
+                terminalToAuxEquipment
+            )
+        }
 
     private fun process(
         terminal: Terminal,

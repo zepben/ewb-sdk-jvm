@@ -15,6 +15,10 @@ internal fun changeSet46() = ChangeSet(
     `Make potential_transformers type non-null`
 )
 
+// Non-null columns cannot be added to existing tables without specifying a default, which cannot be removed later.
+// This has the side effect of allowing the field to be unspecified when inserting new entries, unlike other non-null fields in our schema.
+// This is why an entire new table is created instead, with the values from the old table copied over.
+// We can revisit this when SQLite adds proper support for ALTER COLUMN.
 @Suppress("ObjectPropertyName")
 private val `Make potential_transformers type non-null` = listOf(
     """

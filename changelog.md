@@ -57,6 +57,7 @@
 * `NetworkService.remove` for `LvFeeder` function fixed (previously added instead).
 * Added confirmation of removal to the remove component test.
 * Fixed bug where limited connected traces with `maximumSteps = 1` could include equipment 2 steps away when using a direction.
+* Made `type` column of `potential_transformers` non-null.
 
 ### Notes
 

@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet44Validator
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet45Validator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet46Validator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -29,7 +30,8 @@ class ChangeSetTest {
 
     private val changeSetValidators = mapOf(
         44 to ChangeSet44Validator,
-        45 to ChangeSet45Validator
+        45 to ChangeSet45Validator,
+        46 to ChangeSet46Validator
     )
 
     @Test

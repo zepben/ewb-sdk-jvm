@@ -12,6 +12,7 @@ import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet44
 import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet45
+import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet46
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -26,7 +27,8 @@ class UpgradeRunner constructor(
     private val createBackup: (databaseFilename: Path, backupFilename: Path, copyOption: CopyOption) -> Unit = { f, b, o -> Files.copy(f, b, o) },
     internal val changeSets: List<ChangeSet> = listOf(
         changeSet44(),
-        changeSet45()
+        changeSet45(),
+        changeSet46()
     ),
     private val tableVersion: TableVersion = TableVersion()
 ) {

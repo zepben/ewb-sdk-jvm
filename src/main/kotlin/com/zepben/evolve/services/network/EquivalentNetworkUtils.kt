@@ -13,7 +13,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.wires.EnergyConsumer
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -31,11 +30,6 @@ import kotlin.reflect.full.primaryConstructor
  * they will treat it as an edge and attach an [EquivalentBranch] to it.
  */
 object EquivalentNetworkUtils {
-
-    private val LV_HV = setOf(LvFeeder::class, Feeder::class)
-    private val HV_SUBSTATION = setOf(Feeder::class, Substation::class)
-    private val SUBSTATION_CIRCUIT = setOf(Substation::class, Circuit::class)
-    private val CIRCUIT_LV = setOf(Circuit::class, LvFeeder::class)
 
     inline fun <reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
         container: EquipmentContainer,
@@ -300,14 +294,7 @@ object EquivalentNetworkUtils {
         createEquivalentEquipment: (EquivalentEquipmentDetails) -> Sequence<Pair<PhaseCode, ConductingEquipment>>,
         maxNumber: Int? = null
     ): Set<EquivalentNetworkConnection> {
-        val edgeCnn = when (val neighbourContainers = setOf(container::class, otherContainer::class)) {
-            LV_HV -> getLvHvEdge(network, container, otherContainer)
-            HV_SUBSTATION -> getHvSubstationEdge(network, container, otherContainer)
-            SUBSTATION_CIRCUIT -> getSubstationCircuitEdge(network, container, otherContainer)
-            CIRCUIT_LV -> getCircuitLvEdge(network, container, otherContainer)
-            else -> throw UnsupportedOperationException("Unsupported neighbour containers for determining edge: ${neighbourContainers.map { it.simpleName }}")
-        }
-
+        val edgeCnn = getEdgeNodes(network, setOf(container::class, otherContainer::class), container, otherContainer)
         val edgeCnToProcess = (maxNumber?.let { edgeCnn.take(it) } ?: edgeCnn)
         return edgeCnToProcess.map { cn -> addEquivalentNetwork(network, cn, createEquivalentBranches, createEquivalentEquipment) }.toSet()
     }
@@ -336,14 +323,7 @@ object EquivalentNetworkUtils {
         createEquivalentEquipment: (EquivalentEquipmentDetails) -> Sequence<Pair<PhaseCode, ConductingEquipment>>,
         maxNumber: Int? = null
     ): Set<EquivalentNetworkConnection> {
-        val edgeCnn = when (val neighbourContainers = setOf(container::class, otherContainerClass)) {
-            LV_HV -> getLvHvEdge(network, container)
-            HV_SUBSTATION -> getHvSubstationEdge(network, container)
-            SUBSTATION_CIRCUIT -> getSubstationCircuitEdge(network, container)
-            CIRCUIT_LV -> getCircuitLvEdge(network, container)
-            else -> throw UnsupportedOperationException("Unsupported neighbour containers for determining edge: ${neighbourContainers.map { it.simpleName }}")
-        }
-
+        val edgeCnn = getEdgeNodes(network, setOf(container::class, otherContainerClass), container)
         val edgeCnToProcess = (maxNumber?.let { edgeCnn.take(it) } ?: edgeCnn)
         return edgeCnToProcess.map { cn -> addEquivalentNetwork(network, cn, createEquivalentBranches, createEquivalentEquipment) }.toSet()
     }
@@ -372,16 +352,7 @@ object EquivalentNetworkUtils {
         createEquivalentEquipment: (EquivalentEquipmentDetails) -> Sequence<Pair<PhaseCode, ConductingEquipment>>,
         maxNumber: Int? = null
     ): Set<EquivalentNetworkConnection> {
-        val edgeCnn = when (setOf(containerClass, otherContainerClass)) {
-            LV_HV -> getLvHvEdge(network)
-            HV_SUBSTATION -> getHvSubstationEdge(network)
-            SUBSTATION_CIRCUIT -> getSubstationCircuitEdge(network)
-            CIRCUIT_LV -> getCircuitLvEdge(network)
-            else -> throw UnsupportedOperationException(
-                "Unsupported neighbour containers for determining edge: ${setOf(containerClass, otherContainerClass).map { it.simpleName }}"
-            )
-        }
-
+        val edgeCnn = getEdgeNodes(network, setOf(containerClass, otherContainerClass))
         val edgeCnToProcess = (maxNumber?.let { edgeCnn.take(it) } ?: edgeCnn)
         return edgeCnToProcess.map { cn -> addEquivalentNetwork(network, cn, createEquivalentBranches, createEquivalentEquipment) }.toSet()
     }
@@ -459,25 +430,20 @@ object EquivalentNetworkUtils {
                 .flatMap { ot -> ot.connectedTerminals().flatMap { it.conductingEquipment?.containers ?: emptyList() } }.filter { it !is Site }.toSet()
         )
 
-    private fun getSubstationCircuitEdge(network: NetworkService, vararg containers: EquipmentContainer): Set<ConnectivityNode> =
-        getConnectivityNodeSequence(network, containers.toSet()).filter { cn ->
-            cn.terminals.size == 1 &&
-                cn.terminals.first().conductingEquipment?.containers
-                    ?.let { containers -> containers.any { it is Substation } && containers.any { it is Circuit } } ?: false
-        }.toSet()
-
-    private fun getHvSubstationEdge(network: NetworkService, vararg containers: EquipmentContainer): Set<ConnectivityNode> =
-        getConnectivityNodeSequence(network, containers.toSet()).filter { cn ->
-            cn.terminals.size == 1 &&
-                cn.terminals.first().conductingEquipment?.containers
-                    ?.let { containers -> containers.any { it is Feeder } && containers.any { it is Substation } } ?: false
-        }.toSet()
-
-    private fun getLvHvEdge(network: NetworkService, vararg containers: EquipmentContainer): Set<ConnectivityNode> =
+    private fun getEdgeNodes(
+        network: NetworkService,
+        edgeContainerClasses: Set<KClass<out EquipmentContainer>>,
+        vararg containers: EquipmentContainer
+    ): Set<ConnectivityNode> =
         getConnectivityNodeSequence(network, containers.toSet())
             .filter { cn ->
-                cn.terminals.size == 1
-                    && cn.terminals.first().conductingEquipment?.containers?.let { containers -> containers.any { it is Feeder } && containers.any { it is LvFeeder } } ?: false
+                cn.terminals.size == 1 &&
+                    cn.terminals.first().conductingEquipment?.containers
+                        ?.let { containers ->
+                            edgeContainerClasses
+                                .map { i -> containers.any { i.isInstance(it) } }
+                                .reduce { acc, i -> acc && i }
+                        } ?: false
             }
             // NOTE: This second filter makes sure you don't match ConnectivityNodes associated to equipment that are connected to nothing.
             //     ConductingEquipment connected to nothing can be valid state in a service e.g. After resolving references for an EquipmentContainer's
@@ -486,13 +452,6 @@ object EquivalentNetworkUtils {
                 cn.terminals.first().conductingEquipment?.terminals?.all { it.connectivityNode?.terminals?.size == 1 }?.let { !it } ?: false
             }
             .toSet()
-
-    private fun getCircuitLvEdge(network: NetworkService, vararg containers: EquipmentContainer): Set<ConnectivityNode> =
-        getConnectivityNodeSequence(network, containers.toSet()).filter { cn ->
-            cn.terminals.size == 1 &&
-                cn.terminals.first().conductingEquipment?.containers
-                    ?.let { containers -> containers.any { it is LvFeeder } && containers.any { it is Circuit } } ?: false
-        }.toSet()
 
     private fun getConnectivityNodeSequence(network: NetworkService, containers: Set<EquipmentContainer>): Sequence<ConnectivityNode> =
         if (containers.isEmpty())

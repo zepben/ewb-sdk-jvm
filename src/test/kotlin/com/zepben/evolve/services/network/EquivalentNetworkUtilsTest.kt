@@ -11,6 +11,7 @@ package com.zepben.evolve.services.network
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
@@ -39,6 +40,47 @@ internal class EquivalentNetworkUtilsTest {
         clearAllMocks()
     }
 
+    @Test
+    internal fun `check that calling convenience functions call underlying function with default values`() {
+        val (network, _) = networkWithEdges(LvFeeder::class to Feeder::class)
+        val lvFeeder = network.sequenceOf<LvFeeder>().first()
+        val hvFeeder = network.sequenceOf<Feeder>().first()
+
+        mockkObject(EquivalentNetworkUtils)
+
+        network.addToEdgeBetween<Breaker>(lvFeeder, hvFeeder)
+        verify {
+            addToEdgeBetweenContainers(
+                container = eq(lvFeeder),
+                otherContainer = eq(hvFeeder),
+                network = eq(network),
+                createEquivalentBranches = any(),
+                createEquivalentEquipment = any(),
+            )
+        }
+
+        network.addToEdgeBetween<Breaker>(lvFeeder, Feeder::class)
+        verify {
+            addToEdgeBetweenContainers(
+                container = eq(lvFeeder),
+                otherContainerClass = eq(Feeder::class),
+                network = eq(network),
+                createEquivalentBranches = any(),
+                createEquivalentEquipment = any(),
+            )
+        }
+
+        network.addToEdgeBetween<Breaker>(LvFeeder::class, Feeder::class)
+        verify {
+            addToEdgeBetweenContainers(
+                containerClass = eq(LvFeeder::class),
+                otherContainerClass = eq(Feeder::class),
+                network = eq(network),
+                createEquivalentBranches = any(),
+                createEquivalentEquipment = any(),
+            )
+        }
+    }
 
     @Test
     internal fun `check that 'addToEdgeBetween' with container and otherContainer instances calls 'addToEdgeBetweenContainers' with the appropriate arguments`() {

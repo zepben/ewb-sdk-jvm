@@ -8,7 +8,10 @@
   `BOTH.contains(DOWNSTREAM)` or `DOWNSTREAM in BOTH`
 * Removed deprecated function `NetworkConsumerClient.getFeeder`.
 * Renamed function 'breadFirstSupplier' to 'breadthFirstSupplier' in 'BasicQueue' class.
-* Updated the AssignToFeeders to support assigning AuxiliaryEquipment.
+* Updated AssignToFeeders to support assigning AuxiliaryEquipment.
+* Updated AssignToLvFeeders to support assigning AuxiliaryEquipment.
+* Updated AssignToFeeders to support assigning ProtectionEquipment.
+* Updated AssignToLvFeeders to support assigning ProtectionEquipment.
 
 ### New Features
 

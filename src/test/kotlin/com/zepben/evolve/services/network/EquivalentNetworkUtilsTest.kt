@@ -41,7 +41,27 @@ internal class EquivalentNetworkUtilsTest {
     }
 
     @Test
-    internal fun `check that calling convenience functions call underlying function with default values`() {
+    internal fun `check that calling convenience function with containers calls underlying function with default values`() {
+        val (network, _) = networkWithEdges(LvFeeder::class to Feeder::class)
+        val lvFeeder = network.sequenceOf<LvFeeder>().first()
+        val hvFeeder = network.sequenceOf<Feeder>().first()
+
+        mockkObject(EquivalentNetworkUtils)
+
+        addToEdgeBetween<Breaker>(lvFeeder, hvFeeder, network)
+        verify {
+            addToEdgeBetweenContainers(
+                container = eq(lvFeeder),
+                otherContainer = eq(hvFeeder),
+                network = eq(network),
+                createEquivalentBranches = any(),
+                createEquivalentEquipment = any(),
+            )
+        }
+    }
+
+    @Test
+    internal fun `check that calling convenience extension function with containers calls underlying function with default values`() {
         val (network, _) = networkWithEdges(LvFeeder::class to Feeder::class)
         val lvFeeder = network.sequenceOf<LvFeeder>().first()
         val hvFeeder = network.sequenceOf<Feeder>().first()
@@ -58,6 +78,33 @@ internal class EquivalentNetworkUtilsTest {
                 createEquivalentEquipment = any(),
             )
         }
+    }
+
+    @Test
+    internal fun `check that calling convenience function with container and container class calls underlying function with default values`() {
+        val (network, _) = networkWithEdges(LvFeeder::class to Feeder::class)
+        val lvFeeder = network.sequenceOf<LvFeeder>().first()
+
+        mockkObject(EquivalentNetworkUtils)
+
+        addToEdgeBetween<Breaker>(lvFeeder, Feeder::class, network)
+        verify {
+            addToEdgeBetweenContainers(
+                container = eq(lvFeeder),
+                otherContainerClass = eq(Feeder::class),
+                network = eq(network),
+                createEquivalentBranches = any(),
+                createEquivalentEquipment = any(),
+            )
+        }
+    }
+
+    @Test
+    internal fun `check that calling convenience extension function with container and container class calls underlying function with default values`() {
+        val (network, _) = networkWithEdges(LvFeeder::class to Feeder::class)
+        val lvFeeder = network.sequenceOf<LvFeeder>().first()
+
+        mockkObject(EquivalentNetworkUtils)
 
         network.addToEdgeBetween<Breaker>(lvFeeder, Feeder::class)
         verify {
@@ -69,6 +116,31 @@ internal class EquivalentNetworkUtilsTest {
                 createEquivalentEquipment = any(),
             )
         }
+    }
+
+    @Test
+    internal fun `check that calling convenience function passing equipment container classes calls underlying function with default values`() {
+        val (network, _) = networkWithEdges(LvFeeder::class to Feeder::class)
+
+        mockkObject(EquivalentNetworkUtils)
+
+        addToEdgeBetween<Breaker>(LvFeeder::class, Feeder::class, network)
+        verify {
+            addToEdgeBetweenContainers(
+                containerClass = eq(LvFeeder::class),
+                otherContainerClass = eq(Feeder::class),
+                network = eq(network),
+                createEquivalentBranches = any(),
+                createEquivalentEquipment = any(),
+            )
+        }
+    }
+
+    @Test
+    internal fun `check that calling convenience extension function passing equipment container classes calls underlying function with default values`() {
+        val (network, _) = networkWithEdges(LvFeeder::class to Feeder::class)
+
+        mockkObject(EquivalentNetworkUtils)
 
         network.addToEdgeBetween<Breaker>(LvFeeder::class, Feeder::class)
         verify {

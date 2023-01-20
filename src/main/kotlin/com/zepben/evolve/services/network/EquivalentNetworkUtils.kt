@@ -94,7 +94,7 @@ object EquivalentNetworkUtils {
 
     infix fun ConductingEquipment.via(cn: ConnectivityNode): EquivalentBranchDetails = EquivalentBranchDetails(this, cn)
 
-    infix fun EquivalentBranchDetails.via(eb: EquivalentBranch): EquivalentEquipmentDetails = EquivalentEquipmentDetails(edgeEquipment, edgeNode, eb)
+    infix fun EquivalentBranchDetails.via(eb: EquivalentBranch): EquivalentEquipmentDetails = EquivalentEquipmentDetails(this.edgeEquipment, edgeNode, eb)
 
     /**
      * Function to add an 'equivalent network' to the edge between an [EquipmentContainer] whose equipment is present in a [NetworkService] and a
@@ -128,29 +128,8 @@ object EquivalentNetworkUtils {
         container,
         otherContainer,
         network,
-        { (edgeEq, edgeNode) ->
-            sequenceOf(
-                getPhaseCode(edgeNode) to EquivalentBranch(branchMrid(edgeEq via edgeNode))
-                    .apply {
-                        location = edgeEq.location
-                        baseVoltage = getEquivalentBaseVoltage(edgeEq, edgeNode)
-                        initBranch(edgeEq via edgeNode)
-                    }
-            )
-        },
-        { (edgeEq, edgeNode, eqBranch) ->
-            sequenceOf(
-                getPhaseCode(edgeNode) to requireNotNull(
-                    T::class.primaryConstructor
-                        ?.call(equipmentMrid(edgeEq via edgeNode via eqBranch))
-                        ?.apply {
-                            location = edgeEq.location
-                            baseVoltage = getEquivalentBaseVoltage(edgeEq, edgeNode)
-                            initEquipment(edgeEq via edgeNode via eqBranch)
-                        }
-                )
-            )
-        },
+        defaultEquivalentBranchCreator(branchMrid, initBranch),
+        defaultEquivalentEquipmentCreator(equipmentMrid, initEquipment),
         maxNumber
     )
 
@@ -186,29 +165,8 @@ object EquivalentNetworkUtils {
         container,
         otherContainerClass,
         network,
-        { (edgeEq, edgeNode) ->
-            sequenceOf(
-                getPhaseCode(edgeNode) to EquivalentBranch(branchMrid(edgeEq via edgeNode))
-                    .apply {
-                        location = edgeEq.location
-                        baseVoltage = getEquivalentBaseVoltage(edgeEq, edgeNode)
-                        initBranch(edgeEq via edgeNode)
-                    }
-            )
-        },
-        { (edgeEq, edgeNode, eqBranch) ->
-            sequenceOf(
-                getPhaseCode(edgeNode) to requireNotNull(
-                    T::class.primaryConstructor
-                        ?.call(equipmentMrid(edgeEq via edgeNode via eqBranch))
-                        ?.apply {
-                            location = edgeEq.location
-                            baseVoltage = getEquivalentBaseVoltage(edgeEq, edgeNode)
-                            initEquipment(edgeEq via edgeNode via eqBranch)
-                        }
-                )
-            )
-        },
+        defaultEquivalentBranchCreator(branchMrid, initBranch),
+        defaultEquivalentEquipmentCreator(equipmentMrid, initEquipment),
         maxNumber
     )
 
@@ -244,31 +202,51 @@ object EquivalentNetworkUtils {
         containerClass,
         otherContainerClass,
         network,
-        { (edgeEq, edgeNode) ->
+        defaultEquivalentBranchCreator(branchMrid, initBranch),
+        defaultEquivalentEquipmentCreator(equipmentMrid, initEquipment),
+        maxNumber
+    )
+
+    /**
+     * A default EquivalentBranch creator that should cover most use cases. If you need to override this you should call
+     * addToEdgeBetweenContainers directly.
+     */
+    inline fun defaultEquivalentBranchCreator(
+        crossinline branchMrid: (EquivalentBranchDetails) -> String = { (edgeEquipment) -> "${edgeEquipment.mRID}-eb" },
+        crossinline initBranch: EquivalentBranch.(EquivalentBranchDetails) -> Unit = {},
+    ): (EquivalentBranchDetails) -> Sequence<Pair<PhaseCode, EquivalentBranch>> =
+        { (edgeEquipment, edgeNode) ->
             sequenceOf(
-                getPhaseCode(edgeNode) to EquivalentBranch(branchMrid(edgeEq via edgeNode))
+                getPhaseCode(edgeNode) to EquivalentBranch(branchMrid(edgeEquipment via edgeNode))
                     .apply {
-                        location = edgeEq.location
-                        baseVoltage = getEquivalentBaseVoltage(edgeEq, edgeNode)
-                        initBranch(edgeEq via edgeNode)
+                        location = edgeEquipment.location
+                        baseVoltage = getEquivalentBaseVoltage(edgeEquipment, edgeNode)
+                        initBranch(edgeEquipment via edgeNode)
                     }
             )
-        },
-        { (edgeEq, edgeNode, eqBranch) ->
+        }
+
+    /**
+     * A default EquivalentEquipment creator that should cover most use cases. If you need to override this you should call
+     * addToEdgeBetweenContainers directly.
+     */
+    inline fun <reified T : ConductingEquipment> defaultEquivalentEquipmentCreator(
+        crossinline equipmentMrid: (EquivalentEquipmentDetails) -> String = { (edgeEquipment) -> "${edgeEquipment.mRID}-eeq" },
+        crossinline initEquipment: T.(EquivalentEquipmentDetails) -> Unit = {},
+    ): (EquivalentEquipmentDetails) -> Sequence<Pair<PhaseCode, ConductingEquipment>> =
+        { (edgeEquipment, edgeNode, equivalentBranch) ->
             sequenceOf(
                 getPhaseCode(edgeNode) to requireNotNull(
                     T::class.primaryConstructor
-                        ?.call(equipmentMrid(edgeEq via edgeNode via eqBranch))
+                        ?.call(equipmentMrid(edgeEquipment via edgeNode via equivalentBranch))
                         ?.apply {
-                            location = edgeEq.location
-                            baseVoltage = getEquivalentBaseVoltage(edgeEq, edgeNode)
-                            initEquipment(edgeEq via edgeNode via eqBranch)
+                            location = edgeEquipment.location
+                            baseVoltage = getEquivalentBaseVoltage(edgeEquipment, edgeNode)
+                            initEquipment(edgeEquipment via edgeNode via equivalentBranch)
                         }
                 )
             )
-        },
-        maxNumber
-    )
+        }
 
     /**
      * Function to add 'equivalent networks' which are groups of [ConductingEquipment] connected through [EquivalentBranch]es that represent simplified networks.
@@ -388,13 +366,13 @@ object EquivalentNetworkUtils {
                     addContainer(it)
                 }
 
-                Terminal("${this.mRID}-t${this.numTerminals() + 1}").also {
+                Terminal("$mRID-t${numTerminals() + 1}").also {
                     network.add(it)
                     addTerminal(it)
                     it.conductingEquipment = this
                     it.phases = phaseCode
+                    network.connect(it, edgeNode.mRID)
                 }
-                network.connect(this.terminals.first(), edgeNode.mRID)
             } to
                 createEquivalentEquipment(edgeEquipment via edgeNode via equivalentBranch).map { (phaseCode, conEq) ->
                     conEq.apply {
@@ -410,7 +388,7 @@ object EquivalentNetworkUtils {
                             it.conductingEquipment = equivalentBranch
                             it.phases = phaseCode
                         }
-                        val conEqTerminal = Terminal("${this.mRID}-t${this.numTerminals() + 1}").also {
+                        val conEqTerminal = Terminal("$mRID-t${numTerminals() + 1}").also {
                             network.add(it)
                             conEq.addTerminal(it)
                             it.conductingEquipment = this

@@ -94,16 +94,18 @@ class AssignToLvFeeders {
         { terminal, isStopping ->
             process(
                 terminal,
-                { ce, feeder ->
-                    ce.addContainer(feeder)
-                    when (ce) {
-                        is ProtectedSwitch -> ce.operatedByProtectionEquipment.forEach { pe -> pe.addContainer(feeder) }
+                { eq, feeder ->
+                    eq.addContainer(feeder)
+                    // Handle classes extending Equipment
+                    when (eq) {
+                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> pe.addContainer(feeder) }
                     }
                 },
-                { feeder, ce ->
-                    feeder.addEquipment(ce)
-                    when (ce) {
-                        is ProtectedSwitch -> ce.operatedByProtectionEquipment.forEach { pe -> feeder.addEquipment(pe) }
+                { feeder, eq ->
+                    feeder.addEquipment(eq)
+                    // Handle classes extending Equipment
+                    when (eq) {
+                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> feeder.addEquipment(pe) }
                     }
                 },
                 isStopping,
@@ -115,16 +117,18 @@ class AssignToLvFeeders {
         { terminal, isStopping ->
             process(
                 terminal,
-                { ce, feeder ->
-                    ce.addCurrentContainer(feeder)
-                    when (ce) {
-                        is ProtectedSwitch -> ce.operatedByProtectionEquipment.forEach { pe -> pe.addCurrentContainer(feeder) }
+                { eq, feeder ->
+                    eq.addCurrentContainer(feeder)
+                    // Handle classes extending Equipment
+                    when (eq) {
+                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> pe.addCurrentContainer(feeder) }
                     }
                 },
-                { feeder, ce ->
-                    feeder.addCurrentEquipment(ce)
-                    when (ce) {
-                        is ProtectedSwitch -> ce.operatedByProtectionEquipment.forEach { pe -> feeder.addCurrentEquipment(pe) }
+                { feeder, eq ->
+                    feeder.addCurrentEquipment(eq)
+                    // Handle classes extending Equipment
+                    when (eq) {
+                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> feeder.addCurrentEquipment(pe) }
                     }
                 },
                 isStopping,

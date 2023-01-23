@@ -10,7 +10,9 @@ package com.zepben.evolve.cim.iec61970.base.wires
 import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.common.extensions.*
 
@@ -109,6 +111,39 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
      * @return The [PowerTransformerEnd] with the specified [terminal] if it exists, otherwise null
      */
     fun getEnd(terminal: Terminal): PowerTransformerEnd? = _powerTransformerEnds?.firstOrNull { it.terminal == terminal }
+
+    /**
+     * Get a [PowerTransformerEnd] of this [PowerTransformer] by its [Terminal] [ConnectivityNode].
+     *
+     * @param connectivityNode the [ConnectivityNode] of the required [PowerTransformerEnd]
+     * @return The [PowerTransformerEnd] with the specified [Terminal] if it exists, otherwise null
+     */
+    fun getEnd(connectivityNode: ConnectivityNode): PowerTransformerEnd? =
+        _powerTransformerEnds?.firstOrNull { it.terminal?.connectivityNode == connectivityNode }
+
+    /**
+     * Get [BaseVoltage] of [PowerTransformerEnd] by its end number.
+     *
+     * @param endNumber the end number of the required [PowerTransformerEnd]
+     * @return The [BaseVoltage] of the [PowerTransformerEnd] with the specified 'endNumber' if it exists, otherwise null
+     */
+    fun getBaseVoltage(endNumber: Int): BaseVoltage? = getEnd(endNumber)?.baseVoltage
+
+    /**
+     * Get [BaseVoltage] of [PowerTransformerEnd] by its [Terminal].
+     *
+     * @param terminal the [Terminal] of the required [PowerTransformerEnd]
+     * @return The [BaseVoltage] of the [PowerTransformerEnd] with the specified 'terminal' if it exists, otherwise null
+     */
+    fun getBaseVoltage(terminal: Terminal): BaseVoltage? = getEnd(terminal)?.baseVoltage
+
+    /**
+     * Get [BaseVoltage] of [PowerTransformerEnd] by its [ConnectivityNode].
+     *
+     * @param connectivityNode the [ConnectivityNode] of the required [PowerTransformerEnd]
+     * @return The [BaseVoltage] of the [PowerTransformerEnd] with the specified 'connectivityNode' if it exists, otherwise null
+     */
+    fun getBaseVoltage(connectivityNode: ConnectivityNode): BaseVoltage? = getEnd(connectivityNode)?.baseVoltage
 
     /**
      * Add a [PowerTransformerEnd] to this [PowerTransformer]

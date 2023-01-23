@@ -25,7 +25,7 @@ class BranchRecursiveTraversalTest {
         this::queueNext,
         BasicQueue.depthFirstSupplier(),
         ::BasicTracker,
-        BasicQueue.breadFirstSupplier()
+        BasicQueue.breadthFirstSupplier()
     )
         .addStepAction { i, _ -> visitOrder.add(i) }
         .addStopCondition { ++stopCount; false }

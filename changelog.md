@@ -7,9 +7,11 @@
 * Renamed `FeederDirection.has` to `FeederDirection.contains`, which can be used via its operator version `in`. e.g. `BOTH.has(DOWNSTREAM)` can be replaced with
   `BOTH.contains(DOWNSTREAM)` or `DOWNSTREAM in BOTH`
 * Removed deprecated function `NetworkConsumerClient.getFeeder`.
+* Renamed function 'breadFirstSupplier' to 'breadthFirstSupplier' in 'BasicQueue' class.
 
 ### New Features
 
+* Added EquivalentNetworkUtils class that contains utility methods to add equivalent networks to the edges of gRPC requested network services.
 * Added methods for connecting to the gRPC service in a utility object named `Connect`:
     * `Connect.connectInsecure`: Used to connect to a gRPC service that does not use SSL/TLS.
     * `Connect.connectTls`: Used to connect to a gRPC service that uses SSL/TLS, without user authentication.
@@ -58,6 +60,10 @@
 * Added confirmation of removal to the remove component test.
 * Fixed bug where limited connected traces with `maximumSteps = 1` could include equipment 2 steps away when using a direction.
 * Made `type` column of `potential_transformers` non-null.
+* AssignToFeeders now correctly assigns AuxiliaryEquipment.
+* AssignToLvFeeders now correctly assigns AuxiliaryEquipment.
+* AssignToFeeders now correctly assigns ProtectionEquipment.
+* AssignToLvFeeders now correctly assigns ProtectionEquipment.
 
 ### Notes
 

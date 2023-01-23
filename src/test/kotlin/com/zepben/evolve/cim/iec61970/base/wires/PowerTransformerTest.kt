@@ -11,6 +11,7 @@ import com.zepben.evolve.cim.iec61968.assetinfo.PowerTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
+import com.zepben.evolve.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
@@ -111,6 +112,102 @@ internal class PowerTransformerTest {
         assertThat(pt.getEnd(t1), equalTo(e2))
         assertThat(pt.getEnd(t2), nullValue())
         assertThat(pt.getEnd(t3), equalTo(e1))
+    }
+
+    @Test
+    internal fun getEndByConnectivityNode() {
+        val t1 = Terminal().apply {
+            connectivityNode = ConnectivityNode()
+        }
+        val t2 = Terminal().apply {
+            connectivityNode = ConnectivityNode()
+        }
+        val t3 = Terminal().apply {
+            connectivityNode = ConnectivityNode()
+        }
+        val e1 = PowerTransformerEnd().apply { terminal = t3 }
+        val e2 = PowerTransformerEnd().apply { terminal = t1 }
+        val pt = PowerTransformer().apply {
+            addTerminal(t1)
+            addTerminal(t2)
+            addTerminal(t3)
+            addEnd(e1)
+            addEnd(e2)
+        }
+
+        assertThat(pt.getEnd(t1.connectivityNode!!), equalTo(e2))
+        assertThat(pt.getEnd(t2.connectivityNode!!), nullValue())
+        assertThat(pt.getEnd(t3.connectivityNode!!), equalTo(e1))
+    }
+
+    @Test
+    internal fun getBaseVoltageByEndNumber() {
+        val bv1 = BaseVoltage()
+        val bv2 = BaseVoltage()
+        val e1 = PowerTransformerEnd().apply { baseVoltage = bv1 }
+        val e2 = PowerTransformerEnd().apply { baseVoltage = bv2 }
+        val pt = PowerTransformer().apply {
+            addEnd(e1)
+            addEnd(e2)
+        }
+
+        assertThat(pt.getBaseVoltage(1), equalTo(bv1))
+        assertThat(pt.getBaseVoltage(2), equalTo(bv2))
+        assertThat(pt.getBaseVoltage(3), nullValue())
+    }
+
+    @Test
+    internal fun getBaseVoltageByTerminal() {
+        val bv1 = BaseVoltage()
+        val bv2 = BaseVoltage()
+        val t1 = Terminal()
+        val t2 = Terminal()
+        val t3 = Terminal()
+        val e1 = PowerTransformerEnd().apply { terminal = t1; baseVoltage = bv1 }
+        val e2 = PowerTransformerEnd().apply { terminal = t2; baseVoltage = bv2 }
+        val pt = PowerTransformer().apply {
+            addTerminal(t1)
+            addTerminal(t2)
+            addTerminal(t3)
+            addEnd(e1)
+            addEnd(e2)
+        }
+
+        assertThat(pt.getBaseVoltage(t1), equalTo(bv1))
+        assertThat(pt.getBaseVoltage(t2), equalTo(bv2))
+        assertThat(pt.getBaseVoltage(t3), nullValue())
+    }
+
+    @Test
+    internal fun getBaseVoltageByConnectivityNode() {
+        val bv1 = BaseVoltage().apply {
+            nominalVoltage = 1
+        }
+        val bv2 = BaseVoltage().apply {
+            nominalVoltage = 2
+        }
+        val t1 = Terminal().apply {
+            connectivityNode = ConnectivityNode()
+        }
+        val t2 = Terminal().apply {
+            connectivityNode = ConnectivityNode()
+        }
+        val t3 = Terminal().apply {
+            connectivityNode = ConnectivityNode()
+        }
+        val e1 = PowerTransformerEnd().apply { terminal = t1; baseVoltage = bv1 }
+        val e2 = PowerTransformerEnd().apply { terminal = t2; baseVoltage = bv2 }
+        val pt = PowerTransformer().apply {
+            addTerminal(t1)
+            addTerminal(t2)
+            addTerminal(t3)
+            addEnd(e1)
+            addEnd(e2)
+        }
+
+        assertThat(pt.getBaseVoltage(t1.connectivityNode!!), equalTo(bv1))
+        assertThat(pt.getBaseVoltage(t2.connectivityNode!!), equalTo(bv2))
+        assertThat(pt.getBaseVoltage(t3.connectivityNode!!), nullValue())
     }
 
     @Test

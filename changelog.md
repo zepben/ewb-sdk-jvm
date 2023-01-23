@@ -8,10 +8,6 @@
   `BOTH.contains(DOWNSTREAM)` or `DOWNSTREAM in BOTH`
 * Removed deprecated function `NetworkConsumerClient.getFeeder`.
 * Renamed function 'breadFirstSupplier' to 'breadthFirstSupplier' in 'BasicQueue' class.
-* Updated AssignToFeeders to support assigning AuxiliaryEquipment.
-* Updated AssignToLvFeeders to support assigning AuxiliaryEquipment.
-* Updated AssignToFeeders to support assigning ProtectionEquipment.
-* Updated AssignToLvFeeders to support assigning ProtectionEquipment.
 
 ### New Features
 
@@ -64,6 +60,10 @@
 * Added confirmation of removal to the remove component test.
 * Fixed bug where limited connected traces with `maximumSteps = 1` could include equipment 2 steps away when using a direction.
 * Made `type` column of `potential_transformers` non-null.
+* AssignToFeeders now correctly assigns AuxiliaryEquipment.
+* AssignToLvFeeders now correctly assigns AuxiliaryEquipment.
+* AssignToFeeders now correctly assigns ProtectionEquipment.
+* AssignToLvFeeders now correctly assigns ProtectionEquipment.
 
 ### Notes
 

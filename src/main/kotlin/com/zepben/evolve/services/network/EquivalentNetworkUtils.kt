@@ -13,8 +13,10 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.wires.EnergyConsumer
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
+
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
@@ -24,6 +26,9 @@ import kotlin.reflect.full.primaryConstructor
  * Use cases examples:
  * - Adding [EnergyConsumer]s to the edge between a [Feeder] and its [LvFeeder]s. Essentially simplifying the lv side.
  * - Adding [EnergySource]s to the edge between a [Feeder] and its [Substation]. Essentially simplifying the feeders upstream network.
+ *
+ * IMPORTANT: For the purpose of these functions we are only interested in [EquipmentContainer]s that divide the network into different
+ * levels of voltage e.g. [LvFeeder], [Feeder], [Substation], [Circuit]. As such we filter out [Site]s whenever trying to determine edges.
  *
  * NOTE:
  * This class' methods identify a [ConductingEquipment] as an edge equipment if it belongs to two neighbouring [EquipmentContainer]s.
@@ -427,10 +432,19 @@ object EquivalentNetworkUtils {
         return EquivalentNetworkConnection(edgeEquipment, edgeNode, branchToEquipment)
     }
 
-    private fun getContainersForEdgeConnectivityNode(cn: ConnectivityNode): Set<EquipmentContainer> =
-        (cn.terminals.first().conductingEquipment?.containers?.toSet() ?: emptySet()).minus(
-            (cn.terminals as List).first().otherTerminals()
-                .flatMap { ot -> ot.connectedTerminals().flatMap { it.conductingEquipment?.containers ?: emptyList() } }.filter { it !is Site }.toSet()
+    /**
+     * This function returns the [EquipmentContainer]s associated with an edge node [ConnectivityNode].
+     *
+     * IMPORTANT: We are only interested in [EquipmentContainer]s that divide the network into different
+     * levels of voltage e.g. [LvFeeder], [Feeder], [Substation], [Circuit]. As such we filter out [Site]s.
+     *
+     */
+    private fun getContainersForEdgeConnectivityNode(edgeNode: ConnectivityNode): Set<EquipmentContainer> =
+        (edgeNode.terminals.first().conductingEquipment?.containers?.toSet() ?: emptySet()).minus(
+            edgeNode.terminals.first().otherTerminals()
+                .flatMap { ot -> ot.connectedTerminals().flatMap { it.conductingEquipment?.containers ?: emptyList() } }
+                .filter { it !is Site } // We do not want Sites so we filter them out
+                .toSet()
         )
 
     /**
@@ -465,6 +479,10 @@ object EquivalentNetworkUtils {
             }
             .toSet()
 
+    /**
+     * This function returns a sequence of [ConnectivityNode]s filtered by the 'containers' set of [EquipmentContainer]s.
+     * Passing an empty set as the 'containers' argument will result in the returned sequence having all [ConnectivityNode]s in the [NetworkService].
+     */
     private fun getConnectivityNodeSequence(network: NetworkService, containers: Set<EquipmentContainer>): Sequence<ConnectivityNode> =
         if (containers.isEmpty())
             network.sequenceOf()

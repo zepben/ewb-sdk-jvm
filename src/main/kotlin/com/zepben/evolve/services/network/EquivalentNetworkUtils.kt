@@ -14,6 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.EnergyConsumer
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
@@ -31,6 +32,10 @@ import kotlin.reflect.full.primaryConstructor
  */
 object EquivalentNetworkUtils {
 
+    /**
+     * This is just an extension function to improve readability.
+     * Refer to 'addToEdgeBetween' function below for documentation.
+     */
     inline fun <reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
         container: EquipmentContainer,
         otherContainer: EquipmentContainer,
@@ -41,6 +46,10 @@ object EquivalentNetworkUtils {
         crossinline initEquipment: T.(EquivalentEquipmentDetails) -> Unit = {},
     ): Set<EquivalentNetworkConnection> = addToEdgeBetween(container, otherContainer, this, maxNumber, branchMrid, equipmentMrid, initBranch, initEquipment)
 
+    /**
+     * This is just an extension function to improve readability.
+     * Refer to 'addToEdgeBetween' function below for documentation.
+     */
     inline fun <reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
         container: EquipmentContainer,
         otherContainerClass: KClass<out EquipmentContainer>,
@@ -53,6 +62,10 @@ object EquivalentNetworkUtils {
         addToEdgeBetween(container, otherContainerClass, this, maxNumber, branchMrid, equipmentMrid, initBranch, initEquipment)
 
 
+    /**
+     * This is just an extension function to improve readability.
+     * Refer to 'addToEdgeBetween' function below for documentation.
+     */
     inline fun <reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
         containerClass: KClass<out EquipmentContainer>,
         otherContainerClass: KClass<out EquipmentContainer>,
@@ -107,7 +120,7 @@ object EquivalentNetworkUtils {
      * @param container The [EquipmentContainer] that has its equipment in the [NetworkService] (it doesn't hold the edge [ConnectivityNode]).
      * @param otherContainer The edge [EquipmentContainer] that doesn't have its equipment in the [NetworkService] (it holds the edge [ConnectivityNode]).
      * @param network the [NetworkService] that we need to add the [EquivalentBranch] and [ConductingEquipment] to.
-     * @param maxNumber The maximum number of 'equivalent networks' you want to add.
+     * @param maxNumber The maximum number of 'equivalent networks' you want to add. The default null value will create as many as possible.
      * @param branchMrid factory function to produce the mRID of the created [EquivalentBranch].
      * @param equipmentMrid factory function to produce the mRID of the created [ConductingEquipment].
      * @param initBranch callback function that allows the caller to initialise the [EquivalentBranch].
@@ -134,8 +147,8 @@ object EquivalentNetworkUtils {
     )
 
     /**
-     * Function to add an 'equivalent network' to the edge between an [EquipmentContainer] whose equipment is present in a [NetworkService] and a
-     * neighbouring [EquipmentContainer] whose equipment is missing from the [NetworkService].
+     * Function to add an 'equivalent network' to the edge between an [EquipmentContainer] whose equipment is present in a [NetworkService] and all
+     * neighbouring [EquipmentContainer]s of the 'otherContainerClass' class whose equipment is missing from the [NetworkService].
      *
      * This function wraps the 'addToEdgeBetweenContainers' function and provides a simpler signature that is more convenient to use in most cases.
      *
@@ -144,7 +157,7 @@ object EquivalentNetworkUtils {
      * @param container The [EquipmentContainer] that has its equipment in the [NetworkService] (it doesn't hold the edge [ConnectivityNode]).
      * @param otherContainerClass The edge [EquipmentContainer] class that doesn't have its equipment in the [NetworkService] (it holds the edge [ConnectivityNode]).
      * @param network the [NetworkService] that we need to add the [EquivalentBranch] and [ConductingEquipment] to.
-     * @param maxNumber The maximum number of 'equivalent networks' you want to add.
+     * @param maxNumber The maximum number of 'equivalent networks' you want to add. The default null value will create as many as possible.
      * @param branchMrid factory function to produce the mRID of the created [EquivalentBranch].
      * @param equipmentMrid factory function to produce the mRID of the created [ConductingEquipment].
      * @param initBranch callback function that allows the caller to initialise the [EquivalentBranch].
@@ -171,8 +184,8 @@ object EquivalentNetworkUtils {
     )
 
     /**
-     * Function to add an 'equivalent network' to the edge between an [EquipmentContainer] whose equipment is present in a [NetworkService] and a
-     * neighbouring [EquipmentContainer] whose equipment is missing from the [NetworkService].
+     * Function to add an 'equivalent network' to the edge between all [EquipmentContainer]s of the 'containerClass' class whose equipment is present
+     * in a [NetworkService] and all neighbouring [EquipmentContainer]s of the 'otherContainerClass' class whose equipment is missing from the [NetworkService].
      *
      * This function wraps the 'addToEdgeBetweenContainers' function and provides a simpler signature that is more convenient to use in most cases.
      *
@@ -181,7 +194,7 @@ object EquivalentNetworkUtils {
      * @param containerClass The [EquipmentContainer] class that has its equipment in the [NetworkService] (it doesn't hold the edge [ConnectivityNode]).
      * @param otherContainerClass The edge [EquipmentContainer] class that doesn't have its equipment in the [NetworkService] (it holds the edge [ConnectivityNode]).
      * @param network the [NetworkService] that we need to add the [EquivalentBranch] and [ConductingEquipment] to.
-     * @param maxNumber The maximum number of 'equivalent networks' you want to add.
+     * @param maxNumber The maximum number of 'equivalent networks' you want to add. The default null value will create as many as possible.
      * @param branchMrid factory function to produce the mRID of the created [EquivalentBranch].
      * @param equipmentMrid factory function to produce the mRID of the created [ConductingEquipment].
      * @param initBranch callback function that allows the caller to initialise the [EquivalentBranch].
@@ -253,14 +266,15 @@ object EquivalentNetworkUtils {
      * These 'equivalent networks' are attached to edge [ConnectivityNode]s, which are [ConnectivityNode]s right at the edge between [EquipmentContainer]s.
      * These edge [ConnectivityNode] are identified by having a single [Terminal] that has a [ConductingEquipment] that belongs to both neighbouring [EquipmentContainer]s.
      *
-     * This overload of the function takes two [EquipmentContainer] instances to identify the edge [ConnectivityNode]s.
+     * This overload of the function takes two [EquipmentContainer] instances to identify the edge [ConnectivityNode]s between them.
+     * If no edge [ConnectivityNode] is found nothing will be done and an empty result will be returned.
      *
      * @param container The [EquipmentContainer] that has its equipment in the [NetworkService] (it doesn't hold the edge [ConnectivityNode]).
      * @param otherContainer The edge [EquipmentContainer] that doesn't have its equipment in the [NetworkService] (it holds the edge [ConnectivityNode]).
      * @param network The [NetworkService] that we need to add the [EquivalentBranch] and [ConductingEquipment] to.
      * @param createEquivalentBranches factory function to create the [EquivalentBranch]es that will be attached to the edge [ConnectivityNode] to represent the 'equivalent network'.
      * @param createEquivalentEquipment factory function to create the [ConductingEquipment]s that will be attached to the [EquivalentBranch]es of the 'equivalent network'.
-     * @param maxNumber The maximum number of 'equivalent networks' you want to add.
+     * @param maxNumber The maximum number of 'equivalent networks' you want to add. The default null value will create as many as possible.
      *
      * @return a set of [EquivalentNetworkConnection]s that hold information and references to the edge [ConnectivityNode], edge [ConductingEquipment], and added [EquivalentBranch]es and their [ConductingEquipment].
      */
@@ -282,14 +296,16 @@ object EquivalentNetworkUtils {
      * These 'equivalent networks' are attached to edge [ConnectivityNode]s, which are [ConnectivityNode]s right at the edge between [EquipmentContainer]s.
      * These edge [ConnectivityNode] are identified by having a single [Terminal] that has a [ConductingEquipment] that belongs to both neighbouring [EquipmentContainer]s.
      *
-     * This overload of the function takes an [EquipmentContainer] instance and an [EquipmentContainer] class reference to identify the edge [ConnectivityNode]s.
+     * This overload of the function takes an [EquipmentContainer] instance and an [EquipmentContainer] class reference to identify the edge [ConnectivityNode]s between them.
+     * Equivalent networks will be added on all edges between the 'container' [EquipmentContainer] and all [EquipmentContainer] that have a class of 'otherContainerClass'.
+     * If no edge [ConnectivityNode] is found nothing will be done and an empty result will be returned.
      *
      * @param container The [EquipmentContainer] that has its equipment in the [NetworkService] (it doesn't hold the edge [ConnectivityNode]).
      * @param otherContainerClass The edge [EquipmentContainer] class that doesn't have its equipment in the [NetworkService] (it holds the edge [ConnectivityNode]).
      * @param network The [NetworkService] that we need to add the [EquivalentBranch] and [ConductingEquipment] to.
      * @param createEquivalentBranches factory function to create the [EquivalentBranch]es that will be attached to the edge [ConnectivityNode] to represent the 'equivalent network'.
      * @param createEquivalentEquipment factory function to create the [ConductingEquipment]s that will be attached to the [EquivalentBranch]es of the 'equivalent network'.
-     * @param maxNumber The maximum number of 'equivalent networks' you want to add.
+     * @param maxNumber The maximum number of 'equivalent networks' you want to add. The default null value will create as many as possible.
      *
      * @return a set of [EquivalentNetworkConnection]s that hold information and references to the edge [ConnectivityNode], edge [ConductingEquipment], and added [EquivalentBranch]es and their [ConductingEquipment].
      */
@@ -311,14 +327,17 @@ object EquivalentNetworkUtils {
      * These 'equivalent networks' are attached to edge [ConnectivityNode]s, which are [ConnectivityNode]s right at the edge between [EquipmentContainer]s.
      * These edge [ConnectivityNode] are identified by having a single [Terminal] that has a [ConductingEquipment] that belongs to both neighbouring [EquipmentContainer]s.
      *
-     * This overload of the function takes two [EquipmentContainer] class references to identify the edge [ConnectivityNode]s.
+     * This overload of the function takes two [EquipmentContainer] class references to identify the edge [ConnectivityNode]s between them.
+     * Equivalent networks will be added on all edges between all [EquipmentContainer]s that have a class of 'container' and all [EquipmentContainer]s
+     * that have a class of 'otherContainerClass'.
+     * If no edge [ConnectivityNode] is found nothing will be done and an empty result will be returned.
      *
      * @param containerClass The [EquipmentContainer] class that has its equipment in the [NetworkService] (it doesn't hold the edge [ConnectivityNode]).
      * @param otherContainerClass The edge [EquipmentContainer] class that doesn't have its equipment in the [NetworkService] (it holds the edge [ConnectivityNode]).
      * @param network The [NetworkService] that we need to add the [EquivalentBranch] and [ConductingEquipment] to.
      * @param createEquivalentBranches factory function to create the [EquivalentBranch]es that will be attached to the edge [ConnectivityNode] to represent the 'equivalent network'.
      * @param createEquivalentEquipment factory function to create the [ConductingEquipment]s that will be attached to the [EquivalentBranch]es of the 'equivalent network'.
-     * @param maxNumber The maximum number of 'equivalent networks' you want to add.
+     * @param maxNumber The maximum number of 'equivalent networks' you want to add. The default null value will create as many as possible.
      *
      * @return a set of [EquivalentNetworkConnection]s that hold information and references to the edge [ConnectivityNode], edge [ConductingEquipment], and added [EquivalentBranch]es and their [ConductingEquipment].
      */
@@ -337,6 +356,7 @@ object EquivalentNetworkUtils {
 
     /**
      * Convenience function to get the first [PhaseCode] from a [ConnectivityNode]s [Terminal]s.
+     * This is intended to work for [ConnectivityNode]s with only 1 [Terminal].
      */
     fun getPhaseCode(edgeNode: ConnectivityNode): PhaseCode = edgeNode.terminals.map { it.phases }.first()
 
@@ -345,7 +365,7 @@ object EquivalentNetworkUtils {
      */
     fun getEquivalentBaseVoltage(ce: ConductingEquipment, edgeNode: ConnectivityNode): BaseVoltage? =
         when (ce) {
-            is PowerTransformer -> ce.ends.first { it.terminal?.connectivityNode == edgeNode }.baseVoltage
+            is PowerTransformer -> ce.getBaseVoltage(edgeNode)
             else -> ce.baseVoltage
         }
 
@@ -356,7 +376,12 @@ object EquivalentNetworkUtils {
         createEquivalentEquipment: (EquivalentEquipmentDetails) -> Sequence<Pair<PhaseCode, ConductingEquipment>>
     ): EquivalentNetworkConnection {
         val edgeEquipment = edgeNode.terminals.first().conductingEquipment
-            ?: throw IllegalStateException("ConnectivityNode for EquivalentBranch must have ConductingEquipment")
+            ?: throw IllegalStateException(
+                "[Internal Error]: ${edgeNode.typeNameAndMRID()} for EquivalentBranch must have a ConductingEquipment on " +
+                    "its terminal ${edgeNode.terminals.first().typeNameAndMRID()}"
+            )
+        //NOTE: This exception should never occur as an edgeNode by definition must have an associated ConductingEquipment with multiple equipment containers
+
         val containersForEquivalentNetwork = getContainersForEdgeConnectivityNode(edgeNode)
         val branchToEquipment = createEquivalentBranches(edgeEquipment via edgeNode).map { (phaseCode, equivalentBranch) ->
             equivalentBranch.apply {
@@ -403,11 +428,20 @@ object EquivalentNetworkUtils {
     }
 
     private fun getContainersForEdgeConnectivityNode(cn: ConnectivityNode): Set<EquipmentContainer> =
-        ((cn.terminals as List).first().conductingEquipment?.containers?.toSet() ?: emptySet()).minus(
+        (cn.terminals.first().conductingEquipment?.containers?.toSet() ?: emptySet()).minus(
             (cn.terminals as List).first().otherTerminals()
                 .flatMap { ot -> ot.connectedTerminals().flatMap { it.conductingEquipment?.containers ?: emptyList() } }.filter { it !is Site }.toSet()
         )
 
+    /**
+     * An edge node is a [ConnectivityNode] with the following characteristics:
+     * 1. It has a single [Terminal].
+     * 2. The [Terminal]'s [ConductingEquipment] has multiple [EquipmentContainer]s which flags it as the edge between them.
+     *
+     * This function returns all edge nodes in a [NetworkService] filtered by the [EquipmentContainer]s in the 'containers', where their
+     * associated [ConductingEquipment]'s containers collection has [EquipmentContainer]s of all the classes specified in 'edgeContainerClasses'.
+     *
+     */
     private fun getEdgeNodes(
         network: NetworkService,
         edgeContainerClasses: Set<KClass<out EquipmentContainer>>,

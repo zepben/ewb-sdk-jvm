@@ -10,7 +10,7 @@
 
     <groupId>com.zepben</groupId>
     <artifactId>evolve-sdk</artifactId>
-    <version>0.14.0-SNAPSHOT13</version>
+    <version>0.14.0</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>SDK for interaction with the evolve platform</description>
@@ -81,13 +81,13 @@
         <dependency>
             <groupId>com.zepben.protobuf</groupId>
             <artifactId>evolve-grpc</artifactId>
-            <version>0.23.0-SNAPSHOT5</version>
+            <version>0.23.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zepben.evolve</groupId>
             <artifactId>evolve-conn</artifactId>
-            <version>0.6.0-SNAPSHOT1</version>
+            <version>0.6.0</version>
         </dependency>
 
         <!-- Kotlin -->

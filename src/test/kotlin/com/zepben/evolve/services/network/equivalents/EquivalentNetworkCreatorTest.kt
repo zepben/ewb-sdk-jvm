@@ -77,13 +77,13 @@ internal class EquivalentNetworkCreatorTest {
         val initEquipment = spyk<EquipmentInitialisation<Junction>>()
 
         validateConvenienceCustomisation(branchMrid, equipmentMrid, initBranch, initEquipment) {
-            addToEdgeBetween(lvFeeder, hvFeeder, branchMrid, equipmentMrid, initBranch, initEquipment)
+            addToEdgeBetween(lvFeeder, hvFeeder, branchMrid, equipmentMrid, null, initBranch, initEquipment)
         }
         validateConvenienceCustomisation(branchMrid, equipmentMrid, initBranch, initEquipment) {
-            addToEdgeBetween<Feeder, Junction>(substation, branchMrid, equipmentMrid, initBranch, initEquipment)
+            addToEdgeBetween<Feeder, Junction>(substation, branchMrid, equipmentMrid, null, initBranch, initEquipment)
         }
         validateConvenienceCustomisation(branchMrid, equipmentMrid, initBranch, initEquipment) {
-            addToEdgeBetween<Substation, LvFeeder, Junction>(branchMrid, equipmentMrid, initBranch, initEquipment)
+            addToEdgeBetween<Substation, LvFeeder, Junction>(branchMrid, equipmentMrid, null, initBranch, initEquipment)
         }
         validateConvenienceCustomisation(branchMrid, equipmentMrid, initBranch, initEquipment) {
             addToEdgeBetween(this, EdgeDetectionDetails(classes, containers), branchMrid, equipmentMrid, initBranch, initEquipment)
@@ -153,7 +153,7 @@ internal class EquivalentNetworkCreatorTest {
         val initBranch = spyk<BranchInitialisation>({ location = Location() })
         val initEquipment = spyk<EquipmentInitialisation<EnergySource>>({ baseVoltage = BaseVoltage() })
 
-        val results = network.addToEdgeBetween(lvFeeder, hvFeeder, branchMrid, equipmentMrid, initBranch, initEquipment)
+        val results = network.addToEdgeBetween(lvFeeder, hvFeeder, branchMrid, equipmentMrid, null, initBranch, initEquipment)
 
         results.first().also { result ->
             result.branchToEquipment.entries.first().also { (equivalentBranch, equivalentEquipment) ->

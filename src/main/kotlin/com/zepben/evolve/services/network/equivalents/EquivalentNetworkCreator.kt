@@ -349,9 +349,9 @@ inline fun <reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
     otherContainer: EquipmentContainer,
     noinline branchMrid: BranchMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eb" },
     noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eeq" },
+    maxNumber: Int? = null,
     noinline initBranch: BranchInitialisation = {},
-    noinline initEquipment: EquipmentInitialisation<T> = {},
-    maxNumber: Int? = null
+    noinline initEquipment: EquipmentInitialisation<T> = {}
 ): Set<EquivalentNetworkConnection> =
     addToEdgeBetween(
         this,
@@ -390,9 +390,9 @@ inline fun <reified OtherContainer : EquipmentContainer, reified T : ConductingE
     container: EquipmentContainer,
     noinline branchMrid: BranchMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eb" },
     noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eeq" },
+    maxNumber: Int? = null,
     noinline initBranch: BranchInitialisation = {},
-    noinline initEquipment: EquipmentInitialisation<T> = {},
-    maxNumber: Int? = null
+    noinline initEquipment: EquipmentInitialisation<T> = {}
 ): Set<EquivalentNetworkConnection> =
     addToEdgeBetween(
         this,
@@ -430,9 +430,9 @@ inline fun <reified OtherContainer : EquipmentContainer, reified T : ConductingE
 inline fun <reified Container : EquipmentContainer, reified OtherContainer : EquipmentContainer, reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
     noinline branchMrid: BranchMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eb" },
     noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eeq" },
+    maxNumber: Int? = null,
     noinline initBranch: BranchInitialisation = {},
-    noinline initEquipment: EquipmentInitialisation<T> = {},
-    maxNumber: Int? = null
+    noinline initEquipment: EquipmentInitialisation<T> = {}
 ): Set<EquivalentNetworkConnection> =
     addToEdgeBetween(
         this,

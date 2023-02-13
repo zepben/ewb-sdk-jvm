@@ -14,14 +14,13 @@ import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
+import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.InOrder
-import org.mockito.kotlin.*
 import java.io.IOException
 import java.nio.file.CopyOption
 import java.nio.file.Path
@@ -35,25 +34,25 @@ internal class UpgradeRunnerTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val resultSet = mock<ResultSet>()
-    private val statement = mock<Statement>().also { doReturn(resultSet).`when`(it).executeQuery(any()) }
-    private val preparedStatement = mock<PreparedStatement>().also { doReturn(resultSet).`when`(it).executeQuery(any()) }
-    private val connection = mock<Connection>()
-    private val connectionProvider = spy<(String) -> Connection>(value = { connection })
-    private val statementProvider = spy<(Connection) -> Statement>(value = { statement })
-    private val preparedStatementProvider = spy<(Connection, String) -> PreparedStatement>(value = { _, _ -> preparedStatement })
-    private val createBackup = spy<(Path, Path, CopyOption) -> Unit>(value = { _, _, _ -> })
+    private val resultSet = mockk<ResultSet>(relaxed = true)
+    private val statement = mockk<Statement>(relaxed = true).also { every { it.executeQuery(any()) } returns resultSet }
+    private val preparedStatement = mockk<PreparedStatement>(relaxed = true).also { every { it.executeQuery(any()) } returns resultSet }
+    private val connection = mockk<Connection>(relaxed = true)
+    private val connectionProvider = spyk<(String) -> Connection>({ connection })
+    private val statementProvider = spyk<(Connection) -> Statement>({ statement })
+    private val preparedStatementProvider = spyk<(Connection, String) -> PreparedStatement>({ _, _ -> preparedStatement })
+    private val createBackup = spyk<(Path, Path, CopyOption) -> Unit>({ _, _, _ -> })
 
-    private val changeSet1 = mock<ChangeSet>().also { doReturn(1).`when`(it).number }
-    private val changeSet2 = mock<ChangeSet>().also { doReturn(2).`when`(it).number }
+    private val changeSet1 = mockk<ChangeSet>(relaxed = true).also { every { it.number } returns 1 }
+    private val changeSet2 = mockk<ChangeSet>(relaxed = true).also { every { it.number } returns 2 }
     private val changeSets = listOf(changeSet1, changeSet2)
 
-    private val column = mock<Column>().also { doReturn(1).`when`(it).queryIndex }
-    private val tableVersion = mock<TableVersion>().also {
-        doReturn(2).`when`(it).SUPPORTED_VERSION
-        doReturn(column).`when`(it).VERSION
-        doReturn("select version").`when`(it).selectSql()
-        doReturn("update statement").`when`(it).preparedUpdateSql()
+    private val column = mockk<Column>().also { every { it.queryIndex } returns 1 }
+    private val tableVersion = mockk<TableVersion>().also {
+        every { it.SUPPORTED_VERSION } returns 2
+        every { it.VERSION } returns column
+        every { it.selectSql() } returns "select version"
+        every { it.preparedUpdateSql() } returns "update statement"
     }
 
     private val upgradeRunner = UpgradeRunner(connectionProvider, statementProvider, preparedStatementProvider, createBackup, changeSets, tableVersion)
@@ -69,20 +68,21 @@ internal class UpgradeRunnerTest {
 
     @Test
     internal fun configuresConnectionForBatchProcessing() {
+        mockkStatic("com.zepben.evolve.database.sqlite.extensions.ConnectionExtensionsKt")
         configureDatabaseVersion(2)
 
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
 
-        verify(connectionProvider).invoke("driver:database")
-        verify(connection).configureBatch(statementProvider)
+        verify(exactly = 1) { connectionProvider("driver:database") }
+        verify(exactly = 1) { connection.configureBatch(statementProvider) }
     }
 
 
     @Test
     internal fun runsEachChangeSetInTransactions() {
         configureDatabaseVersion(0)
-        doReturn(listOf("1-1", "1-2")).`when`(changeSet1).commands
-        doReturn(listOf("2-1", "2-2")).`when`(changeSet2).commands
+        every { changeSet1.commands } returns listOf("1-1", "1-2")
+        every { changeSet2.commands } returns listOf("2-1", "2-2")
 
         val connectionResult = upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
 
@@ -91,47 +91,50 @@ internal class UpgradeRunnerTest {
 
         assertThat(systemErr.log, containsString("Upgrading database 'database' from v0 to v2"))
 
-        val inOrder = inOrder(createBackup, statement, preparedStatement, preparedStatementProvider)
+        verifyOrder {
 
-        inOrder.verify(createBackup).invoke(any(), any(), any())
-        inOrder.verify(preparedStatementProvider).invoke(connection, tableVersion.preparedUpdateSql())
+            createBackup(any(), any(), any())
+            tableVersion.preparedUpdateSql()
+            preparedStatementProvider(connection, "update statement")
 
-        validateChangeSetExecuted(inOrder, changeSet1)
-        validateChangeSetExecuted(inOrder, changeSet2)
+            validateChangeSetExecuted(changeSet1, listOf("1-1", "1-2"), 1)
+            validateChangeSetExecuted(changeSet2, listOf("2-1", "2-2"), 2)
+        }
     }
 
     @Test
     internal fun doesntRunUpgradeIfCurrentVersion() {
         configureDatabaseVersion(2)
-        changeSets.forEach { clearInvocations(it) }
+        changeSets.forEach { clearMocks(it, answers = false) }
 
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
 
-        verifyNoMoreInteractions(createBackup)
-        changeSets.forEach { verifyNoMoreInteractions(it) }
+        confirmVerified(createBackup)
+        changeSets.forEach { confirmVerified(it) }
     }
 
     @Test
     internal fun onlyRunsChangeSetsIfRequired() {
         configureDatabaseVersion(1)
-        changeSets.forEach { clearInvocations(it) }
+        changeSets.forEach { clearMocks(it, answers = false) }
 
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
 
-        verify(createBackup).invoke(any(), any(), any())
+        verify(exactly = 1) { createBackup(any(), any(), any()) }
 
-        verify(changeSet1, atLeastOnce()).number
-        verifyNoMoreInteractions(changeSet1)
+        verify(atLeast = 1) { changeSet1.number }
+        confirmVerified(changeSet1)
 
-        verify(changeSet2, atLeastOnce()).number
-        verify(changeSet2).preCommandsHook(any())
-        verify(changeSet2).commands
-        verify(changeSet2).postCommandsHook(any())
-        verifyNoMoreInteractions(changeSet2)
+        verify(atLeast = 1) { changeSet2.number }
+        verify(exactly = 1) { changeSet2.preCommandsHook(any()) }
+        verify(exactly = 1) { changeSet2.commands }
+        verify(exactly = 1) { changeSet2.postCommandsHook(any()) }
+        confirmVerified(changeSet2)
     }
 
     @Test
     internal fun reportsObsoleteDatabaseVersion() {
+        mockkStatic("com.zepben.evolve.database.sqlite.extensions.StatementExtensionsKt")
         configureDatabaseVersion(-2)
 
         expect {
@@ -142,12 +145,13 @@ internal class UpgradeRunnerTest {
                     "unsupported. Please generate a new database from the source system using an updated migrator."
             )
 
-        verify(statement).executeConfiguredQuery("select version")
-        verify(statement, never()).executeQuery("SELECT major FROM version")
+        verify(exactly = 1) { statement.executeConfiguredQuery("select version") }
+        verify(exactly = 0) { statement.executeQuery("SELECT major FROM version") }
     }
 
     @Test
     internal fun reportsFuturisticDatabaseVersion() {
+        mockkStatic("com.zepben.evolve.database.sqlite.extensions.StatementExtensionsKt")
         configureDatabaseVersion(3)
 
         expect {
@@ -158,12 +162,13 @@ internal class UpgradeRunnerTest {
                     "version of the server you are using, or downgrade the migrator."
             )
 
-        verify(statement).executeConfiguredQuery("select version")
+        verify(exactly = 1) { statement.executeConfiguredQuery("select version") }
     }
 
     @Test
     internal fun reportsMissingVersionNumbers() {
-        doAnswer { throw Exception() }.`when`(resultSet).getInt(1)
+        mockkStatic("com.zepben.evolve.database.sqlite.extensions.StatementExtensionsKt")
+        every { resultSet.getInt(1) } throws Exception()
 
         expect {
             upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
@@ -173,14 +178,14 @@ internal class UpgradeRunnerTest {
                     "ensure you only have databases in the EWB data directory that have been generated by a working migrator."
             )
 
-        verify(statement).executeConfiguredQuery("select version")
+        verify(exactly = 1) { statement.executeConfiguredQuery("select version") }
     }
 
     @Test
     internal fun reportsDatabaseConnectionIssues() {
         val exceptionMessage = "some error"
         val exception = SQLException(exceptionMessage)
-        doAnswer { throw exception }.`when`(connectionProvider).invoke(any())
+        every { connectionProvider(any()) } throws exception
 
         expect {
             upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
@@ -194,7 +199,7 @@ internal class UpgradeRunnerTest {
     @Test
     internal fun reportsSqlExceptions() {
         val exception = SQLException("sql message")
-        doAnswer { throw exception }.`when`(preparedStatementProvider).invoke(any(), any())
+        every { preparedStatementProvider(any(), any()) } throws exception
 
         configureDatabaseVersion(0)
 
@@ -212,10 +217,16 @@ internal class UpgradeRunnerTest {
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database.db"))
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("with/path/database.sqlite"))
 
-        verify(createBackup).invoke(Paths.get("database"), Paths.get("database-v1"), StandardCopyOption.REPLACE_EXISTING)
-        verify(createBackup).invoke(Paths.get("database.db"), Paths.get("database-v1.db"), StandardCopyOption.REPLACE_EXISTING)
-        verify(createBackup).invoke(Paths.get("with/path/database.sqlite"), Paths.get("with/path/database-v1.sqlite"), StandardCopyOption.REPLACE_EXISTING)
-        verifyNoMoreInteractions(createBackup)
+        verify(exactly = 1) { createBackup(Paths.get("database"), Paths.get("database-v1"), StandardCopyOption.REPLACE_EXISTING) }
+        verify(exactly = 1) { createBackup(Paths.get("database.db"), Paths.get("database-v1.db"), StandardCopyOption.REPLACE_EXISTING) }
+        verify(exactly = 1) {
+            createBackup(
+                Paths.get("with/path/database.sqlite"),
+                Paths.get("with/path/database-v1.sqlite"),
+                StandardCopyOption.REPLACE_EXISTING
+            )
+        }
+        confirmVerified(createBackup)
     }
 
     @Test
@@ -223,7 +234,7 @@ internal class UpgradeRunnerTest {
         configureDatabaseVersion(0)
 
         val exception = IOException("io error")
-        doAnswer { throw exception }.`when`(createBackup).invoke(any(), any(), any())
+        every { createBackup(any(), any(), any()) } throws exception
 
         expect {
             upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
@@ -236,7 +247,7 @@ internal class UpgradeRunnerTest {
         configureDatabaseVersion(0)
 
         val exception = SecurityException("security error")
-        doAnswer { throw exception }.`when`(createBackup).invoke(any(), any(), any())
+        every { createBackup(any(), any(), any()) } throws exception
 
         expect {
             upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
@@ -247,7 +258,7 @@ internal class UpgradeRunnerTest {
     @Test
     internal fun propagatesUnknownExceptions() {
         val exception = Exception("unknown exception")
-        doAnswer { throw exception }.`when`(preparedStatementProvider).invoke(any(), any())
+        every { preparedStatementProvider(any(), any()) } throws exception
         configureDatabaseVersion(0)
 
         expect {
@@ -268,22 +279,23 @@ internal class UpgradeRunnerTest {
     }
 
     private fun configureDatabaseVersion(version: Int) {
-        doReturn(true).`when`(resultSet).next()
-        doReturn(version).`when`(resultSet).getInt(1)
+        every { resultSet.next() } returns true
+        every { resultSet.getInt(1) } returns version
     }
 
-    private fun validateChangeSetExecuted(inOrder: InOrder, changeSet: ChangeSet) {
-        inOrder.verify(statement).executeUpdate("PRAGMA foreign_keys=OFF")
+    private fun MockKVerificationScope.validateChangeSetExecuted(changeSet: ChangeSet, expectedCommands: List<String>, changeSetNumber: Int) {
+        statement.executeUpdate("PRAGMA foreign_keys=OFF")
 
-        changeSet.commands.forEach { inOrder.verify(statement).executeUpdate(it) }
+        changeSet.commands
+        expectedCommands.forEach { statement.executeUpdate(it) }
 
-        inOrder.verify(preparedStatement).setInt(tableVersion.VERSION.queryIndex, changeSet.number)
-        inOrder.verify(preparedStatement).executeUpdate()
+        preparedStatement.setInt(any(), changeSetNumber)
+        preparedStatement.executeUpdate()
 
-        inOrder.verify(statement).executeUpdate("PRAGMA foreign_key_check")
-        inOrder.verify(statement).executeUpdate("COMMIT")
-        inOrder.verify(statement).executeUpdate("BEGIN TRANSACTION")
-        inOrder.verify(statement).executeUpdate("PRAGMA foreign_keys=ON")
+        statement.executeUpdate("PRAGMA foreign_key_check")
+        statement.executeUpdate("COMMIT")
+        statement.executeUpdate("BEGIN TRANSACTION")
+        statement.executeUpdate("PRAGMA foreign_keys=ON")
     }
 
 }

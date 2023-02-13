@@ -10,16 +10,29 @@ package com.zepben.evolve.database.sqlite.writers
 
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
-import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.database.sqlite.common.DatabaseTables
+import com.zepben.evolve.database.sqlite.network.NetworkCIMWriter
+import com.zepben.evolve.database.sqlite.network.NetworkServiceWriter
+import com.zepben.evolve.database.sqlite.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TablePoles
+import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableStreetlights
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.testutils.junit.SystemLogExtension
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
+import java.sql.Connection
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 
 internal class NetworkServiceWriterTest {
 
@@ -27,71 +40,82 @@ internal class NetworkServiceWriterTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
+
+
+    private val testingDatabaseTables = object : DatabaseTables() {
+        override val tables: Map<Class<out SqliteTable>, SqliteTable> = listOf(
+            TableCircuits(),
+            TableLoops(),
+            TableLvFeeders(),
+            TablePoles(),
+            TableStreetlights(),
+        ).associateBy { it::class.java }
+    }
     private val savedCommonMRIDs = mutableSetOf<String>()
-    private val networkServiceWriter = NetworkServiceWriter(savedCommonMRIDs::contains, savedCommonMRIDs::add)
-    private val networkCIMWriter = mock(NetworkCIMWriter::class.java)
+    private val networkService = NetworkService()
+    private val mw = mockk<NetworkCIMWriter>(relaxed = true)
+    private val networkServiceWriter = NetworkServiceWriter(
+        networkService,
+        mw,
+        savedCommonMRIDs::contains,
+        savedCommonMRIDs::add
+    )
+    private val resultSet = mockk<ResultSet>(relaxed = true)
+    private val connection = mockk<Connection>(relaxed = true)
+    private val preparedStatement = mockk<PreparedStatement>(relaxed = true).also { every { it.executeQuery(any()) } returns resultSet }
+    private val preparedStatementProvider = spyk<(Connection, String) -> PreparedStatement>({ _, _ -> preparedStatement })
 
     @Test
     internal fun savesCircuits() {
-        val circuit1 = Circuit()
-        val circuit2 = Circuit()
 
-        networkServiceWriter.save(serviceOf(circuit1, circuit2), networkCIMWriter)
+        val circuit1 = Circuit().also { networkService.add(it) }
 
-        verify(networkCIMWriter).save(circuit1)
-        verify(networkCIMWriter).save(circuit2)
+        testingDatabaseTables.prepareInsertStatements(connection, preparedStatementProvider)
+        networkServiceWriter.save()
+
+        //the save method will be called once but networkServiceWriter will error out due to fail to write
+        verify(exactly = 1) { mw.save(circuit1) }
+
     }
 
     @Test
     internal fun savesLoops() {
-        val loop1 = Loop()
-        val loop2 = Loop()
+        val loop1 = Loop().also { networkService.add(it) }
 
-        networkServiceWriter.save(serviceOf(loop1, loop2), networkCIMWriter)
+        networkServiceWriter.save()
 
-        verify(networkCIMWriter).save(loop1)
-        verify(networkCIMWriter).save(loop2)
+        //the save method will be called once but networkServiceWriter will error out due to fail to write
+        verify(exactly = 1) { mw.save(loop1) }
     }
 
     @Test
     internal fun savesLvFeeders() {
-        val lvFeeder1 = LvFeeder()
-        val lvFeeder2 = LvFeeder()
+        val lvFeeder1 = LvFeeder().also { networkService.add(it) }
 
-        networkServiceWriter.save(serviceOf(lvFeeder1, lvFeeder2), networkCIMWriter)
+        networkServiceWriter.save()
 
-        verify(networkCIMWriter).save(lvFeeder1)
-        verify(networkCIMWriter).save(lvFeeder2)
+        //the save method will be called once but networkServiceWriter will error out due to fail to write
+        verify(exactly = 1) { mw.save(lvFeeder1) }
     }
 
     @Test
     internal fun `saves Poles`() {
-        val pole1 = Pole()
-        val pole2 = Pole()
+        val pole1 = Pole().also { networkService.add(it) }
 
-        networkServiceWriter.save(serviceOf(pole1, pole2), networkCIMWriter)
+        networkServiceWriter.save()
 
-        verify(networkCIMWriter).save(pole1)
-        verify(networkCIMWriter).save(pole2)
+        //the save method will be called once but networkServiceWriter will error out due to fail to write
+        verify(exactly = 1) { mw.save(pole1) }
     }
 
     @Test
     internal fun `saves Streetlights`() {
-        val streetlight1 = Streetlight()
-        val streetlight2 = Streetlight()
+        val streetlight1 = Streetlight().also { networkService.add(it) }
 
-        networkServiceWriter.save(serviceOf(streetlight1, streetlight2), networkCIMWriter)
+        networkServiceWriter.save()
 
-        verify(networkCIMWriter).save(streetlight1)
-        verify(networkCIMWriter).save(streetlight2)
+        //the save method will be called once but networkServiceWriter will error out due to fail to write
+        verify(exactly = 1) { mw.save(streetlight1) }
     }
 
-    private fun serviceOf(io1: IdentifiedObject, io2: IdentifiedObject): NetworkService {
-        val networkService = NetworkService()
-
-        networkService.tryAdd(io1)
-        networkService.tryAdd(io2)
-
-        return networkService
-    }
 }

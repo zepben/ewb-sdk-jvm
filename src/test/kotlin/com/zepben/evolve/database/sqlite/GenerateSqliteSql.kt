@@ -8,6 +8,9 @@
 
 package com.zepben.evolve.database.sqlite
 
+import com.zepben.evolve.database.sqlite.customer.customerDatabaseTables
+import com.zepben.evolve.database.sqlite.diagram.diagramDatabaseTables
+import com.zepben.evolve.database.sqlite.network.networkDatabaseTables
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -20,7 +23,9 @@ class GenerateSqliteSql {
     @Test
     @Disabled
     fun runThisFunctionAsATestToGetSqlForAnSqliteDatabase() {
-        DatabaseTables().forEachTable { table: SqliteTable -> printSqlFields(table) }
+        customerDatabaseTables.forEachTable { table: SqliteTable -> printSqlFields(table) }
+        networkDatabaseTables.forEachTable { table: SqliteTable -> printSqlFields(table) }
+        diagramDatabaseTables.forEachTable { table: SqliteTable -> printSqlFields(table) }
     }
 
     private fun printSqlFields(table: SqliteTable) {

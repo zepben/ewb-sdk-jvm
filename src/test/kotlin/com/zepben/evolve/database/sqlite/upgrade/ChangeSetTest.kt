@@ -17,7 +17,9 @@ import org.slf4j.LoggerFactory
 import org.sqlite.SQLiteException
 import java.io.File
 import java.sql.Connection
+import java.sql.DriverManager
 import java.sql.DriverManager.getConnection
+import java.sql.Statement
 
 @Suppress("SqlResolve", "SameParameterValue")
 internal class ChangeSetTest {
@@ -40,7 +42,9 @@ internal class ChangeSetTest {
     @Test
     internal fun `test change sets`() {
         val conn = createBaseDB()
-        val runner = UpgradeRunner()
+        val getConnection: (String) -> Connection = DriverManager::getConnection
+        val getStatement: (Connection) -> Statement = Connection::createStatement
+        val runner = UpgradeRunner(getConnection, getStatement)
         val tableVersion = TableVersion()
 
         conn.createStatement().use { stmt ->

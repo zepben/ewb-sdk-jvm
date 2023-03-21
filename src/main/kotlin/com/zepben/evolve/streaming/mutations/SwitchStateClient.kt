@@ -18,7 +18,7 @@ import com.zepben.protobuf.nm.SwitchStateUpdate as PBSwitchStateUpdate
 
 class SwitchStateClient(
     private val stub: SwitchStateServiceGrpc.SwitchStateServiceBlockingStub
-) : GrpcClient() {
+) : GrpcClient(null) {
 
     constructor(channel: Channel) : this(SwitchStateServiceGrpc.newBlockingStub(channel))
     constructor(channel: GrpcChannel) : this(SwitchStateServiceGrpc.newBlockingStub(channel.channel))

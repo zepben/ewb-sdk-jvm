@@ -1,19 +1,29 @@
 # Zepben EWB SDK changelog
+
 ## [0.15.0]
 
 ### Breaking Changes
-* None.
+
+* The CIM consumer clients (network, diagram and customer) have had the following changes:
+    * Implemented the `AutoCloseable` interface. Existing applications that use any of the clients, but do not provide a gRPC stub directly to those clients,
+      should be refactored to close the client in order to shut down the `ExecutorService` that is created under the covers.
+    * You can provide an optional `ExecutorService` when creating a client, which is used to monitor the gRPC stub. If one is provided, it will be shutdown when
+      the client is closed.
 
 ### New Features
+
 * None.
 
 ### Enhancements
+
 * None.
 
 ### Fixes
+
 * None.
 
 ### Notes
+
 * None.
 
 ## [0.14.0] - 2023-02-08
@@ -56,17 +66,17 @@
     * `newCurrentDownstreamEquipmentTrace`: Creates a trace that traverses in the downstream direction using the current state of the network.
     * `newCurrentUpstreamEquipmentTrace`: Creates a trace that traverses in the upstream direction using the current state of the network.
 * Added support for protection equipment with the following classes, enums, and fields:
-  * `SwitchInfo`: Switch datasheet information.
-  * `ProtectionEquipment`: An electrical device designed to respond to input conditions in a prescribed manner and after specified conditions are met to cause
-                           contact operation or similar abrupt change in associated electric control circuits, or simply to display the detected condition.
-  * `CurrentRelay`: A device that checks current flow values in any direction or designated direction.
-  * `CurrentRelayInfo`: Current relay datasheet information.
-  * `RecloseSequence`: A reclose sequence (open and close) is defined for each possible reclosure of a breaker.
-  * `ProtectionKind`: The kind of protection being provided by this protection equipment.
-  * `ProtectedSwitch::breakingCapacity`: The maximum fault current in amps a breaking device can break safely under prescribed conditions of use.
-  * `Switch::ratedCurrent`: The maximum continuous current carrying capacity in amps governed by the device material and construction.
-                            The attribute shall be a positive value.
-  * `Breaker::inTransitTime`: The transition time from open to close in seconds.
+    * `SwitchInfo`: Switch datasheet information.
+    * `ProtectionEquipment`: An electrical device designed to respond to input conditions in a prescribed manner and after specified conditions are met to cause
+      contact operation or similar abrupt change in associated electric control circuits, or simply to display the detected condition.
+    * `CurrentRelay`: A device that checks current flow values in any direction or designated direction.
+    * `CurrentRelayInfo`: Current relay datasheet information.
+    * `RecloseSequence`: A reclose sequence (open and close) is defined for each possible reclosure of a breaker.
+    * `ProtectionKind`: The kind of protection being provided by this protection equipment.
+    * `ProtectedSwitch::breakingCapacity`: The maximum fault current in amps a breaking device can break safely under prescribed conditions of use.
+    * `Switch::ratedCurrent`: The maximum continuous current carrying capacity in amps governed by the device material and construction.
+      The attribute shall be a positive value.
+    * `Breaker::inTransitTime`: The transition time from open to close in seconds.
 
 ### Enhancements
 
@@ -86,5 +96,3 @@
 ### Notes
 
 * None.
-
-

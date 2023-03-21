@@ -9,11 +9,14 @@
 package com.zepben.evolve.streaming.grpc
 
 import com.zepben.testutils.junit.SystemLogExtension
+import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
 
 internal class GrpcClientTest {
 
@@ -71,6 +74,46 @@ internal class GrpcClientTest {
         validateFailure(false)
 
         assertThat(handler.count, equalTo(1))
+    }
+
+    @Test
+    internal fun `cleans up executor if provided`() {
+        val executor = mockk<ExecutorService>().also {
+            justRun { it.shutdown() }
+            every { it.awaitTermination(any(), any()) } returns true
+        }
+
+        val client1 = object : GrpcClient(executor){}
+
+        client1.close()
+
+        verify(exactly = 1) { executor.shutdown() }
+        verify(exactly = 1) { executor.awaitTermination(1000, TimeUnit.MILLISECONDS) }
+        confirmVerified(executor)
+    }
+
+    @Test
+    internal fun `tries more heavy handed shutdown if the first attempt fails`() {
+        val executor = mockk<ExecutorService>().also {
+            justRun { it.shutdown() }
+            every { it.awaitTermination(any(), any()) } returns false
+            every { it.shutdownNow() } returns emptyList()
+        }
+
+        val client1 = object : GrpcClient(executor){}
+
+        client1.close()
+
+        verify(exactly = 1) { executor.shutdown() }
+        verify(exactly = 1) { executor.awaitTermination(1000, TimeUnit.MILLISECONDS) }
+        verify(exactly = 1) { executor.shutdownNow() }
+        confirmVerified(executor)
+    }
+
+    @Test
+    internal fun `supports null executor`() {
+        val client1 = object : GrpcClient(null){}
+        client1.close()
     }
 
     private fun validateFailure(expectHandled: Boolean) {

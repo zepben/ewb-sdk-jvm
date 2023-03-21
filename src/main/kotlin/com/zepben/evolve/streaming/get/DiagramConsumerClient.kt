@@ -18,6 +18,7 @@ import com.zepben.protobuf.dc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.dc.GetIdentifiedObjectsResponse
 import io.grpc.CallCredentials
 import io.grpc.ManagedChannel
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
@@ -29,12 +30,14 @@ import java.util.concurrent.Executors
  * were retrieved but not added to service. This should not be the case unless you are processing things concurrently.
  *
  * @property stub The gRPC stub to be used to communicate with the server
+ * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class DiagramConsumerClient(
     private val stub: DiagramConsumerGrpc.DiagramConsumerStub,
     override val service: DiagramService = DiagramService(),
-    override val protoToCim: DiagramProtoToCim = DiagramProtoToCim(service)
-) : CimConsumerClient<DiagramService, DiagramProtoToCim>() {
+    override val protoToCim: DiagramProtoToCim = DiagramProtoToCim(service),
+    executor: ExecutorService? = null
+) : CimConsumerClient<DiagramService, DiagramProtoToCim>(executor) {
 
     /**
      * Create a [DiagramConsumerClient]
@@ -44,8 +47,10 @@ class DiagramConsumerClient(
      */
     @JvmOverloads
     constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
-        this(DiagramConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor())
-            .apply { callCredentials?.let { withCallCredentials(it) } })
+        this(
+            DiagramConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
+            executor = Executors.newSingleThreadExecutor()
+        )
 
     /**
      * Create a [DiagramConsumerClient]
@@ -55,8 +60,10 @@ class DiagramConsumerClient(
      */
     @JvmOverloads
     constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
-        this(DiagramConsumerGrpc.newStub(channel.channel).withExecutor(Executors.newSingleThreadExecutor())
-            .apply { callCredentials?.let { withCallCredentials(it) } })
+        this(
+            DiagramConsumerGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
+            executor = Executors.newSingleThreadExecutor()
+        )
 
     override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()

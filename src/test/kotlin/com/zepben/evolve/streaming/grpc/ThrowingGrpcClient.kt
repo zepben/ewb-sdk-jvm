@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.streaming.grpc
 
-class ThrowingGrpcClient(val ex: Throwable = RuntimeException()) : GrpcClient() {
+class ThrowingGrpcClient(val ex: Throwable = RuntimeException()) : GrpcClient(null) {
 
     fun throwViaSafeTryRpc(): GrpcResult<Unit> = tryRpc { throw ex }
 

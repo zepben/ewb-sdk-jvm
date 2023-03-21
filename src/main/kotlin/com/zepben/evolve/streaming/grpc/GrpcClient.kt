@@ -7,10 +7,28 @@
  */
 package com.zepben.evolve.streaming.grpc
 
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
+
 /**
  * Base class that defines some helpful functions for gRPC clients to communicate with the server.
+ *
+ * Inherits from [AutoCloseable] to shut down any executors created to monitor the gRPC stub. These executors stubs will be implemented in the leaves as they share no common ancestry.
+ *
+ * @param executor The [ExecutorService] created to monitor the gRPC stub if any. This executor will be shut down on disposal of the client.
  */
-abstract class GrpcClient {
+abstract class GrpcClient(private val executor: ExecutorService?) : AutoCloseable {
+
+    /**
+     * Cleanly shutdown the executor (if there was one).
+     */
+    override fun close() {
+        executor?.apply {
+            shutdown()
+            if (!awaitTermination(1000, TimeUnit.MILLISECONDS))
+                shutdownNow()
+        }
+    }
 
     private val errorHandlers: MutableList<RpcErrorHandler> = mutableListOf()
 

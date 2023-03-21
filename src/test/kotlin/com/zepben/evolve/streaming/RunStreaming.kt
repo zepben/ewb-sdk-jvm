@@ -20,15 +20,13 @@ private var indentLevel = 0
 private var indent = 3
 
 fun main() {
-    // NOTE: There is something stopping this from exiting but it appears the client
-    //       channel is shutdown correctly so not sure what it is.
     connectInsecure(host = "ewb.local", rpcPort = 9001).use { channel ->
-        val client = NetworkConsumerClient(channel)
-
-        time("streaming") {
-            time("get feeder") { runFeeder(client) }
-            time("retrieve network hierarchy") { runNetworkHierarchy(client) }
-            time("retrieve network") { runRetrieve(client) }
+        NetworkConsumerClient(channel).use { client ->
+            time("streaming") {
+                time("get feeder") { runFeeder(client) }
+                time("retrieve network hierarchy") { runNetworkHierarchy(client) }
+                time("retrieve network") { runRetrieve(client) }
+            }
         }
     }
     log("done")
@@ -84,7 +82,7 @@ private fun time(desc: String, run: () -> Unit) {
     --indentLevel
     val duration = System.currentTimeMillis() - startTime
     val durationSec = (duration) / 1000
-    log("$desc took ${(durationSec / 60).toInt()}:${(durationSec % 60).toString().padStart(2, '0')}.${duration % 1000}")
+    log("$desc took ${(durationSec / 60).toInt()}:${(durationSec % 60).toString().padStart(2, '0')}.${(duration % 1000).toString().padStart(3, '0')}")
 }
 
 private fun log(msg: String) {

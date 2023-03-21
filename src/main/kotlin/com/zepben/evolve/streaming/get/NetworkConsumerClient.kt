@@ -24,6 +24,7 @@ import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import io.grpc.CallCredentials
 import io.grpc.ManagedChannel
 import java.io.IOException
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
@@ -36,12 +37,14 @@ import java.util.concurrent.Executors
  *
  * @property stub The gRPC stub to be used to communicate with the server
  * @property service The [NetworkService] to store fetched objects in.
+ * @param executor An optional [ExecutorService] to use with the stub. If provided, it will be cleaned up when this client is closed.
  */
 class NetworkConsumerClient(
     private val stub: NetworkConsumerGrpc.NetworkConsumerStub,
     override val service: NetworkService = NetworkService(),
-    override val protoToCim: NetworkProtoToCim = NetworkProtoToCim(service)
-) : CimConsumerClient<NetworkService, NetworkProtoToCim>() {
+    override val protoToCim: NetworkProtoToCim = NetworkProtoToCim(service),
+    executor: ExecutorService? = null
+) : CimConsumerClient<NetworkService, NetworkProtoToCim>(executor) {
 
     private var networkHierarchy: NetworkHierarchy? = null
 
@@ -53,8 +56,10 @@ class NetworkConsumerClient(
      */
     @JvmOverloads
     constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
-        this(NetworkConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor())
-            .apply { callCredentials?.let { withCallCredentials(it) } })
+        this(
+            NetworkConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
+            executor = Executors.newSingleThreadExecutor()
+        )
 
     /**
      * Create a [NetworkConsumerClient]
@@ -64,8 +69,10 @@ class NetworkConsumerClient(
      */
     @JvmOverloads
     constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
-        this(NetworkConsumerGrpc.newStub(channel.channel).withExecutor(Executors.newSingleThreadExecutor())
-            .apply { callCredentials?.let { withCallCredentials(it) } })
+        this(
+            NetworkConsumerGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
+            executor = Executors.newSingleThreadExecutor()
+        )
 
     /**
      * Retrieve the [Equipment] for [equipmentContainer]

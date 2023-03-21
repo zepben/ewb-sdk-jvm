@@ -12,6 +12,7 @@ import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.streaming.grpc.GrpcClient
 import com.zepben.evolve.streaming.grpc.GrpcResult
+import java.util.concurrent.ExecutorService
 
 /**
  * A result to use when multiple objects are requested.
@@ -38,7 +39,7 @@ data class ExtractResult(val identifiedObject: IdentifiedObject?, val mRID: Stri
  * @param T The type of service used by this client.
  * @property service The service to store fetched objects in. Descendant of [BaseService] defined by [T]
  */
-abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim> : GrpcClient() {
+abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: ExecutorService?) : GrpcClient(executor) {
 
     abstract val service: T
     protected abstract val protoToCim: U

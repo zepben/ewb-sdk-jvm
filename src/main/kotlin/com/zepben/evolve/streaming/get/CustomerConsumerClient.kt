@@ -12,11 +12,9 @@ import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.customer.translator.CustomerProtoToCim
 import com.zepben.evolve.services.customer.translator.mRID
 import com.zepben.evolve.streaming.grpc.GrpcChannel
-import com.zepben.protobuf.cc.CustomerConsumerGrpc
-import com.zepben.protobuf.cc.CustomerIdentifiedObject
+import com.zepben.evolve.streaming.grpc.GrpcResult
+import com.zepben.protobuf.cc.*
 import com.zepben.protobuf.cc.CustomerIdentifiedObject.IdentifiedObjectCase.*
-import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest
-import com.zepben.protobuf.cc.GetIdentifiedObjectsResponse
 import io.grpc.CallCredentials
 import io.grpc.ManagedChannel
 import java.util.concurrent.ExecutorService
@@ -71,6 +69,10 @@ class CustomerConsumerClient @JvmOverloads constructor(
         )
 
 
+    fun getCustomersForContainer(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
+        processCustomersForContainers(mRIDs)
+    }
+
     override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetIdentifiedObjectsResponse> { response ->
@@ -83,6 +85,31 @@ class CustomerConsumerClient @JvmOverloads constructor(
         val builder = GetIdentifiedObjectsRequest.newBuilder()
 
         batchSend(mRIDs, builder::addMrids) {
+            if (builder.mridsList.isNotEmpty())
+                request.onNext(builder.build())
+            builder.clearMrids()
+        }
+
+        request.onCompleted()
+        streamObserver.await()
+
+        return extractResults.asSequence()
+    }
+
+    private fun processCustomersForContainers(
+        mRIDs: Set<String>,
+    ): Sequence<ExtractResult> {
+        val extractResults = mutableListOf<ExtractResult>()
+        val streamObserver = AwaitableStreamObserver<GetCustomersForContainerResponse> { response ->
+            response.identifiedObjectsList.forEach {
+                extractResults.add(extractIdentifiedObject(it))
+            }
+        }
+
+        val request = stub.getCustomersForContainer(streamObserver)
+        val builder = GetCustomersForContainerRequest.newBuilder()
+
+        batchSend(mRIDs.asSequence(), builder::addMrids) {
             if (builder.mridsList.isNotEmpty())
                 request.onNext(builder.build())
             builder.clearMrids()

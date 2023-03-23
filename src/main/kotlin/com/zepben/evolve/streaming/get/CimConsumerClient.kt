@@ -120,4 +120,14 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
     protected inline fun <reified CIM : IdentifiedObject> getOrAdd(mRID: String, addFromPb: U.() -> CIM?): CIM? =
         service.get(CIM::class, mRID) ?: protoToCim.addFromPb()
 
+    protected fun handleMultiObjectRPC(processor: () -> Sequence<ExtractResult>): GrpcResult<MultiObjectResult> =
+        tryRpc {
+            val results = mutableMapOf<String, IdentifiedObject>()
+            val failed = mutableSetOf<String>()
+            processor().forEach { result ->
+                result.identifiedObject?.let { results[it.mRID] = it } ?: failed.add(result.mRID)
+            }
+            MultiObjectResult(results, failed)
+        }
+
 }

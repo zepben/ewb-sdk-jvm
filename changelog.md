@@ -20,7 +20,8 @@
 
 ### Fixes
 
-* None.
+* Stopped the NetworkConsumerClient from resolving the equipment of an EquipmentContainer when resolving references. Equipment for containers must always be 
+explicitly requested by the client.
 
 ### Notes
 

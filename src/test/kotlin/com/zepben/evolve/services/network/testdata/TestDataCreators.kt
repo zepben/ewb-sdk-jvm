@@ -16,6 +16,7 @@ import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
@@ -194,6 +195,29 @@ fun createFeeder(networkService: NetworkService, mRID: String, name: String, sub
                 this.addEquipment(conductingEquipment)
             }
         }
+
+fun createLvFeeder(
+    networkService: NetworkService,
+    mRID: String,
+    name: String = "",
+    feeder: Feeder? = null,
+    headTerminal: Terminal? = null,
+    vararg equipmentMRIDs: String?
+): LvFeeder =
+    LvFeeder(mRID).apply {
+        this.name = name
+        normalHeadTerminal = headTerminal
+        feeder?.let { addNormalEnergizingFeeder(it) }
+
+        equipmentMRIDs.forEach {
+            networkService.get<ConductingEquipment>(it)?.also { ce ->
+                ce.addContainer(this)
+                addEquipment(ce)
+            }
+        }
+
+        networkService.add(this)
+    }
 
 fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int? = null, endNumber: Int = 0) =
     PowerTransformerEnd().also {

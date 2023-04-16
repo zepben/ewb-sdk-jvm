@@ -15,11 +15,14 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
+import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
 import com.zepben.evolve.services.network.translator.toPb
+import com.zepben.evolve.services.network.whenNetworkServiceObject
 import com.zepben.evolve.streaming.get.ConsumerUtils.buildFromBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
@@ -651,6 +654,26 @@ internal class NetworkConsumerClientTest {
         )
     }
 
+    @Test
+    internal fun `resolve references skips resolvers referencing equipment containers`() {
+        val expectedService = LvFeedersWithOpenPoint.create()
+        configureFeederResponses(expectedService)
+
+        val mRID = "lvf001"
+        val result = consumerClient.getEquipmentContainer<LvFeeder>(mRID).throwOnError()
+
+        verify(consumerService.onGetNetworkHierarchy, times(1)).invoke(any(), any())
+        verify(consumerService.onGetEquipmentForContainers, times(1)).invoke(any(), any())
+        verify(consumerService.onGetIdentifiedObjects, times(3)).invoke(any(), any())
+        verifyNoMoreInteractions(consumerService.onGetNetworkHierarchy)
+
+        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat(result.value.objects.containsKey(mRID), equalTo(true))
+        assertThat(result.value.objects.size, equalTo(18))
+        assertThat(consumerClient.service.get<PowerTransformer>("tx2"), nullValue())
+        assertThat(consumerClient.service.get<PowerTransformer>("tx1"), equalTo(result.value.objects["tx1"]))
+    }
+
     private fun createResponse(
         identifiedObjectBuilder: NIO.Builder,
         subClassBuilder: (NIO.Builder) -> Any,
@@ -849,26 +872,78 @@ internal class NetworkConsumerClientTest {
         .build()
 
     private fun buildNIO(obj: IdentifiedObject, identifiedObjectBuilder: NIO.Builder): NIO? {
-        when (obj) {
-            is CableInfo -> identifiedObjectBuilder.cableInfo = obj.toPb()
-            is AcLineSegment -> identifiedObjectBuilder.acLineSegment = obj.toPb()
-            is Breaker -> identifiedObjectBuilder.breaker = obj.toPb()
-            is EnergySource -> identifiedObjectBuilder.energySource = obj.toPb()
-            is Junction -> identifiedObjectBuilder.junction = obj.toPb()
-            is PowerTransformer -> identifiedObjectBuilder.powerTransformer = obj.toPb()
-            is ConnectivityNode -> identifiedObjectBuilder.connectivityNode = obj.toPb()
-            is EnergySourcePhase -> identifiedObjectBuilder.energySourcePhase = obj.toPb()
-            is Feeder -> identifiedObjectBuilder.feeder = obj.toPb()
-            is Location -> identifiedObjectBuilder.location = obj.toPb()
-            is OverheadWireInfo -> identifiedObjectBuilder.overheadWireInfo = obj.toPb()
-            is PerLengthSequenceImpedance -> identifiedObjectBuilder.perLengthSequenceImpedance = obj.toPb()
-            is PowerTransformerEnd -> identifiedObjectBuilder.powerTransformerEnd = obj.toPb()
-            is Substation -> identifiedObjectBuilder.substation = obj.toPb()
-            is Terminal -> identifiedObjectBuilder.terminal = obj.toPb()
-            is Loop -> identifiedObjectBuilder.loop = obj.toPb()
-            is Circuit -> identifiedObjectBuilder.circuit = obj.toPb()
-            is BaseVoltage -> identifiedObjectBuilder.baseVoltage = obj.toPb()
-            else -> throw Exception("Missing class in create response: ${obj.typeNameAndMRID()}")
+        identifiedObjectBuilder.apply {
+            whenNetworkServiceObject(
+                obj,
+                isAcLineSegment = { acLineSegment = it.toPb() },
+                isAccumulator = { accumulator = it.toPb() },
+                isAnalog = { analog = it.toPb() },
+                isAssetOwner = { assetOwner = it.toPb() },
+                isBreaker = { breaker = it.toPb() },
+                isLoadBreakSwitch = { loadBreakSwitch = it.toPb() },
+                isBaseVoltage = { baseVoltage = it.toPb() },
+                isCableInfo = { cableInfo = it.toPb() },
+                isCircuit = { circuit = it.toPb() },
+                isConnectivityNode = { connectivityNode = it.toPb() },
+                isControl = { control = it.toPb() },
+                isDisconnector = { disconnector = it.toPb() },
+                isDiscrete = { discrete = it.toPb() },
+                isEnergyConsumer = { energyConsumer = it.toPb() },
+                isEnergyConsumerPhase = { energyConsumerPhase = it.toPb() },
+                isEnergySource = { energySource = it.toPb() },
+                isEnergySourcePhase = { energySourcePhase = it.toPb() },
+                isFaultIndicator = { faultIndicator = it.toPb() },
+                isFeeder = { feeder = it.toPb() },
+                isFuse = { fuse = it.toPb() },
+                isGeographicalRegion = { geographicalRegion = it.toPb() },
+                isJumper = { jumper = it.toPb() },
+                isJunction = { junction = it.toPb() },
+                isLinearShuntCompensator = { linearShuntCompensator = it.toPb() },
+                isLocation = { location = it.toPb() },
+                isMeter = { meter = it.toPb() },
+                isOperationalRestriction = { operationalRestriction = it.toPb() },
+                isOrganisation = { organisation = it.toPb() },
+                isOverheadWireInfo = { overheadWireInfo = it.toPb() },
+                isPole = { pole = it.toPb() },
+                isPowerTransformer = { powerTransformer = it.toPb() },
+                isPowerTransformerEnd = { powerTransformerEnd = it.toPb() },
+                isPowerTransformerInfo = { powerTransformerInfo = it.toPb() },
+                isRatioTapChanger = { ratioTapChanger = it.toPb() },
+                isRecloser = { recloser = it.toPb() },
+                isRemoteControl = { remoteControl = it.toPb() },
+                isRemoteSource = { remoteSource = it.toPb() },
+                isSite = { site = it.toPb() },
+                isStreetlight = { streetlight = it.toPb() },
+                isSubGeographicalRegion = { subGeographicalRegion = it.toPb() },
+                isSubstation = { substation = it.toPb() },
+                isTerminal = { terminal = it.toPb() },
+                isUsagePoint = { usagePoint = it.toPb() },
+                isPerLengthSequenceImpedance = { perLengthSequenceImpedance = it.toPb() },
+                isLoop = { loop = it.toPb() },
+                isLvFeeder = { lvFeeder = it.toPb() },
+                isBatteryUnit = { batteryUnit = it.toPb() },
+                isPhotoVoltaicUnit = { photoVoltaicUnit = it.toPb() },
+                isPowerElectronicsWindUnit = { powerElectronicsWindUnit = it.toPb() },
+                isPowerElectronicsConnection = { powerElectronicsConnection = it.toPb() },
+                isPowerElectronicsConnectionPhase = { powerElectronicsConnectionPhase = it.toPb() },
+                isBusbarSection = { busbarSection = it.toPb() },
+                isTransformerEndInfo = { transformerEndInfo = it.toPb() },
+                isTransformerTankInfo = { transformerTankInfo = it.toPb() },
+                isTransformerStarImpedance = { transformerStarImpedance = it.toPb() },
+                isNoLoadTest = { noLoadTest = it.toPb() },
+                isOpenCircuitTest = { openCircuitTest = it.toPb() },
+                isShortCircuitTest = { shortCircuitTest = it.toPb() },
+                isEquivalentBranch = { equivalentBranch = it.toPb() },
+                isShuntCompensatorInfo = { shuntCompensatorInfo = it.toPb() },
+                isCurrentTransformerInfo = { currentTransformerInfo = it.toPb() },
+                isPotentialTransformerInfo = { potentialTransformerInfo = it.toPb() },
+                isCurrentTransformer = { currentTransformer = it.toPb() },
+                isPotentialTransformer = { potentialTransformer = it.toPb() },
+                isSwitchInfo = { switchInfo = it.toPb() },
+                isCurrentRelay = { currentRelay = it.toPb() },
+                isCurrentRelayInfo = { currentRelayInfo = it.toPb() },
+                isRecloseSequence = { recloseSequence = it.toPb() },
+            )
         }
 
         return identifiedObjectBuilder.build()

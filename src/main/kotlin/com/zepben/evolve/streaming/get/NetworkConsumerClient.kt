@@ -678,9 +678,11 @@ class NetworkConsumerClient(
     internal fun resolveReferences(mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
         var res = mor
         do {
+            // Skip any reference trying to resolve from an EquipmentContainer - e.g a PowerTransformer trying to pull in its LvFeeder.
+            // EquipmentContainers should be retrieved explicitly or via a hierarchy call.
             val toResolve = res.objects.keys
-                .asSequence()
                 .flatMap { service.getUnresolvedReferencesFrom(it) }
+                .filterNot { EquipmentContainer::class.java.isAssignableFrom(it.resolver.fromClass) }
                 .map { it.toMrid }
                 .distinct()
                 .toList()

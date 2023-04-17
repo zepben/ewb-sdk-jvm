@@ -83,7 +83,7 @@ internal class GrpcClientTest {
             every { it.awaitTermination(any(), any()) } returns true
         }
 
-        val client1 = object : GrpcClient(executor){}
+        val client1 = object : GrpcClient(executor) {}
 
         client1.close()
 
@@ -100,7 +100,7 @@ internal class GrpcClientTest {
             every { it.shutdownNow() } returns emptyList()
         }
 
-        val client1 = object : GrpcClient(executor){}
+        val client1 = object : GrpcClient(executor) {}
 
         client1.close()
 
@@ -112,7 +112,7 @@ internal class GrpcClientTest {
 
     @Test
     internal fun `supports null executor`() {
-        val client1 = object : GrpcClient(null){}
+        val client1 = object : GrpcClient(null) {}
         client1.close()
     }
 

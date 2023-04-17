@@ -13,8 +13,8 @@ import com.zepben.evolve.testing.TestNetworkBuilder
 
 object LvFeedersWithOpenPoint {
 
-    //    lv1:[     c1  {  ]  c2     }:lv2
-    //    lv1:[tx1------{sw]------tx2}:lv2
+    //    lvf5:[     c1  {  ]  c3     }:lvf6
+    //    lvf5:[tx0------{b2]------tx4}:lvf6
     fun create(): NetworkService =
         TestNetworkBuilder()
             .fromPowerTransformer() // tx0

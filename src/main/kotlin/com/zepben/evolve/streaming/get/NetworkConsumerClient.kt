@@ -94,7 +94,8 @@ class NetworkConsumerClient(
         equipmentContainer: EquipmentContainer,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
-    ): GrpcResult<MultiObjectResult> = getEquipmentForContainer(equipmentContainer.mRID, includeEnergizingContainers, includeEnergizedContainers)
+    ): GrpcResult<MultiObjectResult> =
+        getEquipmentForContainer(equipmentContainer.mRID, includeEnergizingContainers, includeEnergizedContainers)
 
     /**
      * Retrieve the [Equipment] for the [EquipmentContainer] represented by [mRID]
@@ -116,7 +117,8 @@ class NetworkConsumerClient(
         mRID: String,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
-    ): GrpcResult<MultiObjectResult> = getEquipmentForContainers(sequenceOf(mRID), includeEnergizingContainers, includeEnergizedContainers)
+    ): GrpcResult<MultiObjectResult> =
+        getEquipmentForContainers(sequenceOf(mRID), includeEnergizingContainers, includeEnergizedContainers)
 
     /**
      * Retrieve the [Equipment] for all [EquipmentContainer]s represented by [mRIDs]
@@ -138,7 +140,8 @@ class NetworkConsumerClient(
         mRIDs: Iterable<String>,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
-    ): GrpcResult<MultiObjectResult> = getEquipmentForContainers(mRIDs.asSequence(), includeEnergizingContainers, includeEnergizedContainers)
+    ): GrpcResult<MultiObjectResult> =
+        getEquipmentForContainers(mRIDs.asSequence(), includeEnergizingContainers, includeEnergizedContainers)
 
     /**
      * Retrieve the [Equipment] for all [EquipmentContainer]s represented by [mRIDs]
@@ -160,9 +163,8 @@ class NetworkConsumerClient(
         mRIDs: Sequence<String>,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
-    ): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
-        processEquipmentForContainers(mRIDs, includeEnergizingContainers, includeEnergizedContainers)
-    }
+    ): GrpcResult<MultiObjectResult> =
+        handleMultiObjectRPC { processEquipmentForContainers(mRIDs, includeEnergizingContainers, includeEnergizedContainers) }
 
     /**
      * Retrieve the [Equipment] for [operationalRestriction].
@@ -262,25 +264,26 @@ class NetworkConsumerClient(
      *
      * @return A simplified version of the network hierarchy that can be used to make further in-depth requests.
      */
-    fun getNetworkHierarchy(): GrpcResult<NetworkHierarchy> = tryRpc {
-        if (networkHierarchy == null) {
-            val streamObserver = AwaitableStreamObserver<GetNetworkHierarchyResponse> { response ->
-                networkHierarchy = NetworkHierarchy(
-                    toMap(response.geographicalRegionsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
-                    toMap(response.subGeographicalRegionsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
-                    toMap(response.substationsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
-                    toMap(response.feedersList) { getOrAdd(it.mRID()) { addFromPb(it) } },
-                    toMap(response.circuitsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
-                    toMap(response.loopsList) { getOrAdd(it.mRID()) { addFromPb(it) } }
-                )
+    fun getNetworkHierarchy(): GrpcResult<NetworkHierarchy> =
+        tryRpc {
+            if (networkHierarchy == null) {
+                val streamObserver = AwaitableStreamObserver<GetNetworkHierarchyResponse> { response ->
+                    networkHierarchy = NetworkHierarchy(
+                        toMap(response.geographicalRegionsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
+                        toMap(response.subGeographicalRegionsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
+                        toMap(response.substationsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
+                        toMap(response.feedersList) { getOrAdd(it.mRID()) { addFromPb(it) } },
+                        toMap(response.circuitsList) { getOrAdd(it.mRID()) { addFromPb(it) } },
+                        toMap(response.loopsList) { getOrAdd(it.mRID()) { addFromPb(it) } }
+                    )
+                }
+
+                stub.getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build(), streamObserver)
+
+                streamObserver.await()
             }
-
-            stub.getNetworkHierarchy(GetNetworkHierarchyRequest.newBuilder().build(), streamObserver)
-
-            streamObserver.await()
+            networkHierarchy ?: throw IOException("No network hierarchy was received before GRPC channel was closed.")
         }
-        networkHierarchy ?: throw IOException("No network hierarchy was received before GRPC channel was closed.")
-    }
 
     /***
      * Retrieve the equipment container network for the specified [mRID] and store the results in the [service].
@@ -341,7 +344,8 @@ class NetworkConsumerClient(
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
-    ): GrpcResult<MultiObjectResult> = getEquipmentContainers(mRIDs.asSequence(), expectedClass, includeEnergizingContainers, includeEnergizedContainers)
+    ): GrpcResult<MultiObjectResult> =
+        getEquipmentContainers(mRIDs.asSequence(), expectedClass, includeEnergizingContainers, includeEnergizedContainers)
 
     /***
      * Retrieve the equipment container networks for the specified [mRID]s and store the results in the [service].
@@ -366,13 +370,14 @@ class NetworkConsumerClient(
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
-    ): GrpcResult<MultiObjectResult> = getWithReferences(mRIDs, expectedClass) { it, mor ->
-        mor.objects.putAll(getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers)
-            .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
-            .value.objects
-        )
-        null
-    }
+    ): GrpcResult<MultiObjectResult> =
+        getWithReferences(mRIDs, expectedClass) { it, mor ->
+            mor.objects.putAll(getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers)
+                .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
+                .value.objects
+            )
+            null
+        }
 
     /**
      * Retrieve the [Equipment] for the [loop]
@@ -547,8 +552,8 @@ class NetworkConsumerClient(
         return extractResults.asSequence()
     }
 
-    private fun extractIdentifiedObject(io: NetworkIdentifiedObject): ExtractResult {
-        return when (io.identifiedObjectCase) {
+    private fun extractIdentifiedObject(io: NetworkIdentifiedObject): ExtractResult =
+        when (io.identifiedObjectCase) {
             BATTERYUNIT -> extractResult(io.batteryUnit.mRID()) { addFromPb(io.batteryUnit) }
             PHOTOVOLTAICUNIT -> extractResult(io.photoVoltaicUnit.mRID()) { addFromPb(io.photoVoltaicUnit) }
             POWERELECTRONICSWINDUNIT -> extractResult(io.powerElectronicsWindUnit.mRID()) { addFromPb(io.powerElectronicsWindUnit) }
@@ -621,11 +626,11 @@ class NetworkConsumerClient(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )
         }
-    }
 
-    private fun <T, U : IdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> = objects
-        .mapNotNull(mapper)
-        .associateBy { it.mRID }
+    private fun <T, U : IdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> =
+        objects
+            .mapNotNull(mapper)
+            .associateBy { it.mRID }
 
     private fun handleMultiObjectRPC(processor: () -> Sequence<ExtractResult>): GrpcResult<MultiObjectResult> =
         tryRpc {
@@ -641,7 +646,8 @@ class NetworkConsumerClient(
         mRID: String,
         expectedClass: Class<out T>,
         getAdditional: (T, MultiObjectResult) -> GrpcResult<MultiObjectResult>?
-    ): GrpcResult<MultiObjectResult> = getWithReferences(sequenceOf(mRID), expectedClass) { it, mor -> getAdditional(it.elementAt(0), mor) }
+    ): GrpcResult<MultiObjectResult> =
+        getWithReferences(sequenceOf(mRID), expectedClass) { it, mor -> getAdditional(it.elementAt(0), mor) }
 
     private inline fun <reified T> getWithReferences(
         mRIDs: Sequence<String>,
@@ -677,12 +683,13 @@ class NetworkConsumerClient(
 
     internal fun resolveReferences(mor: MultiObjectResult): GrpcResult<MultiObjectResult>? {
         var res = mor
+        var subsequent = false
         do {
-            // Skip any reference trying to resolve from an EquipmentContainer - e.g a PowerTransformer trying to pull in its LvFeeder.
+            // Skip any reference trying to resolve from an EquipmentContainer on subsequent passes - e.g a PowerTransformer trying to pull in its LvFeeder.
             // EquipmentContainers should be retrieved explicitly or via a hierarchy call.
             val toResolve = res.objects.keys
                 .flatMap { service.getUnresolvedReferencesFrom(it) }
-                .filterNot { EquipmentContainer::class.java.isAssignableFrom(it.resolver.fromClass) }
+                .filterNot { subsequent && EquipmentContainer::class.java.isAssignableFrom(it.resolver.fromClass) }
                 .map { it.toMrid }
                 .distinct()
                 .toList()
@@ -691,6 +698,8 @@ class NetworkConsumerClient(
                 return GrpcResult.ofError(thrown, wasHandled)
             }.value
             mor.objects.putAll(res.objects)
+
+            subsequent = true
         } while (res.objects.isNotEmpty())
         return null
     }

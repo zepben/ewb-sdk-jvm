@@ -7,9 +7,6 @@
  */
 package com.zepben.evolve.streaming.get
 
-import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -659,7 +656,7 @@ internal class NetworkConsumerClientTest {
         val expectedService = LvFeedersWithOpenPoint.create()
         configureFeederResponses(expectedService)
 
-        val mRID = "lvf001"
+        val mRID = "lvf5"
         val result = consumerClient.getEquipmentContainer<LvFeeder>(mRID).throwOnError()
 
         verify(consumerService.onGetNetworkHierarchy, times(1)).invoke(any(), any())
@@ -668,10 +665,29 @@ internal class NetworkConsumerClientTest {
         verifyNoMoreInteractions(consumerService.onGetNetworkHierarchy)
 
         assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.objects.containsKey(mRID), equalTo(true))
-        assertThat(result.value.objects.size, equalTo(18))
-        assertThat(consumerClient.service.get<PowerTransformer>("tx2"), nullValue())
-        assertThat(consumerClient.service.get<PowerTransformer>("tx1"), equalTo(result.value.objects["tx1"]))
+        assertThat(
+            result.value.objects.keys,
+            containsInAnyOrder(
+                "lvf5",
+                "tx0",
+                "c1",
+                "b2",
+                "tx0-t2",
+                "tx0-e1",
+                "tx0-e2",
+                "tx0-t1",
+                "c1-t1",
+                "c1-t2",
+                "b2-t1",
+                "b2-t2",
+                "lvf6",
+                "generated_cn_0",
+                "generated_cn_1",
+                "generated_cn_2",
+            )
+        )
+        assertThat(consumerClient.service.get<PowerTransformer>("tx4"), nullValue())
+        assertThat(consumerClient.service.get<PowerTransformer>("tx0"), equalTo(result.value.objects["tx0"]))
     }
 
     private fun createResponse(

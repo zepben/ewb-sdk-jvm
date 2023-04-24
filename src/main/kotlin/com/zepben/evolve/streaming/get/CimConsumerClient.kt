@@ -90,16 +90,8 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [CimConsumerClient] warning in this case.
      */
-    fun getIdentifiedObjects(mRIDs: Sequence<String>): GrpcResult<MultiObjectResult> = tryRpc {
-        val results = mutableMapOf<String, IdentifiedObject>()
-        val failed = mRIDs.toMutableSet()
-        processIdentifiedObjects(mRIDs).forEach { result ->
-            result.identifiedObject?.let {
-                results[it.mRID] = it
-                failed.remove(it.mRID)
-            }
-        }
-        MultiObjectResult(results, failed)
+    fun getIdentifiedObjects(mRIDs: Sequence<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC(mRIDs) {
+        processIdentifiedObjects(mRIDs)
     }
 
     protected abstract fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult>
@@ -119,5 +111,22 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
 
     protected inline fun <reified CIM : IdentifiedObject> getOrAdd(mRID: String, addFromPb: U.() -> CIM?): CIM? =
         service.get(CIM::class, mRID) ?: protoToCim.addFromPb()
+
+    /**
+     * @param processor The function which returns results to be handled.
+     * @param mRIDs The mRIDs expected to be retrieved from a call to [processor]
+     */
+    protected fun handleMultiObjectRPC(mRIDs: Sequence<String>? = null, processor: () -> Sequence<ExtractResult>): GrpcResult<MultiObjectResult> =
+        tryRpc {
+            val results = mutableMapOf<String, IdentifiedObject>()
+            val failed = mRIDs?.toMutableSet() ?: mutableSetOf()
+            processor().forEach { result ->
+                result.identifiedObject?.let {
+                    results[it.mRID] = it
+                    failed.remove(it.mRID)
+                } ?: failed.add(result.mRID)
+            }
+            MultiObjectResult(results, failed)
+        }
 
 }

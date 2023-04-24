@@ -7,13 +7,19 @@
  */
 package com.zepben.evolve.streaming.get
 
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
+import com.zepben.evolve.services.diagram.DiagramService
+import com.zepben.evolve.services.diagram.translator.toPb
+import com.zepben.evolve.services.diagram.whenDiagramServiceObject
 import com.zepben.evolve.streaming.get.ConsumerUtils.buildFromBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
 import com.zepben.evolve.streaming.get.testservices.TestDiagramConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
+import com.zepben.protobuf.dc.DiagramIdentifiedObject
+import com.zepben.protobuf.dc.GetDiagramObjectsResponse
 import com.zepben.protobuf.dc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.dc.GetIdentifiedObjectsResponse
 import com.zepben.testutils.exception.ExpectException
@@ -213,6 +219,51 @@ internal class DiagramConsumerClientTest {
         assertThat(result.value.objects.size, equalTo(3))
         assertThat(result.value.failed, empty())
     }
+
+    @Test
+    internal fun `getDiagramObjects returns objects for a given ID`() {
+        val diagramService = DiagramService().apply {
+            add(DiagramObject("d1").also { it.identifiedObjectMRID = "io1" })
+            add(DiagramObject("d2").also { it.identifiedObjectMRID = "io1" })
+            add(DiagramObject("d3").also { it.identifiedObjectMRID = "io2" })
+        }
+
+        configureResponses(diagramService)
+
+        val result = consumerClient.getDiagramObjects("io1").throwOnError()
+
+        assertThat(result.value.objects.size, equalTo(2))
+        assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, containsInAnyOrder("d1", "d2"))
+    }
+
+    private fun configureResponses(expectedDiagramService: DiagramService) {
+        consumerService.onGetDiagramObjects = spy { request, response ->
+            val objects = mutableListOf<DiagramObject>()
+            request.mridsList.forEach { mRID ->
+                expectedDiagramService.getDiagramObjects(mRID).forEach { diagramObject ->
+                    objects.add(diagramObject)
+                }
+            }
+            responseOf(objects).forEach { response.onNext(it) }
+        }
+    }
+
+    private fun responseOf(objects: List<DiagramObject>): MutableIterator<GetDiagramObjectsResponse> {
+        val responses = mutableListOf<GetDiagramObjectsResponse>()
+        objects.forEach {
+            responses.add(GetDiagramObjectsResponse.newBuilder().apply { buildDIO(it, addIdentifiedObjectsBuilder()) }.build())
+        }
+        return responses.iterator()
+    }
+
+    private fun buildDIO(obj: IdentifiedObject, identifiedObjectBuilder: DiagramIdentifiedObject.Builder): DiagramIdentifiedObject? =
+        identifiedObjectBuilder.apply {
+            whenDiagramServiceObject(
+                obj,
+                isDiagram = { diagram = it.toPb() },
+                isDiagramObject = { diagramObject = it.toPb() },
+            )
+        }.build()
 
     private fun createResponse(
         identifiedObjectBuilder: DIO.Builder,

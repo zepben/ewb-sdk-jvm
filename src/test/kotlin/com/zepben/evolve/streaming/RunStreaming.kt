@@ -10,6 +10,8 @@ package com.zepben.evolve.streaming
 
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.streaming.get.CustomerConsumerClient
+import com.zepben.evolve.streaming.get.DiagramConsumerClient
 import com.zepben.evolve.streaming.get.NetworkConsumerClient
 import com.zepben.evolve.streaming.get.getEquipmentContainer
 import com.zepben.evolve.streaming.grpc.Connect.connectInsecure
@@ -50,6 +52,21 @@ private fun runRetrieve(client: NetworkConsumerClient) {
     log("Num unresolved: ${client.service.numUnresolvedReferences()}")
     log("Num objects: ${client.service.num<IdentifiedObject>()}")
 }
+
+private fun runCustomersForFeeder(client: CustomerConsumerClient) {
+    val result = client.getCustomersForContainer(setOf(""))
+    result.throwOnError()
+    log("Num unresolved: ${client.service.numUnresolvedReferences()}")
+    log("Num objects: ${client.service.num<IdentifiedObject>()}")
+}
+
+private fun runDiagramObjects(client: DiagramConsumerClient) {
+    val result = client.getDiagramObjects(setOf(""))
+    result.throwOnError()
+    log("Num unresolved: ${client.service.numUnresolvedReferences()}")
+    log("Num objects: ${client.service.num<IdentifiedObject>()}")
+}
+
 
 private fun runFeeder(client: NetworkConsumerClient) {
     val result = client.getEquipmentContainer<Feeder>("_LATHAM_8TB_LWMLNGLOW")

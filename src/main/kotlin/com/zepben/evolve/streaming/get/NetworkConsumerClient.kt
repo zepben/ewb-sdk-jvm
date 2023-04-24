@@ -632,16 +632,6 @@ class NetworkConsumerClient(
             .mapNotNull(mapper)
             .associateBy { it.mRID }
 
-    private fun handleMultiObjectRPC(processor: () -> Sequence<ExtractResult>): GrpcResult<MultiObjectResult> =
-        tryRpc {
-            val results = mutableMapOf<String, IdentifiedObject>()
-            val failed = mutableSetOf<String>()
-            processor().forEach { result ->
-                result.identifiedObject?.let { results[it.mRID] = it } ?: failed.add(result.mRID)
-            }
-            MultiObjectResult(results, failed)
-        }
-
     private inline fun <reified T> getWithReferences(
         mRID: String,
         expectedClass: Class<out T>,

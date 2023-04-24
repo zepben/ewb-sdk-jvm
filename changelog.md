@@ -12,7 +12,8 @@
 
 ### New Features
 
-* None.
+* Added `getCustomersForContainer` to `CustomerConsumerClient` which allows fetching all the `Customer`s for a given `EquipmentContainer`
+* Added `getDiagramObjects` to `DiagramConsumerClient` which allows fetching all the `DiagramObject`s matching a given mRID.
 
 ### Enhancements
 

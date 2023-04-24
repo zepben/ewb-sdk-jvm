@@ -8,16 +8,18 @@
 
 package com.zepben.evolve.streaming.get.testservices
 
-import com.zepben.protobuf.cc.CustomerConsumerGrpc
-import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest
-import com.zepben.protobuf.cc.GetIdentifiedObjectsResponse
+import com.zepben.protobuf.cc.*
 import io.grpc.stub.StreamObserver
 
 class TestCustomerConsumerService : CustomerConsumerGrpc.CustomerConsumerImplBase() {
 
     lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
 
+    lateinit var onGetCustomersForContainer: (request: GetCustomersForContainerRequest, response: StreamObserver<GetCustomersForContainerResponse>) -> Unit
     override fun getIdentifiedObjects(response: StreamObserver<GetIdentifiedObjectsResponse>): StreamObserver<GetIdentifiedObjectsRequest> =
         TestStreamObserver(response, onGetIdentifiedObjects)
+
+    override fun getCustomersForContainer(responseObserver: StreamObserver<GetCustomersForContainerResponse>?): StreamObserver<GetCustomersForContainerRequest> =
+        TestStreamObserver(responseObserver!!, onGetCustomersForContainer)
 
 }

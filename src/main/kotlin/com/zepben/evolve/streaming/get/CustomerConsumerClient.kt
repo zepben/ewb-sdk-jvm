@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.streaming.get
 
+import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.translator.mRID
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.customer.translator.CustomerProtoToCim
@@ -68,7 +69,28 @@ class CustomerConsumerClient @JvmOverloads constructor(
             executor = Executors.newSingleThreadExecutor()
         )
 
+    /**
+     * Get the [Customer]s in the [EquipmentContainer] represented by [mRID].
+     *
+     * @param mRIDs The mRID of the [EquipmentContainer]s to fetch [Customer]s for.
+     * @return a [GrpcResult] with a result of one of the following:
+     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
+     * Note the [CustomerConsumerClient] warning in this case.
+     */
+    fun getCustomersForContainer(mRID: String): GrpcResult<MultiObjectResult> = getCustomersForContainer(setOf(mRID))
 
+    /**
+     * Get the [Customer]s in the [EquipmentContainer] represented by [mRID].
+     *
+     * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch [Customer]s for.
+     * @return a [GrpcResult] with a result of one of the following:
+     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
+     * Note the [CustomerConsumerClient] warning in this case.
+     */
     fun getCustomersForContainer(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
         processCustomersForContainers(mRIDs)
     }

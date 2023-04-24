@@ -7,18 +7,14 @@
  */
 package com.zepben.evolve.streaming.get
 
+import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.diagram.translator.DiagramProtoToCim
 import com.zepben.evolve.services.diagram.translator.mRID
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
-import com.zepben.protobuf.dc.DiagramConsumerGrpc
-import com.zepben.protobuf.dc.DiagramIdentifiedObject
+import com.zepben.protobuf.dc.*
 import com.zepben.protobuf.dc.DiagramIdentifiedObject.IdentifiedObjectCase.*
-import com.zepben.protobuf.dc.GetDiagramObjectsRequest
-import com.zepben.protobuf.dc.GetDiagramObjectsResponse
-import com.zepben.protobuf.dc.GetIdentifiedObjectsRequest
-import com.zepben.protobuf.dc.GetIdentifiedObjectsResponse
 import io.grpc.CallCredentials
 import io.grpc.ManagedChannel
 import java.util.concurrent.ExecutorService
@@ -68,6 +64,35 @@ class DiagramConsumerClient(
             executor = Executors.newSingleThreadExecutor()
         )
 
+
+    /**
+     * Get DiagramObjects for a given mRID. This will effectively call [DiagramService.getDiagramObjects] on the remote server and return any DiagramObjects
+     * that contain a match against the given mRID.
+     *
+     * @param mRIDs The mRIDs to fetch DiagramObjects for
+     * @return a [GrpcResult] with a result of one of the following:
+     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
+     * Note the [DiagramConsumerClient] warning in this case.
+     */
+    fun getDiagramObjects(mRID: String): GrpcResult<MultiObjectResult> = getDiagramObjects(setOf(mRID))
+
+    /**
+     * Get DiagramObjects for a given mRID. This will effectively call [DiagramService.getDiagramObjects] on the remote server and return any DiagramObjects
+     * that contain a match against the given mRID.
+     *
+     * @param mRIDs The mRIDs to fetch DiagramObjects for
+     * @return a [GrpcResult] with a result of one of the following:
+     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
+     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
+     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
+     * Note the [DiagramConsumerClient] warning in this case.
+     */
+    fun getDiagramObjects(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
+        processDiagramObjects(mRIDs.asSequence())
+    }
+
     override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetIdentifiedObjectsResponse> { response ->
@@ -91,10 +116,6 @@ class DiagramConsumerClient(
         return extractResults.asSequence()
     }
 
-    fun getDiagramObjects(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
-        processGetDiagramObjects(mRIDs)
-    }
-
     private fun extractIdentifiedObject(io: DiagramIdentifiedObject): ExtractResult {
         return when (io.identifiedObjectCase) {
             DIAGRAM -> extractResult(io.diagram.mRID()) { addFromPb(io.diagram) }
@@ -103,8 +124,8 @@ class DiagramConsumerClient(
         }
     }
 
-    private fun processGetDiagramObjects(
-        mRIDs: Set<String>,
+    private fun processDiagramObjects(
+        mRIDs: Sequence<String>,
     ): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetDiagramObjectsResponse> { response ->

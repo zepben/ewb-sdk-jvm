@@ -9,11 +9,17 @@ package com.zepben.evolve.streaming.get
 
 import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.services.customer.CustomerService
+import com.zepben.evolve.services.customer.translator.toPb
+import com.zepben.evolve.services.customer.whenCustomerServiceObject
 import com.zepben.evolve.streaming.get.ConsumerUtils.buildFromBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
+import com.zepben.evolve.streaming.get.testdata.CustomerNetwork
 import com.zepben.evolve.streaming.get.testservices.TestCustomerConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
+import com.zepben.protobuf.cc.GetCustomersForContainerResponse
 import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.cc.GetIdentifiedObjectsResponse
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -213,6 +219,50 @@ internal class CustomerConsumerClientTest {
         assertThat(result.value.objects.size, equalTo(3))
         assertThat(result.value.failed, empty())
     }
+
+    @Test
+    internal fun `getCustomersForContainer returns customers for a given container`() {
+        val (_, expectedCustomerService) = CustomerNetwork.create()
+        configureFeederResponses(expectedCustomerService)
+
+        val result = consumerClient.getCustomersForContainer("unused").throwOnError()
+
+        assertThat(result.value.objects.size, equalTo(service.num(Customer::class)))
+        assertThat(result.value.objects.size, equalTo(2))
+        assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, containsInAnyOrder("customer1", "customer2"))
+    }
+
+    private fun configureFeederResponses(expectedCustomerService: CustomerService) {
+
+        consumerService.onGetCustomersForContainer = spy { request, response ->
+            val objects = mutableListOf<Customer>()
+            expectedCustomerService.sequenceOf<Customer>().forEach { customer ->
+                objects.add(customer)
+            }
+            responseOf(objects).forEach { response.onNext(it) }
+        }
+    }
+
+    private fun responseOf(objects: List<Customer>): MutableIterator<GetCustomersForContainerResponse> {
+        val responses = mutableListOf<GetCustomersForContainerResponse>()
+        objects.forEach {
+            responses.add(GetCustomersForContainerResponse.newBuilder().apply { buildCIO(it, addIdentifiedObjectsBuilder()) }.build())
+        }
+        return responses.iterator()
+    }
+
+    private fun buildCIO(obj: IdentifiedObject, identifiedObjectBuilder: CIO.Builder): CIO? =
+        identifiedObjectBuilder.apply {
+            whenCustomerServiceObject(
+                obj,
+                isCustomer = { customer = it.toPb() },
+                isCustomerAgreement = {},
+                isOrganisation = {},
+                isTariff = {},
+                isPricingStructure = {},
+                isOther = {},
+            )
+        }.build()
 
     private fun createResponse(
         identifiedObjectBuilder: CIO.Builder,

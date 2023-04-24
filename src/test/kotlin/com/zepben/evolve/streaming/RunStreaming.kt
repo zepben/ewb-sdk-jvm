@@ -53,15 +53,15 @@ private fun runRetrieve(client: NetworkConsumerClient) {
     log("Num objects: ${client.service.num<IdentifiedObject>()}")
 }
 
-private fun runCustomers(client: CustomerConsumerClient) {
-    val result = client.getCustomersForContainer(setOf("tx_94649.W2.T-lvf"))
+private fun runCustomersForFeeder(client: CustomerConsumerClient) {
+    val result = client.getCustomersForContainer(setOf(""))
     result.throwOnError()
     log("Num unresolved: ${client.service.numUnresolvedReferences()}")
     log("Num objects: ${client.service.num<IdentifiedObject>()}")
 }
 
 private fun runDiagramObjects(client: DiagramConsumerClient) {
-    val result = client.getDiagramObjects(setOf("sw_166966"))
+    val result = client.getDiagramObjects(setOf(""))
     result.throwOnError()
     log("Num unresolved: ${client.service.numUnresolvedReferences()}")
     log("Num objects: ${client.service.num<IdentifiedObject>()}")

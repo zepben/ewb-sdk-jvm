@@ -13,11 +13,12 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
 import com.zepben.evolve.services.common.extensions.validateReference
+import java.time.Instant
 
 /**
  * @property inService If true, the equipment is in service.
  * @property normallyInService If true, the equipment is _normally_ in service.
- *
+ * @property commissionedDate The date this equipment was commissioned into service.
  * @property sites [Site]'s this equipment belongs to.
  * @property normalFeeders [Feeder]'s that represent the normal feeders of the equipment.
  * @property currentFeeders [Feeder]'s that represent the current feeders of the equipment.
@@ -27,6 +28,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
 
     var inService: Boolean = true
     var normallyInService: Boolean = true
+    var commissionedDate: Instant? = null
     private var _equipmentContainers: MutableList<EquipmentContainer>? = null
     private var _usagePoints: MutableList<UsagePoint>? = null
     private var _operationalRestrictions: MutableList<OperationalRestriction>? = null

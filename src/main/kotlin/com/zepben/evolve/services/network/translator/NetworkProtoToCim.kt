@@ -33,6 +33,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.common.extensions.internEmpty
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
@@ -134,9 +135,11 @@ import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch as PBProtecte
 import com.zepben.protobuf.cim.iec61970.base.wires.RatioTapChanger as PBRatioTapChanger
 import com.zepben.protobuf.cim.iec61970.base.wires.Recloser as PBRecloser
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingCondEq as PBRegulatingCondEq
+import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingControl as PBRegulatingControl
 import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
+import com.zepben.protobuf.cim.iec61970.base.wires.TapChangerControl as PBTapChangerControl
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerStarImpedance as PBTransformerStarImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryUnit as PBBatteryUnit
@@ -146,6 +149,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerEl
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
+import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit as PBEvChargingUnit
 
 /************ IEC61968 ASSET INFO ************/
 
@@ -765,6 +769,11 @@ fun toCim(pb: PBBatteryUnit, networkService: NetworkService): BatteryUnit =
         toCim(pb.peu, this, networkService)
     }
 
+fun toCim(pb: PBEvChargingUnit, networkService: NetworkService): EvChargingUnit =
+    EvChargingUnit(pb.mRID()).apply {
+        toCim(pb.peu, this, networkService)
+    }
+
 fun toCim(pb: PBPhotoVoltaicUnit, networkService: NetworkService): PhotoVoltaicUnit =
     PhotoVoltaicUnit(pb.mRID()).apply {
         toCim(pb.peu, this, networkService)
@@ -776,6 +785,7 @@ fun toCim(pb: PBPowerElectronicsWindUnit, networkService: NetworkService): Power
     }
 
 fun NetworkService.addFromPb(pb: PBBatteryUnit): BatteryUnit? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPhotoVoltaicUnit): PhotoVoltaicUnit? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = tryAddOrNull(toCim(pb, this))
 
@@ -951,6 +961,7 @@ fun toCim(pb: PBPowerElectronicsConnection, networkService: NetworkService): Pow
         q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
         ratedS = pb.ratedS.takeUnless { it == UNKNOWN_INT }
         ratedU = pb.ratedU.takeUnless { it == UNKNOWN_INT }
+        pb.invVArRespQAtV1
         toCim(pb.rce, this, networkService)
     }
 
@@ -1021,6 +1032,12 @@ fun toCim(pb: PBRegulatingCondEq, cim: RegulatingCondEq, networkService: Network
         toCim(pb.ec, this, networkService)
     }
 
+fun toCim(pb: PBRegulatingControl, cim: RegulatingControl, networkService: NetworkService): RegulatingControl =
+    cim.apply {
+        // TODO
+        toCim(pb.psr, this, networkService)
+    }
+
 fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: NetworkService): ShuntCompensator =
     cim.apply {
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
@@ -1053,6 +1070,12 @@ fun toCim(pb: PBTapChanger, cim: TapChanger, networkService: NetworkService): Ta
         normalStep = pb.normalStep.takeUnless { it == UNKNOWN_INT }
         controlEnabled = pb.controlEnabled
         toCim(pb.psr, this, networkService)
+    }
+
+fun toCim(pb: PBTapChangerControl, networkService: NetworkService): TapChangerControl =
+    TapChangerControl(pb.mRID()).apply {
+        // TODO
+        toCim(pb.rc, this, networkService)
     }
 
 fun toCim(pb: PBTransformerEnd, cim: TransformerEnd, networkService: NetworkService): TransformerEnd =
@@ -1098,6 +1121,7 @@ fun NetworkService.addFromPb(pb: PBPowerTransformer): PowerTransformer? = tryAdd
 fun NetworkService.addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBRecloser): Recloser? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBTapChangerControl): TapChangerControl? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = tryAddOrNull(toCim(pb, this))
 
 /************ IEC61970 InfIEC61970 Feeder ************/
@@ -1214,6 +1238,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
 
     // IEC61970 BASE WIRES GENERATION PRODUCTION
     fun addFromPb(pb: PBBatteryUnit): BatteryUnit? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPhotoVoltaicUnit): PhotoVoltaicUnit? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWindUnit? = networkService.addFromPb(pb)
 
@@ -1238,6 +1263,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRecloser): Recloser? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBTapChangerControl): TapChangerControl? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = networkService.addFromPb(pb)
 
     // IEC61970 InfIEC61970 Feeder

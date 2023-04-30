@@ -14,9 +14,11 @@ import com.zepben.evolve.cim.iec61968.assets.AssetInfo
  * Current Relay Datasheet Information.
  *
  * @property curveSetting The type of curve used for the Current Relay.
+ * @property recloseDelays The reclose delays for this curve and relay type. The index of the list is the reclose step, and the value is the overall delay time.
  */
 class CurrentRelayInfo(mRID: String = "") : AssetInfo(mRID) {
 
     var curveSetting: String? = null
+    var recloseDelays: MutableList<Float>? = null
 
 }

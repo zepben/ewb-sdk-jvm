@@ -13,6 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.core.PowerSystemResource
  * Mechanism for changing transformer winding tap positions.
  *
  * @property controlEnabled Specifies the regulation status of the equipment.  True is regulating, false is not regulating.
+ * @property tapChangerControl The regulating control scheme in which this tap changer participates.
  * @property highStep Highest possible tap step position, advance from neutral. The attribute shall be greater than lowStep.
  * @property lowStep Lowest possible tap step position, retard from neutral.
  * @property neutralStep The neutral tap step position for this winding.
@@ -29,6 +30,8 @@ import com.zepben.evolve.cim.iec61970.base.core.PowerSystemResource
 abstract class TapChanger(mRID: String = "") : PowerSystemResource(mRID) {
 
     var controlEnabled: Boolean = true
+
+    var tapChangerControl: TapChangerControl? = null
 
     var highStep: Int? = null
         set(value) {

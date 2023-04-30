@@ -36,12 +36,16 @@ internal class UsagePointTest {
         assertThat(usagePoint.usagePointLocation, nullValue())
         assertThat(usagePoint.isVirtual, equalTo(false))
         assertThat(usagePoint.connectionCategory, nullValue())
+        assertThat(usagePoint.ratedPower, nullValue())
+        assertThat(usagePoint.approvedInverterCapacity, nullValue())
 
         usagePoint.fillFields(NetworkService(), true)
 
         assertThat(usagePoint.usagePointLocation, notNullValue())
         assertThat(usagePoint.isVirtual, equalTo(true))
         assertThat(usagePoint.connectionCategory, equalTo("connectionCategory"))
+        assertThat(usagePoint.ratedPower, equalTo(2000))
+        assertThat(usagePoint.approvedInverterCapacity, equalTo(5000))
     }
 
     @Test

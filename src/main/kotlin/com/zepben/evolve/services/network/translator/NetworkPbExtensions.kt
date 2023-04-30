@@ -39,6 +39,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerEl
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 
 /************ IEC61968 ASSET INFO ************/
 
@@ -185,9 +186,11 @@ fun ProtectedSwitch.mRID(): String = sw.mRID()
 fun RatioTapChanger.mRID(): String = tc.mRID()
 fun Recloser.mRID(): String = sw.mRID()
 fun RegulatingCondEq.mRID(): String = ec.mRID()
+fun RegulatingControl.mRID(): String = psr.mRID()
 fun ShuntCompensator.mRID(): String = rce.mRID()
 fun Switch.mRID(): String = ce.mRID()
 fun TapChanger.mRID(): String = psr.mRID()
+fun TapChangerControl.mRID(): String = rc.mRID()
 fun TransformerEnd.mRID(): String = io.mrid
 fun TransformerStarImpedance.mRID(): String = io.mrid
 
@@ -206,3 +209,6 @@ fun Switch.assetInfoMRID(): String = ce.assetInfoMRID()
 fun Circuit.mRID(): String = l.mRID()
 fun Loop.mRID(): String = io.mrid
 fun LvFeeder.mRID(): String = ec.mRID()
+
+/************ IEC61970 InfIEC61970 WIRES GENERATION PRODUCTION ************/
+fun EvChargingUnit.mRID(): String = peu.mRID()

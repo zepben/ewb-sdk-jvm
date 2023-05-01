@@ -24,7 +24,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -56,7 +55,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableE
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableProtectionEquipment
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableRecloseSequences
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
@@ -965,7 +963,6 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableInt(table.BREAKING_CAPACITY.queryIndex, protectedSwitch.breakingCapacity)
 
         var status = true
-        protectedSwitch.recloseSequences.forEach { status = status and saveRecloseSequence(protectedSwitch, it) }
         protectedSwitch.operatedByProtectionEquipment.forEach { status = status and saveAssociation(it, protectedSwitch) }
 
         return status and saveSwitch(table, insert, protectedSwitch, description)
@@ -1175,17 +1172,6 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.PROTECTION_KIND.queryIndex, protectionEquipment.protectionKind.name)
 
         return saveEquipment(table, insert, protectionEquipment, description)
-    }
-
-    private fun saveRecloseSequence(protectedSwitch: ProtectedSwitch, recloseSequence: RecloseSequence): Boolean {
-        val table = databaseTables.getTable(TableRecloseSequences::class.java)
-        val insert = databaseTables.getInsert(TableRecloseSequences::class.java)
-
-        insert.setString(table.PROTECTED_SWITCH_MRID.queryIndex, protectedSwitch.mRID)
-        insert.setNullableDouble(table.RECLOSE_DELAY.queryIndex, recloseSequence.recloseDelay)
-        insert.setNullableInt(table.RECLOSE_STEP.queryIndex, recloseSequence.recloseStep)
-
-        return saveIdentifiedObject(table, insert, recloseSequence, "reclose sequence")
     }
 
     /************ IEC61970 SCADA ************/

@@ -56,10 +56,18 @@ interface ChangeSetValidator {
         }
     }
 
-    fun ensureIndexes(statement: Statement, vararg expectedIndexes: String) {
+    fun ensureIndexes(statement: Statement, vararg expectedIndexes: String, present: Boolean = true) {
         expectedIndexes.forEach {
             statement.executeQuery("pragma index_info('$it')").use { rs ->
-                assertThat(rs.next(), equalTo(true))
+                assertThat(rs.next(), equalTo(present))
+            }
+        }
+    }
+
+    fun ensureTables(statement: Statement, vararg tableNames: String, present: Boolean = true) {
+        tableNames.forEach {
+            statement.executeQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='$it';").use { rs ->
+                assertThat(rs.next(), equalTo(present))
             }
         }
     }

@@ -27,7 +27,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -641,14 +640,6 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         )
     }
 
-    @Test
-    internal fun compareRecloseSequence() {
-        compareIdentifiedObject { RecloseSequence(it) }
-
-        comparatorValidator.validateProperty(RecloseSequence::recloseDelay, { RecloseSequence(it) }, { 1.1 }, { 2.2 })
-        comparatorValidator.validateProperty(RecloseSequence::recloseStep, { RecloseSequence(it) }, { 1 }, { 2 })
-    }
-
     /************ IEC61970 BASE SCADA ************/
 
     @Test
@@ -988,13 +979,6 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareSwitch(createProtectedSwitch)
 
         comparatorValidator.validateProperty(ProtectedSwitch::breakingCapacity, createProtectedSwitch, { 1 }, { 2 })
-        comparatorValidator.validateCollection(
-            ProtectedSwitch::recloseSequences,
-            ProtectedSwitch::addRecloseSequence,
-            createProtectedSwitch,
-            { RecloseSequence("rs1") },
-            { RecloseSequence("rs2") }
-        )
         comparatorValidator.validateCollection(
             ProtectedSwitch::operatedByProtectionEquipment,
             ProtectedSwitch::addOperatedByProtectionEquipment,

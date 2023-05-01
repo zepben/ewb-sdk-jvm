@@ -10,7 +10,6 @@ package com.zepben.evolve.services.network.testdata
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.NameType
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.services.common.meta.DataSource
 import com.zepben.evolve.services.customer.CustomerService
@@ -116,13 +115,6 @@ object SchemaNetworks {
             is EnergySourcePhase -> {
                 io.energySource = EnergySource().also {
                     it.addPhase(io)
-                    service.add(it)
-                }
-            }
-            is RecloseSequence -> {
-                // Reclose sequences are not saved unless a protected switch references it.
-                Breaker().also {
-                    it.addRecloseSequence(io)
                     service.add(it)
                 }
             }

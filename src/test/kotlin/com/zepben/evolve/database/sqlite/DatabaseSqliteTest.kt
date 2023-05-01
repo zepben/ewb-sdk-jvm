@@ -35,7 +35,6 @@ import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -211,7 +210,6 @@ class DatabaseSqliteTest {
 
         /************ IEC61970 Base Protection ************/
         validateSchema(SchemaNetworks.networkServicesOf(::CurrentRelay, CurrentRelay::fillFields))
-        validateSchema(SchemaNetworks.networkServicesOf(::RecloseSequence, RecloseSequence::fillFields))
 
         /************ IEC61970 BASE SCADA ************/
         validateSchema(SchemaNetworks.networkServicesOf(::RemoteControl, RemoteControl::fillFields))

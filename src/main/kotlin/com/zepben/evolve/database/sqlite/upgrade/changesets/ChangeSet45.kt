@@ -16,7 +16,6 @@ internal fun changeSet45() = ChangeSet(
     `Create switch_info table`,
     `Create current_relay_info table`,
     `Create current_relays table`,
-    `Create reclose_sequences table`,
     `Create protection_equipment_protected_switches table`,
 )
 
@@ -95,23 +94,6 @@ private val `Create current_relays table` = listOf(
     """.trimIndent(),
     "CREATE UNIQUE INDEX current_relays_mrid ON current_relays (mrid);",
     "CREATE INDEX current_relays_name ON current_relays (name);"
-)
-
-@Suppress("ObjectPropertyName")
-private val `Create reclose_sequences table` = listOf(
-    """
-    CREATE TABLE reclose_sequences (
-        mrid TEXT NOT NULL,
-        name TEXT NOT NULL,
-        description TEXT NOT NULL,
-        num_diagram_objects INTEGER NOT NULL,
-        protected_switch_mrid TEXT NOT NULL,
-        reclose_delay NUMBER NULL,
-        reclose_step INTEGER NULL
-    );
-    """.trimIndent(),
-    "CREATE UNIQUE INDEX reclose_sequences_mrid ON reclose_sequences (mrid);",
-    "CREATE INDEX reclose_sequences_name ON reclose_sequences (name);"
 )
 
 @Suppress("ObjectPropertyName")

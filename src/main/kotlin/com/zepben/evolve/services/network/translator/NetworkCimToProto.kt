@@ -26,7 +26,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -119,7 +118,6 @@ import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint as PBIoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay as PBCurrentRelay
 import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionEquipment as PBProtectionEquipment
-import com.zepben.protobuf.cim.iec61970.base.protection.RecloseSequence as PBRecloseSequence
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
@@ -696,15 +694,7 @@ fun toPb(cim: ProtectionEquipment, pb: PBProtectionEquipment.Builder): PBProtect
         toPb(cim, eqBuilder)
     }
 
-fun toPb(cim: RecloseSequence, pb: PBRecloseSequence.Builder): PBRecloseSequence.Builder =
-    pb.apply {
-        recloseDelay = cim.recloseDelay ?: UNKNOWN_DOUBLE
-        recloseStep = cim.recloseStep ?: UNKNOWN_INT
-        toPb(cim, ioBuilder)
-    }
-
 fun CurrentRelay.toPb(): PBCurrentRelay = toPb(this, PBCurrentRelay.newBuilder()).build()
-fun RecloseSequence.toPb(): PBRecloseSequence = toPb(this, PBRecloseSequence.newBuilder()).build()
 
 /************ IEC61970 BASE SCADA ************/
 
@@ -958,7 +948,6 @@ fun toPb(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd.Builder): PBPowerTr
 fun toPb(cim: ProtectedSwitch, pb: PBProtectedSwitch.Builder): PBProtectedSwitch.Builder =
     pb.apply {
         breakingCapacity = cim.breakingCapacity ?: UNKNOWN_INT
-        cim.recloseSequences.forEach { addRecloseSequenceMRIDs(it.mRID) }
         cim.operatedByProtectionEquipment.forEach { addOperatedByProtectionEquipmentMRIDs(it.mRID) }
         toPb(cim, swBuilder)
     }
@@ -1162,7 +1151,6 @@ class NetworkCimToProto : BaseCimToProto() {
 
     // IEC61970 Base Protection
     fun toPb(cim: CurrentRelay): PBCurrentRelay = cim.toPb()
-    fun toPb(cim: RecloseSequence): PBRecloseSequence = cim.toPb()
 
     // IEC61970 BASE SCADA
     fun toPb(cim: RemoteControl): PBRemoteControl = cim.toPb()

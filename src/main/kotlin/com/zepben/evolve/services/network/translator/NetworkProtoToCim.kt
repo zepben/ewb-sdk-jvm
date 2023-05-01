@@ -24,7 +24,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -104,7 +103,6 @@ import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint as PBIoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay as PBCurrentRelay
 import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionEquipment as PBProtectionEquipment
-import com.zepben.protobuf.cim.iec61970.base.protection.RecloseSequence as PBRecloseSequence
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
@@ -727,15 +725,7 @@ fun toCim(pb: PBProtectionEquipment, cim: ProtectionEquipment, networkService: N
         toCim(pb.eq, this, networkService)
     }
 
-fun toCim(pb: PBRecloseSequence, networkService: NetworkService): RecloseSequence =
-    RecloseSequence(pb.mRID()).apply {
-        recloseDelay = pb.recloseDelay.takeUnless { it == UNKNOWN_DOUBLE }
-        recloseStep = pb.recloseStep.takeUnless { it == UNKNOWN_INT }
-        toCim(pb.io, this, networkService)
-    }
-
 fun NetworkService.addFromPb(pb: PBCurrentRelay): CurrentRelay? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBRecloseSequence): RecloseSequence? = tryAddOrNull(toCim(pb, this))
 
 /************ IEC61970 SCADA ************/
 
@@ -1006,9 +996,6 @@ fun toCim(pb: PBPowerTransformerEnd, networkService: NetworkService): PowerTrans
 
 fun toCim(pb: PBProtectedSwitch, cim: ProtectedSwitch, networkService: NetworkService): ProtectedSwitch =
     cim.apply {
-        pb.recloseSequenceMRIDsList.forEach { recloseSequenceMRID ->
-            networkService.resolveOrDeferReference(Resolvers.recloseSequences(this), recloseSequenceMRID)
-        }
         pb.operatedByProtectionEquipmentMRIDsList.forEach { protectionEquipmentMRID ->
             networkService.resolveOrDeferReference(Resolvers.operatedByProtectionEquipment(this), protectionEquipmentMRID)
         }
@@ -1220,7 +1207,6 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
 
     // IEC61970 Base Protection
     fun addFromPb(pb: PBCurrentRelay): CurrentRelay? = networkService.addFromPb(pb)
-    fun addFromPb(pb: PBRecloseSequence): RecloseSequence? = networkService.addFromPb(pb)
 
     // IEC61970 BASE SCADA
     fun addFromPb(pb: PBRemoteControl): RemoteControl? = networkService.addFromPb(pb)

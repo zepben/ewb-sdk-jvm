@@ -28,7 +28,6 @@ import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement
 import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.protobuf.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource
@@ -140,7 +139,6 @@ fun Measurement.mRID(): String = io.mrid
 
 fun CurrentRelay.mRID(): String = pe.mRID()
 fun ProtectionEquipment.mRID(): String = eq.mRID()
-fun RecloseSequence.mRID(): String = io.mrid
 
 fun CurrentRelay.assetInfoMRID(): String = pe.eq.assetInfoMRID()
 

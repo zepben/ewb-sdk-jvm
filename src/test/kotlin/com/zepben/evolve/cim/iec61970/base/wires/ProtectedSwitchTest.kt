@@ -8,7 +8,6 @@
 package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
@@ -39,20 +38,6 @@ internal class ProtectedSwitchTest {
         protectedSwitch.fillFields(NetworkService())
 
         assertThat(protectedSwitch.breakingCapacity, equalTo(1))
-    }
-
-    @Test
-    internal fun recloseSequences() {
-        PrivateCollectionValidator.validate(
-            { object : ProtectedSwitch() {} },
-            { id, _ -> RecloseSequence(id) },
-            ProtectedSwitch::numRecloseSequences,
-            ProtectedSwitch::getRecloseSequence,
-            ProtectedSwitch::recloseSequences,
-            ProtectedSwitch::addRecloseSequence,
-            ProtectedSwitch::removeRecloseSequence,
-            ProtectedSwitch::clearRecloseSequences
-        )
     }
 
     @Test

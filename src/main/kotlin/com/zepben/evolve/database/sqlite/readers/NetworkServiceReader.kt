@@ -134,7 +134,6 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableAnalogs>("analogs", reader::load)
         status = status and loadEach<TableAccumulators>("accumulators", reader::load)
         status = status and loadEach<TableDiscretes>("discretes", reader::load)
-        status = status and loadEach<TableRecloseSequences>("reclose sequences", reader::load)
 
         status = status and loadNames(reader)
 

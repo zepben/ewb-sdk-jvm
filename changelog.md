@@ -9,6 +9,7 @@
       should be refactored to close the client in order to shut down the `ExecutorService` that is created under the covers.
     * You can provide an optional `ExecutorService` when creating a client, which is used to monitor the gRPC stub. If one is provided, it will be shutdown when
       the client is closed.
+* Removed support for `RecloseSequences`. This functionality will be re-added to the model in later versions.
 
 ### New Features
 

@@ -92,10 +92,6 @@ object ChangeSet45Validator : ChangeSetValidator {
         VALUES ('cr', 'name', 'desc', 1, 'loc', 2, true, false, 3.3, 'SEF', 4.4, true, 5.5, 'cri')
         """.trimIndent(),
         """
-        INSERT INTO reclose_sequences (mrid, name, description, num_diagram_objects, protected_switch_mrid, reclose_delay, reclose_step)
-        VALUES ('rs', 'name', 'desc', 1, 'b1', 2.2, 3)
-        """.trimIndent(),
-        """
         INSERT INTO protection_equipment_protected_switches (protection_equipment_mrid, protected_switch_mrid)
         VALUES ('cr', 'b1')
         """.trimIndent()
@@ -110,8 +106,6 @@ object ChangeSet45Validator : ChangeSetValidator {
             "current_relay_info_name",
             "current_relays_mrid",
             "current_relays_name",
-            "reclose_sequences_mrid",
-            "reclose_sequences_name",
             "protection_equipment_protected_switches_protection_equipment_mrid",
             "protection_equipment_protected_switches_protected_switch_mrid"
         )
@@ -327,7 +321,6 @@ object ChangeSet45Validator : ChangeSetValidator {
         "DELETE FROM switch_info",
         "DELETE FROM current_relay_info",
         "DELETE FROM current_relays",
-        "DELETE FROM reclose_sequences",
         "DELETE FROM protection_equipment_protected_switches"
     )
 

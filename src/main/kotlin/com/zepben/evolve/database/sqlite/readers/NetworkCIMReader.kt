@@ -52,7 +52,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableE
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableProtectionEquipment
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableRecloseSequences
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources

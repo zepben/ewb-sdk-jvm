@@ -43,7 +43,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAnalogs
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableDiscretes
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableRecloseSequences
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
@@ -163,7 +162,6 @@ class DatabaseTables {
         TableProtectionEquipmentProtectedSwitches(),
         TableRatioTapChangers(),
         TableReclosers(),
-        TableRecloseSequences(),
         TableRemoteControls(),
         TableRemoteSources(),
         TableShortCircuitTests(),

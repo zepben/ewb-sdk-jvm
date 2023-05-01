@@ -113,10 +113,6 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<PotentialTransformer>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<CurrentRelayInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<CurrentRelay>().forEach { status = status and validateSave(it, writer::save) }
-        /**
-         * Excluded:
-         *  - RecloseSequence: Saved via saveProtectedSwitch
-         */
 
         return status
     }

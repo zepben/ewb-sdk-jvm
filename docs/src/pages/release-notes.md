@@ -2,6 +2,7 @@
 
 | Version | Released |
 | --- | --- |
+|[0.15.0](#v0150)| `01 May 2023` |
 |[0.14.0](#v0140)| `07 February 2023` |
 |[0.13.0](#v0130)| `21 October 2022` |
 |[0.12.1](#v0121)| `22 August 2022` |
@@ -21,6 +22,38 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.15.0]
+
+
+### Breaking Changes
+
+* The CIM consumer clients (network, diagram and customer) have had the following changes:
+    * Implemented the `AutoCloseable` interface. Existing applications that use any of the clients, but do not provide a gRPC stub directly to those clients,
+      should be refactored to close the client in order to shut down the `ExecutorService` that is created under the covers.
+    * You can provide an optional `ExecutorService` when creating a client, which is used to monitor the gRPC stub. If one is provided, it will be shutdown when
+      the client is closed.
+* Removed support for `RecloseSequences`. This functionality will be re-added to the model in later versions.
+
+### New Features
+
+* Added `getCustomersForContainer` to `CustomerConsumerClient` which allows fetching all the `Customer`s for a given `EquipmentContainer`
+* Added `getDiagramObjects` to `DiagramConsumerClient` which allows fetching all the `DiagramObject`s matching a given mRID.
+
+### Enhancements
+
+* None.
+
+### Fixes
+
+* Stopped the NetworkConsumerClient from resolving the equipment of an EquipmentContainer when resolving references. Equipment for containers must always be 
+explicitly requested by the client.
+
+### Notes
+
+* None.
 
 ---
 

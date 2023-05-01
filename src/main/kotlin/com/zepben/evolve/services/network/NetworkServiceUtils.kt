@@ -33,7 +33,6 @@ import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -126,7 +125,6 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isSwitchInfo Handler when the [identifiedObject] is a [SwitchInfo]
  * @param isCurrentRelayInfo Handler when the [identifiedObject] is a [CurrentRelayInfo]
  * @param isCurrentRelay Handler when the [identifiedObject] is a [CurrentRelay]
- * @param isRecloseSequence Handler when the [identifiedObject] is a [RecloseSequence]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -199,7 +197,6 @@ inline fun <R> whenNetworkServiceObject(
     isSwitchInfo: (SwitchInfo) -> R,
     isCurrentRelayInfo: (CurrentRelayInfo) -> R,
     isCurrentRelay: (CurrentRelay) -> R,
-    isRecloseSequence: (RecloseSequence) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -271,6 +268,5 @@ inline fun <R> whenNetworkServiceObject(
     is SwitchInfo -> isSwitchInfo(identifiedObject)
     is CurrentRelayInfo -> isCurrentRelayInfo(identifiedObject)
     is CurrentRelay -> isCurrentRelay(identifiedObject)
-    is RecloseSequence -> isRecloseSequence(identifiedObject)
     else -> isOther(identifiedObject)
 }

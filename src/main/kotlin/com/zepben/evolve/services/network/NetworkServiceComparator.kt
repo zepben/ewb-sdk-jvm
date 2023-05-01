@@ -24,7 +24,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -532,13 +531,6 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareIdReferenceCollections(ProtectionEquipment::protectedSwitches)
         }
 
-    private fun compareRecloseSequence(source: RecloseSequence, target: RecloseSequence): ObjectDifference<RecloseSequence> =
-        ObjectDifference(source, target).apply {
-            compareIdentifiedObject()
-
-            compareValues(RecloseSequence::recloseStep, RecloseSequence::recloseDelay)
-        }
-
     /************ IEC61970 BASE SCADA ************/
 
     private fun compareRemoteControl(source: RemoteControl, target: RemoteControl): ObjectDifference<RemoteControl> =
@@ -812,7 +804,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareSwitch()
 
             compareValues(ProtectedSwitch::breakingCapacity)
-            compareIdReferenceCollections(ProtectedSwitch::recloseSequences, ProtectedSwitch::operatedByProtectionEquipment)
+            compareIdReferenceCollections(ProtectedSwitch::operatedByProtectionEquipment)
         }
 
     private fun compareRatioTapChanger(source: RatioTapChanger, target: RatioTapChanger): ObjectDifference<RatioTapChanger> =

@@ -33,7 +33,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAnalogs
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableDiscretes
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableRecloseSequences
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
@@ -134,7 +133,6 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableAnalogs>("analogs", reader::load)
         status = status and loadEach<TableAccumulators>("accumulators", reader::load)
         status = status and loadEach<TableDiscretes>("discretes", reader::load)
-        status = status and loadEach<TableRecloseSequences>("reclose sequences", reader::load)
 
         status = status and loadNames(reader)
 

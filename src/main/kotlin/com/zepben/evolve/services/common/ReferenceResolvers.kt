@@ -35,7 +35,6 @@ import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -415,10 +414,6 @@ internal object ProtectionEquipmentToProtectedSwitchResolver : ReferenceResolver
 
 internal object ProtectedSwitchToProtectionEquipmentResolver : ReferenceResolver<ProtectedSwitch, ProtectionEquipment> by KReferenceResolver(
     ProtectedSwitch::class, ProtectionEquipment::class, ProtectedSwitch::addOperatedByProtectionEquipment
-)
-
-internal object ProtectedSwitchToRecloseSequenceResolver : ReferenceResolver<ProtectedSwitch, RecloseSequence> by KReferenceResolver(
-    ProtectedSwitch::class, RecloseSequence::class, ProtectedSwitch::addRecloseSequence
 )
 
 //-------------------------------------------//

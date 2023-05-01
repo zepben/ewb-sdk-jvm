@@ -24,7 +24,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -53,7 +52,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableE
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableProtectionEquipment
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableRecloseSequences
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
@@ -685,22 +683,6 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         }
 
         return loadEquipment(protectionEquipment, table, resultSet)
-    }
-
-    fun load(table: TableRecloseSequences, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val recloseSequenceId = setLastMRID(resultSet.getString(table.MRID.queryIndex))
-        val recloseSequence = RecloseSequence(recloseSequenceId).apply {
-            recloseDelay = resultSet.getNullableDouble(table.RECLOSE_DELAY.queryIndex)
-            recloseStep = resultSet.getNullableInt(table.RECLOSE_STEP.queryIndex)
-        }
-
-        val protectedSwitchId = resultSet.getString(table.PROTECTED_SWITCH_MRID.queryIndex)
-        val id = "$protectedSwitchId-to-$recloseSequenceId"
-        val protectedSwitch = networkService.getOrThrow<ProtectedSwitch>(protectedSwitchId, "ProtectedSwitch to RecloseSequence association $id")
-
-        protectedSwitch.addRecloseSequence(recloseSequence)
-
-        return loadIdentifiedObject(recloseSequence, table, resultSet) && networkService.addOrThrow(recloseSequence)
     }
 
     /************ IEC61970 BASE SCADA ************/

@@ -8,7 +8,6 @@
 package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
 import com.zepben.evolve.services.common.extensions.safeRemove
@@ -22,66 +21,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
 abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
 
     var breakingCapacity: Int? = null
-    private var _recloseSequences: MutableList<RecloseSequence>? = null
     private var _operatedByProtectionEquipment: MutableList<ProtectionEquipment>? = null
-
-    /**
-     * All [RecloseSequence]s attached to this [ProtectedSwitch]. Collection is read-only.
-     *
-     * @return A read-only [Collection] of [RecloseSequence]s attached to this [ProtectedSwitch].
-     */
-    val recloseSequences: Collection<RecloseSequence> get() = _recloseSequences.asUnmodifiable()
-
-    /**
-     * Get the number of [RecloseSequence]s attached to this [ProtectedSwitch].
-     *
-     * @return The number of [RecloseSequence]s attached to this [ProtectedSwitch].
-     */
-    fun numRecloseSequences(): Int = _recloseSequences?.size ?: 0
-
-    /**
-     * Get a [RecloseSequence] attached to this [ProtectedSwitch] by its mRID.
-     *
-     * @param mRID The mRID of the desired [RecloseSequence]
-     * @return The [RecloseSequence] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getRecloseSequence(mRID: String): RecloseSequence? = _recloseSequences?.getByMRID(mRID)
-
-    /**
-     * Add a [RecloseSequence] to this [ProtectedSwitch].
-     *
-     * @param recloseSequence The [RecloseSequence] to add to this [ProtectedSwitch].
-     * @return A reference to this [ProtectedSwitch] for fluent use.
-     */
-    fun addRecloseSequence(recloseSequence: RecloseSequence): ProtectedSwitch {
-        if (validateReference(recloseSequence, ::getRecloseSequence, "A RecloseSequence"))
-            return this
-
-        _recloseSequences = _recloseSequences ?: mutableListOf()
-        _recloseSequences!!.add(recloseSequence)
-
-        return this
-    }
-
-    /**
-     * Remove a [RecloseSequence] from this [ProtectedSwitch].
-     *
-     * @param recloseSequence The [RecloseSequence] to remove from this [ProtectedSwitch].
-     * @return true if the [RecloseSequence] was removed.
-     */
-    fun removeRecloseSequence(recloseSequence: RecloseSequence?): Boolean {
-        val ret = _recloseSequences.safeRemove(recloseSequence)
-        if (_recloseSequences.isNullOrEmpty()) _recloseSequences = null
-        return ret
-    }
-
-    /**
-     * Clear all [RecloseSequence]s from this [ProtectedSwitch].
-     */
-    fun clearRecloseSequences(): ProtectedSwitch {
-        _recloseSequences = null
-        return this
-    }
 
     /**
      * All [ProtectionEquipment]s operating this [ProtectedSwitch]. Collection is read-only.

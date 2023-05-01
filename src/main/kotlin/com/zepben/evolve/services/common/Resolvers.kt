@@ -35,7 +35,6 @@ import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -433,9 +432,5 @@ object Resolvers {
             ProtectedSwitchToProtectionEquipmentResolver,
             ProtectionEquipmentToProtectedSwitchResolver
         )
-
-    @JvmStatic
-    fun recloseSequences(protectedSwitch: ProtectedSwitch): BoundReferenceResolver<ProtectedSwitch, RecloseSequence> =
-        BoundReferenceResolver(protectedSwitch, ProtectedSwitchToRecloseSequenceResolver, null)
 
 }

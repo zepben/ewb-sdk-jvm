@@ -135,7 +135,7 @@ internal class NetworkConsumerClientTest {
             response.identifiedObjectsList.forEach { nio ->
                 val type = nio.identifiedObjectCase
                 if (isSupported(type)) {
-                    assertThat(result.wasSuccessful, equalTo(true))
+                    assertThat("Fetching $type was not successful", result.wasSuccessful, equalTo(true))
                     assertThat(result.value.mRID, equalTo(mRID))
                 } else {
                     assertThat(result.wasFailure, equalTo(true))
@@ -714,6 +714,9 @@ internal class NetworkConsumerClientTest {
 
     private fun isSupported(type: NIO.IdentifiedObjectCase): Boolean =
         type != NIO.IdentifiedObjectCase.OTHER
+            // TODO: Remove these in SDK change EWB-3234
+            && type != NIO.IdentifiedObjectCase.TAPCHANGERCONTROL
+            && type != NIO.IdentifiedObjectCase.EVCHARGINGUNIT
 
     private fun validateNetworkHierarchy(actual: NetworkHierarchy, expected: NetworkHierarchy) {
         validateMap(actual.geographicalRegions, expected.geographicalRegions)
@@ -958,7 +961,6 @@ internal class NetworkConsumerClientTest {
                 isSwitchInfo = { switchInfo = it.toPb() },
                 isCurrentRelay = { currentRelay = it.toPb() },
                 isCurrentRelayInfo = { currentRelayInfo = it.toPb() },
-                isRecloseSequence = { recloseSequence = it.toPb() },
             )
         }
 

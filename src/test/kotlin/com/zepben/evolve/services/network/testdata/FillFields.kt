@@ -24,7 +24,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -723,20 +722,6 @@ fun ProtectionEquipment.fillFields(service: NetworkService, includeRuntime: Bool
     return this
 }
 
-fun RecloseSequence.fillFields(service: NetworkService, includeRuntime: Boolean = true): RecloseSequence {
-    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
-
-    recloseDelay = 1.1
-    recloseStep = 2
-
-    // Reclose sequences are not saved unless a protected switch references it.
-    Breaker().also {
-        it.addRecloseSequence(this)
-        service.add(it)
-    }
-
-    return this
-}
 
 /************ IEC61970 BASE SCADA ************/
 
@@ -1067,9 +1052,6 @@ fun ProtectedSwitch.fillFields(service: NetworkService, includeRuntime: Boolean 
 
     breakingCapacity = 1
 
-    addRecloseSequence(RecloseSequence().also {
-        service.add(it)
-    })
     addOperatedByProtectionEquipment(CurrentRelay().also {
         it.addProtectedSwitch(this)
         service.add(it)

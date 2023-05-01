@@ -30,7 +30,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -137,7 +136,6 @@ internal class NetworkTranslatorTest {
 
         /************ IEC61970 Base Protection ************/
         validate({ CurrentRelay() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
-        validate({ RecloseSequence() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
         /************ IEC61970 BASE SCADA ************/
         validate({ RemoteControl() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })

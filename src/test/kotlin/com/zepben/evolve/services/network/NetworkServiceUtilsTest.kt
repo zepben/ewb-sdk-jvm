@@ -29,7 +29,6 @@ import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -128,7 +127,6 @@ internal class NetworkServiceUtilsTest {
         isSwitchInfo: (SwitchInfo) -> String,
         isCurrentRelayInfo: (CurrentRelayInfo) -> String,
         isCurrentRelay: (CurrentRelay) -> String,
-        isRecloseSequence: (RecloseSequence) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -199,7 +197,6 @@ internal class NetworkServiceUtilsTest {
         isSwitchInfo = isSwitchInfo,
         isCurrentRelayInfo = isCurrentRelayInfo,
         isCurrentRelay = isCurrentRelay,
-        isRecloseSequence = isRecloseSequence,
         isOther = isOther
     )
 
@@ -272,7 +269,6 @@ internal class NetworkServiceUtilsTest {
         isSwitchInfo: InvokeChecker<SwitchInfo> = NeverInvokedChecker(),
         isCurrentRelayInfo: InvokeChecker<CurrentRelayInfo> = NeverInvokedChecker(),
         isCurrentRelay: InvokeChecker<CurrentRelay> = NeverInvokedChecker(),
-        isRecloseSequence: InvokeChecker<RecloseSequence> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -344,7 +340,6 @@ internal class NetworkServiceUtilsTest {
             isSwitchInfo = isSwitchInfo,
             isCurrentRelayInfo = isCurrentRelayInfo,
             isCurrentRelay = isCurrentRelay,
-            isRecloseSequence = isRecloseSequence,
             isOther = isOther
         )
 
@@ -416,7 +411,6 @@ internal class NetworkServiceUtilsTest {
         isSwitchInfo.verifyInvoke()
         isCurrentRelayInfo.verifyInvoke()
         isCurrentRelay.verifyInvoke()
-        isRecloseSequence.verifyInvoke()
         isOther.verifyInvoke()
     }
 
@@ -494,7 +488,6 @@ internal class NetworkServiceUtilsTest {
         SwitchInfo().also { whenNetworkServiceObjectTester(it, isSwitchInfo = InvokedChecker(it)) }
         CurrentRelayInfo().also { whenNetworkServiceObjectTester(it, isCurrentRelayInfo = InvokedChecker(it)) }
         CurrentRelay().also { whenNetworkServiceObjectTester(it, isCurrentRelay = InvokedChecker(it)) }
-        RecloseSequence().also { whenNetworkServiceObjectTester(it, isRecloseSequence = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

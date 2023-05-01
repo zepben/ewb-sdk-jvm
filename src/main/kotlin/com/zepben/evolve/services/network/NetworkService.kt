@@ -26,7 +26,6 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.RecloseSequence
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -224,9 +223,6 @@ class NetworkService : BaseService("network") {
 
     fun add(currentRelay: CurrentRelay): Boolean = super.add(currentRelay)
     fun remove(currentRelay: CurrentRelay): Boolean = super.remove(currentRelay)
-
-    fun add(recloseSequence: RecloseSequence): Boolean = super.add(recloseSequence)
-    fun remove(recloseSequence: RecloseSequence): Boolean = super.remove(recloseSequence)
 
     // #######################
     // # IEC61970 BASE SCADA #

@@ -10,15 +10,18 @@ package com.zepben.evolve.services.network.tracing.connectivity
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.services.network.testdata.ConnectedEquipmentNetwork
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
+import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.instanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.fail
 
 internal class ConnectedEquipmentTraceTest {
 
@@ -76,6 +79,31 @@ internal class ConnectedEquipmentTraceTest {
         validateTrace(ConnectedEquipmentTrace::newNormalDownstreamEquipmentTrace, "b4", "c5")
     }
 
+    @Test
+    internal fun `does not queue from single terminals after the first`() {
+        val junctions = TestNetworkBuilder()
+            .fromJunction(numTerminals = 1)
+            .toJunction(numTerminals = 1)
+            .toJunction(numTerminals = 1)
+            .toJunction(numTerminals = 1)
+            .network
+            .listOf<Junction>()
+
+        junctions.forEach { start ->
+            val steppedOn = mutableListOf<ConductingEquipmentStep>()
+
+            // We clear the tracker on every step to allow it to queue things multiple times to ensure it does even try.
+            val trace = ConnectedEquipmentTrace.newConnectedEquipmentTrace().apply {
+                addStepAction { tracker.clear() }
+                addStepAction { steppedOn.add(it).also { if (steppedOn.size > 4) fail("should not have stepped on more than 4 things") } }
+            }
+
+            trace.run(start)
+
+            assertThat(steppedOn, containsInAnyOrder(*junctions.map { ConductingEquipmentStep(it, if (it == start) 0 else 1) }.toTypedArray()))
+        }
+    }
+
     private fun BasicTraversal<ConductingEquipmentStep>.validateRun(start: String, vararg expected: String) {
         val visited = mutableSetOf<String>()
 
@@ -93,4 +121,5 @@ internal class ConnectedEquipmentTraceTest {
 
         assertThat(visited, containsInAnyOrder(start, *expected))
     }
+
 }

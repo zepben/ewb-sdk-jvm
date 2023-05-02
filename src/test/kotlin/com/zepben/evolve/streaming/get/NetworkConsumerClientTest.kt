@@ -714,9 +714,6 @@ internal class NetworkConsumerClientTest {
 
     private fun isSupported(type: NIO.IdentifiedObjectCase): Boolean =
         type != NIO.IdentifiedObjectCase.OTHER
-            // TODO: Remove these in SDK change EWB-3234
-            && type != NIO.IdentifiedObjectCase.TAPCHANGERCONTROL
-            && type != NIO.IdentifiedObjectCase.EVCHARGINGUNIT
 
     private fun validateNetworkHierarchy(actual: NetworkHierarchy, expected: NetworkHierarchy) {
         validateMap(actual.geographicalRegions, expected.geographicalRegions)

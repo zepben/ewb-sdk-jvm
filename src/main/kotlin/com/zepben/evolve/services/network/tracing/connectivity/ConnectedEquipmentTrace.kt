@@ -102,7 +102,7 @@ object ConnectedEquipmentTrace {
 
     private fun queueNext(openTest: OpenTest): BasicTraversal.QueueNext<ConductingEquipmentStep> =
         BasicTraversal.QueueNext { (conductingEquipment, step), traversal ->
-            if ((step == 0) || !openTest.isOpen(conductingEquipment, null)) {
+            if ((step == 0) || ((conductingEquipment.numTerminals() > 1) && !openTest.isOpen(conductingEquipment, null))) {
                 val nextStep = step + 1
                 conductingEquipment.terminals
                     .asSequence()

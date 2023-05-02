@@ -1,20 +1,26 @@
 # Zepben EWB SDK changelog
+
 ## [0.16.0] - UNRELEASED
+
 ### Breaking Changes
+
 * None.
 
 ### New Features
+
 * None.
 
 ### Enhancements
-* None.
+
+* Performance enhancement for `ConnectedEquipmentTrace` when traversing elements with single terminals.
 
 ### Fixes
+
 * None.
 
 ### Notes
-* None.
 
+* None.
 
 ## [0.15.0]
 
@@ -38,8 +44,8 @@
 
 ### Fixes
 
-* Stopped the NetworkConsumerClient from resolving the equipment of an EquipmentContainer when resolving references. Equipment for containers must always be 
-explicitly requested by the client.
+* Stopped the NetworkConsumerClient from resolving the equipment of an EquipmentContainer when resolving references. Equipment for containers must always be
+  explicitly requested by the client.
 
 ### Notes
 

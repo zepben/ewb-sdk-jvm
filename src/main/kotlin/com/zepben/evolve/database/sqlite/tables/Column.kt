@@ -11,8 +11,6 @@ import com.zepben.annotations.EverythingIsNonnullByDefault
 
 /**
  * Represents a column in a database table.
- *
- * @param queryIndex The index the column shall have when built as a prepared statement in [SqliteTable.buildPreparedInsertSql].
  */
 @EverythingIsNonnullByDefault
 class Column @JvmOverloads constructor(

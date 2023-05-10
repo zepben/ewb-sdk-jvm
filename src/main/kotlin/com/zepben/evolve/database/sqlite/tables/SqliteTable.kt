@@ -47,7 +47,7 @@ abstract class SqliteTable {
 
     fun createIndexesSql(): Collection<String> = createIndexesSql ?: buildCreateIndexSql()
 
-    open fun selectSql(): String = selectSql ?: buildSelectSql()
+    fun selectSql(): String = selectSql ?: buildSelectSql()
 
     fun preparedUpdateSql(): String = preparedUpdateSql ?: buildPreparedUpdateSql()
 
@@ -56,12 +56,7 @@ abstract class SqliteTable {
 
     @Suppress("UNCHECKED_CAST")
     private fun createColumnSet(clazz: Class<*>, instance: Any): SortedSet<Column> {
-        // This sorting was originally here because we would select and insert based on the queryIndex, but adding columns broke that as an upgraded table would
-        // not necessarily have the same index as a new version freshly created table. Note this doesn't matter for inserts as prepared statements always use the
-        // column name.
-        // It's no longer necessary for selects as we query based on column name, however it's still necessary for inserts to ensure prepared statements
-        // columns are in a well defined order as the queryIndex will be used to set the corresponding column in the statement.
-        // For all intents and purposes, the queryIndex should be considered as the "preparedStatementColumnIndex".
+        // We sort by the queryIndex so insert and select statements can be addressed by a number
         val cols = sortedSetOf<Column>(Comparator.comparing { it.queryIndex })
         var repeatedField: Boolean
 

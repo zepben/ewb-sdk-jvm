@@ -52,7 +52,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * @property minAllowedTargetValue Minimum allowed target value (RegulatingControl.targetValue).
  * @property terminal The terminal associated with this regulating control. The terminal is associated instead of a node, since the terminal could connect into
  * either a topological node or a connectivity node. Sometimes it is useful to model regulation at a terminal of a bus bar object.
- * @property regulatingCondEqs The equipment that participates in this regulating control scheme.
+ * @property regulatingCondEqs The [RegulatingCondEq] that are controlled by this regulating control scheme.
  */
 abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) {
 
@@ -60,16 +60,16 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     var mode: RegulatingControlModeKind = RegulatingControlModeKind.UNKNOWN_CONTROL_MODE
     var monitoredPhase: PhaseCode = PhaseCode.NONE
     var targetDeadband: Float? = null
-    var targetValue: Float? = null
+    var targetValue: Double? = null
     var enabled: Boolean? = null
-    var maxAllowedTargetValue: Float? = null
-    var minAllowedTargetValue: Float? = null
+    var maxAllowedTargetValue: Double? = null
+    var minAllowedTargetValue: Double? = null
     var terminal: Terminal? = null
 
     private var _regulatingCondEqs: MutableList<RegulatingCondEq>? = null
 
     /**
-     * The regulating conducting equipments for this equipment. The returned collection is read only.
+     * The regulating conducting equipments controlled by this regulating control. The returned collection is read only.
      */
     val regulatingCondEqs: List<RegulatingCondEq> get() = _regulatingCondEqs.asUnmodifiable()
 
@@ -79,7 +79,7 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     fun numRegulatingCondEqs() = _regulatingCondEqs?.size ?: 0
 
     /**
-     * [RegulatingCondEq]'s connected to the electrical grid through this equipment.
+     * [RegulatingCondEq]'s controlled by this [RegulatingControl].
      *
      * @param mRID the mRID of the required [RegulatingCondEq]
      * @return The [RegulatingCondEq] with the specified [mRID] if it exists, otherwise null
@@ -87,7 +87,7 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     fun getRegulatingCondEq(mRID: String) = _regulatingCondEqs.getByMRID(mRID)
 
     /**
-     * @param regulatingCondEq the regulating conducting equipment connected to this RegulatingContrul.
+     * @param regulatingCondEq the regulating conducting equipment controlled by this [RegulatingControl].
      * @return true if the regulating conducting equipment is associated.
      * @return A reference to this [RegulatingControl] to allow fluent use.
      */
@@ -102,7 +102,7 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     }
 
     /**
-     * @param regulatingCondEq the regulating conducting equipment to disconnect from this equipment.
+     * @param regulatingCondEq the regulating conducting equipment to disassociate from this [RegulatingControl].
      * @return this [RegulatingControl]
      */
     fun removeRegulatingCondEq(regulatingCondEq: RegulatingCondEq?): Boolean {

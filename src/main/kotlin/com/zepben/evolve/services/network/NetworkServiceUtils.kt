@@ -42,6 +42,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.customer.CustomerService
 
 /**
@@ -125,6 +126,8 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isSwitchInfo Handler when the [identifiedObject] is a [SwitchInfo]
  * @param isCurrentRelayInfo Handler when the [identifiedObject] is a [CurrentRelayInfo]
  * @param isCurrentRelay Handler when the [identifiedObject] is a [CurrentRelay]
+ * @param isEvChargingUnit Handler when the [identifiedObject] is an [EvChargingUnit]
+ * @param isTapChangerControl Handler when the [identifiedObject] is a [TapChangerControl]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -197,6 +200,8 @@ inline fun <R> whenNetworkServiceObject(
     isSwitchInfo: (SwitchInfo) -> R,
     isCurrentRelayInfo: (CurrentRelayInfo) -> R,
     isCurrentRelay: (CurrentRelay) -> R,
+    isEvChargingUnit: (EvChargingUnit) -> R,
+    isTapChangerControl: (TapChangerControl) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -268,5 +273,7 @@ inline fun <R> whenNetworkServiceObject(
     is SwitchInfo -> isSwitchInfo(identifiedObject)
     is CurrentRelayInfo -> isCurrentRelayInfo(identifiedObject)
     is CurrentRelay -> isCurrentRelay(identifiedObject)
+    is EvChargingUnit -> isEvChargingUnit(identifiedObject)
+    is TapChangerControl -> isTapChangerControl(identifiedObject)
     else -> isOther(identifiedObject)
 }

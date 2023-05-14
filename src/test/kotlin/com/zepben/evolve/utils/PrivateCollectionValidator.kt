@@ -169,9 +169,10 @@ internal class PrivateCollectionValidator {
             get: (T, Int) -> U?,
             forEach: (T, (Int, U) -> Unit) -> Unit,
             add: (T, U) -> T,
-            crossinline addWithIndex: (T, U, Int) -> T,
+            noinline addWithIndex: ((T, U, Int) -> T)?,
             remove: (T, U?) -> Boolean,
-            clear: (T) -> T
+            clear: (T) -> T,
+            supportsDuplicates: Boolean = true,
         ) {
             require(U::class !is IdentifiedObject) { "do not use this function with identified 'other', use one of the other variants instead." }
 
@@ -191,21 +192,31 @@ internal class PrivateCollectionValidator {
             add(it, other3)
             assertThat(num(it), equalTo(3))
 
-            // Non-identified objects can be added more than once
-            add(it, other1)
-            addWithIndex(it, other1, 1)
-            assertThat(num(it), equalTo(5))
+            var numObjects = 3
+            if (supportsDuplicates) {
+                // objects can be added more than once
+                add(it, other1)
+                assertThat(num(it), equalTo(++numObjects))
+            }
+
+            addWithIndex?.let { awi ->
+                awi(it, other1, 1)
+                assertThat(num(it), equalTo(++numObjects))
+            }
 
             assertThat(remove(it, other2), equalTo(true))
             assertThat(remove(it, other2), equalTo(false))
             assertThat(remove(it, null), equalTo(false))
-            assertThat(num(it), equalTo(4))
+            assertThat(num(it), equalTo(--numObjects))
 
             assertThat(get(it, 2), equalTo(other3))
 
             val list = mutableListOf<U>()
             forEach(it, list::add)
-            assertThat(list, contains(other1, other1, other3, other1))
+            if (supportsDuplicates)
+                assertThat(list, contains(other1, other1, other3, other1))
+            else
+                assertThat(list, containsInAnyOrder(other1, other3))
 
             clear(it)
             assertThat(num(it), equalTo(0))
@@ -214,15 +225,17 @@ internal class PrivateCollectionValidator {
             add(it, other2)
             assertThat(num(it), equalTo(1))
 
-            expect { addWithIndex(it, other3, 20) }
-                .toThrowAny()
-                .withMessage(
-                    Pattern.compile(
-                        "Unable to add ${other3.javaClass.simpleName} to ${it.typeNameAndMRID()}. " +
-                            "\\w* number 20 is invalid. Expected a value between 0 and ${num(it)}. " +
-                            "Make sure you are adding the items in order and there are no gaps in the numbering."
+            addWithIndex?.also { awi ->
+                expect { awi(it, other3, 20) }
+                    .toThrowAny()
+                    .withMessage(
+                        Pattern.compile(
+                            "Unable to add ${other3.javaClass.simpleName} to ${it.typeNameAndMRID()}. " +
+                                "\\w* number 20 is invalid. Expected a value between 0 and ${num(it)}. " +
+                                "Make sure you are adding the items in order and there are no gaps in the numbering."
+                        )
                     )
-                )
+            }
 
             remove(it, other2)
             assertThat(num(it), equalTo(0))
@@ -240,5 +253,6 @@ internal class PrivateCollectionValidator {
                     it.simpleName
             } ?: ""
         }
+
     }
 }

@@ -240,6 +240,17 @@ internal object RatioTapChangerToTransformerEndResolver : ReferenceResolver<Rati
     RatioTapChanger::class, TransformerEnd::class, RatioTapChanger::transformerEnd.setter
 )
 
+internal object RegulatingCondEqToRegulatingControlResolver: ReferenceResolver<RegulatingCondEq, RegulatingControl> by KReferenceResolver(
+    RegulatingCondEq::class, RegulatingControl::class, RegulatingCondEq::regulatingControl.setter
+)
+internal object RegulatingControlToTerminalResolver: ReferenceResolver<RegulatingControl, Terminal> by KReferenceResolver(
+    RegulatingControl::class, Terminal::class, RegulatingControl::terminal.setter
+)
+
+internal object RegulatingControlToRegulatingCondEqResolver: ReferenceResolver<RegulatingControl, RegulatingCondEq> by KReferenceResolver(
+    RegulatingControl::class, RegulatingCondEq::class, RegulatingControl::addRegulatingCondEq
+)
+
 internal object RemoteControlToControlResolver : ReferenceResolver<RemoteControl, Control> by KReferenceResolver(
     RemoteControl::class, Control::class, RemoteControl::control.setter
 )
@@ -359,6 +370,10 @@ internal object PowerElectronicsUnitToPowerElectronicsConnectionResolver :
     ReferenceResolver<PowerElectronicsUnit, PowerElectronicsConnection> by KReferenceResolver(
         PowerElectronicsUnit::class, PowerElectronicsConnection::class, PowerElectronicsUnit::powerElectronicsConnection.setter
     )
+
+internal object TapChangerToTapChangerControlResolver: ReferenceResolver<TapChanger, TapChangerControl> by KReferenceResolver(
+    TapChanger::class, TapChangerControl::class, TapChanger::tapChangerControl.setter
+)
 
 internal object TransformerEndToTransformerStarImpedanceResolver : ReferenceResolver<TransformerEnd, TransformerStarImpedance> by KReferenceResolver(
     TransformerEnd::class, TransformerStarImpedance::class, TransformerEnd::starImpedance.setter

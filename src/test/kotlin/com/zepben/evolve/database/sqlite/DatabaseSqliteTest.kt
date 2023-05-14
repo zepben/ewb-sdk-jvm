@@ -44,6 +44,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.BaseServiceComparator
@@ -63,6 +64,7 @@ import com.zepben.evolve.services.network.testdata.SchemaNetworks
 import com.zepben.evolve.services.network.testdata.StupidlyLargeNetwork
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -241,7 +243,11 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.networkServicesOf(::PowerTransformerEnd, PowerTransformerEnd::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::RatioTapChanger, RatioTapChanger::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::Recloser, Recloser::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::TapChangerControl, TapChangerControl::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::TransformerStarImpedance, TransformerStarImpedance::fillFields))
+
+        /************ IEC61970 InfIEC61970 BASE WIRES GENERATION PRODUCTION ************/
+        validateSchema(SchemaNetworks.networkServicesOf(::EvChargingUnit, EvChargingUnit::fillFields))
 
         /************ IEC61970 InfIEC61970 Feeder ************/
         validateSchema(SchemaNetworks.networkServicesOf(::Circuit, Circuit::fillFields))
@@ -259,6 +265,50 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.createNameTestServices())
     }
 
+    @Test
+    internal fun `post process fails with unresolved references`() {
+        val builder = TestNetworkBuilder()
+        val ns = builder.network
+        builder
+            .fromPowerTransformer() // b0
+            .toPowerElectronicsConnection {  // pec1
+                TapChangerControl().also { tcc ->
+                    tcc.addRegulatingCondEq(this)
+                    tcc.terminal = Terminal("test").also { ns.add(it) }
+                    regulatingControl = tcc
+                    ns.add(tcc)
+                }
+            }
+            .build()
+
+        val expectedMetadata = MetadataCollection()
+        val expectedDiagramService = DiagramService()
+        val expectedCustomerService = CustomerService()
+
+        assertThat(
+            DatabaseWriter(SCHEMA_TEST_FILE).save(
+                expectedMetadata,
+                mutableListOf(
+                    ns,
+                    expectedDiagramService,
+                    expectedCustomerService
+                )
+            ),
+            equalTo(true)
+        )
+
+        val metadataCollection = MetadataCollection()
+        val networkService = NetworkService()
+        val diagramService = DiagramService()
+        val customerService = CustomerService()
+
+        // This will throw if unresolved references still exist after a full load
+        assertThat(
+            DatabaseReader(SCHEMA_TEST_FILE).load(metadataCollection, networkService, diagramService, customerService),
+            equalTo(true)
+        )
+
+    }
     @Test
     internal fun `check for error on duplicate id added to customer service`() {
         val writeServices = NetworkModelTestUtil.Services()

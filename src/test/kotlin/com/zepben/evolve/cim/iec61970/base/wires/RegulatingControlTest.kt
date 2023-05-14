@@ -52,10 +52,10 @@ class RegulatingControlTest {
         assertThat(regulatingControl.mode, equalTo(RegulatingControlModeKind.voltage))
         assertThat(regulatingControl.monitoredPhase, equalTo(PhaseCode.ABC))
         assertThat(regulatingControl.targetDeadband, equalTo(2.0f))
-        assertThat(regulatingControl.targetValue, equalTo(100.0f))
+        assertThat(regulatingControl.targetValue, equalTo(100.0))
         assertThat(regulatingControl.enabled, equalTo(true))
-        assertThat(regulatingControl.maxAllowedTargetValue, equalTo(200.0f))
-        assertThat(regulatingControl.minAllowedTargetValue, equalTo(50.0f))
+        assertThat(regulatingControl.maxAllowedTargetValue, equalTo(200.0))
+        assertThat(regulatingControl.minAllowedTargetValue, equalTo(50.0))
         assertThat(regulatingControl.terminal, notNullValue())
     }
 

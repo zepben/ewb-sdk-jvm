@@ -28,14 +28,14 @@ class TapChangerControl(mRID: String = "") : RegulatingControl(mRID) {
     var limitVoltage: Int? = null
 
     var lineDropCompensation: Boolean? = null
-    var lineDropR: Float? = null
-    var lineDropX: Float? = null
-    var reverseLineDropR: Float? = null
-    var reverseLineDropX: Float? = null
+    var lineDropR: Double? = null
+    var lineDropX: Double? = null
+    var reverseLineDropR: Double? = null
+    var reverseLineDropX: Double? = null
 
     var forwardLDCBlocking: Boolean? = null
 
-    var timeDelay: Float? = null
+    var timeDelay: Double? = null
 
     var coGenerationEnabled: Boolean? = null
 

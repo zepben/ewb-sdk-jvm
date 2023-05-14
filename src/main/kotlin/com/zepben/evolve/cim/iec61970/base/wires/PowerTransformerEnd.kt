@@ -7,8 +7,11 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61968.common.PositionPoint
+import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.mergeIfIncomplete
+import java.util.function.BiConsumer
 
 /**
  * A PowerTransformerEnd is associated with each Terminal of a PowerTransformer.
@@ -40,8 +43,8 @@ import com.zepben.evolve.services.network.mergeIfIncomplete
  * @property r Resistance (star-model) of the transformer end in ohms. The attribute shall be equal or greater than zero for non-equivalent transformers.
  *             Do not read this directly, use [resistanceReactance().r] instead.
  * @property r0 Zero sequence series resistance (star-model) of the transformer end in ohms. Do not read this directly, use [resistanceReactance().r0] instead.
- * @property ratedS Normal apparent power rating. The attribute shall be a positive value. For a two-winding transformer the values for the high and low voltage
- *                  sides shall be identical.
+ * @property ratedS The largest normal apparent power rating for this end. The attribute shall be a positive value. For a two-winding transformer the values for
+ * the high and low voltage sides shall be identical.
  * @property ratedU  Rated voltage: phase-phase for three-phase windings, and either phase-phase or phase-neutral for single-phase windings.
  *                   A high voltage side, as given by TransformerEnd.endNumber, shall have a ratedU that is greater or equal than ratedU
  *                   for the lower voltage sides.
@@ -64,10 +67,104 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
     var phaseAngleClock: Int? = null
     var r: Double? = null
     var r0: Double? = null
-    var ratedS: Int? = null
+
+    var ratedS: Int?
+        get() = _sRatings?.firstOrNull()?.ratedS
+        @Deprecated("Use addRating() instead, as this will clear all ratings and is intended for backwards compatibility only",
+            ReplaceWith("addRating(this)"))
+        set(value) {
+            if (value != null) {
+                clearRatings()
+                addRating(value, TransformerCoolingType.UNKNOWN_COOLING_TYPE)
+            } else {
+                clearRatings()
+            }
+
+        }
+
     var ratedU: Int? = null
     var x: Double? = null
     var x0: Double? = null
+    private var _sRatings: MutableList<TransformerEndRatedS>? = null
+
+    /**
+     * The normal apparent power ratings for this transformer by their [TransformerCoolingType],
+     * stored in descending order by ratedS. The largest rating will be at the start.
+     *
+     * The [TransformerEndRatedS.ratedS] attribute shall be a positive value. For a two-winding transformer the values for the high and low voltage sides shall
+     * be identical.
+     *
+     * The returned collection is read only.
+     */
+    val sRatings: List<TransformerEndRatedS> get() = _sRatings.asUnmodifiable()
+
+    fun getRating(coolingType: TransformerCoolingType): TransformerEndRatedS? = _sRatings?.find { it.coolingType == coolingType }
+
+    fun getRating(ratedS: Int): TransformerEndRatedS? = _sRatings?.find { it.ratedS == ratedS }
+
+
+    fun forEachRating(action: BiConsumer<Int, TransformerEndRatedS>) {
+        _sRatings?.forEachIndexed(action::accept)
+    }
+
+    fun numRatings(): Int = _sRatings?.size ?: 0
+
+    /**
+     * Add a normal apparent power rating for this PowerTransformerEnd.
+     * The ratings in the underlying collection will be sorted by [ratedS] in a descending order.
+     *
+     * @param ratedS The normal apparent power rating to set.
+     * @param coolingType The cooling type used for this rating, defaults to [TransformerCoolingType.UNKNOWN_COOLING_TYPE]
+     * @throws IllegalArgumentException if a rating for the provided [coolingType] already exists for this PowerTransformerEnd.
+     */
+    fun addRating(
+        ratedS: Int,
+        coolingType: TransformerCoolingType = TransformerCoolingType.UNKNOWN_COOLING_TYPE,
+    ): PowerTransformerEnd {
+        if (_sRatings?.any { r -> r.coolingType == coolingType } == true)
+            throw IllegalArgumentException("A rating for coolingType ${coolingType.name} already exists, please remove it first.")
+
+        _sRatings = _sRatings ?: mutableListOf()
+        _sRatings!!.add(TransformerEndRatedS(coolingType, ratedS))
+        _sRatings!!.sortByDescending { it.ratedS }
+
+        return this
+    }
+
+    fun addRating(rating: TransformerEndRatedS): PowerTransformerEnd = addRating(rating.ratedS, rating.coolingType)
+
+    /**
+     * Remove [rating] from the [sRatings] collection.
+     *
+     * @param rating The [TransformerEndRatedS] to remove.
+     * @return true if [rating] was removed.
+     */
+    fun removeRating(rating: TransformerEndRatedS?): Boolean {
+        val ret = _sRatings?.remove(rating) == true
+        if (_sRatings.isNullOrEmpty()) _sRatings = null
+        return ret
+    }
+
+    /**
+     * Remove the [TransformerEndRatedS] from the [sRatings] collection with a cooling type of [coolingType]
+     *
+     * @param coolingType The [TransformerCoolingType] to remove.
+     * @return The [TransformerEndRatedS] that was removed, or null if none was removed.
+     */
+    fun removeRating(coolingType: TransformerCoolingType): TransformerEndRatedS? {
+        val r = _sRatings?.find { it.coolingType == coolingType }
+        _sRatings?.remove(r)
+        if (_sRatings.isNullOrEmpty()) _sRatings = null
+        return r
+    }
+
+    /**
+     * Clear the [sRatings] for this end.
+     */
+    fun clearRatings(): PowerTransformerEnd {
+        _sRatings = null
+        return this
+    }
 
     /**
      * Get the [ResistanceReactance] for this [PowerTransformerEnd] from either:
@@ -85,3 +182,7 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
         }
 
 }
+
+fun PowerTransformerEnd.forEachRating(action: (sequenceNumber: Int, rating: TransformerEndRatedS) -> Unit) = forEachRating(BiConsumer(action))
+
+data class TransformerEndRatedS(val coolingType: TransformerCoolingType, val ratedS: Int)

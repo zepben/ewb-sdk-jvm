@@ -9,6 +9,7 @@ package com.zepben.evolve.streaming.get
 
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.evolve.streaming.grpc.GrpcResult
+import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger
 import io.grpc.Status
 import org.hamcrest.MatcherAssert.assertThat
@@ -40,6 +41,25 @@ object ConsumerUtils {
         // Add any customisations required to build the object at a bare minimum
         if (builder is TapChanger.Builder)
             builder.highStep = 1
+
+        if (builder is PowerElectronicsConnection.Builder) {
+            builder.invWattRespV1 = 200
+            builder.invWattRespV2 = 216
+            builder.invWattRespV3 = 235
+            builder.invWattRespV4 = 244
+            builder.invWattRespPAtV1 = 0.0f
+            builder.invWattRespPAtV2 = 0.0f
+            builder.invWattRespPAtV3 = 0.0f
+            builder.invWattRespPAtV4 = 0.0f
+            builder.invVArRespV1 = 200
+            builder.invVArRespV2 = 200
+            builder.invVArRespV3 = 200
+            builder.invVArRespV4 = 200
+            builder.invVArRespQAtV1 = 0.0f
+            builder.invVArRespQAtV2 = 0.0f
+            builder.invVArRespQAtV3 = 0.0f
+            builder.invVArRespQAtV4 = 0.0f
+        }
 
         props.forEach { (name, value) -> builder::class.declaredMemberFunctions.find { it.name == name }?.call(builder, value) }
 

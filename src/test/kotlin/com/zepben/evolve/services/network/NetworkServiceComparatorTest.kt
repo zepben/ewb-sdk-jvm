@@ -34,13 +34,14 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
-import com.zepben.evolve.services.common.BaseServiceComparatorTest
-import com.zepben.evolve.services.common.ObjectDifference
-import com.zepben.evolve.services.common.ValueDifference
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
+import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.utils.ServiceComparatorValidator
 import org.junit.jupiter.api.Test
+import java.time.Instant
 
 @Suppress("SameParameterValue")
 internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
@@ -236,6 +237,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareAssetInfo { CurrentRelayInfo(it) }
 
         comparatorValidator.validateProperty(CurrentRelayInfo::curveSetting, { CurrentRelayInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateIndexedCollection(
+            CurrentRelayInfo::recloseDelays,
+            CurrentRelayInfo::addDelay,
+            { CurrentRelayInfo(it) },
+            { 1.0 },
+            { 2.0 }
+        )
     }
 
     @Test
@@ -298,6 +306,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(UsagePoint::usagePointLocation, { UsagePoint(it) }, { Location("l1") }, { Location("l2") })
         comparatorValidator.validateProperty(UsagePoint::isVirtual, { UsagePoint(it) }, { false }, { true })
         comparatorValidator.validateProperty(UsagePoint::connectionCategory, { UsagePoint(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(UsagePoint::ratedPower, { UsagePoint(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(UsagePoint::approvedInverterCapacity, { UsagePoint(it) }, { 1 }, { 2 })
         comparatorValidator.validateCollection(
             UsagePoint::endDevices,
             UsagePoint::addEndDevice,
@@ -436,6 +446,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(Equipment::inService, createEquipment, { true }, { false })
         comparatorValidator.validateProperty(Equipment::normallyInService, createEquipment, { true }, { false })
+        comparatorValidator.validateProperty(Equipment::commissionedDate, createEquipment, { Instant.MIN }, { Instant.MAX })
         comparatorValidator.validateCollection(Equipment::containers, Equipment::addContainer, createEquipment, { Site("s1") }, { Site("s2") })
 
         comparatorValidator.validateCollection(Equipment::usagePoints, Equipment::addUsagePoint, createEquipment, { UsagePoint("u1") }, { UsagePoint("u2") })
@@ -447,7 +458,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { OperationalRestriction("o1") },
             { OperationalRestriction("o2") })
 
-        comparatorValidator.validateCollection(Equipment::currentContainers, Equipment::addCurrentContainer, createEquipment, { Feeder("f1") }, { Feeder("f2") })
+        comparatorValidator.validateCollection(
+            Equipment::currentContainers,
+            Equipment::addCurrentContainer,
+            createEquipment,
+            { Feeder("f1") },
+            { Feeder("f2") })
     }
 
     private fun compareEquipmentContainer(createEquipmentContainer: (String) -> EquipmentContainer) {
@@ -631,6 +647,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(ProtectionEquipment::relayDelayTime, createProtectionEquipment, { 1.1 }, { 2.2 })
         comparatorValidator.validateProperty(ProtectionEquipment::protectionKind, createProtectionEquipment, { ProtectionKind.EF }, { ProtectionKind.IEF })
+        comparatorValidator.validateProperty(ProtectionEquipment::directable, createProtectionEquipment, { null }, { true })
+        comparatorValidator.validateProperty(
+            ProtectionEquipment::powerDirection,
+            createProtectionEquipment,
+            { PowerDirectionKind.FORWARD },
+            { PowerDirectionKind.UNKNOWN_DIRECTION }
+        )
         comparatorValidator.validateCollection(
             ProtectionEquipment::protectedSwitches,
             ProtectionEquipment::addProtectedSwitch,
@@ -904,6 +927,30 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(PowerElectronicsConnection::q, { PowerElectronicsConnection(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PowerElectronicsConnection::ratedS, { PowerElectronicsConnection(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(PowerElectronicsConnection::ratedU, { PowerElectronicsConnection(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::inverterStandard, { PowerElectronicsConnection(it) }, { "a" }, { "b" })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::sustainOpOvervoltLimit, { PowerElectronicsConnection(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::stopAtOverFreq, { PowerElectronicsConnection(it) }, { 1.0f }, { 2.0f })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::stopAtUnderFreq, { PowerElectronicsConnection(it) }, { 1.0f }, { 2.0f })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invVoltWattRespMode, { PowerElectronicsConnection(it) }, { null }, { true })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invWattRespV1, { PowerElectronicsConnection(it) }, { 200 }, { 201 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invWattRespV2, { PowerElectronicsConnection(it) }, { 216 }, { 217 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invWattRespV3, { PowerElectronicsConnection(it) }, { 235 }, { 236 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invWattRespV4, { PowerElectronicsConnection(it) }, { 244 }, { 245 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invWattRespPAtV1, { PowerElectronicsConnection(it) }, { 1.0f }, { 0.0f })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invWattRespPAtV2, { PowerElectronicsConnection(it) }, { 1.0f }, { 0.0f })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invWattRespPAtV3, { PowerElectronicsConnection(it) }, { 1.0f }, { 0.0f })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invWattRespPAtV4, { PowerElectronicsConnection(it) }, { 0.0f }, { 0.2f })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invVoltVArRespMode, { PowerElectronicsConnection(it) }, { null }, { true })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invVArRespV1, { PowerElectronicsConnection(it) }, { 200 }, { 300 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invVArRespV2, { PowerElectronicsConnection(it) }, { 200 }, { 300 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invVArRespV3, { PowerElectronicsConnection(it) }, { 200 }, { 300 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invVArRespV4, { PowerElectronicsConnection(it) }, { 200 }, { 300 })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invVArRespQAtV1, { PowerElectronicsConnection(it) }, { 0.0f }, { 0.1f })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invVArRespQAtV2, { PowerElectronicsConnection(it) }, { 0.0f }, { 0.1f })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invVArRespQAtV3, { PowerElectronicsConnection(it) }, { 0.0f }, { 0.1f })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invVArRespQAtV4, { PowerElectronicsConnection(it) }, { 0.0f }, { -0.1f })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invReactivePowerMode, { PowerElectronicsConnection(it) }, { null }, { true })
+        comparatorValidator.validateProperty(PowerElectronicsConnection::invFixReactivePower, { PowerElectronicsConnection(it) }, { 0.0f }, { -0.1f })
     }
 
     @Test
@@ -955,7 +1002,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             PowerTransformerEnd::powerTransformer,
             { PowerTransformerEnd(it) },
             { PowerTransformer("pt1") },
-            { PowerTransformer("pt2") })
+            { PowerTransformer("pt2") }
+        )
         comparatorValidator.validateProperty(PowerTransformerEnd::b, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PowerTransformerEnd::b0, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PowerTransformerEnd::connectionKind, { PowerTransformerEnd(it) }, { WindingConnection.A }, { WindingConnection.D })
@@ -964,7 +1012,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(PowerTransformerEnd::phaseAngleClock, { PowerTransformerEnd(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(PowerTransformerEnd::r, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PowerTransformerEnd::r0, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
-        comparatorValidator.validateProperty(PowerTransformerEnd::ratedS, { PowerTransformerEnd(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(PowerTransformerEnd::ratedS, { PowerTransformerEnd(it) }, { 1 }, { 2 }, expectedDifferences = setOf("sRatings"))
         comparatorValidator.validateProperty(PowerTransformerEnd::ratedU, { PowerTransformerEnd(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(PowerTransformerEnd::x, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PowerTransformerEnd::x0, { PowerTransformerEnd(it) }, { 1.0 }, { 2.0 })
@@ -973,6 +1021,16 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(PowerTransformerEnd::r0, { PowerTransformerEnd(it) }, { 1.0 }, { Double.NaN })
         comparatorValidator.validateProperty(PowerTransformerEnd::x, { PowerTransformerEnd(it) }, { 1.0 }, { Double.NaN })
         comparatorValidator.validateProperty(PowerTransformerEnd::x0, { PowerTransformerEnd(it) }, { 1.0 }, { Double.NaN })
+
+        comparatorValidator.validateIndexedCollection(
+            PowerTransformerEnd::sRatings,
+            PowerTransformerEnd::addRating,
+            { PowerTransformerEnd(it) },
+            { TransformerEndRatedS(TransformerCoolingType.UNKNOWN_COOLING_TYPE, 1) },
+            { TransformerEndRatedS(TransformerCoolingType.UNKNOWN_COOLING_TYPE, 2) },
+            expectedDifferences = setOf("ratedS")
+        )
+
     }
 
     private fun compareProtectedSwitch(createProtectedSwitch: (String) -> ProtectedSwitch) {
@@ -1010,6 +1068,32 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareEnergyConnection(createRegulatingCondEq)
 
         comparatorValidator.validateProperty(RegulatingCondEq::controlEnabled, createRegulatingCondEq, { false }, { true })
+    }
+
+    private fun compareRegulatingControl(createRegulatingControl: (String) -> RegulatingControl) {
+        comparePowerSystemResource(createRegulatingControl)
+
+        comparatorValidator.validateProperty(RegulatingControl::discrete, createRegulatingControl, { false }, { true })
+        comparatorValidator.validateProperty(
+            RegulatingControl::mode,
+            createRegulatingControl,
+            { RegulatingControlModeKind.voltage },
+            { RegulatingControlModeKind.UNKNOWN_CONTROL_MODE })
+        comparatorValidator.validateProperty(RegulatingControl::monitoredPhase, createRegulatingControl, { PhaseCode.ABC }, { PhaseCode.A })
+        comparatorValidator.validateProperty(RegulatingControl::targetDeadband, createRegulatingControl, { 1.0f }, { 2.0f })
+        comparatorValidator.validateProperty(RegulatingControl::targetValue, createRegulatingControl, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(RegulatingControl::enabled, createRegulatingControl, { false }, { true })
+        comparatorValidator.validateProperty(RegulatingControl::maxAllowedTargetValue, createRegulatingControl, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(RegulatingControl::minAllowedTargetValue, createRegulatingControl, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(RegulatingControl::terminal, createRegulatingControl, { Terminal("t1") }, { Terminal("t2") })
+
+        comparatorValidator.validateCollection(
+            RegulatingControl::regulatingCondEqs,
+            RegulatingControl::addRegulatingCondEq,
+            createRegulatingControl,
+            { object : RegulatingCondEq("rce1") {} },
+            { object : RegulatingCondEq("rce2") {} }
+        )
     }
 
     private fun compareShuntCompensator(createShuntCompensator: (String) -> ShuntCompensator) {
@@ -1063,6 +1147,26 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(TapChanger::neutralU, createTapChanger, { 1 }, { 2 })
         comparatorValidator.validateProperty(TapChanger::normalStep, { createTapChanger(it).apply { highStep = 10 } }, { 1 }, { 2 })
         comparatorValidator.validateProperty(TapChanger::step, { createTapChanger(it).apply { highStep = 10 } }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(
+            TapChanger::tapChangerControl,
+            { createTapChanger(it).apply { highStep = 10 } },
+            { TapChangerControl("tcc1") },
+            { TapChangerControl("tcc2") })
+    }
+
+    @Test
+    internal fun compareTapChangerControl() {
+        compareRegulatingControl { TapChangerControl(it) }
+
+        comparatorValidator.validateProperty(TapChangerControl::limitVoltage, { TapChangerControl(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(TapChangerControl::lineDropCompensation, { TapChangerControl(it) }, { null }, { true })
+        comparatorValidator.validateProperty(TapChangerControl::lineDropR, { TapChangerControl(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(TapChangerControl::lineDropX, { TapChangerControl(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(TapChangerControl::reverseLineDropR, { TapChangerControl(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(TapChangerControl::reverseLineDropX, { TapChangerControl(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(TapChangerControl::forwardLDCBlocking, { TapChangerControl(it) }, { null }, { true })
+        comparatorValidator.validateProperty(TapChangerControl::timeDelay, { TapChangerControl(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(TapChangerControl::coGenerationEnabled, { TapChangerControl(it) }, { null }, { true })
     }
 
     private fun compareTransformerEnd(createTransformerEnd: (String) -> TransformerEnd) {
@@ -1079,6 +1183,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             createTransformerEnd,
             { TransformerStarImpedance("tsi1") },
             { TransformerStarImpedance("tsi2") })
+    }
+
+    @Test
+    internal fun compareEvChargingUnit() {
+        comparePowerElectronicsUnit { EvChargingUnit(it) }
     }
 
     @Test

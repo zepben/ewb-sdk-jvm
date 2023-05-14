@@ -17,6 +17,8 @@ class TableUsagePoints : TableIdentifiedObjects() {
     val LOCATION_MRID = Column(++columnIndex, "location_mrid", "TEXT", NULL)
     val IS_VIRTUAL = Column(++columnIndex, "is_virtual", "BOOLEAN")
     val CONNECTION_CATEGORY = Column(++columnIndex, "connection_category", "TEXT", NULL)
+    val RATED_POWER = Column(++columnIndex, "rated_power", "INTEGER", NULL)
+    val APPROVED_INVERTER_CAPACITY = Column(++columnIndex, "approved_inverter_capacity", "INTEGER", NULL)
 
     override fun name(): String {
         return "usage_points"

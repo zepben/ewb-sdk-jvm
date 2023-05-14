@@ -35,10 +35,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
-import com.zepben.evolve.services.common.BaseServiceComparator
-import com.zepben.evolve.services.common.ObjectDifference
-import com.zepben.evolve.services.common.ValueDifference
-import com.zepben.evolve.services.common.compareValues
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
+import com.zepben.evolve.services.common.*
 
 /**
  * @param options Indicates which optional checks to perform
@@ -228,6 +226,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareAssetInfo()
 
             compareValues(CurrentRelayInfo::curveSetting)
+            compareIndexedValueCollections(CurrentRelayInfo::recloseDelays)
         }
 
     private fun compareCurrentTransformerInfo(source: CurrentTransformerInfo, target: CurrentTransformerInfo): ObjectDifference<CurrentTransformerInfo> =
@@ -288,7 +287,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareIdentifiedObject()
 
             compareIdReferences(UsagePoint::usagePointLocation)
-            compareValues(UsagePoint::isVirtual, UsagePoint::connectionCategory)
+            compareValues(UsagePoint::isVirtual, UsagePoint::connectionCategory, UsagePoint::ratedPower, UsagePoint::approvedInverterCapacity)
             if (options.compareLvSimplification)
                 compareIdReferenceCollections(UsagePoint::equipment, UsagePoint::endDevices)
         }
@@ -367,7 +366,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         apply {
             comparePowerSystemResource()
 
-            compareValues(Equipment::inService, Equipment::normallyInService)
+            compareValues(Equipment::inService, Equipment::normallyInService, Equipment::commissionedDate)
 
             if (options.compareEquipmentContainers)
                 compareIdReferenceCollections(Equipment::containers)
@@ -527,7 +526,12 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         apply {
             compareEquipment()
 
-            compareValues(ProtectionEquipment::relayDelayTime, ProtectionEquipment::protectionKind)
+            compareValues(
+                ProtectionEquipment::relayDelayTime,
+                ProtectionEquipment::protectionKind,
+                ProtectionEquipment::directable,
+                ProtectionEquipment::powerDirection
+            )
             compareIdReferenceCollections(ProtectionEquipment::protectedSwitches)
         }
 
@@ -750,7 +754,31 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 PowerElectronicsConnection::p,
                 PowerElectronicsConnection::q,
                 PowerElectronicsConnection::ratedS,
-                PowerElectronicsConnection::ratedU
+                PowerElectronicsConnection::ratedU,
+                PowerElectronicsConnection::inverterStandard,
+                PowerElectronicsConnection::sustainOpOvervoltLimit,
+                PowerElectronicsConnection::stopAtOverFreq,
+                PowerElectronicsConnection::stopAtUnderFreq,
+                PowerElectronicsConnection::invVoltWattRespMode,
+                PowerElectronicsConnection::invWattRespV1,
+                PowerElectronicsConnection::invWattRespV2,
+                PowerElectronicsConnection::invWattRespV3,
+                PowerElectronicsConnection::invWattRespV4,
+                PowerElectronicsConnection::invWattRespPAtV1,
+                PowerElectronicsConnection::invWattRespPAtV2,
+                PowerElectronicsConnection::invWattRespPAtV3,
+                PowerElectronicsConnection::invWattRespPAtV4,
+                PowerElectronicsConnection::invVoltVArRespMode,
+                PowerElectronicsConnection::invVArRespV1,
+                PowerElectronicsConnection::invVArRespV2,
+                PowerElectronicsConnection::invVArRespV3,
+                PowerElectronicsConnection::invVArRespV4,
+                PowerElectronicsConnection::invVArRespQAtV1,
+                PowerElectronicsConnection::invVArRespQAtV2,
+                PowerElectronicsConnection::invVArRespQAtV3,
+                PowerElectronicsConnection::invVArRespQAtV4,
+                PowerElectronicsConnection::invReactivePowerMode,
+                PowerElectronicsConnection::invFixReactivePower
             )
         }
 
@@ -797,6 +825,8 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 PowerTransformerEnd::x,
                 PowerTransformerEnd::x0
             )
+
+            compareIndexedValueCollections(PowerTransformerEnd::sRatings)
         }
 
     private fun ObjectDifference<out ProtectedSwitch>.compareProtectedSwitch(): ObjectDifference<out ProtectedSwitch> =
@@ -823,6 +853,24 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareEnergyConnection()
 
             compareValues(RegulatingCondEq::controlEnabled)
+        }
+
+    private fun ObjectDifference<out RegulatingControl>.compareRegulatingControl(): ObjectDifference<out RegulatingControl> =
+        apply {
+            comparePowerSystemResource()
+
+            compareValues(
+                RegulatingControl::discrete,
+                RegulatingControl::mode,
+                RegulatingControl::monitoredPhase,
+                RegulatingControl::targetDeadband,
+                RegulatingControl::targetValue,
+                RegulatingControl::enabled,
+                RegulatingControl::maxAllowedTargetValue,
+                RegulatingControl::minAllowedTargetValue
+            )
+            compareIdReferences(RegulatingControl::terminal)
+            compareIdReferenceCollections(RegulatingControl::regulatingCondEqs)
         }
 
     private fun ObjectDifference<out ShuntCompensator>.compareShuntCompensator(): ObjectDifference<out ShuntCompensator> =
@@ -854,6 +902,24 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 TapChanger::normalStep,
                 TapChanger::step
             )
+            compareIdReferences(TapChanger::tapChangerControl)
+        }
+
+    private fun compareTapChangerControl(source: TapChangerControl, target: TapChangerControl): ObjectDifference<TapChangerControl> =
+        ObjectDifference(source, target).apply {
+            compareRegulatingControl()
+
+            compareValues(
+                TapChangerControl::limitVoltage,
+                TapChangerControl::lineDropCompensation,
+                TapChangerControl::lineDropR,
+                TapChangerControl::lineDropX,
+                TapChangerControl::reverseLineDropR,
+                TapChangerControl::reverseLineDropX,
+                TapChangerControl::forwardLDCBlocking,
+                TapChangerControl::timeDelay,
+                TapChangerControl::coGenerationEnabled
+            )
         }
 
     private fun ObjectDifference<out TransformerEnd>.compareTransformerEnd(): ObjectDifference<out TransformerEnd> =
@@ -873,6 +939,13 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
 
             compareValues(TransformerStarImpedance::r, TransformerStarImpedance::r0, TransformerStarImpedance::x, TransformerStarImpedance::x0)
             compareIdReferences(TransformerStarImpedance::transformerEndInfo)
+        }
+
+    /************ IEC61970 INFIEC61970 BASE WIRES GENERATION PRODUCTION ************/
+
+    private fun compareEvChargingUnit(source: EvChargingUnit, target: EvChargingUnit): ObjectDifference<EvChargingUnit> =
+        ObjectDifference(source, target).apply {
+            comparePowerElectronicsUnit()
         }
 
     /************ IEC61970 InfIEC61970 Feeder ************/

@@ -16,6 +16,8 @@ import org.hamcrest.Matchers.*
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
 
+data class ExpectedDifference(val name: String, val difference: Difference)
+
 class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
     val newService: () -> T,
     val newComparator: (NetworkServiceComparatorOptions) -> C
@@ -72,10 +74,13 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         target: T,
         expectModification: ObjectDifference<T> = ObjectDifference(source, target),
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
-        optionsStopCompare: Boolean = false
+        optionsStopCompare: Boolean = false,
+        expectedDifferences: Set<String> = emptySet()
     ) {
         val diff: ObjectDifference<T> = newComparator(NetworkServiceComparatorOptions.all()).compare(source, target)
-        assertThat(diff, equalTo(expectModification))
+        assertThat(diff.source, equalTo(expectModification.source))
+        assertThat(diff.target, equalTo(expectModification.target))
+        assertThat(diff.differences.filterKeys { it !in expectedDifferences }, equalTo(expectModification.differences))
 
         if (optionsStopCompare) {
             val noDiffExpected: ObjectDifference<T> = newComparator(options).compare(source, target)
@@ -89,7 +94,8 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createValue: (T) -> R,
         createOtherValue: (T) -> R,
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
-        optionsStopCompare: Boolean = false
+        optionsStopCompare: Boolean = false,
+        expectedDifferences: Set<String> = emptySet()
     ) {
         val subject = createIdObj("mRID").apply { property.set(this, createValue(this)) }
         val matching = createIdObj("mRID").apply { property.set(this, createValue(this)) }
@@ -99,7 +105,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
 
         ObjectDifference(subject, modified).apply {
             differences[property.name] = getValueOrReferenceDifference(property.get(subject), property.get(target))
-        }.validateExpected(options, optionsStopCompare)
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 
     fun <T : IdentifiedObject, R> validateValProperty(
@@ -108,7 +114,8 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         changeState: (idObj: T, currentPropertyValue: R) -> Unit,
         otherChangeState: (idObj: T, currentPropertyValue: R) -> Unit,
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
-        optionsStopCompare: Boolean = false
+        optionsStopCompare: Boolean = false,
+        expectedDifferences: Set<String> = emptySet()
     ) {
         val subject = createIdObj("mRID").apply { changeState(this, property.get(this)) }
         val matching = createIdObj("mRID").apply { changeState(this, property.get(this)) }
@@ -118,7 +125,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
 
         ObjectDifference(subject, modified).apply {
             differences[property.name] = getValueOrReferenceDifference(property.get(subject), property.get(target))
-        }.validateExpected(options, optionsStopCompare)
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 
     fun <T : IdentifiedObject, R> validateCollection(
@@ -128,7 +135,8 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createItem: (T) -> R,
         createOtherItem: (T) -> R,
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
-        optionsStopCompare: Boolean = false
+        optionsStopCompare: Boolean = false,
+        expectedDifferences: Set<String> = emptySet()
     ) {
         val sourceEmpty = createIdObj("mRID")
         val targetEmpty = createIdObj("mRID")
@@ -141,12 +149,12 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         ObjectDifference(inSource, targetEmpty).apply {
             val item = property.get(source).first()
             differences[property.name] = CollectionDifference(missingFromTarget = mutableListOf(item))
-        }.validateExpected(options, optionsStopCompare)
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         ObjectDifference(sourceEmpty, inTarget).apply {
             val item = property.get(target).first()
             differences[property.name] = CollectionDifference(missingFromSource = mutableListOf(item))
-        }.validateExpected(options, optionsStopCompare)
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         val inTargetDifference = createIdObj("mRID").apply { addToCollection(this, createOtherItem(this)) }
         ObjectDifference(inSource, inTargetDifference).apply {
@@ -156,7 +164,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
                 missingFromSource = mutableListOf(inTargetItem),
                 missingFromTarget = mutableListOf(inSourceItem)
             )
-        }.validateExpected(options, optionsStopCompare)
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 
     fun <T : IdentifiedObject, R> validateIndexedCollection(
@@ -167,7 +175,8 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createOtherItem: (T) -> R,
         setItemIdObj: (R, T) -> Unit = { _, _ -> },
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
-        optionsStopCompare: Boolean = false
+        optionsStopCompare: Boolean = false,
+        expectedDifferences: Set<String> = emptySet()
     ) {
         val sourceEmpty = createIdObj("mRID")
         val targetEmpty = createIdObj("mRID")
@@ -190,12 +199,12 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         ObjectDifference(inSource, targetEmpty).apply {
             val valOrRefDiff = getValueOrReferenceDifference(getItem(source), null)
             differences[property.name] = CollectionDifference().apply { missingFromTarget.add(IndexedDifference(0, valOrRefDiff)) }
-        }.validateExpected(options, optionsStopCompare)
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         ObjectDifference(sourceEmpty, inTarget).apply {
             val valOrRefDiff = getValueOrReferenceDifference(null, getItem(target))
             differences[property.name] = CollectionDifference().apply { missingFromSource.add(IndexedDifference(0, valOrRefDiff)) }
-        }.validateExpected(options, optionsStopCompare)
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
         val targetDifferent = createIdObj("mRID").apply {
             val item = createOtherItem(this)
@@ -205,7 +214,7 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         ObjectDifference(inSource, targetDifferent).apply {
             val valOrRefDiff = getValueOrReferenceDifference(getItem(source), getItem(target))
             differences[property.name] = CollectionDifference().apply { modifications.add(IndexedDifference(0, valOrRefDiff)) }
-        }.validateExpected(options, optionsStopCompare)
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 
     private fun <T> getValueOrReferenceDifference(source: T?, target: T?): Difference {
@@ -220,8 +229,9 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
 
     private fun <T : IdentifiedObject> ObjectDifference<T>.validateExpected(
         options: NetworkServiceComparatorOptions,
-        optionsStopCompare: Boolean = false
+        optionsStopCompare: Boolean = false,
+        expectedDifferences: Set<String>
     ) {
-        validateCompare(source, target, expectModification = this, options = options, optionsStopCompare = optionsStopCompare)
+        validateCompare(source, target, expectModification = this, options = options, optionsStopCompare = optionsStopCompare, expectedDifferences)
     }
 }

@@ -13,7 +13,9 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
 import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.exception.ExpectException
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -55,6 +57,7 @@ internal class PowerTransformerEndTest {
         assertThat(powerTransformerEnd.ratedU, nullValue())
         assertThat(powerTransformerEnd.x, nullValue())
         assertThat(powerTransformerEnd.x0, nullValue())
+        assertThat(powerTransformerEnd.sRatings, emptyIterable())
 
         powerTransformerEnd.fillFields(NetworkService())
 
@@ -71,6 +74,7 @@ internal class PowerTransformerEndTest {
         assertThat(powerTransformerEnd.ratedU, equalTo(9))
         assertThat(powerTransformerEnd.x, equalTo(10.0))
         assertThat(powerTransformerEnd.x0, equalTo(11.0))
+        assertThat(powerTransformerEnd.sRatings, contains(TransformerEndRatedS(TransformerCoolingType.UNKNOWN_COOLING_TYPE, 8)))
     }
 
     @Test
@@ -167,6 +171,72 @@ internal class PowerTransformerEndTest {
         doReturn(ResistanceReactance(null, null, 3.3, null)).`when`(info).resistanceReactance(end.endNumber)
 
         validateResistanceReactance(end.resistanceReactance(), 1.1, 2.2, 3.3, null)
+    }
+
+    @Test
+    internal fun sRatings() {
+        var rating = 0
+        val coolingTypes = TransformerCoolingType.values()
+        PrivateCollectionValidator.validate(
+            { PowerTransformerEnd() },
+            { TransformerEndRatedS(coolingTypes[rating], rating++) },
+            PowerTransformerEnd::numRatings,
+            { pte: PowerTransformerEnd, idx: Int -> pte.getRating(idx) },
+            PowerTransformerEnd::forEachRating,
+            PowerTransformerEnd::addRating,
+            null,
+            { pte, r: TransformerEndRatedS? -> pte.removeRating(r) },
+            PowerTransformerEnd::clearRatings,
+            supportsDuplicates = false
+        )
+    }
+
+    @Test
+    internal fun `remove rating by cooling type`() {
+        val coolingTypes = TransformerCoolingType.values()
+        val pte = PowerTransformerEnd()
+        (1..11).forEach {
+            pte.addRating(it * 10, coolingTypes[it - 1])
+            assertThat(pte.numRatings(), equalTo(it))
+            assertThat(pte.getRating(coolingTypes[it - 1])?.ratedS, equalTo(it * 10))
+        }
+
+        (1..11).forEach {
+            pte.removeRating(coolingTypes[it - 1])
+            assertThat(pte.numRatings(), equalTo(11 - it))
+            assertThat(pte.getRating(coolingTypes[it - 1]), nullValue())
+        }
+    }
+
+    @Test
+    internal fun `add rating with same cooling type throws exception`() {
+        val pte = PowerTransformerEnd()
+        pte.addRating(3, TransformerCoolingType.KFWF)
+        pte.addRating(3, TransformerCoolingType.KNAF)
+
+        expect {
+            pte.addRating(10, TransformerCoolingType.KFWF)
+        }.toThrow<IllegalArgumentException>()
+            .withMessage("A rating for coolingType KFWF already exists, please remove it first.")
+    }
+
+    @Test
+    internal fun `ratedS setter coverage`() {
+        val pte = PowerTransformerEnd()
+        pte.ratedS = 10
+        assertThat(pte.ratedS, equalTo(10))
+        assertThat(pte.numRatings(), equalTo(1))
+        assertThat(pte.sRatings.first().ratedS, equalTo(10))
+
+        pte.ratedS = 20
+        assertThat(pte.ratedS, equalTo(20))
+        assertThat(pte.numRatings(), equalTo(1))
+        assertThat(pte.sRatings.first().ratedS, equalTo(20))
+
+        pte.ratedS = null
+        assertThat(pte.ratedS, nullValue())
+        assertThat(pte.numRatings(), equalTo(0))
+
     }
 
     private fun clearMockitoInvocations() {

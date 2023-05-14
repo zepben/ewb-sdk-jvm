@@ -47,7 +47,7 @@ abstract class SqliteTable {
 
     fun createIndexesSql(): Collection<String> = createIndexesSql ?: buildCreateIndexSql()
 
-    fun selectSql(): String = selectSql ?: buildSelectSql()
+    open fun selectSql(): String = selectSql ?: buildSelectSql()
 
     fun preparedUpdateSql(): String = preparedUpdateSql ?: buildPreparedUpdateSql()
 

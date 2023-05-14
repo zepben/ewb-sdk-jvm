@@ -234,7 +234,7 @@ internal class CustomerConsumerClientTest {
 
     private fun configureFeederResponses(expectedCustomerService: CustomerService) {
 
-        consumerService.onGetCustomersForContainer = spy { request, response ->
+        consumerService.onGetCustomersForContainer = spy { _, response ->
             val objects = mutableListOf<Customer>()
             expectedCustomerService.sequenceOf<Customer>().forEach { customer ->
                 objects.add(customer)

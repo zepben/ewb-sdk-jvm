@@ -14,4 +14,9 @@ package com.zepben.evolve.cim.iec61970.base.wires
 abstract class RegulatingCondEq(mRID: String = "") : EnergyConnection(mRID) {
 
     var controlEnabled: Boolean = true
+    var regulatingControl: RegulatingControl? = null
+        set(value) {
+            field =
+                if (field == null || field === value) value else throw IllegalStateException("regulatingControl has already been set to $field. Cannot set this field again")
+        }
 }

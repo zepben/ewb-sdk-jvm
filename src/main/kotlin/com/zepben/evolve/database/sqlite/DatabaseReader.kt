@@ -16,6 +16,7 @@ import com.zepben.evolve.database.sqlite.readers.*
 import com.zepben.evolve.database.sqlite.tables.MissingTableConfigException
 import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
 import com.zepben.evolve.services.common.extensions.nameAndMRID
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
@@ -121,6 +122,13 @@ class DatabaseReader @JvmOverloads constructor(
     }
 
     private fun postLoad(networkService: NetworkService): Boolean {
+        logger.info("Ensuring all references resolved...")
+        networkService.unresolvedReferences().forEach {
+            throw IllegalStateException("Network still had unresolved references after load - this should not occur. Failing reference was from " +
+                "${it.from.typeNameAndMRID()} resolving ${it.resolver.toClass.simpleName} ${it.toMrid}")
+        }
+        logger.info("Unresolved references were all resolved during load.")
+
         logger.info("Applying feeder direction to network...")
         setDirection.run(networkService)
         logger.info("Feeder direction applied to network.")

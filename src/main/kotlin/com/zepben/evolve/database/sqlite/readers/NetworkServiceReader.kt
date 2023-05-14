@@ -20,6 +20,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.TablePositionPoi
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
 import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperationalRestrictions
@@ -37,6 +38,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteC
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableEvChargingUnits
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
@@ -68,6 +70,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableCurrentTransformerInfo>("current transformer info", reader::load)
         status = status and loadEach<TablePotentialTransformerInfo>("potential transformer info", reader::load)
         status = status and loadEach<TableCurrentRelayInfo>("current relay info", reader::load)
+        status = status and loadEach<TableRecloseDelays>("reclose delays", reader::load)
         status = status and loadEach<TableLocations>("locations", reader::load)
         status = status and loadEach<TableOrganisations>("organisations", reader::load)
         status = status and loadEach<TableAssetOwners>("asset owners", reader::load)
@@ -84,11 +87,6 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableSites>("sites", reader::load)
         status = status and loadEach<TablePerLengthSequenceImpedances>("per length sequence impedances", reader::load)
         status = status and loadEach<TableEquivalentBranches>("equivalent branches", reader::load)
-        status = status and loadEach<TablePowerElectronicsConnection>("power electronics connection", reader::load)
-        status = status and loadEach<TablePowerElectronicsConnectionPhases>("power electronics connection phases", reader::load)
-        status = status and loadEach<TableBatteryUnit>("battery unit", reader::load)
-        status = status and loadEach<TablePhotoVoltaicUnit>("photo voltaic unit", reader::load)
-        status = status and loadEach<TablePowerElectronicsWindUnit>("power electronics wind unit", reader::load)
         status = status and loadEach<TableAcLineSegments>("AC line segments", reader::load)
         status = status and loadEach<TableBreakers>("breakers", reader::load)
         status = status and loadEach<TableLoadBreakSwitches>("load break switches", reader::load)
@@ -105,9 +103,17 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableLinearShuntCompensators>("linear shunt compensators", reader::load)
         status = status and loadEach<TablePowerTransformers>("power transformers", reader::load)
         status = status and loadEach<TableReclosers>("reclosers", reader::load)
+        status = status and loadEach<TablePowerElectronicsConnection>("power electronics connection", reader::load)
         status = status and loadEach<TableTerminals>("terminals", reader::load)
+        status = status and loadEach<TableTapChangerControls>("tap changer controls", reader::load)
+        status = status and loadEach<TablePowerElectronicsConnectionPhases>("power electronics connection phases", reader::load)
+        status = status and loadEach<TableBatteryUnit>("battery unit", reader::load)
+        status = status and loadEach<TablePhotoVoltaicUnit>("photo voltaic unit", reader::load)
+        status = status and loadEach<TablePowerElectronicsWindUnit>("power electronics wind unit", reader::load)
+        status = status and loadEach<TableEvChargingUnits>("ev charging units", reader::load)
         status = status and loadEach<TableTransformerStarImpedance>("transformer star impedance", reader::load)
         status = status and loadEach<TablePowerTransformerEnds>("power transformer ends", reader::load)
+        status = status and loadEach<TablePowerTransformerEndRatings>("power transformer end ratings", reader::load)
         status = status and loadEach<TableRatioTapChangers>("ratio tap changers", reader::load)
         status = status and loadEach<TableCurrentTransformers>("current transformers", reader::load)
         status = status and loadEach<TableFaultIndicators>("fault indicators", reader::load)

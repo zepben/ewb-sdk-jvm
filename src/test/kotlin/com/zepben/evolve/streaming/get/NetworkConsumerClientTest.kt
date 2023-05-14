@@ -135,7 +135,12 @@ internal class NetworkConsumerClientTest {
             response.identifiedObjectsList.forEach { nio ->
                 val type = nio.identifiedObjectCase
                 if (isSupported(type)) {
-                    assertThat("Fetching $type was not successful", result.wasSuccessful, equalTo(true))
+                    if (result.wasFailure)
+                        /**
+                         * If you hit this you've probably got fields in your CIM class that have requirements that are not being met by the default
+                         * builder. Fix this in [ConsumerUtils.buildFromBuilder]
+                         */
+                        throw result.thrown
                     assertThat(result.value.mRID, equalTo(mRID))
                 } else {
                     assertThat(result.wasFailure, equalTo(true))
@@ -958,6 +963,8 @@ internal class NetworkConsumerClientTest {
                 isSwitchInfo = { switchInfo = it.toPb() },
                 isCurrentRelay = { currentRelay = it.toPb() },
                 isCurrentRelayInfo = { currentRelayInfo = it.toPb() },
+                isEvChargingUnit = { evChargingUnit = it.toPb() },
+                isTapChangerControl = { tapChangerControl = it.toPb() },
             )
         }
 

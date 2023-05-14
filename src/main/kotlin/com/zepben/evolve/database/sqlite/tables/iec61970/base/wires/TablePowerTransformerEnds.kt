@@ -23,7 +23,6 @@ class TablePowerTransformerEnds : TableTransformerEnds() {
     val G0 = Column(++columnIndex, "g0", "NUMBER", NULL)
     val R = Column(++columnIndex, "R", "NUMBER", NULL)
     val R0 = Column(++columnIndex, "R0", "NUMBER", NULL)
-    val RATED_S = Column(++columnIndex, "rated_s", "INTEGER", NULL)
     val RATED_U = Column(++columnIndex, "rated_u", "INTEGER", NULL)
     val X = Column(++columnIndex, "X", "NUMBER", NULL)
     val X0 = Column(++columnIndex, "X0", "NUMBER", NULL)

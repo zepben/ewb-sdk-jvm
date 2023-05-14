@@ -45,7 +45,7 @@ internal class EquipmentTest {
 
         assertThat(equipment.inService, equalTo(false))
         assertThat(equipment.normallyInService, equalTo(false))
-        assertThat(equipment.commissionedDate, equalTo(Instant.EPOCH))
+        assertThat(equipment.commissionedDate, equalTo(Instant.MIN))
     }
 
     @Test

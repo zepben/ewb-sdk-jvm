@@ -35,6 +35,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.DatabaseTables
 import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.tables.associations.*
@@ -44,6 +45,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableEndDevices
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
@@ -59,10 +61,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteC
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnit
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnit
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsUnit
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
@@ -353,6 +352,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableCurrentRelayInfo::class.java)
         val insert = databaseTables.getInsert(TableCurrentRelayInfo::class.java)
 
+        val recloseDelayTable = databaseTables.getTable(TableRecloseDelays::class.java)
+        currentRelayInfo.recloseDelays.forEachIndexed { idx, delay ->
+            val recloseDelayInsert = databaseTables.getInsert(TableRecloseDelays::class.java)
+            recloseDelayInsert.setString(recloseDelayTable.CURRENT_RELAY_INFO_MRID.queryIndex, currentRelayInfo.mRID)
+            recloseDelayInsert.setInt(recloseDelayTable.SEQUENCE_NUMBER.queryIndex, idx)
+            recloseDelayInsert.setDouble(recloseDelayTable.RECLOSE_DELAY.queryIndex, delay)
+            tryExecuteSingleUpdate(recloseDelayInsert, "${currentRelayInfo.mRID}-rd-${idx}", "reclose delay")
+        }
+
         insert.setNullableString(table.CURVE_SETTING.queryIndex, currentRelayInfo.curveSetting)
 
         return saveAssetInfo(table, insert, currentRelayInfo, "current relay info")
@@ -418,6 +426,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableString(table.LOCATION_MRID.queryIndex, usagePoint.usagePointLocation?.mRID)
         insert.setBoolean(table.IS_VIRTUAL.queryIndex, usagePoint.isVirtual)
         insert.setNullableString(table.CONNECTION_CATEGORY.queryIndex, usagePoint.connectionCategory)
+        insert.setNullableInt(table.RATED_POWER.queryIndex, usagePoint.ratedPower)
+        insert.setNullableInt(table.APPROVED_INVERTER_CAPACITY.queryIndex, usagePoint.approvedInverterCapacity)
 
         var status = true
         usagePoint.equipment.forEach { status = status and saveAssociation(it, usagePoint) }
@@ -526,6 +536,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     private fun saveEquipment(table: TableEquipment, insert: PreparedStatement, equipment: Equipment, description: String): Boolean {
         insert.setBoolean(table.NORMALLY_IN_SERVICE.queryIndex, equipment.normallyInService)
         insert.setBoolean(table.IN_SERVICE.queryIndex, equipment.inService)
+        insert.setInstant(table.COMMISSIONED_DATE.queryIndex, equipment.commissionedDate)
 
         var status = true
         equipment.containers.forEach {
@@ -652,6 +663,12 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         saveConductingEquipment(table, insert, equivalentEquipment, description)
 
     /************ IEC61970 WIRES GENERATION PRODUCTION************/
+    fun save(evChargingUnit: EvChargingUnit): Boolean {
+        val table = databaseTables.getTable(TableEvChargingUnits::class.java)
+        val insert = databaseTables.getInsert(TableEvChargingUnits::class.java)
+
+        return savePowerElectronicsUnit(table, insert, evChargingUnit, "ev charging unit")
+    }
 
     fun save(batteryUnit: BatteryUnit): Boolean {
         val table = databaseTables.getTable(TableBatteryUnit::class.java)
@@ -909,6 +926,30 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableDouble(table.Q.queryIndex, powerElectronicsConnection.q)
         insert.setNullableInt(table.RATED_S.queryIndex, powerElectronicsConnection.ratedS)
         insert.setNullableInt(table.RATED_U.queryIndex, powerElectronicsConnection.ratedU)
+        insert.setNullableString(table.INVERTER_STANDARD.queryIndex, powerElectronicsConnection.inverterStandard)
+        insert.setNullableInt(table.SUSTAIN_OP_OVERVOLT_LIMIT.queryIndex, powerElectronicsConnection.sustainOpOvervoltLimit)
+        insert.setNullableFloat(table.STOP_AT_OVER_FREQ.queryIndex, powerElectronicsConnection.stopAtOverFreq)
+        insert.setNullableFloat(table.STOP_AT_UNDER_FREQ.queryIndex, powerElectronicsConnection.stopAtUnderFreq)
+        insert.setNullableBoolean(table.INV_VOLT_WATT_RESP_MODE.queryIndex, powerElectronicsConnection.invVoltWattRespMode)
+        insert.setNullableInt(table.INV_WATT_RESP_V1.queryIndex, powerElectronicsConnection.invWattRespV1)
+        insert.setNullableInt(table.INV_WATT_RESP_V2.queryIndex, powerElectronicsConnection.invWattRespV2)
+        insert.setNullableInt(table.INV_WATT_RESP_V3.queryIndex, powerElectronicsConnection.invWattRespV3)
+        insert.setNullableInt(table.INV_WATT_RESP_V4.queryIndex, powerElectronicsConnection.invWattRespV4)
+        insert.setNullableFloat(table.INV_WATT_RESP_P_AT_V1.queryIndex, powerElectronicsConnection.invWattRespPAtV1)
+        insert.setNullableFloat(table.INV_WATT_RESP_P_AT_V2.queryIndex, powerElectronicsConnection.invWattRespPAtV2)
+        insert.setNullableFloat(table.INV_WATT_RESP_P_AT_V3.queryIndex, powerElectronicsConnection.invWattRespPAtV3)
+        insert.setNullableFloat(table.INV_WATT_RESP_P_AT_V4.queryIndex, powerElectronicsConnection.invWattRespPAtV4)
+        insert.setNullableBoolean(table.INV_VOLT_VAR_RESP_MODE.queryIndex, powerElectronicsConnection.invVoltVArRespMode)
+        insert.setNullableInt(table.INV_VAR_RESP_V1.queryIndex, powerElectronicsConnection.invVArRespV1)
+        insert.setNullableInt(table.INV_VAR_RESP_V2.queryIndex, powerElectronicsConnection.invVArRespV2)
+        insert.setNullableInt(table.INV_VAR_RESP_V3.queryIndex, powerElectronicsConnection.invVArRespV3)
+        insert.setNullableInt(table.INV_VAR_RESP_V4.queryIndex, powerElectronicsConnection.invVArRespV4)
+        insert.setNullableFloat(table.INV_VAR_RESP_Q_AT_V1.queryIndex, powerElectronicsConnection.invVArRespQAtV1)
+        insert.setNullableFloat(table.INV_VAR_RESP_Q_AT_V2.queryIndex, powerElectronicsConnection.invVArRespQAtV2)
+        insert.setNullableFloat(table.INV_VAR_RESP_Q_AT_V3.queryIndex, powerElectronicsConnection.invVArRespQAtV3)
+        insert.setNullableFloat(table.INV_VAR_RESP_Q_AT_V4.queryIndex, powerElectronicsConnection.invVArRespQAtV4)
+        insert.setNullableBoolean(table.INV_REACTIVE_POWER_MODE.queryIndex, powerElectronicsConnection.invReactivePowerMode)
+        insert.setNullableFloat(table.INV_FIX_REACTIVE_POWER.queryIndex, powerElectronicsConnection.invFixReactivePower)
 
         return saveRegulatingCondEq(table, insert, powerElectronicsConnection, "power electronics connection")
     }
@@ -951,10 +992,18 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableDouble(table.G0.queryIndex, powerTransformerEnd.g0)
         insert.setNullableDouble(table.R.queryIndex, powerTransformerEnd.r)
         insert.setNullableDouble(table.R0.queryIndex, powerTransformerEnd.r0)
-        insert.setNullableInt(table.RATED_S.queryIndex, powerTransformerEnd.ratedS)
         insert.setNullableInt(table.RATED_U.queryIndex, powerTransformerEnd.ratedU)
         insert.setNullableDouble(table.X.queryIndex, powerTransformerEnd.x)
         insert.setNullableDouble(table.X0.queryIndex, powerTransformerEnd.x0)
+
+        val ratingsTable = databaseTables.getTable(TablePowerTransformerEndRatings::class.java)
+        val ratingsInsert = databaseTables.getInsert(TablePowerTransformerEndRatings::class.java)
+        powerTransformerEnd.sRatings.forEach {
+            ratingsInsert.setString(ratingsTable.POWER_TRANSFORMER_END_MRID.queryIndex, powerTransformerEnd.mRID)
+            ratingsInsert.setString(ratingsTable.COOLING_TYPE.queryIndex, it.coolingType.name)
+            ratingsInsert.setInt(ratingsTable.RATED_S.queryIndex, it.ratedS)
+            tryExecuteSingleUpdate(ratingsInsert, "${powerTransformerEnd.mRID}-${it.coolingType.name}-${it.ratedS}", "transformer end ratedS")
+        }
 
         return saveTransformerEnd(table, insert, powerTransformerEnd, "power transformer end")
     }
@@ -992,8 +1041,28 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         description: String
     ): Boolean {
         insert.setBoolean(table.CONTROL_ENABLED.queryIndex, regulatingCondEq.controlEnabled)
+        insert.setNullableString(table.REGULATING_CONTROL_MRID.queryIndex, regulatingCondEq.regulatingControl?.mRID)
 
         return saveEnergyConnection(table, insert, regulatingCondEq, description)
+    }
+
+    private fun saveRegulatingControl(
+        table: TableRegulatingControls,
+        insert: PreparedStatement,
+        regulatingControl: RegulatingControl,
+        description: String
+    ): Boolean {
+        insert.setNullableBoolean(table.DISCRETE.queryIndex, regulatingControl.discrete)
+        insert.setString(table.MODE.queryIndex, regulatingControl.mode.name)
+        insert.setString(table.MONITORED_PHASE.queryIndex, regulatingControl.monitoredPhase.name)
+        insert.setNullableFloat(table.TARGET_DEADBAND.queryIndex, regulatingControl.targetDeadband)
+        insert.setNullableDouble(table.TARGET_VALUE.queryIndex, regulatingControl.targetValue)
+        insert.setNullableBoolean(table.ENABLED.queryIndex, regulatingControl.enabled)
+        insert.setNullableDouble(table.MAX_ALLOWED_TARGET_VALUE.queryIndex, regulatingControl.maxAllowedTargetValue)
+        insert.setNullableDouble(table.MIN_ALLOWED_TARGET_VALUE.queryIndex, regulatingControl.minAllowedTargetValue)
+        insert.setNullableString(table.TERMINAL_MRID.queryIndex, regulatingControl.terminal?.mRID)
+
+        return savePowerSystemResource(table, insert, regulatingControl, description)
     }
 
     private fun saveShuntCompensator(
@@ -1028,8 +1097,26 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableInt(table.NEUTRAL_U.queryIndex, tapChanger.neutralU)
         insert.setNullableInt(table.NORMAL_STEP.queryIndex, tapChanger.normalStep)
         insert.setNullableDouble(table.STEP.queryIndex, tapChanger.step)
+        insert.setNullableString(table.TAP_CHANGER_CONTROL_MRID.queryIndex, tapChanger.tapChangerControl?.mRID)
 
         return savePowerSystemResource(table, insert, tapChanger, description)
+    }
+
+    fun save(tapChangerControl: TapChangerControl): Boolean {
+        val table = databaseTables.getTable(TableTapChangerControls::class.java)
+        val insert = databaseTables.getInsert(TableTapChangerControls::class.java)
+
+        insert.setNullableInt(table.LIMIT_VOLTAGE.queryIndex, tapChangerControl.limitVoltage)
+        insert.setNullableBoolean(table.LINE_DROP_COMPENSATION.queryIndex, tapChangerControl.lineDropCompensation)
+        insert.setNullableDouble(table.LINE_DROP_R.queryIndex, tapChangerControl.lineDropR)
+        insert.setNullableDouble(table.LINE_DROP_X.queryIndex, tapChangerControl.lineDropX)
+        insert.setNullableDouble(table.REVERSE_LINE_DROP_R.queryIndex, tapChangerControl.reverseLineDropR)
+        insert.setNullableDouble(table.REVERSE_LINE_DROP_X.queryIndex, tapChangerControl.reverseLineDropX)
+        insert.setNullableBoolean(table.FORWARD_LDC_BLOCKING.queryIndex, tapChangerControl.forwardLDCBlocking)
+        insert.setNullableDouble(table.TIME_DELAY.queryIndex, tapChangerControl.timeDelay)
+        insert.setNullableBoolean(table.CO_GENERATION_ENABLED.queryIndex, tapChangerControl.coGenerationEnabled)
+
+        return saveRegulatingControl(table, insert, tapChangerControl, "tap changer control")
     }
 
     private fun saveTransformerEnd(
@@ -1170,6 +1257,8 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     ): Boolean {
         insert.setNullableDouble(table.RELAY_DELAY_TIME.queryIndex, protectionEquipment.relayDelayTime)
         insert.setString(table.PROTECTION_KIND.queryIndex, protectionEquipment.protectionKind.name)
+        insert.setNullableBoolean(table.DIRECTABLE.queryIndex, protectionEquipment.directable)
+        insert.setString(table.POWER_DIRECTION.queryIndex, protectionEquipment.powerDirection.name)
 
         return saveEquipment(table, insert, protectionEquipment, description)
     }

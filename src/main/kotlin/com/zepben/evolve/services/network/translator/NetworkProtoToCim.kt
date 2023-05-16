@@ -979,15 +979,15 @@ fun toCim(pb: PBPowerElectronicsConnection, networkService: NetworkService): Pow
         invWattRespPAtV2 = pb.invWattRespPAtV2.takeUnless { it == UNKNOWN_FLOAT }
         invWattRespPAtV3 = pb.invWattRespPAtV3.takeUnless { it == UNKNOWN_FLOAT }
         invWattRespPAtV4 = pb.invWattRespPAtV4.takeUnless { it == UNKNOWN_FLOAT }
-        invVoltVArRespMode = pb.invVoltVArRespModeSet.takeUnless { pb.hasInvVoltVArRespModeNull() }
-        invVArRespV1 = pb.invVArRespV1.takeUnless { it == UNKNOWN_INT }
-        invVArRespV2 = pb.invVArRespV2.takeUnless { it == UNKNOWN_INT }
-        invVArRespV3 = pb.invVArRespV3.takeUnless { it == UNKNOWN_INT }
-        invVArRespV4 = pb.invVArRespV4.takeUnless { it == UNKNOWN_INT }
-        invVArRespQAtV1 = pb.invVArRespQAtV1.takeUnless { it == UNKNOWN_FLOAT }
-        invVArRespQAtV2 = pb.invVArRespQAtV2.takeUnless { it == UNKNOWN_FLOAT }
-        invVArRespQAtV3 = pb.invVArRespQAtV3.takeUnless { it == UNKNOWN_FLOAT }
-        invVArRespQAtV4 = pb.invVArRespQAtV4.takeUnless { it == UNKNOWN_FLOAT }
+        invVoltVarRespMode = pb.invVoltVarRespModeSet.takeUnless { pb.hasInvVoltVarRespModeNull() }
+        invVarRespV1 = pb.invVarRespV1.takeUnless { it == UNKNOWN_INT }
+        invVarRespV2 = pb.invVarRespV2.takeUnless { it == UNKNOWN_INT }
+        invVarRespV3 = pb.invVarRespV3.takeUnless { it == UNKNOWN_INT }
+        invVarRespV4 = pb.invVarRespV4.takeUnless { it == UNKNOWN_INT }
+        invVarRespQAtV1 = pb.invVarRespQAtV1.takeUnless { it == UNKNOWN_FLOAT }
+        invVarRespQAtV2 = pb.invVarRespQAtV2.takeUnless { it == UNKNOWN_FLOAT }
+        invVarRespQAtV3 = pb.invVarRespQAtV3.takeUnless { it == UNKNOWN_FLOAT }
+        invVarRespQAtV4 = pb.invVarRespQAtV4.takeUnless { it == UNKNOWN_FLOAT }
         invReactivePowerMode = pb.invReactivePowerModeSet.takeUnless { pb.hasInvReactivePowerModeNull() }
         invFixReactivePower = pb.invFixReactivePower.takeUnless { it == UNKNOWN_FLOAT }
         toCim(pb.rce, this, networkService)

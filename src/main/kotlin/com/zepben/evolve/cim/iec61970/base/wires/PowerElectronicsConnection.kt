@@ -44,15 +44,15 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * @property invWattRespPAtV2  Power output set point 2 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 1 (inclusive).
  * @property invWattRespPAtV3  Power output set point 3 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 1 (inclusive).
  * @property invWattRespPAtV4  Power output set point 4 as a percentage of rated output for inverter Volt-Watt response mode. Permitted range is between 0 and 0.2 (inclusive).
- * @property invVoltVArRespMode Volt-VAr response mode allows an inverter to consume (sink) or produce (source) reactive power depending on the measured voltage. This mode is further described in AS4777.2:2015, section 6.3.2.3. True implies the mode is enabled.
- * @property invVArRespV1  Set point 1 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
- * @property invVArRespV2  Set point 2 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
- * @property invVArRespV3  Set point 3 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
- * @property invVArRespV4  Set point 4 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
- * @property invVArRespQAtV1  Power output set point 1 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between 0 and 0.6 (inclusive).
- * @property invVArRespQAtV2  Power output set point 2 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -1 and 1 (inclusive) with a negative number referring to a sink.
- * @property invVArRespQAtV3  Power output set point 3 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -1 and 1 (inclusive) with a negative number referring to a sink.
- * @property invVArRespQAtV4  Power output set point 4 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -0.6 and 0 (inclusive) with a negative number referring to a sink.
+ * @property invVoltVarRespMode Volt-VAr response mode allows an inverter to consume (sink) or produce (source) reactive power depending on the measured voltage. This mode is further described in AS4777.2:2015, section 6.3.2.3. True implies the mode is enabled.
+ * @property invVarRespV1  Set point 1 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
+ * @property invVarRespV2  Set point 2 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
+ * @property invVarRespV3  Set point 3 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
+ * @property invVarRespV4  Set point 4 in volts for inverter Volt-VAr response mode. Permitted range is between 200 and 300 (inclusive).
+ * @property invVarRespQAtV1  Power output set point 1 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between 0 and 0.6 (inclusive).
+ * @property invVarRespQAtV2  Power output set point 2 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -1 and 1 (inclusive) with a negative number referring to a sink.
+ * @property invVarRespQAtV3  Power output set point 3 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -1 and 1 (inclusive) with a negative number referring to a sink.
+ * @property invVarRespQAtV4  Power output set point 4 as a percentage of rated output for inverter Volt-VAr response mode. Permitted range is between -0.6 and 0 (inclusive) with a negative number referring to a sink.
  * @property invReactivePowerMode If true, enables Static Reactive Power mode on the inverter. Note: It must be false if invVoltVarRespMode or InvVoltWattRespMode is true.
  * @property invFixReactivePower  Static Reactive Power, specified in a percentage output of the system. Permitted range is between -1.0 and 1.0 (inclusive), with a negative sign referring to “sink”.
  */
@@ -118,52 +118,52 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
             field = value
         }
 
-    var invVoltVArRespMode: Boolean? = null
-    var invVArRespV1: Int? = null
+    var invVoltVarRespMode: Boolean? = null
+    var invVarRespV1: Int? = null
         set(value) {
-            check(value == null || (value >= 200) && (value <= 300)) { "invVArRespV1 [$value] must be between 200 and 300." }
+            check(value == null || (value >= 200) && (value <= 300)) { "invVarRespV1 [$value] must be between 200 and 300." }
             field = value
         }
 
-    var invVArRespV2: Int? = null
+    var invVarRespV2: Int? = null
         set(value) {
-            check(value == null || (value >= 200) && (value <= 300)) { "invVArRespV2 [$value] must be between 200 and 300." }
+            check(value == null || (value >= 200) && (value <= 300)) { "invVarRespV2 [$value] must be between 200 and 300." }
             field = value
         }
 
-    var invVArRespV3: Int? = null
+    var invVarRespV3: Int? = null
         set(value) {
-            check(value == null || (value >= 200) && (value <= 300)) { "invVArRespV3 [$value] must be between 200 and 300." }
+            check(value == null || (value >= 200) && (value <= 300)) { "invVarRespV3 [$value] must be between 200 and 300." }
             field = value
         }
 
-    var invVArRespV4: Int? = null
+    var invVarRespV4: Int? = null
         set(value) {
-            check(value == null || (value >= 200) && (value <= 300)) { "invVArRespV4 [$value] must be between 200 and 300." }
+            check(value == null || (value >= 200) && (value <= 300)) { "invVarRespV4 [$value] must be between 200 and 300." }
             field = value
         }
 
-    var invVArRespQAtV1: Float? = null
+    var invVarRespQAtV1: Float? = null
         set(value) {
-            check(value == null || (value >= 0.0f) && (value <= 0.6f)) { "invVArRespQAtV1 [$value] must be between 0.0 and 0.6." }
+            check(value == null || (value >= 0.0f) && (value <= 0.6f)) { "invVarRespQAtV1 [$value] must be between 0.0 and 0.6." }
             field = value
         }
 
-    var invVArRespQAtV2: Float? = null
+    var invVarRespQAtV2: Float? = null
         set(value) {
-            check(value == null || (value >= -1.0f) && (value <= 1.0f)) { "invVArRespQAtV2 [$value] must be between -1.0 and 1.0." }
+            check(value == null || (value >= -1.0f) && (value <= 1.0f)) { "invVarRespQAtV2 [$value] must be between -1.0 and 1.0." }
             field = value
         }
 
-    var invVArRespQAtV3: Float? = null
+    var invVarRespQAtV3: Float? = null
         set(value) {
-            check(value == null || (value >= -1.0f) && (value <= 1.0f)) { "invVArRespQAtV3 [$value] must be between -1.0 and 1.0." }
+            check(value == null || (value >= -1.0f) && (value <= 1.0f)) { "invVarRespQAtV3 [$value] must be between -1.0 and 1.0." }
             field = value
         }
 
-    var invVArRespQAtV4: Float? = null
+    var invVarRespQAtV4: Float? = null
         set(value) {
-            check(value == null || (value >= -0.6f) && (value <= 0.0f)) { "invVArRespQAtV4 [$value] must be between -0.6 and 0.0." }
+            check(value == null || (value >= -0.6f) && (value <= 0.0f)) { "invVarRespQAtV4 [$value] must be between -0.6 and 0.0." }
             field = value
         }
 

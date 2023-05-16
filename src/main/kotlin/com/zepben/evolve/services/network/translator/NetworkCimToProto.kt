@@ -930,15 +930,15 @@ fun toPb(cim: PowerElectronicsConnection, pb: PBPowerElectronicsConnection.Build
         invWattRespPAtV2 = cim.invWattRespPAtV2 ?: UNKNOWN_FLOAT
         invWattRespPAtV3 = cim.invWattRespPAtV3 ?: UNKNOWN_FLOAT
         invWattRespPAtV4 = cim.invWattRespPAtV4 ?: UNKNOWN_FLOAT
-        cim.invVoltVArRespMode?.let { invVoltVArRespModeSet = it } ?: run { invVoltVArRespModeNull = NullValue.NULL_VALUE }
-        invVArRespV1 = cim.invVArRespV1 ?: UNKNOWN_INT
-        invVArRespV2 = cim.invVArRespV2 ?: UNKNOWN_INT
-        invVArRespV3 = cim.invVArRespV3 ?: UNKNOWN_INT
-        invVArRespV4 = cim.invVArRespV4 ?: UNKNOWN_INT
-        invVArRespQAtV1 = cim.invVArRespQAtV1 ?: UNKNOWN_FLOAT
-        invVArRespQAtV2 = cim.invVArRespQAtV2 ?: UNKNOWN_FLOAT
-        invVArRespQAtV3 = cim.invVArRespQAtV3 ?: UNKNOWN_FLOAT
-        invVArRespQAtV4 = cim.invVArRespQAtV4 ?: UNKNOWN_FLOAT
+        cim.invVoltVarRespMode?.let { invVoltVarRespModeSet = it } ?: run { invVoltVarRespModeNull = NullValue.NULL_VALUE }
+        invVarRespV1 = cim.invVarRespV1 ?: UNKNOWN_INT
+        invVarRespV2 = cim.invVarRespV2 ?: UNKNOWN_INT
+        invVarRespV3 = cim.invVarRespV3 ?: UNKNOWN_INT
+        invVarRespV4 = cim.invVarRespV4 ?: UNKNOWN_INT
+        invVarRespQAtV1 = cim.invVarRespQAtV1 ?: UNKNOWN_FLOAT
+        invVarRespQAtV2 = cim.invVarRespQAtV2 ?: UNKNOWN_FLOAT
+        invVarRespQAtV3 = cim.invVarRespQAtV3 ?: UNKNOWN_FLOAT
+        invVarRespQAtV4 = cim.invVarRespQAtV4 ?: UNKNOWN_FLOAT
         cim.invReactivePowerMode?.let { invReactivePowerModeSet = it } ?: run { invReactivePowerModeNull = NullValue.NULL_VALUE }
         invFixReactivePower = cim.invFixReactivePower ?: UNKNOWN_FLOAT
         toPb(cim, rceBuilder)

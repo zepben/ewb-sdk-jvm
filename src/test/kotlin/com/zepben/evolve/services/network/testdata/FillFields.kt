@@ -806,15 +806,15 @@ fun PowerElectronicsConnection.fillFields(service: NetworkService, includeRuntim
     invWattRespPAtV2 = 0.2f
     invWattRespPAtV3 = 0.3f
     invWattRespPAtV4 = 0.1f
-    invVoltVArRespMode = false
-    invVArRespV1 = 200
-    invVArRespV2 = 200
-    invVArRespV3 = 300
-    invVArRespV4 = 300
-    invVArRespQAtV1 = 0.6f
-    invVArRespQAtV2 = -1.0f
-    invVArRespQAtV3 = 1.0f
-    invVArRespQAtV4 = -0.6f
+    invVoltVarRespMode = false
+    invVarRespV1 = 200
+    invVarRespV2 = 200
+    invVarRespV3 = 300
+    invVarRespV4 = 300
+    invVarRespQAtV1 = 0.6f
+    invVarRespQAtV2 = -1.0f
+    invVarRespQAtV3 = 1.0f
+    invVarRespQAtV4 = -0.6f
     invReactivePowerMode = false
     invFixReactivePower = -1.0f
 

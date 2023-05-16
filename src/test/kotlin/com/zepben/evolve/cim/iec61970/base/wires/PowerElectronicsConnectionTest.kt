@@ -160,53 +160,53 @@ internal class PowerElectronicsConnectionTest {
 
         expect { powerElectronicsConnection.invVarRespV1 = 199 }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespV1 [199] must be between 200 and 300.")
+            .withMessage("invVarRespV1 [199] must be between 200 and 300.")
         expect { powerElectronicsConnection.invVarRespV1 = 301 }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespV1 [301] must be between 200 and 300.")
+            .withMessage("invVarRespV1 [301] must be between 200 and 300.")
         expect { powerElectronicsConnection.invVarRespV2 = 199 }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespV2 [199] must be between 200 and 300.")
+            .withMessage("invVarRespV2 [199] must be between 200 and 300.")
         expect { powerElectronicsConnection.invVarRespV2 = 301 }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespV2 [301] must be between 200 and 300.")
+            .withMessage("invVarRespV2 [301] must be between 200 and 300.")
         expect { powerElectronicsConnection.invVarRespV3 = 199 }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespV3 [199] must be between 200 and 300.")
+            .withMessage("invVarRespV3 [199] must be between 200 and 300.")
         expect { powerElectronicsConnection.invVarRespV3 = 301 }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespV3 [301] must be between 200 and 300.")
+            .withMessage("invVarRespV3 [301] must be between 200 and 300.")
         expect { powerElectronicsConnection.invVarRespV4 = 199 }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespV4 [199] must be between 200 and 300.")
+            .withMessage("invVarRespV4 [199] must be between 200 and 300.")
         expect { powerElectronicsConnection.invVarRespV4 = 301 }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespV4 [301] must be between 200 and 300.")
+            .withMessage("invVarRespV4 [301] must be between 200 and 300.")
 
         expect { powerElectronicsConnection.invVarRespQAtV1 = -0.1f }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespQAtV1 [-0.1] must be between 0.0 and 0.6.")
+            .withMessage("invVarRespQAtV1 [-0.1] must be between 0.0 and 0.6.")
         expect { powerElectronicsConnection.invVarRespQAtV1 = 0.7f }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespQAtV1 [0.7] must be between 0.0 and 0.6.")
+            .withMessage("invVarRespQAtV1 [0.7] must be between 0.0 and 0.6.")
         expect { powerElectronicsConnection.invVarRespQAtV2 = -1.1f }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespQAtV2 [-1.1] must be between -1.0 and 1.0.")
+            .withMessage("invVarRespQAtV2 [-1.1] must be between -1.0 and 1.0.")
         expect { powerElectronicsConnection.invVarRespQAtV2 = 1.1f }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespQAtV2 [1.1] must be between -1.0 and 1.0.")
+            .withMessage("invVarRespQAtV2 [1.1] must be between -1.0 and 1.0.")
         expect { powerElectronicsConnection.invVarRespQAtV3 = -1.1f }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespQAtV3 [-1.1] must be between -1.0 and 1.0.")
+            .withMessage("invVarRespQAtV3 [-1.1] must be between -1.0 and 1.0.")
         expect { powerElectronicsConnection.invVarRespQAtV3 = 1.1f }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespQAtV3 [1.1] must be between -1.0 and 1.0.")
+            .withMessage("invVarRespQAtV3 [1.1] must be between -1.0 and 1.0.")
         expect { powerElectronicsConnection.invVarRespQAtV4 = -0.7f }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespQAtV4 [-0.7] must be between -0.6 and 0.0.")
+            .withMessage("invVarRespQAtV4 [-0.7] must be between -0.6 and 0.0.")
         expect { powerElectronicsConnection.invVarRespQAtV4 = 0.1f }
             .toThrow<IllegalStateException>()
-            .withMessage("invVArRespQAtV4 [0.1] must be between -0.6 and 0.0.")
+            .withMessage("invVarRespQAtV4 [0.1] must be between -0.6 and 0.0.")
 
     }
 

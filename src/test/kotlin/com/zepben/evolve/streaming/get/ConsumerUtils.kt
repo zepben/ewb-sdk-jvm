@@ -51,14 +51,14 @@ object ConsumerUtils {
             builder.invWattRespPAtV2 = 0.0f
             builder.invWattRespPAtV3 = 0.0f
             builder.invWattRespPAtV4 = 0.0f
-            builder.invVArRespV1 = 200
-            builder.invVArRespV2 = 200
-            builder.invVArRespV3 = 200
-            builder.invVArRespV4 = 200
-            builder.invVArRespQAtV1 = 0.0f
-            builder.invVArRespQAtV2 = 0.0f
-            builder.invVArRespQAtV3 = 0.0f
-            builder.invVArRespQAtV4 = 0.0f
+            builder.invVarRespV1 = 200
+            builder.invVarRespV2 = 200
+            builder.invVarRespV3 = 200
+            builder.invVarRespV4 = 200
+            builder.invVarRespQAtV1 = 0.0f
+            builder.invVarRespQAtV2 = 0.0f
+            builder.invVarRespQAtV3 = 0.0f
+            builder.invVarRespQAtV4 = 0.0f
         }
 
         props.forEach { (name, value) -> builder::class.declaredMemberFunctions.find { it.name == name }?.call(builder, value) }

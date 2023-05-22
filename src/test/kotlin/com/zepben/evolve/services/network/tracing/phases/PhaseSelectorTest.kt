@@ -144,6 +144,24 @@ class PhaseSelectorTest {
     }
 
     @Test
+    fun testAsPhaseCodeNone() {
+        val terminal = Terminal().apply { phases = PhaseCode.NONE }
+        val normalPhases = terminal.normalPhases
+        val currentPhases = terminal.currentPhases
+
+        assertThat(normalPhases.asPhaseCode(), equalTo(PhaseCode.NONE))
+        assertThat(currentPhases.asPhaseCode(), equalTo(PhaseCode.NONE))
+
+        PhaseCode.ABCN.singlePhases.forEach {
+            normalPhases[it] = it
+            currentPhases[it] = it
+        }
+
+        assertThat(normalPhases.asPhaseCode(), equalTo(PhaseCode.NONE))
+        assertThat(currentPhases.asPhaseCode(), equalTo(PhaseCode.NONE))
+    }
+
+    @Test
     fun asPhaseCodeHandlesChangingTerminalPhases() {
         val terminal = Terminal().apply { phases = PhaseCode.BC }
         val normalPhases = terminal.normalPhases

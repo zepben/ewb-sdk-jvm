@@ -39,6 +39,9 @@ abstract class PhaseStatus(private val terminal: Terminal) {
      * @return The [PhaseCode] if the combination of phases makes sense, otherwise null.
      */
     fun asPhaseCode(): PhaseCode? {
+        if (terminal.phases == PhaseCode.NONE)
+            return PhaseCode.NONE
+
         val tracedPhases = terminal.phases.singlePhases.map { get(it) }
         val phases = tracedPhases.toSet()
 

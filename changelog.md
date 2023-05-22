@@ -16,7 +16,7 @@
 
 ### Fixes
 
-* None.
+* Asking for the traced phases as a phase code when there are no nominal phases no longer throws.
 
 ### Notes
 

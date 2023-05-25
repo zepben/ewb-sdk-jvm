@@ -42,7 +42,7 @@ class TableRecloseDelays : SqliteTable() {
     }
 
     override fun selectSql(): String {
-        return "${super.selectSql()} GROUP BY current_relay_info_mrid, sequence_number ORDER BY sequence_number ASC;"
+        return "${super.selectSql()} ORDER BY current_relay_info_mrid, sequence_number ASC;"
     }
 
     override val tableClass = this.javaClass

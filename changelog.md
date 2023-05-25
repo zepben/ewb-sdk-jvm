@@ -8,7 +8,25 @@
 
 ### New Features
 
-* None.
+* PowerTransformerEnd now supports multiple ratings based on cooling types attached to the transformer. Use new `addRating` and `getRating` methods.
+* Added new classes:
+    * TapChangerControl
+    * EvChargingUnit
+    * RegulatingControl
+* Added new fields:
+    * Equipment.commissionedDate
+    * UsagePoint
+        * ratedPower
+        * approvedInverterCapacity
+    * ProtectionEquipment
+        * directable
+        * powerDirection
+    * CurrentRelayInfo.recloseDelays
+    * DER register fields on PowerElectronicsConnection
+* Added new enums
+    * PowerDirectionKind
+    * RegulatingControlModeKind
+    * TransformerCoolingType
 
 ### Enhancements
 
@@ -20,7 +38,7 @@
 
 ### Notes
 
-* None.
+* Deprecated setting `ratedS` on PowerTransformerEnd.
 
 ## [0.15.0]
 

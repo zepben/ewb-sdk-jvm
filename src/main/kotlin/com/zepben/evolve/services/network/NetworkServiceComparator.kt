@@ -820,7 +820,6 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 PowerTransformerEnd::phaseAngleClock,
                 PowerTransformerEnd::r,
                 PowerTransformerEnd::r0,
-                PowerTransformerEnd::ratedS,
                 PowerTransformerEnd::ratedU,
                 PowerTransformerEnd::x,
                 PowerTransformerEnd::x0

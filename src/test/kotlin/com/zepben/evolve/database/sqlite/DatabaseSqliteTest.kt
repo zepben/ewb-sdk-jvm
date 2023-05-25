@@ -65,6 +65,7 @@ import com.zepben.evolve.services.network.testdata.StupidlyLargeNetwork
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.testing.TestNetworkBuilder
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -78,6 +79,7 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.sql.DriverManager.getConnection
 
 class DatabaseSqliteTest {
 
@@ -272,7 +274,7 @@ class DatabaseSqliteTest {
         builder
             .fromPowerTransformer() // b0
             .toPowerElectronicsConnection {  // pec1
-                TapChangerControl().also { tcc ->
+                TapChangerControl("tcc").also { tcc ->
                     tcc.addRegulatingCondEq(this)
                     tcc.terminal = Terminal("test").also { ns.add(it) }
                     regulatingControl = tcc
@@ -296,17 +298,23 @@ class DatabaseSqliteTest {
             ),
             equalTo(true)
         )
+        // Delete a link to cause an unresolved reference.
+        getConnection("jdbc:sqlite:$SCHEMA_TEST_FILE").createStatement().use { statement ->
+            statement.execute("DELETE FROM tap_changer_controls WHERE mRID = 'tcc'")
+        }
 
         val metadataCollection = MetadataCollection()
         val networkService = NetworkService()
         val diagramService = DiagramService()
         val customerService = CustomerService()
 
-        // This will throw if unresolved references still exist after a full load
-        assertThat(
-            DatabaseReader(SCHEMA_TEST_FILE).load(metadataCollection, networkService, diagramService, customerService),
-            equalTo(true)
-        )
+        expect {
+            DatabaseReader(SCHEMA_TEST_FILE).load(metadataCollection, networkService, diagramService, customerService)
+        }.toThrow<IllegalStateException>()
+            .withMessage(
+                "Network still had unresolved references after load - this should not occur. " +
+                    "Failing reference was from PowerElectronicsConnection pec1 resolving RegulatingControl tcc"
+            )
 
     }
     @Test

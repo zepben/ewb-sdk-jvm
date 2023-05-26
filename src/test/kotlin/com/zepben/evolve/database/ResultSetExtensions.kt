@@ -29,23 +29,5 @@ internal fun ResultSet.getNullableDouble(columnName: String): Double? {
         dbl
 }
 
-internal fun ResultSet.getNullableFloat(columnName: String): Float? {
-    // Annoyingly getFloat will return 0.0 for string values, so we need to check all 0.0's for NaN.
-    val float = getFloat(columnName).takeUnless { wasNull() }
-    return if (float == 0.0f) {
-        when (getString(columnName).uppercase()) {
-            "NAN" -> Float.NaN
-            else -> float
-        }
-    } else
-        float
-}
-
-internal fun ResultSet.getNullableInt(columnName: String): Int? =
-    getInt(columnName).takeUnless { wasNull() }
-
-internal fun ResultSet.getNullableLong(columnName: String): Long? =
-    getLong(columnName).takeUnless { wasNull() }
-
 internal fun ResultSet.getInstant(columnName: String): Instant? =
     getString(columnName).takeUnless { wasNull() }?.let { Instant.parse(it) }

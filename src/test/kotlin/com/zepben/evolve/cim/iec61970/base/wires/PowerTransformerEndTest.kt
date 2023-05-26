@@ -75,6 +75,13 @@ internal class PowerTransformerEndTest {
         assertThat(powerTransformerEnd.x, equalTo(10.0))
         assertThat(powerTransformerEnd.x0, equalTo(11.0))
         assertThat(powerTransformerEnd.sRatings, contains(TransformerEndRatedS(TransformerCoolingType.UNKNOWN_COOLING_TYPE, 8)))
+
+        // Cover default cooling type for addRating
+        val pte = PowerTransformerEnd()
+        assertThat(pte.ratedS, nullValue())
+        pte.addRating(11000)
+        assertThat(pte.ratedS, equalTo(11000))
+        assertThat(pte.sRatings, contains(TransformerEndRatedS(TransformerCoolingType.UNKNOWN_COOLING_TYPE, 11000)))
     }
 
     @Test
@@ -82,7 +89,7 @@ internal class PowerTransformerEndTest {
         val tx = PowerTransformer().apply { assetInfo = PowerTransformerInfo() }
         val end = PowerTransformerEnd().apply { powerTransformer = tx }.also { tx.addEnd(it) }
 
-        ExpectException.expect { end.starImpedance = TransformerStarImpedance() }
+        expect { end.starImpedance = TransformerStarImpedance() }
             .toThrow<IllegalArgumentException>()
             .withMessage("Unable to use a star impedance for ${end.typeNameAndMRID()} directly because ${tx.typeNameAndMRID()} references ${tx.assetInfo?.typeNameAndMRID()}.")
     }

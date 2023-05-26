@@ -27,6 +27,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableTariffs
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
 import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperationalRestrictions
@@ -47,6 +48,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteC
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableEvChargingUnits
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
@@ -123,6 +125,7 @@ class DatabaseTables {
         TableEquipmentOperationalRestrictions(),
         TableEquipmentUsagePoints(),
         TableEquivalentBranches(),
+        TableEvChargingUnits(),
         TableFaultIndicators(),
         TableFeeders(),
         TableFuses(),
@@ -155,6 +158,7 @@ class DatabaseTables {
         TablePowerElectronicsConnectionPhases(),
         TablePowerElectronicsWindUnit(),
         TablePowerTransformerEnds(),
+        TablePowerTransformerEndRatings(),
         TablePowerTransformerInfo(),
         TablePowerTransformers(),
         TablePricingStructures(),
@@ -162,6 +166,7 @@ class DatabaseTables {
         TableProtectionEquipmentProtectedSwitches(),
         TableRatioTapChangers(),
         TableReclosers(),
+        TableRecloseDelays(),
         TableRemoteControls(),
         TableRemoteSources(),
         TableShortCircuitTests(),
@@ -171,6 +176,7 @@ class DatabaseTables {
         TableSubGeographicalRegions(),
         TableSubstations(),
         TableSwitchInfo(),
+        TableTapChangerControls(),
         TableTariffs(),
         TableTerminals(),
         TableTransformerEndInfo(),

@@ -9,6 +9,7 @@
 package com.zepben.evolve.cim.iec61970.base.protection
 
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
@@ -31,11 +32,15 @@ internal class ProtectionEquipmentTest {
 
         assertThat(protectionEquipment.relayDelayTime, nullValue())
         assertThat(protectionEquipment.protectionKind, equalTo(ProtectionKind.UNKNOWN))
+        assertThat(protectionEquipment.directable, nullValue())
+        assertThat(protectionEquipment.powerDirection, equalTo(PowerDirectionKind.UNKNOWN_DIRECTION))
 
         protectionEquipment.fillFields(NetworkService())
 
         assertThat(protectionEquipment.relayDelayTime, equalTo(1.1))
         assertThat(protectionEquipment.protectionKind, equalTo(ProtectionKind.IEF))
+        assertThat(protectionEquipment.directable, equalTo(true))
+        assertThat(protectionEquipment.powerDirection, equalTo(PowerDirectionKind.FORWARD))
     }
 
     @Test

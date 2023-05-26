@@ -8,14 +8,12 @@
 package com.zepben.evolve.database.sqlite.upgrade
 
 import com.zepben.evolve.database.sqlite.tables.TableVersion
-import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet44Validator
-import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet45Validator
-import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet46Validator
-import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet47Validator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.*
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.slf4j.LoggerFactory
+import org.sqlite.SQLiteException
 import java.io.File
 import java.sql.Connection
 import java.sql.DriverManager.getConnection
@@ -33,7 +31,8 @@ class ChangeSetTest {
         44 to ChangeSet44Validator,
         45 to ChangeSet45Validator,
         46 to ChangeSet46Validator,
-        47 to ChangeSet47Validator
+        47 to ChangeSet47Validator,
+        48 to ChangeSet48Validator
     )
 
     @Test
@@ -60,7 +59,11 @@ class ChangeSetTest {
 
                     logger.info("Populating after update ${cs.number}.")
                     validator.populateStatements().forEach {
-                        stmt.executeUpdate(it)
+                        try {
+                            stmt.executeUpdate(it)
+                        } catch (e: SQLiteException) {
+                            throw SQLiteException("Failed executing update error was: ${e.message}\n Query was: $it: ", e.resultCode)
+                        }
                     }
                     stmt.executeUpdate("PRAGMA foreign_key_check")
                     stmt.executeUpdate("COMMIT")

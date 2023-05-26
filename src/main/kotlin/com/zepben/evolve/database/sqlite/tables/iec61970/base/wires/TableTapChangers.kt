@@ -22,5 +22,6 @@ abstract class TableTapChangers : TablePowerSystemResources() {
     val NEUTRAL_U = Column(++columnIndex, "neutral_u", "INTEGER", NULL)
     val NORMAL_STEP = Column(++columnIndex, "normal_step", "INTEGER", NULL)
     val STEP = Column(++columnIndex, "step", "NUMBER", NULL)
+    val TAP_CHANGER_CONTROL_MRID = Column(++columnIndex, "tap_changer_control_mrid", "TEXT", NULL)
 
 }

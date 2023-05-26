@@ -10,6 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.protection
 
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
@@ -23,11 +24,16 @@ import com.zepben.evolve.services.common.extensions.validateReference
  *
  * @property relayDelayTime The time delay from detection of abnormal conditions to relay operation in seconds.
  * @property protectionKind The kind of protection being provided by this protection equipment.
+ * @property directable Whether this ProtectionEquipment responds to power flow in a given direction.
+ * @property powerDirection The flow of power direction used by this ProtectionEquipment.
+ *
  */
 abstract class ProtectionEquipment(mRID: String = "") : Equipment(mRID) {
 
     var relayDelayTime: Double? = null
     var protectionKind: ProtectionKind = ProtectionKind.UNKNOWN
+    var directable: Boolean? = null
+    var powerDirection: PowerDirectionKind = PowerDirectionKind.UNKNOWN_DIRECTION
     private var _protectedSwitches: MutableList<ProtectedSwitch>? = null
 
     /**

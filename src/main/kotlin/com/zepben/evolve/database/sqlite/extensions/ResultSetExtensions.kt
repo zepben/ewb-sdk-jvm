@@ -30,6 +30,18 @@ internal fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
         dbl
 }
 
+internal fun ResultSet.getNullableFloat(queryIndex: Int): Float? {
+    // Annoyingly getFloat will return 0.0 for string values, so we need to check all 0.0's for NaN.
+    val float = getFloat(queryIndex).takeUnless { wasNull() }
+    return if (float == 0.0f) {
+        when (getString(queryIndex).uppercase()) {
+            "NAN" -> Float.NaN
+            else -> float
+        }
+    } else
+        float
+}
+
 internal fun ResultSet.getNullableInt(queryIndex: Int): Int? =
     getInt(queryIndex).takeUnless { wasNull() }
 
@@ -43,3 +55,4 @@ internal fun ResultSet.getNullableRatio(numeratorIndex: Int, denominatorIndex: I
     getNullableDouble(denominatorIndex)?.let { denominator ->
         getNullableDouble(numeratorIndex)?.let { numerator -> Ratio(numerator, denominator) }
     }
+

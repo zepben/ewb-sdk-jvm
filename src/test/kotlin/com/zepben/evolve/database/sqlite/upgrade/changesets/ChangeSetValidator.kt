@@ -67,7 +67,19 @@ interface ChangeSetValidator {
     fun ensureTables(statement: Statement, vararg tableNames: String, present: Boolean = true) {
         tableNames.forEach {
             statement.executeQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='$it';").use { rs ->
-                assertThat(rs.next(), equalTo(present))
+                assertThat("Table $it was not created.", rs.next(), equalTo(present))
+            }
+        }
+    }
+
+    fun ensureColumn(statement: Statement, table: String, vararg expectedColumns: String, present: Boolean = true) {
+        statement.executeQuery("pragma table_info('$table')").use { rs ->
+            val columns = mutableListOf<String>()
+            while (rs.next()) {
+                columns.add(rs.getString("name"))
+            }
+            expectedColumns.forEach {
+                assertThat(it in columns, equalTo(present))
             }
         }
     }

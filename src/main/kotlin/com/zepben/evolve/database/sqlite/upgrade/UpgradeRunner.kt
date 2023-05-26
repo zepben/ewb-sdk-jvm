@@ -10,10 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.tables.TableVersion
-import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet44
-import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet45
-import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet46
-import com.zepben.evolve.database.sqlite.upgrade.changesets.changeSet47
+import com.zepben.evolve.database.sqlite.upgrade.changesets.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -30,7 +27,8 @@ class UpgradeRunner constructor(
         changeSet44(),
         changeSet45(),
         changeSet46(),
-        changeSet47()
+        changeSet47(),
+        changeSet48()
     ),
     private val tableVersion: TableVersion = TableVersion()
 ) {

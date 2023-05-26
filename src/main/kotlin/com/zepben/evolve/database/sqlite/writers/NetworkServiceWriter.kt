@@ -38,6 +38,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.network.NetworkService
 
 class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) :
@@ -113,6 +114,8 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<PotentialTransformer>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<CurrentRelayInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<CurrentRelay>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<TapChangerControl>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<EvChargingUnit>().forEach { status = status and validateSave(it, writer::save) }
 
         return status
     }

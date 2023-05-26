@@ -32,12 +32,15 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createRemoteSource
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locationOf
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
+import java.time.Instant
 import java.util.*
 
 /************ IEC61968 ASSET INFO ************/
@@ -272,6 +275,7 @@ fun CurrentRelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean
     (this as AssetInfo).fillFields(service, includeRuntime)
 
     curveSetting = "curveSetting"
+    addDelays(1.0, 2.0, 3.0)
 
     return this
 }
@@ -337,6 +341,8 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
     usagePointLocation = Location().also { service.add(it) }
     isVirtual = true
     connectionCategory = "connectionCategory"
+    ratedPower = 2000
+    approvedInverterCapacity = 5000
 
     for (i in 0..1) {
         addEquipment(Junction().also {
@@ -508,6 +514,7 @@ fun Equipment.fillFields(service: NetworkService, includeRuntime: Boolean = true
 
     inService = false
     normallyInService = false
+    commissionedDate = Instant.MIN
 
     for (i in 0..1) {
         addUsagePoint(UsagePoint().also {
@@ -713,6 +720,8 @@ fun ProtectionEquipment.fillFields(service: NetworkService, includeRuntime: Bool
 
     relayDelayTime = 1.1
     protectionKind = ProtectionKind.IEF
+    directable = true
+    powerDirection = PowerDirectionKind.FORWARD
 
     addProtectedSwitch(Breaker().also {
         it.addOperatedByProtectionEquipment(this)
@@ -764,6 +773,11 @@ fun BatteryUnit.fillFields(service: NetworkService, includeRuntime: Boolean = tr
     return this
 }
 
+fun EvChargingUnit.fillFields(service: NetworkService, includeRuntime: Boolean = true): EvChargingUnit {
+    (this as PowerElectronicsUnit).fillFields(service, includeRuntime)
+    return this
+}
+
 fun PhotoVoltaicUnit.fillFields(service: NetworkService, includeRuntime: Boolean = true): PhotoVoltaicUnit {
     (this as PowerElectronicsUnit).fillFields(service, includeRuntime)
     return this
@@ -779,6 +793,30 @@ fun PowerElectronicsConnection.fillFields(service: NetworkService, includeRuntim
     q = 5.0
     ratedS = 6
     ratedU = 7
+    inverterStandard = "TEST"
+    sustainOpOvervoltLimit = 8
+    stopAtOverFreq = 10.0f
+    stopAtUnderFreq = 5.0f
+    invVoltWattRespMode = false
+    invWattRespV1 = 200
+    invWattRespV2 = 216
+    invWattRespV3 = 235
+    invWattRespV4 = 244
+    invWattRespPAtV1 = 0.1f
+    invWattRespPAtV2 = 0.2f
+    invWattRespPAtV3 = 0.3f
+    invWattRespPAtV4 = 0.1f
+    invVoltVarRespMode = false
+    invVarRespV1 = 200
+    invVarRespV2 = 200
+    invVarRespV3 = 300
+    invVarRespV4 = 300
+    invVarRespQAtV1 = 0.6f
+    invVarRespQAtV2 = -1.0f
+    invVarRespQAtV3 = 1.0f
+    invVarRespQAtV4 = -0.6f
+    invReactivePowerMode = false
+    invFixReactivePower = -1.0f
 
     return this
 }
@@ -1039,7 +1077,7 @@ fun PowerTransformerEnd.fillFields(service: NetworkService, includeRuntime: Bool
     phaseAngleClock = 5
     r = 6.0
     r0 = 7.0
-    ratedS = 8
+    addRating(8, TransformerCoolingType.UNKNOWN_COOLING_TYPE)
     ratedU = 9
     x = 10.0
     x0 = 11.0
@@ -1081,6 +1119,24 @@ fun RegulatingCondEq.fillFields(service: NetworkService, includeRuntime: Boolean
     (this as EnergyConnection).fillFields(service, includeRuntime)
 
     controlEnabled = false
+    regulatingControl = TapChangerControl().also { it.addRegulatingCondEq(this); service.add(it) }
+
+    return this
+}
+
+fun RegulatingControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): RegulatingControl {
+    (this as PowerSystemResource).fillFields(service, includeRuntime)
+
+    discrete = false
+    mode = RegulatingControlModeKind.voltage
+    monitoredPhase = PhaseCode.ABC
+    targetDeadband = 2.0f
+    targetValue = 100.0
+    enabled = true
+    maxAllowedTargetValue = 200.0
+    minAllowedTargetValue = 50.0
+    terminal = Terminal().also { service.add(it) }
+    addRegulatingCondEq(PowerElectronicsConnection().also { it.regulatingControl = this; service.add(it) })
 
     return this
 }
@@ -1095,6 +1151,23 @@ fun TapChanger.fillFields(service: NetworkService, includeRuntime: Boolean = tru
     neutralU = 3
     normalStep = 4
     step = 5.5
+    tapChangerControl = TapChangerControl().also { service.add(it) }
+
+    return this
+}
+
+fun TapChangerControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): TapChangerControl {
+    (this as RegulatingControl).fillFields(service, includeRuntime)
+
+    limitVoltage = 1000
+    lineDropCompensation = true
+    lineDropR = 10.0
+    lineDropX = 4.0
+    reverseLineDropR = 1.0
+    reverseLineDropX = 1.0
+    forwardLDCBlocking = true
+    timeDelay = 5.3
+    coGenerationEnabled = false
 
     return this
 }

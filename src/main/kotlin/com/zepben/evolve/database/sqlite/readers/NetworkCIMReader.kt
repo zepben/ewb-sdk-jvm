@@ -32,7 +32,9 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
@@ -41,6 +43,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableEndDevices
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
@@ -56,13 +59,11 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteC
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnit
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnit
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsUnit
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
+import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.extensions.*
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.ResultSet
@@ -333,6 +334,18 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadAssetInfo(currentRelayInfo, table, resultSet) && networkService.addOrThrow(currentRelayInfo)
     }
 
+    fun load(table: TableRecloseDelays, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        // Note TablePowerTransformerEndRatings.selectSql ensures we process ratings in the correct order.
+        val currentRelayInfoMRID = resultSet.getString(table.CURRENT_RELAY_INFO_MRID.queryIndex)
+        val recloseDelay = resultSet.getDouble(table.RECLOSE_DELAY.queryIndex)
+        setLastMRID("$currentRelayInfoMRID.s$recloseDelay")
+
+        val cri = networkService.ensureGet<CurrentRelayInfo>(currentRelayInfoMRID, "$currentRelayInfoMRID.s$recloseDelay")
+        cri?.addDelay(recloseDelay)
+
+        return true
+    }
+
     fun load(table: TableCurrentTransformerInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val currentTransformerInfo = CurrentTransformerInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             accuracyClass = resultSet.getNullableString(table.ACCURACY_CLASS.queryIndex)
@@ -390,6 +403,8 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             usagePointLocation = networkService.ensureGet(resultSet.getNullableString(table.LOCATION_MRID.queryIndex), typeNameAndMRID())
             isVirtual = resultSet.getBoolean(table.IS_VIRTUAL.queryIndex)
             connectionCategory = resultSet.getNullableString(table.CONNECTION_CATEGORY.queryIndex)
+            ratedPower = resultSet.getNullableInt(table.RATED_POWER.queryIndex)
+            approvedInverterCapacity = resultSet.getNullableInt(table.APPROVED_INVERTER_CAPACITY.queryIndex)
         }
 
         return loadIdentifiedObject(usagePoint, table, resultSet) && networkService.addOrThrow(usagePoint)
@@ -490,6 +505,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         equipment.apply {
             normallyInService = resultSet.getBoolean(table.NORMALLY_IN_SERVICE.queryIndex)
             inService = resultSet.getBoolean(table.IN_SERVICE.queryIndex)
+            commissionedDate = resultSet.getInstant(table.COMMISSIONED_DATE.queryIndex)
         }
 
         return loadPowerSystemResource(equipment, table, resultSet)
@@ -680,6 +696,9 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         protectionEquipment.apply {
             relayDelayTime = resultSet.getNullableDouble(table.RELAY_DELAY_TIME.queryIndex)
             protectionKind = ProtectionKind.valueOf(resultSet.getString(table.PROTECTION_KIND.queryIndex))
+            directable = resultSet.getNullableBoolean(table.DIRECTABLE.queryIndex)
+            powerDirection = PowerDirectionKind.valueOf(resultSet.getString(table.POWER_DIRECTION.queryIndex))
+
         }
 
         return loadEquipment(protectionEquipment, table, resultSet)
@@ -716,6 +735,12 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         }
 
         return loadPowerElectronicsUnit(batteryUnit, table, resultSet) && networkService.addOrThrow(batteryUnit)
+    }
+
+    fun load(table: TableEvChargingUnits, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val evChargingUnit = EvChargingUnit(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadPowerElectronicsUnit(evChargingUnit, table, resultSet) && networkService.addOrThrow(evChargingUnit)
     }
 
     fun load(table: TablePhotoVoltaicUnit, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
@@ -951,8 +976,32 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             minQ = resultSet.getNullableDouble(table.MIN_Q.queryIndex)
             p = resultSet.getNullableDouble(table.P.queryIndex)
             q = resultSet.getNullableDouble(table.Q.queryIndex)
-            ratedS = resultSet.getNullableInt(table.RATED_S.queryIndex)
             ratedU = resultSet.getNullableInt(table.RATED_U.queryIndex)
+            ratedS = resultSet.getNullableInt(table.RATED_S.queryIndex)
+            inverterStandard = resultSet.getNullableString(table.INVERTER_STANDARD.queryIndex)
+            sustainOpOvervoltLimit = resultSet.getNullableInt(table.SUSTAIN_OP_OVERVOLT_LIMIT.queryIndex)
+            stopAtOverFreq = resultSet.getNullableFloat(table.STOP_AT_OVER_FREQ.queryIndex)
+            stopAtUnderFreq = resultSet.getNullableFloat(table.STOP_AT_UNDER_FREQ.queryIndex)
+            invVoltWattRespMode = resultSet.getNullableBoolean(table.INV_VOLT_WATT_RESP_MODE.queryIndex)
+            invWattRespV1 = resultSet.getNullableInt(table.INV_WATT_RESP_V1.queryIndex)
+            invWattRespV2 = resultSet.getNullableInt(table.INV_WATT_RESP_V2.queryIndex)
+            invWattRespV3 = resultSet.getNullableInt(table.INV_WATT_RESP_V3.queryIndex)
+            invWattRespV4 = resultSet.getNullableInt(table.INV_WATT_RESP_V4.queryIndex)
+            invWattRespPAtV1 = resultSet.getNullableFloat(table.INV_WATT_RESP_P_AT_V1.queryIndex)
+            invWattRespPAtV2 = resultSet.getNullableFloat(table.INV_WATT_RESP_P_AT_V2.queryIndex)
+            invWattRespPAtV3 = resultSet.getNullableFloat(table.INV_WATT_RESP_P_AT_V3.queryIndex)
+            invWattRespPAtV4 = resultSet.getNullableFloat(table.INV_WATT_RESP_P_AT_V4.queryIndex)
+            invVoltVarRespMode = resultSet.getNullableBoolean(table.INV_VOLT_VAR_RESP_MODE.queryIndex)
+            invVarRespV1 = resultSet.getNullableInt(table.INV_VAR_RESP_V1.queryIndex)
+            invVarRespV2 = resultSet.getNullableInt(table.INV_VAR_RESP_V2.queryIndex)
+            invVarRespV3 = resultSet.getNullableInt(table.INV_VAR_RESP_V3.queryIndex)
+            invVarRespV4 = resultSet.getNullableInt(table.INV_VAR_RESP_V4.queryIndex)
+            invVarRespQAtV1 = resultSet.getNullableFloat(table.INV_VAR_RESP_Q_AT_V1.queryIndex)
+            invVarRespQAtV2 = resultSet.getNullableFloat(table.INV_VAR_RESP_Q_AT_V2.queryIndex)
+            invVarRespQAtV3 = resultSet.getNullableFloat(table.INV_VAR_RESP_Q_AT_V3.queryIndex)
+            invVarRespQAtV4 = resultSet.getNullableFloat(table.INV_VAR_RESP_Q_AT_V4.queryIndex)
+            invReactivePowerMode = resultSet.getNullableBoolean(table.INV_REACTIVE_POWER_MODE.queryIndex)
+            invFixReactivePower = resultSet.getNullableFloat(table.INV_FIX_REACTIVE_POWER.queryIndex)
         }
 
         return loadRegulatingCondEq(powerElectronicsConnection, table, resultSet) && networkService.addOrThrow(powerElectronicsConnection)
@@ -1006,13 +1055,25 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             g0 = resultSet.getNullableDouble(table.G0.queryIndex)
             r = resultSet.getNullableDouble(table.R.queryIndex)
             r0 = resultSet.getNullableDouble(table.R0.queryIndex)
-            ratedS = resultSet.getNullableInt(table.RATED_S.queryIndex)
             ratedU = resultSet.getNullableInt(table.RATED_U.queryIndex)
             x = resultSet.getNullableDouble(table.X.queryIndex)
             x0 = resultSet.getNullableDouble(table.X0.queryIndex)
         }
 
         return loadTransformerEnd(powerTransformerEnd, table, resultSet) && networkService.addOrThrow(powerTransformerEnd)
+    }
+
+    fun load(table: TablePowerTransformerEndRatings, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        // Note TablePowerTransformerEndRatings.selectSql ensures we process ratings in the correct order.
+        val powerTransformerEndMRID = resultSet.getString(table.POWER_TRANSFORMER_END_MRID.queryIndex)
+        val ratedS = resultSet.getInt(table.RATED_S.queryIndex)
+        setLastMRID("$powerTransformerEndMRID.s$ratedS")
+
+        val pte = networkService.ensureGet<PowerTransformerEnd>(powerTransformerEndMRID, "$powerTransformerEndMRID.s$ratedS")
+        val coolingType = TransformerCoolingType.valueOf(resultSet.getString(table.COOLING_TYPE.queryIndex))
+        pte?.addRating(ratedS, coolingType)
+
+        return true
     }
 
     private fun loadProtectedSwitch(protectedSwitch: ProtectedSwitch, table: TableProtectedSwitches, resultSet: ResultSet): Boolean {
@@ -1050,9 +1111,32 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     ): Boolean {
         regulatingCondEq.apply {
             controlEnabled = resultSet.getBoolean(table.CONTROL_ENABLED.queryIndex)
+            // We use a resolver here because there is an ordering conflict between terminals, RegulatingCondEq, and RegulatingControls
+            // We check this resolver has actually been resolved in the postLoad of the database read and throw there if it hasn't.
+            networkService.resolveOrDeferReference(Resolvers.regulatingControl(this), resultSet.getNullableString(table.REGULATING_CONTROL_MRID.queryIndex))
         }
 
         return loadEnergyConnection(regulatingCondEq, table, resultSet)
+    }
+
+    private fun loadRegulatingControl(
+        regulatingControl: RegulatingControl,
+        table: TableRegulatingControls,
+        resultSet: ResultSet
+    ): Boolean {
+        regulatingControl.apply {
+            discrete = resultSet.getNullableBoolean(table.DISCRETE.queryIndex)
+            mode = RegulatingControlModeKind.valueOf(resultSet.getString(table.MODE.queryIndex))
+            monitoredPhase = PhaseCode.valueOf(resultSet.getString(table.MONITORED_PHASE.queryIndex))
+            targetDeadband = resultSet.getNullableFloat(table.TARGET_DEADBAND.queryIndex)
+            targetValue = resultSet.getNullableDouble(table.TARGET_VALUE.queryIndex)
+            enabled = resultSet.getNullableBoolean(table.ENABLED.queryIndex)
+            maxAllowedTargetValue = resultSet.getNullableDouble(table.MAX_ALLOWED_TARGET_VALUE.queryIndex)
+            minAllowedTargetValue = resultSet.getNullableDouble(table.MIN_ALLOWED_TARGET_VALUE.queryIndex)
+            terminal = networkService.ensureGet(resultSet.getNullableString(table.TERMINAL_MRID.queryIndex), typeNameAndMRID())
+        }
+
+        return loadPowerSystemResource(regulatingControl, table, resultSet)
     }
 
     private fun loadShuntCompensator(
@@ -1095,9 +1179,26 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             neutralU = resultSet.getNullableInt(table.NEUTRAL_U.queryIndex)
             normalStep = resultSet.getNullableInt(table.NORMAL_STEP.queryIndex)
             step = resultSet.getNullableDouble(table.STEP.queryIndex)
+            tapChangerControl = networkService.ensureGet(resultSet.getNullableString(table.TAP_CHANGER_CONTROL_MRID.queryIndex), typeNameAndMRID())
         }
 
         return loadPowerSystemResource(tapChanger, table, resultSet)
+    }
+
+    fun load(table: TableTapChangerControls, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val tapChangerControl = TapChangerControl(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            limitVoltage = resultSet.getNullableInt(table.LIMIT_VOLTAGE.queryIndex)
+            lineDropCompensation = resultSet.getNullableBoolean(table.LINE_DROP_COMPENSATION.queryIndex)
+            lineDropR = resultSet.getNullableDouble(table.LINE_DROP_R.queryIndex)
+            lineDropX = resultSet.getNullableDouble(table.LINE_DROP_X.queryIndex)
+            reverseLineDropR = resultSet.getNullableDouble(table.REVERSE_LINE_DROP_R.queryIndex)
+            reverseLineDropX = resultSet.getNullableDouble(table.REVERSE_LINE_DROP_X.queryIndex)
+            forwardLDCBlocking = resultSet.getNullableBoolean(table.FORWARD_LDC_BLOCKING.queryIndex)
+            timeDelay = resultSet.getNullableDouble(table.TIME_DELAY.queryIndex)
+            coGenerationEnabled = resultSet.getNullableBoolean(table.CO_GENERATION_ENABLED.queryIndex)
+        }
+
+        return loadRegulatingControl(tapChangerControl, table, resultSet) && networkService.addOrThrow(tapChangerControl)
     }
 
     private fun loadTransformerEnd(transformerEnd: TransformerEnd, table: TableTransformerEnds, resultSet: ResultSet): Boolean {
@@ -1290,6 +1391,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
                 substation.addLoop(loop)
                 loop.addSubstation(substation)
             }
+
             LoopSubstationRelationship.SUBSTATION_ENERGIZES_LOOP -> {
                 substation.addEnergizedLoop(loop)
                 loop.addEnergizingSubstation(substation)

@@ -35,6 +35,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
@@ -311,6 +312,9 @@ class NetworkService : BaseService("network") {
     fun add(recloser: Recloser): Boolean = super.add(recloser)
     fun remove(recloser: Recloser): Boolean = super.remove(recloser)
 
+    fun add(tapChangerControl: TapChangerControl): Boolean = super.add(tapChangerControl)
+    fun remove(tapChangerControl: TapChangerControl): Boolean = super.remove(tapChangerControl)
+
     fun add(transformerStarImpedance: TransformerStarImpedance): Boolean = super.add(transformerStarImpedance)
     fun remove(transformerStarImpedance: TransformerStarImpedance): Boolean = super.remove(transformerStarImpedance)
 
@@ -326,6 +330,13 @@ class NetworkService : BaseService("network") {
 
     fun add(lvFeeder: LvFeeder): Boolean = super.add(lvFeeder)
     fun remove(lvFeeder: LvFeeder): Boolean = super.remove(lvFeeder)
+
+    // ###############################
+    // # IEC61970 InfIEC61970 WIRES.GENERATION.PRODUCTION #
+    // ###############################
+
+    fun add(evChargingUnit: EvChargingUnit): Boolean = super.add(evChargingUnit)
+    fun remove(evChargingUnit: EvChargingUnit): Boolean = super.remove(evChargingUnit)
 
     /**
      * Get all measurements of type [T] associated with the given [mRID].

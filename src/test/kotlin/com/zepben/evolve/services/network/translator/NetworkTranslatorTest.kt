@@ -39,6 +39,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.evolve.services.network.NetworkService
@@ -70,7 +71,9 @@ internal class NetworkTranslatorTest {
         TransformerEnd::class.java to { PowerTransformerEnd(it) },
         WireInfo::class.java to { OverheadWireInfo(it) },
         ProtectionEquipment::class.java to { CurrentRelay(it) },
-        ProtectedSwitch::class.java to { Breaker(it) }
+        ProtectedSwitch::class.java to { Breaker(it) },
+        RegulatingControl::class.java to { TapChangerControl(it) },
+        RegulatingCondEq::class.java to { PowerElectronicsConnection(it) }
     )
 
     @Test
@@ -168,6 +171,10 @@ internal class NetworkTranslatorTest {
         validate({ RatioTapChanger() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Recloser() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ TransformerStarImpedance() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ TapChangerControl() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+
+        /************ IEC61970 InfIEC61970 BASE WIRES GENERATION PRODUCTION ************/
+        validate({ EvChargingUnit() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
         /************ IEC61970 InfIEC61970 Feeder ************/
         validate({ Circuit() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })

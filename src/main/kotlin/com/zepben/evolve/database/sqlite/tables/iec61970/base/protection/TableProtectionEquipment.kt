@@ -18,5 +18,7 @@ abstract class TableProtectionEquipment : TableEquipment() {
 
     val RELAY_DELAY_TIME = Column(++columnIndex, "relay_delay_time", "NUMBER", NULL)
     val PROTECTION_KIND = Column(++columnIndex, "protection_kind", "TEXT", NOT_NULL)
+    val DIRECTABLE = Column(++columnIndex, "directable", "BOOLEAN", NULL)
+    val POWER_DIRECTION = Column(++columnIndex, "power_direction", "TEXT", NOT_NULL)
 
 }

@@ -10,7 +10,10 @@ package com.zepben.evolve.services.network.testdata
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.NameType
-import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.EnergyConsumer
+import com.zepben.evolve.cim.iec61970.base.wires.EnergyConsumerPhase
+import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
+import com.zepben.evolve.cim.iec61970.base.wires.EnergySourcePhase
 import com.zepben.evolve.services.common.meta.DataSource
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService

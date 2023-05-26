@@ -11,5 +11,4 @@ package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 /**
  * A photovoltaic device or an aggregation of such devices.
  */
-class PhotoVoltaicUnit(mRID: String = "") : PowerElectronicsUnit(mRID) {
-}
+class PhotoVoltaicUnit(mRID: String = "") : PowerElectronicsUnit(mRID)

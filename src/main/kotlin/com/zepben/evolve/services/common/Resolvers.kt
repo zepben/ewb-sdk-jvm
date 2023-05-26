@@ -192,7 +192,7 @@ object Resolvers {
     @JvmStatic
     fun normalHeadTerminal(feeder: Feeder): BoundReferenceResolver<Feeder, Terminal> =
         BoundReferenceResolver(feeder, FeederToNormalHeadTerminalResolver, null)
-    
+
     @JvmStatic
     fun normalEnergizedLvFeeders(feeder: Feeder): BoundReferenceResolver<Feeder, LvFeeder> =
         BoundReferenceResolver(feeder, FeederToNormalEnergizedLvFeedersResolver, LvFeederToNormalEnergizingFeedersResolver)
@@ -432,5 +432,29 @@ object Resolvers {
             ProtectedSwitchToProtectionEquipmentResolver,
             ProtectionEquipmentToProtectedSwitchResolver
         )
+
+    @JvmStatic
+    fun terminal(regulatingControl: RegulatingControl): BoundReferenceResolver<RegulatingControl, Terminal> =
+        BoundReferenceResolver(regulatingControl, RegulatingControlToTerminalResolver, null)
+
+    @JvmStatic
+    fun regulatingCondEq(regulatingControl: RegulatingControl): BoundReferenceResolver<RegulatingControl, RegulatingCondEq> =
+        BoundReferenceResolver(
+            regulatingControl,
+            RegulatingControlToRegulatingCondEqResolver,
+            RegulatingCondEqToRegulatingControlResolver
+        )
+
+    @JvmStatic
+    fun regulatingControl(regulatingCondEq: RegulatingCondEq): BoundReferenceResolver<RegulatingCondEq, RegulatingControl> =
+        BoundReferenceResolver(
+            regulatingCondEq,
+            RegulatingCondEqToRegulatingControlResolver,
+            RegulatingControlToRegulatingCondEqResolver
+        )
+
+    @JvmStatic
+    fun tapChangerControl(tapChanger: TapChanger): BoundReferenceResolver<TapChanger, TapChangerControl> =
+        BoundReferenceResolver(tapChanger, TapChangerToTapChangerControlResolver, null)
 
 }

@@ -12,10 +12,7 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.Breaker
-import com.zepben.evolve.cim.iec61970.base.wires.Fuse
-import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
+import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -259,7 +256,7 @@ internal class TestNetworkBuilderTest {
         //
         TestNetworkBuilder()
             .fromPowerTransformer(listOf(PhaseCode.ABC, PhaseCode.ABC), listOf({ ratedU = 1 }, { ratedU = 2 })) // tx0
-            .toPowerTransformer(listOf(PhaseCode.ABC), listOf { ratedS = 3 }) // tx1
+            .toPowerTransformer(listOf(PhaseCode.ABC), listOf { addRating(3, TransformerCoolingType.UNKNOWN_COOLING_TYPE) }) // tx1
             .fromPowerTransformer(listOf(PhaseCode.AB, PhaseCode.AB, PhaseCode.AN), listOf({ b = 4.0 }, { b = 5.0 }, { b = 6.0 })) // tx2
             .build()
             .apply {

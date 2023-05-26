@@ -27,10 +27,12 @@ internal class CurrentRelayInfoTest {
         val currentRelayInfo = CurrentRelayInfo()
 
         assertThat(currentRelayInfo.curveSetting, nullValue())
+        assertThat(currentRelayInfo.recloseDelays, emptyIterable())
 
         currentRelayInfo.fillFields(NetworkService())
 
         assertThat(currentRelayInfo.curveSetting, equalTo("curveSetting"))
+        assertThat(currentRelayInfo.recloseDelays, contains(1.0, 2.0, 3.0))
     }
 
 }

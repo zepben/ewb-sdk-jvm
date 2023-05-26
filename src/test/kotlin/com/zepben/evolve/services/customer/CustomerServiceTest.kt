@@ -7,14 +7,8 @@
  */
 package com.zepben.evolve.services.customer
 
-import com.zepben.evolve.cim.iec61968.common.Organisation
-import com.zepben.evolve.cim.iec61968.customers.Customer
-import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
-import com.zepben.evolve.cim.iec61968.customers.PricingStructure
-import com.zepben.evolve.cim.iec61968.customers.Tariff
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test

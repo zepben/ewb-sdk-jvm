@@ -38,6 +38,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.InvokeChecker
 import com.zepben.evolve.services.common.InvokedChecker
 import com.zepben.evolve.services.common.NeverInvokedChecker
@@ -127,6 +128,8 @@ internal class NetworkServiceUtilsTest {
         isSwitchInfo: (SwitchInfo) -> String,
         isCurrentRelayInfo: (CurrentRelayInfo) -> String,
         isCurrentRelay: (CurrentRelay) -> String,
+        isEvChargingUnit: (EvChargingUnit) -> String,
+        isTapChangerControl: (TapChangerControl) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -197,6 +200,8 @@ internal class NetworkServiceUtilsTest {
         isSwitchInfo = isSwitchInfo,
         isCurrentRelayInfo = isCurrentRelayInfo,
         isCurrentRelay = isCurrentRelay,
+        isEvChargingUnit = isEvChargingUnit,
+        isTapChangerControl = isTapChangerControl,
         isOther = isOther
     )
 
@@ -269,6 +274,8 @@ internal class NetworkServiceUtilsTest {
         isSwitchInfo: InvokeChecker<SwitchInfo> = NeverInvokedChecker(),
         isCurrentRelayInfo: InvokeChecker<CurrentRelayInfo> = NeverInvokedChecker(),
         isCurrentRelay: InvokeChecker<CurrentRelay> = NeverInvokedChecker(),
+        isEvChargingUnit: InvokeChecker<EvChargingUnit> = NeverInvokedChecker(),
+        isTapChangerControl: InvokeChecker<TapChangerControl> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -340,6 +347,8 @@ internal class NetworkServiceUtilsTest {
             isSwitchInfo = isSwitchInfo,
             isCurrentRelayInfo = isCurrentRelayInfo,
             isCurrentRelay = isCurrentRelay,
+            isEvChargingUnit = isEvChargingUnit,
+            isTapChangerControl = isTapChangerControl,
             isOther = isOther
         )
 
@@ -411,6 +420,8 @@ internal class NetworkServiceUtilsTest {
         isSwitchInfo.verifyInvoke()
         isCurrentRelayInfo.verifyInvoke()
         isCurrentRelay.verifyInvoke()
+        isEvChargingUnit.verifyInvoke()
+        isTapChangerControl.verifyInvoke()
         isOther.verifyInvoke()
     }
 
@@ -488,6 +499,8 @@ internal class NetworkServiceUtilsTest {
         SwitchInfo().also { whenNetworkServiceObjectTester(it, isSwitchInfo = InvokedChecker(it)) }
         CurrentRelayInfo().also { whenNetworkServiceObjectTester(it, isCurrentRelayInfo = InvokedChecker(it)) }
         CurrentRelay().also { whenNetworkServiceObjectTester(it, isCurrentRelay = InvokedChecker(it)) }
+        EvChargingUnit().also { whenNetworkServiceObjectTester(it, isEvChargingUnit = InvokedChecker(it)) }
+        TapChangerControl().also { whenNetworkServiceObjectTester(it, isTapChangerControl = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

@@ -20,6 +20,12 @@ fun <T, R> KProperty1<in T, R?>.compareValues(source: T?, target: T?): ValueDiff
         } else {
             ValueDifference(sVal, tVal)
         }
+    } else if (sVal is Float) {
+        if ((tVal is Float) && ((sVal == tVal) || (sVal.isNaN() && tVal.isNaN()))) {
+            null
+        } else {
+            ValueDifference(sVal, tVal)
+        }
     } else if (sVal == tVal) {
         null
     } else {

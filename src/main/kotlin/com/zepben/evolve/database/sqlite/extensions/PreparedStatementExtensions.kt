@@ -13,9 +13,7 @@ import java.security.AccessController
 import java.security.PrivilegedActionException
 import java.security.PrivilegedExceptionAction
 import java.sql.PreparedStatement
-import java.sql.Types
-import java.sql.Types.BOOLEAN
-import java.sql.Types.DOUBLE
+import java.sql.Types.*
 import java.time.Instant
 
 internal fun PreparedStatement.setNullableBoolean(queryIndex: Int, value: Boolean?) {
@@ -27,7 +25,7 @@ internal fun PreparedStatement.setNullableBoolean(queryIndex: Int, value: Boolea
 
 internal fun PreparedStatement.setNullableString(queryIndex: Int, value: String?) {
     when (value) {
-        null -> setNull(queryIndex, Types.VARCHAR)
+        null -> setNull(queryIndex, VARCHAR)
         else -> setString(queryIndex, value)
     }
 }
@@ -40,31 +38,39 @@ internal fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?
     }
 }
 
+internal fun PreparedStatement.setNullableFloat(queryIndex: Int, value: Float?) {
+    when {
+        value == null -> this.setNull(queryIndex, FLOAT)
+        value.isNaN() -> this.setString(queryIndex, "NaN")
+        else -> this.setFloat(queryIndex, value)
+    }
+}
+
 internal fun PreparedStatement.setNullableInt(queryIndex: Int, value: Int?) {
     if (value == null)
-        this.setNull(queryIndex, Types.INTEGER)
+        this.setNull(queryIndex, INTEGER)
     else
         this.setInt(queryIndex, value)
 }
 
 internal fun PreparedStatement.setNullableLong(queryIndex: Int, value: Long?) {
     if (value == null)
-        this.setNull(queryIndex, Types.INTEGER)
+        this.setNull(queryIndex, INTEGER)
     else
         this.setLong(queryIndex, value)
 }
 
 internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
     when (value) {
-        null -> setNull(queryIndex, Types.VARCHAR)
+        null -> setNull(queryIndex, VARCHAR)
         else -> setString(queryIndex, value.toString())
     }
 }
 
 internal fun PreparedStatement.setNullableRatio(numeratorIndex: Int, denominatorIndex: Int, value: Ratio?) {
     if (value == null) {
-        this.setNull(denominatorIndex, Types.DOUBLE)
-        this.setNull(numeratorIndex, Types.DOUBLE)
+        this.setNull(denominatorIndex, DOUBLE)
+        this.setNull(numeratorIndex, DOUBLE)
     } else {
         this.setDouble(denominatorIndex, value.denominator)
         this.setDouble(numeratorIndex, value.numerator)

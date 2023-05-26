@@ -7,6 +7,8 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -37,22 +39,18 @@ internal class TapChangerTest {
         assertThat(tapChanger.neutralU, nullValue())
         assertThat(tapChanger.normalStep, nullValue())
         assertThat(tapChanger.step, nullValue())
+        assertThat(tapChanger.tapChangerControl, nullValue())
 
-        tapChanger.controlEnabled = false
-        tapChanger.highStep = 4
-        tapChanger.lowStep = -4
-        tapChanger.neutralStep = 1
-        tapChanger.neutralU = 1234
-        tapChanger.normalStep = 2
-        tapChanger.step = 3.3
+        tapChanger.fillFields(NetworkService(), true)
 
         assertThat(tapChanger.controlEnabled, equalTo(false))
-        assertThat(tapChanger.highStep, equalTo(4))
-        assertThat(tapChanger.lowStep, equalTo(-4))
-        assertThat(tapChanger.neutralStep, equalTo(1))
-        assertThat(tapChanger.neutralU, equalTo(1234))
-        assertThat(tapChanger.normalStep, equalTo(2))
-        assertThat(tapChanger.step, equalTo(3.3))
+        assertThat(tapChanger.highStep, equalTo(22))
+        assertThat(tapChanger.lowStep, equalTo(1))
+        assertThat(tapChanger.neutralStep, equalTo(2))
+        assertThat(tapChanger.neutralU, equalTo(3))
+        assertThat(tapChanger.normalStep, equalTo(4))
+        assertThat(tapChanger.step, equalTo(5.5))
+        assertThat(tapChanger.tapChangerControl, notNullValue())
     }
 
     @Test

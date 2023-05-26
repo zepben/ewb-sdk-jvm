@@ -11,12 +11,15 @@ package com.zepben.evolve.cim.iec61970.base.core
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.time.Instant
 
 internal class EquipmentTest {
 
@@ -36,12 +39,13 @@ internal class EquipmentTest {
 
         assertThat(equipment.inService, equalTo(true))
         assertThat(equipment.normallyInService, equalTo(true))
+        assertThat(equipment.commissionedDate, nullValue())
 
-        equipment.inService = false
-        equipment.normallyInService = false
+        equipment.fillFields(NetworkService())
 
         assertThat(equipment.inService, equalTo(false))
         assertThat(equipment.normallyInService, equalTo(false))
+        assertThat(equipment.commissionedDate, equalTo(Instant.MIN))
     }
 
     @Test

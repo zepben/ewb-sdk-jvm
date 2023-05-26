@@ -37,21 +37,22 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
-import com.zepben.evolve.services.common.UNKNOWN_DOUBLE
-import com.zepben.evolve.services.common.UNKNOWN_INT
-import com.zepben.evolve.services.common.UNKNOWN_LONG
-import com.zepben.evolve.services.common.UNKNOWN_UINT
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
+import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.common.translator.BaseCimToProto
 import com.zepben.evolve.services.common.translator.toPb
+import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.PotentialTransformerKind
 import com.zepben.protobuf.cim.iec61970.base.wires.PhaseShuntConnectionKind
 import com.zepben.protobuf.cim.iec61970.base.wires.SinglePhaseKind
+import com.zepben.protobuf.cim.iec61970.base.wires.TransformerCoolingType
 import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind
+import com.zepben.protobuf.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.protobuf.network.model.FeederDirection
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.NoLoadTest as PBNoLoadTest
@@ -149,10 +150,14 @@ import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch as PBProtecte
 import com.zepben.protobuf.cim.iec61970.base.wires.RatioTapChanger as PBRatioTapChanger
 import com.zepben.protobuf.cim.iec61970.base.wires.Recloser as PBRecloser
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingCondEq as PBRegulatingCondEq
+import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingControl as PBRegulatingControl
+import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingControlModeKind as PBRegulatingControlModeKind
 import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
+import com.zepben.protobuf.cim.iec61970.base.wires.TapChangerControl as PBTapChangerControl
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
+import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEndRatedS as PBTransformerEndRatedS
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerStarImpedance as PBTransformerStarImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryUnit as PBBatteryUnit
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit as PBPhotoVoltaicUnit
@@ -162,6 +167,7 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
 import com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind as PBProtectionKind
+import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit as PBEvChargingUnit
 
 /************ IEC61968 ASSET INFO ************/
 
@@ -379,6 +385,7 @@ fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()
 fun toPb(cim: CurrentRelayInfo, pb: PBCurrentRelayInfo.Builder): PBCurrentRelayInfo.Builder =
     pb.apply {
         cim.curveSetting?.let { curveSetting = it } ?: clearCurveSetting()
+        cim.recloseDelays.forEach { addRecloseDelays(it) }
         toPb(cim, aiBuilder)
     }
 
@@ -442,6 +449,8 @@ fun toPb(cim: UsagePoint, pb: PBUsagePoint.Builder): PBUsagePoint.Builder =
     pb.apply {
         cim.usagePointLocation?.let { usagePointLocationMRID = it.mRID } ?: clearUsagePointLocationMRID()
         isVirtual = cim.isVirtual
+        ratedPower = cim.ratedPower ?: UNKNOWN_INT
+        approvedInverterCapacity = cim.approvedInverterCapacity ?: UNKNOWN_INT
         cim.connectionCategory?.let { connectionCategory = it } ?: clearConnectionCategory()
         clearEquipmentMRIDs()
         cim.equipment.forEach { addEquipmentMRIDs(it.mRID) }
@@ -519,6 +528,8 @@ fun toPb(cim: Equipment, pb: PBEquipment.Builder): PBEquipment.Builder =
     pb.apply {
         inService = cim.inService
         normallyInService = cim.normallyInService
+
+        cim.commissionedDate.toTimestamp()?.let { commissionedDate = it } ?: clearCommissionedDate()
 
         clearEquipmentContainerMRIDs()
         cim.containers.forEach { addEquipmentContainerMRIDs(it.mRID) }
@@ -690,6 +701,8 @@ fun toPb(cim: ProtectionEquipment, pb: PBProtectionEquipment.Builder): PBProtect
     pb.apply {
         relayDelayTime = cim.relayDelayTime ?: UNKNOWN_DOUBLE
         protectionKind = PBProtectionKind.valueOf(cim.protectionKind.name)
+        cim.directable?.also { directableSet = it } ?: run { directableNull = NullValue.NULL_VALUE }
+        powerDirection = PowerDirectionKind.valueOf(cim.powerDirection.name)
         cim.protectedSwitches.forEach { addProtectedSwitchMRIDs(it.mRID) }
         toPb(cim, eqBuilder)
     }
@@ -904,6 +917,30 @@ fun toPb(cim: PowerElectronicsConnection, pb: PBPowerElectronicsConnection.Build
         q = cim.q ?: UNKNOWN_DOUBLE
         ratedS = cim.ratedS ?: UNKNOWN_INT
         ratedU = cim.ratedU ?: UNKNOWN_INT
+        cim.inverterStandard?.also { inverterStandard = it } ?: clearInverterStandard()
+        sustainOpOvervoltLimit = cim.sustainOpOvervoltLimit ?: UNKNOWN_INT
+        stopAtOverFreq = cim.stopAtOverFreq ?: UNKNOWN_FLOAT
+        stopAtUnderFreq = cim.stopAtUnderFreq ?: UNKNOWN_FLOAT
+        cim.invVoltWattRespMode?.let { invVoltWattRespModeSet = it } ?: run { invVoltWattRespModeNull = NullValue.NULL_VALUE }
+        invWattRespV1 = cim.invWattRespV1 ?: UNKNOWN_INT
+        invWattRespV2 = cim.invWattRespV2 ?: UNKNOWN_INT
+        invWattRespV3 = cim.invWattRespV3 ?: UNKNOWN_INT
+        invWattRespV4 = cim.invWattRespV4 ?: UNKNOWN_INT
+        invWattRespPAtV1 = cim.invWattRespPAtV1 ?: UNKNOWN_FLOAT
+        invWattRespPAtV2 = cim.invWattRespPAtV2 ?: UNKNOWN_FLOAT
+        invWattRespPAtV3 = cim.invWattRespPAtV3 ?: UNKNOWN_FLOAT
+        invWattRespPAtV4 = cim.invWattRespPAtV4 ?: UNKNOWN_FLOAT
+        cim.invVoltVarRespMode?.let { invVoltVarRespModeSet = it } ?: run { invVoltVarRespModeNull = NullValue.NULL_VALUE }
+        invVarRespV1 = cim.invVarRespV1 ?: UNKNOWN_INT
+        invVarRespV2 = cim.invVarRespV2 ?: UNKNOWN_INT
+        invVarRespV3 = cim.invVarRespV3 ?: UNKNOWN_INT
+        invVarRespV4 = cim.invVarRespV4 ?: UNKNOWN_INT
+        invVarRespQAtV1 = cim.invVarRespQAtV1 ?: UNKNOWN_FLOAT
+        invVarRespQAtV2 = cim.invVarRespQAtV2 ?: UNKNOWN_FLOAT
+        invVarRespQAtV3 = cim.invVarRespQAtV3 ?: UNKNOWN_FLOAT
+        invVarRespQAtV4 = cim.invVarRespQAtV4 ?: UNKNOWN_FLOAT
+        cim.invReactivePowerMode?.let { invReactivePowerModeSet = it } ?: run { invReactivePowerModeNull = NullValue.NULL_VALUE }
+        invFixReactivePower = cim.invFixReactivePower ?: UNKNOWN_FLOAT
         toPb(cim, rceBuilder)
     }
 
@@ -930,7 +967,7 @@ fun toPb(cim: PowerTransformer, pb: PBPowerTransformer.Builder): PBPowerTransfor
 fun toPb(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd.Builder): PBPowerTransformerEnd.Builder =
     pb.apply {
         cim.powerTransformer?.let { powerTransformerMRID = it.mRID } ?: clearPowerTransformerMRID()
-        ratedS = cim.ratedS ?: UNKNOWN_INT
+        cim.sRatings.forEach { addRatings(toPb(it)) }
         ratedU = cim.ratedU ?: UNKNOWN_INT
         r = cim.r ?: UNKNOWN_DOUBLE
         r0 = cim.r0 ?: UNKNOWN_DOUBLE
@@ -943,6 +980,13 @@ fun toPb(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd.Builder): PBPowerTr
         g0 = cim.g0 ?: UNKNOWN_DOUBLE
         phaseAngleClock = cim.phaseAngleClock ?: UNKNOWN_INT
         toPb(cim, teBuilder)
+    }
+
+fun toPb(cim: TransformerEndRatedS): PBTransformerEndRatedS.Builder =
+    PBTransformerEndRatedS.newBuilder().apply {
+        ratedS = cim.ratedS
+        coolingType = TransformerCoolingType.valueOf(cim.coolingType.name)
+
     }
 
 fun toPb(cim: ProtectedSwitch, pb: PBProtectedSwitch.Builder): PBProtectedSwitch.Builder =
@@ -966,7 +1010,25 @@ fun toPb(cim: Recloser, pb: PBRecloser.Builder): PBRecloser.Builder =
 fun toPb(cim: RegulatingCondEq, pb: PBRegulatingCondEq.Builder): PBRegulatingCondEq.Builder =
     pb.apply {
         controlEnabled = cim.controlEnabled
+        cim.regulatingControl?.also { regulatingControlMRID = it.mRID } ?: clearRegulatingControlMRID()
         toPb(cim, ecBuilder)
+    }
+
+fun toPb(cim: RegulatingControl, pb: PBRegulatingControl.Builder): PBRegulatingControl.Builder =
+    pb.apply {
+        cim.discrete?.let { discreteSet = it } ?: run { discreteNull = NullValue.NULL_VALUE }
+        mode = PBRegulatingControlModeKind.valueOf(cim.mode.name)
+        monitoredPhase = PBPhaseCode.valueOf(cim.monitoredPhase.name)
+        targetDeadband = cim.targetDeadband ?: UNKNOWN_FLOAT
+        targetValue = cim.targetValue ?: UNKNOWN_DOUBLE
+        cim.enabled?.let { enabledSet = it } ?: run { enabledNull = NullValue.NULL_VALUE }
+        maxAllowedTargetValue = cim.maxAllowedTargetValue ?: UNKNOWN_DOUBLE
+        minAllowedTargetValue = cim.minAllowedTargetValue ?: UNKNOWN_DOUBLE
+        cim.terminal?.also { terminalMRID = it.mRID } ?: clearTerminalMRID()
+        clearRegulatingCondEqMRIDs()
+        cim.regulatingCondEqs.forEach { addRegulatingCondEqMRIDs(it.mRID) }
+
+        toPb(cim, psrBuilder)
     }
 
 fun toPb(cim: ShuntCompensator, pb: PBShuntCompensator.Builder): PBShuntCompensator.Builder =
@@ -998,7 +1060,27 @@ fun toPb(cim: TapChanger, pb: PBTapChanger.Builder): PBTapChanger.Builder =
         neutralU = cim.neutralU ?: UNKNOWN_INT
         normalStep = cim.normalStep ?: UNKNOWN_INT
         controlEnabled = cim.controlEnabled
+        cim.tapChangerControl?.also { tapChangerControlMRID = it.mRID } ?: clearTapChangerControlMRID()
+
         toPb(cim, psrBuilder)
+    }
+
+fun toPb(cim: TapChangerControl, pb: PBTapChangerControl.Builder): PBTapChangerControl.Builder =
+    pb.apply {
+        limitVoltage = cim.limitVoltage ?: UNKNOWN_INT
+        cim.lineDropCompensation?.let { lineDropCompensationSet = it } ?: run { lineDropCompensationNull = NullValue.NULL_VALUE }
+        lineDropR = cim.lineDropR ?: UNKNOWN_DOUBLE
+        lineDropX = cim.lineDropX ?: UNKNOWN_DOUBLE
+        reverseLineDropR = cim.reverseLineDropR ?: UNKNOWN_DOUBLE
+        reverseLineDropX = cim.reverseLineDropX ?: UNKNOWN_DOUBLE
+
+        cim.forwardLDCBlocking?.let { forwardLDCBlockingSet = it } ?: run { forwardLDCBlockingNull = NullValue.NULL_VALUE }
+
+        timeDelay = cim.timeDelay ?: UNKNOWN_DOUBLE
+
+        cim.coGenerationEnabled?.let { coGenerationEnabledSet = it } ?: run { coGenerationEnabledNull = NullValue.NULL_VALUE }
+
+        toPb(cim, rcBuilder)
     }
 
 fun toPb(cim: TransformerEnd, pb: PBTransformerEnd.Builder): PBTransformerEnd.Builder =
@@ -1044,7 +1126,17 @@ fun PowerTransformer.toPb(): PBPowerTransformer = toPb(this, PBPowerTransformer.
 fun PowerTransformerEnd.toPb(): PBPowerTransformerEnd = toPb(this, PBPowerTransformerEnd.newBuilder()).build()
 fun RatioTapChanger.toPb(): PBRatioTapChanger = toPb(this, PBRatioTapChanger.newBuilder()).build()
 fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
+fun TapChangerControl.toPb(): PBTapChangerControl = toPb(this, PBTapChangerControl.newBuilder()).build()
 fun TransformerStarImpedance.toPb(): PBTransformerStarImpedance = toPb(this, PBTransformerStarImpedance.newBuilder()).build()
+
+/************ IEC61970 InfIEC61970 Wires.Generation.Production ************/
+
+fun toPb(cim: EvChargingUnit, pb: PBEvChargingUnit.Builder): PBEvChargingUnit.Builder =
+    pb.apply {
+        toPb(cim, peuBuilder)
+    }
+
+fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBuilder()).build()
 
 /************ IEC61970 InfIEC61970 Feeder ************/
 
@@ -1182,7 +1274,11 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: PowerTransformerEnd): PBPowerTransformerEnd = cim.toPb()
     fun toPb(cim: RatioTapChanger): PBRatioTapChanger = cim.toPb()
     fun toPb(cim: Recloser): PBRecloser = cim.toPb()
+    fun toPb(cim: TapChangerControl): PBTapChangerControl = cim.toPb()
     fun toPb(cim: TransformerStarImpedance): PBTransformerStarImpedance = cim.toPb()
+
+    // IEC61970 InfIEC61970 Base Wires Generation Production
+    fun toPb(cim: EvChargingUnit): PBEvChargingUnit = cim.toPb()
 
     // IEC61970 InfIEC61970 Feeder
     fun toPb(cim: Circuit): PBCircuit = cim.toPb()

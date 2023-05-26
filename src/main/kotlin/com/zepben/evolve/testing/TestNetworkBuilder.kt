@@ -174,6 +174,28 @@ open class TestNetworkBuilder {
     }
 
     /**
+     * Add a new [PowerElectronicsConnection] to the network and connect it to the current network pointer, updating the network pointer to the new
+     * [PowerElectronicsConnection].
+     *
+     * @param nominalPhases The nominal phases for the new [PowerElectronicsConnection].
+     * @param action An action that accepts the new [PowerElectronicsConnection] to allow for additional initialisation.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun toPowerElectronicsConnection(
+        nominalPhases: PhaseCode = PhaseCode.ABC,
+        numTerminals: Int = 2,
+        action: PowerElectronicsConnection.() -> Unit = {}
+    ): TestNetworkBuilder {
+        current = network.createPowerElectronicsConnection(nominalPhases, numTerminals).also {
+            connect(current!!, it)
+            action(it)
+        }
+        return this
+    }
+
+    /**
      * Start a new network island from a [PowerTransformer], updating the network pointer to the new [PowerTransformer].
      *
      * @param nominalPhases The nominal phases for each end of the new [PowerTransformer]. Defaults to two [PhaseCode.ABC] ends.
@@ -385,6 +407,14 @@ open class TestNetworkBuilder {
     private fun NetworkService.createJunction(phaseCode: PhaseCode = PhaseCode.ABC, numTerminals: Int?) =
         nextId("j").let { id ->
             Junction(id).apply {
+                for (i in 1..(numTerminals ?: 2))
+                    addTerminal(Terminal("$id-t$i").apply { phases = phaseCode }.also { add(it) })
+            }.also { add(it) }
+        }
+
+    private fun NetworkService.createPowerElectronicsConnection(phaseCode: PhaseCode = PhaseCode.ABC, numTerminals: Int?) =
+        nextId("pec").let { id ->
+            PowerElectronicsConnection(id).apply {
                 for (i in 1..(numTerminals ?: 2))
                     addTerminal(Terminal("$id-t$i").apply { phases = phaseCode }.also { add(it) })
             }.also { add(it) }

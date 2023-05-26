@@ -25,12 +25,16 @@ import com.zepben.evolve.services.common.extensions.validateReference
  *                     of a company's premises distributed widely across the distribution territory. Otherwise, the usage point is physical,
  *                     i.e., there is a logical point in the network where a meter could be located to collect meter readings.
  * @property connectionCategory A code used to specify the connection category, e.g., low voltage or low pressure, where the usage point is defined.
+ * @property ratedPower Active power that this usage point is configured to deliver in watts.
+ * @property approvedInverterCapacity The approved inverter capacity at this UsagePoint in volt-amperes.
  */
 class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
 
     var usagePointLocation: Location? = null
     var isVirtual: Boolean = false
     var connectionCategory: String? = null
+    var ratedPower: Int? = null
+    var approvedInverterCapacity: Int? = null
 
     private var _equipment: MutableList<Equipment>? = null
     private var _endDevices: MutableList<EndDevice>? = null

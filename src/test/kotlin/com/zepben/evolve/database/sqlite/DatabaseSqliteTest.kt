@@ -299,8 +299,10 @@ class DatabaseSqliteTest {
             equalTo(true)
         )
         // Delete a link to cause an unresolved reference.
-        getConnection("jdbc:sqlite:$SCHEMA_TEST_FILE").createStatement().use { statement ->
-            statement.execute("DELETE FROM tap_changer_controls WHERE mRID = 'tcc'")
+        getConnection("jdbc:sqlite:$SCHEMA_TEST_FILE").use { connection ->
+            connection.createStatement().use { statement ->
+                statement.execute("DELETE FROM tap_changer_controls WHERE mRID = 'tcc'")
+            }
         }
 
         val metadataCollection = MetadataCollection()

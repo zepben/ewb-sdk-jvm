@@ -14,7 +14,6 @@ import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.ResistanceReactanceTest.Companion.validateResistanceReactance
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
-import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat

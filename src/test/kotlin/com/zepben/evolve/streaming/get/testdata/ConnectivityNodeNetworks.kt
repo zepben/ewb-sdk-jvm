@@ -32,4 +32,5 @@ object ConnectivityNodeNetworks {
                 ns.connect(t, mRID)
             }
         }
+
 }

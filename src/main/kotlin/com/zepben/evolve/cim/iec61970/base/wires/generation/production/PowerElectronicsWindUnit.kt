@@ -11,5 +11,4 @@ package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 /**
  * A wind generating unit that connects to the AC network with power electronics rather than rotating machines or an aggregation of such units.
  */
-class PowerElectronicsWindUnit(mRID: String = "") : PowerElectronicsUnit(mRID) {
-}
+class PowerElectronicsWindUnit(mRID: String = "") : PowerElectronicsUnit(mRID)

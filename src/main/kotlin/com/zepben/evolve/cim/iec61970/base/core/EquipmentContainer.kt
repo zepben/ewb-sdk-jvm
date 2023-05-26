@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.cim.iec61970.base.core
 
-import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.validateReference
 

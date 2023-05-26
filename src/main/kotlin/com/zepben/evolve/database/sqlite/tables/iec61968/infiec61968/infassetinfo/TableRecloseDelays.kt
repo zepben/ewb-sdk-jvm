@@ -10,9 +10,7 @@ package com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetin
 
 import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
-import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetInfo
 
 @Suppress("PropertyName")
 class TableRecloseDelays : SqliteTable() {

@@ -8,7 +8,10 @@
 
 package com.zepben.evolve.cim.iec61970.infiec61970.feeder
 
-import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.core.Equipment
+import com.zepben.evolve.cim.iec61970.base.core.EquipmentContainer
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.validateReference
 

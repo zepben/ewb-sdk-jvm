@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
-import com.zepben.evolve.cim.iec61968.common.PositionPoint
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.mergeIfIncomplete

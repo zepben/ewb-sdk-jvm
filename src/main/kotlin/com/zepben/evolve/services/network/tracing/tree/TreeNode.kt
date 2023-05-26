@@ -10,7 +10,6 @@ package com.zepben.evolve.services.network.tracing.tree
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import java.lang.ref.WeakReference
-import kotlin.math.max
 
 class TreeNode(
     val conductingEquipment: ConductingEquipment,

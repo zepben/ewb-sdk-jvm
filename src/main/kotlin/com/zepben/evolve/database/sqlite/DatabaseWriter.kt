@@ -72,26 +72,31 @@ class DatabaseWriter @JvmOverloads constructor(
 
         var status = MetadataCollectionWriter().save(metadataCollection, MetaDataEntryWriter(databaseTables))
         services.forEach {
+            logger.info("Saving ${it.name} objects...")
             status = status and try {
                 when (it) {
                     is NetworkService -> NetworkServiceWriter(::hasCommon, ::addCommon).save(
                         it,
                         NetworkCIMWriter(databaseTables)
                     )
+
                     is CustomerService -> CustomerServiceWriter(::hasCommon, ::addCommon).save(
                         it,
                         CustomerCIMWriter(databaseTables)
                     )
+
                     is DiagramService -> DiagramServiceWriter(::hasCommon, ::addCommon).save(
                         it,
                         DiagramCIMWriter(databaseTables)
                     )
+
                     else -> run { logger.error("Unsupported service of type ${it.javaClass.simpleName} couldn't be saved."); false }
                 }
             } catch (e: MissingTableConfigException) {
                 logger.error("Unable to save database: " + e.message)
                 false
             }
+            logger.info("${it.name} objects saved.")
         }
 
         return status and postSave()
@@ -142,7 +147,7 @@ class DatabaseWriter @JvmOverloads constructor(
     private fun create(): Boolean {
         try {
             val versionTable = databaseTables.getTable(TableVersion::class.java)
-            logger.info("Creating database schema v${versionTable.SUPPORTED_VERSION}")
+            logger.info("Creating database schema v${versionTable.SUPPORTED_VERSION}...")
 
             getStatement(saveConnection).use { statement ->
                 statement.queryTimeout = 2
@@ -156,7 +161,7 @@ class DatabaseWriter @JvmOverloads constructor(
                 }
 
                 saveConnection.commit()
-                logger.info("Database saved.")
+                logger.info("Schema created.")
             }
         } catch (e: SQLException) {
             logger.error("Failed to create database schema: " + e.message)
@@ -177,13 +182,20 @@ class DatabaseWriter @JvmOverloads constructor(
 
     private fun postSave(): Boolean {
         try {
+            logger.info("Adding indexes...")
+
             saveConnection.createStatement().use { statement ->
                 databaseTables.forEachTable { table ->
                     table.createIndexesSql().forEach { sql -> statement.execute(sql) }
                 }
             }
 
+            logger.info("Indexes added.")
+            logger.info("Committing...")
+
             saveConnection.commit()
+
+            logger.info("Done.")
         } catch (e: SQLException) {
             logger.error("Failed to finalise the database: " + e.message)
             closeConnection()

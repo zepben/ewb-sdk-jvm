@@ -31,6 +31,7 @@
 ### Enhancements
 
 * Performance enhancement for `ConnectedEquipmentTrace` when traversing elements with single terminals.
+* Added support for LV2 below SWER transformers.
 * Improved logging when saving a database.
 
 ### Fixes

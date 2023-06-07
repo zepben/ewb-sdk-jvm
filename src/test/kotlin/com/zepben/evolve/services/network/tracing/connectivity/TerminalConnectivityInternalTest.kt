@@ -249,6 +249,52 @@ internal class TerminalConnectivityInternalTest {
         validateTxPaths(PhaseCode.XN, PhaseCode.X)
     }
 
+    @Test
+    internal fun pathsThroughSwerLv2Tx() {
+        validateTxPaths(PhaseCode.A, PhaseCode.ABN)
+        validateTxPaths(PhaseCode.A, PhaseCode.BCN, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.A, PhaseCode.ACN, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.A, PhaseCode.XYN)
+
+        validateTxPaths(PhaseCode.B, PhaseCode.ABN, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.B, PhaseCode.BCN)
+        validateTxPaths(PhaseCode.B, PhaseCode.ACN, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.B, PhaseCode.XYN)
+
+        validateTxPaths(PhaseCode.C, PhaseCode.ABN, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.C, PhaseCode.BCN, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.C, PhaseCode.ACN)
+        validateTxPaths(PhaseCode.C, PhaseCode.XYN)
+
+        validateTxPaths(PhaseCode.X, PhaseCode.ABN)
+        validateTxPaths(PhaseCode.X, PhaseCode.BCN)
+        validateTxPaths(PhaseCode.X, PhaseCode.ACN)
+        validateTxPaths(PhaseCode.X, PhaseCode.XYN)
+    }
+
+    @Test
+    internal fun pathsThroughLv2SwerTx() {
+        validateTxPaths(PhaseCode.ABN, PhaseCode.A)
+        validateTxPaths(PhaseCode.ABN, PhaseCode.B, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.ABN, PhaseCode.C, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.ABN, PhaseCode.X)
+
+        validateTxPaths(PhaseCode.BCN, PhaseCode.A, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.BCN, PhaseCode.B)
+        validateTxPaths(PhaseCode.BCN, PhaseCode.C, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.BCN, PhaseCode.X)
+
+        validateTxPaths(PhaseCode.ACN, PhaseCode.A, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.ACN, PhaseCode.B, PhaseCode.NONE)
+        validateTxPaths(PhaseCode.ACN, PhaseCode.C)
+        validateTxPaths(PhaseCode.ACN, PhaseCode.X)
+
+        validateTxPaths(PhaseCode.XYN, PhaseCode.A)
+        validateTxPaths(PhaseCode.XYN, PhaseCode.B)
+        validateTxPaths(PhaseCode.XYN, PhaseCode.C)
+        validateTxPaths(PhaseCode.XYN, PhaseCode.X)
+    }
+
     private fun validateTxPaths(primary: PhaseCode, secondary: PhaseCode, traced: PhaseCode = secondary) {
         val tx = PowerTransformer()
         val primaryTerminal = Terminal().apply { phases = primary }.also { tx.addTerminal(it) }

@@ -171,6 +171,43 @@ internal class TestNetworkBuilderTest {
     }
 
     @Test
+    fun `can override ids`() {
+        TestNetworkBuilder()
+            .fromSource(mRID = "my source 1")
+            .toSource(mRID = "my source 2")
+            .fromAcls(mRID = "my acls 1")
+            .toAcls(mRID = "my acls 2")
+            .fromBreaker(mRID = "my breaker 1")
+            .toBreaker(mRID = "my breaker 2")
+            .fromJunction(mRID = "my junction 1")
+            .toJunction(mRID = "my junction 2")
+            .fromPowerTransformer(mRID = "my tx 1")
+            .toPowerTransformer(mRID = "my tx 2")
+            .fromOther(::Fuse, mRID = "my other 1")
+            .toOther(::Fuse, mRID = "my other 2")
+            .build()
+            .apply {
+                assertThat(
+                    listOf<ConductingEquipment>().map { it.mRID },
+                    containsInAnyOrder(
+                        "my source 1",
+                        "my source 2",
+                        "my acls 1",
+                        "my acls 2",
+                        "my breaker 1",
+                        "my breaker 2",
+                        "my junction 1",
+                        "my junction 2",
+                        "my tx 1",
+                        "my tx 2",
+                        "my other 1",
+                        "my other 2"
+                    )
+                )
+            }
+    }
+
+    @Test
     internal fun canStartWithOpenPoints() {
         //
         // 1 b0 2
@@ -295,6 +332,27 @@ internal class TestNetworkBuilderTest {
             }
     }
 
+    @Test
+    internal fun canCreateOtherTypesKotlin() {
+        //
+        // o0 11 my1 2
+        //
+        // 1 my2 21 o1
+        //
+        TestNetworkBuilder()
+            .fromOther<Fuse>(numTerminals = 1) // o0
+            .toOther<LoadBreakSwitch>(mRID = "my1")
+            .fromOther<Recloser>(nominalPhases = PhaseCode.AB, mRID = "my2")
+            .toOther<Recloser>(nominalPhases = PhaseCode.AB, numTerminals = 1) // o1
+            .build()
+            .apply {
+                validateConnections("o0", listOf("my1-t1"))
+                validateConnections("my1", listOf("o0-t1"), emptyList())
+                validateConnections("my2", emptyList(), listOf("o1-t1"))
+                validateConnections("o1", listOf("my2-t2"))
+            }
+    }
+
     private fun NetworkService.validateConnections(mRID: String, vararg expectedTerms: List<String>) {
         assertThat(get<ConductingEquipment>(mRID)!!.numTerminals(), equalTo(expectedTerms.size))
         expectedTerms.forEachIndexed { index, expected ->
@@ -302,8 +360,7 @@ internal class TestNetworkBuilderTest {
         }
     }
 
-    @Suppress("unused")
-    private fun NetworkService.validateConnections(terminal: Terminal, expectedTerms: List<String>) {
+    private fun validateConnections(terminal: Terminal, expectedTerms: List<String>) {
         if (expectedTerms.isNotEmpty())
             assertThat(NetworkService.connectedTerminals(terminal).map { it.toTerminal.mRID }, containsInAnyOrder(*expectedTerms.toTypedArray()))
         else

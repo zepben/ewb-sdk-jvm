@@ -33,6 +33,10 @@
 * Performance enhancement for `ConnectedEquipmentTrace` when traversing elements with single terminals.
 * Added support for LV2 below SWER transformers.
 * Improved logging when saving a database.
+* The `TestNetworkBuilder` has been enhanced with the following features:
+    * You can now set the ID's without having to create a customer 'other' creator.
+    * Added Kotlin wrappers for `.fromOther` and `.toOther` that allow you to pass a class type rather than a creator. e.g. `.toOther<Fuse>()` instead
+      of `.toOther(::Fuse)` or `.toOther( { Fuse(it) } )`.
 
 ### Fixes
 

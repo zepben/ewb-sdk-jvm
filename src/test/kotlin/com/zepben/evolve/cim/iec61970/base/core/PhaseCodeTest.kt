@@ -98,6 +98,36 @@ internal class PhaseCodeTest {
     }
 
     @Test
+    internal fun plus() {
+        assertThat(PhaseCode.A + SinglePhaseKind.B, equalTo(PhaseCode.AB))
+        assertThat(PhaseCode.BC + PhaseCode.AN, equalTo(PhaseCode.ABCN))
+        assertThat(PhaseCode.X + SinglePhaseKind.Y, equalTo(PhaseCode.XY))
+        assertThat(PhaseCode.N + PhaseCode.XY, equalTo(PhaseCode.XYN))
+
+        // Can add existing phases.
+        assertThat(PhaseCode.ABCN + SinglePhaseKind.A, equalTo(PhaseCode.ABCN))
+        assertThat(PhaseCode.ABCN + SinglePhaseKind.B, equalTo(PhaseCode.ABCN))
+        assertThat(PhaseCode.A + PhaseCode.ABCN, equalTo(PhaseCode.ABCN))
+
+        // Returns NONE for invalid additions.
+        assertThat(PhaseCode.ABCN + SinglePhaseKind.X, equalTo(PhaseCode.NONE))
+        assertThat(PhaseCode.ABCN + PhaseCode.X, equalTo(PhaseCode.NONE))
+    }
+
+    @Test
+    internal fun minus() {
+        assertThat(PhaseCode.ABCN - SinglePhaseKind.B, equalTo(PhaseCode.ACN))
+        assertThat(PhaseCode.ABCN - PhaseCode.AN, equalTo(PhaseCode.BC))
+        assertThat(PhaseCode.BC - SinglePhaseKind.C, equalTo(PhaseCode.B))
+        assertThat(PhaseCode.XY - PhaseCode.X, equalTo(PhaseCode.Y))
+
+        assertThat(PhaseCode.X - SinglePhaseKind.Y, equalTo(PhaseCode.X))
+        assertThat(PhaseCode.AB - PhaseCode.C, equalTo(PhaseCode.AB))
+
+        assertThat(PhaseCode.ABCN - PhaseCode.ABCN, equalTo(PhaseCode.NONE))
+    }
+
+    @Test
     internal fun singlePhaseHelpers() {
         assertThat(PhaseCode.ABC.map { "$it-$it" }.toList(), contains("A-A", "B-B", "C-C"))
 

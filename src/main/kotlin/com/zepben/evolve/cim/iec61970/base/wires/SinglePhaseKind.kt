@@ -7,6 +7,9 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
+
 /**
  * Enumeration of single phase identifiers. Allows designation of single phases for both transmission and distribution equipment, circuits and loads.
  *
@@ -21,7 +24,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
  * @property s2 Secondary phase 2.
  * @property INVALID Invalid phase. Caused by trying to energise with multiple phases simultaneously.
  */
-enum class SinglePhaseKind(private val value: Int, private val maskIndex: Int) {
+enum class SinglePhaseKind(val value: Int, val maskIndex: Int) {
 
     NONE(0, -1),
     A(1, 0),
@@ -43,17 +46,26 @@ enum class SinglePhaseKind(private val value: Int, private val maskIndex: Int) {
         }
     }
 
-    private val bitMask = if (maskIndex >= 0) 1 shl maskIndex else 0
+    val bitMask = if (maskIndex >= 0) 1 shl maskIndex else 0
 
+    operator fun plus(phase: SinglePhaseKind): PhaseCode = PhaseCode.fromSinglePhases(setOf(this) + phase)
+    operator fun plus(phaseCode: PhaseCode): PhaseCode = PhaseCode.fromSinglePhases(setOf(this) + phaseCode.singlePhases)
+    operator fun minus(phase: SinglePhaseKind): PhaseCode = PhaseCode.fromSinglePhases(setOf(this) - phase)
+    operator fun minus(phaseCode: PhaseCode): PhaseCode = PhaseCode.fromSinglePhases(setOf(this) - phaseCode.singlePhases.toSet())
+
+    @Deprecated("Use `value` (or `getValue()` in java) instead.", ReplaceWith("value"))
     fun value(): Int {
         return value
     }
 
+    @Deprecated("Use `maskIndex` (or `getMaskIndex()` in java) instead.", ReplaceWith("maskIndex"))
     fun maskIndex(): Int {
         return maskIndex
     }
 
+    @Deprecated("Use `bitMask` (or `getBitMask()` in java) instead.", ReplaceWith("bitMask"))
     fun bitMask(): Int {
         return bitMask
     }
+
 }

@@ -7,8 +7,11 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.protobuf.cim.iec61970.base.wires.SinglePhaseKind as PBSinglePhaseKind
@@ -22,6 +25,29 @@ internal class SinglePhaseKindTest {
     @Test
     internal fun validateVsPb() {
         validateEnum(SinglePhaseKind.values(), PBSinglePhaseKind.values())
+    }
+
+    @Test
+    internal fun accessors() {
+        // These tests are just to provide coverage and satisfy the IDE visibility checks.
+        assertThat(SinglePhaseKind.A.value, equalTo(1))
+        assertThat(SinglePhaseKind.A.maskIndex, equalTo(0))
+        assertThat(SinglePhaseKind.A.bitMask, equalTo(1))
+    }
+
+    @Test
+    internal fun plus() {
+        assertThat(SinglePhaseKind.A + SinglePhaseKind.B, equalTo(PhaseCode.AB))
+        assertThat(SinglePhaseKind.A + SinglePhaseKind.A, equalTo(PhaseCode.A))
+        assertThat(SinglePhaseKind.A + PhaseCode.BC, equalTo(PhaseCode.ABC))
+    }
+
+    @Test
+    internal fun minus() {
+        assertThat(SinglePhaseKind.B - SinglePhaseKind.A, equalTo(PhaseCode.B))
+        assertThat(SinglePhaseKind.A - SinglePhaseKind.A, equalTo(PhaseCode.NONE))
+        assertThat(SinglePhaseKind.A - PhaseCode.BC, equalTo(PhaseCode.A))
+        assertThat(SinglePhaseKind.A - PhaseCode.ABC, equalTo(PhaseCode.NONE))
     }
 
 }

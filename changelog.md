@@ -4,7 +4,15 @@
 
 ### Breaking Changes
 
-* None.
+* Deprecated old style accessors in favour of Kotlin accessors for `SinglePhaseKind`. To use the new function make the folloiwng modification to your code:
+    * Kotlin:
+        * `spk.value()` -> `spk.value`
+        * `spk.maskIndex()` -> `spk.maskIndex`
+        * `spk.bitMask()` -> `spk.bitMask`
+    * Java:
+        * `spk.value()` -> `spk.getValue()`
+        * `spk.maskIndex()` -> `spk.getMaskIndex()`
+        * `spk.bitMask()` -> `spk.getBitMask()`
 
 ### New Features
 
@@ -37,6 +45,7 @@
     * You can now set the ID's without having to create a customer 'other' creator.
     * Added Kotlin wrappers for `.fromOther` and `.toOther` that allow you to pass a class type rather than a creator. e.g. `.toOther<Fuse>()` instead
       of `.toOther(::Fuse)` or `.toOther( { Fuse(it) } )`.
+* Added `+` and `-` operators to `PhaseCode` and `SinglePhaseKind`.
 
 ### Fixes
 

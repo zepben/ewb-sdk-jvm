@@ -50,6 +50,8 @@
 ### Fixes
 
 * Asking for the traced phases as a phase code when there are no nominal phases no longer throws.
+* Feeder directions are now stopped at substation transformers in the same way as assigning equipment incase the feeder has no breaker, or the start point is
+  not inline.
 
 ### Notes
 

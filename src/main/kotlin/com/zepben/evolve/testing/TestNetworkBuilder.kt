@@ -38,6 +38,7 @@ open class TestNetworkBuilder {
      * Start a new network island from an [EnergySource], updating the network pointer to the new [EnergySource].
      *
      * @param phases The [PhaseCode] for the new [EnergySource], used as both the nominal and energising phases. Must be a subset of [PhaseCode.ABCN].
+     * @param mRID Optional mRID for the new [EnergySource].
      * @param action An action that accepts the new [EnergySource] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -52,6 +53,7 @@ open class TestNetworkBuilder {
      * Add a new [EnergySource] to the network and connect it to the current network pointer, updating the network pointer to the new [EnergySource].
      *
      * @param phases The [PhaseCode] for the new [EnergySource], used as both the nominal and energising phases. Must be a subset of [PhaseCode.ABCN].
+     * @param mRID Optional mRID for the new [EnergySource].
      * @param action An action that accepts the new [EnergySource] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -69,6 +71,7 @@ open class TestNetworkBuilder {
      * Start a new network island from an [AcLineSegment], updating the network pointer to the new [AcLineSegment].
      *
      * @param nominalPhases The nominal phases for the new [AcLineSegment].
+     * @param mRID Optional mRID for the new [AcLineSegment].
      * @param action An action that accepts the new [AcLineSegment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -83,6 +86,7 @@ open class TestNetworkBuilder {
      * Add a new [AcLineSegment] to the network and connect it to the current network pointer, updating the network pointer to the new [AcLineSegment].
      *
      * @param nominalPhases The nominal phases for the new [AcLineSegment].
+     * @param mRID Optional mRID for the new [AcLineSegment].
      * @param action An action that accepts the new [AcLineSegment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -102,6 +106,7 @@ open class TestNetworkBuilder {
      * @param nominalPhases The nominal phases for the new [Breaker].
      * @param isNormallyOpen The normal state of the switch. Defaults to false.
      * @param isOpen The current state of the switch. Defaults to [isNormallyOpen].
+     * @param mRID Optional mRID for the new [Breaker].
      * @param action An action that accepts the new [Breaker] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -124,6 +129,7 @@ open class TestNetworkBuilder {
      * @param nominalPhases The nominal phases for the new [Breaker].
      * @param isNormallyOpen The normal state of the switch. Defaults to false.
      * @param isOpen The current state of the switch. Defaults to [isNormallyOpen].
+     * @param mRID Optional mRID for the new [Breaker].
      * @param action An action that accepts the new [Breaker] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -148,6 +154,7 @@ open class TestNetworkBuilder {
      *
      * @param nominalPhases The nominal phases for the new [Junction].
      * @param numTerminals The number of terminals to create on the new [Junction]. Defaults to 2.
+     * @param mRID Optional mRID for the new [Junction].
      * @param action An action that accepts the new [Junction] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -168,6 +175,7 @@ open class TestNetworkBuilder {
      *
      * @param nominalPhases The nominal phases for the new [Junction].
      * @param numTerminals The number of terminals to create on the new [Junction]. Defaults to 2.
+     * @param mRID Optional mRID for the new [Junction].
      * @param action An action that accepts the new [Junction] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -191,6 +199,8 @@ open class TestNetworkBuilder {
      * [PowerElectronicsConnection].
      *
      * @param nominalPhases The nominal phases for the new [PowerElectronicsConnection].
+     * @param numTerminals The number of terminals to create on the new [PowerElectronicsConnection]. Defaults to 2.
+     * @param mRID Optional mRID for the new [PowerElectronicsConnection].
      * @param action An action that accepts the new [PowerElectronicsConnection] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -214,6 +224,7 @@ open class TestNetworkBuilder {
      *
      * @param nominalPhases The nominal phases for each end of the new [PowerTransformer]. Defaults to two [PhaseCode.ABC] ends.
      * @param endActions Actions that accepts the new [PowerTransformerEnd] to allow for additional initialisation.
+     * @param mRID Optional mRID for the new [PowerTransformer].
      * @param action An action that accepts the new [PowerTransformer] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -239,6 +250,7 @@ open class TestNetworkBuilder {
      *
      * @param nominalPhases The nominal phases for each end of the new [PowerTransformer]. Defaults to two [PhaseCode.ABC] ends.
      * @param endActions Actions that accepts the new [PowerTransformerEnd] to allow for additional initialisation.
+     * @param mRID Optional mRID for the new [PowerTransformer].
      * @param action An action that accepts the new [PowerTransformer] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -266,6 +278,7 @@ open class TestNetworkBuilder {
      * @param creator Creator of the new [ConductingEquipment].
      * @param nominalPhases The nominal phases for the new [ConductingEquipment].
      * @param numTerminals The number of terminals to create on the new [ConductingEquipment]. Defaults to 2.
+     * @param mRID Optional mRID for the new [ConductingEquipment].
      * @param action An action that accepts the new [ConductingEquipment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -288,6 +301,7 @@ open class TestNetworkBuilder {
      * @param T The type of object to create.
      * @param nominalPhases The nominal phases for the new [ConductingEquipment].
      * @param numTerminals The number of terminals to create on the new [ConductingEquipment]. Defaults to 2.
+     * @param mRID Optional mRID for the new [ConductingEquipment].
      * @param action An action that accepts the new [ConductingEquipment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -306,6 +320,7 @@ open class TestNetworkBuilder {
      * @param creator Creator of the new [ConductingEquipment].
      * @param nominalPhases The nominal phases for the new [ConductingEquipment].
      * @param numTerminals The number of terminals to create on the new [ConductingEquipment]. Defaults to 2.
+     * @param mRID Optional mRID for the new [ConductingEquipment].
      * @param action An action that accepts the new [ConductingEquipment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -331,6 +346,7 @@ open class TestNetworkBuilder {
      * @param T The type of object to create.
      * @param nominalPhases The nominal phases for the new [ConductingEquipment].
      * @param numTerminals The number of terminals to create on the new [ConductingEquipment]. Defaults to 2.
+     * @param mRID Optional mRID for the new [ConductingEquipment].
      * @param action An action that accepts the new [ConductingEquipment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -347,6 +363,7 @@ open class TestNetworkBuilder {
      * Move the current network pointer to the specified [from] allowing branching of the network. This has the effect of changing the current network pointer.
      *
      * @param from The mRID of the [ConductingEquipment] to branch from.
+     * @param terminal Optional sequence number of the terminal on [from] which will be connected.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
@@ -376,6 +393,7 @@ open class TestNetworkBuilder {
      *
      * @param headMrid The mRID of the head [ConductingEquipment].
      * @param sequenceNumber The [Terminal] sequence number of the head terminal. Defaults to last terminal.
+     * @param mRID Optional mRID for the new [Feeder].
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
@@ -390,6 +408,7 @@ open class TestNetworkBuilder {
      *
      * @param headMrid The mRID of the head [ConductingEquipment].
      * @param sequenceNumber The [Terminal] sequence number of the head terminal. Defaults to last terminal.
+     * @param mRID Optional mRID for the new [LvFeeder].
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
@@ -402,6 +421,9 @@ open class TestNetworkBuilder {
      * Get the [NetworkService] after apply traced phasing, feeder directions, and HV/LV feeder assignment.
      *
      * Does not infer phasing.
+     *
+     * @param applyDirectionsFromSources Indicates if directions should be applied from sources in addition to feeders. This is because test networks typically
+     * are minimal, and having a source is a common start point.
      *
      * @return The [NetworkService] created by this [TestNetworkBuilder]
      */

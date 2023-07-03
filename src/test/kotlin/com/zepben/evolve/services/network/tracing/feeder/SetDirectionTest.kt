@@ -117,6 +117,33 @@ class SetDirectionTest {
     }
 
     @Test
+    internal fun `doesn't trace from open feeder heads`() {
+        //
+        // 1 b0 21--c1--21--c2--21 b3 2
+        //
+        val n = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .toAcls() // c1
+            .toAcls() // c2
+            .toBreaker(isNormallyOpen = true) // b3
+            .addFeeder("b0", 2)
+            .addFeeder("b3", 1)
+            .network
+
+        SetDirection().run(n)
+        DirectionLogger.trace(n["b0"])
+
+        n.getT("b0", 1).validateDirections(NONE)
+        n.getT("b0", 2).validateDirections(DOWNSTREAM)
+        n.getT("c1", 1).validateDirections(UPSTREAM)
+        n.getT("c1", 2).validateDirections(DOWNSTREAM)
+        n.getT("c2", 1).validateDirections(UPSTREAM)
+        n.getT("c2", 2).validateDirections(DOWNSTREAM)
+        n.getT("b3", 1).validateDirections(UPSTREAM)
+        n.getT("b3", 2).validateDirections(NONE)
+    }
+
+    @Test
     internal fun `stops at zone transformers incase feeder heads are missing`() {
         //
         // 1 b0*21--c1--21 tx2 21--c3--2

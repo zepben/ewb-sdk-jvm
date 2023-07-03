@@ -13,6 +13,8 @@
         * `spk.value()` -> `spk.getValue()`
         * `spk.maskIndex()` -> `spk.getMaskIndex()`
         * `spk.bitMask()` -> `spk.getBitMask()`
+* `SetDirection.run(NetworkService)` will no longer set directions for feeders with a head terminal on an open switch. It is expected these feeders are either
+  placeholder feeders with no meaningful equipment, or are energised from another feeder which will set the directions from the other end.
 
 ### New Features
 

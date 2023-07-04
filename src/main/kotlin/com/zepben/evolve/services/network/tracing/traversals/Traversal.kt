@@ -112,8 +112,30 @@ abstract class Traversal<T> {
      * @param action Action to be called on each item in the traversal, without passing if the trace will stop on this step.
      * @return this traversal instance.
      */
-    fun addStepAction(action: (T) -> Unit): Traversal<T> {
+    fun addStepAction(action: (item: T) -> Unit): Traversal<T> {
         stepActions.add { it, _ -> action(it) }
+        return this
+    }
+
+    /**
+     * Add a callback which is called for every item in the traversal that does not match a stop condition (including the starting item).
+     *
+     * @param action Action to be called on each item in the traversal that is not being stopped on.
+     * @return this traversal instance.
+     */
+    fun ifNotStopping(action: (item: T) -> Unit): Traversal<T> {
+        stepActions.add { it, isStopping -> if (!isStopping) action(it) }
+        return this
+    }
+
+    /**
+     * Add a callback which is called for every item in the traversal that matches a stop condition (including the starting item).
+     *
+     * @param action Action to be called on each item in the traversal that is being stopped on.
+     * @return this traversal instance.
+     */
+    fun ifStopping(action: (item: T) -> Unit): Traversal<T> {
+        stepActions.add { it, isStopping -> if (isStopping) action(it) }
         return this
     }
 

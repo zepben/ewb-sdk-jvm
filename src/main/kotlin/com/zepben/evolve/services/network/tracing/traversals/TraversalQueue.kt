@@ -37,6 +37,24 @@ interface TraversalQueue<T> {
     fun add(item: T): Boolean
 
     /**
+     * Adds the items to the queue.
+     *
+     * @param items A collection of items to add to the queue.
+     * @return true if the queue was changed as the result of the operation.
+     */
+    fun addAll(items: Collection<T>): Boolean =
+        items.fold(false) { result, item -> add(item) || result }
+
+    /**
+     * Adds the items to the queue.
+     *
+     * @param items The items to be added to the queue.
+     * @return true if the queue was changed as the result of the operation.
+     */
+    fun addAll(vararg items: T): Boolean =
+        addAll(items.asList())
+
+    /**
      * Look at the item at the front of the queue without removing it.  Most implementations of this interface will return
      * null is this is called when the queue is empty, however it is not enforced.
      */

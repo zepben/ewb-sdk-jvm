@@ -47,6 +47,7 @@
     * You can now set the ID's without having to create a customer 'other' creator.
     * Added Kotlin wrappers for `.fromOther` and `.toOther` that allow you to pass a class type rather than a creator. e.g. `.toOther<Fuse>()` instead
       of `.toOther(::Fuse)` or `.toOther( { Fuse(it) } )`.
+    * Added inbuilt support for `PowerElectronicsConnection` and `EnergyConsumer`
 * Added `+` and `-` operators to `PhaseCode` and `SinglePhaseKind`.
 * `TraversalQueue` now has `addAll` methods taking either a collection or varargs, which by default will just call `add` for each item, but can be overridden if
   there is an `addAll` available on the underlying queue implementation.

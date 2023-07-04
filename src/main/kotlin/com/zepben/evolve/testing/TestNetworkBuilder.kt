@@ -273,6 +273,29 @@ open class TestNetworkBuilder {
     }
 
     /**
+     * Add a new [EnergyConsumer] to the network and connect it to the current network pointer, updating the network pointer to the new
+     * [EnergyConsumer].
+     *
+     * @param nominalPhases The nominal phases for the new [EnergyConsumer].
+     * @param mRID Optional mRID for the new [EnergyConsumer].
+     * @param action An action that accepts the new [EnergyConsumer] to allow for additional initialisation.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun toEnergyConsumer(
+        nominalPhases: PhaseCode = PhaseCode.ABC,
+        mRID: String? = null,
+        action: EnergyConsumer.() -> Unit = {}
+    ): TestNetworkBuilder {
+        current = network.createEnergyConsumer(mRID, nominalPhases).also {
+            connect(current!!, it)
+            action(it)
+        }
+        return this
+    }
+
+    /**
      * Start a new network island from a [ConductingEquipment], updating the network pointer to the new [ConductingEquipment].
      *
      * @param creator Creator of the new [ConductingEquipment].
@@ -505,6 +528,13 @@ open class TestNetworkBuilder {
                     addTerminal(t)
                     addEnd(PowerTransformerEnd("$id-e${i + 1}").apply { terminal = t }.also { add(it) })
                 }
+            }.also { add(it) }
+        }
+
+    private fun NetworkService.createEnergyConsumer(mRID: String?, phaseCode: PhaseCode = PhaseCode.ABC) =
+        mRID.orNextId("ec").let { id ->
+            EnergyConsumer(id).apply {
+                addTerminal(Terminal("$id-t1").apply { phases = phaseCode }.also { add(it) })
             }.also { add(it) }
         }
 

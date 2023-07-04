@@ -181,8 +181,10 @@ internal class TestNetworkBuilderTest {
             .toBreaker(mRID = "my breaker 2")
             .fromJunction(mRID = "my junction 1")
             .toJunction(mRID = "my junction 2")
+            .toPowerElectronicsConnection(mRID = "my pec 1")
             .fromPowerTransformer(mRID = "my tx 1")
             .toPowerTransformer(mRID = "my tx 2")
+            .toEnergyConsumer(mRID = "my ec 1")
             .fromOther(::Fuse, mRID = "my other 1")
             .toOther(::Fuse, mRID = "my other 2")
             .build()
@@ -198,8 +200,10 @@ internal class TestNetworkBuilderTest {
                         "my breaker 2",
                         "my junction 1",
                         "my junction 2",
+                        "my pec 1",
                         "my tx 1",
                         "my tx 2",
+                        "my ec 1",
                         "my other 1",
                         "my other 2"
                     )

@@ -69,8 +69,10 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
 
     var ratedS: Int?
         get() = _sRatings?.firstOrNull()?.ratedS
-        @Deprecated("Use addRating() instead, as this will clear all ratings and is intended for backwards compatibility only",
-            ReplaceWith("addRating(this)"))
+        @Deprecated(
+            "Use addRating() instead, as this will clear all ratings and is intended for backwards compatibility only",
+            ReplaceWith("addRating(value, TransformerCoolingType.UNKNOWN_COOLING_TYPE)")
+        )
         set(value) {
             if (value != null) {
                 clearRatings()

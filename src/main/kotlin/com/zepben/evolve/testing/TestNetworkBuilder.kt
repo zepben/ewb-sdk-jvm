@@ -44,7 +44,11 @@ open class TestNetworkBuilder {
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun fromSource(phases: PhaseCode = PhaseCode.ABC, mRID: String? = null, action: EnergySource.() -> Unit = {}): TestNetworkBuilder {
+    fun fromSource(
+        phases: PhaseCode = PhaseCode.ABC,
+        mRID: String? = null,
+        action: EnergySource.() -> Unit = {}
+    ): TestNetworkBuilder {
         current = network.createExternalSource(mRID, phases).also(action)
         return this
     }
@@ -54,14 +58,21 @@ open class TestNetworkBuilder {
      *
      * @param phases The [PhaseCode] for the new [EnergySource], used as both the nominal and energising phases. Must be a subset of [PhaseCode.ABCN].
      * @param mRID Optional mRID for the new [EnergySource].
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [EnergySource] to the previous item. Will only be used if the
+     * previous item is not already connected.
      * @param action An action that accepts the new [EnergySource] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun toSource(phases: PhaseCode = PhaseCode.ABC, mRID: String? = null, action: EnergySource.() -> Unit = {}): TestNetworkBuilder {
+    fun toSource(
+        phases: PhaseCode = PhaseCode.ABC,
+        mRID: String? = null,
+        connectivityNodeMrid: String? = null,
+        action: EnergySource.() -> Unit = {}
+    ): TestNetworkBuilder {
         current = network.createExternalSource(mRID, phases).also {
-            connect(current!!, it)
+            connect(current!!, it, connectivityNodeMrid)
             action(it)
         }
         return this
@@ -77,7 +88,11 @@ open class TestNetworkBuilder {
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun fromAcls(nominalPhases: PhaseCode = PhaseCode.ABC, mRID: String? = null, action: AcLineSegment.() -> Unit = {}): TestNetworkBuilder {
+    fun fromAcls(
+        nominalPhases: PhaseCode = PhaseCode.ABC,
+        mRID: String? = null,
+        action: AcLineSegment.() -> Unit = {}
+    ): TestNetworkBuilder {
         current = network.createAcls(mRID, nominalPhases).also(action)
         return this
     }
@@ -87,14 +102,21 @@ open class TestNetworkBuilder {
      *
      * @param nominalPhases The nominal phases for the new [AcLineSegment].
      * @param mRID Optional mRID for the new [AcLineSegment].
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [AcLineSegment] to the previous item. Will only be used if the
+     * previous item is not already connected.
      * @param action An action that accepts the new [AcLineSegment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun toAcls(nominalPhases: PhaseCode = PhaseCode.ABC, mRID: String? = null, action: AcLineSegment.() -> Unit = {}): TestNetworkBuilder {
+    fun toAcls(
+        nominalPhases: PhaseCode = PhaseCode.ABC,
+        mRID: String? = null,
+        connectivityNodeMrid: String? = null,
+        action: AcLineSegment.() -> Unit = {}
+    ): TestNetworkBuilder {
         current = network.createAcls(mRID, nominalPhases).also {
-            connect(current!!, it)
+            connect(current!!, it, connectivityNodeMrid)
             action(it)
         }
         return this
@@ -130,6 +152,8 @@ open class TestNetworkBuilder {
      * @param isNormallyOpen The normal state of the switch. Defaults to false.
      * @param isOpen The current state of the switch. Defaults to [isNormallyOpen].
      * @param mRID Optional mRID for the new [Breaker].
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [Breaker] to the previous item. Will only be used if the previous
+     * item is not already connected.
      * @param action An action that accepts the new [Breaker] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -140,10 +164,11 @@ open class TestNetworkBuilder {
         isNormallyOpen: Boolean = false,
         isOpen: Boolean? = null,
         mRID: String? = null,
+        connectivityNodeMrid: String? = null,
         action: Breaker.() -> Unit = {}
     ): TestNetworkBuilder {
         current = network.createBreaker(mRID, nominalPhases, isNormallyOpen = isNormallyOpen, isOpen = isOpen ?: isNormallyOpen).also {
-            connect(current!!, it)
+            connect(current!!, it, connectivityNodeMrid)
             action(it)
         }
         return this
@@ -176,6 +201,8 @@ open class TestNetworkBuilder {
      * @param nominalPhases The nominal phases for the new [Junction].
      * @param numTerminals The number of terminals to create on the new [Junction]. Defaults to 2.
      * @param mRID Optional mRID for the new [Junction].
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [Junction] to the previous item. Will only be used if the previous
+     * item is not already connected.
      * @param action An action that accepts the new [Junction] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -185,10 +212,11 @@ open class TestNetworkBuilder {
         nominalPhases: PhaseCode = PhaseCode.ABC,
         numTerminals: Int? = null,
         mRID: String? = null,
+        connectivityNodeMrid: String? = null,
         action: Junction.() -> Unit = {}
     ): TestNetworkBuilder {
         current = network.createJunction(mRID, nominalPhases, numTerminals).also {
-            connect(current!!, it)
+            connect(current!!, it, connectivityNodeMrid)
             action(it)
         }
         return this
@@ -201,6 +229,8 @@ open class TestNetworkBuilder {
      * @param nominalPhases The nominal phases for the new [PowerElectronicsConnection].
      * @param numTerminals The number of terminals to create on the new [PowerElectronicsConnection]. Defaults to 2.
      * @param mRID Optional mRID for the new [PowerElectronicsConnection].
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [PowerElectronicsConnection] to the previous item. Will only be
+     * used if the previous item is not already connected.
      * @param action An action that accepts the new [PowerElectronicsConnection] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -210,10 +240,11 @@ open class TestNetworkBuilder {
         nominalPhases: PhaseCode = PhaseCode.ABC,
         numTerminals: Int = 2,
         mRID: String? = null,
+        connectivityNodeMrid: String? = null,
         action: PowerElectronicsConnection.() -> Unit = {}
     ): TestNetworkBuilder {
         current = network.createPowerElectronicsConnection(mRID, nominalPhases, numTerminals).also {
-            connect(current!!, it)
+            connect(current!!, it, connectivityNodeMrid)
             action(it)
         }
         return this
@@ -251,6 +282,8 @@ open class TestNetworkBuilder {
      * @param nominalPhases The nominal phases for each end of the new [PowerTransformer]. Defaults to two [PhaseCode.ABC] ends.
      * @param endActions Actions that accepts the new [PowerTransformerEnd] to allow for additional initialisation.
      * @param mRID Optional mRID for the new [PowerTransformer].
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [PowerTransformer] to the previous item. Will only be used if the
+     * previous item is not already connected.
      * @param action An action that accepts the new [PowerTransformer] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -260,10 +293,11 @@ open class TestNetworkBuilder {
         nominalPhases: List<PhaseCode> = listOf(PhaseCode.ABC, PhaseCode.ABC),
         endActions: List<PowerTransformerEnd.() -> Unit>? = null,
         mRID: String? = null,
+        connectivityNodeMrid: String? = null,
         action: PowerTransformer.() -> Unit = {}
     ): TestNetworkBuilder {
         current = network.createPowerTransformer(mRID, nominalPhases).also {
-            connect(current!!, it)
+            connect(current!!, it, connectivityNodeMrid)
             endActions?.forEachIndexed { index, endAction ->
                 endAction(it.ends[index])
             }
@@ -278,6 +312,8 @@ open class TestNetworkBuilder {
      *
      * @param nominalPhases The nominal phases for the new [EnergyConsumer].
      * @param mRID Optional mRID for the new [EnergyConsumer].
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [EnergyConsumer] to the previous item. Will only be used if the
+     * previous item is not already connected.
      * @param action An action that accepts the new [EnergyConsumer] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -286,10 +322,11 @@ open class TestNetworkBuilder {
     fun toEnergyConsumer(
         nominalPhases: PhaseCode = PhaseCode.ABC,
         mRID: String? = null,
+        connectivityNodeMrid: String? = null,
         action: EnergyConsumer.() -> Unit = {}
     ): TestNetworkBuilder {
         current = network.createEnergyConsumer(mRID, nominalPhases).also {
-            connect(current!!, it)
+            connect(current!!, it, connectivityNodeMrid)
             action(it)
         }
         return this
@@ -344,6 +381,8 @@ open class TestNetworkBuilder {
      * @param nominalPhases The nominal phases for the new [ConductingEquipment].
      * @param numTerminals The number of terminals to create on the new [ConductingEquipment]. Defaults to 2.
      * @param mRID Optional mRID for the new [ConductingEquipment].
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [ConductingEquipment] to the previous item. Will only be used if
+     * the previous item is not already connected.
      * @param action An action that accepts the new [ConductingEquipment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -354,10 +393,11 @@ open class TestNetworkBuilder {
         nominalPhases: PhaseCode = PhaseCode.ABC,
         numTerminals: Int? = null,
         mRID: String? = null,
+        connectivityNodeMrid: String? = null,
         action: ConductingEquipment.() -> Unit = {}
     ): TestNetworkBuilder {
         current = network.createOther(mRID, creator, nominalPhases, numTerminals).also {
-            connect(current!!, it)
+            connect(current!!, it, connectivityNodeMrid)
             action(it)
         }
         return this
@@ -370,6 +410,8 @@ open class TestNetworkBuilder {
      * @param nominalPhases The nominal phases for the new [ConductingEquipment].
      * @param numTerminals The number of terminals to create on the new [ConductingEquipment]. Defaults to 2.
      * @param mRID Optional mRID for the new [ConductingEquipment].
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [ConductingEquipment] to the previous item. Will only be used if
+     * the previous item is not already connected.
      * @param action An action that accepts the new [ConductingEquipment] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
@@ -378,9 +420,10 @@ open class TestNetworkBuilder {
         nominalPhases: PhaseCode = PhaseCode.ABC,
         numTerminals: Int? = null,
         mRID: String? = null,
+        connectivityNodeMrid: String? = null,
         noinline action: ConductingEquipment.() -> Unit = {}
     ): TestNetworkBuilder =
-        toOther({ T::class.primaryConstructor!!.call(it) }, nominalPhases, numTerminals, mRID, action)
+        toOther({ T::class.primaryConstructor!!.call(it) }, nominalPhases, numTerminals, mRID, connectivityNodeMrid, action)
 
     /**
      * Move the current network pointer to the specified [from] allowing branching of the network. This has the effect of changing the current network pointer.
@@ -403,11 +446,19 @@ open class TestNetworkBuilder {
      * @param to The mRID of the second [ConductingEquipment] to be connected.
      * @param fromTerminal The sequence number of the terminal on [from] which will be connected.
      * @param toTerminal The sequence number of the terminal on [to] which will be connected.
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect the terminals. Will only be used if both terminals are not already
+     * connected.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
-    fun connect(from: String, to: String, fromTerminal: Int, toTerminal: Int): TestNetworkBuilder {
-        connect(network[from]!!, network[to]!!, fromTerminal, toTerminal)
+    fun connect(
+        from: String,
+        to: String,
+        fromTerminal: Int,
+        toTerminal: Int,
+        connectivityNodeMrid: String? = null
+    ): TestNetworkBuilder {
+        connect(network[from]!!, network[to]!!, connectivityNodeMrid, fromTerminal, toTerminal)
         return this
     }
 
@@ -465,11 +516,21 @@ open class TestNetworkBuilder {
 
     private fun String?.orNextId(type: String): String = this ?: "$type${count++}"
 
-    private fun connect(from: ConductingEquipment, to: ConductingEquipment, fromTerminal: Int? = null, toTerminal: Int? = null) {
-        network.connect(
-            from.getTerminal(fromTerminal ?: currentTerminal ?: from.numTerminals())!!,
-            to.getTerminal(toTerminal ?: 1)!!
-        )
+    private fun connect(
+        from: ConductingEquipment,
+        to: ConductingEquipment,
+        connectivityNodeMrid: String? = null,
+        fromTerminal: Int? = null,
+        toTerminal: Int? = null
+    ) {
+        val fromTerm = from.getTerminal(fromTerminal ?: currentTerminal ?: from.numTerminals())!!
+        val toTerm = to.getTerminal(toTerminal ?: 1)!!
+        if ((connectivityNodeMrid == null) || fromTerm.isConnected || toTerm.isConnected)
+            network.connect(fromTerm, toTerm)
+        else {
+            network.connect(fromTerm, connectivityNodeMrid)
+            network.connect(toTerm, connectivityNodeMrid)
+        }
         currentTerminal = null
     }
 

@@ -8,10 +8,7 @@
 
 package com.zepben.evolve.testing
 
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
@@ -357,6 +354,18 @@ internal class TestNetworkBuilderTest {
             }
     }
 
+    @Test
+    internal fun `can choose the connectivity node id`() {
+        validateConnectivityNodeOverride { mRID, cnMrid -> toBreaker(mRID = mRID, connectivityNodeMrid = cnMrid) }
+        validateConnectivityNodeOverride { mRID, cnMrid -> toJunction(mRID = mRID, connectivityNodeMrid = cnMrid) }
+        validateConnectivityNodeOverride { mRID, cnMrid -> toAcls(mRID = mRID, connectivityNodeMrid = cnMrid) }
+        validateConnectivityNodeOverride { mRID, cnMrid -> toPowerTransformer(mRID = mRID, connectivityNodeMrid = cnMrid) }
+        validateConnectivityNodeOverride { mRID, cnMrid -> toPowerElectronicsConnection(mRID = mRID, connectivityNodeMrid = cnMrid) }
+        validateConnectivityNodeOverride { mRID, cnMrid -> toEnergyConsumer(mRID = mRID, connectivityNodeMrid = cnMrid) }
+        validateConnectivityNodeOverride { mRID, cnMrid -> toSource(mRID = mRID, connectivityNodeMrid = cnMrid) }
+        validateConnectivityNodeOverride { mRID, cnMrid -> toOther<Fuse>(mRID = mRID, connectivityNodeMrid = cnMrid) }
+    }
+
     private fun NetworkService.validateConnections(mRID: String, vararg expectedTerms: List<String>) {
         assertThat(get<ConductingEquipment>(mRID)!!.numTerminals(), equalTo(expectedTerms.size))
         expectedTerms.forEachIndexed { index, expected ->
@@ -393,6 +402,34 @@ internal class TestNetworkBuilderTest {
                 assertThat(end.terminal, equalTo(terminals[index]))
             }
         }
+    }
+
+    private fun validateConnectivityNodeOverride(addWithConnectivityNode: TestNetworkBuilder.(mRID: String, cnMrid: String) -> Unit) {
+        val ns = TestNetworkBuilder()
+            .fromSource() // s0
+            // Connect using a specific connectivity node
+            .apply { addWithConnectivityNode("my1", "specified-cn") }
+            .fromAcls() // c1
+            // Reuse the specific connectivity node, which should connect all 4 items.
+            .apply { addWithConnectivityNode("my2", "specified-cn") }
+            .fromAcls() // c2
+            .fromAcls() // c3
+            // Force connect to the specific connectivity node, which should connect the additional 2 items.
+            .connect("c2", "c3", 2, 1, "specified-cn")
+            .fromAcls() // c4
+            // Force connect using a different connectivity node, which should be overridden due to the `to` terminal being connected.
+            .connect("c2", "c4", 2, 1, "different-cn")
+            .fromAcls() // c5
+            // Force connect using a different connectivity node, which should be overridden due to the `from` terminal being connected.
+            .connect("c5", "c4", 2, 1, "different-cn")
+            .network
+
+        assertThat(
+            ns.get<ConnectivityNode>("specified-cn")!!.terminals.map { it.mRID },
+            containsInAnyOrder("s0-t1", "my1-t1", "c1-t2", "my2-t1", "c2-t2", "c3-t1", "c4-t1", "c5-t2")
+        )
+        // Make sure our overridden connectivity node was not created.
+        assertThat(ns.get<ConnectivityNode>("different-cn"), nullValue())
     }
 
 }

@@ -8,8 +8,11 @@
 
 package com.zepben.evolve.services.network.tracing.feeder
 
+import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
@@ -54,7 +57,7 @@ class SetDirection {
      * @param network The network in which to apply feeder directions.
      */
     fun run(network: NetworkService) {
-        run(network.sequenceOf<Feeder>().mapNotNull { it.normalHeadTerminal }.toList())
+        run(network.sequenceOf<Feeder>().mapNotNull { it.normalHeadTerminal }.filter { !it.conductingEquipment.isNormallyOpenSwitch() }.toList())
     }
 
     /**
@@ -102,6 +105,9 @@ class SetDirection {
                 .any { it.normalHeadTerminal == terminal }
         } ?: false
 
+    private fun reachedSubstationTransformer(terminal: Terminal): Boolean =
+        terminal.conductingEquipment.let { ce -> (ce is PowerTransformer) && ce.substations.isNotEmpty() }
+
     private fun flowUpstreamAndQueueNextStraight(
         traversal: BranchRecursiveTraversal<Terminal>,
         terminal: Terminal,
@@ -141,7 +147,7 @@ class SetDirection {
         if (!direction.add(FeederDirection.UPSTREAM))
             return
 
-        if (isFeederHeadTerminal(terminal))
+        if (isFeederHeadTerminal(terminal) || reachedSubstationTransformer(terminal))
             return
 
         val ce = terminal.conductingEquipment ?: return
@@ -153,6 +159,9 @@ class SetDirection {
             .filter { it != terminal }
             .forEach { queue(it) }
     }
+
+    private fun ConductingEquipment?.isNormallyOpenSwitch(): Boolean =
+        (this is Switch) && isNormallyOpen()
 
     private fun BranchRecursiveTraversal<Terminal>.startNewBranch(terminal: Terminal) {
         branchQueue.add(branchSupplier().setStart(terminal))

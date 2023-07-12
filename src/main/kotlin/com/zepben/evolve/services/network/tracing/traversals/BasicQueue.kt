@@ -31,6 +31,10 @@ open class BasicQueue<T> protected constructor(
         return queue.add(item)
     }
 
+    override fun addAll(items: Collection<T>): Boolean {
+        return queue.addAll(items)
+    }
+
     override fun peek(): T? {
         return queue.peek()
     }

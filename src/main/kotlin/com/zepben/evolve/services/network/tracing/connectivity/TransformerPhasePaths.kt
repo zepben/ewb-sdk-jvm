@@ -86,18 +86,24 @@ object TransformerPhasePaths {
             PhaseCode.XYN to listOf(path(SPK.A, SPK.X), path(SPK.B, SPK.Y), path(SPK.N, SPK.N)),
             PhaseCode.AB to listOf(path(SPK.A, SPK.A), path(SPK.B, SPK.B)),
             PhaseCode.XY to listOf(path(SPK.A, SPK.X), path(SPK.B, SPK.Y)),
+            PhaseCode.A to listOf(path(SPK.A, SPK.A)),
+            PhaseCode.X to listOf(path(SPK.A, SPK.X)),
         ),
         PhaseCode.BCN to mapOf(
             PhaseCode.BCN to listOf(path(SPK.B, SPK.B), path(SPK.C, SPK.C), path(SPK.N, SPK.N)),
             PhaseCode.XYN to listOf(path(SPK.B, SPK.X), path(SPK.C, SPK.Y), path(SPK.N, SPK.N)),
             PhaseCode.BC to listOf(path(SPK.B, SPK.B), path(SPK.C, SPK.C)),
             PhaseCode.XY to listOf(path(SPK.B, SPK.X), path(SPK.C, SPK.Y)),
+            PhaseCode.B to listOf(path(SPK.B, SPK.B)),
+            PhaseCode.X to listOf(path(SPK.B, SPK.X)),
         ),
         PhaseCode.ACN to mapOf(
             PhaseCode.ACN to listOf(path(SPK.A, SPK.A), path(SPK.C, SPK.C), path(SPK.N, SPK.N)),
             PhaseCode.XYN to listOf(path(SPK.A, SPK.X), path(SPK.C, SPK.Y), path(SPK.N, SPK.N)),
             PhaseCode.AC to listOf(path(SPK.A, SPK.A), path(SPK.C, SPK.C)),
             PhaseCode.XY to listOf(path(SPK.A, SPK.X), path(SPK.C, SPK.Y)),
+            PhaseCode.C to listOf(path(SPK.C, SPK.C)),
+            PhaseCode.X to listOf(path(SPK.C, SPK.X)),
         ),
         PhaseCode.XYN to mapOf(
             PhaseCode.ABN to listOf(path(SPK.X, SPK.A), path(SPK.Y, SPK.B), path(SPK.N, SPK.N)),
@@ -108,6 +114,10 @@ object TransformerPhasePaths {
             PhaseCode.BC to listOf(path(SPK.X, SPK.B), path(SPK.Y, SPK.C)),
             PhaseCode.AC to listOf(path(SPK.X, SPK.A), path(SPK.Y, SPK.C)),
             PhaseCode.XY to listOf(path(SPK.X, SPK.X), path(SPK.Y, SPK.Y)),
+            PhaseCode.A to listOf(path(SPK.X, SPK.A)),
+            PhaseCode.B to listOf(path(SPK.X, SPK.B)),
+            PhaseCode.C to listOf(path(SPK.X, SPK.C)),
+            PhaseCode.X to listOf(path(SPK.X, SPK.X)),
         ),
         PhaseCode.AB to mapOf(
             PhaseCode.ABN to listOf(path(SPK.A, SPK.A), path(SPK.B, SPK.B), addNeutral),
@@ -164,6 +174,8 @@ object TransformerPhasePaths {
             PhaseCode.XY to listOf(path(SPK.A, SPK.X), path(SPK.NONE, SPK.Y)),
             PhaseCode.A to listOf(path(SPK.A, SPK.A)),
             PhaseCode.X to listOf(path(SPK.A, SPK.X)),
+            PhaseCode.ABN to listOf(path(SPK.A, SPK.A), path(SPK.NONE, SPK.B), addNeutral),
+            PhaseCode.XYN to listOf(path(SPK.A, SPK.X), path(SPK.NONE, SPK.Y), addNeutral),
         ),
         PhaseCode.B to mapOf(
             PhaseCode.BN to listOf(path(SPK.B, SPK.B), addNeutral),
@@ -172,6 +184,8 @@ object TransformerPhasePaths {
             PhaseCode.XY to listOf(path(SPK.B, SPK.X), path(SPK.NONE, SPK.Y)),
             PhaseCode.B to listOf(path(SPK.B, SPK.B)),
             PhaseCode.X to listOf(path(SPK.B, SPK.X)),
+            PhaseCode.BCN to listOf(path(SPK.B, SPK.B), path(SPK.NONE, SPK.C), addNeutral),
+            PhaseCode.XYN to listOf(path(SPK.B, SPK.X), path(SPK.NONE, SPK.Y), addNeutral),
         ),
         PhaseCode.C to mapOf(
             PhaseCode.CN to listOf(path(SPK.C, SPK.C), addNeutral),
@@ -180,6 +194,8 @@ object TransformerPhasePaths {
             PhaseCode.XY to listOf(path(SPK.C, SPK.X), path(SPK.NONE, SPK.Y)),
             PhaseCode.C to listOf(path(SPK.C, SPK.C)),
             PhaseCode.X to listOf(path(SPK.C, SPK.X)),
+            PhaseCode.ACN to listOf(path(SPK.C, SPK.C), path(SPK.NONE, SPK.A), addNeutral),
+            PhaseCode.XYN to listOf(path(SPK.C, SPK.X), path(SPK.NONE, SPK.Y), addNeutral),
         ),
         PhaseCode.X to mapOf(
             PhaseCode.AN to listOf(path(SPK.X, SPK.A), addNeutral),
@@ -194,6 +210,10 @@ object TransformerPhasePaths {
             PhaseCode.B to listOf(path(SPK.X, SPK.B)),
             PhaseCode.C to listOf(path(SPK.X, SPK.C)),
             PhaseCode.X to listOf(path(SPK.X, SPK.X)),
+            PhaseCode.ABN to listOf(path(SPK.X, SPK.A), path(SPK.NONE, SPK.B), addNeutral),
+            PhaseCode.BCN to listOf(path(SPK.X, SPK.B), path(SPK.NONE, SPK.C), addNeutral),
+            PhaseCode.ACN to listOf(path(SPK.X, SPK.C), path(SPK.NONE, SPK.A), addNeutral),
+            PhaseCode.XYN to listOf(path(SPK.X, SPK.X), path(SPK.NONE, SPK.Y), addNeutral),
         ),
     )
 

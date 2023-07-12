@@ -11,10 +11,7 @@
 
 package com.zepben.evolve.services.network.tracing.feeder
 
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.evolve.services.network.tracing.feeder.DirectionValidator.validateDirections
@@ -117,6 +114,60 @@ class SetDirectionTest {
         n.getT("j3", 2).validateDirections(NONE)
         n.getT("c4", 1).validateDirections(NONE)
         n.getT("c4", 2).validateDirections(NONE)
+    }
+
+    @Test
+    internal fun `doesn't trace from open feeder heads`() {
+        //
+        // 1 b0 21--c1--21--c2--21 b3 2
+        //
+        val n = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .toAcls() // c1
+            .toAcls() // c2
+            .toBreaker(isNormallyOpen = true) // b3
+            .addFeeder("b0", 2)
+            .addFeeder("b3", 1)
+            .network
+
+        SetDirection().run(n)
+        DirectionLogger.trace(n["b0"])
+
+        n.getT("b0", 1).validateDirections(NONE)
+        n.getT("b0", 2).validateDirections(DOWNSTREAM)
+        n.getT("c1", 1).validateDirections(UPSTREAM)
+        n.getT("c1", 2).validateDirections(DOWNSTREAM)
+        n.getT("c2", 1).validateDirections(UPSTREAM)
+        n.getT("c2", 2).validateDirections(DOWNSTREAM)
+        n.getT("b3", 1).validateDirections(UPSTREAM)
+        n.getT("b3", 2).validateDirections(NONE)
+    }
+
+    @Test
+    internal fun `stops at zone transformers incase feeder heads are missing`() {
+        //
+        // 1 b0*21--c1--21 tx2 21--c3--2
+        //
+        // * = feeder start
+        //
+        val n = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .toAcls() // c1
+            .toPowerTransformer { addContainer(Substation()) } // tx2
+            .toAcls() // c3
+            .addFeeder("b0", 2)
+            .build()
+
+        DirectionLogger.trace(n["b0"])
+
+        n.getT("b0", 1).validateDirections(NONE)
+        n.getT("b0", 2).validateDirections(DOWNSTREAM)
+        n.getT("c1", 1).validateDirections(UPSTREAM)
+        n.getT("c1", 2).validateDirections(DOWNSTREAM)
+        n.getT("tx2", 1).validateDirections(UPSTREAM)
+        n.getT("tx2", 2).validateDirections(NONE)
+        n.getT("c3", 1).validateDirections(NONE)
+        n.getT("c3", 2).validateDirections(NONE)
     }
 
     @Test

@@ -69,8 +69,8 @@ class BasicTraversalTest {
             }
 
         t.run(1, true)
-        assertThat<Set<Int>>(visited, containsInAnyOrder(1, 2, 3, 4))
-        assertThat<Set<Int>>(stoppingOn, containsInAnyOrder(3, 4))
+        assertThat(visited, containsInAnyOrder(1, 2, 3, 4))
+        assertThat(stoppingOn, containsInAnyOrder(3, 4))
     }
 
     @Test
@@ -97,6 +97,31 @@ class BasicTraversalTest {
             .run(1, true)
 
         assertThat(stopCalls, contains(1, 1, 1))
+    }
+
+    @Test
+    fun `stop checking actions are triggered correctly`() {
+        // We do not bother with the queue next as we will just prime the queue with what we want to test.
+        val queueNext = BasicTraversal.QueueNext<Int> { _, _ -> }
+
+        val steppedOn = mutableSetOf<Int>()
+        val notStoppingOn = mutableSetOf<Int>()
+        val stoppingOn = mutableSetOf<Int>()
+
+        BasicTraversal(queueNext, BasicQueue.depthFirst(), BasicTracker()).apply {
+            addStopCondition { it >= 3 }
+            addStepAction { steppedOn.add(it) }
+            ifNotStopping { notStoppingOn.add(it) }
+            ifStopping { stoppingOn.add(it) }
+
+            queue.addAll(1, 2, 3, 4)
+
+            run()
+        }
+
+        assertThat(steppedOn, containsInAnyOrder(1, 2, 3, 4))
+        assertThat(notStoppingOn, containsInAnyOrder(1, 2))
+        assertThat(stoppingOn, containsInAnyOrder(3, 4))
     }
 
     private fun validateStoppingOnFirstAsset(t: BasicTraversal<Int>, expectedOrder: List<Int>) {

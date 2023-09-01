@@ -78,9 +78,10 @@ object Connect {
         confAddress: String? = null,
         confCAFilename: String? = null,
         authCAFilename: String? = null,
-        caFilename: String? = null
+        caFilename: String? = null,
+        verifyCertificates: Boolean = true
     ): GrpcChannel {
-        val tokenFetcher = createTokenFetcher(confAddress ?: "https://$host/ewb/auth", confCAFilename = confCAFilename, authCAFilename = authCAFilename)
+        val tokenFetcher = createTokenFetcher(confAddress ?: "https://$host/ewb/auth", confCAFilename = confCAFilename, authCAFilename = authCAFilename, verifyCertificates = verifyCertificates)
             ?: return connectTls(host, rpcPort, caFilename)
 
         return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, caFilename)

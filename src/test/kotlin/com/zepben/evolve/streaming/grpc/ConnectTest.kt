@@ -120,7 +120,7 @@ internal class ConnectTest {
             constructedWith<ZepbenTokenFetcher>(
                 EqMatcher("audience"), EqMatcher("issuerDomain"),  EqMatcher(AuthMethod.OAUTH),
                 AllAnyMatcher<String>(), AllAnyMatcher<String>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<JsonObject>(),
-                AllAnyMatcher<HttpClient>(), AllAnyMatcher<String?>(), AllAnyMatcher<String>(), AllAnyMatcher<(JsonObject) -> String>()
+                AllAnyMatcher<String?>(), AllAnyMatcher<String>(), AllAnyMatcher<(JsonObject) -> String>()
             ).tokenRequestData
         } returns tokenRequestData
 
@@ -211,7 +211,7 @@ internal class ConnectTest {
             constructedWith<ZepbenTokenFetcher>(
                 EqMatcher("audience"), EqMatcher("issuerDomain"),  EqMatcher(AuthMethod.OAUTH),
                 AllAnyMatcher<String>(), AllAnyMatcher<String>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<JsonObject>(),
-                AllAnyMatcher<HttpClient>(), AllAnyMatcher<String?>(), AllAnyMatcher<String>(), AllAnyMatcher<(JsonObject) -> String>()
+                AllAnyMatcher<String?>(), AllAnyMatcher<String>(), AllAnyMatcher<(JsonObject) -> String>()
             ).tokenRequestData
         } returns tokenRequestData
 

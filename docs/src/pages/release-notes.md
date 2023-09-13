@@ -2,6 +2,7 @@
 
 | Version | Released |
 | --- | --- |
+|[0.16.0](#v0160)| `13 September 2023` |
 |[0.15.0](#v0150)| `01 May 2023` |
 |[0.14.0](#v0140)| `07 February 2023` |
 |[0.13.0](#v0130)| `21 October 2022` |
@@ -22,6 +23,75 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.16.0]
+
+
+### Breaking Changes
+
+* Deprecated old style accessors in favour of Kotlin accessors for `SinglePhaseKind`. To use the new function make the folloiwng modification to your code:
+    * Kotlin:
+        * `spk.value()` -> `spk.value`
+        * `spk.maskIndex()` -> `spk.maskIndex`
+        * `spk.bitMask()` -> `spk.bitMask`
+    * Java:
+        * `spk.value()` -> `spk.getValue()`
+        * `spk.maskIndex()` -> `spk.getMaskIndex()`
+        * `spk.bitMask()` -> `spk.getBitMask()`
+* `SetDirection.run(NetworkService)` will no longer set directions for feeders with a head terminal on an open switch. It is expected these feeders are either
+  placeholder feeders with no meaningful equipment, or are energised from another feeder which will set the directions from the other end.
+
+### New Features
+
+* PowerTransformerEnd now supports multiple ratings based on cooling types attached to the transformer. Use new `addRating` and `getRating` methods.
+* Added new classes:
+    * TapChangerControl
+    * EvChargingUnit
+    * RegulatingControl
+* Added new fields:
+    * Equipment.commissionedDate
+    * UsagePoint
+        * ratedPower
+        * approvedInverterCapacity
+    * ProtectionEquipment
+        * directable
+        * powerDirection
+    * CurrentRelayInfo.recloseDelays
+    * DER register fields on PowerElectronicsConnection
+* Added new enums
+    * PowerDirectionKind
+    * RegulatingControlModeKind
+    * TransformerCoolingType
+
+### Enhancements
+
+* Performance enhancement for `ConnectedEquipmentTrace` when traversing elements with single terminals.
+* Added support for LV2 below SWER transformers.
+* Improved logging when saving a database.
+* The `TestNetworkBuilder` has been enhanced with the following features:
+    * You can now set the ID's without having to create a customer 'other' creator.
+    * Added Kotlin wrappers for `.fromOther` and `.toOther` that allow you to pass a class type rather than a creator. e.g. `.toOther<Fuse>()` instead
+      of `.toOther(::Fuse)` or `.toOther( { Fuse(it) } )`.
+    * Added inbuilt support for `PowerElectronicsConnection` and `EnergyConsumer`
+    * The `to*` and `connect` functions can specify the connectivity node mRID to use. This will only be used if the terminals are not already connected.
+* Added `+` and `-` operators to `PhaseCode` and `SinglePhaseKind`.
+* `TraversalQueue` now has `addAll` methods taking either a collection or varargs, which by default will just call `add` for each item, but can be overridden if
+  there is an `addAll` available on the underlying queue implementation.
+* `Traversal` has two new helper methods:
+    * `ifNotStopping`: Adds a step action that is only called if the traversal is not stopping on the item.
+    * `ifStopping`: Adds a step action that is only called if the traversal is stopping on the item.
+
+### Fixes
+
+* Asking for the traced phases as a phase code when there are no nominal phases no longer throws.
+* Feeder directions are now stopped at substation transformers in the same way as assigning equipment incase the feeder has no breaker, or the start point is
+  not inline.
+
+### Notes
+
+* Deprecated setting `ratedS` on PowerTransformerEnd.
 
 ---
 

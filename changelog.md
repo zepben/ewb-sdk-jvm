@@ -4,7 +4,7 @@
 * None.
 
 ### New Features
-* None.
+* Updated to evolve-grpc 0.26.0.
 
 ### Enhancements
 * None.

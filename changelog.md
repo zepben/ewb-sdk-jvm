@@ -53,8 +53,7 @@
     * PowerDirectionKind
     * RegulatingControlModeKind
     * TransformerCoolingType
-* Added support for M2M Azure tokens
-    * Requires new evolve-conn, supports using Azure to generate oauth2 tokens.
+* Added support for authentication via Azure Entra ID M2M tokens.
 
 ### Enhancements
 

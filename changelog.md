@@ -53,6 +53,7 @@
     * PowerDirectionKind
     * RegulatingControlModeKind
     * TransformerCoolingType
+* Added support for authentication via Azure Entra ID M2M tokens.
 
 ### Enhancements
 

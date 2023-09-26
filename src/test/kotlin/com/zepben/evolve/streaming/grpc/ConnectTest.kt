@@ -18,6 +18,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.net.http.HttpClient
 
 internal class ConnectTest {
 
@@ -98,7 +99,7 @@ internal class ConnectTest {
     fun connectWithSecretConnectsWithTlsIfNoAuth() {
         mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
         every {
-            createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
+            createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any(), any())
         } returns null
 
         mockkStatic(Connect::class)
@@ -117,8 +118,9 @@ internal class ConnectTest {
         mockkConstructor(ZepbenTokenFetcher::class)
         every {
             constructedWith<ZepbenTokenFetcher>(
-                EqMatcher("audience"), EqMatcher("issuerDomain"), EqMatcher(AuthMethod.OAUTH), AllAnyMatcher<String?>(),
-                AllAnyMatcher<String>(), AllAnyMatcher<String>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<String?>()
+                EqMatcher("audience"), EqMatcher("issuerDomain"),  EqMatcher(AuthMethod.OAUTH),
+                AllAnyMatcher<String>(), AllAnyMatcher<String>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<JsonObject>(),
+                AllAnyMatcher<String?>(), AllAnyMatcher<String>(), AllAnyMatcher<(JsonObject) -> String>()
             ).tokenRequestData
         } returns tokenRequestData
 
@@ -207,8 +209,9 @@ internal class ConnectTest {
         mockkConstructor(ZepbenTokenFetcher::class)
         every {
             constructedWith<ZepbenTokenFetcher>(
-                EqMatcher("audience"), EqMatcher("issuerDomain"), EqMatcher(AuthMethod.OAUTH), AllAnyMatcher<String?>(),
-                AllAnyMatcher<String>(), AllAnyMatcher<String>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<String?>()
+                EqMatcher("audience"), EqMatcher("issuerDomain"),  EqMatcher(AuthMethod.OAUTH),
+                AllAnyMatcher<String>(), AllAnyMatcher<String>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<JsonObject>(),
+                AllAnyMatcher<String?>(), AllAnyMatcher<String>(), AllAnyMatcher<(JsonObject) -> String>()
             ).tokenRequestData
         } returns tokenRequestData
 

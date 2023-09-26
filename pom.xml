@@ -87,7 +87,7 @@
         <dependency>
             <groupId>com.zepben.evolve</groupId>
             <artifactId>evolve-conn</artifactId>
-            <version>0.7.0-SNAPSHOT2</version>
+            <version>0.7.0-SNAPSHOT3</version>
         </dependency>
 
         <!-- Kotlin -->

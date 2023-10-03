@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.zepben.maven</groupId>
         <artifactId>evolve-super-pom</artifactId>
-        <version>0.30.0</version>
+        <version>0.31.0</version>
     </parent>
 
     <groupId>com.zepben</groupId>
@@ -149,7 +149,6 @@
         <dependency>
             <groupId>io.mockk</groupId>
             <artifactId>mockk</artifactId>
-            <version>1.12.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -166,8 +165,8 @@
                 <!--suppress MavenModelInspection -->
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <configuration>
-                    <apiVersion>1.5</apiVersion>
-                    <languageVersion>1.5</languageVersion>
+                    <apiVersion>${kotlin.language.version}</apiVersion>
+                    <languageVersion>${kotlin.language.version}</languageVersion>
                     <compilerPlugins>
                         <plugin>kotlinx-serialization</plugin>
                     </compilerPlugins>

@@ -6,6 +6,7 @@
 ### New Features
 * Updated to evolve-grpc 0.26.0.
 * Updated super-pom to version 0.30.0
+* Added Identity token fetcher helper for Azure VMs/Managed Identity
 
 ### Enhancements
 * None.

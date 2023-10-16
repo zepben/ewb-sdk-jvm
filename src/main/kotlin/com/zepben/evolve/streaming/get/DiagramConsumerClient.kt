@@ -15,6 +15,8 @@ import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.dc.*
 import com.zepben.protobuf.dc.DiagramIdentifiedObject.IdentifiedObjectCase.*
+import com.zepben.protobuf.metadata.GetMetadataRequest
+import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
 import io.grpc.ManagedChannel
 import java.util.concurrent.ExecutorService
@@ -148,5 +150,7 @@ class DiagramConsumerClient(
 
         return extractResults.asSequence()
     }
-
+    override fun runGetMetadata(getMetadataRequest: GetMetadataRequest, streamObserver: AwaitableStreamObserver<GetMetadataResponse>) {
+        stub.getMetadata(getMetadataRequest, streamObserver)
+    }
 }

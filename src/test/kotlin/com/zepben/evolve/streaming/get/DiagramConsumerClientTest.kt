@@ -18,10 +18,14 @@ import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
 import com.zepben.evolve.streaming.get.testservices.TestDiagramConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
+import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.dc.DiagramIdentifiedObject
 import com.zepben.protobuf.dc.GetDiagramObjectsResponse
 import com.zepben.protobuf.dc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.dc.GetIdentifiedObjectsResponse
+import com.zepben.protobuf.metadata.GetMetadataRequest
+import com.zepben.protobuf.metadata.GetMetadataResponse
+import com.zepben.protobuf.nc.NetworkConsumerGrpc
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.StatusRuntimeException
@@ -34,10 +38,8 @@ import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.spy
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.*
+import java.util.concurrent.Executors
 import com.zepben.protobuf.dc.DiagramIdentifiedObject as DIO
 
 internal class DiagramConsumerClientTest {
@@ -55,8 +57,9 @@ internal class DiagramConsumerClientTest {
     private val consumerService = TestDiagramConsumerService()
 
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
+    private val stub = spy(DiagramConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()))
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val consumerClient = spy(DiagramConsumerClient(channel).apply { addErrorHandler(onErrorHandler) })
+    private val consumerClient = spy(DiagramConsumerClient(stub).apply { addErrorHandler(onErrorHandler) })
     private val service = consumerClient.service
 
     private val serverException = IllegalStateException("custom message")
@@ -234,6 +237,27 @@ internal class DiagramConsumerClientTest {
 
         assertThat(result.value.objects.size, equalTo(2))
         assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, containsInAnyOrder("d1", "d2"))
+    }
+
+    @Test
+    internal fun `runGetMetadata calls stub with arguments it's passed`() {
+        val request = GetMetadataRequest.newBuilder().build()
+        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> { _ -> }
+        doNothing().`when`(stub).getMetadata(request, streamObserver)
+
+        consumerClient.runGetMetadata(request, streamObserver)
+
+        verify(stub).getMetadata(request, streamObserver)
+    }
+
+    @Test
+    internal fun `calls error handler when getting the metadata throws`() {
+        consumerService.onGetMetadataRequest = spy { _, _ -> throw serverException }
+
+        val result = consumerClient.getMetadata()
+
+        verify(consumerService.onGetMetadataRequest).invoke(eq(GetMetadataRequest.newBuilder().build()), any())
+        validateFailure(onErrorHandler, result, serverException)
     }
 
     private fun configureResponses(expectedDiagramService: DiagramService) {

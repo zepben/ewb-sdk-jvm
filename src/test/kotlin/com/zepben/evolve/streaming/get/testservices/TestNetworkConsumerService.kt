@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.streaming.get.testservices
 
+import com.zepben.protobuf.metadata.GetMetadataRequest
+import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.nc.*
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
@@ -20,12 +22,17 @@ class TestNetworkConsumerService : NetworkConsumerGrpc.NetworkConsumerImplBase()
     lateinit var onGetCurrentEquipmentForFeeder: (request: GetCurrentEquipmentForFeederRequest, response: StreamObserver<GetCurrentEquipmentForFeederResponse>) -> Unit
     lateinit var onGetEquipmentForRestriction: (request: GetEquipmentForRestrictionRequest, response: StreamObserver<GetEquipmentForRestrictionResponse>) -> Unit
     lateinit var onGetTerminalsForNode: (request: GetTerminalsForNodeRequest, response: StreamObserver<GetTerminalsForNodeResponse>) -> Unit
+    lateinit var onGetMetadataRequest: (request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) -> Unit
 
     override fun getIdentifiedObjects(response: StreamObserver<GetIdentifiedObjectsResponse>): StreamObserver<GetIdentifiedObjectsRequest> =
         TestStreamObserver(response, onGetIdentifiedObjects)
 
     override fun getNetworkHierarchy(request: GetNetworkHierarchyRequest, response: StreamObserver<GetNetworkHierarchyResponse>) {
         runGrpc(request, response, onGetNetworkHierarchy)
+    }
+
+    override fun getMetadata(request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) {
+        runGrpc(request, response, onGetMetadataRequest)
     }
 
     override fun getEquipmentForContainers(response: StreamObserver<GetEquipmentForContainersResponse>): StreamObserver<GetEquipmentForContainersRequest> =

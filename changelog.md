@@ -4,7 +4,7 @@
 * None.
 
 ### New Features
-* Updated to evolve-grpc 0.26.0-SNAPSHOT3
+* Updated to evolve-grpc 0.26.0.
 * Updated super-pom to version 0.30.0
 
 ### Enhancements

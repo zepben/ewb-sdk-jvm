@@ -52,13 +52,13 @@ object TracedPhasesBitManipulation {
     @JvmStatic
     fun set(status: UInt, nominalPhase: SinglePhaseKind, singlePhaseKind: SinglePhaseKind): UInt =
         if (singlePhaseKind == SinglePhaseKind.NONE)
-            (status and nominalPhaseMasks[nominalPhase.maskIndex()].inv())
+            (status and nominalPhaseMasks[nominalPhase.maskIndex].inv())
         else
-            (status and nominalPhaseMasks[nominalPhase.maskIndex()].inv()) or singlePhaseKind.shiftedValue(nominalPhase)
+            (status and nominalPhaseMasks[nominalPhase.maskIndex].inv()) or singlePhaseKind.shiftedValue(nominalPhase)
 
-    private fun SinglePhaseKind.byteSelector() = maskIndex() * 4
+    private fun SinglePhaseKind.byteSelector() = maskIndex * 4
 
     private fun SinglePhaseKind.shiftedValue(nominalPhase: SinglePhaseKind) =
-        phaseMasks[maskIndex()] shl nominalPhase.byteSelector()
+        phaseMasks[maskIndex] shl nominalPhase.byteSelector()
 
 }

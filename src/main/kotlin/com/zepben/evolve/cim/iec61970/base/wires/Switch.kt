@@ -78,13 +78,13 @@ abstract class Switch(mRID: String = "") : ConductingEquipment(mRID) {
         when (phase) {
             SinglePhaseKind.NONE, SinglePhaseKind.INVALID -> throw IllegalArgumentException("Invalid phase specified.")
             null -> currentState != 0
-            else -> (currentState and phase.bitMask()) != 0
+            else -> (currentState and phase.bitMask) != 0
         }
 
     private fun calculateOpenState(currentState: Int, isOpen: Boolean, phase: SinglePhaseKind?): Int =
         when (phase) {
             SinglePhaseKind.NONE, SinglePhaseKind.INVALID -> throw IllegalArgumentException("Invalid phase specified.")
             null -> if (isOpen) 0b1111 else 0
-            else -> if (isOpen) currentState or phase.bitMask() else currentState and phase.bitMask().inv()
+            else -> if (isOpen) currentState or phase.bitMask else currentState and phase.bitMask.inv()
         }
 }

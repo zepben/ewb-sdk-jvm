@@ -62,12 +62,12 @@ internal class ConductorTest {
         val oh = OverheadWireInfo()
         val conductor = object : Conductor() {}
 
-        Assert.assertThat(conductor.isUnderground, equalTo(false))
+        assertThat(conductor.isUnderground, equalTo(false))
 
         conductor.assetInfo = ug
-        Assert.assertThat(conductor.isUnderground, equalTo(true))
+        assertThat(conductor.isUnderground, equalTo(true))
 
         conductor.assetInfo = oh
-        Assert.assertThat(conductor.isUnderground, equalTo(false))
+        assertThat(conductor.isUnderground, equalTo(false))
     }
 }

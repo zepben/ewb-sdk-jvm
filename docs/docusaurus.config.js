@@ -14,7 +14,7 @@ module.exports = {
     tagline: "",
     url: "https://zepben.github.io/evolve/docs/jvm-sdk/",
     baseUrl: "/evolve/docs/jvm-sdk/",
-    onBrokenLinks: "warn",
+    onBrokenLinks: "throw",
     favicon: "img/favicon.ico",
     organizationName: "zepben",
     projectName: "evolve-sdk-jvm",
@@ -40,7 +40,7 @@ module.exports = {
                 },
                 {
                     to: "/",
-                    activeBasePath: "docs",
+                    activeBasePath: "/",
                     label: "Docs",
                     position: "left",
                 },
@@ -82,6 +82,7 @@ module.exports = {
         [
             "@zepben/docusaurus-preset",
             {
+                gtag: { ...zepbenDocusaurusPreset.defaultThemeConfig.gtag },
                 docs: {
                     routeBasePath: '/',
                     sidebarPath: require.resolve("./sidebars.js"),

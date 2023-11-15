@@ -12,14 +12,13 @@ const versions = require("./versions.json");
 module.exports = {
     title: "Evolve SDK (JVM)",
     tagline: "",
-    url: "https://zepben.github.io/evolve/docs/jvm-sdk/",
+    url: "https://zepben.github.io/",
     baseUrl: "/evolve/docs/jvm-sdk/",
     onBrokenLinks: "throw",
     favicon: "img/favicon.ico",
     organizationName: "zepben",
     projectName: "evolve-sdk-jvm",
     themeConfig: {
-        ...zepbenDocusaurusPreset.defaultThemeConfig,
         colorMode: {
             defaultMode: "light",
             disableSwitch: false,
@@ -76,7 +75,7 @@ module.exports = {
                 facetFilters: ["project:jvm-sdk"]
             }
         },
-        metadatas: [{name: 'docsearch:project', content: 'jvm-sdk'}],
+        metadata: [{name: 'docsearch:project', content: 'jvm-sdk'}],
     },
     presets: [
         [

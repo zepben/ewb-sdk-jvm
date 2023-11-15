@@ -167,6 +167,51 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 
+    // validateCollection for names in identifiedObjects
+    // T: Identified Object
+    // T2: String for first name
+    // T3: String for second name
+    // R: Name class
+    fun <T : IdentifiedObject, T2, T3, R> validateCollection(
+        property: KProperty1<in T, Collection<R>>,
+        addToCollection: (T, T2, T3) -> T,
+        createIdObj: (String) -> T,
+        createItem: (T) -> T3,
+        createOtherItem: (T) -> T3,
+        createSecondItem: () -> T2,
+        options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
+        optionsStopCompare: Boolean = false,
+        expectedDifferences: Set<String> = emptySet()
+    ) {
+        val sourceEmpty = createIdObj("mRID")
+        val targetEmpty = createIdObj("mRID")
+        validateCompare(sourceEmpty, targetEmpty, options = options, optionsStopCompare = optionsStopCompare)
+
+        val inSource = createIdObj("mRID").apply { addToCollection(this, createSecondItem(), createItem(this)) }
+        val inTarget = createIdObj("mRID").apply { addToCollection(this, createSecondItem(), createItem(this)) }
+        validateCompare(inSource, inTarget, options = options, optionsStopCompare = optionsStopCompare)
+
+        ObjectDifference(inSource, targetEmpty).apply {
+            val item = property.get(source).first()
+            differences[property.name] = CollectionDifference(missingFromTarget = mutableListOf(item))
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
+
+        ObjectDifference(sourceEmpty, inTarget).apply {
+            val item = property.get(target).first()
+            differences[property.name] = CollectionDifference(missingFromSource = mutableListOf(item))
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
+
+        val inTargetDifference = createIdObj("mRID").apply { addToCollection(this, createSecondItem(), createOtherItem(this)) }
+        ObjectDifference(inSource, inTargetDifference).apply {
+            val inSourceItem = property.get(source).first()
+            val inTargetItem = property.get(target).first()
+            differences[property.name] = CollectionDifference(
+                missingFromSource = mutableListOf(inTargetItem),
+                missingFromTarget = mutableListOf(inSourceItem)
+            )
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
+    }
+
     fun <T : IdentifiedObject, R> validateIndexedCollection(
         property: KProperty1<in T, Collection<R>>,
         addToCollection: (T, R) -> Unit,

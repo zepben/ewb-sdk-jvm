@@ -1,7 +1,8 @@
 # Zepben EWB SDK changelog
 ## [0.18.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* IdentifiedObject.AddName has been remade to take in a NameType and a String. This is doing the same thing under the hood as previous addName function, but
+  simplifies the input by lowering the amount of objects that needed to be created prior to adding names.
 
 ### New Features
 * None.

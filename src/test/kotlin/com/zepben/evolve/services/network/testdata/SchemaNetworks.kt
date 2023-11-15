@@ -29,7 +29,7 @@ object SchemaNetworks {
             val nameType = NameType("type1").apply {
                 description = "type description"
                 Organisation("org1").also {
-                    it.addName(getOrAddName("name1", it))
+                    it.addName(this,"name1")
                     add(it)
                 }
             }
@@ -41,7 +41,7 @@ object SchemaNetworks {
             val nameType = NameType("type1").apply {
                 description = "type description"
                 Organisation("org1").also {
-                    it.addName(getOrAddName("name1", it))
+                    it.addName(this,"name1")
                     add(it)
                 }
             }

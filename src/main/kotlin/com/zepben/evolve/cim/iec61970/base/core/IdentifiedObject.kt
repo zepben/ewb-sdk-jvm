@@ -8,7 +8,6 @@
 package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
-import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import java.util.*
 
 /**
@@ -24,7 +23,7 @@ import java.util.*
  */
 abstract class IdentifiedObject(mRID: String = "") {
 
-    private var _names: MutableList<Name>? = null
+    private var _names: MutableSet<Name>? = null
 
     val mRID: String = if (mRID.isEmpty()) UUID.randomUUID().toString() else mRID
     var name: String = ""
@@ -62,14 +61,10 @@ abstract class IdentifiedObject(mRID: String = "") {
      */
     fun getName(type: String, name: String): Name? = _names?.getByTypeAndName(type, name)
 
-    fun addName(name: Name): IdentifiedObject {
-        require(name.identifiedObject === this) { "Attempting to add a Name to ${typeNameAndMRID()} that does not reference this identified object" }
+    fun addName(type: NameType, name: String): IdentifiedObject {
 
-        if (getName(name.type.name, name.name) != null)
-            return this
-
-        _names = _names ?: mutableListOf()
-        _names!!.add(name)
+        _names = _names ?: mutableSetOf()
+        _names!!.add(type.getOrAddName(name, this))
 
         return this
     }

@@ -43,6 +43,7 @@ object PhaseValidator {
                 else
                     assertThat(io.getTerminal(2), nullValue())
             }
+
             else -> throw IllegalArgumentException()
         }
     }

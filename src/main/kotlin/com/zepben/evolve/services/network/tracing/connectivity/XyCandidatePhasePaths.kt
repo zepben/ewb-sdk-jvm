@@ -82,12 +82,16 @@ class XyCandidatePhasePaths {
         return when {
             candidateXCounts.isEmpty() ->
                 SPK.NONE to findCandidate(candidateYCounts, priority = yPriority)
+
             candidateXCounts.size == 1 ->
                 candidateXCounts.keys.first() to findCandidate(candidateYCounts, priority = yPriority, after = candidateXCounts.keys.first())
+
             candidateYCounts.isEmpty() ->
                 findCandidate(candidateXCounts, priority = xPriority) to SPK.NONE
+
             candidateYCounts.size == 1 ->
                 findCandidate(candidateXCounts, priority = xPriority, before = candidateYCounts.keys.first()) to candidateYCounts.keys.first()
+
             else -> {
                 val xCandidate = findCandidate(candidateXCounts, priority = xPriority)
                 val yCandidate = findCandidate(candidateYCounts, priority = yPriority)

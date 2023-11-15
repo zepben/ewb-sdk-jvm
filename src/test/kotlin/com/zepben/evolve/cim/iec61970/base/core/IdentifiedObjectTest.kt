@@ -45,48 +45,146 @@ internal class IdentifiedObjectTest {
     }
 
     @Test
-    internal fun names() {
-        val identifiedObject = object : IdentifiedObject("id") {}
-        val name1 = Name("1", NameType("type"), identifiedObject)
-        val name2 = Name("2", NameType("type"), identifiedObject)
-        val name3 = Name("3", NameType("type"), identifiedObject)
-        val duplicate1 = Name("1", NameType("type"), identifiedObject)
+    internal fun `User can add names to identified object`() {
 
+        val identifiedObject = object : IdentifiedObject("id") {}
+        val nameType = NameType("type")
+        assertThat(identifiedObject.numNames(), equalTo(0))
+
+        identifiedObject.addName(nameType, "1")
+
+        assertThat(identifiedObject.numNames(), equalTo(1))
+    }
+
+    @Test
+    internal fun `Adding identical name to the same object doesn't change the list of names belonging to it`() {
+        val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
+        val originalNames = identifiedObject.names
+
+        identifiedObject.addName(nameType, "1")
+        val newNames = identifiedObject.names
+        assertThat(originalNames, equalTo(newNames))
+    }
+
+    @Test
+    internal fun `getName obtain expected Name object`() {
+        val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
+
+        val name1 = identifiedObject.getName("type", "1")!!
+        val name2 = identifiedObject.getName("type", "2")!!
+        val name3 = identifiedObject.getName("type", "3")!!
+
+        assertThat(name2.name, equalTo("2"))
+        assertThat(name2.type.name, equalTo("type"))
+
+        // Make sure item obtained are different
         assertThat(name1, not(equalTo(name2)))
         assertThat(name1, not(equalTo(name3)))
         assertThat(name2, not(equalTo(name3)))
+    }
 
-        assertThat(identifiedObject.numNames(), equalTo(0))
+    @Test
+    internal fun `getName(String, String) and getName(NameType, String) grabs the same object`() {
+        val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
 
-        identifiedObject.addName(name1)
-        identifiedObject.addName(name2)
-        identifiedObject.addName(name3)
-        assertThat(identifiedObject.numNames(), equalTo(3))
-        identifiedObject.addName(duplicate1)
+        val name2 = identifiedObject.getName("type", "2")!!
+        val dupeName2 = identifiedObject.getName(nameType, "2")
+        assertThat(name2, sameInstance(dupeName2))
+    }
 
-        assertThat(identifiedObject.numNames(), equalTo(3))
+    @Test
+    internal fun `nameType contains the names added to the identified object`() {
+        val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
 
-        assertThat(identifiedObject.removeName(name1), equalTo(true))
-        assertThat(identifiedObject.removeName(name1), equalTo(false))
-        assertThat(identifiedObject.removeName(null), equalTo(false))
+        assertThat("expected to have name 1", nameType.hasName("1"))
+        assertThat("expected to have name 2", nameType.hasName("2"))
+        assertThat("expected to have name 3", nameType.hasName("3"))
+    }
+
+    @Test
+    internal fun `getNames obtains all names of a identified object with a given nameType`() {
+        val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
+
+        val nameType2 = NameType("type2")
+        val nameType3 = NameType("type3")
+        identifiedObject.addName(nameType2, "1")
+
+        assertThat(identifiedObject.getNames(nameType)?.size, equalTo(3))
+        assertThat(identifiedObject.getNames(nameType2)?.size, equalTo(1))
+        assertThat(identifiedObject.getNames(nameType3), equalTo(null))
+    }
+
+    @Test
+    internal fun `removeName removes name from the identified object and the nameType`() {
+        val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
+        val name1 = identifiedObject.getName("type", "1")!!
+        val name2 = identifiedObject.getName("type", "2")!!
+        val name3 = identifiedObject.getName("type", "3")!!
+
+        assertThat("name1 successfully removed from nameType", identifiedObject.removeName(name1))
+        assertThat("name1 can not be removed from nameType", !identifiedObject.removeName(name1))
+        assertThat("can not remove name null from identifiedObject", !identifiedObject.removeName(null))
         assertThat(identifiedObject.numNames(), equalTo(2))
-
-        assertThat(identifiedObject.getName("type", name2.name), equalTo(name2))
+        assertThat("should not have had name 1", !nameType.hasName("1"))
 
         assertThat(identifiedObject.names, containsInAnyOrder(name2, name3))
+    }
+
+    @Test
+    internal fun `clearNames removes all names from the identified object and the nameType`() {
+        val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
+
+        assertThat(identifiedObject.numNames(), equalTo(3))
+        assertThat("expected to have name 1", nameType.hasName("1"))
+        assertThat("expected to have name 2", nameType.hasName("2"))
+        assertThat("expected to have name 3", nameType.hasName("3"))
 
         identifiedObject.clearNames()
         assertThat(identifiedObject.numNames(), equalTo(0))
+        assertThat("should not have had name 1", !nameType.hasName("1"))
+        assertThat("should not have had name 2", !nameType.hasName("2"))
+        assertThat("should not have had name 3", !nameType.hasName("3"))
+    }
 
-        // Make sure you can add an item back after it has been removed
-        identifiedObject.addName(name1)
+    @Test
+    internal fun `user can add the same name back after it has been removed`() {
+        val identifiedObject = object : IdentifiedObject("id") {}
+        val nameType = NameType("type")
+
+        identifiedObject.addName(nameType, "1")
+        val name1 = identifiedObject.getName("type", "1")
+        identifiedObject.clearNames()
+
+        identifiedObject.removeName(name1)
+        assertThat(identifiedObject.numNames(), equalTo(0))
+    }
+
+    @Test
+    internal fun `removing name from empty name list does not cause any issue`() {
+        val identifiedObject = object : IdentifiedObject("id") {}
+        val nameType = NameType("type")
+
+        identifiedObject.addName(nameType, "1")
+        val name1 = identifiedObject.getName("type", "1")
         assertThat(identifiedObject.numNames(), equalTo(1))
 
         identifiedObject.removeName(name1)
         assertThat(identifiedObject.numNames(), equalTo(0))
 
-        // Make sure you can call remove on an empty list.
-        identifiedObject.removeName(name2)
-        assertThat(identifiedObject.numNames(), equalTo(0))
+        identifiedObject.addName(nameType, "1")
+        val dupeName1 = identifiedObject.getName(nameType, "1")
+        assertThat(name1, not(sameInstance(dupeName1)))
+        assertThat(identifiedObject.numNames(), equalTo(1))
+    }
+
+    private fun createMultipleBaseNames(): Pair<IdentifiedObject, NameType> {
+        val identifiedObject = object : IdentifiedObject("id") {}
+        val nameType = NameType("type")
+
+        identifiedObject.addName(nameType, "1")
+        identifiedObject.addName(nameType, "2")
+        identifiedObject.addName(nameType, "3")
+
+        return identifiedObject to nameType
     }
 }

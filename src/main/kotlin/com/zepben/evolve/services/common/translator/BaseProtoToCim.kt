@@ -11,7 +11,6 @@ import com.zepben.evolve.cim.iec61968.common.Document
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.evolve.cim.iec61970.base.core.Name
 import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.Resolvers
@@ -20,7 +19,6 @@ import com.zepben.protobuf.cim.iec61968.common.Document as PBDocument
 import com.zepben.protobuf.cim.iec61968.common.Organisation as PBOrganisation
 import com.zepben.protobuf.cim.iec61968.common.OrganisationRole as PBOrganisationRole
 import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject as PBIdentifiedObject
-import com.zepben.protobuf.cim.iec61970.base.core.Name as PBName
 import com.zepben.protobuf.cim.iec61970.base.core.NameType as PBNameType
 
 //
@@ -53,19 +51,16 @@ fun toCim(pb: PBOrganisationRole, cim: OrganisationRole, baseService: BaseServic
 
 /************ IEC61970 CORE ************/
 
-@Suppress("UNUSED_PARAMETER")
 fun toCim(pb: PBIdentifiedObject, cim: IdentifiedObject, baseService: BaseService): IdentifiedObject =
     cim.apply {
         name = pb.name.internEmpty()
         description = pb.description.internEmpty()
         numDiagramObjects = pb.numDiagramObjects
-        pb.namesList.forEach { addName(toCim(it, this, baseService)) }
+        pb.namesList.forEach { entry ->
+            val nameType = baseService.getNameType(entry.type) ?: NameType(entry.type).also { baseService.addNameType(it) }
+            this.addName(nameType, entry.name)
+        }
     }
-
-fun toCim(pb: PBName, io: IdentifiedObject, baseService: BaseService): Name {
-    val nameType = baseService.getNameType(pb.type) ?: NameType(pb.type).also { baseService.addNameType(it) }
-    return nameType.getOrAddName(pb.name, io)
-}
 
 //
 // NOTE: We always update the description in case the name type was created from the name embedded in an IdentifiedObject.

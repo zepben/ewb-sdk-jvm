@@ -147,6 +147,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
                 runGetMetadata(GetMetadataRequest.newBuilder().build(), streamObserver)
                 streamObserver.await()
             }
-            serviceInfo ?: throw IOException("No metadata was received before GRPC channel was closed.")// Other exceptions should be raised before serviceInfo is found to be null
+            serviceInfo
+                ?: throw IOException("No metadata was received before GRPC channel was closed.")// Other exceptions should be raised before serviceInfo is found to be null
         }
 }

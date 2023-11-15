@@ -138,10 +138,10 @@ internal class NetworkConsumerClientTest {
                 val type = nio.identifiedObjectCase
                 if (isSupported(type)) {
                     if (result.wasFailure)
-                        /**
-                         * If you hit this you've probably got fields in your CIM class that have requirements that are not being met by the default
-                         * builder. Fix this in [ConsumerUtils.buildFromBuilder]
-                         */
+                    /**
+                     * If you hit this you've probably got fields in your CIM class that have requirements that are not being met by the default
+                     * builder. Fix this in [ConsumerUtils.buildFromBuilder]
+                     */
                         throw result.thrown
                     assertThat(result.value.mRID, equalTo(mRID))
                 } else {

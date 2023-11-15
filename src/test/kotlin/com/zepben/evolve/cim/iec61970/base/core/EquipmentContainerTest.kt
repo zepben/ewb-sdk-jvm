@@ -44,7 +44,7 @@ internal class EquipmentContainerTest {
     @Test
     internal fun currentEquipment() {
         PrivateCollectionValidator.validate(
-            { object: EquipmentContainer() {} },
+            { object : EquipmentContainer() {} },
             { id, _ -> object : Equipment(id) {} },
             EquipmentContainer::numCurrentEquipment,
             EquipmentContainer::getCurrentEquipment,

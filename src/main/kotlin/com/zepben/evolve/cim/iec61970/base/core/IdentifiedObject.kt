@@ -7,8 +7,6 @@
  */
 package com.zepben.evolve.cim.iec61970.base.core
 
-import com.zepben.evolve.services.common.extensions.asUnmodifiable
-import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import java.util.*
 
 /**
@@ -24,7 +22,8 @@ import java.util.*
  */
 abstract class IdentifiedObject(mRID: String = "") {
 
-    private var _names: MutableList<Name>? = null
+    // Changed to use mutableSet to prevent duplicated entries from addName function
+    private var _names: MutableSet<Name>? = null
 
     val mRID: String = if (mRID.isEmpty()) UUID.randomUUID().toString() else mRID
     var name: String = ""
@@ -46,7 +45,7 @@ abstract class IdentifiedObject(mRID: String = "") {
     /**
      * The names for this identified object. The returned collection is read only.
      */
-    val names: Collection<Name> get() = _names.asUnmodifiable()
+    val names: Collection<Name> get() = _names?.toSet() ?: emptySet()
 
     /**
      * Get the number of entries in the [Name] collection.
@@ -62,30 +61,75 @@ abstract class IdentifiedObject(mRID: String = "") {
      */
     fun getName(type: String, name: String): Name? = _names?.getByTypeAndName(type, name)
 
-    fun addName(name: Name): IdentifiedObject {
-        require(name.identifiedObject === this) { "Attempting to add a Name to ${typeNameAndMRID()} that does not reference this identified object" }
+    /**
+     * The individual name information of the identified object.
+     *
+     * @param name the name of the required [Name]
+     * @param type the required [NameType]
+     * @return The [Name] with the specified [name] if it exists, otherwise null
+     */
+    fun getName(type: NameType, name: String): Name? = _names?.getByTypeAndName(type.name, name)
 
-        if (getName(name.type.name, name.name) != null)
-            return this
+    /**
+     * All name information of the identified object given a [NameType].
+     *
+     * @param type the required [NameType]
+     * @return List of [Name] with the specified [type] if it exists, otherwise null
+     */
+    fun getNames(type: NameType): List<Name>? = _names?.filter { it.type == type }?.takeUnless { it.isEmpty() }
 
-        _names = _names ?: mutableListOf()
-        _names!!.add(name)
+    /**
+     * All name information of the identified object given the name of a [NameType].
+     *
+     * @param type the name of the required [NameType]
+     * @return List of [Name] with the specified [type] if it exists, otherwise null
+     */
+    fun getNames(type: String): List<Name>? = _names?.filter { it.type.name == type }?.takeUnless { it.isEmpty() }
+
+    /**
+     * Add a [Name] to the [IdentifiedObject]
+     *
+     * @param type the required [NameType]
+     * @param name the name of the new [Name]
+     * @return this [IdentifiedObject] with a newly added [Name]
+     */
+    fun addName(type: NameType, name: String): IdentifiedObject {
+
+        _names = _names ?: mutableSetOf()
+        _names!!.add(type.getOrAddName(name, this))
 
         return this
     }
 
+    /**
+     * Remove a [Name] from the [IdentifiedObject]
+     *
+     * @param name the [Name] to be removed from the [IdentifiedObject]
+     * @return A [Boolean] to indicate if the [name] is successfully removed
+     */
     fun removeName(name: Name?): Boolean {
         val ret = _names?.remove(name) == true
+        // Remove names from nameType if nameType contains the name
+        if (ret) name!!.type.removeName(name)
         if (_names.isNullOrEmpty()) _names = null
         return ret
     }
 
+    /**
+     * Remove all [Name] from the [IdentifiedObject]
+     *
+     * @return this [IdentifiedObject]
+     */
     fun clearNames(): IdentifiedObject {
+        // Remove names from nameType
+        _names?.toList()?.forEach {
+            removeName(it)
+        }
         _names = null
         return this
     }
 
-    private fun Iterable<Name>?.getByTypeAndName(type: String,  name: String): Name? {
+    private fun Iterable<Name>?.getByTypeAndName(type: String, name: String): Name? {
         return this?.firstOrNull { it.type.name == type && it.name == name }
     }
 }

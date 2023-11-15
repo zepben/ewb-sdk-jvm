@@ -36,7 +36,10 @@ internal class DatabaseTablesTest {
     }
 
     private class MissingTable : SqliteTable() {
-        override fun name(): String { error("this should never be called") }
+        override fun name(): String {
+            error("this should never be called")
+        }
+
         override val tableClass: Class<out SqliteTable> get() = error("this should never be called")
         override val tableClassInstance: SqliteTable get() = error("this should never be called")
     }

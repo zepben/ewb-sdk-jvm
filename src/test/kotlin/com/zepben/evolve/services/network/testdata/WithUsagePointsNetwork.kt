@@ -124,17 +124,17 @@ object WithUsagePointsNetwork {
                 UsagePoint().apply {
                     isVirtual = true
                     connectionCategory = virtualConnectionCategory
-                    addName(nameType.getOrAddName("vcpi", this))
+                    addName(nameType, "vcpi")
                 }.also { network.add(it) }
             )
         }.also { network.add(it) }
         val ec1 = EnergyConsumer("ec1").apply {
             createTerminals(network, this, 1)
-            addUsagePoint(UsagePoint().apply { addName(nameType.getOrAddName("cpi1", this)) }.also { network.add(it) })
+            addUsagePoint(UsagePoint().apply { addName(nameType, "cpi1") }.also { network.add(it) })
         }.also { network.add(it) }
         val ec2 = EnergyConsumer("ec2").apply {
             createTerminals(network, this, 1)
-            addUsagePoint(UsagePoint().apply { addName(nameType.getOrAddName("cpi2", this)) }.also { network.add(it) })
+            addUsagePoint(UsagePoint().apply { addName(nameType, "cpi2") }.also { network.add(it) })
         }.also { network.add(it) }
 
         val lv = AcLineSegment().apply {
@@ -168,13 +168,13 @@ object WithUsagePointsNetwork {
             addUsagePoint(
                 UsagePoint().apply {
                     this.connectionCategory = connectionCategory
-                    addName(nameType.getOrAddName("vcpi", this))
+                    addName(nameType, "vcpi")
                 }.also { network.add(it) }
             )
         }.also { network.add(it) }
         val ec = EnergyConsumer("ec").apply {
             createTerminals(network, this, 1)
-            addUsagePoint(UsagePoint().apply { addName(nameType.getOrAddName("cpi1", this)) }.also { network.add(it) })
+            addUsagePoint(UsagePoint().apply { addName(nameType, "cpi1") }.also { network.add(it) })
         }.also { network.add(it) }
 
         val lv = AcLineSegment().apply {

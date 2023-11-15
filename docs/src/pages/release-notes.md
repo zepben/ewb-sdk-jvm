@@ -1,25 +1,25 @@
 #### Release History
 
-| Version | Released |
-| --- | --- |
-|[0.17.0](#v0.17.0//./)| `22 November 2023` |
-|[0.16.0](#v0160)| `13 September 2023` |
-|[0.15.0](#v0150)| `01 May 2023` |
-|[0.14.0](#v0140)| `07 February 2023` |
-|[0.13.0](#v0130)| `21 October 2022` |
-|[0.12.1](#v0121)| `22 August 2022` |
-|[0.12.0](#v0120)| `12 August 2022` |
-|[0.11.0](#v0110)| `09 May 2022` |
-|[0.10.0](#v0100)| `27 April 2022` |
-|[0.9.0](#v090)| `05 April 2022` |
-|[0.8.0](#v080)| `03 March 2022` |
-|[0.7.0](#v070)| `22 September 2021` |
-|[0.6.0](#v060)| `06 April 2021` |
-|[0.5.0](#v050)| `01 February 2021` |
-|[0.4.0](#v040)| `12 January 2021` |
-|[0.3.0](#v030)| `10 November 2020` |
-| [0.2.0](#v020) | `08 October 2020` |
-| [0.1.0](#v010) | `07 September 2020` |
+| Version                | Released            |
+|------------------------|---------------------|
+| [0.17.0](#v0.17.0//./) | `22 November 2023`  |
+| [0.16.0](#v0160)       | `13 September 2023` |
+| [0.15.0](#v0150)       | `01 May 2023`       |
+| [0.14.0](#v0140)       | `07 February 2023`  |
+| [0.13.0](#v0130)       | `21 October 2022`   |
+| [0.12.1](#v0121)       | `22 August 2022`    |
+| [0.12.0](#v0120)       | `12 August 2022`    |
+| [0.11.0](#v0110)       | `09 May 2022`       |
+| [0.10.0](#v0100)       | `27 April 2022`     |
+| [0.9.0](#v090)         | `05 April 2022`     |
+| [0.8.0](#v080)         | `03 March 2022`     |
+| [0.7.0](#v070)         | `22 September 2021` |
+| [0.6.0](#v060)         | `06 April 2021`     |
+| [0.5.0](#v050)         | `01 February 2021`  |
+| [0.4.0](#v040)         | `12 January 2021`   |
+| [0.3.0](#v030)         | `10 November 2020`  |
+| [0.2.0](#v020)         | `08 October 2020`   |
+| [0.1.0](#v010)         | `07 September 2020` |
 
 ---
 
@@ -30,26 +30,30 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 ## [0.17.0]
 
 ### Breaking Changes
+
 * None.
 
 ### New Features
+
 * Updated to evolve-grpc 0.26.0.
 * Updated super-pom to version 0.30.0
 * Added `connectWithIdentity()` for connecting using Azure Managed Identities.
 
 ### Enhancements
+
 * Update docusaurus version and the configuration.
 
 ### Fixes
+
 * None.
 
 ### Notes
+
 * None.
 
 ---
 
 ## [0.16.0]
-
 
 ### Breaking Changes
 
@@ -119,7 +123,6 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ## [0.15.0]
 
-
 ### Breaking Changes
 
 * The CIM consumer clients (network, diagram and customer) have had the following changes:
@@ -140,8 +143,8 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
 
 ### Fixes
 
-* Stopped the NetworkConsumerClient from resolving the equipment of an EquipmentContainer when resolving references. Equipment for containers must always be 
-explicitly requested by the client.
+* Stopped the NetworkConsumerClient from resolving the equipment of an EquipmentContainer when resolving references. Equipment for containers must always be
+  explicitly requested by the client.
 
 ### Notes
 
@@ -189,17 +192,17 @@ explicitly requested by the client.
     * `newCurrentDownstreamEquipmentTrace`: Creates a trace that traverses in the downstream direction using the current state of the network.
     * `newCurrentUpstreamEquipmentTrace`: Creates a trace that traverses in the upstream direction using the current state of the network.
 * Added support for protection equipment with the following classes, enums, and fields:
-  * `SwitchInfo`: Switch datasheet information.
-  * `ProtectionEquipment`: An electrical device designed to respond to input conditions in a prescribed manner and after specified conditions are met to cause
-                           contact operation or similar abrupt change in associated electric control circuits, or simply to display the detected condition.
-  * `CurrentRelay`: A device that checks current flow values in any direction or designated direction.
-  * `CurrentRelayInfo`: Current relay datasheet information.
-  * `RecloseSequence`: A reclose sequence (open and close) is defined for each possible reclosure of a breaker.
-  * `ProtectionKind`: The kind of protection being provided by this protection equipment.
-  * `ProtectedSwitch::breakingCapacity`: The maximum fault current in amps a breaking device can break safely under prescribed conditions of use.
-  * `Switch::ratedCurrent`: The maximum continuous current carrying capacity in amps governed by the device material and construction.
-                            The attribute shall be a positive value.
-  * `Breaker::inTransitTime`: The transition time from open to close in seconds.
+    * `SwitchInfo`: Switch datasheet information.
+    * `ProtectionEquipment`: An electrical device designed to respond to input conditions in a prescribed manner and after specified conditions are met to cause
+      contact operation or similar abrupt change in associated electric control circuits, or simply to display the detected condition.
+    * `CurrentRelay`: A device that checks current flow values in any direction or designated direction.
+    * `CurrentRelayInfo`: Current relay datasheet information.
+    * `RecloseSequence`: A reclose sequence (open and close) is defined for each possible reclosure of a breaker.
+    * `ProtectionKind`: The kind of protection being provided by this protection equipment.
+    * `ProtectedSwitch::breakingCapacity`: The maximum fault current in amps a breaking device can break safely under prescribed conditions of use.
+    * `Switch::ratedCurrent`: The maximum continuous current carrying capacity in amps governed by the device material and construction.
+      The attribute shall be a positive value.
+    * `Breaker::inTransitTime`: The transition time from open to close in seconds.
 
 ### Enhancements
 
@@ -225,37 +228,43 @@ explicitly requested by the client.
 ### v0.13.0
 
 ##### Breaking Changes
+
 * Replaced `Equipment().currentFeeders` with `Equipment().currentContainers`, which yields a `Collection<EquipmentContainer>` instead of a `Collection<Feeder>`.
 * Changed the `AssignToFeeders` trace to stop at and exclude LV equipment, which should now be added to the new `LvFeeder` object.
 * Renamed `Tracing().assignEquipmentContainerToFeeders` to `Tracing().assignEquipmentToFeeders`
 * Changed the minimum supported database version to v43.
 
 ##### New Features
+
 * Added support for YYN single phase transformers when determining phases.
 * Added `LvFeeder`, a branch of LV network starting at a distribution substation and continuing until the end of the LV network.
 * Added the following optional arguments to `NetworkConsumerClient().getEquipment(For)Container(s)`:
-  * `includeEnergizingContainers`: Specifies whether to include equipment from containers energizing the ones listed in
-    `mRIDs`. This is of the enum type `IncludedEnergizingContainers`, which has three possible values:
-    * `EXCLUDE_ENERGIZING_CONTAINERS`: No additional effect (default).
-    * `INCLUDE_ENERGIZING_FEEDERS`: Include HV/MV feeders that power LV feeders listed in `mRIDs`.
-    * `INCLUDE_ENERGIZING_SUBSTATIONS`: In addition to `INCLUDE_ENERGIZING_FEEDERS`, include substations that energize a HV/MV feeder listed in `mRIDs` or
-      included via `INCLUDE_ENERGIZING_FEEDERS`.
-  * `includeEnergizedContainers`: Specifies whether to include equipment from containers energized by the ones listed in
-    `mRIDs`. This is of the enum type `IncludedEnergizedContainers`, which has three possible values:
-    * `EXCLUDE_ENERGIZED_CONTAINERS`: No additional effect (default).
-    * `INCLUDE_ENERGIZED_FEEDERS`: Include HV/MV feeders powered by substations listed in `mRIDs`.
-    * `INCLUDE_ENERGIZED_LV_FEEDERS`: In addition to `INCLUDE_ENERGIZED_FEEDERS`, include LV feeders that are energizes by a HV/MV feeder listed in `mRIDs` or
-      included via `INCLUDE_ENERGIZED_FEEDERS`.
+    * `includeEnergizingContainers`: Specifies whether to include equipment from containers energizing the ones listed in
+      `mRIDs`. This is of the enum type `IncludedEnergizingContainers`, which has three possible values:
+        * `EXCLUDE_ENERGIZING_CONTAINERS`: No additional effect (default).
+        * `INCLUDE_ENERGIZING_FEEDERS`: Include HV/MV feeders that power LV feeders listed in `mRIDs`.
+        * `INCLUDE_ENERGIZING_SUBSTATIONS`: In addition to `INCLUDE_ENERGIZING_FEEDERS`, include substations that energize a HV/MV feeder listed in `mRIDs` or
+          included via `INCLUDE_ENERGIZING_FEEDERS`.
+    * `includeEnergizedContainers`: Specifies whether to include equipment from containers energized by the ones listed in
+      `mRIDs`. This is of the enum type `IncludedEnergizedContainers`, which has three possible values:
+        * `EXCLUDE_ENERGIZED_CONTAINERS`: No additional effect (default).
+        * `INCLUDE_ENERGIZED_FEEDERS`: Include HV/MV feeders powered by substations listed in `mRIDs`.
+        * `INCLUDE_ENERGIZED_LV_FEEDERS`: In addition to `INCLUDE_ENERGIZED_FEEDERS`, include LV feeders that are energizes by a HV/MV feeder listed in `mRIDs`
+          or
+          included via `INCLUDE_ENERGIZED_FEEDERS`.
 * Added `FindSwerEquipment` class which can be used for finding the SWER equipment in a `NetworkService` or `Feeder`.
 
 ##### Enhancements
+
 * None.
 
 ##### Fixes
+
 * Failure when reading in database tables will now cause a short-circuit failure when all tables are loaded rather than after post load processing.
 * Corrected function that calculates the equivalent impedance of a transformer from the results of a short circuit test.
 
 ##### Notes
+
 * None.
 
 ---
@@ -415,24 +424,24 @@ explicitly requested by the client.
 * Updated database version.
 * `TownDetail` fields are now nullable.
 * Renamed `PhaseDirection` to `FeederDirection`:
-  * `IN` renamed to `UPSTREAM`
-  * `OUT` renamed to `DOWNSTREAM`
+    * `IN` renamed to `UPSTREAM`
+    * `OUT` renamed to `DOWNSTREAM`
 * Separated feeder direction from phase.
-  * Direction has been removed from `TracedPhases` and is now accessed directly off the `Terminal`.
-  * Direction has been removed from `PhaseStatus` and is now accessed via `DirectionStatus`.
+    * Direction has been removed from `TracedPhases` and is now accessed directly off the `Terminal`.
+    * Direction has been removed from `PhaseStatus` and is now accessed via `DirectionStatus`.
 * The following `Terminal` fields are now Kotlin properties rather than accessor functions:
-  * `connectivityNodeId`
-  * `isConnected`
-  * `normalPhases`
-  * `currentPhases`
+    * `connectivityNodeId`
+    * `isConnected`
+    * `normalPhases`
+    * `currentPhases`
 * `PhaseCode.singlePhases` is now a Kotlin read-only property rather than an accessor function.
 
 ##### New Features
 
 * Added the following CIM classes/enums:
-  * `TransformerConstructionKind`
-  * `TransformerFunctionKind`
-  * `StreetDetail`
+    * `TransformerConstructionKind`
+    * `TransformerFunctionKind`
+    * `StreetDetail`
 * Added `TestNetworkBuilder` which can be used to create simple test networks.
 
 ##### Enhancements
@@ -447,10 +456,10 @@ explicitly requested by the client.
 * Column names fixed for `TableBaseVoltages.NOMINAL_VOLTAGE`, `TableRemoteSources.MEASUREMENT_MRID`, and `TableControls.CONTROL_MRID` - database upgrade path
   provided.
 * Relaxed the constraint on `power_electronics_connection_mrid` (no longer unique) in the following tables:
-  * `battery_unit`
-  * `photo_voltaic_unit`
-  * `power_electronics_wind_unit`
-  * `power_electronics_connection_phase`
+    * `battery_unit`
+    * `photo_voltaic_unit`
+    * `power_electronics_wind_unit`
+    * `power_electronics_connection_phase`
 
 ##### Notes
 
@@ -484,13 +493,13 @@ explicitly requested by the client.
 * Added API calls for getting loops.
 * Added `RunStreaming` examples to the tests, which can be used to talk to a real server.
 * Added the following CIM classes:
-  * `EquivalentBranch`
-  * `EquivalentEquipment`
-  * `NoLoadTest`
-  * `OpenCircuitTest`
-  * `ShortCircuitTest`
-  * `ShuntCompensatorInfo`
-  * `TransformerTest`
+    * `EquivalentBranch`
+    * `EquivalentEquipment`
+    * `NoLoadTest`
+    * `OpenCircuitTest`
+    * `ShortCircuitTest`
+    * `ShuntCompensatorInfo`
+    * `TransformerTest`
 * Objects that belong to a parent object will now be automatically assigned if the parent is null when added. e.g. a `Terminal`
   with no `ConductingEquipment` will be automatically associated to any `ConductingEquipment` to which it is added.
 * Added a helper function to `Breaker` to identify if it is the head of a `Feeder`.
@@ -520,6 +529,7 @@ explicitly requested by the client.
 ### v0.6.0
 
 ##### Breaking Changes
+
 * `GrpcChannelFactory.create()` now returns a `GrpcChannel`, which is a wrapper around a `Channel` or `ManagedChannel`. This should only be breaking for Java
   users.
 * `BatteryUnit` `ratedE` and `storedE` are now `Long` instead of `Double`.
@@ -529,8 +539,9 @@ explicitly requested by the client.
   call in Kotlin etc.
 
 ##### New Features
+
 * New class `GrpcChannel` that can be used in try-with-resources blocks when communicating with a Grpc server.
-  
+
 * NetworkConsumerClient has 4 new functions:
     - For fetching equipment for an EquipmentContainer
 
@@ -545,37 +556,41 @@ explicitly requested by the client.
 
           getTerminalsForConnectivityNode(service: NetworkService, mrid: String)         
 
-* `NetworkConsumerClient.get_feeder()` now resolves all references, and thus you can expect to receive a Feeder with all equipment and their associations populated.
+* `NetworkConsumerClient.get_feeder()` now resolves all references, and thus you can expect to receive a Feeder with all equipment and their associations
+  populated.
 
 * New class `SwitchStateClient` that allows you to set the current state of switches via a gRPC service.
 
 * BaseService has two new functions which allow retrieving the UnresolvedReferences for an mRID by either `toMrid` or `from.mRID`:
-  - getUnresolvedReferencesTo(mRID: String): Sequence<UnresolvedReference<*,*>>
-  - getUnresolvedReferencesFrom(mRID: String): Sequence<UnresolvedReference<*,*>>
+    - getUnresolvedReferencesTo(mRID: String): Sequence<UnresolvedReference<*,*>>
+    - getUnresolvedReferencesFrom(mRID: String): Sequence<UnresolvedReference<*,*>>
 
 * Added the following classes:
-  * `LoadBreakSwitch`
-  * `TransformerEndInfo`
-  * `TransformerTankInfo`
-  * `TransformerStarImpedance`
-  * `Name`
-  * `NameType`
+    * `LoadBreakSwitch`
+    * `TransformerEndInfo`
+    * `TransformerTankInfo`
+    * `TransformerStarImpedance`
+    * `Name`
+    * `NameType`
 
 * New class `JwtCredentials` added to support managing OAuth2 refresh tokens from Auth0. To be using with the gRPC Consumer and Producer clients which now also
   accept `JwtCredentials` or other `CallCredentials` at initialisation to apply to the stub.
 
 ##### Enhancements
+
 * Added some better testing mechanism for database upgrades.
 * Instantiating database reader / writer classes is now faster. (Mainly benefits tests)
 
 ##### Fixes
-* `Resolvers.powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit).` 
-  `Resolvers.powerElectronicsConnection(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase)` 
-  `Resolvers.powerElectronicsUnit(powerElectronicsConnection: PowerElectronicsConnection)` 
-  `Resolvers.powerElectronicsConnectionPhase(powerElectronicsConnection: PowerElectronicsConnection)` 
+
+* `Resolvers.powerElectronicsConnection(powerElectronicsUnit: PowerElectronicsUnit).`
+  `Resolvers.powerElectronicsConnection(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase)`
+  `Resolvers.powerElectronicsUnit(powerElectronicsConnection: PowerElectronicsConnection)`
+  `Resolvers.powerElectronicsConnectionPhase(powerElectronicsConnection: PowerElectronicsConnection)`
   now all have their reverse resolver assigned.
-  
+
 ##### Notes
+
 * Name and NameType classes enable the ability to give IdentifiedObjects multiple names.
 
 ---
@@ -583,25 +598,29 @@ explicitly requested by the client.
 ### v0.5.0
 
 ##### Breaking Changes
- None.
+
+None.
 
 ##### New Features
 
 * Added the following classes:
-  * `BatteryUnit`
-  * `BusbarSection`
-  * `PhotoVoltaicUnit`
-  * `PowerElectronicsConnection`
-  * `PowerElectronicsConnectionPhase`
-  * `PowerElectronicsWindUnit`
+    * `BatteryUnit`
+    * `BusbarSection`
+    * `PhotoVoltaicUnit`
+    * `PowerElectronicsConnection`
+    * `PowerElectronicsConnectionPhase`
+    * `PowerElectronicsWindUnit`
 
 ##### Enhancements
+
 * None.
 
 ##### Fixes
+
 * None.
 
 ##### Notes
+
 * None.
 
 ---
@@ -609,7 +628,9 @@ explicitly requested by the client.
 ### v0.4.0
 
 ##### Breaking Changes
-* Updated logic for the PhaseInferrer. When trying to fix missing phases it will first check if it has nominal phase data available and use it before trying to infer the phase.
+
+* Updated logic for the PhaseInferrer. When trying to fix missing phases it will first check if it has nominal phase data available and use it before trying to
+  infer the phase.
 * The `AssignToFeeders` was changed to assign all `ConductingEquipment` on the `normalHeadTerminal` side
   (inclusive) stopping at open points, head equipment for other feeders and substation transformers.
 * You can no longer run `AssignToFeeders` directly on a feeder.
@@ -634,6 +655,7 @@ explicitly requested by the client.
 * None.
 
 ##### Enhancements
+
 * Updated `Feeder` to allow for updating the `normalHeadTerminal` if the feeder has no equipment assigned.
 * Added transformer utilisation property to PowerTransformer class
 * PhaseInferrer now supports Neutral phase.

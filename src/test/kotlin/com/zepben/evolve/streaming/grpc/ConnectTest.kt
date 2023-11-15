@@ -83,15 +83,19 @@ internal class ConnectTest {
         )
 
         assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
-        assertThat(tokenRequestData, equalTo(
-            JsonObject("""
+        assertThat(
+            tokenRequestData, equalTo(
+                JsonObject(
+                    """
                 {
                     "client_id": "clientId",
                     "client_secret": "clientSecret",
                     "grant_type": "client_credentials"
                 }
-            """.trimIndent())
-        ))
+            """.trimIndent()
+                )
+            )
+        )
     }
 
     @Test
@@ -168,8 +172,10 @@ internal class ConnectTest {
         )
 
         assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
-        assertThat(tokenRequestData, equalTo(
-            JsonObject("""
+        assertThat(
+            tokenRequestData, equalTo(
+                JsonObject(
+                    """
                 {
                     "client_id": "clientId",
                     "username": "username",
@@ -177,8 +183,10 @@ internal class ConnectTest {
                     "grant_type": "password",
                     "scope": "offline_access"
                 }
-            """.trimIndent())
-        ))
+            """.trimIndent()
+                )
+            )
+        )
     }
 
     @Test
@@ -282,7 +290,10 @@ internal class ConnectTest {
         assertThat(Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain"), equalTo(grpcChannelWithAuth))
         assertThat(Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost"), equalTo(grpcChannelWithAuth))
         assertThat(Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", 50051), equalTo(grpcChannelWithAuth))
-        assertThat(Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", 50051, AuthMethod.OAUTH), equalTo(grpcChannelWithAuth))
+        assertThat(
+            Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", 50051, AuthMethod.OAUTH),
+            equalTo(grpcChannelWithAuth)
+        )
     }
 
     @Test
@@ -309,8 +320,14 @@ internal class ConnectTest {
 
         assertThat(Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain"), equalTo(grpcChannelWithAuth))
         assertThat(Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost"), equalTo(grpcChannelWithAuth))
-        assertThat(Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost", 50051), equalTo(grpcChannelWithAuth))
-        assertThat(Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost", 50051, AuthMethod.OAUTH), equalTo(grpcChannelWithAuth))
+        assertThat(
+            Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost", 50051),
+            equalTo(grpcChannelWithAuth)
+        )
+        assertThat(
+            Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost", 50051, AuthMethod.OAUTH),
+            equalTo(grpcChannelWithAuth)
+        )
     }
 
 }

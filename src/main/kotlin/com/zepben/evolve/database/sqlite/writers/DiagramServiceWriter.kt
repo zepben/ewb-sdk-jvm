@@ -11,7 +11,8 @@ import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.services.diagram.DiagramService
 
-class DiagramServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) : BaseServiceWriter<DiagramService, DiagramCIMWriter>(hasCommon, addCommon) {
+class DiagramServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) :
+    BaseServiceWriter<DiagramService, DiagramCIMWriter>(hasCommon, addCommon) {
 
     override fun save(service: DiagramService, writer: DiagramCIMWriter): Boolean {
         var status = super.save(service, writer)

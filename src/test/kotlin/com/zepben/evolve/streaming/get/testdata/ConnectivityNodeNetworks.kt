@@ -28,7 +28,7 @@ object ConnectivityNodeNetworks {
             ns.add(this)
 
             terminalPhases.forEachIndexed { i, it ->
-                val t = createTerminal(ns, null, it, i+1)
+                val t = createTerminal(ns, null, it, i + 1)
                 ns.connect(t, mRID)
             }
         }

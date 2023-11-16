@@ -81,13 +81,13 @@
         <dependency>
             <groupId>com.zepben.protobuf</groupId>
             <artifactId>evolve-grpc</artifactId>
-            <version>0.26.0-SNAPSHOT10</version>
+            <version>0.26.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zepben.evolve</groupId>
             <artifactId>evolve-conn</artifactId>
-            <version>0.7.0-SNAPSHOT4</version>
+            <version>0.7.0</version>
         </dependency>
 
         <!-- Kotlin -->

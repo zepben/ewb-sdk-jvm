@@ -171,7 +171,7 @@ class DatabaseReader @JvmOverloads constructor(
             logger.warn("$count ${className}s were missing an equipment container.")
         }
         if (countByClass.isNotEmpty())
-            logger.warn("A total of ${missingContainers.size} equipment had no associated equipment container. Turn on debug logging to see more details.")
+            logger.warn("A total of ${missingContainers.size} equipment had no associated equipment container. Debug logging will show more details.")
         missingContainers.forEach { equipment ->
             logger.debug("${equipment.typeNameAndMRID()} was not assigned to any equipment container." )
         }

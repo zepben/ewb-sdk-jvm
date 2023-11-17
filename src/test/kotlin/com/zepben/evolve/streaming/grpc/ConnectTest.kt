@@ -18,6 +18,8 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
 
 internal class ConnectTest {
 
@@ -116,10 +118,7 @@ internal class ConnectTest {
     fun connectWithSecretWithKnownTokenFetcherConfig() {
         mockkConstructor(ZepbenTokenFetcher::class)
         every {
-            constructedWith<ZepbenTokenFetcher>(
-                EqMatcher("audience"), EqMatcher("issuerDomain"),  EqMatcher(AuthMethod.OAUTH),
-                AllAnyMatcher<String>(), AllAnyMatcher<String>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<JsonObject>(),
-                AllAnyMatcher<String?>(), AllAnyMatcher<String>(), AllAnyMatcher<(JsonObject) -> String>()
+            anyConstructed<ZepbenTokenFetcher>(
             ).tokenRequestData
         } returns tokenRequestData
 
@@ -207,11 +206,7 @@ internal class ConnectTest {
     fun connectWithPasswordWithKnownTokenFetcherConfig() {
         mockkConstructor(ZepbenTokenFetcher::class)
         every {
-            constructedWith<ZepbenTokenFetcher>(
-                EqMatcher("audience"), EqMatcher("issuerDomain"),  EqMatcher(AuthMethod.OAUTH),
-                AllAnyMatcher<String>(), AllAnyMatcher<String>(), AllAnyMatcher<JsonObject>(), AllAnyMatcher<JsonObject>(),
-                AllAnyMatcher<String?>(), AllAnyMatcher<String>(), AllAnyMatcher<(JsonObject) -> String>()
-            ).tokenRequestData
+            anyConstructed<ZepbenTokenFetcher>().tokenRequestData
         } returns tokenRequestData
 
         every { gcbWithTls.withTokenFetcher(any()) } returns gcbWithAuth

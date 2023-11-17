@@ -12,16 +12,27 @@ in the future. Please provide any feedback about this API to [Zepben](www.zepben
 :::
 
 The SDK provides a client to request models to a remote data server via [gRPC](https://grpc.io/). The service and proto 
-definitions for this API can be found [here](https://github.com/zepben/evolve-grpc). An implementation of the consumer 
+definitions for this API can be found [here](https://github.com/evolve-grpc). An implementation of the consumer
 server is provided with the Evolve platform data services.
 
 When working with models, it is often impractical to load a whole model to a client due to the size of the data. This 
-is generally not a problem however, as most use cases only operate on a small subsection of the model at a time. So, the 
-consumer API provides the ability to request smaller portions of the model quickly and easily. The other benefit to this
-is you can set up many clients in parallel operating on different chunks of the model to reduce the amount of time to
-run any analytics you may wish to perform across the whole model.
+is generally not a problem however, as most use cases only operate on a small subsection of the model at a time, such
+as a Feeder. So, the consumer API provides the ability to request smaller portions of the model quickly and easily.
+The other benefit to this is you can set up many clients in parallel operating on different chunks of the model to reduce
+the amount of time to run any analytics you may wish to perform across the whole model.
 
 ## Connecting to a server
+
+There are many helper functions to connect to a Energy Workbench server (EWB). All authenticated connections are based on OAuth2 flows, and
+you will need to use the correct function for the configuration of the server, and for which credentials you plan to use.
+This will typically be one of the following:
+
+1. `connect_insecure()`, for unauthenticated, insecure connections. Cannot be used against a secured (HTTPS) EWB.
+1. `connect_tls()`, for unauthenticated, but https connections. Can only be used if EWB is configured without auth.
+1. `connectWithPassword()`, for authenticating with a username, password, and client ID.
+1. `connectWithSecret()`, for authenticating with a client ID and secret, typically used for machine-to-machine services.1
+1. `connectWithIdentity()`, for authenticating with an Azure managed identity.
+
 
 <Tabs
     groupId="code-example"
@@ -35,14 +46,14 @@ run any analytics you may wish to perform across the whole model.
 
 ```java
 // Insecure
-try (GrpcChannel channel = Connect.connectInsecure("localhost", 50051)) {
+try (GrpcChannel channel = Connect.connectInsecure("example.zepben.com", 443)) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
     GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
     NetworkService ns = client.getService();
 }
 
 // With SSL
-try (GrpcChannel channel = Connect.connectTls("localhost", 50051, "ca.cert")) {
+try (GrpcChannel channel = Connect.connectTls("example.zepben.com", 443, "ca.cert")) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
     GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
     NetworkService ns = client.getService();
@@ -52,12 +63,26 @@ try (GrpcChannel channel = Connect.connectTls("localhost", 50051, "ca.cert")) {
 try (GrpcChannel channel = Connect.connectWithSecret(
     "client_id",
     "client_secret",
-    "localhost", // rpc hostname
-    50051, // rpc port
-    "config_address", // set to null to fetch configuration from "https://{rpc hostname}/ewb/auth"
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "config_address",     // set to null to fetch configuration from "https://{rpc hostname}/ewb/auth"
     "config_CA_filename", // set to null to use system CAs for fetching configuration
-    "auth_CA_filename", // set to null to use system CAs for fetching access tokens
-    "path/to/zepben/ca.cert")
+    "auth_CA_filename",   // set to null to use system CAs for fetching access tokens
+    "path/to/ca.cert"     // set to null to use system CAs for server cert verification
+    )
+) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+
+// With an Azure managed identity
+try (GrpcChannel channel = Connect.connectWithIdentity(
+    "client_id",
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "path/to/ca.cert"     // set to null to use system CAs for server cert verification
+    )
 ) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
     GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
@@ -70,11 +95,12 @@ try (GrpcChannel channel = Connect.connectWithSecret(
     "client_secret",
     "https://evolve-ewb/",
     "zepben.au.auth0.com",
-    "localhost", // rpc hostname
-    50051, // rpc port
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
     AuthMethod.Auth0,
-    "auth_CA_filename", // set to null to use system CAs for fetching access tokens
-    "path/to/zepben/ca.cert")
+    "auth_CA_filename",   // set to null to use system CAs for fetching access tokens
+    "path/to/ca.cert"     // set to null to use system CAs for server cert verification
+    )
 ) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
     GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
@@ -82,7 +108,7 @@ try (GrpcChannel channel = Connect.connectWithSecret(
 }
 
 // With SSL and client authentication
-try (GrpcChannel channel = new GrpcChannelBuilder().forAddress("localhost", 50051)
+try (GrpcChannel channel = new GrpcChannelBuilder().forAddress("example.zepben.com", 443)
     .makeSecure("ca.cert", "certchain.pem", "private_key").build()) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
     GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
@@ -95,14 +121,14 @@ try (GrpcChannel channel = new GrpcChannelBuilder().forAddress("localhost", 5005
 
 ```kotlin
 // Insecure
-Connect.connectInsecure("localhost", 50051).use { channel ->
+Connect.connectInsecure("example.zepben.com", 443).use { channel ->
     val client = NetworkConsumerClient(channel)
     val result = client.getEquipmentContainer("container_mrid").throwOnError()
     val ns = client.service
 }
 
 // With just SSL
-Connect.connectTls("localhost", 50051, "path/to/zepben/ca.cert").use { channel ->
+Connect.connectTls("example.zepben.com", 443, "path/to/ca.cert").use { channel ->
     val client = NetworkConsumerClient(channel)
     val result = client.getEquipmentContainer("container_mrid").throwOnError()
     val ns = client.service
@@ -112,16 +138,29 @@ Connect.connectTls("localhost", 50051, "path/to/zepben/ca.cert").use { channel -
 Connect.connectWithSecret(
     "client_id",
     "client_secret",
-    "localhost", // rpc hostname
-    50051, // rpc port
-    "config_address", // set to null to fetch configuration from "https://{rpc hostname}/ewb/auth"
-    "config_CA_filename", // set to null to use system CAs for fetching configuration
-    "auth_CA_filename", // set to null to use system CAs for fetching access tokens
-    "path/to/zepben/ca.cert"
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "config_address",     // set to null to fetch configuration from "https://{rpc hostname}/ewb/auth"
+    "config_CA_filename", // Do not pass if you intend to use system CAs for fetching EWB configuration
+    "auth_CA_filename",   // Do not pass if you intend to use system CAs for fetching access tokens
+    "path/to/ca.cert"     // Do not pass if you intend to use system CAs for server cert verification
 ).use { channel ->
     val client = NetworkConsumerClient(channel)
     val result = client.getEquipmentContainer("container_mrid").throwOnError()
     val ns = client.service
+}
+
+// With an Azure managed identity
+Connect.connectWithIdentity(
+    "client_id",
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "path/to/ca.cert"     // Do not pass if you intend to use system CAs for server cert verification
+    )
+).use { channel ->
+     val client = NetworkConsumerClient(channel)
+     val result = client.getEquipmentContainer("container_mrid").throwOnError()
+     val ns = client.service
 }
 
 // Or specify the authentication configuration directly:
@@ -130,11 +169,11 @@ Connect.connectWithSecret(
     "client_secret",
     "https://evolve-ewb/",
     "zepben.au.auth0.com",
-    "localhost", // rpc hostname
-    50051, // rpc port
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
     AuthMethod.Auth0,
-    "auth_CA_filename", // set to null to use system CAs for fetching access tokens
-    "path/to/zepben/ca.cert"
+    "auth_CA_filename",   // Do not pass if you intend to use system CAs for fetching access tokens
+    "path/to/ca.cert"     // Do not pass if you intend to use system CAs for server cert verification
 ).use { channel ->
     val client = NetworkConsumerClient(channel)
     val result = client.getEquipmentContainer("container_mrid").throwOnError()
@@ -142,7 +181,7 @@ Connect.connectWithSecret(
 }
 
 // With SSL and client authentication
-GrpcChannelBuilder().forAddress("localhost", 50051).makeSecure("ca.cert", "certchain.pem", "private_key").build().use { channel ->
+GrpcChannelBuilder().forAddress("example.zepben.com", 443).makeSecure("ca.cert", "certchain.pem", "private_key").build().use { channel ->
     val client = NetworkConsumerClient(channel)
     val result = client.getEquipmentContainer("container_mrid").throwOnError()
     val ns = client.service

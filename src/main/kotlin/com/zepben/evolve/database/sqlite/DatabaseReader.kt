@@ -36,6 +36,7 @@ import java.sql.DriverManager
 import java.sql.SQLException
 import java.sql.Statement
 import java.util.*
+import kotlin.reflect.KClass
 
 /**
  * @property databaseFile the filename of the database to write.
@@ -158,13 +159,22 @@ class DatabaseReader @JvmOverloads constructor(
     }
 
     private fun validateEquipmentContainers(networkService: NetworkService) {
-        networkService.sequenceOf<Equipment>()
+        val missingContainers = networkService.sequenceOf<Equipment>()
             .filter { it.containers.isEmpty() }
-            .forEach { equipment ->
-                logger.warn(
-                    "Equipment ${equipment.nameAndMRID()} was not assigned to any equipment container."
-                )
-            }
+            .toList()
+        val countByClass = mutableMapOf<String, Int>()
+        missingContainers.forEach {
+            countByClass.getOrPut(it.javaClass.simpleName) { 0 }
+            countByClass[it.javaClass.simpleName] = countByClass[it.javaClass.simpleName]!! + 1
+        }
+        countByClass.forEach { (className, count) ->
+            logger.warn("$count ${className}s were missing an equipment container.")
+        }
+        if (countByClass.isNotEmpty())
+            logger.warn("A total of ${missingContainers.size} equipment had no associated equipment container. Debug logging will show more details.")
+        missingContainers.forEach { equipment ->
+            logger.debug("${equipment.typeNameAndMRID()} was not assigned to any equipment container." )
+        }
     }
 
     private fun validateSources(networkService: NetworkService) {

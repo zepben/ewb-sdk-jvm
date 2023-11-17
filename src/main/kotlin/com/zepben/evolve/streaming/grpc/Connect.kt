@@ -10,6 +10,7 @@ package com.zepben.evolve.streaming.grpc
 
 import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.client.createTokenFetcher
+import com.zepben.auth.client.createTokenFetcherManagedIdentity
 import com.zepben.auth.common.AuthMethod
 
 /**
@@ -192,6 +193,28 @@ object Connect {
         val tokenFetcher = ZepbenTokenFetcher(audience = audience, issuerDomain = issuerDomain, authMethod = authMethod, caFilename = authCAFilename)
 
         return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, caFilename)
+    }
+
+    /**
+     * Create a `GrpcChannel` that communicates with the gRPC service using SSL/TLS transport security and the OAuth identity url
+     *
+     * @param identityUrl The identity URL for the VM this connection is attempted from
+     * @param host The hostname where the gRPC service is hosted
+     * @param rpcPort The port of the gRPC service
+     * @param caFilename The filename of a truststore containing additional trusted root certificates. This parameter is optional
+     *                   and defaults to null, in which case only the system CAs are used to verify certificates.
+     * @return An Auth0-authenticated, encrypted connection to the gRPC service
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun connectWithIdentity(
+        identityUrl: String,
+        host: String = "localhost",
+        rpcPort: Int = 50051,
+        caFilename: String? = null,
+    ): GrpcChannel {
+        val tokenFetcher = createTokenFetcherManagedIdentity(identityUrl)
+        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build()
     }
 
     private fun connectWithSecretUsingTokenFetcher(

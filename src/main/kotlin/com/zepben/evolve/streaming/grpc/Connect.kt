@@ -213,8 +213,6 @@ object Connect {
         rpcPort: Int = 50051,
         caFilename: String? = null,
     ): GrpcChannel {
-
-        // TODO: move to conn-jvm createTokenFetcherManagedIdentity
         val tokenFetcher = createTokenFetcherManagedIdentity(identityUrl)
         return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build()
     }

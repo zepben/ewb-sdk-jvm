@@ -9,7 +9,7 @@
 * Added `connectWithIdentity()` for connecting using Azure Managed Identities.
 
 ### Enhancements
-* None.
+* Update docusaurus version and the configuration.
 
 ### Fixes
 * None.

@@ -167,18 +167,22 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 
-    // validateCollection for names in identifiedObjects
-    // T: Identified Object
-    // T2: String for first name
-    // T3: String for second name
-    // R: Name class
-    fun <T : IdentifiedObject, T2, T3, R> validateCollection(
+    /**
+     * A variation of the collection validation that passes two parameters (type [U] and [V]) to [addToCollection] that results in an object of type [R] being
+     * added to the collection.
+     *
+     * This will validate if either of the [U] or [V] parameters are different, the resulting [R] is considered different.
+     *
+     * Example usage of this function is for validating the names collection of an [IdentifiedObject].
+     */
+    fun <T : IdentifiedObject, U, V, R> validateCollection(
         property: KProperty1<in T, Collection<R>>,
-        addToCollection: (T, T2, T3) -> T,
+        addToCollection: (T, U, V) -> T,
         createIdObj: (String) -> T,
-        createItem: (T) -> T3,
-        createOtherItem: (T) -> T3,
-        createSecondItem: () -> T2,
+        createItem1: (T) -> U,
+        createOtherItem1: (T) -> U,
+        createItem2: (T) -> V,
+        createOtherItem2: (T) -> V,
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false,
         expectedDifferences: Set<String> = emptySet()
@@ -187,8 +191,8 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         val targetEmpty = createIdObj("mRID")
         validateCompare(sourceEmpty, targetEmpty, options = options, optionsStopCompare = optionsStopCompare)
 
-        val inSource = createIdObj("mRID").apply { addToCollection(this, createSecondItem(), createItem(this)) }
-        val inTarget = createIdObj("mRID").apply { addToCollection(this, createSecondItem(), createItem(this)) }
+        val inSource = createIdObj("mRID").apply { addToCollection(this, createItem1(this), createItem2(this)) }
+        val inTarget = createIdObj("mRID").apply { addToCollection(this, createItem1(this), createItem2(this)) }
         validateCompare(inSource, inTarget, options = options, optionsStopCompare = optionsStopCompare)
 
         ObjectDifference(inSource, targetEmpty).apply {
@@ -201,8 +205,18 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
             differences[property.name] = CollectionDifference(missingFromSource = mutableListOf(item))
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 
-        val inTargetDifference = createIdObj("mRID").apply { addToCollection(this, createSecondItem(), createOtherItem(this)) }
-        ObjectDifference(inSource, inTargetDifference).apply {
+        val inTargetDifference1 = createIdObj("mRID").apply { addToCollection(this, createOtherItem1(this), createItem2(this)) }
+        ObjectDifference(inSource, inTargetDifference1).apply {
+            val inSourceItem = property.get(source).first()
+            val inTargetItem = property.get(target).first()
+            differences[property.name] = CollectionDifference(
+                missingFromSource = mutableListOf(inTargetItem),
+                missingFromTarget = mutableListOf(inSourceItem)
+            )
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
+
+        val inTargetDifference2 = createIdObj("mRID").apply { addToCollection(this, createItem1(this), createOtherItem2(this)) }
+        ObjectDifference(inSource, inTargetDifference2).apply {
             val inSourceItem = property.get(source).first()
             val inTargetItem = property.get(target).first()
             differences[property.name] = CollectionDifference(

@@ -51,15 +51,14 @@ fun toCim(pb: PBOrganisationRole, cim: OrganisationRole, baseService: BaseServic
 
 /************ IEC61970 CORE ************/
 
-@Suppress("UNUSED_PARAMETER")
 fun toCim(pb: PBIdentifiedObject, cim: IdentifiedObject, baseService: BaseService): IdentifiedObject =
     cim.apply {
         name = pb.name.internEmpty()
         description = pb.description.internEmpty()
         numDiagramObjects = pb.numDiagramObjects
-        pb.namesList.forEach {
-            val nameType = baseService.getNameType(it.type) ?: NameType(it.type).also { baseService.addNameType(it) }
-            this.addName(nameType, it.name)
+        pb.namesList.forEach { entry ->
+            val nameType = baseService.getNameType(entry.type) ?: NameType(entry.type).also { baseService.addNameType(it) }
+            this.addName(nameType, entry.name)
         }
     }
 

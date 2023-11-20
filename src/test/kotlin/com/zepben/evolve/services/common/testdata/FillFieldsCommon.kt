@@ -68,7 +68,7 @@ fun IdentifiedObject.fillFieldsCommon(service: BaseService, @Suppress("UNUSED_PA
             ?: NameType("name_type $i")
                 .apply { description = "name_type_${i}_description" }
                 .also { service.addNameType(it) }
-        addName(nameType,"name_$i")
+        addName(nameType, "name_$i")
     }
 
     return this

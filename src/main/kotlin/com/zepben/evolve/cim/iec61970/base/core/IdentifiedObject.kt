@@ -23,6 +23,7 @@ import java.util.*
  */
 abstract class IdentifiedObject(mRID: String = "") {
 
+    // Changed to use mutableSet to prevent duplicated entries from addName function
     private var _names: MutableSet<Name>? = null
 
     val mRID: String = if (mRID.isEmpty()) UUID.randomUUID().toString() else mRID
@@ -61,6 +62,8 @@ abstract class IdentifiedObject(mRID: String = "") {
      */
     fun getName(type: String, name: String): Name? = _names?.getByTypeAndName(type, name)
 
+    fun getName(type: NameType, name: String): Name? = _names?.getByTypeAndName(type.name, name)
+
     fun addName(type: NameType, name: String): IdentifiedObject {
 
         _names = _names ?: mutableSetOf()
@@ -71,11 +74,17 @@ abstract class IdentifiedObject(mRID: String = "") {
 
     fun removeName(name: Name?): Boolean {
         val ret = _names?.remove(name) == true
+        // Remove names from nameType
+        if (ret) name?.type?.removeName(name)
         if (_names.isNullOrEmpty()) _names = null
         return ret
     }
 
     fun clearNames(): IdentifiedObject {
+        // Remove names from nameType
+        _names?.toList()?.forEach {
+            removeName(it)
+        }
         _names = null
         return this
     }

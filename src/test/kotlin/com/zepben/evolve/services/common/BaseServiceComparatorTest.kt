@@ -39,7 +39,10 @@ abstract class BaseServiceComparatorTest {
             IdentifiedObject::names,
             IdentifiedObject::addName,
             newIdObj,
-            { "name1" }, { "name2" }, {NameType("type")}
+            { NameType("type1") },
+            { NameType("type2") },
+            { "name1" },
+            { "name2" }
         )
     }
 

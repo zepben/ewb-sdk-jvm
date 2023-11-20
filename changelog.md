@@ -3,6 +3,7 @@
 ### Breaking Changes
 * IdentifiedObject.AddName has been remade to take in a NameType and a String. This is doing the same thing under the hood as previous addName function, but
   simplifies the input by lowering the amount of objects that needed to be created prior to adding names.
+  * Example usage change: obj.addName(Name(NameType, "name", obj)) or obj.addName(nameType.getOrAddName("name", obj)) -> obj.addName(NameType, "name")
 
 ### New Features
 * None.

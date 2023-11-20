@@ -21,7 +21,7 @@ import com.zepben.evolve.services.network.NetworkModelTestUtil
 import com.zepben.evolve.services.network.NetworkService
 import java.time.Instant
 
-@Suppress("SameParameterValue", "BooleanLiteralArgument")
+@Suppress("SameParameterValue")
 object SchemaNetworks {
 
     fun createNameTestServices() = NetworkModelTestUtil.Services().apply {
@@ -29,7 +29,7 @@ object SchemaNetworks {
             val nameType = NameType("type1").apply {
                 description = "type description"
                 Organisation("org1").also {
-                    it.addName(this,"name1")
+                    it.addName(this, "name1")
                     add(it)
                 }
             }
@@ -41,7 +41,7 @@ object SchemaNetworks {
             val nameType = NameType("type1").apply {
                 description = "type description"
                 Organisation("org1").also {
-                    it.addName(this,"name1")
+                    it.addName(this, "name1")
                     add(it)
                 }
             }
@@ -115,6 +115,7 @@ object SchemaNetworks {
                     service.add(it)
                 }
             }
+
             is EnergySourcePhase -> {
                 io.energySource = EnergySource().also {
                     it.addPhase(io)

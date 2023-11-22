@@ -2,6 +2,7 @@
 
 | Version | Released |
 | --- | --- |
+|[0.17.0](#v0.17.0//./)| `22 November 2023` |
 |[0.16.0](#v0160)| `13 September 2023` |
 |[0.15.0](#v0150)| `01 May 2023` |
 |[0.14.0](#v0140)| `07 February 2023` |
@@ -23,6 +24,27 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.17.0]
+
+### Breaking Changes
+* None.
+
+### New Features
+* Updated to evolve-grpc 0.26.0.
+* Updated super-pom to version 0.30.0
+* Added `connectWithIdentity()` for connecting using Azure Managed Identities.
+
+### Enhancements
+* Update docusaurus version and the configuration.
+
+### Fixes
+* None.
+
+### Notes
+* None.
 
 ---
 

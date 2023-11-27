@@ -1,7 +1,7 @@
 # Zepben EWB SDK changelog
 ## [0.18.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Updated to super-pom version 0.34.x.
 
 ### New Features
 * None.

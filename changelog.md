@@ -21,8 +21,10 @@
 
 ### New Features
 * Updated to evolve-grpc 0.26.0.
-* Updated super-pom to version 0.30.0
+* Updated super-pom to version 0.33.0
 * Added `connectWithIdentity()` for connecting using Azure Managed Identities.
+* Added `getMetadata` to `CustomerConsumerClient`, `DiagramConsumerClient`, and `NetworkConsumerClient`. This returns a `ServiceInfo` containing `DataSource`
+  and version information of the connected service.
 
 ### Enhancements
 * Update docusaurus version and the configuration.

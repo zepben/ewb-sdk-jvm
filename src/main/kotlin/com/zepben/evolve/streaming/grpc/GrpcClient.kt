@@ -56,7 +56,7 @@ abstract class GrpcClient(private val executor: ExecutorService?) : AutoCloseabl
      * Allows a safe RPC call to be made to the server by wrapping [rpcCall] in a try/catch block. Any [Throwable] caught will
      * be passed to all registered error handlers.
      */
-    protected fun <T> tryRpc(rpcCall: () -> T): GrpcResult<T> {
+    internal fun <T> tryRpc(rpcCall: () -> T): GrpcResult<T> {
         return try {
             GrpcResult.of(rpcCall())
         } catch (t: Throwable) {

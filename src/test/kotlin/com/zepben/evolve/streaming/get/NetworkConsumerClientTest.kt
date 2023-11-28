@@ -28,6 +28,8 @@ import com.zepben.evolve.streaming.get.testdata.*
 import com.zepben.evolve.streaming.get.testservices.TestNetworkConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
 import com.zepben.evolve.streaming.grpc.GrpcResult
+import com.zepben.protobuf.metadata.GetMetadataRequest
+import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.nc.*
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
@@ -265,6 +267,27 @@ internal class NetworkConsumerClientTest {
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(GetNetworkHierarchyRequest.newBuilder().build()), any())
         assertThat(result.wasSuccessful, equalTo(true))
         validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy())
+    }
+
+    @Test
+    internal fun `runGetMetadata calls stub with arguments it's passed`() {
+        val request = GetMetadataRequest.newBuilder().build()
+        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> { _ -> }
+        doNothing().`when`(stub).getMetadata(request, streamObserver)
+
+        consumerClient.runGetMetadata(request, streamObserver)
+
+        verify(stub).getMetadata(request, streamObserver)
+    }
+
+    @Test
+    internal fun `calls error handler when getting the metadata throws`() {
+        consumerService.onGetMetadataRequest = spy { _, _ -> throw serverException }
+
+        val result = consumerClient.getMetadata()
+
+        verify(consumerService.onGetMetadataRequest).invoke(eq(GetMetadataRequest.newBuilder().build()), any())
+        validateFailure(onErrorHandler, result, serverException)
     }
 
     @Test

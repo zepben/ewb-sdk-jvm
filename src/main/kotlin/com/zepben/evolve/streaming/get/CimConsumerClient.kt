@@ -9,9 +9,14 @@ package com.zepben.evolve.streaming.get
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.services.common.meta.ServiceInfo
+import com.zepben.evolve.services.common.meta.fromPb
 import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.streaming.grpc.GrpcClient
 import com.zepben.evolve.streaming.grpc.GrpcResult
+import com.zepben.protobuf.metadata.GetMetadataRequest
+import com.zepben.protobuf.metadata.GetMetadataResponse
+import java.io.IOException
 import java.util.concurrent.ExecutorService
 
 /**
@@ -43,6 +48,7 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
 
     abstract val service: T
     protected abstract val protoToCim: U
+    internal var serviceInfo: ServiceInfo? = null
 
     /**
      * Retrieve the object with the given [mRID] and store the result in the [service].
@@ -129,4 +135,18 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
             MultiObjectResult(results, failed)
         }
 
+    internal abstract fun runGetMetadata(getMetadataRequest: GetMetadataRequest, streamObserver: AwaitableStreamObserver<GetMetadataResponse>)
+
+    fun getMetadata(): GrpcResult<ServiceInfo> =
+        tryRpc {
+            if (serviceInfo == null) {
+                val streamObserver = AwaitableStreamObserver<GetMetadataResponse> { response ->
+                    serviceInfo = response.serviceInfo.fromPb()
+                }
+
+                runGetMetadata(GetMetadataRequest.newBuilder().build(), streamObserver)
+                streamObserver.await()
+            }
+            serviceInfo ?: throw IOException("No metadata was received before GRPC channel was closed.")// Other exceptions should be raised before serviceInfo is found to be null
+        }
 }

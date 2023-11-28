@@ -359,3 +359,47 @@ service.getUnresolvedReferencesTo(mrid).forEach {
 
 </TabItem>
 </Tabs>
+
+## Service metadata
+
+Metadata about the servers title, version, and data sources can be retrieved via the `getMetadata()` call.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+ServiceInfo serviceInfo = client.getMetadata();
+
+System.out.println(serviceInfo.title);
+
+System.out.println("Data sources:");
+for (DataSource ds : serviceInfo.dataSources) {
+    System.out.println("  " + ds.title);
+    System.out.println("  " + ds.version);
+    System.out.println("  " + ds.timestamp);
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val serviceInfo = client.getMetadata()
+
+println("Data sources:")
+serviceInfo.dataSources.forEach {
+    System.out.println("  ${ds.title}");
+    System.out.println("  ${ds.version}");
+    System.out.println("  ${ds.timestamp}");
+}
+```
+
+</TabItem>
+</Tabs>

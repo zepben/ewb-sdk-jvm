@@ -9,7 +9,9 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
+import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
@@ -38,5 +40,17 @@ internal class RegulatingCondEqTest {
 
         assertThat(regulatingCondEq.controlEnabled, equalTo(false))
         assertThat(regulatingCondEq.regulatingControl, notNullValue())
+    }
+
+    @Test
+    internal fun cannotChangeRegulatingControl() {
+        val regulatingCondEq = object : RegulatingCondEq() {}
+        val regControl = mockk<RegulatingControl>()
+        regulatingCondEq.regulatingControl = regControl
+
+        expect {
+            regulatingCondEq.regulatingControl = mockk()
+        }.toThrow<IllegalStateException>().withMessage("regulatingControl has already been set to $regControl. Cannot set this field again")
+        assertThat(regulatingCondEq.regulatingControl, equalTo(regControl))
     }
 }

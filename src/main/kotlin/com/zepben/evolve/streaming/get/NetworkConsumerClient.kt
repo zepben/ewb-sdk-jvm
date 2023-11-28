@@ -13,12 +13,16 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.translator.mRID
+import com.zepben.evolve.services.common.translator.toInstant
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.translator.NetworkProtoToCim
 import com.zepben.evolve.services.network.translator.mRID
 import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchy
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
+import com.zepben.protobuf.metadata.DataSource
+import com.zepben.protobuf.metadata.GetMetadataRequest
+import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.nc.*
 import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import io.grpc.CallCredentials
@@ -73,6 +77,10 @@ class NetworkConsumerClient(
             NetworkConsumerGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
             executor = Executors.newSingleThreadExecutor()
         )
+
+    override fun runGetMetadata(getMetadataRequest: GetMetadataRequest, streamObserver: AwaitableStreamObserver<GetMetadataResponse>) {
+        stub.getMetadata(getMetadataRequest, streamObserver)
+    }
 
     /**
      * Retrieve the [Equipment] for [equipmentContainer]

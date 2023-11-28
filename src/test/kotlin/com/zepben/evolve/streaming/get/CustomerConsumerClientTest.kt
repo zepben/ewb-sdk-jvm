@@ -19,9 +19,13 @@ import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
 import com.zepben.evolve.streaming.get.testdata.CustomerNetwork
 import com.zepben.evolve.streaming.get.testservices.TestCustomerConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
+import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.cc.GetCustomersForContainerResponse
 import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.cc.GetIdentifiedObjectsResponse
+import com.zepben.protobuf.dc.DiagramConsumerGrpc
+import com.zepben.protobuf.metadata.GetMetadataRequest
+import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.StatusRuntimeException
@@ -34,10 +38,8 @@ import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.spy
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.*
+import java.util.concurrent.Executors
 import com.zepben.protobuf.cc.CustomerIdentifiedObject as CIO
 
 internal class CustomerConsumerClientTest {
@@ -55,8 +57,9 @@ internal class CustomerConsumerClientTest {
     private val consumerService = TestCustomerConsumerService()
 
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
+    private val stub = spy(CustomerConsumerGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()))
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val consumerClient = spy(CustomerConsumerClient(channel).apply { addErrorHandler(onErrorHandler) })
+    private val consumerClient = spy(CustomerConsumerClient(stub).apply { addErrorHandler(onErrorHandler) })
     private val service = consumerClient.service
 
     private val serverException = IllegalStateException("custom message")
@@ -230,6 +233,27 @@ internal class CustomerConsumerClientTest {
         assertThat(result.value.objects.size, equalTo(service.num(Customer::class)))
         assertThat(result.value.objects.size, equalTo(2))
         assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, containsInAnyOrder("customer1", "customer2"))
+    }
+
+    @Test
+    internal fun `runGetMetadata calls stub with arguments it's passed`() {
+        val request = GetMetadataRequest.newBuilder().build()
+        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> { _ -> }
+        doNothing().`when`(stub).getMetadata(request, streamObserver)
+
+        consumerClient.runGetMetadata(request, streamObserver)
+
+        verify(stub).getMetadata(request, streamObserver)
+    }
+
+    @Test
+    internal fun `calls error handler when getting the metadata throws`() {
+        consumerService.onGetMetadataRequest = spy { _, _ -> throw serverException }
+
+        val result = consumerClient.getMetadata()
+
+        verify(consumerService.onGetMetadataRequest).invoke(eq(GetMetadataRequest.newBuilder().build()), any())
+        validateFailure(onErrorHandler, result, serverException)
     }
 
     private fun configureFeederResponses(expectedCustomerService: CustomerService) {

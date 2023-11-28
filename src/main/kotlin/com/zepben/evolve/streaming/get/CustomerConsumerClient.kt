@@ -16,6 +16,8 @@ import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.cc.*
 import com.zepben.protobuf.cc.CustomerIdentifiedObject.IdentifiedObjectCase.*
+import com.zepben.protobuf.metadata.GetMetadataRequest
+import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
 import io.grpc.ManagedChannel
 import java.util.concurrent.ExecutorService
@@ -154,4 +156,7 @@ class CustomerConsumerClient @JvmOverloads constructor(
         }
     }
 
+    override fun runGetMetadata(getMetadataRequest: GetMetadataRequest, streamObserver: AwaitableStreamObserver<GetMetadataResponse>) {
+        stub.getMetadata(getMetadataRequest, streamObserver)
+    }
 }

@@ -27,8 +27,8 @@ There are many helper functions to connect to a Energy Workbench server (EWB). A
 you will need to use the correct function for the configuration of the server, and for which credentials you plan to use.
 This will typically be one of the following:
 
-1. `connect_insecure()`, for unauthenticated, insecure connections. Cannot be used against a secured (HTTPS) EWB.
-1. `connect_tls()`, for unauthenticated, but https connections. Can only be used if EWB is configured without auth.
+1. `connectInsecure()`, for unauthenticated, insecure connections. Cannot be used against a secured (HTTPS) EWB.
+1. `connectTls()`, for unauthenticated, but https connections. Can only be used if EWB is configured without auth.
 1. `connectWithPassword()`, for authenticating with a username, password, and client ID.
 1. `connectWithSecret()`, for authenticating with a client ID and secret, typically used for machine-to-machine services.1
 1. `connectWithIdentity()`, for authenticating with an Azure managed identity.
@@ -392,12 +392,13 @@ for (DataSource ds : serviceInfo.dataSources) {
 
 ```kotlin
 val serviceInfo = client.getMetadata()
+println(serviceInfo.title)
 
 println("Data sources:")
 serviceInfo.dataSources.forEach {
-    System.out.println("  ${ds.title}");
-    System.out.println("  ${ds.version}");
-    System.out.println("  ${ds.timestamp}");
+    println("  ${ds.title}")
+    println("  ${ds.version}")
+    println("  ${ds.timestamp}")
 }
 ```
 

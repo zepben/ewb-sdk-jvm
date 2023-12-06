@@ -57,6 +57,7 @@ class NameType(val name: String) {
                     Name(name, this, identifiedObject).also {
                         namesMultiIndex[name] = mutableListOf(existing, it)
                         namesIndex.remove(name)
+                        identifiedObject.addName(this, name)
                     }
                 }
             }
@@ -66,12 +67,14 @@ class NameType(val name: String) {
                 if (nameObj == null) {
                     nameObj = Name(name, this, identifiedObject)
                     names.add(nameObj)
+                    identifiedObject.addName(this, name)
                 }
                 nameObj
             }
             else -> {
                 Name(name, this, identifiedObject).also {
                     namesIndex[name] = it
+                    identifiedObject.addName(this, name)
                 }
             }
         }
@@ -80,7 +83,7 @@ class NameType(val name: String) {
     /**
      * Removes the [name] from this name type.
      *
-     * @return true if the name instance was sucessfully removed
+     * @return true if the name instance was successfully removed
      */
     fun removeName(name: Name): Boolean {
         if (name.type !== this) {
@@ -90,12 +93,21 @@ class NameType(val name: String) {
         return when (namesIndex.remove(name.name)) {
             null -> {
                 val removed = namesMultiIndex[name.name]?.remove(name) ?: false
-                if (removed && namesMultiIndex[name.name]?.isEmpty() == true) {
-                    namesMultiIndex.remove(name.name)
+                if (removed) {
+                    // Remove name from associated identified object when it's removed from the nameType
+                    name.identifiedObject.removeName(name)
+                    if (namesMultiIndex[name.name]?.isEmpty() == true) {
+                        namesMultiIndex.remove(name.name)
+                    }
                 }
                 removed
             }
-            else -> true
+
+            else -> {
+                // Remove name from associated identified object when it's removed from the nameType
+                name.identifiedObject.removeName(name)
+                true
+            }
         }
     }
 
@@ -104,9 +116,32 @@ class NameType(val name: String) {
      *
      * @return true if a matching name was removed.
      */
-    fun removeNames(name: String?): Boolean = (namesIndex.remove(name) ?: namesMultiIndex.remove(name)) != null
+    fun removeNames(name: String?): Boolean {
+        // Calling removeName from identifiedObject will remove the name from both the identifiedObject and the nameType
+        namesIndex[name]?.let { n->
+            return n.identifiedObject.removeName(n)
+        }
+        namesMultiIndex[name]?.let { names->
+            var removed = false
+            names.toList().forEach { name->
+                removed = name.identifiedObject.removeName(name)
+            }
+            return removed
+        }
+        return false
+    }
 
     fun clearNames(): NameType {
+        // Remove name from associated identified object when it's removed from the nameType
+        namesIndex.toMap().forEach { entry->
+            entry.value.identifiedObject.removeName(entry.value)
+        }
+        namesMultiIndex.toMap().forEach { entry->
+            entry.value.forEach{ name->
+                name.identifiedObject.removeName(name)
+            }
+        }
+        // Clean name from nameType indexes
         namesIndex = mutableMapOf()
         namesMultiIndex = mutableMapOf()
         return this

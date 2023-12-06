@@ -96,9 +96,9 @@ internal class IdentifiedObjectTest {
     internal fun `nameType contains the names added to the identified object`() {
         val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
 
-        assertThat(nameType.hasName("1"), equalTo(true))
-        assertThat(nameType.hasName("2"), equalTo(true))
-        assertThat(nameType.hasName("3"), equalTo(true))
+        assertThat("expected to have name 1", nameType.hasName("1"))
+        assertThat("expected to have name 2", nameType.hasName("2"))
+        assertThat("expected to have name 3", nameType.hasName("3"))
     }
 
     @Test
@@ -108,11 +108,11 @@ internal class IdentifiedObjectTest {
         val name2 = identifiedObject.getName("type", "2")!!
         val name3 = identifiedObject.getName("type", "3")!!
 
-        assertThat(identifiedObject.removeName(name1), equalTo(true))
-        assertThat(identifiedObject.removeName(name1), equalTo(false))
-        assertThat(identifiedObject.removeName(null), equalTo(false))
+        assertThat("name1 successfully removed from nameType", identifiedObject.removeName(name1))
+        assertThat("name1 can not be removed from nameType", !identifiedObject.removeName(name1))
+        assertThat("can not remove name null from identifiedObject", !identifiedObject.removeName(null))
         assertThat(identifiedObject.numNames(), equalTo(2))
-        assertThat(nameType.hasName("1"), equalTo(false))
+        assertThat("should not have had name 1", !nameType.hasName("1"))
 
         assertThat(identifiedObject.names, containsInAnyOrder(name2, name3))
     }
@@ -122,15 +122,15 @@ internal class IdentifiedObjectTest {
         val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
 
         assertThat(identifiedObject.numNames(), equalTo(3))
-        assertThat(nameType.hasName("1"), equalTo(true))
-        assertThat(nameType.hasName("2"), equalTo(true))
-        assertThat(nameType.hasName("3"), equalTo(true))
+        assertThat("expected to have name 1", nameType.hasName("1"))
+        assertThat("expected to have name 2", nameType.hasName("2"))
+        assertThat("expected to have name 3", nameType.hasName("3"))
 
         identifiedObject.clearNames()
         assertThat(identifiedObject.numNames(), equalTo(0))
-        assertThat(nameType.hasName("1"), equalTo(false))
-        assertThat(nameType.hasName("2"), equalTo(false))
-        assertThat(nameType.hasName("3"), equalTo(false))
+        assertThat("should not have had name 1", !nameType.hasName("1"))
+        assertThat("should not have had name 2", !nameType.hasName("2"))
+        assertThat("should not have had name 3", !nameType.hasName("3"))
     }
 
     @Test

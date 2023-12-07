@@ -1,29 +1,42 @@
 # Zepben EWB SDK changelog
+
 ## [0.18.0] - UNRELEASED
+
 ### Breaking Changes
-* `IdentifiedObject.AddName` has been remade to take in a `NameType` and a String. This is doing the same thing under the hood as previous `addName()` function,
+
+* `IdentifiedObject.AddName` has been remade to take in a `NameType` and a `String`. This is doing the same thing under the hood as previous `addName()`
+  function,
   but simplifies the input by lowering the amount of objects that needed to be created prior to adding names.
-  * Example usage change: `obj.addName(Name(NameType, "name", obj))` or `obj.addName(nameType.getOrAddName("name", obj))` -> `obj.addName(NameType, "name")`
-* `addName()`/`removeName()` related function for both `IdentifiedObject` and `NameType` will now also perform the same function on the other object type. 
-  i.e. Removing a name from the identifiedObject will remove it from the nameType and vice versa. Same interaction is also applied to adding a name.
+    * Example usage change: `obj.addName(nameType, "name", obj))` or `obj.addName(nameType.getOrAddName("name", obj))` -> `obj.addName(nameType, "name")`
+* `addName()`/`removeName()` related function for both `IdentifiedObject` and `NameType` will now also perform the same function on the other object type.
+  i.e. Removing a name from the identified object will remove it from the name type and vice versa. Same interaction is also applied to adding a name.
+* Added `getNames(IdentifiedObject)` to `NameType` so user can retrieve all names associated with the `NameType` that belongs to an `IdentifiedObject`.
+* Added `getNames(NameType)` and `getNamees(String)` to `IdentifiedObject` so user can retrieve all names of a given `NameType` of the `IdentifiedObject` 
 
 ### New Features
+
 * None.
 
 ### Enhancements
+
 * None.
 
 ### Fixes
+
 * None.
 
 ### Notes
+
 * None.
 
 ## [0.17.0] - 2023-11-23
+
 ### Breaking Changes
+
 * None.
 
 ### New Features
+
 * Updated to evolve-grpc 0.27.0.
 * Updated super-pom to version 0.33.0
 * Added `connectWithIdentity()` for connecting using Azure Managed Identities.
@@ -31,14 +44,16 @@
   and version information of the connected service.
 
 ### Enhancements
+
 * Update docusaurus version and the configuration.
 
 ### Fixes
+
 * None.
 
 ### Notes
-* None.
 
+* None.
 
 ## [0.16.0] - 2023-09-13
 

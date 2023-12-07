@@ -119,6 +119,23 @@ internal class NameTypeTest {
     }
 
     @Test
+    fun `getNames retrieves all the names associated with a given identifiedObject`() {
+        val nt = NameType("nt")
+
+        val j1 = Junction()
+        val j2 = Junction()
+
+        val n1a = nt.getOrAddName("n1", j1)
+        val n1b = nt.getOrAddName("n1", j2)
+        val n2 = nt.getOrAddName("n2", j2)
+
+        assertThat(nt.getNames(j1).size, equalTo(1))
+        assertThat("n1a should be found", nt.getNames(j1).contains(n1a))
+        assertThat(nt.getNames(j2).size, equalTo(2))
+        assertThat("n1b and n2 should be found", nt.getNames(j2).containsAll(listOf(n1b, n2)))
+    }
+
+    @Test
     fun `removeName remove name from nameType and associated identifiedObject`() {
         val nt = NameType("nt")
 

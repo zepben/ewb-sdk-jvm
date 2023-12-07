@@ -62,8 +62,38 @@ abstract class IdentifiedObject(mRID: String = "") {
      */
     fun getName(type: String, name: String): Name? = _names?.getByTypeAndName(type, name)
 
+    /**
+     * The individual name information of the identified object.
+     *
+     * @param name the name of the required [Name]
+     * @param type the required [NameType]
+     * @return The [Name] with the specified [name] if it exists, otherwise null
+     */
     fun getName(type: NameType, name: String): Name? = _names?.getByTypeAndName(type.name, name)
 
+    /**
+     * All name information of the identified object given a [NameType].
+     *
+     * @param type the required [NameType]
+     * @return List of [Name] with the specified [type] if it exists, otherwise null
+     */
+    fun getNames(type: NameType): List<Name>? = _names?.filter { it.type == type }
+
+    /**
+     * All name information of the identified object given the name of a [NameType].
+     *
+     * @param type the name of the required [NameType]
+     * @return List of [Name] with the specified [type] if it exists, otherwise null
+     */
+    fun getNames(type: String): List<Name>? = _names?.filter { it.type.name == type }
+
+    /**
+     * Add a [Name] to the [IdentifiedObject]
+     *
+     * @param type the required [NameType]
+     * @param name the name of the new [Name]
+     * @return this [IdentifiedObject] with a newly added [Name]
+     */
     fun addName(type: NameType, name: String): IdentifiedObject {
 
         _names = _names ?: mutableSetOf()
@@ -72,6 +102,12 @@ abstract class IdentifiedObject(mRID: String = "") {
         return this
     }
 
+    /**
+     * Remove a [Name] from the [IdentifiedObject]
+     *
+     * @param name the [Name] to be removed from the [IdentifiedObject]
+     * @return A [Boolean] to indicate if the [name] is successfully removed
+     */
     fun removeName(name: Name?): Boolean {
         val ret = _names?.remove(name) == true
         // Remove names from nameType
@@ -80,6 +116,11 @@ abstract class IdentifiedObject(mRID: String = "") {
         return ret
     }
 
+    /**
+     * Remove all [Name] from the [IdentifiedObject]
+     *
+     * @return this [IdentifiedObject]
+     */
     fun clearNames(): IdentifiedObject {
         // Remove names from nameType
         _names?.toList()?.forEach {
@@ -89,7 +130,7 @@ abstract class IdentifiedObject(mRID: String = "") {
         return this
     }
 
-    private fun Iterable<Name>?.getByTypeAndName(type: String,  name: String): Name? {
+    private fun Iterable<Name>?.getByTypeAndName(type: String, name: String): Name? {
         return this?.firstOrNull { it.type.name == type && it.name == name }
     }
 }

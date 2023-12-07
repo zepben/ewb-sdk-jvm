@@ -102,6 +102,17 @@ internal class IdentifiedObjectTest {
     }
 
     @Test
+    internal fun `getNames obtains all names of a identified object with a given nameType`() {
+        val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
+
+        val nameType2 = NameType("type2")
+        identifiedObject.addName(nameType2, "1")
+
+        assertThat(identifiedObject.getNames(nameType)?.size, equalTo(3))
+        assertThat(identifiedObject.getNames(nameType2)?.size, equalTo(1))
+    }
+
+    @Test
     internal fun `removeName removes name from the identified object and the nameType`() {
         val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
         val name1 = identifiedObject.getName("type", "1")!!
@@ -134,7 +145,7 @@ internal class IdentifiedObjectTest {
     }
 
     @Test
-    internal fun `user can add the same name back after it has been removed`(){
+    internal fun `user can add the same name back after it has been removed`() {
         val identifiedObject = object : IdentifiedObject("id") {}
         val nameType = NameType("type")
 
@@ -147,7 +158,7 @@ internal class IdentifiedObjectTest {
     }
 
     @Test
-    internal fun `removing name from empty name list does not cause any issue`(){
+    internal fun `removing name from empty name list does not cause any issue`() {
         val identifiedObject = object : IdentifiedObject("id") {}
         val nameType = NameType("type")
 

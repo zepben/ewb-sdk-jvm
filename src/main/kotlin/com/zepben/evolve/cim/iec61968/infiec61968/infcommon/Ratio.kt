@@ -22,7 +22,7 @@ data class Ratio(
 ) {
 
     @get:Throws(IllegalArgumentException::class)
-    val quotient : Double by lazy {
+    val quotient: Double by lazy {
         if (denominator == 0.0)
             throw IllegalArgumentException("Cannot calculate the quotient of a Ratio with a denominator of zero.")
 

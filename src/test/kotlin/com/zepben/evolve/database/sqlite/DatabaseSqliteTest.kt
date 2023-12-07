@@ -319,6 +319,7 @@ class DatabaseSqliteTest {
             )
 
     }
+
     @Test
     internal fun `check for error on duplicate id added to customer service`() {
         val writeServices = NetworkModelTestUtil.Services()

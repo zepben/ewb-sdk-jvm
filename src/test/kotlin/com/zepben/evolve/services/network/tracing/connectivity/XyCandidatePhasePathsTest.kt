@@ -243,10 +243,12 @@ internal class XyCandidatePhasePathsTest {
                             .toThrow<IllegalArgumentException>()
                             .withMessage("Unable to use phase $it as a candidate, expected B or C.")
                     }
+
                     in PhaseCode.ABC -> {
                         addCandidates(SPK.X, listOf(it))
                         addCandidates(SPK.Y, listOf(it))
                     }
+
                     else -> {
                         expect { addCandidates(SPK.X, listOf(it)) }
                             .toThrow<IllegalArgumentException>()

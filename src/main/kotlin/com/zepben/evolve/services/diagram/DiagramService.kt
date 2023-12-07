@@ -72,7 +72,7 @@ class DiagramService : BaseService("diagram") {
      */
     fun remove(diagramObject: DiagramObject): Boolean = super.remove(diagramObject) && removeIndex(diagramObject)
 
-   /**
+    /**
      * Index a [DiagramObject] against its associated [Diagram] and [IdentifiedObject].
      *
      * @return true if the index was updated.

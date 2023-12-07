@@ -1,6 +1,6 @@
 name: Create Hotfix Branch
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       version:

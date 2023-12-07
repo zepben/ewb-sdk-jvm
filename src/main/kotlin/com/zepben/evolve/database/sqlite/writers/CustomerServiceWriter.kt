@@ -14,7 +14,8 @@ import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
 import com.zepben.evolve.services.customer.CustomerService
 
-class CustomerServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) : BaseServiceWriter<CustomerService, CustomerCIMWriter>(hasCommon, addCommon) {
+class CustomerServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) :
+    BaseServiceWriter<CustomerService, CustomerCIMWriter>(hasCommon, addCommon) {
 
     override fun save(service: CustomerService, writer: CustomerCIMWriter): Boolean {
         var status = super.save(service, writer)

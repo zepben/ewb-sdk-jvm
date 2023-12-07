@@ -51,14 +51,14 @@ internal class NetworkServiceWriterTest {
         verify(networkCIMWriter).save(loop1)
         verify(networkCIMWriter).save(loop2)
     }
-    
+
     @Test
     internal fun savesLvFeeders() {
         val lvFeeder1 = LvFeeder()
         val lvFeeder2 = LvFeeder()
-        
+
         networkServiceWriter.save(serviceOf(lvFeeder1, lvFeeder2), networkCIMWriter)
-        
+
         verify(networkCIMWriter).save(lvFeeder1)
         verify(networkCIMWriter).save(lvFeeder2)
     }

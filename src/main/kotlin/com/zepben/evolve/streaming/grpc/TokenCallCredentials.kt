@@ -21,7 +21,7 @@ internal val AUTHORIZATION_METADATA_KEY: Metadata.Key<String> = Metadata.Key.of(
  * The token string is updated each call using a factory function specified upon instantiation.
  * In practice, this function will be a method of an object that manages token retrieval and returns a cached token if it isn't expired.
  */
-class TokenCallCredentials(private val getToken: () -> String): CallCredentials() {
+class TokenCallCredentials(private val getToken: () -> String) : CallCredentials() {
 
     override fun applyRequestMetadata(requestInfo: RequestInfo, executor: Executor, applier: MetadataApplier) {
         try {

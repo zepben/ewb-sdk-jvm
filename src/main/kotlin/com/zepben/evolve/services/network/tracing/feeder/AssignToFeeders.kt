@@ -16,7 +16,8 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
+import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 
 /**
  * Convenience class that provides methods for assigning HV/MV feeders on a [NetworkService].
@@ -25,8 +26,9 @@ import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
  */
 class AssignToFeeders {
 
-    private val normalTraversal = AssociatedTerminalTrace.newNormalTrace()
-    private val currentTraversal = AssociatedTerminalTrace.newCurrentTrace()
+    private val normalTraversal = Tracing.connectedTerminalTrace().stopAtNormallyOpen()
+    private val currentTraversal = Tracing.connectedTerminalTrace().stopAtCurrentlyOpen()
+
     private lateinit var activeFeeder: Feeder
 
     fun run(network: NetworkService) {
@@ -57,47 +59,44 @@ class AssignToFeeders {
         run(currentTraversal, headTerminal)
     }
 
-    private fun run(traversal: BasicTraversal<Terminal>, headTerminal: Terminal) {
+    private fun run(traversal: NetworkTrace<Unit>, headTerminal: Terminal) {
         traversal.reset()
-
-        traversal.tracker.visit(headTerminal)
-        traversal.applyStepActions(headTerminal, false)
-        AssociatedTerminalTrace.queueAssociated(traversal, headTerminal)
-
-        traversal.run()
+        traversal.run(headTerminal, false)
     }
 
-    private fun configureStepActions(traversal: BasicTraversal<Terminal>, terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>) {
+    private fun configureStepActions(traversal: NetworkTrace<*>, terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>) {
         traversal.clearStepActions()
         normalTraversal.addStepAction(processNormal(terminalToAuxEquipment))
         currentTraversal.addStepAction(processCurrent(terminalToAuxEquipment))
     }
 
-    private fun configureStopConditions(traversal: BasicTraversal<Terminal>, feederStartPoints: Set<ConductingEquipment>) {
+    private fun configureStopConditions(traversal: NetworkTrace<Unit>, feederStartPoints: Set<ConductingEquipment>) {
         traversal.clearStopConditions()
         traversal.addStopCondition(reachedEquipment(feederStartPoints))
-        traversal.addStopCondition(reachedSubstationTransformer)
-        traversal.addStopCondition(reachedLv)
+        traversal.addStopCondition { step, _ -> reachedSubstationTransformer(step.path.toEquipment) }
+        traversal.addStopCondition { step, _ -> reachedLv(step.path.toEquipment) }
     }
 
-    private val reachedEquipment: (Set<ConductingEquipment>) -> (Terminal) -> Boolean = { { terminal: Terminal -> it.contains(terminal.conductingEquipment) } }
+    private val reachedEquipment: (Set<ConductingEquipment>) -> (NetworkTraceStep<Unit>, StepContext) -> Boolean =
+        { { step, _ -> it.contains(step.path.toEquipment) } }
 
-    private val reachedSubstationTransformer: (Terminal) -> Boolean = { ps: Terminal ->
-        val ce = ps.conductingEquipment
+    private val reachedSubstationTransformer: (ConductingEquipment) -> Boolean = { ce ->
         ce is PowerTransformer && ce.substations.isNotEmpty()
     }
 
-    private val reachedLv: (Terminal) -> Boolean = { terminal ->
-        terminal.conductingEquipment?.baseVoltage?.let { it.nominalVoltage < 1000 } ?: false
+    private val reachedLv: (ConductingEquipment) -> Boolean = { ce ->
+        ce.baseVoltage?.let { it.nominalVoltage < 1000 } ?: false
     }
 
     private fun processNormal(
         terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
-    ): (Terminal, Boolean) -> Unit =
-        { terminal, isStopping ->
+    ): (NetworkTraceStep<Unit>, StepContext) -> Unit =
+        { step, context ->
             process(
-                terminal,
+                step.path,
+                context,
                 { eq, feeder ->
+                    feeder.addEquipment(eq)
                     eq.addContainer(feeder)
                     // Handle classes extending Equipment
                     when (eq) {
@@ -107,27 +106,20 @@ class AssignToFeeders {
                             }
                     }
                 },
-                { feeder, eq ->
-                    feeder.addEquipment(eq)
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                feeder.addEquipment(system)
-                            }
-                    }
-                },
-                isStopping,
+                context.isStopping,
                 terminalToAuxEquipment
             )
         }
 
     private fun processCurrent(
         terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
-    ): (Terminal, Boolean) -> Unit =
-        { terminal, isStopping ->
+    ): (NetworkTraceStep<Unit>, StepContext) -> Unit =
+        { step, context ->
             process(
-                terminal,
+                step.path,
+                context,
                 { eq, feeder ->
+                    feeder.addCurrentEquipment(eq)
                     eq.addCurrentContainer(feeder)
                     // Handle classes extending Equipment
                     when (eq) {
@@ -137,40 +129,31 @@ class AssignToFeeders {
                             }
                     }
                 },
-                { feeder, eq ->
-                    feeder.addCurrentEquipment(eq)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                feeder.addCurrentEquipment(system)
-                            }
-                    }
-                },
-                isStopping,
+                context.isStopping,
                 terminalToAuxEquipment
             )
         }
 
     private fun process(
-        terminal: Terminal,
-        assignFeederToEquipment: (Equipment, Feeder) -> Unit,
-        assignEquipmentToFeeder: (Feeder, Equipment) -> Unit,
+        stepPath: StepPath,
+        stepContext: StepContext,
+        associateFeederAndEquipment: (Equipment, Feeder) -> Unit,
         isStopping: Boolean,
         terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
     ) {
-        if (isStopping && (reachedLv(terminal) || reachedSubstationTransformer(terminal)))
+        if (stepPath.tracedInternally && !stepContext.isStartItem)
             return
 
-        terminalToAuxEquipment[terminal.mRID]?.forEach {
-            assignFeederToEquipment(it, activeFeeder)
-            assignEquipmentToFeeder(activeFeeder, it)
+        if (isStopping && (reachedLv(stepPath.toEquipment) || reachedSubstationTransformer(stepPath.toEquipment)))
+            return
+
+        stepPath.toTerminal?.let { terminal ->
+            terminalToAuxEquipment[terminal.mRID]?.forEach {
+                associateFeederAndEquipment(it, activeFeeder)
+            }
         }
 
-        terminal.conductingEquipment?.let {
-            assignFeederToEquipment(it, activeFeeder)
-            assignEquipmentToFeeder(activeFeeder, it)
-        }
+        associateFeederAndEquipment(stepPath.toEquipment, activeFeeder)
     }
 
 }

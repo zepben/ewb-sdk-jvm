@@ -26,7 +26,7 @@ interface TraversalQueue<T> {
      *
      * @return The next item in the queue.
      */
-    operator fun next(): T?
+    operator fun next(): T
 
     /**
      * Adds an item to the queue.

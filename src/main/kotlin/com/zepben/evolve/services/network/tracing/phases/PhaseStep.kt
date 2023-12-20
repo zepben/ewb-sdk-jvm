@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.services.network.tracing.phases
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
@@ -17,7 +16,6 @@ import java.util.*
  * Class that records which cores were traced to get to a given conducting equipment during a trace.
  * Allows a trace to continue only on the cores used to get to the current step in the trace.
  */
-@EverythingIsNonnullByDefault
 class PhaseStep private constructor(
     val conductingEquipment: ConductingEquipment,
     phases: Collection<SinglePhaseKind>,

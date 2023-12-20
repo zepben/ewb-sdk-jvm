@@ -7,12 +7,9 @@
  */
 package com.zepben.evolve.database.sqlite.tables
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
-
 /**
  * Represents a column in a database table.
  */
-@EverythingIsNonnullByDefault
 class Column @JvmOverloads constructor(
     val queryIndex: Int,
     val name: String,

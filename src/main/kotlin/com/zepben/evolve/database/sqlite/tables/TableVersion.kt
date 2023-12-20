@@ -7,11 +7,9 @@
  */
 package com.zepben.evolve.database.sqlite.tables
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 
 @Suppress("PropertyName")
-@EverythingIsNonnullByDefault
 class TableVersion : SqliteTable() {
 
     val SUPPORTED_VERSION = 48

@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.services.network.tracing.phases
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 
 /**
@@ -16,5 +15,4 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
  * @property from The nominal phase where the path comes from.
  * @property to The nominal phase where the path goes to.
  */
-@EverythingIsNonnullByDefault
 data class NominalPhasePath(val from: SinglePhaseKind, val to: SinglePhaseKind)

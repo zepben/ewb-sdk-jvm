@@ -8,11 +8,9 @@
 
 package com.zepben.evolve.database.sqlite.tables
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 
 @Suppress("PropertyName")
-@EverythingIsNonnullByDefault
 class TableMetadataDataSources : SqliteTable() {
 
     val SOURCE = Column(++columnIndex, "source", "TEXT", NOT_NULL)

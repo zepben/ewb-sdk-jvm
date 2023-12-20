@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.services.network.tracing.traversals;
 
-import com.zepben.annotations.EverythingIsNonnullByDefault;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 
-@EverythingIsNonnullByDefault
 public class BranchRecursiveTraversalJavaTest {
 
     private final List<Integer> visitOrder = new ArrayList<>();

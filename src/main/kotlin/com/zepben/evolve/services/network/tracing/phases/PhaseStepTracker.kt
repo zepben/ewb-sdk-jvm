@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.services.network.tracing.phases
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.tracing.traversals.Tracker
@@ -21,7 +20,6 @@ import com.zepben.evolve.services.network.tracing.traversals.Tracker
  *
  * This tracker does not support null items.
  */
-@EverythingIsNonnullByDefault
 class PhaseStepTracker : Tracker<PhaseStep> {
 
     private val visited = mutableMapOf<ConductingEquipment, MutableSet<SinglePhaseKind>>()

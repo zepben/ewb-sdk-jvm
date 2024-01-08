@@ -477,8 +477,8 @@ names.forEach { name ->
 }
 
 // Get an individual Name.
-val name: Name = subTx.getName("GIS_ID", "123456789")
-val name: Name = subTx.getName(gisNameType, "123456789")
+var name: Name = subTx.getName("GIS_ID", "123456789")
+name: Name = subTx.getName(gisNameType, "123456789")
 ```
 
 </TabItem>

@@ -48,8 +48,8 @@ internal class NameTypeTest {
         val n1c = nt.getOrAddName("n1", j3)
         val n2 = nt.getOrAddName("n2", j2)
 
-        assertThat(nt.hasName("n1"), equalTo(true))
-        assertThat(nt.hasName("n2"), equalTo(true))
+        assertThat("expected to have name n1", nt.hasName("n1"))
+        assertThat("expected to have name n2", nt.hasName("n2"))
         assertThat(n1a, not(sameInstance(n1b)))
         assertThat(n1a, not(sameInstance(n1c)))
         assertThat(n1b, not(sameInstance(n1c)))
@@ -59,6 +59,11 @@ internal class NameTypeTest {
         assertThat(n1b, sameInstance(nt.getOrAddName("n1", j2)))
         assertThat(n1c, sameInstance(nt.getOrAddName("n1", j3)))
         assertThat(n2, sameInstance(nt.getOrAddName("n2", j2)))
+
+        // identifiedObjects should have these names added to them as well
+        assertThat(j1.numNames(), equalTo(1))
+        assertThat(j2.numNames(), equalTo(2))
+        assertThat(j3.numNames(), equalTo(1))
     }
 
     @Test
@@ -92,7 +97,7 @@ internal class NameTypeTest {
     }
 
     @Test
-    fun removesNames() {
+    fun `removesNames remove names from nameType and associated identifiedObject`() {
         val nt = NameType("nt")
 
         val j1 = Junction()
@@ -102,19 +107,41 @@ internal class NameTypeTest {
         val n1b = nt.getOrAddName("n1", j2)
         val n2 = nt.getOrAddName("n2", j2)
 
+        assertThat(j1.numNames(), equalTo(1))
+        assertThat(j2.numNames(), equalTo(2))
         assertThat(nt.names.toList(), containsInAnyOrder(n1a, n1b, n2))
 
-        assertThat(nt.removeNames("n1"), equalTo(true))
+        assertThat("n1 successfully removed from nt", nt.removeNames("n1"))
         assertThat(nt.names.toList(), containsInAnyOrder(n2))
+        assertThat(j1.numNames(), equalTo(0))
+        assertThat(j2.numNames(), equalTo(1))
 
-        assertThat(nt.removeNames("n2"), equalTo(true))
+        assertThat("n2 successfully removed from nt", nt.removeNames("n2"))
         assertThat(nt.names.toList(), empty())
+        assertThat(j2.numNames(), equalTo(0))
 
-        assertThat(nt.removeNames("n1"), equalTo(false))
+        assertThat("n1 can not be removed from nt", !nt.removeNames("n1"))
     }
 
     @Test
-    fun removeName() {
+    fun `getNames retrieves all the names associated with a given identifiedObject`() {
+        val nt = NameType("nt")
+
+        val j1 = Junction()
+        val j2 = Junction()
+
+        val n1a = nt.getOrAddName("n1", j1)
+        val n1b = nt.getOrAddName("n1", j2)
+        val n2 = nt.getOrAddName("n2", j2)
+
+        assertThat(nt.getNames(j1).size, equalTo(1))
+        assertThat("n1a should be found", nt.getNames(j1).contains(n1a))
+        assertThat(nt.getNames(j2).size, equalTo(2))
+        assertThat("n1b and n2 should be found", nt.getNames(j2).containsAll(listOf(n1b, n2)))
+    }
+
+    @Test
+    fun `removeName remove name from nameType and associated identifiedObject`() {
         val nt = NameType("nt")
 
         val j1 = Junction()
@@ -125,34 +152,48 @@ internal class NameTypeTest {
         val n2 = nt.getOrAddName("n2", j2)
         val n3 = Name("n3", NameType("other"), Junction())
 
+        assertThat(j1.numNames(), equalTo(1))
+        assertThat(j2.numNames(), equalTo(2))
         assertThat(nt.names.toList(), containsInAnyOrder(n1a, n1b, n2))
 
-        assertThat(nt.removeName(n1b), equalTo(true))
+        assertThat("n1b successfully removed from nt", nt.removeName(n1b))
+        assertThat(j1.numNames(), equalTo(1))
+        assertThat(j2.numNames(), equalTo(1))
         assertThat(nt.names.toList(), containsInAnyOrder(n1a, n2))
 
-        assertThat(nt.removeName(n1a), equalTo(true))
+        assertThat("n1a successfully removed from nt", nt.removeName(n1a))
+        assertThat(j1.numNames(), equalTo(0))
+        assertThat(j2.numNames(), equalTo(1))
         assertThat(nt.names.toList(), containsInAnyOrder(n2))
 
-        assertThat(nt.removeName(n2), equalTo(true))
+        assertThat("n2 successfully removed from nt", nt.removeName(n2))
+        assertThat(j1.numNames(), equalTo(0))
+        assertThat(j2.numNames(), equalTo(0))
         assertThat(nt.names.toList(), empty())
 
-        assertThat(nt.removeName(n1a), equalTo(false))
-        assertThat(nt.removeName(n3), equalTo(false))
+        assertThat("n1a can not be removed from nt", !nt.removeName(n1a))
+        assertThat("n3 can not be removed from nt", !nt.removeName(n3))
     }
 
     @Test
-    fun clearNames() {
+    fun `clearNames remove all names from nameType and associated identifiedObject`() {
         val nt = NameType("nt")
 
         val j1 = Junction()
+        val j2 = Junction()
 
         val n1 = nt.getOrAddName("n1", j1)
         val n2 = nt.getOrAddName("n2", j1)
+        val n1b = nt.getOrAddName("n1", j2)
 
-        assertThat(nt.names.toList(), containsInAnyOrder(n1, n2))
+        assertThat(nt.names.toList(), containsInAnyOrder(n1, n2, n1b))
+        assertThat(j1.numNames(), equalTo(2))
+        assertThat(j2.numNames(), equalTo(1))
 
         nt.clearNames()
         assertThat(nt.names.toList(), empty())
+        assertThat(j1.numNames(), equalTo(0))
+        assertThat(j2.numNames(), equalTo(0))
     }
 
 }

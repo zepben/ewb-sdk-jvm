@@ -79,7 +79,7 @@ internal class NetworkTranslatorTest {
     @Test
     internal fun convertsCorrectly() {
         val nsToPb = NetworkCimToProto()
-        
+
         /************ IEC61968 ASSET INFO ************/
         validate({ CableInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ NoLoadTest() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
@@ -179,7 +179,7 @@ internal class NetworkTranslatorTest {
         /************ IEC61970 InfIEC61970 Feeder ************/
         validate({ Circuit() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Loop() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
-        validate({ LvFeeder() }, { ns, it -> it.fillFields(ns)}, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ LvFeeder() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
     }
 
     //

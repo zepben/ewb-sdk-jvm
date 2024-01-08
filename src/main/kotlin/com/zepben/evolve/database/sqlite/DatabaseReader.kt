@@ -125,8 +125,10 @@ class DatabaseReader @JvmOverloads constructor(
     private fun postLoad(networkService: NetworkService): Boolean {
         logger.info("Ensuring all references resolved...")
         networkService.unresolvedReferences().forEach {
-            throw IllegalStateException("Network still had unresolved references after load - this should not occur. Failing reference was from " +
-                "${it.from.typeNameAndMRID()} resolving ${it.resolver.toClass.simpleName} ${it.toMrid}")
+            throw IllegalStateException(
+                "Network still had unresolved references after load - this should not occur. Failing reference was from " +
+                    "${it.from.typeNameAndMRID()} resolving ${it.resolver.toClass.simpleName} ${it.toMrid}"
+            )
         }
         logger.info("Unresolved references were all resolved during load.")
 
@@ -173,7 +175,7 @@ class DatabaseReader @JvmOverloads constructor(
         if (countByClass.isNotEmpty())
             logger.warn("A total of ${missingContainers.size} equipment had no associated equipment container. Debug logging will show more details.")
         missingContainers.forEach { equipment ->
-            logger.debug("${equipment.typeNameAndMRID()} was not assigned to any equipment container." )
+            logger.debug("${equipment.typeNameAndMRID()} was not assigned to any equipment container.")
         }
     }
 

@@ -11,7 +11,6 @@ import com.zepben.evolve.cim.iec61968.common.Document
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.evolve.cim.iec61970.base.core.Name
 import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.utils.ServiceComparatorValidator
@@ -40,7 +39,10 @@ abstract class BaseServiceComparatorTest {
             IdentifiedObject::names,
             IdentifiedObject::addName,
             newIdObj,
-            { Name("name1", NameType("type1"), it) }, { Name("name2", NameType("type2"), it) }
+            { NameType("type1") },
+            { NameType("type2") },
+            { "name1" },
+            { "name2" }
         )
     }
 

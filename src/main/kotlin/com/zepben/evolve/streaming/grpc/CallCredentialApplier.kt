@@ -13,7 +13,7 @@ import io.grpc.*
 /**
  * This client interceptor applies a call credential to each client call for a gRPC channel.
  */
-class CallCredentialApplier(private val callCredentials: CallCredentials): ClientInterceptor {
+class CallCredentialApplier(private val callCredentials: CallCredentials) : ClientInterceptor {
 
     override fun <ReqT, RespT> interceptCall(
         methodDescriptor: MethodDescriptor<ReqT, RespT>,

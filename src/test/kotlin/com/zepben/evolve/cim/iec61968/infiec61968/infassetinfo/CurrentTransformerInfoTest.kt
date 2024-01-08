@@ -61,5 +61,5 @@ internal class CurrentTransformerInfoTest {
         assertThat(currentTransformerInfo.secondaryRatio, equalTo(11.11))
         assertThat(currentTransformerInfo.usage, equalTo("usage"))
     }
-    
+
 }

@@ -86,7 +86,10 @@ internal class GrpcChannelBuilderTest {
         every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).build() } returns secureChannel
 
         assertThat(GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(caFile, certChainFile, pkFile).build().channel, equalTo(secureChannel))
-        assertThat(GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(certificateChain = certChainFile, privateKey = pkFile).build().channel, equalTo(secureChannel))
+        assertThat(
+            GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(certificateChain = certChainFile, privateKey = pkFile).build().channel,
+            equalTo(secureChannel)
+        )
     }
 
     @Test

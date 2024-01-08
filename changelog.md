@@ -1,25 +1,41 @@
 # Zepben EWB SDK changelog
+
 ## [0.18.0] - UNRELEASED
+
 ### Breaking Changes
 * Updated to super-pom version 0.34.x.
+* `IdentifiedObject.addName` has been refactored to take in a `NameType` and a `String`. This is doing the same thing under the hood as previous `addName()` function,
+  but simplifies the input by lowering the amount of objects that needed to be created prior to adding names.
+  Example usage change: 
+  `obj.addName(nameType, "name", obj))` or `obj.addName(nameType.getOrAddName("name", obj))` becomes `obj.addName(nameType, "name")`
+* `addName()`/`removeName()` related function for both `IdentifiedObject` and `NameType` will now also perform the same function on the other object type.
+  i.e. Removing a name from the identified object will remove it from the name type and vice versa. Same interaction is also applied to adding a name.
 
 ### New Features
-* None.
+
+* Added `getNames(IdentifiedObject)` to `NameType` to retrieve all names associated with the `NameType` that belongs to an `IdentifiedObject`.
+* Added `getNames(NameType)` and `getNames(String)` to `IdentifiedObject` so user can retrieve all names for a given `NameType` of the `IdentifiedObject` 
 
 ### Enhancements
+
 * None.
 
 ### Fixes
+
 * None.
 
 ### Notes
+
 * None.
 
 ## [0.17.0] - 2023-11-23
+
 ### Breaking Changes
+
 * None.
 
 ### New Features
+
 * Updated to evolve-grpc 0.27.0.
 * Updated super-pom to version 0.33.0
 * Added `connectWithIdentity()` for connecting using Azure Managed Identities.
@@ -27,14 +43,16 @@
   and version information of the connected service.
 
 ### Enhancements
+
 * Update docusaurus version and the configuration.
 
 ### Fixes
+
 * None.
 
 ### Notes
-* None.
 
+* None.
 
 ## [0.16.0] - 2023-09-13
 

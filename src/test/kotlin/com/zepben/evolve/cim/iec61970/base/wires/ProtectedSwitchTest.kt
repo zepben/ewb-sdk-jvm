@@ -53,5 +53,5 @@ internal class ProtectedSwitchTest {
             ProtectedSwitch::clearOperatedByProtectionEquipment
         )
     }
-    
+
 }

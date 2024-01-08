@@ -107,9 +107,9 @@ class DatabaseWriter @JvmOverloads constructor(
 
     private fun preSave(): Boolean {
         return removeExisting()
-                && connect()
-                && create()
-                && prepareInsertStatements()
+            && connect()
+            && create()
+            && prepareInsertStatements()
     }
 
     private fun removeExisting(): Boolean {

@@ -72,10 +72,7 @@ abstract class BaseCIMReader(private val baseService: BaseService) {
         // service and add a name for it if it exists, but ignore if it doesn't. Note that this can potentially lead to there being
         // a name record that never gets used because that identified object doesn't exist in any service and currently we
         // don't check or warn about that.
-        baseService.get<IdentifiedObject>(resultSet.getString(table.IDENTIFIED_OBJECT_MRID.queryIndex))?.let {
-            val name = nameType.getOrAddName(nameName, it)
-            it.addName(name)
-        }
+        baseService.get<IdentifiedObject>(resultSet.getString(table.IDENTIFIED_OBJECT_MRID.queryIndex))?.addName(nameType, nameName)
 
         return true
     }

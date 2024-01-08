@@ -88,6 +88,7 @@ open class BaseServiceReader constructor(protected val getStatement: () -> State
                 is IllegalArgumentException,
                 is MRIDLookupException,
                 is DuplicateMRIDException -> t
+
                 else -> throw t
             }
         }

@@ -105,6 +105,7 @@ class RemoveDirection {
 
                     otherTerminals.forEach { traversal.queue.add(TerminalDirection(it, oppositeDirection)) }
                 }
+
                 1 -> {
                     matchingTerminals.first().also {
                         if (directionSelector.select(it).remove(oppositeDirection))

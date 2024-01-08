@@ -150,6 +150,7 @@ class DiagramConsumerClient(
 
         return extractResults.asSequence()
     }
+
     override fun runGetMetadata(getMetadataRequest: GetMetadataRequest, streamObserver: AwaitableStreamObserver<GetMetadataResponse>) {
         stub.getMetadata(getMetadataRequest, streamObserver)
     }

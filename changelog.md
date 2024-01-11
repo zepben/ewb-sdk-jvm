@@ -1,7 +1,38 @@
 # Zepben EWB SDK changelog
 
 ## [0.18.0] - UNRELEASED
+### Breaking Changes
+* None.
 
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
+## [0.17.1] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
+## [0.17.0] - 2023-11-23
 ### Breaking Changes
 * Updated to super-pom version 0.34.x.
 * `IdentifiedObject.addName` has been refactored to take in a `NameType` and a `String`. This is doing the same thing under the hood as previous `addName()` function,

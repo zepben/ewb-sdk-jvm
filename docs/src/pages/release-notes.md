@@ -2,6 +2,7 @@
 
 | Version | Released |
 | --- | --- |
+|[0.17.1](#v0171)| `11 January 2024` |
 |[0.17.0](#v0.17.0//./)| `22 November 2023` |
 |[0.16.0](#v0160)| `13 September 2023` |
 |[0.15.0](#v0150)| `01 May 2023` |
@@ -24,6 +25,25 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.17.1]
+
+### Breaking Changes
+* None.
+
+### New Features
+* Allow setting gRPC `maxInboundMessageSize` via `GrpcChannelBuilder.build`.
+
+### Enhancements
+* None.
+
+### Fixes
+* Accept larger protobuf messages up to 20MB in size by default.
+
+### Notes
+* None.
 
 ---
 

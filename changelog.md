@@ -4,13 +4,13 @@
 * None.
 
 ### New Features
-* None.
+* Allow setting gRPC `maxInboundMessageSize` via `GrpcChannelBuilder.build`.
 
 ### Enhancements
 * None.
 
 ### Fixes
-* None.
+* Accept larger protobuf messages up to 20MB in size by default.
 
 ### Notes
 * None.

@@ -29,11 +29,40 @@ internal class GrpcChannelBuilderTest {
     }
 
     @Test
+    internal fun `test max inbound message size is set`() {
+        val insecureChannel = mockk<ManagedChannel>()
+
+        mockkStatic(NettyChannelBuilder::class)
+        every { NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(any()).build() } returns insecureChannel
+
+        var grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).build(2000)
+
+        verify {
+            NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(2000)
+        }
+        assertThat(grpcChannel.channel, equalTo(insecureChannel))
+
+        grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).build()
+
+        verify {
+            NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(20971520)
+        }
+        assertThat(grpcChannel.channel, equalTo(insecureChannel))
+
+        grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).build(0)
+
+        verify {
+            NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(0)
+        }
+        assertThat(grpcChannel.channel, equalTo(insecureChannel))
+    }
+
+    @Test
     internal fun forAddress() {
         val insecureChannel = mockk<ManagedChannel>()
 
         mockkStatic(NettyChannelBuilder::class)
-        every { NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().build() } returns insecureChannel
+        every { NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(any()).build() } returns insecureChannel
 
         val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).build()
         assertThat(grpcChannel.channel, equalTo(insecureChannel))
@@ -49,7 +78,7 @@ internal class GrpcChannelBuilderTest {
         every { TlsChannelCredentials.newBuilder().trustManager(caFile).build() } returns channelCredentials
 
         mockkStatic(NettyChannelBuilder::class)
-        every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).build() } returns secureChannel
+        every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).maxInboundMessageSize(any()).build() } returns secureChannel
 
         val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(caFile).build()
         assertThat(grpcChannel.channel, equalTo(secureChannel))
@@ -64,7 +93,7 @@ internal class GrpcChannelBuilderTest {
         every { TlsChannelCredentials.create() } returns channelCredentials
 
         mockkStatic(NettyChannelBuilder::class)
-        every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).build() } returns secureChannel
+        every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).maxInboundMessageSize(any()).build() } returns secureChannel
 
         val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure().build()
         assertThat(grpcChannel.channel, equalTo(secureChannel))
@@ -83,7 +112,7 @@ internal class GrpcChannelBuilderTest {
         every { TlsChannelCredentials.newBuilder().keyManager(certChainFile, pkFile).build() } returns channelCredentials
 
         mockkStatic(NettyChannelBuilder::class)
-        every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).build() } returns secureChannel
+        every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).maxInboundMessageSize(any()).build() } returns secureChannel
 
         assertThat(GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(caFile, certChainFile, pkFile).build().channel, equalTo(secureChannel))
         assertThat(
@@ -110,7 +139,7 @@ internal class GrpcChannelBuilderTest {
         val authenticatedChannel = mockk<ManagedChannel>()
 
         mockkStatic(NettyChannelBuilder::class)
-        every { NettyChannelBuilder.forAddress("hostname", 1234, any()).intercept(any<CallCredentialApplier>()).build() } returns authenticatedChannel
+        every { NettyChannelBuilder.forAddress("hostname", 1234, any()).maxInboundMessageSize(any()).intercept(any<CallCredentialApplier>()).build() } returns authenticatedChannel
 
         val tokenFetcher = ZepbenTokenFetcher("audience", "domain", AuthMethod.AUTH0)
         val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure().withTokenFetcher(tokenFetcher).build()

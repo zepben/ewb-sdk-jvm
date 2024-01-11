@@ -15,6 +15,8 @@ import io.grpc.TlsChannelCredentials
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import java.io.File
 
+private const val TWENTY_MEGABYTES = 1024 * 1024 * 20
+
 /**
  * Builder class for GrpcChannel. Allows easy specification of channel credentials via SSL/TLS
  * and call credentials via a ZepbenTokenFetcher.
@@ -26,13 +28,13 @@ class GrpcChannelBuilder {
     private var _channelCredentials: ChannelCredentials? = null
     private var _callCredentials: CallCredentials? = null
 
-    fun build(): GrpcChannel = GrpcChannel(
+    fun build(maxInboundMessageSize: Int = TWENTY_MEGABYTES): GrpcChannel = GrpcChannel(
         _channelCredentials?.let { channelCreds ->
-            val channelBuilder = NettyChannelBuilder.forAddress(_host, _port, channelCreds)
+            val channelBuilder = NettyChannelBuilder.forAddress(_host, _port, channelCreds).maxInboundMessageSize(maxInboundMessageSize)
             _callCredentials?.let { callCreds ->
                 channelBuilder.intercept(CallCredentialApplier(callCreds)).build()
             } ?: channelBuilder.build()
-        } ?: NettyChannelBuilder.forAddress(_host, _port).usePlaintext().build()
+        } ?: NettyChannelBuilder.forAddress(_host, _port).usePlaintext().maxInboundMessageSize(maxInboundMessageSize).build()
     )
 
     fun forAddress(

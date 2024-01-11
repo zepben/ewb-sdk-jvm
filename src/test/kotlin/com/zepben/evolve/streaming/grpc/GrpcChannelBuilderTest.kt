@@ -45,7 +45,7 @@ internal class GrpcChannelBuilderTest {
         grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).build()
 
         verify {
-            NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(20000000)
+            NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(20971520)
         }
         assertThat(grpcChannel.channel, equalTo(insecureChannel))
 

@@ -2,38 +2,6 @@
 
 ## [0.18.0] - UNRELEASED
 ### Breaking Changes
-* None.
-
-### New Features
-* None.
-
-### Enhancements
-* None.
-
-### Fixes
-* None.
-
-### Notes
-* None.
-
-## [0.17.1] - UNRELEASED
-### Breaking Changes
-* None.
-
-### New Features
-* Allow setting gRPC `maxInboundMessageSize` via `GrpcChannelBuilder.build`.
-
-### Enhancements
-* None.
-
-### Fixes
-* Accept larger protobuf messages up to 20MB in size by default.
-
-### Notes
-* None.
-
-## [0.17.0] - 2023-11-23
-### Breaking Changes
 * Updated to super-pom version 0.34.x.
 * `IdentifiedObject.addName` has been refactored to take in a `NameType` and a `String`. This is doing the same thing under the hood as previous `addName()` function,
   but simplifies the input by lowering the amount of objects that needed to be created prior to adding names.
@@ -59,8 +27,23 @@
 
 * None.
 
-## [0.17.0] - 2023-11-23
+## [0.17.1] - 2024-01-12
+### Breaking Changes
+* None.
 
+### New Features
+* Allow setting gRPC `maxInboundMessageSize` via `GrpcChannelBuilder.build`.
+
+### Enhancements
+* None.
+
+### Fixes
+* Accept larger protobuf messages up to 20MB in size by default.
+
+### Notes
+* None.
+
+## [0.17.0] - 2023-11-23
 ### Breaking Changes
 
 * None.

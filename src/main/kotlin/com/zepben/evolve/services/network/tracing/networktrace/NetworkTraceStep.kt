@@ -14,7 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 // TODO: Decent doco about why this is private and why we have other constructors. That is future proofing for Clamps.
 class NetworkTraceStep<T>(
     val path: StepPath,
-    val data: T?
+    val data: T
 )
 
 sealed interface StepPath {

@@ -8,12 +8,16 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 
 object Tracing {
 
-    fun <T> connectedEquipmentTrace(queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst()): NetworkTrace<T> {
+    fun <T> connectedEquipmentTrace(
+        queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
+        computeNextT: (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T,
+    ): NetworkTrace<T> {
         val queueNext = NetworkTrace.QueueNext<T> { ts, ctx, queueItem, t ->
             val path = ts.path
             path.toEquipment.terminals
@@ -31,7 +35,7 @@ object Tracing {
                         }
                     }
 
-                    NetworkTraceStep(nextPath, t.computeNextData(ts, ctx, nextPath))
+                    NetworkTraceStep(nextPath, computeNextT(ts, ctx, nextPath))
                 }
                 .forEach { queueItem(it) }
         }
@@ -39,7 +43,13 @@ object Tracing {
         return NetworkTrace(queueNext, queue, NetworkTraceTracker { it.path.toEquipment })
     }
 
-    fun <T> connectedTerminalTrace(): NetworkTrace<T> {
+    fun connectedEquipmentTrace(queue: TraversalQueue<NetworkTraceStep<Unit>> = BasicQueue.depthFirst()): NetworkTrace<Unit> =
+        connectedEquipmentTrace(queue) { _, _, _ -> }
+
+    fun <T> connectedTerminalTrace(
+        queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
+        computeNextT: (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T,
+    ): NetworkTrace<T> {
         val queueNext = NetworkTrace.QueueNext<T> { ts, ctx, queueItem, t ->
             // Check if we last moved between equipment, or across it.
             // TODO: Should we handle the TerminalToTerminalTraceStep cast here?
@@ -57,13 +67,16 @@ object Tracing {
                     }
                 }
 
-                val nextStep = NetworkTraceStep(nextPath, t.computeNextData(ts, ctx, nextPath))
+                val nextStep = NetworkTraceStep(nextPath, computeNextT(ts, ctx, nextPath))
                 queueItem(nextStep)
             }
         }
 
-        return NetworkTrace(queueNext, BasicQueue.depthFirst(), NetworkTraceTracker { it.path.toTerminal })
+        return NetworkTrace(queueNext, queue, NetworkTraceTracker { it.path.toTerminal })
     }
+
+    fun connectedTerminalTrace(queue: TraversalQueue<NetworkTraceStep<Unit>> = BasicQueue.depthFirst()): NetworkTrace<Unit> =
+        connectedTerminalTrace(queue) { _, _, _ -> }
 
 }
 

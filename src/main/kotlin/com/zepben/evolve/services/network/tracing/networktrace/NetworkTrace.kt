@@ -15,9 +15,6 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.*
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.DirectionCondition
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.OpenCondition
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversalV2.TraversalV2
 import com.zepben.evolve.services.network.tracing.traversals.Tracker
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
@@ -25,32 +22,17 @@ import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 class NetworkTrace<T>(
     queueNext: QueueNext<T>,
     queue: TraversalQueue<NetworkTraceStep<T>>,
-    tracker: Tracker<NetworkTraceStep<T>>
+    tracker: Tracker<NetworkTraceStep<T>>,
 ) : TraversalV2<NetworkTraceStep<T>, NetworkTrace<T>>(queueNext, queue, tracker) {
 
     fun interface QueueNext<T> : TraversalV2.QueueNext<NetworkTraceStep<T>, NetworkTrace<T>>
 
-    private var computeData: ((NetworkTraceStep<T>, context: StepContext, StepPath) -> T)? = null
-
-    fun setComputeData(computeContext: ((NetworkTraceStep<T>, context: StepContext, StepPath) -> T)?): NetworkTrace<T> {
-        this.computeData = computeContext
-        return this
-    }
-
-    fun clearComputeData(): NetworkTrace<T> {
-        this.computeData = null
-        return this
-    }
-
-    fun computeNextData(step: NetworkTraceStep<T>, context: StepContext, nextPath: StepPath): T? =
-        computeData?.invoke(step, context, nextPath)
-
-    fun run(start: Terminal, canStopOnStartItem: Boolean = true, context: T? = null) {
+    fun run(start: Terminal, canStopOnStartItem: Boolean = true, context: T) {
         addStartItem(NetworkTraceStep(TerminalToTerminalPath(start, start, 0, 0), context))
         run(canStopOnStartItem)
     }
 
-    fun run(start: ConductingEquipment, canStopOnStartItem: Boolean = true, context: T? = null) {
+    fun run(start: ConductingEquipment, canStopOnStartItem: Boolean = true, context: T) {
         start.terminals.forEach {
             addStartItem(NetworkTraceStep(TerminalToTerminalPath(it, it, 0, 0), context))
         }
@@ -103,4 +85,12 @@ class NetworkTrace<T>(
     }
 
     override fun getDerivedThis(): NetworkTrace<T> = this
+}
+
+fun NetworkTrace<Unit>.run(start: Terminal, canStopOnStartItem: Boolean = true) {
+    this.run(start, canStopOnStartItem, Unit)
+}
+
+fun NetworkTrace<Unit>.run(start: ConductingEquipment, canStopOnStartItem: Boolean = true) {
+    this.run(start, canStopOnStartItem, Unit)
 }

@@ -10,9 +10,9 @@ package com.zepben.evolve.services.network
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -23,7 +23,7 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -221,12 +221,12 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
 
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
-    private fun compareCurrentRelayInfo(source: CurrentRelayInfo, target: CurrentRelayInfo): ObjectDifference<CurrentRelayInfo> =
+    private fun compareRelayInfo(source: RelayInfo, target: RelayInfo): ObjectDifference<RelayInfo> =
         ObjectDifference(source, target).apply {
             compareAssetInfo()
 
-            compareValues(CurrentRelayInfo::curveSetting)
-            compareIndexedValueCollections(CurrentRelayInfo::recloseDelays)
+            compareValues(RelayInfo::curveSetting)
+            compareIndexedValueCollections(RelayInfo::recloseDelays)
         }
 
     private fun compareCurrentTransformerInfo(source: CurrentTransformerInfo, target: CurrentTransformerInfo): ObjectDifference<CurrentTransformerInfo> =
@@ -517,22 +517,25 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
 
     private fun compareCurrentRelay(source: CurrentRelay, target: CurrentRelay): ObjectDifference<CurrentRelay> =
         ObjectDifference(source, target).apply {
-            compareProtectionEquipment()
+            compareProtectionRelayFunction()
 
             compareValues(CurrentRelay::currentLimit1, CurrentRelay::inverseTimeFlag, CurrentRelay::timeDelay1)
         }
 
-    private fun ObjectDifference<out ProtectionEquipment>.compareProtectionEquipment(): ObjectDifference<out ProtectionEquipment> =
+    private fun ObjectDifference<out ProtectionRelayFunction>.compareProtectionRelayFunction(): ObjectDifference<out ProtectionRelayFunction> =
         apply {
-            compareEquipment()
+            comparePowerSystemResource()
 
             compareValues(
-                ProtectionEquipment::relayDelayTime,
-                ProtectionEquipment::protectionKind,
-                ProtectionEquipment::directable,
-                ProtectionEquipment::powerDirection
+                ProtectionRelayFunction::model,
+                ProtectionRelayFunction::reclosing,
+                ProtectionRelayFunction::relayDelayTime,
+                ProtectionRelayFunction::protectionKind,
+                ProtectionRelayFunction::directable,
+                ProtectionRelayFunction::powerDirection
             )
-            compareIdReferenceCollections(ProtectionEquipment::protectedSwitches)
+            compareIndexedValueCollections(ProtectionRelayFunction::timeLimits)
+            compareIdReferenceCollections(ProtectionRelayFunction::protectedSwitches)
         }
 
     /************ IEC61970 BASE SCADA ************/
@@ -834,7 +837,6 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareSwitch()
 
             compareValues(ProtectedSwitch::breakingCapacity)
-            compareIdReferenceCollections(ProtectedSwitch::operatedByProtectionEquipment)
         }
 
     private fun compareRatioTapChanger(source: RatioTapChanger, target: RatioTapChanger): ObjectDifference<RatioTapChanger> =

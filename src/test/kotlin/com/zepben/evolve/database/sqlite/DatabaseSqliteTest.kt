@@ -17,7 +17,7 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -165,7 +165,7 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.customerServicesOf(::Tariff, Tariff::fillFields))
 
         /************ IEC61968 infIEC61968 InfAssetInfo ************/
-        validateSchema(SchemaNetworks.networkServicesOf(::CurrentRelayInfo, CurrentRelayInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::RelayInfo, RelayInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::CurrentTransformerInfo, CurrentTransformerInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::PotentialTransformerInfo, PotentialTransformerInfo::fillFields))
 

@@ -19,9 +19,9 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -34,7 +34,6 @@ import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -82,8 +81,8 @@ object Resolvers {
         BoundReferenceResolver(conductor, ConductorToWireInfoResolver, null)
 
     @JvmStatic
-    fun assetInfo(currentRelay: CurrentRelay): BoundReferenceResolver<CurrentRelay, CurrentRelayInfo> =
-        BoundReferenceResolver(currentRelay, CurrentRelayToCurrentRelayInfoResolver, null)
+    fun assetInfo(currentRelay: CurrentRelay): BoundReferenceResolver<CurrentRelay, RelayInfo> =
+        BoundReferenceResolver(currentRelay, CurrentRelayToRelayInfoResolver, null)
 
     @JvmStatic
     fun assetInfo(currentTransformer: CurrentTransformer): BoundReferenceResolver<CurrentTransformer, CurrentTransformerInfo> =
@@ -416,22 +415,6 @@ object Resolvers {
     @JvmStatic
     fun energisedEndOpenCircuitTests(transformerEndInfo: TransformerEndInfo): BoundReferenceResolver<TransformerEndInfo, OpenCircuitTest> =
         BoundReferenceResolver(transformerEndInfo, TransformerEndInfoToEnergisedEndOpenCircuitTestResolver, null)
-
-    @JvmStatic
-    fun protectedSwitches(protectionEquipment: ProtectionEquipment): BoundReferenceResolver<ProtectionEquipment, ProtectedSwitch> =
-        BoundReferenceResolver(
-            protectionEquipment,
-            ProtectionEquipmentToProtectedSwitchResolver,
-            ProtectedSwitchToProtectionEquipmentResolver
-        )
-
-    @JvmStatic
-    fun operatedByProtectionEquipment(protectedSwitch: ProtectedSwitch): BoundReferenceResolver<ProtectedSwitch, ProtectionEquipment> =
-        BoundReferenceResolver(
-            protectedSwitch,
-            ProtectedSwitchToProtectionEquipmentResolver,
-            ProtectionEquipmentToProtectedSwitchResolver
-        )
 
     @JvmStatic
     fun terminal(regulatingControl: RegulatingControl): BoundReferenceResolver<RegulatingControl, Terminal> =

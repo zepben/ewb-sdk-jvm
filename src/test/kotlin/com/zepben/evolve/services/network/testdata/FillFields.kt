@@ -23,7 +23,7 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -32,8 +32,6 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createRemoteSource
@@ -271,7 +269,7 @@ fun Location.fillFields(service: NetworkService, includeRuntime: Boolean = true)
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
-fun CurrentRelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentRelayInfo {
+fun RelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): RelayInfo {
     (this as AssetInfo).fillFields(service, includeRuntime)
 
     curveSetting = "curveSetting"
@@ -704,29 +702,13 @@ fun Measurement.fillFields(service: NetworkService, includeRuntime: Boolean = tr
 /************ IEC61970 Base Protection ************/
 
 fun CurrentRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentRelay {
-    (this as ProtectionEquipment).fillFields(service, includeRuntime)
+    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
 
-    assetInfo = CurrentRelayInfo().also { service.add(it) }
+    assetInfo = RelayInfo().also { service.add(it) }
 
     currentLimit1 = 1.1
     inverseTimeFlag = true
     timeDelay1 = 2.2
-
-    return this
-}
-
-fun ProtectionEquipment.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionEquipment {
-    (this as Equipment).fillFields(service, includeRuntime)
-
-    relayDelayTime = 1.1
-    protectionKind = ProtectionKind.IEF
-    directable = true
-    powerDirection = PowerDirectionKind.FORWARD
-
-    addProtectedSwitch(Breaker().also {
-        it.addOperatedByProtectionEquipment(this)
-        service.add(it)
-    })
 
     return this
 }
@@ -1089,11 +1071,6 @@ fun ProtectedSwitch.fillFields(service: NetworkService, includeRuntime: Boolean 
     (this as Switch).fillFields(service, includeRuntime)
 
     breakingCapacity = 1
-
-    addOperatedByProtectionEquipment(CurrentRelay().also {
-        it.addProtectedSwitch(this)
-        service.add(it)
-    })
 
     return this
 }

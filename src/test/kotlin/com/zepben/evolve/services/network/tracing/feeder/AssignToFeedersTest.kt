@@ -13,8 +13,6 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.testing.TestNetworkBuilder
@@ -170,31 +168,6 @@ class AssignToFeedersTest {
         Tracing.assignEquipmentToFeeders().run(network)
 
         validateEquipment(feeder.equipment, "b0", "c1", "a1", "a2")
-    }
-
-    @Test
-    fun `assigns ProtectionEquipment to Feeder`() {
-        val network = TestNetworkBuilder()
-            .fromBreaker() // b0
-            .addFeeder("b0")
-            .network
-            .apply {
-                val ps = get<ProtectedSwitch>("b0")!!
-                add(CurrentRelay("cr1").apply {
-                    ps.addOperatedByProtectionEquipment(this)
-                    this.addProtectedSwitch(ps)
-                })
-                add(CurrentRelay("cr2").apply {
-                    ps.addOperatedByProtectionEquipment(this)
-                    this.addProtectedSwitch(ps)
-                })
-            }
-
-        val feeder: Feeder = network["fdr1"]!!
-
-        Tracing.assignEquipmentToFeeders().run(network)
-
-        validateEquipment(feeder.equipment, "b0", "cr1", "cr2")
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

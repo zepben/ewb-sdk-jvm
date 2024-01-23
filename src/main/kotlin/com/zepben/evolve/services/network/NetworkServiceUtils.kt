@@ -17,9 +17,9 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -124,7 +124,7 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isCurrentTransformer Handler when the [identifiedObject] is a [CurrentTransformer]
  * @param isPotentialTransformer Handler when the [identifiedObject] is a [PotentialTransformer]
  * @param isSwitchInfo Handler when the [identifiedObject] is a [SwitchInfo]
- * @param isCurrentRelayInfo Handler when the [identifiedObject] is a [CurrentRelayInfo]
+ * @param isRelayInfo Handler when the [identifiedObject] is a [RelayInfo]
  * @param isCurrentRelay Handler when the [identifiedObject] is a [CurrentRelay]
  * @param isEvChargingUnit Handler when the [identifiedObject] is an [EvChargingUnit]
  * @param isTapChangerControl Handler when the [identifiedObject] is a [TapChangerControl]
@@ -198,7 +198,7 @@ inline fun <R> whenNetworkServiceObject(
     isCurrentTransformer: (CurrentTransformer) -> R,
     isPotentialTransformer: (PotentialTransformer) -> R,
     isSwitchInfo: (SwitchInfo) -> R,
-    isCurrentRelayInfo: (CurrentRelayInfo) -> R,
+    isRelayInfo: (RelayInfo) -> R,
     isCurrentRelay: (CurrentRelay) -> R,
     isEvChargingUnit: (EvChargingUnit) -> R,
     isTapChangerControl: (TapChangerControl) -> R,
@@ -271,7 +271,7 @@ inline fun <R> whenNetworkServiceObject(
     is CurrentTransformer -> isCurrentTransformer(identifiedObject)
     is PotentialTransformer -> isPotentialTransformer(identifiedObject)
     is SwitchInfo -> isSwitchInfo(identifiedObject)
-    is CurrentRelayInfo -> isCurrentRelayInfo(identifiedObject)
+    is RelayInfo -> isRelayInfo(identifiedObject)
     is CurrentRelay -> isCurrentRelay(identifiedObject)
     is EvChargingUnit -> isEvChargingUnit(identifiedObject)
     is TapChangerControl -> isTapChangerControl(identifiedObject)

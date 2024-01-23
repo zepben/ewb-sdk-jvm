@@ -17,10 +17,10 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableLocationStr
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableLocations
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableOrganisations
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TablePositionPoints
-import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
 import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperationalRestrictions
@@ -69,7 +69,7 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableTransformerEndInfo>("transformer end info", reader::load)
         status = status and loadEach<TableCurrentTransformerInfo>("current transformer info", reader::load)
         status = status and loadEach<TablePotentialTransformerInfo>("potential transformer info", reader::load)
-        status = status and loadEach<TableCurrentRelayInfo>("current relay info", reader::load)
+        status = status and loadEach<TableRelayInfo>("relay info", reader::load)
         status = status and loadEach<TableRecloseDelays>("reclose delays", reader::load)
         status = status and loadEach<TableLocations>("locations", reader::load)
         status = status and loadEach<TableOrganisations>("organisations", reader::load)
@@ -129,7 +129,6 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableEquipmentUsagePoints>("equipment to usage point associations", reader::load)
         status = status and loadEach<TableEquipmentOperationalRestrictions>("equipment to operational restriction associations", reader::load)
         status = status and loadEach<TableEquipmentEquipmentContainers>("equipment to equipment container associations", reader::load)
-        status = status and loadEach<TableProtectionEquipmentProtectedSwitches>("protection equipment to protected switch associations", reader::load)
         status = status and loadEach<TableCircuitsSubstations>("circuit to substation associations", reader::load)
         status = status and loadEach<TableCircuitsTerminals>("circuit to terminal associations", reader::load)
         status = status and loadEach<TableLoopsSubstations>("loop to substation associations", reader::load)

@@ -13,8 +13,6 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.testdata.DownstreamFeederStartPointNetwork
 import com.zepben.evolve.services.network.testdata.DroppedPhasesNetwork
@@ -228,31 +226,6 @@ class AssignToLvFeedersTest {
         Tracing.assignEquipmentToLvFeeders().run(network)
 
         validateEquipment(lvFeeder.equipment, "b0", "c1", "a1", "a2")
-    }
-
-    @Test
-    fun `assigns ProtectionEquipment to LvFeeder`() {
-        val network = TestNetworkBuilder()
-            .fromBreaker() // b0
-            .addLvFeeder("b0")
-            .network
-            .apply {
-                val ps = get<ProtectedSwitch>("b0")!!
-                add(CurrentRelay("cr1").apply {
-                    ps.addOperatedByProtectionEquipment(this)
-                    this.addProtectedSwitch(ps)
-                })
-                add(CurrentRelay("cr2").apply {
-                    ps.addOperatedByProtectionEquipment(this)
-                    this.addProtectedSwitch(ps)
-                })
-            }
-
-        val lvFeeder: LvFeeder = network["lvf1"]!!
-
-        Tracing.assignEquipmentToLvFeeders().run(network)
-
-        validateEquipment(lvFeeder.equipment, "b0", "cr1", "cr2")
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

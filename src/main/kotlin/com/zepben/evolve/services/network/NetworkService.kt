@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -119,8 +119,8 @@ class NetworkService : BaseService("network") {
     // # IEC61968 infIEC61968 InfAssetInfo #
     // #####################################
 
-    fun add(currentRelayInfo: CurrentRelayInfo): Boolean = super.add(currentRelayInfo)
-    fun remove(currentRelayInfo: CurrentRelayInfo): Boolean = super.remove(currentRelayInfo)
+    fun add(relayInfo: RelayInfo): Boolean = super.add(relayInfo)
+    fun remove(relayInfo: RelayInfo): Boolean = super.remove(relayInfo)
 
     fun add(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.add(currentTransformerInfo)
     fun remove(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.remove(currentTransformerInfo)

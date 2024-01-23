@@ -16,7 +16,7 @@ import com.zepben.evolve.services.common.extensions.asUnmodifiable
  *
  * @property curveSetting The type of curve used for the Current Relay.
  */
-class CurrentRelayInfo(mRID: String = "") : AssetInfo(mRID) {
+class RelayInfo(mRID: String = "") : AssetInfo(mRID) {
 
     var curveSetting: String? = null
     var _recloseDelays: MutableList<Double>? = null
@@ -27,7 +27,7 @@ class CurrentRelayInfo(mRID: String = "") : AssetInfo(mRID) {
     val recloseDelays: List<Double> get() = _recloseDelays.asUnmodifiable()
 
     /**
-     * Returns the number of reclose delays for this [CurrentRelayInfo]
+     * Returns the number of reclose delays for this [RelayInfo]
      */
     fun numDelays(): Int = _recloseDelays?.size ?: 0
 
@@ -35,12 +35,12 @@ class CurrentRelayInfo(mRID: String = "") : AssetInfo(mRID) {
      * Add a reclose delay
      * @param delay The delay in seconds to add.
      * @param index The index into the list to add the delay at. Defaults to the end of the list.
-     * @return This [CurrentRelayInfo] for fluent use.
+     * @return This [RelayInfo] for fluent use.
      */
     fun addDelay(
         delay: Double,
         index: Int = numDelays()
-    ): CurrentRelayInfo {
+    ): RelayInfo {
         _recloseDelays = _recloseDelays ?: mutableListOf()
         _recloseDelays!!.add(index, delay)
 
@@ -50,11 +50,11 @@ class CurrentRelayInfo(mRID: String = "") : AssetInfo(mRID) {
     /**
      * Add reclose delays
      * @param delays The delays in seconds to add.
-     * @return This [CurrentRelayInfo] for fluent use.
+     * @return This [RelayInfo] for fluent use.
      */
     fun addDelays(
         vararg delays: Double,
-    ): CurrentRelayInfo {
+    ): RelayInfo {
         _recloseDelays = _recloseDelays ?: mutableListOf()
         delays.forEach {
             _recloseDelays!!.add(it)
@@ -76,9 +76,9 @@ class CurrentRelayInfo(mRID: String = "") : AssetInfo(mRID) {
 
     /**
      * Clear [recloseDelays].
-     * @return This [CurrentRelayInfo] for fluent use.
+     * @return This [RelayInfo] for fluent use.
      */
-    fun clearDelays(): CurrentRelayInfo {
+    fun clearDelays(): RelayInfo {
         _recloseDelays = null
         return this
     }

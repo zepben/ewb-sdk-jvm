@@ -14,25 +14,25 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 
-internal class CurrentRelayInfoTest {
+internal class RelayInfoTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(CurrentRelayInfo().mRID, not(equalTo("")))
-        assertThat(CurrentRelayInfo("id").mRID, equalTo("id"))
+        assertThat(RelayInfo().mRID, not(equalTo("")))
+        assertThat(RelayInfo("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
-        val currentRelayInfo = CurrentRelayInfo()
+        val relayInfo = RelayInfo()
 
-        assertThat(currentRelayInfo.curveSetting, nullValue())
-        assertThat(currentRelayInfo.recloseDelays, emptyIterable())
+        assertThat(relayInfo.curveSetting, nullValue())
+        assertThat(relayInfo.recloseDelays, emptyIterable())
 
-        currentRelayInfo.fillFields(NetworkService())
+        relayInfo.fillFields(NetworkService())
 
-        assertThat(currentRelayInfo.curveSetting, equalTo("curveSetting"))
-        assertThat(currentRelayInfo.recloseDelays, contains(1.0, 2.0, 3.0))
+        assertThat(relayInfo.curveSetting, equalTo("curveSetting"))
+        assertThat(relayInfo.recloseDelays, contains(1.0, 2.0, 3.0))
     }
 
 }

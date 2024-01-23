@@ -10,9 +10,9 @@ package com.zepben.evolve.database.sqlite.writers
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -23,7 +23,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -42,10 +41,10 @@ import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
-import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableEndDevices
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
@@ -56,7 +55,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableE
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableProtectionEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
@@ -348,22 +346,22 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
-    fun save(currentRelayInfo: CurrentRelayInfo): Boolean {
-        val table = databaseTables.getTable(TableCurrentRelayInfo::class.java)
-        val insert = databaseTables.getInsert(TableCurrentRelayInfo::class.java)
+    fun save(relayInfo: RelayInfo): Boolean {
+        val table = databaseTables.getTable(TableRelayInfo::class.java)
+        val insert = databaseTables.getInsert(TableRelayInfo::class.java)
 
         val recloseDelayTable = databaseTables.getTable(TableRecloseDelays::class.java)
-        currentRelayInfo.recloseDelays.forEachIndexed { idx, delay ->
+        relayInfo.recloseDelays.forEachIndexed { idx, delay ->
             val recloseDelayInsert = databaseTables.getInsert(TableRecloseDelays::class.java)
-            recloseDelayInsert.setString(recloseDelayTable.CURRENT_RELAY_INFO_MRID.queryIndex, currentRelayInfo.mRID)
+            recloseDelayInsert.setString(recloseDelayTable.RELAY_INFO_MRID.queryIndex, relayInfo.mRID)
             recloseDelayInsert.setInt(recloseDelayTable.SEQUENCE_NUMBER.queryIndex, idx)
             recloseDelayInsert.setDouble(recloseDelayTable.RECLOSE_DELAY.queryIndex, delay)
-            tryExecuteSingleUpdate(recloseDelayInsert, "${currentRelayInfo.mRID}-rd-${idx}", "reclose delay")
+            tryExecuteSingleUpdate(recloseDelayInsert, "${relayInfo.mRID}-rd-${idx}", "reclose delay")
         }
 
-        insert.setNullableString(table.CURVE_SETTING.queryIndex, currentRelayInfo.curveSetting)
+        insert.setNullableString(table.CURVE_SETTING.queryIndex, relayInfo.curveSetting)
 
-        return saveAssetInfo(table, insert, currentRelayInfo, "current relay info")
+        return saveAssetInfo(table, insert, relayInfo, "relay info")
     }
 
     fun save(currentTransformerInfo: CurrentTransformerInfo): Boolean {
@@ -1011,10 +1009,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     private fun saveProtectedSwitch(table: TableProtectedSwitches, insert: PreparedStatement, protectedSwitch: ProtectedSwitch, description: String): Boolean {
         insert.setNullableInt(table.BREAKING_CAPACITY.queryIndex, protectedSwitch.breakingCapacity)
 
-        var status = true
-        protectedSwitch.operatedByProtectionEquipment.forEach { status = status and saveAssociation(it, protectedSwitch) }
-
-        return status and saveSwitch(table, insert, protectedSwitch, description)
+        return saveSwitch(table, insert, protectedSwitch, description)
     }
 
     fun save(ratioTapChanger: RatioTapChanger): Boolean {
@@ -1244,23 +1239,9 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableDouble(table.CURRENT_LIMIT_1.queryIndex, currentRelay.currentLimit1)
         insert.setNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex, currentRelay.inverseTimeFlag)
         insert.setNullableDouble(table.TIME_DELAY_1.queryIndex, currentRelay.timeDelay1)
-        insert.setNullableString(table.CURRENT_RELAY_INFO_MRID.queryIndex, currentRelay.assetInfo?.mRID)
+        insert.setNullableString(table.RELAY_INFO_MRID.queryIndex, currentRelay.assetInfo?.mRID)
 
-        return saveProtectionEquipment(table, insert, currentRelay, "current relay")
-    }
-
-    private fun saveProtectionEquipment(
-        table: TableProtectionEquipment,
-        insert: PreparedStatement,
-        protectionEquipment: ProtectionEquipment,
-        description: String
-    ): Boolean {
-        insert.setNullableDouble(table.RELAY_DELAY_TIME.queryIndex, protectionEquipment.relayDelayTime)
-        insert.setString(table.PROTECTION_KIND.queryIndex, protectionEquipment.protectionKind.name)
-        insert.setNullableBoolean(table.DIRECTABLE.queryIndex, protectionEquipment.directable)
-        insert.setString(table.POWER_DIRECTION.queryIndex, protectionEquipment.powerDirection.name)
-
-        return saveEquipment(table, insert, protectionEquipment, description)
+        return true // TODO replace with saveProtectionRelayFunction(...)
     }
 
     /************ IEC61970 SCADA ************/
@@ -1397,20 +1378,6 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             insert,
             "${loop.mRID}-to-${substation.mRID}",
             "loop to substation association"
-        )
-    }
-
-    private fun saveAssociation(protectionEquipment: ProtectionEquipment, protectedSwitch: ProtectedSwitch): Boolean {
-        val table = databaseTables.getTable(TableProtectionEquipmentProtectedSwitches::class.java)
-        val insert = databaseTables.getInsert(TableProtectionEquipmentProtectedSwitches::class.java)
-
-        insert.setString(table.PROTECTION_EQUIPMENT_MRID.queryIndex, protectionEquipment.mRID)
-        insert.setString(table.PROTECTED_SWITCH_MRID.queryIndex, protectedSwitch.mRID)
-
-        return tryExecuteSingleUpdate(
-            insert,
-            "${protectionEquipment.mRID}-to-${protectedSwitch.mRID}",
-            "protection equipment to protected switch"
         )
     }
 

@@ -13,7 +13,6 @@ import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 
@@ -98,17 +97,9 @@ class AssignToFeeders {
                 terminal,
                 { eq, feeder ->
                     eq.addContainer(feeder)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> pe.addContainer(feeder) }
-                    }
                 },
                 { feeder, eq ->
                     feeder.addEquipment(eq)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> feeder.addEquipment(pe) }
-                    }
                 },
                 isStopping,
                 terminalToAuxEquipment
@@ -123,17 +114,9 @@ class AssignToFeeders {
                 terminal,
                 { eq, feeder ->
                     eq.addCurrentContainer(feeder)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> pe.addCurrentContainer(feeder) }
-                    }
                 },
                 { feeder, eq ->
                     feeder.addCurrentEquipment(eq)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> feeder.addCurrentEquipment(pe) }
-                    }
                 },
                 isStopping,
                 terminalToAuxEquipment

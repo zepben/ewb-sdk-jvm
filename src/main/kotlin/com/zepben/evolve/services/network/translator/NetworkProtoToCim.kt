@@ -23,7 +23,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -32,8 +31,6 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.common.extensions.internEmpty
@@ -68,7 +65,7 @@ import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
-import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo as PBCurrentRelayInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infcommon.Ratio as PBRatio
@@ -105,7 +102,6 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint as PBIoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay as PBCurrentRelay
-import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionEquipment as PBProtectionEquipment
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
@@ -371,8 +367,8 @@ fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb,
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
-fun toCim(pb: PBCurrentRelayInfo, networkService: NetworkService): CurrentRelayInfo =
-    CurrentRelayInfo(pb.mRID()).apply {
+fun toCim(pb: PBRelayInfo, networkService: NetworkService): RelayInfo =
+    RelayInfo(pb.mRID()).apply {
         curveSetting = pb.curveSetting.takeIf { it.isNotBlank() }
         pb.recloseDelaysList.forEach {
             addDelay(it)
@@ -408,7 +404,7 @@ fun toCim(pb: PBPotentialTransformerInfo, networkService: NetworkService): Poten
         toCim(pb.ai, this, networkService)
     }
 
-fun NetworkService.addFromPb(pb: PBCurrentRelayInfo): CurrentRelayInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBRelayInfo): RelayInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = tryAddOrNull(toCim(pb, this))
 
@@ -725,20 +721,10 @@ fun toCim(pb: PBCurrentRelay, networkService: NetworkService): CurrentRelay =
         inverseTimeFlag = pb.inverseTimeFlagSet.takeUnless { pb.hasInverseTimeFlagNull() }
         timeDelay1 = pb.timeDelay1.takeUnless { it == UNKNOWN_DOUBLE }
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
-        toCim(pb.pe, this, networkService)
+        // toCim(pb.prf, this, networkService) TODO
     }
 
-fun toCim(pb: PBProtectionEquipment, cim: ProtectionEquipment, networkService: NetworkService): ProtectionEquipment =
-    cim.apply {
-        pb.protectedSwitchMRIDsList.forEach { protectedSwitchMRID ->
-            networkService.resolveOrDeferReference(Resolvers.protectedSwitches(this), protectedSwitchMRID)
-        }
-        relayDelayTime = pb.relayDelayTime.takeUnless { it == UNKNOWN_DOUBLE }
-        protectionKind = ProtectionKind.valueOf(pb.protectionKind.name)
-        directable = pb.directableSet.takeUnless { pb.hasDirectableNull() }
-        powerDirection = PowerDirectionKind.valueOf(pb.powerDirection.name)
-        toCim(pb.eq, this, networkService)
-    }
+// fun toCim(pb: PBProtectionRelayFunction, cim: ProtectionRelayFunction, networkService: NetworkService) TODO
 
 fun NetworkService.addFromPb(pb: PBCurrentRelay): CurrentRelay? = tryAddOrNull(toCim(pb, this))
 
@@ -1041,9 +1027,6 @@ fun toCim(pb: PBTransformerEndRatedS): TransformerEndRatedS =
 
 fun toCim(pb: PBProtectedSwitch, cim: ProtectedSwitch, networkService: NetworkService): ProtectedSwitch =
     cim.apply {
-        pb.operatedByProtectionEquipmentMRIDsList.forEach { protectionEquipmentMRID ->
-            networkService.resolveOrDeferReference(Resolvers.operatedByProtectionEquipment(this), protectionEquipmentMRID)
-        }
         breakingCapacity = pb.breakingCapacity.takeUnless { it == UNKNOWN_INT }
         toCim(pb.sw, this, networkService)
     }
@@ -1262,7 +1245,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBLocation): Location? = networkService.addFromPb(pb)
 
     // IEC61968 infIEC61968 InfAssetInfo
-    fun addFromPb(pb: PBCurrentRelayInfo): CurrentRelayInfo? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBRelayInfo): RelayInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = networkService.addFromPb(pb)
 

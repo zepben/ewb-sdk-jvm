@@ -985,7 +985,7 @@ internal class NetworkConsumerClientTest {
                 isPotentialTransformer = { potentialTransformer = it.toPb() },
                 isSwitchInfo = { switchInfo = it.toPb() },
                 isCurrentRelay = { currentRelay = it.toPb() },
-                isCurrentRelayInfo = { currentRelayInfo = it.toPb() },
+                isRelayInfo = { relayInfo = it.toPb() },
                 isEvChargingUnit = { evChargingUnit = it.toPb() },
                 isTapChangerControl = { tapChangerControl = it.toPb() },
             )

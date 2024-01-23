@@ -23,7 +23,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -32,18 +31,16 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.*
-import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableEndDevices
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
@@ -54,7 +51,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableE
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableProtectionEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
@@ -326,21 +322,21 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
-    fun load(table: TableCurrentRelayInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val currentRelayInfo = CurrentRelayInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+    fun load(table: TableRelayInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val relayInfo = RelayInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             curveSetting = resultSet.getNullableString(table.CURVE_SETTING.queryIndex)
         }
 
-        return loadAssetInfo(currentRelayInfo, table, resultSet) && networkService.addOrThrow(currentRelayInfo)
+        return loadAssetInfo(relayInfo, table, resultSet) && networkService.addOrThrow(relayInfo)
     }
 
     fun load(table: TableRecloseDelays, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         // Note TablePowerTransformerEndRatings.selectSql ensures we process ratings in the correct order.
-        val currentRelayInfoMRID = resultSet.getString(table.CURRENT_RELAY_INFO_MRID.queryIndex)
+        val relayInfoMRID = resultSet.getString(table.RELAY_INFO_MRID.queryIndex)
         val recloseDelay = resultSet.getDouble(table.RECLOSE_DELAY.queryIndex)
-        setLastMRID("$currentRelayInfoMRID.s$recloseDelay")
+        setLastMRID("$relayInfoMRID.s$recloseDelay")
 
-        val cri = networkService.ensureGet<CurrentRelayInfo>(currentRelayInfoMRID, "$currentRelayInfoMRID.s$recloseDelay")
+        val cri = networkService.ensureGet<RelayInfo>(relayInfoMRID, "$relayInfoMRID.s$recloseDelay")
         cri?.addDelay(recloseDelay)
 
         return true
@@ -681,7 +677,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TableCurrentRelays, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val currentRelay = CurrentRelay(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             assetInfo = networkService.ensureGet(
-                resultSet.getNullableString(table.CURRENT_RELAY_INFO_MRID.queryIndex),
+                resultSet.getNullableString(table.RELAY_INFO_MRID.queryIndex),
                 typeNameAndMRID()
             )
             currentLimit1 = resultSet.getNullableDouble(table.CURRENT_LIMIT_1.queryIndex)
@@ -689,19 +685,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             timeDelay1 = resultSet.getNullableDouble(table.TIME_DELAY_1.queryIndex)
         }
 
-        return loadProtectionEquipment(currentRelay, table, resultSet) && networkService.addOrThrow(currentRelay)
-    }
-
-    private fun loadProtectionEquipment(protectionEquipment: ProtectionEquipment, table: TableProtectionEquipment, resultSet: ResultSet): Boolean {
-        protectionEquipment.apply {
-            relayDelayTime = resultSet.getNullableDouble(table.RELAY_DELAY_TIME.queryIndex)
-            protectionKind = ProtectionKind.valueOf(resultSet.getString(table.PROTECTION_KIND.queryIndex))
-            directable = resultSet.getNullableBoolean(table.DIRECTABLE.queryIndex)
-            powerDirection = PowerDirectionKind.valueOf(resultSet.getString(table.POWER_DIRECTION.queryIndex))
-
-        }
-
-        return loadEquipment(protectionEquipment, table, resultSet)
+        return /* TODO loadProtectionRelayFunction(currentRelay, table, resultSet) && */ networkService.addOrThrow(currentRelay)
     }
 
     /************ IEC61970 BASE SCADA ************/
@@ -1397,23 +1381,6 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
                 loop.addEnergizingSubstation(substation)
             }
         }
-
-        return true
-    }
-
-    fun load(table: TableProtectionEquipmentProtectedSwitches, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val protectionEquipmentMRID = setLastMRID(resultSet.getString(table.PROTECTION_EQUIPMENT_MRID.queryIndex))
-        setLastMRID("${protectionEquipmentMRID}-to-UNKNOWN")
-
-        val protectedSwitchMRID = resultSet.getString(table.PROTECTED_SWITCH_MRID.queryIndex)
-        val id = setLastMRID("${protectionEquipmentMRID}-to-${protectedSwitchMRID}")
-
-        val typeNameAndMRID = "ProtectionEquipment to ProtectedSwitch association $id"
-        val protectionEquipment = networkService.getOrThrow<ProtectionEquipment>(protectionEquipmentMRID, typeNameAndMRID)
-        val protectedSwitch = networkService.getOrThrow<ProtectedSwitch>(protectedSwitchMRID, typeNameAndMRID)
-
-        protectedSwitch.addOperatedByProtectionEquipment(protectionEquipment)
-        protectionEquipment.addProtectedSwitch(protectedSwitch)
 
         return true
     }

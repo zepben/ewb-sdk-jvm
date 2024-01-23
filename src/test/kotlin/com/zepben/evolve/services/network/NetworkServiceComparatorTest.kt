@@ -26,7 +26,6 @@ import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -34,8 +33,6 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
@@ -233,14 +230,14 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
     @Test
-    internal fun compareCurrentRelayInfo() {
-        compareAssetInfo { CurrentRelayInfo(it) }
+    internal fun compareRelayInfo() {
+        compareAssetInfo { RelayInfo(it) }
 
-        comparatorValidator.validateProperty(CurrentRelayInfo::curveSetting, { CurrentRelayInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(RelayInfo::curveSetting, { RelayInfo(it) }, { "first" }, { "second" })
         comparatorValidator.validateIndexedCollection(
-            CurrentRelayInfo::recloseDelays,
-            CurrentRelayInfo::addDelay,
-            { CurrentRelayInfo(it) },
+            RelayInfo::recloseDelays,
+            RelayInfo::addDelay,
+            { RelayInfo(it) },
             { 1.0 },
             { 2.0 }
         )
@@ -635,32 +632,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
     @Test
     internal fun compareCurrentRelay() {
-        compareProtectionEquipment { CurrentRelay(it) }
+        // TODO compareProtectionRelayFunction { CurrentRelay(it) }
 
         comparatorValidator.validateProperty(CurrentRelay::currentLimit1, { CurrentRelay(it) }, { 1.1 }, { 2.2 })
         comparatorValidator.validateProperty(CurrentRelay::inverseTimeFlag, { CurrentRelay(it) }, { false }, { true })
         comparatorValidator.validateProperty(CurrentRelay::timeDelay1, { CurrentRelay(it) }, { 1.1 }, { 2.2 })
-    }
-
-    private fun compareProtectionEquipment(createProtectionEquipment: (String) -> ProtectionEquipment) {
-        compareEquipment(createProtectionEquipment)
-
-        comparatorValidator.validateProperty(ProtectionEquipment::relayDelayTime, createProtectionEquipment, { 1.1 }, { 2.2 })
-        comparatorValidator.validateProperty(ProtectionEquipment::protectionKind, createProtectionEquipment, { ProtectionKind.EF }, { ProtectionKind.IEF })
-        comparatorValidator.validateProperty(ProtectionEquipment::directable, createProtectionEquipment, { null }, { true })
-        comparatorValidator.validateProperty(
-            ProtectionEquipment::powerDirection,
-            createProtectionEquipment,
-            { PowerDirectionKind.FORWARD },
-            { PowerDirectionKind.UNKNOWN_DIRECTION }
-        )
-        comparatorValidator.validateCollection(
-            ProtectionEquipment::protectedSwitches,
-            ProtectionEquipment::addProtectedSwitch,
-            createProtectionEquipment,
-            { object : ProtectedSwitch("ps1") {} },
-            { object : ProtectedSwitch("ps2") {} }
-        )
     }
 
     /************ IEC61970 BASE SCADA ************/
@@ -1037,13 +1013,6 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareSwitch(createProtectedSwitch)
 
         comparatorValidator.validateProperty(ProtectedSwitch::breakingCapacity, createProtectedSwitch, { 1 }, { 2 })
-        comparatorValidator.validateCollection(
-            ProtectedSwitch::operatedByProtectionEquipment,
-            ProtectedSwitch::addOperatedByProtectionEquipment,
-            createProtectedSwitch,
-            { object : ProtectionEquipment("pe1") {} },
-            { object : ProtectionEquipment("pe2") {} }
-        )
     }
 
     @Test

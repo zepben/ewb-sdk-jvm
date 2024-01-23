@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -126,7 +126,7 @@ internal class NetworkServiceUtilsTest {
         isCurrentTransformer: (CurrentTransformer) -> String,
         isPotentialTransformer: (PotentialTransformer) -> String,
         isSwitchInfo: (SwitchInfo) -> String,
-        isCurrentRelayInfo: (CurrentRelayInfo) -> String,
+        isRelayInfo: (RelayInfo) -> String,
         isCurrentRelay: (CurrentRelay) -> String,
         isEvChargingUnit: (EvChargingUnit) -> String,
         isTapChangerControl: (TapChangerControl) -> String,
@@ -198,7 +198,7 @@ internal class NetworkServiceUtilsTest {
         isCurrentTransformer = isCurrentTransformer,
         isPotentialTransformer = isPotentialTransformer,
         isSwitchInfo = isSwitchInfo,
-        isCurrentRelayInfo = isCurrentRelayInfo,
+        isRelayInfo = isRelayInfo,
         isCurrentRelay = isCurrentRelay,
         isEvChargingUnit = isEvChargingUnit,
         isTapChangerControl = isTapChangerControl,
@@ -272,7 +272,7 @@ internal class NetworkServiceUtilsTest {
         isCurrentTransformer: InvokeChecker<CurrentTransformer> = NeverInvokedChecker(),
         isPotentialTransformer: InvokeChecker<PotentialTransformer> = NeverInvokedChecker(),
         isSwitchInfo: InvokeChecker<SwitchInfo> = NeverInvokedChecker(),
-        isCurrentRelayInfo: InvokeChecker<CurrentRelayInfo> = NeverInvokedChecker(),
+        isRelayInfo: InvokeChecker<RelayInfo> = NeverInvokedChecker(),
         isCurrentRelay: InvokeChecker<CurrentRelay> = NeverInvokedChecker(),
         isEvChargingUnit: InvokeChecker<EvChargingUnit> = NeverInvokedChecker(),
         isTapChangerControl: InvokeChecker<TapChangerControl> = NeverInvokedChecker(),
@@ -345,7 +345,7 @@ internal class NetworkServiceUtilsTest {
             isCurrentTransformer = isCurrentTransformer,
             isPotentialTransformer = isPotentialTransformer,
             isSwitchInfo = isSwitchInfo,
-            isCurrentRelayInfo = isCurrentRelayInfo,
+            isRelayInfo = isRelayInfo,
             isCurrentRelay = isCurrentRelay,
             isEvChargingUnit = isEvChargingUnit,
             isTapChangerControl = isTapChangerControl,
@@ -418,7 +418,7 @@ internal class NetworkServiceUtilsTest {
         isCurrentTransformer.verifyInvoke()
         isPotentialTransformer.verifyInvoke()
         isSwitchInfo.verifyInvoke()
-        isCurrentRelayInfo.verifyInvoke()
+        isRelayInfo.verifyInvoke()
         isCurrentRelay.verifyInvoke()
         isEvChargingUnit.verifyInvoke()
         isTapChangerControl.verifyInvoke()
@@ -497,11 +497,10 @@ internal class NetworkServiceUtilsTest {
         CurrentTransformer().also { whenNetworkServiceObjectTester(it, isCurrentTransformer = InvokedChecker(it)) }
         PotentialTransformer().also { whenNetworkServiceObjectTester(it, isPotentialTransformer = InvokedChecker(it)) }
         SwitchInfo().also { whenNetworkServiceObjectTester(it, isSwitchInfo = InvokedChecker(it)) }
-        CurrentRelayInfo().also { whenNetworkServiceObjectTester(it, isCurrentRelayInfo = InvokedChecker(it)) }
+        RelayInfo().also { whenNetworkServiceObjectTester(it, isRelayInfo = InvokedChecker(it)) }
         CurrentRelay().also { whenNetworkServiceObjectTester(it, isCurrentRelay = InvokedChecker(it)) }
         EvChargingUnit().also { whenNetworkServiceObjectTester(it, isEvChargingUnit = InvokedChecker(it)) }
         TapChangerControl().also { whenNetworkServiceObjectTester(it, isTapChangerControl = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }
-

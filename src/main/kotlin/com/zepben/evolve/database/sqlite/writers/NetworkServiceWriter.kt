@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -112,7 +112,7 @@ class NetworkServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -
         service.sequenceOf<PotentialTransformerInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<CurrentTransformer>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<PotentialTransformer>().forEach { status = status and validateSave(it, writer::save) }
-        service.sequenceOf<CurrentRelayInfo>().forEach { status = status and validateSave(it, writer::save) }
+        service.sequenceOf<RelayInfo>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<CurrentRelay>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<TapChangerControl>().forEach { status = status and validateSave(it, writer::save) }
         service.sequenceOf<EvChargingUnit>().forEach { status = status and validateSave(it, writer::save) }

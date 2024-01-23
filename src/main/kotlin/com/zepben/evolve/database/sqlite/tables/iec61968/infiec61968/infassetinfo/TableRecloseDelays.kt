@@ -15,7 +15,7 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableRecloseDelays : SqliteTable() {
 
-    val CURRENT_RELAY_INFO_MRID = Column(++columnIndex, "current_relay_info_mrid", "TEXT", NOT_NULL)
+    val RELAY_INFO_MRID = Column(++columnIndex, "relay_info_mrid", "TEXT", NOT_NULL)
     val RECLOSE_DELAY = Column(++columnIndex, "reclose_delay", "NUMBER", NOT_NULL)
     val SEQUENCE_NUMBER = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
 
@@ -26,7 +26,7 @@ class TableRecloseDelays : SqliteTable() {
     override fun uniqueIndexColumns(): MutableList<List<Column>> {
         val cols = super.uniqueIndexColumns()
 
-        cols.add(listOf(CURRENT_RELAY_INFO_MRID, SEQUENCE_NUMBER))
+        cols.add(listOf(RELAY_INFO_MRID, SEQUENCE_NUMBER))
 
         return cols
     }
@@ -34,13 +34,13 @@ class TableRecloseDelays : SqliteTable() {
     override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
         val cols = super.nonUniqueIndexColumns()
 
-        cols.add(listOf(CURRENT_RELAY_INFO_MRID))
+        cols.add(listOf(RELAY_INFO_MRID))
 
         return cols
     }
 
     override fun selectSql(): String {
-        return "${super.selectSql()} ORDER BY current_relay_info_mrid, sequence_number ASC;"
+        return "${super.selectSql()} ORDER BY relay_info_mrid, sequence_number ASC;"
     }
 
     override val tableClass = this.javaClass

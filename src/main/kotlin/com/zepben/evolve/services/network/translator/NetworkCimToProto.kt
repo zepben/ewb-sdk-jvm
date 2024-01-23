@@ -51,7 +51,6 @@ import com.zepben.protobuf.cim.iec61970.base.wires.TransformerCoolingType
 import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind
-import com.zepben.protobuf.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.protobuf.network.model.FeederDirection
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.NoLoadTest as PBNoLoadTest
@@ -173,7 +172,6 @@ import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerEl
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
-import com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind as PBProtectionKind
 import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit as PBEvChargingUnit
 
 /************ IEC61968 ASSET INFO ************/

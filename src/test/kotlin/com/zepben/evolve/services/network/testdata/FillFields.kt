@@ -31,8 +31,6 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createRemoteSource

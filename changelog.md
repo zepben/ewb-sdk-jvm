@@ -128,7 +128,7 @@
     * ProtectionEquipment
         * directable
         * powerDirection
-    * CurrentRelayInfo.recloseDelays
+    * RelayInfo.recloseDelays
     * DER register fields on PowerElectronicsConnection
 * Added new enums
     * PowerDirectionKind
@@ -237,7 +237,7 @@
     * `ProtectionEquipment`: An electrical device designed to respond to input conditions in a prescribed manner and after specified conditions are met to cause
       contact operation or similar abrupt change in associated electric control circuits, or simply to display the detected condition.
     * `CurrentRelay`: A device that checks current flow values in any direction or designated direction.
-    * `CurrentRelayInfo`: Current relay datasheet information.
+    * `RelayInfo`: Current relay datasheet information.
     * `RecloseSequence`: A reclose sequence (open and close) is defined for each possible reclosure of a breaker.
     * `ProtectionKind`: The kind of protection being provided by this protection equipment.
     * `ProtectedSwitch::breakingCapacity`: The maximum fault current in amps a breaking device can break safely under prescribed conditions of use.

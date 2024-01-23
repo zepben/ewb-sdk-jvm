@@ -24,6 +24,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableCustomer
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableCustomers
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TablePricingStructures
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableTariffs
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
@@ -105,6 +106,7 @@ class DatabaseTables {
         TableCircuitsTerminals(),
         TableConnectivityNodes(),
         TableControls(),
+        TableRelayInfo(),
         TableCurrentRelays(),
         TableCurrentTransformerInfo(),
         TableCurrentTransformers(),

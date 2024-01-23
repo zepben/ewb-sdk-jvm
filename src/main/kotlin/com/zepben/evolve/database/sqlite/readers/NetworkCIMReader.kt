@@ -31,8 +31,6 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
-import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.tables.associations.*
@@ -340,7 +338,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         setLastMRID("$relayInfoMRID.s$recloseDelay")
 
         val cri = networkService.ensureGet<RelayInfo>(relayInfoMRID, "$relayInfoMRID.s$recloseDelay")
-        cri?.addDelay(recloseDelay,)
+        cri?.addDelay(recloseDelay)
 
         return true
     }
@@ -679,6 +677,10 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TableCurrentRelays, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val currentRelay = CurrentRelay(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            assetInfo = networkService.ensureGet(
+                resultSet.getNullableString(table.RELAY_INFO_MRID.queryIndex),
+                typeNameAndMRID()
+            )
             currentLimit1 = resultSet.getNullableDouble(table.CURRENT_LIMIT_1.queryIndex)
             inverseTimeFlag = resultSet.getNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex)
             timeDelay1 = resultSet.getNullableDouble(table.TIME_DELAY_1.queryIndex)

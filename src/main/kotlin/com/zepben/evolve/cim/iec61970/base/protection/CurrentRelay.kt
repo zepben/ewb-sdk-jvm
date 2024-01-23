@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.cim.iec61970.base.protection
 
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
+
 /**
  * A device that checks current flow values in any direction or designated direction.
  *
@@ -16,6 +18,8 @@ package com.zepben.evolve.cim.iec61970.base.protection
  * @property timeDelay1 Inverse time delay number 1 for current limit number 1 in seconds.
  */
 class CurrentRelay @JvmOverloads constructor(mRID: String = "") : ProtectionRelayFunction(mRID) {
+
+    override var assetInfo: RelayInfo? = null
 
     var currentLimit1: Double? = null
     var inverseTimeFlag: Boolean? = null

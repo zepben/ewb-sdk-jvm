@@ -21,7 +21,7 @@ internal class WindingConnectionTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(WindingConnection.values(), PBWindingConnection.values())
+        validateEnum(WindingConnection.entries, PBWindingConnection.entries)
     }
 
 }

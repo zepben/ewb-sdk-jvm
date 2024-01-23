@@ -23,7 +23,7 @@ internal class UnitSymbolTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(UnitSymbol.values(), PBUnitSymbol.values())
+        validateEnum(UnitSymbol.entries, PBUnitSymbol.entries)
     }
 
     @Test

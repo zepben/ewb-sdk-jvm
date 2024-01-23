@@ -24,7 +24,7 @@ internal class SinglePhaseKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(SinglePhaseKind.values(), PBSinglePhaseKind.values())
+        validateEnum(SinglePhaseKind.entries, PBSinglePhaseKind.entries)
     }
 
     @Test

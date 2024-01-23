@@ -25,7 +25,7 @@ internal class PhaseCodeTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(PhaseCode.values(), PBPhaseCode.values())
+        validateEnum(PhaseCode.entries, PBPhaseCode.entries)
     }
 
     @Test

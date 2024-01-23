@@ -21,7 +21,7 @@ internal class WireMaterialKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(WireMaterialKind.values(), PBWireMaterialKind.values())
+        validateEnum(WireMaterialKind.entries, PBWireMaterialKind.entries)
     }
 
 }

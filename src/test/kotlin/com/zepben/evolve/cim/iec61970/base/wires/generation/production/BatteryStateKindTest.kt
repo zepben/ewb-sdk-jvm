@@ -21,7 +21,7 @@ internal class BatteryStateKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(BatteryStateKind.values(), PBBatteryStateKind.values())
+        validateEnum(BatteryStateKind.entries, PBBatteryStateKind.entries)
     }
 
 }

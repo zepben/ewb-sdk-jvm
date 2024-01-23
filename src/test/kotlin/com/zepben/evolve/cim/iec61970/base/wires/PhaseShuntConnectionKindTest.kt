@@ -21,7 +21,7 @@ internal class PhaseShuntConnectionKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(PhaseShuntConnectionKind.values(), PBPhaseShuntConnectionKind.Enum.values())
+        validateEnum(PhaseShuntConnectionKind.entries, PBPhaseShuntConnectionKind.Enum.entries)
     }
 
 }

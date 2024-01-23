@@ -21,7 +21,7 @@ internal class CustomerKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(CustomerKind.values(), PBCustomerKind.values())
+        validateEnum(CustomerKind.entries, PBCustomerKind.entries)
     }
 
 }

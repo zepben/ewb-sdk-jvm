@@ -1,13 +1,12 @@
 /*
- * Copyright 2021 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.tracing.networktrace
+package com.zepben.evolve.services.network.tracing.traversalV2
 
-import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
 import com.zepben.evolve.services.network.tracing.traversals.Tracker
@@ -16,7 +15,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 
-class Traversal {
+class TraversalTest {
 
     class TestTraversal(
         queueNext: QueueNext,

@@ -15,7 +15,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.*
-import com.zepben.evolve.services.network.tracing.traversalV2.TraversalV2
+import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
 import com.zepben.evolve.services.network.tracing.traversals.Tracker
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 
@@ -23,9 +23,9 @@ class NetworkTrace<T>(
     queueNext: QueueNext<T>,
     queue: TraversalQueue<NetworkTraceStep<T>>,
     tracker: Tracker<NetworkTraceStep<T>>,
-) : TraversalV2<NetworkTraceStep<T>, NetworkTrace<T>>(queueNext, queue, tracker) {
+) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueNext, queue, tracker) {
 
-    fun interface QueueNext<T> : TraversalV2.QueueNext<NetworkTraceStep<T>, NetworkTrace<T>>
+    fun interface QueueNext<T> : Traversal.QueueNext<NetworkTraceStep<T>, NetworkTrace<T>>
 
     fun run(start: Terminal, canStopOnStartItem: Boolean = true, context: T) {
         addStartItem(NetworkTraceStep(TerminalToTerminalPath(start, start, 0, 0), context))

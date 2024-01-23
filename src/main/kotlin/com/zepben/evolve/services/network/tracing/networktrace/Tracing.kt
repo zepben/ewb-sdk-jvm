@@ -18,7 +18,7 @@ object Tracing {
         queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
         computeNextT: (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T,
     ): NetworkTrace<T> {
-        val queueNext = NetworkTrace.QueueNext<T> { ts, ctx, queueItem, t ->
+        val queueNext = NetworkTrace.QueueNext { ts, ctx, queueItem, t ->
             val path = ts.path
             path.toEquipment.terminals
                 .filter { it != path.toTerminal }
@@ -50,7 +50,7 @@ object Tracing {
         queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
         computeNextT: (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T,
     ): NetworkTrace<T> {
-        val queueNext = NetworkTrace.QueueNext<T> { ts, ctx, queueItem, t ->
+        val queueNext = NetworkTrace.QueueNext { ts, ctx, queueItem, t ->
             // Check if we last moved between equipment, or across it.
             // TODO: Should we handle the TerminalToTerminalTraceStep cast here?
             val path = ts.path

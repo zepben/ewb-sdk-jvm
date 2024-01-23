@@ -10,6 +10,7 @@ package com.zepben.evolve.services.network.tracing.traversalV2
 import com.zepben.evolve.services.network.tracing.traversals.Tracker
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 import java.util.*
+import kotlin.collections.ArrayDeque
 
 /**
  *
@@ -24,7 +25,7 @@ import java.util.*
  *
  * @param T Object type to be traversed.
  */
-abstract class TraversalV2<T, D : TraversalV2<T, D>>(
+abstract class Traversal<T, D : Traversal<T, D>>(
     private val queueNext: QueueNext<T, D>,
     private val queue: TraversalQueue<T>,
     val tracker: Tracker<T>
@@ -34,7 +35,7 @@ abstract class TraversalV2<T, D : TraversalV2<T, D>>(
      *
      * @param T The type of object being traversed.
      */
-    fun interface QueueNext<T, D : TraversalV2<T, D>> {
+    fun interface QueueNext<T, D : Traversal<T, D>> {
         fun accept(item: T, context: StepContext, queueItem: (T) -> Boolean, traversal: D)
     }
 
@@ -42,7 +43,7 @@ abstract class TraversalV2<T, D : TraversalV2<T, D>>(
     /**
      * The item the traversal will start at, or `null` if it has not been set.
      */
-    private val startItems: MutableList<T> = mutableListOf()
+    private val startItems: ArrayDeque<T> = ArrayDeque()
 
     @Volatile
     private var running = false
@@ -93,7 +94,7 @@ abstract class TraversalV2<T, D : TraversalV2<T, D>>(
      * @param other The other traversal object to copy from.
      * @return this traversal instance.
      */
-    fun copyStopConditions(other: TraversalV2<T, D>): D {
+    fun copyStopConditions(other: Traversal<T, D>): D {
         stopConditions.addAll(other.stopConditions)
         computeNextContextFuns.putAll(other.computeNextContextFuns.filter { it.value is StopCondition<*> })
         return getDerivedThis()
@@ -125,7 +126,7 @@ abstract class TraversalV2<T, D : TraversalV2<T, D>>(
         return getDerivedThis()
     }
 
-    fun copyQueueConditions(other: TraversalV2<T, D>): D {
+    fun copyQueueConditions(other: Traversal<T, D>): D {
         queueConditions.addAll(other.queueConditions)
         computeNextContextFuns.putAll(other.computeNextContextFuns.filter { it is QueueCondition<*> })
         return getDerivedThis()
@@ -185,7 +186,7 @@ abstract class TraversalV2<T, D : TraversalV2<T, D>>(
      * @param other The other traversal object to copy from.
      * @return this traversal instance.
      */
-    fun copyStepActions(other: TraversalV2<T, D>): D {
+    fun copyStepActions(other: Traversal<T, D>): D {
         stepActions.addAll(other.stepActions)
         computeNextContextFuns.putAll(other.computeNextContextFuns.filter { it is StepAction<*> })
         return getDerivedThis()
@@ -216,7 +217,7 @@ abstract class TraversalV2<T, D : TraversalV2<T, D>>(
         return getDerivedThis()
     }
 
-    fun copyContextDataComputers(other: TraversalV2<T, D>): D {
+    fun copyContextDataComputers(other: Traversal<T, D>): D {
         computeNextContextFuns.putAll(other.computeNextContextFuns.filter { it.value.isStandaloneComputer() })
         return getDerivedThis()
     }
@@ -251,6 +252,11 @@ abstract class TraversalV2<T, D : TraversalV2<T, D>>(
         return getDerivedThis()
     }
 
+    fun run(startItem: T, canStopOnStartItem: Boolean = true) {
+        startItems.add(startItem)
+        run(canStopOnStartItem)
+    }
+
     /**
      * Starts the traversal. [setStart] should of been called to set the starting item or use the
      * overloaded run method that takes an item to start at.
@@ -281,7 +287,8 @@ abstract class TraversalV2<T, D : TraversalV2<T, D>>(
     }
 
     private fun doRun(canStopOnStartItem: Boolean) {
-        for (startItem in startItems) {
+        while (startItems.isNotEmpty()) {
+            val startItem = startItems.removeFirst()
             queue.add(startItem)
             var canStop = canStopOnStartItem
             contexts[startItem] = computeNextContext(startItem, null)

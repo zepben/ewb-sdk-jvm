@@ -62,5 +62,6 @@ class DistanceRelay(mRID: String = "") : ProtectionRelayFunction(mRID) {
     /**
      * The phase angle (in degrees) between voltage and current during normal operating conditions for zone 3 relay.
      */
-    var operationPhaseAngle3 = 10.0
+    var operationPhaseAngle3: Double? = null
+
 }

@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.cim.iec61970.base.auxiliaryequipment
 
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -25,6 +27,20 @@ internal class SensorTest {
     internal fun constructorCoverage() {
         assertThat(object : Sensor() {}.mRID, not(equalTo("")))
         assertThat(object : Sensor("id") {}.mRID, equalTo("id"))
+    }
+
+    @Test
+    internal fun relayFunctions() {
+        PrivateCollectionValidator.validate(
+            { object : Sensor() {} },
+            { id, _ -> object : ProtectionRelayFunction(id) {} },
+            Sensor::numRelayFunctions,
+            Sensor::getRelayFunction,
+            Sensor::relayFunctions,
+            Sensor::addRelayFunction,
+            Sensor::removeRelayFunction,
+            Sensor::clearRelayFunctions
+        )
     }
 
 }

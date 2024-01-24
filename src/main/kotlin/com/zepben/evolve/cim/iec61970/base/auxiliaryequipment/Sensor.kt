@@ -66,8 +66,8 @@ abstract class Sensor @JvmOverloads constructor(mRID: String = "") : AuxiliaryEq
      * @param protectionRelayFunction The [ProtectionRelayFunction] to disassociate from this [Sensor].
      * @return true if the [ProtectionRelayFunction] was disassociated.
      */
-    fun removeOperatedByProtectionRelayFunction(protectionRelayFunction: ProtectionRelayFunction?): Boolean {
-        val ret = _relayFunctions.safeRemove(protectionRelayFunction)
+    fun removeRelayFunction(relayFunction: ProtectionRelayFunction?): Boolean {
+        val ret = _relayFunctions.safeRemove(relayFunction)
         if (_relayFunctions.isNullOrEmpty()) _relayFunctions = null
         return ret
     }
@@ -77,7 +77,7 @@ abstract class Sensor @JvmOverloads constructor(mRID: String = "") : AuxiliaryEq
      *
      * @return A reference to this [Sensor] for fluent use.
      */
-    fun clearOperatedByProtectionRelayFunction(): Sensor {
+    fun clearRelayFunctions(): Sensor {
         _relayFunctions = null
         return this
     }

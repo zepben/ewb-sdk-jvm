@@ -31,6 +31,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createRemoteSource
@@ -715,6 +717,38 @@ fun CurrentRelay.fillFields(service: NetworkService, includeRuntime: Boolean = t
     currentLimit1 = 1.1
     inverseTimeFlag = true
     timeDelay1 = 2.2
+
+    return this
+}
+
+fun DistanceRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): DistanceRelay {
+    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
+
+    backwardBlind = 1.1
+    backwardReach = 2.2
+    backwardReactance = 3.3
+    forwardBlind = 4.4
+    forwardReach = 5.5
+    forwardReactance = 6.6
+    operationPhaseAngle1 = 7.7
+    operationPhaseAngle2 = 8.8
+    operationPhaseAngle3 = 9.9
+
+    return this
+}
+
+fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelayFunction {
+    (this as PowerSystemResource).fillFields(service, includeRuntime)
+
+    model = "model"
+    reclosing = true
+    relayDelayTime = 1.1
+    protectionKind = ProtectionKind.DISTANCE
+    directable = true
+    powerDirection = PowerDirectionKind.FORWARD
+    addTimeLimit(1.0)
+    addTimeLimit(2.0)
+    addTimeLimit(3.0)
 
     return this
 }

@@ -48,9 +48,9 @@ class ProtectionRelayScheme(mRID: String = "") : IdentifiedObject(mRID) {
     fun getFunction(mRID: String): ProtectionRelayFunction? = _functions?.getByMRID(mRID)
 
     /**
-     * Add a [ProtectionRelayFunction] to this [ProtectionRelayScheme].
+     * Associate a [ProtectionRelayFunction] with this [ProtectionRelayScheme].
      *
-     * @param function The [ProtectionRelayFunction] to add to this [ProtectionRelayScheme].
+     * @param function The [ProtectionRelayFunction] to associate with this [ProtectionRelayScheme].
      * @return A reference to this [ProtectionRelayScheme] for fluent use.
      */
     fun addFunction(function: ProtectionRelayFunction): ProtectionRelayScheme {
@@ -64,7 +64,7 @@ class ProtectionRelayScheme(mRID: String = "") : IdentifiedObject(mRID) {
     }
 
     /**
-     * Remove a [ProtectionRelayFunction] from this [ProtectionRelayScheme].
+     * Disassociate a [ProtectionRelayFunction] from this [ProtectionRelayScheme].
      *
      * @param function The [ProtectionRelayFunction] to disassociate from this [ProtectionRelayScheme].
      * @return true if the [ProtectionRelayFunction] was disassociated.

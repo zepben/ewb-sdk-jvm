@@ -38,6 +38,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     private var _protectedSwitches: MutableList<ProtectedSwitch>? = null
     private var _sensors: MutableList<Sensor>? = null
     private var _thresholds: MutableList<RelaySetting>? = null
+    private var _schemes: MutableList<ProtectionRelayScheme>? = null
 
     /**
      * Returns a read-only [List] of time limits (in seconds) for this [ProtectionRelayFunction].
@@ -289,6 +290,66 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      */
     fun clearThresholds(): ProtectionRelayFunction {
         _thresholds = null
+        return this
+    }
+
+    /**
+     * The schemes this function operates under.
+     *
+     * @return An unmodifiable [Collection] of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
+     */
+    val scheme: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
+
+    /**
+     * Get the number of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
+     *
+     * @return The number of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
+     */
+    fun numSchemes(): Int = _schemes?.size ?: 0
+
+    /**
+     * Get a [ProtectionRelayScheme] this [ProtectionRelayFunction] operates under by its mRID.
+     *
+     * @param mRID The mRID of the desired [ProtectionRelayScheme]
+     * @return The [ProtectionRelayScheme] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getScheme(mRID: String): ProtectionRelayScheme? = _schemes?.getByMRID(mRID)
+
+    /**
+     * Associate this [ProtectionRelayFunction] to a [ProtectionRelayScheme] it operates under.
+     *
+     * @param scheme The [ProtectionRelayScheme] to associate with this [ProtectionRelayFunction].
+     * @return A reference to this [ProtectionRelayFunction] for fluent use.
+     */
+    fun addScheme(scheme: ProtectionRelayScheme): ProtectionRelayFunction {
+        if (validateReference(scheme, ::getScheme, "A ProtectionRelayScheme"))
+            return this
+
+        _schemes = _schemes ?: mutableListOf()
+        _schemes!!.add(scheme)
+
+        return this
+    }
+
+    /**
+     * Disassociate this [ProtectionRelayFunction] from a [ProtectionRelayScheme].
+     *
+     * @param function The [ProtectionRelayScheme] to disassociate from this [ProtectionRelayFunction].
+     * @return true if the [ProtectionRelayScheme] was disassociated.
+     */
+    fun removeScheme(scheme: ProtectionRelayScheme?): Boolean {
+        val ret = _schemes.safeRemove(scheme)
+        if (_schemes.isNullOrEmpty()) _schemes = null
+        return ret
+    }
+
+    /**
+     * Disassociate all [ProtectionRelayScheme]s from this [ProtectionRelayFunction].
+     *
+     * @return A reference to this [ProtectionRelayFunction] for fluent use.
+     */
+    fun clearSchemes(): ProtectionRelayFunction {
+        _schemes = null
         return this
     }
 

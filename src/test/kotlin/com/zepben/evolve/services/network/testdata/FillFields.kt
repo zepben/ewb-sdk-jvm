@@ -746,9 +746,6 @@ fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: 
     protectionKind = ProtectionKind.DISTANCE
     directable = true
     powerDirection = PowerDirectionKind.FORWARD
-    addTimeLimit(1.0)
-    addTimeLimit(2.0)
-    addTimeLimit(3.0)
 
     return this
 }

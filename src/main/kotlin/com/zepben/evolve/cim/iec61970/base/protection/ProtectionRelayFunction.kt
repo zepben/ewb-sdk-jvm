@@ -343,28 +343,40 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     fun numThresholds(): Int = _thresholds?.size ?: 0
 
     /**
-     * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its index. Thresholds are 0-indexed. Returns null for out-of-bound indices.
+     * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its mRID. Returns null if no matching [RelaySetting] is found.
      *
-     * @param sequenceNumber The index of the desired threshold [RelaySetting]
-     * @return The threshold [RelaySetting] with the specified [sequenceNumber] if it exists, otherwise null
+     * @param mRID The mRID of the desired threshold [RelaySetting]
+     * @return The threshold [RelaySetting] with the specified [mRID] if it exists, otherwise null
      */
-    fun getThreshold(sequenceNumber: Int): RelaySetting? = _thresholds?.getOrNull(sequenceNumber)
+    fun getThreshold(mRID: String): RelaySetting? = _thresholds.getByMRID(mRID)
 
     /**
-     * Insert a threshold [RelaySetting] into this [ProtectionRelayFunction]'s list of thresholds.
+     * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its index. Thresholds are 0-indexed. Returns null for out-of-bound indices.
+     *
+     * @param thresholdNumber The sequence number of the desired threshold [RelaySetting]
+     * @return The threshold [RelaySetting] with the specified [thresholdNumber] if it exists, otherwise null
+     */
+    fun getThreshold(thresholdNumber: Int): RelaySetting? = _thresholds?.firstOrNull { it.thresholdNumber == thresholdNumber }
+
+    /**
+     * Add a threshold [RelaySetting] to this [ProtectionRelayFunction]'s list of thresholds.
      *
      * @param threshold The threshold [RelaySetting] to add to this [ProtectionRelayFunction].
-     * @param index The index to insert the threshold. Defaults to adding the threshold to the end of the list.
      * @return A reference to this [ProtectionRelayFunction] for fluent use.
      */
-    fun addThreshold(threshold: RelaySetting, index: Int = numThresholds()): ProtectionRelayFunction {
-        require(index in 0..(numThresholds())) {
-            "Unable to add RelaySetting to ${typeNameAndMRID()}. " +
-                "Index $index is invalid. Expected a value between 0 and ${numThresholds()}."
-        }
+    fun addThreshold(threshold: RelaySetting): ProtectionRelayFunction {
+        if (validateReference(threshold, ::getThreshold, "A RelaySetting")) return this
+
+        if (threshold.thresholdNumber == 0)
+            threshold.thresholdNumber = numThresholds() + 1
+
+        require(getThreshold(threshold.thresholdNumber) == null) {
+            "Unable to add ${threshold.typeNameAndMRID()} to ${typeNameAndMRID()}. " +
+                "A ${getThreshold(threshold.thresholdNumber)!!.typeNameAndMRID()} already exists with thresholdNumber ${threshold.thresholdNumber}." }
 
         _thresholds = _thresholds ?: mutableListOf()
-        _thresholds!!.add(index, threshold)
+        _thresholds!!.add(threshold)
+        _thresholds!!.sortBy { it.thresholdNumber }
 
         return this
     }

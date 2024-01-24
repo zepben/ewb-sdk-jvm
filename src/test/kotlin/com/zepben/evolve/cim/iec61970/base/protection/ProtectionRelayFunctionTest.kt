@@ -7,14 +7,15 @@
  */
 package com.zepben.evolve.cim.iec61970.base.protection
 
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
+import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.emptyIterable
 import org.junit.jupiter.api.Test
 
 internal class ProtectionRelayFunctionTest {
@@ -35,7 +36,6 @@ internal class ProtectionRelayFunctionTest {
         assertThat(protectionRelayFunction.protectionKind, equalTo(ProtectionKind.UNKNOWN))
         assertThat(protectionRelayFunction.directable, nullValue())
         assertThat(protectionRelayFunction.powerDirection, equalTo(PowerDirectionKind.UNKNOWN_DIRECTION))
-        assertThat(protectionRelayFunction.timeLimits, emptyIterable())
 
         protectionRelayFunction.fillFields(NetworkService())
 
@@ -45,6 +45,66 @@ internal class ProtectionRelayFunctionTest {
         assertThat(protectionRelayFunction.protectionKind, equalTo(ProtectionKind.DISTANCE))
         assertThat(protectionRelayFunction.directable, equalTo(true))
         assertThat(protectionRelayFunction.powerDirection, equalTo(PowerDirectionKind.FORWARD))
-        assertThat(protectionRelayFunction.timeLimits, contains(1.0, 2.0, 3.0))
     }
+
+    @Test
+    internal fun timeLimits() {
+        var timeLimit = 0.0
+        PrivateCollectionValidator.validate(
+            { object : ProtectionRelayFunction() {} },
+            { _: ProtectionRelayFunction -> timeLimit++ },
+            ProtectionRelayFunction::numTimeLimits,
+            ProtectionRelayFunction::getTimeLimit,
+            ProtectionRelayFunction::forEachTimeLimits,
+            ProtectionRelayFunction::addTimeLimit,
+            ProtectionRelayFunction::addTimeLimit,
+            ProtectionRelayFunction::removeTimeLimit,
+            ProtectionRelayFunction::removeTimeLimitAt,
+            ProtectionRelayFunction::clearTimeLimits
+        )
+    }
+
+    @Test
+    internal fun protectedSwitches() {
+        PrivateCollectionValidator.validate(
+            { object : ProtectionRelayFunction() {} },
+            { id, _ -> object : ProtectedSwitch(id) {} },
+            ProtectionRelayFunction::numProtectedSwitches,
+            ProtectionRelayFunction::getProtectedSwitch,
+            ProtectionRelayFunction::protectedSwitches,
+            ProtectionRelayFunction::addProtectedSwitch,
+            ProtectionRelayFunction::removeProtectedSwitch,
+            ProtectionRelayFunction::clearProtectedSwitches
+        )
+    }
+
+    @Test
+    internal fun sensors() {
+        PrivateCollectionValidator.validate(
+            { object : ProtectionRelayFunction() {} },
+            { id, _ -> object : Sensor(id) {} },
+            ProtectionRelayFunction::numSensors,
+            ProtectionRelayFunction::getSensor,
+            ProtectionRelayFunction::sensors,
+            ProtectionRelayFunction::addSensor,
+            ProtectionRelayFunction::removeSensor,
+            ProtectionRelayFunction::clearSensors
+        )
+    }
+
+    @Test
+    internal fun thresholds() {
+        PrivateCollectionValidator.validate(
+            { object : ProtectionRelayFunction() {} },
+            { id, _, tn -> RelaySetting(id).apply { tn?.let { thresholdNumber = it } } },
+            ProtectionRelayFunction::numThresholds,
+            ProtectionRelayFunction::getThreshold,
+            ProtectionRelayFunction::getThreshold,
+            ProtectionRelayFunction::thresholds,
+            ProtectionRelayFunction::addThreshold,
+            ProtectionRelayFunction::removeThreshold,
+            ProtectionRelayFunction::clearThresholds
+        )
+    }
+
 }

@@ -16,10 +16,12 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
  *
  * @property unitSymbol The unit of the value.
  * @property value The value of the setting, e.g voltage, current, etc.
+ * @property thresholdNumber Sequence number for this threshold setting in a [ProtectionRelayFunction].
  */
 class RelaySetting(mRID: String = "") : IdentifiedObject(mRID) {
 
     var unitSymbol: UnitSymbol = UnitSymbol.NONE
     var value: Double = 0.0
+    var thresholdNumber: Int = 0
 
 }

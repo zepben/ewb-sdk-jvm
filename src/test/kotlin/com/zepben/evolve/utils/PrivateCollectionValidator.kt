@@ -171,6 +171,7 @@ internal class PrivateCollectionValidator {
             add: (T, U) -> T,
             noinline addWithIndex: ((T, U, Int) -> T)?,
             remove: (T, U?) -> Boolean,
+            noinline removeAtIndex: ((T, Int) -> U?)?,
             clear: (T) -> T,
             supportsDuplicates: Boolean = true,
         ) {
@@ -191,6 +192,7 @@ internal class PrivateCollectionValidator {
             add(it, other2)
             add(it, other3)
             assertThat(num(it), equalTo(3))
+            assertThat(get(it, 2), equalTo(other3))
 
             var numObjects = 3
             if (supportsDuplicates) {
@@ -199,24 +201,23 @@ internal class PrivateCollectionValidator {
                 assertThat(num(it), equalTo(++numObjects))
             }
 
-            addWithIndex?.let { awi ->
-                awi(it, other1, 1)
-                assertThat(num(it), equalTo(++numObjects))
-            }
-
             assertThat(remove(it, other2), equalTo(true))
             assertThat(remove(it, other2), equalTo(false))
             assertThat(remove(it, null), equalTo(false))
             assertThat(num(it), equalTo(--numObjects))
 
-            assertThat(get(it, 2), equalTo(other3))
-
             val list = mutableListOf<U>()
             forEach(it, list::add)
             if (supportsDuplicates)
-                assertThat(list, contains(other1, other1, other3, other1))
+                assertThat(list, contains(other1, other3, other1))
             else
                 assertThat(list, containsInAnyOrder(other1, other3))
+
+            addWithIndex?.let { awi ->
+                awi(it, other2, 1)
+                assertThat(num(it), equalTo(++numObjects))
+                assertThat(get(it, 1), equalTo(other2))
+            }
 
             clear(it)
             assertThat(num(it), equalTo(0))
@@ -243,6 +244,16 @@ internal class PrivateCollectionValidator {
             // Make sure you can call remove on an empty list.
             remove(it, other2)
             assertThat(num(it), equalTo(0))
+
+            removeAtIndex?.let { rai ->
+                add(it, other1)
+                add(it, other2)
+                add(it, other3)
+                assertThat(rai(it, 1), equalTo(other2))
+                assertThat(num(it), equalTo(2))
+                assertThat(get(it, 1), equalTo(other3))
+                assertThat(rai(it, 2), nullValue())
+            }
         }
 
         private fun getName(clazz: Class<*>?): String {

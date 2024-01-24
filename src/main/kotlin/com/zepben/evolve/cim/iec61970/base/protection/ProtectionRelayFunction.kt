@@ -14,6 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.common.extensions.*
+import java.util.function.BiConsumer
 
 /**
  * A function that a relay implements to protect equipment.
@@ -53,6 +54,23 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     fun numTimeLimits(): Int = _timeLimits?.size ?: 0
 
     /**
+     * Get the time limit of this [ProtectionRelayFunction] with index [sequenceNumber] if it exists, otherwise null.
+     *
+     * @param sequenceNumber The index of the desired time limit.
+     * @return The time limit with the specified [sequenceNumber] if it exists, otherwise null.
+     */
+    fun getTimeLimit(sequenceNumber: Int): Double? = _timeLimits?.getOrNull(sequenceNumber)
+
+    /**
+     * Java interop forEachTimeLimit. Perform the specified action against each time limit.
+     *
+     * @param action The action to perform on each time limit
+     */
+    fun forEachTimeLimit(action: BiConsumer<Int, Double>) {
+        _timeLimits?.forEachIndexed(action::accept)
+    }
+
+    /**
      * Add a time limit
      * @param timeLimit The time limit in seconds to add.
      * @param index The index into the list to add the time limit at. Defaults to the end of the list.
@@ -63,8 +81,8 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         index: Int = numTimeLimits()
     ): ProtectionRelayFunction {
         require(index in 0..(numTimeLimits())) {
-            "Unable to add PositionPoint to ${typeNameAndMRID()}. " +
-                "Index $index is invalid. Expected a value between 0 and ${numTimeLimits()}. " +
+            "Unable to add Double to ${typeNameAndMRID()}. " +
+                "Sequence number $index is invalid. Expected a value between 0 and ${numTimeLimits()}. " +
                 "Make sure you are adding the items in order and there are no gaps in the numbering."
         }
 
@@ -92,10 +110,22 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
 
     /**
      * Remove a time limit from the list.
+     * @param timeLimit The time limit to remove.
+     * @return true if the time limit was found and removed.
+     */
+    fun removeTimeLimit(timeLimit: Double?): Boolean {
+        val ret = _timeLimits?.remove(timeLimit) ?: false
+        if (_sensors.isNullOrEmpty()) _sensors = null
+        return ret
+    }
+
+    /**
+     * Remove a time limit from the list.
      * @param index The index of the time limit to remove.
      * @return The time limit that was removed, or null if no time limit was present at [index].
      */
-    fun removeTimeLimit(index: Int): Double? {
+    fun removeTimeLimitAt(index: Int): Double? {
+        if (index >= numTimeLimits()) return null
         val ret = _timeLimits?.removeAt(index)
         if (_timeLimits.isNullOrEmpty()) _timeLimits = null
         return ret
@@ -245,28 +275,40 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     fun numThresholds(): Int = _thresholds?.size ?: 0
 
     /**
-     * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its index. Thresholds are 0-indexed. Returns null for out-of-bound indices.
+     * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its mRID. Returns null if no matching [RelaySetting] is found.
      *
-     * @param sequenceNumber The index of the desired threshold [RelaySetting]
-     * @return The threshold [RelaySetting] with the specified [sequenceNumber] if it exists, otherwise null
+     * @param mRID The mRID of the desired threshold [RelaySetting]
+     * @return The threshold [RelaySetting] with the specified [mRID] if it exists, otherwise null
      */
-    fun getThreshold(sequenceNumber: Int): RelaySetting? = _thresholds?.getOrNull(sequenceNumber)
+    fun getThreshold(mRID: String): RelaySetting? = _thresholds.getByMRID(mRID)
 
     /**
-     * Insert a threshold [RelaySetting] into this [ProtectionRelayFunction]'s list of thresholds.
+     * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its index. Thresholds are 0-indexed. Returns null for out-of-bound indices.
+     *
+     * @param thresholdNumber The sequence number of the desired threshold [RelaySetting]
+     * @return The threshold [RelaySetting] with the specified [thresholdNumber] if it exists, otherwise null
+     */
+    fun getThreshold(thresholdNumber: Int): RelaySetting? = _thresholds?.firstOrNull { it.thresholdNumber == thresholdNumber }
+
+    /**
+     * Add a threshold [RelaySetting] to this [ProtectionRelayFunction]'s list of thresholds.
      *
      * @param threshold The threshold [RelaySetting] to add to this [ProtectionRelayFunction].
-     * @param index The index to insert the threshold. Defaults to adding the threshold to the end of the list.
      * @return A reference to this [ProtectionRelayFunction] for fluent use.
      */
-    fun addThreshold(threshold: RelaySetting, index: Int = numThresholds()): ProtectionRelayFunction {
-        require(index in 0..(numThresholds())) {
-            "Unable to add RelaySetting to ${typeNameAndMRID()}. " +
-                "Index $index is invalid. Expected a value between 0 and ${numThresholds()}."
-        }
+    fun addThreshold(threshold: RelaySetting): ProtectionRelayFunction {
+        if (validateReference(threshold, ::getThreshold, "A RelaySetting")) return this
+
+        if (threshold.thresholdNumber == 0)
+            threshold.thresholdNumber = numThresholds() + 1
+
+        require(getThreshold(threshold.thresholdNumber) == null) {
+            "Unable to add ${threshold.typeNameAndMRID()} to ${typeNameAndMRID()}. " +
+                "A ${getThreshold(threshold.thresholdNumber)!!.typeNameAndMRID()} already exists with thresholdNumber ${threshold.thresholdNumber}." }
 
         _thresholds = _thresholds ?: mutableListOf()
-        _thresholds!!.add(index, threshold)
+        _thresholds!!.add(threshold)
+        _thresholds!!.sortBy { it.thresholdNumber }
 
         return this
     }
@@ -354,3 +396,10 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     }
 
 }
+
+/**
+ * Perform the specified action against each time limit.
+ *
+ * @param action The action to perform on each time limit
+ */
+fun ProtectionRelayFunction.forEachTimeLimits(action: (sequenceNumber: Int, timeLimit: Double) -> Unit) = forEachTimeLimit(BiConsumer(action))

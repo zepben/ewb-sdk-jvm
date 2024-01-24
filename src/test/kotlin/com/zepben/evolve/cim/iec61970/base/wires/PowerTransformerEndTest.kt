@@ -192,6 +192,7 @@ internal class PowerTransformerEndTest {
             PowerTransformerEnd::addRating,
             null,
             { pte, r: TransformerEndRatedS? -> pte.removeRating(r) },
+            null,
             PowerTransformerEnd::clearRatings,
             supportsDuplicates = false
         )

@@ -78,5 +78,5 @@ abstract class Sensor(mRID: String = "") : AuxiliaryEquipment(mRID) {
         _relayFunctions = null
         return this
     }
-    
+
 }

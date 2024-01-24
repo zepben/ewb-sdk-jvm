@@ -8,8 +8,78 @@
 
 package com.zepben.evolve.cim.iec61970.base.auxiliaryequipment
 
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.evolve.services.common.extensions.asUnmodifiable
+import com.zepben.evolve.services.common.extensions.getByMRID
+import com.zepben.evolve.services.common.extensions.safeRemove
+import com.zepben.evolve.services.common.extensions.validateReference
+
 /**
  * This class describes devices that transform a measured quantity into signals that can be presented at displays,
  * used in control or be recorded.
  */
-abstract class Sensor @JvmOverloads constructor(mRID: String = "") : AuxiliaryEquipment(mRID)
+abstract class Sensor @JvmOverloads constructor(mRID: String = "") : AuxiliaryEquipment(mRID) {
+
+    private var _relayFunctions: MutableList<ProtectionRelayFunction>? = null
+
+    /**
+     * All [ProtectionRelayFunction]s operating this [Sensor]. Collection is read-only.
+     *
+     * @return A read-only [Collection] of [ProtectionRelayFunction]s operating this [Sensor].
+     */
+    val relayFunctions: Collection<ProtectionRelayFunction> get() = _relayFunctions.asUnmodifiable()
+
+    /**
+     * Get the number of [ProtectionRelayFunction]s operating this [Sensor].
+     *
+     * @return The number of [ProtectionRelayFunction]s operating this [Sensor].
+     */
+    fun numRelayFunctions(): Int = _relayFunctions?.size ?: 0
+
+    /**
+     * Get a [ProtectionRelayFunction] operating this [Sensor] by its mRID.
+     *
+     * @param mRID The mRID of the desired [ProtectionRelayFunction]
+     * @return The [ProtectionRelayFunction] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getRelayFunction(mRID: String): ProtectionRelayFunction? = _relayFunctions?.getByMRID(mRID)
+
+    /**
+     * Associate this [Sensor] with a [ProtectionRelayFunction] operating it.
+     *
+     * @param protectionRelayFunction The [ProtectionRelayFunction] to associate with this [Sensor].
+     * @return A reference to this [Sensor] for fluent use.
+     */
+    fun addRelayFunction(protectionRelayFunction: ProtectionRelayFunction): Sensor {
+        if (validateReference(protectionRelayFunction, ::getRelayFunction, "A ProtectionRelayFunction"))
+            return this
+
+        _relayFunctions = _relayFunctions ?: mutableListOf()
+        _relayFunctions!!.add(protectionRelayFunction)
+
+        return this
+    }
+
+    /**
+     * Disassociate this [Sensor] from a [ProtectionRelayFunction].
+     *
+     * @param protectionRelayFunction The [ProtectionRelayFunction] to disassociate from this [Sensor].
+     * @return true if the [ProtectionRelayFunction] was disassociated.
+     */
+    fun removeOperatedByProtectionRelayFunction(protectionRelayFunction: ProtectionRelayFunction?): Boolean {
+        val ret = _relayFunctions.safeRemove(protectionRelayFunction)
+        if (_relayFunctions.isNullOrEmpty()) _relayFunctions = null
+        return ret
+    }
+
+    /**
+     * Disassociate all [ProtectionRelayFunction]s from this [Sensor].
+     *
+     * @return A reference to this [Sensor] for fluent use.
+     */
+    fun clearOperatedByProtectionRelayFunction(): Sensor {
+        _relayFunctions = null
+        return this
+    }
+    
+}

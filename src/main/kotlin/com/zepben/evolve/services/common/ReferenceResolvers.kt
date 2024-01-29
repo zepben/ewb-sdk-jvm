@@ -37,6 +37,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -449,6 +450,14 @@ internal object ProtectionRelayFunctionToProtectionRelaySchemeResolver : Referen
 
 internal object ProtectionRelaySchemeToProtectionRelayFunctionResolver : ReferenceResolver<ProtectionRelayScheme, ProtectionRelayFunction> by KReferenceResolver(
     ProtectionRelayScheme::class, ProtectionRelayFunction::class, ProtectionRelayScheme::addFunction
+)
+
+internal object ProtectionRelaySchemeToProtectionRelaySystemResolver : ReferenceResolver<ProtectionRelayScheme, ProtectionRelaySystem> by KReferenceResolver(
+    ProtectionRelayScheme::class, ProtectionRelaySystem::class, ProtectionRelayScheme::system.setter
+)
+
+internal object ProtectionRelaySystemToProtectionRelaySchemeResolver : ReferenceResolver<ProtectionRelaySystem, ProtectionRelayScheme> by KReferenceResolver(
+    ProtectionRelaySystem::class, ProtectionRelayScheme::class, ProtectionRelaySystem::addScheme
 )
 
 //-------------------------------------------//

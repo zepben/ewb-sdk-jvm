@@ -11,6 +11,9 @@ package com.zepben.evolve.cim.iec61970.base.protection
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
+import com.zepben.evolve.services.common.extensions.getByMRID
+import com.zepben.evolve.services.common.extensions.safeRemove
+import com.zepben.evolve.services.common.extensions.validateReference
 
 /**
  * A relay system for controlling ProtectedSwitches.
@@ -26,9 +29,9 @@ class ProtectionRelaySystem(mRID: String = "") : Equipment(mRID) {
     /**
      * The schemes implemented by this [ProtectionRelaySystem].
      *
-     * @return An unmodifiable [List] of the [ProtectionRelayScheme]s implemented by this [ProtectionRelaySystem].
+     * @return An unmodifiable [Collection] of the [ProtectionRelayScheme]s implemented by this [ProtectionRelaySystem].
      */
-    val schemes: List<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
+    val schemes: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
 
     /**
      * Returns the number of schemes for this [ProtectionRelaySystem]
@@ -36,28 +39,37 @@ class ProtectionRelaySystem(mRID: String = "") : Equipment(mRID) {
     fun numSchemes(): Int = _schemes?.size ?: 0
 
     /**
-     * Add a scheme
+     * Get a scheme for this [ProtectionRelaySystem] by its mRID.
+     *
+     * @param mRID The mRID of the [ProtectionRelayScheme]
+     * @return The [ProtectionRelayScheme] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getScheme(mRID: String): ProtectionRelayScheme? = _schemes.getByMRID(mRID)
+
+    /**
+     * Add a scheme to this [ProtectionRelaySystem]
      * @param scheme The scheme to add.
-     * @param index The index into the list to add the scheme at. Defaults to the end of the list.
      * @return This [ProtectionRelaySystem] for fluent use.
      */
     fun addScheme(
         scheme: ProtectionRelayScheme,
-        index: Int = numSchemes()
     ): ProtectionRelaySystem {
+        if (validateReference(scheme, ::getScheme, "A ProtectionRelayScheme"))
+            return this
+
         _schemes = _schemes ?: mutableListOf()
-        _schemes!!.add(index, scheme)
+        _schemes!!.add(scheme)
 
         return this
     }
 
     /**
-     * Remove a scheme from the list.
-     * @param index The index of the scheme to remove.
-     * @return The scheme that was removed, or null if no scheme was present at [index].
+     * Remove a scheme from this [ProtectionRelaySystem].
+     * @param scheme The [ProtectionRelayScheme] to remove.
+     * @return true if the scheme was removed.
      */
-    fun removeScheme(index: Int): ProtectionRelayScheme? {
-        val ret = _schemes?.removeAt(index)
+    fun removeScheme(scheme: ProtectionRelayScheme?): Boolean {
+        val ret = _schemes.safeRemove(scheme)
         if (_schemes.isNullOrEmpty()) _schemes = null
         return ret
     }

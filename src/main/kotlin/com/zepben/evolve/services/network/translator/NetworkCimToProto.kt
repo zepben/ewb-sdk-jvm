@@ -500,7 +500,10 @@ fun toPb(cim: PotentialTransformer, pb: PBPotentialTransformer.Builder): PBPoten
     }
 
 fun toPb(cim: Sensor, pb: PBSensor.Builder): PBSensor.Builder =
-    pb.apply { toPb(cim, aeBuilder) }
+    pb.apply {
+        cim.relayFunctions.forEach { addRelayFunctionMRIDs(it.mRID) }
+        toPb(cim, aeBuilder)
+    }
 
 fun CurrentTransformer.toPb(): PBCurrentTransformer = toPb(this, PBCurrentTransformer.newBuilder()).build()
 fun FaultIndicator.toPb(): PBFaultIndicator = toPb(this, PBFaultIndicator.newBuilder()).build()
@@ -920,7 +923,10 @@ fun toPb(cim: EnergySourcePhase, pb: PBEnergySourcePhase.Builder): PBEnergySourc
     }
 
 fun toPb(cim: Fuse, pb: PBFuse.Builder): PBFuse.Builder =
-    pb.apply { toPb(cim, swBuilder) }
+    pb.apply {
+        cim.function?.let { functionMRID = it.mRID } ?: clearFunctionMRID()
+        toPb(cim, swBuilder)
+    }
 
 fun toPb(cim: Ground, pb: PBGround.Builder): PBGround.Builder =
     pb.apply { toPb(cim, ceBuilder) }
@@ -1064,6 +1070,7 @@ fun toPb(cim: TransformerEndRatedS): PBTransformerEndRatedS.Builder =
 
 fun toPb(cim: ProtectedSwitch, pb: PBProtectedSwitch.Builder): PBProtectedSwitch.Builder =
     pb.apply {
+        cim.relayFunctions.forEach { addRelayFunctionMRIDs(it.mRID) }
         breakingCapacity = cim.breakingCapacity ?: UNKNOWN_INT
         toPb(cim, swBuilder)
     }
@@ -1096,6 +1103,7 @@ fun toPb(cim: RegulatingControl, pb: PBRegulatingControl.Builder): PBRegulatingC
         cim.enabled?.let { enabledSet = it } ?: run { enabledNull = NullValue.NULL_VALUE }
         maxAllowedTargetValue = cim.maxAllowedTargetValue ?: UNKNOWN_DOUBLE
         minAllowedTargetValue = cim.minAllowedTargetValue ?: UNKNOWN_DOUBLE
+        ratedCurrent = cim.ratedCurrent ?: UNKNOWN_DOUBLE
         cim.terminal?.also { terminalMRID = it.mRID } ?: clearTerminalMRID()
         clearRegulatingCondEqMRIDs()
         cim.regulatingCondEqs.forEach { addRegulatingCondEqMRIDs(it.mRID) }

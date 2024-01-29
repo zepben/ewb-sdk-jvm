@@ -44,6 +44,7 @@ class RegulatingControlTest {
         assertThat(regulatingControl.enabled, nullValue())
         assertThat(regulatingControl.maxAllowedTargetValue, nullValue())
         assertThat(regulatingControl.minAllowedTargetValue, nullValue())
+        assertThat(regulatingControl.ratedCurrent, nullValue())
         assertThat(regulatingControl.terminal, nullValue())
 
         regulatingControl.fillFields(NetworkService(), true)
@@ -56,6 +57,7 @@ class RegulatingControlTest {
         assertThat(regulatingControl.enabled, equalTo(true))
         assertThat(regulatingControl.maxAllowedTargetValue, equalTo(200.0))
         assertThat(regulatingControl.minAllowedTargetValue, equalTo(50.0))
+        assertThat(regulatingControl.ratedCurrent, equalTo(10.0))
         assertThat(regulatingControl.terminal, notNullValue())
     }
 

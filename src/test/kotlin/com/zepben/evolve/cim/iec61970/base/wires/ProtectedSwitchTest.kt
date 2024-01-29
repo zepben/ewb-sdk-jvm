@@ -7,8 +7,10 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -36,6 +38,20 @@ internal class ProtectedSwitchTest {
         protectedSwitch.fillFields(NetworkService())
 
         assertThat(protectedSwitch.breakingCapacity, equalTo(1))
+    }
+
+    @Test
+    internal fun relayFunctions() {
+        PrivateCollectionValidator.validate(
+            { object : ProtectedSwitch() {} },
+            { id, _ -> object : ProtectionRelayFunction(id) {} },
+            ProtectedSwitch::numRelayFunctions,
+            ProtectedSwitch::getRelayFunction,
+            ProtectedSwitch::relayFunctions,
+            ProtectedSwitch::addRelayFunction,
+            ProtectedSwitch::removeRelayFunction,
+            ProtectedSwitch::clearRelayFunctions
+        )
     }
 
 }

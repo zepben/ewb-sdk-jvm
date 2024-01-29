@@ -11,6 +11,7 @@ package com.zepben.evolve.cim.iec61970.base.protection
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert
@@ -26,13 +27,27 @@ internal class ProtectionRelaySystemTest {
 
     @Test
     internal fun accessorCoverage() {
-        val ProtectionRelaySystem = ProtectionRelaySystem()
+        val protectionRelaySystem = ProtectionRelaySystem()
 
-        MatcherAssert.assertThat(ProtectionRelaySystem.protectionKind, equalTo(ProtectionKind.UNKNOWN))
+        MatcherAssert.assertThat(protectionRelaySystem.protectionKind, equalTo(ProtectionKind.UNKNOWN))
 
-        ProtectionRelaySystem.fillFields(NetworkService())
+        protectionRelaySystem.fillFields(NetworkService())
 
-        MatcherAssert.assertThat(ProtectionRelaySystem.protectionKind, equalTo(ProtectionKind.DISTANCE))
+        MatcherAssert.assertThat(protectionRelaySystem.protectionKind, equalTo(ProtectionKind.DISTANCE))
+    }
+
+    @Test
+    internal fun schemes() {
+        PrivateCollectionValidator.validate(
+            { ProtectionRelaySystem() },
+            { id, _ -> ProtectionRelayScheme(id) },
+            ProtectionRelaySystem::numSchemes,
+            ProtectionRelaySystem::getScheme,
+            ProtectionRelaySystem::schemes,
+            ProtectionRelaySystem::addScheme,
+            ProtectionRelaySystem::removeScheme,
+            ProtectionRelaySystem::clearSchemes
+        )
     }
 
 }

@@ -488,4 +488,24 @@ object Resolvers {
             ProtectionRelaySchemeToProtectionRelaySystemResolver
         )
 
+    @JvmStatic
+    fun relayFunctions(sensor: Sensor): BoundReferenceResolver<Sensor, ProtectionRelayFunction> =
+        BoundReferenceResolver(
+            sensor,
+            SensorToProtectionRelayFunctionResolver,
+            ProtectionRelayFunctionToSensorResolver
+        )
+
+    @JvmStatic
+    fun relayFunctions(protectedSwitch: ProtectedSwitch): BoundReferenceResolver<ProtectedSwitch, ProtectionRelayFunction> =
+        BoundReferenceResolver(
+            protectedSwitch,
+            ProtectedSwitchToProtectionRelayFunctionResolver,
+            ProtectionRelayFunctionToProtectedSwitchResolver
+        )
+
+    @JvmStatic
+    fun function(fuse: Fuse): BoundReferenceResolver<Fuse, ProtectionRelayFunction> =
+        BoundReferenceResolver(fuse, FuseToProtectionRelayFunctionResolver, null)
+
 }

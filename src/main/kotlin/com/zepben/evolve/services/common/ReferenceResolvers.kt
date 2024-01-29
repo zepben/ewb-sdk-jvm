@@ -460,6 +460,10 @@ internal object ProtectionRelaySystemToProtectionRelaySchemeResolver : Reference
     ProtectionRelaySystem::class, ProtectionRelayScheme::class, ProtectionRelaySystem::addScheme
 )
 
+internal object FuseToProtectionRelayFunctionResolver : ReferenceResolver<Fuse, ProtectionRelayFunction> by KReferenceResolver(
+    Fuse::class, ProtectionRelayFunction::class, Fuse::function.setter
+)
+
 //-------------------------------------------//
 
 class KReferenceResolver<T : IdentifiedObject, R : IdentifiedObject>(

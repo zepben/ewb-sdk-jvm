@@ -22,8 +22,7 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -329,7 +328,11 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         }
 
     private fun ObjectDifference<out Sensor>.compareSensor(): ObjectDifference<out Sensor> =
-        apply { compareAuxiliaryEquipment() }
+        apply {
+            compareAuxiliaryEquipment()
+
+            compareIdReferenceCollections(Sensor::relayFunctions)
+        }
 
     /************ IEC61970 BASE CORE ************/
 
@@ -522,6 +525,23 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareValues(CurrentRelay::currentLimit1, CurrentRelay::inverseTimeFlag, CurrentRelay::timeDelay1)
         }
 
+    private fun compareDistanceRelay(source: DistanceRelay, target: DistanceRelay): ObjectDifference<DistanceRelay> =
+        ObjectDifference(source, target).apply {
+            compareProtectionRelayFunction()
+
+            compareValues(
+                DistanceRelay::backwardBlind,
+                DistanceRelay::backwardReach,
+                DistanceRelay::backwardReactance,
+                DistanceRelay::forwardBlind,
+                DistanceRelay::forwardReach,
+                DistanceRelay::forwardReactance,
+                DistanceRelay::operationPhaseAngle1,
+                DistanceRelay::operationPhaseAngle2,
+                DistanceRelay::operationPhaseAngle3
+            )
+        }
+
     private fun ObjectDifference<out ProtectionRelayFunction>.compareProtectionRelayFunction(): ObjectDifference<out ProtectionRelayFunction> =
         apply {
             comparePowerSystemResource()
@@ -534,8 +554,33 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 ProtectionRelayFunction::directable,
                 ProtectionRelayFunction::powerDirection
             )
-            compareIndexedValueCollections(ProtectionRelayFunction::timeLimits)
-            compareIdReferenceCollections(ProtectionRelayFunction::protectedSwitches)
+            compareIndexedValueCollections(ProtectionRelayFunction::timeLimits, ProtectionRelayFunction::thresholds)
+            compareIdReferenceCollections(
+                ProtectionRelayFunction::protectedSwitches,
+                ProtectionRelayFunction::sensors,
+                ProtectionRelayFunction::schemes
+            )
+        }
+
+    private fun compareProtectionRelayScheme(source: ProtectionRelayScheme, target: ProtectionRelayScheme) =
+        ObjectDifference(source, target).apply {
+            compareIdentifiedObject()
+
+            compareIdReferences(ProtectionRelayScheme::system)
+            compareIdReferenceCollections(ProtectionRelayScheme::functions)
+        }
+
+    private fun compareProtectionRelaySystem(source: ProtectionRelaySystem, target: ProtectionRelaySystem) =
+        ObjectDifference(source, target).apply {
+            compareEquipment()
+
+            compareValues(ProtectionRelaySystem::protectionKind)
+            compareIdReferenceCollections(ProtectionRelaySystem::schemes)
+        }
+
+    private fun compareVoltageRelay(source: VoltageRelay, target: VoltageRelay) =
+        ObjectDifference(source, target).apply {
+            compareProtectionRelayFunction()
         }
 
     /************ IEC61970 BASE SCADA ************/
@@ -692,7 +737,21 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         }
 
     private fun compareFuse(source: Fuse, target: Fuse): ObjectDifference<Fuse> =
-        ObjectDifference(source, target).apply { compareSwitch() }
+        ObjectDifference(source, target).apply {
+            compareSwitch()
+
+            compareIdReferences(Fuse::function)
+        }
+
+    private fun compareGround(source: Ground, target: Ground): ObjectDifference<Ground> =
+        ObjectDifference(source, target).apply {
+            compareConductingEquipment()
+        }
+
+    private fun compareGroundDisconnector(source: GroundDisconnector, target: GroundDisconnector): ObjectDifference<GroundDisconnector> =
+        ObjectDifference(source, target).apply {
+            compareSwitch()
+        }
 
     private fun compareJumper(source: Jumper, target: Jumper): ObjectDifference<Jumper> =
         ObjectDifference(source, target).apply { compareSwitch() }
@@ -837,6 +896,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
             compareSwitch()
 
             compareValues(ProtectedSwitch::breakingCapacity)
+            compareIdReferenceCollections(ProtectedSwitch::relayFunctions)
         }
 
     private fun compareRatioTapChanger(source: RatioTapChanger, target: RatioTapChanger): ObjectDifference<RatioTapChanger> =
@@ -869,10 +929,25 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
                 RegulatingControl::targetValue,
                 RegulatingControl::enabled,
                 RegulatingControl::maxAllowedTargetValue,
-                RegulatingControl::minAllowedTargetValue
+                RegulatingControl::minAllowedTargetValue,
+                RegulatingControl::ratedCurrent
             )
             compareIdReferences(RegulatingControl::terminal)
             compareIdReferenceCollections(RegulatingControl::regulatingCondEqs)
+        }
+
+    private fun compareSeriesCompensator(source: SeriesCompensator, target: SeriesCompensator): ObjectDifference<SeriesCompensator> =
+        ObjectDifference(source, target).apply {
+            compareConductingEquipment()
+
+            compareValues(
+                SeriesCompensator::r,
+                SeriesCompensator::r0,
+                SeriesCompensator::x,
+                SeriesCompensator::x0,
+                SeriesCompensator::varistorRatedCurrent,
+                SeriesCompensator::varistorVoltageThreshold
+            )
         }
 
     private fun ObjectDifference<out ShuntCompensator>.compareShuntCompensator(): ObjectDifference<out ShuntCompensator> =

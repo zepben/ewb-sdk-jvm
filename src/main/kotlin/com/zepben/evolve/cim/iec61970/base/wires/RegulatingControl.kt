@@ -66,8 +66,8 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     var enabled: Boolean? = null
     var maxAllowedTargetValue: Double? = null
     var minAllowedTargetValue: Double? = null
-    var terminal: Terminal? = null
     var ratedCurrent: Double? = null
+    var terminal: Terminal? = null
 
     private var _regulatingCondEqs: MutableList<RegulatingCondEq>? = null
 

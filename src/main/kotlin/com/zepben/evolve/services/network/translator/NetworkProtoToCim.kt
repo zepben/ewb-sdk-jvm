@@ -500,7 +500,12 @@ fun toCim(pb: PBPotentialTransformer, networkService: NetworkService): Potential
     }
 
 fun toCim(pb: PBSensor, cim: Sensor, networkService: NetworkService): Sensor =
-    cim.apply { toCim(pb.ae, this, networkService) }
+    cim.apply {
+        pb.relayFunctionMRIDsList.forEach { relayFunctionMRID ->
+            networkService.resolveOrDeferReference(Resolvers.relayFunctions(this), relayFunctionMRID)
+        }
+        toCim(pb.ae, this, networkService)
+    }
 
 fun NetworkService.addFromPb(pb: PBCurrentTransformer): CurrentTransformer? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBFaultIndicator): FaultIndicator? = tryAddOrNull(toCim(pb, this))
@@ -970,6 +975,7 @@ fun toCim(pb: PBEnergySourcePhase, networkService: NetworkService): EnergySource
 
 fun toCim(pb: PBFuse, networkService: NetworkService): Fuse =
     Fuse(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.function(this), pb.functionMRID)
         toCim(pb.sw, this, networkService)
     }
 
@@ -1114,6 +1120,9 @@ fun toCim(pb: PBTransformerEndRatedS): TransformerEndRatedS =
 
 fun toCim(pb: PBProtectedSwitch, cim: ProtectedSwitch, networkService: NetworkService): ProtectedSwitch =
     cim.apply {
+        pb.relayFunctionMRIDsList.forEach { relayFunctionMRID ->
+            networkService.resolveOrDeferReference(Resolvers.relayFunctions(this), relayFunctionMRID)
+        }
         breakingCapacity = pb.breakingCapacity.takeUnless { it == UNKNOWN_INT }
         toCim(pb.sw, this, networkService)
     }
@@ -1147,6 +1156,7 @@ fun toCim(pb: PBRegulatingControl, cim: RegulatingControl, networkService: Netwo
         enabled = pb.enabledSet.takeUnless { pb.hasEnabledNull() }
         maxAllowedTargetValue = pb.maxAllowedTargetValue.takeUnless { it == UNKNOWN_DOUBLE }
         minAllowedTargetValue = pb.minAllowedTargetValue.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_DOUBLE }
         networkService.resolveOrDeferReference(Resolvers.terminal(this), pb.terminalMRID)
         pb.regulatingCondEqMRIDsList.forEach {
             networkService.resolveOrDeferReference(Resolvers.regulatingCondEq(this), it)

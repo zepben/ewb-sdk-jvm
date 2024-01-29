@@ -1025,6 +1025,9 @@ fun EnergySourcePhase.fillFields(service: NetworkService, includeRuntime: Boolea
 
 fun Fuse.fillFields(service: NetworkService, includeRuntime: Boolean = true): Fuse {
     (this as Switch).fillFields(service, includeRuntime)
+
+    function = VoltageRelay().also { service.add(it) }
+
     return this
 }
 
@@ -1163,6 +1166,7 @@ fun RegulatingControl.fillFields(service: NetworkService, includeRuntime: Boolea
     enabled = true
     maxAllowedTargetValue = 200.0
     minAllowedTargetValue = 50.0
+    ratedCurrent = 10.0
     terminal = Terminal().also { service.add(it) }
     addRegulatingCondEq(PowerElectronicsConnection().also { it.regulatingControl = this; service.add(it) })
 

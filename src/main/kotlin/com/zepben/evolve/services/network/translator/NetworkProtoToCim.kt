@@ -1384,6 +1384,10 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
 
     // IEC61970 Base Protection
     fun addFromPb(pb: PBCurrentRelay): CurrentRelay? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBDistanceRelay): DistanceRelay? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBProtectionRelayScheme): ProtectionRelayScheme? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBProtectionRelaySystem): ProtectionRelaySystem? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBVoltageRelay): VoltageRelay? = networkService.addFromPb(pb)
 
     // IEC61970 BASE SCADA
     fun addFromPb(pb: PBRemoteControl): RemoteControl? = networkService.addFromPb(pb)
@@ -1404,6 +1408,8 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBEnergySource): EnergySource? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBEnergySourcePhase): EnergySourcePhase? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBFuse): Fuse? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBGround): Ground? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBGroundDisconnector): GroundDisconnector? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBJumper): Jumper? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBJunction): Junction? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensator? = networkService.addFromPb(pb)
@@ -1415,6 +1421,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRecloser): Recloser? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBSeriesCompensator): SeriesCompensator? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTapChangerControl): TapChangerControl? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = networkService.addFromPb(pb)
 

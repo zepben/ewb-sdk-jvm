@@ -629,13 +629,13 @@ class NetworkConsumerClient(
             CURRENTRELAY -> extractResult(io.currentRelay.mRID()) { addFromPb(io.currentRelay) }
             EVCHARGINGUNIT -> extractResult(io.evChargingUnit.mRID()) { addFromPb(io.evChargingUnit) }
             TAPCHANGERCONTROL -> extractResult(io.tapChangerControl.mRID()) { addFromPb(io.tapChangerControl) }
-            SERIESCOMPENSATOR -> extractResult(io.seriesCompensator.mRID()) { null } // TODO
-            GROUND -> extractResult(io.ground.mRID()) { null } // TODO
-            GROUNDDISCONNECTOR -> extractResult(io.groundDisconnector.mRID()) { null } // TODO
-            PROTECTIONRELAYSCHEME -> extractResult(io.protectionRelayScheme.mRID()) { null } // TODO
-            PROTECTIONRELAYSYSTEM -> extractResult(io.protectionRelaySystem.mRID()) { null } // TODO
-            VOLTAGERELAY -> extractResult(io.voltageRelay.mRID()) { null } // TODO
-            DISTANCERELAY -> extractResult(io.distanceRelay.mRID()) { null } // TODO
+            SERIESCOMPENSATOR -> extractResult(io.seriesCompensator.mRID()) { addFromPb(io.seriesCompensator) }
+            GROUND -> extractResult(io.ground.mRID()) { addFromPb(io.ground) }
+            GROUNDDISCONNECTOR -> extractResult(io.groundDisconnector.mRID()) { addFromPb(io.groundDisconnector) }
+            PROTECTIONRELAYSCHEME -> extractResult(io.protectionRelayScheme.mRID()) { addFromPb(io.protectionRelayScheme) }
+            PROTECTIONRELAYSYSTEM -> extractResult(io.protectionRelaySystem.mRID()) { addFromPb(io.protectionRelaySystem) }
+            VOLTAGERELAY -> extractResult(io.voltageRelay.mRID()) { addFromPb(io.voltageRelay) }
+            DISTANCERELAY -> extractResult(io.distanceRelay.mRID()) { addFromPb(io.distanceRelay) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )

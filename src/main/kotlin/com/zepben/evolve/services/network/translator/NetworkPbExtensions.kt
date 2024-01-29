@@ -12,9 +12,9 @@ import com.zepben.evolve.services.common.translator.nameAndMRID
 import com.zepben.protobuf.cim.iec61968.assetinfo.*
 import com.zepben.protobuf.cim.iec61968.assets.*
 import com.zepben.protobuf.cim.iec61968.common.Location
-import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint
@@ -142,9 +142,7 @@ fun DistanceRelay.mRID(): String = prf.mRID()
 fun ProtectionRelayFunction.mRID(): String = psr.mRID()
 fun ProtectionRelayScheme.mRID(): String = io.mrid
 fun ProtectionRelaySystem.mRID(): String = eq.mRID()
-fun RelaySetting.mRID(): String = io.mrid
 fun VoltageRelay.mRID(): String = prf.mRID()
-
 fun CurrentRelay.assetInfoMRID(): String = prf.assetInfoMRID()
 fun ProtectionRelayFunction.assetInfoMRID(): String = psr.assetInfoMRID
 

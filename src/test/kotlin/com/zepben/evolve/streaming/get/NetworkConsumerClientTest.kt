@@ -988,6 +988,13 @@ internal class NetworkConsumerClientTest {
                 isRelayInfo = { relayInfo = it.toPb() },
                 isEvChargingUnit = { evChargingUnit = it.toPb() },
                 isTapChangerControl = { tapChangerControl = it.toPb() },
+                isSeriesCompensator = { seriesCompensator = it.toPb() },
+                isGround = { ground = it.toPb() },
+                isGroundDisconnector = { groundDisconnector = it.toPb() },
+                isProtectionRelayScheme = { protectionRelayScheme = it.toPb() },
+                isProtectionRelaySystem = { protectionRelaySystem = it.toPb() },
+                isVoltageRelay = { voltageRelay = it.toPb() },
+                isDistanceRelay = { distanceRelay = it.toPb() },
             )
         }
 

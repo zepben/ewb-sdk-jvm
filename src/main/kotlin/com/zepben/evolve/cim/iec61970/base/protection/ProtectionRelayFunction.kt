@@ -367,7 +367,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      */
     fun addThreshold(threshold: RelaySetting, sequenceNumber: Int = numThresholds()): ProtectionRelayFunction {
         require(sequenceNumber in 0..(numThresholds())) {
-            "Unable to add PositionPoint to ${typeNameAndMRID()}. " +
+            "Unable to add RelaySetting to ${typeNameAndMRID()}. " +
                 "Sequence number $sequenceNumber is invalid. Expected a value between 0 and ${numThresholds()}. " +
                 "Make sure you are adding the items in order and there are no gaps in the numbering."
         }
@@ -405,7 +405,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      *
      * @return An unmodifiable [Collection] of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
      */
-    val scheme: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
+    val schemes: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
 
     /**
      * Get the number of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.

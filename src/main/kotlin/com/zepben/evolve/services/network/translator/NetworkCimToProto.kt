@@ -172,6 +172,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerEl
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
+import com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind as PBProtectionKind
 import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit as PBEvChargingUnit
 
 /************ IEC61968 ASSET INFO ************/
@@ -926,6 +927,12 @@ fun toPb(cim: Fuse, pb: PBFuse.Builder): PBFuse.Builder =
         cim.function?.let { functionMRID = it.mRID } ?: clearFunctionMRID()
         toPb(cim, swBuilder)
     }
+
+fun toPb(cim: Ground, pb: PBGround.Builder): PBGround.Builder =
+    pb.apply { toPb(cim, ceBuilder) }
+
+fun toPb(cim: GroundDisconnector, pb: PBGroundDisconnector.Builder): PBGroundDisconnector.Builder =
+    pb.apply { toPb(cim, swBuilder) }
 
 fun toPb(cim: Ground, pb: PBGround.Builder): PBGround.Builder =
     pb.apply { toPb(cim, ceBuilder) }

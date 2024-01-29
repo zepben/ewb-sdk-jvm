@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.cim.iec61970.base.protection
 
-import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 
 /**
@@ -16,12 +15,10 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
  *
  * @property unitSymbol The unit of the value.
  * @property value The value of the setting, e.g voltage, current, etc.
- * @property thresholdNumber Sequence number for this threshold setting in a [ProtectionRelayFunction].
+ * @property name The name of the setting.
  */
-class RelaySetting(mRID: String = "") : IdentifiedObject(mRID) {
-
-    var unitSymbol: UnitSymbol = UnitSymbol.NONE
-    var value: Double = 0.0
-    var thresholdNumber: Int = 0
-
-}
+data class RelaySetting(
+    val unitSymbol: UnitSymbol,
+    val value: Double,
+    val name: String? = null
+)

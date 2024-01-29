@@ -62,7 +62,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     fun getTimeLimit(sequenceNumber: Int): Double? = _timeLimits?.getOrNull(sequenceNumber)
 
     /**
-     * Java interop forEachTimeLimit. Perform the specified action against each time limit.
+     * Java interop forEachIndexed. Perform the specified action against each time limit.
      *
      * @param action The action to perform on each time limit
      */
@@ -275,20 +275,21 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     fun numThresholds(): Int = _thresholds?.size ?: 0
 
     /**
-     * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its mRID. Returns null if no matching [RelaySetting] is found.
-     *
-     * @param mRID The mRID of the desired threshold [RelaySetting]
-     * @return The threshold [RelaySetting] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getThreshold(mRID: String): RelaySetting? = _thresholds.getByMRID(mRID)
-
-    /**
      * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its index. Thresholds are 0-indexed. Returns null for out-of-bound indices.
      *
-     * @param thresholdNumber The sequence number of the desired threshold [RelaySetting]
-     * @return The threshold [RelaySetting] with the specified [thresholdNumber] if it exists, otherwise null
+     * @param sequenceNumber The sequence number of the desired threshold [RelaySetting]
+     * @return The threshold [RelaySetting] with the specified [sequenceNumber] if it exists, otherwise null
      */
-    fun getThreshold(thresholdNumber: Int): RelaySetting? = _thresholds?.firstOrNull { it.thresholdNumber == thresholdNumber }
+    fun getThreshold(sequenceNumber: Int): RelaySetting? = _thresholds?.getOrNull(sequenceNumber)
+
+    /**
+     * Java interop forEachIndexed. Perform the specified action against each threshold [RelaySetting].
+     *
+     * @param action The action to perform on each threshold [RelaySetting]
+     */
+    fun forEachThreshold(action: BiConsumer<Int, RelaySetting>) {
+        _thresholds?.forEachIndexed(action::accept)
+    }
 
     /**
      * Add a threshold [RelaySetting] to this [ProtectionRelayFunction]'s list of thresholds.
@@ -296,19 +297,15 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      * @param threshold The threshold [RelaySetting] to add to this [ProtectionRelayFunction].
      * @return A reference to this [ProtectionRelayFunction] for fluent use.
      */
-    fun addThreshold(threshold: RelaySetting): ProtectionRelayFunction {
-        if (validateReference(threshold, ::getThreshold, "A RelaySetting")) return this
-
-        if (threshold.thresholdNumber == 0)
-            threshold.thresholdNumber = numThresholds() + 1
-
-        require(getThreshold(threshold.thresholdNumber) == null) {
-            "Unable to add ${threshold.typeNameAndMRID()} to ${typeNameAndMRID()}. " +
-                "A ${getThreshold(threshold.thresholdNumber)!!.typeNameAndMRID()} already exists with thresholdNumber ${threshold.thresholdNumber}." }
+    fun addThreshold(threshold: RelaySetting, sequenceNumber: Int = numThresholds()): ProtectionRelayFunction {
+        require(sequenceNumber in 0..(numThresholds())) {
+            "Unable to add PositionPoint to ${typeNameAndMRID()}. " +
+                "Sequence number $sequenceNumber is invalid. Expected a value between 0 and ${numThresholds()}. " +
+                "Make sure you are adding the items in order and there are no gaps in the numbering."
+        }
 
         _thresholds = _thresholds ?: mutableListOf()
-        _thresholds!!.add(threshold)
-        _thresholds!!.sortBy { it.thresholdNumber }
+        _thresholds!!.add(sequenceNumber, threshold)
 
         return this
     }
@@ -320,7 +317,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      * @return true if the threshold [RelaySetting] was disassociated.
      */
     fun removeThreshold(threshold: RelaySetting?): Boolean {
-        val ret = _thresholds.safeRemove(threshold)
+        val ret = _thresholds?.remove(threshold) == true
         if (_thresholds.isNullOrEmpty()) _thresholds = null
         return ret
     }
@@ -403,3 +400,10 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
  * @param action The action to perform on each time limit
  */
 fun ProtectionRelayFunction.forEachTimeLimits(action: (sequenceNumber: Int, timeLimit: Double) -> Unit) = forEachTimeLimit(BiConsumer(action))
+
+/**
+ * Perform the specified action against each threshold.
+ *
+ * @param action The action to perform on each threshold
+ */
+fun ProtectionRelayFunction.forEachThreshold(action: (sequenceNumber: Int, threshold: RelaySetting) -> Unit) = forEachThreshold(BiConsumer(action))

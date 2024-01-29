@@ -8,6 +8,7 @@
 package com.zepben.evolve.cim.iec61970.base.protection
 
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
+import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
@@ -52,7 +53,7 @@ internal class ProtectionRelayFunctionTest {
         var timeLimit = 0.0
         PrivateCollectionValidator.validate(
             { object : ProtectionRelayFunction() {} },
-            { _: ProtectionRelayFunction -> timeLimit++ },
+            { timeLimit++ },
             ProtectionRelayFunction::numTimeLimits,
             ProtectionRelayFunction::getTimeLimit,
             ProtectionRelayFunction::forEachTimeLimits,
@@ -94,15 +95,17 @@ internal class ProtectionRelayFunctionTest {
 
     @Test
     internal fun thresholds() {
+        var thresholdNumber = 0.0
         PrivateCollectionValidator.validate(
             { object : ProtectionRelayFunction() {} },
-            { id, _, tn -> RelaySetting(id).apply { tn?.let { thresholdNumber = it } } },
+            { RelaySetting(UnitSymbol.W, thresholdNumber++) },
             ProtectionRelayFunction::numThresholds,
             ProtectionRelayFunction::getThreshold,
-            ProtectionRelayFunction::getThreshold,
-            ProtectionRelayFunction::thresholds,
+            ProtectionRelayFunction::forEachThreshold,
+            ProtectionRelayFunction::addThreshold,
             ProtectionRelayFunction::addThreshold,
             ProtectionRelayFunction::removeThreshold,
+            null,
             ProtectionRelayFunction::clearThresholds
         )
     }

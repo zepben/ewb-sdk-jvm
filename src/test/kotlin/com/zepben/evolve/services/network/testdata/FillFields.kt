@@ -1303,6 +1303,19 @@ fun SeriesCompensator.fillFields(service: NetworkService, includeRuntime: Boolea
     return this
 }
 
+fun SeriesCompensator.fillFields(service: NetworkService, includeRuntime: Boolean = true): SeriesCompensator {
+    (this as ConductingEquipment).fillFields(service, includeRuntime)
+
+    r = 1.1
+    r0 = 2.2
+    x = 3.3
+    x0 = 4.4
+    varistorRatedCurrent = 5
+    varistorVoltageThreshold = 6
+
+    return this
+}
+
 fun ShuntCompensator.fillFields(service: NetworkService, includeRuntime: Boolean = true): ShuntCompensator {
     (this as RegulatingCondEq).fillFields(service, includeRuntime)
 

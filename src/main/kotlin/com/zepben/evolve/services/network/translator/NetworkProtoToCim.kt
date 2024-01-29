@@ -22,7 +22,7 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -31,6 +31,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.common.extensions.internEmpty
@@ -65,9 +67,9 @@ import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
-import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infcommon.Ratio as PBRatio
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
@@ -102,6 +104,10 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint as PBIoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay as PBCurrentRelay
+import com.zepben.protobuf.cim.iec61970.base.protection.DistanceRelay as PBDistanceRelay
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionRelayFunction as PBProtectionRelayFunction
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionRelayScheme as PBProtectionRelayScheme
+import com.zepben.protobuf.cim.iec61970.base.protection.RelaySetting as PBRelaySetting
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
@@ -721,10 +727,54 @@ fun toCim(pb: PBCurrentRelay, networkService: NetworkService): CurrentRelay =
         inverseTimeFlag = pb.inverseTimeFlagSet.takeUnless { pb.hasInverseTimeFlagNull() }
         timeDelay1 = pb.timeDelay1.takeUnless { it == UNKNOWN_DOUBLE }
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
-        // toCim(pb.prf, this, networkService) TODO
+        toCim(pb.prf, this, networkService)
     }
 
-// fun toCim(pb: PBProtectionRelayFunction, cim: ProtectionRelayFunction, networkService: NetworkService) TODO
+fun toCim(pb: PBDistanceRelay, networkService: NetworkService): DistanceRelay =
+    DistanceRelay(pb.mRID()).apply {
+        backwardBlind = pb.backwardBlind.takeUnless { it == UNKNOWN_DOUBLE }
+        backwardReach = pb.backwardReach.takeUnless { it == UNKNOWN_DOUBLE }
+        backwardReactance = pb.backwardReactance.takeUnless { it == UNKNOWN_DOUBLE }
+        forwardBlind = pb.forwardBlind.takeUnless { it == UNKNOWN_DOUBLE }
+        forwardReach = pb.forwardReach.takeUnless { it == UNKNOWN_DOUBLE }
+        forwardReactance = pb.forwardReactance.takeUnless { it == UNKNOWN_DOUBLE }
+        operationPhaseAngle1 = pb.operationPhaseAngle1.takeUnless { it == UNKNOWN_DOUBLE }
+        operationPhaseAngle2 = pb.operationPhaseAngle2.takeUnless { it == UNKNOWN_DOUBLE }
+        operationPhaseAngle3 = pb.operationPhaseAngle3.takeUnless { it == UNKNOWN_DOUBLE }
+        toCim(pb.prf, this, networkService)
+    }
+
+fun toCim(pb: PBProtectionRelayFunction, cim: ProtectionRelayFunction, networkService: NetworkService): ProtectionRelayFunction =
+    cim.apply {
+        pb.protectedSwitchMRIDsList.forEach { protectedSwitchMRID ->
+            networkService.resolveOrDeferReference(Resolvers.protectedSwitches(this), protectedSwitchMRID)
+        }
+        pb.sensorMRIDsList.forEach { sensorMRID ->
+            networkService.resolveOrDeferReference(Resolvers.sensors(this), sensorMRID)
+        }
+        pb.schemeMRIDsList.forEach { schemeMRID ->
+            networkService.resolveOrDeferReference(Resolvers.schemes(this), schemeMRID)
+        }
+        model = pb.model.takeIf { it.isNotBlank() }
+        reclosing = pb.reclosingSet.takeUnless { pb.hasReclosingNull() }
+        relayDelayTime = pb.relayDelayTime.takeUnless { it == UNKNOWN_DOUBLE }
+        protectionKind = ProtectionKind.valueOf(pb.protectionKind.name)
+        directable = pb.directableSet.takeUnless { pb.hasDirectableNull() }
+        powerDirection = PowerDirectionKind.valueOf(pb.powerDirection.name)
+
+        pb.timeLimitsList.forEach { addTimeLimit(it) }
+        pb.thresholdsList.forEach { addThreshold(toCim(it)) }
+
+        toCim(pb.psr, this, networkService)
+    }
+
+fun toCim(pb: PBProtectionRelayScheme, cim: ProtectionRelayScheme, networkService: NetworkService): ProtectionRelayScheme =
+    ProtectionRelayScheme(pb.mRID()).apply {
+
+    }
+
+fun toCim(pb: PBRelaySetting): RelaySetting =
+    RelaySetting(UnitSymbol.valueOf(pb.unitSymbol.name), pb.value, pb.name.takeIf { it.isNotEmpty() })
 
 fun NetworkService.addFromPb(pb: PBCurrentRelay): CurrentRelay? = tryAddOrNull(toCim(pb, this))
 

@@ -13,9 +13,9 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -25,7 +25,7 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransform
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -225,6 +225,18 @@ class NetworkService : BaseService("network") {
     fun add(currentRelay: CurrentRelay): Boolean = super.add(currentRelay)
     fun remove(currentRelay: CurrentRelay): Boolean = super.remove(currentRelay)
 
+    fun add(distanceRelay: DistanceRelay): Boolean = super.add(distanceRelay)
+    fun remove(distanceRelay: DistanceRelay): Boolean = super.remove(distanceRelay)
+
+    fun add(protectionRelayScheme: ProtectionRelayScheme): Boolean = super.add(protectionRelayScheme)
+    fun remove(protectionRelayScheme: ProtectionRelayScheme): Boolean = super.remove(protectionRelayScheme)
+
+    fun add(protectionRelaySystem: ProtectionRelaySystem): Boolean = super.add(protectionRelaySystem)
+    fun remove(protectionRelaySystem: ProtectionRelaySystem): Boolean = super.remove(protectionRelaySystem)
+
+    fun add(voltageRelay: VoltageRelay): Boolean = super.add(voltageRelay)
+    fun remove(voltageRelay: VoltageRelay): Boolean = super.remove(voltageRelay)
+
     // #######################
     // # IEC61970 BASE SCADA #
     // #######################
@@ -279,6 +291,12 @@ class NetworkService : BaseService("network") {
     fun add(fuse: Fuse): Boolean = super.add(fuse)
     fun remove(fuse: Fuse): Boolean = super.remove(fuse)
 
+    fun add(ground: Ground): Boolean = super.add(ground)
+    fun remove(ground: Ground): Boolean = super.remove(ground)
+
+    fun add(groundDisconnector: GroundDisconnector): Boolean = super.add(groundDisconnector)
+    fun remove(groundDisconnector: GroundDisconnector): Boolean = super.remove(groundDisconnector)
+
     fun add(jumper: Jumper): Boolean = super.add(jumper)
     fun remove(jumper: Jumper): Boolean = super.remove(jumper)
 
@@ -311,6 +329,9 @@ class NetworkService : BaseService("network") {
 
     fun add(recloser: Recloser): Boolean = super.add(recloser)
     fun remove(recloser: Recloser): Boolean = super.remove(recloser)
+
+    fun add(seriesCompensator: SeriesCompensator): Boolean = super.add(seriesCompensator)
+    fun remove(seriesCompensator: SeriesCompensator): Boolean = super.remove(seriesCompensator)
 
     fun add(tapChangerControl: TapChangerControl): Boolean = super.add(tapChangerControl)
     fun remove(tapChangerControl: TapChangerControl): Boolean = super.remove(tapChangerControl)

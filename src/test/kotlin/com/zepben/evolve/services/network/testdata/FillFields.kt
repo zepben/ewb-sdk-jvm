@@ -22,9 +22,7 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.DistanceRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -742,6 +740,27 @@ fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: 
     directable = true
     powerDirection = PowerDirectionKind.FORWARD
 
+    return this
+}
+
+fun ProtectionRelayScheme.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelayScheme {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+
+    system = ProtectionRelaySystem().also { service.add(it) }
+
+    return this
+}
+
+fun ProtectionRelaySystem.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelaySystem {
+    (this as Equipment).fillFieldsCommon(service, includeRuntime)
+
+    protectionKind = ProtectionKind.DISTANCE
+
+    return this
+}
+
+fun VoltageRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): VoltageRelay {
+    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
     return this
 }
 

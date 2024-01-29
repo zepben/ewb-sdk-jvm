@@ -28,12 +28,15 @@ import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -439,5 +442,29 @@ object Resolvers {
     @JvmStatic
     fun tapChangerControl(tapChanger: TapChanger): BoundReferenceResolver<TapChanger, TapChangerControl> =
         BoundReferenceResolver(tapChanger, TapChangerToTapChangerControlResolver, null)
+
+    @JvmStatic
+    fun protectedSwitches(protectionRelayFunction: ProtectionRelayFunction): BoundReferenceResolver<ProtectionRelayFunction, ProtectedSwitch> =
+        BoundReferenceResolver(
+            protectionRelayFunction,
+            ProtectionRelayFunctionToProtectedSwitchResolver,
+            ProtectedSwitchToProtectionRelayFunctionResolver
+        )
+
+    @JvmStatic
+    fun sensors(protectionRelayFunction: ProtectionRelayFunction): BoundReferenceResolver<ProtectionRelayFunction, Sensor> =
+        BoundReferenceResolver(
+            protectionRelayFunction,
+            ProtectionRelayFunctionToSensorResolver,
+            SensorToProtectionRelayFunctionResolver
+        )
+
+    @JvmStatic
+    fun schemes(protectionRelayFunction: ProtectionRelayFunction): BoundReferenceResolver<ProtectionRelayFunction, ProtectionRelayScheme> =
+        BoundReferenceResolver(
+            protectionRelayFunction,
+            ProtectionRelayFunctionToProtectionRelaySchemeResolver,
+            ProtectionRelaySchemeToProtectionRelayFunctionResolver
+        )
 
 }

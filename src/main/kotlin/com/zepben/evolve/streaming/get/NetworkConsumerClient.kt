@@ -627,14 +627,13 @@ class NetworkConsumerClient(
             SWITCHINFO -> extractResult(io.switchInfo.mRID()) { addFromPb(io.switchInfo) }
             RELAYINFO -> extractResult(io.relayInfo.mRID()) { addFromPb(io.relayInfo) }
             CURRENTRELAY -> extractResult(io.currentRelay.mRID()) { addFromPb(io.currentRelay) }
-            TAPCHANGERCONTROL -> extractResult(io.tapChangerControl.mRID()) { addFromPb(io.tapChangerControl) }
             EVCHARGINGUNIT -> extractResult(io.evChargingUnit.mRID()) { addFromPb(io.evChargingUnit) }
+            TAPCHANGERCONTROL -> extractResult(io.tapChangerControl.mRID()) { addFromPb(io.tapChangerControl) }
             SERIESCOMPENSATOR -> extractResult(io.seriesCompensator.mRID()) { null } // TODO
             GROUND -> extractResult(io.ground.mRID()) { null } // TODO
             GROUNDDISCONNECTOR -> extractResult(io.groundDisconnector.mRID()) { null } // TODO
             PROTECTIONRELAYSCHEME -> extractResult(io.protectionRelayScheme.mRID()) { null } // TODO
             PROTECTIONRELAYSYSTEM -> extractResult(io.protectionRelaySystem.mRID()) { null } // TODO
-            RELAYSETTING -> extractResult(io.relaySetting.mRID()) { null } // TODO
             VOLTAGERELAY -> extractResult(io.voltageRelay.mRID()) { null } // TODO
             DISTANCERELAY -> extractResult(io.distanceRelay.mRID()) { null } // TODO
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(

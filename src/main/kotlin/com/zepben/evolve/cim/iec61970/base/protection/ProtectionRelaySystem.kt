@@ -17,7 +17,7 @@ import com.zepben.evolve.services.common.extensions.asUnmodifiable
  *
  * @property protectionKind The kind of protection being provided by this protection equipment.
  */
-class ProtectionRelaySystem(mRID: String) : Equipment(mRID) {
+class ProtectionRelaySystem(mRID: String = "") : Equipment(mRID) {
 
     var protectionKind: ProtectionKind = ProtectionKind.UNKNOWN
     

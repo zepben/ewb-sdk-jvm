@@ -28,12 +28,15 @@ import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -422,6 +425,30 @@ internal object TransformerEndInfoToOpenEndOpenCircuitTestResolver : ReferenceRe
 
 internal object TransformerEndInfoToEnergisedEndOpenCircuitTestResolver : ReferenceResolver<TransformerEndInfo, OpenCircuitTest> by KReferenceResolver(
     TransformerEndInfo::class, OpenCircuitTest::class, TransformerEndInfo::energisedEndOpenCircuitTests.setter
+)
+
+internal object ProtectionRelayFunctionToProtectedSwitchResolver : ReferenceResolver<ProtectionRelayFunction, ProtectedSwitch> by KReferenceResolver(
+    ProtectionRelayFunction::class, ProtectedSwitch::class, ProtectionRelayFunction::addProtectedSwitch
+)
+
+internal object ProtectedSwitchToProtectionRelayFunctionResolver : ReferenceResolver<ProtectedSwitch, ProtectionRelayFunction> by KReferenceResolver(
+    ProtectedSwitch::class, ProtectionRelayFunction::class, ProtectedSwitch::addRelayFunction
+)
+
+internal object ProtectionRelayFunctionToSensorResolver : ReferenceResolver<ProtectionRelayFunction, Sensor> by KReferenceResolver(
+    ProtectionRelayFunction::class, Sensor::class, ProtectionRelayFunction::addSensor
+)
+
+internal object SensorToProtectionRelayFunctionResolver : ReferenceResolver<Sensor, ProtectionRelayFunction> by KReferenceResolver(
+    Sensor::class, ProtectionRelayFunction::class, Sensor::addRelayFunction
+)
+
+internal object ProtectionRelayFunctionToProtectionRelaySchemeResolver : ReferenceResolver<ProtectionRelayFunction, ProtectionRelayScheme> by KReferenceResolver(
+    ProtectionRelayFunction::class, ProtectionRelayScheme::class, ProtectionRelayFunction::addScheme
+)
+
+internal object ProtectionRelaySchemeToProtectionRelayFunctionResolver : ReferenceResolver<ProtectionRelayScheme, ProtectionRelayFunction> by KReferenceResolver(
+    ProtectionRelayScheme::class, ProtectionRelayFunction::class, ProtectionRelayScheme::addFunction
 )
 
 //-------------------------------------------//

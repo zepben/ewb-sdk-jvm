@@ -32,7 +32,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -128,6 +128,13 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isCurrentRelay Handler when the [identifiedObject] is a [CurrentRelay]
  * @param isEvChargingUnit Handler when the [identifiedObject] is an [EvChargingUnit]
  * @param isTapChangerControl Handler when the [identifiedObject] is a [TapChangerControl]
+ * @param isSeriesCompensator Handler when the [identifiedObject] is a [SeriesCompensator]
+ * @param isGround Handler when the [identifiedObject] is a [Ground]
+ * @param isGroundDisconnector Handler when the [identifiedObject] is a [GroundDisconnector]
+ * @param isProtectionRelayScheme Handler when the [identifiedObject] is a [ProtectionRelayScheme]
+ * @param isProtectionRelaySystem Handler when the [identifiedObject] is a [ProtectionRelaySystem]
+ * @param isVoltageRelay Handler when the [identifiedObject] is a [VoltageRelay]
+ * @param isDistanceRelay Handler when the [identifiedObject] is a [DistanceRelay]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -202,6 +209,13 @@ inline fun <R> whenNetworkServiceObject(
     isCurrentRelay: (CurrentRelay) -> R,
     isEvChargingUnit: (EvChargingUnit) -> R,
     isTapChangerControl: (TapChangerControl) -> R,
+    isSeriesCompensator: (SeriesCompensator) -> R,
+    isGround: (Ground) -> R,
+    isGroundDisconnector: (GroundDisconnector) -> R,
+    isProtectionRelayScheme: (ProtectionRelayScheme) -> R,
+    isProtectionRelaySystem: (ProtectionRelaySystem) -> R,
+    isVoltageRelay: (VoltageRelay) -> R,
+    isDistanceRelay: (DistanceRelay) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -275,5 +289,12 @@ inline fun <R> whenNetworkServiceObject(
     is CurrentRelay -> isCurrentRelay(identifiedObject)
     is EvChargingUnit -> isEvChargingUnit(identifiedObject)
     is TapChangerControl -> isTapChangerControl(identifiedObject)
+    is SeriesCompensator -> isSeriesCompensator(identifiedObject)
+    is Ground -> isGround(identifiedObject)
+    is GroundDisconnector -> isGroundDisconnector(identifiedObject)
+    is ProtectionRelayScheme -> isProtectionRelayScheme(identifiedObject)
+    is ProtectionRelaySystem -> isProtectionRelaySystem(identifiedObject)
+    is VoltageRelay -> isVoltageRelay(identifiedObject)
+    is DistanceRelay -> isDistanceRelay(identifiedObject)
     else -> isOther(identifiedObject)
 }

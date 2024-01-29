@@ -31,37 +31,11 @@ class DistanceRelay(mRID: String = "") : ProtectionRelayFunction(mRID) {
     var backwardBlind: Double? = null
     var backwardReach: Double? = null
     var backwardReactance : Double? = null
-
-    /**
-     * The forward blind impedance (in ohms) that defines the area to be blinded in the direction of the power flow.
-     */
     var forwardBlind : Double? = null
-
-    /**
-     * The forward reach impedance (in ohms) that determines the maximum distance along the transmission line in the
-     * direction of power flow for which the relay will provide protection.
-     */
     var forwardReach : Double? = null
-
-    /**
-     * The forward reactance (in ohms) that determines the maximum distance along the transmission line in the direction
-     * of power flow for which the relay will provide protection.
-     */
     var forwardReactance : Double? = null
-
-    /**
-     * The phase angle (in degrees) between voltage and current during normal operating conditions for zone 1 relay.
-     */
     var operationPhaseAngle1 : Double? = null
-
-    /**
-     * The phase angle (in degrees) between voltage and current during normal operating conditions for zone 2 relay.
-     */
     var operationPhaseAngle2 : Double? = null
-
-    /**
-     * The phase angle (in degrees) between voltage and current during normal operating conditions for zone 3 relay.
-     */
     var operationPhaseAngle3: Double? = null
 
 }

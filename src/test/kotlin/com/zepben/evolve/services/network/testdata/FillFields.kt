@@ -750,6 +750,27 @@ fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: 
     return this
 }
 
+fun ProtectionRelayScheme.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelayScheme {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+
+    system = ProtectionRelaySystem().also { service.add(it) }
+
+    return this
+}
+
+fun ProtectionRelaySystem.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelaySystem {
+    (this as Equipment).fillFieldsCommon(service, includeRuntime)
+
+    protectionKind = ProtectionKind.DISTANCE
+
+    return this
+}
+
+fun VoltageRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): VoltageRelay {
+    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
+    return this
+}
+
 fun DistanceRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): DistanceRelay {
     (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
 

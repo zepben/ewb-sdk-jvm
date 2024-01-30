@@ -753,7 +753,10 @@ fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: 
 fun ProtectionRelayScheme.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelayScheme {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
-    system = ProtectionRelaySystem().also { service.add(it) }
+    system = ProtectionRelaySystem().also {
+        it.addScheme(this)
+        service.add(it)
+    }
 
     return this
 }

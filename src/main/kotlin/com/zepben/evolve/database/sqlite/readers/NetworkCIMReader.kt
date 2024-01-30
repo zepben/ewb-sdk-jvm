@@ -748,14 +748,15 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TableProtectionRelayFunctionTimeLimits, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         // Note TableProtectionRelayFunctionTimeLimits.selectSql ensures we process ratings in the correct order.
         val protectionRelayFunctionMRID = setLastMRID(resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex))
+        val sequenceNumber = resultSet.getInt(table.SEQUENCE_NUMBER.queryIndex)
         val timeLimit = resultSet.getDouble(table.TIME_LIMIT.queryIndex)
-        setLastMRID("$protectionRelayFunctionMRID time limit $timeLimit")
+        setLastMRID("$protectionRelayFunctionMRID time limit $sequenceNumber")
 
-        val protectionRelayFunction = networkService.ensureGet<ProtectionRelayFunction>(
+        val protectionRelayFunction = networkService.getOrThrow<ProtectionRelayFunction>(
             protectionRelayFunctionMRID,
             "$protectionRelayFunctionMRID time limit $timeLimit"
         )
-        protectionRelayFunction?.addTimeLimit(timeLimit)
+        protectionRelayFunction.addTimeLimit(timeLimit)
 
         return true
     }

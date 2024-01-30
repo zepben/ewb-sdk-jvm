@@ -22,7 +22,7 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -54,7 +54,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
@@ -846,7 +846,23 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         val table = databaseTables.getTable(TableFuses::class.java)
         val insert = databaseTables.getInsert(TableFuses::class.java)
 
+        insert.setNullableString(table.FUNCTION_MRID.queryIndex, fuse.function?.mRID)
+
         return saveSwitch(table, insert, fuse, "fuse")
+    }
+
+    fun save(ground: Ground): Boolean {
+        val table = databaseTables.getTable(TableGrounds::class.java)
+        val insert = databaseTables.getInsert(TableGrounds::class.java)
+
+        return saveConductingEquipment(table, insert, ground, "ground")
+    }
+
+    fun save(ground: GroundDisconnector): Boolean {
+        val table = databaseTables.getTable(TableGrounds::class.java)
+        val insert = databaseTables.getInsert(TableGrounds::class.java)
+
+        return saveConductingEquipment(table, insert, ground, "ground")
     }
 
     fun save(jumper: Jumper): Boolean {
@@ -1055,9 +1071,24 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableBoolean(table.ENABLED.queryIndex, regulatingControl.enabled)
         insert.setNullableDouble(table.MAX_ALLOWED_TARGET_VALUE.queryIndex, regulatingControl.maxAllowedTargetValue)
         insert.setNullableDouble(table.MIN_ALLOWED_TARGET_VALUE.queryIndex, regulatingControl.minAllowedTargetValue)
+        insert.setNullableDouble(table.RATED_CURRENT.queryIndex, regulatingControl.ratedCurrent)
         insert.setNullableString(table.TERMINAL_MRID.queryIndex, regulatingControl.terminal?.mRID)
 
         return savePowerSystemResource(table, insert, regulatingControl, description)
+    }
+
+    fun save(seriesCompensator: SeriesCompensator): Boolean {
+        val table = databaseTables.getTable(TableSeriesCompensators::class.java)
+        val insert = databaseTables.getInsert(TableSeriesCompensators::class.java)
+
+        insert.setNullableDouble(table.R.queryIndex, seriesCompensator.r)
+        insert.setNullableDouble(table.R0.queryIndex, seriesCompensator.r0)
+        insert.setNullableDouble(table.X.queryIndex, seriesCompensator.x)
+        insert.setNullableDouble(table.X0.queryIndex, seriesCompensator.x0)
+        insert.setNullableInt(table.VARISTOR_RATED_CURRENT.queryIndex, seriesCompensator.varistorRatedCurrent)
+        insert.setNullableInt(table.VARISTOR_VOLTAGE_THRESHOLD.queryIndex, seriesCompensator.varistorVoltageThreshold)
+
+        return saveConductingEquipment(table, insert, seriesCompensator, "series compensator")
     }
 
     private fun saveShuntCompensator(
@@ -1241,7 +1272,110 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableDouble(table.TIME_DELAY_1.queryIndex, currentRelay.timeDelay1)
         insert.setNullableString(table.RELAY_INFO_MRID.queryIndex, currentRelay.assetInfo?.mRID)
 
-        return true // TODO replace with saveProtectionRelayFunction(...)
+        return saveProtectionRelayFunction(table, insert, currentRelay, "current relay")
+    }
+
+    fun save(distanceRelay: DistanceRelay): Boolean {
+        val table = databaseTables.getTable(TableDistanceRelays::class.java)
+        val insert = databaseTables.getInsert(TableDistanceRelays::class.java)
+
+        insert.setNullableDouble(table.BACKWARD_BLIND.queryIndex, distanceRelay.backwardBlind)
+        insert.setNullableDouble(table.BACKWARD_REACH.queryIndex, distanceRelay.backwardReach)
+        insert.setNullableDouble(table.BACKWARD_REACTANCE.queryIndex, distanceRelay.backwardReactance)
+        insert.setNullableDouble(table.FORWARD_BLIND.queryIndex, distanceRelay.forwardBlind)
+        insert.setNullableDouble(table.FORWARD_REACH.queryIndex, distanceRelay.forwardReach)
+        insert.setNullableDouble(table.FORWARD_REACTANCE.queryIndex, distanceRelay.forwardReactance)
+        insert.setNullableDouble(table.OPERATION_PHASE_ANGLE1.queryIndex, distanceRelay.operationPhaseAngle1)
+        insert.setNullableDouble(table.OPERATION_PHASE_ANGLE2.queryIndex, distanceRelay.operationPhaseAngle2)
+        insert.setNullableDouble(table.OPERATION_PHASE_ANGLE3.queryIndex, distanceRelay.operationPhaseAngle3)
+
+        return saveProtectionRelayFunction(table, insert, distanceRelay, "distance relay")
+    }
+
+    private fun saveProtectionRelayFunction(
+        table: TableProtectionRelayFunctions,
+        insert: PreparedStatement,
+        protectionRelayFunction: ProtectionRelayFunction,
+        description: String
+    ): Boolean {
+        insert.setNullableString(table.MODEL.queryIndex, protectionRelayFunction.model)
+        insert.setNullableBoolean(table.RECLOSING.queryIndex, protectionRelayFunction.reclosing)
+        insert.setNullableDouble(table.RELAY_DELAY_TIME.queryIndex, protectionRelayFunction.relayDelayTime)
+        insert.setString(table.PROTECTION_KIND.queryIndex, protectionRelayFunction.protectionKind.name)
+        insert.setNullableBoolean(table.DIRECTABLE.queryIndex, protectionRelayFunction.directable)
+        insert.setString(table.POWER_DIRECTION.queryIndex, protectionRelayFunction.powerDirection.name)
+
+        var status = true
+        protectionRelayFunction.protectedSwitches.forEach { status = status and saveAssociation(protectionRelayFunction, it) }
+        protectionRelayFunction.sensors.forEach { status = status and saveAssociation(protectionRelayFunction, it) }
+        protectionRelayFunction.thresholds.forEachIndexed { sequenceNumber, threshold ->
+            status = status and saveProtectionRelayFunctionThreshold(protectionRelayFunction, sequenceNumber, threshold)
+        }
+        protectionRelayFunction.timeLimits.forEachIndexed { sequenceNumber, timeLimit ->
+            status = status and saveProtectionRelayFunctionTimeLimit(protectionRelayFunction, sequenceNumber, timeLimit)
+        }
+
+        return status and savePowerSystemResource(table, insert, protectionRelayFunction, description)
+    }
+
+    private fun saveProtectionRelayFunctionThreshold(protectionRelayFunction: ProtectionRelayFunction, sequenceNumber: Int, threshold: RelaySetting): Boolean {
+        val table = databaseTables.getTable(TableProtectionRelayFunctionThresholds::class.java)
+        val insert = databaseTables.getInsert(TableProtectionRelayFunctionThresholds::class.java)
+
+        insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
+        insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
+        insert.setString(table.UNIT_SYMBOL.queryIndex, threshold.unitSymbol.name)
+        insert.setDouble(table.VALUE.queryIndex, threshold.value)
+        insert.setNullableString(table.NAME.queryIndex, threshold.name)
+
+        return tryExecuteSingleUpdate(
+            insert,
+            "${protectionRelayFunction.mRID}-threshold$sequenceNumber",
+            "protection relay function threshold"
+        )
+    }
+
+    private fun saveProtectionRelayFunctionTimeLimit(protectionRelayFunction: ProtectionRelayFunction, sequenceNumber: Int, timeLimit: Double): Boolean {
+        val table = databaseTables.getTable(TableProtectionRelayFunctionTimeLimits::class.java)
+        val insert = databaseTables.getInsert(TableProtectionRelayFunctionTimeLimits::class.java)
+
+        insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
+        insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
+        insert.setDouble(table.TIME_LIMIT.queryIndex, timeLimit)
+
+        return tryExecuteSingleUpdate(
+            insert,
+            "${protectionRelayFunction.mRID}-timeLimit$sequenceNumber",
+            "protection relay function time limit"
+        )
+    }
+
+    fun save(protectionRelayScheme: ProtectionRelayScheme): Boolean {
+        val table = databaseTables.getTable(TableProtectionRelaySchemes::class.java)
+        val insert = databaseTables.getInsert(TableProtectionRelaySchemes::class.java)
+
+        insert.setNullableString(table.SYSTEM_MRID.queryIndex, protectionRelayScheme.system?.mRID)
+
+        var status = true
+        protectionRelayScheme.functions.forEach { status = status and saveAssociation(protectionRelayScheme, it) }
+
+        return status and saveIdentifiedObject(table, insert, protectionRelayScheme, "protection relay scheme")
+    }
+
+    fun save(protectionRelaySystem: ProtectionRelaySystem): Boolean {
+        val table = databaseTables.getTable(TableProtectionRelaySystems::class.java)
+        val insert = databaseTables.getInsert(TableProtectionRelaySystems::class.java)
+
+        insert.setString(table.PROTECTION_KIND.queryIndex, protectionRelaySystem.protectionKind.name)
+
+        return saveEquipment(table, insert, protectionRelaySystem, "protection relay system")
+    }
+
+    fun save(voltageRelay: VoltageRelay): Boolean {
+        val table = databaseTables.getTable(TableVoltageRelays::class.java)
+        val insert = databaseTables.getInsert(TableVoltageRelays::class.java)
+
+        return saveProtectionRelayFunction(table, insert, voltageRelay, "voltage relay")
     }
 
     /************ IEC61970 SCADA ************/
@@ -1378,6 +1512,48 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             insert,
             "${loop.mRID}-to-${substation.mRID}",
             "loop to substation association"
+        )
+    }
+
+    private fun saveAssociation(protectionRelayFunction: ProtectionRelayFunction, protectedSwitch: ProtectedSwitch): Boolean {
+        val table = databaseTables.getTable(TableProtectionRelayFunctionsProtectedSwitches::class.java)
+        val insert = databaseTables.getInsert(TableProtectionRelayFunctionsProtectedSwitches::class.java)
+
+        insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
+        insert.setString(table.PROTECTED_SWITCH_MRID.queryIndex, protectedSwitch.mRID)
+
+        return tryExecuteSingleUpdate(
+            insert,
+            "${protectionRelayFunction.mRID}-to-${protectedSwitch.mRID}",
+            "protection relay function to protected switch association"
+        )
+    }
+
+    private fun saveAssociation(protectionRelayFunction: ProtectionRelayFunction, sensor: Sensor): Boolean {
+        val table = databaseTables.getTable(TableProtectionRelayFunctionsSensors::class.java)
+        val insert = databaseTables.getInsert(TableProtectionRelayFunctionsSensors::class.java)
+
+        insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
+        insert.setString(table.SENSOR_MRID.queryIndex, sensor.mRID)
+
+        return tryExecuteSingleUpdate(
+            insert,
+            "${protectionRelayFunction.mRID}-to-${sensor.mRID}",
+            "protection relay function to sensor association"
+        )
+    }
+
+    private fun saveAssociation(protectionRelayScheme: ProtectionRelayScheme, protectionRelayFunction: ProtectionRelayFunction): Boolean {
+        val table = databaseTables.getTable(TableProtectionRelaySchemesProtectionRelayFunctions::class.java)
+        val insert = databaseTables.getInsert(TableProtectionRelaySchemesProtectionRelayFunctions::class.java)
+
+        insert.setString(table.PROTECTION_RELAY_SCHEME_MRID.queryIndex, protectionRelayScheme.mRID)
+        insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
+
+        return tryExecuteSingleUpdate(
+            insert,
+            "${protectionRelayScheme.mRID}-to-${protectionRelayFunction.mRID}",
+            "protection relay function to protection relay function association"
         )
     }
 

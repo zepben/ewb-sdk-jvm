@@ -703,7 +703,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             operationPhaseAngle3 = resultSet.getNullableDouble(table.OPERATION_PHASE_ANGLE3.queryIndex)
         }
 
-        return loadProtectionRelayFunction(distanceRelay, table, resultSet)
+        return loadProtectionRelayFunction(distanceRelay, table, resultSet) && networkService.addOrThrow(distanceRelay)
     }
 
     private fun loadProtectionRelayFunction(
@@ -767,7 +767,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             system?.addScheme(this)
         }
 
-        return loadIdentifiedObject(protectionRelayScheme, table, resultSet)
+        return loadIdentifiedObject(protectionRelayScheme, table, resultSet) && networkService.addOrThrow(protectionRelayScheme)
     }
 
     fun load(table: TableProtectionRelaySystems, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
@@ -775,13 +775,13 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             protectionKind = ProtectionKind.valueOf(resultSet.getString(table.PROTECTION_KIND.queryIndex))
         }
 
-        return loadEquipment(protectionRelaySystem, table, resultSet)
+        return loadEquipment(protectionRelaySystem, table, resultSet) && networkService.addOrThrow(protectionRelaySystem)
     }
 
     fun load(table: TableVoltageRelays, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val voltageRelay = VoltageRelay(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadProtectionRelayFunction(voltageRelay, table, resultSet)
+        return loadProtectionRelayFunction(voltageRelay, table, resultSet) && networkService.addOrThrow(voltageRelay)
     }
 
     /************ IEC61970 BASE SCADA ************/
@@ -1244,7 +1244,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             varistorVoltageThreshold = resultSet.getNullableInt(table.VARISTOR_VOLTAGE_THRESHOLD.queryIndex)
         }
 
-        return loadConductingEquipment(seriesCompensator, table, resultSet)
+        return loadConductingEquipment(seriesCompensator, table, resultSet) && networkService.addOrThrow(seriesCompensator)
     }
 
     private fun loadShuntCompensator(

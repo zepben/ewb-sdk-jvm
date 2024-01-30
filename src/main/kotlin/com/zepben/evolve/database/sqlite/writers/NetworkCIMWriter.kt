@@ -858,11 +858,11 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConductingEquipment(table, insert, ground, "ground")
     }
 
-    fun save(ground: GroundDisconnector): Boolean {
-        val table = databaseTables.getTable(TableGrounds::class.java)
-        val insert = databaseTables.getInsert(TableGrounds::class.java)
+    fun save(groundDisconnector: GroundDisconnector): Boolean {
+        val table = databaseTables.getTable(TableGroundDisconnectors::class.java)
+        val insert = databaseTables.getInsert(TableGroundDisconnectors::class.java)
 
-        return saveConductingEquipment(table, insert, ground, "ground")
+        return saveSwitch(table, insert, groundDisconnector, "ground disconnector")
     }
 
     fun save(jumper: Jumper): Boolean {

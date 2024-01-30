@@ -105,7 +105,6 @@ class DatabaseTables {
         TableCircuitsTerminals(),
         TableConnectivityNodes(),
         TableControls(),
-        TableRelayInfo(),
         TableCurrentRelays(),
         TableCurrentTransformerInfo(),
         TableCurrentTransformers(),

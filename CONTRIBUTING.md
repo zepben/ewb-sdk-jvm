@@ -46,9 +46,9 @@ Our main style requirements are:
     1. Add schema tests - `DatabaseSqliteTest.kt` /
 1. Reference resolver(s) added (if new associations). /
 1. Protobuf/gRPC
-    1. *CimToProto(s) updated (including java wrapper).
-    1. *ProtoToCim(s) updated (including java wrapper).
-    1. *TranslatorTest(s) updated.
+    1. *CimToProto(s) updated (including java wrapper). /
+    1. *ProtoToCim(s) updated (including java wrapper). /
+    1. *TranslatorTest(s) updated. /
 
 NOTE: Do not update the StupidlyLargeNetwork file, this will be phased out.
 

@@ -12,9 +12,9 @@ import com.zepben.evolve.cim.iec61968.assets.AssetInfo
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 
 /**
- * Current Relay Datasheet Information.
+ * Relay Datasheet Information.
  *
- * @property curveSetting The type of curve used for the Current Relay.
+ * @property curveSetting The type of curve used for the Relay.
  */
 class RelayInfo(mRID: String = "") : AssetInfo(mRID) {
 

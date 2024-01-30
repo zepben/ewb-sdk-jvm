@@ -1031,6 +1031,16 @@ fun Fuse.fillFields(service: NetworkService, includeRuntime: Boolean = true): Fu
     return this
 }
 
+fun Ground.fillFields(service: NetworkService, includeRuntime: Boolean = true): Ground {
+    (this as ConductingEquipment).fillFields(service, includeRuntime)
+    return this
+}
+
+fun GroundDisconnector.fillFields(service: NetworkService, includeRuntime: Boolean = true): GroundDisconnector {
+    (this as Switch).fillFields(service, includeRuntime)
+    return this
+}
+
 fun Jumper.fillFields(service: NetworkService, includeRuntime: Boolean = true): Jumper {
     (this as Switch).fillFields(service, includeRuntime)
     return this
@@ -1173,37 +1183,6 @@ fun RegulatingControl.fillFields(service: NetworkService, includeRuntime: Boolea
     return this
 }
 
-fun TapChanger.fillFields(service: NetworkService, includeRuntime: Boolean = true): TapChanger {
-    (this as PowerSystemResource).fillFields(service, includeRuntime)
-
-    controlEnabled = false
-    highStep = 22
-    lowStep = 1
-    neutralStep = 2
-    neutralU = 3
-    normalStep = 4
-    step = 5.5
-    tapChangerControl = TapChangerControl().also { service.add(it) }
-
-    return this
-}
-
-fun TapChangerControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): TapChangerControl {
-    (this as RegulatingControl).fillFields(service, includeRuntime)
-
-    limitVoltage = 1000
-    lineDropCompensation = true
-    lineDropR = 10.0
-    lineDropX = 4.0
-    reverseLineDropR = 1.0
-    reverseLineDropX = 1.0
-    forwardLDCBlocking = true
-    timeDelay = 5.3
-    coGenerationEnabled = false
-
-    return this
-}
-
 fun SeriesCompensator.fillFields(service: NetworkService, includeRuntime: Boolean = true): SeriesCompensator {
     (this as ConductingEquipment).fillFields(service, includeRuntime)
 
@@ -1241,6 +1220,37 @@ fun Switch.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
     // when unganged support is added to protobuf
     //    normalOpen = 2
     //    open = 3
+
+    return this
+}
+
+fun TapChanger.fillFields(service: NetworkService, includeRuntime: Boolean = true): TapChanger {
+    (this as PowerSystemResource).fillFields(service, includeRuntime)
+
+    controlEnabled = false
+    highStep = 22
+    lowStep = 1
+    neutralStep = 2
+    neutralU = 3
+    normalStep = 4
+    step = 5.5
+    tapChangerControl = TapChangerControl().also { service.add(it) }
+
+    return this
+}
+
+fun TapChangerControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): TapChangerControl {
+    (this as RegulatingControl).fillFields(service, includeRuntime)
+
+    limitVoltage = 1000
+    lineDropCompensation = true
+    lineDropR = 10.0
+    lineDropX = 4.0
+    reverseLineDropR = 1.0
+    reverseLineDropX = 1.0
+    forwardLDCBlocking = true
+    timeDelay = 5.3
+    coGenerationEnabled = false
 
     return this
 }

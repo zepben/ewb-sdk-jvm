@@ -12,7 +12,7 @@ import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
-class TableCurrentRelays : TableProtectionEquipment() {
+class TableCurrentRelays : TableProtectionRelayFunctions() {
 
     val CURRENT_LIMIT_1 = Column(++columnIndex, "current_limit_1", "NUMBER", NULL)
     val INVERSE_TIME_FLAG = Column(++columnIndex, "inverse_time_flag", "BOOLEAN", NULL)

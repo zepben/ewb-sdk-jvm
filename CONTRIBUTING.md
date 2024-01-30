@@ -26,11 +26,11 @@ Our main style requirements are:
 
 ## Checklist for model change ##
 
-1. Update `pom.xml` to import the correct version of `evolve-grpc`.
-1. Model updated and tested.
-1. Add/remove methods added to *Service class if new class was added.
-1. Descriptions copied from CIM and added as doc comments to new changes (on class, property etc)
-1. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required.
+1. Update `pom.xml` to import the correct version of `evolve-grpc`. /
+1. Model updated and tested. /
+1. Add/remove methods added to *Service class if new class was added. /
+1. Descriptions copied from CIM and added as doc comments to new changes (on class, property etc) /
+1. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required. /
 1. Database:
     1. Table class(es) updated. - `com.zepben.evolve.database.sqlite.tables`
     1. New tables added to DatabaseTables - `DatabaseTables.kt`

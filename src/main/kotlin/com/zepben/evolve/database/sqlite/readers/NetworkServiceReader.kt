@@ -33,7 +33,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAccumula
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAnalogs
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableDiscretes
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
@@ -92,6 +92,12 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableLoadBreakSwitches>("load break switches", reader::load)
         status = status and loadEach<TableBusbarSections>("busbar sections", reader::load)
         status = status and loadEach<TableCurrentRelays>("current relays", reader::load)
+        status = status and loadEach<TableDistanceRelays>("distance relays", reader::load)
+        status = status and loadEach<TableVoltageRelays>("voltage relays", reader::load)
+        status = status and loadEach<TableProtectionRelayFunctionThresholds>("protection relay function thresholds", reader::load)
+        status = status and loadEach<TableProtectionRelayFunctionTimeLimits>("protection relay function time limits", reader::load)
+        status = status and loadEach<TableProtectionRelaySystems>("protection relay system", reader::load)
+        status = status and loadEach<TableProtectionRelaySchemes>("protection relay schemes", reader::load)
         status = status and loadEach<TableDisconnectors>("disconnectors", reader::load)
         status = status and loadEach<TableEnergyConsumers>("energy consumers", reader::load)
         status = status and loadEach<TableEnergyConsumerPhases>("energy consumer phases", reader::load)
@@ -100,6 +106,9 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableFuses>("fuses", reader::load)
         status = status and loadEach<TableJumpers>("jumpers", reader::load)
         status = status and loadEach<TableJunctions>("junctions", reader::load)
+        status = status and loadEach<TableGrounds>("grounds", reader::load)
+        status = status and loadEach<TableGroundDisconnectors>("ground disconnectors", reader::load)
+        status = status and loadEach<TableSeriesCompensators>("series compensators", reader::load)
         status = status and loadEach<TableLinearShuntCompensators>("linear shunt compensators", reader::load)
         status = status and loadEach<TablePowerTransformers>("power transformers", reader::load)
         status = status and loadEach<TableReclosers>("reclosers", reader::load)
@@ -132,6 +141,9 @@ class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServ
         status = status and loadEach<TableCircuitsSubstations>("circuit to substation associations", reader::load)
         status = status and loadEach<TableCircuitsTerminals>("circuit to terminal associations", reader::load)
         status = status and loadEach<TableLoopsSubstations>("loop to substation associations", reader::load)
+        status = status and loadEach<TableProtectionRelayFunctionsProtectedSwitches>("protection relay function to protected switch associations", reader::load)
+        status = status and loadEach<TableProtectionRelayFunctionsSensors>("protection relay function to sensor associations", reader::load)
+        status = status and loadEach<TableProtectionRelaySchemesProtectionRelayFunctions>("protection relay scheme to protection relay function associations", reader::load)
         status = status and loadEach<TableControls>("controls", reader::load)
         status = status and loadEach<TableRemoteControls>("remote controls", reader::load)
         status = status and loadEach<TableRemoteSources>("remote sources", reader::load)

@@ -22,7 +22,7 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -31,6 +31,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
+import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.tables.associations.*
@@ -50,7 +52,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentEquipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.*
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
@@ -685,7 +687,100 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             timeDelay1 = resultSet.getNullableDouble(table.TIME_DELAY_1.queryIndex)
         }
 
-        return /* TODO loadProtectionRelayFunction(currentRelay, table, resultSet) && */ networkService.addOrThrow(currentRelay)
+        return loadProtectionRelayFunction(currentRelay, table, resultSet) && networkService.addOrThrow(currentRelay)
+    }
+
+    fun load(table: TableDistanceRelays, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val distanceRelay = DistanceRelay(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            backwardBlind = resultSet.getNullableDouble(table.BACKWARD_BLIND.queryIndex)
+            backwardReach = resultSet.getNullableDouble(table.BACKWARD_REACH.queryIndex)
+            backwardReactance = resultSet.getNullableDouble(table.BACKWARD_REACTANCE.queryIndex)
+            forwardBlind = resultSet.getNullableDouble(table.FORWARD_BLIND.queryIndex)
+            forwardReach = resultSet.getNullableDouble(table.FORWARD_REACH.queryIndex)
+            forwardReactance = resultSet.getNullableDouble(table.FORWARD_REACTANCE.queryIndex)
+            operationPhaseAngle1 = resultSet.getNullableDouble(table.OPERATION_PHASE_ANGLE1.queryIndex)
+            operationPhaseAngle2 = resultSet.getNullableDouble(table.OPERATION_PHASE_ANGLE2.queryIndex)
+            operationPhaseAngle3 = resultSet.getNullableDouble(table.OPERATION_PHASE_ANGLE3.queryIndex)
+        }
+
+        return loadProtectionRelayFunction(distanceRelay, table, resultSet)
+    }
+
+    private fun loadProtectionRelayFunction(
+        protectionRelayFunction: ProtectionRelayFunction,
+        table: TableProtectionRelayFunctions,
+        resultSet: ResultSet
+    ): Boolean {
+        protectionRelayFunction.apply {
+            model = resultSet.getNullableString(table.MODEL.queryIndex)
+            reclosing = resultSet.getNullableBoolean(table.RECLOSING.queryIndex)
+            relayDelayTime = resultSet.getNullableDouble(table.RELAY_DELAY_TIME.queryIndex)
+            protectionKind = ProtectionKind.valueOf(resultSet.getString(table.PROTECTION_KIND.queryIndex))
+            directable = resultSet.getNullableBoolean(table.DIRECTABLE.queryIndex)
+            powerDirection = PowerDirectionKind.valueOf(resultSet.getString(table.POWER_DIRECTION.queryIndex))
+        }
+
+        return loadPowerSystemResource(protectionRelayFunction, table, resultSet)
+    }
+
+    fun load(table: TableProtectionRelayFunctionThresholds, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val protectionRelayFunctionMRID = setLastMRID(resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex))
+        val sequenceNumber = resultSet.getInt(table.SEQUENCE_NUMBER.queryIndex)
+
+        val id = setLastMRID("$protectionRelayFunctionMRID-threshold$sequenceNumber")
+        val protectionRelayFunction = networkService.getOrThrow<ProtectionRelayFunction>(
+            protectionRelayFunctionMRID,
+            "ProtectionRelayFunction to RelaySetting association $id"
+        )
+
+        protectionRelayFunction.addThreshold(
+            RelaySetting(
+                UnitSymbol.valueOf(resultSet.getString(table.UNIT_SYMBOL.queryIndex)),
+                resultSet.getDouble(table.VALUE.queryIndex),
+                resultSet.getNullableString(table.NAME.queryIndex)
+            ),
+            sequenceNumber
+        )
+
+        return true
+    }
+
+    fun load(table: TableProtectionRelayFunctionTimeLimits, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        // Note TableProtectionRelayFunctionTimeLimits.selectSql ensures we process ratings in the correct order.
+        val protectionRelayFunctionMRID = setLastMRID(resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex))
+        val timeLimit = resultSet.getDouble(table.TIME_LIMIT.queryIndex)
+        setLastMRID("$protectionRelayFunctionMRID time limit $timeLimit")
+
+        val protectionRelayFunction = networkService.ensureGet<ProtectionRelayFunction>(
+            protectionRelayFunctionMRID,
+            "$protectionRelayFunctionMRID time limit $timeLimit"
+        )
+        protectionRelayFunction?.addTimeLimit(timeLimit)
+
+        return true
+    }
+
+    fun load(table: TableProtectionRelaySchemes, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val protectionRelayScheme = ProtectionRelayScheme(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            system = networkService.ensureGet(resultSet.getString(table.SYSTEM_MRID.queryIndex), typeNameAndMRID())
+            system?.addScheme(this)
+        }
+
+        return loadIdentifiedObject(protectionRelayScheme, table, resultSet)
+    }
+
+    fun load(table: TableProtectionRelaySystems, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val protectionRelaySystem = ProtectionRelaySystem(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            protectionKind = ProtectionKind.valueOf(resultSet.getString(table.PROTECTION_KIND.queryIndex))
+        }
+
+        return loadEquipment(protectionRelaySystem, table, resultSet)
+    }
+
+    fun load(table: TableVoltageRelays, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val voltageRelay = VoltageRelay(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadProtectionRelayFunction(voltageRelay, table, resultSet)
     }
 
     /************ IEC61970 BASE SCADA ************/
@@ -895,9 +990,23 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     }
 
     fun load(table: TableFuses, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
-        val fuse = Fuse(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+        val fuse = Fuse(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            function = networkService.ensureGet(resultSet.getString(table.FUNCTION_MRID.queryIndex), typeNameAndMRID())
+        }
 
         return loadSwitch(fuse, table, resultSet) && networkService.addOrThrow(fuse)
+    }
+
+    fun load(table: TableGrounds, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val ground = Ground(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadConductingEquipment(ground, table, resultSet) && networkService.addOrThrow(ground)
+    }
+
+    fun load(table: TableGroundDisconnectors, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val groundDisconnector = GroundDisconnector(setLastMRID(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadSwitch(groundDisconnector, table, resultSet) && networkService.addOrThrow(groundDisconnector)
     }
 
     fun load(table: TableJumpers, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
@@ -1117,10 +1226,24 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
             enabled = resultSet.getNullableBoolean(table.ENABLED.queryIndex)
             maxAllowedTargetValue = resultSet.getNullableDouble(table.MAX_ALLOWED_TARGET_VALUE.queryIndex)
             minAllowedTargetValue = resultSet.getNullableDouble(table.MIN_ALLOWED_TARGET_VALUE.queryIndex)
+            ratedCurrent = resultSet.getNullableDouble(table.RATED_CURRENT.queryIndex)
             terminal = networkService.ensureGet(resultSet.getNullableString(table.TERMINAL_MRID.queryIndex), typeNameAndMRID())
         }
 
         return loadPowerSystemResource(regulatingControl, table, resultSet)
+    }
+
+    fun load(table: TableSeriesCompensators, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val seriesCompensator = SeriesCompensator(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
+            r = resultSet.getNullableDouble(table.R.queryIndex)
+            r0 = resultSet.getNullableDouble(table.R0.queryIndex)
+            x = resultSet.getNullableDouble(table.X.queryIndex)
+            x0 = resultSet.getNullableDouble(table.X0.queryIndex)
+            varistorRatedCurrent = resultSet.getNullableInt(table.VARISTOR_RATED_CURRENT.queryIndex)
+            varistorVoltageThreshold = resultSet.getNullableInt(table.VARISTOR_VOLTAGE_THRESHOLD.queryIndex)
+        }
+
+        return loadConductingEquipment(seriesCompensator, table, resultSet)
     }
 
     private fun loadShuntCompensator(
@@ -1381,6 +1504,54 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
                 loop.addEnergizingSubstation(substation)
             }
         }
+
+        return true
+    }
+
+    fun load(table: TableProtectionRelayFunctionsProtectedSwitches, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val protectionRelayFunctionMRID = setLastMRID(resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex))
+        setLastMRID("${protectionRelayFunctionMRID}-to-UNKNOWN")
+
+        val protectedSwitchMRID = resultSet.getString(table.PROTECTED_SWITCH_MRID.queryIndex)
+        val id = setLastMRID("${protectionRelayFunctionMRID}-to-${protectedSwitchMRID}")
+
+        val typeNameAndMRID = "ProtectionRelayFunction to ProtectedSwitch association $id"
+        val protectionRelayFunction = networkService.getOrThrow<ProtectionRelayFunction>(protectionRelayFunctionMRID, typeNameAndMRID)
+        val protectedSwitch = networkService.getOrThrow<ProtectedSwitch>(protectedSwitchMRID, typeNameAndMRID)
+
+        protectionRelayFunction.addProtectedSwitch(protectedSwitch)
+
+        return true
+    }
+
+    fun load(table: TableProtectionRelayFunctionsSensors, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val protectionRelayFunctionMRID = setLastMRID(resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex))
+        setLastMRID("${protectionRelayFunctionMRID}-to-UNKNOWN")
+
+        val sensorMRID = resultSet.getString(table.SENSOR_MRID.queryIndex)
+        val id = setLastMRID("${protectionRelayFunctionMRID}-to-${sensorMRID}")
+
+        val typeNameAndMRID = "ProtectionRelayFunction to Sensor association $id"
+        val protectionRelayFunction = networkService.getOrThrow<ProtectionRelayFunction>(protectionRelayFunctionMRID, typeNameAndMRID)
+        val sensor = networkService.getOrThrow<Sensor>(sensorMRID, typeNameAndMRID)
+
+        protectionRelayFunction.addSensor(sensor)
+
+        return true
+    }
+
+    fun load(table: TableProtectionRelaySchemesProtectionRelayFunctions, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
+        val protectionRelaySchemeMRID = setLastMRID(resultSet.getString(table.PROTECTION_RELAY_SCHEME_MRID.queryIndex))
+        setLastMRID("${protectionRelaySchemeMRID}-to-UNKNOWN")
+
+        val protectionRelayFunctionMRID = resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex)
+        val id = setLastMRID("${protectionRelaySchemeMRID}-to-${protectionRelayFunctionMRID}")
+
+        val typeNameAndMRID = "ProtectionRelayScheme to ProtectionRelayFunction association $id"
+        val protectionRelayScheme = networkService.getOrThrow<ProtectionRelayScheme>(protectionRelaySchemeMRID, typeNameAndMRID)
+        val protectionRelayFunction = networkService.getOrThrow<ProtectionRelayFunction>(protectionRelayFunctionMRID, typeNameAndMRID)
+
+        protectionRelayScheme.addFunction(protectionRelayFunction)
 
         return true
     }

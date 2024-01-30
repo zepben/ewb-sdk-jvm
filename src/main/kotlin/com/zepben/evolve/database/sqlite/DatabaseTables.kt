@@ -43,7 +43,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAccumula
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAnalogs
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableDiscretes
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
@@ -105,7 +105,6 @@ class DatabaseTables {
         TableCircuitsTerminals(),
         TableConnectivityNodes(),
         TableControls(),
-        TableRelayInfo(),
         TableCurrentRelays(),
         TableCurrentTransformerInfo(),
         TableCurrentTransformers(),
@@ -117,6 +116,7 @@ class DatabaseTables {
         TableDiagrams(),
         TableDisconnectors(),
         TableDiscretes(),
+        TableDistanceRelays(),
         TableEnergyConsumerPhases(),
         TableEnergyConsumers(),
         TableEnergySourcePhases(),
@@ -130,6 +130,8 @@ class DatabaseTables {
         TableFeeders(),
         TableFuses(),
         TableGeographicalRegions(),
+        TableGrounds(),
+        TableGroundDisconnectors(),
         TableJumpers(),
         TableJunctions(),
         TableLinearShuntCompensators(),
@@ -163,12 +165,17 @@ class DatabaseTables {
         TablePowerTransformers(),
         TablePricingStructures(),
         TablePricingStructuresTariffs(),
+        TableProtectionRelayFunctionThresholds(),
+        TableProtectionRelayFunctionTimeLimits(),
         TableProtectionRelayFunctionsProtectedSwitches(),
+        TableProtectionRelaySchemes(),
         TableRatioTapChangers(),
         TableReclosers(),
         TableRecloseDelays(),
+        TableRelayInfo(),
         TableRemoteControls(),
         TableRemoteSources(),
+        TableSeriesCompensators(),
         TableShortCircuitTests(),
         TableShuntCompensatorInfo(),
         TableSites(),
@@ -185,5 +192,6 @@ class DatabaseTables {
         TableUsagePoints(),
         TableUsagePointsEndDevices(),
         TableVersion(),
+        TableVoltageRelays()
     ).associateBy { it::class.java }
 }

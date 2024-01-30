@@ -23,6 +23,7 @@ abstract class TableRegulatingControls : TablePowerSystemResources() {
     val ENABLED = Column(++columnIndex, "enabled", "BOOLEAN", NULL)
     val MAX_ALLOWED_TARGET_VALUE = Column(++columnIndex, "max_allowed_target_value", "NUMBER", NULL)
     val MIN_ALLOWED_TARGET_VALUE = Column(++columnIndex, "min_allowed_target_value", "NUMBER", NULL)
+    val RATED_CURRENT = Column(++columnIndex, "rated_current", "NUMBER", NULL)
     val TERMINAL_MRID = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
 
 }

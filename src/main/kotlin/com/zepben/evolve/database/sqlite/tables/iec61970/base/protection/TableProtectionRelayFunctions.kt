@@ -16,8 +16,8 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TablePowerSys
 @Suppress("PropertyName")
 abstract class TableProtectionRelayFunctions : TablePowerSystemResources() {
 
-    val MODEL = Column(++columnIndex, "model","TEXT", NULL)
-    val RECLOSING = Column(++columnIndex, "reclosing","BOOLEAN", NULL)
+    val MODEL = Column(++columnIndex, "model", "TEXT", NULL)
+    val RECLOSING = Column(++columnIndex, "reclosing", "BOOLEAN", NULL)
     val RELAY_DELAY_TIME = Column(++columnIndex, "relay_delay_time", "NUMBER", NULL)
     val PROTECTION_KIND = Column(++columnIndex, "protection_kind", "TEXT", NOT_NULL)
     val DIRECTABLE = Column(++columnIndex, "directable", "BOOLEAN", NULL)

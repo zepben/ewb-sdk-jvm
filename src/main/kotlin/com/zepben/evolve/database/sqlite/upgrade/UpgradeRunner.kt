@@ -28,7 +28,8 @@ class UpgradeRunner constructor(
         changeSet45(),
         changeSet46(),
         changeSet47(),
-        changeSet48()
+        changeSet48(),
+        changeSet49()
     ),
     private val tableVersion: TableVersion = TableVersion()
 ) {

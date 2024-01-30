@@ -13,7 +13,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableFuses : TableSwitches() {
 
-    val FUNCTION_MRID = Column(++columnIndex, "function", "TEXT", NULL)
+    val FUNCTION_MRID = Column(++columnIndex, "function_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "fuses"

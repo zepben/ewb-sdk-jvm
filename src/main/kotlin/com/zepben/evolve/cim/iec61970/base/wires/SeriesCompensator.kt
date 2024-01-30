@@ -23,7 +23,7 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
  * @property varistorVoltageThreshold The dc voltage in volts at which the varistor starts conducting. It is used for short circuit calculations. If null and
  *                                    varistorRatedCurrent is null, a varistor is not present.
  */
-class SeriesCompensator(mRID: String = "") : ConductingEquipment(mRID) {
+class SeriesCompensator @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID) {
 
     var r: Double? = null
     var r0: Double? = null

@@ -19,7 +19,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
  *
  * @property system The system this scheme belongs to.
  */
-class ProtectionRelayScheme(mRID: String = "") : IdentifiedObject(mRID) {
+class ProtectionRelayScheme @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
 
     var system: ProtectionRelaySystem? = null
 

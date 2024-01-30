@@ -28,8 +28,7 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransform
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -139,6 +138,10 @@ internal class NetworkTranslatorTest {
 
         /************ IEC61970 Base Protection ************/
         validate({ CurrentRelay() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ DistanceRelay() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ ProtectionRelayScheme() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ ProtectionRelaySystem() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ VoltageRelay() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
         /************ IEC61970 BASE SCADA ************/
         validate({ RemoteControl() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
@@ -161,6 +164,8 @@ internal class NetworkTranslatorTest {
         validate({ EnergySource() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ EnergySourcePhase() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Fuse() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ Ground() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ GroundDisconnector() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Jumper() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Junction() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ LinearShuntCompensator() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
@@ -170,6 +175,7 @@ internal class NetworkTranslatorTest {
         validate({ PowerTransformerEnd() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ RatioTapChanger() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Recloser() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ SeriesCompensator() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ TransformerStarImpedance() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ TapChangerControl() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 

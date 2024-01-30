@@ -11,4 +11,4 @@ package com.zepben.evolve.cim.iec61970.base.wires
 /**
  * A manually operated or motor operated mechanical switching device used for isolating a circuit or equipment from ground.
  */
-class GroundDisconnector(mRID: String = "") : Switch(mRID)
+class GroundDisconnector @JvmOverloads constructor(mRID: String = "") : Switch(mRID)

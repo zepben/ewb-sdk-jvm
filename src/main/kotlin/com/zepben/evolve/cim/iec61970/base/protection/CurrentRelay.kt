@@ -18,7 +18,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
  * @property timeDelay1 Inverse time delay number 1 for current limit number 1 in seconds.
  * @property assetInfo Datasheet information for this CurrentRelay.
  */
-class CurrentRelay(mRID: String = "") : ProtectionRelayFunction(mRID) {
+class CurrentRelay @JvmOverloads constructor(mRID: String = "") : ProtectionRelayFunction(mRID) {
 
     override var assetInfo: RelayInfo? = null
 

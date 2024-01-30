@@ -26,7 +26,7 @@ package com.zepben.evolve.cim.iec61970.base.protection
  * @property operationPhaseAngle2 The phase angle (in degrees) between voltage and current during normal operating conditions for zone 2 relay.
  * @property operationPhaseAngle3 The phase angle (in degrees) between voltage and current during normal operating conditions for zone 3 relay.
  */
-class DistanceRelay(mRID: String = "") : ProtectionRelayFunction(mRID) {
+class DistanceRelay @JvmOverloads constructor(mRID: String = "") : ProtectionRelayFunction(mRID) {
 
     var backwardBlind: Double? = null
     var backwardReach: Double? = null

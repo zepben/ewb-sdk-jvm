@@ -26,7 +26,7 @@ import java.util.function.BiConsumer
  * @property directable Whether this [ProtectionRelayFunction] responds to power flow in a given direction.
  * @property powerDirection The flow of power direction used by this ProtectionRelayFunction.
  */
-abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(mRID) {
+abstract class ProtectionRelayFunction @JvmOverloads constructor(mRID: String = "") : PowerSystemResource(mRID) {
 
     var model: String? = null
     var reclosing: Boolean? = null

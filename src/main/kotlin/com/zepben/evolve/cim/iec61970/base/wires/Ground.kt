@@ -13,4 +13,4 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 /**
  * A point where the system is grounded used for connecting conducting equipment to ground. The power system model can have any number of grounds.
  */
-class Ground(mRID: String = "") : ConductingEquipment(mRID)
+class Ground @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(mRID)

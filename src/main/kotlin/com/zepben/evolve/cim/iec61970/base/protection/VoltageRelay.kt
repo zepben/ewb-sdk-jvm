@@ -12,4 +12,4 @@ package com.zepben.evolve.cim.iec61970.base.protection
  * A device that detects when the voltage in an AC circuit reaches a preset voltage. There are two basic types of voltage relay operation: overvoltage relay for
  * overvoltage detection and undervoltage relay for undervoltage detection.
  */
-class VoltageRelay(mRID: String = "") : ProtectionRelayFunction(mRID)
+class VoltageRelay @JvmOverloads constructor(mRID: String = "") : ProtectionRelayFunction(mRID)

@@ -1326,6 +1326,10 @@ class NetworkCimToProto : BaseCimToProto() {
 
     // IEC61970 Base Protection
     fun toPb(cim: CurrentRelay): PBCurrentRelay = cim.toPb()
+    fun toPb(cim: DistanceRelay): PBDistanceRelay = cim.toPb()
+    fun toPb(cim: ProtectionRelayScheme): PBProtectionRelayScheme = cim.toPb()
+    fun toPb(cim: ProtectionRelaySystem): PBProtectionRelaySystem = cim.toPb()
+    fun toPb(cim: VoltageRelay): PBVoltageRelay = cim.toPb()
 
     // IEC61970 BASE SCADA
     fun toPb(cim: RemoteControl): PBRemoteControl = cim.toPb()
@@ -1346,6 +1350,8 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: EnergySource): PBEnergySource = cim.toPb()
     fun toPb(cim: EnergySourcePhase): PBEnergySourcePhase = cim.toPb()
     fun toPb(cim: Fuse): PBFuse = cim.toPb()
+    fun toPb(cim: Ground): PBGround = cim.toPb()
+    fun toPb(cim: GroundDisconnector): PBGroundDisconnector = cim.toPb()
     fun toPb(cim: Jumper): PBJumper = cim.toPb()
     fun toPb(cim: Junction): PBJunction = cim.toPb()
     fun toPb(cim: LinearShuntCompensator): PBLinearShuntCompensator = cim.toPb()
@@ -1357,6 +1363,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: PowerTransformerEnd): PBPowerTransformerEnd = cim.toPb()
     fun toPb(cim: RatioTapChanger): PBRatioTapChanger = cim.toPb()
     fun toPb(cim: Recloser): PBRecloser = cim.toPb()
+    fun toPb(cim: SeriesCompensator): PBSeriesCompensator = cim.toPb()
     fun toPb(cim: TapChangerControl): PBTapChangerControl = cim.toPb()
     fun toPb(cim: TransformerStarImpedance): PBTransformerStarImpedance = cim.toPb()
 

@@ -194,24 +194,17 @@ private val sql = listOf(
     """CREATE INDEX protection_relay_schemes_protection_relay_functions_protection_relay_function_mrid
         ON protection_relay_schemes_protection_relay_functions (protection_relay_function_mrid);""".trimIndent(),
 
-    "CREATE TABLE reclose_delays_new (relay_info_mrid TEXT NOT NULL, reclose_delay NUMBER NOT NULL, sequence_number INTEGER NOT NULL);",
-    "CREATE UNIQUE INDEX reclose_delays_relay_info_mrid_sequence_number ON reclose_delays_new (relay_info_mrid, sequence_number);",
-    "CREATE INDEX reclose_delays_relay_info_mrid ON reclose_delays_new (relay_info_mrid);",
-    "INSERT INTO reclose_delays_new SELECT current_relay_info_mrid, reclose_delay, sequence_number FROM reclose_delays;",
-    "DROP TABLE reclose_delays;",
-    "ALTER TABLE reclose_delays_new RENAME TO reclose_delays;",
+    "ALTER TABLE reclose_delays RENAME COLUMN current_relay_info_mrid to relay_info_mrid;",
+    "DROP INDEX IF EXISTS reclose_delays_current_relay_info_mrid;",
+    "DROP INDEX IF EXISTS reclose_delays_current_relay_info_mrid_sequence_number;",
+    "CREATE UNIQUE INDEX reclose_delays_relay_info_mrid_sequence_number ON reclose_delays (relay_info_mrid, sequence_number);",
+    "CREATE INDEX reclose_delays_relay_info_mrid ON reclose_delays (relay_info_mrid);",
 
-    """CREATE TABLE relay_info (
-        mrid TEXT NOT NULL,
-        name TEXT NOT NULL,
-        description TEXT NOT NULL,
-        num_diagram_objects INTEGER NOT NULL,
-        curve_setting TEXT NULL
-    );""".trimIndent(),
+    "ALTER TABLE current_relay_info RENAME TO relay_info;",
+    "DROP INDEX IF EXISTS current_relay_info_mrid;",
+    "DROP INDEX IF EXISTS current_relay_info_name;",
     "CREATE UNIQUE INDEX relay_info_mrid ON relay_info (mrid);",
     "CREATE INDEX relay_info_name ON relay_info (name);",
-    "INSERT INTO relay_info SELECT mrid, name, description, num_diagram_objects, curve_setting FROM current_relay_info;",
-    "DROP TABLE current_relay_info;",
 
     "ALTER TABLE current_relays ADD model TEXT NULL;",
     "ALTER TABLE current_relays ADD reclosing BOOLEAN NULL;",

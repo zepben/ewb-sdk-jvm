@@ -194,7 +194,7 @@ private val sql = listOf(
     """CREATE INDEX protection_relay_schemes_protection_relay_functions_protection_relay_function_mrid
         ON protection_relay_schemes_protection_relay_functions (protection_relay_function_mrid);""".trimIndent(),
 
-    "ALTER TABLE reclose_delays RENAME COLUMN current_relay_info_mrid to relay_info_mrid;",
+    "ALTER TABLE reclose_delays RENAME COLUMN current_relay_info_mrid TO relay_info_mrid;",
     "DROP INDEX IF EXISTS reclose_delays_current_relay_info_mrid;",
     "DROP INDEX IF EXISTS reclose_delays_current_relay_info_mrid_sequence_number;",
     "CREATE UNIQUE INDEX reclose_delays_relay_info_mrid_sequence_number ON reclose_delays (relay_info_mrid, sequence_number);",
@@ -208,6 +208,7 @@ private val sql = listOf(
 
     "ALTER TABLE current_relays ADD model TEXT NULL;",
     "ALTER TABLE current_relays ADD reclosing BOOLEAN NULL;",
+    "ALTER TABLE current_relays RENAME COLUMN current_relay_info_mrid TO relay_info_mrid;",
     "ALTER TABLE fuses ADD function_mrid TEXT NULL;",
     "ALTER TABLE tap_changer_controls ADD rated_current NUMBER NULL;",
 

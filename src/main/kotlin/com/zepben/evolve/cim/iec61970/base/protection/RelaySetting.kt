@@ -17,4 +17,4 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
  * @property value The value of the setting, e.g voltage, current, etc.
  * @property name The name of the setting.
  */
-data class RelaySetting(val unitSymbol: UnitSymbol, val value: Double, val name: String? = null)
+data class RelaySetting @JvmOverloads constructor(val unitSymbol: UnitSymbol, val value: Double, val name: String? = null)

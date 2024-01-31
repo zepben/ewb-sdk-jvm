@@ -26,29 +26,29 @@ Our main style requirements are:
 
 ## Checklist for model change ##
 
-1. Update `pom.xml` to import the correct version of `evolve-grpc`. /
-1. Model updated and tested. /
-1. Add/remove methods added to *Service class if new class was added. /
-1. Descriptions copied from CIM and added as doc comments to new changes (on class, property etc) /
-1. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required. /
+1. Update `pom.xml` to import the correct version of `evolve-grpc`.
+1. Model updated and tested.
+1. Add/remove methods added to *Service class if new class was added.
+1. Descriptions copied from CIM and added as doc comments to new changes (on class, property etc)
+1. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required.
 1. Database:
-    1. Table class(es) updated. - `com.zepben.evolve.database.sqlite.tables` /
-    1. New tables added to DatabaseTables - `DatabaseTables.kt` /
-    1. Writer updated. - `com.zepben.evolve.database.sqlite.writers` /
-    1. Reader updated. - `com.zepben.evolve.database.sqlite.readers` /
-    1. ServiceReader updated if a new class was added. - `com.zepben.evolve.database.sqlite.readers.*ServiceReader` /
-    1. ServiceWriter updated if a new class was added. - `com.zepben.evolve.database.sqlite.writers.*ServiceWriter` /
-    1. DB version updated. - `TableVersion.kt` /
+    1. Table class(es) updated. - `com.zepben.evolve.database.sqlite.tables`
+    1. New tables added to DatabaseTables - `DatabaseTables.kt`
+    1. Writer updated. - `com.zepben.evolve.database.sqlite.writers`
+    1. Reader updated. - `com.zepben.evolve.database.sqlite.readers`
+    1. ServiceReader updated if a new class was added. - `com.zepben.evolve.database.sqlite.readers.*ServiceReader`
+    1. ServiceWriter updated if a new class was added. - `com.zepben.evolve.database.sqlite.writers.*ServiceWriter`
+    1. DB version updated. - `TableVersion.kt`
     1. Migration written. - `com.zepben.evolve.database.sqlite.upgrade`
         1. ChangeSet added to UpgradeRunner. - `com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner`
         1. ChangeSetValidator written for ChangeSet. - `com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet*Validator`
         1. ChangeSetValidator added to changeSetValidators. - `com.zepben.evolve.database.sqlite.upgrade.ChangeSetTest`
-    1. Add schema tests - `DatabaseSqliteTest.kt` /
-1. Reference resolver(s) added (if new associations). /
+    1. Add schema tests - `DatabaseSqliteTest.kt`
+1. Reference resolver(s) added (if new associations).
 1. Protobuf/gRPC
-    1. *CimToProto(s) updated (including java wrapper). /
-    1. *ProtoToCim(s) updated (including java wrapper). /
-    1. *TranslatorTest(s) updated. /
+    1. *CimToProto(s) updated (including java wrapper).
+    1. *ProtoToCim(s) updated (including java wrapper).
+    1. *TranslatorTest(s) updated.
 
 NOTE: Do not update the StupidlyLargeNetwork file, this will be phased out.
 

@@ -663,6 +663,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     private fun compareProtectionRelayFunction(createProtectionRelayFunction: (String) -> ProtectionRelayFunction) {
         comparePowerSystemResource(createProtectionRelayFunction)
 
+        comparatorValidator.validateProperty(ProtectionRelayFunction::assetInfo, createProtectionRelayFunction, { RelayInfo("ri1") }, { RelayInfo("ri2") })
         comparatorValidator.validateProperty(ProtectionRelayFunction::model, createProtectionRelayFunction, { "model1" }, { "model2" })
         comparatorValidator.validateProperty(ProtectionRelayFunction::reclosing, createProtectionRelayFunction, { false }, { true })
         comparatorValidator.validateProperty(ProtectionRelayFunction::relayDelayTime, createProtectionRelayFunction, { 1.1 }, { 2.2 })
@@ -1079,6 +1080,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun comparePowerTransformer() {
         compareConductingEquipment { PowerTransformer(it) }
 
+        comparatorValidator.validateProperty(
+            PowerTransformer::assetInfo,
+            { PowerTransformer(it) },
+            { PowerTransformerInfo("pti1") },
+            { PowerTransformerInfo("pti2") }
+        )
         comparatorValidator.validateProperty(PowerTransformer::vectorGroup, { PowerTransformer(it) }, { VectorGroup.DYN11 }, { VectorGroup.D0 })
         comparatorValidator.validateProperty(PowerTransformer::transformerUtilisation, { PowerTransformer(it) }, { 0.1 }, { 0.9 })
         comparatorValidator.validateProperty(

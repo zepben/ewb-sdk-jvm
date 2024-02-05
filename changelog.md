@@ -40,7 +40,7 @@
 
 ### Enhancements
 
-* None.
+* Fixed transitive bug that made a database round-trip test fail on Windows due to an issue in `sqlitejdbc.dll`. 
 
 ### Fixes
 

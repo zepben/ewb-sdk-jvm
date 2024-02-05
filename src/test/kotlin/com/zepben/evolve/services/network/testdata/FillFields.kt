@@ -705,8 +705,6 @@ fun Measurement.fillFields(service: NetworkService, includeRuntime: Boolean = tr
 fun CurrentRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentRelay {
     (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
 
-    assetInfo = RelayInfo().also { service.add(it) }
-
     currentLimit1 = 1.1
     inverseTimeFlag = true
     timeDelay1 = 2.2
@@ -732,6 +730,8 @@ fun DistanceRelay.fillFields(service: NetworkService, includeRuntime: Boolean = 
 
 fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelayFunction {
     (this as PowerSystemResource).fillFields(service, includeRuntime)
+
+    assetInfo = RelayInfo().also { service.add(it) }
 
     model = "model"
     reclosing = true

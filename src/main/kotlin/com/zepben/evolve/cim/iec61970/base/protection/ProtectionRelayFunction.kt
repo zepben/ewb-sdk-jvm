@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.cim.iec61970.base.protection
 
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.evolve.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
@@ -25,8 +26,11 @@ import java.util.function.BiConsumer
  * @property protectionKind The kind of protection being provided by this ProtectionRelayFunction.
  * @property directable Whether this [ProtectionRelayFunction] responds to power flow in a given direction.
  * @property powerDirection The flow of power direction used by this ProtectionRelayFunction.
+ * @property assetInfo Datasheet information for this CurrentRelay.
  */
 abstract class ProtectionRelayFunction @JvmOverloads constructor(mRID: String = "") : PowerSystemResource(mRID) {
+
+    override var assetInfo: RelayInfo? = null
 
     var model: String? = null
     var reclosing: Boolean? = null

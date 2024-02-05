@@ -34,7 +34,6 @@ import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
@@ -86,10 +85,6 @@ internal object ConductingEquipmentToTerminalsResolver : ReferenceResolver<Condu
 
 internal object ConductorToWireInfoResolver : ReferenceResolver<Conductor, WireInfo> by KReferenceResolver(
     Conductor::class, WireInfo::class, Conductor::assetInfo.setter
-)
-
-internal object CurrentRelayToRelayInfoResolver : ReferenceResolver<CurrentRelay, RelayInfo> by KReferenceResolver(
-    CurrentRelay::class, RelayInfo::class, CurrentRelay::assetInfo.setter
 )
 
 internal object CurrentTransformerToCurrentTransformerInfoResolver : ReferenceResolver<CurrentTransformer, CurrentTransformerInfo> by KReferenceResolver(
@@ -462,6 +457,10 @@ internal object ProtectionRelaySystemToProtectionRelaySchemeResolver : Reference
 
 internal object FuseToProtectionRelayFunctionResolver : ReferenceResolver<Fuse, ProtectionRelayFunction> by KReferenceResolver(
     Fuse::class, ProtectionRelayFunction::class, Fuse::function.setter
+)
+
+internal object ProtectionRelayFunctionToRelayInfoResolver : ReferenceResolver<ProtectionRelayFunction, RelayInfo> by KReferenceResolver(
+    ProtectionRelayFunction::class, RelayInfo::class, ProtectionRelayFunction::assetInfo.setter
 )
 
 //-------------------------------------------//

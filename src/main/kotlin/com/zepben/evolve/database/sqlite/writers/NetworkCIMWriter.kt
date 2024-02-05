@@ -1270,7 +1270,6 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableDouble(table.CURRENT_LIMIT_1.queryIndex, currentRelay.currentLimit1)
         insert.setNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex, currentRelay.inverseTimeFlag)
         insert.setNullableDouble(table.TIME_DELAY_1.queryIndex, currentRelay.timeDelay1)
-        insert.setNullableString(table.RELAY_INFO_MRID.queryIndex, currentRelay.assetInfo?.mRID)
 
         return saveProtectionRelayFunction(table, insert, currentRelay, "current relay")
     }
@@ -1304,6 +1303,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.PROTECTION_KIND.queryIndex, protectionRelayFunction.protectionKind.name)
         insert.setNullableBoolean(table.DIRECTABLE.queryIndex, protectionRelayFunction.directable)
         insert.setString(table.POWER_DIRECTION.queryIndex, protectionRelayFunction.powerDirection.name)
+        insert.setNullableString(table.RELAY_INFO_MRID.queryIndex, protectionRelayFunction.assetInfo?.mRID)
 
         var status = true
         protectionRelayFunction.protectedSwitches.forEach { status = status and saveAssociation(protectionRelayFunction, it) }

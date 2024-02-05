@@ -29,6 +29,7 @@ private val sql = listOf(
         protection_kind TEXT NOT NULL,
         directable BOOLEAN NULL,
         power_direction TEXT NOT NULL,
+        relay_info_mrid TEXT NULL,
         backward_blind NUMBER NULL,
         backward_reach NUMBER NULL,
         backward_reactance NUMBER NULL,
@@ -79,7 +80,8 @@ private val sql = listOf(
         relay_delay_time NUMBER NULL,
         protection_kind TEXT NOT NULL,
         directable BOOLEAN NULL,
-        power_direction TEXT NOT NULL
+        power_direction TEXT NOT NULL,
+        relay_info_mrid TEXT NULL
     );""".trimIndent(),
     "CREATE UNIQUE INDEX voltage_relays_mrid ON voltage_relays (mrid);",
     "CREATE INDEX voltage_relays_name ON voltage_relays (name);",

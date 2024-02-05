@@ -34,7 +34,6 @@ import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
@@ -83,10 +82,6 @@ object Resolvers {
     @JvmStatic
     fun assetInfo(conductor: Conductor): BoundReferenceResolver<Conductor, WireInfo> =
         BoundReferenceResolver(conductor, ConductorToWireInfoResolver, null)
-
-    @JvmStatic
-    fun assetInfo(currentRelay: CurrentRelay): BoundReferenceResolver<CurrentRelay, RelayInfo> =
-        BoundReferenceResolver(currentRelay, CurrentRelayToRelayInfoResolver, null)
 
     @JvmStatic
     fun assetInfo(currentTransformer: CurrentTransformer): BoundReferenceResolver<CurrentTransformer, CurrentTransformerInfo> =
@@ -507,5 +502,9 @@ object Resolvers {
     @JvmStatic
     fun function(fuse: Fuse): BoundReferenceResolver<Fuse, ProtectionRelayFunction> =
         BoundReferenceResolver(fuse, FuseToProtectionRelayFunctionResolver, null)
+
+    @JvmStatic
+    fun assetInfo(protectionRelayFunction: ProtectionRelayFunction): BoundReferenceResolver<ProtectionRelayFunction, RelayInfo> =
+        BoundReferenceResolver(protectionRelayFunction, ProtectionRelayFunctionToRelayInfoResolver, null)
 
 }

@@ -37,17 +37,18 @@ object ChangeSet49Validator : ChangeSetValidator {
         "INSERT INTO reclose_delays (relay_info_mrid, reclose_delay, sequence_number) VALUES ('id5', 1.1, 2)",
         "INSERT INTO relay_info (mrid, name, description, num_diagram_objects, curve_setting) VALUES ('id5', 'name', 'desc', 1, 'curve')",
         "INSERT INTO current_relays (mrid, name, description, num_diagram_objects, location_mrid, num_controls, model, reclosing, relay_delay_time, " +
-            "protection_kind, directable, power_direction, current_limit_1, inverse_time_flag, time_delay_1, relay_info_mrid) VALUES ('id6', 'name', 'desc', " +
-            "1, 'loc', 2, 'model', true, 3.3, 'ZL', true, 'BOTH', 4.4, true, 5.5, 'id5')",
+            "protection_kind, directable, power_direction, relay_info_mrid, current_limit_1, inverse_time_flag, time_delay_1) VALUES ('id6', 'name', 'desc', " +
+            "1, 'loc', 2, 'model', true, 3.3, 'ZL', true, 'BOTH', 'id5', 4.4, true, 5.5)",
         "INSERT INTO distance_relays (mrid, name, description, num_diagram_objects, location_mrid, num_controls, model, reclosing, relay_delay_time, " +
-            "protection_kind, directable, power_direction, backward_blind, backward_reach, backward_reactance, forward_blind, forward_reach, " +
-            "forward_reactance, operation_phase_angle1, operation_phase_angle2, operation_phase_angle3) VALUES ('id7', 'name', 'desc', 1, 'loc', 2, 'model', " +
-            "true, 3.3, 'ZL', true, 'BOTH', 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10, 11.11, 12.12)",
+            "protection_kind, directable, power_direction, relay_info_mrid, backward_blind, backward_reach, backward_reactance, forward_blind, " +
+            "forward_reach, forward_reactance, operation_phase_angle1, operation_phase_angle2, operation_phase_angle3) VALUES ('id7', 'name', 'desc', 1, " +
+            "'loc', 2, 'model', true, 3.3, 'ZL', true, 'BOTH', 'id5', 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10, 11.11, 12.12)",
         "INSERT INTO protection_relay_schemes (mrid, name, description, num_diagram_objects, system_mrid) VALUES ('id8', 'name', 'desc', 1, 'id9')",
         "INSERT INTO protection_relay_systems (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, " +
             "commissioned_date, protection_kind) VALUES ('id9', 'name', 'desc', 1, 'loc', 2, true, true, '1970-01-01', 'MULTI_FUNCTION')",
         "INSERT INTO voltage_relays (mrid, name, description, num_diagram_objects, location_mrid, num_controls, model, reclosing, relay_delay_time, " +
-            "protection_kind, directable, power_direction) VALUES ('id10', 'name', 'desc', 1, 'loc', 2, 'model', true, 3.3, 'ZL', true, 'BOTH')",
+            "protection_kind, directable, power_direction, relay_info_mrid) VALUES ('id10', 'name', 'desc', 1, 'loc', 2, 'model', true, 3.3, 'ZL', true, " +
+            "'BOTH', 'id5')",
         "INSERT INTO fuses (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, " +
             "base_voltage_mrid, normal_open, open, rated_current, switch_info_mrid, function_mrid) VALUES ('id11', 'name', 'desc', 1, 'loc', 2, true, true, " +
             "'1970-01-01', 'bvid', 3, 4, 5, 'siid', 'id10')",
@@ -149,10 +150,10 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getString("protection_kind"), equalTo("JG"))
                 assertThat(rs.getBoolean("directable"), equalTo(true))
                 assertThat(rs.getString("power_direction"), equalTo("BOTH"))
+                assertThat(rs.getString("relay_info_mrid"), equalTo("id1"))
                 assertThat(rs.getDouble("current_limit_1"), equalTo(4.4))
                 assertThat(rs.getBoolean("inverse_time_flag"), equalTo(true))
                 assertThat(rs.getDouble("time_delay_1"), equalTo(5.5))
-                assertThat(rs.getString("relay_info_mrid"), equalTo("id1"))
             },
             { rs ->
                 assertThat(rs.getString("mrid"), equalTo("id6"))
@@ -167,10 +168,10 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getString("protection_kind"), equalTo("ZL"))
                 assertThat(rs.getBoolean("directable"), equalTo(true))
                 assertThat(rs.getString("power_direction"), equalTo("BOTH"))
+                assertThat(rs.getString("relay_info_mrid"), equalTo("id5"))
                 assertThat(rs.getDouble("current_limit_1"), equalTo(4.4))
                 assertThat(rs.getBoolean("inverse_time_flag"), equalTo(true))
                 assertThat(rs.getDouble("time_delay_1"), equalTo(5.5))
-                assertThat(rs.getString("relay_info_mrid"), equalTo("id5"))
             }
         )
         validateRows(statement, "SELECT * FROM distance_relays",
@@ -187,6 +188,7 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getString("protection_kind"), equalTo("ZL"))
                 assertThat(rs.getBoolean("directable"), equalTo(true))
                 assertThat(rs.getString("power_direction"), equalTo("BOTH"))
+                assertThat(rs.getString("relay_info_mrid"), equalTo("id5"))
                 assertThat(rs.getDouble("backward_blind"), equalTo(4.4))
                 assertThat(rs.getDouble("backward_reach"), equalTo(5.5))
                 assertThat(rs.getDouble("backward_reactance"), equalTo(6.6))
@@ -235,6 +237,7 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getString("protection_kind"), equalTo("ZL"))
                 assertThat(rs.getBoolean("directable"), equalTo(true))
                 assertThat(rs.getString("power_direction"), equalTo("BOTH"))
+                assertThat(rs.getString("relay_info_mrid"), equalTo("id5"))
             }
         )
         validateRows(statement, "SELECT * FROM fuses",

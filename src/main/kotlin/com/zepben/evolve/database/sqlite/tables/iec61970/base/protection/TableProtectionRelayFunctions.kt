@@ -22,5 +22,6 @@ abstract class TableProtectionRelayFunctions : TablePowerSystemResources() {
     val PROTECTION_KIND = Column(++columnIndex, "protection_kind", "TEXT", NOT_NULL)
     val DIRECTABLE = Column(++columnIndex, "directable", "BOOLEAN", NULL)
     val POWER_DIRECTION = Column(++columnIndex, "power_direction", "TEXT", NOT_NULL)
+    val RELAY_INFO_MRID = Column(++columnIndex, "relay_info_mrid", "TEXT", NULL)
 
 }

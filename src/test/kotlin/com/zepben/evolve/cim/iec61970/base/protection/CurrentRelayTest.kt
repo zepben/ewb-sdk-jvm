@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.cim.iec61970.base.protection
 
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import org.hamcrest.CoreMatchers.*
@@ -27,15 +26,12 @@ internal class CurrentRelayTest {
     internal fun accessorCoverage() {
         val currentRelay = CurrentRelay()
 
-        assertThat(currentRelay.assetInfo, nullValue())
         assertThat(currentRelay.currentLimit1, nullValue())
         assertThat(currentRelay.inverseTimeFlag, nullValue())
         assertThat(currentRelay.timeDelay1, nullValue())
 
         currentRelay.fillFields(NetworkService())
 
-        assertThat(currentRelay.assetInfo, notNullValue())
-        assertThat(currentRelay.assetInfo, instanceOf(RelayInfo::class.java))
         assertThat(currentRelay.currentLimit1, equalTo(1.1))
         assertThat(currentRelay.inverseTimeFlag, equalTo(true))
         assertThat(currentRelay.timeDelay1, equalTo(2.2))

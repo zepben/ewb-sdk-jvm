@@ -678,10 +678,6 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
 
     fun load(table: TableCurrentRelays, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val currentRelay = CurrentRelay(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
-            assetInfo = networkService.ensureGet(
-                resultSet.getNullableString(table.RELAY_INFO_MRID.queryIndex),
-                typeNameAndMRID()
-            )
             currentLimit1 = resultSet.getNullableDouble(table.CURRENT_LIMIT_1.queryIndex)
             inverseTimeFlag = resultSet.getNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex)
             timeDelay1 = resultSet.getNullableDouble(table.TIME_DELAY_1.queryIndex)
@@ -712,6 +708,10 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         resultSet: ResultSet
     ): Boolean {
         protectionRelayFunction.apply {
+            assetInfo = networkService.ensureGet(
+                resultSet.getNullableString(table.RELAY_INFO_MRID.queryIndex),
+                typeNameAndMRID()
+            )
             model = resultSet.getNullableString(table.MODEL.queryIndex)
             reclosing = resultSet.getNullableBoolean(table.RECLOSING.queryIndex)
             relayDelayTime = resultSet.getNullableDouble(table.RELAY_DELAY_TIME.queryIndex)

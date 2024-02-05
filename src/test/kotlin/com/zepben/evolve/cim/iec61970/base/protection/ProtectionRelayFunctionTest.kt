@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.protection
 
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
@@ -31,6 +32,7 @@ internal class ProtectionRelayFunctionTest {
     internal fun accessorCoverage() {
         val protectionRelayFunction = object : ProtectionRelayFunction() {}
 
+        assertThat(protectionRelayFunction.assetInfo, nullValue())
         assertThat(protectionRelayFunction.model, nullValue())
         assertThat(protectionRelayFunction.reclosing, nullValue())
         assertThat(protectionRelayFunction.relayDelayTime, nullValue())
@@ -40,6 +42,7 @@ internal class ProtectionRelayFunctionTest {
 
         protectionRelayFunction.fillFields(NetworkService())
 
+        assertThat(protectionRelayFunction.assetInfo, instanceOf(RelayInfo::class.java))
         assertThat(protectionRelayFunction.model, equalTo("model"))
         assertThat(protectionRelayFunction.reclosing, equalTo(true))
         assertThat(protectionRelayFunction.relayDelayTime, equalTo(1.1))

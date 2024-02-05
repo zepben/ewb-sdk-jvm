@@ -736,7 +736,6 @@ fun toCim(pb: PBCurrentRelay, networkService: NetworkService): CurrentRelay =
         currentLimit1 = pb.currentLimit1.takeUnless { it == UNKNOWN_DOUBLE }
         inverseTimeFlag = pb.inverseTimeFlagSet.takeUnless { pb.hasInverseTimeFlagNull() }
         timeDelay1 = pb.timeDelay1.takeUnless { it == UNKNOWN_DOUBLE }
-        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
         toCim(pb.prf, this, networkService)
     }
 
@@ -771,6 +770,7 @@ fun toCim(pb: PBProtectionRelayFunction, cim: ProtectionRelayFunction, networkSe
         protectionKind = ProtectionKind.valueOf(pb.protectionKind.name)
         directable = pb.directableSet.takeUnless { pb.hasDirectableNull() }
         powerDirection = PowerDirectionKind.valueOf(pb.powerDirection.name)
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
 
         pb.timeLimitsList.forEach { addTimeLimit(it) }
         pb.thresholdsList.forEach { addThreshold(toCim(it)) }

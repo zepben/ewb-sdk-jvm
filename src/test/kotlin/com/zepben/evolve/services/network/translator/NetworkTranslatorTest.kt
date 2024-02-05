@@ -247,7 +247,7 @@ internal class NetworkTranslatorTest {
     }
 
     private inline fun <reified T : IdentifiedObject> addWithUnresolvedReferences(cim: T, adder: (NetworkService, T) -> T?): T {
-        // We need to convert the populated item before we check the differences so we can complete the unresolved references.
+        // We need to convert the populated item before we check the differences, so we can complete the unresolved references.
         val service = NetworkService()
         val convertedCim = adder(service, cim)!!
         service.unresolvedReferences().toList().forEach { ref ->

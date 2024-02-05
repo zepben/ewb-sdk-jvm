@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.cim.iec61970.base.protection
 
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import org.hamcrest.CoreMatchers.*

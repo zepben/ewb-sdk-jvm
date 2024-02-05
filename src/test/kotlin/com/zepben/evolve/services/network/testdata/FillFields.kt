@@ -740,6 +740,8 @@ fun DistanceRelay.fillFields(service: NetworkService, includeRuntime: Boolean = 
 fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelayFunction {
     (this as PowerSystemResource).fillFields(service, includeRuntime)
 
+    assetInfo = RelayInfo().also { service.add(it) }
+
     model = "model"
     reclosing = true
     relayDelayTime = 1.1

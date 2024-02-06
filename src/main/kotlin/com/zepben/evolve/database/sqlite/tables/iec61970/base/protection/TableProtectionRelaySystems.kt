@@ -9,12 +9,13 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.protection
 
 import com.zepben.evolve.database.sqlite.tables.Column
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableEquipment
 
 @Suppress("PropertyName")
 class TableProtectionRelaySystems : TableEquipment() {
 
-    val PROTECTION_KIND = Column(++columnIndex, "protection_kind", "TEXT", Column.Nullable.NOT_NULL)
+    val PROTECTION_KIND = Column(++columnIndex, "protection_kind", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "protection_relay_systems"

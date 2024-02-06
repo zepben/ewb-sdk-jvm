@@ -38,7 +38,7 @@ internal class UnitSymbolTest {
 
     @Test
     internal fun fromCimNameCoverage() {
-        UnitSymbol.values().forEach {
+        UnitSymbol.entries.forEach {
             assertThat(UnitSymbol.fromCimName(it.toString()), equalTo(it))
         }
     }

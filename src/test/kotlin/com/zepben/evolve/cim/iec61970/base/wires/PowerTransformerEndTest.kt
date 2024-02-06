@@ -182,7 +182,7 @@ internal class PowerTransformerEndTest {
     @Test
     internal fun sRatings() {
         var rating = 0
-        val coolingTypes = TransformerCoolingType.values()
+        val coolingTypes = TransformerCoolingType.entries
         PrivateCollectionValidator.validate(
             { PowerTransformerEnd() },
             { TransformerEndRatedS(coolingTypes[rating], rating++) },
@@ -200,7 +200,7 @@ internal class PowerTransformerEndTest {
 
     @Test
     internal fun `remove rating by cooling type`() {
-        val coolingTypes = TransformerCoolingType.values()
+        val coolingTypes = TransformerCoolingType.entries
         val pte = PowerTransformerEnd()
         (1..11).forEach {
             pte.addRating(it * 10, coolingTypes[it - 1])

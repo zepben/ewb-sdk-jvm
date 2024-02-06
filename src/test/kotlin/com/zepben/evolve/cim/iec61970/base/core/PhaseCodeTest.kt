@@ -30,7 +30,7 @@ internal class PhaseCodeTest {
 
     @Test
     internal fun singlePhases() {
-        PhaseCode.values().forEach { phaseCode ->
+        PhaseCode.entries.forEach { phaseCode ->
             if (phaseCode === PhaseCode.NONE)
                 assertThat(phaseCode.singlePhases, contains(SinglePhaseKind.NONE))
             else {
@@ -51,7 +51,7 @@ internal class PhaseCodeTest {
 
     @Test
     internal fun numPhases() {
-        PhaseCode.values().forEach { phaseCode ->
+        PhaseCode.entries.forEach { phaseCode ->
             if (phaseCode === PhaseCode.NONE)
                 assertThat(phaseCode.numPhases(), equalTo(0))
             else

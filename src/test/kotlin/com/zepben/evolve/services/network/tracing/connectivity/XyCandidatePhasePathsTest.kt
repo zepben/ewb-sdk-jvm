@@ -215,7 +215,7 @@ internal class XyCandidatePhasePathsTest {
     @Test
     internal fun onlyTracksXY() {
         XyCandidatePhasePaths().apply {
-            SPK.values().forEach {
+            SPK.entries.forEach {
                 if (it in PhaseCode.XY) {
                     addKnown(it, SPK.B)
                     addCandidates(it, listOf(SPK.B))
@@ -234,7 +234,7 @@ internal class XyCandidatePhasePathsTest {
     @Test
     internal fun validatesCandidatePhases() {
         XyCandidatePhasePaths().apply {
-            SPK.values().forEach {
+            SPK.entries.forEach {
                 when (it) {
                     SPK.A -> {
                         addCandidates(SPK.X, listOf(it))

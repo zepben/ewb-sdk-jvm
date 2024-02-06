@@ -9,12 +9,13 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.protection
 
 import com.zepben.evolve.database.sqlite.tables.Column
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects
 
 @Suppress("PropertyName")
 class TableProtectionRelaySchemes : TableIdentifiedObjects() {
 
-    val SYSTEM_MRID = Column(++columnIndex, "system_mrid", "TEXT", Column.Nullable.NULL)
+    val SYSTEM_MRID = Column(++columnIndex, "system_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "protection_relay_schemes"

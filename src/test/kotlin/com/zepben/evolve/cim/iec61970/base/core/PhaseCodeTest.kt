@@ -70,7 +70,7 @@ internal class PhaseCodeTest {
 
     @Test
     internal fun fromSinglePhases() {
-        PhaseCode.values()
+        PhaseCode.entries
             .asSequence()
             .forEach {
                 assertThat(PhaseCode.fromSinglePhases(it.singlePhases), equalTo(it))

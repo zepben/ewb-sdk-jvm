@@ -10,6 +10,7 @@ package com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo
 
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
@@ -33,6 +34,23 @@ internal class RelayInfoTest {
 
         assertThat(relayInfo.curveSetting, equalTo("curveSetting"))
         assertThat(relayInfo.recloseDelays, contains(1.0, 2.0, 3.0))
+    }
+
+    @Test
+    internal fun recloseDelays() {
+        var delay = 0.0
+        PrivateCollectionValidator.validate(
+            { RelayInfo() },
+            { delay++ },
+            RelayInfo::numDelays,
+            RelayInfo::getDelay,
+            RelayInfo::forEachDelay,
+            RelayInfo::addDelay,
+            RelayInfo::addDelay,
+            RelayInfo::removeDelay,
+            RelayInfo::removeDelayAt,
+            RelayInfo::clearDelays
+        )
     }
 
 }

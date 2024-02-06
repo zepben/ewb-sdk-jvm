@@ -312,7 +312,7 @@ enum class UnitSymbol(private val value: Int, private val cimName: String) {
     }
 
     companion object {
-        private val map = values().associateBy(UnitSymbol::cimName)
+        private val map = entries.associateBy(UnitSymbol::cimName)
 
         @JvmStatic
         fun fromCimName(value: String): UnitSymbol? = map[value]

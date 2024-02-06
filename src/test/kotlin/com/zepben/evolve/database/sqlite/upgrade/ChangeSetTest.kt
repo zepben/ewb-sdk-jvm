@@ -7,7 +7,7 @@
  */
 package com.zepben.evolve.database.sqlite.upgrade
 
-import ChangeSet49Validator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet49Validator
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.*
 import com.zepben.testutils.junit.SystemLogExtension

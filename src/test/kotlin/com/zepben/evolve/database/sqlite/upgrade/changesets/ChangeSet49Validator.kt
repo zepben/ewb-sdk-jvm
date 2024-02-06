@@ -6,10 +6,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+package com.zepben.evolve.database.sqlite.upgrade.changesets
+
 import com.zepben.evolve.database.getNullableBoolean
 import com.zepben.evolve.database.getNullableDouble
 import com.zepben.evolve.database.getNullableString
-import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue

@@ -52,7 +52,6 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
  * The naming pattern for the resolver matches the property name of the reference. E.g. to get the resolver for
  * base voltage for conducting equipment: `Resolvers.baseVoltage(conductingEquip)`.
  */
-@Suppress("UNUSED_PARAMETER")
 object Resolvers {
 
     @JvmStatic

@@ -12,6 +12,7 @@ import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
 
+@Suppress("PropertyName")
 class TableProtectionRelayFunctionsProtectedSwitches : SqliteTable() {
 
     val PROTECTION_RELAY_FUNCTION_MRID = Column(++columnIndex, "protection_relay_function_mrid", "TEXT", NOT_NULL)

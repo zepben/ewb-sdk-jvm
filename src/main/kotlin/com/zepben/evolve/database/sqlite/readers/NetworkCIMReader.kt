@@ -339,7 +339,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         setLastMRID("$relayInfoMRID.s$recloseDelay")
 
         val cri = networkService.ensureGet<RelayInfo>(relayInfoMRID, "$relayInfoMRID.s$recloseDelay")
-        cri?.addDelay(recloseDelay)
+        cri?.addDelay(recloseDelay,)
 
         return true
     }

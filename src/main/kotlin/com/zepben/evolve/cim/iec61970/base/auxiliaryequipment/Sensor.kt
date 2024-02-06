@@ -63,7 +63,7 @@ abstract class Sensor @JvmOverloads constructor(mRID: String = "") : AuxiliaryEq
     /**
      * Disassociate this [Sensor] from a [ProtectionRelayFunction].
      *
-     * @param protectionRelayFunction The [ProtectionRelayFunction] to disassociate from this [Sensor].
+     * @param relayFunction The [ProtectionRelayFunction] to disassociate from this [Sensor].
      * @return true if the [ProtectionRelayFunction] was disassociated.
      */
     fun removeRelayFunction(relayFunction: ProtectionRelayFunction?): Boolean {

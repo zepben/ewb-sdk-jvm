@@ -441,7 +441,7 @@ abstract class ProtectionRelayFunction @JvmOverloads constructor(mRID: String = 
     /**
      * Disassociate this [ProtectionRelayFunction] from a [ProtectionRelayScheme].
      *
-     * @param function The [ProtectionRelayScheme] to disassociate from this [ProtectionRelayFunction].
+     * @param scheme The [ProtectionRelayScheme] to disassociate from this [ProtectionRelayFunction].
      * @return true if the [ProtectionRelayScheme] was disassociated.
      */
     fun removeScheme(scheme: ProtectionRelayScheme?): Boolean {

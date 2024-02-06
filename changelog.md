@@ -15,6 +15,8 @@
 * Removed symmetric relation `ProtectionEquipment` &harr; `ProtectedSwitch`.
 * Renamed `CurrentRelayInfo` to `RelayInfo`.
   * The override `assetInfo: RelayInfo?` has been moved from `CurrentRelay` to its new parent class, `ProtectionRelayFunction`.
+  * Renamed `RelayInfo.removeDelay` to `RelayInfo.removeDelayAt`. The original method name has been repurposed to remove a delay by its value rather than its
+    index.
 * Reworked values for enumerable type `ProtectionKind`.
 
 ### New Features
@@ -40,7 +42,11 @@
 
 ### Enhancements
 
-* None.
+* Added missing collection methods for `RelayInfo.recloseDelays` (`RelayInfo` was previously named `CurrentRelayInfo`):
+  * `RelayInfo.getDelay(sequenceNumber: Int): Double?`
+  * `RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit)`
+  * `RelayInfo.removeDelay(delay: Double?): Boolean`
+    * The original method with this name has been renamed to `RelayInfo.removeDelayAt(index: Int): Double?`.
 
 ### Fixes
 

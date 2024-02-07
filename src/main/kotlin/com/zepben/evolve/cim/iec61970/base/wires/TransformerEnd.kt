@@ -44,6 +44,7 @@ abstract class TransformerEnd(mRID: String = "") : IdentifiedObject(mRID) {
 
     var terminal: Terminal? = null
         set(value) {
+            // We do not require the terminal's equipment to be non-null here, to accommodate reconstruction from protobuf messages in any order.
             if (value?.conductingEquipment != null) {
                 require(value.conductingEquipment is PowerTransformer) {
                     "Cannot assign ${typeNameAndMRID()} to ${value.typeNameAndMRID()}, which is connected to " +

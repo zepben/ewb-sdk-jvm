@@ -72,4 +72,12 @@ internal class TransformerEndTest {
                 "${junction.typeNameAndMRID()} rather than a PowerTransformer.")
     }
 
+    @Test
+    internal fun doesNotThrowOnAssignmentToDisconnectedTerminal() {
+        val end = object : TransformerEnd() {}
+        val terminal = Terminal()
+        end.terminal = terminal
+        assertThat(end.terminal, equalTo(terminal))
+    }
+
 }

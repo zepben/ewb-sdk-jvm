@@ -80,6 +80,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      * @param index The index into the list to add the time limit at. Defaults to the end of the list.
      * @return This [ProtectionRelayFunction] for fluent use.
      */
+    @JvmOverloads
     fun addTimeLimit(
         timeLimit: Double,
         index: Int = numTimeLimits()
@@ -301,6 +302,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      * @param threshold The threshold [RelaySetting] to add to this [ProtectionRelayFunction].
      * @return A reference to this [ProtectionRelayFunction] for fluent use.
      */
+    @JvmOverloads
     fun addThreshold(threshold: RelaySetting, sequenceNumber: Int = numThresholds()): ProtectionRelayFunction {
         require(sequenceNumber in 0..(numThresholds())) {
             "Unable to add RelaySetting to ${typeNameAndMRID()}. " +

@@ -28,7 +28,7 @@ import java.util.function.BiConsumer
  * @property powerDirection The flow of power direction used by this ProtectionRelayFunction.
  * @property assetInfo Datasheet information for this CurrentRelay.
  */
-abstract class ProtectionRelayFunction @JvmOverloads constructor(mRID: String = "") : PowerSystemResource(mRID) {
+abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(mRID) {
 
     override var assetInfo: RelayInfo? = null
 

@@ -18,7 +18,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * This class describes devices that transform a measured quantity into signals that can be presented at displays,
  * used in control or be recorded.
  */
-abstract class Sensor @JvmOverloads constructor(mRID: String = "") : AuxiliaryEquipment(mRID) {
+abstract class Sensor(mRID: String = "") : AuxiliaryEquipment(mRID) {
 
     private var _relayFunctions: MutableList<ProtectionRelayFunction>? = null
 

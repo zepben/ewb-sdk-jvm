@@ -18,7 +18,7 @@ import java.util.function.BiConsumer
  *
  * @property curveSetting The type of curve used for the Relay.
  */
-class RelayInfo(mRID: String = "") : AssetInfo(mRID) {
+class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
 
     var curveSetting: String? = null
     private var _recloseDelays: MutableList<Double>? = null

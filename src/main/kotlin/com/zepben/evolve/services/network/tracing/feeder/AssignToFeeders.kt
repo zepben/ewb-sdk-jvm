@@ -13,6 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 
@@ -97,9 +98,22 @@ class AssignToFeeders {
                 terminal,
                 { eq, feeder ->
                     eq.addContainer(feeder)
+                    // Handle classes extending Equipment
+                    when (eq) {
+                        is ProtectedSwitch ->
+                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
+                                system.addContainer(feeder)
+                            }
+                    }
                 },
                 { feeder, eq ->
                     feeder.addEquipment(eq)
+                    when (eq) {
+                        is ProtectedSwitch ->
+                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
+                                feeder.addEquipment(system)
+                            }
+                    }
                 },
                 isStopping,
                 terminalToAuxEquipment
@@ -114,9 +128,23 @@ class AssignToFeeders {
                 terminal,
                 { eq, feeder ->
                     eq.addCurrentContainer(feeder)
+                    // Handle classes extending Equipment
+                    when (eq) {
+                        is ProtectedSwitch ->
+                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
+                                system.addCurrentContainer(feeder)
+                            }
+                    }
                 },
                 { feeder, eq ->
                     feeder.addCurrentEquipment(eq)
+                    // Handle classes extending Equipment
+                    when (eq) {
+                        is ProtectedSwitch ->
+                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
+                                feeder.addCurrentEquipment(system)
+                            }
+                    }
                 },
                 isStopping,
                 terminalToAuxEquipment

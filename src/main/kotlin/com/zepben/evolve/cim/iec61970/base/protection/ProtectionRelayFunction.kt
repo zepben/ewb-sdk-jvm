@@ -33,7 +33,7 @@ import java.util.function.BiConsumer
  * @property sensors The [Sensor]s for this relay function.
  * @property schemes The schemes this function operates under.
  */
-abstract class ProtectionRelayFunction @JvmOverloads constructor(mRID: String = "") : PowerSystemResource(mRID) {
+abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(mRID) {
 
     override var assetInfo: RelayInfo? = null
 

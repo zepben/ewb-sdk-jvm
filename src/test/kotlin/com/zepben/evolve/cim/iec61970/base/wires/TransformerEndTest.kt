@@ -7,10 +7,11 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
-import com.zepben.testutils.exception.ExpectException
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -55,9 +56,20 @@ internal class TransformerEndTest {
     @Test
     internal fun throwsOnUnknownEndType() {
         val end = object : TransformerEnd() {}
-        ExpectException.expect { end.resistanceReactance() }
+        expect { end.resistanceReactance() }
             .toThrow<NotImplementedError>()
             .withMessage("Unknown transformer end leaf type: ${end.typeNameAndMRID()}. Add support which should at least include `starImpedance?.resistanceReactance() ?: ResistanceReactance()`.")
+    }
+
+    @Test
+    internal fun throwsOnAssignmentToNonTransformerTerminal() {
+        val end = object : TransformerEnd() {}
+        val junction = Junction("j0")
+        val terminal = Terminal("j0-t1").also { junction.addTerminal(it) }
+        expect { end.terminal = terminal }
+            .toThrow<IllegalArgumentException>()
+            .withMessage("Cannot assign ${end.typeNameAndMRID()} to ${terminal.typeNameAndMRID()}, which is connected to " +
+                "${junction.typeNameAndMRID()} rather than a PowerTransformer.")
     }
 
 }

@@ -37,7 +37,7 @@ class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
      * Get the reclose delay at the specified index, if it exists. Otherwise, this returns null.
      *
      * @param sequenceNumber the index of the reclose delay.
-     * @return the reclose delay at [index] if it exists, otherwise null.
+     * @return the reclose delay at [sequenceNumber] if it exists, otherwise null.
      */
     fun getDelay(sequenceNumber: Int): Double? = _recloseDelays?.getOrNull(sequenceNumber)
 

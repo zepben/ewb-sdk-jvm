@@ -28,7 +28,7 @@ import kotlin.reflect.jvm.isAccessible
 abstract class BaseServiceComparator {
 
     @Suppress("UNCHECKED_CAST")
-    val compareByType: Map<KType, KFunction<ObjectDifference<*>>> = this::class.memberFunctions
+    private val compareByType: Map<KType, KFunction<ObjectDifference<*>>> = this::class.memberFunctions
         .asSequence()
         .filter { it.name.startsWith("compare") }
         .filter { it.parameters.size == 3 }

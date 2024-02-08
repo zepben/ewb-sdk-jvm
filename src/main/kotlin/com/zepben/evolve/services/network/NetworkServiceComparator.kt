@@ -35,7 +35,10 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
-import com.zepben.evolve.services.common.*
+import com.zepben.evolve.services.common.BaseServiceComparator
+import com.zepben.evolve.services.common.ObjectDifference
+import com.zepben.evolve.services.common.ValueDifference
+import com.zepben.evolve.services.common.compareValues
 
 /**
  * @param options Indicates which optional checks to perform
@@ -46,8 +49,9 @@ import com.zepben.evolve.services.common.*
 //       function, so make sure you check the code coverage
 //
 @Suppress("unused")
-class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()) :
-    BaseServiceComparator() {
+class NetworkServiceComparator @JvmOverloads constructor(
+    private var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()
+) : BaseServiceComparator() {
 
     /************ IEC61968 ASSET INFO ************/
 

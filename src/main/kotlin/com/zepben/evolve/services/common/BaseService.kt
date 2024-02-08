@@ -476,7 +476,6 @@ abstract class BaseService(
      *
      * @return a [Stream] containing all instances of type [T].
      */
-    @Suppress("UNCHECKED_CAST")
     fun <T : IdentifiedObject> streamOf(clazz: Class<T>): Stream<T> {
         return sequenceOf(clazz.kotlin).asStream()
     }

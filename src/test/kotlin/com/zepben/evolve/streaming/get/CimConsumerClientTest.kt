@@ -58,7 +58,7 @@ class TestCimConsumerClient {
         }
 
         every { baseConsumerClient.getMetadata() } answers { callOriginal() }
-        every { baseConsumerClient.tryRpc<ServiceInfo>(any<() -> ServiceInfo>()) } answers {
+        every { baseConsumerClient.tryRpc(any<() -> ServiceInfo>()) } answers {
             GrpcResult.of(firstArg<() -> ServiceInfo>().invoke())
         }
 
@@ -106,7 +106,7 @@ class TestCimConsumerClient {
         every { baseConsumerClient.serviceInfo } returns cachedResponse
 
         every { baseConsumerClient.getMetadata() } answers { callOriginal() }
-        every { baseConsumerClient.tryRpc<ServiceInfo>(any<() -> ServiceInfo>()) } answers {
+        every { baseConsumerClient.tryRpc(any<() -> ServiceInfo>()) } answers {
             GrpcResult.of(firstArg<() -> ServiceInfo>().invoke())
         }
         mockkStatic(PBServiceInfo::fromPb) {

@@ -20,7 +20,7 @@ import java.sql.Statement
  *
  * @property getStatement provider of statements for the connection.
  */
-class DiagramServiceReader constructor(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
+class DiagramServiceReader(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
 
     fun load(reader: DiagramCIMReader): Boolean {
         var status = loadNameTypes(reader)

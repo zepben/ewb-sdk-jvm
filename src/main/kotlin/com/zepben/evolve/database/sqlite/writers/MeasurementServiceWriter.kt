@@ -7,6 +7,5 @@
  */
 package com.zepben.evolve.database.sqlite.writers
 
-class MeasurementServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean) {
-
-}
+// TODO find out if this is still needed
+class MeasurementServiceWriter(hasCommon: (String) -> Boolean, addCommon: (String) -> Boolean)

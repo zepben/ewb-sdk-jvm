@@ -52,7 +52,7 @@ import java.sql.Statement
  *
  * @property getStatement provider of statements for the connection.
  */
-class NetworkServiceReader constructor(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
+class NetworkServiceReader(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
 
     fun load(reader: NetworkCIMReader): Boolean {
         var status = loadNameTypes(reader)

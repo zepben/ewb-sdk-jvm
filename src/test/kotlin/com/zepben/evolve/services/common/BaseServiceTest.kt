@@ -118,7 +118,7 @@ internal class BaseServiceTest {
 
     @Test
     fun asStreamJavaInterop() {
-        assertThat(service.sequenceOf<IdentifiedObject>().toList(), containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2))
+        assertThat(service.sequenceOf<IdentifiedObject>().toList(), containsInAnyOrder(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.sequenceOf<Breaker>().toList(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.sequenceOf<AcLineSegment>().toList(), containsInAnyOrder(acLineSegment1, acLineSegment2))
     }
@@ -148,7 +148,7 @@ internal class BaseServiceTest {
         assertThat(service.mapOf<IdentifiedObject>().keys, containsInAnyOrder(breaker1.mRID, breaker2.mRID, acLineSegment1.mRID, acLineSegment2.mRID))
         assertThat(
             service.mapOf<IdentifiedObject>().values,
-            containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2)
+            containsInAnyOrder(breaker1, breaker2, acLineSegment1, acLineSegment2)
         )
 
         assertThat(service.mapOf<Breaker>().keys, containsInAnyOrder(breaker1.mRID, breaker2.mRID))
@@ -158,7 +158,7 @@ internal class BaseServiceTest {
         assertThat(service.mapOf<AcLineSegment>().values, containsInAnyOrder(acLineSegment1, acLineSegment2))
 
         assertThat(service.mapOf<IdentifiedObject> { it.name.isEmpty() }.keys, containsInAnyOrder(breaker1.mRID, acLineSegment2.mRID))
-        assertThat(service.mapOf<IdentifiedObject> { it.name.isEmpty() }.values, containsInAnyOrder<IdentifiedObject>(breaker1, acLineSegment2))
+        assertThat(service.mapOf<IdentifiedObject> { it.name.isEmpty() }.values, containsInAnyOrder(breaker1, acLineSegment2))
 
         assertThat(service.mapOf<Breaker> { it.name.isEmpty() }.keys, containsInAnyOrder(breaker1.mRID))
         assertThat(service.mapOf<Breaker> { it.name.isEmpty() }.values, containsInAnyOrder(breaker1))

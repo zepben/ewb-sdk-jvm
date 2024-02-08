@@ -36,10 +36,10 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.time.Instant
 
-@Suppress("SameParameterValue", "BooleanLiteralArgument", "MemberVisibilityCanBePrivate")
+@Suppress("SameParameterValue", "MemberVisibilityCanBePrivate")
 class NetworkModelTestUtil {
 
-    data class Services constructor(
+    data class Services @JvmOverloads constructor(
         val metadataCollection: MetadataCollection = MetadataCollection(),
         val networkService: NetworkService = NetworkService(),
         val diagramService: DiagramService = DiagramService(),

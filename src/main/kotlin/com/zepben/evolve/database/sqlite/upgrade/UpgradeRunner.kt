@@ -18,7 +18,7 @@ import java.nio.file.*
 import java.sql.*
 
 @Suppress("SqlResolve")
-class UpgradeRunner constructor(
+class UpgradeRunner @JvmOverloads constructor(
     private val getConnection: (String) -> Connection = DriverManager::getConnection,
     private val getStatement: (Connection) -> Statement = Connection::createStatement,
     private val getPreparedStatement: (Connection, String) -> PreparedStatement = Connection::prepareStatement,

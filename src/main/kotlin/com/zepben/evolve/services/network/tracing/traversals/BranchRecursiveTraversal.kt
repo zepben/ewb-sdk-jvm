@@ -25,7 +25,7 @@ import java.util.function.Supplier
  * @param branchQueueSupplier  A supplier of the branch queue to be used by this traversal.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-class BranchRecursiveTraversal<T> constructor(
+class BranchRecursiveTraversal<T>(
     private val queueNext: QueueNext<T>,
     private val processQueueSupplier: () -> TraversalQueue<T>,
     private val trackerSupplier: () -> Tracker<T>,

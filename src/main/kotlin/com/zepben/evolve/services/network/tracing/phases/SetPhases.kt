@@ -34,7 +34,7 @@ class SetPhases(
      * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    val normalTraversal = BranchRecursiveTraversal<Terminal>(
+    val normalTraversal = BranchRecursiveTraversal(
         { current, traversal -> setPhasesAndQueueNext(traversal, current, OpenTest.NORMALLY_OPEN, PhaseSelector.NORMAL_PHASES) },
         { WeightedPriorityQueue.processQueue { it.phases.numPhases() } },
         { BasicTracker() },
@@ -47,7 +47,7 @@ class SetPhases(
      * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    val currentTraversal = BranchRecursiveTraversal<Terminal>(
+    val currentTraversal = BranchRecursiveTraversal(
         { current, traversal -> setPhasesAndQueueNext(traversal, current, OpenTest.CURRENTLY_OPEN, PhaseSelector.CURRENT_PHASES) },
         { WeightedPriorityQueue.processQueue { it.phases.numPhases() } },
         { BasicTracker() },

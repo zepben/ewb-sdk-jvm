@@ -33,7 +33,7 @@ internal sealed class InvokeChecker<T> : (T) -> String {
 }
 
 internal class InvokedChecker<T>(val expected: T) : InvokeChecker<T>() {
-    var captured: T? = null
+    private var captured: T? = null
     override fun invoke(p1: T): String {
         captured = p1
         return p1.toString()
@@ -45,7 +45,7 @@ internal class InvokedChecker<T>(val expected: T) : InvokeChecker<T>() {
 }
 
 internal class NeverInvokedChecker<T> : InvokeChecker<T>() {
-    var invoked = 0
+    private var invoked = 0
     override fun invoke(p1: T): String {
         invoked += 1
         return ""

@@ -17,7 +17,7 @@ import java.sql.Statement
  *
  * @property getStatement provider of statements for the connection.
  */
-class MetadataCollectionReader constructor(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
+class MetadataCollectionReader(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
 
     fun load(reader: MetadataEntryReader): Boolean {
         var status = true

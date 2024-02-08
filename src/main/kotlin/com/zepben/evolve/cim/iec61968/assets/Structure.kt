@@ -11,6 +11,4 @@ package com.zepben.evolve.cim.iec61968.assets
  * Construction holding assets such as conductors, transformers, switchgear, etc. Where applicable, number of conductors
  * can be derived from the number of associated wire spacing instances.
  */
-abstract class Structure(mRID: String = "") : AssetContainer(mRID) {
-
-}
+abstract class Structure(mRID: String = "") : AssetContainer(mRID)

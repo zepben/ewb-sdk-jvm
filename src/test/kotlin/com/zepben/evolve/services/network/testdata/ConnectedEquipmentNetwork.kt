@@ -49,7 +49,7 @@ object ConnectedEquipmentNetwork {
         .toBreaker { setNormallyOpen(true) } // b2
         .toAcls() // c3
         .branchFrom("b1")
-        .toBreaker() { setOpen(true) }// b4
+        .toBreaker { setOpen(true) }// b4
         .toAcls() // c5
         .addFeeder("c0") // fdr6
         .build()

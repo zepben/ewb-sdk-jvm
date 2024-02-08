@@ -51,7 +51,7 @@ class TerminalConnectivityInternal {
                 .filter { (it.from in includePhases) || (it.from == SPK.NONE) }
         )
 
-    fun straightTerminalConnectivity(
+    private fun straightTerminalConnectivity(
         terminal: Terminal,
         otherTerminal: Terminal,
         includePhases: Set<SPK>

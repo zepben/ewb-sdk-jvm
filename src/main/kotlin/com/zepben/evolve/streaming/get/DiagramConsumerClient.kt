@@ -139,7 +139,7 @@ class DiagramConsumerClient(
         val request = stub.getDiagramObjects(streamObserver)
         val builder = GetDiagramObjectsRequest.newBuilder()
 
-        batchSend(mRIDs.asSequence(), builder::addMrids) {
+        batchSend(mRIDs, builder::addMrids) {
             if (builder.mridsList.isNotEmpty())
                 request.onNext(builder.build())
             builder.clearMrids()

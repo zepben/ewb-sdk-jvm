@@ -18,14 +18,9 @@ import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
 import com.zepben.evolve.streaming.get.testservices.TestDiagramConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
-import com.zepben.protobuf.dc.DiagramConsumerGrpc
-import com.zepben.protobuf.dc.DiagramIdentifiedObject
-import com.zepben.protobuf.dc.GetDiagramObjectsResponse
-import com.zepben.protobuf.dc.GetIdentifiedObjectsRequest
-import com.zepben.protobuf.dc.GetIdentifiedObjectsResponse
+import com.zepben.protobuf.dc.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
-import com.zepben.protobuf.nc.NetworkConsumerGrpc
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import io.grpc.StatusRuntimeException

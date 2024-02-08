@@ -300,7 +300,6 @@ internal class BaseServiceTest {
 
     private class MyService : BaseService("") {
         fun add(cableInfo: MyIdentifiedObject): Boolean = super.add(cableInfo)
-        fun remove(cableInfo: MyIdentifiedObject): Boolean = super.remove(cableInfo)
     }
 
 }

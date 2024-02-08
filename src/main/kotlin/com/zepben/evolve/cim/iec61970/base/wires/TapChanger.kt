@@ -35,13 +35,13 @@ abstract class TapChanger(mRID: String = "") : PowerSystemResource(mRID) {
 
     var highStep: Int? = null
         set(value) {
-            check((value == null) || (value > lowStep ?: Int.MIN_VALUE)) { "high step [$value] must be greater than low step [$lowStep]." }
+            check((value == null) || (value > (lowStep ?: Int.MIN_VALUE))) { "high step [$value] must be greater than low step [$lowStep]." }
             field = value
         }
 
     var lowStep: Int? = null
         set(value) {
-            check((value == null) || (value < highStep ?: Int.MAX_VALUE)) { "low step [$value] must be lower than high step [$highStep]." }
+            check((value == null) || (value < (highStep ?: Int.MAX_VALUE))) { "low step [$value] must be lower than high step [$highStep]." }
             field = value
         }
 
@@ -66,9 +66,9 @@ abstract class TapChanger(mRID: String = "") : PowerSystemResource(mRID) {
         }
 
     private fun isInRange(value: Int?): Boolean =
-        (value == null) || ((value >= lowStep ?: Int.MIN_VALUE) && (value <= highStep ?: Int.MAX_VALUE))
+        (value == null) || ((value >= (lowStep ?: Int.MIN_VALUE)) && (value <= (highStep ?: Int.MAX_VALUE)))
 
     private fun isInRange(value: Double?): Boolean =
-        (value == null) || ((value >= lowStep ?: Int.MIN_VALUE) && (value <= highStep ?: Int.MAX_VALUE))
+        (value == null) || ((value >= (lowStep ?: Int.MIN_VALUE)) && (value <= (highStep ?: Int.MAX_VALUE)))
 
 }

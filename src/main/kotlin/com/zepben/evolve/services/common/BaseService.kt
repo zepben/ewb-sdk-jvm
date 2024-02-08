@@ -331,7 +331,7 @@ abstract class BaseService(
         boundResolver: BoundReferenceResolver<T, R>,
         toMrid: String?
     ): Boolean {
-        if (toMrid == null || toMrid.isEmpty()) {
+        if (toMrid.isNullOrEmpty()) {
             return true
         }
 

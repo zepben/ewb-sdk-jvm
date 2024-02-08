@@ -25,7 +25,7 @@ abstract class IdentifiedObject(mRID: String = "") {
     // Changed to use mutableSet to prevent duplicated entries from addName function
     private var _names: MutableSet<Name>? = null
 
-    val mRID: String = if (mRID.isEmpty()) UUID.randomUUID().toString() else mRID
+    val mRID: String = mRID.ifEmpty { UUID.randomUUID().toString() }
     var name: String = ""
     var description: String = ""
     var numDiagramObjects: Int = 0

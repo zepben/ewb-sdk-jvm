@@ -9,10 +9,9 @@
 package com.zepben.evolve.services.common.meta
 
 import com.google.protobuf.Timestamp
-import com.zepben.protobuf.metadata.GetMetadataResponse
+import java.time.Instant
 import com.zepben.protobuf.metadata.DataSource as PBDataSource
 import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
-import java.time.Instant
 
 fun PBDataSource.fromPb(): DataSource =
     DataSource(

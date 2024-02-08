@@ -43,7 +43,7 @@ class OperationalRestriction @JvmOverloads constructor(mRID: String = "") : Docu
      * @param mRID the mRID of the required [Equipment]
      * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
      */
-    fun getEquipment(mRID: String) = _equipment?.asSequence()?.firstOrNull { it.mRID == mRID }
+    fun getEquipment(mRID: String) = _equipment?.firstOrNull { it.mRID == mRID }
 
     /**
      * Add equipment to which this restriction applies.

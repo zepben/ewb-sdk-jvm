@@ -22,13 +22,6 @@ abstract class SqliteTable {
     @JvmField
     protected var columnIndex = 0
 
-    private var columnSet: SortedSet<Column>? = null
-    private var createTableSql: String? = null
-    private var preparedInsertSql: String? = null
-    private var preparedUpdateSql: String? = null
-    private var createIndexesSql: Collection<String>? = null
-    private var selectSql: String? = null
-
     abstract fun name(): String
 
     open fun uniqueIndexColumns(): MutableList<List<Column>> {
@@ -39,17 +32,17 @@ abstract class SqliteTable {
         return ArrayList()
     }
 
-    fun columnSet(): SortedSet<Column> = columnSet ?: createColumnSet(tableClass, tableClassInstance)
+    private fun columnSet(): SortedSet<Column> = createColumnSet(tableClass, tableClassInstance)
 
-    fun createTableSql(): String = createTableSql ?: buildCreateTableSql()
+    fun createTableSql(): String = buildCreateTableSql()
 
-    fun preparedInsertSql(): String = preparedInsertSql ?: buildPreparedInsertSql()
+    fun preparedInsertSql(): String = buildPreparedInsertSql()
 
-    fun createIndexesSql(): Collection<String> = createIndexesSql ?: buildCreateIndexSql()
+    fun createIndexesSql(): Collection<String> = buildCreateIndexSql()
 
-    open fun selectSql(): String = selectSql ?: buildSelectSql()
+    open fun selectSql(): String = buildSelectSql()
 
-    fun preparedUpdateSql(): String = preparedUpdateSql ?: buildPreparedUpdateSql()
+    fun preparedUpdateSql(): String = buildPreparedUpdateSql()
 
     protected abstract val tableClass: Class<out SqliteTable>
     protected abstract val tableClassInstance: SqliteTable

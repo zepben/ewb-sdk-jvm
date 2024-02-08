@@ -36,7 +36,6 @@ import java.sql.DriverManager
 import java.sql.SQLException
 import java.sql.Statement
 import java.util.*
-import kotlin.reflect.KClass
 
 /**
  * @property databaseFile the filename of the database to write.

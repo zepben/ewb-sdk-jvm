@@ -23,7 +23,6 @@ import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.cc.GetCustomersForContainerResponse
 import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.cc.GetIdentifiedObjectsResponse
-import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.testutils.exception.ExpectException.Companion.expect

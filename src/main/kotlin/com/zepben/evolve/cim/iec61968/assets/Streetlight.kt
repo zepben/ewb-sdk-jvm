@@ -10,7 +10,7 @@ package com.zepben.evolve.cim.iec61968.assets
 /**
  * A Streetlight asset
  */
-class Streetlight(mRID: String = "") : Asset(mRID) {
+class Streetlight @JvmOverloads constructor(mRID: String = "") : Asset(mRID) {
 
     /**
      * The [Pole] this [Streetlight] is attached to.

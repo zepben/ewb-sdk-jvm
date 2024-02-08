@@ -15,7 +15,7 @@ import com.zepben.evolve.cim.iec61968.assets.AssetInfo
  *
  * @property ratedInterruptingTime Switch rated interrupting time in seconds.
  */
-class SwitchInfo(mRID: String = "") : AssetInfo(mRID) {
+class SwitchInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
 
     var ratedInterruptingTime: Double? = null
 

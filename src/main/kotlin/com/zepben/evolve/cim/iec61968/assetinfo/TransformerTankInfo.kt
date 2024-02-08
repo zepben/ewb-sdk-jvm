@@ -20,7 +20,7 @@ import com.zepben.evolve.services.network.ResistanceReactance
  *
  * @property powerTransformerInfo Power transformer data that this tank description is part of.
  */
-class TransformerTankInfo(mRID: String = "") : AssetInfo(mRID) {
+class TransformerTankInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
 
     var powerTransformerInfo: PowerTransformerInfo? = null
 

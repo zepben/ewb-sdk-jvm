@@ -18,7 +18,7 @@ import com.zepben.evolve.cim.iec61968.assets.AssetInfo
  * @property ratedReactivePower Rated reactive power in volt-amperes reactive.
  * @property ratedVoltage Rated voltage in volts.
  */
-class ShuntCompensatorInfo(mRID: String = "") : AssetInfo(mRID) {
+class ShuntCompensatorInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
 
     var maxPowerLoss: Int? = null
     var ratedCurrent: Int? = null

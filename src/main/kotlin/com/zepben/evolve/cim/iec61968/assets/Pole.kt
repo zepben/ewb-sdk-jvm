@@ -15,7 +15,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
 /**
  * A Pole asset
  */
-class Pole(mRID: String = "") : Structure(mRID) {
+class Pole @JvmOverloads constructor(mRID: String = "") : Structure(mRID) {
     /**
      * Pole class: 1, 2, 3, 4, 5, 6, 7, H1, H2, Other, Unknown.
      */

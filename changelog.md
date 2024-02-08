@@ -128,7 +128,7 @@
     * ProtectionEquipment
         * directable
         * powerDirection
-    * RelayInfo.recloseDelays
+    * CurrentRelayInfo.recloseDelays
     * DER register fields on PowerElectronicsConnection
 * Added new enums
     * PowerDirectionKind

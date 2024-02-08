@@ -14,7 +14,6 @@ import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -27,7 +26,7 @@ class RegulatingControlTest {
 
     @Test
     internal fun constructorCoverage() {
-        assertThat(object : RegulatingControl() {}.mRID, Matchers.not(equalTo("")))
+        assertThat(object : RegulatingControl() {}.mRID, not(equalTo("")))
         assertThat(object : RegulatingControl("id") {}.mRID, equalTo("id"))
     }
 

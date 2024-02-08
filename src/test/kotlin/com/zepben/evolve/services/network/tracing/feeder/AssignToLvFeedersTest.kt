@@ -26,8 +26,8 @@ import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.empty
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -167,8 +167,8 @@ class AssignToLvFeedersTest {
         Tracing.assignEquipmentToFeeders().run(network)
         Tracing.assignEquipmentToLvFeeders().run(network)
 
-        assertThat(feeder.normalEnergizedLvFeeders, Matchers.empty())
-        assertThat(lvFeeder.normalEnergizingFeeders, Matchers.empty())
+        assertThat(feeder.normalEnergizedLvFeeders, empty())
+        assertThat(lvFeeder.normalEnergizingFeeders, empty())
     }
 
     @Test

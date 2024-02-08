@@ -121,7 +121,7 @@ abstract class BaseCIMReader(private val baseService: BaseService) {
         }
     }
 
-    protected fun BaseService.addOrThrow(nameType: NameType): Boolean {
+    private fun BaseService.addOrThrow(nameType: NameType): Boolean {
         return if (addNameType(nameType)) {
             true
         } else {

@@ -21,7 +21,7 @@ class PhaseStepTest {
 
     @JvmField
     @RegisterExtension
-    var systemOutRule: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     fun accessors() {

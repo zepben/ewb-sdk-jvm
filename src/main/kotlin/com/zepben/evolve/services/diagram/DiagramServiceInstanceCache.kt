@@ -10,7 +10,7 @@ package com.zepben.evolve.services.diagram
 import com.google.common.collect.Interners
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObjectPoint
 
-@Suppress("UnstableApiUsage")
+// TODO find out if this is used
 class DiagramServiceInstanceCache {
 
     private val diagramObjectPoints = Interners.newStrongInterner<DiagramObjectPoint>()

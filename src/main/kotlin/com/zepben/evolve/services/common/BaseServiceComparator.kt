@@ -8,7 +8,6 @@
 package com.zepben.evolve.services.common
 
 import com.zepben.evolve.cim.iec61968.common.Document
-import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.Name
@@ -116,7 +115,7 @@ abstract class BaseServiceComparator {
         compareNames(IdentifiedObject::names)
     }
 
-    protected fun compareNameType(source: NameType, target: NameType): ObjectDifference<NameType> =
+    private fun compareNameType(source: NameType, target: NameType): ObjectDifference<NameType> =
         ObjectDifference(source, target).apply {
             compareValues(NameType::description)
 
@@ -152,11 +151,6 @@ abstract class BaseServiceComparator {
             compareIdReferences(OrganisationRole::organisation)
         }
 
-    protected fun compareOrganisation(source: Organisation, target: Organisation): ObjectDifference<Organisation> =
-        ObjectDifference(source, target).apply {
-            compareIdentifiedObject()
-        }
-
     private fun getComparableType(clazz: KClass<*>): KType? {
         val packageName = if (clazz.qualifiedName.isNullOrBlank()) null else clazz.java.packageName
         if (packageName?.startsWith("com.zepben.evolve.cim.") == true)
@@ -183,7 +177,7 @@ abstract class BaseServiceComparator {
         return this
     }
 
-    fun <T : IdentifiedObject> ObjectDifference<T>.compareNames(
+    private fun <T : IdentifiedObject> ObjectDifference<T>.compareNames(
         vararg properties: KProperty1<IdentifiedObject, Collection<Name>>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareNames(source, target)) }

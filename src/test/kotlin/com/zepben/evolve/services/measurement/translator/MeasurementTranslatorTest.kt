@@ -31,10 +31,12 @@ internal class MeasurementTranslatorTest {
 
     @Test
     internal fun convertsCorrectly() {
+        val msToPb = MeasurementCimToProto()
+        
         /************ IEC61970 BASE MEAS ************/
-        validate({ AnalogValue() }, { it.fillFields() }, { ns, it -> ns.addFromPb(it.toPb()) })
-        validate({ AccumulatorValue() }, { it.fillFields() }, { ns, it -> ns.addFromPb(it.toPb()) })
-        validate({ DiscreteValue() }, { it.fillFields() }, { ns, it -> ns.addFromPb(it.toPb()) })
+        validate({ AnalogValue() }, { it.fillFields() }, { ns, it -> ns.addFromPb(msToPb.toPb(it)) })
+        validate({ AccumulatorValue() }, { it.fillFields() }, { ns, it -> ns.addFromPb(msToPb.toPb(it)) })
+        validate({ DiscreteValue() }, { it.fillFields() }, { ns, it -> ns.addFromPb(msToPb.toPb(it)) })
     }
 
     private inline fun <reified T : MeasurementValue> validate(creator: () -> T, filler: (T) -> Unit, adder: (MeasurementService, T) -> T?) {

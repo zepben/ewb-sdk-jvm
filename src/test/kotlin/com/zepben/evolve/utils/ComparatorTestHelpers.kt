@@ -16,8 +16,6 @@ import org.hamcrest.Matchers.*
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
 
-data class ExpectedDifference(val name: String, val difference: Difference)
-
 class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
     val newService: () -> T,
     val newComparator: (NetworkServiceComparatorOptions) -> C

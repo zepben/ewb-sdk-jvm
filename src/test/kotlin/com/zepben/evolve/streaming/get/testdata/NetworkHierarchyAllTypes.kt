@@ -8,7 +8,10 @@
 
 package com.zepben.evolve.streaming.get.testdata
 
-import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.base.core.GeographicalRegion
+import com.zepben.evolve.cim.iec61970.base.core.SubGeographicalRegion
+import com.zepben.evolve.cim.iec61970.base.core.Substation
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkService
@@ -96,7 +99,5 @@ object NetworkHierarchyAllTypes {
     fun createNetworkHierarchy() = createService().let {
         NetworkHierarchy(it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf())
     }
-
-    private fun <T : IdentifiedObject> mapOf(vararg items: T): Map<String, T> = items.associateBy { it.mRID }
 
 }

@@ -33,9 +33,11 @@ internal class DiagramTranslatorTest {
 
     @Test
     internal fun convertsCorrectly() {
+        val dsToPb = DiagramCimToProto()
+
         /************ IEC61970 BASE DIAGRAM LAYOUT ************/
-        validate({ Diagram() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
-        validate({ DiagramObject() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
+        validate({ Diagram() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(dsToPb.toPb(it)) })
+        validate({ DiagramObject() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(dsToPb.toPb(it)) })
     }
 
     //

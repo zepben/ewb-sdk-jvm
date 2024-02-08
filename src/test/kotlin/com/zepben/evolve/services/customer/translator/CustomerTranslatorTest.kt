@@ -35,11 +35,13 @@ internal class CustomerTranslatorTest {
 
     @Test
     internal fun convertsCorrectly() {
+        val csToPb = CustomerCimToProto()
+
         /************ IEC61968 CUSTOMERS ************/
-        validate({ Customer() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
-        validate({ CustomerAgreement() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
-        validate({ PricingStructure() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
-        validate({ Tariff() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(it.toPb()) })
+        validate({ Customer() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(csToPb.toPb(it)) })
+        validate({ CustomerAgreement() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(csToPb.toPb(it)) })
+        validate({ PricingStructure() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(csToPb.toPb(it)) })
+        validate({ Tariff() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(csToPb.toPb(it)) })
     }
 
     //

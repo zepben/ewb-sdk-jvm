@@ -8,7 +8,6 @@
 package com.zepben.evolve.services.customer.translator
 
 import com.zepben.evolve.services.common.translator.mRID
-import com.zepben.evolve.services.common.translator.nameAndMRID
 import com.zepben.protobuf.cim.iec61968.common.Agreement
 import com.zepben.protobuf.cim.iec61968.customers.Customer
 import com.zepben.protobuf.cim.iec61968.customers.CustomerAgreement
@@ -21,6 +20,3 @@ fun CustomerAgreement.mRID(): String = agr.mRID()
 fun Agreement.mRID(): String = doc.mRID()
 fun Tariff.mRID(): String = doc.mRID()
 fun PricingStructure.mRID(): String = doc.mRID()
-
-fun CustomerAgreement.nameAndMRID(): String = agr.nameAndMRID()
-fun Agreement.nameAndMRID(): String = doc.nameAndMRID()

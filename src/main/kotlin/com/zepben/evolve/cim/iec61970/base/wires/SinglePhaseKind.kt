@@ -24,6 +24,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
  * @property s2 Secondary phase 2.
  * @property INVALID Invalid phase. Caused by trying to energise with multiple phases simultaneously.
  */
+@Suppress("EnumEntryName")
 enum class SinglePhaseKind(val value: Int, val maskIndex: Int) {
 
     NONE(0, -1),

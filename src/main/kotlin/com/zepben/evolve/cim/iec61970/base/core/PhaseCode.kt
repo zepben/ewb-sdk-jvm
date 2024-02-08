@@ -51,6 +51,7 @@ import java.util.function.Consumer
  * @property s2 Secondary phase 2.
  * @property s2N Secondary phase 2 and neutral.
  */
+@Suppress("EnumEntryName")
 enum class PhaseCode(vararg singlePhases: SinglePhaseKind) {
 
     NONE(SinglePhaseKind.NONE),

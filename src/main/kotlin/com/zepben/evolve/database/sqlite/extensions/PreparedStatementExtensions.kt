@@ -8,7 +8,6 @@
 package com.zepben.evolve.database.sqlite.extensions
 
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
-import java.lang.Double.isNaN
 import java.security.AccessController
 import java.security.PrivilegedActionException
 import java.security.PrivilegedExceptionAction
@@ -33,7 +32,7 @@ internal fun PreparedStatement.setNullableString(queryIndex: Int, value: String?
 internal fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?) {
     when {
         value == null -> this.setNull(queryIndex, DOUBLE)
-        isNaN(value) -> this.setString(queryIndex, "NaN")
+        value.isNaN() -> this.setString(queryIndex, "NaN")
         else -> this.setDouble(queryIndex, value)
     }
 }

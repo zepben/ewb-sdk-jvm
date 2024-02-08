@@ -7,6 +7,8 @@
  */
 package com.zepben.evolve.streaming.get
 
+import com.zepben.evolve.cim.iec61968.customers.Customer
+import com.zepben.evolve.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.translator.mRID
 import com.zepben.evolve.services.customer.CustomerService
@@ -74,7 +76,7 @@ class CustomerConsumerClient @JvmOverloads constructor(
     /**
      * Get the [Customer]s in the [EquipmentContainer] represented by [mRID].
      *
-     * @param mRIDs The mRID of the [EquipmentContainer]s to fetch [Customer]s for.
+     * @param mRID The mRID of the [EquipmentContainer]s to fetch [Customer]s for.
      * @return a [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).

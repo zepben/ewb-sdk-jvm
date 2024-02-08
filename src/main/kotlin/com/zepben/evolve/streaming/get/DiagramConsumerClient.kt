@@ -71,7 +71,7 @@ class DiagramConsumerClient(
      * Get DiagramObjects for a given mRID. This will effectively call [DiagramService.getDiagramObjects] on the remote server and return any DiagramObjects
      * that contain a match against the given mRID.
      *
-     * @param mRIDs The mRIDs to fetch DiagramObjects for
+     * @param mRID The mRID to fetch DiagramObjects for
      * @return a [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).

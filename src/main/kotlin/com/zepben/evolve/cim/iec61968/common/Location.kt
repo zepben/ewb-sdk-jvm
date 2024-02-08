@@ -24,6 +24,7 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
     private var _positionPoints: MutableList<PositionPoint>? = null
 
     /**
+     * TODO find out what Location.CoordinateSystem refers to
      * Sequence of position points describing this location, expressed in coordinate system [Location.CoordinateSystem].
      * The returned collection is read only.
      */

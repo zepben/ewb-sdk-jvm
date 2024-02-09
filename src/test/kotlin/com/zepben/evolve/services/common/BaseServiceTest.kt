@@ -300,6 +300,10 @@ internal class BaseServiceTest {
 
     private class MyService : BaseService("") {
         fun add(cableInfo: MyIdentifiedObject): Boolean = super.add(cableInfo)
+
+        // required, since BaseService checks that each add method has a matching remove method
+        @Suppress("Unused")
+        fun remove(cableInfo: MyIdentifiedObject): Boolean = super.remove(cableInfo)
     }
 
 }

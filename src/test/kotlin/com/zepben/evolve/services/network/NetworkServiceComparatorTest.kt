@@ -210,25 +210,6 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareAssetContainer(createStructure)
     }
 
-    /************ IEC61968 COMMON ************/
-
-    @Test
-    internal fun compareLocation() {
-        compareIdentifiedObject { Location(it) }
-
-        comparatorValidator.validateProperty(
-            Location::mainAddress,
-            { Location(it) },
-            { StreetAddress(townDetail = TownDetail("town", "state")) },
-            { StreetAddress(townDetail = TownDetail("other", "state")) })
-        comparatorValidator.validateIndexedCollection(
-            Location::points,
-            Location::addPoint,
-            { Location(it) },
-            { PositionPoint(1.0, 2.0) },
-            { PositionPoint(3.0, 4.0) })
-    }
-
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
     @Test

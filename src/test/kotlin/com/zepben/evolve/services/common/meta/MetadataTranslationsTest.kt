@@ -8,15 +8,16 @@
 
 package com.zepben.evolve.services.common.meta
 
-import com.google.protobuf.Timestamp as PBTimestamp
 import io.mockk.*
-import com.zepben.protobuf.metadata.DataSource as PBDataSource
-import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matchers.contains
 import org.junit.jupiter.api.Test
 import java.time.Instant
+import com.google.protobuf.Timestamp as PBTimestamp
+import com.zepben.protobuf.metadata.DataSource as PBDataSource
+import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
 class MetadataTranslationsTest {
 
@@ -111,8 +112,8 @@ class MetadataTranslationsTest {
             val result = serviceInfo.toPb()
 
             verifySequence {
-                pbServiceInfoBuilder.setTitle("test title")
-                pbServiceInfoBuilder.setVersion("test version")
+                pbServiceInfoBuilder.title = "test title"
+                pbServiceInfoBuilder.version = "test version"
                 dataSourceOne.toPb()
                 dataSourceTwo.toPb()
                 pbServiceInfoBuilder.addAllDataSources(listOf(PBDataSource.newBuilder().build(), PBDataSource.newBuilder().build()))

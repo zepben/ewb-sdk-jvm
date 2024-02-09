@@ -26,7 +26,7 @@ import com.zepben.evolve.services.common.BaseService
  */
 @Throws(MRIDLookupException::class)
 inline fun <reified T : IdentifiedObject> BaseService.getOrThrow(mRID: String?, typeNameAndMRID: String): T {
-    return get<T>(mRID)
+    return get(mRID)
         ?: throw MRIDLookupException("Failed to find ${T::class.simpleName} with mRID $mRID for $typeNameAndMRID")
 }
 
@@ -59,5 +59,5 @@ inline fun <reified T : IdentifiedObject> BaseService.ensureGet(mRID: String?, t
     return if (mRID.isNullOrBlank())
         null
     else
-        getOrThrow<T>(mRID, typeNameAndMRID)
+        getOrThrow(mRID, typeNameAndMRID)
 }

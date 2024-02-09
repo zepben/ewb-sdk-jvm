@@ -272,7 +272,7 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `runGetMetadata calls stub with arguments it's passed`() {
         val request = GetMetadataRequest.newBuilder().build()
-        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> { _ -> }
+        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> {}
         doNothing().`when`(stub).getMetadata(request, streamObserver)
 
         consumerClient.runGetMetadata(request, streamObserver)

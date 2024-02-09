@@ -18,7 +18,10 @@ import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
 import com.zepben.evolve.streaming.get.testservices.TestDiagramConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
-import com.zepben.protobuf.dc.*
+import com.zepben.protobuf.dc.DiagramConsumerGrpc
+import com.zepben.protobuf.dc.GetDiagramObjectsResponse
+import com.zepben.protobuf.dc.GetIdentifiedObjectsRequest
+import com.zepben.protobuf.dc.GetIdentifiedObjectsResponse
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.testutils.exception.ExpectException
@@ -237,7 +240,7 @@ internal class DiagramConsumerClientTest {
     @Test
     internal fun `runGetMetadata calls stub with arguments it's passed`() {
         val request = GetMetadataRequest.newBuilder().build()
-        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> { _ -> }
+        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> {}
         doNothing().`when`(stub).getMetadata(request, streamObserver)
 
         consumerClient.runGetMetadata(request, streamObserver)
@@ -275,7 +278,7 @@ internal class DiagramConsumerClientTest {
         return responses.iterator()
     }
 
-    private fun buildDIO(obj: IdentifiedObject, identifiedObjectBuilder: DiagramIdentifiedObject.Builder): DiagramIdentifiedObject? =
+    private fun buildDIO(obj: IdentifiedObject, identifiedObjectBuilder: DIO.Builder): DIO? =
         identifiedObjectBuilder.apply {
             whenDiagramServiceObject(
                 obj,

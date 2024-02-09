@@ -29,6 +29,7 @@ internal fun IdentifiedObject.validateReference(other: IdentifiedObject, getter:
 
 /**
  * Removes all names that belong to this object from their corresponding [NameType][com.zepben.evolve.cim.iec61970.base.core.NameType].
+ * TODO: investigate whether this is superseded by clearNames()
  */
 fun IdentifiedObject.removeNamesFromTypes() {
     names.forEach { it.type.removeName(it) }

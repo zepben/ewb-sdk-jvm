@@ -15,11 +15,11 @@ import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
-import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 import io.mockk.*
-import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
+import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
 class TestCimConsumerClient {
 
@@ -52,7 +52,7 @@ class TestCimConsumerClient {
 
         val returnedServiceInfo = metadataResponse.serviceInfo.fromPb()
 
-        every { baseConsumerClient.runGetMetadata(ofType(GetMetadataRequest::class), any<AwaitableStreamObserver<GetMetadataResponse>>()) } answers {
+        every { baseConsumerClient.runGetMetadata(ofType(GetMetadataRequest::class), any()) } answers {
             secondArg<AwaitableStreamObserver<GetMetadataResponse>>().onNext(metadataResponse)
             secondArg<AwaitableStreamObserver<GetMetadataResponse>>().onCompleted()
         }

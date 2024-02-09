@@ -12,7 +12,7 @@ import java.util.function.Supplier
 
 /**
  * A traversal class that allows you to branch by spawning another traversal instance.
- * I've tried to make this a reusable class, but not sure how useful it is in it's current state.
+ * I've tried to make this a reusable class, but not sure how useful it is in its current state.
  * It's working for my current use case (set phase tracing) but may need to be rethought to meet requirements of
  * other traversals.
  * Be seriously careful if you ever plan to subclass this class. It would be extremely easy to break it's intended

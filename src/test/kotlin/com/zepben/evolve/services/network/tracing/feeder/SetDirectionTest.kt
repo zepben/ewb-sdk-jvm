@@ -144,7 +144,7 @@ class SetDirectionTest {
     }
 
     @Test
-    internal fun `stops at zone transformers incase feeder heads are missing`() {
+    internal fun `stops at zone transformers in case feeder heads are missing`() {
         //
         // 1 b0*21--c1--21 tx2 21--c3--2
         //

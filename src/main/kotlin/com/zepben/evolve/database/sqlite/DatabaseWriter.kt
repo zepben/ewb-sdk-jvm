@@ -49,9 +49,9 @@ class DatabaseWriter @JvmOverloads constructor(
 
     /**
      * Will attempt to save the provided [BaseService]s to the connected database.
-     * Can only be called once per [DatabaseWriter]. Currently supports NetworkService, DiagramService, CustomerService,
+     * Can only be called once per [DatabaseWriter]. This currently supports NetworkService, DiagramService, CustomerService,
      * and MeasurementService. Multiple of each type can be passed and will be merged in the database. This is not
-     * well supported however, and not recommended. Merge services prior to calling save (for the moment :))
+     * well-supported however, and not recommended. Merge services prior to calling save (for the moment :))
      */
     fun save(metadataCollection: MetadataCollection, services: List<BaseService>): Boolean {
         if (services.isEmpty()) {

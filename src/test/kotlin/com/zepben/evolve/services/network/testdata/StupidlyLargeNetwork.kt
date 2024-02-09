@@ -637,7 +637,7 @@ object StupidlyLargeNetwork {
     }
 
     /*
-     * The duplicated nmi (n1) results in a many to many mapping with the current mapping format (August 2017).
+     * The duplicated nmi (n1) results in a many-to-many mapping with the current mapping format (August 2017).
      * TX3 and TX4 allow testing of parallel transformers causing a one usage point to many TX mapping (appeared in mapping August 2017).
     *
     *           TX1         TX2               TX3    TX4

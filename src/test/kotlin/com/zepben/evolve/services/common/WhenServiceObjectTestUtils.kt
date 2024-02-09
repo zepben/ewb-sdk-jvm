@@ -14,7 +14,7 @@ import kotlin.reflect.KFunction
 
 internal fun verifyWhenServiceObjectFunctionSupportsAllServiceObjectTypes(supportedKClasses: Set<KClass<*>>, whenFunction: KFunction<*>) {
     // Find all the parameters that have arguments and get their first parameter.
-    // These should all be IdentifiedObject leaf classes in the when*ServiceObject functions.
+    // These should all be IdentifiedObject leaf classes in the "when*ServiceObject" functions.
     val functionParamIdentifiedObjectTypes = whenFunction
         .parameters
         .asSequence()

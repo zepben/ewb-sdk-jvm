@@ -19,7 +19,7 @@ import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
 
 /**
- * A utility class intended to be a one stop shop to instantiate all your common network traces!
+ * A utility class intended to be a one-stop shop to instantiate all your common network traces!
  */
 object Tracing {
 

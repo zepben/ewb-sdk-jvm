@@ -164,7 +164,7 @@ internal class NetworkServiceTest {
         val node4 = createNodeForConnecting(network, "node4", 2)
         val node5 = createNodeForConnecting(network, "node5", 2)
 
-        // Connect up a network so we can disconnect it :)
+        // Connect up a network, so we can disconnect it :)
         network.connect(node0.getTerminal(1)!!, "cn_1")
         network.connect(node1.getTerminal(1)!!, "cn_1")
         network.connect(node2.getTerminal(1)!!, "cn_1")

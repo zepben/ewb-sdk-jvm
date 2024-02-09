@@ -67,7 +67,7 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     }
 
     /**
-     * Convenience function to find all of the normal [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
+     * Convenience function to find all the normal [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
      *
      * @return the normal feeders for all associated feeders
      */
@@ -78,7 +78,7 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     }
 
     /**
-     * Convenience function to find all of the current [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
+     * Convenience function to find all the current [Feeder]'s of the [Equipment] associated with this [EquipmentContainer].
      *
      * @return the current feeders for all associated feeders
      */

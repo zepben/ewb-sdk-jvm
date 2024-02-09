@@ -81,7 +81,7 @@ class TransformerEndInfo @JvmOverloads constructor(mRID: String = "") : AssetInf
             val amps = current ?: (rS / rU)
 
             val r = voltageOhmicPart?.let {
-                // active voltage = copper loss (i.e. wattmeter reading) / current (i.e. ampmeter reading)
+                // active voltage = copper loss (i.e. wattmeter reading) / current (i.e. ammeter reading)
                 // R = copper loss / current^2 = active voltage / current
                 val activeVoltage = (it / 100) * rU
                 activeVoltage / amps

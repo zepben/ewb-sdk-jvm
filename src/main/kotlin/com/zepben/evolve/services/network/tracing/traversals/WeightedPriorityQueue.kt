@@ -73,7 +73,7 @@ class WeightedPriorityQueue<T>(
         fun <T> processQueue(getWeight: (T) -> Int): TraversalQueue<T> = WeightedPriorityQueue({ Collections.asLifoQueue(ArrayDeque()) }, getWeight)
 
         /**
-         * Special priority queue that queues branch items with the largest weight on the starting item as highest priority.
+         * Special priority queue that queues branch items with the largest weight on the starting item as the highest priority.
          */
         @JvmStatic
         fun <T> branchQueue(getWeight: (T) -> Int): TraversalQueue<Traversal<T>> = WeightedPriorityQueue(

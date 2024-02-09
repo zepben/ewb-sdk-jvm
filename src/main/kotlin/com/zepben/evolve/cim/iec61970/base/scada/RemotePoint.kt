@@ -10,7 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.scada
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 
 /**
- * For a RTU remote points correspond to telemetered values or control outputs. Other units (e.g. control centers) usually
+ * For an RTU remote points correspond to telemetered values or control outputs. Other units (e.g. control centers) usually
  * also contain calculated values.
  */
 abstract class RemotePoint(mRID: String = "") : IdentifiedObject(mRID)

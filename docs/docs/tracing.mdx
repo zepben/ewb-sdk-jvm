@@ -11,14 +11,14 @@ simple tasks such as adding up cable lengths along a line to advanced functions 
 
 The Evolve SDK provides an API to make following connectivity (what we will call tracing) less cumbersome and more
 productive. It provides a variety of use-case specific traces out of the box, but also a generic mechanism to write
-your own traces in an easy to use manner. The
+your own traces in an easy-to-use manner. The
 [Tracing](https://github.com/zepben/evolve-sdk-jvm/blob/main/src/main/java/com/zepben/cimbend/network/tracing/Tracing.java)
 package is a great place to get an overview of the kind of tools we provide as part of the SDK.
 
 ## Basic Connectivity 
 
 So, let's start at the absolute basic use case. "What is directly connected to this piece of equipment?".
-Obviously we provide a function to let you to find out. Let's see it in code:
+Obviously we provide a function to let you find out. Let's see it in code:
 
 <Tabs
     groupId="code-example"
@@ -155,8 +155,8 @@ preconfigured BasicTraversal creators for these common use cases. These can be f
 [tracing package](https://github.com/zepben/evolve-sdk-jvm/blob/main/src/main/java/com/zepben/cimbend/network/tracing/Tracing.java).
 
 To get started, lets take a look at the `Tracing.connectedEquipmentTrace()`. This returns a `BasicTraversal` that is
-preconfigured to continously step to equipment that is connected in any way. Under the covers it uses the 
-`Tracing.connectedEquipment` function we looked at above to continously step to connected objects. Now, say we wanted to
+preconfigured to continuously step to equipment that is connected in any way. Under the covers it uses the
+`Tracing.connectedEquipment` function we looked at above to continuously step to connected objects. Now, say we wanted to
 identify the nearest circuit breakers to a piece of equipment, capturing all equipment between those breakers. We can do
 that with the following:
 

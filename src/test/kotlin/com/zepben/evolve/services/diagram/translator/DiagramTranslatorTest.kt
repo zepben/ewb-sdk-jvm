@@ -81,7 +81,7 @@ internal class DiagramTranslatorTest {
     }
 
     private inline fun <reified T : IdentifiedObject> addWithUnresolvedReferences(cim: T, adder: (DiagramService, T) -> T?): T {
-        // We need to convert the populated item before we check the differences so we can complete the unresolved references.
+        // We need to convert the populated item before we check the differences, so we can complete the unresolved references.
         val service = DiagramService()
         val convertedCim = adder(service, cim)!!
         service.unresolvedReferences().toList().forEach { ref ->

@@ -56,7 +56,7 @@ abstract class Traversal<T> {
     }
 
     /**
-     * Clears all of the stop conditions registered on this traversal.
+     * Clears all the stop conditions registered on this traversal.
      */
     fun clearStopConditions(): Traversal<T> {
         stopConditions.clear()
@@ -193,7 +193,7 @@ abstract class Traversal<T> {
     }
 
     /**
-     * Starts the traversal. [setStart] should of been called to set the starting item or use the
+     * Starts the traversal. [setStart] should have been called to set the starting item or use the
      * overloaded run method that takes an item to start at.
      *
      * @param canStopOnStartItem Indicates if the traversal will check the start item for stop conditions.

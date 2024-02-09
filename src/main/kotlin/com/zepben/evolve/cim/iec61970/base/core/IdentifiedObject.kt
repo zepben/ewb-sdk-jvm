@@ -16,8 +16,8 @@ import java.util.*
  *                is easily achieved by using a UUID,  as specified in RFC 4122, for the mRID. The use of UUID is strongly recommended.
  *                For CIMXML data files in RDF syntax conforming to IEC 61970-552 Edition 1, the mRID is mapped to rdf:ID or rdf:about attributes
  *                that identify CIM object elements.
- * @property name is any free human readable and possibly non unique text naming the object.
- * @property description a free human readable text describing or naming the object. It may be non unique and may not correlate to a naming hierarchy.
+ * @property name is any free human-readable and possibly non-unique text naming the object.
+ * @property description a free human-readable text describing or naming the object. It may be non-unique and may not correlate to a naming hierarchy.
  * @property numDiagramObjects Number of DiagramObject's known to associate with this [IdentifiedObject]
  */
 abstract class IdentifiedObject(mRID: String = "") {

@@ -64,7 +64,7 @@ object SchemaNetworks {
             customerService.tryAdd(factory("empty"))
             customerService.tryAdd(filler(factory("filled"), customerService, false))
 
-            // Copy items to other services that get auto loaded there.
+            // Copy items to other services that get automatically loaded there.
             customerService.sequenceOf<Organisation>().forEach { networkService.add(it) }
             customerService.nameTypes.forEach {
                 networkService.addNameType(NameType(it.name).apply {
@@ -82,7 +82,7 @@ object SchemaNetworks {
             diagramService.tryAdd(factory("empty"))
             diagramService.tryAdd(filler(factory("filled"), diagramService, false))
 
-            // Copy items to other services that get auto loaded there.
+            // Copy items to other services that get automatically loaded there.
             diagramService.nameTypes.forEach {
                 customerService.addNameType(NameType(it.name).apply { description = it.description })
                 networkService.addNameType(NameType(it.name).apply { description = it.description })
@@ -94,7 +94,7 @@ object SchemaNetworks {
             networkService.tryAdd(factory("empty").also { fillRequired(networkService, it) })
             networkService.tryAdd(filler(factory("filled"), networkService, false))
 
-            // Copy items to other services that get auto loaded there.
+            // Copy items to other services that get automatically loaded there.
             networkService.sequenceOf<Organisation>().forEach { customerService.add(it) }
             networkService.nameTypes.forEach {
                 customerService.addNameType(NameType(it.name).apply {

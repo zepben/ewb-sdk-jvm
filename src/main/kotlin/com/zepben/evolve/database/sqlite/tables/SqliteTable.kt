@@ -13,7 +13,7 @@ import kotlin.reflect.KProperty1
 import kotlin.reflect.jvm.kotlinProperty
 
 /**
- * Represents a table in an Sqlite Database
+ * Represents a table in a Sqlite Database
  */
 abstract class SqliteTable {
 

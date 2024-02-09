@@ -30,7 +30,7 @@ class ConnectivityNode @JvmOverloads constructor(mRID: String = "") : Identified
     fun numTerminals() = _terminals.size
 
     /**
-     * Terminals interconnected with zero impedance at a this connectivity node.
+     * Terminals interconnected with zero impedance at this connectivity node.
      *
      * @param mRID the mRID of the required [Terminal]
      * @return The [Terminal] with the specified [mRID] if it exists, otherwise null

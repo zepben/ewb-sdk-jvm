@@ -19,7 +19,7 @@ import java.time.Instant
 
 //
 // NOTE: The following extensions are named differently on purpose. If they are called `fillFields` you can not import them
-//       correctly and you get skipping of sub levels in the service specific use.
+//       correctly, and you get skipping of sublevels in the service specific use.
 //
 
 /************ IEC61968 COMMON ************/

@@ -24,4 +24,5 @@ class NetworkServiceInstanceCache {
     fun intern(item: TownDetail): TownDetail = townDetails.intern(item)
     fun intern(item: StreetAddress): StreetAddress = streetAddresses.intern(item)
     fun intern(item: PositionPoint): PositionPoint = positionPoints.intern(item)
+    fun intern(item: RelaySetting): RelaySetting = relaySettings.intern(item)
 }

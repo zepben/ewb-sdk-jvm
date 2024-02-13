@@ -21,7 +21,7 @@ import com.zepben.protobuf.cc.CustomerIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
-import io.grpc.ManagedChannel
+import io.grpc.Channel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -50,11 +50,11 @@ class CustomerConsumerClient @JvmOverloads constructor(
     /**
      * Create a [CustomerConsumerClient]
      *
-     * @param channel [ManagedChannel] to build a stub from.
+     * @param channel [Channel] to build a stub from.
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+    constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
             CustomerConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
             executor = Executors.newSingleThreadExecutor()
@@ -67,11 +67,7 @@ class CustomerConsumerClient @JvmOverloads constructor(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
-        this(
-            CustomerConsumerGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
-        )
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) : this(channel.channel, callCredentials)
 
     /**
      * Get the [Customer]s in the [EquipmentContainer] represented by [mRID].

@@ -24,7 +24,7 @@ import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.nc.*
 import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import io.grpc.CallCredentials
-import io.grpc.ManagedChannel
+import io.grpc.Channel
 import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -53,11 +53,11 @@ class NetworkConsumerClient(
     /**
      * Create a [NetworkConsumerClient]
      *
-     * @param channel [ManagedChannel] to build a stub from.
+     * @param channel [Channel] to build a stub from.
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+    constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
             NetworkConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
             executor = Executors.newSingleThreadExecutor()
@@ -70,11 +70,7 @@ class NetworkConsumerClient(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
-        this(
-            NetworkConsumerGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
-        )
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) : this(channel.channel, callCredentials)
 
     override fun runGetMetadata(getMetadataRequest: GetMetadataRequest, streamObserver: AwaitableStreamObserver<GetMetadataResponse>) {
         stub.getMetadata(getMetadataRequest, streamObserver)
@@ -398,6 +394,7 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
+    // FIXME write a test for this
     fun getEquipmentForLoop(loop: Loop): GrpcResult<MultiObjectResult> =
         getEquipmentForLoop(loop.mRID)
 

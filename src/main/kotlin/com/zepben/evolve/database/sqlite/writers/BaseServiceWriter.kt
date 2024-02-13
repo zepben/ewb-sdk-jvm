@@ -60,7 +60,7 @@ abstract class BaseServiceWriter<T : BaseService, W : BaseCIMWriter>(
         }
     }
 
-    protected inline fun validateSave(
+    private inline fun validateSave(
         nameType: NameType,
         saver: (nameType: NameType) -> Boolean
     ): Boolean {
@@ -69,7 +69,7 @@ abstract class BaseServiceWriter<T : BaseService, W : BaseCIMWriter>(
         }
     }
 
-    protected inline fun validateSave(
+    private inline fun validateSave(
         name: Name,
         saver: (name: Name) -> Boolean
     ): Boolean {

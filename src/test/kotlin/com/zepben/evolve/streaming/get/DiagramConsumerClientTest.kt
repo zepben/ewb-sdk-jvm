@@ -18,6 +18,7 @@ import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
 import com.zepben.evolve.streaming.get.testservices.TestDiagramConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
+import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.dc.GetDiagramObjectsResponse
 import com.zepben.protobuf.dc.GetIdentifiedObjectsRequest
@@ -26,10 +27,14 @@ import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
+import io.grpc.Channel
 import io.grpc.StatusRuntimeException
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
@@ -256,6 +261,45 @@ internal class DiagramConsumerClientTest {
 
         verify(consumerService.onGetMetadataRequest).invoke(eq(GetMetadataRequest.newBuilder().build()), any())
         validateFailure(onErrorHandler, result, serverException)
+    }
+
+    @Test
+    fun `construct via Channel`() {
+        val diagramService = DiagramService().apply {
+            add(DiagramObject("d1").also { it.identifiedObjectMRID = "io1" })
+        }
+
+        configureResponses(diagramService)
+
+        val channel = mockk<Channel>()
+        mockkStatic(DiagramConsumerGrpc::class)
+        every { DiagramConsumerGrpc.newStub(channel) } returns stub
+
+        val clientViaChannel = DiagramConsumerClient(channel)
+        val result = clientViaChannel.getDiagramObjects("io1").throwOnError()
+
+        assertThat(result.value.objects.size, equalTo(1))
+        assertThat(clientViaChannel.service.listOf(IdentifiedObject::class).map { it.mRID }, contains("d1"))
+    }
+
+    @Test
+    fun `construct via GrpcChannel`() {
+        val diagramService = DiagramService().apply {
+            add(DiagramObject("d1").also { it.identifiedObjectMRID = "io1" })
+        }
+
+        configureResponses(diagramService)
+
+        val channel = mockk<Channel>()
+        val grpcChannel = GrpcChannel(channel)
+        mockkStatic(DiagramConsumerGrpc::class)
+        every { DiagramConsumerGrpc.newStub(channel) } returns stub
+
+        val clientViaGrpcChannel = DiagramConsumerClient(grpcChannel)
+        val result = clientViaGrpcChannel.getDiagramObjects("io1").throwOnError()
+
+        assertThat(result.value.objects.size, equalTo(1))
+        assertThat(clientViaGrpcChannel.service.listOf(IdentifiedObject::class).map { it.mRID }, contains("d1"))
     }
 
     private fun configureResponses(expectedDiagramService: DiagramService) {

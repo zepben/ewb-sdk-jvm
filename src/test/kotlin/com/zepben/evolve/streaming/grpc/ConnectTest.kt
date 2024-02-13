@@ -10,6 +10,7 @@ package com.zepben.evolve.streaming.grpc
 
 import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.client.createTokenFetcher
+import com.zepben.auth.client.createTokenFetcherManagedIdentity
 import com.zepben.auth.common.AuthMethod
 import io.mockk.*
 import io.vertx.core.json.JsonObject
@@ -328,6 +329,13 @@ internal class ConnectTest {
             Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost", 50051, AuthMethod.OAUTH),
             equalTo(grpcChannelWithAuth)
         )
+    }
+
+    @Test
+    fun connectWithIdentity() {
+        mockkStatic(::createTokenFetcherManagedIdentity)
+        every { createTokenFetcherManagedIdentity("identityUrl") } returns tokenFetcher
+        assertThat(Connect.connectWithIdentity("identityUrl", "hostname", 1234, "caFilename"), equalTo(grpcChannelWithAuth))
     }
 
 }

@@ -394,7 +394,6 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    // FIXME write a test for this
     fun getEquipmentForLoop(loop: Loop): GrpcResult<MultiObjectResult> =
         getEquipmentForLoop(loop.mRID)
 

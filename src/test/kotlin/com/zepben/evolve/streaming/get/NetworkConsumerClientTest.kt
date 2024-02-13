@@ -9,7 +9,9 @@ package com.zepben.evolve.streaming.get
 
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.*
-import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.evolve.cim.iec61970.base.wires.Breaker
+import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
@@ -619,6 +621,30 @@ internal class NetworkConsumerClientTest {
         val mor = consumerClient.getEquipmentForLoop(loop).throwOnError().value
         assertThat(service.num<IdentifiedObject>(), equalTo((listOf(loop) + loopContainers + hierarchyObjs + containerEquip + assocObjs).size))
         assertThat(mor.objects.size, equalTo((listOf(loop) + loopContainers + containerEquip + assocObjs).size))
+    }
+
+    @Test
+    internal fun `can get loop by cim object`() {
+        val loopNetwork = LoopNetwork.create()
+        configureResponses(loopNetwork)
+
+        val loop = Loop("BTS-ZEP-BEN-BTS-CBR")
+        val loopContainers = listOf("BTS", "ZEP", "BEN", "CBR", "BTSZEP", "ZEPBENCBR", "BTSBEN")
+        val hierarchyObjs = listOf(
+            "TG", "ZTS", "ACT",
+            "TGZTS", "TGBTS", "ZTSBTS", "BTSACT", "ZTSACT",
+            "TG-ZTS-BTS-TG", "ZTS-ACT-BTS",
+            "ZEP001", "BEN001", "CBR001", "ACT001"
+        )
+        val containerEquip = listOf(
+            "BTS-j-132000", "BTS-j-66000", "ZEP-j-66000", "ZEP-j-11000", "BEN-j-66000", "BEN-j-11000", "CBR-j-66000", "CBR-j-11000",
+            "BTSZEP-j", "ZEPBENCBR-j", "BTSBEN-j"
+        )
+        val assocObjs = containerEquip.map { "$it-t" } + listOf("bv132", "bv66", "bv11")
+
+        val mor = consumerClient.getEquipmentForLoop(loop).throwOnError().value
+        assertThat(service.num<IdentifiedObject>(), equalTo((listOf(loop.mRID) + loopContainers + hierarchyObjs + containerEquip + assocObjs).size))
+        assertThat(mor.objects.size, equalTo((listOf(loop.mRID) + loopContainers + containerEquip + assocObjs).size))
     }
 
     @Test

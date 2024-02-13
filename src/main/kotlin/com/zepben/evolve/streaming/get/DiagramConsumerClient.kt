@@ -18,7 +18,7 @@ import com.zepben.protobuf.dc.DiagramIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
-import io.grpc.ManagedChannel
+import io.grpc.Channel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -43,11 +43,11 @@ class DiagramConsumerClient(
     /**
      * Create a [DiagramConsumerClient]
      *
-     * @param channel [ManagedChannel] to build a stub from.
+     * @param channel [Channel] to build a stub from.
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+    constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
             DiagramConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
             executor = Executors.newSingleThreadExecutor()

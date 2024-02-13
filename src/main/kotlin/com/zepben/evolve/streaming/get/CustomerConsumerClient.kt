@@ -79,10 +79,10 @@ class CustomerConsumerClient @JvmOverloads constructor(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [CustomerConsumerClient] warning in this case.
      */
-    fun getCustomersForContainer(mRID: String): GrpcResult<MultiObjectResult> = getCustomersForContainer(setOf(mRID))
+    fun getCustomersForContainer(mRID: String): GrpcResult<MultiObjectResult> = getCustomersForContainers(setOf(mRID))
 
     /**
-     * Get the [Customer]s in the [EquipmentContainer] represented by [mRID].
+     * Get the [Customer]s in the [EquipmentContainer]s represented by their [mRIDs].
      *
      * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch [Customer]s for.
      * @return a [GrpcResult] with a result of one of the following:
@@ -91,7 +91,7 @@ class CustomerConsumerClient @JvmOverloads constructor(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [CustomerConsumerClient] warning in this case.
      */
-    fun getCustomersForContainer(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
+    fun getCustomersForContainers(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
         processCustomersForContainers(mRIDs)
     }
 

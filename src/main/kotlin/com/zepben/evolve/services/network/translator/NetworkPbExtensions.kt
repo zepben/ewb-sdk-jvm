@@ -8,7 +8,6 @@
 package com.zepben.evolve.services.network.translator
 
 import com.zepben.evolve.services.common.translator.mRID
-import com.zepben.evolve.services.common.translator.nameAndMRID
 import com.zepben.protobuf.cim.iec61968.assetinfo.*
 import com.zepben.protobuf.cim.iec61968.assets.*
 import com.zepben.protobuf.cim.iec61968.common.Location
@@ -114,13 +113,6 @@ fun SubGeographicalRegion.mRID(): String = io.mrid
 fun Substation.mRID(): String = ec.mRID()
 fun Terminal.mRID(): String = ad.mRID()
 
-fun AcDcTerminal.nameAndMRID(): String = io.nameAndMRID()
-fun ConnectivityNodeContainer.nameAndMRID(): String = psr.nameAndMRID()
-fun EquipmentContainer.nameAndMRID(): String = cnc.nameAndMRID()
-fun Feeder.nameAndMRID(): String = ec.nameAndMRID()
-fun PowerSystemResource.nameAndMRID(): String = io.nameAndMRID()
-fun Terminal.nameAndMRID(): String = ad.nameAndMRID()
-
 fun ConductingEquipment.assetInfoMRID(): String = eq.assetInfoMRID()
 fun Equipment.assetInfoMRID(): String = psr.assetInfoMRID
 
@@ -198,11 +190,6 @@ fun TapChanger.mRID(): String = psr.mRID()
 fun TapChangerControl.mRID(): String = rc.mRID()
 fun TransformerEnd.mRID(): String = io.mrid
 fun TransformerStarImpedance.mRID(): String = io.mrid
-
-fun EnergyConsumerPhase.nameAndMRID(): String = psr.nameAndMRID()
-fun EnergySourcePhase.nameAndMRID(): String = psr.nameAndMRID()
-fun PowerTransformerEnd.nameAndMRID(): String = te.nameAndMRID()
-fun TransformerEnd.nameAndMRID(): String = io.nameAndMRID()
 
 fun Conductor.assetInfoMRID(): String = ce.assetInfoMRID()
 fun PowerTransformer.assetInfoMRID(): String = ce.assetInfoMRID()

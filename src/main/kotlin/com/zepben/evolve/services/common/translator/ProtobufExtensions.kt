@@ -19,9 +19,6 @@ fun OrganisationRole.mRID(): String = io.mrid
 fun Document.mRID(): String = io.mrid
 fun Organisation.mRID(): String = io.mrid
 
-fun IdentifiedObject.nameAndMRID(): String = "$mrid${if (name.isNotBlank()) " [$name]" else ""}"
-fun Document.nameAndMRID(): String = io.nameAndMRID()
-
 fun Timestamp.toInstant(): Instant? = if (seconds == 0L && nanos == 0) null else Instant.ofEpochSecond(seconds, nanos.toLong())
 fun Instant?.toTimestamp(): Timestamp? {
     return this?.let {

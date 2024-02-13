@@ -24,8 +24,7 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
     private var _positionPoints: MutableList<PositionPoint>? = null
 
     /**
-     * TODO find out what Location.CoordinateSystem refers to
-     * Sequence of position points describing this location, expressed in coordinate system [Location.CoordinateSystem].
+     * Sequence of [PositionPoint]s describing this location.
      * The returned collection is read only.
      */
     val points: List<PositionPoint> get() = _positionPoints.asUnmodifiable()
@@ -36,7 +35,7 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
     fun numPoints() = _positionPoints?.size ?: 0
 
     /**
-     * Sequence of position points describing this location, expressed in coordinate system [Location.CoordinateSystem].
+     * Get a [PositionPoint] of this [Location] by its sequence number.
      *
      * @param sequenceNumber the sequence number of the required [PositionPoint]
      * @return The [PositionPoint] with the specified [sequenceNumber] if it exists, otherwise null

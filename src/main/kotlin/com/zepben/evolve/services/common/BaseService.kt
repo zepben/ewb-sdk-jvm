@@ -210,7 +210,7 @@ abstract class BaseService(
      * that is provided.
      *
      * If the service does support the [identifiedObject], it will be added as if you are calling the add function
-     * directly on the instance where the corresponding add function is defined for this type of identified object.
+     * directly on the instance where the corresponding "add" function is defined for this type of identified object.
      *
      * @throws [UnsupportedIdentifiedObjectException] if the service does not support the [identifiedObject].
      * @return the return value of the underlying add function.
@@ -373,7 +373,7 @@ abstract class BaseService(
     /**
      * Check if there are [UnresolvedReference]s in the service
      *
-     * @param mRID, The mRID to check for [UnresolvedReference]s. If null, will check if any unresolved references exist in the service.
+     * @param mRID The mRID to check for [UnresolvedReference]s. If null, will check if any unresolved references exist in the service.
      *
      * @return true if at least one reference exists.
      */

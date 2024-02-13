@@ -11,7 +11,6 @@ import com.google.protobuf.Timestamp
 import com.zepben.protobuf.cim.iec61968.common.Document
 import com.zepben.protobuf.cim.iec61968.common.Organisation
 import com.zepben.protobuf.cim.iec61968.common.OrganisationRole
-import com.zepben.protobuf.cim.iec61970.base.core.IdentifiedObject
 import java.time.Instant
 
 

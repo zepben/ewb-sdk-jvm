@@ -36,7 +36,7 @@ object ChangeSet49Validator : ChangeSetValidator {
 
     override fun populateStatements(): List<String> = listOf(
         "INSERT INTO reclose_delays (relay_info_mrid, reclose_delay, sequence_number) VALUES ('id5', 1.1, 2)",
-        "INSERT INTO relay_info (mrid, name, description, num_diagram_objects, curve_setting) VALUES ('id5', 'name', 'desc', 1, 'curve')",
+        "INSERT INTO relay_info (mrid, name, description, num_diagram_objects, curve_setting, reclose_fast) VALUES ('id5', 'name', 'desc', 1, 'curve', true)",
         "INSERT INTO current_relays (mrid, name, description, num_diagram_objects, location_mrid, num_controls, model, reclosing, relay_delay_time, " +
             "protection_kind, directable, power_direction, relay_info_mrid, current_limit_1, inverse_time_flag, time_delay_1) VALUES ('id6', 'name', 'desc', " +
             "1, 'loc', 2, 'model', true, 3.3, 'ZL', true, 'BOTH', 'id5', 4.4, true, 5.5)",
@@ -128,6 +128,7 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getString("description"), equalTo("desc"))
                 assertThat(rs.getInt("num_diagram_objects"), equalTo(1))
                 assertThat(rs.getString("curve_setting"), equalTo("curve"))
+                assertThat(rs.getNullableBoolean("reclose_fast"), nullValue())
             },
             { rs ->
                 assertThat(rs.getString("mrid"), equalTo("id5"))
@@ -135,6 +136,7 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getString("description"), equalTo("desc"))
                 assertThat(rs.getInt("num_diagram_objects"), equalTo(1))
                 assertThat(rs.getString("curve_setting"), equalTo("curve"))
+                assertThat(rs.getNullableBoolean("reclose_fast"), equalTo(true))
             }
         )
         validateRows(statement, "SELECT * FROM current_relays",

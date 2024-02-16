@@ -224,7 +224,7 @@ class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkSer
         ObjectDifference(source, target).apply {
             compareAssetInfo()
 
-            compareValues(RelayInfo::curveSetting)
+            compareValues(RelayInfo::curveSetting, RelayInfo::recloseFast)
             compareIndexedValueCollections(RelayInfo::recloseDelays)
         }
 

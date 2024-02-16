@@ -360,6 +360,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         }
 
         insert.setNullableString(table.CURVE_SETTING.queryIndex, relayInfo.curveSetting)
+        insert.setNullableBoolean(table.RECLOSE_FAST.queryIndex, relayInfo.recloseFast)
 
         return saveAssetInfo(table, insert, relayInfo, "relay info")
     }

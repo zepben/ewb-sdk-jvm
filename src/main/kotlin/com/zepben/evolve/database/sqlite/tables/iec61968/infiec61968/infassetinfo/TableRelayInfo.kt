@@ -16,6 +16,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetInfo
 class TableRelayInfo : TableAssetInfo() {
 
     val CURVE_SETTING = Column(++columnIndex, "curve_setting", "TEXT", NULL)
+    val RECLOSE_FAST = Column(++columnIndex, "reclose_fast", "BOOLEAN", NULL)
 
     override fun name(): String {
         return "relay_info"

@@ -28,11 +28,13 @@ internal class RelayInfoTest {
         val relayInfo = RelayInfo()
 
         assertThat(relayInfo.curveSetting, nullValue())
+        assertThat(relayInfo.recloseFast, nullValue())
         assertThat(relayInfo.recloseDelays, emptyIterable())
 
         relayInfo.fillFields(NetworkService())
 
         assertThat(relayInfo.curveSetting, equalTo("curveSetting"))
+        assertThat(relayInfo.recloseFast, equalTo(true))
         assertThat(relayInfo.recloseDelays, contains(1.0, 2.0, 3.0))
     }
 

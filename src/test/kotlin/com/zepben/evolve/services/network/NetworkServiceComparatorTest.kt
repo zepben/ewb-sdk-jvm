@@ -236,6 +236,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareAssetInfo { RelayInfo(it) }
 
         comparatorValidator.validateProperty(RelayInfo::curveSetting, { RelayInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(RelayInfo::recloseFast, { RelayInfo(it) }, { false }, { true })
         comparatorValidator.validateIndexedCollection(
             RelayInfo::recloseDelays,
             RelayInfo::addDelay,

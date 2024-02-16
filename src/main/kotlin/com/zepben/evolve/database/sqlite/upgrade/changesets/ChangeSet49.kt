@@ -203,6 +203,7 @@ private val sql = listOf(
     "CREATE INDEX reclose_delays_relay_info_mrid ON reclose_delays (relay_info_mrid);",
 
     "ALTER TABLE current_relay_info RENAME TO relay_info;",
+    "ALTER TABLE relay_info ADD reclose_fast BOOLEAN NULL;",
     "DROP INDEX IF EXISTS current_relay_info_mrid;",
     "DROP INDEX IF EXISTS current_relay_info_name;",
     "CREATE UNIQUE INDEX relay_info_mrid ON relay_info (mrid);",

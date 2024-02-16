@@ -381,6 +381,7 @@ fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb,
 fun toCim(pb: PBRelayInfo, networkService: NetworkService): RelayInfo =
     RelayInfo(pb.mRID()).apply {
         curveSetting = pb.curveSetting.takeIf { it.isNotBlank() }
+        recloseFast = pb.recloseFastSet.takeUnless { pb.hasRecloseFastNull() }
         pb.recloseDelaysList.forEach {
             addDelay(it,)
         }

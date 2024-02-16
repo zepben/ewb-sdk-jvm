@@ -274,6 +274,7 @@ fun RelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true
     (this as AssetInfo).fillFields(service, includeRuntime)
 
     curveSetting = "curveSetting"
+    recloseFast = true
     addDelays(1.0, 2.0, 3.0)
 
     return this

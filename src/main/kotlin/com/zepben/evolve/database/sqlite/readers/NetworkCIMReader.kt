@@ -327,6 +327,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
     fun load(table: TableRelayInfo, resultSet: ResultSet, setLastMRID: (String) -> String): Boolean {
         val relayInfo = RelayInfo(setLastMRID(resultSet.getString(table.MRID.queryIndex))).apply {
             curveSetting = resultSet.getNullableString(table.CURVE_SETTING.queryIndex)
+            recloseFast = resultSet.getNullableBoolean(table.RECLOSE_FAST.queryIndex)
         }
 
         return loadAssetInfo(relayInfo, table, resultSet) && networkService.addOrThrow(relayInfo)

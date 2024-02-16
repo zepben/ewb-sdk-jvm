@@ -392,6 +392,7 @@ fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()
 fun toPb(cim: RelayInfo, pb: PBRelayInfo.Builder): PBRelayInfo.Builder =
     pb.apply {
         cim.curveSetting?.let { curveSetting = it } ?: clearCurveSetting()
+        cim.recloseFast?.let { recloseFastSet = it } ?: run { recloseFastNull = NullValue.NULL_VALUE }
         cim.recloseDelays.forEach { addRecloseDelays(it) }
         toPb(cim, aiBuilder)
     }

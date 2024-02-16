@@ -17,10 +17,13 @@ import java.util.function.BiConsumer
  * Relay Datasheet Information.
  *
  * @property curveSetting The type of curve used for the Relay.
+ * @property recloseFast true if recloseDelays are associated with a fast Curve, false otherwise.
  */
 class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
 
     var curveSetting: String? = null
+    var recloseFast: Boolean? = null
+
     private var _recloseDelays: MutableList<Double>? = null
 
     /**

@@ -1149,6 +1149,13 @@ fun PowerTransformer.fillFields(service: NetworkService, includeRuntime: Boolean
     function = TransformerFunctionKind.voltageRegulator
     assetInfo = PowerTransformerInfo().also { service.add(it) }
 
+    for (i in 0..1) {
+        addEnd(PowerTransformerEnd().also {
+            it.powerTransformer = this
+            service.add(it)
+        })
+    }
+
     return this
 }
 

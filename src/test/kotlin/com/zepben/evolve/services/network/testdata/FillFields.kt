@@ -751,7 +751,7 @@ fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: 
 
     for (i in 0..1) {
         addTimeLimit(i.toDouble())
-        addThreshold(RelaySetting(UnitSymbol.A, i.toDouble(), "setting $i"))
+        addThreshold(RelaySetting(UnitSymbol.entries[i], i.toDouble(), "setting $i"))
         addProtectedSwitch(Breaker().also {
             it.addRelayFunction(this)
             service.add(it)

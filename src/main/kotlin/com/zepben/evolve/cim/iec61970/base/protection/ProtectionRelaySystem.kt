@@ -19,6 +19,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * A relay system for controlling ProtectedSwitches.
  *
  * @property protectionKind The kind of protection being provided by this protection equipment.
+ * @property schemes The schemes implemented by this ProtectionRelaySystem.
  */
 class ProtectionRelaySystem @JvmOverloads constructor(mRID: String = "") : Equipment(mRID) {
 
@@ -26,11 +27,6 @@ class ProtectionRelaySystem @JvmOverloads constructor(mRID: String = "") : Equip
     
     private var _schemes: MutableList<ProtectionRelayScheme>? = null
 
-    /**
-     * The schemes implemented by this [ProtectionRelaySystem].
-     *
-     * @return An unmodifiable [Collection] of the [ProtectionRelayScheme]s implemented by this [ProtectionRelaySystem].
-     */
     val schemes: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
 
     /**

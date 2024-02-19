@@ -23,10 +23,15 @@ import java.util.function.BiConsumer
  * @property model The protection equipment type name (manufacturer information)
  * @property reclosing True if the protection equipment is reclosing or False otherwise.
  * @property relayDelayTime The time delay from detection of abnormal conditions to relay operation in seconds.
- * @property protectionKind The kind of protection being provided by this ProtectionRelayFunction.
+ * @property protectionKind The kind of protection being provided by this [ProtectionRelayFunction].
  * @property directable Whether this [ProtectionRelayFunction] responds to power flow in a given direction.
- * @property powerDirection The flow of power direction used by this ProtectionRelayFunction.
- * @property assetInfo Datasheet information for this CurrentRelay.
+ * @property powerDirection The flow of power direction used by this [ProtectionRelayFunction].
+ * @property assetInfo Datasheet information for this [ProtectionRelayFunction].
+ * @property timeLimits The time limits (in seconds) for this relay function. Order of entries corresponds to the order of entries in thresholds.
+ * @property thresholds The thresholds for this relay function. The order of thresholds corresponds to the order of time limits.
+ * @property protectedSwitches The [ProtectedSwitch]es operated by this [ProtectionRelayFunction].
+ * @property sensors The [Sensor]s for this relay function.
+ * @property schemes The schemes this function operates under.
  */
 abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(mRID) {
 
@@ -45,11 +50,6 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     private var _thresholds: MutableList<RelaySetting>? = null
     private var _schemes: MutableList<ProtectionRelayScheme>? = null
 
-    /**
-     * Returns a read-only [List] of time limits (in seconds) for this [ProtectionRelayFunction].
-     *
-     * @return A read-only [List] of time limits (in seconds) for this [ProtectionRelayFunction].
-     */
     val timeLimits: List<Double> get() = _timeLimits.asUnmodifiable()
 
     /**
@@ -145,11 +145,6 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * All [ProtectedSwitch]es operated by this [ProtectionRelayFunction]. Collection is read-only.
-     *
-     * @return A read-only [Collection] of [ProtectedSwitch]es operated by this [ProtectionRelayFunction].
-     */
     val protectedSwitches: Collection<ProtectedSwitch> get() = _protectedSwitches.asUnmodifiable()
 
     /**
@@ -205,11 +200,6 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * All [Sensor]s for this [ProtectionRelayFunction]. Collection is read-only.
-     *
-     * @return A read-only [Collection] of [Sensor]s for this [ProtectionRelayFunction].
-     */
     val sensors: Collection<Sensor> get() = _sensors.asUnmodifiable()
 
     /**
@@ -265,11 +255,6 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * All threshold [RelaySetting]s for this [ProtectionRelayFunction]. Collection is read-only.
-     *
-     * @return A read-only [List] of threshold [RelaySetting]s for this [ProtectionRelayFunction].
-     */
     val thresholds: List<RelaySetting> get() = _thresholds.asUnmodifiable()
 
     /**
@@ -338,11 +323,6 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * The schemes this function operates under.
-     *
-     * @return An unmodifiable [Collection] of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
-     */
     val schemes: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
 
     /**

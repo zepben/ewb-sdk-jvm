@@ -12,10 +12,28 @@ import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
 
 internal fun changeSet49() = ChangeSet(
     49,
-    sql
+    `Create distance_relays table`,
+    `Create protection_relay_schemes table`,
+    `Create protection_relay_systems table`,
+    `Create voltage_relays table`,
+    `Create grounds table`,
+    `Create ground_disconnectors table`,
+    `Create series_compensators table`,
+    `Create protection_relay_function_thresholds table`,
+    `Create protection_relay_function_time_limits table`,
+    `Create protection_relay_functions_protected_switches`,
+    `Create protection_relay_functions_sensors table`,
+    `Create protection_relay_schemes_protection_relay_functions`,
+    `Rename column current_relay_info_mrid to relay_info_mrid in reclose_delays table`,
+    `Rename table current_relay_info to relay_info and add column reclose_fast`,
+    `Add model and reclosing columns to current_relays and rename column current_relay_info_mrid to relay_info_mrid`,
+    `Add function_mrid column to fuses table`,
+    `Add rated_current column to tap_changer_controls table`,
+    `Drop protection_equipment_protected_switched table`
 )
 
-private val sql = listOf(
+@Suppress("ObjectPropertyName")
+private val `Create distance_relays table` = listOf(
     """CREATE TABLE distance_relays (
         mrid TEXT NOT NULL,
         name TEXT NOT NULL,
@@ -41,8 +59,11 @@ private val sql = listOf(
         operation_phase_angle3 NUMBER NULL
     );""".trimIndent(),
     "CREATE UNIQUE INDEX distance_relays_mrid ON distance_relays (mrid);",
-    "CREATE INDEX distance_relays_name ON distance_relays (name);",
+    "CREATE INDEX distance_relays_name ON distance_relays (name);"
+)
 
+@Suppress("ObjectPropertyName")
+private val `Create protection_relay_schemes table` = listOf(
     """CREATE TABLE protection_relay_schemes (
         mrid TEXT NOT NULL,
         name TEXT NOT NULL,
@@ -51,8 +72,11 @@ private val sql = listOf(
         system_mrid TEXT NULL
     );""".trimIndent(),
     "CREATE UNIQUE INDEX protection_relay_schemes_mrid ON protection_relay_schemes (mrid);",
-    "CREATE INDEX protection_relay_schemes_name ON protection_relay_schemes (name);",
+    "CREATE INDEX protection_relay_schemes_name ON protection_relay_schemes (name);"
+)
 
+@Suppress("ObjectPropertyName")
+private val `Create protection_relay_systems table` = listOf(
     """CREATE TABLE protection_relay_systems (
         mrid TEXT NOT NULL,
         name TEXT NOT NULL,
@@ -66,8 +90,11 @@ private val sql = listOf(
         protection_kind TEXT NOT NULL
     );""".trimIndent(),
     "CREATE UNIQUE INDEX protection_relay_systems_mrid ON protection_relay_systems (mrid);",
-    "CREATE INDEX protection_relay_systems_name ON protection_relay_systems (name);",
+    "CREATE INDEX protection_relay_systems_name ON protection_relay_systems (name);"
+)
 
+@Suppress("ObjectPropertyName")
+private val `Create voltage_relays table` = listOf(
     """CREATE TABLE voltage_relays (
         mrid TEXT NOT NULL,
         name TEXT NOT NULL,
@@ -84,8 +111,11 @@ private val sql = listOf(
         relay_info_mrid TEXT NULL
     );""".trimIndent(),
     "CREATE UNIQUE INDEX voltage_relays_mrid ON voltage_relays (mrid);",
-    "CREATE INDEX voltage_relays_name ON voltage_relays (name);",
+    "CREATE INDEX voltage_relays_name ON voltage_relays (name);"
+)
 
+@Suppress("ObjectPropertyName")
+private val `Create grounds table` = listOf(
     """CREATE TABLE grounds (
         mrid TEXT NOT NULL,
         name TEXT NOT NULL,
@@ -99,8 +129,11 @@ private val sql = listOf(
         base_voltage_mrid TEXT NULL
     );""".trimIndent(),
     "CREATE UNIQUE INDEX grounds_mrid ON grounds (mrid);",
-    "CREATE INDEX grounds_name ON grounds (name);",
+    "CREATE INDEX grounds_name ON grounds (name);"
+)
 
+@Suppress("ObjectPropertyName")
+private val `Create ground_disconnectors table` = listOf(
     """CREATE TABLE ground_disconnectors (
         mrid TEXT NOT NULL,
         name TEXT NOT NULL,
@@ -118,8 +151,11 @@ private val sql = listOf(
         switch_info_mrid TEXT NULL
     );""".trimIndent(),
     "CREATE UNIQUE INDEX ground_disconnectors_mrid ON ground_disconnectors (mrid);",
-    "CREATE INDEX ground_disconnectors_name ON ground_disconnectors (name);",
+    "CREATE INDEX ground_disconnectors_name ON ground_disconnectors (name);"
+)
 
+@Suppress("ObjectPropertyName")
+private val `Create series_compensators table` = listOf(
     """CREATE TABLE series_compensators (
         mrid TEXT NOT NULL,
         name TEXT NOT NULL,
@@ -139,8 +175,11 @@ private val sql = listOf(
         varistor_voltage_threshold INTEGER NULL
     );""".trimIndent(),
     "CREATE UNIQUE INDEX series_compensators_mrid ON series_compensators (mrid);",
-    "CREATE INDEX series_compensators_name ON series_compensators (name);",
-    
+    "CREATE INDEX series_compensators_name ON series_compensators (name);"
+)
+
+@Suppress("ObjectPropertyName")
+private val `Create protection_relay_function_thresholds table` = listOf(
     """CREATE TABLE protection_relay_function_thresholds (
         protection_relay_function_mrid TEXT NOT NULL,
         sequence_number INTEGER NOT NULL,
@@ -151,8 +190,11 @@ private val sql = listOf(
     """CREATE UNIQUE INDEX protection_relay_function_thresholds_protection_relay_function_mrid_sequence_number
         ON protection_relay_function_thresholds (protection_relay_function_mrid, sequence_number);""".trimIndent(),
     """CREATE INDEX protection_relay_function_thresholds_protection_relay_function_mrid
-        ON protection_relay_function_thresholds (protection_relay_function_mrid);""".trimIndent(),
+        ON protection_relay_function_thresholds (protection_relay_function_mrid);""".trimIndent()
+)
 
+@Suppress("ObjectPropertyName")
+private val `Create protection_relay_function_time_limits table` = listOf(
     """CREATE TABLE protection_relay_function_time_limits (
         protection_relay_function_mrid TEXT NOT NULL,
         sequence_number INTEGER NOT NULL,
@@ -161,8 +203,11 @@ private val sql = listOf(
     """CREATE UNIQUE INDEX protection_relay_function_time_limits_protection_relay_function_mrid_sequence_number
         ON protection_relay_function_time_limits (protection_relay_function_mrid, sequence_number);""".trimIndent(),
     """CREATE INDEX protection_relay_function_time_limits_protection_relay_function_mrid
-        ON protection_relay_function_time_limits (protection_relay_function_mrid);""".trimIndent(),
-    
+        ON protection_relay_function_time_limits (protection_relay_function_mrid);""".trimIndent()
+)
+
+@Suppress("ObjectPropertyName")
+private val `Create protection_relay_functions_protected_switches` = listOf(
     """CREATE TABLE protection_relay_functions_protected_switches (
         protection_relay_function_mrid TEXT NOT NULL,
         protected_switch_mrid TEXT NOT NULL
@@ -172,8 +217,12 @@ private val sql = listOf(
     """CREATE INDEX protection_relay_functions_protected_switches_protection_relay_function_mrid
         ON protection_relay_functions_protected_switches (protection_relay_function_mrid);""".trimIndent(),
     """CREATE INDEX protection_relay_functions_protected_switches_protected_switch_mrid
-        ON protection_relay_functions_protected_switches (protected_switch_mrid);""".trimIndent(),
+        ON protection_relay_functions_protected_switches (protected_switch_mrid);""".trimIndent()
 
+)
+
+@Suppress("ObjectPropertyName")
+private val `Create protection_relay_functions_sensors table` = listOf(
     """CREATE TABLE protection_relay_functions_sensors (
         protection_relay_function_mrid TEXT NOT NULL,
         sensor_mrid TEXT NOT NULL
@@ -183,8 +232,11 @@ private val sql = listOf(
     """CREATE INDEX protection_relay_functions_sensors_protection_relay_function_mrid
         ON protection_relay_functions_sensors (protection_relay_function_mrid);""".trimIndent(),
     """CREATE INDEX protection_relay_functions_sensors_sensor_mrid
-        ON protection_relay_functions_sensors (sensor_mrid);""".trimIndent(),
+        ON protection_relay_functions_sensors (sensor_mrid);""".trimIndent()
+)
 
+@Suppress("ObjectPropertyName")
+private val `Create protection_relay_schemes_protection_relay_functions` = listOf(
     """CREATE TABLE protection_relay_schemes_protection_relay_functions (
         protection_relay_scheme_mrid TEXT NOT NULL,
         protection_relay_function_mrid TEXT NOT NULL
@@ -194,26 +246,46 @@ private val sql = listOf(
     """CREATE INDEX protection_relay_schemes_protection_relay_functions_protection_relay_scheme_mrid
         ON protection_relay_schemes_protection_relay_functions (protection_relay_scheme_mrid);""".trimIndent(),
     """CREATE INDEX protection_relay_schemes_protection_relay_functions_protection_relay_function_mrid
-        ON protection_relay_schemes_protection_relay_functions (protection_relay_function_mrid);""".trimIndent(),
+        ON protection_relay_schemes_protection_relay_functions (protection_relay_function_mrid);""".trimIndent()
+)
 
+@Suppress("ObjectPropertyName")
+private val `Rename column current_relay_info_mrid to relay_info_mrid in reclose_delays table` = listOf(
     "ALTER TABLE reclose_delays RENAME COLUMN current_relay_info_mrid TO relay_info_mrid;",
     "DROP INDEX IF EXISTS reclose_delays_current_relay_info_mrid;",
     "DROP INDEX IF EXISTS reclose_delays_current_relay_info_mrid_sequence_number;",
     "CREATE UNIQUE INDEX reclose_delays_relay_info_mrid_sequence_number ON reclose_delays (relay_info_mrid, sequence_number);",
-    "CREATE INDEX reclose_delays_relay_info_mrid ON reclose_delays (relay_info_mrid);",
+    "CREATE INDEX reclose_delays_relay_info_mrid ON reclose_delays (relay_info_mrid);"
+)
 
+@Suppress("ObjectPropertyName")
+private val `Rename table current_relay_info to relay_info and add column reclose_fast` = listOf(
     "ALTER TABLE current_relay_info RENAME TO relay_info;",
     "ALTER TABLE relay_info ADD reclose_fast BOOLEAN NULL;",
     "DROP INDEX IF EXISTS current_relay_info_mrid;",
     "DROP INDEX IF EXISTS current_relay_info_name;",
     "CREATE UNIQUE INDEX relay_info_mrid ON relay_info (mrid);",
-    "CREATE INDEX relay_info_name ON relay_info (name);",
+    "CREATE INDEX relay_info_name ON relay_info (name);"
+)
 
+@Suppress("ObjectPropertyName")
+private val `Add model and reclosing columns to current_relays and rename column current_relay_info_mrid to relay_info_mrid` = listOf(
     "ALTER TABLE current_relays ADD model TEXT NULL;",
     "ALTER TABLE current_relays ADD reclosing BOOLEAN NULL;",
-    "ALTER TABLE current_relays RENAME COLUMN current_relay_info_mrid TO relay_info_mrid;",
-    "ALTER TABLE fuses ADD function_mrid TEXT NULL;",
-    "ALTER TABLE tap_changer_controls ADD rated_current NUMBER NULL;",
+    "ALTER TABLE current_relays RENAME COLUMN current_relay_info_mrid TO relay_info_mrid;"
+)
 
+@Suppress("ObjectPropertyName")
+private val `Add function_mrid column to fuses table` = listOf(
+    "ALTER TABLE fuses ADD function_mrid TEXT NULL;"
+)
+
+@Suppress("ObjectPropertyName")
+private val `Add rated_current column to tap_changer_controls table` = listOf(
+    "ALTER TABLE tap_changer_controls ADD rated_current NUMBER NULL;"
+)
+
+@Suppress("ObjectPropertyName")
+private val `Drop protection_equipment_protected_switched table` = listOf(
     "DROP TABLE protection_equipment_protected_switches;"
 )

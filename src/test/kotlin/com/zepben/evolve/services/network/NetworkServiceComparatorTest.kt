@@ -1151,6 +1151,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareSwitch(createProtectedSwitch)
 
         comparatorValidator.validateProperty(ProtectedSwitch::breakingCapacity, createProtectedSwitch, { 1 }, { 2 })
+        comparatorValidator.validateCollection(
+            ProtectedSwitch::relayFunctions,
+            ProtectedSwitch::addRelayFunction,
+            createProtectedSwitch,
+            { object : ProtectionRelayFunction("prf1") {} },
+            { object : ProtectionRelayFunction("prf2") {} }
+        )
     }
 
     @Test

@@ -17,27 +17,24 @@ import com.zepben.evolve.services.common.extensions.validateReference
 /**
  * This class describes devices that transform a measured quantity into signals that can be presented at displays,
  * used in control or be recorded.
+ *
+ * @property relayFunctions The relay functions influenced by this [Sensor].
  */
 abstract class Sensor(mRID: String = "") : AuxiliaryEquipment(mRID) {
 
     private var _relayFunctions: MutableList<ProtectionRelayFunction>? = null
 
-    /**
-     * All [ProtectionRelayFunction]s operating this [Sensor]. Collection is read-only.
-     *
-     * @return A read-only [Collection] of [ProtectionRelayFunction]s operating this [Sensor].
-     */
     val relayFunctions: Collection<ProtectionRelayFunction> get() = _relayFunctions.asUnmodifiable()
 
     /**
-     * Get the number of [ProtectionRelayFunction]s operating this [Sensor].
+     * Get the number of [ProtectionRelayFunction]s influenced by this [Sensor].
      *
-     * @return The number of [ProtectionRelayFunction]s operating this [Sensor].
+     * @return The number of [ProtectionRelayFunction]s influenced by this [Sensor].
      */
     fun numRelayFunctions(): Int = _relayFunctions?.size ?: 0
 
     /**
-     * Get a [ProtectionRelayFunction] operating this [Sensor] by its mRID.
+     * Get a [ProtectionRelayFunction] influenced by this [Sensor] by its mRID.
      *
      * @param mRID The mRID of the desired [ProtectionRelayFunction]
      * @return The [ProtectionRelayFunction] with the specified [mRID] if it exists, otherwise null
@@ -45,7 +42,7 @@ abstract class Sensor(mRID: String = "") : AuxiliaryEquipment(mRID) {
     fun getRelayFunction(mRID: String): ProtectionRelayFunction? = _relayFunctions?.getByMRID(mRID)
 
     /**
-     * Associate this [Sensor] with a [ProtectionRelayFunction] operating it.
+     * Associate this [Sensor] with a [ProtectionRelayFunction] it influences.
      *
      * @param protectionRelayFunction The [ProtectionRelayFunction] to associate with this [Sensor].
      * @return A reference to this [Sensor] for fluent use.

@@ -18,6 +18,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * A scheme that a group of relay functions implement. For example, typically schemes are primary and secondary, or main and failsafe.
  *
  * @property system The system this scheme belongs to.
+ * @property functions The functions operated as part of this protection scheme.
  */
 class ProtectionRelayScheme @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
 
@@ -25,11 +26,6 @@ class ProtectionRelayScheme @JvmOverloads constructor(mRID: String = "") : Ident
 
     private var _functions: MutableList<ProtectionRelayFunction>? = null
 
-    /**
-     * The functions operated as part of this protection scheme.
-     *
-     * @return An unmodifiable [Collection] of [ProtectionRelayFunction]s operated as part of this [ProtectionRelayScheme].
-     */
     val functions: Collection<ProtectionRelayFunction> get() = _functions.asUnmodifiable()
 
     /**

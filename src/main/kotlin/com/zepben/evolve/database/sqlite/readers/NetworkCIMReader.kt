@@ -1522,6 +1522,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         val protectedSwitch = networkService.getOrThrow<ProtectedSwitch>(protectedSwitchMRID, typeNameAndMRID)
 
         protectionRelayFunction.addProtectedSwitch(protectedSwitch)
+        protectedSwitch.addRelayFunction(protectionRelayFunction)
 
         return true
     }
@@ -1538,6 +1539,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         val sensor = networkService.getOrThrow<Sensor>(sensorMRID, typeNameAndMRID)
 
         protectionRelayFunction.addSensor(sensor)
+        sensor.addRelayFunction(protectionRelayFunction)
 
         return true
     }
@@ -1554,6 +1556,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         val protectionRelayFunction = networkService.getOrThrow<ProtectionRelayFunction>(protectionRelayFunctionMRID, typeNameAndMRID)
 
         protectionRelayScheme.addFunction(protectionRelayFunction)
+        protectionRelayFunction.addScheme(protectionRelayScheme)
 
         return true
     }

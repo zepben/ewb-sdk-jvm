@@ -104,7 +104,7 @@ NOTE: This library is not yet stable, and breaking changes should be expected un
     * ProtectionEquipment
         * directable
         * powerDirection
-    * RelayInfo.recloseDelays
+    * CurrentRelayInfo.recloseDelays
     * DER register fields on PowerElectronicsConnection
 * Added new enums
     * PowerDirectionKind

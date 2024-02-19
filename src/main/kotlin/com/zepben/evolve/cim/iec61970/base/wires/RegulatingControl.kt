@@ -71,9 +71,6 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
 
     private var _regulatingCondEqs: MutableList<RegulatingCondEq>? = null
 
-    /**
-     * The regulating conducting equipments controlled by this regulating control. The returned collection is read only.
-     */
     val regulatingCondEqs: List<RegulatingCondEq> get() = _regulatingCondEqs.asUnmodifiable()
 
     /**

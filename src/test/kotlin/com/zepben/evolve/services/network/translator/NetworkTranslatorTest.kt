@@ -25,6 +25,7 @@ import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
@@ -72,7 +73,8 @@ internal class NetworkTranslatorTest {
         ProtectionRelayFunction::class.java to { CurrentRelay(it) },
         ProtectedSwitch::class.java to { Breaker(it) },
         RegulatingControl::class.java to { TapChangerControl(it) },
-        RegulatingCondEq::class.java to { PowerElectronicsConnection(it) }
+        RegulatingCondEq::class.java to { PowerElectronicsConnection(it) },
+        Sensor::class.java to { CurrentTransformer(it) }
     )
 
     @Test

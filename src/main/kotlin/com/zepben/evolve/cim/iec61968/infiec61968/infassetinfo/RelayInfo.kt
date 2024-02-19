@@ -18,6 +18,7 @@ import java.util.function.BiConsumer
  *
  * @property curveSetting The type of curve used for the Relay.
  * @property recloseFast true if recloseDelays are associated with a fast Curve, false otherwise.
+ * @property recloseDelays The reclose delays for this curve and relay type. The index of the list is the reclose step, and the value is the overall delay time.
  */
 class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
 
@@ -26,9 +27,6 @@ class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
 
     private var _recloseDelays: MutableList<Double>? = null
 
-    /**
-     * The reclose delays for this curve and relay type. The index of the list is the reclose step, and the value is the overall delay time.
-     */
     val recloseDelays: List<Double> get() = _recloseDelays.asUnmodifiable()
 
     /**
@@ -92,6 +90,11 @@ class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
         return this
     }
 
+    /**
+     * Remove a delay by its value.
+     * @param delay The value of the delay to remove.
+     * @return true if a delay was removed, false otherwise.
+     */
     fun removeDelay(delay: Double?): Boolean {
         val ret = _recloseDelays?.remove(delay) == true
         if (_recloseDelays.isNullOrEmpty()) _recloseDelays = null

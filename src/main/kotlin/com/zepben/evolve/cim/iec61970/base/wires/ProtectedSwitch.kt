@@ -14,20 +14,16 @@ import com.zepben.evolve.services.common.extensions.safeRemove
 import com.zepben.evolve.services.common.extensions.validateReference
 
 /**
- * A ProtectedSwitch is a switching device that can be operated by ProtectionRelayFunction.
+ * A ProtectedSwitch is a switching device that can be operated by [ProtectionRelayFunction]s.
  *
  * @property breakingCapacity The maximum fault current in amps a breaking device can break safely under prescribed conditions of use.
+ * @property relayFunctions The [ProtectionRelayFunction]s operating this [ProtectedSwitch].
  */
 abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
 
     var breakingCapacity: Int? = null
     private var _relayFunctions: MutableList<ProtectionRelayFunction>? = null
 
-    /**
-     * All [ProtectionRelayFunction]s operating this [ProtectedSwitch]. Collection is read-only.
-     *
-     * @return A read-only [Collection] of [ProtectionRelayFunction]s operating this [ProtectedSwitch].
-     */
     val relayFunctions: Collection<ProtectionRelayFunction> get() = _relayFunctions.asUnmodifiable()
 
     /**

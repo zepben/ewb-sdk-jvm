@@ -688,6 +688,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { 1.1 },
             { 2.2 }
         )
+        comparatorValidator.validateIndexedCollection(
+            ProtectionRelayFunction::thresholds,
+            ProtectionRelayFunction::addThreshold,
+            createProtectionRelayFunction,
+            { RelaySetting(UnitSymbol.V, 1.1) },
+            { RelaySetting(UnitSymbol.V, 2.2) }
+        )
         comparatorValidator.validateCollection(
             ProtectionRelayFunction::protectedSwitches,
             ProtectionRelayFunction::addProtectedSwitch,
@@ -701,13 +708,6 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             createProtectionRelayFunction,
             { CurrentTransformer("ct1") },
             { CurrentTransformer("ct2") }
-        )
-        comparatorValidator.validateIndexedCollection(
-            ProtectionRelayFunction::thresholds,
-            ProtectionRelayFunction::addThreshold,
-            createProtectionRelayFunction,
-            { RelaySetting(UnitSymbol.V, 1.1) },
-            { RelaySetting(UnitSymbol.V, 2.2) }
         )
         comparatorValidator.validateCollection(
             ProtectionRelayFunction::schemes,

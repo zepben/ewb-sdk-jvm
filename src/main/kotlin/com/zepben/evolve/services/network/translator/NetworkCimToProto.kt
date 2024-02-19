@@ -731,9 +731,9 @@ fun toPb(cim: ProtectionRelayFunction, pb: PBProtectionRelayFunction.Builder): P
         cim.directable?.also { directableSet = it } ?: run { directableNull = NullValue.NULL_VALUE }
         powerDirection = PowerDirectionKind.valueOf(cim.powerDirection.name)
         cim.timeLimits.forEach { addTimeLimits(it) }
+        cim.thresholds.forEach { addThresholds(toPb(it)) }
         cim.protectedSwitches.forEach { addProtectedSwitchMRIDs(it.mRID) }
         cim.sensors.forEach { addSensorMRIDs(it.mRID) }
-        cim.thresholds.forEach { addThresholds(toPb(it)) }
         cim.schemes.forEach { addSchemeMRIDs(it.mRID) }
         toPb(cim, psrBuilder)
     }

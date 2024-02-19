@@ -69,6 +69,23 @@ internal class ProtectionRelayFunctionTest {
     }
 
     @Test
+    internal fun thresholds() {
+        var thresholdNumber = 0.0
+        PrivateCollectionValidator.validate(
+            { object : ProtectionRelayFunction() {} },
+            { RelaySetting(UnitSymbol.W, thresholdNumber++) },
+            ProtectionRelayFunction::numThresholds,
+            ProtectionRelayFunction::getThreshold,
+            ProtectionRelayFunction::forEachThreshold,
+            ProtectionRelayFunction::addThreshold,
+            ProtectionRelayFunction::addThreshold,
+            ProtectionRelayFunction::removeThreshold,
+            null,
+            ProtectionRelayFunction::clearThresholds
+        )
+    }
+
+    @Test
     internal fun protectedSwitches() {
         PrivateCollectionValidator.validate(
             { object : ProtectionRelayFunction() {} },
@@ -93,23 +110,6 @@ internal class ProtectionRelayFunctionTest {
             ProtectionRelayFunction::addSensor,
             ProtectionRelayFunction::removeSensor,
             ProtectionRelayFunction::clearSensors
-        )
-    }
-
-    @Test
-    internal fun thresholds() {
-        var thresholdNumber = 0.0
-        PrivateCollectionValidator.validate(
-            { object : ProtectionRelayFunction() {} },
-            { RelaySetting(UnitSymbol.W, thresholdNumber++) },
-            ProtectionRelayFunction::numThresholds,
-            ProtectionRelayFunction::getThreshold,
-            ProtectionRelayFunction::forEachThreshold,
-            ProtectionRelayFunction::addThreshold,
-            ProtectionRelayFunction::addThreshold,
-            ProtectionRelayFunction::removeThreshold,
-            null,
-            ProtectionRelayFunction::clearThresholds
         )
     }
 

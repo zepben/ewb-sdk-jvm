@@ -145,6 +145,74 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
+    val thresholds: List<RelaySetting> get() = _thresholds.asUnmodifiable()
+
+    /**
+     * Get the number of threshold [RelaySetting]s for this [ProtectionRelayFunction].
+     *
+     * @return The number of threshold [RelaySetting]s for this [ProtectionRelayFunction].
+     */
+    fun numThresholds(): Int = _thresholds?.size ?: 0
+
+    /**
+     * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its index. Thresholds are 0-indexed. Returns null for out-of-bound indices.
+     *
+     * @param sequenceNumber The sequence number of the desired threshold [RelaySetting]
+     * @return The threshold [RelaySetting] with the specified [sequenceNumber] if it exists, otherwise null
+     */
+    fun getThreshold(sequenceNumber: Int): RelaySetting? = _thresholds?.getOrNull(sequenceNumber)
+
+    /**
+     * Java interop forEachIndexed. Perform the specified action against each threshold [RelaySetting].
+     *
+     * @param action The action to perform on each threshold [RelaySetting]
+     */
+    fun forEachThreshold(action: BiConsumer<Int, RelaySetting>) {
+        _thresholds?.forEachIndexed(action::accept)
+    }
+
+    /**
+     * Add a threshold [RelaySetting] to this [ProtectionRelayFunction]'s list of thresholds.
+     *
+     * @param threshold The threshold [RelaySetting] to add to this [ProtectionRelayFunction].
+     * @return A reference to this [ProtectionRelayFunction] for fluent use.
+     */
+    @JvmOverloads
+    fun addThreshold(threshold: RelaySetting, sequenceNumber: Int = numThresholds()): ProtectionRelayFunction {
+        require(sequenceNumber in 0..(numThresholds())) {
+            "Unable to add RelaySetting to ${typeNameAndMRID()}. " +
+                "Sequence number $sequenceNumber is invalid. Expected a value between 0 and ${numThresholds()}. " +
+                "Make sure you are adding the items in order and there are no gaps in the numbering."
+        }
+
+        _thresholds = _thresholds ?: mutableListOf()
+        _thresholds!!.add(sequenceNumber, threshold)
+
+        return this
+    }
+
+    /**
+     * Removes a threshold [RelaySetting] from this [ProtectionRelayFunction].
+     *
+     * @param threshold The threshold [RelaySetting] to disassociate from this [ProtectionRelayFunction].
+     * @return true if the threshold [RelaySetting] was disassociated.
+     */
+    fun removeThreshold(threshold: RelaySetting?): Boolean {
+        val ret = _thresholds?.remove(threshold) == true
+        if (_thresholds.isNullOrEmpty()) _thresholds = null
+        return ret
+    }
+
+    /**
+     * Removes all threshold [RelaySetting]s from this [ProtectionRelayFunction].
+     *
+     * @return A reference to this [ProtectionRelayFunction] for fluent use.
+     */
+    fun clearThresholds(): ProtectionRelayFunction {
+        _thresholds = null
+        return this
+    }
+
     val protectedSwitches: Collection<ProtectedSwitch> get() = _protectedSwitches.asUnmodifiable()
 
     /**
@@ -252,74 +320,6 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      */
     fun clearSensors(): ProtectionRelayFunction {
         _sensors = null
-        return this
-    }
-
-    val thresholds: List<RelaySetting> get() = _thresholds.asUnmodifiable()
-
-    /**
-     * Get the number of threshold [RelaySetting]s for this [ProtectionRelayFunction].
-     *
-     * @return The number of threshold [RelaySetting]s for this [ProtectionRelayFunction].
-     */
-    fun numThresholds(): Int = _thresholds?.size ?: 0
-
-    /**
-     * Get a threshold [RelaySetting] for this [ProtectionRelayFunction] by its index. Thresholds are 0-indexed. Returns null for out-of-bound indices.
-     *
-     * @param sequenceNumber The sequence number of the desired threshold [RelaySetting]
-     * @return The threshold [RelaySetting] with the specified [sequenceNumber] if it exists, otherwise null
-     */
-    fun getThreshold(sequenceNumber: Int): RelaySetting? = _thresholds?.getOrNull(sequenceNumber)
-
-    /**
-     * Java interop forEachIndexed. Perform the specified action against each threshold [RelaySetting].
-     *
-     * @param action The action to perform on each threshold [RelaySetting]
-     */
-    fun forEachThreshold(action: BiConsumer<Int, RelaySetting>) {
-        _thresholds?.forEachIndexed(action::accept)
-    }
-
-    /**
-     * Add a threshold [RelaySetting] to this [ProtectionRelayFunction]'s list of thresholds.
-     *
-     * @param threshold The threshold [RelaySetting] to add to this [ProtectionRelayFunction].
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
-    @JvmOverloads
-    fun addThreshold(threshold: RelaySetting, sequenceNumber: Int = numThresholds()): ProtectionRelayFunction {
-        require(sequenceNumber in 0..(numThresholds())) {
-            "Unable to add RelaySetting to ${typeNameAndMRID()}. " +
-                "Sequence number $sequenceNumber is invalid. Expected a value between 0 and ${numThresholds()}. " +
-                "Make sure you are adding the items in order and there are no gaps in the numbering."
-        }
-
-        _thresholds = _thresholds ?: mutableListOf()
-        _thresholds!!.add(sequenceNumber, threshold)
-
-        return this
-    }
-
-    /**
-     * Removes a threshold [RelaySetting] from this [ProtectionRelayFunction].
-     *
-     * @param threshold The threshold [RelaySetting] to disassociate from this [ProtectionRelayFunction].
-     * @return true if the threshold [RelaySetting] was disassociated.
-     */
-    fun removeThreshold(threshold: RelaySetting?): Boolean {
-        val ret = _thresholds?.remove(threshold) == true
-        if (_thresholds.isNullOrEmpty()) _thresholds = null
-        return ret
-    }
-
-    /**
-     * Removes all threshold [RelaySetting]s from this [ProtectionRelayFunction].
-     *
-     * @return A reference to this [ProtectionRelayFunction] for fluent use.
-     */
-    fun clearThresholds(): ProtectionRelayFunction {
-        _thresholds = null
         return this
     }
 

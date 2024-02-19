@@ -8,12 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.upgrade.changesets
 
-import com.zepben.evolve.database.getNullableBoolean
-import com.zepben.evolve.database.getNullableDouble
-import com.zepben.evolve.database.getNullableString
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
 import java.sql.Statement
 
 object ChangeSet49Validator : ChangeSetValidator {
@@ -128,7 +124,7 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getString("description"), equalTo("desc"))
                 assertThat(rs.getInt("num_diagram_objects"), equalTo(1))
                 assertThat(rs.getString("curve_setting"), equalTo("curve"))
-                assertThat(rs.getNullableBoolean("reclose_fast"), nullValue())
+                assertThat("reclose_fast should default to NULL", rs.apply { getBoolean("reclose_fast") }.wasNull())
             },
             { rs ->
                 assertThat(rs.getString("mrid"), equalTo("id5"))
@@ -136,7 +132,7 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getString("description"), equalTo("desc"))
                 assertThat(rs.getInt("num_diagram_objects"), equalTo(1))
                 assertThat(rs.getString("curve_setting"), equalTo("curve"))
-                assertThat(rs.getNullableBoolean("reclose_fast"), equalTo(true))
+                assertThat(rs.getBoolean("reclose_fast"), equalTo(true))
             }
         )
         validateRows(statement, "SELECT * FROM current_relays",
@@ -147,8 +143,8 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getInt("num_diagram_objects"), equalTo(1))
                 assertThat(rs.getString("location_mrid"), equalTo("loc"))
                 assertThat(rs.getInt("num_controls"), equalTo(2))
-                assertThat(rs.getNullableString("model"), nullValue())
-                assertThat(rs.getNullableBoolean("reclosing"), nullValue())
+                assertThat("model should default to NULL", rs.apply { getString("model") }.wasNull())
+                assertThat("reclosing should default to NULL", rs.apply { getBoolean("reclosing") }.wasNull())
                 assertThat(rs.getDouble("relay_delay_time"), equalTo(3.3))
                 assertThat(rs.getString("protection_kind"), equalTo("JG"))
                 assertThat(rs.getBoolean("directable"), equalTo(true))
@@ -259,7 +255,7 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getInt("open"), equalTo(4))
                 assertThat(rs.getInt("rated_current"), equalTo(5))
                 assertThat(rs.getString("switch_info_mrid"), equalTo("siid"))
-                assertThat(rs.getNullableString("function_mrid"), nullValue())
+                assertThat("function_mrid should default to NULL", rs.apply { getString("function_mrid") }.wasNull())
             },
             { rs ->
                 assertThat(rs.getString("mrid"), equalTo("id11"))
@@ -347,7 +343,7 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getBoolean("enabled"), equalTo(true))
                 assertThat(rs.getDouble("max_allowed_target_value"), equalTo(5.5))
                 assertThat(rs.getDouble("min_allowed_target_value"), equalTo(6.6))
-                assertThat(rs.getNullableDouble("rated_current"), nullValue())
+                assertThat("rated_current should default to NULL", rs.apply { getDouble("rated_current") }.wasNull())
                 assertThat(rs.getString("terminal_mrid"), equalTo("tid"))
                 assertThat(rs.getInt("limit_voltage"), equalTo(7))
                 assertThat(rs.getBoolean("line_drop_compensation"), equalTo(true))

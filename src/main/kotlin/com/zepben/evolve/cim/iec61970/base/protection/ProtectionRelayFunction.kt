@@ -268,11 +268,6 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * All [Sensor]s for this [ProtectionRelayFunction]. Collection is read-only.
-     *
-     * @return A read-only [Collection] of [Sensor]s for this [ProtectionRelayFunction].
-     */
     val sensors: Collection<Sensor> get() = _sensors.asUnmodifiable()
 
     /**
@@ -328,11 +323,6 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * All threshold [RelaySetting]s for this [ProtectionRelayFunction]. Collection is read-only.
-     *
-     * @return A read-only [List] of threshold [RelaySetting]s for this [ProtectionRelayFunction].
-     */
     val thresholds: List<RelaySetting> get() = _thresholds.asUnmodifiable()
 
     /**
@@ -401,11 +391,6 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
         return this
     }
 
-    /**
-     * The schemes this function operates under.
-     *
-     * @return An unmodifiable [Collection] of [ProtectionRelayScheme]s this [ProtectionRelayFunction] operates under.
-     */
     val schemes: Collection<ProtectionRelayScheme> get() = _schemes.asUnmodifiable()
 
     /**

@@ -749,6 +749,23 @@ fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: 
     directable = true
     powerDirection = PowerDirectionKind.FORWARD
 
+    for (i in 0..1) {
+        addTimeLimit(i.toDouble())
+        addThreshold(RelaySetting(UnitSymbol.A, i.toDouble(), "setting $i"))
+        addProtectedSwitch(Breaker().also {
+            it.addRelayFunction(this)
+            service.add(it)
+        })
+        addSensor(CurrentTransformer().also {
+            it.addRelayFunction(this)
+            service.add(it)
+        })
+        addScheme(ProtectionRelayScheme().also {
+            it.addFunction(this)
+            service.add(it)
+        })
+    }
+
     return this
 }
 
@@ -760,6 +777,13 @@ fun ProtectionRelayScheme.fillFields(service: NetworkService, includeRuntime: Bo
         service.add(it)
     }
 
+    for (i in 0..1) {
+        addFunction(CurrentRelay().also {
+            it.addScheme(this)
+            service.add(it)
+        })
+    }
+
     return this
 }
 
@@ -767,6 +791,13 @@ fun ProtectionRelaySystem.fillFields(service: NetworkService, includeRuntime: Bo
     (this as Equipment).fillFieldsCommon(service, includeRuntime)
 
     protectionKind = ProtectionKind.DISTANCE
+
+    for (i in 0..1) {
+        addScheme(ProtectionRelayScheme().also {
+            it.system = this
+            service.add(it)
+        })
+    }
 
     return this
 }

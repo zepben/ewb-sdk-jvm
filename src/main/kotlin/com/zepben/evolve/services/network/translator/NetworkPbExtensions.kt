@@ -143,7 +143,6 @@ fun ProtectionRelayFunction.mRID(): String = psr.mRID()
 fun ProtectionRelayScheme.mRID(): String = io.mrid
 fun ProtectionRelaySystem.mRID(): String = eq.mRID()
 fun VoltageRelay.mRID(): String = prf.mRID()
-fun CurrentRelay.assetInfoMRID(): String = prf.assetInfoMRID()
 fun ProtectionRelayFunction.assetInfoMRID(): String = psr.assetInfoMRID
 
 /************ IEC61970 BASE SCADA ************/

@@ -13,6 +13,7 @@ module.exports = {
     "sdk-phases",
     "sdk-tracing",
     "sdk-persistence",
-    "sdk-consumer"
+    "sdk-consumer",
+    "sdk-protection"
   ]
 };

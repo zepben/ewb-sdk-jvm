@@ -61,6 +61,7 @@ internal class DiagramObjectTest {
             DiagramObject::addPoint,
             DiagramObject::addPoint,
             DiagramObject::removePoint,
+            null,
             DiagramObject::clearPoints
         )
     }

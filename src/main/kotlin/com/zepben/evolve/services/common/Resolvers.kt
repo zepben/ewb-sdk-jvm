@@ -19,22 +19,24 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -50,7 +52,6 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
  * The naming pattern for the resolver matches the property name of the reference. E.g. to get the resolver for
  * base voltage for conducting equipment: `Resolvers.baseVoltage(conductingEquip)`.
  */
-@Suppress("UNUSED_PARAMETER")
 object Resolvers {
 
     @JvmStatic
@@ -80,10 +81,6 @@ object Resolvers {
     @JvmStatic
     fun assetInfo(conductor: Conductor): BoundReferenceResolver<Conductor, WireInfo> =
         BoundReferenceResolver(conductor, ConductorToWireInfoResolver, null)
-
-    @JvmStatic
-    fun assetInfo(currentRelay: CurrentRelay): BoundReferenceResolver<CurrentRelay, CurrentRelayInfo> =
-        BoundReferenceResolver(currentRelay, CurrentRelayToCurrentRelayInfoResolver, null)
 
     @JvmStatic
     fun assetInfo(currentTransformer: CurrentTransformer): BoundReferenceResolver<CurrentTransformer, CurrentTransformerInfo> =
@@ -418,22 +415,6 @@ object Resolvers {
         BoundReferenceResolver(transformerEndInfo, TransformerEndInfoToEnergisedEndOpenCircuitTestResolver, null)
 
     @JvmStatic
-    fun protectedSwitches(protectionEquipment: ProtectionEquipment): BoundReferenceResolver<ProtectionEquipment, ProtectedSwitch> =
-        BoundReferenceResolver(
-            protectionEquipment,
-            ProtectionEquipmentToProtectedSwitchResolver,
-            ProtectedSwitchToProtectionEquipmentResolver
-        )
-
-    @JvmStatic
-    fun operatedByProtectionEquipment(protectedSwitch: ProtectedSwitch): BoundReferenceResolver<ProtectedSwitch, ProtectionEquipment> =
-        BoundReferenceResolver(
-            protectedSwitch,
-            ProtectedSwitchToProtectionEquipmentResolver,
-            ProtectionEquipmentToProtectedSwitchResolver
-        )
-
-    @JvmStatic
     fun terminal(regulatingControl: RegulatingControl): BoundReferenceResolver<RegulatingControl, Terminal> =
         BoundReferenceResolver(regulatingControl, RegulatingControlToTerminalResolver, null)
 
@@ -456,5 +437,73 @@ object Resolvers {
     @JvmStatic
     fun tapChangerControl(tapChanger: TapChanger): BoundReferenceResolver<TapChanger, TapChangerControl> =
         BoundReferenceResolver(tapChanger, TapChangerToTapChangerControlResolver, null)
+
+    @JvmStatic
+    fun protectedSwitches(protectionRelayFunction: ProtectionRelayFunction): BoundReferenceResolver<ProtectionRelayFunction, ProtectedSwitch> =
+        BoundReferenceResolver(
+            protectionRelayFunction,
+            ProtectionRelayFunctionToProtectedSwitchResolver,
+            ProtectedSwitchToProtectionRelayFunctionResolver
+        )
+
+    @JvmStatic
+    fun sensors(protectionRelayFunction: ProtectionRelayFunction): BoundReferenceResolver<ProtectionRelayFunction, Sensor> =
+        BoundReferenceResolver(protectionRelayFunction, ProtectionRelayFunctionToSensorResolver, SensorToProtectionRelayFunctionResolver)
+
+    @JvmStatic
+    fun schemes(protectionRelayFunction: ProtectionRelayFunction): BoundReferenceResolver<ProtectionRelayFunction, ProtectionRelayScheme> =
+        BoundReferenceResolver(
+            protectionRelayFunction,
+            ProtectionRelayFunctionToProtectionRelaySchemeResolver,
+            ProtectionRelaySchemeToProtectionRelayFunctionResolver
+        )
+
+    @JvmStatic
+    fun system(protectionRelayScheme: ProtectionRelayScheme): BoundReferenceResolver<ProtectionRelayScheme, ProtectionRelaySystem> =
+        BoundReferenceResolver(
+            protectionRelayScheme,
+            ProtectionRelaySchemeToProtectionRelaySystemResolver,
+            ProtectionRelaySystemToProtectionRelaySchemeResolver
+        )
+
+    @JvmStatic
+    fun functions(protectionRelayScheme: ProtectionRelayScheme): BoundReferenceResolver<ProtectionRelayScheme, ProtectionRelayFunction> =
+        BoundReferenceResolver(
+            protectionRelayScheme,
+            ProtectionRelaySchemeToProtectionRelayFunctionResolver,
+            ProtectionRelayFunctionToProtectionRelaySchemeResolver
+        )
+
+    @JvmStatic
+    fun schemes(protectionRelaySystem: ProtectionRelaySystem): BoundReferenceResolver<ProtectionRelaySystem, ProtectionRelayScheme> =
+        BoundReferenceResolver(
+            protectionRelaySystem,
+            ProtectionRelaySystemToProtectionRelaySchemeResolver,
+            ProtectionRelaySchemeToProtectionRelaySystemResolver
+        )
+
+    @JvmStatic
+    fun relayFunctions(sensor: Sensor): BoundReferenceResolver<Sensor, ProtectionRelayFunction> =
+        BoundReferenceResolver(
+            sensor,
+            SensorToProtectionRelayFunctionResolver,
+            ProtectionRelayFunctionToSensorResolver
+        )
+
+    @JvmStatic
+    fun relayFunctions(protectedSwitch: ProtectedSwitch): BoundReferenceResolver<ProtectedSwitch, ProtectionRelayFunction> =
+        BoundReferenceResolver(
+            protectedSwitch,
+            ProtectedSwitchToProtectionRelayFunctionResolver,
+            ProtectionRelayFunctionToProtectedSwitchResolver
+        )
+
+    @JvmStatic
+    fun function(fuse: Fuse): BoundReferenceResolver<Fuse, ProtectionRelayFunction> =
+        BoundReferenceResolver(fuse, FuseToProtectionRelayFunctionResolver, null)
+
+    @JvmStatic
+    fun assetInfo(protectionRelayFunction: ProtectionRelayFunction): BoundReferenceResolver<ProtectionRelayFunction, RelayInfo> =
+        BoundReferenceResolver(protectionRelayFunction, ProtectionRelayFunctionToRelayInfoResolver, null)
 
 }

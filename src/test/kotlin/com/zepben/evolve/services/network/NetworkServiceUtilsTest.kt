@@ -13,9 +13,9 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -28,7 +28,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -126,10 +126,17 @@ internal class NetworkServiceUtilsTest {
         isCurrentTransformer: (CurrentTransformer) -> String,
         isPotentialTransformer: (PotentialTransformer) -> String,
         isSwitchInfo: (SwitchInfo) -> String,
-        isCurrentRelayInfo: (CurrentRelayInfo) -> String,
+        isRelayInfo: (RelayInfo) -> String,
         isCurrentRelay: (CurrentRelay) -> String,
         isEvChargingUnit: (EvChargingUnit) -> String,
         isTapChangerControl: (TapChangerControl) -> String,
+        isSeriesCompensator: (SeriesCompensator) -> String,
+        isGround: (Ground) -> String,
+        isGroundDisconnector: (GroundDisconnector) -> String,
+        isProtectionRelayScheme: (ProtectionRelayScheme) -> String,
+        isProtectionRelaySystem: (ProtectionRelaySystem) -> String,
+        isVoltageRelay: (VoltageRelay) -> String,
+        isDistanceRelay: (DistanceRelay) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -198,10 +205,17 @@ internal class NetworkServiceUtilsTest {
         isCurrentTransformer = isCurrentTransformer,
         isPotentialTransformer = isPotentialTransformer,
         isSwitchInfo = isSwitchInfo,
-        isCurrentRelayInfo = isCurrentRelayInfo,
+        isRelayInfo = isRelayInfo,
         isCurrentRelay = isCurrentRelay,
         isEvChargingUnit = isEvChargingUnit,
         isTapChangerControl = isTapChangerControl,
+        isSeriesCompensator = isSeriesCompensator,
+        isGround = isGround,
+        isGroundDisconnector = isGroundDisconnector,
+        isProtectionRelayScheme = isProtectionRelayScheme,
+        isProtectionRelaySystem = isProtectionRelaySystem,
+        isVoltageRelay = isVoltageRelay,
+        isDistanceRelay = isDistanceRelay,
         isOther = isOther
     )
 
@@ -272,10 +286,17 @@ internal class NetworkServiceUtilsTest {
         isCurrentTransformer: InvokeChecker<CurrentTransformer> = NeverInvokedChecker(),
         isPotentialTransformer: InvokeChecker<PotentialTransformer> = NeverInvokedChecker(),
         isSwitchInfo: InvokeChecker<SwitchInfo> = NeverInvokedChecker(),
-        isCurrentRelayInfo: InvokeChecker<CurrentRelayInfo> = NeverInvokedChecker(),
+        isRelayInfo: InvokeChecker<RelayInfo> = NeverInvokedChecker(),
         isCurrentRelay: InvokeChecker<CurrentRelay> = NeverInvokedChecker(),
         isEvChargingUnit: InvokeChecker<EvChargingUnit> = NeverInvokedChecker(),
         isTapChangerControl: InvokeChecker<TapChangerControl> = NeverInvokedChecker(),
+        isSeriesCompensator: InvokeChecker<SeriesCompensator> = NeverInvokedChecker(),
+        isGround: InvokeChecker<Ground> = NeverInvokedChecker(),
+        isGroundDisconnector: InvokeChecker<GroundDisconnector> = NeverInvokedChecker(),
+        isProtectionRelayScheme: InvokeChecker<ProtectionRelayScheme> = NeverInvokedChecker(),
+        isProtectionRelaySystem: InvokeChecker<ProtectionRelaySystem> = NeverInvokedChecker(),
+        isVoltageRelay: InvokeChecker<VoltageRelay> = NeverInvokedChecker(),
+        isDistanceRelay: InvokeChecker<DistanceRelay> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -345,10 +366,17 @@ internal class NetworkServiceUtilsTest {
             isCurrentTransformer = isCurrentTransformer,
             isPotentialTransformer = isPotentialTransformer,
             isSwitchInfo = isSwitchInfo,
-            isCurrentRelayInfo = isCurrentRelayInfo,
+            isRelayInfo = isRelayInfo,
             isCurrentRelay = isCurrentRelay,
             isEvChargingUnit = isEvChargingUnit,
             isTapChangerControl = isTapChangerControl,
+            isSeriesCompensator = isSeriesCompensator,
+            isGround = isGround,
+            isGroundDisconnector = isGroundDisconnector,
+            isProtectionRelayScheme = isProtectionRelayScheme,
+            isProtectionRelaySystem = isProtectionRelaySystem,
+            isVoltageRelay = isVoltageRelay,
+            isDistanceRelay = isDistanceRelay,
             isOther = isOther
         )
 
@@ -418,7 +446,7 @@ internal class NetworkServiceUtilsTest {
         isCurrentTransformer.verifyInvoke()
         isPotentialTransformer.verifyInvoke()
         isSwitchInfo.verifyInvoke()
-        isCurrentRelayInfo.verifyInvoke()
+        isRelayInfo.verifyInvoke()
         isCurrentRelay.verifyInvoke()
         isEvChargingUnit.verifyInvoke()
         isTapChangerControl.verifyInvoke()
@@ -497,11 +525,17 @@ internal class NetworkServiceUtilsTest {
         CurrentTransformer().also { whenNetworkServiceObjectTester(it, isCurrentTransformer = InvokedChecker(it)) }
         PotentialTransformer().also { whenNetworkServiceObjectTester(it, isPotentialTransformer = InvokedChecker(it)) }
         SwitchInfo().also { whenNetworkServiceObjectTester(it, isSwitchInfo = InvokedChecker(it)) }
-        CurrentRelayInfo().also { whenNetworkServiceObjectTester(it, isCurrentRelayInfo = InvokedChecker(it)) }
+        RelayInfo().also { whenNetworkServiceObjectTester(it, isRelayInfo = InvokedChecker(it)) }
         CurrentRelay().also { whenNetworkServiceObjectTester(it, isCurrentRelay = InvokedChecker(it)) }
         EvChargingUnit().also { whenNetworkServiceObjectTester(it, isEvChargingUnit = InvokedChecker(it)) }
         TapChangerControl().also { whenNetworkServiceObjectTester(it, isTapChangerControl = InvokedChecker(it)) }
+        SeriesCompensator().also { whenNetworkServiceObjectTester(it, isSeriesCompensator = InvokedChecker(it)) }
+        Ground().also { whenNetworkServiceObjectTester(it, isGround = InvokedChecker(it)) }
+        GroundDisconnector().also { whenNetworkServiceObjectTester(it, isGroundDisconnector = InvokedChecker(it)) }
+        ProtectionRelayScheme().also { whenNetworkServiceObjectTester(it, isProtectionRelayScheme = InvokedChecker(it)) }
+        ProtectionRelaySystem().also { whenNetworkServiceObjectTester(it, isProtectionRelaySystem = InvokedChecker(it)) }
+        VoltageRelay().also { whenNetworkServiceObjectTester(it, isVoltageRelay = InvokedChecker(it)) }
+        DistanceRelay().also { whenNetworkServiceObjectTester(it, isDistanceRelay = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }
-

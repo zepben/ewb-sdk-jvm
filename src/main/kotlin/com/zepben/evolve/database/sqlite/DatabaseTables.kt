@@ -24,10 +24,10 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableCustomer
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableCustomers
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TablePricingStructures
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableTariffs
-import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
+import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRelayInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.tables.iec61968.metering.TableUsagePoints
 import com.zepben.evolve.database.sqlite.tables.iec61968.operations.TableOperationalRestrictions
@@ -43,7 +43,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAccumula
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAnalogs
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableDiscretes
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.TableCurrentRelays
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
@@ -105,7 +105,6 @@ class DatabaseTables {
         TableCircuitsTerminals(),
         TableConnectivityNodes(),
         TableControls(),
-        TableCurrentRelayInfo(),
         TableCurrentRelays(),
         TableCurrentTransformerInfo(),
         TableCurrentTransformers(),
@@ -117,6 +116,7 @@ class DatabaseTables {
         TableDiagrams(),
         TableDisconnectors(),
         TableDiscretes(),
+        TableDistanceRelays(),
         TableEnergyConsumerPhases(),
         TableEnergyConsumers(),
         TableEnergySourcePhases(),
@@ -130,6 +130,8 @@ class DatabaseTables {
         TableFeeders(),
         TableFuses(),
         TableGeographicalRegions(),
+        TableGrounds(),
+        TableGroundDisconnectors(),
         TableJumpers(),
         TableJunctions(),
         TableLinearShuntCompensators(),
@@ -163,12 +165,20 @@ class DatabaseTables {
         TablePowerTransformers(),
         TablePricingStructures(),
         TablePricingStructuresTariffs(),
-        TableProtectionEquipmentProtectedSwitches(),
+        TableProtectionRelayFunctionThresholds(),
+        TableProtectionRelayFunctionTimeLimits(),
+        TableProtectionRelayFunctionsProtectedSwitches(),
+        TableProtectionRelayFunctionsSensors(),
+        TableProtectionRelaySchemes(),
+        TableProtectionRelaySchemesProtectionRelayFunctions(),
+        TableProtectionRelaySystems(),
         TableRatioTapChangers(),
         TableReclosers(),
         TableRecloseDelays(),
+        TableRelayInfo(),
         TableRemoteControls(),
         TableRemoteSources(),
+        TableSeriesCompensators(),
         TableShortCircuitTests(),
         TableShuntCompensatorInfo(),
         TableSites(),
@@ -185,5 +195,6 @@ class DatabaseTables {
         TableUsagePoints(),
         TableUsagePointsEndDevices(),
         TableVersion(),
+        TableVoltageRelays()
     ).associateBy { it::class.java }
 }

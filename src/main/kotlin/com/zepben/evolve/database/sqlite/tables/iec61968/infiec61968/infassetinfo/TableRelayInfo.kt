@@ -13,12 +13,13 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetInfo
 
 @Suppress("PropertyName")
-class TableCurrentRelayInfo : TableAssetInfo() {
+class TableRelayInfo : TableAssetInfo() {
 
     val CURVE_SETTING = Column(++columnIndex, "curve_setting", "TEXT", NULL)
+    val RECLOSE_FAST = Column(++columnIndex, "reclose_fast", "BOOLEAN", NULL)
 
     override fun name(): String {
-        return "current_relay_info"
+        return "relay_info"
     }
 
     override val tableClass = this.javaClass

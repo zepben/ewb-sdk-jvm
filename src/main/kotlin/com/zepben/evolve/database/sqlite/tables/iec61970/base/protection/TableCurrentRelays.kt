@@ -12,12 +12,11 @@ import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
-class TableCurrentRelays : TableProtectionEquipment() {
+class TableCurrentRelays : TableProtectionRelayFunctions() {
 
     val CURRENT_LIMIT_1 = Column(++columnIndex, "current_limit_1", "NUMBER", NULL)
     val INVERSE_TIME_FLAG = Column(++columnIndex, "inverse_time_flag", "BOOLEAN", NULL)
     val TIME_DELAY_1 = Column(++columnIndex, "time_delay_1", "NUMBER", NULL)
-    val CURRENT_RELAY_INFO_MRID = Column(++columnIndex, "current_relay_info_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "current_relays"

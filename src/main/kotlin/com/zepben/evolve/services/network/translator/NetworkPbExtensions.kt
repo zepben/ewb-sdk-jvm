@@ -12,9 +12,9 @@ import com.zepben.evolve.services.common.translator.nameAndMRID
 import com.zepben.protobuf.cim.iec61968.assetinfo.*
 import com.zepben.protobuf.cim.iec61968.assets.*
 import com.zepben.protobuf.cim.iec61968.common.Location
-import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint
@@ -26,8 +26,7 @@ import com.zepben.protobuf.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.protobuf.cim.iec61970.base.meas.Control
 import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement
-import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.protobuf.cim.iec61970.base.protection.*
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource
@@ -73,7 +72,7 @@ fun Location.mRID(): String = io.mrid
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
-fun CurrentRelayInfo.mRID(): String = ai.mRID()
+fun RelayInfo.mRID(): String = ai.mRID()
 fun CurrentTransformerInfo.mRID(): String = ai.mRID()
 fun PotentialTransformerInfo.mRID(): String = ai.mRID()
 
@@ -138,10 +137,13 @@ fun Measurement.mRID(): String = io.mrid
 
 /************ IEC61970 Base Protection ************/
 
-fun CurrentRelay.mRID(): String = pe.mRID()
-fun ProtectionEquipment.mRID(): String = eq.mRID()
-
-fun CurrentRelay.assetInfoMRID(): String = pe.eq.assetInfoMRID()
+fun CurrentRelay.mRID(): String = prf.mRID()
+fun DistanceRelay.mRID(): String = prf.mRID()
+fun ProtectionRelayFunction.mRID(): String = psr.mRID()
+fun ProtectionRelayScheme.mRID(): String = io.mrid
+fun ProtectionRelaySystem.mRID(): String = eq.mRID()
+fun VoltageRelay.mRID(): String = prf.mRID()
+fun ProtectionRelayFunction.assetInfoMRID(): String = psr.assetInfoMRID
 
 /************ IEC61970 BASE SCADA ************/
 
@@ -171,6 +173,8 @@ fun EnergyConsumerPhase.mRID(): String = psr.mRID()
 fun EnergySource.mRID(): String = ec.mRID()
 fun EnergySourcePhase.mRID(): String = psr.mRID()
 fun Fuse.mRID(): String = sw.mRID()
+fun Ground.mRID(): String = ce.mRID()
+fun GroundDisconnector.mRID(): String = sw.mRID()
 fun Jumper.mRID(): String = sw.mRID()
 fun Junction.mRID(): String = cn.mRID()
 fun Line.mRID(): String = ec.mRID()
@@ -187,6 +191,7 @@ fun RatioTapChanger.mRID(): String = tc.mRID()
 fun Recloser.mRID(): String = sw.mRID()
 fun RegulatingCondEq.mRID(): String = ec.mRID()
 fun RegulatingControl.mRID(): String = psr.mRID()
+fun SeriesCompensator.mRID(): String = ce.mRID()
 fun ShuntCompensator.mRID(): String = rce.mRID()
 fun Switch.mRID(): String = ce.mRID()
 fun TapChanger.mRID(): String = psr.mRID()

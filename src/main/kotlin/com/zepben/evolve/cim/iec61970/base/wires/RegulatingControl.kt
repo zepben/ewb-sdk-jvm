@@ -50,6 +50,8 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * @property enabled The flag tells if regulation is enabled.
  * @property maxAllowedTargetValue Maximum allowed target value (RegulatingControl.targetValue).
  * @property minAllowedTargetValue Minimum allowed target value (RegulatingControl.targetValue).
+ * @property ratedCurrent The rated current of associated CT in amps for this RegulatingControl. Forms the base used to convert Line Drop Compensation settings
+ * from ohms to voltage.
  * @property terminal The terminal associated with this regulating control. The terminal is associated instead of a node, since the terminal could connect into
  * either a topological node or a connectivity node. Sometimes it is useful to model regulation at a terminal of a bus bar object.
  * @property regulatingCondEqs The [RegulatingCondEq] that are controlled by this regulating control scheme.
@@ -64,13 +66,11 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     var enabled: Boolean? = null
     var maxAllowedTargetValue: Double? = null
     var minAllowedTargetValue: Double? = null
+    var ratedCurrent: Double? = null
     var terminal: Terminal? = null
 
     private var _regulatingCondEqs: MutableList<RegulatingCondEq>? = null
 
-    /**
-     * The regulating conducting equipments controlled by this regulating control. The returned collection is read only.
-     */
     val regulatingCondEqs: List<RegulatingCondEq> get() = _regulatingCondEqs.asUnmodifiable()
 
     /**

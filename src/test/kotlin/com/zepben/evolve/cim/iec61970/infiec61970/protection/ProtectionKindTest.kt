@@ -22,7 +22,7 @@ internal class ProtectionKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(ProtectionKind.values(), PBProtectionKind.values())
+        validateEnum(ProtectionKind.entries, PBProtectionKind.entries)
     }
 
 }

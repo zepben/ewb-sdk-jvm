@@ -17,7 +17,7 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -34,7 +34,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -165,7 +165,7 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.customerServicesOf(::Tariff, Tariff::fillFields))
 
         /************ IEC61968 infIEC61968 InfAssetInfo ************/
-        validateSchema(SchemaNetworks.networkServicesOf(::CurrentRelayInfo, CurrentRelayInfo::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::RelayInfo, RelayInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::CurrentTransformerInfo, CurrentTransformerInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::PotentialTransformerInfo, PotentialTransformerInfo::fillFields))
 
@@ -214,6 +214,10 @@ class DatabaseSqliteTest {
 
         /************ IEC61970 Base Protection ************/
         validateSchema(SchemaNetworks.networkServicesOf(::CurrentRelay, CurrentRelay::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::DistanceRelay, DistanceRelay::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::ProtectionRelayScheme, ProtectionRelayScheme::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::ProtectionRelaySystem, ProtectionRelaySystem::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::VoltageRelay, VoltageRelay::fillFields))
 
         /************ IEC61970 BASE SCADA ************/
         validateSchema(SchemaNetworks.networkServicesOf(::RemoteControl, RemoteControl::fillFields))
@@ -236,6 +240,8 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.networkServicesOf(::EnergySource, EnergySource::fillFields).apply { Tracing.setPhases().run(networkService) })
         validateSchema(SchemaNetworks.networkServicesOf(::EnergySourcePhase, EnergySourcePhase::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::Fuse, Fuse::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::Ground, Ground::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::GroundDisconnector, GroundDisconnector::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::Jumper, Jumper::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::Junction, Junction::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::LinearShuntCompensator, LinearShuntCompensator::fillFields))
@@ -245,6 +251,7 @@ class DatabaseSqliteTest {
         validateSchema(SchemaNetworks.networkServicesOf(::PowerTransformerEnd, PowerTransformerEnd::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::RatioTapChanger, RatioTapChanger::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::Recloser, Recloser::fillFields))
+        validateSchema(SchemaNetworks.networkServicesOf(::SeriesCompensator, SeriesCompensator::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::TapChangerControl, TapChangerControl::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::TransformerStarImpedance, TransformerStarImpedance::fillFields))
 

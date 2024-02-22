@@ -7,79 +7,75 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
 import com.zepben.evolve.services.common.extensions.safeRemove
 import com.zepben.evolve.services.common.extensions.validateReference
 
 /**
- * A ProtectedSwitch is a switching device that can be operated by ProtectionEquipment.
+ * A ProtectedSwitch is a switching device that can be operated by [ProtectionRelayFunction]s.
  *
  * @property breakingCapacity The maximum fault current in amps a breaking device can break safely under prescribed conditions of use.
+ * @property relayFunctions The [ProtectionRelayFunction]s operating this [ProtectedSwitch].
  */
 abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
 
     var breakingCapacity: Int? = null
-    private var _operatedByProtectionEquipment: MutableList<ProtectionEquipment>? = null
+    private var _relayFunctions: MutableList<ProtectionRelayFunction>? = null
+
+    val relayFunctions: Collection<ProtectionRelayFunction> get() = _relayFunctions.asUnmodifiable()
 
     /**
-     * All [ProtectionEquipment]s operating this [ProtectedSwitch]. Collection is read-only.
+     * Get the number of [ProtectionRelayFunction]s operating this [ProtectedSwitch].
      *
-     * @return A read-only [Collection] of [ProtectionEquipment]s operating this [ProtectedSwitch].
+     * @return The number of [ProtectionRelayFunction]s operating this [ProtectedSwitch].
      */
-    val operatedByProtectionEquipment: Collection<ProtectionEquipment> get() = _operatedByProtectionEquipment.asUnmodifiable()
+    fun numRelayFunctions(): Int = _relayFunctions?.size ?: 0
 
     /**
-     * Get the number of [ProtectionEquipment]s operating this [ProtectedSwitch].
+     * Get a [ProtectionRelayFunction] operating this [ProtectedSwitch] by its mRID.
      *
-     * @return The number of [ProtectionEquipment]s operating this [ProtectedSwitch].
+     * @param mRID The mRID of the desired [ProtectionRelayFunction]
+     * @return The [ProtectionRelayFunction] with the specified [mRID] if it exists, otherwise null
      */
-    fun numOperatedByProtectionEquipment(): Int = _operatedByProtectionEquipment?.size ?: 0
+    fun getRelayFunction(mRID: String): ProtectionRelayFunction? = _relayFunctions?.getByMRID(mRID)
 
     /**
-     * Get a [ProtectionEquipment] operating this [ProtectedSwitch] by its mRID.
+     * Associate this [ProtectedSwitch] with a [ProtectionRelayFunction] operating it.
      *
-     * @param mRID The mRID of the desired [ProtectionEquipment]
-     * @return The [ProtectionEquipment] with the specified [mRID] if it exists, otherwise null
-     */
-    fun getOperatedByProtectionEquipment(mRID: String): ProtectionEquipment? = _operatedByProtectionEquipment?.getByMRID(mRID)
-
-    /**
-     * Associate this [ProtectedSwitch] with a [ProtectionEquipment] operating it.
-     *
-     * @param protectionEquipment The [ProtectionEquipment] to associate with this [ProtectedSwitch].
+     * @param relayFunction The [ProtectionRelayFunction] to associate with this [ProtectedSwitch].
      * @return A reference to this [ProtectedSwitch] for fluent use.
      */
-    fun addOperatedByProtectionEquipment(protectionEquipment: ProtectionEquipment): ProtectedSwitch {
-        if (validateReference(protectionEquipment, ::getOperatedByProtectionEquipment, "A ProtectionEquipment"))
+    fun addRelayFunction(relayFunction: ProtectionRelayFunction): ProtectedSwitch {
+        if (validateReference(relayFunction, ::getRelayFunction, "A ProtectionRelayFunction"))
             return this
 
-        _operatedByProtectionEquipment = _operatedByProtectionEquipment ?: mutableListOf()
-        _operatedByProtectionEquipment!!.add(protectionEquipment)
+        _relayFunctions = _relayFunctions ?: mutableListOf()
+        _relayFunctions!!.add(relayFunction)
 
         return this
     }
 
     /**
-     * Disassociate this [ProtectedSwitch] from a [ProtectionEquipment].
+     * Disassociate this [ProtectedSwitch] from a [ProtectionRelayFunction].
      *
-     * @param protectionEquipment The [ProtectionEquipment] to disassociate from this [ProtectedSwitch].
-     * @return true if the [ProtectionEquipment] was disassociated.
+     * @param relayFunction The [ProtectionRelayFunction] to disassociate from this [ProtectedSwitch].
+     * @return true if the [ProtectionRelayFunction] was disassociated.
      */
-    fun removeOperatedByProtectionEquipment(protectionEquipment: ProtectionEquipment?): Boolean {
-        val ret = _operatedByProtectionEquipment.safeRemove(protectionEquipment)
-        if (_operatedByProtectionEquipment.isNullOrEmpty()) _operatedByProtectionEquipment = null
+    fun removeRelayFunction(relayFunction: ProtectionRelayFunction?): Boolean {
+        val ret = _relayFunctions.safeRemove(relayFunction)
+        if (_relayFunctions.isNullOrEmpty()) _relayFunctions = null
         return ret
     }
 
     /**
-     * Disassociate all [ProtectionEquipment]s from this [ProtectedSwitch].
+     * Disassociate all [ProtectionRelayFunction]s from this [ProtectedSwitch].
      *
      * @return A reference to this [ProtectedSwitch] for fluent use.
      */
-    fun clearOperatedByProtectionEquipment(): ProtectedSwitch {
-        _operatedByProtectionEquipment = null
+    fun clearRelayFunctions(): ProtectedSwitch {
+        _relayFunctions = null
         return this
     }
 

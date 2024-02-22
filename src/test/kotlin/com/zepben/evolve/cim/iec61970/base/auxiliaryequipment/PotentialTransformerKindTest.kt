@@ -22,7 +22,7 @@ internal class PotentialTransformerKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(PotentialTransformerKind.values(), PBPotentialTransformerKind.values())
+        validateEnum(PotentialTransformerKind.entries, PBPotentialTransformerKind.entries)
     }
 
 }

@@ -25,8 +25,7 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -233,14 +232,15 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
     @Test
-    internal fun compareCurrentRelayInfo() {
-        compareAssetInfo { CurrentRelayInfo(it) }
+    internal fun compareRelayInfo() {
+        compareAssetInfo { RelayInfo(it) }
 
-        comparatorValidator.validateProperty(CurrentRelayInfo::curveSetting, { CurrentRelayInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(RelayInfo::curveSetting, { RelayInfo(it) }, { "first" }, { "second" })
+        comparatorValidator.validateProperty(RelayInfo::recloseFast, { RelayInfo(it) }, { false }, { true })
         comparatorValidator.validateIndexedCollection(
-            CurrentRelayInfo::recloseDelays,
-            CurrentRelayInfo::addDelay,
-            { CurrentRelayInfo(it) },
+            RelayInfo::recloseDelays,
+            RelayInfo::addDelay,
+            { RelayInfo(it) },
             { 1.0 },
             { 2.0 }
         )
@@ -396,6 +396,10 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
     private fun compareSensor(createSensor: (String) -> Sensor) {
         compareAuxiliaryEquipment(createSensor)
+
+        comparatorValidator.validateCollection(
+            Sensor::relayFunctions, Sensor::addRelayFunction, createSensor, { CurrentRelay("cr1") }, { CurrentRelay("cr2") }
+        )
     }
 
     /************ IEC61970 BASE CORE ************/
@@ -635,32 +639,124 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
     @Test
     internal fun compareCurrentRelay() {
-        compareProtectionEquipment { CurrentRelay(it) }
+        compareProtectionRelayFunction { CurrentRelay(it) }
 
         comparatorValidator.validateProperty(CurrentRelay::currentLimit1, { CurrentRelay(it) }, { 1.1 }, { 2.2 })
         comparatorValidator.validateProperty(CurrentRelay::inverseTimeFlag, { CurrentRelay(it) }, { false }, { true })
         comparatorValidator.validateProperty(CurrentRelay::timeDelay1, { CurrentRelay(it) }, { 1.1 }, { 2.2 })
     }
 
-    private fun compareProtectionEquipment(createProtectionEquipment: (String) -> ProtectionEquipment) {
-        compareEquipment(createProtectionEquipment)
+    @Test
+    internal fun compareDistanceRelay() {
+        compareProtectionRelayFunction { DistanceRelay(it) }
 
-        comparatorValidator.validateProperty(ProtectionEquipment::relayDelayTime, createProtectionEquipment, { 1.1 }, { 2.2 })
-        comparatorValidator.validateProperty(ProtectionEquipment::protectionKind, createProtectionEquipment, { ProtectionKind.EF }, { ProtectionKind.IEF })
-        comparatorValidator.validateProperty(ProtectionEquipment::directable, createProtectionEquipment, { null }, { true })
+        comparatorValidator.validateProperty(DistanceRelay::backwardBlind, { DistanceRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(DistanceRelay::backwardReach, { DistanceRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(DistanceRelay::backwardReactance, { DistanceRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(DistanceRelay::forwardBlind, { DistanceRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(DistanceRelay::forwardReach, { DistanceRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(DistanceRelay::forwardReactance, { DistanceRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(DistanceRelay::operationPhaseAngle1, { DistanceRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(DistanceRelay::operationPhaseAngle2, { DistanceRelay(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(DistanceRelay::operationPhaseAngle3, { DistanceRelay(it) }, { 1.1 }, { 2.2 })
+    }
+
+    private fun compareProtectionRelayFunction(createProtectionRelayFunction: (String) -> ProtectionRelayFunction) {
+        comparePowerSystemResource(createProtectionRelayFunction)
+
+        comparatorValidator.validateProperty(ProtectionRelayFunction::assetInfo, createProtectionRelayFunction, { RelayInfo("ri1") }, { RelayInfo("ri2") })
+        comparatorValidator.validateProperty(ProtectionRelayFunction::model, createProtectionRelayFunction, { "model1" }, { "model2" })
+        comparatorValidator.validateProperty(ProtectionRelayFunction::reclosing, createProtectionRelayFunction, { false }, { true })
+        comparatorValidator.validateProperty(ProtectionRelayFunction::relayDelayTime, createProtectionRelayFunction, { 1.1 }, { 2.2 })
         comparatorValidator.validateProperty(
-            ProtectionEquipment::powerDirection,
-            createProtectionEquipment,
+            ProtectionRelayFunction::protectionKind,
+            createProtectionRelayFunction,
+            { ProtectionKind.FREQ },
+            { ProtectionKind.DISTANCE }
+        )
+        comparatorValidator.validateProperty(ProtectionRelayFunction::directable, createProtectionRelayFunction, { false }, { true })
+        comparatorValidator.validateProperty(
+            ProtectionRelayFunction::powerDirection,
+            createProtectionRelayFunction,
             { PowerDirectionKind.FORWARD },
-            { PowerDirectionKind.UNKNOWN_DIRECTION }
+            { PowerDirectionKind.REVERSE }
+        )
+        comparatorValidator.validateIndexedCollection(
+            ProtectionRelayFunction::timeLimits,
+            ProtectionRelayFunction::addTimeLimit,
+            createProtectionRelayFunction,
+            { 1.1 },
+            { 2.2 }
+        )
+        comparatorValidator.validateIndexedCollection(
+            ProtectionRelayFunction::thresholds,
+            ProtectionRelayFunction::addThreshold,
+            createProtectionRelayFunction,
+            { RelaySetting(UnitSymbol.V, 1.1) },
+            { RelaySetting(UnitSymbol.V, 2.2) }
         )
         comparatorValidator.validateCollection(
-            ProtectionEquipment::protectedSwitches,
-            ProtectionEquipment::addProtectedSwitch,
-            createProtectionEquipment,
-            { object : ProtectedSwitch("ps1") {} },
-            { object : ProtectedSwitch("ps2") {} }
+            ProtectionRelayFunction::protectedSwitches,
+            ProtectionRelayFunction::addProtectedSwitch,
+            createProtectionRelayFunction,
+            { Breaker("b1") },
+            { Breaker("b2") }
         )
+        comparatorValidator.validateCollection(
+            ProtectionRelayFunction::sensors,
+            ProtectionRelayFunction::addSensor,
+            createProtectionRelayFunction,
+            { CurrentTransformer("ct1") },
+            { CurrentTransformer("ct2") }
+        )
+        comparatorValidator.validateCollection(
+            ProtectionRelayFunction::schemes,
+            ProtectionRelayFunction::addScheme,
+            createProtectionRelayFunction,
+            { ProtectionRelayScheme("prs1") },
+            { ProtectionRelayScheme("prs2") }
+        )
+    }
+
+    @Test
+    internal fun compareProtectionRelayScheme() {
+        compareIdentifiedObject { ProtectionRelayScheme(it) }
+
+        comparatorValidator.validateProperty(
+            ProtectionRelayScheme::system,
+            { ProtectionRelayScheme(it) },
+            { ProtectionRelaySystem("prsys1") },
+            { ProtectionRelaySystem("prsys2") }
+        )
+        comparatorValidator.validateCollection(
+            ProtectionRelayScheme::functions,
+            ProtectionRelayScheme::addFunction,
+            { ProtectionRelayScheme(it) },
+            { CurrentRelay("cr1") },
+            { CurrentRelay("cr2") }
+        )
+    }
+
+    @Test
+    internal fun compareProtectionRelaySystem() {
+        compareEquipment { ProtectionRelaySystem(it) }
+
+        comparatorValidator.validateProperty(
+            ProtectionRelaySystem::protectionKind, { ProtectionRelaySystem(it) },
+            { ProtectionKind.FREQ }, { ProtectionKind.DISTANCE }
+        )
+        comparatorValidator.validateCollection(
+            ProtectionRelaySystem::schemes,
+            ProtectionRelaySystem::addScheme,
+            { ProtectionRelaySystem(it) },
+            { ProtectionRelayScheme("prs1") },
+            { ProtectionRelayScheme("prs2") }
+        )
+    }
+
+    @Test
+    internal fun compareVoltageRelay() {
+        compareProtectionRelayFunction { VoltageRelay(it) }
     }
 
     /************ IEC61970 BASE SCADA ************/
@@ -854,6 +950,18 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     @Test
     internal fun compareFuse() {
         compareSwitch { Fuse(it) }
+
+        comparatorValidator.validateProperty(Fuse::function, { Fuse(it) }, { CurrentRelay("cr1") }, { CurrentRelay("cr2") })
+    }
+
+    @Test
+    internal fun compareGround() {
+        compareConductingEquipment { Ground(it) }
+    }
+
+    @Test
+    internal fun compareGroundDisconnector() {
+        compareSwitch { GroundDisconnector(it) }
     }
 
     @Test
@@ -973,6 +1081,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun comparePowerTransformer() {
         compareConductingEquipment { PowerTransformer(it) }
 
+        comparatorValidator.validateProperty(
+            PowerTransformer::assetInfo,
+            { PowerTransformer(it) },
+            { PowerTransformerInfo("pti1") },
+            { PowerTransformerInfo("pti2") }
+        )
         comparatorValidator.validateProperty(PowerTransformer::vectorGroup, { PowerTransformer(it) }, { VectorGroup.DYN11 }, { VectorGroup.D0 })
         comparatorValidator.validateProperty(PowerTransformer::transformerUtilisation, { PowerTransformer(it) }, { 0.1 }, { 0.9 })
         comparatorValidator.validateProperty(
@@ -1038,11 +1152,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(ProtectedSwitch::breakingCapacity, createProtectedSwitch, { 1 }, { 2 })
         comparatorValidator.validateCollection(
-            ProtectedSwitch::operatedByProtectionEquipment,
-            ProtectedSwitch::addOperatedByProtectionEquipment,
+            ProtectedSwitch::relayFunctions,
+            ProtectedSwitch::addRelayFunction,
             createProtectedSwitch,
-            { object : ProtectionEquipment("pe1") {} },
-            { object : ProtectionEquipment("pe2") {} }
+            { object : ProtectionRelayFunction("prf1") {} },
+            { object : ProtectionRelayFunction("prf2") {} }
         )
     }
 
@@ -1085,6 +1199,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(RegulatingControl::enabled, createRegulatingControl, { false }, { true })
         comparatorValidator.validateProperty(RegulatingControl::maxAllowedTargetValue, createRegulatingControl, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(RegulatingControl::minAllowedTargetValue, createRegulatingControl, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(RegulatingControl::ratedCurrent, createRegulatingControl, { 1.1 }, { 2.2 })
         comparatorValidator.validateProperty(RegulatingControl::terminal, createRegulatingControl, { Terminal("t1") }, { Terminal("t2") })
 
         comparatorValidator.validateCollection(
@@ -1094,6 +1209,18 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { object : RegulatingCondEq("rce1") {} },
             { object : RegulatingCondEq("rce2") {} }
         )
+    }
+
+    @Test
+    internal fun compareSeriesCompensator() {
+        compareConductingEquipment { SeriesCompensator(it) }
+
+        comparatorValidator.validateProperty(SeriesCompensator::r, { SeriesCompensator(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SeriesCompensator::r0, { SeriesCompensator(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SeriesCompensator::x, { SeriesCompensator(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SeriesCompensator::x0, { SeriesCompensator(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SeriesCompensator::varistorRatedCurrent, { SeriesCompensator(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(SeriesCompensator::varistorVoltageThreshold, { SeriesCompensator(it) }, { 1 }, { 2 })
     }
 
     private fun compareShuntCompensator(createShuntCompensator: (String) -> ShuntCompensator) {

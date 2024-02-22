@@ -13,14 +13,12 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.translator.mRID
-import com.zepben.evolve.services.common.translator.toInstant
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.translator.NetworkProtoToCim
 import com.zepben.evolve.services.network.translator.mRID
 import com.zepben.evolve.streaming.get.hierarchy.NetworkHierarchy
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcResult
-import com.zepben.protobuf.metadata.DataSource
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.nc.*
@@ -627,10 +625,17 @@ class NetworkConsumerClient(
             CURRENTTRANSFORMERINFO -> extractResult(io.currentTransformerInfo.mRID()) { addFromPb(io.currentTransformerInfo) }
             POTENTIALTRANSFORMERINFO -> extractResult(io.potentialTransformerInfo.mRID()) { addFromPb(io.potentialTransformerInfo) }
             SWITCHINFO -> extractResult(io.switchInfo.mRID()) { addFromPb(io.switchInfo) }
-            CURRENTRELAYINFO -> extractResult(io.currentRelayInfo.mRID()) { addFromPb(io.currentRelayInfo) }
+            RELAYINFO -> extractResult(io.relayInfo.mRID()) { addFromPb(io.relayInfo) }
             CURRENTRELAY -> extractResult(io.currentRelay.mRID()) { addFromPb(io.currentRelay) }
-            TAPCHANGERCONTROL -> extractResult(io.tapChangerControl.mRID()) { addFromPb(io.tapChangerControl) }
             EVCHARGINGUNIT -> extractResult(io.evChargingUnit.mRID()) { addFromPb(io.evChargingUnit) }
+            TAPCHANGERCONTROL -> extractResult(io.tapChangerControl.mRID()) { addFromPb(io.tapChangerControl) }
+            SERIESCOMPENSATOR -> extractResult(io.seriesCompensator.mRID()) { addFromPb(io.seriesCompensator) }
+            GROUND -> extractResult(io.ground.mRID()) { addFromPb(io.ground) }
+            GROUNDDISCONNECTOR -> extractResult(io.groundDisconnector.mRID()) { addFromPb(io.groundDisconnector) }
+            PROTECTIONRELAYSCHEME -> extractResult(io.protectionRelayScheme.mRID()) { addFromPb(io.protectionRelayScheme) }
+            PROTECTIONRELAYSYSTEM -> extractResult(io.protectionRelaySystem.mRID()) { addFromPb(io.protectionRelaySystem) }
+            VOLTAGERELAY -> extractResult(io.voltageRelay.mRID()) { addFromPb(io.voltageRelay) }
+            DISTANCERELAY -> extractResult(io.distanceRelay.mRID()) { addFromPb(io.distanceRelay) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )

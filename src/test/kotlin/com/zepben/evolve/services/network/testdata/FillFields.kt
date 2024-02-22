@@ -22,8 +22,7 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -271,10 +270,11 @@ fun Location.fillFields(service: NetworkService, includeRuntime: Boolean = true)
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
-fun CurrentRelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentRelayInfo {
+fun RelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): RelayInfo {
     (this as AssetInfo).fillFields(service, includeRuntime)
 
     curveSetting = "curveSetting"
+    recloseFast = true
     addDelays(1.0, 2.0, 3.0)
 
     return this
@@ -415,6 +415,14 @@ fun PotentialTransformer.fillFields(service: NetworkService, includeRuntime: Boo
 
 fun Sensor.fillFields(service: NetworkService, includeRuntime: Boolean = true): Sensor {
     (this as AuxiliaryEquipment).fillFields(service, includeRuntime)
+
+    for (i in 0..1) {
+        addRelayFunction(CurrentRelay().also {
+            it.addSensor(this)
+            service.add(it)
+        })
+    }
+
     return this
 }
 
@@ -704,9 +712,7 @@ fun Measurement.fillFields(service: NetworkService, includeRuntime: Boolean = tr
 /************ IEC61970 Base Protection ************/
 
 fun CurrentRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentRelay {
-    (this as ProtectionEquipment).fillFields(service, includeRuntime)
-
-    assetInfo = CurrentRelayInfo().also { service.add(it) }
+    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
 
     currentLimit1 = 1.1
     inverseTimeFlag = true
@@ -715,19 +721,89 @@ fun CurrentRelay.fillFields(service: NetworkService, includeRuntime: Boolean = t
     return this
 }
 
-fun ProtectionEquipment.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionEquipment {
-    (this as Equipment).fillFields(service, includeRuntime)
+fun DistanceRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): DistanceRelay {
+    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
 
+    backwardBlind = 1.1
+    backwardReach = 2.2
+    backwardReactance = 3.3
+    forwardBlind = 4.4
+    forwardReach = 5.5
+    forwardReactance = 6.6
+    operationPhaseAngle1 = 7.7
+    operationPhaseAngle2 = 8.8
+    operationPhaseAngle3 = 9.9
+
+    return this
+}
+
+fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelayFunction {
+    (this as PowerSystemResource).fillFields(service, includeRuntime)
+
+    assetInfo = RelayInfo().also { service.add(it) }
+
+    model = "model"
+    reclosing = true
     relayDelayTime = 1.1
-    protectionKind = ProtectionKind.IEF
+    protectionKind = ProtectionKind.DISTANCE
     directable = true
     powerDirection = PowerDirectionKind.FORWARD
 
-    addProtectedSwitch(Breaker().also {
-        it.addOperatedByProtectionEquipment(this)
-        service.add(it)
-    })
+    for (i in 0..1) {
+        addTimeLimit(i.toDouble())
+        addThreshold(RelaySetting(UnitSymbol.entries[i], i.toDouble(), "setting $i"))
+        addProtectedSwitch(Breaker().also {
+            it.addRelayFunction(this)
+            service.add(it)
+        })
+        addSensor(CurrentTransformer().also {
+            it.addRelayFunction(this)
+            service.add(it)
+        })
+        addScheme(ProtectionRelayScheme().also {
+            it.addFunction(this)
+            service.add(it)
+        })
+    }
 
+    return this
+}
+
+fun ProtectionRelayScheme.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelayScheme {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+
+    system = ProtectionRelaySystem().also {
+        it.addScheme(this)
+        service.add(it)
+    }
+
+    for (i in 0..1) {
+        addFunction(CurrentRelay().also {
+            it.addScheme(this)
+            service.add(it)
+        })
+    }
+
+    return this
+}
+
+fun ProtectionRelaySystem.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelaySystem {
+    (this as Equipment).fillFieldsCommon(service, includeRuntime)
+
+    protectionKind = ProtectionKind.DISTANCE
+
+    for (i in 0..1) {
+        addScheme(ProtectionRelayScheme().also {
+            it.system = this
+            service.add(it)
+        })
+    }
+
+    return this
+}
+
+fun VoltageRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): VoltageRelay {
+    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
     return this
 }
 
@@ -992,6 +1068,19 @@ fun EnergySourcePhase.fillFields(service: NetworkService, includeRuntime: Boolea
 
 fun Fuse.fillFields(service: NetworkService, includeRuntime: Boolean = true): Fuse {
     (this as Switch).fillFields(service, includeRuntime)
+
+    function = VoltageRelay().also { service.add(it) }
+
+    return this
+}
+
+fun Ground.fillFields(service: NetworkService, includeRuntime: Boolean = true): Ground {
+    (this as ConductingEquipment).fillFields(service, includeRuntime)
+    return this
+}
+
+fun GroundDisconnector.fillFields(service: NetworkService, includeRuntime: Boolean = true): GroundDisconnector {
+    (this as Switch).fillFields(service, includeRuntime)
     return this
 }
 
@@ -1060,6 +1149,13 @@ fun PowerTransformer.fillFields(service: NetworkService, includeRuntime: Boolean
     function = TransformerFunctionKind.voltageRegulator
     assetInfo = PowerTransformerInfo().also { service.add(it) }
 
+    for (i in 0..1) {
+        addEnd(PowerTransformerEnd().also {
+            it.powerTransformer = this
+            service.add(it)
+        })
+    }
+
     return this
 }
 
@@ -1090,10 +1186,12 @@ fun ProtectedSwitch.fillFields(service: NetworkService, includeRuntime: Boolean 
 
     breakingCapacity = 1
 
-    addOperatedByProtectionEquipment(CurrentRelay().also {
-        it.addProtectedSwitch(this)
-        service.add(it)
-    })
+    for (i in 0..1) {
+        addRelayFunction(CurrentRelay().also {
+            it.addProtectedSwitch(this)
+            service.add(it)
+        })
+    }
 
     return this
 }
@@ -1135,8 +1233,50 @@ fun RegulatingControl.fillFields(service: NetworkService, includeRuntime: Boolea
     enabled = true
     maxAllowedTargetValue = 200.0
     minAllowedTargetValue = 50.0
+    ratedCurrent = 10.0
     terminal = Terminal().also { service.add(it) }
     addRegulatingCondEq(PowerElectronicsConnection().also { it.regulatingControl = this; service.add(it) })
+
+    return this
+}
+
+fun SeriesCompensator.fillFields(service: NetworkService, includeRuntime: Boolean = true): SeriesCompensator {
+    (this as ConductingEquipment).fillFields(service, includeRuntime)
+
+    r = 1.1
+    r0 = 2.2
+    x = 3.3
+    x0 = 4.4
+    varistorRatedCurrent = 5
+    varistorVoltageThreshold = 6
+
+    return this
+}
+
+fun ShuntCompensator.fillFields(service: NetworkService, includeRuntime: Boolean = true): ShuntCompensator {
+    (this as RegulatingCondEq).fillFields(service, includeRuntime)
+
+    assetInfo = ShuntCompensatorInfo().also { service.add((it)) }
+
+    grounded = true
+    nomU = 1
+    phaseConnection = PhaseShuntConnectionKind.I
+    sections = 2.2
+
+    return this
+}
+
+fun Switch.fillFields(service: NetworkService, includeRuntime: Boolean = true): Switch {
+    (this as ConductingEquipment).fillFields(service, includeRuntime)
+
+    assetInfo = SwitchInfo().also { service.add(it) }
+    ratedCurrent = 1
+
+    setNormallyOpen(true)
+    setOpen(true)
+    // when unganged support is added to protobuf
+    //    normalOpen = 2
+    //    open = 3
 
     return this
 }
@@ -1168,34 +1308,6 @@ fun TapChangerControl.fillFields(service: NetworkService, includeRuntime: Boolea
     forwardLDCBlocking = true
     timeDelay = 5.3
     coGenerationEnabled = false
-
-    return this
-}
-
-fun ShuntCompensator.fillFields(service: NetworkService, includeRuntime: Boolean = true): ShuntCompensator {
-    (this as RegulatingCondEq).fillFields(service, includeRuntime)
-
-    assetInfo = ShuntCompensatorInfo().also { service.add((it)) }
-
-    grounded = true
-    nomU = 1
-    phaseConnection = PhaseShuntConnectionKind.I
-    sections = 2.2
-
-    return this
-}
-
-fun Switch.fillFields(service: NetworkService, includeRuntime: Boolean = true): Switch {
-    (this as ConductingEquipment).fillFields(service, includeRuntime)
-
-    assetInfo = SwitchInfo().also { service.add(it) }
-    ratedCurrent = 1
-
-    setNormallyOpen(true)
-    setOpen(true)
-    // when unganged support is added to protobuf
-    //    normalOpen = 2
-    //    open = 3
 
     return this
 }

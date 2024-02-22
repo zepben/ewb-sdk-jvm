@@ -21,7 +21,7 @@ internal class OrientationKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(OrientationKind.values(), PBOrientationKind.values())
+        validateEnum(OrientationKind.entries, PBOrientationKind.entries)
     }
 
 }

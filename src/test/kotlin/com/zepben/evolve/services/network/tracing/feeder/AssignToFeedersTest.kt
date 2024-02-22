@@ -14,6 +14,8 @@ import com.zepben.evolve.cim.iec61970.base.core.BaseVoltage
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.Tracing
@@ -178,23 +180,28 @@ class AssignToFeedersTest {
             .fromBreaker() // b0
             .addFeeder("b0")
             .network
-            .apply {
-                val ps = get<ProtectedSwitch>("b0")!!
-                add(CurrentRelay("cr1").apply {
-                    ps.addOperatedByProtectionEquipment(this)
-                    this.addProtectedSwitch(ps)
-                })
-                add(CurrentRelay("cr2").apply {
-                    ps.addOperatedByProtectionEquipment(this)
-                    this.addProtectedSwitch(ps)
-                })
-            }
+        val ps = network.get<ProtectedSwitch>("b0")!!
+        val cr = CurrentRelay("cr1").apply {
+            ps.addRelayFunction(this)
+            addProtectedSwitch(ps)
+        }
+        val prs = ProtectionRelayScheme("prs2").apply {
+            cr.addScheme(this)
+            addFunction(cr)
+        }
+        val prsys = ProtectionRelaySystem("prsys3").apply {
+            prs.system = this
+            addScheme(prs)
+        }
+        network.add(cr)
+        network.add(prs)
+        network.add(prsys)
 
         val feeder: Feeder = network["fdr1"]!!
 
         Tracing.assignEquipmentToFeeders().run(network)
 
-        validateEquipment(feeder.equipment, "b0", "cr1", "cr2")
+        validateEquipment(feeder.equipment, "b0", "prsys3")
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

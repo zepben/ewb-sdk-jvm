@@ -22,8 +22,7 @@ import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -68,9 +67,9 @@ import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
-import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo as PBCurrentRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infcommon.Ratio as PBRatio
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
@@ -105,7 +104,12 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint as PBIoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay as PBCurrentRelay
-import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionEquipment as PBProtectionEquipment
+import com.zepben.protobuf.cim.iec61970.base.protection.DistanceRelay as PBDistanceRelay
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionRelayFunction as PBProtectionRelayFunction
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionRelayScheme as PBProtectionRelayScheme
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionRelaySystem as PBProtectionRelaySystem
+import com.zepben.protobuf.cim.iec61970.base.protection.RelaySetting as PBRelaySetting
+import com.zepben.protobuf.cim.iec61970.base.protection.VoltageRelay as PBVoltageRelay
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
@@ -121,6 +125,8 @@ import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConsumerPhase as PBEner
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergySource as PBEnergySource
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergySourcePhase as PBEnergySourcePhase
 import com.zepben.protobuf.cim.iec61970.base.wires.Fuse as PBFuse
+import com.zepben.protobuf.cim.iec61970.base.wires.Ground as PBGround
+import com.zepben.protobuf.cim.iec61970.base.wires.GroundDisconnector as PBGroundDisconnector
 import com.zepben.protobuf.cim.iec61970.base.wires.Jumper as PBJumper
 import com.zepben.protobuf.cim.iec61970.base.wires.Junction as PBJunction
 import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
@@ -138,6 +144,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.RatioTapChanger as PBRatioTap
 import com.zepben.protobuf.cim.iec61970.base.wires.Recloser as PBRecloser
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingCondEq as PBRegulatingCondEq
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingControl as PBRegulatingControl
+import com.zepben.protobuf.cim.iec61970.base.wires.SeriesCompensator as PBSeriesCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
@@ -371,11 +378,12 @@ fun NetworkService.addFromPb(pb: PBLocation): Location? = tryAddOrNull(toCim(pb,
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
-fun toCim(pb: PBCurrentRelayInfo, networkService: NetworkService): CurrentRelayInfo =
-    CurrentRelayInfo(pb.mRID()).apply {
+fun toCim(pb: PBRelayInfo, networkService: NetworkService): RelayInfo =
+    RelayInfo(pb.mRID()).apply {
         curveSetting = pb.curveSetting.takeIf { it.isNotBlank() }
+        recloseFast = pb.recloseFastSet.takeUnless { pb.hasRecloseFastNull() }
         pb.recloseDelaysList.forEach {
-            addDelay(it)
+            addDelay(it,)
         }
         toCim(pb.ai, this, networkService)
     }
@@ -408,7 +416,7 @@ fun toCim(pb: PBPotentialTransformerInfo, networkService: NetworkService): Poten
         toCim(pb.ai, this, networkService)
     }
 
-fun NetworkService.addFromPb(pb: PBCurrentRelayInfo): CurrentRelayInfo? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBRelayInfo): RelayInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = tryAddOrNull(toCim(pb, this))
 
@@ -493,7 +501,12 @@ fun toCim(pb: PBPotentialTransformer, networkService: NetworkService): Potential
     }
 
 fun toCim(pb: PBSensor, cim: Sensor, networkService: NetworkService): Sensor =
-    cim.apply { toCim(pb.ae, this, networkService) }
+    cim.apply {
+        pb.relayFunctionMRIDsList.forEach { relayFunctionMRID ->
+            networkService.resolveOrDeferReference(Resolvers.relayFunctions(this), relayFunctionMRID)
+        }
+        toCim(pb.ae, this, networkService)
+    }
 
 fun NetworkService.addFromPb(pb: PBCurrentTransformer): CurrentTransformer? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBFaultIndicator): FaultIndicator? = tryAddOrNull(toCim(pb, this))
@@ -724,23 +737,79 @@ fun toCim(pb: PBCurrentRelay, networkService: NetworkService): CurrentRelay =
         currentLimit1 = pb.currentLimit1.takeUnless { it == UNKNOWN_DOUBLE }
         inverseTimeFlag = pb.inverseTimeFlagSet.takeUnless { pb.hasInverseTimeFlagNull() }
         timeDelay1 = pb.timeDelay1.takeUnless { it == UNKNOWN_DOUBLE }
-        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
-        toCim(pb.pe, this, networkService)
+        toCim(pb.prf, this, networkService)
     }
 
-fun toCim(pb: PBProtectionEquipment, cim: ProtectionEquipment, networkService: NetworkService): ProtectionEquipment =
+fun toCim(pb: PBDistanceRelay, networkService: NetworkService): DistanceRelay =
+    DistanceRelay(pb.mRID()).apply {
+        backwardBlind = pb.backwardBlind.takeUnless { it == UNKNOWN_DOUBLE }
+        backwardReach = pb.backwardReach.takeUnless { it == UNKNOWN_DOUBLE }
+        backwardReactance = pb.backwardReactance.takeUnless { it == UNKNOWN_DOUBLE }
+        forwardBlind = pb.forwardBlind.takeUnless { it == UNKNOWN_DOUBLE }
+        forwardReach = pb.forwardReach.takeUnless { it == UNKNOWN_DOUBLE }
+        forwardReactance = pb.forwardReactance.takeUnless { it == UNKNOWN_DOUBLE }
+        operationPhaseAngle1 = pb.operationPhaseAngle1.takeUnless { it == UNKNOWN_DOUBLE }
+        operationPhaseAngle2 = pb.operationPhaseAngle2.takeUnless { it == UNKNOWN_DOUBLE }
+        operationPhaseAngle3 = pb.operationPhaseAngle3.takeUnless { it == UNKNOWN_DOUBLE }
+        toCim(pb.prf, this, networkService)
+    }
+
+fun toCim(pb: PBProtectionRelayFunction, cim: ProtectionRelayFunction, networkService: NetworkService): ProtectionRelayFunction =
     cim.apply {
         pb.protectedSwitchMRIDsList.forEach { protectedSwitchMRID ->
             networkService.resolveOrDeferReference(Resolvers.protectedSwitches(this), protectedSwitchMRID)
         }
+        pb.sensorMRIDsList.forEach { sensorMRID ->
+            networkService.resolveOrDeferReference(Resolvers.sensors(this), sensorMRID)
+        }
+        pb.schemeMRIDsList.forEach { schemeMRID ->
+            networkService.resolveOrDeferReference(Resolvers.schemes(this), schemeMRID)
+        }
+        model = pb.model.takeIf { it.isNotBlank() }
+        reclosing = pb.reclosingSet.takeUnless { pb.hasReclosingNull() }
         relayDelayTime = pb.relayDelayTime.takeUnless { it == UNKNOWN_DOUBLE }
         protectionKind = ProtectionKind.valueOf(pb.protectionKind.name)
         directable = pb.directableSet.takeUnless { pb.hasDirectableNull() }
         powerDirection = PowerDirectionKind.valueOf(pb.powerDirection.name)
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
+
+        pb.timeLimitsList.forEach { addTimeLimit(it) }
+        pb.thresholdsList.forEach { addThreshold(toCim(it)) }
+
+        toCim(pb.psr, this, networkService)
+    }
+
+fun toCim(pb: PBProtectionRelayScheme, networkService: NetworkService): ProtectionRelayScheme =
+    ProtectionRelayScheme(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.system(this), pb.systemMRID)
+        pb.functionMRIDsList.forEach { functionMRID ->
+            networkService.resolveOrDeferReference(Resolvers.functions(this), functionMRID)
+        }
+        toCim(pb.io, this, networkService)
+    }
+
+fun toCim(pb: PBProtectionRelaySystem, networkService: NetworkService): ProtectionRelaySystem =
+    ProtectionRelaySystem(pb.mRID()).apply {
+        pb.schemeMRIDsList.forEach { schemeMRID ->
+            networkService.resolveOrDeferReference(Resolvers.schemes(this), schemeMRID)
+        }
+        protectionKind = ProtectionKind.valueOf(pb.protectionKind.name)
         toCim(pb.eq, this, networkService)
     }
 
+fun toCim(pb: PBRelaySetting): RelaySetting =
+    RelaySetting(UnitSymbol.valueOf(pb.unitSymbol.name), pb.value, pb.name.takeIf { it.isNotEmpty() })
+
+fun toCim(pb: PBVoltageRelay, networkService: NetworkService): VoltageRelay =
+    VoltageRelay(pb.mRID()).apply {
+        toCim(pb.prf, this, networkService)
+    }
+
 fun NetworkService.addFromPb(pb: PBCurrentRelay): CurrentRelay? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBDistanceRelay): DistanceRelay? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBProtectionRelayScheme): ProtectionRelayScheme? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBProtectionRelaySystem): ProtectionRelaySystem? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBVoltageRelay): VoltageRelay? = tryAddOrNull(toCim(pb, this))
 
 /************ IEC61970 SCADA ************/
 
@@ -907,6 +976,17 @@ fun toCim(pb: PBEnergySourcePhase, networkService: NetworkService): EnergySource
 
 fun toCim(pb: PBFuse, networkService: NetworkService): Fuse =
     Fuse(pb.mRID()).apply {
+        networkService.resolveOrDeferReference(Resolvers.function(this), pb.functionMRID)
+        toCim(pb.sw, this, networkService)
+    }
+
+fun toCim(pb: PBGround, networkService: NetworkService): Ground =
+    Ground(pb.mRID()).apply {
+        toCim(pb.ce, this, networkService)
+    }
+
+fun toCim(pb: PBGroundDisconnector, networkService: NetworkService): GroundDisconnector =
+    GroundDisconnector(pb.mRID()).apply {
         toCim(pb.sw, this, networkService)
     }
 
@@ -1041,8 +1121,8 @@ fun toCim(pb: PBTransformerEndRatedS): TransformerEndRatedS =
 
 fun toCim(pb: PBProtectedSwitch, cim: ProtectedSwitch, networkService: NetworkService): ProtectedSwitch =
     cim.apply {
-        pb.operatedByProtectionEquipmentMRIDsList.forEach { protectionEquipmentMRID ->
-            networkService.resolveOrDeferReference(Resolvers.operatedByProtectionEquipment(this), protectionEquipmentMRID)
+        pb.relayFunctionMRIDsList.forEach { relayFunctionMRID ->
+            networkService.resolveOrDeferReference(Resolvers.relayFunctions(this), relayFunctionMRID)
         }
         breakingCapacity = pb.breakingCapacity.takeUnless { it == UNKNOWN_INT }
         toCim(pb.sw, this, networkService)
@@ -1077,12 +1157,24 @@ fun toCim(pb: PBRegulatingControl, cim: RegulatingControl, networkService: Netwo
         enabled = pb.enabledSet.takeUnless { pb.hasEnabledNull() }
         maxAllowedTargetValue = pb.maxAllowedTargetValue.takeUnless { it == UNKNOWN_DOUBLE }
         minAllowedTargetValue = pb.minAllowedTargetValue.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_DOUBLE }
         networkService.resolveOrDeferReference(Resolvers.terminal(this), pb.terminalMRID)
         pb.regulatingCondEqMRIDsList.forEach {
             networkService.resolveOrDeferReference(Resolvers.regulatingCondEq(this), it)
         }
 
         toCim(pb.psr, this, networkService)
+    }
+
+fun toCim(pb: PBSeriesCompensator, networkService: NetworkService): SeriesCompensator =
+    SeriesCompensator(pb.mRID()).apply {
+        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
+        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
+        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
+        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
+        varistorRatedCurrent = pb.varistorRatedCurrent.takeUnless { it == UNKNOWN_INT }
+        varistorVoltageThreshold = pb.varistorVoltageThreshold.takeUnless { it == UNKNOWN_INT }
+        toCim(pb.ce, this, networkService)
     }
 
 fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: NetworkService): ShuntCompensator =
@@ -1170,6 +1262,8 @@ fun NetworkService.addFromPb(pb: PBEnergyConsumerPhase): EnergyConsumerPhase? = 
 fun NetworkService.addFromPb(pb: PBEnergySource): EnergySource? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBEnergySourcePhase): EnergySourcePhase? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBFuse): Fuse? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBGround): Ground? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBGroundDisconnector): GroundDisconnector? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBJumper): Jumper? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBJunction): Junction? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensator? = tryAddOrNull(toCim(pb, this))
@@ -1181,6 +1275,7 @@ fun NetworkService.addFromPb(pb: PBPowerTransformer): PowerTransformer? = tryAdd
 fun NetworkService.addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBRecloser): Recloser? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBSeriesCompensator): SeriesCompensator? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTapChangerControl): TapChangerControl? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = tryAddOrNull(toCim(pb, this))
 
@@ -1262,7 +1357,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBLocation): Location? = networkService.addFromPb(pb)
 
     // IEC61968 infIEC61968 InfAssetInfo
-    fun addFromPb(pb: PBCurrentRelayInfo): CurrentRelayInfo? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBRelayInfo): RelayInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBCurrentTransformerInfo): CurrentTransformerInfo? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPotentialTransformerInfo): PotentialTransformerInfo? = networkService.addFromPb(pb)
 
@@ -1300,6 +1395,10 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
 
     // IEC61970 Base Protection
     fun addFromPb(pb: PBCurrentRelay): CurrentRelay? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBDistanceRelay): DistanceRelay? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBProtectionRelayScheme): ProtectionRelayScheme? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBProtectionRelaySystem): ProtectionRelaySystem? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBVoltageRelay): VoltageRelay? = networkService.addFromPb(pb)
 
     // IEC61970 BASE SCADA
     fun addFromPb(pb: PBRemoteControl): RemoteControl? = networkService.addFromPb(pb)
@@ -1320,6 +1419,8 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBEnergySource): EnergySource? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBEnergySourcePhase): EnergySourcePhase? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBFuse): Fuse? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBGround): Ground? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBGroundDisconnector): GroundDisconnector? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBJumper): Jumper? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBJunction): Junction? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensator? = networkService.addFromPb(pb)
@@ -1331,6 +1432,7 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRecloser): Recloser? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBSeriesCompensator): SeriesCompensator? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTapChangerControl): TapChangerControl? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = networkService.addFromPb(pb)
 

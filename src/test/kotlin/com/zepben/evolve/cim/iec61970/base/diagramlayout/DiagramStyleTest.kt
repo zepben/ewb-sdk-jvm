@@ -21,7 +21,7 @@ internal class DiagramStyleTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(DiagramStyle.values(), PBDiagramStyle.values())
+        validateEnum(DiagramStyle.entries, PBDiagramStyle.entries)
     }
 
 }

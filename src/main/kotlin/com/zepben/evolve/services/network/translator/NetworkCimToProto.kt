@@ -11,9 +11,9 @@ import com.google.protobuf.NullValue
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -24,8 +24,7 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentEquipment
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
@@ -80,9 +79,9 @@ import com.zepben.protobuf.cim.iec61968.common.PositionPoint as PBPositionPoint
 import com.zepben.protobuf.cim.iec61968.common.StreetAddress as PBStreetAddress
 import com.zepben.protobuf.cim.iec61968.common.StreetDetail as PBStreetDetail
 import com.zepben.protobuf.cim.iec61968.common.TownDetail as PBTownDetail
-import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo as PBCurrentRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo as PBCurrentTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo as PBPotentialTransformerInfo
+import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infcommon.Ratio as PBRatio
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
@@ -118,7 +117,12 @@ import com.zepben.protobuf.cim.iec61970.base.meas.Discrete as PBDiscrete
 import com.zepben.protobuf.cim.iec61970.base.meas.IoPoint as PBIoPoint
 import com.zepben.protobuf.cim.iec61970.base.meas.Measurement as PBMeasurement
 import com.zepben.protobuf.cim.iec61970.base.protection.CurrentRelay as PBCurrentRelay
-import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionEquipment as PBProtectionEquipment
+import com.zepben.protobuf.cim.iec61970.base.protection.DistanceRelay as PBDistanceRelay
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionRelayFunction as PBProtectionRelayFunction
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionRelayScheme as PBProtectionRelayScheme
+import com.zepben.protobuf.cim.iec61970.base.protection.ProtectionRelaySystem as PBProtectionRelaySystem
+import com.zepben.protobuf.cim.iec61970.base.protection.RelaySetting as PBRelaySetting
+import com.zepben.protobuf.cim.iec61970.base.protection.VoltageRelay as PBVoltageRelay
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteControl as PBRemoteControl
 import com.zepben.protobuf.cim.iec61970.base.scada.RemotePoint as PBRemotePoint
 import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSource
@@ -134,6 +138,8 @@ import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConsumerPhase as PBEner
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergySource as PBEnergySource
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergySourcePhase as PBEnergySourcePhase
 import com.zepben.protobuf.cim.iec61970.base.wires.Fuse as PBFuse
+import com.zepben.protobuf.cim.iec61970.base.wires.Ground as PBGround
+import com.zepben.protobuf.cim.iec61970.base.wires.GroundDisconnector as PBGroundDisconnector
 import com.zepben.protobuf.cim.iec61970.base.wires.Jumper as PBJumper
 import com.zepben.protobuf.cim.iec61970.base.wires.Junction as PBJunction
 import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
@@ -152,6 +158,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.Recloser as PBRecloser
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingCondEq as PBRegulatingCondEq
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingControl as PBRegulatingControl
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingControlModeKind as PBRegulatingControlModeKind
+import com.zepben.protobuf.cim.iec61970.base.wires.SeriesCompensator as PBSeriesCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
@@ -382,9 +389,10 @@ fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
-fun toPb(cim: CurrentRelayInfo, pb: PBCurrentRelayInfo.Builder): PBCurrentRelayInfo.Builder =
+fun toPb(cim: RelayInfo, pb: PBRelayInfo.Builder): PBRelayInfo.Builder =
     pb.apply {
         cim.curveSetting?.let { curveSetting = it } ?: clearCurveSetting()
+        cim.recloseFast?.let { recloseFastSet = it } ?: run { recloseFastNull = NullValue.NULL_VALUE }
         cim.recloseDelays.forEach { addRecloseDelays(it) }
         toPb(cim, aiBuilder)
     }
@@ -417,7 +425,7 @@ fun toPb(cim: PotentialTransformerInfo, pb: PBPotentialTransformerInfo.Builder):
         toPb(cim, aiBuilder)
     }
 
-fun CurrentRelayInfo.toPb(): PBCurrentRelayInfo = toPb(this, PBCurrentRelayInfo.newBuilder()).build()
+fun RelayInfo.toPb(): PBRelayInfo = toPb(this, PBRelayInfo.newBuilder()).build()
 fun CurrentTransformerInfo.toPb(): PBCurrentTransformerInfo = toPb(this, PBCurrentTransformerInfo.newBuilder()).build()
 fun PotentialTransformerInfo.toPb(): PBPotentialTransformerInfo = toPb(this, PBPotentialTransformerInfo.newBuilder()).build()
 
@@ -493,7 +501,10 @@ fun toPb(cim: PotentialTransformer, pb: PBPotentialTransformer.Builder): PBPoten
     }
 
 fun toPb(cim: Sensor, pb: PBSensor.Builder): PBSensor.Builder =
-    pb.apply { toPb(cim, aeBuilder) }
+    pb.apply {
+        cim.relayFunctions.forEach { addRelayFunctionMRIDs(it.mRID) }
+        toPb(cim, aeBuilder)
+    }
 
 fun CurrentTransformer.toPb(): PBCurrentTransformer = toPb(this, PBCurrentTransformer.newBuilder()).build()
 fun FaultIndicator.toPb(): PBFaultIndicator = toPb(this, PBFaultIndicator.newBuilder()).build()
@@ -694,20 +705,70 @@ fun toPb(cim: CurrentRelay, pb: PBCurrentRelay.Builder): PBCurrentRelay.Builder 
         currentLimit1 = cim.currentLimit1 ?: UNKNOWN_DOUBLE
         cim.inverseTimeFlag?.let { inverseTimeFlagSet = it } ?: run { inverseTimeFlagNull = NullValue.NULL_VALUE }
         timeDelay1 = cim.timeDelay1 ?: UNKNOWN_DOUBLE
-        toPb(cim, peBuilder)
+        toPb(cim, prfBuilder)
     }
 
-fun toPb(cim: ProtectionEquipment, pb: PBProtectionEquipment.Builder): PBProtectionEquipment.Builder =
+fun toPb(cim: DistanceRelay, pb: PBDistanceRelay.Builder): PBDistanceRelay.Builder =
     pb.apply {
+        backwardBlind = cim.backwardBlind ?: UNKNOWN_DOUBLE
+        backwardReach = cim.backwardReach ?: UNKNOWN_DOUBLE
+        backwardReactance = cim.backwardReactance ?: UNKNOWN_DOUBLE
+        forwardBlind = cim.forwardBlind ?: UNKNOWN_DOUBLE
+        forwardReach = cim.forwardReach ?: UNKNOWN_DOUBLE
+        forwardReactance = cim.forwardReactance ?: UNKNOWN_DOUBLE
+        operationPhaseAngle1 = cim.operationPhaseAngle1 ?: UNKNOWN_DOUBLE
+        operationPhaseAngle2 = cim.operationPhaseAngle2 ?: UNKNOWN_DOUBLE
+        operationPhaseAngle3 = cim.operationPhaseAngle3 ?: UNKNOWN_DOUBLE
+        toPb(cim, prfBuilder)
+    }
+
+fun toPb(cim: ProtectionRelayFunction, pb: PBProtectionRelayFunction.Builder): PBProtectionRelayFunction.Builder =
+    pb.apply {
+        cim.model?.let { model = it } ?: clearModel()
+        cim.reclosing?.also { reclosingSet = it } ?: run { reclosingNull = NullValue.NULL_VALUE }
         relayDelayTime = cim.relayDelayTime ?: UNKNOWN_DOUBLE
         protectionKind = PBProtectionKind.valueOf(cim.protectionKind.name)
         cim.directable?.also { directableSet = it } ?: run { directableNull = NullValue.NULL_VALUE }
         powerDirection = PowerDirectionKind.valueOf(cim.powerDirection.name)
+        cim.timeLimits.forEach { addTimeLimits(it) }
+        cim.thresholds.forEach { addThresholds(toPb(it)) }
         cim.protectedSwitches.forEach { addProtectedSwitchMRIDs(it.mRID) }
+        cim.sensors.forEach { addSensorMRIDs(it.mRID) }
+        cim.schemes.forEach { addSchemeMRIDs(it.mRID) }
+        toPb(cim, psrBuilder)
+    }
+
+fun toPb(cim: ProtectionRelayScheme, pb: PBProtectionRelayScheme.Builder): PBProtectionRelayScheme.Builder =
+    pb.apply {
+        cim.system?.let { systemMRID = it.mRID } ?: clearSystemMRID()
+        cim.functions.forEach { addFunctionMRIDs(it.mRID) }
+        toPb(cim, ioBuilder)
+    }
+
+fun toPb(cim: ProtectionRelaySystem, pb: PBProtectionRelaySystem.Builder): PBProtectionRelaySystem.Builder =
+    pb.apply {
+        protectionKind = PBProtectionKind.valueOf(cim.protectionKind.name)
+        cim.schemes.forEach { addSchemeMRIDs(it.mRID) }
         toPb(cim, eqBuilder)
     }
 
+fun toPb(cim: RelaySetting): PBRelaySetting.Builder =
+    PBRelaySetting.newBuilder().apply {
+        unitSymbol = PBUnitSymbol.valueOf(cim.unitSymbol.name)
+        value = cim.value
+        cim.name?.let { name = it } ?: clearName()
+    }
+
+fun toPb(cim: VoltageRelay, pb: PBVoltageRelay.Builder): PBVoltageRelay.Builder =
+    pb.apply {
+        toPb(cim, prfBuilder)
+    }
+
 fun CurrentRelay.toPb(): PBCurrentRelay = toPb(this, PBCurrentRelay.newBuilder()).build()
+fun DistanceRelay.toPb(): PBDistanceRelay = toPb(this, PBDistanceRelay.newBuilder()).build()
+fun ProtectionRelayScheme.toPb(): PBProtectionRelayScheme = toPb(this, PBProtectionRelayScheme.newBuilder()).build()
+fun ProtectionRelaySystem.toPb(): PBProtectionRelaySystem = toPb(this, PBProtectionRelaySystem.newBuilder()).build()
+fun VoltageRelay.toPb(): PBVoltageRelay = toPb(this, PBVoltageRelay.newBuilder()).build()
 
 /************ IEC61970 BASE SCADA ************/
 
@@ -863,6 +924,15 @@ fun toPb(cim: EnergySourcePhase, pb: PBEnergySourcePhase.Builder): PBEnergySourc
     }
 
 fun toPb(cim: Fuse, pb: PBFuse.Builder): PBFuse.Builder =
+    pb.apply {
+        cim.function?.let { functionMRID = it.mRID } ?: clearFunctionMRID()
+        toPb(cim, swBuilder)
+    }
+
+fun toPb(cim: Ground, pb: PBGround.Builder): PBGround.Builder =
+    pb.apply { toPb(cim, ceBuilder) }
+
+fun toPb(cim: GroundDisconnector, pb: PBGroundDisconnector.Builder): PBGroundDisconnector.Builder =
     pb.apply { toPb(cim, swBuilder) }
 
 fun toPb(cim: Jumper, pb: PBJumper.Builder): PBJumper.Builder =
@@ -982,17 +1052,27 @@ fun toPb(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd.Builder): PBPowerTr
         toPb(cim, teBuilder)
     }
 
+fun toPb(cim: SeriesCompensator, pb: PBSeriesCompensator.Builder) =
+    pb.apply {
+        r = cim.r ?: UNKNOWN_DOUBLE
+        r0 = cim.r0 ?: UNKNOWN_DOUBLE
+        x = cim.x ?: UNKNOWN_DOUBLE
+        x0 = cim.x0 ?: UNKNOWN_DOUBLE
+        varistorRatedCurrent = cim.varistorRatedCurrent ?: UNKNOWN_INT
+        varistorVoltageThreshold = cim.varistorVoltageThreshold ?: UNKNOWN_INT
+        toPb(cim, ceBuilder)
+    }
+
 fun toPb(cim: TransformerEndRatedS): PBTransformerEndRatedS.Builder =
     PBTransformerEndRatedS.newBuilder().apply {
         ratedS = cim.ratedS
         coolingType = TransformerCoolingType.valueOf(cim.coolingType.name)
-
     }
 
 fun toPb(cim: ProtectedSwitch, pb: PBProtectedSwitch.Builder): PBProtectedSwitch.Builder =
     pb.apply {
+        cim.relayFunctions.forEach { addRelayFunctionMRIDs(it.mRID) }
         breakingCapacity = cim.breakingCapacity ?: UNKNOWN_INT
-        cim.operatedByProtectionEquipment.forEach { addOperatedByProtectionEquipmentMRIDs(it.mRID) }
         toPb(cim, swBuilder)
     }
 
@@ -1024,6 +1104,7 @@ fun toPb(cim: RegulatingControl, pb: PBRegulatingControl.Builder): PBRegulatingC
         cim.enabled?.let { enabledSet = it } ?: run { enabledNull = NullValue.NULL_VALUE }
         maxAllowedTargetValue = cim.maxAllowedTargetValue ?: UNKNOWN_DOUBLE
         minAllowedTargetValue = cim.minAllowedTargetValue ?: UNKNOWN_DOUBLE
+        ratedCurrent = cim.ratedCurrent ?: UNKNOWN_DOUBLE
         cim.terminal?.also { terminalMRID = it.mRID } ?: clearTerminalMRID()
         clearRegulatingCondEqMRIDs()
         cim.regulatingCondEqs.forEach { addRegulatingCondEqMRIDs(it.mRID) }
@@ -1115,6 +1196,8 @@ fun EnergyConsumerPhase.toPb(): PBEnergyConsumerPhase = toPb(this, PBEnergyConsu
 fun EnergySource.toPb(): PBEnergySource = toPb(this, PBEnergySource.newBuilder()).build()
 fun EnergySourcePhase.toPb(): PBEnergySourcePhase = toPb(this, PBEnergySourcePhase.newBuilder()).build()
 fun Fuse.toPb(): PBFuse = toPb(this, PBFuse.newBuilder()).build()
+fun Ground.toPb(): PBGround = toPb(this, PBGround.newBuilder()).build()
+fun GroundDisconnector.toPb(): PBGroundDisconnector = toPb(this, PBGroundDisconnector.newBuilder()).build()
 fun Jumper.toPb(): PBJumper = toPb(this, PBJumper.newBuilder()).build()
 fun Junction.toPb(): PBJunction = toPb(this, PBJunction.newBuilder()).build()
 fun LinearShuntCompensator.toPb(): PBLinearShuntCompensator = toPb(this, PBLinearShuntCompensator.newBuilder()).build()
@@ -1126,6 +1209,7 @@ fun PowerTransformer.toPb(): PBPowerTransformer = toPb(this, PBPowerTransformer.
 fun PowerTransformerEnd.toPb(): PBPowerTransformerEnd = toPb(this, PBPowerTransformerEnd.newBuilder()).build()
 fun RatioTapChanger.toPb(): PBRatioTapChanger = toPb(this, PBRatioTapChanger.newBuilder()).build()
 fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
+fun SeriesCompensator.toPb(): PBSeriesCompensator = toPb(this, PBSeriesCompensator.newBuilder()).build()
 fun TapChangerControl.toPb(): PBTapChangerControl = toPb(this, PBTapChangerControl.newBuilder()).build()
 fun TransformerStarImpedance.toPb(): PBTransformerStarImpedance = toPb(this, PBTransformerStarImpedance.newBuilder()).build()
 
@@ -1206,7 +1290,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: Location): PBLocation = cim.toPb()
 
     // IEC61968 infIEC61968 InfAssetInfo
-    fun toPb(cim: CurrentRelayInfo): PBCurrentRelayInfo = cim.toPb()
+    fun toPb(cim: RelayInfo): PBRelayInfo = cim.toPb()
     fun toPb(cim: CurrentTransformerInfo): PBCurrentTransformerInfo = cim.toPb()
     fun toPb(cim: PotentialTransformerInfo): PBPotentialTransformerInfo = cim.toPb()
 
@@ -1243,6 +1327,10 @@ class NetworkCimToProto : BaseCimToProto() {
 
     // IEC61970 Base Protection
     fun toPb(cim: CurrentRelay): PBCurrentRelay = cim.toPb()
+    fun toPb(cim: DistanceRelay): PBDistanceRelay = cim.toPb()
+    fun toPb(cim: ProtectionRelayScheme): PBProtectionRelayScheme = cim.toPb()
+    fun toPb(cim: ProtectionRelaySystem): PBProtectionRelaySystem = cim.toPb()
+    fun toPb(cim: VoltageRelay): PBVoltageRelay = cim.toPb()
 
     // IEC61970 BASE SCADA
     fun toPb(cim: RemoteControl): PBRemoteControl = cim.toPb()
@@ -1263,6 +1351,8 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: EnergySource): PBEnergySource = cim.toPb()
     fun toPb(cim: EnergySourcePhase): PBEnergySourcePhase = cim.toPb()
     fun toPb(cim: Fuse): PBFuse = cim.toPb()
+    fun toPb(cim: Ground): PBGround = cim.toPb()
+    fun toPb(cim: GroundDisconnector): PBGroundDisconnector = cim.toPb()
     fun toPb(cim: Jumper): PBJumper = cim.toPb()
     fun toPb(cim: Junction): PBJunction = cim.toPb()
     fun toPb(cim: LinearShuntCompensator): PBLinearShuntCompensator = cim.toPb()
@@ -1274,6 +1364,7 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: PowerTransformerEnd): PBPowerTransformerEnd = cim.toPb()
     fun toPb(cim: RatioTapChanger): PBRatioTapChanger = cim.toPb()
     fun toPb(cim: Recloser): PBRecloser = cim.toPb()
+    fun toPb(cim: SeriesCompensator): PBSeriesCompensator = cim.toPb()
     fun toPb(cim: TapChangerControl): PBTapChangerControl = cim.toPb()
     fun toPb(cim: TransformerStarImpedance): PBTransformerStarImpedance = cim.toPb()
 

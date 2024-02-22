@@ -9,19 +9,48 @@
   `obj.addName(nameType, "name", obj))` or `obj.addName(nameType.getOrAddName("name", obj))` becomes `obj.addName(nameType, "name")`
 * `addName()`/`removeName()` related function for both `IdentifiedObject` and `NameType` will now also perform the same function on the other object type.
   i.e. Removing a name from the identified object will remove it from the name type and vice versa. Same interaction is also applied to adding a name.
+* Removed `ProtectionEquipment`.
+* Change of inheritance: `CurrentRelay` &rarr; `ProtectionEquipment`.
+  becomes `CurrentRelay` &rarr; `ProtectionRelayFunction`.
+* Removed symmetric relation `ProtectionEquipment` &harr; `ProtectedSwitch`.
+* Renamed `CurrentRelayInfo` to `RelayInfo`.
+  * The override `assetInfo: RelayInfo?` has been moved from `CurrentRelay` to its new parent class, `ProtectionRelayFunction`.
+  * Renamed `RelayInfo.removeDelay` to `RelayInfo.removeDelayAt`. The original method name has been repurposed to remove a delay by its value rather than its
+    index.
+* Reworked values for enumerable type `ProtectionKind`.
 
 ### New Features
 
 * Added `getNames(IdentifiedObject)` to `NameType` to retrieve all names associated with the `NameType` that belongs to an `IdentifiedObject`.
 * Added `getNames(NameType)` and `getNames(String)` to `IdentifiedObject` so user can retrieve all names for a given `NameType` of the `IdentifiedObject` 
+* Added new classes and fields to support advanced modelling of protection relays:
+    * `SeriesCompensator`: A series capacitor or reactor or an AC transmission line without charging susceptance.
+    * `Ground`: A point where the system is grounded used for connecting conducting equipment to ground.
+    * `GroundDisconnector`: A manually operated or motor operated mechanical switching device used for isolating a circuit
+      or equipment from ground.
+    * `ProtectionRelayScheme`: A scheme that a group of relay functions implement. For example, typically schemes are
+      primary and secondary, or main and failsafe.
+    * `ProtectionRelayFunction`: A function that a relay implements to protect equipment.
+    * `ProtectionRelaySystem`: A relay system for controlling `ProtectedSwitch`es.
+    * `RelaySetting`: The threshold settings for a given relay.
+    * `VoltageRelay`: A device that detects when the voltage in an AC circuit reaches a preset voltage.
+    * `DistanceRelay`: A protective device used in power systems that measures the impedance of a transmission line to
+      determine the distance to a fault, and initiates circuit breaker tripping to isolate the faulty
+      section and safeguard the power system.
+    * `RelayInfo.recloseFast`: True if recloseDelays are associated with a fast Curve, False otherwise.
+    * `RegulatingControl.ratedCurrent`: The rated current of associated CT in amps for a RegulatingControl.
 
 ### Enhancements
 
-* None.
+* Added missing collection methods for `RelayInfo.recloseDelays` (`RelayInfo` was previously named `CurrentRelayInfo`):
+  * `RelayInfo.getDelay(sequenceNumber: Int): Double?`
+  * `RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit)`
+  * `RelayInfo.removeDelay(delay: Double?): Boolean`
+    * The original method with this name has been renamed to `RelayInfo.removeDelayAt(index: Int): Double?`.
 
 ### Fixes
 
-* None.
+* Fixed transitive bug that made a database round-trip test fail on Windows due to an issue in `sqlitejdbc.dll`.
 
 ### Notes
 

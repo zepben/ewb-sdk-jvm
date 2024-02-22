@@ -22,7 +22,7 @@ internal class TransformerConstructionKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(TransformerConstructionKind.values(), PBTransformerConstructionKind.values())
+        validateEnum(TransformerConstructionKind.entries, PBTransformerConstructionKind.entries)
     }
 
 }

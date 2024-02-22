@@ -23,8 +23,8 @@ object PhasePaths {
         SPK.Y to NominalPhasePath(SPK.Y, SPK.Y),
     )
 
-    private val knownPhaseCodes = PhaseCode.values().filter { pc -> pc.singlePhases.any { it in PhaseCode.ABC.singlePhases } || (pc == PhaseCode.N) }
-    private val unknownPhaseCodes = PhaseCode.values().filter { pc -> pc.singlePhases.any { it in PhaseCode.XY.singlePhases } }
+    private val knownPhaseCodes = PhaseCode.entries.filter { pc -> pc.singlePhases.any { it in PhaseCode.ABC.singlePhases } || (pc == PhaseCode.N) }
+    private val unknownPhaseCodes = PhaseCode.entries.filter { pc -> pc.singlePhases.any { it in PhaseCode.XY.singlePhases } }
 
     val straightPhaseConnectivity: Map<PhaseCode, Map<PhaseCode, List<NominalPhasePath>>> =
         knownPhaseCodes.associateWith { fromPhases ->

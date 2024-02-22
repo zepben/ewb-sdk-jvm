@@ -21,7 +21,7 @@ internal class StreetlightLampKindTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(StreetlightLampKind.values(), PBStreetlightLampKind.values())
+        validateEnum(StreetlightLampKind.entries, PBStreetlightLampKind.entries)
     }
 
 }

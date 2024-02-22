@@ -746,4 +746,3 @@ None.
 ### v0.1.0
 
 Initial release containing the Zepben CIM profile, database [de]serialisation, protobuf [de]serialisation, network model tracing, and gRPC producer clients.
-

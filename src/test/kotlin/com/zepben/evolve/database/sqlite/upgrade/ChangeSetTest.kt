@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.database.sqlite.upgrade
 
+import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet49Validator
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.*
 import com.zepben.testutils.junit.SystemLogExtension
@@ -32,7 +33,8 @@ class ChangeSetTest {
         45 to ChangeSet45Validator,
         46 to ChangeSet46Validator,
         47 to ChangeSet47Validator,
-        48 to ChangeSet48Validator
+        48 to ChangeSet48Validator,
+        49 to ChangeSet49Validator
     )
 
     @Test

@@ -15,9 +15,9 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
@@ -25,11 +25,11 @@ import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.cim.iec61970.base.meas.*
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -70,10 +70,11 @@ internal class NetworkTranslatorTest {
         Measurement::class.java to { Discrete(it) },
         TransformerEnd::class.java to { PowerTransformerEnd(it) },
         WireInfo::class.java to { OverheadWireInfo(it) },
-        ProtectionEquipment::class.java to { CurrentRelay(it) },
+        ProtectionRelayFunction::class.java to { CurrentRelay(it) },
         ProtectedSwitch::class.java to { Breaker(it) },
         RegulatingControl::class.java to { TapChangerControl(it) },
-        RegulatingCondEq::class.java to { PowerElectronicsConnection(it) }
+        RegulatingCondEq::class.java to { PowerElectronicsConnection(it) },
+        Sensor::class.java to { CurrentTransformer(it) }
     )
 
     @Test
@@ -102,7 +103,7 @@ internal class NetworkTranslatorTest {
         validate({ Organisation() }, { ns, it -> it.fillFieldsCommon(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
         /************ IEC61968 infIEC61968 InfAssetInfo ************/
-        validate({ CurrentRelayInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ RelayInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ CurrentTransformerInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ PotentialTransformerInfo() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
@@ -139,6 +140,10 @@ internal class NetworkTranslatorTest {
 
         /************ IEC61970 Base Protection ************/
         validate({ CurrentRelay() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ DistanceRelay() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ ProtectionRelayScheme() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ ProtectionRelaySystem() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ VoltageRelay() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
         /************ IEC61970 BASE SCADA ************/
         validate({ RemoteControl() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
@@ -161,6 +166,8 @@ internal class NetworkTranslatorTest {
         validate({ EnergySource() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ EnergySourcePhase() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Fuse() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ Ground() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ GroundDisconnector() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Jumper() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Junction() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ LinearShuntCompensator() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
@@ -170,6 +177,7 @@ internal class NetworkTranslatorTest {
         validate({ PowerTransformerEnd() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ RatioTapChanger() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Recloser() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ SeriesCompensator() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ TransformerStarImpedance() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ TapChangerControl() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 
@@ -241,7 +249,7 @@ internal class NetworkTranslatorTest {
     }
 
     private inline fun <reified T : IdentifiedObject> addWithUnresolvedReferences(cim: T, adder: (NetworkService, T) -> T?): T {
-        // We need to convert the populated item before we check the differences so we can complete the unresolved references.
+        // We need to convert the populated item before we check the differences, so we can complete the unresolved references.
         val service = NetworkService()
         val convertedCim = adder(service, cim)!!
         service.unresolvedReferences().toList().forEach { ref ->

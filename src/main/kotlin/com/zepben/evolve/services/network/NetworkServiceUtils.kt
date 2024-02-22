@@ -17,9 +17,9 @@ import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -32,7 +32,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Accumulator
 import com.zepben.evolve.cim.iec61970.base.meas.Analog
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Discrete
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -124,10 +124,17 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isCurrentTransformer Handler when the [identifiedObject] is a [CurrentTransformer]
  * @param isPotentialTransformer Handler when the [identifiedObject] is a [PotentialTransformer]
  * @param isSwitchInfo Handler when the [identifiedObject] is a [SwitchInfo]
- * @param isCurrentRelayInfo Handler when the [identifiedObject] is a [CurrentRelayInfo]
+ * @param isRelayInfo Handler when the [identifiedObject] is a [RelayInfo]
  * @param isCurrentRelay Handler when the [identifiedObject] is a [CurrentRelay]
  * @param isEvChargingUnit Handler when the [identifiedObject] is an [EvChargingUnit]
  * @param isTapChangerControl Handler when the [identifiedObject] is a [TapChangerControl]
+ * @param isSeriesCompensator Handler when the [identifiedObject] is a [SeriesCompensator]
+ * @param isGround Handler when the [identifiedObject] is a [Ground]
+ * @param isGroundDisconnector Handler when the [identifiedObject] is a [GroundDisconnector]
+ * @param isProtectionRelayScheme Handler when the [identifiedObject] is a [ProtectionRelayScheme]
+ * @param isProtectionRelaySystem Handler when the [identifiedObject] is a [ProtectionRelaySystem]
+ * @param isVoltageRelay Handler when the [identifiedObject] is a [VoltageRelay]
+ * @param isDistanceRelay Handler when the [identifiedObject] is a [DistanceRelay]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -198,10 +205,17 @@ inline fun <R> whenNetworkServiceObject(
     isCurrentTransformer: (CurrentTransformer) -> R,
     isPotentialTransformer: (PotentialTransformer) -> R,
     isSwitchInfo: (SwitchInfo) -> R,
-    isCurrentRelayInfo: (CurrentRelayInfo) -> R,
+    isRelayInfo: (RelayInfo) -> R,
     isCurrentRelay: (CurrentRelay) -> R,
     isEvChargingUnit: (EvChargingUnit) -> R,
     isTapChangerControl: (TapChangerControl) -> R,
+    isSeriesCompensator: (SeriesCompensator) -> R,
+    isGround: (Ground) -> R,
+    isGroundDisconnector: (GroundDisconnector) -> R,
+    isProtectionRelayScheme: (ProtectionRelayScheme) -> R,
+    isProtectionRelaySystem: (ProtectionRelaySystem) -> R,
+    isVoltageRelay: (VoltageRelay) -> R,
+    isDistanceRelay: (DistanceRelay) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -271,9 +285,16 @@ inline fun <R> whenNetworkServiceObject(
     is CurrentTransformer -> isCurrentTransformer(identifiedObject)
     is PotentialTransformer -> isPotentialTransformer(identifiedObject)
     is SwitchInfo -> isSwitchInfo(identifiedObject)
-    is CurrentRelayInfo -> isCurrentRelayInfo(identifiedObject)
+    is RelayInfo -> isRelayInfo(identifiedObject)
     is CurrentRelay -> isCurrentRelay(identifiedObject)
     is EvChargingUnit -> isEvChargingUnit(identifiedObject)
     is TapChangerControl -> isTapChangerControl(identifiedObject)
+    is SeriesCompensator -> isSeriesCompensator(identifiedObject)
+    is Ground -> isGround(identifiedObject)
+    is GroundDisconnector -> isGroundDisconnector(identifiedObject)
+    is ProtectionRelayScheme -> isProtectionRelayScheme(identifiedObject)
+    is ProtectionRelaySystem -> isProtectionRelaySystem(identifiedObject)
+    is VoltageRelay -> isVoltageRelay(identifiedObject)
+    is DistanceRelay -> isDistanceRelay(identifiedObject)
     else -> isOther(identifiedObject)
 }

@@ -19,22 +19,24 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentRelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.meas.Control
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
@@ -83,10 +85,6 @@ internal object ConductingEquipmentToTerminalsResolver : ReferenceResolver<Condu
 
 internal object ConductorToWireInfoResolver : ReferenceResolver<Conductor, WireInfo> by KReferenceResolver(
     Conductor::class, WireInfo::class, Conductor::assetInfo.setter
-)
-
-internal object CurrentRelayToCurrentRelayInfoResolver : ReferenceResolver<CurrentRelay, CurrentRelayInfo> by KReferenceResolver(
-    CurrentRelay::class, CurrentRelayInfo::class, CurrentRelay::assetInfo.setter
 )
 
 internal object CurrentTransformerToCurrentTransformerInfoResolver : ReferenceResolver<CurrentTransformer, CurrentTransformerInfo> by KReferenceResolver(
@@ -425,12 +423,44 @@ internal object TransformerEndInfoToEnergisedEndOpenCircuitTestResolver : Refere
     TransformerEndInfo::class, OpenCircuitTest::class, TransformerEndInfo::energisedEndOpenCircuitTests.setter
 )
 
-internal object ProtectionEquipmentToProtectedSwitchResolver : ReferenceResolver<ProtectionEquipment, ProtectedSwitch> by KReferenceResolver(
-    ProtectionEquipment::class, ProtectedSwitch::class, ProtectionEquipment::addProtectedSwitch
+internal object ProtectionRelayFunctionToProtectedSwitchResolver : ReferenceResolver<ProtectionRelayFunction, ProtectedSwitch> by KReferenceResolver(
+    ProtectionRelayFunction::class, ProtectedSwitch::class, ProtectionRelayFunction::addProtectedSwitch
 )
 
-internal object ProtectedSwitchToProtectionEquipmentResolver : ReferenceResolver<ProtectedSwitch, ProtectionEquipment> by KReferenceResolver(
-    ProtectedSwitch::class, ProtectionEquipment::class, ProtectedSwitch::addOperatedByProtectionEquipment
+internal object ProtectedSwitchToProtectionRelayFunctionResolver : ReferenceResolver<ProtectedSwitch, ProtectionRelayFunction> by KReferenceResolver(
+    ProtectedSwitch::class, ProtectionRelayFunction::class, ProtectedSwitch::addRelayFunction
+)
+
+internal object ProtectionRelayFunctionToSensorResolver : ReferenceResolver<ProtectionRelayFunction, Sensor> by KReferenceResolver(
+    ProtectionRelayFunction::class, Sensor::class, ProtectionRelayFunction::addSensor
+)
+
+internal object SensorToProtectionRelayFunctionResolver : ReferenceResolver<Sensor, ProtectionRelayFunction> by KReferenceResolver(
+    Sensor::class, ProtectionRelayFunction::class, Sensor::addRelayFunction
+)
+
+internal object ProtectionRelayFunctionToProtectionRelaySchemeResolver : ReferenceResolver<ProtectionRelayFunction, ProtectionRelayScheme> by KReferenceResolver(
+    ProtectionRelayFunction::class, ProtectionRelayScheme::class, ProtectionRelayFunction::addScheme
+)
+
+internal object ProtectionRelaySchemeToProtectionRelayFunctionResolver : ReferenceResolver<ProtectionRelayScheme, ProtectionRelayFunction> by KReferenceResolver(
+    ProtectionRelayScheme::class, ProtectionRelayFunction::class, ProtectionRelayScheme::addFunction
+)
+
+internal object ProtectionRelaySchemeToProtectionRelaySystemResolver : ReferenceResolver<ProtectionRelayScheme, ProtectionRelaySystem> by KReferenceResolver(
+    ProtectionRelayScheme::class, ProtectionRelaySystem::class, ProtectionRelayScheme::system.setter
+)
+
+internal object ProtectionRelaySystemToProtectionRelaySchemeResolver : ReferenceResolver<ProtectionRelaySystem, ProtectionRelayScheme> by KReferenceResolver(
+    ProtectionRelaySystem::class, ProtectionRelayScheme::class, ProtectionRelaySystem::addScheme
+)
+
+internal object FuseToProtectionRelayFunctionResolver : ReferenceResolver<Fuse, ProtectionRelayFunction> by KReferenceResolver(
+    Fuse::class, ProtectionRelayFunction::class, Fuse::function.setter
+)
+
+internal object ProtectionRelayFunctionToRelayInfoResolver : ReferenceResolver<ProtectionRelayFunction, RelayInfo> by KReferenceResolver(
+    ProtectionRelayFunction::class, RelayInfo::class, ProtectionRelayFunction::assetInfo.setter
 )
 
 //-------------------------------------------//

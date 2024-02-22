@@ -12,11 +12,12 @@ import com.google.protobuf.ProtocolMessageEnum
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import kotlin.enums.EnumEntries
 
-fun <T : Enum<T>, U : Enum<U>> validateEnum(cimEnum: Array<T>, pbEnum: Array<U>) {
-    System.err.println("cim ${cimEnum.asList()}")
+inline fun <reified T : Enum<T>, reified U : Enum<U>> validateEnum(cimEnum: EnumEntries<T>, pbEnum: EnumEntries<U>) {
+    System.err.println("cim ${cimEnum.toTypedArray()}")
     System.err.println("   vs")
-    System.err.println("pb ${pbEnum.asList()}'")
+    System.err.println("pb ${pbEnum.toTypedArray()}'")
 
     assertThat(cimEnum.size, equalTo(pbEnum.size - 1))
 

@@ -7,8 +7,16 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
+
 /**
  * An overcurrent protective device with a circuit opening fusible part that is heated and severed by the passage of
  * overcurrent through it. A fuse is considered a switching device because it breaks current.
+ *
+ * @property function The function implemented by this Fuse
  */
-class Fuse @JvmOverloads constructor(mRID: String = "") : Switch(mRID)
+class Fuse @JvmOverloads constructor(mRID: String = "") : Switch(mRID) {
+
+    var function: ProtectionRelayFunction? = null
+
+}

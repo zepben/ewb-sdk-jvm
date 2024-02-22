@@ -49,6 +49,7 @@ internal class LocationTest {
             Location::addPoint,
             Location::addPoint,
             Location::removePoint,
+            null,
             Location::clearPoints
         )
     }

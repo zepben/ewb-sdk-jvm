@@ -7,7 +7,7 @@
  */
 package com.zepben.evolve.cim.iec61970.base.wires
 
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionEquipment
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
@@ -41,16 +41,16 @@ internal class ProtectedSwitchTest {
     }
 
     @Test
-    internal fun operatedByProtectionEquipments() {
+    internal fun relayFunctions() {
         PrivateCollectionValidator.validate(
             { object : ProtectedSwitch() {} },
-            { id, _ -> object : ProtectionEquipment(id) {} },
-            ProtectedSwitch::numOperatedByProtectionEquipment,
-            ProtectedSwitch::getOperatedByProtectionEquipment,
-            ProtectedSwitch::operatedByProtectionEquipment,
-            ProtectedSwitch::addOperatedByProtectionEquipment,
-            ProtectedSwitch::removeOperatedByProtectionEquipment,
-            ProtectedSwitch::clearOperatedByProtectionEquipment
+            { id, _ -> object : ProtectionRelayFunction(id) {} },
+            ProtectedSwitch::numRelayFunctions,
+            ProtectedSwitch::getRelayFunction,
+            ProtectedSwitch::relayFunctions,
+            ProtectedSwitch::addRelayFunction,
+            ProtectedSwitch::removeRelayFunction,
+            ProtectedSwitch::clearRelayFunctions
         )
     }
 

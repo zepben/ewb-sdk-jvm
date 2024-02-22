@@ -21,7 +21,7 @@ internal class VectorGroupTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(VectorGroup.values(), PBVectorGroup.values())
+        validateEnum(VectorGroup.entries, PBVectorGroup.entries)
     }
 
 }

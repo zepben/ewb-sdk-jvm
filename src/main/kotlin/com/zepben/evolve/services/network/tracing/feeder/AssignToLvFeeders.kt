@@ -98,14 +98,20 @@ class AssignToLvFeeders {
                     eq.addContainer(feeder)
                     // Handle classes extending Equipment
                     when (eq) {
-                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> pe.addContainer(feeder) }
+                        is ProtectedSwitch ->
+                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
+                                system.addContainer(feeder)
+                            }
                     }
                 },
                 { feeder, eq ->
                     feeder.addEquipment(eq)
                     // Handle classes extending Equipment
                     when (eq) {
-                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> feeder.addEquipment(pe) }
+                        is ProtectedSwitch ->
+                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
+                                feeder.addEquipment(system)
+                            }
                     }
                 },
                 isStopping,
@@ -121,14 +127,20 @@ class AssignToLvFeeders {
                     eq.addCurrentContainer(feeder)
                     // Handle classes extending Equipment
                     when (eq) {
-                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> pe.addCurrentContainer(feeder) }
+                        is ProtectedSwitch ->
+                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
+                                system.addContainer(feeder)
+                            }
                     }
                 },
                 { feeder, eq ->
                     feeder.addCurrentEquipment(eq)
                     // Handle classes extending Equipment
                     when (eq) {
-                        is ProtectedSwitch -> eq.operatedByProtectionEquipment.forEach { pe -> feeder.addCurrentEquipment(pe) }
+                        is ProtectedSwitch ->
+                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
+                                feeder.addCurrentEquipment(system)
+                            }
                     }
                 },
                 isStopping,

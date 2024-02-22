@@ -21,7 +21,7 @@ internal class FeederDirectionTest {
 
     @Test
     internal fun valueCoverage() {
-        FeederDirection.values().forEach {
+        FeederDirection.entries.forEach {
             assertThat(FeederDirection.valueOf(it.name), equalTo(it))
         }
     }

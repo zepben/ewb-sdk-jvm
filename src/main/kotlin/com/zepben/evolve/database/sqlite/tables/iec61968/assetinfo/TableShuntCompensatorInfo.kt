@@ -11,6 +11,7 @@ import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetInfo
 
+@Suppress("PropertyName")
 class TableShuntCompensatorInfo : TableAssetInfo() {
 
     val MAX_POWER_LOSS = Column(++columnIndex, "max_power_loss", "INTEGER", NULL)

@@ -11,6 +11,7 @@ import com.google.common.collect.Interners
 import com.zepben.evolve.cim.iec61968.common.PositionPoint
 import com.zepben.evolve.cim.iec61968.common.StreetAddress
 import com.zepben.evolve.cim.iec61968.common.TownDetail
+import com.zepben.evolve.cim.iec61970.base.protection.RelaySetting
 
 @Suppress("UnstableApiUsage")
 class NetworkServiceInstanceCache {
@@ -18,8 +19,10 @@ class NetworkServiceInstanceCache {
     private val townDetails = Interners.newStrongInterner<TownDetail>()
     private val streetAddresses = Interners.newStrongInterner<StreetAddress>()
     private val positionPoints = Interners.newStrongInterner<PositionPoint>()
+    private val relaySettings = Interners.newStrongInterner<RelaySetting>()
 
     fun intern(item: TownDetail): TownDetail = townDetails.intern(item)
     fun intern(item: StreetAddress): StreetAddress = streetAddresses.intern(item)
     fun intern(item: PositionPoint): PositionPoint = positionPoints.intern(item)
+    fun intern(item: RelaySetting): RelaySetting = relaySettings.intern(item)
 }

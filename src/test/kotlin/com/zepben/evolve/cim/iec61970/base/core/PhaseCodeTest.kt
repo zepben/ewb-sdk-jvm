@@ -25,12 +25,12 @@ internal class PhaseCodeTest {
 
     @Test
     internal fun validateVsPb() {
-        validateEnum(PhaseCode.values(), PBPhaseCode.values())
+        validateEnum(PhaseCode.entries, PBPhaseCode.entries)
     }
 
     @Test
     internal fun singlePhases() {
-        PhaseCode.values().forEach { phaseCode ->
+        PhaseCode.entries.forEach { phaseCode ->
             if (phaseCode === PhaseCode.NONE)
                 assertThat(phaseCode.singlePhases, contains(SinglePhaseKind.NONE))
             else {
@@ -51,7 +51,7 @@ internal class PhaseCodeTest {
 
     @Test
     internal fun numPhases() {
-        PhaseCode.values().forEach { phaseCode ->
+        PhaseCode.entries.forEach { phaseCode ->
             if (phaseCode === PhaseCode.NONE)
                 assertThat(phaseCode.numPhases(), equalTo(0))
             else
@@ -70,7 +70,7 @@ internal class PhaseCodeTest {
 
     @Test
     internal fun fromSinglePhases() {
-        PhaseCode.values()
+        PhaseCode.entries
             .asSequence()
             .forEach {
                 assertThat(PhaseCode.fromSinglePhases(it.singlePhases), equalTo(it))

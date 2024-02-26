@@ -14,11 +14,11 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 @Suppress("PropertyName")
 class TableTransformerStarImpedance : TableIdentifiedObjects() {
 
-    val R = Column(++columnIndex, "R", "NUMBER", NULL)
-    val R0 = Column(++columnIndex, "R0", "NUMBER", NULL)
-    val X = Column(++columnIndex, "X", "NUMBER", NULL)
-    val X0 = Column(++columnIndex, "X0", "NUMBER", NULL)
-    val TRANSFORMER_END_INFO_MRID = Column(++columnIndex, "transformer_end_info_mrid", "TEXT", NULL)
+    val R: Column = Column(++columnIndex, "R", "NUMBER", NULL)
+    val R0: Column = Column(++columnIndex, "R0", "NUMBER", NULL)
+    val X: Column = Column(++columnIndex, "X", "NUMBER", NULL)
+    val X0: Column = Column(++columnIndex, "X0", "NUMBER", NULL)
+    val TRANSFORMER_END_INFO_MRID: Column = Column(++columnIndex, "transformer_end_info_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "transformer_star_impedance"
@@ -32,7 +32,7 @@ class TableTransformerStarImpedance : TableIdentifiedObjects() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableTransformerStarImpedance> = this.javaClass
+    override val tableClassInstance: TableTransformerStarImpedance = this
 
 }

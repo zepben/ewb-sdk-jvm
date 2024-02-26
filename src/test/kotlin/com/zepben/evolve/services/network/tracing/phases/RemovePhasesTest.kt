@@ -32,7 +32,7 @@ class RemovePhasesTest {
     //
     // s4 --c5--
     //
-    val n = TestNetworkBuilder()
+    val n: NetworkService = TestNetworkBuilder()
         .fromSource(PhaseCode.ABCN) // s0
         .toAcls(PhaseCode.ABCN) // c1
         .toAcls(PhaseCode.ABCN) // c2

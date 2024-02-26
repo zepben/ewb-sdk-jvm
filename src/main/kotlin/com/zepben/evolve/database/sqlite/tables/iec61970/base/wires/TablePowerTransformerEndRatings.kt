@@ -15,9 +15,9 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TablePowerTransformerEndRatings : SqliteTable() {
 
-    val POWER_TRANSFORMER_END_MRID = Column(++columnIndex, "power_transformer_end_mrid", "TEXT", NULL)
-    val COOLING_TYPE = Column(++columnIndex, "cooling_type", "TEXT", NOT_NULL)
-    val RATED_S = Column(++columnIndex, "rated_s", "INTEGER", NOT_NULL)
+    val POWER_TRANSFORMER_END_MRID: Column = Column(++columnIndex, "power_transformer_end_mrid", "TEXT", NULL)
+    val COOLING_TYPE: Column = Column(++columnIndex, "cooling_type", "TEXT", NOT_NULL)
+    val RATED_S: Column = Column(++columnIndex, "rated_s", "INTEGER", NOT_NULL)
 
     override fun name(): String {
         return "power_transformer_end_ratings"
@@ -39,7 +39,7 @@ class TablePowerTransformerEndRatings : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TablePowerTransformerEndRatings> = this.javaClass
+    override val tableClassInstance: TablePowerTransformerEndRatings = this
 
 }

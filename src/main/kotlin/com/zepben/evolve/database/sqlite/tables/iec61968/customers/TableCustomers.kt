@@ -15,14 +15,14 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableOrganisatio
 @Suppress("PropertyName")
 class TableCustomers : TableOrganisationRoles() {
 
-    val KIND = Column(++columnIndex, "kind", "TEXT", NOT_NULL)
-    val NUM_END_DEVICES = Column(++columnIndex, "num_end_devices", "INTEGER", NULL)
+    val KIND: Column = Column(++columnIndex, "kind", "TEXT", NOT_NULL)
+    val NUM_END_DEVICES: Column = Column(++columnIndex, "num_end_devices", "INTEGER", NULL)
 
     override fun name(): String {
         return "customers"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableCustomers> = this.javaClass
+    override val tableClassInstance: TableCustomers = this
 
 }

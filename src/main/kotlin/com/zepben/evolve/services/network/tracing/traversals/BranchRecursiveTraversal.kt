@@ -38,7 +38,7 @@ class BranchRecursiveTraversal<T>(
     val branchQueue: TraversalQueue<Traversal<T>> = branchQueueSupplier()
     override val tracker: Tracker<T> = trackerSupplier()
 
-    var branchSupplier = defaultBranchSupplier()
+    var branchSupplier: () -> Traversal<T> = defaultBranchSupplier()
 
     /**
      * Java interop constructor.

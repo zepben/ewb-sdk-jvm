@@ -13,7 +13,7 @@ class TableEvChargingUnits : TablePowerElectronicsUnit() {
         return "ev_charging_units"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableEvChargingUnits> = this.javaClass
+    override val tableClassInstance: TableEvChargingUnits = this
 
 }

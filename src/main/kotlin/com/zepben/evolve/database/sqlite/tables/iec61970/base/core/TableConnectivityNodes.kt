@@ -13,7 +13,7 @@ class TableConnectivityNodes : TableIdentifiedObjects() {
         return "connectivity_nodes"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableConnectivityNodes> = this.javaClass
+    override val tableClassInstance: TableConnectivityNodes = this
 
 }

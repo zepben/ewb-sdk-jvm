@@ -13,14 +13,14 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableAcLineSegments : TableConductors() {
 
-    val PER_LENGTH_SEQUENCE_IMPEDANCE_MRID =
+    val PER_LENGTH_SEQUENCE_IMPEDANCE_MRID: Column =
         Column(++columnIndex, "per_length_sequence_impedance_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "ac_line_segments"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableAcLineSegments> = this.javaClass
+    override val tableClassInstance: TableAcLineSegments = this
 
 }

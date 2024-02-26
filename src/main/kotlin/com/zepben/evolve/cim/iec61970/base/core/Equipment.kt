@@ -50,7 +50,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     /**
      * Get the number of entries in the [EquipmentContainer] collection.
      */
-    fun numContainers() = _equipmentContainers?.size ?: 0
+    fun numContainers(): Int = _equipmentContainers?.size ?: 0
 
     /**
      * [EquipmentContainer]'s that this equipment is associated with.
@@ -58,7 +58,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
      * @param mRID the mRID of the required [EquipmentContainer]
      * @return The [EquipmentContainer] with the specified [mRID] if it exists, otherwise null
      */
-    fun getContainer(mRID: String) = _equipmentContainers.getByMRID(mRID)
+    fun getContainer(mRID: String): EquipmentContainer? = _equipmentContainers.getByMRID(mRID)
 
     /**
      * @param equipmentContainer the equipment container to associate with this equipment.
@@ -101,7 +101,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     /**
      * Get the number of entries in the current [EquipmentContainer] collection.
      */
-    fun numCurrentContainers() = _currentContainers?.size ?: 0
+    fun numCurrentContainers(): Int = _currentContainers?.size ?: 0
 
     /**
      * [EquipmentContainer]'s that represent the current containers of the equipment.
@@ -109,7 +109,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
      * @param mRID the mRID of the required current [EquipmentContainer]
      * @return The current [EquipmentContainer] with the specified [mRID] if it exists, otherwise null
      */
-    fun getCurrentContainer(mRID: String) = _currentContainers.getByMRID(mRID)
+    fun getCurrentContainer(mRID: String): EquipmentContainer? = _currentContainers.getByMRID(mRID)
 
     /**
      * @param equipmentContainer the equipment container to associate with this equipment.
@@ -152,7 +152,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     /**
      * Get the number of entries in the [UsagePoint] collection.
      */
-    fun numUsagePoints() = _usagePoints?.size ?: 0
+    fun numUsagePoints(): Int = _usagePoints?.size ?: 0
 
     /**
      * [UsagePoint]'s connected to the electrical grid through this equipment.
@@ -160,7 +160,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
      * @param mRID the mRID of the required [UsagePoint]
      * @return The [UsagePoint] with the specified [mRID] if it exists, otherwise null
      */
-    fun getUsagePoint(mRID: String) = _usagePoints.getByMRID(mRID)
+    fun getUsagePoint(mRID: String): UsagePoint? = _usagePoints.getByMRID(mRID)
 
     /**
      * @param usagePoint the usage point that connects to the electrical grid through this equipment.
@@ -204,7 +204,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
     /**
      * Get the number of entries in the [OperationalRestriction] collection.
      */
-    fun numOperationalRestrictions() = _operationalRestrictions?.size ?: 0
+    fun numOperationalRestrictions(): Int = _operationalRestrictions?.size ?: 0
 
     /**
      * [OperationalRestriction]'s that this equipment is associated with.
@@ -212,7 +212,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
      * @param mRID the mRID of the required [OperationalRestriction]
      * @return The [OperationalRestriction] with the specified [mRID] if it exists, otherwise null
      */
-    fun getOperationalRestriction(mRID: String) = _operationalRestrictions.getByMRID(mRID)
+    fun getOperationalRestriction(mRID: String): OperationalRestriction? = _operationalRestrictions.getByMRID(mRID)
 
     /**
      * Add an operational restriction that applies to this equipment.

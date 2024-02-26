@@ -14,10 +14,10 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableAssetOrganisationRolesAssets : SqliteTable() {
 
-    val ASSET_ORGANISATION_ROLE_MRID =
+    val ASSET_ORGANISATION_ROLE_MRID: Column =
         Column(++columnIndex, "asset_organisation_role_mrid", "TEXT", NOT_NULL)
 
-    val ASSET_MRID = Column(++columnIndex, "asset_mrid", "TEXT", NOT_NULL)
+    val ASSET_MRID: Column = Column(++columnIndex, "asset_mrid", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "asset_organisation_roles_assets"
@@ -40,7 +40,7 @@ class TableAssetOrganisationRolesAssets : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableAssetOrganisationRolesAssets> = this.javaClass
+    override val tableClassInstance: TableAssetOrganisationRolesAssets = this
 
 }

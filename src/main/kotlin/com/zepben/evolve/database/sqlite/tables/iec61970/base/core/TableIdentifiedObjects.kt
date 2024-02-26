@@ -14,10 +14,10 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 abstract class TableIdentifiedObjects : SqliteTable() {
 
-    val MRID = Column(++columnIndex, "mrid", "TEXT", NOT_NULL)
-    val NAME = Column(++columnIndex, "name", "TEXT", NOT_NULL)
-    val DESCRIPTION = Column(++columnIndex, "description", "TEXT", NOT_NULL)
-    val NUM_DIAGRAM_OBJECTS = Column(++columnIndex, "num_diagram_objects", "INTEGER", NOT_NULL)
+    val MRID: Column = Column(++columnIndex, "mrid", "TEXT", NOT_NULL)
+    val NAME: Column = Column(++columnIndex, "name", "TEXT", NOT_NULL)
+    val DESCRIPTION: Column = Column(++columnIndex, "description", "TEXT", NOT_NULL)
+    val NUM_DIAGRAM_OBJECTS: Column = Column(++columnIndex, "num_diagram_objects", "INTEGER", NOT_NULL)
 
     override fun uniqueIndexColumns(): MutableList<List<Column>> = mutableListOf(
         listOf(MRID)

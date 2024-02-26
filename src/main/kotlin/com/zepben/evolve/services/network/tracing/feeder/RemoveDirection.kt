@@ -155,7 +155,7 @@ class RemoveDirection {
 
     class TerminalDirection(val terminal: Terminal, val directionToEbb: FeederDirection) {
 
-        val weight = terminal.phases.numPhases()
+        val weight: Int = terminal.phases.numPhases()
 
     }
 

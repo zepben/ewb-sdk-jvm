@@ -15,13 +15,13 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 @Suppress("PropertyName")
 class TableProtectionRelaySchemes : TableIdentifiedObjects() {
 
-    val SYSTEM_MRID = Column(++columnIndex, "system_mrid", "TEXT", NULL)
+    val SYSTEM_MRID: Column = Column(++columnIndex, "system_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "protection_relay_schemes"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableProtectionRelaySchemes> = this.javaClass
+    override val tableClassInstance: TableProtectionRelaySchemes = this
 
 }

@@ -14,7 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.TableLines
 @Suppress("PropertyName")
 class TableCircuits : TableLines() {
 
-    val LOOP_MRID = Column(++columnIndex, "loop_mrid", "TEXT", NULL)
+    val LOOP_MRID: Column = Column(++columnIndex, "loop_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "circuits"
@@ -28,7 +28,7 @@ class TableCircuits : TableLines() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableCircuits> = this.javaClass
+    override val tableClassInstance: TableCircuits = this
 
 }

@@ -13,13 +13,13 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 @Suppress("PropertyName")
 class TablePoles : TableStructures() {
 
-    var CLASSIFICATION = Column(++columnIndex, "classification", "TEXT", NOT_NULL)
+    var CLASSIFICATION: Column = Column(++columnIndex, "classification", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "poles"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TablePoles> = this.javaClass
+    override val tableClassInstance: TablePoles = this
 
 }

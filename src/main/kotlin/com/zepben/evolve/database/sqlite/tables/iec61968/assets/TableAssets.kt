@@ -14,6 +14,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 @Suppress("PropertyName")
 abstract class TableAssets : TableIdentifiedObjects() {
 
-    val LOCATION_MRID = Column(++columnIndex, "location_mrid", "TEXT", NULL)
+    val LOCATION_MRID: Column = Column(++columnIndex, "location_mrid", "TEXT", NULL)
 
 }

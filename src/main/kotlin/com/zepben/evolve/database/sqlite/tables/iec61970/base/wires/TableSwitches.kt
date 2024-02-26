@@ -15,9 +15,9 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableConducti
 @Suppress("PropertyName")
 abstract class TableSwitches : TableConductingEquipment() {
 
-    val NORMAL_OPEN = Column(++columnIndex, "normal_open", "INTEGER", NOT_NULL)
-    val OPEN = Column(++columnIndex, "open", "INTEGER", NOT_NULL)
-    val RATED_CURRENT = Column(++columnIndex, "rated_current", "INTEGER", NULL)
-    val SWITCH_INFO_MRID = Column(++columnIndex, "switch_info_mrid", "TEXT", NULL)
+    val NORMAL_OPEN: Column = Column(++columnIndex, "normal_open", "INTEGER", NOT_NULL)
+    val OPEN: Column = Column(++columnIndex, "open", "INTEGER", NOT_NULL)
+    val RATED_CURRENT: Column = Column(++columnIndex, "rated_current", "INTEGER", NULL)
+    val SWITCH_INFO_MRID: Column = Column(++columnIndex, "switch_info_mrid", "TEXT", NULL)
 
 }

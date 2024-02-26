@@ -13,8 +13,8 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.*
 @Suppress("PropertyName")
 abstract class TableEquipment : TablePowerSystemResources() {
 
-    val NORMALLY_IN_SERVICE = Column(++columnIndex, "normally_in_service", "BOOLEAN")
-    val IN_SERVICE = Column(++columnIndex, "in_service", "BOOLEAN")
-    val COMMISSIONED_DATE = Column(++columnIndex, "commissioned_date", "TEXT", NULL)
+    val NORMALLY_IN_SERVICE: Column = Column(++columnIndex, "normally_in_service", "BOOLEAN")
+    val IN_SERVICE: Column = Column(++columnIndex, "in_service", "BOOLEAN")
+    val COMMISSIONED_DATE: Column = Column(++columnIndex, "commissioned_date", "TEXT", NULL)
 
 }

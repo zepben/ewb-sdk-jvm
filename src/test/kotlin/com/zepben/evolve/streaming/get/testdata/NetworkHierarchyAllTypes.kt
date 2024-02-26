@@ -66,7 +66,7 @@ object NetworkHierarchyAllTypes {
         return response.build()
     }
 
-    fun createService() = NetworkService().also { service ->
+    fun createService(): NetworkService = NetworkService().also { service ->
         val loop1 = Loop("loop1").apply { name = "loop 1" }.also { service.add(it) }
         Loop("loop2").apply { name = "loop 2" }.also { service.add(it) }
 
@@ -96,7 +96,7 @@ object NetworkHierarchyAllTypes {
         Feeder("fdr2").apply { name = "fdr 2"; normalEnergizingSubstation = sub1 }.also { sub1.addFeeder(it); service.add(it) }
     }
 
-    fun createNetworkHierarchy() = createService().let {
+    fun createNetworkHierarchy(): NetworkHierarchy = createService().let {
         NetworkHierarchy(it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf())
     }
 

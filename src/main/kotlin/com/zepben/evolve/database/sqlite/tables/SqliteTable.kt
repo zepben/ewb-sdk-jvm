@@ -17,10 +17,10 @@ import kotlin.reflect.jvm.kotlinProperty
  */
 abstract class SqliteTable {
 
-    private val logger = LoggerFactory.getLogger(this::class.java)
+    private val logger = LoggerFactory.getLogger(SqliteTable::class.java)
 
     @JvmField
-    protected var columnIndex = 0
+    protected var columnIndex: Int = 0
 
     abstract fun name(): String
 

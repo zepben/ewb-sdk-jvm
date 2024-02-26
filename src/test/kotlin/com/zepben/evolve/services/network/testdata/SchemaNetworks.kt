@@ -24,7 +24,7 @@ import java.time.Instant
 @Suppress("SameParameterValue")
 object SchemaNetworks {
 
-    fun createNameTestServices() = NetworkModelTestUtil.Services().apply {
+    fun createNameTestServices(): NetworkModelTestUtil.Services = NetworkModelTestUtil.Services().apply {
         networkService.apply {
             val nameType = NameType("type1").apply {
                 description = "type description"
@@ -54,12 +54,12 @@ object SchemaNetworks {
         }
     }
 
-    fun createDataSourceTestServices() = NetworkModelTestUtil.Services().apply {
+    fun createDataSourceTestServices(): NetworkModelTestUtil.Services = NetworkModelTestUtil.Services().apply {
         metadataCollection.add(DataSource("source1", "v1", Instant.EPOCH))
         metadataCollection.add(DataSource("source2", "v2", Instant.now()))
     }
 
-    fun <T : IdentifiedObject> customerServicesOf(factory: (mRID: String) -> T, filler: (T, CustomerService, Boolean) -> T) =
+    fun <T : IdentifiedObject> customerServicesOf(factory: (mRID: String) -> T, filler: (T, CustomerService, Boolean) -> T): NetworkModelTestUtil.Services =
         NetworkModelTestUtil.Services().apply {
             customerService.tryAdd(factory("empty"))
             customerService.tryAdd(filler(factory("filled"), customerService, false))
@@ -71,13 +71,13 @@ object SchemaNetworks {
                     description = it.description
                     it.names
                         .filter { name -> name.identifiedObject is Organisation }
-                        .forEach { name -> getOrAddName(name.name, name.identifiedObject) }
+                        .forEach { (name, _, identifiedObject) -> getOrAddName(name, identifiedObject) }
                 })
                 diagramService.addNameType(NameType(it.name).apply { description = it.description })
             }
         }
 
-    fun <T : IdentifiedObject> diagramServicesOf(factory: (mRID: String) -> T, filler: (T, DiagramService, Boolean) -> T) =
+    fun <T : IdentifiedObject> diagramServicesOf(factory: (mRID: String) -> T, filler: (T, DiagramService, Boolean) -> T): NetworkModelTestUtil.Services =
         NetworkModelTestUtil.Services().apply {
             diagramService.tryAdd(factory("empty"))
             diagramService.tryAdd(filler(factory("filled"), diagramService, false))
@@ -89,7 +89,7 @@ object SchemaNetworks {
             }
         }
 
-    fun <T : IdentifiedObject> networkServicesOf(factory: (mRID: String) -> T, filler: (T, NetworkService, Boolean) -> T) =
+    fun <T : IdentifiedObject> networkServicesOf(factory: (mRID: String) -> T, filler: (T, NetworkService, Boolean) -> T): NetworkModelTestUtil.Services =
         NetworkModelTestUtil.Services().apply {
             networkService.tryAdd(factory("empty").also { fillRequired(networkService, it) })
             networkService.tryAdd(filler(factory("filled"), networkService, false))
@@ -101,7 +101,7 @@ object SchemaNetworks {
                     description = it.description
                     it.names
                         .filter { name -> name.identifiedObject is Organisation }
-                        .forEach { name -> getOrAddName(name.name, name.identifiedObject) }
+                        .forEach { (name, _, identifiedObject) -> getOrAddName(name, identifiedObject) }
                 })
                 diagramService.addNameType(NameType(it.name).apply { description = it.description })
             }

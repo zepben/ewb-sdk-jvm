@@ -14,7 +14,7 @@ class TableVoltageRelays : TableProtectionRelayFunctions() {
         return "voltage_relays"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableVoltageRelays> = this.javaClass
+    override val tableClassInstance: TableVoltageRelays = this
 
 }

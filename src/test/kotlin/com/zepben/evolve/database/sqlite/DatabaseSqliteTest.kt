@@ -17,9 +17,9 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -386,7 +386,7 @@ class DatabaseSqliteTest {
     private fun validateSchema(services: NetworkModelTestUtil.Services) {
         systemErr.clearCapturedLog()
 
-        val (expectedMetadata, expectedNetworkService, expectedDiagramService, expectedCustomerService) = services
+        val (expectedMetadata, expectedNetworkService, expectedDiagramService, expectedCustomerService, _) = services
 
         assertThat(
             DatabaseWriter(SCHEMA_TEST_FILE).save(
@@ -429,7 +429,7 @@ class DatabaseSqliteTest {
         validateRead: (Boolean) -> Unit
     ) {
         assertThat(systemErr.logLines.size, equalTo(0))
-        val (writeMetadata, writeNetworkService, writeDiagramService, writeCustomerService) = writeServices
+        val (writeMetadata, writeNetworkService, writeDiagramService, writeCustomerService, _) = writeServices
 
         validateWrite(
             DatabaseWriter(SCHEMA_TEST_FILE).save(
@@ -445,7 +445,7 @@ class DatabaseSqliteTest {
         if (!Files.exists(Paths.get(SCHEMA_TEST_FILE)))
             return
 
-        val (readMetadata, readNetworkService, readDiagramService, readCustomerService) = readServices
+        val (readMetadata, readNetworkService, readDiagramService, readCustomerService, _) = readServices
         validateRead(
             DatabaseReader(SCHEMA_TEST_FILE).load(
                 readMetadata,

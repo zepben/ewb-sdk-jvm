@@ -13,7 +13,7 @@ class TableJunctions : TableConnectors() {
         return "junctions"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableJunctions> = this.javaClass
+    override val tableClassInstance: TableJunctions = this
 
 }

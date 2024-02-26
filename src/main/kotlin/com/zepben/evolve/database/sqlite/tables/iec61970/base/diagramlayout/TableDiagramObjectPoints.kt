@@ -15,10 +15,10 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableDiagramObjectPoints : SqliteTable() {
 
-    val DIAGRAM_OBJECT_MRID = Column(++columnIndex, "diagram_object_mrid", "TEXT", NOT_NULL)
-    val SEQUENCE_NUMBER = Column(++columnIndex, "sequence_number", "TEXT", NOT_NULL)
-    val X_POSITION = Column(++columnIndex, "x_position", "TEXT", NULL)
-    val Y_POSITION = Column(++columnIndex, "y_position", "TEXT", NULL)
+    val DIAGRAM_OBJECT_MRID: Column = Column(++columnIndex, "diagram_object_mrid", "TEXT", NOT_NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "TEXT", NOT_NULL)
+    val X_POSITION: Column = Column(++columnIndex, "x_position", "TEXT", NULL)
+    val Y_POSITION: Column = Column(++columnIndex, "y_position", "TEXT", NULL)
 
     override fun name(): String {
         return "diagram_object_points"
@@ -40,7 +40,7 @@ class TableDiagramObjectPoints : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableDiagramObjectPoints> = this.javaClass
+    override val tableClassInstance: TableDiagramObjectPoints = this
 
 }

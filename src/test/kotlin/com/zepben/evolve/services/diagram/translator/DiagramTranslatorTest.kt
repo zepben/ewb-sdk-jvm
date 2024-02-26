@@ -84,14 +84,14 @@ internal class DiagramTranslatorTest {
         // We need to convert the populated item before we check the differences, so we can complete the unresolved references.
         val service = DiagramService()
         val convertedCim = adder(service, cim)!!
-        service.unresolvedReferences().toList().forEach { ref ->
+        service.unresolvedReferences().toList().forEach { (_, toMrid, resolver, _) ->
             try {
                 // There are no abstract classes in the chain currently for the diagram service. If they ever show up copy the code
                 // form network to support them.
-                ref.resolver.toClass.getDeclaredConstructor(String::class.java).newInstance(ref.toMrid).also { service.tryAdd(it) }
+                resolver.toClass.getDeclaredConstructor(String::class.java).newInstance(toMrid).also { service.tryAdd(it) }
             } catch (e: Exception) {
                 // If this fails you need to add a concrete type mapping to the abstractCreators map at the top of this class.
-                fail("Failed to create unresolved reference for ${ref.resolver.toClass}.", e)
+                fail("Failed to create unresolved reference for ${resolver.toClass}.", e)
             }
         }
         return convertedCim

@@ -47,7 +47,7 @@ enum class SinglePhaseKind(val value: Int, val maskIndex: Int) {
         }
     }
 
-    val bitMask = if (maskIndex >= 0) 1 shl maskIndex else 0
+    val bitMask: Int = if (maskIndex >= 0) 1 shl maskIndex else 0
 
     operator fun plus(phase: SinglePhaseKind): PhaseCode = PhaseCode.fromSinglePhases(setOf(this) + phase)
     operator fun plus(phaseCode: PhaseCode): PhaseCode = PhaseCode.fromSinglePhases(setOf(this) + phaseCode.singlePhases)

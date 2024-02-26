@@ -14,14 +14,14 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 @Suppress("PropertyName")
 class TableDiagrams : TableIdentifiedObjects() {
 
-    val DIAGRAM_STYLE = Column(++columnIndex, "diagram_style", "TEXT", NOT_NULL)
-    val ORIENTATION_KIND = Column(++columnIndex, "orientation_kind", "TEXT", NOT_NULL)
+    val DIAGRAM_STYLE: Column = Column(++columnIndex, "diagram_style", "TEXT", NOT_NULL)
+    val ORIENTATION_KIND: Column = Column(++columnIndex, "orientation_kind", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "diagrams"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableDiagrams> = this.javaClass
+    override val tableClassInstance: TableDiagrams = this
 
 }

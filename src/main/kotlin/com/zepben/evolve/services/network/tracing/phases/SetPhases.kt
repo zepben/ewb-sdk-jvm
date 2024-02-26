@@ -34,7 +34,7 @@ class SetPhases(
      * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    val normalTraversal = BranchRecursiveTraversal(
+    val normalTraversal: BranchRecursiveTraversal<Terminal> = BranchRecursiveTraversal(
         { current, traversal -> setPhasesAndQueueNext(traversal, current, OpenTest.NORMALLY_OPEN, PhaseSelector.NORMAL_PHASES) },
         { WeightedPriorityQueue.processQueue { it.phases.numPhases() } },
         { BasicTracker() },
@@ -47,7 +47,7 @@ class SetPhases(
      * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    val currentTraversal = BranchRecursiveTraversal(
+    val currentTraversal: BranchRecursiveTraversal<Terminal> = BranchRecursiveTraversal(
         { current, traversal -> setPhasesAndQueueNext(traversal, current, OpenTest.CURRENTLY_OPEN, PhaseSelector.CURRENT_PHASES) },
         { WeightedPriorityQueue.processQueue { it.phases.numPhases() } },
         { BasicTracker() },
@@ -234,23 +234,23 @@ class SetPhases(
         val toPhases = phaseSelector.phases(cr.toTerminal)
 
         val changedPhases = mutableSetOf<SinglePhaseKind>()
-        for (path in cr.nominalPhasePaths) {
+        for ((from, to) in cr.nominalPhasePaths) {
             try {
                 // If the path comes from NONE, then we want to apply the `to phase`.
-                val phase = if (path.from != SinglePhaseKind.NONE)
-                    fromPhases[path.from]
-                else if (path.to !in PhaseCode.XY)
-                    path.to
+                val phase = if (from != SinglePhaseKind.NONE)
+                    fromPhases[from]
+                else if (to !in PhaseCode.XY)
+                    to
                 else
-                    toPhases[path.to]
+                    toPhases[to]
 
-                if ((phase != SinglePhaseKind.NONE) && toPhases.set(path.to, phase))
-                    changedPhases.add(path.to)
+                if ((phase != SinglePhaseKind.NONE) && toPhases.set(to, phase))
+                    changedPhases.add(to)
             } catch (ex: UnsupportedOperationException) {
-                val phaseDesc = if (path.from == path.to)
-                    "${path.from}"
+                val phaseDesc = if (from == to)
+                    "$from"
                 else
-                    "path ${path.from} to ${path.to}"
+                    "path $from to $to"
 
                 val terminalDesc = if (cr.from == cr.to)
                     "from ${cr.fromTerminal} to ${cr.toTerminal} through ${cr.from?.typeNameAndMRID()}"
@@ -258,7 +258,7 @@ class SetPhases(
                     "between ${cr.fromTerminal} on ${cr.from?.typeNameAndMRID()} and ${cr.toTerminal} on ${cr.to?.typeNameAndMRID()}"
 
                 throw IllegalStateException(
-                    "Attempted to flow conflicting phase ${fromPhases[path.from]} onto ${toPhases[path.to]} on nominal phase $phaseDesc. This occurred while " +
+                    "Attempted to flow conflicting phase ${fromPhases[from]} onto ${toPhases[to]} on nominal phase $phaseDesc. This occurred while " +
                         "flowing $terminalDesc. This is caused by missing open points, or incorrect phases in upstream equipment that should be " +
                         "corrected in the source data."
                 )

@@ -13,20 +13,20 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TablePerLengthSequenceImpedances : TablePerLengthImpedances() {
 
-    val R = Column(++columnIndex, "r", "NUMBER", NULL)
-    val X = Column(++columnIndex, "x", "NUMBER", NULL)
-    val R0 = Column(++columnIndex, "r0", "NUMBER", NULL)
-    val X0 = Column(++columnIndex, "x0", "NUMBER", NULL)
-    val BCH = Column(++columnIndex, "bch", "NUMBER", NULL)
-    val GCH = Column(++columnIndex, "gch", "NUMBER", NULL)
-    val B0CH = Column(++columnIndex, "b0ch", "NUMBER", NULL)
-    val G0CH = Column(++columnIndex, "g0ch", "NUMBER", NULL)
+    val R: Column = Column(++columnIndex, "r", "NUMBER", NULL)
+    val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)
+    val R0: Column = Column(++columnIndex, "r0", "NUMBER", NULL)
+    val X0: Column = Column(++columnIndex, "x0", "NUMBER", NULL)
+    val BCH: Column = Column(++columnIndex, "bch", "NUMBER", NULL)
+    val GCH: Column = Column(++columnIndex, "gch", "NUMBER", NULL)
+    val B0CH: Column = Column(++columnIndex, "b0ch", "NUMBER", NULL)
+    val G0CH: Column = Column(++columnIndex, "g0ch", "NUMBER", NULL)
 
     override fun name(): String {
         return "per_length_sequence_impedances"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TablePerLengthSequenceImpedances> = this.javaClass
+    override val tableClassInstance: TablePerLengthSequenceImpedances = this
 
 }

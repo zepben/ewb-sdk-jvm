@@ -15,12 +15,12 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableEquipmen
 @Suppress("PropertyName")
 class TableLvFeeders : TableEquipmentContainers() {
 
-    val NORMAL_HEAD_TERMINAL_MRID = Column(++columnIndex, "normal_head_terminal_mrid", "TEXT", NULL)
+    val NORMAL_HEAD_TERMINAL_MRID: Column = Column(++columnIndex, "normal_head_terminal_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "lv_feeders"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableLvFeeders> = this.javaClass
+    override val tableClassInstance: TableLvFeeders = this
 }

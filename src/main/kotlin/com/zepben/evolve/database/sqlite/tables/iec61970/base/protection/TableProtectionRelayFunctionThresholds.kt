@@ -16,11 +16,11 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableProtectionRelayFunctionThresholds : SqliteTable() {
 
-    val PROTECTION_RELAY_FUNCTION_MRID = Column(++columnIndex, "protection_relay_function_mrid", "TEXT", NOT_NULL)
-    val SEQUENCE_NUMBER = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
-    val UNIT_SYMBOL = Column(++columnIndex, "unit_symbol", "TEXT", NOT_NULL)
-    val VALUE = Column(++columnIndex, "value", "NUMBER", NOT_NULL)
-    val NAME = Column(++columnIndex, "name", "TEXT", NULL)
+    val PROTECTION_RELAY_FUNCTION_MRID: Column = Column(++columnIndex, "protection_relay_function_mrid", "TEXT", NOT_NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
+    val UNIT_SYMBOL: Column = Column(++columnIndex, "unit_symbol", "TEXT", NOT_NULL)
+    val VALUE: Column = Column(++columnIndex, "value", "NUMBER", NOT_NULL)
+    val NAME: Column = Column(++columnIndex, "name", "TEXT", NULL)
 
     override fun name(): String {
         return "protection_relay_function_thresholds"
@@ -42,7 +42,7 @@ class TableProtectionRelayFunctionThresholds : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableProtectionRelayFunctionThresholds> = this.javaClass
+    override val tableClassInstance: TableProtectionRelayFunctionThresholds = this
 
 }

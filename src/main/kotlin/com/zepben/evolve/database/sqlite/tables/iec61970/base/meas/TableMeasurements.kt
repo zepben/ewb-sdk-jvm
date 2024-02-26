@@ -15,11 +15,11 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 @Suppress("PropertyName")
 abstract class TableMeasurements : TableIdentifiedObjects() {
 
-    val POWER_SYSTEM_RESOURCE_MRID = Column(++columnIndex, "power_system_resource_mrid", "TEXT", NULL)
-    val REMOTE_SOURCE_MRID = Column(++columnIndex, "remote_source_mrid", "TEXT", NULL)
-    val TERMINAL_MRID = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
-    val PHASES = Column(++columnIndex, "phases", "TEXT", NOT_NULL)
-    val UNIT_SYMBOL = Column(++columnIndex, "unit_symbol", "TEXT", NOT_NULL)
+    val POWER_SYSTEM_RESOURCE_MRID: Column = Column(++columnIndex, "power_system_resource_mrid", "TEXT", NULL)
+    val REMOTE_SOURCE_MRID: Column = Column(++columnIndex, "remote_source_mrid", "TEXT", NULL)
+    val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
+    val PHASES: Column = Column(++columnIndex, "phases", "TEXT", NOT_NULL)
+    val UNIT_SYMBOL: Column = Column(++columnIndex, "unit_symbol", "TEXT", NOT_NULL)
 
     override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
         val cols: MutableList<List<Column>> = super.nonUniqueIndexColumns()

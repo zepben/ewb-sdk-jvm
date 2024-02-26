@@ -47,7 +47,7 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     /**
      * Get the number of entries in the [Equipment] collection.
      */
-    fun numEquipment() = _equipment?.size ?: 0
+    fun numEquipment(): Int = _equipment?.size ?: 0
 
     /**
      * All equipment connecting this usage point to the electrical grid.
@@ -55,7 +55,7 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
      * @param mRID the mRID of the required [Equipment]
      * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
      */
-    fun getEquipment(mRID: String) = _equipment?.getByMRID(mRID)
+    fun getEquipment(mRID: String): Equipment? = _equipment?.getByMRID(mRID)
 
     fun addEquipment(equipment: Equipment): UsagePoint {
         if (validateReference(equipment, ::getEquipment, "An Equipment"))
@@ -86,7 +86,7 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     /**
      * Get the number of entries in the [EndDevice] collection.
      */
-    fun numEndDevices() = _endDevices?.size ?: 0
+    fun numEndDevices(): Int = _endDevices?.size ?: 0
 
     /**
      * All end devices at this usage point.
@@ -94,7 +94,7 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
      * @param mRID the mRID of the required [EndDevice]
      * @return The [EndDevice] with the specified [mRID] if it exists, otherwise null
      */
-    fun getEndDevice(mRID: String) = _endDevices?.getByMRID(mRID)
+    fun getEndDevice(mRID: String): EndDevice? = _endDevices?.getByMRID(mRID)
 
     fun addEndDevice(endDevice: EndDevice): UsagePoint {
         if (validateReference(endDevice, ::getEndDevice, "An EndDevice"))

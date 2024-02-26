@@ -15,11 +15,11 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 @Suppress("PropertyName")
 abstract class TableDocuments : TableIdentifiedObjects() {
 
-    val TITLE = Column(++columnIndex, "title", "TEXT", NOT_NULL)
-    val CREATED_DATE_TIME = Column(++columnIndex, "created_date_time", "TEXT", NULL)
-    val AUTHOR_NAME = Column(++columnIndex, "author_name", "TEXT", NOT_NULL)
-    val TYPE = Column(++columnIndex, "type", "TEXT", NOT_NULL)
-    val STATUS = Column(++columnIndex, "status", "TEXT", NOT_NULL)
-    val COMMENT = Column(++columnIndex, "comment", "TEXT", NOT_NULL)
+    val TITLE: Column = Column(++columnIndex, "title", "TEXT", NOT_NULL)
+    val CREATED_DATE_TIME: Column = Column(++columnIndex, "created_date_time", "TEXT", NULL)
+    val AUTHOR_NAME: Column = Column(++columnIndex, "author_name", "TEXT", NOT_NULL)
+    val TYPE: Column = Column(++columnIndex, "type", "TEXT", NOT_NULL)
+    val STATUS: Column = Column(++columnIndex, "status", "TEXT", NOT_NULL)
+    val COMMENT: Column = Column(++columnIndex, "comment", "TEXT", NOT_NULL)
 
 }

@@ -76,7 +76,7 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     /**
      * Get the number of entries in the [RegulatingCondEq] collection.
      */
-    fun numRegulatingCondEqs() = _regulatingCondEqs?.size ?: 0
+    fun numRegulatingCondEqs(): Int = _regulatingCondEqs?.size ?: 0
 
     /**
      * [RegulatingCondEq]'s controlled by this [RegulatingControl].
@@ -84,7 +84,7 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
      * @param mRID the mRID of the required [RegulatingCondEq]
      * @return The [RegulatingCondEq] with the specified [mRID] if it exists, otherwise null
      */
-    fun getRegulatingCondEq(mRID: String) = _regulatingCondEqs.getByMRID(mRID)
+    fun getRegulatingCondEq(mRID: String): RegulatingCondEq? = _regulatingCondEqs.getByMRID(mRID)
 
     /**
      * @param regulatingCondEq the regulating conducting equipment controlled by this [RegulatingControl].

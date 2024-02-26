@@ -53,7 +53,7 @@ class NetworkModelTestUtil {
         //
         // NOTE: Feeder start points are not feeder CB's.
         //
-        fun createFeederStart(network: NetworkService, num: Int) =
+        fun createFeederStart(network: NetworkService, num: Int): Junction =
             Junction("fs$num")
                 .apply {
                     name = "Feeder Start $num"
@@ -84,7 +84,7 @@ class NetworkModelTestUtil {
                     assertThat(network.add(it), equalTo(true))
                 }
 
-        fun createEnergySource(network: NetworkService, mRID: String, name: String, phases: PhaseCode = PhaseCode.A) =
+        fun createEnergySource(network: NetworkService, mRID: String, name: String, phases: PhaseCode = PhaseCode.A): EnergySource =
             EnergySource(mRID)
                 .apply {
                     this.name = name
@@ -97,7 +97,7 @@ class NetworkModelTestUtil {
                     assertThat(network.add(it), equalTo(true))
                 }
 
-        fun createJunction(network: NetworkService, num: Int, equipmentContainer: EquipmentContainer, location: Location?) =
+        fun createJunction(network: NetworkService, num: Int, equipmentContainer: EquipmentContainer, location: Location?): Junction =
             Junction("j$num")
                 .apply {
                     name = "Junction $num"
@@ -109,7 +109,7 @@ class NetworkModelTestUtil {
                     assertThat(network.add(it), equalTo(true))
                 }
 
-        fun createTransformer(network: NetworkService, num: Int, equipmentContainer: EquipmentContainer, location: Location?) =
+        fun createTransformer(network: NetworkService, num: Int, equipmentContainer: EquipmentContainer, location: Location?): PowerTransformer =
             PowerTransformer("t$num")
                 .apply {
                     name = "Transformer $num"
@@ -130,7 +130,7 @@ class NetworkModelTestUtil {
             equipmentContainer: EquipmentContainer? = null,
             location: Location? = null,
             phases: PhaseCode = PhaseCode.A
-        ) =
+        ): AcLineSegment =
             AcLineSegment("c$num")
                 .apply {
                     name = "AC line segment $num"
@@ -152,7 +152,7 @@ class NetworkModelTestUtil {
             dest: Terminal,
             equipmentContainer: EquipmentContainer,
             phases: PhaseCode = PhaseCode.A
-        ) =
+        ): AcLineSegment =
             AcLineSegment("service$num").apply {
                 name = "Service $num"
                 addContainer(equipmentContainer)
@@ -164,13 +164,13 @@ class NetworkModelTestUtil {
                 assertThat(network.add(it), equalTo(true))
             }
 
-        fun createOverheadWireInfo(network: NetworkService, mRID: String = "") =
+        fun createOverheadWireInfo(network: NetworkService, mRID: String = ""): OverheadWireInfo =
             OverheadWireInfo(mRID)
                 .also {
                     assertThat(network.add(it), equalTo(true))
                 }
 
-        fun createGeographicalRegion(network: NetworkService, num: Int) =
+        fun createGeographicalRegion(network: NetworkService, num: Int): GeographicalRegion =
             GeographicalRegion("b$num")
                 .apply {
                     name = "Business $num"
@@ -178,7 +178,7 @@ class NetworkModelTestUtil {
                     assertThat(network.add(it), equalTo(true))
                 }
 
-        fun createSubGeographicalRegion(network: NetworkService, num: Int, geographicalRegion: GeographicalRegion) =
+        fun createSubGeographicalRegion(network: NetworkService, num: Int, geographicalRegion: GeographicalRegion): SubGeographicalRegion =
             SubGeographicalRegion("r$num")
                 .apply {
                     name = "Sub Geographical Region $num"
@@ -188,7 +188,7 @@ class NetworkModelTestUtil {
                     assertThat(network.add(it), equalTo(true))
                 }
 
-        fun createSubstation(network: NetworkService, num: Int, subGeographicalRegion: SubGeographicalRegion?) =
+        fun createSubstation(network: NetworkService, num: Int, subGeographicalRegion: SubGeographicalRegion?): Substation =
             Substation("z$num")
                 .apply {
                     name = "Substation $num"
@@ -198,7 +198,7 @@ class NetworkModelTestUtil {
                     assertThat(network.add(it), equalTo(true))
                 }
 
-        fun createFeeder(network: NetworkService, num: Int, feederStart: ConductingEquipment?, substation: Substation?) =
+        fun createFeeder(network: NetworkService, num: Int, feederStart: ConductingEquipment?, substation: Substation?): Feeder =
             Feeder("f$num")
                 .apply {
                     normalHeadTerminal = feederStart?.let { it.getTerminal(1)!! }
@@ -213,7 +213,7 @@ class NetworkModelTestUtil {
                     assertThat(network.add(it), equalTo(true))
                 }
 
-        fun createSite(network: NetworkService, num: Int) =
+        fun createSite(network: NetworkService, num: Int): Site =
             Site("site$num")
                 .apply {
                     name = "Site $num"
@@ -221,7 +221,7 @@ class NetworkModelTestUtil {
                     assertThat(network.add(it), equalTo(true))
                 }
 
-        fun createOperationalRestriction(network: NetworkService, num: Int) =
+        fun createOperationalRestriction(network: NetworkService, num: Int): OperationalRestriction =
             OperationalRestriction("OperationalRestriction$num")
                 .apply {
                     name = "Operational Restriction $num"
@@ -235,13 +235,13 @@ class NetworkModelTestUtil {
                     assertThat(network.add(it), equalTo(true))
                 }
 
-        fun setNormalFeeder(feeder: Feeder, vararg assets: ConductingEquipment) =
+        fun setNormalFeeder(feeder: Feeder, vararg assets: ConductingEquipment): Unit =
             assets.forEach {
                 it.addContainer(feeder)
                 feeder.addEquipment(it)
             }
 
-        fun setCurrentFeeder(feeder: Feeder, vararg assets: ConductingEquipment) =
+        fun setCurrentFeeder(feeder: Feeder, vararg assets: ConductingEquipment): Unit =
             assets.forEach {
                 it.addCurrentContainer(feeder)
                 feeder.addCurrentEquipment(it)
@@ -256,17 +256,17 @@ class NetworkModelTestUtil {
             }
         }
 
-        fun locationOf(postcode: Int, state: String, locality: String) =
+        fun locationOf(postcode: Int, state: String, locality: String): Location =
             Location().apply {
                 mainAddress = StreetAddress(postcode.toString(), TownDetail(locality, state))
             }
 
-        fun locationOf(vararg coords: Double) = Location().apply {
+        fun locationOf(vararg coords: Double): Location = Location().apply {
             for (i in coords.indices step 2)
                 addPoint(PositionPoint(coords[i], coords[i + 1]))
         }
 
-        fun baseVoltageOf(voltage: Int) = baseVoltagesByNominalVoltage.computeIfAbsent(voltage) {
+        fun baseVoltageOf(voltage: Int): BaseVoltage = baseVoltagesByNominalVoltage.computeIfAbsent(voltage) {
             BaseVoltage().apply { nominalVoltage = it }
         }
 

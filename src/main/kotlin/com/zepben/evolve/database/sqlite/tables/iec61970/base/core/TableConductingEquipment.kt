@@ -13,6 +13,6 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 abstract class TableConductingEquipment : TableEquipment() {
 
-    val BASE_VOLTAGE_MRID = Column(++columnIndex, "base_voltage_mrid", "TEXT", NULL)
+    val BASE_VOLTAGE_MRID: Column = Column(++columnIndex, "base_voltage_mrid", "TEXT", NULL)
 
 }

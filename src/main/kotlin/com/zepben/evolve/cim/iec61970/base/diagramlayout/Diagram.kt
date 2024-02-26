@@ -33,7 +33,7 @@ class Diagram @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mR
     /**
      * Get the number of entries in the [DiagramObject] collection.
      */
-    fun numDiagramObjects() = _diagramObjects?.size ?: 0
+    fun numDiagramObjects(): Int = _diagramObjects?.size ?: 0
 
     /**
      * A diagram is made up of multiple diagram objects.
@@ -41,7 +41,7 @@ class Diagram @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mR
      * @param mRID the mRID of the required [DiagramObject]
      * @return The [DiagramObject] with the specified [mRID] if it exists, otherwise null
      */
-    fun getDiagramObject(mRID: String) = _diagramObjects?.get(mRID)
+    fun getDiagramObject(mRID: String): DiagramObject? = _diagramObjects?.get(mRID)
 
     /**
      * @param diagramObject The diagram object to add to the [DiagramObject] collection.

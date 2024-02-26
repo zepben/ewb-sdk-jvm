@@ -13,13 +13,13 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableControls : TableIoPoints() {
 
-    val POWER_SYSTEM_RESOURCE_MRID = Column(++columnIndex, "power_system_resource_mrid", "TEXT", NULL)
+    val POWER_SYSTEM_RESOURCE_MRID: Column = Column(++columnIndex, "power_system_resource_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "controls"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableControls> = this.javaClass
+    override val tableClassInstance: TableControls = this
 
 }

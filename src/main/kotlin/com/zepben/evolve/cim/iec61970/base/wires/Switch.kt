@@ -40,7 +40,7 @@ abstract class Switch(mRID: String = "") : ConductingEquipment(mRID) {
      * @return the status of the phase in its normal state.
      */
     @JvmOverloads
-    fun isNormallyOpen(phase: SinglePhaseKind? = null) = checkIsOpen(normalOpen, phase)
+    fun isNormallyOpen(phase: SinglePhaseKind? = null): Boolean = checkIsOpen(normalOpen, phase)
 
     /**
      * Helper function to check if the switch is currently open.
@@ -50,7 +50,7 @@ abstract class Switch(mRID: String = "") : ConductingEquipment(mRID) {
      * @return the status of the phase in its current state.
      */
     @JvmOverloads
-    fun isOpen(phase: SinglePhaseKind? = null) = checkIsOpen(open, phase)
+    fun isOpen(phase: SinglePhaseKind? = null): Boolean = checkIsOpen(open, phase)
 
     /**
      * @param isNormallyOpen indicates if the phase(s) should be opened.

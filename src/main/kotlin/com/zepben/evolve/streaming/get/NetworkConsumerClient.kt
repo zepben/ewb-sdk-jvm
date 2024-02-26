@@ -373,8 +373,8 @@ class NetworkConsumerClient(
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
     ): GrpcResult<MultiObjectResult> =
-        getWithReferences(mRIDs, expectedClass) { it, mor ->
-            mor.objects.putAll(getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers)
+        getWithReferences(mRIDs, expectedClass) { it, (objects, _) ->
+            objects.putAll(getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers)
                 .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
                 .value.objects
             )
@@ -411,13 +411,13 @@ class NetworkConsumerClient(
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getEquipmentForLoop(mRID: String): GrpcResult<MultiObjectResult> =
-        getWithReferences(mRID, Loop::class.java) { loop, mor ->
-            mor.objects.putAll(loop.circuits.associateBy { it.mRID })
-            mor.objects.putAll(loop.substations.associateBy { it.mRID })
-            mor.objects.putAll(loop.energizingSubstations.associateBy { it.mRID })
+        getWithReferences(mRID, Loop::class.java) { loop, (objects, _) ->
+            objects.putAll(loop.circuits.associateBy { it.mRID })
+            objects.putAll(loop.substations.associateBy { it.mRID })
+            objects.putAll(loop.energizingSubstations.associateBy { it.mRID })
 
             val containers = loop.circuits.asSequence() + loop.substations.asSequence() + loop.energizingSubstations.asSequence()
-            mor.objects.putAll(getEquipmentForContainers(containers.map { it.mRID })
+            objects.putAll(getEquipmentForContainers(containers.map { it.mRID })
                 .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
                 .value.objects)
             null

@@ -15,13 +15,13 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 @Suppress("PropertyName")
 abstract class TableTransformerEnds : TableIdentifiedObjects() {
 
-    val END_NUMBER = Column(++columnIndex, "end_number", "INTEGER", NOT_NULL)
-    val TERMINAL_MRID = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
-    val BASE_VOLTAGE_MRID = Column(++columnIndex, "base_voltage_mrid", "TEXT", NULL)
-    val GROUNDED = Column(++columnIndex, "grounded", "BOOLEAN", NOT_NULL)
-    val R_GROUND = Column(++columnIndex, "r_ground", "NUMBER", NULL)
-    val X_GROUND = Column(++columnIndex, "x_ground", "NUMBER", NULL)
-    val STAR_IMPEDANCE_MRID = Column(++columnIndex, "star_impedance_mrid", "TEXT", NULL)
+    val END_NUMBER: Column = Column(++columnIndex, "end_number", "INTEGER", NOT_NULL)
+    val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
+    val BASE_VOLTAGE_MRID: Column = Column(++columnIndex, "base_voltage_mrid", "TEXT", NULL)
+    val GROUNDED: Column = Column(++columnIndex, "grounded", "BOOLEAN", NOT_NULL)
+    val R_GROUND: Column = Column(++columnIndex, "r_ground", "NUMBER", NULL)
+    val X_GROUND: Column = Column(++columnIndex, "x_ground", "NUMBER", NULL)
+    val STAR_IMPEDANCE_MRID: Column = Column(++columnIndex, "star_impedance_mrid", "TEXT", NULL)
 
     override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
         val cols = super.nonUniqueIndexColumns()

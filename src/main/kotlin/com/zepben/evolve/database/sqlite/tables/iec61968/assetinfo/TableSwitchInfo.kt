@@ -15,13 +15,13 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetInfo
 @Suppress("PropertyName")
 class TableSwitchInfo : TableAssetInfo() {
 
-    val RATED_INTERRUPTING_TIME = Column(++columnIndex, "rated_interrupting_time", "NUMBER", NULL)
+    val RATED_INTERRUPTING_TIME: Column = Column(++columnIndex, "rated_interrupting_time", "NUMBER", NULL)
 
     override fun name(): String {
         return "switch_info"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableSwitchInfo> = this.javaClass
+    override val tableClassInstance: TableSwitchInfo = this
 
 }

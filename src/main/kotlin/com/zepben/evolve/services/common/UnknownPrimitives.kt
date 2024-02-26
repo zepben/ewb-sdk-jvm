@@ -12,8 +12,8 @@ package com.zepben.evolve.services.common
 // NOTE: These values must be comparable using standard equality operators (i.e ==)
 //
 
-const val UNKNOWN_DOUBLE = Double.NEGATIVE_INFINITY
-const val UNKNOWN_INT = Int.MIN_VALUE
-const val UNKNOWN_UINT = -1
-const val UNKNOWN_LONG = Long.MIN_VALUE
-const val UNKNOWN_FLOAT = Float.NEGATIVE_INFINITY
+const val UNKNOWN_DOUBLE: Double = Double.NEGATIVE_INFINITY
+const val UNKNOWN_INT: Int = Int.MIN_VALUE
+const val UNKNOWN_UINT: Int = -1
+const val UNKNOWN_LONG: Long = Long.MIN_VALUE
+const val UNKNOWN_FLOAT: Float = Float.NEGATIVE_INFINITY

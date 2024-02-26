@@ -31,7 +31,7 @@ class Pole @JvmOverloads constructor(mRID: String = "") : Structure(mRID) {
     /**
      * Get the number of entries in the [Streetlight] collection.
      */
-    fun numStreetlights() = _streetlights?.size ?: 0
+    fun numStreetlights(): Int = _streetlights?.size ?: 0
 
     /**
      * Get a [Streetlight] attached to this Pole by its mRID.
@@ -39,7 +39,7 @@ class Pole @JvmOverloads constructor(mRID: String = "") : Structure(mRID) {
      * @param mRID the mRID of the required [Streetlight]
      * @return The [Streetlight] with the specified [mRID] if it exists, otherwise null
      */
-    fun getStreetlight(mRID: String) = _streetlights.getByMRID(mRID)
+    fun getStreetlight(mRID: String): Streetlight? = _streetlights.getByMRID(mRID)
 
     /**
      * @param streetlight the [Streetlight] to associate with this [Pole].

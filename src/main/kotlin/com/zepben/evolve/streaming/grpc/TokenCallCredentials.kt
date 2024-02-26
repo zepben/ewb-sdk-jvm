@@ -23,6 +23,9 @@ internal val AUTHORIZATION_METADATA_KEY: Metadata.Key<String> = Metadata.Key.of(
  */
 class TokenCallCredentials(private val getToken: () -> String) : CallCredentials() {
 
+    /**
+     * Gets token using provided function [getToken] and assigns it to the "Authorization" header in a gRPC request.
+     */
     override fun applyRequestMetadata(requestInfo: RequestInfo, executor: Executor, applier: MetadataApplier) {
         try {
             val headers = Metadata()
@@ -32,7 +35,5 @@ class TokenCallCredentials(private val getToken: () -> String) : CallCredentials
             applier.fail(Status.fromThrowable(e))
         }
     }
-
-    override fun thisUsesUnstableApi() {}
 
 }

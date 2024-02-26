@@ -13,7 +13,7 @@ class TableCableInfo : TableWireInfo() {
         return "cable_info"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableCableInfo> = this.javaClass
+    override val tableClassInstance: TableCableInfo = this
 
 }

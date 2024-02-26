@@ -13,7 +13,7 @@ class TableGeographicalRegions : TableIdentifiedObjects() {
         return "geographical_regions"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableGeographicalRegions> = this.javaClass
+    override val tableClassInstance: TableGeographicalRegions = this
 
 }

@@ -13,7 +13,7 @@ class TableMeters : TableEndDevices() {
         return "meters"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableMeters> = this.javaClass
+    override val tableClassInstance: TableMeters = this
 
 }

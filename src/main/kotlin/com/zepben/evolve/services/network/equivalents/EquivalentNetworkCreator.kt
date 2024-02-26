@@ -71,8 +71,8 @@ object EquivalentNetworkCreator {
     inline fun <reified T : ConductingEquipment> addToEdgeBetween(
         network: NetworkService,
         edgeDetectionDetails: EdgeDetectionDetails,
-        noinline branchMrid: BranchMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eb" },
-        noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eeq" },
+        noinline branchMrid: BranchMridSupplier = { (edgeEquipment, _) -> "${edgeEquipment.mRID}-eb" },
+        noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment, _, _) -> "${edgeEquipment.mRID}-eeq" },
         noinline initBranch: BranchInitialisation = {},
         noinline initEquipment: EquipmentInitialisation<T> = {},
         maxNumber: Int? = null
@@ -144,7 +144,7 @@ object EquivalentNetworkCreator {
      * @return A sequence containing the single [EquivalentBranch] that has been created and needs to be connected to the network.
      */
     fun singleEquivalentBranchCreator(
-        branchMrid: BranchMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eb" },
+        branchMrid: BranchMridSupplier = { (edgeEquipment, _) -> "${edgeEquipment.mRID}-eb" },
         initBranch: BranchInitialisation = {},
     ): EquivalentBranchesCreator =
         { (edgeEquipment, edgeNode) ->
@@ -167,7 +167,7 @@ object EquivalentNetworkCreator {
      * @return The [EquivalentEquipmentCreator].
      */
     inline fun <reified T : ConductingEquipment> singleEquipmentCreator(
-        noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eeq" },
+        noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment, _, _) -> "${edgeEquipment.mRID}-eeq" },
         noinline initEquipment: EquipmentInitialisation<T> = {},
     ): EquivalentEquipmentCreator =
         singleEquipmentCreator(T::class, equipmentMrid, initEquipment)
@@ -183,7 +183,7 @@ object EquivalentNetworkCreator {
      */
     fun <T : ConductingEquipment> singleEquipmentCreator(
         klass: KClass<T>,
-        equipmentMrid: EquipmentMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eeq" },
+        equipmentMrid: EquipmentMridSupplier = { (edgeEquipment, _, _) -> "${edgeEquipment.mRID}-eeq" },
         initEquipment: EquipmentInitialisation<T> = {},
     ): EquivalentEquipmentCreator =
         { (edgeEquipment, edgeNode, equivalentBranch) ->
@@ -347,8 +347,8 @@ object EquivalentNetworkCreator {
 inline fun <reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
     container: EquipmentContainer,
     otherContainer: EquipmentContainer,
-    noinline branchMrid: BranchMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eb" },
-    noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eeq" },
+    noinline branchMrid: BranchMridSupplier = { (edgeEquipment, _) -> "${edgeEquipment.mRID}-eb" },
+    noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment, _, _) -> "${edgeEquipment.mRID}-eeq" },
     maxNumber: Int? = null,
     noinline initBranch: BranchInitialisation = {},
     noinline initEquipment: EquipmentInitialisation<T> = {}
@@ -388,8 +388,8 @@ inline fun <reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
  */
 inline fun <reified OtherContainer : EquipmentContainer, reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
     container: EquipmentContainer,
-    noinline branchMrid: BranchMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eb" },
-    noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eeq" },
+    noinline branchMrid: BranchMridSupplier = { (edgeEquipment, _) -> "${edgeEquipment.mRID}-eb" },
+    noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment, _, _) -> "${edgeEquipment.mRID}-eeq" },
     maxNumber: Int? = null,
     noinline initBranch: BranchInitialisation = {},
     noinline initEquipment: EquipmentInitialisation<T> = {}
@@ -428,8 +428,8 @@ inline fun <reified OtherContainer : EquipmentContainer, reified T : ConductingE
  *   added [EquivalentBranch]es and their [ConductingEquipment].
  */
 inline fun <reified Container : EquipmentContainer, reified OtherContainer : EquipmentContainer, reified T : ConductingEquipment> NetworkService.addToEdgeBetween(
-    noinline branchMrid: BranchMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eb" },
-    noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment) -> "${edgeEquipment.mRID}-eeq" },
+    noinline branchMrid: BranchMridSupplier = { (edgeEquipment, _) -> "${edgeEquipment.mRID}-eb" },
+    noinline equipmentMrid: EquipmentMridSupplier = { (edgeEquipment, _, _) -> "${edgeEquipment.mRID}-eeq" },
     maxNumber: Int? = null,
     noinline initBranch: BranchInitialisation = {},
     noinline initEquipment: EquipmentInitialisation<T> = {}

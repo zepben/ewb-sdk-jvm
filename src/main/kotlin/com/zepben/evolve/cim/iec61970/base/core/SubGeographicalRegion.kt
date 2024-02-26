@@ -26,7 +26,7 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
     /**
      * Get the number of entries in the [Substation] collection.
      */
-    fun numSubstations() = _substations?.size ?: 0
+    fun numSubstations(): Int = _substations?.size ?: 0
 
     /**
      * The substations in this sub-geographical region.
@@ -34,7 +34,7 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
      * @param mRID the mRID of the required [Substation]
      * @return The [Substation] with the specified [mRID] if it exists, otherwise null
      */
-    fun getSubstation(mRID: String) = _substations.getByMRID(mRID)
+    fun getSubstation(mRID: String): Substation? = _substations.getByMRID(mRID)
 
     /**
      * @param substation the [Substation] to associate with this [SubGeographicalRegion].

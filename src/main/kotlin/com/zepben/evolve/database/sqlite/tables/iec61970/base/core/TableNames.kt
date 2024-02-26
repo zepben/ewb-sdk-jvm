@@ -14,16 +14,16 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableNames : SqliteTable() {
 
-    val NAME = Column(++columnIndex, "name", "TEXT", NOT_NULL)
-    val IDENTIFIED_OBJECT_MRID = Column(++columnIndex, "identified_object_mrid", "TEXT", NOT_NULL)
-    val NAME_TYPE_NAME = Column(++columnIndex, "name_type_name", "TEXT", NOT_NULL)
+    val NAME: Column = Column(++columnIndex, "name", "TEXT", NOT_NULL)
+    val IDENTIFIED_OBJECT_MRID: Column = Column(++columnIndex, "identified_object_mrid", "TEXT", NOT_NULL)
+    val NAME_TYPE_NAME: Column = Column(++columnIndex, "name_type_name", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "names"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableNames> = this.javaClass
+    override val tableClassInstance: TableNames = this
 
     override fun uniqueIndexColumns(): MutableList<List<Column>> = mutableListOf(
         listOf(IDENTIFIED_OBJECT_MRID, NAME_TYPE_NAME, NAME)

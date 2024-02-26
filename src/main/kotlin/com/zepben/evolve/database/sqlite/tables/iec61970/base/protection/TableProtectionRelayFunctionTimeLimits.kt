@@ -15,9 +15,9 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableProtectionRelayFunctionTimeLimits : SqliteTable() {
 
-    val PROTECTION_RELAY_FUNCTION_MRID = Column(++columnIndex, "protection_relay_function_mrid", "TEXT", NOT_NULL)
-    val SEQUENCE_NUMBER = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
-    val TIME_LIMIT = Column(++columnIndex, "time_limit", "NUMBER", NOT_NULL)
+    val PROTECTION_RELAY_FUNCTION_MRID: Column = Column(++columnIndex, "protection_relay_function_mrid", "TEXT", NOT_NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
+    val TIME_LIMIT: Column = Column(++columnIndex, "time_limit", "NUMBER", NOT_NULL)
 
     override fun name(): String {
         return "protection_relay_function_time_limits"
@@ -39,7 +39,7 @@ class TableProtectionRelayFunctionTimeLimits : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableProtectionRelayFunctionTimeLimits> = this.javaClass
+    override val tableClassInstance: TableProtectionRelayFunctionTimeLimits = this
 
 }

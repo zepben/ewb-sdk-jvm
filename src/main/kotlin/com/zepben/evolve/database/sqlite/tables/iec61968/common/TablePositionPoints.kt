@@ -14,10 +14,10 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TablePositionPoints : SqliteTable() {
 
-    val LOCATION_MRID = Column(++columnIndex, "location_mrid", "TEXT", NOT_NULL)
-    val SEQUENCE_NUMBER = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
-    val X_POSITION = Column(++columnIndex, "x_position", "NUMBER", NOT_NULL)
-    val Y_POSITION = Column(++columnIndex, "y_position", "NUMBER", NOT_NULL)
+    val LOCATION_MRID: Column = Column(++columnIndex, "location_mrid", "TEXT", NOT_NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
+    val X_POSITION: Column = Column(++columnIndex, "x_position", "NUMBER", NOT_NULL)
+    val Y_POSITION: Column = Column(++columnIndex, "y_position", "NUMBER", NOT_NULL)
 
     override fun name(): String {
         return "position_points"
@@ -31,7 +31,7 @@ class TablePositionPoints : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TablePositionPoints> = this.javaClass
+    override val tableClassInstance: TablePositionPoints = this
 
 }

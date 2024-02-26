@@ -15,7 +15,7 @@ class TableLocations : TableIdentifiedObjects() {
         return "locations"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableLocations> = this.javaClass
+    override val tableClassInstance: TableLocations = this
 
 }

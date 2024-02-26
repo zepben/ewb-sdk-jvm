@@ -14,14 +14,14 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 abstract class TableStreetAddresses : TableTownDetails() {
 
-    val POSTAL_CODE = Column(++columnIndex, "postal_code", "TEXT", NOT_NULL)
-    val PO_BOX = Column(++columnIndex, "po_box", "TEXT", NULL)
-    val BUILDING_NAME = Column(++columnIndex, "building_name", "TEXT", NULL)
-    val FLOOR_IDENTIFICATION = Column(++columnIndex, "floor_identification", "TEXT", NULL)
-    val STREET_NAME = Column(++columnIndex, "name", "TEXT", NULL)
-    val NUMBER = Column(++columnIndex, "number", "TEXT", NULL)
-    val SUITE_NUMBER = Column(++columnIndex, "suite_number", "TEXT", NULL)
-    val TYPE = Column(++columnIndex, "type", "TEXT", NULL)
-    val DISPLAY_ADDRESS = Column(++columnIndex, "display_address", "TEXT", NULL)
+    val POSTAL_CODE: Column = Column(++columnIndex, "postal_code", "TEXT", NOT_NULL)
+    val PO_BOX: Column = Column(++columnIndex, "po_box", "TEXT", NULL)
+    val BUILDING_NAME: Column = Column(++columnIndex, "building_name", "TEXT", NULL)
+    val FLOOR_IDENTIFICATION: Column = Column(++columnIndex, "floor_identification", "TEXT", NULL)
+    val STREET_NAME: Column = Column(++columnIndex, "name", "TEXT", NULL)
+    val NUMBER: Column = Column(++columnIndex, "number", "TEXT", NULL)
+    val SUITE_NUMBER: Column = Column(++columnIndex, "suite_number", "TEXT", NULL)
+    val TYPE: Column = Column(++columnIndex, "type", "TEXT", NULL)
+    val DISPLAY_ADDRESS: Column = Column(++columnIndex, "display_address", "TEXT", NULL)
 
 }

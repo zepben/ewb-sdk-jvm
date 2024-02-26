@@ -15,9 +15,9 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableRecloseDelays : SqliteTable() {
 
-    val RELAY_INFO_MRID = Column(++columnIndex, "relay_info_mrid", "TEXT", NOT_NULL)
-    val RECLOSE_DELAY = Column(++columnIndex, "reclose_delay", "NUMBER", NOT_NULL)
-    val SEQUENCE_NUMBER = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
+    val RELAY_INFO_MRID: Column = Column(++columnIndex, "relay_info_mrid", "TEXT", NOT_NULL)
+    val RECLOSE_DELAY: Column = Column(++columnIndex, "reclose_delay", "NUMBER", NOT_NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
 
     override fun name(): String {
         return "reclose_delays"
@@ -43,7 +43,7 @@ class TableRecloseDelays : SqliteTable() {
         return "${super.selectSql()} ORDER BY relay_info_mrid, sequence_number ASC;"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableRecloseDelays> = this.javaClass
+    override val tableClassInstance: TableRecloseDelays = this
 
 }

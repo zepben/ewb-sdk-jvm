@@ -13,7 +13,7 @@ class TableSites : TableEquipmentContainers() {
         return "sites"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableSites> = this.javaClass
+    override val tableClassInstance: TableSites = this
 
 }

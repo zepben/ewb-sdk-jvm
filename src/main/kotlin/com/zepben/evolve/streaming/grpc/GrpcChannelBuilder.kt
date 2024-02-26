@@ -73,7 +73,7 @@ class GrpcChannelBuilder {
         rootCertificates: String? = null,
         certificateChain: String,
         privateKey: String
-    ) = makeSecure(rootCertificates?.let { File(it) }, File(certificateChain), File(privateKey))
+    ): GrpcChannelBuilder = makeSecure(rootCertificates?.let { File(it) }, File(certificateChain), File(privateKey))
 
     fun withTokenFetcher(tokenFetcher: ZepbenTokenFetcher): GrpcChannelBuilder = apply {
         _callCredentials = TokenCallCredentials(tokenFetcher::fetchToken)

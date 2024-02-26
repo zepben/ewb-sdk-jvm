@@ -21,7 +21,7 @@ object SplitSinglePhasesFromJunctionNetwork {
     //          BC
     //          | ac4
     //
-    fun create() = NetworkService().also { network ->
+    fun create(): NetworkService = NetworkService().also { network ->
         val acLineSegment1 = createAcLineSegmentForConnecting(network, "acLineSegment1", PhaseCode.ABCN)
         val acLineSegment2 = createAcLineSegmentForConnecting(network, "acLineSegment2", PhaseCode.AB)
         val acLineSegment3 = createAcLineSegmentForConnecting(network, "acLineSegment3", PhaseCode.AC)

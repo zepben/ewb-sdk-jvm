@@ -43,7 +43,7 @@ object LoopingNetwork {
     //                 \--21* n14
     //               ac15
     //
-    fun create() = NetworkService().also { network ->
+    fun create(): NetworkService = NetworkService().also { network ->
         val node0 = createSourceForConnecting(network, "node0", 1, PhaseCode.ABCN)
         val node1 = createNodeForConnecting(network, "node1", 3, PhaseCode.ABCN)
         val node2 = createNodeForConnecting(network, "node2", 2, PhaseCode.ABCN)

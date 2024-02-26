@@ -15,10 +15,10 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 @Suppress("PropertyName")
 class TableDiagramObjects : TableIdentifiedObjects() {
 
-    val IDENTIFIED_OBJECT_MRID = Column(++columnIndex, "identified_object_mrid", "TEXT", NULL)
-    val DIAGRAM_MRID = Column(++columnIndex, "diagram_mrid", "TEXT", NULL)
-    val STYLE = Column(++columnIndex, "style", "TEXT", NULL)
-    val ROTATION = Column(++columnIndex, "rotation", "NUMBER", NOT_NULL)
+    val IDENTIFIED_OBJECT_MRID: Column = Column(++columnIndex, "identified_object_mrid", "TEXT", NULL)
+    val DIAGRAM_MRID: Column = Column(++columnIndex, "diagram_mrid", "TEXT", NULL)
+    val STYLE: Column = Column(++columnIndex, "style", "TEXT", NULL)
+    val ROTATION: Column = Column(++columnIndex, "rotation", "NUMBER", NOT_NULL)
 
     override fun name(): String {
         return "diagram_objects"
@@ -33,7 +33,7 @@ class TableDiagramObjects : TableIdentifiedObjects() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableDiagramObjects> = this.javaClass
+    override val tableClassInstance: TableDiagramObjects = this
 
 }

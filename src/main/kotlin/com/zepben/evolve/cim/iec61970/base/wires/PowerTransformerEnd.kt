@@ -184,6 +184,6 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
 
 }
 
-fun PowerTransformerEnd.forEachRating(action: (sequenceNumber: Int, rating: TransformerEndRatedS) -> Unit) = forEachRating(BiConsumer(action))
+fun PowerTransformerEnd.forEachRating(action: (sequenceNumber: Int, rating: TransformerEndRatedS) -> Unit): Unit = forEachRating(BiConsumer(action))
 
 data class TransformerEndRatedS(val coolingType: TransformerCoolingType, val ratedS: Int)

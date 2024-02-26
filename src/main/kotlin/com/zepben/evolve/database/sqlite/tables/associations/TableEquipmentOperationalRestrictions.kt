@@ -14,8 +14,8 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableEquipmentOperationalRestrictions : SqliteTable() {
 
-    val EQUIPMENT_MRID = Column(++columnIndex, "equipment_mrid", "TEXT", NOT_NULL)
-    val OPERATIONAL_RESTRICTION_MRID =
+    val EQUIPMENT_MRID: Column = Column(++columnIndex, "equipment_mrid", "TEXT", NOT_NULL)
+    val OPERATIONAL_RESTRICTION_MRID: Column =
         Column(++columnIndex, "operational_restriction_mrid", "TEXT", NOT_NULL)
 
     override fun name(): String {
@@ -39,7 +39,7 @@ class TableEquipmentOperationalRestrictions : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableEquipmentOperationalRestrictions> = this.javaClass
+    override val tableClassInstance: TableEquipmentOperationalRestrictions = this
 
 }

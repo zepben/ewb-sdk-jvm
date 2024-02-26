@@ -140,7 +140,7 @@ fun createTerminals(network: NetworkService, condEq: ConductingEquipment, numTer
         createTerminal(network, condEq, nominalPhases, i)
 }
 
-fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment?, phases: PhaseCode = PhaseCode.A, sequenceNumber: Int) =
+fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment?, phases: PhaseCode = PhaseCode.A, sequenceNumber: Int): Terminal =
     conductingEquipment?.getTerminal(sequenceNumber) ?: Terminal(conductingEquipment?.mRID?.let { "$it-t$sequenceNumber" } ?: "").apply {
         this.conductingEquipment = conductingEquipment
         this.phases = phases
@@ -184,7 +184,7 @@ fun createFeeder(
         networkService.add(this)
     }
 
-fun createFeeder(networkService: NetworkService, mRID: String, name: String, substation: Substation, vararg equipmentMRIDs: String?) =
+fun createFeeder(networkService: NetworkService, mRID: String, name: String, substation: Substation, vararg equipmentMRIDs: String?): Feeder =
     createFeeder(networkService, mRID, name, substation, networkService.get(ConductingEquipment::class, equipmentMRIDs[0]))
         .apply {
             for (equipmentMRID in equipmentMRIDs) {
@@ -195,7 +195,7 @@ fun createFeeder(networkService: NetworkService, mRID: String, name: String, sub
             }
         }
 
-fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int? = null, endNumber: Int = 0) =
+fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int? = null, endNumber: Int = 0): PowerTransformerEnd =
     PowerTransformerEnd().also {
         it.ratedU = ratedU
         it.endNumber = endNumber
@@ -204,7 +204,7 @@ fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int?
         networkService.add(it)
     }
 
-fun createOperationalRestriction(networkService: NetworkService, mRID: String, name: String, vararg equipmentMRIDs: String) =
+fun createOperationalRestriction(networkService: NetworkService, mRID: String, name: String, vararg equipmentMRIDs: String): OperationalRestriction =
     OperationalRestriction(mRID).apply {
         this.name = name
 

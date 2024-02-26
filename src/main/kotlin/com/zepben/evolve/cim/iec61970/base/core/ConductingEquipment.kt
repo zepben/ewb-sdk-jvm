@@ -42,7 +42,7 @@ abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
     /**
      * Get the number of entries in the [Terminal] collection.
      */
-    fun numTerminals() = _terminals.size
+    fun numTerminals(): Int = _terminals.size
 
     /**
      * Conducting equipment have terminals that may be connected to other conducting equipment terminals
@@ -51,7 +51,7 @@ abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
      * @param mRID the mRID of the required [Terminal]
      * @return The [Terminal] with the specified [mRID] if it exists, otherwise null
      */
-    fun getTerminal(mRID: String) = _terminals.getByMRID(mRID)
+    fun getTerminal(mRID: String): Terminal? = _terminals.getByMRID(mRID)
 
     /**
      * Conducting equipment have terminals that may be connected to other conducting equipment terminals
@@ -103,4 +103,3 @@ abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
         return false
     }
 }
-

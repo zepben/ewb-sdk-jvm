@@ -13,16 +13,16 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableLinearShuntCompensators : TableShuntCompensators() {
 
-    val B0_PER_SECTION = Column(++columnIndex, "b0_per_section", "NUMBER", NULL)
-    val B_PER_SECTION = Column(++columnIndex, "b_per_section", "NUMBER", NULL)
-    val G0_PER_SECTION = Column(++columnIndex, "g0_per_section", "NUMBER", NULL)
-    val G_PER_SECTION = Column(++columnIndex, "g_per_section", "NUMBER", NULL)
+    val B0_PER_SECTION: Column = Column(++columnIndex, "b0_per_section", "NUMBER", NULL)
+    val B_PER_SECTION: Column = Column(++columnIndex, "b_per_section", "NUMBER", NULL)
+    val G0_PER_SECTION: Column = Column(++columnIndex, "g0_per_section", "NUMBER", NULL)
+    val G_PER_SECTION: Column = Column(++columnIndex, "g_per_section", "NUMBER", NULL)
 
     override fun name(): String {
         return "linear_shunt_compensators"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableLinearShuntCompensators> = this.javaClass
+    override val tableClassInstance: TableLinearShuntCompensators = this
 
 }

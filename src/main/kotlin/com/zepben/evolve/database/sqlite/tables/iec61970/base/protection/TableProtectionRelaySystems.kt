@@ -15,13 +15,13 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableEquipmen
 @Suppress("PropertyName")
 class TableProtectionRelaySystems : TableEquipment() {
 
-    val PROTECTION_KIND = Column(++columnIndex, "protection_kind", "TEXT", NOT_NULL)
+    val PROTECTION_KIND: Column = Column(++columnIndex, "protection_kind", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "protection_relay_systems"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableProtectionRelaySystems> = this.javaClass
+    override val tableClassInstance: TableProtectionRelaySystems = this
 
 }

@@ -17,7 +17,7 @@ object FeederToSubstationTransformerNetwork {
     //      c1      c2
     // fsp ---- tz ----
     //
-    fun create() = NetworkService().also { networkService ->
+    fun create(): NetworkService = NetworkService().also { networkService ->
         val substation = Substation().also { networkService.add(it) }
 
         val fsp = createNodeForConnecting(networkService, "fsp", 1)

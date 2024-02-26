@@ -15,8 +15,8 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableProtectionRelayFunctionsSensors : SqliteTable() {
 
-    val PROTECTION_RELAY_FUNCTION_MRID = Column(++columnIndex, "protection_relay_function_mrid", "TEXT", NOT_NULL)
-    val SENSOR_MRID = Column(++columnIndex, "sensor_mrid", "TEXT", NOT_NULL)
+    val PROTECTION_RELAY_FUNCTION_MRID: Column = Column(++columnIndex, "protection_relay_function_mrid", "TEXT", NOT_NULL)
+    val SENSOR_MRID: Column = Column(++columnIndex, "sensor_mrid", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "protection_relay_functions_sensors"
@@ -39,7 +39,7 @@ class TableProtectionRelayFunctionsSensors : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableProtectionRelayFunctionsSensors> = this.javaClass
+    override val tableClassInstance: TableProtectionRelayFunctionsSensors = this
 
 }

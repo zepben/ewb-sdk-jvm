@@ -18,6 +18,7 @@
   * Renamed `RelayInfo.removeDelay` to `RelayInfo.removeDelayAt`. The original method name has been repurposed to remove a delay by its value rather than its
     index.
 * Reworked values for enumerable type `ProtectionKind`.
+* Removed `IdentifiedObject.removeNamesFromTypes()`. Use `IdentifiedObject.clearNames()` instead.
 
 ### New Features
 

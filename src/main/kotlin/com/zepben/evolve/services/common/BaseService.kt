@@ -168,7 +168,7 @@ abstract class BaseService(
      *
      * @return true if there is an object associated with the specified [mRID].
      */
-    fun contains(mRID: String) = objectsByType.values.any { it.containsKey(mRID) }
+    fun contains(mRID: String): Boolean = objectsByType.values.any { it.containsKey(mRID) }
 
     /**
      * Get the number of objects associated with this service.
@@ -377,7 +377,7 @@ abstract class BaseService(
      *
      * @return true if at least one reference exists.
      */
-    fun hasUnresolvedReferences(mRID: String? = null) = if (mRID != null) unresolvedReferencesTo.containsKey(mRID) else unresolvedReferencesTo.isNotEmpty()
+    fun hasUnresolvedReferences(mRID: String? = null): Boolean = if (mRID != null) unresolvedReferencesTo.containsKey(mRID) else unresolvedReferencesTo.isNotEmpty()
 
     /**
      * Get the number of [UnresolvedReference]s in this service.
@@ -437,7 +437,7 @@ abstract class BaseService(
      *
      * @return true if the object is disassociated from this service.
      */
-    protected fun remove(identifiedObject: IdentifiedObject) = objectsByType[identifiedObject::class]?.remove(identifiedObject.mRID) != null
+    protected fun remove(identifiedObject: IdentifiedObject): Boolean = objectsByType[identifiedObject::class]?.remove(identifiedObject.mRID) != null
 
     /**
      * Create a sequence of all instances of the specified type.

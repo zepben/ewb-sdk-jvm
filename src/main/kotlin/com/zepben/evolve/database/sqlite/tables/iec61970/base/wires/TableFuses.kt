@@ -13,13 +13,13 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableFuses : TableSwitches() {
 
-    val FUNCTION_MRID = Column(++columnIndex, "function_mrid", "TEXT", NULL)
+    val FUNCTION_MRID: Column = Column(++columnIndex, "function_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "fuses"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableFuses> = this.javaClass
+    override val tableClassInstance: TableFuses = this
 
 }

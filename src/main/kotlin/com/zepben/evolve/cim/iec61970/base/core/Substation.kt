@@ -33,7 +33,7 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     /**
      * Get the number of entries in the [Feeder] collection.
      */
-    fun numFeeders() = _normalEnergizedFeeders?.size ?: 0
+    fun numFeeders(): Int = _normalEnergizedFeeders?.size ?: 0
 
     /**
      * The normal energized feeders of the substation. Also used for naming purposes.
@@ -41,7 +41,7 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
      * @param mRID the mRID of the required [Feeder]
      * @return The [Feeder] with the specified [mRID] if it exists, otherwise null
      */
-    fun getFeeder(mRID: String) = _normalEnergizedFeeders.getByMRID(mRID)
+    fun getFeeder(mRID: String): Feeder? = _normalEnergizedFeeders.getByMRID(mRID)
 
     /**
      * @param feeder the [Feeder] to associate with this [Substation].
@@ -92,7 +92,7 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     /**
      * Get the number of entries in the [loops] collection.
      */
-    fun numLoops() = _loops?.size ?: 0
+    fun numLoops(): Int = _loops?.size ?: 0
 
     /**
      * Retrieve a [Loop] from the [loops] collection.
@@ -100,7 +100,7 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
      * @param mRID the mRID of the required [Loop]
      * @return The [Loop] with the specified [mRID] if it exists, otherwise null
      */
-    fun getLoop(mRID: String) = _loops.getByMRID(mRID)
+    fun getLoop(mRID: String): Loop? = _loops.getByMRID(mRID)
 
     /**
      * @param loop the [Loop] to associate with this [Substation].
@@ -144,7 +144,7 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     /**
      * Get the number of entries in the [energizedLoops] collection.
      */
-    fun numEnergizedLoops() = _energizedLoops?.size ?: 0
+    fun numEnergizedLoops(): Int = _energizedLoops?.size ?: 0
 
     /**
      * Retrieve a [Loop] from the [energizedLoops] collection.
@@ -152,7 +152,7 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
      * @param mRID the mRID of the required [Loop]
      * @return The [Loop] with the specified [mRID] if it exists, otherwise null
      */
-    fun getEnergizedLoop(mRID: String) = _energizedLoops.getByMRID(mRID)
+    fun getEnergizedLoop(mRID: String): Loop? = _energizedLoops.getByMRID(mRID)
 
     /**
      * @param loop the [Loop] to associate with this [Substation].
@@ -196,7 +196,7 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
     /**
      * Get the number of entries in the [circuits] collection.
      */
-    fun numCircuits() = _circuits?.size ?: 0
+    fun numCircuits(): Int = _circuits?.size ?: 0
 
     /**
      * Retrieve a [Circuit] from the [circuits] collection.
@@ -204,7 +204,7 @@ class Substation @JvmOverloads constructor(mRID: String = "") : EquipmentContain
      * @param mRID the mRID of the required [Circuit]
      * @return The [Circuit] with the specified [mRID] if it exists, otherwise null
      */
-    fun getCircuit(mRID: String) = _circuits.getByMRID(mRID)
+    fun getCircuit(mRID: String): Circuit? = _circuits.getByMRID(mRID)
 
     /**
      * @param circuit the [Circuit] to associate with this [Substation].

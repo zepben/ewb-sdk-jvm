@@ -21,7 +21,7 @@ object ConnectedEquipmentNetwork {
     // no = normally open
     // co = currently open
     //
-    fun createStraight() = NetworkService().also { n ->
+    fun createStraight(): NetworkService = NetworkService().also { n ->
         val start = createNodeForConnecting(n, "start", 2)
         val s1 = createSwitchForConnecting(n, "s1", 2).apply { setNormallyOpen(true) }
         val s2 = createSwitchForConnecting(n, "s2", 2).apply { setNormallyOpen(true).setOpen(true) }
@@ -43,7 +43,7 @@ object ConnectedEquipmentNetwork {
     //               1
     //               b4(c0) 21--c5--2
     //
-    fun createBranched() = TestNetworkBuilder()
+    fun createBranched(): NetworkService = TestNetworkBuilder()
         .fromAcls() // c0
         .toBreaker() // b1
         .toBreaker { setNormallyOpen(true) } // b2

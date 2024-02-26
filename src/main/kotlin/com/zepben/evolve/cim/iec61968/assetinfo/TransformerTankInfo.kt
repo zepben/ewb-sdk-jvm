@@ -34,7 +34,7 @@ class TransformerTankInfo @JvmOverloads constructor(mRID: String = "") : AssetIn
     /**
      * Get the number of entries in the [TransformerEndInfo] collection.
      */
-    fun numTransformerEndInfos() = _transformerEndInfos?.size ?: 0
+    fun numTransformerEndInfos(): Int = _transformerEndInfos?.size ?: 0
 
     /**
      * Get the [TransformerEndInfo] of this [TransformerTankInfo] represented by [mRID]
@@ -42,7 +42,7 @@ class TransformerTankInfo @JvmOverloads constructor(mRID: String = "") : AssetIn
      * @param mRID the mRID of the required [TransformerEndInfo]
      * @return The [TransformerEndInfo] with the specified [mRID] if it exists, otherwise null
      */
-    fun getTransformerEndInfo(mRID: String) = _transformerEndInfos.getByMRID(mRID)
+    fun getTransformerEndInfo(mRID: String): TransformerEndInfo? = _transformerEndInfos.getByMRID(mRID)
 
     /**
      * Add a [TransformerEndInfo] to this [TransformerTankInfo]

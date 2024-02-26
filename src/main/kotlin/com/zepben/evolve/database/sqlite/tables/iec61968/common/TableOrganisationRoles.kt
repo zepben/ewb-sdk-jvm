@@ -14,6 +14,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 @Suppress("PropertyName")
 abstract class TableOrganisationRoles : TableIdentifiedObjects() {
 
-    val ORGANISATION_MRID = Column(++columnIndex, "organisation_mrid", "TEXT", NULL)
+    val ORGANISATION_MRID: Column = Column(++columnIndex, "organisation_mrid", "TEXT", NULL)
 
 }

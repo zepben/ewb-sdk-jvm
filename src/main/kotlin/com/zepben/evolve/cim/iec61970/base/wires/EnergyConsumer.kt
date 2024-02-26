@@ -44,7 +44,7 @@ class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnec
     /**
      * Get the number of entries in the [EnergyConsumerPhase] collection.
      */
-    fun numPhases() = _energyConsumerPhases?.size ?: 0
+    fun numPhases(): Int = _energyConsumerPhases?.size ?: 0
 
     /**
      * The individual phase models for this energy consumer.
@@ -52,7 +52,7 @@ class EnergyConsumer @JvmOverloads constructor(mRID: String = "") : EnergyConnec
      * @param mRID the mRID of the required [EnergyConsumerPhase]
      * @return The [EnergyConsumerPhase] with the specified [mRID] if it exists, otherwise null
      */
-    fun getPhase(mRID: String) = _energyConsumerPhases?.getByMRID(mRID)
+    fun getPhase(mRID: String): EnergyConsumerPhase? = _energyConsumerPhases?.getByMRID(mRID)
 
     fun addPhase(phase: EnergyConsumerPhase): EnergyConsumer {
         if (validateReference(phase, ::getPhase, "An EnergyConsumerPhase"))

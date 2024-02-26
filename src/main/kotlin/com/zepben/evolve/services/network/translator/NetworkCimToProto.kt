@@ -792,7 +792,7 @@ fun RemoteSource.toPb(): PBRemoteSource = toPb(this, PBRemoteSource.newBuilder()
 
 /************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
 
-fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder) =
+fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder): com.zepben.protobuf.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit.Builder =
     pb.apply {
         cim.powerElectronicsConnection?.let { powerElectronicsConnectionMRID = it.mRID } ?: clearPowerElectronicsConnectionMRID()
         maxP = cim.maxP ?: UNKNOWN_INT
@@ -1052,7 +1052,7 @@ fun toPb(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd.Builder): PBPowerTr
         toPb(cim, teBuilder)
     }
 
-fun toPb(cim: SeriesCompensator, pb: PBSeriesCompensator.Builder) =
+fun toPb(cim: SeriesCompensator, pb: PBSeriesCompensator.Builder): com.zepben.protobuf.cim.iec61970.base.wires.SeriesCompensator.Builder =
     pb.apply {
         r = cim.r ?: UNKNOWN_DOUBLE
         r0 = cim.r0 ?: UNKNOWN_DOUBLE

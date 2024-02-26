@@ -19,7 +19,7 @@ object DownstreamFeederStartPointNetwork {
     //  c1        c2       c3
     // ---- fsp1 ---- fsp2 ----
     //
-    fun create(fsp2Terminal: Int, makeFeedersLv: Boolean = false) = NetworkService().also { networkService ->
+    fun create(fsp2Terminal: Int, makeFeedersLv: Boolean = false): NetworkService = NetworkService().also { networkService ->
         val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.A)
         val fsp1 = createNodeForConnecting(networkService, "fsp1", 2)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.A)

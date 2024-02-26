@@ -13,7 +13,7 @@ class TableDisconnectors : TableSwitches() {
         return "disconnectors"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableDisconnectors> = this.javaClass
+    override val tableClassInstance: TableDisconnectors = this
 
 }

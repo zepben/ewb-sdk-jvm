@@ -14,8 +14,8 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableCircuitsSubstations : SqliteTable() {
 
-    val CIRCUIT_MRID = Column(++columnIndex, "circuit_mrid", "TEXT", NOT_NULL)
-    val SUBSTATION_MRID = Column(++columnIndex, "substation_mrid", "TEXT", NOT_NULL)
+    val CIRCUIT_MRID: Column = Column(++columnIndex, "circuit_mrid", "TEXT", NOT_NULL)
+    val SUBSTATION_MRID: Column = Column(++columnIndex, "substation_mrid", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "circuits_substations"
@@ -38,7 +38,7 @@ class TableCircuitsSubstations : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableCircuitsSubstations> = this.javaClass
+    override val tableClassInstance: TableCircuitsSubstations = this
 
 }

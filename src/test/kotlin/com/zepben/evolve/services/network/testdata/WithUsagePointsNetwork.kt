@@ -40,7 +40,7 @@ object WithUsagePointsNetwork {
     // sw1: normally close, currently open
     // sw2: normally open, currently closed
     //
-    fun createLarge() = NetworkService().also { network ->
+    fun createLarge(): NetworkService = NetworkService().also { network ->
         val es = createSourceForConnecting(network, "es", 1)
         val iso = createPowerTransformerForConnecting(network, "iso", 2, 1, 2)
         val sw1 = createSwitchForConnecting(network, "sw1", 2)
@@ -115,7 +115,7 @@ object WithUsagePointsNetwork {
     //       |
     //      ec2 [cpi1]
     //
-    inline fun <reified T : ConductingEquipment> createTxWithVirtual(virtualConnectionCategory: String) = NetworkService().also { network ->
+    inline fun <reified T : ConductingEquipment> createTxWithVirtual(virtualConnectionCategory: String): NetworkService = NetworkService().also { network ->
         val nameType = NameType("CPI").also { network.addNameType(it) }
         val es = createSourceForConnecting(network, "es", 1)
         val tx = PowerTransformer("tx").apply {
@@ -160,7 +160,7 @@ object WithUsagePointsNetwork {
     //                 LV
     // es - tx [cpi1] ---- ec [cpi2]
     //
-    fun createTxWithRealAndLv(connectionCategory: String? = null) = NetworkService().also { network ->
+    fun createTxWithRealAndLv(connectionCategory: String? = null): NetworkService = NetworkService().also { network ->
         val nameType = NameType("CPI").also { network.addNameType(it) }
         val es = createSourceForConnecting(network, "es", 1)
         val tx = PowerTransformer("tx").apply {

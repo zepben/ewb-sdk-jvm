@@ -12,7 +12,7 @@ class TableReclosers : TableProtectedSwitches() {
         return "reclosers"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableReclosers> = this.javaClass
+    override val tableClassInstance: TableReclosers = this
 
 }

@@ -14,8 +14,8 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TablePowerSys
 @Suppress("PropertyName")
 class TableEnergySourcePhases : TablePowerSystemResources() {
 
-    val ENERGY_SOURCE_MRID = Column(++columnIndex, "energy_source_mrid", "TEXT", NOT_NULL)
-    val PHASE = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
+    val ENERGY_SOURCE_MRID: Column = Column(++columnIndex, "energy_source_mrid", "TEXT", NOT_NULL)
+    val PHASE: Column = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "energy_source_phases"
@@ -37,7 +37,7 @@ class TableEnergySourcePhases : TablePowerSystemResources() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableEnergySourcePhases> = this.javaClass
+    override val tableClassInstance: TableEnergySourcePhases = this
 
 }

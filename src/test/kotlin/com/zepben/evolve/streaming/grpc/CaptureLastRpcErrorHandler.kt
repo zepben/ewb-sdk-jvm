@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
  */
 class CaptureLastRpcErrorHandler(val filter: KClass<out Throwable> = Throwable::class) : RpcErrorHandler {
     var lastError: Throwable? = null
-    var count = 0
+    var count: Int = 0
 
     override fun onError(t: Throwable): Boolean {
         ++count

@@ -32,7 +32,7 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
     /**
      * Get the number of entries in the [PositionPoint] collection.
      */
-    fun numPoints() = _positionPoints?.size ?: 0
+    fun numPoints(): Int = _positionPoints?.size ?: 0
 
     /**
      * Get a [PositionPoint] of this [Location] by its sequence number.
@@ -82,4 +82,4 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
  *
  * @param action The action to perform on each [PositionPoint]
  */
-fun Location.forEachPoint(action: (sequenceNumber: Int, point: PositionPoint) -> Unit) = forEachPoint(BiConsumer(action))
+fun Location.forEachPoint(action: (sequenceNumber: Int, point: PositionPoint) -> Unit): Unit = forEachPoint(BiConsumer(action))

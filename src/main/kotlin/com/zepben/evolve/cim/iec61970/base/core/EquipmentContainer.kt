@@ -26,7 +26,7 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     /**
      * Get the number of entries in the [Equipment] collection.
      */
-    fun numEquipment() = _equipmentById?.size ?: 0
+    fun numEquipment(): Int = _equipmentById?.size ?: 0
 
     /**
      * Contained equipment.
@@ -34,7 +34,7 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
      * @param mRID the mRID of the required [Equipment]
      * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
      */
-    fun getEquipment(mRID: String) = _equipmentById?.get(mRID)
+    fun getEquipment(mRID: String): Equipment? = _equipmentById?.get(mRID)
 
     /**
      * @param equipment the equipment to associate with this equipment container.

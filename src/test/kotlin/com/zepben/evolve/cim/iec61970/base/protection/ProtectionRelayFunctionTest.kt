@@ -127,18 +127,4 @@ internal class ProtectionRelayFunctionTest {
         )
     }
 
-    @Test
-    internal fun schemes() {
-        PrivateCollectionValidator.validate(
-            { object : ProtectionRelayFunction() {} },
-            { id, _ -> ProtectionRelayScheme(id) },
-            ProtectionRelayFunction::numSchemes,
-            ProtectionRelayFunction::getScheme,
-            ProtectionRelayFunction::schemes,
-            ProtectionRelayFunction::addScheme,
-            ProtectionRelayFunction::removeScheme,
-            ProtectionRelayFunction::clearSchemes
-        )
-    }
-
 }

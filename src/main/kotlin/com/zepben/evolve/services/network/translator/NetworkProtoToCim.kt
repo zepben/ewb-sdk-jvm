@@ -990,16 +990,6 @@ fun toCim(pb: PBGroundDisconnector, networkService: NetworkService): GroundDisco
         toCim(pb.sw, this, networkService)
     }
 
-fun toCim(pb: PBGround, networkService: NetworkService): Ground =
-    Ground(pb.mRID()).apply {
-        toCim(pb.ce, this, networkService)
-    }
-
-fun toCim(pb: PBGroundDisconnector, networkService: NetworkService): GroundDisconnector =
-    GroundDisconnector(pb.mRID()).apply {
-        toCim(pb.sw, this, networkService)
-    }
-
 fun toCim(pb: PBJumper, networkService: NetworkService): Jumper =
     Jumper(pb.mRID()).apply {
         toCim(pb.sw, this, networkService)

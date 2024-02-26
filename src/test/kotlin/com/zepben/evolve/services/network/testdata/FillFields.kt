@@ -810,92 +810,6 @@ fun VoltageRelay.fillFields(service: NetworkService, includeRuntime: Boolean = t
     return this
 }
 
-fun DistanceRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): DistanceRelay {
-    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
-
-    backwardBlind = 1.1
-    backwardReach = 2.2
-    backwardReactance = 3.3
-    forwardBlind = 4.4
-    forwardReach = 5.5
-    forwardReactance = 6.6
-    operationPhaseAngle1 = 7.7
-    operationPhaseAngle2 = 8.8
-    operationPhaseAngle3 = 9.9
-
-    return this
-}
-
-fun ProtectionRelayFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelayFunction {
-    (this as PowerSystemResource).fillFields(service, includeRuntime)
-
-    assetInfo = RelayInfo().also { service.add(it) }
-
-    model = "model"
-    reclosing = true
-    relayDelayTime = 1.1
-    protectionKind = ProtectionKind.DISTANCE
-    directable = true
-    powerDirection = PowerDirectionKind.FORWARD
-
-    for (i in 0..1) {
-        addTimeLimit(i.toDouble())
-        addThreshold(RelaySetting(UnitSymbol.entries[i], i.toDouble(), "setting $i"))
-        addProtectedSwitch(Breaker().also {
-            it.addRelayFunction(this)
-            service.add(it)
-        })
-        addSensor(CurrentTransformer().also {
-            it.addRelayFunction(this)
-            service.add(it)
-        })
-        addScheme(ProtectionRelayScheme().also {
-            it.addFunction(this)
-            service.add(it)
-        })
-    }
-
-    return this
-}
-
-fun ProtectionRelayScheme.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelayScheme {
-    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
-
-    system = ProtectionRelaySystem().also {
-        it.addScheme(this)
-        service.add(it)
-    }
-
-    for (i in 0..1) {
-        addFunction(CurrentRelay().also {
-            it.addScheme(this)
-            service.add(it)
-        })
-    }
-
-    return this
-}
-
-fun ProtectionRelaySystem.fillFields(service: NetworkService, includeRuntime: Boolean = true): ProtectionRelaySystem {
-    (this as Equipment).fillFieldsCommon(service, includeRuntime)
-
-    protectionKind = ProtectionKind.DISTANCE
-
-    for (i in 0..1) {
-        addScheme(ProtectionRelayScheme().also {
-            it.system = this
-            service.add(it)
-        })
-    }
-
-    return this
-}
-
-fun VoltageRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): VoltageRelay {
-    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
-    return this
-}
-
 
 /************ IEC61970 BASE SCADA ************/
 
@@ -1325,19 +1239,6 @@ fun RegulatingControl.fillFields(service: NetworkService, includeRuntime: Boolea
     ratedCurrent = 10.0
     terminal = Terminal().also { service.add(it) }
     addRegulatingCondEq(PowerElectronicsConnection().also { it.regulatingControl = this; service.add(it) })
-
-    return this
-}
-
-fun SeriesCompensator.fillFields(service: NetworkService, includeRuntime: Boolean = true): SeriesCompensator {
-    (this as ConductingEquipment).fillFields(service, includeRuntime)
-
-    r = 1.1
-    r0 = 2.2
-    x = 3.3
-    x0 = 4.4
-    varistorRatedCurrent = 5
-    varistorVoltageThreshold = 6
 
     return this
 }

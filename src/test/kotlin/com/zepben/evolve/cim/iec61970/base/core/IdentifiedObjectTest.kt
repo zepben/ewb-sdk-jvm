@@ -94,7 +94,7 @@ internal class IdentifiedObjectTest {
 
     @Test
     internal fun `nameType contains the names added to the identified object`() {
-        val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
+        val (_: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
 
         assertThat("expected to have name 1", nameType.hasName("1"))
         assertThat("expected to have name 2", nameType.hasName("2"))

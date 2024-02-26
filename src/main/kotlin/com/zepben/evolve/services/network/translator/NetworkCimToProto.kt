@@ -51,6 +51,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.TransformerCoolingType
 import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind
+import com.zepben.protobuf.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.protobuf.network.model.FeederDirection
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.NoLoadTest as PBNoLoadTest
@@ -927,12 +928,6 @@ fun toPb(cim: Fuse, pb: PBFuse.Builder): PBFuse.Builder =
         cim.function?.let { functionMRID = it.mRID } ?: clearFunctionMRID()
         toPb(cim, swBuilder)
     }
-
-fun toPb(cim: Ground, pb: PBGround.Builder): PBGround.Builder =
-    pb.apply { toPb(cim, ceBuilder) }
-
-fun toPb(cim: GroundDisconnector, pb: PBGroundDisconnector.Builder): PBGroundDisconnector.Builder =
-    pb.apply { toPb(cim, swBuilder) }
 
 fun toPb(cim: Ground, pb: PBGround.Builder): PBGround.Builder =
     pb.apply { toPb(cim, ceBuilder) }

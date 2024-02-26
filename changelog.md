@@ -19,6 +19,7 @@
     index.
 * Reworked values for enumerable type `ProtectionKind`.
 * Removed `IdentifiedObject.removeNamesFromTypes()`. Use `IdentifiedObject.clearNames()` instead.
+* Removed `DiagramServiceInstanceCache` and `NetworkServiceInstanceCache`.
 
 ### New Features
 
@@ -48,6 +49,7 @@
   * `RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit)`
   * `RelayInfo.removeDelay(delay: Double?): Boolean`
     * The original method with this name has been renamed to `RelayInfo.removeDelayAt(index: Int): Double?`.
+* Cleaned up code using IntelliJ code inspection. Some typos in documentation have also been fixed.
 
 ### Fixes
 

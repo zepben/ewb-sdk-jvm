@@ -102,7 +102,7 @@
 
 ### Breaking Changes
 
-* Deprecated old style accessors in favour of Kotlin accessors for `SinglePhaseKind`. To use the new function make the folloiwng modification to your code:
+* Deprecated old style accessors in favour of Kotlin accessors for `SinglePhaseKind`. To use the new function make the following modification to your code:
     * Kotlin:
         * `spk.value()` -> `spk.value`
         * `spk.maskIndex()` -> `spk.maskIndex`
@@ -158,7 +158,7 @@
 ### Fixes
 
 * Asking for the traced phases as a phase code when there are no nominal phases no longer throws.
-* Feeder directions are now stopped at substation transformers in the same way as assigning equipment incase the feeder has no breaker, or the start point is
+* Feeder directions are now stopped at substation transformers in the same way as assigning equipment in case the feeder has no breaker, or the start point is
   not inline.
 
 ### Notes

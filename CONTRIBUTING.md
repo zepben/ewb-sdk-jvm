@@ -19,9 +19,8 @@ with us prior to writing code. We recommend following the process documented [he
 Simply import the maven project into your favourite IDE.
 
 Our main style requirements are:
-- Tabsize of 4
-- Spaces instead of tabs
-- Continuation line indent of 4
+- 4 spaces instead of tabs
+- Continuation line indent of 4 spaces
 - Line wrap at 160 characters
 
 ## Checklist for model change ##

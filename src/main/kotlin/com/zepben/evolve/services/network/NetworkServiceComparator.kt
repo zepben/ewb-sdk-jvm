@@ -9,6 +9,7 @@ package com.zepben.evolve.services.network
 
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
+import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
@@ -209,6 +210,16 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
             compareValues(Streetlight::lightRating, Streetlight::lampKind)
             compareIdReferences(Streetlight::pole)
+        }
+
+    /************ IEC61968 COMMON ************/
+
+    private fun compareLocation(source: Location, target: Location): ObjectDifference<Location> =
+        ObjectDifference(source, target).apply {
+            compareIdentifiedObject()
+
+            compareValues(Location::mainAddress)
+            compareIndexedValueCollections(Location::points)
         }
 
     /************ IEC61968 infIEC61968 InfAssetInfo ************/

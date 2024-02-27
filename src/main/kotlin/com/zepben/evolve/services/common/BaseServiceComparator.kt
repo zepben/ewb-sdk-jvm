@@ -8,7 +8,6 @@
 package com.zepben.evolve.services.common
 
 import com.zepben.evolve.cim.iec61968.common.Document
-import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
@@ -145,15 +144,6 @@ abstract class BaseServiceComparator {
         apply {
             compareIdentifiedObject()
             compareValues(Document::title, Document::createdDateTime, Document::authorName, Document::type, Document::status, Document::comment)
-        }
-
-    // Used via reflection
-    @Suppress("Unused")
-    protected fun compareLocation(source: Location, target: Location): ObjectDifference<Location> =
-        ObjectDifference(source, target).apply {
-            compareIdentifiedObject()
-            compareValues(Location::mainAddress)
-            compareIndexedValueCollections(Location::points)
         }
 
     protected fun ObjectDifference<out OrganisationRole>.compareOrganisationRole(): ObjectDifference<out OrganisationRole> =

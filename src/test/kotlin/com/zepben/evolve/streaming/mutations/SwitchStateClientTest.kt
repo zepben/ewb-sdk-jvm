@@ -30,9 +30,9 @@ internal class SwitchStateClientTest {
     @RegisterExtension
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
-    private val stub: SwitchStateServiceGrpc.SwitchStateServiceBlockingStub = mockk(relaxed = true)
+    private val stub = mockk<SwitchStateServiceGrpc.SwitchStateServiceBlockingStub>(relaxed = true)
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val client: SwitchStateClient = SwitchStateClient(stub).apply { addErrorHandler(onErrorHandler) }
+    private val client =  SwitchStateClient(stub).apply { addErrorHandler(onErrorHandler) }
 
     @Test
     internal fun `update current switch state`() {
@@ -40,7 +40,7 @@ internal class SwitchStateClientTest {
 
         val result = client.setCurrentSwitchState(switchToUpdate)
 
-        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat("should have been successful", result.wasSuccessful)
         verify {
             stub.setCurrentSwitchStates(
                 SetCurrentSwitchStatesRequest.newBuilder()
@@ -57,7 +57,7 @@ internal class SwitchStateClientTest {
 
         val result = client.setCurrentSwitchStates(listOf(update1, update2))
 
-        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat("should have been successful", result.wasSuccessful)
         verify {
             stub.setCurrentSwitchStates(
                 SetCurrentSwitchStatesRequest.newBuilder()
@@ -76,7 +76,7 @@ internal class SwitchStateClientTest {
 
         val result = client.setCurrentSwitchState(switchToUpdate)
 
-        assertThat(result.wasFailure, equalTo(true))
+        assertThat("should have failed", result.wasFailure)
         assertThat(onErrorHandler.lastError, equalTo(expectedEx))
         verify {
             stub.setCurrentSwitchStates(
@@ -96,7 +96,7 @@ internal class SwitchStateClientTest {
         val switchToUpdate = SwitchStateUpdate("id", true)
         val result = SwitchStateClient(channel).setCurrentSwitchState(switchToUpdate)
 
-        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat("should have been successful", result.wasSuccessful)
         verify {
             stub.setCurrentSwitchStates(
                 SetCurrentSwitchStatesRequest.newBuilder()
@@ -116,7 +116,7 @@ internal class SwitchStateClientTest {
         val switchToUpdate = SwitchStateUpdate("id", true)
         val result = SwitchStateClient(grpcChannel).setCurrentSwitchState(switchToUpdate)
 
-        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat("should have been successful", result.wasSuccessful)
         verify {
             stub.setCurrentSwitchStates(
                 SetCurrentSwitchStatesRequest.newBuilder()

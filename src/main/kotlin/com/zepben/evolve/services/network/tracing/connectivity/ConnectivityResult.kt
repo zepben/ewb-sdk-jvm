@@ -42,7 +42,7 @@ class ConnectivityResult private constructor(
 
         other as ConnectivityResult
 
-        return fromTerminal == other.fromTerminal && toTerminal == other.toTerminal && nominalPhasePaths == other.nominalPhasePaths
+        return (fromTerminal == other.fromTerminal) && (toTerminal == other.toTerminal) && (nominalPhasePaths == other.nominalPhasePaths)
     }
 
     override fun hashCode(): Int {

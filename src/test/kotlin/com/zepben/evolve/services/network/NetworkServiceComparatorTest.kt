@@ -10,6 +10,9 @@ package com.zepben.evolve.services.network
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
+import com.zepben.evolve.cim.iec61968.common.PositionPoint
+import com.zepben.evolve.cim.iec61968.common.StreetAddress
+import com.zepben.evolve.cim.iec61968.common.TownDetail
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
@@ -205,6 +208,25 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
     private fun compareStructure(createStructure: (String) -> Structure) {
         compareAssetContainer(createStructure)
+    }
+
+    /************ IEC61968 COMMON ************/
+
+    @Test
+    internal fun compareLocation() {
+        compareIdentifiedObject { Location(it) }
+
+        comparatorValidator.validateProperty(
+            Location::mainAddress,
+            { Location(it) },
+            { StreetAddress(townDetail = TownDetail("town", "state")) },
+            { StreetAddress(townDetail = TownDetail("other", "state")) })
+        comparatorValidator.validateIndexedCollection(
+            Location::points,
+            Location::addPoint,
+            { Location(it) },
+            { PositionPoint(1.0, 2.0) },
+            { PositionPoint(3.0, 4.0) })
     }
 
     /************ IEC61968 infIEC61968 InfAssetInfo ************/

@@ -21,7 +21,7 @@ import kotlin.reflect.full.primaryConstructor
 /**
  * A class for building simple test networks, often used for unit testing.
  */
-internal open class TestNetworkBuilder {
+open class TestNetworkBuilder {
 
     private var currentTerminal: Int? = null
 

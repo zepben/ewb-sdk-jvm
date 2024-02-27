@@ -7,7 +7,9 @@
  */
 package com.zepben.evolve.services.common
 
-import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.common.Document
+import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.common.OrganisationRole
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
@@ -53,23 +55,6 @@ internal abstract class BaseServiceComparatorTest {
         comparatorValidator.validateProperty(Document::type, newDocument, { "type" }, { "diff type" })
         comparatorValidator.validateProperty(Document::status, newDocument, { "status" }, { "diff status" })
         comparatorValidator.validateProperty(Document::comment, newDocument, { "comment" }, { "diff comment" })
-    }
-
-    @Test
-    internal fun testCompareLocation() {
-        compareIdentifiedObject { Location(it) }
-
-        comparatorValidator.validateProperty(
-            Location::mainAddress,
-            { Location(it) },
-            { StreetAddress(townDetail = TownDetail("town", "state")) },
-            { StreetAddress(townDetail = TownDetail("other", "state")) })
-        comparatorValidator.validateIndexedCollection(
-            Location::points,
-            Location::addPoint,
-            { Location(it) },
-            { PositionPoint(1.0, 2.0) },
-            { PositionPoint(3.0, 4.0) })
     }
 
     protected fun compareOrganisationRole(newOrganisationRole: (mRID: String) -> OrganisationRole) {

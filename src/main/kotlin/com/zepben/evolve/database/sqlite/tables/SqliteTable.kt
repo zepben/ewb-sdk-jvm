@@ -17,7 +17,7 @@ import kotlin.reflect.jvm.kotlinProperty
  */
 abstract class SqliteTable {
 
-    private val logger = LoggerFactory.getLogger(SqliteTable::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     @JvmField
     protected var columnIndex: Int = 0

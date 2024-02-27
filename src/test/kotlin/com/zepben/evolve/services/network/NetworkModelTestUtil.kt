@@ -37,7 +37,7 @@ import org.hamcrest.Matchers.equalTo
 import java.time.Instant
 
 @Suppress("SameParameterValue", "MemberVisibilityCanBePrivate")
-internal class NetworkModelTestUtil {
+class NetworkModelTestUtil {
 
     data class Services @JvmOverloads constructor(
         val metadataCollection: MetadataCollection = MetadataCollection(),

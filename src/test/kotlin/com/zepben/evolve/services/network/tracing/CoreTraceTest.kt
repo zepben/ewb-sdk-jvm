@@ -23,7 +23,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class CoreTraceTest {
+internal class CoreTraceTest {
 
     @JvmField
     @RegisterExtension

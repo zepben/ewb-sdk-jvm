@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
-class SetPhasesTest {
+internal class SetPhasesTest {
 
     @JvmField
     @RegisterExtension

@@ -19,7 +19,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class ConnectivityResultTest {
+internal class ConnectivityResultTest {
 
     @JvmField
     @RegisterExtension

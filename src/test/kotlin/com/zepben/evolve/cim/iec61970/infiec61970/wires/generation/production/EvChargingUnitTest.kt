@@ -15,7 +15,7 @@ import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class EvChargingUnitTest {
+internal class EvChargingUnitTest {
 
     @JvmField
     @RegisterExtension

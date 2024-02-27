@@ -53,7 +53,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 
 @Suppress("SameParameterValue", "BooleanLiteralArgument")
-object StupidlyLargeNetwork {
+internal object StupidlyLargeNetwork {
 
     fun create(): NetworkModelTestUtil.Services {
         val networkService = NetworkService()

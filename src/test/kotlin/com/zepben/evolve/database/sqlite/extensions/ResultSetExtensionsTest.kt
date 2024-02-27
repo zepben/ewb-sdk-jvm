@@ -18,10 +18,10 @@ import org.junit.jupiter.api.Test
 import java.sql.ResultSet
 import java.time.Instant
 
-class ResultSetExtensionsTest {
+internal class ResultSetExtensionsTest {
 
     @Test
-    fun `getNullableBoolean returns a bool`() {
+    internal fun `getNullableBoolean returns a bool`() {
         val rs = createMockResultSet {
             every { it.getBoolean(any<Int>()) } returns true
         }
@@ -30,7 +30,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableBoolean returns a null`() {
+    internal fun `getNullableBoolean returns a null`() {
         val rs = createMockResultSet(true) {
             every { it.getBoolean(any<Int>()) } returns true
 
@@ -40,7 +40,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableDouble returns a double`() {
+    internal fun `getNullableDouble returns a double`() {
         val rs = createMockResultSet {
             every { it.getDouble(any<Int>()) } returns 1.0
         }
@@ -49,7 +49,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableDouble returns a null`() {
+    internal fun `getNullableDouble returns a null`() {
         val rs = createMockResultSet(true) {
             every { it.getDouble(any<Int>()) } returns 0.0
         }
@@ -58,7 +58,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableDouble returns a NaN`() {
+    internal fun `getNullableDouble returns a NaN`() {
         val rs = createMockResultSet {
             every { it.getDouble(any<Int>()) } returns 0.0
             every { it.getString(any<Int>()) } returns "nan"
@@ -68,7 +68,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableDouble returns a 0`() {
+    internal fun `getNullableDouble returns a 0`() {
         val rs = createMockResultSet {
             every { it.getDouble(any<Int>()) } returns 0.0
             every { it.getString(any<Int>()) } returns "0.0"
@@ -78,7 +78,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableFloat returns a float`() {
+    internal fun `getNullableFloat returns a float`() {
         val rs = createMockResultSet {
             every { it.getFloat(any<Int>()) } returns 1.0f
         }
@@ -87,7 +87,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableFloat returns a null`() {
+    internal fun `getNullableFloat returns a null`() {
         val rs = createMockResultSet(true) {
             every { it.getFloat(any<Int>()) } returns 0.0f
         }
@@ -96,7 +96,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableFloat returns a NaN`() {
+    internal fun `getNullableFloat returns a NaN`() {
         val rs = createMockResultSet {
             every { it.getFloat(any<Int>()) } returns 0.0f
             every { it.getString(any<Int>()) } returns "nan"
@@ -106,7 +106,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableFloat returns a 0f`() {
+    internal fun `getNullableFloat returns a 0f`() {
         val rs = createMockResultSet {
             every { it.getFloat(any<Int>()) } returns 0.0f
             every { it.getString(any<Int>()) } returns "0.0"
@@ -117,7 +117,7 @@ class ResultSetExtensionsTest {
 
 
     @Test
-    fun `getNullableInt returns a int`() {
+    internal fun `getNullableInt returns a int`() {
         val rs = createMockResultSet {
             every { it.getInt(any<Int>()) } returns 1
         }
@@ -126,7 +126,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableInt returns a null`() {
+    internal fun `getNullableInt returns a null`() {
         val rs = createMockResultSet(true) {
             every { it.getInt(any<Int>()) } returns 0
         }
@@ -135,7 +135,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableString returns a string`() {
+    internal fun `getNullableString returns a string`() {
         val rs = createMockResultSet {
             every { it.getString(any<Int>()) } returns "string"
         }
@@ -144,7 +144,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableString returns a null`() {
+    internal fun `getNullableString returns a null`() {
         val rs = createMockResultSet(true) {
             every { it.getString(any<Int>()) } returns null
         }
@@ -153,7 +153,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableLong returns a long`() {
+    internal fun `getNullableLong returns a long`() {
         val rs = createMockResultSet {
             every { it.getLong(any<Int>()) } returns 1L
         }
@@ -162,7 +162,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableLong returns a null`() {
+    internal fun `getNullableLong returns a null`() {
         val rs = createMockResultSet(true) {
             every { it.getLong(any<Int>()) } returns 0L
         }
@@ -171,7 +171,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getInstant returns an instant`() {
+    internal fun `getInstant returns an instant`() {
         val rs = createMockResultSet {
             every { it.getString(any<Int>()) } returns "2020-01-01T00:00:00.000Z"
         }
@@ -180,7 +180,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getInstant returns a null`() {
+    internal fun `getInstant returns a null`() {
         val rs = createMockResultSet(true) {
             every { it.getString(any<Int>()) } returns ""
         }
@@ -189,7 +189,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableRatio returns a ratio`() {
+    internal fun `getNullableRatio returns a ratio`() {
         val rs = createMockResultSet {
             every { it.getDouble(any<Int>()) } returns 1.0 andThen 2.0
         }
@@ -198,7 +198,7 @@ class ResultSetExtensionsTest {
     }
 
     @Test
-    fun `getNullableRatio returns a null`() {
+    internal fun `getNullableRatio returns a null`() {
         val rs = createMockResultSet(true) {
             every { it.getDouble(any<Int>()) } returns 0.0
         }

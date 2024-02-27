@@ -264,7 +264,7 @@ internal class DiagramConsumerClientTest {
     }
 
     @Test
-    fun `construct via Channel`() {
+    internal fun `construct via Channel`() {
         val diagramService = DiagramService().apply {
             add(DiagramObject("d1").also { it.identifiedObjectMRID = "io1" })
         }
@@ -283,7 +283,7 @@ internal class DiagramConsumerClientTest {
     }
 
     @Test
-    fun `construct via GrpcChannel`() {
+    internal fun `construct via GrpcChannel`() {
         val diagramService = DiagramService().apply {
             add(DiagramObject("d1").also { it.identifiedObjectMRID = "io1" })
         }

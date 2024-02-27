@@ -56,17 +56,17 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectInsecure() {
+    internal fun connectInsecure() {
         assertThat(Connect.connectInsecure("hostname", 1234), equalTo(grpcChannel))
     }
 
     @Test
-    fun connectTls() {
+    internal fun connectTls() {
         assertThat(Connect.connectTls("hostname", 1234, "caFilename"), equalTo(grpcChannelWithTls))
     }
 
     @Test
-    fun connectWithSecret() {
+    internal fun connectWithSecret() {
         mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
         every {
             createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
@@ -100,7 +100,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectWithSecretConnectsWithTlsIfNoAuth() {
+    internal fun connectWithSecretConnectsWithTlsIfNoAuth() {
         mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
         every {
             createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any(), any())
@@ -118,7 +118,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectWithSecretWithKnownTokenFetcherConfig() {
+    internal fun connectWithSecretWithKnownTokenFetcherConfig() {
         mockkConstructor(ZepbenTokenFetcher::class)
         every {
             anyConstructed<ZepbenTokenFetcher>().tokenRequestData
@@ -154,7 +154,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectWithPassword() {
+    internal fun connectWithPassword() {
         mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
         every {
             createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
@@ -191,7 +191,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectWithPasswordConnectsWithTlsIfNoAuth() {
+    internal fun connectWithPasswordConnectsWithTlsIfNoAuth() {
         mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
         every {
             createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
@@ -209,7 +209,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectWithPasswordWithKnownTokenFetcherConfig() {
+    internal fun connectWithPasswordWithKnownTokenFetcherConfig() {
         mockkConstructor(ZepbenTokenFetcher::class)
         every {
             anyConstructed<ZepbenTokenFetcher>().tokenRequestData
@@ -248,7 +248,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectInsecureJvmOverloadsCoverage() {
+    internal fun connectInsecureJvmOverloadsCoverage() {
         mockkStatic(Connect::class)
         every { Connect.connectInsecure("localhost", 50051) } returns grpcChannel
 
@@ -257,7 +257,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectTlsJvmOverloadsCoverage() {
+    internal fun connectTlsJvmOverloadsCoverage() {
         mockkStatic(Connect::class)
         every { Connect.connectTls("localhost", 50051, null) } returns grpcChannelWithTls
 
@@ -267,7 +267,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectWithSecretAndConfAddressJvmOverloadsCoverage() {
+    internal fun connectWithSecretAndConfAddressJvmOverloadsCoverage() {
         mockkStatic(Connect::class)
         every {
             Connect.connectWithSecret("clientId", "clientSecret", "localhost", 50051, null, null, null, null)
@@ -282,7 +282,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectWithSecretAndAuthConfJvmOverloadsCoverage() {
+    internal fun connectWithSecretAndAuthConfJvmOverloadsCoverage() {
         mockkStatic(Connect::class)
         every {
             Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", 50051, AuthMethod.OAUTH, null, null)
@@ -298,7 +298,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectWithPasswordAndConfAddressJvmOverloadsCoverage() {
+    internal fun connectWithPasswordAndConfAddressJvmOverloadsCoverage() {
         mockkStatic(Connect::class)
         every {
             Connect.connectWithPassword("clientId", "username", "password", "localhost", 50051, null, null, null, null)
@@ -313,7 +313,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectWithPasswordAndAuthConfJvmOverloadsCoverage() {
+    internal fun connectWithPasswordAndAuthConfJvmOverloadsCoverage() {
         mockkStatic(Connect::class)
         every {
             Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost", 50051, AuthMethod.OAUTH, null, null)
@@ -332,7 +332,7 @@ internal class ConnectTest {
     }
 
     @Test
-    fun connectWithIdentity() {
+    internal fun connectWithIdentity() {
         mockkStatic(::createTokenFetcherManagedIdentity)
         every { createTokenFetcherManagedIdentity("identityUrl") } returns tokenFetcher
         assertThat(Connect.connectWithIdentity("identityUrl", "hostname", 1234, "caFilename"), equalTo(grpcChannelWithAuth))

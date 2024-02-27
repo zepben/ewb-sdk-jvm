@@ -15,10 +15,10 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 
-class TreeNodeTest {
+internal class TreeNodeTest {
 
     @Test
-    fun accessors() {
+    internal fun accessors() {
         val treeNode0 = TreeNode(Junction("node0"), null)
         val treeNode1 = TreeNode(Junction("node1"), treeNode0)
         val treeNode2 = TreeNode(Junction("node2"), treeNode0)
@@ -54,7 +54,7 @@ class TreeNodeTest {
     }
 
     @Test
-    fun sortWeight() {
+    internal fun sortWeight() {
         val treeNode0 = TreeNode(Junction("node0"), null)
         val treeNode1 = TreeNode(
             Junction("node1").apply { addTerminal(Terminal().apply { phases = PhaseCode.AB }) },

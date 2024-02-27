@@ -31,14 +31,14 @@ import org.hamcrest.Matchers.empty
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class AssignToLvFeedersTest {
+internal class AssignToLvFeedersTest {
 
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    fun appliesToEquipmentOnHeadTerminalSide() {
+    internal fun appliesToEquipmentOnHeadTerminalSide() {
         val network = FeederStartPointBetweenConductorsNetwork.create(makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
@@ -48,7 +48,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun stopsAtNormallyOpenPoints() {
+    internal fun stopsAtNormallyOpenPoints() {
         val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = true, currentlyOpen = false, makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
@@ -59,7 +59,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun stopsAtCurrentlyOpenPoints() {
+    internal fun stopsAtCurrentlyOpenPoints() {
         val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = false, currentlyOpen = true, makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
@@ -70,7 +70,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun stopsAtLvFeederStartPoints() {
+    internal fun stopsAtLvFeederStartPoints() {
         val network = DownstreamFeederStartPointNetwork.create(1, makeFeedersLv = true)
         val lvFeeder1: LvFeeder = network["f1"]!!
         val lvFeeder2: LvFeeder = network["f2"]!!
@@ -82,7 +82,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun stopsAtLvFeederStartPointsReversedHeadTerminal() {
+    internal fun stopsAtLvFeederStartPointsReversedHeadTerminal() {
         val network = DownstreamFeederStartPointNetwork.create(2, makeFeedersLv = true)
         val lvFeeder1: LvFeeder = network["f1"]!!
         val lvFeeder2: LvFeeder = network["f2"]!!
@@ -94,7 +94,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun handlesDroppedPhases() {
+    internal fun handlesDroppedPhases() {
         val network = DroppedPhasesNetwork.create(makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
@@ -104,7 +104,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun stopsAtHvEquipment() {
+    internal fun stopsAtHvEquipment() {
         val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
         val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
@@ -125,7 +125,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun includesTransformers() {
+    internal fun includesTransformers() {
         val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
         val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
@@ -147,7 +147,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun onlyPoweredViaHeadEquipment() {
+    internal fun onlyPoweredViaHeadEquipment() {
         val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
         val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
@@ -172,7 +172,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun singleFeederPowersMultipleLvFeeders() {
+    internal fun singleFeederPowersMultipleLvFeeders() {
         val network = TestNetworkBuilder()
             .fromBreaker() // b0
             .addFeeder("b0") // fdr1
@@ -193,7 +193,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun multipleFeedersPowerSingleLvFeeder() {
+    internal fun multipleFeedersPowerSingleLvFeeder() {
         val network = TestNetworkBuilder()
             .fromBreaker() // b0
             .addFeeder("b0") // fdr1
@@ -214,7 +214,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun `assigns AuxiliaryEquipment to LvFeeder`() {
+    internal fun `assigns AuxiliaryEquipment to LvFeeder`() {
         val network = TestNetworkBuilder()
             .fromBreaker() // b0
             .toAcls() // c1
@@ -233,7 +233,7 @@ class AssignToLvFeedersTest {
     }
 
     @Test
-    fun `assigns ProtectionRelaySystems to LvFeeder`() {
+    internal fun `assigns ProtectionRelaySystems to LvFeeder`() {
         val network = TestNetworkBuilder()
             .fromBreaker() // b0
             .addLvFeeder("b0")

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
-class TracedPhasesTest {
+internal class TracedPhasesTest {
 
     @JvmField
     @RegisterExtension
@@ -26,7 +26,7 @@ class TracedPhasesTest {
     private val tracedPhases = TracedPhases(terminal = Terminal().apply { phases = PhaseCode.ABCN })
 
     @Test
-    fun testSetAndGet() {
+    internal fun testSetAndGet() {
         /* -- Setting -- */
         assertThat(tracedPhases.setNormal(SPK.A, SPK.N), equalTo(true))
         assertThat(tracedPhases.setNormal(SPK.B, SPK.C), equalTo(true))
@@ -62,14 +62,14 @@ class TracedPhasesTest {
     }
 
     @Test
-    fun testInvalidNominalPhaseNormal() {
+    internal fun testInvalidNominalPhaseNormal() {
         expect { tracedPhases.normal[SPK.INVALID] }
             .toThrow<IllegalArgumentException>()
             .withMessage("INTERNAL ERROR: Phase INVALID is invalid.")
     }
 
     @Test
-    fun testCrossingPhasesExceptionNormal() {
+    internal fun testCrossingPhasesExceptionNormal() {
         expect {
             tracedPhases.setNormal(SPK.A, SPK.A)
             tracedPhases.setNormal(SPK.A, SPK.B)
@@ -78,13 +78,13 @@ class TracedPhasesTest {
     }
 
     @Test
-    fun testInvalidNominalPhaseCurrent() {
+    internal fun testInvalidNominalPhaseCurrent() {
         expect { tracedPhases.current[SPK.INVALID] }
             .toThrow<IllegalArgumentException>()
     }
 
     @Test
-    fun testCrossingPhasesExceptionCurrent() {
+    internal fun testCrossingPhasesExceptionCurrent() {
         expect {
             tracedPhases.setCurrent(SPK.A, SPK.A)
             tracedPhases.setCurrent(SPK.A, SPK.B)

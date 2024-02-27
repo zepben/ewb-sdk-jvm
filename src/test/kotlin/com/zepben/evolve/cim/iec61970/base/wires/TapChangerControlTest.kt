@@ -16,7 +16,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class TapChangerControlTest {
+internal class TapChangerControlTest {
 
     @JvmField
     @RegisterExtension

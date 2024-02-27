@@ -22,7 +22,7 @@ import com.zepben.evolve.services.network.NetworkService
 import java.time.Instant
 
 @Suppress("SameParameterValue")
-object SchemaNetworks {
+internal object SchemaNetworks {
 
     fun createNameTestServices(): NetworkModelTestUtil.Services = NetworkModelTestUtil.Services().apply {
         networkService.apply {

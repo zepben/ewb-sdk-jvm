@@ -14,7 +14,7 @@ import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class CustomerServiceTest {
+internal class CustomerServiceTest {
 
     @JvmField
     @RegisterExtension

@@ -21,7 +21,7 @@ internal class DatabaseTablesTest {
     private val tables = DatabaseTables()
 
     @Test
-    fun `has all tables`() {
+    internal fun `has all tables`() {
         expect { tables.getTable(MissingTable::class.java) }.toThrow<MissingTableConfigException>()
 
         ClassPath.from(ClassLoader.getSystemClassLoader())

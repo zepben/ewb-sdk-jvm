@@ -81,7 +81,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.DriverManager.getConnection
 
-class DatabaseSqliteTest {
+internal class DatabaseSqliteTest {
 
     @JvmField
     @RegisterExtension
@@ -89,19 +89,19 @@ class DatabaseSqliteTest {
 
     @BeforeEach
     @Throws(IOException::class)
-    fun setup() {
+    internal fun setup() {
         Files.deleteIfExists(Paths.get(SCHEMA_TEST_FILE))
     }
 
     @AfterEach
     @Throws(IOException::class)
-    fun teardown() {
+    internal fun teardown() {
         Files.deleteIfExists(Paths.get(SCHEMA_TEST_FILE))
     }
 
     @Test
     @Disabled
-    fun loadRealFile() {
+    internal fun loadRealFile() {
         systemErr.unmute()
 
         // Put the name of the database you want to load in src/test/resources/text-database.txt
@@ -128,7 +128,7 @@ class DatabaseSqliteTest {
     }
 
     @Test
-    fun testStupidlyLargeSchema() {
+    internal fun testStupidlyLargeSchema() {
         // TODO - This needs to be replaced with a test for assigning to feeders and checking the below error. This should be
         //        done in a separate task to monitor code coverage drops.
         validateSchema(StupidlyLargeNetwork.create())
@@ -140,7 +140,7 @@ class DatabaseSqliteTest {
     }
 
     @Test
-    fun `test schema for each supported type`() {
+    internal fun `test schema for each supported type`() {
         /************ IEC61968 ASSET INFO ************/
         validateSchema(SchemaNetworks.networkServicesOf(::CableInfo, CableInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::NoLoadTest, NoLoadTest::fillFields))
@@ -265,12 +265,12 @@ class DatabaseSqliteTest {
     }
 
     @Test
-    fun testMetadataDataSourceSchema() {
+    internal fun testMetadataDataSourceSchema() {
         validateSchema(SchemaNetworks.createDataSourceTestServices())
     }
 
     @Test
-    fun `test Name and NameType schema`() {
+    internal fun `test Name and NameType schema`() {
         validateSchema(SchemaNetworks.createNameTestServices())
     }
 

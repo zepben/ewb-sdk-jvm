@@ -168,7 +168,7 @@ internal class TestNetworkBuilderTest {
     }
 
     @Test
-    fun `can override ids`() {
+    internal fun `can override ids`() {
         TestNetworkBuilder()
             .fromSource(mRID = "my source 1")
             .toSource(mRID = "my source 2")

@@ -17,14 +17,14 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
-class PhaseStepTest {
+internal class PhaseStepTest {
 
     @JvmField
     @RegisterExtension
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    fun accessors() {
+    internal fun accessors() {
         val asset = mock<ConductingEquipment>()
         val ps = PhaseStep.startAt(asset, listOf(SPK.A, SPK.B, SPK.C, SPK.N, SPK.B, SPK.C, SPK.N))
 
@@ -33,7 +33,7 @@ class PhaseStepTest {
     }
 
     @Test
-    fun coverage() {
+    internal fun coverage() {
         val asset1 = mock<ConductingEquipment>(defaultAnswer = DefaultAnswer.of(String::class.java, "asset1"))
         val asset2 = mock<ConductingEquipment>(defaultAnswer = DefaultAnswer.of(String::class.java, "asset2"))
 

@@ -13,7 +13,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 
-class DiagramServiceTest {
+internal class DiagramServiceTest {
 
     private val service = DiagramService()
 

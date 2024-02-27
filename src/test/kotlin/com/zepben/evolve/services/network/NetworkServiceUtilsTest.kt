@@ -454,7 +454,7 @@ internal class NetworkServiceUtilsTest {
     }
 
     @Test
-    fun `supports all network service types`() {
+    internal fun `supports all network service types`() {
         verifyWhenServiceObjectFunctionSupportsAllServiceObjectTypes(NetworkService().supportedKClasses, ::whenNetworkServiceObjectProxy)
     }
 

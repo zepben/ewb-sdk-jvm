@@ -17,10 +17,10 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import java.util.*
 
-class DownstreamTreeTest {
+internal class DownstreamTreeTest {
 
     @Test
-    fun downstreamTreeTest() {
+    internal fun downstreamTreeTest() {
         val n = LoopingNetwork.create()
 
         Tracing.setPhases().run(n)

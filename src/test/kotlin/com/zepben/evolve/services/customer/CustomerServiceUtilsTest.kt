@@ -80,7 +80,7 @@ internal class CustomerServiceUtilsTest {
     }
 
     @Test
-    fun `supports all customer service types`() {
+    internal fun `supports all customer service types`() {
         verifyWhenServiceObjectFunctionSupportsAllServiceObjectTypes(CustomerService().supportedKClasses, ::whenCustomerServiceObjectProxy)
     }
 
@@ -94,4 +94,3 @@ internal class CustomerServiceUtilsTest {
         object : IdentifiedObject() {}.also { whenCustomerServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }
-

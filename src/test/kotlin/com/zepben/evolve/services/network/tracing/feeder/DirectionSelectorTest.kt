@@ -16,12 +16,12 @@ import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 
-class DirectionSelectorTest {
+internal class DirectionSelectorTest {
 
     private val terminal = spy<Terminal>()
 
     @Test
-    fun testNormalDirectionSelectorGet() {
+    internal fun testNormalDirectionSelectorGet() {
         val ds = DirectionSelector.NORMAL_DIRECTION.select(terminal)
 
         ds.value
@@ -31,7 +31,7 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testNormalDirectionSelectorSet() {
+    internal fun testNormalDirectionSelectorSet() {
         val ds = DirectionSelector.NORMAL_DIRECTION.select(terminal)
 
         assertThat(ds.set(FeederDirection.UPSTREAM), equalTo(true))
@@ -48,7 +48,7 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testNormalDirectionSelectorAdd() {
+    internal fun testNormalDirectionSelectorAdd() {
         val ds = DirectionSelector.NORMAL_DIRECTION.select(terminal)
 
         assertThat(ds.add(FeederDirection.UPSTREAM), equalTo(true))
@@ -69,7 +69,7 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testNormalDirectionSelectorRemove() {
+    internal fun testNormalDirectionSelectorRemove() {
         val ds = DirectionSelector.NORMAL_DIRECTION.select(terminal)
 
         assertThat(ds.set(FeederDirection.BOTH), equalTo(true))
@@ -90,7 +90,7 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testCurrentDirectionSelectorGet() {
+    internal fun testCurrentDirectionSelectorGet() {
         val ds = DirectionSelector.CURRENT_DIRECTION.select(terminal)
 
         ds.value
@@ -100,7 +100,7 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testCurrentDirectionSelectorSet() {
+    internal fun testCurrentDirectionSelectorSet() {
         val ds = DirectionSelector.CURRENT_DIRECTION.select(terminal)
 
         assertThat(ds.set(FeederDirection.UPSTREAM), equalTo(true))
@@ -117,7 +117,7 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testCurrentDirectionSelectorAdd() {
+    internal fun testCurrentDirectionSelectorAdd() {
         val ds = DirectionSelector.CURRENT_DIRECTION.select(terminal)
 
         assertThat(ds.add(FeederDirection.UPSTREAM), equalTo(true))
@@ -138,7 +138,7 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testCurrentDirectionSelectorRemove() {
+    internal fun testCurrentDirectionSelectorRemove() {
         val ds = DirectionSelector.CURRENT_DIRECTION.select(terminal)
 
         assertThat(ds.set(FeederDirection.BOTH), equalTo(true))

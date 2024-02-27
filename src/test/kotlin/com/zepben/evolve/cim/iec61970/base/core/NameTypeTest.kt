@@ -22,12 +22,12 @@ internal class NameTypeTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    fun constructorCoverage() {
+    internal fun constructorCoverage() {
         assertThat(NameType("nt").name, equalTo("nt"))
     }
 
     @Test
-    fun accessors() {
+    internal fun accessors() {
         val nt = NameType("nt")
         assertThat(nt.description, equalTo(""))
 
@@ -36,7 +36,7 @@ internal class NameTypeTest {
     }
 
     @Test
-    fun getOrAddNames() {
+    internal fun getOrAddNames() {
         val nt = NameType("nt")
 
         val j1 = Junction()
@@ -67,7 +67,7 @@ internal class NameTypeTest {
     }
 
     @Test
-    fun names() {
+    internal fun names() {
         val nt = NameType("nt")
 
         val j1 = Junction()
@@ -81,7 +81,7 @@ internal class NameTypeTest {
     }
 
     @Test
-    fun getNames() {
+    internal fun getNames() {
         val nt = NameType("nt")
 
         val j1 = Junction()
@@ -97,7 +97,7 @@ internal class NameTypeTest {
     }
 
     @Test
-    fun `removesNames remove names from nameType and associated identifiedObject`() {
+    internal fun `removesNames remove names from nameType and associated identifiedObject`() {
         val nt = NameType("nt")
 
         val j1 = Junction()
@@ -124,7 +124,7 @@ internal class NameTypeTest {
     }
 
     @Test
-    fun `getNames retrieves all the names associated with a given identifiedObject`() {
+    internal fun `getNames retrieves all the names associated with a given identifiedObject`() {
         val nt = NameType("nt")
 
         val j1 = Junction()
@@ -141,7 +141,7 @@ internal class NameTypeTest {
     }
 
     @Test
-    fun `removeName remove name from nameType and associated identifiedObject`() {
+    internal fun `removeName remove name from nameType and associated identifiedObject`() {
         val nt = NameType("nt")
 
         val j1 = Junction()
@@ -176,7 +176,7 @@ internal class NameTypeTest {
     }
 
     @Test
-    fun `clearNames remove all names from nameType and associated identifiedObject`() {
+    internal fun `clearNames remove all names from nameType and associated identifiedObject`() {
         val nt = NameType("nt")
 
         val j1 = Junction()

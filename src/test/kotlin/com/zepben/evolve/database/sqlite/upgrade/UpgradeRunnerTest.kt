@@ -28,7 +28,7 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.sql.*
 
-class UpgradeRunnerTest {
+internal class UpgradeRunnerTest {
 
     @JvmField
     @RegisterExtension
@@ -78,7 +78,7 @@ class UpgradeRunnerTest {
 
 
     @Test
-    fun runsEachChangeSetInTransactions() {
+    internal fun runsEachChangeSetInTransactions() {
         configureDatabaseVersion(0)
         doReturn(listOf("1-1", "1-2")).`when`(changeSet1).commands
         doReturn(listOf("2-1", "2-2")).`when`(changeSet2).commands
@@ -204,7 +204,7 @@ class UpgradeRunnerTest {
     }
 
     @Test
-    fun createAppropriatelyNamedBackup() {
+    internal fun createAppropriatelyNamedBackup() {
         configureDatabaseVersion(1)
 
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 internal class PhaseStepTrackerTest {
 
     @Test
-    fun `visited set of phases is reported as visited`() {
+    internal fun `visited set of phases is reported as visited`() {
         val tracker = PhaseStepTracker()
         val ce = Junction()
         val phaseStep = PhaseStep.startAt(ce, PhaseCode.AB)
@@ -29,7 +29,7 @@ internal class PhaseStepTrackerTest {
     }
 
     @Test
-    fun `set of phases disjoint from visited phases is reported as unvisited`() {
+    internal fun `set of phases disjoint from visited phases is reported as unvisited`() {
         val tracker = PhaseStepTracker()
         val ce = Junction()
         val phaseStep1 = PhaseStep.startAt(ce, PhaseCode.AB)
@@ -42,7 +42,7 @@ internal class PhaseStepTrackerTest {
     }
 
     @Test
-    fun `set of phases partially overlapping with visited phases is reported as unvisited`() {
+    internal fun `set of phases partially overlapping with visited phases is reported as unvisited`() {
         val tracker = PhaseStepTracker()
         val ce = Junction()
         val phaseStep1 = PhaseStep.startAt(ce, PhaseCode.AB)
@@ -55,7 +55,7 @@ internal class PhaseStepTrackerTest {
     }
 
     @Test
-    fun `strict subset of visited phases is reported as visited`() {
+    internal fun `strict subset of visited phases is reported as visited`() {
         val tracker = PhaseStepTracker()
         val ce = Junction()
         val phaseStep1 = PhaseStep.startAt(ce, PhaseCode.ABC)
@@ -68,7 +68,7 @@ internal class PhaseStepTrackerTest {
     }
 
     @Test
-    fun `phases of different equipment are tracked separately`() {
+    internal fun `phases of different equipment are tracked separately`() {
         val tracker = PhaseStepTracker()
         val ce1 = Junction()
         val ce2 = Junction()

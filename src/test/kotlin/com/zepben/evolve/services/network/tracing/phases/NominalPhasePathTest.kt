@@ -14,7 +14,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class NominalPhasePathTest {
+internal class NominalPhasePathTest {
 
     @JvmField
     @RegisterExtension
@@ -24,7 +24,7 @@ class NominalPhasePathTest {
     private val nominalPhasePath2 = NominalPhasePath(SinglePhaseKind.C, SinglePhaseKind.N)
 
     @Test
-    fun accessors() {
+    internal fun accessors() {
         assertThat(nominalPhasePath1.from, equalTo(SinglePhaseKind.A))
         assertThat(nominalPhasePath1.to, equalTo(SinglePhaseKind.B))
         assertThat(nominalPhasePath2.from, equalTo(SinglePhaseKind.C))
@@ -32,7 +32,7 @@ class NominalPhasePathTest {
     }
 
     @Test
-    fun coverage() {
+    internal fun coverage() {
         assertThat(nominalPhasePath1, equalTo(nominalPhasePath1))
         assertThat(nominalPhasePath1, equalTo(NominalPhasePath(SinglePhaseKind.A, SinglePhaseKind.B)))
         assertThat(nominalPhasePath1, not(equalTo(nominalPhasePath2)))

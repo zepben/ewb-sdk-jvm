@@ -12,7 +12,7 @@ package com.zepben.evolve.services.network.tracing.traversals
  * A basic traversal implementation that can be used to traverse any type of item.
  *
  * The traversal gets the next items to be traversed to by calling a user provided functional interface
- * ([QueueNext], that passes the current item of the traversal, and the
+ * [QueueNext], that passes the current item of the traversal, and the
  * traversal instance itself where the process queue can have items added to it. This is registered during construction.
  *
  * The process queue, an instance of [TraversalQueue] is also supplied during construction. This gives the

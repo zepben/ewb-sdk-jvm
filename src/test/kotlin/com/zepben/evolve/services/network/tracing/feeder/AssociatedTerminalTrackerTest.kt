@@ -14,13 +14,13 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 
-class AssociatedTerminalTrackerTest {
+internal class AssociatedTerminalTrackerTest {
 
     /**
      * Verify that terminal tracking is linked to its conducting equipment
      */
     @Test
-    fun testVisit() {
+    internal fun testVisit() {
         val junction1 = Junction()
         val junction2 = Junction()
         val terminal11 = Terminal().also { junction1.addTerminal(it) }
@@ -55,7 +55,7 @@ class AssociatedTerminalTrackerTest {
      * Verify that a terminal that has no conducting equipment is considered visited even without being visited.
      */
     @Test
-    fun testTerminalsWithoutConductingEquipmentAreConsideredVisited() {
+    internal fun testTerminalsWithoutConductingEquipmentAreConsideredVisited() {
         val terminal = Terminal()
 
         val tracker = AssociatedTerminalTracker()
@@ -67,7 +67,7 @@ class AssociatedTerminalTrackerTest {
      * Verify that a terminal that has no conducting equipment can't be visited.
      */
     @Test
-    fun testCantVisitTerminalsWithoutConductingEquipment() {
+    internal fun testCantVisitTerminalsWithoutConductingEquipment() {
         val terminal = Terminal()
 
         val tracker = AssociatedTerminalTracker()

@@ -24,7 +24,7 @@ internal class ConductingEquipmentStepTrackerTest {
     private val tracker = ConductingEquipmentStepTracker()
 
     @Test
-    fun `visited step is reported as visited`() {
+    internal fun `visited step is reported as visited`() {
         val step = ConductingEquipmentStep(Junction())
 
         assertThat("hasVisited returns false for unvisited equipment", not(tracker.hasVisited(step)))
@@ -34,7 +34,7 @@ internal class ConductingEquipmentStepTrackerTest {
     }
 
     @Test
-    fun `smaller step for same equipment is reported as unvisited`() {
+    internal fun `smaller step for same equipment is reported as unvisited`() {
         val ce = Junction()
         val step1 = ConductingEquipmentStep(ce, 1)
         val step2 = ConductingEquipmentStep(ce)
@@ -46,7 +46,7 @@ internal class ConductingEquipmentStepTrackerTest {
     }
 
     @Test
-    fun `larger step for same equipment is reported as visited`() {
+    internal fun `larger step for same equipment is reported as visited`() {
         val ce = Junction()
         val step1 = ConductingEquipmentStep(ce)
         val step2 = ConductingEquipmentStep(ce, 1)
@@ -58,7 +58,7 @@ internal class ConductingEquipmentStepTrackerTest {
     }
 
     @Test
-    fun `steps of different equipment are tracked separately`() {
+    internal fun `steps of different equipment are tracked separately`() {
         val step1 = ConductingEquipmentStep(Junction())
         val step2 = ConductingEquipmentStep(Junction())
 

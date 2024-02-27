@@ -63,7 +63,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun supportedTypesCollectionMatch() {
+    internal fun supportedTypesCollectionMatch() {
         assertThat(service.supportedClasses, containsInAnyOrder(*service.supportedKClasses.map { it.java }.toTypedArray()))
     }
 
@@ -78,7 +78,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun getJavaInterop() {
+    internal fun getJavaInterop() {
         assertThat(service.get<IdentifiedObject>(breaker1.mRID), equalTo(breaker1))
         assertThat(service.get<IdentifiedObject>(breaker2.mRID), equalTo(breaker2))
         assertThat(service.get<IdentifiedObject>(acLineSegment1.mRID), equalTo(acLineSegment1))
@@ -96,14 +96,14 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun countJavaInterop() {
+    internal fun countJavaInterop() {
         assertThat(service.num<IdentifiedObject>(), equalTo(4))
         assertThat(service.num<Breaker>(), equalTo(2))
         assertThat(service.num<AcLineSegment>(), equalTo(2))
     }
 
     @Test
-    fun forEachJavaInterop() {
+    internal fun forEachJavaInterop() {
         validateForEach<IdentifiedObject>(listOf(breaker1, breaker2, acLineSegment1, acLineSegment2))
         validateForEach<Breaker>(listOf(breaker1, breaker2))
         validateForEach<AcLineSegment>(listOf(acLineSegment1, acLineSegment2))
@@ -117,14 +117,14 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun asStreamJavaInterop() {
+    internal fun asStreamJavaInterop() {
         assertThat(service.sequenceOf<IdentifiedObject>().toList(), containsInAnyOrder(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.sequenceOf<Breaker>().toList(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.sequenceOf<AcLineSegment>().toList(), containsInAnyOrder(acLineSegment1, acLineSegment2))
     }
 
     @Test
-    fun toListJavaInterop() {
+    internal fun toListJavaInterop() {
         assertThat(service.listOf(), containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.listOf(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.listOf(), containsInAnyOrder(acLineSegment1, acLineSegment2))
@@ -134,7 +134,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun toSetJavaInterop() {
+    internal fun toSetJavaInterop() {
         assertThat(service.setOf(), containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.setOf(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.setOf(), containsInAnyOrder(acLineSegment1, acLineSegment2))
@@ -144,7 +144,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun toMapJavaInterop() {
+    internal fun toMapJavaInterop() {
         assertThat(service.mapOf<IdentifiedObject>().keys, containsInAnyOrder(breaker1.mRID, breaker2.mRID, acLineSegment1.mRID, acLineSegment2.mRID))
         assertThat(
             service.mapOf<IdentifiedObject>().values,
@@ -168,7 +168,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun testUnresolvedBidirectionalReferences() {
+    internal fun testUnresolvedBidirectionalReferences() {
         val terminal = Terminal("t1")
         assertThat(service.add(terminal), equalTo(true))
         assertThat(service.resolveOrDeferReference(Resolvers.conductingEquipment(terminal), "j1"), equalTo(false))
@@ -197,7 +197,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun testUnresolvedUnidirectionalReferences() {
+    internal fun testUnresolvedUnidirectionalReferences() {
         val junction = Junction("j1")
         assertThat(service.add(junction), equalTo(true))
         assertThat(service.resolveOrDeferReference(Resolvers.baseVoltage(junction), "bv1"), equalTo(false))
@@ -215,7 +215,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun `test add resolves reverse relationship`() {
+    internal fun `test add resolves reverse relationship`() {
         val ns = NetworkService()
 
         OperationalRestriction("or1").apply {
@@ -231,7 +231,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun `add returns true when object already in service`() {
+    internal fun `add returns true when object already in service`() {
         val ns = NetworkService()
 
         AcLineSegment("acls1").apply {
@@ -252,7 +252,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun `add only returns true when object is the same instance, not just equal`() {
+    internal fun `add only returns true when object is the same instance, not just equal`() {
         val ms = MyService()
         val obj1 = MyIdentifiedObject("1")
         val obj1Dup = MyIdentifiedObject("1")

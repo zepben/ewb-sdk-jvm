@@ -273,7 +273,7 @@ internal class CustomerConsumerClientTest {
     }
 
     @Test
-    fun `construct via Channel`() {
+    internal fun `construct via Channel`() {
         val (_, expectedCustomerService) = CustomerNetwork.create()
         configureFeederResponses(expectedCustomerService)
 
@@ -290,7 +290,7 @@ internal class CustomerConsumerClientTest {
     }
 
     @Test
-    fun `construct via GrpcChannel`() {
+    internal fun `construct via GrpcChannel`() {
         val (_, expectedCustomerService) = CustomerNetwork.create()
         configureFeederResponses(expectedCustomerService)
 

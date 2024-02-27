@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.database.sqlite.upgrade
 
-import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet49Validator
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.*
 import com.zepben.testutils.junit.SystemLogExtension
@@ -20,7 +19,7 @@ import java.sql.Connection
 import java.sql.DriverManager.getConnection
 
 @Suppress("SqlResolve", "SameParameterValue")
-class ChangeSetTest {
+internal class ChangeSetTest {
 
     @JvmField
     @RegisterExtension

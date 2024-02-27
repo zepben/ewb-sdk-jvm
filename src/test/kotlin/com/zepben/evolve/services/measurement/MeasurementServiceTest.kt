@@ -15,7 +15,7 @@ import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 
-class MeasurementServiceTest {
+internal class MeasurementServiceTest {
 
     private val service = MeasurementService()
 

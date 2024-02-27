@@ -21,12 +21,12 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
-class TestCimConsumerClient {
+internal class TestCimConsumerClient {
 
     private val baseConsumerClient = mockk<CimConsumerClient<BaseService, BaseProtoToCim>>()
 
     @Test
-    fun `getMetaData returns non-cached response, and caches it`() {
+    internal fun `getMetaData returns non-cached response, and caches it`() {
         val metadataResponse = GetMetadataResponse.newBuilder().apply {
             serviceInfoBuilder.apply {
                 title = "test title"
@@ -87,7 +87,7 @@ class TestCimConsumerClient {
     }
 
     @Test
-    fun `getMetaData returns cached response`() {
+    internal fun `getMetaData returns cached response`() {
         val uncachedServiceInfo = mockk<ServiceInfo>()
 
         val cachedResponse = PBServiceInfo.newBuilder().apply {

@@ -35,7 +35,7 @@ internal class SwitchStateClientTest {
     private val client: SwitchStateClient = SwitchStateClient(stub).apply { addErrorHandler(onErrorHandler) }
 
     @Test
-    fun `update current switch state`() {
+    internal fun `update current switch state`() {
         val switchToUpdate = SwitchStateUpdate("id", true)
 
         val result = client.setCurrentSwitchState(switchToUpdate)
@@ -51,7 +51,7 @@ internal class SwitchStateClientTest {
     }
 
     @Test
-    fun `update multiple switch states`() {
+    internal fun `update multiple switch states`() {
         val update1 = SwitchStateUpdate("id1", true)
         val update2 = SwitchStateUpdate("id2", false)
 
@@ -68,7 +68,7 @@ internal class SwitchStateClientTest {
     }
 
     @Test
-    fun `calls error handler when setCurrentSwitchState throws`() {
+    internal fun `calls error handler when setCurrentSwitchState throws`() {
         val switchToUpdate = SwitchStateUpdate("id", true)
 
         val expectedEx = StatusRuntimeException(Status.UNAVAILABLE)
@@ -88,7 +88,7 @@ internal class SwitchStateClientTest {
     }
 
     @Test
-    fun `construct via Channel`() {
+    internal fun `construct via Channel`() {
         val channel = mockk<Channel>()
         mockkStatic(SwitchStateServiceGrpc::class)
         every { SwitchStateServiceGrpc.newBlockingStub(channel) } returns stub
@@ -107,7 +107,7 @@ internal class SwitchStateClientTest {
     }
 
     @Test
-    fun `construct via GrpcChannel`() {
+    internal fun `construct via GrpcChannel`() {
         val channel = mockk<Channel>()
         val grpcChannel = GrpcChannel(channel)
         mockkStatic(SwitchStateServiceGrpc::class)

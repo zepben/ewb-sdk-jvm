@@ -23,7 +23,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class SetDirectionTest {
+internal class SetDirectionTest {
 
     @JvmField
     @RegisterExtension

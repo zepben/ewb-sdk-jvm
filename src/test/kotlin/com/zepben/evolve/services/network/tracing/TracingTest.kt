@@ -26,7 +26,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import java.util.function.Supplier
 
-class TracingTest {
+internal class TracingTest {
 
     // Just trace all connected assets and make sure we actually visit every item.
     @Test

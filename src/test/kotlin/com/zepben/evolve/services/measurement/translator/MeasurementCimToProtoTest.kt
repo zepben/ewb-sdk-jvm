@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.DiscreteValue
 import com.zepben.evolve.services.measurement.testdata.fillFields
 import org.junit.jupiter.api.Test
 
-class MeasurementCimToProtoTest {
+internal class MeasurementCimToProtoTest {
 
     private val validator = MeasurementCimToProtoTestValidator()
 

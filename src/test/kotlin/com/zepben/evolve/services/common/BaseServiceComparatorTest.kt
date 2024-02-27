@@ -19,7 +19,7 @@ import java.time.Instant
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
-abstract class BaseServiceComparatorTest {
+internal abstract class BaseServiceComparatorTest {
 
     @JvmField
     @RegisterExtension

@@ -22,6 +22,8 @@ import java.time.Instant
  * @property sites [Site]'s this equipment belongs to.
  * @property normalFeeders [Feeder]'s that represent the normal feeders of the equipment.
  * @property currentFeeders [Feeder]'s that represent the current feeders of the equipment.
+ * @property normalLvFeeders [LvFeeder]'s that represent the normal LV feeders of the equipment.
+ * @property currentLvFeeders [LvFeeder]'s that represent the current LV feeders of the equipment.
  * @property substations [Substation]'s that represent the substation of the equipment.
  */
 abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {

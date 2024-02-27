@@ -32,7 +32,7 @@ internal class SwitchStateClientTest {
 
     private val stub = mockk<SwitchStateServiceGrpc.SwitchStateServiceBlockingStub>(relaxed = true)
     private val onErrorHandler = CaptureLastRpcErrorHandler()
-    private val client =  SwitchStateClient(stub).apply { addErrorHandler(onErrorHandler) }
+    private val client = SwitchStateClient(stub).apply { addErrorHandler(onErrorHandler) }
 
     @Test
     internal fun `update current switch state`() {

@@ -52,7 +52,7 @@
 * Cleaned up code using IntelliJ code inspection. Some typos in documentation have also been fixed.
 * Added missing `@JvmOverloads` for the constructors of the following CIM classes: `NoLoadTest`, `OpenCircuitTest`, `PowerTransformerInfo`, `ShortCircuitTest`,
   `ShuntCompensatorInfo`, `SwitchInfo`, `TransformerEndInfo`, `TransformerTankInfo`, `Pole`, `Streetlight`, `TapChangerControl`, `TransformerStarImpedance`,
-  `BatteryUnit`, `PhotoVoltaicUnit`, `PowerElectronicsWindUnit`, `EvChargingUnit`, 
+  `BatteryUnit`, `PhotoVoltaicUnit`, `PowerElectronicsWindUnit`, and `EvChargingUnit`.
 
 ### Fixes
 

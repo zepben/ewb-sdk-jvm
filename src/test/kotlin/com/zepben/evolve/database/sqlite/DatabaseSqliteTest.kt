@@ -107,7 +107,7 @@ internal class DatabaseSqliteTest {
         // Put the name of the database you want to load in src/test/resources/text-database.txt
         val databaseFileName = Files.readString(Path.of("src", "test", "resources", "test-database.txt")).trim().trim('"')
 
-        assertThat(Files.exists(Paths.get(databaseFileName)), equalTo(true))
+        assertThat("File $databaseFileName should exist", Files.exists(Paths.get(databaseFileName)))
 
         val metadataCollection = MetadataCollection()
         val networkLoaded = NetworkService()
@@ -115,8 +115,8 @@ internal class DatabaseSqliteTest {
         val customerService = CustomerService()
 
         assertThat(
-            DatabaseReader(databaseFileName).load(metadataCollection, networkLoaded, diagramLoaded, customerService),
-            equalTo(true)
+            "Services should load successfully from database",
+            DatabaseReader(databaseFileName).load(metadataCollection, networkLoaded, diagramLoaded, customerService)
         )
 
         logger.info("Sleeping...")
@@ -295,6 +295,7 @@ internal class DatabaseSqliteTest {
         val expectedCustomerService = CustomerService()
 
         assertThat(
+            "Services should save successfully as database",
             DatabaseWriter(SCHEMA_TEST_FILE).save(
                 expectedMetadata,
                 mutableListOf(
@@ -302,8 +303,7 @@ internal class DatabaseSqliteTest {
                     expectedDiagramService,
                     expectedCustomerService
                 )
-            ),
-            equalTo(true)
+            )
         )
         // Delete a link to cause an unresolved reference.
         getConnection("jdbc:sqlite:$SCHEMA_TEST_FILE").use { connection ->
@@ -375,9 +375,9 @@ internal class DatabaseSqliteTest {
         testWriteRead(
             writeServices,
             readServices,
-            { success -> assertThat(success, equalTo(true)) },
+            { success -> assertThat("Database write should be successful", success) },
             { success ->
-                assertThat(success, equalTo(false))
+                assertThat("Database read should fail due to duplicate ${duplicate.typeNameAndMRID()}", !success)
                 assertThat(systemErr.log, containsString(expectedError))
             }
         )
@@ -389,6 +389,7 @@ internal class DatabaseSqliteTest {
         val (expectedMetadata, expectedNetworkService, expectedDiagramService, expectedCustomerService, _) = services
 
         assertThat(
+            "Database write should be successful",
             DatabaseWriter(SCHEMA_TEST_FILE).save(
                 expectedMetadata,
                 mutableListOf(
@@ -396,12 +397,11 @@ internal class DatabaseSqliteTest {
                     expectedDiagramService,
                     expectedCustomerService
                 )
-            ),
-            equalTo(true)
+            )
         )
 
         assertThat(systemErr.log, containsString("Creating database schema v${TableVersion().SUPPORTED_VERSION}"))
-        assertThat(Files.exists(Paths.get(SCHEMA_TEST_FILE)), equalTo(true))
+        assertThat("File $SCHEMA_TEST_FILE should exist", Files.exists(Paths.get(SCHEMA_TEST_FILE)))
 
         val metadataCollection = MetadataCollection()
         val networkService = NetworkService()
@@ -409,8 +409,8 @@ internal class DatabaseSqliteTest {
         val customerService = CustomerService()
 
         assertThat(
+            "Services should successfully load from database",
             DatabaseReader(SCHEMA_TEST_FILE).load(metadataCollection, networkService, diagramService, customerService),
-            equalTo(true)
         )
 
         validateMetadata(metadataCollection, expectedMetadata)
@@ -428,7 +428,7 @@ internal class DatabaseSqliteTest {
         validateWrite: (Boolean) -> Unit,
         validateRead: (Boolean) -> Unit
     ) {
-        assertThat(systemErr.logLines.size, equalTo(0))
+        assertThat(systemErr.logLines, emptyArray())
         val (writeMetadata, writeNetworkService, writeDiagramService, writeCustomerService, _) = writeServices
 
         validateWrite(

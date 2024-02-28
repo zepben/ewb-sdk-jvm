@@ -30,20 +30,20 @@ internal class AssociatedTerminalTrackerTest {
 
         val tracker = AssociatedTerminalTracker()
 
-        assertThat("has not visited terminal11", not(tracker.hasVisited(terminal11)))
-        assertThat("has not visited terminal12", not(tracker.hasVisited(terminal12)))
-        assertThat("has not visited terminal21", not(tracker.hasVisited(terminal21)))
-        assertThat("has not visited terminal22", not(tracker.hasVisited(terminal22)))
+        assertThat("has not visited terminal11", !tracker.hasVisited(terminal11))
+        assertThat("has not visited terminal12", !tracker.hasVisited(terminal12))
+        assertThat("has not visited terminal21", !tracker.hasVisited(terminal21))
+        assertThat("has not visited terminal22", !tracker.hasVisited(terminal22))
 
         assertThat("can visit terminal11", tracker.visit(terminal11))
 
         assertThat("has visited terminal11", tracker.hasVisited(terminal11))
         assertThat("has visited terminal12", tracker.hasVisited(terminal12))
-        assertThat("has not visited terminal21", not(tracker.hasVisited(terminal21)))
-        assertThat("has not visited terminal22", not(tracker.hasVisited(terminal22)))
+        assertThat("has not visited terminal21", !tracker.hasVisited(terminal21))
+        assertThat("has not visited terminal22", !tracker.hasVisited(terminal22))
 
-        assertThat("can't visit terminal11 twice", not(tracker.visit(terminal11)))
-        assertThat("can't visit terminal12 after terminal11", not(tracker.visit(terminal12)))
+        assertThat("can't visit terminal11 twice", !tracker.visit(terminal11))
+        assertThat("can't visit terminal12 after terminal11", !tracker.visit(terminal12))
 
         assertThat("can visit terminal22", tracker.visit(terminal22))
 
@@ -72,6 +72,6 @@ internal class AssociatedTerminalTrackerTest {
 
         val tracker = AssociatedTerminalTracker()
 
-        assertThat("can't visit terminal", not(tracker.visit(terminal)))
+        assertThat("can't visit terminal", !tracker.visit(terminal))
     }
 }

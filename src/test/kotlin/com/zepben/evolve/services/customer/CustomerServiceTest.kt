@@ -28,9 +28,9 @@ internal class CustomerServiceTest {
             .asSequence()
             .map { it.getDeclaredConstructor().newInstance() }
             .forEach {
-                assertThat(service.tryAdd(it), equalTo(true))
+                assertThat("Initial tryAdd should return true", service.tryAdd(it))
                 assertThat(service[it.mRID], equalTo(it))
-                assertThat(service.tryRemove(it), equalTo(true))
+                assertThat("tryRemove should return true for previously-added object", service.tryRemove(it))
                 assertThat(service[it.mRID], nullValue())
             }
     }

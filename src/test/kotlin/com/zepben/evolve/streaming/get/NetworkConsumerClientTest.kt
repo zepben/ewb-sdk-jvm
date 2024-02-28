@@ -147,7 +147,7 @@ internal class NetworkConsumerClientTest {
                         throw result.thrown
                     assertThat(result.value.mRID, equalTo(mRID))
                 } else {
-                    assertThat(result.wasFailure, equalTo(true))
+                    assertThat("getIdentifiedObject should fail for unsupported type ${type.name}", result.wasFailure)
                     assertThat(result.thrown, instanceOf(StatusRuntimeException::class.java))
                     assertThat(result.thrown.cause, instanceOf(UnsupportedOperationException::class.java))
                     assertThat(result.thrown.cause?.message, equalTo("Identified object type $type is not supported by the network service"))
@@ -184,7 +184,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getIdentifiedObject(mRID)
 
         verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
-        assertThat(result.wasFailure, equalTo(true))
+        assertThat("getIdentifiedObject should fail for mRID '$mRID', which isn't in the network", result.wasFailure)
         expect { throw result.thrown }
             .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID $mRID could be found.")
@@ -227,8 +227,8 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getIdentifiedObjects(mRIDs.asSequence())
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.objects.size, equalTo(3))
+        assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
+        assertThat(result.value.objects, aMapWithSize(3))
         assertThat(result.value.objects[mRIDs[0]], instanceOf(AcLineSegment::class.java))
         assertThat(result.value.objects[mRIDs[1]], instanceOf(AcLineSegment::class.java))
         assertThat(result.value.objects[mRIDs[2]], instanceOf(Breaker::class.java))
@@ -267,7 +267,7 @@ internal class NetworkConsumerClientTest {
         val result = consumerClient.getNetworkHierarchy()
 
         verify(consumerService.onGetNetworkHierarchy).invoke(eq(GetNetworkHierarchyRequest.newBuilder().build()), any())
-        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat("getNetworkHierarchy should succeed", result.wasSuccessful)
         validateNetworkHierarchy(result.value, NetworkHierarchyAllTypes.createNetworkHierarchy())
     }
 
@@ -327,9 +327,9 @@ internal class NetworkConsumerClientTest {
         verify(consumerService.onGetIdentifiedObjects, times(3)).invoke(any(), any())
         verifyNoMoreInteractions(consumerService.onGetNetworkHierarchy)
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.objects.containsKey(mRID), equalTo(true))
-        assertThat(result.value.objects.size, equalTo(20))
+        assertThat("getEquipmentContainer should succeed for in-network feeder $mRID", result.wasSuccessful)
+        assertThat("getEquipmentContainer result should contain the fetched container's mRID", result.value.objects.containsKey(mRID))
+        assertThat(result.value.objects, aMapWithSize(20))
 
         result.value.objects.values.forEach { assertThat(service[it.mRID], equalTo(it)) }
         service.sequenceOf<IdentifiedObject>().forEach {
@@ -356,7 +356,7 @@ internal class NetworkConsumerClientTest {
 
         verify(consumerService.onGetIdentifiedObjects, times(1)).invoke(any(), any())
 
-        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat("getEquipmentContainer should fail for mRID f002, which isn't in the customer service", !result.wasSuccessful)
         expect { throw result.thrown }
             .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID f002 could be found.")
@@ -484,8 +484,8 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getIdentifiedObjects(mRIDs)
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.objects.size, equalTo(1))
+        assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
+        assertThat(result.value.objects, aMapWithSize(1))
         assertThat(result.value.objects["id1"], instanceOf(AcLineSegment::class.java))
         assertThat(result.value.failed, containsInAnyOrder(mRIDs[1]))
 
@@ -509,7 +509,7 @@ internal class NetworkConsumerClientTest {
         assertThat(result.value.objects, hasEntry("id1", acls))
         assertThat(result.value.objects, hasKey("id2"))
         assertThat(result.value.objects, hasKey("id3"))
-        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.objects, aMapWithSize(3))
         assertThat(result.value.failed, empty())
     }
 
@@ -520,9 +520,9 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getEquipmentForContainer("f001")
 
-        assertThat(result.value.objects.size, equalTo(service.num(Equipment::class)))
-        assertThat(result.value.objects.size, equalTo(3))
-        assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, containsInAnyOrder("fsp", "c2", "tx"))
+        assertThat(result.value.objects, aMapWithSize(service.num<Equipment>()))
+        assertThat(service.num<Equipment>(), equalTo(3))
+        assertThat(service.listOf<IdentifiedObject>().map { it.mRID }, containsInAnyOrder("fsp", "c2", "tx"))
     }
 
     @Test
@@ -532,9 +532,9 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getCurrentEquipmentForFeeder("f001")
 
-        assertThat(result.value.objects.size, equalTo(service.num(Equipment::class)))
-        assertThat(result.value.objects.size, equalTo(5))
-        assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, containsInAnyOrder("fsp", "c2", "tx", "c3", "sw"))
+        assertThat(result.value.objects, aMapWithSize(service.num<Equipment>()))
+        assertThat(service.num<Equipment>(), equalTo(5))
+        assertThat(service.listOf<IdentifiedObject>().map { it.mRID }, containsInAnyOrder("fsp", "c2", "tx", "c3", "sw"))
     }
 
     @Test
@@ -544,9 +544,9 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getEquipmentForRestriction("or1").throwOnError()
 
-        assertThat(result.value.objects.size, equalTo(service.num(Equipment::class)))
-        assertThat(result.value.objects.size, equalTo(3))
-        assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, containsInAnyOrder("fsp", "c2", "tx"))
+        assertThat(result.value.objects, aMapWithSize(service.num<Equipment>()))
+        assertThat(service.num<Equipment>(), equalTo(3))
+        assertThat(service.listOf<IdentifiedObject>().map { it.mRID }, containsInAnyOrder("fsp", "c2", "tx"))
     }
 
     @Test
@@ -556,8 +556,8 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getTerminalsForConnectivityNode("cn1").throwOnError()
 
-        assertThat(result.value.objects.size, equalTo(service.num(Terminal::class)))
-        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.objects, aMapWithSize(service.num<Terminal>()))
+        assertThat(service.num<Terminal>(), equalTo(3))
         expectedService.get<ConnectivityNode>("cn1")!!.terminals.forEach {
             assertThat(service[it.mRID], notNullValue())
         }
@@ -620,7 +620,7 @@ internal class NetworkConsumerClientTest {
 
         val mor = consumerClient.getEquipmentForLoop(loop).throwOnError().value
         assertThat(service.num<IdentifiedObject>(), equalTo((listOf(loop) + loopContainers + hierarchyObjs + containerEquip + assocObjs).size))
-        assertThat(mor.objects.size, equalTo((listOf(loop) + loopContainers + containerEquip + assocObjs).size))
+        assertThat(mor.objects, aMapWithSize((listOf(loop) + loopContainers + containerEquip + assocObjs).size))
     }
 
     @Test
@@ -644,7 +644,7 @@ internal class NetworkConsumerClientTest {
 
         val mor = consumerClient.getEquipmentForLoop(loop).throwOnError().value
         assertThat(service.num<IdentifiedObject>(), equalTo((listOf(loop.mRID) + loopContainers + hierarchyObjs + containerEquip + assocObjs).size))
-        assertThat(mor.objects.size, equalTo((listOf(loop.mRID) + loopContainers + containerEquip + assocObjs).size))
+        assertThat(mor.objects, aMapWithSize((listOf(loop.mRID) + loopContainers + containerEquip + assocObjs).size))
     }
 
     @Test
@@ -658,7 +658,7 @@ internal class NetworkConsumerClientTest {
         )
 
         val result = consumerClient.getAllLoops()
-        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat("getAllLoops should succeed", result.wasSuccessful)
         assertThat(result.value.failed, empty())
 
         val equipmentContainersRequestCaptor = argumentCaptor<GetEquipmentForContainersRequest>()
@@ -676,7 +676,7 @@ internal class NetworkConsumerClientTest {
 
         val result = consumerClient.getEquipmentContainer<Circuit>("f001")
 
-        assertThat(result.wasSuccessful, equalTo(false))
+        assertThat("getEquipmentContainer should fail if container with matching mRID isn't of the specified type", !result.wasSuccessful)
         expect { throw result.thrown }
             .toThrow<ClassCastException>()
             .withMessage("Unable to extract Circuit networks from [${expectedService.get<Feeder>("f001")?.typeNameAndMRID()}].")
@@ -718,7 +718,7 @@ internal class NetworkConsumerClientTest {
         verify(consumerService.onGetIdentifiedObjects, times(3)).invoke(any(), any())
         verifyNoMoreInteractions(consumerService.onGetNetworkHierarchy)
 
-        assertThat(result.wasSuccessful, equalTo(true))
+        assertThat("getEquipmentContainer should succeed for in-network LV feeder $mRID", result.wasSuccessful)
         assertThat(
             result.value.objects.keys,
             containsInAnyOrder(
@@ -779,7 +779,7 @@ internal class NetworkConsumerClientTest {
     }
 
     private fun <T : IdentifiedObject> validateMap(actualMap: Map<String, T>, expectedMap: Map<String, T>) {
-        assertThat(actualMap.size, equalTo(expectedMap.size))
+        assertThat(actualMap, aMapWithSize(expectedMap.size))
 
         actualMap.forEach { (mRID, it) ->
             val expected = expectedMap[mRID]

@@ -8,7 +8,8 @@
 package com.zepben.evolve.services.network.tracing.traversals
 
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.containsInAnyOrder
 import org.junit.jupiter.api.Test
 import java.util.function.Consumer
 
@@ -142,7 +143,7 @@ internal class BasicTraversalTest {
     private fun validateRun(t: Traversal<Int>, canStopOnStart: Boolean, visitOrder: List<Int>, expectedOrder: List<Int>) {
         t.run(1, canStopOnStart)
         assertThat(visitOrder, contains<Any>(*expectedOrder.toTypedArray()))
-        expectedOrder.forEach { assertThat(t.tracker.hasVisited(it), equalTo(true)) }
+        expectedOrder.forEach { assertThat("Tracker should have visited $it", t.tracker.hasVisited(it)) }
     }
 
 }

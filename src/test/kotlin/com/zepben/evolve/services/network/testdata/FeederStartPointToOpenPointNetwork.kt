@@ -19,7 +19,7 @@ object FeederStartPointToOpenPointNetwork {
     // fsp ---- op ----
     //
     fun create(normallyOpen: Boolean, currentlyOpen: Boolean, makeFeederLv: Boolean = false): NetworkService = NetworkService().also { networkService ->
-        val fsp = createNodeForConnecting(networkService, "fsp", 1)
+        val fsp = createJunctionForConnecting(networkService, "fsp", 1)
         val c1 = createAcLineSegmentForConnecting(networkService, "c1")
         val op = createSwitchForConnecting(networkService, "op", 2)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2")

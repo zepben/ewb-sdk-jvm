@@ -74,7 +74,7 @@ internal class FindWithUsagePointsTest {
     internal fun normalStateMultiTrace() {
         val results = findWithUsagePoints.runNormal(listOf(es, c3, c5, es), listOf(null, c5, c3, c11))
 
-        assertThat(results.size, equalTo(4))
+        assertThat(results, hasSize(4))
         validate(results[0], NO_ERROR, listOf("tx1", "tx2", "tx3", "tx4", "tx5", "iso"))
         validate(results[1], NO_ERROR, listOf("tx4", "tx5"))
         validate(results[2], NO_ERROR, listOf("tx4", "tx5"))
@@ -96,7 +96,7 @@ internal class FindWithUsagePointsTest {
     internal fun currentStateMultiTrace() {
         val results = findWithUsagePoints.runCurrent(listOf(es, c1, c12, es), listOf(null, c12, c1, c5))
 
-        assertThat(results.size, equalTo(4))
+        assertThat(results, hasSize(4))
         validate(results[0], NO_ERROR, listOf("tx2", "tx3", "tx6", "tx7", "tx8"))
         validate(results[1], NO_ERROR, listOf("tx3", "tx7"))
         validate(results[2], NO_ERROR, listOf("tx3", "tx7"))
@@ -180,7 +180,7 @@ internal class FindWithUsagePointsTest {
     }
 
     private fun validateMismatch(results: List<FindWithUsagePoints.Result>, expectedResults: Int) {
-        assertThat(results.size, equalTo(expectedResults))
+        assertThat(results, hasSize(expectedResults))
 
         results.forEach(Consumer { result: FindWithUsagePoints.Result ->
             assertThat(result.status, equalTo(MISMATCHED_FROM_TO))

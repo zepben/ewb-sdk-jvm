@@ -8,7 +8,6 @@
 package com.zepben.evolve.services.network
 
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 
 internal class NetworkServiceComparatorOptionsTest {
@@ -16,21 +15,21 @@ internal class NetworkServiceComparatorOptionsTest {
     @Test
     internal fun all() {
         val options = NetworkServiceComparatorOptions.all()
-        assertThat(options.compareTracedPhases, equalTo(true))
-        assertThat(options.compareTerminals, equalTo(true))
-        assertThat(options.compareFeederEquipment, equalTo(true))
-        assertThat(options.compareEquipmentContainers, equalTo(true))
-        assertThat(options.compareLvSimplification, equalTo(true))
+        assertThat("compareTracedPhases should be true for all()", options.compareTracedPhases)
+        assertThat("compareTerminals should be true for all()", options.compareTerminals)
+        assertThat("compareFeederEquipment should be true for all()", options.compareFeederEquipment)
+        assertThat("compareEquipmentContainers should be true for all()", options.compareEquipmentContainers)
+        assertThat("compareLvSimplification should be true for all()", options.compareLvSimplification)
     }
 
     @Test
     internal fun none() {
         val options = NetworkServiceComparatorOptions.none()
-        assertThat(options.compareTracedPhases, equalTo(false))
-        assertThat(options.compareTerminals, equalTo(false))
-        assertThat(options.compareFeederEquipment, equalTo(false))
-        assertThat(options.compareEquipmentContainers, equalTo(false))
-        assertThat(options.compareLvSimplification, equalTo(false))
+        assertThat("compareTracedPhases should be false for none()", !options.compareTracedPhases)
+        assertThat("compareTerminals should be false for none()", !options.compareTerminals)
+        assertThat("compareFeederEquipment should be false for none()", !options.compareFeederEquipment)
+        assertThat("compareEquipmentContainers should be false for none()", !options.compareEquipmentContainers)
+        assertThat("compareLvSimplification should be false for none()", !options.compareLvSimplification)
     }
 
     @Test
@@ -43,21 +42,21 @@ internal class NetworkServiceComparatorOptionsTest {
             .compareLvSimplification()
             .build()
 
-        assertThat(options.compareTracedPhases, equalTo(true))
-        assertThat(options.compareTerminals, equalTo(true))
-        assertThat(options.compareFeederEquipment, equalTo(true))
-        assertThat(options.compareEquipmentContainers, equalTo(true))
-        assertThat(options.compareLvSimplification, equalTo(true))
+        assertThat("compareTracedPhases should be true when building with all options enabled", options.compareTracedPhases)
+        assertThat("compareTerminals should be true when building with all options enabled", options.compareTerminals)
+        assertThat("compareFeederEquipment should be true when building with all options enabled", options.compareFeederEquipment)
+        assertThat("compareEquipmentContainers should be true when building with all options enabled", options.compareEquipmentContainers)
+        assertThat("compareLvSimplification should be true when building with all options enabled", options.compareLvSimplification)
     }
 
     @Test
     internal fun builderNone() {
         val options = NetworkServiceComparatorOptions.of().build()
 
-        assertThat(options.compareTracedPhases, equalTo(false))
-        assertThat(options.compareTerminals, equalTo(false))
-        assertThat(options.compareFeederEquipment, equalTo(false))
-        assertThat(options.compareEquipmentContainers, equalTo(false))
-        assertThat(options.compareLvSimplification, equalTo(false))
+        assertThat("compareTracedPhases should be false when building without any options enabled", !options.compareTracedPhases)
+        assertThat("compareTerminals should be false when building without any options enabled", !options.compareTerminals)
+        assertThat("compareFeederEquipment should be false when building without any options enabled", !options.compareFeederEquipment)
+        assertThat("compareEquipmentContainers should be false when building without any options enabled", !options.compareEquipmentContainers)
+        assertThat("compareLvSimplification should be false when building without any options enabled", !options.compareLvSimplification)
     }
 }

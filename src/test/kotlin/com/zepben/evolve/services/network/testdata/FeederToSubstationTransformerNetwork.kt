@@ -20,7 +20,7 @@ object FeederToSubstationTransformerNetwork {
     fun create(): NetworkService = NetworkService().also { networkService ->
         val substation = Substation().also { networkService.add(it) }
 
-        val fsp = createNodeForConnecting(networkService, "fsp", 1)
+        val fsp = createJunctionForConnecting(networkService, "fsp", 1)
         val c1 = createAcLineSegmentForConnecting(networkService, "c1")
         val tz = createPowerTransformerForConnecting(networkService, "tz", 2, 0, 0)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2")

@@ -68,7 +68,7 @@ internal class IdentifiedObjectTest {
 
     @Test
     internal fun `getName obtain expected Name object`() {
-        val (identifiedObject: IdentifiedObject, nameType: NameType) = createMultipleBaseNames()
+        val (identifiedObject: IdentifiedObject, _: NameType) = createMultipleBaseNames()
 
         val name1 = identifiedObject.getName("type", "1")!!
         val name2 = identifiedObject.getName("type", "2")!!
@@ -109,8 +109,8 @@ internal class IdentifiedObjectTest {
         val nameType3 = NameType("type3")
         identifiedObject.addName(nameType2, "1")
 
-        assertThat(identifiedObject.getNames(nameType)?.size, equalTo(3))
-        assertThat(identifiedObject.getNames(nameType2)?.size, equalTo(1))
+        assertThat(identifiedObject.getNames(nameType), hasSize(3))
+        assertThat(identifiedObject.getNames(nameType2), hasSize(1))
         assertThat(identifiedObject.getNames(nameType3), equalTo(null))
     }
 

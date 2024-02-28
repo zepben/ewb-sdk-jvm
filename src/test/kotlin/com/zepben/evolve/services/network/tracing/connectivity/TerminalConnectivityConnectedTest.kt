@@ -275,7 +275,7 @@ internal class TerminalConnectivityConnectedTest {
     private fun validateConnection(t: Terminal, expectedPhases: List<Pair<Terminal, List<SPK>>>) {
         val connected = connectivity.connectedTerminals(t).associateBy { it.toTerminal }
 
-        assertThat(connected.size, equalTo(expectedPhases.size))
+        assertThat(connected, aMapWithSize(expectedPhases.size))
         expectedPhases.forEach { (toTerminal, phases) ->
             assertThat(
                 connected[toTerminal]!!.nominalPhasePaths,

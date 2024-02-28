@@ -20,7 +20,6 @@ import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 
 fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode = PhaseCode.A): EnergySource =
     EnergySource(id).apply {
@@ -36,7 +35,7 @@ fun createSourceForConnecting(network: NetworkService, id: String, numTerminals:
         network.add(this)
     }
 
-fun createNodeForConnecting(network: NetworkService, id: String, numTerminals: Int, nominalPhases: PhaseCode = PhaseCode.A): Junction =
+fun createJunctionForConnecting(network: NetworkService, id: String, numTerminals: Int, nominalPhases: PhaseCode = PhaseCode.A): Junction =
     Junction(id).apply {
         name = "test name"
         createTerminals(network, this, numTerminals, nominalPhases)
@@ -147,7 +146,7 @@ fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquip
         this.sequenceNumber = sequenceNumber
         conductingEquipment?.addTerminal(this)
 
-        assertThat(network.add(this), equalTo(true))
+        assertThat("Initial add should return true", network.add(this))
     }
 
 fun createSubstation(networkService: NetworkService, mRID: String, name: String, subGeographicalRegion: SubGeographicalRegion? = null): Substation =

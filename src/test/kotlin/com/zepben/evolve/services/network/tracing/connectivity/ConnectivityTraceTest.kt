@@ -33,8 +33,8 @@ internal class ConnectivityTraceTest {
 
     @Test
     internal fun connectivityTraceIgnoresOpenState() {
-        validateRun(Tracing.connectivityTrace(), "s1", "s2", "n1", "s3", "s4", "n2")
-        validateRun(Tracing.connectivityBreadthTrace(), "s1", "s2", "n1", "s3", "s4", "n2")
+        validateRun(Tracing.connectivityTrace(), "s1", "s2",  "j1", "s3", "s4",  "j2")
+        validateRun(Tracing.connectivityBreadthTrace(), "s1", "s2",  "j1", "s3", "s4",  "j2")
     }
 
     @Test

@@ -27,10 +27,10 @@ internal class ConductingEquipmentStepTrackerTest {
     internal fun `visited step is reported as visited`() {
         val step = ConductingEquipmentStep(Junction())
 
-        assertThat("hasVisited returns false for unvisited equipment", not(tracker.hasVisited(step)))
+        assertThat("hasVisited returns false for unvisited equipment", !tracker.hasVisited(step))
         assertThat("Visiting unvisited equipment returns true", tracker.visit(step))
         assertThat("hasVisited returns true for visited equipment", tracker.hasVisited(step))
-        assertThat("Revisiting visited equipment returns false", not(tracker.visit(step)))
+        assertThat("Revisiting visited equipment returns false", !tracker.visit(step))
     }
 
     @Test
@@ -41,7 +41,7 @@ internal class ConductingEquipmentStepTrackerTest {
 
         tracker.visit(step1)
 
-        assertThat("hasVisited returns false for smaller step of visited", not(tracker.hasVisited(step2)))
+        assertThat("hasVisited returns false for smaller step of visited", !tracker.hasVisited(step2))
         assertThat("Visiting smaller step of visited returns true", tracker.visit(step2))
     }
 
@@ -54,7 +54,7 @@ internal class ConductingEquipmentStepTrackerTest {
         tracker.visit(step1)
 
         assertThat("hasVisited returns true for larger step of visited", tracker.hasVisited(step2))
-        assertThat("Visiting larger step of visited returns false", not(tracker.visit(step2)))
+        assertThat("Visiting larger step of visited returns false", !tracker.visit(step2))
     }
 
     @Test
@@ -64,7 +64,7 @@ internal class ConductingEquipmentStepTrackerTest {
 
         tracker.visit(step1)
 
-        assertThat("hasVisited returns false for same step on different equipment", not(tracker.hasVisited(step2)))
+        assertThat("hasVisited returns false for same step on different equipment", !tracker.hasVisited(step2))
         assertThat("Visiting same step on different equipment returns true", tracker.visit(step2))
     }
 

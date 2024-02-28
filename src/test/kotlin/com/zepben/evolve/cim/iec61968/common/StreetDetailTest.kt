@@ -40,15 +40,15 @@ internal class StreetDetailTest {
 
     @Test
     internal fun testAllFieldsEmpty() {
-        assertThat(StreetDetail().allFieldsEmpty(), equalTo(true))
+        assertThat("allFieldsEmpty should return true for empty StreetDetail", StreetDetail().allFieldsEmpty())
 
-        assertThat(StreetDetail(buildingName = "value").allFieldsEmpty(), equalTo(false))
-        assertThat(StreetDetail(floorIdentification = "value").allFieldsEmpty(), equalTo(false))
-        assertThat(StreetDetail(name = "value").allFieldsEmpty(), equalTo(false))
-        assertThat(StreetDetail(number = "value").allFieldsEmpty(), equalTo(false))
-        assertThat(StreetDetail(suiteNumber = "value").allFieldsEmpty(), equalTo(false))
-        assertThat(StreetDetail(type = "value").allFieldsEmpty(), equalTo(false))
-        assertThat(StreetDetail(displayAddress = "value").allFieldsEmpty(), equalTo(false))
+        assertThat("allFieldsEmpty() should return false for nonempty buildingName", !StreetDetail(buildingName = "value").allFieldsEmpty())
+        assertThat("allFieldsEmpty() should return false for nonempty floorIdentification", !StreetDetail(floorIdentification = "value").allFieldsEmpty())
+        assertThat("allFieldsEmpty() should return false for nonempty name", !StreetDetail(name = "value").allFieldsEmpty())
+        assertThat("allFieldsEmpty() should return false for nonempty number", !StreetDetail(number = "value").allFieldsEmpty())
+        assertThat("allFieldsEmpty() should return false for nonempty suiteNumber", !StreetDetail(suiteNumber = "value").allFieldsEmpty())
+        assertThat("allFieldsEmpty() should return false for nonempty type", !StreetDetail(type = "value").allFieldsEmpty())
+        assertThat("allFieldsEmpty() should return false for nonempty displayAddress", !StreetDetail(displayAddress = "value").allFieldsEmpty())
     }
 
 }

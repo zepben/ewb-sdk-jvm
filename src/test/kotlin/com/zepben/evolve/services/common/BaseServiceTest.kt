@@ -71,8 +71,8 @@ internal class BaseServiceTest {
     @Test
     internal fun tryFunctions() {
         val junction = Junction()
-        assertThat(service.tryAdd(junction), equalTo(true))
-        assertThat(service.tryRemove(junction), equalTo(true))
+        assertThat("Initial tryAdd should return true", service.tryAdd(junction))
+        assertThat("tryRemove should return true for previously-added object", service.tryRemove(junction))
         expect { service.tryAdd(CableInfo()) }.toThrow<UnsupportedIdentifiedObjectException>()
         expect { service.tryRemove(CableInfo()) }.toThrow<UnsupportedIdentifiedObjectException>()
     }
@@ -170,8 +170,11 @@ internal class BaseServiceTest {
     @Test
     internal fun testUnresolvedBidirectionalReferences() {
         val terminal = Terminal("t1")
-        assertThat(service.add(terminal), equalTo(true))
-        assertThat(service.resolveOrDeferReference(Resolvers.conductingEquipment(terminal), "j1"), equalTo(false))
+        assertThat("Initial add should return true", service.add(terminal))
+        assertThat(
+            "resolveOrDeferReference should return false for mRID not in service",
+            !service.resolveOrDeferReference(Resolvers.conductingEquipment(terminal), "j1")
+        )
 
         val resolver = Resolvers.conductingEquipment(terminal)
         val unresolvedReference = UnresolvedReference(terminal, "j1", resolver.resolver, resolver.reverseResolver)
@@ -182,7 +185,10 @@ internal class BaseServiceTest {
         assertThat(service.getUnresolvedReferencesTo("j1").toList(), contains(unresolvedReference))
 
         val junction = Junction("j1")
-        assertThat(service.resolveOrDeferReference(Resolvers.terminals(junction), terminal.mRID), equalTo(true))
+        assertThat(
+            "resolveOrDeferReference should return true for mRID in service",
+            service.resolveOrDeferReference(Resolvers.terminals(junction), terminal.mRID)
+        )
 
         assertThat(service.unresolvedReferences().toList(), empty())
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.conductingEquipment(terminal)), empty())
@@ -193,20 +199,23 @@ internal class BaseServiceTest {
         assertThat(terminal.conductingEquipment, equalTo(junction))
         assertThat(junction.getTerminal(terminal.mRID), equalTo(terminal))
 
-        assertThat(service.add(junction), equalTo(true))
+        assertThat("Initial add should return true", service.add(junction))
     }
 
     @Test
     internal fun testUnresolvedUnidirectionalReferences() {
         val junction = Junction("j1")
-        assertThat(service.add(junction), equalTo(true))
-        assertThat(service.resolveOrDeferReference(Resolvers.baseVoltage(junction), "bv1"), equalTo(false))
+        assertThat("Initial add should return true", service.add(junction))
+        assertThat(
+            "resolveOrDeferReference should return false for mRID not in service",
+            !service.resolveOrDeferReference(Resolvers.baseVoltage(junction), "bv1")
+        )
 
         assertThat(service.unresolvedReferences().toList(), equalTo(listOf(UnresolvedReference(junction, "bv1", Resolvers.baseVoltage(junction).resolver))))
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(junction)), contains("bv1"))
 
         val baseVoltage = BaseVoltage("bv1")
-        assertThat(service.add(baseVoltage), equalTo(true))
+        assertThat("Initial add should return true", service.add(baseVoltage))
 
         assertThat(service.unresolvedReferences().toList(), empty())
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(junction)), empty())
@@ -235,19 +244,19 @@ internal class BaseServiceTest {
         val ns = NetworkService()
 
         AcLineSegment("acls1").apply {
-            assertThat(ns.add(this), equalTo(true))
+            assertThat("Initial add should return true", ns.add(this))
             // Re-adding the same object should return true
-            assertThat(ns.add(this), equalTo(true))
+            assertThat("Adding the same instance should return true", ns.add(this))
         }
 
         // a new ACLS with the same mRID should fail
         AcLineSegment("acls1").apply {
-            assertThat(ns.add(this), equalTo(false))
+            assertThat("Adding a different instance of the same class with the same mRID should return false", !ns.add(this))
         }
 
         // A completely different object with the same mRID should fail
         Junction("acls1").apply {
-            assertThat(ns.add(this), equalTo(false))
+            assertThat("Adding a different instance of a different class with the same mRID should return false", !ns.add(this))
         }
     }
 
@@ -257,9 +266,9 @@ internal class BaseServiceTest {
         val obj1 = MyIdentifiedObject("1")
         val obj1Dup = MyIdentifiedObject("1")
 
-        assertThat(ms.add(obj1), equalTo(true))
-        assertThat(ms.add(obj1), equalTo(true))
-        assertThat(ms.add(obj1Dup), equalTo(false))
+        assertThat("Initial add should return true", ms.add(obj1))
+        assertThat("Adding same instance should return true", ms.add(obj1))
+        assertThat("Adding equivalent but different instance should return false", !ms.add(obj1Dup))
     }
 
     @Test
@@ -275,10 +284,10 @@ internal class BaseServiceTest {
     @Test
     internal fun `mrid must be unique`() {
         val junction = Junction("id1")
-        assertThat(service.add(junction), equalTo(true))
+        assertThat("Initial add should return true", service.add(junction))
 
         val location = Location(junction.mRID)
-        assertThat(service.add(location), equalTo(false))
+        assertThat("Adding different object with same mRID should return false", !service.add(location))
     }
 
     private inline fun <reified T : IdentifiedObject> validateForEach(expected: List<ConductingEquipment>) {

@@ -34,7 +34,7 @@ internal class ConnectedEquipmentTraceTest {
 
     @Test
     internal fun `connectedEquipmentTrace checks open state`() {
-        Tracing.connectedEquipmentTrace().validateRun("start", "s1", "s2", "n1", "s3", "s4", "n2")
+        Tracing.connectedEquipmentTrace().validateRun("start", "s1", "s2",  "j1", "s3", "s4",  "j2")
         Tracing.normalConnectedEquipmentTrace().validateRun("start", "s1", "s3", "s4")
         Tracing.currentConnectedEquipmentTrace().validateRun("start", "s1", "s2", "s3")
     }
@@ -48,8 +48,8 @@ internal class ConnectedEquipmentTraceTest {
 
     @Test
     internal fun `connectedEquipmentTrace can start on an open switch`() {
-        Tracing.normalConnectedEquipmentTrace().validateRun("s2", "n1", "s1")
-        Tracing.currentConnectedEquipmentTrace().validateRun("s4", "s3", "n2")
+        Tracing.normalConnectedEquipmentTrace().validateRun("s2",  "j1", "s1")
+        Tracing.currentConnectedEquipmentTrace().validateRun("s4", "s3",  "j2")
     }
 
     @Test

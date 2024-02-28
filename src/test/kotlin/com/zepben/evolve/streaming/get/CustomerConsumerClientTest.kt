@@ -91,10 +91,10 @@ internal class CustomerConsumerClientTest {
 
             val type = response.identifiedObjectsList[0].identifiedObjectCase
             if (isSupported(type)) {
-                assertThat(result.wasSuccessful, equalTo(true))
+                assertThat("getIdentifiedObject should succeed for supported type ${type.name}", result.wasSuccessful)
                 assertThat(result.value.mRID, equalTo(mRID))
             } else {
-                assertThat(result.wasFailure, equalTo(true))
+                assertThat("getIdentifiedObject should fail for unsupported type ${type.name}", result.wasFailure)
                 assertThat(result.thrown, instanceOf(StatusRuntimeException::class.java))
                 assertThat(result.thrown.cause, instanceOf(UnsupportedOperationException::class.java))
                 assertThat(result.thrown.cause?.message, equalTo("Identified object type $type is not supported by the customer service"))
@@ -113,7 +113,7 @@ internal class CustomerConsumerClientTest {
         val result = consumerClient.getIdentifiedObject(mRID)
 
         verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
-        assertThat(result.wasFailure, equalTo(true))
+        assertThat("getIdentifiedObject should fail for mRID '$mRID', which isn't in the customer service", result.wasFailure)
         expect { throw result.thrown }
             .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID $mRID could be found.")
@@ -155,8 +155,8 @@ internal class CustomerConsumerClientTest {
 
         val result = consumerClient.getIdentifiedObjects(mRIDs.asSequence())
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.objects.size, equalTo(3))
+        assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
+        assertThat(result.value.objects, aMapWithSize(3))
         assertThat(result.value.objects[mRIDs[0]], instanceOf(Customer::class.java))
         assertThat(result.value.objects[mRIDs[1]], instanceOf(Customer::class.java))
         assertThat(result.value.objects[mRIDs[2]], instanceOf(CustomerAgreement::class.java))
@@ -198,8 +198,8 @@ internal class CustomerConsumerClientTest {
 
         val result = consumerClient.getIdentifiedObjects(mRIDs)
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.objects.size, equalTo(1))
+        assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
+        assertThat(result.value.objects, aMapWithSize(1))
         assertThat(result.value.objects["id1"], instanceOf(Customer::class.java))
         assertThat(result.value.failed, containsInAnyOrder(mRIDs[1]))
 
@@ -223,7 +223,7 @@ internal class CustomerConsumerClientTest {
         assertThat(result.value.objects, hasEntry("id1", customer))
         assertThat(result.value.objects, hasKey("id2"))
         assertThat(result.value.objects, hasKey("id3"))
-        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.objects, aMapWithSize(3))
         assertThat(result.value.failed, empty())
     }
 
@@ -234,9 +234,9 @@ internal class CustomerConsumerClientTest {
 
         val result = consumerClient.getCustomersForContainer("customer1").throwOnError()
 
-        assertThat(result.value.objects.size, equalTo(service.num(Customer::class)))
-        assertThat(result.value.objects.size, equalTo(1))
-        assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, contains("customer1"))
+        assertThat(result.value.objects, aMapWithSize(1))
+        assertThat(service.num<Customer>(), equalTo(1))
+        assertThat(service.listOf<IdentifiedObject>().map { it.mRID }, contains("customer1"))
     }
 
     @Test
@@ -246,9 +246,9 @@ internal class CustomerConsumerClientTest {
 
         val result = consumerClient.getCustomersForContainers(setOf("customer1", "customer2")).throwOnError()
 
-        assertThat(result.value.objects.size, equalTo(service.num(Customer::class)))
-        assertThat(result.value.objects.size, equalTo(2))
-        assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, containsInAnyOrder("customer1", "customer2"))
+        assertThat(result.value.objects, aMapWithSize(2))
+        assertThat(service.num<Customer>(), equalTo(2))
+        assertThat(service.listOf<IdentifiedObject>().map { it.mRID }, containsInAnyOrder("customer1", "customer2"))
     }
 
     @Test
@@ -284,9 +284,9 @@ internal class CustomerConsumerClientTest {
         val clientViaChannel = CustomerConsumerClient(channel)
         val result = clientViaChannel.getCustomersForContainer("customer1")
 
-        assertThat(result.value.objects.size, equalTo(clientViaChannel.service.num(Customer::class)))
-        assertThat(result.value.objects.size, equalTo(1))
-        assertThat(clientViaChannel.service.listOf(IdentifiedObject::class).map { it.mRID }, contains("customer1"))
+        assertThat(result.value.objects, aMapWithSize(clientViaChannel.service.num<Customer>()))
+        assertThat(clientViaChannel.service.num<Customer>(), equalTo(1))
+        assertThat(clientViaChannel.service.listOf<IdentifiedObject>().map { it.mRID }, contains("customer1"))
     }
 
     @Test
@@ -302,9 +302,9 @@ internal class CustomerConsumerClientTest {
         val clientViaGrpcChannel = CustomerConsumerClient(grpcChannel)
         val result = clientViaGrpcChannel.getCustomersForContainer("customer1")
 
-        assertThat(result.value.objects.size, equalTo(clientViaGrpcChannel.service.num(Customer::class)))
-        assertThat(result.value.objects.size, equalTo(1))
-        assertThat(clientViaGrpcChannel.service.listOf(IdentifiedObject::class).map { it.mRID }, contains("customer1"))
+        assertThat(result.value.objects, aMapWithSize(clientViaGrpcChannel.service.num<Customer>()))
+        assertThat(clientViaGrpcChannel.service.num<Customer>(), equalTo(1))
+        assertThat(clientViaGrpcChannel.service.listOf<IdentifiedObject>().map { it.mRID }, contains("customer1"))
     }
 
     private fun configureFeederResponses(expectedCustomerService: CustomerService) {

@@ -14,7 +14,6 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.services.common.BaseService
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import java.time.Instant
 
 //
@@ -46,7 +45,7 @@ fun OrganisationRole.fillFieldsCommon(service: BaseService, includeRuntime: Bool
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     organisation = Organisation().also {
-        assertThat(service.tryAdd(it), equalTo(true))
+        assertThat("Initial tryAdd should return true", service.tryAdd(it))
     }
 
     return this

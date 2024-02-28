@@ -11,8 +11,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
@@ -35,7 +34,7 @@ internal class PhaseCodeTest {
                 assertThat(phaseCode.singlePhases, contains(SinglePhaseKind.NONE))
             else {
                 // We need to strip the 's' off secondary phases for the following checks to work correctly.
-                assertThat(phaseCode.singlePhases.size, equalTo(phaseCode.name.trimStart('s').length))
+                assertThat(phaseCode.singlePhases, hasSize(phaseCode.name.trimStart('s').length))
 
                 val singlePhases = phaseCode.singlePhases
                     .asSequence()

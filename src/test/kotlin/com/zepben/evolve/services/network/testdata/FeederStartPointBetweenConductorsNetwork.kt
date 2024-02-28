@@ -21,7 +21,7 @@ object FeederStartPointBetweenConductorsNetwork {
     //
     fun create(makeFeederLv: Boolean = false): NetworkService = NetworkService().also { networkService ->
         val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.A)
-        val fsp = createNodeForConnecting(networkService, "fsp", 2)
+        val fsp = createJunctionForConnecting(networkService, "fsp", 2)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2", PhaseCode.A)
 
         networkService.connect(c1.getTerminal(2)!!, fsp.getTerminal(1)!!)

@@ -23,13 +23,13 @@ internal class CustomerTest {
     @Test
     internal fun hasEndDevicesReflectsNumEndDevices() {
         val customer = Customer()
-        assertThat("Customer has no end devices by default", not(customer.hasEndDevices()))
+        assertThat("Customer has no end devices by default", !customer.hasEndDevices())
 
         customer.numEndDevices = 1
         assertThat("Customer with 1 end device has end devices", customer.hasEndDevices())
 
         customer.numEndDevices = 0
-        assertThat("Customer with 0 end devices has no end devices", not(customer.hasEndDevices()))
+        assertThat("Customer with 0 end devices has no end devices", !customer.hasEndDevices())
     }
 
     @Test

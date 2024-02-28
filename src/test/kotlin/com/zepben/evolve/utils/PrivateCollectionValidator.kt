@@ -54,9 +54,9 @@ internal class PrivateCollectionValidator {
 
             assertThat(num(it), equalTo(3))
 
-            assertThat(remove(it, other1), equalTo(true))
-            assertThat(remove(it, other1), equalTo(false))
-            assertThat(remove(it, null), equalTo(false))
+            assertThat("remove should return true for previously-added object", remove(it, other1))
+            assertThat("remove should return false for already-removed object", !remove(it, other1))
+            assertThat("remove should return false for null", !remove(it, null))
             assertThat(num(it), equalTo(2))
 
             assertThat(get(it, other2.mRID), equalTo(other2))
@@ -119,9 +119,9 @@ internal class PrivateCollectionValidator {
 
             assertThat(num(it), equalTo(2))
 
-            assertThat(remove(it, other1), equalTo(true))
-            assertThat(remove(it, other1), equalTo(false))
-            assertThat(remove(it, null), equalTo(false))
+            assertThat("remove should return true for previously-added object", remove(it, other1))
+            assertThat("remove should return false for already-removed object", !remove(it, other1))
+            assertThat("remove should return false for null", !remove(it, null))
             assertThat(num(it), equalTo(1))
 
             assertThat(getById(it, other3.mRID), equalTo(other3))
@@ -201,9 +201,9 @@ internal class PrivateCollectionValidator {
                 assertThat(num(it), equalTo(++numObjects))
             }
 
-            assertThat(remove(it, other2), equalTo(true))
-            assertThat(remove(it, other2), equalTo(false))
-            assertThat(remove(it, null), equalTo(false))
+            assertThat("Removing previously-added object should return true", remove(it, other2))
+            assertThat("Removing already-removed object should return false", !remove(it, other2))
+            assertThat("Removing null should return false", !remove(it, null))
             assertThat(num(it), equalTo(--numObjects))
 
             val list = mutableListOf<U>()

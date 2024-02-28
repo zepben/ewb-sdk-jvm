@@ -33,7 +33,6 @@ import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.measurement.MeasurementService
 import com.zepben.evolve.services.network.testdata.createTerminal
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import java.time.Instant
 
 @Suppress("SameParameterValue", "MemberVisibilityCanBePrivate")
@@ -60,7 +59,7 @@ class NetworkModelTestUtil {
                 }.also {
                     val energySource = createEnergySource(network, it.mRID + "_source", "")
                     network.connect(createTerminal(network, energySource, PhaseCode.A, 1), createTerminal(network, it, PhaseCode.A, 1))
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createSwitch(
@@ -81,7 +80,7 @@ class NetworkModelTestUtil {
                     location?.let { network.add(it) }
                 }.also {
                     equipmentContainer?.addEquipment(it)
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createEnergySource(network: NetworkService, mRID: String, name: String, phases: PhaseCode = PhaseCode.A): EnergySource =
@@ -91,10 +90,10 @@ class NetworkModelTestUtil {
                 }.also {
                     phases.singlePhases.forEach { phase ->
                         val energySourcePhase = EnergySourcePhase().apply { this.phase = phase; energySource = it; it.addPhase(this) }
-                        assertThat(network.add(energySourcePhase), equalTo(true))
+                        assertThat("Initial add should return true", network.add(energySourcePhase))
                         it.addPhase(energySourcePhase)
                     }
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createJunction(network: NetworkService, num: Int, equipmentContainer: EquipmentContainer, location: Location?): Junction =
@@ -106,7 +105,7 @@ class NetworkModelTestUtil {
                     location?.let { network.add(it) }
                 }.also {
                     equipmentContainer.addEquipment(it)
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createTransformer(network: NetworkService, num: Int, equipmentContainer: EquipmentContainer, location: Location?): PowerTransformer =
@@ -118,7 +117,7 @@ class NetworkModelTestUtil {
                     location?.let { network.add(it) }
                 }.also {
                     equipmentContainer.addEquipment(it)
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createAcLineSegment(
@@ -141,8 +140,8 @@ class NetworkModelTestUtil {
                     network.connect(createTerminal(network, it, phases, 1), source)
                     network.connect(createTerminal(network, it, phases, 2), dest)
                     equipmentContainer?.addEquipment(it)
-                    assertThat(network.add(it), equalTo(true))
-                    location?.let { loc -> assertThat(network.add(loc), equalTo(true)) }
+                    assertThat("Initial add should return true", network.add(it))
+                    location?.let { loc -> assertThat("Initial add should return true", network.add(loc)) }
                 }
 
         fun createService(
@@ -161,13 +160,13 @@ class NetworkModelTestUtil {
                 network.connect(createTerminal(network, it, phases, 1), source)
                 network.connect(createTerminal(network, it, phases, 2), dest)
                 equipmentContainer.addEquipment(it)
-                assertThat(network.add(it), equalTo(true))
+                assertThat("Initial add should return true", network.add(it))
             }
 
         fun createOverheadWireInfo(network: NetworkService, mRID: String = ""): OverheadWireInfo =
             OverheadWireInfo(mRID)
                 .also {
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createGeographicalRegion(network: NetworkService, num: Int): GeographicalRegion =
@@ -175,7 +174,7 @@ class NetworkModelTestUtil {
                 .apply {
                     name = "Business $num"
                 }.also {
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createSubGeographicalRegion(network: NetworkService, num: Int, geographicalRegion: GeographicalRegion): SubGeographicalRegion =
@@ -185,7 +184,7 @@ class NetworkModelTestUtil {
                     this.geographicalRegion = geographicalRegion
                 }.also {
                     geographicalRegion.addSubGeographicalRegion(it)
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createSubstation(network: NetworkService, num: Int, subGeographicalRegion: SubGeographicalRegion?): Substation =
@@ -195,7 +194,7 @@ class NetworkModelTestUtil {
                     this.subGeographicalRegion = subGeographicalRegion
                 }.also {
                     subGeographicalRegion?.addSubstation(it)
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createFeeder(network: NetworkService, num: Int, feederStart: ConductingEquipment?, substation: Substation?): Feeder =
@@ -210,7 +209,7 @@ class NetworkModelTestUtil {
                         setCurrentFeeder(it, fs)
                     }
                     substation?.addFeeder(it)
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createSite(network: NetworkService, num: Int): Site =
@@ -218,7 +217,7 @@ class NetworkModelTestUtil {
                 .apply {
                     name = "Site $num"
                 }.also {
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun createOperationalRestriction(network: NetworkService, num: Int): OperationalRestriction =
@@ -232,7 +231,7 @@ class NetworkModelTestUtil {
                     status = "status$num"
                     comment = "comment$num"
                 }.also {
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
         fun setNormalFeeder(feeder: Feeder, vararg assets: ConductingEquipment): Unit =
@@ -302,7 +301,7 @@ class NetworkModelTestUtil {
                     meas.remoteSource = this
                     measurement = meas
                 }
-                .also { assertThat(network.add(it), equalTo(true)) }
+                .also { assertThat("Initial add should return true", network.add(it)) }
         }
 
         fun createAnalog(
@@ -319,7 +318,7 @@ class NetworkModelTestUtil {
                     unitSymbol = UnitSymbol.HOURS
                     positiveFlowIn = true
                 }.also {
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
             if (isRemote)
@@ -342,7 +341,7 @@ class NetworkModelTestUtil {
                     phases = PhaseCode.XYN
                     unitSymbol = UnitSymbol.HOURS
                 }.also {
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
 
             if (isRemote)
@@ -364,7 +363,7 @@ class NetworkModelTestUtil {
                     phases = PhaseCode.XYN
                     unitSymbol = UnitSymbol.HOURS
                 }.also {
-                    assertThat(network.add(it), equalTo(true))
+                    assertThat("Initial add should return true", network.add(it))
                 }
             if (isRemote)
                 createRemoteSource(network, meas)

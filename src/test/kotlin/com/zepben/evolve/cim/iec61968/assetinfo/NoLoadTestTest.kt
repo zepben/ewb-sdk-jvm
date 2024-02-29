@@ -37,7 +37,7 @@ internal class NoLoadTestTest {
         assertThat(noLoadTest.loss, nullValue())
         assertThat(noLoadTest.lossZero, nullValue())
 
-        noLoadTest.fillFields(NetworkService(), true)
+        noLoadTest.fillFields(NetworkService())
 
         assertThat(noLoadTest.energisedEndVoltage, equalTo(1))
         assertThat(noLoadTest.excitingCurrent, equalTo(2.2))

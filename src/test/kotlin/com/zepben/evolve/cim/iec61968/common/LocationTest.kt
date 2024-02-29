@@ -29,7 +29,7 @@ internal class LocationTest {
     @Test
     internal fun accessorCoverage() {
         val location = Location()
-        val mainAddress = StreetAddress("", null, "", null)
+        val mainAddress = StreetAddress()
 
         assertThat(location.mainAddress, nullValue())
 

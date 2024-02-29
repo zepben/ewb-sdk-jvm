@@ -36,7 +36,7 @@ internal class CurrentTransformerTest {
         assertThat(currentTransformer.assetInfo, nullValue())
         assertThat(currentTransformer.coreBurden, nullValue())
 
-        currentTransformer.fillFields(NetworkService(), true)
+        currentTransformer.fillFields(NetworkService())
 
         assertThat(currentTransformer.assetInfo, instanceOf(CurrentTransformerInfo::class.java))
         assertThat(currentTransformer.coreBurden, equalTo(1))

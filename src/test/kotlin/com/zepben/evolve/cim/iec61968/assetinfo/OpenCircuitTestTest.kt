@@ -37,7 +37,7 @@ internal class OpenCircuitTestTest {
         assertThat(transformerTest.openEndVoltage, nullValue())
         assertThat(transformerTest.phaseShift, nullValue())
 
-        transformerTest.fillFields(NetworkService(), true)
+        transformerTest.fillFields(NetworkService())
 
         assertThat(transformerTest.energisedEndStep, equalTo(1))
         assertThat(transformerTest.energisedEndVoltage, equalTo(2))

@@ -69,7 +69,7 @@ internal class BasicTraversalTest {
                     stoppingOn.add(i)
             }
 
-        t.run(1, true)
+        t.run(1)
         assertThat(visited, containsInAnyOrder(1, 2, 3, 4))
         assertThat(stoppingOn, containsInAnyOrder(3, 4))
     }
@@ -82,7 +82,7 @@ internal class BasicTraversalTest {
             .addStopCondition { i -> stopCalls[0] = i; true }
             .addStopCondition { i -> stopCalls[1] = i; true }
             .addStopCondition { i -> stopCalls[2] = i; true }
-            .run(1, true)
+            .run(1)
 
         assertThat(stopCalls, contains(1, 1, 1))
     }
@@ -95,7 +95,7 @@ internal class BasicTraversalTest {
             .addStepAction { i, _ -> stopCalls[0] = i }
             .addStepAction(Consumer { i -> stopCalls[1] = i })
             .addStepAction { i -> stopCalls[2] = i }
-            .run(1, true)
+            .run(1)
 
         assertThat(stopCalls, contains(1, 1, 1))
     }

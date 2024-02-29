@@ -38,7 +38,7 @@ internal class ShuntCompensatorTest {
         assertThat(shuntCompensator.phaseConnection, equalTo(PhaseShuntConnectionKind.UNKNOWN))
         assertThat(shuntCompensator.sections, nullValue())
 
-        shuntCompensator.fillFields(NetworkService(), true)
+        shuntCompensator.fillFields(NetworkService())
 
         assertThat(shuntCompensator.assetInfo, notNullValue())
         assertThat(shuntCompensator.assetInfo, instanceOf(ShuntCompensatorInfo::class.java))

@@ -41,7 +41,7 @@ internal class TapChangerTest {
         assertThat(tapChanger.step, nullValue())
         assertThat(tapChanger.tapChangerControl, nullValue())
 
-        tapChanger.fillFields(NetworkService(), true)
+        tapChanger.fillFields(NetworkService())
 
         assertThat(tapChanger.controlEnabled, equalTo(false))
         assertThat(tapChanger.highStep, equalTo(22))

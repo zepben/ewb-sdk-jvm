@@ -42,7 +42,7 @@ internal class TapChangerControlTest {
         assertThat(tapChangerControl.timeDelay, nullValue())
         assertThat(tapChangerControl.coGenerationEnabled, nullValue())
 
-        tapChangerControl.fillFields(NetworkService(), true)
+        tapChangerControl.fillFields(NetworkService())
 
         assertThat(tapChangerControl.limitVoltage, equalTo(1000))
         assertThat(tapChangerControl.lineDropCompensation, equalTo(true))

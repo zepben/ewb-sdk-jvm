@@ -11,7 +11,6 @@ package com.zepben.evolve.services.network.tracing.feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 
 internal class AssociatedTerminalTrackerTest {

@@ -34,7 +34,7 @@ internal class TransformerTestTest {
         assertThat(transformerTest.basePower, nullValue())
         assertThat(transformerTest.temperature, nullValue())
 
-        transformerTest.fillFields(NetworkService(), true)
+        transformerTest.fillFields(NetworkService())
 
         assertThat(transformerTest.basePower, equalTo(1))
         assertThat(transformerTest.temperature, equalTo(2.2))

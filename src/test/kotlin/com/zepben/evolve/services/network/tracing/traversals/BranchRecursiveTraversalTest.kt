@@ -50,7 +50,7 @@ internal class BranchRecursiveTraversalTest {
         visitOrder.clear()
         stopCount = 0
 
-        traversal.run(0, true)
+        traversal.run(0)
 
         assertThat<List<Int>>(visitOrder, contains(0))
         assertThat(stopCount, equalTo(visitOrder.size))

@@ -36,7 +36,7 @@ internal class PotentialTransformerTest {
         assertThat(potentialTransformer.assetInfo, nullValue())
         assertThat(potentialTransformer.type, equalTo(PotentialTransformerKind.UNKNOWN))
 
-        potentialTransformer.fillFields(NetworkService(), true)
+        potentialTransformer.fillFields(NetworkService())
 
         assertThat(potentialTransformer.assetInfo, instanceOf(PotentialTransformerInfo::class.java))
         assertThat(potentialTransformer.type, equalTo(PotentialTransformerKind.capacitiveCoupling))

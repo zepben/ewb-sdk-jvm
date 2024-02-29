@@ -11,7 +11,6 @@ package com.zepben.evolve.services.network.tracing.connectivity
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 

@@ -46,7 +46,7 @@ internal class RegulatingControlTest {
         assertThat(regulatingControl.ratedCurrent, nullValue())
         assertThat(regulatingControl.terminal, nullValue())
 
-        regulatingControl.fillFields(NetworkService(), true)
+        regulatingControl.fillFields(NetworkService())
 
         assertThat(regulatingControl.discrete, equalTo(false))
         assertThat(regulatingControl.mode, equalTo(RegulatingControlModeKind.voltage))

@@ -46,7 +46,7 @@ internal class CurrentTransformerInfoTest {
         assertThat(currentTransformerInfo.secondaryRatio, nullValue())
         assertThat(currentTransformerInfo.usage, nullValue())
 
-        currentTransformerInfo.fillFields(NetworkService(), true)
+        currentTransformerInfo.fillFields(NetworkService())
 
         assertThat(currentTransformerInfo.accuracyClass, equalTo("accuracyClass"))
         assertThat(currentTransformerInfo.accuracyLimit, equalTo(1.1))

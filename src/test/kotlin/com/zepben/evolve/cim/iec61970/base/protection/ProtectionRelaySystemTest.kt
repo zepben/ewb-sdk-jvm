@@ -14,6 +14,7 @@ import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert
 import org.junit.jupiter.api.Test
 
@@ -21,7 +22,7 @@ internal class ProtectionRelaySystemTest {
 
     @Test
     internal fun constructorCoverage() {
-        MatcherAssert.assertThat(ProtectionRelaySystem().mRID, CoreMatchers.not(equalTo("")))
+        MatcherAssert.assertThat(ProtectionRelaySystem().mRID, not(equalTo("")))
         MatcherAssert.assertThat(ProtectionRelaySystem("id").mRID, equalTo("id"))
     }
 

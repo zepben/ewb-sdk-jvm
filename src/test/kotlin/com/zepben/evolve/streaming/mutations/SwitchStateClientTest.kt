@@ -40,7 +40,7 @@ internal class SwitchStateClientTest {
 
         val result = client.setCurrentSwitchState(switchToUpdate)
 
-        assertThat("should have been successful", result.wasSuccessful)
+        assertThat("Updating switch state should have succeeded", result.wasSuccessful)
         verify {
             stub.setCurrentSwitchStates(
                 SetCurrentSwitchStatesRequest.newBuilder()
@@ -57,7 +57,7 @@ internal class SwitchStateClientTest {
 
         val result = client.setCurrentSwitchStates(listOf(update1, update2))
 
-        assertThat("should have been successful", result.wasSuccessful)
+        assertThat("Updating multiple switch states should have succeeded", result.wasSuccessful)
         verify {
             stub.setCurrentSwitchStates(
                 SetCurrentSwitchStatesRequest.newBuilder()
@@ -76,7 +76,7 @@ internal class SwitchStateClientTest {
 
         val result = client.setCurrentSwitchState(switchToUpdate)
 
-        assertThat("should have failed", result.wasFailure)
+        assertThat("Updating switch states should have failed due to $expectedEx", result.wasFailure)
         assertThat(onErrorHandler.lastError, equalTo(expectedEx))
         verify {
             stub.setCurrentSwitchStates(
@@ -96,7 +96,7 @@ internal class SwitchStateClientTest {
         val switchToUpdate = SwitchStateUpdate("id", true)
         val result = SwitchStateClient(channel).setCurrentSwitchState(switchToUpdate)
 
-        assertThat("should have been successful", result.wasSuccessful)
+        assertThat("Updating switch state should have succeeded", result.wasSuccessful)
         verify {
             stub.setCurrentSwitchStates(
                 SetCurrentSwitchStatesRequest.newBuilder()
@@ -116,7 +116,7 @@ internal class SwitchStateClientTest {
         val switchToUpdate = SwitchStateUpdate("id", true)
         val result = SwitchStateClient(grpcChannel).setCurrentSwitchState(switchToUpdate)
 
-        assertThat("should have been successful", result.wasSuccessful)
+        assertThat("Updating switch state should have succeeded", result.wasSuccessful)
         verify {
             stub.setCurrentSwitchStates(
                 SetCurrentSwitchStatesRequest.newBuilder()

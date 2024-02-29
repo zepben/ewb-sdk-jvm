@@ -201,9 +201,9 @@ internal class PrivateCollectionValidator {
                 assertThat(num(it), equalTo(++numObjects))
             }
 
-            assertThat("Removing previously-added object should return true", remove(it, other2))
-            assertThat("Removing already-removed object should return false", !remove(it, other2))
-            assertThat("Removing null should return false", !remove(it, null))
+            assertThat("remove should return true for previously-added object", remove(it, other2))
+            assertThat("remove should return false for already-removed object", !remove(it, other2))
+            assertThat("remove should return false for null", !remove(it, null))
             assertThat(num(it), equalTo(--numObjects))
 
             val list = mutableListOf<U>()

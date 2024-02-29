@@ -204,7 +204,7 @@ internal class NetworkServiceTest {
 
         network.disconnect(j1.getTerminal(1)!!)
         network.disconnect(j2.getTerminal(1)!!)
-        assertThat("Connectivity node should be removed after all terminals are disconnected", !network.containsConnectivityNode(connectivityNode.mRID))
+        assertThat("Connectivity node should be removed after all its terminals are disconnected", !network.containsConnectivityNode(connectivityNode.mRID))
         assertThat(connectivityNode.numTerminals(), equalTo(0))
 
         connectivityNode = j3.getTerminal(1)!!.connectivityNode!!

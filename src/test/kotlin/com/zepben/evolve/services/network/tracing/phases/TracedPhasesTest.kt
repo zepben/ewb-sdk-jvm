@@ -50,15 +50,15 @@ internal class TracedPhasesTest {
         assertThat(tracedPhases.current[SPK.N], equalTo(SPK.N))
 
         /* -- Setting Unchanged -- */
-        assertThat("Should return false when setting normal traced phase of A to N", !tracedPhases.setNormal(SPK.A, SPK.N))
-        assertThat("Should return false when setting normal traced phase of B to C", !tracedPhases.setNormal(SPK.B, SPK.C))
-        assertThat("Should return false when setting normal traced phase of C to B", !tracedPhases.setNormal(SPK.C, SPK.B))
-        assertThat("Should return false when setting normal traced phase of N to A", !tracedPhases.setNormal(SPK.N, SPK.A))
+        assertThat("Should return false when attempting to set already-set normal traced phase of A", !tracedPhases.setNormal(SPK.A, SPK.N))
+        assertThat("Should return false when attempting to set already-set normal traced phase of B", !tracedPhases.setNormal(SPK.B, SPK.C))
+        assertThat("Should return false when attempting to set already-set normal traced phase of C", !tracedPhases.setNormal(SPK.C, SPK.B))
+        assertThat("Should return false when attempting to set already-set normal traced phase of N", !tracedPhases.setNormal(SPK.N, SPK.A))
 
-        assertThat("Should return false when setting current traced phase of A to A", !tracedPhases.setCurrent(SPK.A, SPK.A))
-        assertThat("Should return false when setting current traced phase of B to B", !tracedPhases.setCurrent(SPK.B, SPK.B))
-        assertThat("Should return false when setting current traced phase of C to C", !tracedPhases.setCurrent(SPK.C, SPK.C))
-        assertThat("Should return false when setting current traced phase of N to N", !tracedPhases.setCurrent(SPK.N, SPK.N))
+        assertThat("Should return false when attempting to set already-set current traced phase of A", !tracedPhases.setCurrent(SPK.A, SPK.A))
+        assertThat("Should return false when attempting to set already-set current traced phase of B", !tracedPhases.setCurrent(SPK.B, SPK.B))
+        assertThat("Should return false when attempting to set already-set current traced phase of C", !tracedPhases.setCurrent(SPK.C, SPK.C))
+        assertThat("Should return false when attempting to set already-set current traced phase of N", !tracedPhases.setCurrent(SPK.N, SPK.N))
     }
 
     @Test

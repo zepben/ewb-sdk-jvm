@@ -16,14 +16,14 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class ServiceDifferencesTest {
+internal class ServiceDifferencesTest {
 
     @JvmField
     @RegisterExtension
-    var systemOutRule: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    fun accessors() {
+    internal fun accessors() {
         val s1 = Junction("s1").apply { name = "source-object-1" }
         val t1 = Junction("t1").apply { name = "target-object-1" }
         val s2 = NameType("s2").apply { description = "source-name-type-2" }

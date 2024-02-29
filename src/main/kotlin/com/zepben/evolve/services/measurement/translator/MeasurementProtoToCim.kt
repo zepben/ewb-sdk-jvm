@@ -49,6 +49,8 @@ fun MeasurementService.addFromPb(pb: PBDiscreteValue): DiscreteValue = toCim(pb)
 
 /************ Class for Java friendly usage ************/
 
+// This will be left unused until we have a measurement consumer client.
+@Suppress("Unused")
 class MeasurementProtoToCim(private val measurementService: MeasurementService) {
     fun addFromPb(pb: PBAnalogValue): AnalogValue = measurementService.addFromPb(pb)
     fun addFromPb(pb: PBAccumulatorValue): AccumulatorValue = measurementService.addFromPb(pb)

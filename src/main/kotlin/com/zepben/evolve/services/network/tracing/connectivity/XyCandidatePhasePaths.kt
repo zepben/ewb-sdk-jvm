@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.connectivity
 
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 /**
@@ -177,12 +178,12 @@ class XyCandidatePhasePaths {
         /**
          * The pathing priority for nominal phase X
          */
-        val xPriority = listOf(SPK.A, SPK.B, SPK.C)
+        val xPriority: List<SinglePhaseKind> = listOf(SPK.A, SPK.B, SPK.C)
 
         /**
          * The pathing priority for nominal phase X
          */
-        val yPriority = listOf(SPK.C, SPK.B)
+        val yPriority: List<SinglePhaseKind> = listOf(SPK.C, SPK.B)
 
         fun SPK.isBefore(before: SPK?): Boolean = when (before) {
             null, SPK.NONE -> true

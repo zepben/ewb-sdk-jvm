@@ -24,7 +24,7 @@ import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.protobuf.nc.*
 import com.zepben.protobuf.nc.NetworkIdentifiedObject.IdentifiedObjectCase.*
 import io.grpc.CallCredentials
-import io.grpc.ManagedChannel
+import io.grpc.Channel
 import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -53,11 +53,11 @@ class NetworkConsumerClient(
     /**
      * Create a [NetworkConsumerClient]
      *
-     * @param channel [ManagedChannel] to build a stub from.
+     * @param channel [Channel] to build a stub from.
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+    constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
             NetworkConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
             executor = Executors.newSingleThreadExecutor()
@@ -70,11 +70,7 @@ class NetworkConsumerClient(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
-        this(
-            NetworkConsumerGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
-        )
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) : this(channel.channel, callCredentials)
 
     override fun runGetMetadata(getMetadataRequest: GetMetadataRequest, streamObserver: AwaitableStreamObserver<GetMetadataResponse>) {
         stub.getMetadata(getMetadataRequest, streamObserver)
@@ -377,8 +373,8 @@ class NetworkConsumerClient(
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
         includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
     ): GrpcResult<MultiObjectResult> =
-        getWithReferences(mRIDs, expectedClass) { it, mor ->
-            mor.objects.putAll(getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers)
+        getWithReferences(mRIDs, expectedClass) { it, (objects, _) ->
+            objects.putAll(getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers)
                 .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
                 .value.objects
             )
@@ -415,13 +411,13 @@ class NetworkConsumerClient(
      * Note the [NetworkConsumerClient] warning in this case.
      */
     fun getEquipmentForLoop(mRID: String): GrpcResult<MultiObjectResult> =
-        getWithReferences(mRID, Loop::class.java) { loop, mor ->
-            mor.objects.putAll(loop.circuits.associateBy { it.mRID })
-            mor.objects.putAll(loop.substations.associateBy { it.mRID })
-            mor.objects.putAll(loop.energizingSubstations.associateBy { it.mRID })
+        getWithReferences(mRID, Loop::class.java) { loop, (objects, _) ->
+            objects.putAll(loop.circuits.associateBy { it.mRID })
+            objects.putAll(loop.substations.associateBy { it.mRID })
+            objects.putAll(loop.energizingSubstations.associateBy { it.mRID })
 
             val containers = loop.circuits.asSequence() + loop.substations.asSequence() + loop.energizingSubstations.asSequence()
-            mor.objects.putAll(getEquipmentForContainers(containers.map { it.mRID })
+            objects.putAll(getEquipmentForContainers(containers.map { it.mRID })
                 .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
                 .value.objects)
             null

@@ -617,7 +617,7 @@ fun toPb(cim: Terminal, pb: PBTerminal.Builder): PBTerminal.Builder =
     pb.apply {
         cim.conductingEquipment?.let { conductingEquipmentMRID = it.mRID } ?: clearConductingEquipmentMRID()
         cim.connectivityNodeId?.let { connectivityNodeMRID = it } ?: clearConnectivityNodeMRID()
-        phases = com.zepben.protobuf.cim.iec61970.base.core.PhaseCode.valueOf(cim.phases.name)
+        phases = PBPhaseCode.valueOf(cim.phases.name)
         sequenceNumber = cim.sequenceNumber
         normalFeederDirection = FeederDirection.valueOf(cim.normalFeederDirection.name)
         currentFeederDirection = FeederDirection.valueOf(cim.currentFeederDirection.name)
@@ -792,7 +792,7 @@ fun RemoteSource.toPb(): PBRemoteSource = toPb(this, PBRemoteSource.newBuilder()
 
 /************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
 
-fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder) =
+fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder): PBPowerElectronicsUnit.Builder =
     pb.apply {
         cim.powerElectronicsConnection?.let { powerElectronicsConnectionMRID = it.mRID } ?: clearPowerElectronicsConnectionMRID()
         maxP = cim.maxP ?: UNKNOWN_INT
@@ -1052,7 +1052,7 @@ fun toPb(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd.Builder): PBPowerTr
         toPb(cim, teBuilder)
     }
 
-fun toPb(cim: SeriesCompensator, pb: PBSeriesCompensator.Builder) =
+fun toPb(cim: SeriesCompensator, pb: PBSeriesCompensator.Builder): PBSeriesCompensator.Builder =
     pb.apply {
         r = cim.r ?: UNKNOWN_DOUBLE
         r0 = cim.r0 ?: UNKNOWN_DOUBLE

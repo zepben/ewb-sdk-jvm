@@ -27,15 +27,15 @@ class ConnectivityNode @JvmOverloads constructor(mRID: String = "") : Identified
     /**
      * Get the number of entries in the [Terminal] collection.
      */
-    fun numTerminals() = _terminals.size
+    fun numTerminals(): Int = _terminals.size
 
     /**
-     * Terminals interconnected with zero impedance at a this connectivity node.
+     * Terminals interconnected with zero impedance at this connectivity node.
      *
      * @param mRID the mRID of the required [Terminal]
      * @return The [Terminal] with the specified [mRID] if it exists, otherwise null
      */
-    fun getTerminal(mRID: String) = _terminals.getByMRID(mRID)
+    fun getTerminal(mRID: String): Terminal? = _terminals.getByMRID(mRID)
 
     /**
      * Add a [Terminal] to this [ConnectivityNode]

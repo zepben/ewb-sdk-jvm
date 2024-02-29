@@ -24,7 +24,7 @@ import java.sql.Statement
  *
  * @property getStatement provider of statements for the connection.
  */
-class CustomerServiceReader constructor(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
+class CustomerServiceReader(getStatement: () -> Statement) : BaseServiceReader(getStatement) {
 
     fun load(reader: CustomerCIMReader): Boolean {
         var status = loadNameTypes(reader)

@@ -18,7 +18,7 @@ package com.zepben.evolve.cim.iec61968.assetinfo
  * @property loss Losses measured from a positive-sequence or single-phase excitation test in watts.
  * @property lossZero Losses measured from a zero-sequence excitation test in watts.
  */
-class NoLoadTest(mRID: String = "") : TransformerTest(mRID) {
+class NoLoadTest @JvmOverloads constructor(mRID: String = "") : TransformerTest(mRID) {
 
     var energisedEndVoltage: Int? = null
     var excitingCurrent: Double? = null

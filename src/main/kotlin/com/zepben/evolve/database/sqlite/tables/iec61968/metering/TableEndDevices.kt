@@ -14,7 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetContai
 @Suppress("PropertyName")
 abstract class TableEndDevices : TableAssetContainers() {
 
-    val CUSTOMER_MRID = Column(++columnIndex, "customer_mrid", "TEXT", NULL)
-    val SERVICE_LOCATION_MRID = Column(++columnIndex, "service_location_mrid", "TEXT", NULL)
+    val CUSTOMER_MRID: Column = Column(++columnIndex, "customer_mrid", "TEXT", NULL)
+    val SERVICE_LOCATION_MRID: Column = Column(++columnIndex, "service_location_mrid", "TEXT", NULL)
 
 }

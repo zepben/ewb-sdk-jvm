@@ -17,9 +17,9 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
-import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -81,7 +81,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.DriverManager.getConnection
 
-class DatabaseSqliteTest {
+internal class DatabaseSqliteTest {
 
     @JvmField
     @RegisterExtension
@@ -89,25 +89,25 @@ class DatabaseSqliteTest {
 
     @BeforeEach
     @Throws(IOException::class)
-    fun setup() {
+    internal fun setup() {
         Files.deleteIfExists(Paths.get(SCHEMA_TEST_FILE))
     }
 
     @AfterEach
     @Throws(IOException::class)
-    fun teardown() {
+    internal fun teardown() {
         Files.deleteIfExists(Paths.get(SCHEMA_TEST_FILE))
     }
 
     @Test
     @Disabled
-    fun loadRealFile() {
+    internal fun loadRealFile() {
         systemErr.unmute()
 
         // Put the name of the database you want to load in src/test/resources/text-database.txt
         val databaseFileName = Files.readString(Path.of("src", "test", "resources", "test-database.txt")).trim().trim('"')
 
-        assertThat(Files.exists(Paths.get(databaseFileName)), equalTo(true))
+        assertThat("File $databaseFileName should exist", Files.exists(Paths.get(databaseFileName)))
 
         val metadataCollection = MetadataCollection()
         val networkLoaded = NetworkService()
@@ -115,8 +115,8 @@ class DatabaseSqliteTest {
         val customerService = CustomerService()
 
         assertThat(
-            DatabaseReader(databaseFileName).load(metadataCollection, networkLoaded, diagramLoaded, customerService),
-            equalTo(true)
+            "Services should load successfully from database",
+            DatabaseReader(databaseFileName).load(metadataCollection, networkLoaded, diagramLoaded, customerService)
         )
 
         logger.info("Sleeping...")
@@ -128,7 +128,7 @@ class DatabaseSqliteTest {
     }
 
     @Test
-    fun testStupidlyLargeSchema() {
+    internal fun testStupidlyLargeSchema() {
         // TODO - This needs to be replaced with a test for assigning to feeders and checking the below error. This should be
         //        done in a separate task to monitor code coverage drops.
         validateSchema(StupidlyLargeNetwork.create())
@@ -140,7 +140,7 @@ class DatabaseSqliteTest {
     }
 
     @Test
-    fun `test schema for each supported type`() {
+    internal fun `test schema for each supported type`() {
         /************ IEC61968 ASSET INFO ************/
         validateSchema(SchemaNetworks.networkServicesOf(::CableInfo, CableInfo::fillFields))
         validateSchema(SchemaNetworks.networkServicesOf(::NoLoadTest, NoLoadTest::fillFields))
@@ -265,12 +265,12 @@ class DatabaseSqliteTest {
     }
 
     @Test
-    fun testMetadataDataSourceSchema() {
+    internal fun testMetadataDataSourceSchema() {
         validateSchema(SchemaNetworks.createDataSourceTestServices())
     }
 
     @Test
-    fun `test Name and NameType schema`() {
+    internal fun `test Name and NameType schema`() {
         validateSchema(SchemaNetworks.createNameTestServices())
     }
 
@@ -295,6 +295,7 @@ class DatabaseSqliteTest {
         val expectedCustomerService = CustomerService()
 
         assertThat(
+            "Services should save successfully as database",
             DatabaseWriter(SCHEMA_TEST_FILE).save(
                 expectedMetadata,
                 mutableListOf(
@@ -302,8 +303,7 @@ class DatabaseSqliteTest {
                     expectedDiagramService,
                     expectedCustomerService
                 )
-            ),
-            equalTo(true)
+            )
         )
         // Delete a link to cause an unresolved reference.
         getConnection("jdbc:sqlite:$SCHEMA_TEST_FILE").use { connection ->
@@ -375,9 +375,9 @@ class DatabaseSqliteTest {
         testWriteRead(
             writeServices,
             readServices,
-            { success -> assertThat(success, equalTo(true)) },
+            { success -> assertThat("Database write should be successful", success) },
             { success ->
-                assertThat(success, equalTo(false))
+                assertThat("Database read should fail due to duplicate ${duplicate.typeNameAndMRID()}", !success)
                 assertThat(systemErr.log, containsString(expectedError))
             }
         )
@@ -386,9 +386,10 @@ class DatabaseSqliteTest {
     private fun validateSchema(services: NetworkModelTestUtil.Services) {
         systemErr.clearCapturedLog()
 
-        val (expectedMetadata, expectedNetworkService, expectedDiagramService, expectedCustomerService) = services
+        val (expectedMetadata, expectedNetworkService, expectedDiagramService, expectedCustomerService, _) = services
 
         assertThat(
+            "Database write should be successful",
             DatabaseWriter(SCHEMA_TEST_FILE).save(
                 expectedMetadata,
                 mutableListOf(
@@ -396,12 +397,11 @@ class DatabaseSqliteTest {
                     expectedDiagramService,
                     expectedCustomerService
                 )
-            ),
-            equalTo(true)
+            )
         )
 
         assertThat(systemErr.log, containsString("Creating database schema v${TableVersion().SUPPORTED_VERSION}"))
-        assertThat(Files.exists(Paths.get(SCHEMA_TEST_FILE)), equalTo(true))
+        assertThat("File $SCHEMA_TEST_FILE should exist", Files.exists(Paths.get(SCHEMA_TEST_FILE)))
 
         val metadataCollection = MetadataCollection()
         val networkService = NetworkService()
@@ -409,8 +409,8 @@ class DatabaseSqliteTest {
         val customerService = CustomerService()
 
         assertThat(
+            "Services should successfully load from database",
             DatabaseReader(SCHEMA_TEST_FILE).load(metadataCollection, networkService, diagramService, customerService),
-            equalTo(true)
         )
 
         validateMetadata(metadataCollection, expectedMetadata)
@@ -428,8 +428,8 @@ class DatabaseSqliteTest {
         validateWrite: (Boolean) -> Unit,
         validateRead: (Boolean) -> Unit
     ) {
-        assertThat(systemErr.logLines.size, equalTo(0))
-        val (writeMetadata, writeNetworkService, writeDiagramService, writeCustomerService) = writeServices
+        assertThat(systemErr.logLines, emptyArray())
+        val (writeMetadata, writeNetworkService, writeDiagramService, writeCustomerService, _) = writeServices
 
         validateWrite(
             DatabaseWriter(SCHEMA_TEST_FILE).save(
@@ -445,7 +445,7 @@ class DatabaseSqliteTest {
         if (!Files.exists(Paths.get(SCHEMA_TEST_FILE)))
             return
 
-        val (readMetadata, readNetworkService, readDiagramService, readCustomerService) = readServices
+        val (readMetadata, readNetworkService, readDiagramService, readCustomerService, _) = readServices
         validateRead(
             DatabaseReader(SCHEMA_TEST_FILE).load(
                 readMetadata,

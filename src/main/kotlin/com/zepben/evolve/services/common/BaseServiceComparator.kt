@@ -28,7 +28,7 @@ import kotlin.reflect.jvm.isAccessible
 abstract class BaseServiceComparator {
 
     @Suppress("UNCHECKED_CAST")
-    val compareByType: Map<KType, KFunction<ObjectDifference<*>>> = this::class.memberFunctions
+    private val compareByType: Map<KType, KFunction<ObjectDifference<*>>> = this::class.memberFunctions
         .asSequence()
         .filter { it.name.startsWith("compare") }
         .filter { it.parameters.size == 3 }
@@ -116,7 +116,7 @@ abstract class BaseServiceComparator {
         compareNames(IdentifiedObject::names)
     }
 
-    protected fun compareNameType(source: NameType, target: NameType): ObjectDifference<NameType> =
+    private fun compareNameType(source: NameType, target: NameType): ObjectDifference<NameType> =
         ObjectDifference(source, target).apply {
             compareValues(NameType::description)
 
@@ -152,6 +152,8 @@ abstract class BaseServiceComparator {
             compareIdReferences(OrganisationRole::organisation)
         }
 
+    // Used via reflection
+    @Suppress("Unused")
     protected fun compareOrganisation(source: Organisation, target: Organisation): ObjectDifference<Organisation> =
         ObjectDifference(source, target).apply {
             compareIdentifiedObject()
@@ -183,7 +185,7 @@ abstract class BaseServiceComparator {
         return this
     }
 
-    fun <T : IdentifiedObject> ObjectDifference<T>.compareNames(
+    private fun <T : IdentifiedObject> ObjectDifference<T>.compareNames(
         vararg properties: KProperty1<IdentifiedObject, Collection<Name>>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareNames(source, target)) }

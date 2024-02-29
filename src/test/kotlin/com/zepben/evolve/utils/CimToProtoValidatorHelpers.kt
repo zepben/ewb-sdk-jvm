@@ -7,27 +7,10 @@
  */
 package com.zepben.evolve.utils
 
-import com.google.protobuf.ProtocolStringList
-import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.emptyString
+import org.hamcrest.Matchers.equalTo
 
 internal fun validateMRID(pb: String, mrid: String?) {
     mrid?.let { assertThat(pb, equalTo(it)) } ?: assertThat(pb, emptyString())
-}
-
-internal fun validateMRID(pb: String, cim: IdentifiedObject?) {
-    validateMRID(pb, cim?.mRID)
-}
-
-internal fun validateMRIDList(pb: ProtocolStringList, cim: Collection<IdentifiedObject>) {
-    assertThat(pb.size, equalTo(cim.size))
-    if (cim.isNotEmpty())
-        assertThat(pb, containsInAnyOrder(*cim.stream().map { it.mRID }.toArray()))
-}
-
-internal fun validateMRIDList(pb: ProtocolStringList, cim: List<IdentifiedObject>) {
-    assertThat(pb.size, equalTo(cim.size))
-    if (cim.isNotEmpty())
-        assertThat(pb, contains(*cim.stream().map { it.mRID }.toArray()))
 }

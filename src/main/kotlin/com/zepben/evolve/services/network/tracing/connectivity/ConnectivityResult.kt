@@ -42,11 +42,7 @@ class ConnectivityResult private constructor(
 
         other as ConnectivityResult
 
-        if (fromTerminal != other.fromTerminal) return false
-        if (toTerminal != other.toTerminal) return false
-        if (nominalPhasePaths != other.nominalPhasePaths) return false
-
-        return true
+        return (fromTerminal == other.fromTerminal) && (toTerminal == other.toTerminal) && (nominalPhasePaths == other.nominalPhasePaths)
     }
 
     override fun hashCode(): Int {

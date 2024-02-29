@@ -24,10 +24,10 @@ import java.sql.Statement
  *
  * @property getStatement provider of statements for the connection.
  */
-open class BaseServiceReader constructor(protected val getStatement: () -> Statement) {
+open class BaseServiceReader(protected val getStatement: () -> Statement) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
-    protected val databaseTables = DatabaseTables()
+    protected val databaseTables: DatabaseTables = DatabaseTables()
 
     fun loadNameTypes(reader: BaseCIMReader): Boolean {
         var status = true

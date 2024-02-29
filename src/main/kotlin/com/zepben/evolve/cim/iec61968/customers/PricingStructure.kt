@@ -30,7 +30,7 @@ class PricingStructure @JvmOverloads constructor(mRID: String = "") : Document(m
     /**
      * Get the number of entries in the [Tariff] collection.
      */
-    fun numTariffs() = _tariffs?.size ?: 0
+    fun numTariffs(): Int = _tariffs?.size ?: 0
 
     /**
      * All tariffs used by this pricing structure.
@@ -38,7 +38,7 @@ class PricingStructure @JvmOverloads constructor(mRID: String = "") : Document(m
      * @param mRID the mRID of the required [Tariff]
      * @return The [Tariff] with the specified [mRID] if it exists, otherwise null
      */
-    fun getTariff(mRID: String) = _tariffs?.getByMRID(mRID)
+    fun getTariff(mRID: String): Tariff? = _tariffs?.getByMRID(mRID)
 
     fun addTariff(tariff: Tariff): PricingStructure {
         if (validateReference(tariff, ::getTariff, "A Tariff"))

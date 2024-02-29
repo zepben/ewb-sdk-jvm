@@ -28,7 +28,7 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
     /**
      * @return True if this [Customer] has at least 1 EndDevice associated with it, false otherwise.
      */
-    fun hasEndDevices() = numEndDevices?.let { it > 0 } ?: false
+    fun hasEndDevices(): Boolean = numEndDevices?.let { it > 0 } ?: false
 
     /**
      * All agreements of this customer. The returned collection is read only.
@@ -38,7 +38,7 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
     /**
      * Get the number of entries in the [CustomerAgreement] collection.
      */
-    fun numAgreements() = _customerAgreements?.size ?: 0
+    fun numAgreements(): Int = _customerAgreements?.size ?: 0
 
     /**
      * All agreements of this customer.
@@ -46,7 +46,7 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
      * @param mRID the mRID of the required [CustomerAgreement]
      * @return The [CustomerAgreement] with the specified [mRID] if it exists, otherwise null
      */
-    fun getAgreement(mRID: String) = _customerAgreements?.getByMRID(mRID)
+    fun getAgreement(mRID: String): CustomerAgreement? = _customerAgreements?.getByMRID(mRID)
 
     fun addAgreement(customerAgreement: CustomerAgreement): Customer {
         if (validateReference(customerAgreement, ::getAgreement, "A CustomerAgreement"))

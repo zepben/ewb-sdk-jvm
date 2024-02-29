@@ -62,7 +62,7 @@ internal class DiagramServiceUtilsTest {
     }
 
     @Test
-    fun `supports all diagram service types`() {
+    internal fun `supports all diagram service types`() {
         verifyWhenServiceObjectFunctionSupportsAllServiceObjectTypes(DiagramService().supportedKClasses, ::whenDiagramServiceObjectProxy)
     }
 
@@ -73,4 +73,3 @@ internal class DiagramServiceUtilsTest {
         object : IdentifiedObject() {}.also { whenDiagramServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }
-

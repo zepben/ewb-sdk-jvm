@@ -126,11 +126,11 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
         tryRpc {
             val results = mutableMapOf<String, IdentifiedObject>()
             val failed = mRIDs?.toMutableSet() ?: mutableSetOf()
-            processor().forEach { result ->
-                result.identifiedObject?.let {
+            processor().forEach { (identifiedObject, mRID) ->
+                identifiedObject?.let {
                     results[it.mRID] = it
                     failed.remove(it.mRID)
-                } ?: failed.add(result.mRID)
+                } ?: failed.add(mRID)
             }
             MultiObjectResult(results, failed)
         }

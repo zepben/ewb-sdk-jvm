@@ -18,6 +18,8 @@
   * Renamed `RelayInfo.removeDelay` to `RelayInfo.removeDelayAt`. The original method name has been repurposed to remove a delay by its value rather than its
     index.
 * Reworked values for enumerable type `ProtectionKind`.
+* Removed `IdentifiedObject.removeNamesFromTypes()`. Use `IdentifiedObject.clearNames()` instead.
+* Removed `DiagramServiceInstanceCache` and `NetworkServiceInstanceCache`.
 
 ### New Features
 
@@ -47,6 +49,12 @@
   * `RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit)`
   * `RelayInfo.removeDelay(delay: Double?): Boolean`
     * The original method with this name has been renamed to `RelayInfo.removeDelayAt(index: Int): Double?`.
+* Cleaned up code using IntelliJ code inspection. Some typos in documentation have also been fixed.
+* Added missing `@JvmOverloads` for the constructors of the following CIM classes: `NoLoadTest`, `OpenCircuitTest`, `PowerTransformerInfo`, `ShortCircuitTest`,
+  `ShuntCompensatorInfo`, `SwitchInfo`, `TransformerEndInfo`, `TransformerTankInfo`, `Pole`, `Streetlight`, `TapChangerControl`, `TransformerStarImpedance`,
+  `BatteryUnit`, `PhotoVoltaicUnit`, `PowerElectronicsWindUnit`, and `EvChargingUnit`.
+* Added helper properties `t1`, `t2`, and `t3` to `ConductingEquipment` which get the first, second, and third terminal respectively. A `NullPointerException`
+  is thrown if there is no such terminal (e.g. evaluating `br.t3` for a breaker `br` that has only two terminals).
 
 ### Fixes
 
@@ -101,7 +109,7 @@
 
 ### Breaking Changes
 
-* Deprecated old style accessors in favour of Kotlin accessors for `SinglePhaseKind`. To use the new function make the folloiwng modification to your code:
+* Deprecated old style accessors in favour of Kotlin accessors for `SinglePhaseKind`. To use the new function make the following modification to your code:
     * Kotlin:
         * `spk.value()` -> `spk.value`
         * `spk.maskIndex()` -> `spk.maskIndex`
@@ -157,7 +165,7 @@
 ### Fixes
 
 * Asking for the traced phases as a phase code when there are no nominal phases no longer throws.
-* Feeder directions are now stopped at substation transformers in the same way as assigning equipment incase the feeder has no breaker, or the start point is
+* Feeder directions are now stopped at substation transformers in the same way as assigning equipment in case the feeder has no breaker, or the start point is
   not inline.
 
 ### Notes

@@ -13,15 +13,15 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 @Suppress("PropertyName")
 class TableMetadataDataSources : SqliteTable() {
 
-    val SOURCE = Column(++columnIndex, "source", "TEXT", NOT_NULL)
-    val VERSION = Column(++columnIndex, "version", "TEXT", NOT_NULL)
-    val TIMESTAMP = Column(++columnIndex, "timestamp", "TEXT", NOT_NULL)
+    val SOURCE: Column = Column(++columnIndex, "source", "TEXT", NOT_NULL)
+    val VERSION: Column = Column(++columnIndex, "version", "TEXT", NOT_NULL)
+    val TIMESTAMP: Column = Column(++columnIndex, "timestamp", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "metadata_data_sources"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableMetadataDataSources> = this.javaClass
+    override val tableClassInstance: TableMetadataDataSources = this
 
 }

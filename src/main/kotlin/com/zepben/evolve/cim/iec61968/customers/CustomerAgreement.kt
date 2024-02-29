@@ -37,7 +37,7 @@ class CustomerAgreement @JvmOverloads constructor(mRID: String = "") : Agreement
     /**
      * Get the number of entries in the [PricingStructure] collection.
      */
-    fun numPricingStructures() = _pricingStructures?.size ?: 0
+    fun numPricingStructures(): Int = _pricingStructures?.size ?: 0
 
     /**
      * All pricing structures applicable to this customer agreement.
@@ -45,7 +45,7 @@ class CustomerAgreement @JvmOverloads constructor(mRID: String = "") : Agreement
      * @param mRID the mRID of the required [PricingStructure]
      * @return The [PricingStructure] with the specified [mRID] if it exists, otherwise null
      */
-    fun getPricingStructure(mRID: String) = _pricingStructures?.getByMRID(mRID)
+    fun getPricingStructure(mRID: String): PricingStructure? = _pricingStructures?.getByMRID(mRID)
 
     fun addPricingStructure(pricingStructure: PricingStructure): CustomerAgreement {
         if (validateReference(pricingStructure, ::getPricingStructure, "A PricingStructure"))

@@ -20,7 +20,6 @@ import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.Tracing
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 
 fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode = PhaseCode.A): EnergySource =
     EnergySource(id).apply {
@@ -36,7 +35,7 @@ fun createSourceForConnecting(network: NetworkService, id: String, numTerminals:
         network.add(this)
     }
 
-fun createNodeForConnecting(network: NetworkService, id: String, numTerminals: Int, nominalPhases: PhaseCode = PhaseCode.A): Junction =
+fun createJunctionForConnecting(network: NetworkService, id: String, numTerminals: Int, nominalPhases: PhaseCode = PhaseCode.A): Junction =
     Junction(id).apply {
         name = "test name"
         createTerminals(network, this, numTerminals, nominalPhases)
@@ -140,14 +139,14 @@ fun createTerminals(network: NetworkService, condEq: ConductingEquipment, numTer
         createTerminal(network, condEq, nominalPhases, i)
 }
 
-fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment?, phases: PhaseCode = PhaseCode.A, sequenceNumber: Int) =
+fun createTerminal(network: NetworkService, conductingEquipment: ConductingEquipment?, phases: PhaseCode = PhaseCode.A, sequenceNumber: Int): Terminal =
     conductingEquipment?.getTerminal(sequenceNumber) ?: Terminal(conductingEquipment?.mRID?.let { "$it-t$sequenceNumber" } ?: "").apply {
         this.conductingEquipment = conductingEquipment
         this.phases = phases
         this.sequenceNumber = sequenceNumber
         conductingEquipment?.addTerminal(this)
 
-        assertThat(network.add(this), equalTo(true))
+        assertThat("Initial add should return true", network.add(this))
     }
 
 fun createSubstation(networkService: NetworkService, mRID: String, name: String, subGeographicalRegion: SubGeographicalRegion? = null): Substation =
@@ -174,7 +173,7 @@ fun createFeeder(
         this.name = name
 
         if (feederStartPoint != null)
-            normalHeadTerminal = headTerminal ?: feederStartPoint.getTerminal(1)!!
+            normalHeadTerminal = headTerminal ?: feederStartPoint.t1
 
         if (substation != null) {
             normalEnergizingSubstation = substation
@@ -184,7 +183,7 @@ fun createFeeder(
         networkService.add(this)
     }
 
-fun createFeeder(networkService: NetworkService, mRID: String, name: String, substation: Substation, vararg equipmentMRIDs: String?) =
+fun createFeeder(networkService: NetworkService, mRID: String, name: String, substation: Substation, vararg equipmentMRIDs: String?): Feeder =
     createFeeder(networkService, mRID, name, substation, networkService.get(ConductingEquipment::class, equipmentMRIDs[0]))
         .apply {
             for (equipmentMRID in equipmentMRIDs) {
@@ -195,7 +194,7 @@ fun createFeeder(networkService: NetworkService, mRID: String, name: String, sub
             }
         }
 
-fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int? = null, endNumber: Int = 0) =
+fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int? = null, endNumber: Int = 0): PowerTransformerEnd =
     PowerTransformerEnd().also {
         it.ratedU = ratedU
         it.endNumber = endNumber
@@ -204,7 +203,7 @@ fun createEnd(networkService: NetworkService, tx: PowerTransformer, ratedU: Int?
         networkService.add(it)
     }
 
-fun createOperationalRestriction(networkService: NetworkService, mRID: String, name: String, vararg equipmentMRIDs: String) =
+fun createOperationalRestriction(networkService: NetworkService, mRID: String, name: String, vararg equipmentMRIDs: String): OperationalRestriction =
     OperationalRestriction(mRID).apply {
         this.name = name
 

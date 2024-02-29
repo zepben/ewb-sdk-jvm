@@ -15,7 +15,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetInfo
 @Suppress("PropertyName")
 abstract class TableWireInfo : TableAssetInfo() {
 
-    val RATED_CURRENT = Column(++columnIndex, "rated_current", "NUMBER", NULL)
-    val MATERIAL = Column(++columnIndex, "material", "TEXT", NOT_NULL)
+    val RATED_CURRENT: Column = Column(++columnIndex, "rated_current", "NUMBER", NULL)
+    val MATERIAL: Column = Column(++columnIndex, "material", "TEXT", NOT_NULL)
 
 }

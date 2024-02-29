@@ -39,7 +39,7 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
     /**
      * Get the number of entries in the current [Equipment] collection.
      */
-    override fun numCurrentEquipment() = _currentEquipmentById?.size ?: 0
+    override fun numCurrentEquipment(): Int = _currentEquipmentById?.size ?: 0
 
     /**
      * Contained equipment using the current state of the network.
@@ -47,7 +47,7 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
      * @param mRID the mRID of the required current [Equipment]
      * @return The [Equipment] with the specified [mRID] if it exists, otherwise null
      */
-    override fun getCurrentEquipment(mRID: String) = _currentEquipmentById?.get(mRID)
+    override fun getCurrentEquipment(mRID: String): Equipment? = _currentEquipmentById?.get(mRID)
 
     /**
      * @param equipment the equipment to associate with this feeder in the current state of the network.
@@ -87,7 +87,7 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
     /**
      * Get the number of entries in the normal [LvFeeder] collection.
      */
-    fun numNormalEnergizedLvFeeders() = _normalEnergizedLvFeedersById?.size ?: 0
+    fun numNormalEnergizedLvFeeders(): Int = _normalEnergizedLvFeedersById?.size ?: 0
 
     /**
      * Energized LV feeder using the normal state of the network.
@@ -95,7 +95,7 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
      * @param mRID the mRID of the required normal [LvFeeder]
      * @return The [LvFeeder] with the specified [mRID] if it exists, otherwise null
      */
-    fun getNormalEnergizedLvFeeder(mRID: String) = _normalEnergizedLvFeedersById?.get(mRID)
+    fun getNormalEnergizedLvFeeder(mRID: String): LvFeeder? = _normalEnergizedLvFeedersById?.get(mRID)
 
     /**
      * @param lvFeeder the LV feeder to associate with this feeder in the normal state of the network.

@@ -11,12 +11,6 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.services.common.BaseService
-import kotlin.reflect.KClass
-
-private val supportedClasses: Set<KClass<out IdentifiedObject>> = setOf(
-    Diagram::class,
-    DiagramObject::class
-)
 
 /**
  * Maintains an in-memory model of diagrams.

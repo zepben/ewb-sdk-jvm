@@ -383,7 +383,7 @@ fun toCim(pb: PBRelayInfo, networkService: NetworkService): RelayInfo =
         curveSetting = pb.curveSetting.takeIf { it.isNotBlank() }
         recloseFast = pb.recloseFastSet.takeUnless { pb.hasRecloseFastNull() }
         pb.recloseDelaysList.forEach {
-            addDelay(it,)
+            addDelay(it)
         }
         toCim(pb.ai, this, networkService)
     }

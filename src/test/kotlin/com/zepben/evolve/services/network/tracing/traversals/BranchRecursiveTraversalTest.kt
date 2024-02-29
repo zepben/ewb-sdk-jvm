@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
  * I'm not entirely sure how to test this class thoroughly...
  * Testing some basic things for now (2015-12-01)
  */
-class BranchRecursiveTraversalTest {
+internal class BranchRecursiveTraversalTest {
 
     private val visitOrder = mutableListOf<Int>()
     private var stopCount = 0
@@ -31,7 +31,7 @@ class BranchRecursiveTraversalTest {
         .addStopCondition { ++stopCount; false }
 
     @Test
-    fun simpleTest() {
+    internal fun simpleTest() {
         traversal.run(0)
 
         assertThat(visitOrder, contains(0, 1, 2, 3, 3, 2, 1))
@@ -39,7 +39,7 @@ class BranchRecursiveTraversalTest {
     }
 
     @Test
-    fun canControlStoppingOnFirstAsset() {
+    internal fun canControlStoppingOnFirstAsset() {
         traversal.addStopCondition { i -> i == 0 }
             .run(0, false)
 
@@ -50,7 +50,7 @@ class BranchRecursiveTraversalTest {
         visitOrder.clear()
         stopCount = 0
 
-        traversal.run(0, true)
+        traversal.run(0)
 
         assertThat<List<Int>>(visitOrder, contains(0))
         assertThat(stopCount, equalTo(visitOrder.size))

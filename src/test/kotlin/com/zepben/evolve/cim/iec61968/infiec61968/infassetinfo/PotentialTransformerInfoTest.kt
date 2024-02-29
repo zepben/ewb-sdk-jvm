@@ -40,7 +40,7 @@ internal class PotentialTransformerInfoTest {
         assertThat(potentialTransformerInfo.ratedVoltage, nullValue())
         assertThat(potentialTransformerInfo.secondaryRatio, nullValue())
 
-        potentialTransformerInfo.fillFields(NetworkService(), true)
+        potentialTransformerInfo.fillFields(NetworkService())
 
         assertThat(potentialTransformerInfo.accuracyClass, equalTo("accuracyClass"))
         assertThat(potentialTransformerInfo.nominalRatio, equalTo(Ratio(1.1, 2.2)))

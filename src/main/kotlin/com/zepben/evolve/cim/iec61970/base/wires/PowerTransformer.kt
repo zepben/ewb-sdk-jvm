@@ -31,12 +31,12 @@ import com.zepben.evolve.services.common.extensions.*
  * @property vectorGroup Vector group of the transformer for protective relaying, e.g., Dyn1. For unbalanced transformers, this may not be simply
  * determined from the constituent winding connections and phase angle displacements.
  *
- * The vectorGroup string consists of the following components in the order listed: high voltage winding connection, mid voltage winding connection(for three
+ * The vectorGroup string consists of the following components in the order listed: high voltage winding connection, mid-voltage winding connection(for three
  * winding transformers), phase displacement clock number from 0 to 11,  low voltage winding connection phase displacement clock number from 0 to 11.
  * The winding connections are D(delta), Y(wye), YN(wye with neutral), Z(zigzag), ZN(zigzag with neutral), A(auto transformer). Upper case means the high
  * voltage, lower case mid or low.The high voltage winding always has clock position 0 and is not included in the vector group string.
  * Some examples: YNy0(two winding wye to wye with no phase displacement), YNd11(two winding wye to delta with 330 degrees phase displacement),
- * YNyn0d5(three winding transformer wye with neutral high voltage, wye with neutral mid voltage and no phase displacement, delta low voltage with 150 degrees
+ * YNyn0d5(three winding transformer wye with neutral high voltage, wye with neutral mid-voltage and no phase displacement, delta low voltage with 150 degrees
  * displacement).
  *
  * Phase displacement is defined as the angular difference between the phasors representing the voltages between the neutral point(real or imaginary) and the
@@ -192,4 +192,3 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
         return false
     }
 }
-

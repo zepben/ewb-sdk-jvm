@@ -24,7 +24,7 @@ class GeographicalRegion @JvmOverloads constructor(mRID: String = "") : Identifi
     /**
      * Get the number of entries in the [SubGeographicalRegion] collection.
      */
-    fun numSubGeographicalRegions() = _subGeographicalRegions?.size ?: 0
+    fun numSubGeographicalRegions(): Int = _subGeographicalRegions?.size ?: 0
 
     /**
      * All sub-geographical regions within this geographical region.
@@ -32,7 +32,7 @@ class GeographicalRegion @JvmOverloads constructor(mRID: String = "") : Identifi
      * @param mRID the mRID of the required [SubGeographicalRegion]
      * @return The [SubGeographicalRegion] with the specified [mRID] if it exists, otherwise null
      */
-    fun getSubGeographicalRegion(mRID: String) = _subGeographicalRegions.getByMRID(mRID)
+    fun getSubGeographicalRegion(mRID: String): SubGeographicalRegion? = _subGeographicalRegions.getByMRID(mRID)
 
     /**
      * @param subGeographicalRegion The sub geographical region to associate within this geographical region.

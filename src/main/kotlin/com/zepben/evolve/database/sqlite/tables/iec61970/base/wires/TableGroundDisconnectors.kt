@@ -14,7 +14,7 @@ class TableGroundDisconnectors : TableSwitches() {
         return "ground_disconnectors"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableGroundDisconnectors> = this.javaClass
+    override val tableClassInstance: TableGroundDisconnectors = this
 
 }

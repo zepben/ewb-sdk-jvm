@@ -26,7 +26,7 @@ internal class TokenCallCredentialsTest {
     }
 
     @Test
-    fun applyRequestMetadata() {
+    internal fun applyRequestMetadata() {
         mockkConstructor(Metadata::class)
         val requestInfo = mockk<RequestInfo>()
         val executor = mockk<Executor>()
@@ -41,7 +41,7 @@ internal class TokenCallCredentialsTest {
     }
 
     @Test
-    fun applyRequestMetadataFailsWithException() {
+    internal fun applyRequestMetadataFailsWithException() {
         mockkConstructor(Metadata::class)
         val requestInfo = mockk<RequestInfo>()
         val executor = mockk<Executor>()
@@ -62,7 +62,7 @@ internal class TokenCallCredentialsTest {
     }
 
     @Test
-    fun thisUsesUnstableApiCoverage() {
+    internal fun thisUsesUnstableApiCoverage() {
         TokenCallCredentials { "token" }.thisUsesUnstableApi()
     }
 }

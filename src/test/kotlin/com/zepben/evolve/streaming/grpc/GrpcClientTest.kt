@@ -119,7 +119,7 @@ internal class GrpcClientTest {
     private fun validateFailure(expectHandled: Boolean) {
         val result = client.throwViaSafeTryRpc()
 
-        assertThat(result.wasFailure, equalTo(true))
+        assertThat("Result should be failure", result.wasFailure)
         assertThat(result.thrown, equalTo(client.ex))
         assertThat(result.wasErrorHandled, equalTo(expectHandled))
     }

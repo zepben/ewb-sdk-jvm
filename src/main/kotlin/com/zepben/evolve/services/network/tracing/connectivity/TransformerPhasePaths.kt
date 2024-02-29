@@ -17,7 +17,7 @@ object TransformerPhasePaths {
 
     private fun path(from: SPK, to: SPK) = NominalPhasePath(from, to)
 
-    // THis is used to indicate that a transformer adds a neutral and it should be energised from the transformer.
+    // This is used to indicate that a transformer adds a neutral, and it should be energised from the transformer.
     private val addNeutral = path(SPK.NONE, SPK.N)
 
     /**

@@ -14,7 +14,6 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
  * exchange contexts:
  * - as attributes of an asset instance (installed or in stock)
  * - as attributes of an asset model (product by a manufacturer)
- * - as attributes of a type asset (generic type of an asset as used in designs/extension planning).
+ * - as attributes of a type asset (generic type of asset as used in designs/extension planning).
  */
 abstract class AssetInfo(mRID: String = "") : IdentifiedObject(mRID)
-

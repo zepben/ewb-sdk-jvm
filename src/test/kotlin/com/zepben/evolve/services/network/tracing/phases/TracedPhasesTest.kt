@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
-class TracedPhasesTest {
+internal class TracedPhasesTest {
 
     @JvmField
     @RegisterExtension
@@ -26,17 +26,17 @@ class TracedPhasesTest {
     private val tracedPhases = TracedPhases(terminal = Terminal().apply { phases = PhaseCode.ABCN })
 
     @Test
-    fun testSetAndGet() {
+    internal fun testSetAndGet() {
         /* -- Setting -- */
-        assertThat(tracedPhases.setNormal(SPK.A, SPK.N), equalTo(true))
-        assertThat(tracedPhases.setNormal(SPK.B, SPK.C), equalTo(true))
-        assertThat(tracedPhases.setNormal(SPK.C, SPK.B), equalTo(true))
-        assertThat(tracedPhases.setNormal(SPK.N, SPK.A), equalTo(true))
+        assertThat("Should return true when setting normal traced phase of A to N", tracedPhases.setNormal(SPK.A, SPK.N))
+        assertThat("Should return true when setting normal traced phase of B to C", tracedPhases.setNormal(SPK.B, SPK.C))
+        assertThat("Should return true when setting normal traced phase of C to B", tracedPhases.setNormal(SPK.C, SPK.B))
+        assertThat("Should return true when setting normal traced phase of N to A", tracedPhases.setNormal(SPK.N, SPK.A))
 
-        assertThat(tracedPhases.setCurrent(SPK.A, SPK.A), equalTo(true))
-        assertThat(tracedPhases.setCurrent(SPK.B, SPK.B), equalTo(true))
-        assertThat(tracedPhases.setCurrent(SPK.C, SPK.C), equalTo(true))
-        assertThat(tracedPhases.setCurrent(SPK.N, SPK.N), equalTo(true))
+        assertThat("Should return true when setting current traced phase of A to A", tracedPhases.setCurrent(SPK.A, SPK.A))
+        assertThat("Should return true when setting current traced phase of B to B", tracedPhases.setCurrent(SPK.B, SPK.B))
+        assertThat("Should return true when setting current traced phase of C to C", tracedPhases.setCurrent(SPK.C, SPK.C))
+        assertThat("Should return true when setting current traced phase of N to N", tracedPhases.setCurrent(SPK.N, SPK.N))
 
         /* -- Getting Phase-- */
         assertThat(tracedPhases.normal[SPK.A], equalTo(SPK.N))
@@ -50,26 +50,26 @@ class TracedPhasesTest {
         assertThat(tracedPhases.current[SPK.N], equalTo(SPK.N))
 
         /* -- Setting Unchanged -- */
-        assertThat(tracedPhases.setNormal(SPK.A, SPK.N), equalTo(false))
-        assertThat(tracedPhases.setNormal(SPK.B, SPK.C), equalTo(false))
-        assertThat(tracedPhases.setNormal(SPK.C, SPK.B), equalTo(false))
-        assertThat(tracedPhases.setNormal(SPK.N, SPK.A), equalTo(false))
+        assertThat("Should return false when attempting to set already-set normal traced phase of A", !tracedPhases.setNormal(SPK.A, SPK.N))
+        assertThat("Should return false when attempting to set already-set normal traced phase of B", !tracedPhases.setNormal(SPK.B, SPK.C))
+        assertThat("Should return false when attempting to set already-set normal traced phase of C", !tracedPhases.setNormal(SPK.C, SPK.B))
+        assertThat("Should return false when attempting to set already-set normal traced phase of N", !tracedPhases.setNormal(SPK.N, SPK.A))
 
-        assertThat(tracedPhases.setCurrent(SPK.A, SPK.A), equalTo(false))
-        assertThat(tracedPhases.setCurrent(SPK.B, SPK.B), equalTo(false))
-        assertThat(tracedPhases.setCurrent(SPK.C, SPK.C), equalTo(false))
-        assertThat(tracedPhases.setCurrent(SPK.N, SPK.N), equalTo(false))
+        assertThat("Should return false when attempting to set already-set current traced phase of A", !tracedPhases.setCurrent(SPK.A, SPK.A))
+        assertThat("Should return false when attempting to set already-set current traced phase of B", !tracedPhases.setCurrent(SPK.B, SPK.B))
+        assertThat("Should return false when attempting to set already-set current traced phase of C", !tracedPhases.setCurrent(SPK.C, SPK.C))
+        assertThat("Should return false when attempting to set already-set current traced phase of N", !tracedPhases.setCurrent(SPK.N, SPK.N))
     }
 
     @Test
-    fun testInvalidNominalPhaseNormal() {
+    internal fun testInvalidNominalPhaseNormal() {
         expect { tracedPhases.normal[SPK.INVALID] }
             .toThrow<IllegalArgumentException>()
             .withMessage("INTERNAL ERROR: Phase INVALID is invalid.")
     }
 
     @Test
-    fun testCrossingPhasesExceptionNormal() {
+    internal fun testCrossingPhasesExceptionNormal() {
         expect {
             tracedPhases.setNormal(SPK.A, SPK.A)
             tracedPhases.setNormal(SPK.A, SPK.B)
@@ -78,13 +78,13 @@ class TracedPhasesTest {
     }
 
     @Test
-    fun testInvalidNominalPhaseCurrent() {
+    internal fun testInvalidNominalPhaseCurrent() {
         expect { tracedPhases.current[SPK.INVALID] }
             .toThrow<IllegalArgumentException>()
     }
 
     @Test
-    fun testCrossingPhasesExceptionCurrent() {
+    internal fun testCrossingPhasesExceptionCurrent() {
         expect {
             tracedPhases.setCurrent(SPK.A, SPK.A)
             tracedPhases.setCurrent(SPK.A, SPK.B)

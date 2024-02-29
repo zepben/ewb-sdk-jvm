@@ -15,10 +15,10 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TablePowerSys
 @Suppress("PropertyName")
 class TablePowerElectronicsConnectionPhases : TablePowerSystemResources() {
 
-    val POWER_ELECTRONICS_CONNECTION_MRID = Column(++columnIndex, "power_electronics_connection_mrid", "TEXT", NULL)
-    val P = Column(++columnIndex, "p", "NUMBER", NULL)
-    val PHASE = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
-    val Q = Column(++columnIndex, "q", "NUMBER", NULL)
+    val POWER_ELECTRONICS_CONNECTION_MRID: Column = Column(++columnIndex, "power_electronics_connection_mrid", "TEXT", NULL)
+    val P: Column = Column(++columnIndex, "p", "NUMBER", NULL)
+    val PHASE: Column = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
+    val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)
 
     override fun name(): String {
         return "power_electronics_connection_phase"
@@ -30,7 +30,7 @@ class TablePowerElectronicsConnectionPhases : TablePowerSystemResources() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TablePowerElectronicsConnectionPhases> = this.javaClass
+    override val tableClassInstance: TablePowerElectronicsConnectionPhases = this
 
 }

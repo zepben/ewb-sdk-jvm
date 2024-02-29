@@ -29,7 +29,6 @@ abstract class PowerSystemResource(mRID: String = "") : IdentifiedObject(mRID) {
     /**
      * @return True if this [PowerSystemResource] has at least 1 Control associated with it, false otherwise.
      */
-    fun hasControls() = numControls > 0
+    fun hasControls(): Boolean = numControls > 0
 
 }
-

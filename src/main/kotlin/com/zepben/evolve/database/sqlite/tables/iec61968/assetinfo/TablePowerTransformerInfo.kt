@@ -15,7 +15,7 @@ class TablePowerTransformerInfo : TableAssetInfo() {
         return "power_transformer_info"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TablePowerTransformerInfo> = this.javaClass
+    override val tableClassInstance: TablePowerTransformerInfo = this
 
 }

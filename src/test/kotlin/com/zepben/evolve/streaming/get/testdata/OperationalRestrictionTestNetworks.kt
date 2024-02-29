@@ -26,7 +26,7 @@ object OperationalRestrictionTestNetworks {
 
         val source = createSourceForConnecting(networkService, "source", 1, PhaseCode.AB)
         val fcb = createSwitchForConnecting(networkService, "fcb", 2, nominalPhases = PhaseCode.AB)
-        val fsp = createNodeForConnecting(networkService, "fsp", 2, PhaseCode.AB)
+        val fsp = createJunctionForConnecting(networkService, "fsp", 2, PhaseCode.AB)
         val tx = createPowerTransformerForConnecting(networkService, "tx", 2, 0, 0, PhaseCode.AB)
 
         val c1 = createAcLineSegmentForConnecting(networkService, "c1", PhaseCode.AB)
@@ -44,11 +44,11 @@ object OperationalRestrictionTestNetworks {
         addLocation(networkService, c1, listOf(1.0, 1.0, 5.0, 1.0))
         addLocation(networkService, c2, listOf(5.0, 1.0, 10.0, 2.0))
 
-        networkService.connect(source.getTerminal(1)!!, fcb.getTerminal(1)!!)
-        networkService.connect(fcb.getTerminal(2)!!, c1.getTerminal(1)!!)
-        networkService.connect(c1.getTerminal(2)!!, fsp.getTerminal(1)!!)
-        networkService.connect(fsp.getTerminal(2)!!, c2.getTerminal(1)!!)
-        networkService.connect(c2.getTerminal(2)!!, tx.getTerminal(1)!!)
+        networkService.connect(source.t1, fcb.t1)
+        networkService.connect(fcb.t2, c1.t1)
+        networkService.connect(c1.t2, fsp.t1)
+        networkService.connect(fsp.t2, c2.t1)
+        networkService.connect(c2.t2, tx.t1)
 
         return networkService
     }

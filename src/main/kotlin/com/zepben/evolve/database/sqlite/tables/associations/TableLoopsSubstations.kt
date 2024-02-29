@@ -14,9 +14,9 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableLoopsSubstations : SqliteTable() {
 
-    val LOOP_MRID = Column(++columnIndex, "loop_mrid", "TEXT", NOT_NULL)
-    val SUBSTATION_MRID = Column(++columnIndex, "substation_mrid", "TEXT", NOT_NULL)
-    val RELATIONSHIP = Column(++columnIndex, "relationship", "TEXT", NOT_NULL)
+    val LOOP_MRID: Column = Column(++columnIndex, "loop_mrid", "TEXT", NOT_NULL)
+    val SUBSTATION_MRID: Column = Column(++columnIndex, "substation_mrid", "TEXT", NOT_NULL)
+    val RELATIONSHIP: Column = Column(++columnIndex, "relationship", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "loops_substations"
@@ -39,7 +39,7 @@ class TableLoopsSubstations : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableLoopsSubstations> = this.javaClass
+    override val tableClassInstance: TableLoopsSubstations = this
 
 }

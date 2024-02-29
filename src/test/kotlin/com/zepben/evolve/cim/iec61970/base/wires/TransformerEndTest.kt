@@ -42,7 +42,7 @@ internal class TransformerEndTest {
         assertThat(transformerEnd.terminal, nullValue())
         assertThat(transformerEnd.starImpedance, nullValue())
 
-        transformerEnd.fillFields(NetworkService(), true)
+        transformerEnd.fillFields(NetworkService())
 
         assertThat(transformerEnd.grounded, equalTo(true))
         assertThat(transformerEnd.rGround, equalTo(1.0))

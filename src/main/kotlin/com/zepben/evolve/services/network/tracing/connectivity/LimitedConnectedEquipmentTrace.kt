@@ -60,7 +60,7 @@ class LimitedConnectedEquipmentTrace(
         maximumSteps: Int,
         feederDirection: FeederDirection
     ): List<ConductingEquipmentStep> {
-        val matchingEquipment = mutableListOf<ConductingEquipmentStep>().apply { addAll(startingEquipment.map { ConductingEquipmentStep(it, 0) }) }
+        val matchingEquipment = mutableListOf<ConductingEquipmentStep>().apply { addAll(startingEquipment.map { ConductingEquipmentStep(it) }) }
 
         startingEquipment
             .asSequence()

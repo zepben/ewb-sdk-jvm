@@ -40,7 +40,7 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
     /**
      * Get the number of entries in the [UsagePoint] collection.
      */
-    fun numUsagePoints() = _usagePoints?.size ?: 0
+    fun numUsagePoints(): Int = _usagePoints?.size ?: 0
 
     /**
      * Usage point to which this end device belongs.
@@ -48,7 +48,7 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
      * @param mRID the mRID of the required [UsagePoint]
      * @return The [UsagePoint] with the specified [mRID] if it exists, otherwise null
      */
-    fun getUsagePoint(mRID: String) = _usagePoints?.asSequence()?.firstOrNull { it.mRID == mRID }
+    fun getUsagePoint(mRID: String): UsagePoint? = _usagePoints?.firstOrNull { it.mRID == mRID }
 
     /**
      * @param usagePoint the usage point to associate with this end device.

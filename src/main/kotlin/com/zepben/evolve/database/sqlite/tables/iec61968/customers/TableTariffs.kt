@@ -15,7 +15,7 @@ class TableTariffs : TableDocuments() {
         return "tariffs"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableTariffs> = this.javaClass
+    override val tableClassInstance: TableTariffs = this
 
 }

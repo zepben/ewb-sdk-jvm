@@ -15,12 +15,12 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TablePowerSys
 @Suppress("PropertyName")
 class TableEnergyConsumerPhases : TablePowerSystemResources() {
 
-    val ENERGY_CONSUMER_MRID = Column(++columnIndex, "energy_consumer_mrid", "TEXT", NOT_NULL)
-    val PHASE = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
-    val P = Column(++columnIndex, "p", "NUMBER", NULL)
-    val Q = Column(++columnIndex, "q", "NUMBER", NULL)
-    val P_FIXED = Column(++columnIndex, "p_fixed", "NUMBER", NULL)
-    val Q_FIXED = Column(++columnIndex, "q_fixed", "NUMBER", NULL)
+    val ENERGY_CONSUMER_MRID: Column = Column(++columnIndex, "energy_consumer_mrid", "TEXT", NOT_NULL)
+    val PHASE: Column = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
+    val P: Column = Column(++columnIndex, "p", "NUMBER", NULL)
+    val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)
+    val P_FIXED: Column = Column(++columnIndex, "p_fixed", "NUMBER", NULL)
+    val Q_FIXED: Column = Column(++columnIndex, "q_fixed", "NUMBER", NULL)
 
     override fun name(): String {
         return "energy_consumer_phases"
@@ -42,7 +42,7 @@ class TableEnergyConsumerPhases : TablePowerSystemResources() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableEnergyConsumerPhases> = this.javaClass
+    override val tableClassInstance: TableEnergyConsumerPhases = this
 
 }

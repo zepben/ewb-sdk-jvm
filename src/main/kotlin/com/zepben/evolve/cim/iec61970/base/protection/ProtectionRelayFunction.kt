@@ -385,11 +385,11 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
  *
  * @param action The action to perform on each time limit
  */
-fun ProtectionRelayFunction.forEachTimeLimits(action: (sequenceNumber: Int, timeLimit: Double) -> Unit) = forEachTimeLimit(BiConsumer(action))
+fun ProtectionRelayFunction.forEachTimeLimits(action: (sequenceNumber: Int, timeLimit: Double) -> Unit): Unit = forEachTimeLimit(BiConsumer(action))
 
 /**
  * Perform the specified action against each threshold.
  *
  * @param action The action to perform on each threshold
  */
-fun ProtectionRelayFunction.forEachThreshold(action: (sequenceNumber: Int, threshold: RelaySetting) -> Unit) = forEachThreshold(BiConsumer(action))
+fun ProtectionRelayFunction.forEachThreshold(action: (sequenceNumber: Int, threshold: RelaySetting) -> Unit): Unit = forEachThreshold(BiConsumer(action))

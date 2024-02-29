@@ -19,7 +19,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class ConnectivityResultTest {
+internal class ConnectivityResultTest {
 
     @JvmField
     @RegisterExtension
@@ -37,9 +37,9 @@ class ConnectivityResultTest {
         addTerminal(Terminal().apply { phases = PhaseCode.A })
     }
 
-    private val terminal11 = asset1.getTerminal(1)!!
-    private val terminal12 = asset1.getTerminal(2)!!
-    private val terminal21 = asset2.getTerminal(1)!!
+    private val terminal11 = asset1.t1
+    private val terminal12 = asset1.t2
+    private val terminal21 = asset2.t1
 
     @Test
     internal fun accessors() {

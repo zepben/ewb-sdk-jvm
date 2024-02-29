@@ -129,4 +129,4 @@ class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
  *
  * @param action The action to perform on each reclose delay ([Double])
  */
-fun RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit) = forEachDelay(BiConsumer(action))
+fun RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit): Unit = forEachDelay(BiConsumer(action))

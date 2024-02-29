@@ -14,19 +14,19 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableEnergyConsumers : TableEnergyConnections() {
 
-    val CUSTOMER_COUNT = Column(++columnIndex, "customer_count", "INTEGER", NULL)
-    val GROUNDED = Column(++columnIndex, "grounded", "BOOLEAN", NOT_NULL)
-    val P = Column(++columnIndex, "p", "NUMBER", NULL)
-    val Q = Column(++columnIndex, "q", "NUMBER", NULL)
-    val P_FIXED = Column(++columnIndex, "p_fixed", "NUMBER", NULL)
-    val Q_FIXED = Column(++columnIndex, "q_fixed", "NUMBER", NULL)
-    val PHASE_CONNECTION = Column(++columnIndex, "phase_connection", "TEXT", NOT_NULL)
+    val CUSTOMER_COUNT: Column = Column(++columnIndex, "customer_count", "INTEGER", NULL)
+    val GROUNDED: Column = Column(++columnIndex, "grounded", "BOOLEAN", NOT_NULL)
+    val P: Column = Column(++columnIndex, "p", "NUMBER", NULL)
+    val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)
+    val P_FIXED: Column = Column(++columnIndex, "p_fixed", "NUMBER", NULL)
+    val Q_FIXED: Column = Column(++columnIndex, "q_fixed", "NUMBER", NULL)
+    val PHASE_CONNECTION: Column = Column(++columnIndex, "phase_connection", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "energy_consumers"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableEnergyConsumers> = this.javaClass
+    override val tableClassInstance: TableEnergyConsumers = this
 
 }

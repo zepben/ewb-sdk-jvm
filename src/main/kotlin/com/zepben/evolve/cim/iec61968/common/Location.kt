@@ -24,7 +24,7 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
     private var _positionPoints: MutableList<PositionPoint>? = null
 
     /**
-     * Sequence of position points describing this location, expressed in coordinate system [Location.CoordinateSystem].
+     * Sequence of [PositionPoint]s describing this location.
      * The returned collection is read only.
      */
     val points: List<PositionPoint> get() = _positionPoints.asUnmodifiable()
@@ -32,10 +32,10 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
     /**
      * Get the number of entries in the [PositionPoint] collection.
      */
-    fun numPoints() = _positionPoints?.size ?: 0
+    fun numPoints(): Int = _positionPoints?.size ?: 0
 
     /**
-     * Sequence of position points describing this location, expressed in coordinate system [Location.CoordinateSystem].
+     * Get a [PositionPoint] of this [Location] by its sequence number.
      *
      * @param sequenceNumber the sequence number of the required [PositionPoint]
      * @return The [PositionPoint] with the specified [sequenceNumber] if it exists, otherwise null
@@ -82,4 +82,4 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
  *
  * @param action The action to perform on each [PositionPoint]
  */
-fun Location.forEachPoint(action: (sequenceNumber: Int, point: PositionPoint) -> Unit) = forEachPoint(BiConsumer(action))
+fun Location.forEachPoint(action: (sequenceNumber: Int, point: PositionPoint) -> Unit): Unit = forEachPoint(BiConsumer(action))

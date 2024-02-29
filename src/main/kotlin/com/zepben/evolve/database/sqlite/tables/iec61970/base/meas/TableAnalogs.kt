@@ -13,13 +13,13 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 @Suppress("PropertyName")
 class TableAnalogs : TableMeasurements() {
 
-    val POSITIVE_FLOW_IN = Column(++columnIndex, "positive_flow_in", "BOOLEAN", NOT_NULL)
+    val POSITIVE_FLOW_IN: Column = Column(++columnIndex, "positive_flow_in", "BOOLEAN", NOT_NULL)
 
     override fun name(): String {
         return "analogs"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableAnalogs> = this.javaClass
+    override val tableClassInstance: TableAnalogs = this
 
 }

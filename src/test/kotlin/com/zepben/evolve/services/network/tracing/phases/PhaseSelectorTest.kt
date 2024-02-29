@@ -19,7 +19,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 
-class PhaseSelectorTest {
+internal class PhaseSelectorTest {
 
     private val normal = mock<PhaseStatus>()
     private val current = mock<PhaseStatus>()
@@ -30,7 +30,7 @@ class PhaseSelectorTest {
     private val terminal = mock<Terminal>().also { doReturn(tracedPhases).`when`(it).tracedPhases }
 
     @Test
-    fun testNormalPhaseSelectorGet() {
+    internal fun testNormalPhaseSelectorGet() {
         val ps = PhaseSelector.NORMAL_PHASES.phases(terminal)
 
         ps[SinglePhaseKind.A]
@@ -43,7 +43,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun testNormalPhaseSelectorSet() {
+    internal fun testNormalPhaseSelectorSet() {
         val ps = PhaseSelector.NORMAL_PHASES.phases(terminal)
 
         ps[SinglePhaseKind.B] = SinglePhaseKind.C
@@ -56,7 +56,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun testCurrentPhaseSelectorGet() {
+    internal fun testCurrentPhaseSelectorGet() {
         val ps = PhaseSelector.CURRENT_PHASES.phases(terminal)
 
         ps[SinglePhaseKind.X]
@@ -69,7 +69,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun testCurrentPhaseSelectorSet() {
+    internal fun testCurrentPhaseSelectorSet() {
         val ps = PhaseSelector.CURRENT_PHASES.phases(terminal)
 
         ps[SinglePhaseKind.Y] = SinglePhaseKind.N
@@ -82,7 +82,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun testAsPhaseCodeThree() {
+    internal fun testAsPhaseCodeThree() {
         val terminal = Terminal().apply { phases = PhaseCode.ABCN }
         val normalPhases = terminal.normalPhases
         val currentPhases = terminal.currentPhases
@@ -116,7 +116,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun testAsPhaseCodeSingle() {
+    internal fun testAsPhaseCodeSingle() {
         val terminal = Terminal().apply { phases = PhaseCode.BC }
         val normalPhases = terminal.normalPhases
         val currentPhases = terminal.currentPhases
@@ -144,7 +144,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun testAsPhaseCodeNone() {
+    internal fun testAsPhaseCodeNone() {
         val terminal = Terminal().apply { phases = PhaseCode.NONE }
         val normalPhases = terminal.normalPhases
         val currentPhases = terminal.currentPhases
@@ -162,7 +162,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun asPhaseCodeHandlesChangingTerminalPhases() {
+    internal fun asPhaseCodeHandlesChangingTerminalPhases() {
         val terminal = Terminal().apply { phases = PhaseCode.BC }
         val normalPhases = terminal.normalPhases
 
@@ -177,7 +177,7 @@ class PhaseSelectorTest {
     }
 
     @Test
-    fun asPhaseCodeDoesNotDropPhases() {
+    internal fun asPhaseCodeDoesNotDropPhases() {
         val terminal = Terminal().apply { phases = PhaseCode.BC }
         val normalPhases = terminal.normalPhases
 

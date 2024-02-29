@@ -7,6 +7,8 @@
  */
 package com.zepben.evolve.streaming.get
 
+import com.zepben.evolve.cim.iec61968.customers.Customer
+import com.zepben.evolve.cim.iec61970.base.core.EquipmentContainer
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.translator.mRID
 import com.zepben.evolve.services.customer.CustomerService
@@ -19,7 +21,7 @@ import com.zepben.protobuf.cc.CustomerIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
-import io.grpc.ManagedChannel
+import io.grpc.Channel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -48,11 +50,11 @@ class CustomerConsumerClient @JvmOverloads constructor(
     /**
      * Create a [CustomerConsumerClient]
      *
-     * @param channel [ManagedChannel] to build a stub from.
+     * @param channel [Channel] to build a stub from.
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+    constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
             CustomerConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
             executor = Executors.newSingleThreadExecutor()
@@ -65,26 +67,22 @@ class CustomerConsumerClient @JvmOverloads constructor(
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) :
-        this(
-            CustomerConsumerGrpc.newStub(channel.channel).apply { callCredentials?.let { withCallCredentials(it) } },
-            executor = Executors.newSingleThreadExecutor()
-        )
+    constructor(channel: GrpcChannel, callCredentials: CallCredentials? = null) : this(channel.channel, callCredentials)
 
     /**
      * Get the [Customer]s in the [EquipmentContainer] represented by [mRID].
      *
-     * @param mRIDs The mRID of the [EquipmentContainer]s to fetch [Customer]s for.
+     * @param mRID The mRID of the [EquipmentContainer]s to fetch [Customer]s for.
      * @return a [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [CustomerConsumerClient] warning in this case.
      */
-    fun getCustomersForContainer(mRID: String): GrpcResult<MultiObjectResult> = getCustomersForContainer(setOf(mRID))
+    fun getCustomersForContainer(mRID: String): GrpcResult<MultiObjectResult> = getCustomersForContainers(setOf(mRID))
 
     /**
-     * Get the [Customer]s in the [EquipmentContainer] represented by [mRID].
+     * Get the [Customer]s in the [EquipmentContainer]s represented by their [mRIDs].
      *
      * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch [Customer]s for.
      * @return a [GrpcResult] with a result of one of the following:
@@ -93,7 +91,7 @@ class CustomerConsumerClient @JvmOverloads constructor(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [CustomerConsumerClient] warning in this case.
      */
-    fun getCustomersForContainer(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
+    fun getCustomersForContainers(mRIDs: Set<String>): GrpcResult<MultiObjectResult> = handleMultiObjectRPC {
         processCustomersForContainers(mRIDs)
     }
 

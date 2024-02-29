@@ -14,10 +14,6 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 fun IdentifiedObject.nameAndMRID(): String = if (name.isBlank()) mRID else "'$name' [$mRID]"
 fun IdentifiedObject.typeNameAndMRID(): String = if (name.isBlank()) "${javaClass.simpleName} $mRID" else "${javaClass.simpleName} $name [$mRID]"
 
-internal fun <T : IdentifiedObject> Iterable<T>?.containsMRID(mRID: String): Boolean {
-    return getByMRID(mRID) != null
-}
-
 internal fun <T : IdentifiedObject> Iterable<T>?.getByMRID(mRID: String): T? {
     return this?.firstOrNull { it.mRID == mRID }
 }
@@ -31,9 +27,3 @@ internal fun IdentifiedObject.validateReference(other: IdentifiedObject, getter:
     return false
 }
 
-/**
- * Removes all names that belong to this object from their corresponding [NameType][com.zepben.evolve.cim.iec61970.base.core.NameType].
- */
-fun IdentifiedObject.removeNamesFromTypes() {
-    names.forEach { it.type.removeName(it) }
-}

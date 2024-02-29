@@ -13,7 +13,7 @@ class TableAssetOwners : TableAssetOrganisationRoles() {
         return "asset_owners"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableAssetOwners> = this.javaClass
+    override val tableClassInstance: TableAssetOwners = this
 
 }

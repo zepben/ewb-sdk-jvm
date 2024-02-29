@@ -84,7 +84,7 @@ class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnecti
     /**
      * Get the number of entries in the [EnergySourcePhase] collection.
      */
-    fun numPhases() = _energySourcePhases?.size ?: 0
+    fun numPhases(): Int = _energySourcePhases?.size ?: 0
 
     /**
      * The individual phase information of the energy source.
@@ -92,7 +92,7 @@ class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnecti
      * @param mRID the mRID of the required [EnergySourcePhase]
      * @return The [EnergySourcePhase] with the specified [mRID] if it exists, otherwise null
      */
-    fun getPhase(mRID: String) = _energySourcePhases?.getByMRID(mRID)
+    fun getPhase(mRID: String): EnergySourcePhase? = _energySourcePhases?.getByMRID(mRID)
 
     fun addPhase(phase: EnergySourcePhase): EnergySource {
         if (validateReference(phase, ::getPhase, "An EnergySourcePhase"))

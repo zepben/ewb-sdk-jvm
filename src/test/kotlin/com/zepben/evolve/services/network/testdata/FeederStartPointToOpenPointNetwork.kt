@@ -18,8 +18,8 @@ object FeederStartPointToOpenPointNetwork {
     //      c1      c2
     // fsp ---- op ----
     //
-    fun create(normallyOpen: Boolean, currentlyOpen: Boolean, makeFeederLv: Boolean = false) = NetworkService().also { networkService ->
-        val fsp = createNodeForConnecting(networkService, "fsp", 1)
+    fun create(normallyOpen: Boolean, currentlyOpen: Boolean, makeFeederLv: Boolean = false): NetworkService = NetworkService().also { networkService ->
+        val fsp = createJunctionForConnecting(networkService, "fsp", 1)
         val c1 = createAcLineSegmentForConnecting(networkService, "c1")
         val op = createSwitchForConnecting(networkService, "op", 2)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2")
@@ -27,9 +27,9 @@ object FeederStartPointToOpenPointNetwork {
         op.setNormallyOpen(normallyOpen)
         op.setOpen(currentlyOpen)
 
-        networkService.connect(c1.getTerminal(1)!!, fsp.getTerminal(1)!!)
-        networkService.connect(c1.getTerminal(2)!!, op.getTerminal(1)!!)
-        networkService.connect(c2.getTerminal(1)!!, op.getTerminal(2)!!)
+        networkService.connect(c1.t1, fsp.t1)
+        networkService.connect(c1.t2, op.t1)
+        networkService.connect(c2.t1, op.t2)
 
         if (makeFeederLv) {
             LvFeeder("f").apply { normalHeadTerminal = fsp.getTerminal(1) }.also { networkService.add(it) }

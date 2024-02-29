@@ -15,13 +15,13 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TablePowerSys
 @Suppress("PropertyName")
 abstract class TableTapChangers : TablePowerSystemResources() {
 
-    val CONTROL_ENABLED = Column(++columnIndex, "control_enabled", "BOOLEAN", NOT_NULL)
-    val HIGH_STEP = Column(++columnIndex, "high_step", "INTEGER", NULL)
-    val LOW_STEP = Column(++columnIndex, "low_step", "INTEGER", NULL)
-    val NEUTRAL_STEP = Column(++columnIndex, "neutral_step", "INTEGER", NULL)
-    val NEUTRAL_U = Column(++columnIndex, "neutral_u", "INTEGER", NULL)
-    val NORMAL_STEP = Column(++columnIndex, "normal_step", "INTEGER", NULL)
-    val STEP = Column(++columnIndex, "step", "NUMBER", NULL)
-    val TAP_CHANGER_CONTROL_MRID = Column(++columnIndex, "tap_changer_control_mrid", "TEXT", NULL)
+    val CONTROL_ENABLED: Column = Column(++columnIndex, "control_enabled", "BOOLEAN", NOT_NULL)
+    val HIGH_STEP: Column = Column(++columnIndex, "high_step", "INTEGER", NULL)
+    val LOW_STEP: Column = Column(++columnIndex, "low_step", "INTEGER", NULL)
+    val NEUTRAL_STEP: Column = Column(++columnIndex, "neutral_step", "INTEGER", NULL)
+    val NEUTRAL_U: Column = Column(++columnIndex, "neutral_u", "INTEGER", NULL)
+    val NORMAL_STEP: Column = Column(++columnIndex, "normal_step", "INTEGER", NULL)
+    val STEP: Column = Column(++columnIndex, "step", "NUMBER", NULL)
+    val TAP_CHANGER_CONTROL_MRID: Column = Column(++columnIndex, "tap_changer_control_mrid", "TEXT", NULL)
 
 }

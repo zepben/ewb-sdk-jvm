@@ -13,17 +13,17 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableOpenCircuitTests : TableTransformerTest() {
 
-    val ENERGISED_END_STEP = Column(++columnIndex, "energised_end_step", "INTEGER", NULL)
-    val ENERGISED_END_VOLTAGE = Column(++columnIndex, "energised_end_voltage", "INTEGER", NULL)
-    val OPEN_END_STEP = Column(++columnIndex, "open_end_step", "INTEGER", NULL)
-    val OPEN_END_VOLTAGE = Column(++columnIndex, "open_end_voltage", "INTEGER", NULL)
-    val PHASE_SHIFT = Column(++columnIndex, "phase_shift", "NUMBER", NULL)
+    val ENERGISED_END_STEP: Column = Column(++columnIndex, "energised_end_step", "INTEGER", NULL)
+    val ENERGISED_END_VOLTAGE: Column = Column(++columnIndex, "energised_end_voltage", "INTEGER", NULL)
+    val OPEN_END_STEP: Column = Column(++columnIndex, "open_end_step", "INTEGER", NULL)
+    val OPEN_END_VOLTAGE: Column = Column(++columnIndex, "open_end_voltage", "INTEGER", NULL)
+    val PHASE_SHIFT: Column = Column(++columnIndex, "phase_shift", "NUMBER", NULL)
 
     override fun name(): String {
         return "open_circuit_tests"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableOpenCircuitTests> = this.javaClass
+    override val tableClassInstance: TableOpenCircuitTests = this
 
 }

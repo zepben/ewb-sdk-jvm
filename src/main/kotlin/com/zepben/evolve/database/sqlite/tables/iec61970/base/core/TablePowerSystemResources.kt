@@ -14,7 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 abstract class TablePowerSystemResources : TableIdentifiedObjects() {
 
-    val LOCATION_MRID = Column(++columnIndex, "location_mrid", "TEXT", NULL)
-    val NUM_CONTROLS = Column(++columnIndex, "num_controls", "INTEGER", NOT_NULL)
+    val LOCATION_MRID: Column = Column(++columnIndex, "location_mrid", "TEXT", NULL)
+    val NUM_CONTROLS: Column = Column(++columnIndex, "num_controls", "INTEGER", NOT_NULL)
 
 }

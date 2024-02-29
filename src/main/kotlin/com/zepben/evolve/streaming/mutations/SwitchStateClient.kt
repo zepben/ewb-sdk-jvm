@@ -21,7 +21,7 @@ class SwitchStateClient(
 ) : GrpcClient(null) {
 
     constructor(channel: Channel) : this(SwitchStateServiceGrpc.newBlockingStub(channel))
-    constructor(channel: GrpcChannel) : this(SwitchStateServiceGrpc.newBlockingStub(channel.channel))
+    constructor(channel: GrpcChannel) : this(channel.channel)
 
     /**
      * Send a request to the server to update the current state of a switch.

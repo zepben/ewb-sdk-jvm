@@ -184,7 +184,7 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
     /**
      * Get the number of entries in the [PowerElectronicsUnit] collection.
      */
-    fun numUnits() = _powerElectronicsUnits?.size ?: 0
+    fun numUnits(): Int = _powerElectronicsUnits?.size ?: 0
 
     /**
      * The individual unit information of the power electronics connection.
@@ -192,7 +192,7 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
      * @param mRID the mRID of the required [PowerElectronicsUnit]
      * @return The [PowerElectronicsUnit] with the specified [mRID] if it exists, otherwise null
      */
-    fun getUnit(mRID: String) = _powerElectronicsUnits?.getByMRID(mRID)
+    fun getUnit(mRID: String): PowerElectronicsUnit? = _powerElectronicsUnits?.getByMRID(mRID)
 
     fun addUnit(unit: PowerElectronicsUnit): PowerElectronicsConnection {
         if (validateReference(unit, ::getUnit, "An PowerElectronicsUnit"))
@@ -218,7 +218,7 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
     /**
      * Get the number of entries in the [PowerElectronicsConnectionPhase] collection.
      */
-    fun numPhases() = _powerElectronicsConnectionPhases?.size ?: 0
+    fun numPhases(): Int = _powerElectronicsConnectionPhases?.size ?: 0
 
     /**
      * The individual phase information of the power electronics connection.
@@ -226,7 +226,7 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
      * @param mRID the mRID of the required [PowerElectronicsConnectionPhase]
      * @return The [PowerElectronicsConnectionPhase] with the specified [mRID] if it exists, otherwise null
      */
-    fun getPhase(mRID: String) = _powerElectronicsConnectionPhases?.getByMRID(mRID)
+    fun getPhase(mRID: String): PowerElectronicsConnectionPhase? = _powerElectronicsConnectionPhases?.getByMRID(mRID)
 
     fun addPhase(phase: PowerElectronicsConnectionPhase): PowerElectronicsConnection {
         if (validateReference(phase, ::getPhase, "An PowerElectronicsConnectionPhase"))

@@ -13,21 +13,21 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableTapChangerControls : TableRegulatingControls() {
 
-    val LIMIT_VOLTAGE = Column(++columnIndex, "limit_voltage", "NUMBER", NULL)
-    val LINE_DROP_COMPENSATION = Column(++columnIndex, "line_drop_compensation", "BOOLEAN", NULL)
-    val LINE_DROP_R = Column(++columnIndex, "line_drop_r", "NUMBER", NULL)
-    val LINE_DROP_X = Column(++columnIndex, "line_drop_x", "NUMBER", NULL)
-    val REVERSE_LINE_DROP_R = Column(++columnIndex, "reverse_line_drop_r", "NUMBER", NULL)
-    val REVERSE_LINE_DROP_X = Column(++columnIndex, "reverse_line_drop_x", "NUMBER", NULL)
-    val FORWARD_LDC_BLOCKING = Column(++columnIndex, "forward_ldc_blocking", "BOOLEAN", NULL)
-    val TIME_DELAY = Column(++columnIndex, "time_delay", "NUMBER", NULL)
-    val CO_GENERATION_ENABLED = Column(++columnIndex, "co_generation_enabled", "BOOLEAN", NULL)
+    val LIMIT_VOLTAGE: Column = Column(++columnIndex, "limit_voltage", "NUMBER", NULL)
+    val LINE_DROP_COMPENSATION: Column = Column(++columnIndex, "line_drop_compensation", "BOOLEAN", NULL)
+    val LINE_DROP_R: Column = Column(++columnIndex, "line_drop_r", "NUMBER", NULL)
+    val LINE_DROP_X: Column = Column(++columnIndex, "line_drop_x", "NUMBER", NULL)
+    val REVERSE_LINE_DROP_R: Column = Column(++columnIndex, "reverse_line_drop_r", "NUMBER", NULL)
+    val REVERSE_LINE_DROP_X: Column = Column(++columnIndex, "reverse_line_drop_x", "NUMBER", NULL)
+    val FORWARD_LDC_BLOCKING: Column = Column(++columnIndex, "forward_ldc_blocking", "BOOLEAN", NULL)
+    val TIME_DELAY: Column = Column(++columnIndex, "time_delay", "NUMBER", NULL)
+    val CO_GENERATION_ENABLED: Column = Column(++columnIndex, "co_generation_enabled", "BOOLEAN", NULL)
 
     override fun name(): String {
         return "tap_changer_controls"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableTapChangerControls> = this.javaClass
+    override val tableClassInstance: TableTapChangerControls = this
 
 }

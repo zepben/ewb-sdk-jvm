@@ -42,7 +42,7 @@ internal class ShortCircuitTestTest {
         assertThat(shortCircuitTest.voltage, nullValue())
         assertThat(shortCircuitTest.voltageOhmicPart, nullValue())
 
-        shortCircuitTest.fillFields(NetworkService(), true)
+        shortCircuitTest.fillFields(NetworkService())
 
         assertThat(shortCircuitTest.current, equalTo(1.1))
         assertThat(shortCircuitTest.energisedEndStep, equalTo(2))

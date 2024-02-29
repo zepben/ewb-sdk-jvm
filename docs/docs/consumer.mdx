@@ -194,7 +194,7 @@ GrpcChannelBuilder().forAddress("example.zepben.com", 443).makeSecure("ca.cert",
 ## Network Hierarchy
 
 The network can be built with a hierarchy as discussed earlier [here](datamodel.mdx#network-hierarchy). This allows you
-to easily identify and request smaller chunks of the network so you can focus on areas of concern. Here is an example
+to easily identify and request smaller chunks of the network, so you can focus on areas of concern. Here is an example
 of how to request the network hierarchy and print it out as a tree to the console.
 
 <Tabs
@@ -252,11 +252,11 @@ fun printNetworkHierarchy(client: NetworkConsumerClient) {
 </TabItem>
 </Tabs>
 
-Each item from the hierarchy result contains an identified object mRID and it's name. This simplified data structure
+Each item from the hierarchy result contains an identified object mRID and its name. This simplified data structure
 enables you to do things like easily build a suitable UI component allowing a user to select a portion of the network
 they wish to use, without needing to pull back large amounts of full object data.
 
-## Requesting Identififed Objects
+## Requesting Identified Objects
 
 :::warning
 The *ConsumerClient APIs will take care of this for you, and you typically only need these functions if you're

@@ -26,11 +26,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.function.Consumer
 
 
-class FindWithUsagePointsTest {
+internal class FindWithUsagePointsTest {
 
     @JvmField
     @RegisterExtension
-    var systemOutRule: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val findWithUsagePoints = FindWithUsagePoints()
 
@@ -63,7 +63,7 @@ class FindWithUsagePointsTest {
     private val tx6 = ce("tx6")
 
     @Test
-    fun normalStateSingleTrace() {
+    internal fun normalStateSingleTrace() {
         validate(findWithUsagePoints.runNormal(es, null), NO_ERROR, listOf("tx1", "tx2", "tx3", "tx4", "tx5", "iso"))
         validate(findWithUsagePoints.runNormal(c3, c5), NO_ERROR, listOf("tx4", "tx5"))
         validate(findWithUsagePoints.runNormal(c5, c3), NO_ERROR, listOf("tx4", "tx5"))
@@ -71,10 +71,10 @@ class FindWithUsagePointsTest {
     }
 
     @Test
-    fun normalStateMultiTrace() {
+    internal fun normalStateMultiTrace() {
         val results = findWithUsagePoints.runNormal(listOf(es, c3, c5, es), listOf(null, c5, c3, c11))
 
-        assertThat(results.size, equalTo(4))
+        assertThat(results, hasSize(4))
         validate(results[0], NO_ERROR, listOf("tx1", "tx2", "tx3", "tx4", "tx5", "iso"))
         validate(results[1], NO_ERROR, listOf("tx4", "tx5"))
         validate(results[2], NO_ERROR, listOf("tx4", "tx5"))
@@ -85,7 +85,7 @@ class FindWithUsagePointsTest {
     }
 
     @Test
-    fun currentStateSingleTrace() {
+    internal fun currentStateSingleTrace() {
         validate(findWithUsagePoints.runCurrent(es, null), NO_ERROR, listOf("tx2", "tx3", "tx6", "tx7", "tx8"))
         validate(findWithUsagePoints.runCurrent(c1, c12), NO_ERROR, listOf("tx3", "tx7"))
         validate(findWithUsagePoints.runCurrent(c12, c1), NO_ERROR, listOf("tx3", "tx7"))
@@ -93,10 +93,10 @@ class FindWithUsagePointsTest {
     }
 
     @Test
-    fun currentStateMultiTrace() {
+    internal fun currentStateMultiTrace() {
         val results = findWithUsagePoints.runCurrent(listOf(es, c1, c12, es), listOf(null, c12, c1, c5))
 
-        assertThat(results.size, equalTo(4))
+        assertThat(results, hasSize(4))
         validate(results[0], NO_ERROR, listOf("tx2", "tx3", "tx6", "tx7", "tx8"))
         validate(results[1], NO_ERROR, listOf("tx3", "tx7"))
         validate(results[2], NO_ERROR, listOf("tx3", "tx7"))
@@ -107,13 +107,13 @@ class FindWithUsagePointsTest {
     }
 
     @Test
-    fun sameFromAndTo() {
+    internal fun sameFromAndTo() {
         validate(findWithUsagePoints.runNormal(c3, c3), NO_ERROR, emptyList())
         validate(findWithUsagePoints.runNormal(tx6, tx6), NO_ERROR, listOf("tx6"))
     }
 
     @Test
-    fun worksWithNoTerminals() {
+    internal fun worksWithNoTerminals() {
         val tx1 = PowerTransformer()
         val tx2 = PowerTransformer()
         val usagePoint = UsagePoint()
@@ -128,7 +128,7 @@ class FindWithUsagePointsTest {
     }
 
     @Test
-    fun doesntRelyOnTerminalSequenceNumbers() {
+    internal fun doesntRelyOnTerminalSequenceNumbers() {
         val validateSingleTransformerNetwork = { sequenceNumber: Int ->
             val networkService1 = SingleTransformerNetwork.create(sequenceNumber)
 
@@ -180,7 +180,7 @@ class FindWithUsagePointsTest {
     }
 
     private fun validateMismatch(results: List<FindWithUsagePoints.Result>, expectedResults: Int) {
-        assertThat(results.size, equalTo(expectedResults))
+        assertThat(results, hasSize(expectedResults))
 
         results.forEach(Consumer { result: FindWithUsagePoints.Result ->
             assertThat(result.status, equalTo(MISMATCHED_FROM_TO))

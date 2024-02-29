@@ -15,29 +15,29 @@ import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 
-class MeasurementServiceTest {
+internal class MeasurementServiceTest {
 
     private val service = MeasurementService()
 
     @Test
     internal fun supportsAnalogValue() {
         val measurement = AnalogValue()
-        assertThat(service.add(measurement), equalTo(true))
-        assertThat(service.remove(measurement), equalTo(true))
+        assertThat("Initial add should return true", service.add(measurement))
+        assertThat("Removing previously-added object should return true", service.remove(measurement))
     }
 
     @Test
     internal fun supportsAccumulatorValue() {
         val measurement = AccumulatorValue()
-        assertThat(service.add(measurement), equalTo(true))
-        assertThat(service.remove(measurement), equalTo(true))
+        assertThat("Initial add should return true", service.add(measurement))
+        assertThat("Removing previously-added object should return true", service.remove(measurement))
     }
 
     @Test
     internal fun supportsDiscreteValue() {
         val measurement = DiscreteValue()
-        assertThat(service.add(measurement), equalTo(true))
-        assertThat(service.remove(measurement), equalTo(true))
+        assertThat("Initial add should return true", service.add(measurement))
+        assertThat("Removing previously-added object should return true", service.remove(measurement))
     }
 
     @Test

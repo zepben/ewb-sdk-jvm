@@ -96,7 +96,7 @@ fun <T : IdentifiedObject> KProperty1<in T, Collection<Name>>.compareNames(sourc
     }
 
     targetCollection.forEach {
-        if (sourceNameTypeNames.find { nameTypeName -> it.name == nameTypeName.name && it.type.name == nameTypeName.nameType } == null)
+        if (sourceNameTypeNames.find { (nameType, otherName) -> it.name == otherName && it.type.name == nameType } == null)
             differences.missingFromSource.add(it)
     }
 

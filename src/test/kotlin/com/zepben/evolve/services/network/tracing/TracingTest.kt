@@ -26,7 +26,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import java.util.function.Supplier
 
-class TracingTest {
+internal class TracingTest {
 
     // Just trace all connected assets and make sure we actually visit every item.
     @Test
@@ -36,7 +36,7 @@ class TracingTest {
         val visited = mutableSetOf<ConductingEquipment>()
 
         Tracing.connectedEquipmentTrace().apply { addStepAction { (ce, _) -> visited.add(ce) } }
-            .run(n["node0"]!!)
+            .run(n["j0"]!!)
 
         assertThat(expected, equalTo(visited))
     }

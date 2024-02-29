@@ -30,7 +30,7 @@ class RemovePhases {
      * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    val normalTraversal = BranchRecursiveTraversal<EbbPhases>(
+    val normalTraversal: BranchRecursiveTraversal<EbbPhases> = BranchRecursiveTraversal(
         { current, traversal -> ebbAndQueue(traversal, current, PhaseSelector.NORMAL_PHASES) },
         { processQueue { it.nominalPhases.size } },
         { BasicTracker() },
@@ -43,7 +43,7 @@ class RemovePhases {
      * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    private val currentTraversal = BranchRecursiveTraversal<EbbPhases>(
+    private val currentTraversal = BranchRecursiveTraversal(
         { current, traversal -> ebbAndQueue(traversal, current, PhaseSelector.CURRENT_PHASES) },
         { processQueue { it.nominalPhases.size } },
         { BasicTracker() },

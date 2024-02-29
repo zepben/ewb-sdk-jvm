@@ -18,12 +18,11 @@ import com.zepben.evolve.services.network.tracing.phases.PhaseStep
 import com.zepben.evolve.services.network.tracing.traversals.Traversal
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class CoreTraceTest {
+internal class CoreTraceTest {
 
     @JvmField
     @RegisterExtension
@@ -34,20 +33,25 @@ class CoreTraceTest {
         val n = getNetwork()
 
         // Trace all cores, we should visit everything
-        var start = n.get<ConductingEquipment>("node0")!!
+        var start = n.get<ConductingEquipment>("j0")!!
         var visited = currentNonDirectionalTrace(start, SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N)
-        assertThat(visited.size.toLong(), equalTo(22))
+        assertThat(visited, hasSize(22))
 
         // Trace core 0 from single core asset
-        start = n["node9"]!!
+        start = n["j9"]!!
         visited = currentNonDirectionalTrace(start, SinglePhaseKind.Y)
-        assertThat(visited.size.toLong(), equalTo(21))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment11", SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node5", SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node0", SinglePhaseKind.B)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node6", SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node6", SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node7", SinglePhaseKind.B)), equalTo(true))
+        assertThat(visited, hasSize(21))
+        assertThat(
+            visited,
+            hasItems(
+                createResultItem(n, "acLineSegment11", SinglePhaseKind.Y),
+                createResultItem(n, "j5", SinglePhaseKind.Y),
+                createResultItem(n, "j0", SinglePhaseKind.B),
+                createResultItem(n, "j6", SinglePhaseKind.Y),
+                createResultItem(n, "j6", SinglePhaseKind.Y),
+                createResultItem(n, "j7", SinglePhaseKind.B)
+            )
+        )
     }
 
     @Test
@@ -55,20 +59,20 @@ class CoreTraceTest {
         val n = getNetwork()
 
         // Test from the "source" of the network downstream
-        var start = n.get<ConductingEquipment>("node0")!!
+        var start = n.get<ConductingEquipment>("j0")!!
         var visited = currentDownstreamTrace(start, SinglePhaseKind.A)
 
-        // node7, node9, acLineSegment8, acLineSegment9 and acLineSegment11 should not be traced.
+        // j7, j9, acLineSegment8, acLineSegment9 and acLineSegment11 should not be traced.
         assertThat(
             visited, containsInAnyOrder(
-                createResultItem(n, "node0", SinglePhaseKind.A),
-                createResultItem(n, "node1", SinglePhaseKind.A),
-                createResultItem(n, "node2", SinglePhaseKind.A),
-                createResultItem(n, "node3", SinglePhaseKind.A),
-                createResultItem(n, "node4", SinglePhaseKind.X),
-                createResultItem(n, "node5", SinglePhaseKind.X),
-                createResultItem(n, "node6", SinglePhaseKind.X),
-                createResultItem(n, "node8", SinglePhaseKind.X),
+                createResultItem(n, "j0", SinglePhaseKind.A),
+                createResultItem(n, "j1", SinglePhaseKind.A),
+                createResultItem(n, "j2", SinglePhaseKind.A),
+                createResultItem(n, "j3", SinglePhaseKind.A),
+                createResultItem(n, "j4", SinglePhaseKind.X),
+                createResultItem(n, "j5", SinglePhaseKind.X),
+                createResultItem(n, "j6", SinglePhaseKind.X),
+                createResultItem(n, "j8", SinglePhaseKind.X),
                 createResultItem(n, "acLineSegment0", SinglePhaseKind.A),
                 createResultItem(n, "acLineSegment1", SinglePhaseKind.A),
                 createResultItem(n, "acLineSegment2", SinglePhaseKind.A),
@@ -82,23 +86,28 @@ class CoreTraceTest {
         )
 
         // Test from partway downstream to make sure we don't go upstream
-        start = n["node1"]!!
+        start = n["j1"]!!
         visited = normalDownstreamTrace(start, SinglePhaseKind.A)
-        assertThat(visited.size.toLong(), equalTo(4))
-        assertThat(visited.contains(createResultItem(n, "node1", SinglePhaseKind.A)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node2", SinglePhaseKind.A)), equalTo(true))
-        assertThat(visited.stream().noneMatch { i: PhaseStep -> i.conductingEquipment.mRID == "acLineSegment1" }, equalTo(true))
-        assertThat(visited.stream().noneMatch { i: PhaseStep -> i.conductingEquipment.mRID == "acLineSegment9" }, equalTo(true))
+        var visitedMRIDs = visited.map { it.conductingEquipment.mRID }
+        assertThat(visited, hasSize(4))
+        assertThat(visited, hasItems(createResultItem(n, "j1", SinglePhaseKind.A), createResultItem(n, "j2", SinglePhaseKind.A)))
+        assertThat(visitedMRIDs, not(contains("acLineSegment1")))
+        assertThat(visitedMRIDs, not(contains("acLineSegment1")))
 
         // Test on a core that splits onto different cores on different branches
-        start = n["node0"]!!
+        start = n["j0"]!!
         visited = normalDownstreamTrace(start, SinglePhaseKind.C)
-        assertThat(visited.size.toLong(), equalTo(11))
-        assertThat(visited.contains(createResultItem(n, "node1", SinglePhaseKind.C)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node2", SinglePhaseKind.C)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node7", SinglePhaseKind.C)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node6", SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.stream().noneMatch { i: PhaseStep -> i.conductingEquipment.mRID == "node3" }, equalTo(true))
+        assertThat(visited, hasSize(11))
+        assertThat(
+            visited,
+            hasItems(
+                createResultItem(n, "j1", SinglePhaseKind.C),
+                createResultItem(n, "j2", SinglePhaseKind.C),
+                createResultItem(n, "j7", SinglePhaseKind.C),
+                createResultItem(n, "j6", SinglePhaseKind.Y)
+            )
+        )
+        assertThat(visitedMRIDs, not(contains("j3")))
     }
 
     @Test
@@ -106,22 +115,22 @@ class CoreTraceTest {
         val n = getNetwork()
 
         // Test from the "source" of the network downstream
-        val start = n.get<ConductingEquipment>("node0")!!
+        val start = n.get<ConductingEquipment>("j0")!!
         val visited = normalDownstreamTrace(start, SinglePhaseKind.B, SinglePhaseKind.C)
 
-        // node8 and acLineSegment10 should not be traced.
+        // j8 and acLineSegment10 should not be traced.
         assertThat(
             visited,
             containsInAnyOrder(
-                createResultItem(n, "node0", SinglePhaseKind.B, SinglePhaseKind.C),
-                createResultItem(n, "node1", SinglePhaseKind.B, SinglePhaseKind.C),
-                createResultItem(n, "node2", SinglePhaseKind.B, SinglePhaseKind.C),
-                createResultItem(n, "node3", SinglePhaseKind.B),
-                createResultItem(n, "node4", SinglePhaseKind.Y),
-                createResultItem(n, "node5", SinglePhaseKind.Y),
-                createResultItem(n, "node6", SinglePhaseKind.X, SinglePhaseKind.Y),
-                createResultItem(n, "node7", SinglePhaseKind.B, SinglePhaseKind.C),
-                createResultItem(n, "node9", SinglePhaseKind.Y),
+                createResultItem(n, "j0", SinglePhaseKind.B, SinglePhaseKind.C),
+                createResultItem(n, "j1", SinglePhaseKind.B, SinglePhaseKind.C),
+                createResultItem(n, "j2", SinglePhaseKind.B, SinglePhaseKind.C),
+                createResultItem(n, "j3", SinglePhaseKind.B),
+                createResultItem(n, "j4", SinglePhaseKind.Y),
+                createResultItem(n, "j5", SinglePhaseKind.Y),
+                createResultItem(n, "j6", SinglePhaseKind.X, SinglePhaseKind.Y),
+                createResultItem(n, "j7", SinglePhaseKind.B, SinglePhaseKind.C),
+                createResultItem(n, "j9", SinglePhaseKind.Y),
                 createResultItem(n, "acLineSegment0", SinglePhaseKind.B, SinglePhaseKind.C),
                 createResultItem(n, "acLineSegment1", SinglePhaseKind.B, SinglePhaseKind.C),
                 createResultItem(n, "acLineSegment2", SinglePhaseKind.B, SinglePhaseKind.C),
@@ -143,16 +152,21 @@ class CoreTraceTest {
         val start = n.get<ConductingEquipment>("acLineSegment11")!!
         val visited = normalUpstreamTrace(start, SinglePhaseKind.Y)
 
-        assertThat(visited.size.toLong(), equalTo(9))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment11", SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node5", SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment6", SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node4", SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment5", SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node3", SinglePhaseKind.B)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment4", SinglePhaseKind.B)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment0", SinglePhaseKind.B)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node0", SinglePhaseKind.B)), equalTo(true))
+        assertThat(visited, hasSize(9))
+        assertThat(
+            visited,
+            containsInAnyOrder(
+                createResultItem(n, "acLineSegment11", SinglePhaseKind.Y),
+                createResultItem(n, "j5", SinglePhaseKind.Y),
+                createResultItem(n, "acLineSegment6", SinglePhaseKind.Y),
+                createResultItem(n, "j4", SinglePhaseKind.Y),
+                createResultItem(n, "acLineSegment5", SinglePhaseKind.Y),
+                createResultItem(n, "j3", SinglePhaseKind.B),
+                createResultItem(n, "acLineSegment4", SinglePhaseKind.B),
+                createResultItem(n, "acLineSegment0", SinglePhaseKind.B),
+                createResultItem(n, "j0", SinglePhaseKind.B)
+            )
+        )
     }
 
     @Test
@@ -161,15 +175,19 @@ class CoreTraceTest {
         val start = n.get<ConductingEquipment>("acLineSegment8")!!
         val visited = normalUpstreamTrace(start, SinglePhaseKind.X, SinglePhaseKind.Y)
 
-        assertThat(visited.size.toLong(), equalTo(8))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment8", SinglePhaseKind.X, SinglePhaseKind.Y)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node7", SinglePhaseKind.B, SinglePhaseKind.C)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment9", SinglePhaseKind.B, SinglePhaseKind.C)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment2", SinglePhaseKind.B, SinglePhaseKind.C)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node1", SinglePhaseKind.B, SinglePhaseKind.C)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment1", SinglePhaseKind.B, SinglePhaseKind.C)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "acLineSegment0", SinglePhaseKind.B, SinglePhaseKind.C)), equalTo(true))
-        assertThat(visited.contains(createResultItem(n, "node0", SinglePhaseKind.B, SinglePhaseKind.C)), equalTo(true))
+        assertThat(
+            visited,
+            containsInAnyOrder(
+                createResultItem(n, "acLineSegment8", SinglePhaseKind.X, SinglePhaseKind.Y),
+                createResultItem(n, "j7", SinglePhaseKind.B, SinglePhaseKind.C),
+                createResultItem(n, "acLineSegment9", SinglePhaseKind.B, SinglePhaseKind.C),
+                createResultItem(n, "acLineSegment2", SinglePhaseKind.B, SinglePhaseKind.C),
+                createResultItem(n, "j1", SinglePhaseKind.B, SinglePhaseKind.C),
+                createResultItem(n, "acLineSegment1", SinglePhaseKind.B, SinglePhaseKind.C),
+                createResultItem(n, "acLineSegment0", SinglePhaseKind.B, SinglePhaseKind.C),
+                createResultItem(n, "j0", SinglePhaseKind.B, SinglePhaseKind.C)
+            )
+        )
     }
 
     private fun getNetwork() = PhaseSwapLoopNetwork.create().also {

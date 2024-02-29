@@ -23,7 +23,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class SetDirectionTest {
+internal class SetDirectionTest {
 
     @JvmField
     @RegisterExtension
@@ -39,20 +39,20 @@ class SetDirectionTest {
         checkExpectedDirection(n.getT("acLineSegment0", 2), DOWNSTREAM)
         checkExpectedDirection(n.getT("acLineSegment1", 1), UPSTREAM)
         checkExpectedDirection(n.getT("acLineSegment4", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("node4", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("node4", 2), DOWNSTREAM)
-        checkExpectedDirection(n.getT("node4", 3), DOWNSTREAM)
-        checkExpectedDirection(n.getT("node8", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("node5", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("node5", 2), DOWNSTREAM)
-        checkExpectedDirection(n.getT("node5", 3), DOWNSTREAM)
-        checkExpectedDirection(n.getT("node9", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("node6", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("node6", 2), UPSTREAM)
+        checkExpectedDirection(n.getT("j4", 1), UPSTREAM)
+        checkExpectedDirection(n.getT("j4", 2), DOWNSTREAM)
+        checkExpectedDirection(n.getT("j4", 3), DOWNSTREAM)
+        checkExpectedDirection(n.getT("j8", 1), UPSTREAM)
+        checkExpectedDirection(n.getT("j5", 1), UPSTREAM)
+        checkExpectedDirection(n.getT("j5", 2), DOWNSTREAM)
+        checkExpectedDirection(n.getT("j5", 3), DOWNSTREAM)
+        checkExpectedDirection(n.getT("j9", 1), UPSTREAM)
+        checkExpectedDirection(n.getT("j6", 1), UPSTREAM)
+        checkExpectedDirection(n.getT("j6", 2), UPSTREAM)
         checkExpectedDirection(n.getT("acLineSegment2", 2), DOWNSTREAM)
         checkExpectedDirection(n.getT("acLineSegment3", 1), UPSTREAM)
         checkExpectedDirection(n.getT("acLineSegment9", 2), UPSTREAM)
-        checkExpectedDirection(n.getT("node2", 1), UPSTREAM)
+        checkExpectedDirection(n.getT("j2", 1), UPSTREAM)
     }
 
     @Test
@@ -144,7 +144,7 @@ class SetDirectionTest {
     }
 
     @Test
-    internal fun `stops at zone transformers incase feeder heads are missing`() {
+    internal fun `stops at zone transformers in case feeder heads are missing`() {
         //
         // 1 b0*21--c1--21 tx2 21--c3--2
         //

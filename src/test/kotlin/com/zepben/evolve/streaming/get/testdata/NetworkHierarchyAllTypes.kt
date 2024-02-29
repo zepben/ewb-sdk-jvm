@@ -8,7 +8,10 @@
 
 package com.zepben.evolve.streaming.get.testdata
 
-import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.base.core.GeographicalRegion
+import com.zepben.evolve.cim.iec61970.base.core.SubGeographicalRegion
+import com.zepben.evolve.cim.iec61970.base.core.Substation
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.services.network.NetworkService
@@ -63,7 +66,7 @@ object NetworkHierarchyAllTypes {
         return response.build()
     }
 
-    fun createService() = NetworkService().also { service ->
+    fun createService(): NetworkService = NetworkService().also { service ->
         val loop1 = Loop("loop1").apply { name = "loop 1" }.also { service.add(it) }
         Loop("loop2").apply { name = "loop 2" }.also { service.add(it) }
 
@@ -93,10 +96,8 @@ object NetworkHierarchyAllTypes {
         Feeder("fdr2").apply { name = "fdr 2"; normalEnergizingSubstation = sub1 }.also { sub1.addFeeder(it); service.add(it) }
     }
 
-    fun createNetworkHierarchy() = createService().let {
+    fun createNetworkHierarchy(): NetworkHierarchy = createService().let {
         NetworkHierarchy(it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf(), it.mapOf())
     }
-
-    private fun <T : IdentifiedObject> mapOf(vararg items: T): Map<String, T> = items.associateBy { it.mRID }
 
 }

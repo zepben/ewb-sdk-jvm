@@ -72,10 +72,10 @@ class FindSwerEquipment(
         val trace = createTrace().apply {
             addStopCondition { it.conductingEquipment in swerEquipment }
             addStopCondition { !it.hasSwerTerminal }
-            addStepAction { it, isStopping ->
+            addStepAction { (conductingEquipment, _), isStopping ->
                 // To make sure we include any open points on a SWER network (unlikely) we include stop equipment if it is a [Switch].
-                if (!isStopping || (it.conductingEquipment is Switch))
-                    swerEquipment.add(it.conductingEquipment)
+                if (!isStopping || (conductingEquipment is Switch))
+                    swerEquipment.add(conductingEquipment)
             }
         }
 

@@ -105,4 +105,21 @@ internal class ConductingEquipmentTest {
             .withMessage("Unable to add ${duplicateTerminal.typeNameAndMRID()} to ${ce.typeNameAndMRID()}. A ${t1.typeNameAndMRID()} already exists with sequenceNumber 1.")
     }
 
+    @Test
+    internal fun `terminal helpers`() {
+        val ce = object : ConductingEquipment() {}
+
+        expect { ce.t1 }.toThrow<NullPointerException>()
+        expect { ce.t2 }.toThrow<NullPointerException>()
+        expect { ce.t3 }.toThrow<NullPointerException>()
+
+        val t1 = Terminal().also { ce.addTerminal(it) }
+        val t2 = Terminal().also { ce.addTerminal(it) }
+        val t3 = Terminal().also { ce.addTerminal(it) }
+
+        assertThat(ce.t1, equalTo(t1))
+        assertThat(ce.t2, equalTo(t2))
+        assertThat(ce.t3, equalTo(t3))
+    }
+
 }

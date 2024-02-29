@@ -15,7 +15,7 @@ class TableOperationalRestrictions : TableDocuments() {
         return "operational_restrictions"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableOperationalRestrictions> = this.javaClass
+    override val tableClassInstance: TableOperationalRestrictions = this
 
 }

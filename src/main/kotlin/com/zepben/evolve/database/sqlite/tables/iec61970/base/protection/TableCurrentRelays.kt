@@ -14,15 +14,15 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableCurrentRelays : TableProtectionRelayFunctions() {
 
-    val CURRENT_LIMIT_1 = Column(++columnIndex, "current_limit_1", "NUMBER", NULL)
-    val INVERSE_TIME_FLAG = Column(++columnIndex, "inverse_time_flag", "BOOLEAN", NULL)
-    val TIME_DELAY_1 = Column(++columnIndex, "time_delay_1", "NUMBER", NULL)
+    val CURRENT_LIMIT_1: Column = Column(++columnIndex, "current_limit_1", "NUMBER", NULL)
+    val INVERSE_TIME_FLAG: Column = Column(++columnIndex, "inverse_time_flag", "BOOLEAN", NULL)
+    val TIME_DELAY_1: Column = Column(++columnIndex, "time_delay_1", "NUMBER", NULL)
 
     override fun name(): String {
         return "current_relays"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableCurrentRelays> = this.javaClass
+    override val tableClassInstance: TableCurrentRelays = this
 
 }

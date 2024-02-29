@@ -15,6 +15,7 @@ internal fun changeSet47() = ChangeSet(
     `Delete all reclose sequences`
 )
 
+@Suppress("ObjectPropertyName")
 private val `Delete all reclose sequences` = listOf(
     "DROP INDEX IF EXISTS reclose_sequences_mrid;",
     "DROP INDEX IF EXISTS reclose_sequences_name;",

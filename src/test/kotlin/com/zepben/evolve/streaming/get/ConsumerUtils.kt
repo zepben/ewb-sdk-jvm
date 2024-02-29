@@ -75,7 +75,7 @@ object ConsumerUtils {
         expectHandled: Boolean = true,
         fromServer: Boolean = true
     ) {
-        assertThat(result.wasFailure, equalTo(true))
+        assertThat("Result should be failure", result.wasFailure)
         assertThat(result.wasErrorHandled, equalTo(expectHandled))
         assertThat(onErrorHandler.lastError, if (expectHandled) equalTo(result.thrown) else nullValue())
 

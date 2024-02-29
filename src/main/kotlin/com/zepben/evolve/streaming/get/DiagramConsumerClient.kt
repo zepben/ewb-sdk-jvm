@@ -18,7 +18,7 @@ import com.zepben.protobuf.dc.DiagramIdentifiedObject.IdentifiedObjectCase.*
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.CallCredentials
-import io.grpc.ManagedChannel
+import io.grpc.Channel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -43,11 +43,11 @@ class DiagramConsumerClient(
     /**
      * Create a [DiagramConsumerClient]
      *
-     * @param channel [ManagedChannel] to build a stub from.
+     * @param channel [Channel] to build a stub from.
      * @param callCredentials [CallCredentials] to be attached to the stub.
      */
     @JvmOverloads
-    constructor(channel: ManagedChannel, callCredentials: CallCredentials? = null) :
+    constructor(channel: Channel, callCredentials: CallCredentials? = null) :
         this(
             DiagramConsumerGrpc.newStub(channel).apply { callCredentials?.let { withCallCredentials(it) } },
             executor = Executors.newSingleThreadExecutor()
@@ -71,7 +71,7 @@ class DiagramConsumerClient(
      * Get DiagramObjects for a given mRID. This will effectively call [DiagramService.getDiagramObjects] on the remote server and return any DiagramObjects
      * that contain a match against the given mRID.
      *
-     * @param mRIDs The mRIDs to fetch DiagramObjects for
+     * @param mRID The mRID to fetch DiagramObjects for
      * @return a [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
@@ -139,7 +139,7 @@ class DiagramConsumerClient(
         val request = stub.getDiagramObjects(streamObserver)
         val builder = GetDiagramObjectsRequest.newBuilder()
 
-        batchSend(mRIDs.asSequence(), builder::addMrids) {
+        batchSend(mRIDs, builder::addMrids) {
             if (builder.mridsList.isNotEmpty())
                 request.onNext(builder.build())
             builder.clearMrids()

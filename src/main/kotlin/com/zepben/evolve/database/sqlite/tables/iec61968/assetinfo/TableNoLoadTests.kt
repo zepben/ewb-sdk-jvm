@@ -13,17 +13,17 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableNoLoadTests : TableTransformerTest() {
 
-    val ENERGISED_END_VOLTAGE = Column(++columnIndex, "energised_end_voltage", "INTEGER", NULL)
-    val EXCITING_CURRENT = Column(++columnIndex, "exciting_current", "NUMBER", NULL)
-    val EXCITING_CURRENT_ZERO = Column(++columnIndex, "exciting_current_zero", "NUMBER", NULL)
-    val LOSS = Column(++columnIndex, "loss", "INTEGER", NULL)
-    val LOSS_ZERO = Column(++columnIndex, "loss_zero", "INTEGER", NULL)
+    val ENERGISED_END_VOLTAGE: Column = Column(++columnIndex, "energised_end_voltage", "INTEGER", NULL)
+    val EXCITING_CURRENT: Column = Column(++columnIndex, "exciting_current", "NUMBER", NULL)
+    val EXCITING_CURRENT_ZERO: Column = Column(++columnIndex, "exciting_current_zero", "NUMBER", NULL)
+    val LOSS: Column = Column(++columnIndex, "loss", "INTEGER", NULL)
+    val LOSS_ZERO: Column = Column(++columnIndex, "loss_zero", "INTEGER", NULL)
 
     override fun name(): String {
         return "no_load_tests"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableNoLoadTests> = this.javaClass
+    override val tableClassInstance: TableNoLoadTests = this
 
 }

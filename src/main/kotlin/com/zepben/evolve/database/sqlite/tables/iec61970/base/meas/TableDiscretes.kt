@@ -13,7 +13,7 @@ class TableDiscretes : TableMeasurements() {
         return "discretes"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableDiscretes> = this.javaClass
+    override val tableClassInstance: TableDiscretes = this
 
 }

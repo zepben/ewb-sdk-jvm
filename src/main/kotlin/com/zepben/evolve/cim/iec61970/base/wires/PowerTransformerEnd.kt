@@ -19,14 +19,14 @@ import java.util.function.BiConsumer
  * The impedance values r, r0, x, and x0 of a PowerTransformerEnd represents a star equivalent as follows
  *
  *
- * 1) for a two Terminal PowerTransformer the high voltage (TransformerEnd.endNumber=1) PowerTransformerEnd has non zero values on
+ * 1) for a two Terminal PowerTransformer the high voltage (TransformerEnd.endNumber=1) PowerTransformerEnd has nonzero values on
  * r, r0, x, and x0 while the low voltage (TransformerEnd.endNumber=0) PowerTransformerEnd has zero values for r, r0, x, and x0.
  * 2) for a three Terminal PowerTransformer the three PowerTransformerEnds represents a star equivalent with each leg in the star
  * represented by r, r0, x, and x0 values.
  * 3) For a three Terminal transformer each PowerTransformerEnd shall have g, g0, b and b0 values corresponding the no load losses
  * distributed on the three PowerTransformerEnds. The total no load loss shunt impedances may also be placed at one of the
  * PowerTransformerEnds, preferably the end numbered 1, having the shunt values on end 1 is the preferred way.
- * 4) for a PowerTransformer with more than three Terminals the PowerTransformerEnd impedance values cannot be used. Instead use
+ * 4) for a PowerTransformer with more than three Terminals the PowerTransformerEnd impedance values cannot be used. Instead, use
  * the TransformerMeshImpedance or split the transformer into multiple PowerTransformers.
  *
  * @property powerTransformer The power transformer of this power transformer end.
@@ -112,7 +112,7 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
 
     /**
      * Add a normal apparent power rating for this PowerTransformerEnd.
-     * The ratings in the underlying collection will be sorted by [ratedS] in a descending order.
+     * The ratings in the underlying collection will be sorted by [ratedS] in descending order.
      *
      * @param ratedS The normal apparent power rating to set.
      * @param coolingType The cooling type used for this rating, defaults to [TransformerCoolingType.UNKNOWN_COOLING_TYPE]
@@ -184,6 +184,6 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
 
 }
 
-fun PowerTransformerEnd.forEachRating(action: (sequenceNumber: Int, rating: TransformerEndRatedS) -> Unit) = forEachRating(BiConsumer(action))
+fun PowerTransformerEnd.forEachRating(action: (sequenceNumber: Int, rating: TransformerEndRatedS) -> Unit): Unit = forEachRating(BiConsumer(action))
 
 data class TransformerEndRatedS(val coolingType: TransformerCoolingType, val ratedS: Int)

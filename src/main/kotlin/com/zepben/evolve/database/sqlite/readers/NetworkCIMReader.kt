@@ -340,7 +340,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         setLastMRID("$relayInfoMRID.s$recloseDelay")
 
         val cri = networkService.ensureGet<RelayInfo>(relayInfoMRID, "$relayInfoMRID.s$recloseDelay")
-        cri?.addDelay(recloseDelay,)
+        cri?.addDelay(recloseDelay)
 
         return true
     }
@@ -830,7 +830,7 @@ class NetworkCIMReader(private val networkService: NetworkService) : BaseCIMRead
         return loadPowerElectronicsUnit(photoVoltaicUnit, table, resultSet) && networkService.addOrThrow(photoVoltaicUnit)
     }
 
-    fun loadPowerElectronicsUnit(powerElectronicsUnit: PowerElectronicsUnit, table: TablePowerElectronicsUnit, resultSet: ResultSet): Boolean {
+    private fun loadPowerElectronicsUnit(powerElectronicsUnit: PowerElectronicsUnit, table: TablePowerElectronicsUnit, resultSet: ResultSet): Boolean {
         powerElectronicsUnit.apply {
             powerElectronicsConnection = networkService.ensureGet(
                 resultSet.getNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex),

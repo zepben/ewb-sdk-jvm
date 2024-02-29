@@ -39,7 +39,7 @@ internal class UsagePointTest {
         assertThat(usagePoint.ratedPower, nullValue())
         assertThat(usagePoint.approvedInverterCapacity, nullValue())
 
-        usagePoint.fillFields(NetworkService(), true)
+        usagePoint.fillFields(NetworkService())
 
         assertThat(usagePoint.usagePointLocation, notNullValue())
         assertThat(usagePoint.isVirtual, equalTo(true))

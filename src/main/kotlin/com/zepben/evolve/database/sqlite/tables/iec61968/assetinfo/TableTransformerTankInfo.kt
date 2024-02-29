@@ -14,7 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetInfo
 @Suppress("PropertyName")
 class TableTransformerTankInfo : TableAssetInfo() {
 
-    val POWER_TRANSFORMER_INFO_MRID = Column(++columnIndex, "power_transformer_info_mrid", "TEXT", NULL)
+    val POWER_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "power_transformer_info_mrid", "TEXT", NULL)
 
     override fun name(): String {
         return "transformer_tank_info"
@@ -29,7 +29,7 @@ class TableTransformerTankInfo : TableAssetInfo() {
     }
 
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableTransformerTankInfo> = this.javaClass
+    override val tableClassInstance: TableTransformerTankInfo = this
 
 }

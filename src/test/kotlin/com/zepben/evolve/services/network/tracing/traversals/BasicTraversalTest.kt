@@ -8,11 +8,12 @@
 package com.zepben.evolve.services.network.tracing.traversals
 
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.containsInAnyOrder
 import org.junit.jupiter.api.Test
 import java.util.function.Consumer
 
-class BasicTraversalTest {
+internal class BasicTraversalTest {
 
     private val queueNext = BasicTraversal.QueueNext<Int> { i, t ->
         sequenceOf(i - 2, i - 1, i + 1, i + 2)
@@ -21,7 +22,7 @@ class BasicTraversalTest {
     }
 
     @Test
-    fun testBreadthFirst() {
+    internal fun testBreadthFirst() {
         val expectedOrder = listOf(1, 2, 3, 4, 5, 6, 7)
         val visitOrder = mutableListOf<Int>()
 
@@ -33,7 +34,7 @@ class BasicTraversalTest {
     }
 
     @Test
-    fun testDepthFirst() {
+    internal fun testDepthFirst() {
         val expectedOrder = listOf(1, 3, 5, 7, 6, 4, 2)
         val visitOrder = mutableListOf<Int>()
 
@@ -45,13 +46,13 @@ class BasicTraversalTest {
     }
 
     @Test
-    fun canControlStoppingOnFirstAsset() {
+    internal fun canControlStoppingOnFirstAsset() {
         validateStoppingOnFirstAsset(BasicTraversal(queueNext, BasicQueue.breadthFirst(), BasicTracker()), listOf(1, 2, 3))
         validateStoppingOnFirstAsset(BasicTraversal(queueNext, BasicQueue.depthFirst(), BasicTracker()), listOf(1, 3, 2))
     }
 
     @Test
-    fun passesStoppingToStep() {
+    internal fun passesStoppingToStep() {
         val queueNext = BasicTraversal.QueueNext<Int> { i, t ->
             t.queue.add(i + 1)
             t.queue.add(i + 2)
@@ -68,7 +69,7 @@ class BasicTraversalTest {
                     stoppingOn.add(i)
             }
 
-        t.run(1, true)
+        t.run(1)
         assertThat(visited, containsInAnyOrder(1, 2, 3, 4))
         assertThat(stoppingOn, containsInAnyOrder(3, 4))
     }
@@ -81,7 +82,7 @@ class BasicTraversalTest {
             .addStopCondition { i -> stopCalls[0] = i; true }
             .addStopCondition { i -> stopCalls[1] = i; true }
             .addStopCondition { i -> stopCalls[2] = i; true }
-            .run(1, true)
+            .run(1)
 
         assertThat(stopCalls, contains(1, 1, 1))
     }
@@ -94,13 +95,13 @@ class BasicTraversalTest {
             .addStepAction { i, _ -> stopCalls[0] = i }
             .addStepAction(Consumer { i -> stopCalls[1] = i })
             .addStepAction { i -> stopCalls[2] = i }
-            .run(1, true)
+            .run(1)
 
         assertThat(stopCalls, contains(1, 1, 1))
     }
 
     @Test
-    fun `stop checking actions are triggered correctly`() {
+    internal fun `stop checking actions are triggered correctly`() {
         // We do not bother with the queue next as we will just prime the queue with what we want to test.
         val queueNext = BasicTraversal.QueueNext<Int> { _, _ -> }
 
@@ -142,7 +143,7 @@ class BasicTraversalTest {
     private fun validateRun(t: Traversal<Int>, canStopOnStart: Boolean, visitOrder: List<Int>, expectedOrder: List<Int>) {
         t.run(1, canStopOnStart)
         assertThat(visitOrder, contains<Any>(*expectedOrder.toTypedArray()))
-        expectedOrder.forEach { assertThat(t.tracker.hasVisited(it), equalTo(true)) }
+        expectedOrder.forEach { assertThat("Tracker should have visited $it", t.tracker.hasVisited(it)) }
     }
 
 }

@@ -93,7 +93,7 @@ internal class EquivalentNetworkCreatorTest {
     @Test
     internal fun `check that 'addToEdgeBetween' creates default equivalent network`() {
         val network = NetworkService()
-        val (edgeEquipment, lvFeeder, hvFeeder) = network.createEdgeBetween<LvFeeder, Feeder>()
+        val (edgeEquipment, lvFeeder, hvFeeder, _) = network.createEdgeBetween<LvFeeder, Feeder>()
         edgeEquipment.apply {
             location = Location()
             baseVoltage = BaseVoltage().apply { nominalVoltage = 1 }
@@ -103,11 +103,11 @@ internal class EquivalentNetworkCreatorTest {
         val results = network.addToEdgeBetween<EnergySource>(lvFeeder, hvFeeder)
 
         assertThat(results, hasSize(1))
-        results.first().also { result ->
-            assertThat(result.edgeEquipment, equalTo(edgeEquipment))
+        results.first().also { (otherEdgeEquipment, _, branchToEquipment) ->
+            assertThat(otherEdgeEquipment, equalTo(edgeEquipment))
 
-            assertThat(result.branchToEquipment, aMapWithSize(1))
-            result.branchToEquipment.entries.first().also { (equivalentBranch, equivalentEquipment) ->
+            assertThat(branchToEquipment, aMapWithSize(1))
+            branchToEquipment.entries.first().also { (equivalentBranch, equivalentEquipment) ->
                 assertThat(equivalentBranch.mRID, equalTo("${edgeEquipment.mRID}-eb"))
                 assertThat(equivalentBranch.location, equalTo(edgeEquipment.location))
                 assertThat(equivalentBranch.baseVoltage, equalTo(edgeEquipment.baseVoltage))
@@ -184,7 +184,7 @@ internal class EquivalentNetworkCreatorTest {
     @Test
     internal fun `check that 'addToEdgeBetween' can override branch phases by creating terminals`() {
         val network = NetworkService()
-        val (edgeEquipment, lvFeeder, hvFeeder) = network.createEdgeBetween<LvFeeder, Feeder>()
+        val (edgeEquipment, lvFeeder, hvFeeder, _) = network.createEdgeBetween<LvFeeder, Feeder>()
         edgeEquipment.apply {
             location = Location()
             baseVoltage = BaseVoltage().apply { nominalVoltage = 1 }
@@ -208,7 +208,7 @@ internal class EquivalentNetworkCreatorTest {
     @Test
     internal fun `check that 'addToEdgeBetween' can override equipment phases by creating terminals`() {
         val network = NetworkService()
-        val (edgeEquipment, lvFeeder, hvFeeder) = network.createEdgeBetween<LvFeeder, Feeder>()
+        val (edgeEquipment, lvFeeder, hvFeeder, _) = network.createEdgeBetween<LvFeeder, Feeder>()
         edgeEquipment.apply {
             location = Location()
             baseVoltage = BaseVoltage().apply { nominalVoltage = 1 }
@@ -232,7 +232,7 @@ internal class EquivalentNetworkCreatorTest {
     @Test
     internal fun `check that 'addToEdgeBetween' can override equipment by returning different phases`() {
         val network = NetworkService()
-        val (edgeEquipment, lvFeeder, hvFeeder) = network.createEdgeBetween<LvFeeder, Feeder>()
+        val (edgeEquipment, lvFeeder, hvFeeder, _) = network.createEdgeBetween<LvFeeder, Feeder>()
         edgeEquipment.apply {
             location = Location()
             baseVoltage = BaseVoltage().apply { nominalVoltage = 1 }
@@ -258,7 +258,7 @@ internal class EquivalentNetworkCreatorTest {
     @Test
     internal fun `check that 'addToEdgeBetween' adds equivalent branch and equipment to correct container`() {
         NetworkService().also { network ->
-            val (edgeEquipment, lvFeeder, hvFeeder) = network.createEdgeBetween<LvFeeder, Feeder>()
+            val (edgeEquipment, lvFeeder, hvFeeder, _) = network.createEdgeBetween<LvFeeder, Feeder>()
             val otherEquipment = network.sequenceOf<AcLineSegment>().first()
 
             network.addToEdgeBetween<EnergySource>(lvFeeder, hvFeeder)
@@ -275,7 +275,7 @@ internal class EquivalentNetworkCreatorTest {
 
         // Do the same check with the containers set in the reverse order.
         NetworkService().also { network ->
-            val (edgeEquipment, lvFeeder, hvFeeder) = network.createEdgeBetween<LvFeeder, Feeder>(edgeIsOnFirstContainer = true)
+            val (edgeEquipment, lvFeeder, hvFeeder, _) = network.createEdgeBetween<LvFeeder, Feeder>(edgeIsOnFirstContainer = true)
             val otherEquipment = network.sequenceOf<AcLineSegment>().first()
 
             network.addToEdgeBetween<EnergySource>(lvFeeder, hvFeeder)
@@ -305,7 +305,7 @@ internal class EquivalentNetworkCreatorTest {
     @Test
     internal fun `check that 'addToEdgeBetween' can add multiple branches with multiple equipment`() {
         val network = NetworkService()
-        val (edgeEquipment) = network.createEdgeBetween<LvFeeder, Feeder>()
+        val (edgeEquipment, _, _, _) = network.createEdgeBetween<LvFeeder, Feeder>()
 
         val equivalentBranchesCreator = spyk<EquivalentBranchesCreator>({
             sequenceOf(EquivalentBranch("${it.edgeEquipment.mRID}-b1"), EquivalentBranch("${it.edgeEquipment.mRID}-b2"))

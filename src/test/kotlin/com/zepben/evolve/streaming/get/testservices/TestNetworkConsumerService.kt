@@ -14,7 +14,7 @@ import com.zepben.protobuf.nc.*
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
 
-class TestNetworkConsumerService : NetworkConsumerGrpc.NetworkConsumerImplBase() {
+internal class TestNetworkConsumerService : NetworkConsumerGrpc.NetworkConsumerImplBase() {
 
     lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
     lateinit var onGetNetworkHierarchy: (request: GetNetworkHierarchyRequest, response: StreamObserver<GetNetworkHierarchyResponse>) -> Unit

@@ -26,7 +26,7 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
  *
  * Some Measurements represent quantities related to a particular sensor location in the network, e.g. a voltage transformer
  * (PT) at a busbar or a current transformer (CT) at the bar between a breaker and an isolator. The sensing position is not
- * captured in the PSR - Measurement association. Instead it is captured by the Measurement - Terminal association that is
+ * captured in the PSR - Measurement association. Instead, it is captured by the Measurement - Terminal association that is
  * used to define the sensing location in the network topology. The location is defined by the connection of the Terminal to
  * ConductingEquipment.
  *

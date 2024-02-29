@@ -17,7 +17,7 @@ import com.zepben.evolve.services.network.ResistanceReactance
 /**
  * Set of power transformer data, from an equipment library.
  */
-class PowerTransformerInfo(mRID: String = "") : AssetInfo(mRID) {
+class PowerTransformerInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
 
     private var _transformerTankInfos: MutableList<TransformerTankInfo>? = null
 
@@ -29,7 +29,7 @@ class PowerTransformerInfo(mRID: String = "") : AssetInfo(mRID) {
     /**
      * Get the number of entries in the [TransformerTankInfo] collection.
      */
-    fun numTransformerTankInfos() = _transformerTankInfos?.size ?: 0
+    fun numTransformerTankInfos(): Int = _transformerTankInfos?.size ?: 0
 
     /**
      * Get the [TransformerTankInfo] of this [PowerTransformerInfo] represented by [mRID]
@@ -37,7 +37,7 @@ class PowerTransformerInfo(mRID: String = "") : AssetInfo(mRID) {
      * @param mRID the mRID of the required [TransformerTankInfo]
      * @return The [TransformerTankInfo] with the specified [mRID] if it exists, otherwise null
      */
-    fun getTransformerTankInfo(mRID: String) = _transformerTankInfos.getByMRID(mRID)
+    fun getTransformerTankInfo(mRID: String): TransformerTankInfo? = _transformerTankInfos.getByMRID(mRID)
 
     /**
      * Add a [TransformerTankInfo] to this [PowerTransformerInfo]

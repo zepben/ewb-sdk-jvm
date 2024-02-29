@@ -22,20 +22,20 @@ internal class ResistanceReactanceTest {
 
     @Test
     internal fun isEmpty() {
-        assertThat(ResistanceReactance(null, null, null, null).isEmpty(), equalTo(true))
-        assertThat(ResistanceReactance(1.1, null, null, null).isEmpty(), equalTo(false))
-        assertThat(ResistanceReactance(null, 2.2, null, null).isEmpty(), equalTo(false))
-        assertThat(ResistanceReactance(null, null, 3.3, null).isEmpty(), equalTo(false))
-        assertThat(ResistanceReactance(null, null, null, 4.4).isEmpty(), equalTo(false))
+        assertThat("ResistanceReactance with all nulls is empty", ResistanceReactance().isEmpty())
+        assertThat("ResistanceReactance with nonnull r is not empty", !ResistanceReactance(r = 1.1).isEmpty())
+        assertThat("ResistanceReactance with nonnull x is not empty", !ResistanceReactance(x = 2.2).isEmpty())
+        assertThat("ResistanceReactance with nonnull r0 is not empty", !ResistanceReactance(r0 = 3.3).isEmpty())
+        assertThat("ResistanceReactance with nonnull x0 is not empty", !ResistanceReactance(x0 = 4.4).isEmpty())
     }
 
     @Test
     internal fun isComplete() {
-        assertThat(ResistanceReactance(1.1, 1.2, 1.3, 1.4).isComplete(), equalTo(true))
-        assertThat(ResistanceReactance(null, 2.2, 2.3, 2.4).isComplete(), equalTo(false))
-        assertThat(ResistanceReactance(3.1, null, 3.3, 3.4).isComplete(), equalTo(false))
-        assertThat(ResistanceReactance(4.1, 4.2, null, 4.4).isComplete(), equalTo(false))
-        assertThat(ResistanceReactance(5.1, 5.2, 5.3, null).isComplete(), equalTo(false))
+        assertThat("ResistanceReactance without nulls is complete", ResistanceReactance(1.1, 1.2, 1.3, 1.4).isComplete())
+        assertThat("ResistanceReactance with null r is not complete", !ResistanceReactance(x = 2.2, r0 = 2.3, x0 = 2.4).isComplete())
+        assertThat("ResistanceReactance with null x is not complete", !ResistanceReactance(r = 3.1, r0 = 3.3, x0 = 3.4).isComplete())
+        assertThat("ResistanceReactance with null r0 is not complete", !ResistanceReactance(r = 4.1, x = 4.2, x0 = 4.4).isComplete())
+        assertThat("ResistanceReactance with null x0 is not complete", !ResistanceReactance(r = 5.1, x = 5.2, r0 = 5.3).isComplete())
     }
 
     companion object {

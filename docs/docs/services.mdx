@@ -30,7 +30,7 @@ they can provide some common level of functionality. This functionality can be f
 
 As the different services support different subsets of identified objects, you can only add objects directly to a concrete
 service reference. However, sometimes you wish to write some code that works with a set of different objects that are all supported
-by the one service. For example you might have some code that works only on `ConductingEquipment` and you want add or remove
+by the one service. For example, you might have some code that works only on `ConductingEquipment` and you want to add or remove
 these objects. Instead of having to cast to their derived type just to add/remove, `tryAdd` and `tryRemove` functions
 are provided that accept any identified object. These functions will do the grunt work and call the appropriate concrete
 add/remove functions on the service. If the service does not support the provided identified object an exception is thrown.

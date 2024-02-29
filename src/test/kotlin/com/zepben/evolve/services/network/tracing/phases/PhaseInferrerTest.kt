@@ -23,7 +23,7 @@ import org.mockito.kotlin.spy
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 @Suppress("SameParameterValue")
-class PhaseInferrerTest {
+internal class PhaseInferrerTest {
 
     @JvmField
     @RegisterExtension
@@ -326,7 +326,7 @@ class PhaseInferrerTest {
     // AN <-> ABCN <-> AN
     //
     @Test
-    fun testDualFeedANtoABCN() {
+    internal fun testDualFeedANtoABCN() {
         val network = TestNetworkBuilder()
             .fromSource(PhaseCode.AN)
             .toAcls(PhaseCode.ABCN)

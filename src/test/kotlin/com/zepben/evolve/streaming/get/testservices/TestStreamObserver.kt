@@ -11,7 +11,7 @@ package com.zepben.evolve.streaming.get.testservices
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
 
-class TestStreamObserver<T, U>(private val response: StreamObserver<U>, private val onNextHandler: (request: T, response: StreamObserver<U>) -> Unit) :
+internal class TestStreamObserver<T, U>(private val response: StreamObserver<U>, private val onNextHandler: (request: T, response: StreamObserver<U>) -> Unit) :
     StreamObserver<T> {
 
     override fun onNext(request: T) {

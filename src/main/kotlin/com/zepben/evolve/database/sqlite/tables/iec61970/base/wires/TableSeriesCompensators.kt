@@ -15,18 +15,18 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableConducti
 @Suppress("PropertyName")
 class TableSeriesCompensators : TableConductingEquipment() {
 
-    val R = Column(++columnIndex, "r", "NUMBER", NULL)
-    val R0 = Column(++columnIndex, "r0", "NUMBER", NULL)
-    val X = Column(++columnIndex, "x", "NUMBER", NULL)
-    val X0 = Column(++columnIndex, "x0", "NUMBER", NULL)
-    val VARISTOR_RATED_CURRENT = Column(++columnIndex, "varistor_rated_current", "INTEGER", NULL)
-    val VARISTOR_VOLTAGE_THRESHOLD = Column(++columnIndex, "varistor_voltage_threshold", "INTEGER", NULL)
+    val R: Column = Column(++columnIndex, "r", "NUMBER", NULL)
+    val R0: Column = Column(++columnIndex, "r0", "NUMBER", NULL)
+    val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)
+    val X0: Column = Column(++columnIndex, "x0", "NUMBER", NULL)
+    val VARISTOR_RATED_CURRENT: Column = Column(++columnIndex, "varistor_rated_current", "INTEGER", NULL)
+    val VARISTOR_VOLTAGE_THRESHOLD: Column = Column(++columnIndex, "varistor_voltage_threshold", "INTEGER", NULL)
 
     override fun name(): String {
         return "series_compensators"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableSeriesCompensators> = this.javaClass
+    override val tableClassInstance: TableSeriesCompensators = this
 
 }

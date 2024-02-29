@@ -15,18 +15,18 @@ import com.zepben.evolve.services.common.translator.BaseProtoToCim
 import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
-import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 import io.mockk.*
+import org.hamcrest.Matchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.Test
+import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
-class TestCimConsumerClient {
+internal class TestCimConsumerClient {
 
     private val baseConsumerClient = mockk<CimConsumerClient<BaseService, BaseProtoToCim>>()
 
     @Test
-    fun `getMetaData returns non-cached response, and caches it`() {
+    internal fun `getMetaData returns non-cached response, and caches it`() {
         val metadataResponse = GetMetadataResponse.newBuilder().apply {
             serviceInfoBuilder.apply {
                 title = "test title"
@@ -52,13 +52,13 @@ class TestCimConsumerClient {
 
         val returnedServiceInfo = metadataResponse.serviceInfo.fromPb()
 
-        every { baseConsumerClient.runGetMetadata(ofType(GetMetadataRequest::class), any<AwaitableStreamObserver<GetMetadataResponse>>()) } answers {
+        every { baseConsumerClient.runGetMetadata(ofType(GetMetadataRequest::class), any()) } answers {
             secondArg<AwaitableStreamObserver<GetMetadataResponse>>().onNext(metadataResponse)
             secondArg<AwaitableStreamObserver<GetMetadataResponse>>().onCompleted()
         }
 
         every { baseConsumerClient.getMetadata() } answers { callOriginal() }
-        every { baseConsumerClient.tryRpc<ServiceInfo>(any<() -> ServiceInfo>()) } answers {
+        every { baseConsumerClient.tryRpc(any<() -> ServiceInfo>()) } answers {
             GrpcResult.of(firstArg<() -> ServiceInfo>().invoke())
         }
 
@@ -87,7 +87,7 @@ class TestCimConsumerClient {
     }
 
     @Test
-    fun `getMetaData returns cached response`() {
+    internal fun `getMetaData returns cached response`() {
         val uncachedServiceInfo = mockk<ServiceInfo>()
 
         val cachedResponse = PBServiceInfo.newBuilder().apply {
@@ -106,7 +106,7 @@ class TestCimConsumerClient {
         every { baseConsumerClient.serviceInfo } returns cachedResponse
 
         every { baseConsumerClient.getMetadata() } answers { callOriginal() }
-        every { baseConsumerClient.tryRpc<ServiceInfo>(any<() -> ServiceInfo>()) } answers {
+        every { baseConsumerClient.tryRpc(any<() -> ServiceInfo>()) } answers {
             GrpcResult.of(firstArg<() -> ServiceInfo>().invoke())
         }
         mockkStatic(PBServiceInfo::fromPb) {

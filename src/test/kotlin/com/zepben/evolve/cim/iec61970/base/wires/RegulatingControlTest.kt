@@ -18,7 +18,7 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class RegulatingControlTest {
+internal class RegulatingControlTest {
 
     @JvmField
     @RegisterExtension
@@ -46,7 +46,7 @@ class RegulatingControlTest {
         assertThat(regulatingControl.ratedCurrent, nullValue())
         assertThat(regulatingControl.terminal, nullValue())
 
-        regulatingControl.fillFields(NetworkService(), true)
+        regulatingControl.fillFields(NetworkService())
 
         assertThat(regulatingControl.discrete, equalTo(false))
         assertThat(regulatingControl.mode, equalTo(RegulatingControlModeKind.voltage))

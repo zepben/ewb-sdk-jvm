@@ -34,7 +34,7 @@ internal class WireInfoTest {
         assertThat(wireInfo.material, equalTo(WireMaterialKind.UNKNOWN))
         assertThat(wireInfo.ratedCurrent, nullValue())
 
-        wireInfo.fillFields(NetworkService(), true)
+        wireInfo.fillFields(NetworkService())
 
         assertThat(wireInfo.material, equalTo(WireMaterialKind.aaac))
         assertThat(wireInfo.ratedCurrent, equalTo(123))

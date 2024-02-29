@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
-class SetPhasesTest {
+internal class SetPhasesTest {
 
     @JvmField
     @RegisterExtension
@@ -44,20 +44,20 @@ class SetPhasesTest {
         PhaseValidator.validatePhases(n.getT("acLineSegment0", 2), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
         PhaseValidator.validatePhases(n.getT("acLineSegment1", 1), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
         PhaseValidator.validatePhases(n.getT("acLineSegment4", 1), listOf(SPK.A, SPK.B))
-        PhaseValidator.validatePhases(n.getT("node4", 1), listOf(SPK.A, SPK.B))
-        PhaseValidator.validatePhases(n.getT("node4", 2), listOf(SPK.A, SPK.B))
-        PhaseValidator.validatePhases(n.getT("node4", 3), listOf(SPK.A, SPK.B))
-        PhaseValidator.validatePhases(n.getT("node8", 1), listOf(SPK.A))
-        PhaseValidator.validatePhases(n.getT("node5", 1), listOf(SPK.A, SPK.B))
-        PhaseValidator.validatePhases(n.getT("node5", 2), listOf(SPK.A, SPK.B))
-        PhaseValidator.validatePhases(n.getT("node5", 3), listOf(SPK.A, SPK.B))
-        PhaseValidator.validatePhases(n.getT("node9", 1), listOf(SPK.B))
-        PhaseValidator.validatePhases(n.getT("node6", 1), listOf(SPK.A, SPK.B))
-        PhaseValidator.validatePhases(n.getT("node6", 2), listOf(SPK.B, SPK.C))
+        PhaseValidator.validatePhases(n.getT("j4", 1), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("j4", 2), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("j4", 3), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("j8", 1), listOf(SPK.A))
+        PhaseValidator.validatePhases(n.getT("j5", 1), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("j5", 2), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("j5", 3), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("j9", 1), listOf(SPK.B))
+        PhaseValidator.validatePhases(n.getT("j6", 1), listOf(SPK.A, SPK.B))
+        PhaseValidator.validatePhases(n.getT("j6", 2), listOf(SPK.B, SPK.C))
         PhaseValidator.validatePhases(n.getT("acLineSegment2", 2), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
         PhaseValidator.validatePhases(n.getT("acLineSegment3", 1), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
         PhaseValidator.validatePhases(n.getT("acLineSegment9", 2), listOf(SPK.B, SPK.C))
-        PhaseValidator.validatePhases(n.getT("node2", 1), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
+        PhaseValidator.validatePhases(n.getT("j2", 1), listOf(SPK.A, SPK.B, SPK.C, SPK.N))
     }
 
     @Test

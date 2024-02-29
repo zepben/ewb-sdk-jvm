@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.upgrade.changesets
 
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import java.sql.Statement
 

@@ -13,8 +13,8 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableFeeders : TableEquipmentContainers() {
 
-    val NORMAL_HEAD_TERMINAL_MRID = Column(++columnIndex, "normal_head_terminal_mrid", "TEXT", NULL)
-    val NORMAL_ENERGIZING_SUBSTATION_MRID =
+    val NORMAL_HEAD_TERMINAL_MRID: Column = Column(++columnIndex, "normal_head_terminal_mrid", "TEXT", NULL)
+    val NORMAL_ENERGIZING_SUBSTATION_MRID: Column =
         Column(++columnIndex, "normal_energizing_substation_mrid", "TEXT", NULL)
 
     override fun name(): String {
@@ -29,7 +29,7 @@ class TableFeeders : TableEquipmentContainers() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableFeeders> = this.javaClass
+    override val tableClassInstance: TableFeeders = this
 
 }

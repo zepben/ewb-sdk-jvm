@@ -14,28 +14,28 @@ import com.zepben.evolve.testing.TestNetworkBuilder
 object ConnectedEquipmentNetwork {
 
     //
-    // n1--s2--s1--start--s3--s4--n2
+    // j1--s2--s1--start--s3--s4--j2
     //     bo  no         co  bo
     //
     // bo = both open
     // no = normally open
     // co = currently open
     //
-    fun createStraight() = NetworkService().also { n ->
-        val start = createNodeForConnecting(n, "start", 2)
+    fun createStraight(): NetworkService = NetworkService().also { n ->
+        val start = createJunctionForConnecting(n, "start", 2)
         val s1 = createSwitchForConnecting(n, "s1", 2).apply { setNormallyOpen(true) }
         val s2 = createSwitchForConnecting(n, "s2", 2).apply { setNormallyOpen(true).setOpen(true) }
-        val n1 = createNodeForConnecting(n, "n1", 1)
+        val j1 = createJunctionForConnecting(n,  "j1", 1)
         val s3 = createSwitchForConnecting(n, "s3", 2).apply { setOpen(true) }
         val s4 = createSwitchForConnecting(n, "s4", 2).apply { setNormallyOpen(true).setOpen(true) }
-        val n2 = createNodeForConnecting(n, "n2", 1)
+        val j2 = createJunctionForConnecting(n,  "j2", 1)
 
         n.connect(start.terminals[0], s1.terminals[0])
         n.connect(s1.terminals[1], s2.terminals[0])
-        n.connect(s2.terminals[1], n1.terminals[0])
+        n.connect(s2.terminals[1], j1.terminals[0])
         n.connect(start.terminals[1], s3.terminals[0])
         n.connect(s3.terminals[1], s4.terminals[0])
-        n.connect(s4.terminals[1], n2.terminals[0])
+        n.connect(s4.terminals[1], j2.terminals[0])
     }
 
     //
@@ -43,13 +43,13 @@ object ConnectedEquipmentNetwork {
     //               1
     //               b4(c0) 21--c5--2
     //
-    fun createBranched() = TestNetworkBuilder()
+    fun createBranched(): NetworkService = TestNetworkBuilder()
         .fromAcls() // c0
         .toBreaker() // b1
         .toBreaker { setNormallyOpen(true) } // b2
         .toAcls() // c3
         .branchFrom("b1")
-        .toBreaker() { setOpen(true) }// b4
+        .toBreaker { setOpen(true) }// b4
         .toAcls() // c5
         .addFeeder("c0") // fdr6
         .build()

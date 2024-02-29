@@ -14,15 +14,15 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableBatteryUnit : TablePowerElectronicsUnit() {
 
-    val BATTERY_STATE = Column(++columnIndex, "battery_state", "TEXT", NOT_NULL)
-    val RATED_E = Column(++columnIndex, "rated_e", "INTEGER", NULL)
-    val STORED_E = Column(++columnIndex, "stored_e", "INTEGER", NULL)
+    val BATTERY_STATE: Column = Column(++columnIndex, "battery_state", "TEXT", NOT_NULL)
+    val RATED_E: Column = Column(++columnIndex, "rated_e", "INTEGER", NULL)
+    val STORED_E: Column = Column(++columnIndex, "stored_e", "INTEGER", NULL)
 
     override fun name(): String {
         return "battery_unit"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableBatteryUnit> = this.javaClass
+    override val tableClassInstance: TableBatteryUnit = this
 
 }

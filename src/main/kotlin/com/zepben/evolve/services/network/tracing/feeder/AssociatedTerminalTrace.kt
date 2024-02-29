@@ -23,13 +23,6 @@ import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 internal object AssociatedTerminalTrace {
 
     /**
-     * @return a traversal ignoring open points.
-     */
-    internal fun newTrace(): BasicTraversal<Terminal> {
-        return newTrace(OpenTest.IGNORE_OPEN)
-    }
-
-    /**
      * @return a traversal stopping at normally open points.
      */
     internal fun newNormalTrace(): BasicTraversal<Terminal> {

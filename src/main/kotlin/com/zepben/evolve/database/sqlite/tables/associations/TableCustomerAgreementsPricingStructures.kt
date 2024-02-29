@@ -14,8 +14,8 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableCustomerAgreementsPricingStructures : SqliteTable() {
 
-    val CUSTOMER_AGREEMENT_MRID = Column(++columnIndex, "customer_agreement_mrid", "TEXT", NOT_NULL)
-    val PRICING_STRUCTURE_MRID = Column(++columnIndex, "pricing_structure_mrid", "TEXT", NOT_NULL)
+    val CUSTOMER_AGREEMENT_MRID: Column = Column(++columnIndex, "customer_agreement_mrid", "TEXT", NOT_NULL)
+    val PRICING_STRUCTURE_MRID: Column = Column(++columnIndex, "pricing_structure_mrid", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "customer_agreements_pricing_structures"
@@ -38,7 +38,7 @@ class TableCustomerAgreementsPricingStructures : SqliteTable() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableCustomerAgreementsPricingStructures> = this.javaClass
+    override val tableClassInstance: TableCustomerAgreementsPricingStructures = this
 
 }

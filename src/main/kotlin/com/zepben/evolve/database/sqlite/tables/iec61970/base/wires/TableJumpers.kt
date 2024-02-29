@@ -13,7 +13,7 @@ class TableJumpers : TableSwitches() {
         return "jumpers"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableJumpers> = this.javaClass
+    override val tableClassInstance: TableJumpers = this
 
 }

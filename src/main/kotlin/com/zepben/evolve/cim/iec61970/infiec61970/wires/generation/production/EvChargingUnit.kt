@@ -13,4 +13,4 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElec
 /**
  * An electric vehicle charging station.
  */
-class EvChargingUnit(mRID: String = "") : PowerElectronicsUnit(mRID)
+class EvChargingUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronicsUnit(mRID)

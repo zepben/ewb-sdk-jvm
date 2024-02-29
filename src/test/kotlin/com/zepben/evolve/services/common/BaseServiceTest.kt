@@ -63,7 +63,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun supportedTypesCollectionMatch() {
+    internal fun supportedTypesCollectionMatch() {
         assertThat(service.supportedClasses, containsInAnyOrder(*service.supportedKClasses.map { it.java }.toTypedArray()))
     }
 
@@ -71,14 +71,14 @@ internal class BaseServiceTest {
     @Test
     internal fun tryFunctions() {
         val junction = Junction()
-        assertThat(service.tryAdd(junction), equalTo(true))
-        assertThat(service.tryRemove(junction), equalTo(true))
+        assertThat("Initial tryAdd should return true", service.tryAdd(junction))
+        assertThat("tryRemove should return true for previously-added object", service.tryRemove(junction))
         expect { service.tryAdd(CableInfo()) }.toThrow<UnsupportedIdentifiedObjectException>()
         expect { service.tryRemove(CableInfo()) }.toThrow<UnsupportedIdentifiedObjectException>()
     }
 
     @Test
-    fun getJavaInterop() {
+    internal fun getJavaInterop() {
         assertThat(service.get<IdentifiedObject>(breaker1.mRID), equalTo(breaker1))
         assertThat(service.get<IdentifiedObject>(breaker2.mRID), equalTo(breaker2))
         assertThat(service.get<IdentifiedObject>(acLineSegment1.mRID), equalTo(acLineSegment1))
@@ -96,14 +96,14 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun countJavaInterop() {
+    internal fun countJavaInterop() {
         assertThat(service.num<IdentifiedObject>(), equalTo(4))
         assertThat(service.num<Breaker>(), equalTo(2))
         assertThat(service.num<AcLineSegment>(), equalTo(2))
     }
 
     @Test
-    fun forEachJavaInterop() {
+    internal fun forEachJavaInterop() {
         validateForEach<IdentifiedObject>(listOf(breaker1, breaker2, acLineSegment1, acLineSegment2))
         validateForEach<Breaker>(listOf(breaker1, breaker2))
         validateForEach<AcLineSegment>(listOf(acLineSegment1, acLineSegment2))
@@ -117,14 +117,14 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun asStreamJavaInterop() {
-        assertThat(service.sequenceOf<IdentifiedObject>().toList(), containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2))
+    internal fun asStreamJavaInterop() {
+        assertThat(service.sequenceOf<IdentifiedObject>().toList(), containsInAnyOrder(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.sequenceOf<Breaker>().toList(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.sequenceOf<AcLineSegment>().toList(), containsInAnyOrder(acLineSegment1, acLineSegment2))
     }
 
     @Test
-    fun toListJavaInterop() {
+    internal fun toListJavaInterop() {
         assertThat(service.listOf(), containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.listOf(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.listOf(), containsInAnyOrder(acLineSegment1, acLineSegment2))
@@ -134,7 +134,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun toSetJavaInterop() {
+    internal fun toSetJavaInterop() {
         assertThat(service.setOf(), containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2))
         assertThat(service.setOf(), containsInAnyOrder(breaker1, breaker2))
         assertThat(service.setOf(), containsInAnyOrder(acLineSegment1, acLineSegment2))
@@ -144,11 +144,11 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun toMapJavaInterop() {
+    internal fun toMapJavaInterop() {
         assertThat(service.mapOf<IdentifiedObject>().keys, containsInAnyOrder(breaker1.mRID, breaker2.mRID, acLineSegment1.mRID, acLineSegment2.mRID))
         assertThat(
             service.mapOf<IdentifiedObject>().values,
-            containsInAnyOrder<IdentifiedObject>(breaker1, breaker2, acLineSegment1, acLineSegment2)
+            containsInAnyOrder(breaker1, breaker2, acLineSegment1, acLineSegment2)
         )
 
         assertThat(service.mapOf<Breaker>().keys, containsInAnyOrder(breaker1.mRID, breaker2.mRID))
@@ -158,7 +158,7 @@ internal class BaseServiceTest {
         assertThat(service.mapOf<AcLineSegment>().values, containsInAnyOrder(acLineSegment1, acLineSegment2))
 
         assertThat(service.mapOf<IdentifiedObject> { it.name.isEmpty() }.keys, containsInAnyOrder(breaker1.mRID, acLineSegment2.mRID))
-        assertThat(service.mapOf<IdentifiedObject> { it.name.isEmpty() }.values, containsInAnyOrder<IdentifiedObject>(breaker1, acLineSegment2))
+        assertThat(service.mapOf<IdentifiedObject> { it.name.isEmpty() }.values, containsInAnyOrder(breaker1, acLineSegment2))
 
         assertThat(service.mapOf<Breaker> { it.name.isEmpty() }.keys, containsInAnyOrder(breaker1.mRID))
         assertThat(service.mapOf<Breaker> { it.name.isEmpty() }.values, containsInAnyOrder(breaker1))
@@ -168,10 +168,13 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun testUnresolvedBidirectionalReferences() {
+    internal fun testUnresolvedBidirectionalReferences() {
         val terminal = Terminal("t1")
-        assertThat(service.add(terminal), equalTo(true))
-        assertThat(service.resolveOrDeferReference(Resolvers.conductingEquipment(terminal), "j1"), equalTo(false))
+        assertThat("Initial add should return true", service.add(terminal))
+        assertThat(
+            "resolveOrDeferReference should return false for mRID not in service",
+            !service.resolveOrDeferReference(Resolvers.conductingEquipment(terminal), "j1")
+        )
 
         val resolver = Resolvers.conductingEquipment(terminal)
         val unresolvedReference = UnresolvedReference(terminal, "j1", resolver.resolver, resolver.reverseResolver)
@@ -182,7 +185,10 @@ internal class BaseServiceTest {
         assertThat(service.getUnresolvedReferencesTo("j1").toList(), contains(unresolvedReference))
 
         val junction = Junction("j1")
-        assertThat(service.resolveOrDeferReference(Resolvers.terminals(junction), terminal.mRID), equalTo(true))
+        assertThat(
+            "resolveOrDeferReference should return true for mRID in service",
+            service.resolveOrDeferReference(Resolvers.terminals(junction), terminal.mRID)
+        )
 
         assertThat(service.unresolvedReferences().toList(), empty())
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.conductingEquipment(terminal)), empty())
@@ -193,20 +199,23 @@ internal class BaseServiceTest {
         assertThat(terminal.conductingEquipment, equalTo(junction))
         assertThat(junction.getTerminal(terminal.mRID), equalTo(terminal))
 
-        assertThat(service.add(junction), equalTo(true))
+        assertThat("Initial add should return true", service.add(junction))
     }
 
     @Test
-    fun testUnresolvedUnidirectionalReferences() {
+    internal fun testUnresolvedUnidirectionalReferences() {
         val junction = Junction("j1")
-        assertThat(service.add(junction), equalTo(true))
-        assertThat(service.resolveOrDeferReference(Resolvers.baseVoltage(junction), "bv1"), equalTo(false))
+        assertThat("Initial add should return true", service.add(junction))
+        assertThat(
+            "resolveOrDeferReference should return false for mRID not in service",
+            !service.resolveOrDeferReference(Resolvers.baseVoltage(junction), "bv1")
+        )
 
         assertThat(service.unresolvedReferences().toList(), equalTo(listOf(UnresolvedReference(junction, "bv1", Resolvers.baseVoltage(junction).resolver))))
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(junction)), contains("bv1"))
 
         val baseVoltage = BaseVoltage("bv1")
-        assertThat(service.add(baseVoltage), equalTo(true))
+        assertThat("Initial add should return true", service.add(baseVoltage))
 
         assertThat(service.unresolvedReferences().toList(), empty())
         assertThat(service.getUnresolvedReferenceMrids(Resolvers.baseVoltage(junction)), empty())
@@ -215,7 +224,7 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun `test add resolves reverse relationship`() {
+    internal fun `test add resolves reverse relationship`() {
         val ns = NetworkService()
 
         OperationalRestriction("or1").apply {
@@ -231,35 +240,35 @@ internal class BaseServiceTest {
     }
 
     @Test
-    fun `add returns true when object already in service`() {
+    internal fun `add returns true when object already in service`() {
         val ns = NetworkService()
 
         AcLineSegment("acls1").apply {
-            assertThat(ns.add(this), equalTo(true))
+            assertThat("Initial add should return true", ns.add(this))
             // Re-adding the same object should return true
-            assertThat(ns.add(this), equalTo(true))
+            assertThat("Adding the same instance should return true", ns.add(this))
         }
 
         // a new ACLS with the same mRID should fail
         AcLineSegment("acls1").apply {
-            assertThat(ns.add(this), equalTo(false))
+            assertThat("Adding a different instance of the same class with the same mRID should return false", !ns.add(this))
         }
 
         // A completely different object with the same mRID should fail
         Junction("acls1").apply {
-            assertThat(ns.add(this), equalTo(false))
+            assertThat("Adding a different instance of a different class with the same mRID should return false", !ns.add(this))
         }
     }
 
     @Test
-    fun `add only returns true when object is the same instance, not just equal`() {
+    internal fun `add only returns true when object is the same instance, not just equal`() {
         val ms = MyService()
         val obj1 = MyIdentifiedObject("1")
         val obj1Dup = MyIdentifiedObject("1")
 
-        assertThat(ms.add(obj1), equalTo(true))
-        assertThat(ms.add(obj1), equalTo(true))
-        assertThat(ms.add(obj1Dup), equalTo(false))
+        assertThat("Initial add should return true", ms.add(obj1))
+        assertThat("Adding same instance should return true", ms.add(obj1))
+        assertThat("Adding equivalent but different instance should return false", !ms.add(obj1Dup))
     }
 
     @Test
@@ -275,10 +284,10 @@ internal class BaseServiceTest {
     @Test
     internal fun `mrid must be unique`() {
         val junction = Junction("id1")
-        assertThat(service.add(junction), equalTo(true))
+        assertThat("Initial add should return true", service.add(junction))
 
         val location = Location(junction.mRID)
-        assertThat(service.add(location), equalTo(false))
+        assertThat("Adding different object with same mRID should return false", !service.add(location))
     }
 
     private inline fun <reified T : IdentifiedObject> validateForEach(expected: List<ConductingEquipment>) {
@@ -300,6 +309,9 @@ internal class BaseServiceTest {
 
     private class MyService : BaseService("") {
         fun add(cableInfo: MyIdentifiedObject): Boolean = super.add(cableInfo)
+
+        // required, since BaseService checks that each add method has a matching remove method
+        @Suppress("Unused")
         fun remove(cableInfo: MyIdentifiedObject): Boolean = super.remove(cableInfo)
     }
 

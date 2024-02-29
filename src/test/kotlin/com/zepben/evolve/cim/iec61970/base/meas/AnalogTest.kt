@@ -7,6 +7,8 @@
  */
 package com.zepben.evolve.cim.iec61970.base.meas
 
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -27,12 +29,12 @@ internal class AnalogTest {
 
     @Test
     internal fun accessorCoverage() {
-        val measurement = Analog()
-        assertThat(measurement.positiveFlowIn, equalTo(false))
+        val analog = Analog()
+        assertThat(analog.positiveFlowIn, equalTo(false))
 
-        measurement.positiveFlowIn = true
+        analog.fillFields(NetworkService())
 
-        assertThat(measurement.positiveFlowIn, equalTo(true))
-
+        assertThat(analog.positiveFlowIn, equalTo(true))
     }
+
 }

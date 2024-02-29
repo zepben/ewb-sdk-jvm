@@ -13,7 +13,7 @@ class TableFaultIndicators : TableAuxiliaryEquipment() {
         return "fault_indicators"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableFaultIndicators> = this.javaClass
+    override val tableClassInstance: TableFaultIndicators = this
 
 }

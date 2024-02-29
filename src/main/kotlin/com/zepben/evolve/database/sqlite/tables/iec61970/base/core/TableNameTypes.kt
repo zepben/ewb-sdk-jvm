@@ -15,15 +15,15 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableNameTypes : SqliteTable() {
 
-    val NAME = Column(++columnIndex, "name", "TEXT", NOT_NULL)
-    val DESCRIPTION = Column(++columnIndex, "description", "TEXT", NULL)
+    val NAME: Column = Column(++columnIndex, "name", "TEXT", NOT_NULL)
+    val DESCRIPTION: Column = Column(++columnIndex, "description", "TEXT", NULL)
 
     override fun name(): String {
         return "name_types"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableNameTypes> = this.javaClass
+    override val tableClassInstance: TableNameTypes = this
 
     override fun uniqueIndexColumns(): MutableList<List<Column>> = mutableListOf(
         listOf(NAME)

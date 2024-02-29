@@ -16,7 +16,7 @@ class TableGrounds : TableConductingEquipment() {
         return "grounds"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableGrounds> = this.javaClass
+    override val tableClassInstance: TableGrounds = this
 
 }

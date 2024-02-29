@@ -14,12 +14,11 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.services.common.BaseService
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import java.time.Instant
 
 //
 // NOTE: The following extensions are named differently on purpose. If they are called `fillFields` you can not import them
-//       correctly and you get skipping of sub levels in the service specific use.
+//       correctly, and you get skipping of sublevels in the service specific use.
 //
 
 /************ IEC61968 COMMON ************/
@@ -46,7 +45,7 @@ fun OrganisationRole.fillFieldsCommon(service: BaseService, includeRuntime: Bool
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     organisation = Organisation().also {
-        assertThat(service.tryAdd(it), equalTo(true))
+        assertThat("Initial tryAdd should return true", service.tryAdd(it))
     }
 
     return this

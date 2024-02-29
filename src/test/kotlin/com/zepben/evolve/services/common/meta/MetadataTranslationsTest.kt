@@ -8,20 +8,21 @@
 
 package com.zepben.evolve.services.common.meta
 
-import com.google.protobuf.Timestamp as PBTimestamp
 import io.mockk.*
-import com.zepben.protobuf.metadata.DataSource as PBDataSource
-import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.isA
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matchers.contains
 import org.junit.jupiter.api.Test
 import java.time.Instant
+import com.google.protobuf.Timestamp as PBTimestamp
+import com.zepben.protobuf.metadata.DataSource as PBDataSource
+import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
-class MetadataTranslationsTest {
+internal class MetadataTranslationsTest {
 
     @Test
-    fun `DataSource from Protobuf`() {
+    internal fun `DataSource from Protobuf`() {
         val timestampFromPb = mockk<PBTimestamp>().also {
             every { it.seconds } returns 123L
             every { it.nanos } returns 456
@@ -50,7 +51,7 @@ class MetadataTranslationsTest {
     }
 
     @Test
-    fun `DataSource to Protobuf`() {
+    internal fun `DataSource to Protobuf`() {
         val timestamp = mockk<Instant> {
             every { epochSecond } returns 123L
             every { nano } returns 456
@@ -80,7 +81,7 @@ class MetadataTranslationsTest {
     }
 
     @Test
-    fun `ServiceInfo to Protobuf`() {
+    internal fun `ServiceInfo to Protobuf`() {
         val dataSourceOne = mockk<DataSource>()
         val dataSourceTwo = mockk<DataSource>()
         val dataSources = listOf(dataSourceOne, dataSourceTwo)
@@ -111,8 +112,8 @@ class MetadataTranslationsTest {
             val result = serviceInfo.toPb()
 
             verifySequence {
-                pbServiceInfoBuilder.setTitle("test title")
-                pbServiceInfoBuilder.setVersion("test version")
+                pbServiceInfoBuilder.title = "test title"
+                pbServiceInfoBuilder.version = "test version"
                 dataSourceOne.toPb()
                 dataSourceTwo.toPb()
                 pbServiceInfoBuilder.addAllDataSources(listOf(PBDataSource.newBuilder().build(), PBDataSource.newBuilder().build()))
@@ -129,7 +130,7 @@ class MetadataTranslationsTest {
     }
 
     @Test
-    fun `ServiceInfo from protobuf`() {
+    internal fun `ServiceInfo from protobuf`() {
         val dataSourceOne = mockk<PBDataSource>()
         val dataSourceTwo = mockk<PBDataSource>()
         val dataSourceList = listOf(dataSourceOne, dataSourceTwo)

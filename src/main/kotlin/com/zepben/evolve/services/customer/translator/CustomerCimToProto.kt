@@ -63,7 +63,7 @@ fun Tariff.toPb(): PBTariff = toPb(this, PBTariff.newBuilder()).build()
 
 /************ Class for Java friendly usage ************/
 
-class CustomerCimToProto() : BaseCimToProto() {
+class CustomerCimToProto : BaseCimToProto() {
 
     // IEC61968 CUSTOMERS
     fun toPb(cim: Customer): PBCustomer = cim.toPb()

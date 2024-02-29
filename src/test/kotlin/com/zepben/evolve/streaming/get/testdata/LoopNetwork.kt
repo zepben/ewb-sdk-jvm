@@ -32,7 +32,7 @@ object LoopNetwork {
     //      |
     //     CBR
     //
-    fun create() = NetworkService().apply {
+    fun create(): NetworkService = NetworkService().apply {
         val v330 = BaseVoltage().apply { nominalVoltage = 330000 }.also { add(it) }
         val v132 = BaseVoltage().apply { nominalVoltage = 132000 }.also { add(it) }
         val v66 = BaseVoltage().apply { nominalVoltage = 66000 }.also { add(it) }

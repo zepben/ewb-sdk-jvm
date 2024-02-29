@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
-class RemovePhasesTest {
+internal class RemovePhasesTest {
 
     @JvmField
     @RegisterExtension
@@ -32,7 +32,7 @@ class RemovePhasesTest {
     //
     // s4 --c5--
     //
-    val n = TestNetworkBuilder()
+    private val n = TestNetworkBuilder()
         .fromSource(PhaseCode.ABCN) // s0
         .toAcls(PhaseCode.ABCN) // c1
         .toAcls(PhaseCode.ABCN) // c2

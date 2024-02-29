@@ -13,7 +13,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableSubstations : TableEquipmentContainers() {
 
-    val SUB_GEOGRAPHICAL_REGION_MRID =
+    val SUB_GEOGRAPHICAL_REGION_MRID: Column =
         Column(++columnIndex, "sub_geographical_region_mrid", "TEXT", NULL)
 
     override fun name(): String {
@@ -28,7 +28,7 @@ class TableSubstations : TableEquipmentContainers() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableSubstations> = this.javaClass
+    override val tableClassInstance: TableSubstations = this
 
 }

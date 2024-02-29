@@ -13,7 +13,7 @@ class TableLoadBreakSwitches : TableProtectedSwitches() {
         return "load_break_switches"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableLoadBreakSwitches> = this.javaClass
+    override val tableClassInstance: TableLoadBreakSwitches = this
 
 }

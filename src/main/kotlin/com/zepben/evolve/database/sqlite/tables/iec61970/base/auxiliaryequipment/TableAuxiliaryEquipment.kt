@@ -14,6 +14,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableEquipmen
 @Suppress("PropertyName")
 abstract class TableAuxiliaryEquipment : TableEquipment() {
 
-    val TERMINAL_MRID = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
+    val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
 
 }

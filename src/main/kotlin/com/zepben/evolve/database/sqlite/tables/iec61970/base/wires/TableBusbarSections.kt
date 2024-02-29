@@ -13,7 +13,7 @@ class TableBusbarSections : TableConnectors() {
         return "busbar_sections"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableBusbarSections> = this.javaClass
+    override val tableClassInstance: TableBusbarSections = this
 
 }

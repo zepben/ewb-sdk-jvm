@@ -46,8 +46,9 @@ import com.zepben.evolve.services.common.*
 //       function, so make sure you check the code coverage
 //
 @Suppress("unused")
-class NetworkServiceComparator @JvmOverloads constructor(var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()) :
-    BaseServiceComparator() {
+class NetworkServiceComparator @JvmOverloads constructor(
+    private var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()
+) : BaseServiceComparator() {
 
     /************ IEC61968 ASSET INFO ************/
 

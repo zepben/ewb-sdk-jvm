@@ -102,7 +102,7 @@ data class GrpcResult<T>(
          */
         @JvmStatic
         fun <T> of(result: T): GrpcResult<T> {
-            return GrpcResult(result, false)
+            return GrpcResult(result)
         }
 
         /**

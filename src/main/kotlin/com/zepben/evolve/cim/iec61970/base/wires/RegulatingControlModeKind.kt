@@ -20,6 +20,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
  * @property temperature Control switches on/off based on the local temperature (i.e., a thermostat).
  * @property powerFactor Power factor is specified.
  */
+@Suppress("EnumEntryName")
 enum class RegulatingControlModeKind {
 
     UNKNOWN_CONTROL_MODE,

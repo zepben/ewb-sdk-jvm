@@ -8,7 +8,7 @@
 package com.zepben.evolve.cim.iec61970.base.domain
 
 /**
- * The derived units defined for usage in the CIM. In some cases, the derived unit is equal to an SI unit. Whenever possible, the standard derived symbol is used instead of the formula for the derived unit. For example, the unit symbol Farad is defined as “F” instead of “CPerV”. In cases where a standard symbol does not exist for a derived unit, the formula for the unit is used as the unit symbol. For example, density does not have a standard symbol and so it is represented as “kgPerm3”. With the exception of the “kg”, which is an SI unit, the unit symbols do not contain multipliers and therefore represent the base derived unit to which a multiplier can be applied as a whole.
+ * The derived units defined for usage in the CIM. In some cases, the derived unit is equal to an SI unit. Whenever possible, the standard derived symbol is used instead of the formula for the derived unit. For example, the unit symbol Farad is defined as “F” instead of “CPerV”. In cases where a standard symbol does not exist for a derived unit, the formula for the unit is used as the unit symbol. For example, density does not have a standard symbol and so it is represented as “kgPerm3”. Except for “kg”, which is an SI unit, the unit symbols do not contain multipliers and therefore represent the base derived unit to which a multiplier can be applied as a whole.
  * Every unit symbol is treated as an unparseable text as if it were a single-letter symbol. The meaning of each unit symbol is defined by the accompanying descriptive text and not by the text contents of the unit symbol.
  * To allow the widest possible range of serializations without requiring special character handling, several substitutions are made which deviate from the format described in IEC 80000-1. The division symbol “/” is replaced by the letters “Per”. Exponents are written in plain text after the unit as “m3” instead of being formatted as “m” with a superscript of 3 or introducing a symbol as in “m^3”. The degree symbol “°” is replaced with the letters “deg”. Any clarification of the meaning for a substitution is included in the description for the unit symbol.
  * Non-SI units are included in list of unit symbols to allow sources of data to be correctly labelled with their non-SI units (for example, a GPS sensor that is reporting numbers that represent feet instead of meters). This allows software to use the unit symbol information correctly convert and scale the raw data of those sources into SI-based units.
@@ -28,7 +28,7 @@ package com.zepben.evolve.cim.iec61970.base.domain
  * @property GY Absorbed dose in grays (J/kg).
  * @property BQ Radioactivity in becquerels (1/s).
  * @property DEGC Relative temperature in degrees Celsius.
- *				  In the SI unit system the symbol is °C. Electric charge is measured in coulomb that has the unit symbol C. To distinguish degree Celsius from coulomb the symbol used in the UML is degC. The reason for not using °C is that the special character ° is difficult to manage in software."
+ *				  In the SI unit system the symbol is °C. Electric charge is measured in coulomb that has the unit symbol C. To distinguish degree Celsius from coulomb the symbol used in the UML is degC. The reason for not using °C is that the special character ° is difficult to manage in software.
  * @property SV Dose equivalent in sieverts (J/kg).
  * @property F Electric capacitance in farads (C/V).
  * @property C Electric charge in coulombs (A·s).
@@ -67,10 +67,10 @@ package com.zepben.evolve.cim.iec61970.base.domain
  * @property JPERKGK Specific heat capacity, specific entropy, joules per kilogram Kelvin.
  * @property VA Apparent power in volt amperes. See also real power and reactive power.
  * @property VAR Reactive power in volt amperes reactive. The “reactive” or “imaginary” component of electrical power (VIsin(phi)). (See also real power and apparent power).
- * 				 Note: Different meter designs use different methods to arrive at their results. Some meters may compute reactive power as an arithmetic value, while others compute the value vectorially. The data consumer should determine the method in use and the suitability of the measurement for the intended purpose."
+ * 				 Note: Different meter designs use different methods to arrive at their results. Some meters may compute reactive power as an arithmetic value, while others compute the value vectorially. The data consumer should determine the method in use and the suitability of the measurement for the intended purpose.
  * @property COSPHI Power factor, dimensionless.
  * 				    Note 1: This definition of power factor only holds for balanced systems. See the alternative definition under code 153.
- * 				    Note 2 : Beware of differing sign conventions in use between the IEC and EEI. It is assumed that the data consumer understands the type of meter in use and the sign convention in use by the utility."
+ * 				    Note 2 : Beware of differing sign conventions in use between the IEC and EEI. It is assumed that the data consumer understands the type of meter in use and the sign convention in use by the utility.
  * @property VS Volt seconds (Ws/A).
  * @property V2 Volt squared (W²/A²).
  * @property AS Ampere seconds (A·s).

@@ -43,18 +43,18 @@ class DiagramObject @JvmOverloads constructor(mRID: String = "") : IdentifiedObj
     /**
      * Get a count of the [DiagramObjectPoint]'s associated with this [DiagramObject]
      */
-    fun numPoints() = _diagramObjectPoints?.size ?: 0
+    fun numPoints(): Int = _diagramObjectPoints?.size ?: 0
 
     /**
      * A diagram object can have 0 or more points to reflect its layout position, routing
      * (for polylines) or boundary (for polygons). Index in the list corresponds to the sequence number
      */
-    fun getPoint(sequenceNumber: Int) = _diagramObjectPoints?.get(sequenceNumber)
+    fun getPoint(sequenceNumber: Int): DiagramObjectPoint? = _diagramObjectPoints?.get(sequenceNumber)
 
     /**
      * Get a [DiagramObjectPoint] by its sequenceNumber relative to this [DiagramObject]
      */
-    operator fun get(sequenceNumber: Int) = getPoint(sequenceNumber)
+    operator fun get(sequenceNumber: Int): DiagramObjectPoint? = getPoint(sequenceNumber)
 
     /**
      * Java interop forEachIndexed. Performs the given [action] on each element.
@@ -109,4 +109,4 @@ class DiagramObject @JvmOverloads constructor(mRID: String = "") : IdentifiedObj
  *
  * @param action The action to perform on each [DiagramObjectPoint]
  */
-fun DiagramObject.forEachPoint(action: (sequenceNumber: Int, point: DiagramObjectPoint) -> Unit) = forEachPoint(BiConsumer(action))
+fun DiagramObject.forEachPoint(action: (sequenceNumber: Int, point: DiagramObjectPoint) -> Unit): Unit = forEachPoint(BiConsumer(action))

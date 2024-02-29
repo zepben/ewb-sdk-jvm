@@ -15,7 +15,7 @@ class TablePricingStructures : TableDocuments() {
         return "pricing_structures"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TablePricingStructures> = this.javaClass
+    override val tableClassInstance: TablePricingStructures = this
 
 }

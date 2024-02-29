@@ -18,7 +18,7 @@ import org.mockito.kotlin.mock
 internal class CallCredentialApplierTest {
 
     @Test
-    fun interceptCallAppliesCallCredentials() {
+    internal fun interceptCallAppliesCallCredentials() {
         val callCredentials = mock<CallCredentials>()
         val callOptions = mock<CallOptions>()
         val callOptionsWithCredentials = mock<CallOptions>()

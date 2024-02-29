@@ -8,7 +8,7 @@
 package com.zepben.evolve.cim.iec61970.base.core
 
 /**
- * The Name class provides the means to define any number of human readable names for an object. A name is **not** to be used for defining inter-object
+ * The Name class provides the means to define any number of human-readable names for an object. A name is **not** to be used for defining inter-object
  * relationships. For inter-object relationships instead use the object identification 'mRID'.
  *
  * @property name Any free text that name the object.

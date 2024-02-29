@@ -15,14 +15,14 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetInfo
 @Suppress("PropertyName")
 class TableRelayInfo : TableAssetInfo() {
 
-    val CURVE_SETTING = Column(++columnIndex, "curve_setting", "TEXT", NULL)
-    val RECLOSE_FAST = Column(++columnIndex, "reclose_fast", "BOOLEAN", NULL)
+    val CURVE_SETTING: Column = Column(++columnIndex, "curve_setting", "TEXT", NULL)
+    val RECLOSE_FAST: Column = Column(++columnIndex, "reclose_fast", "BOOLEAN", NULL)
 
     override fun name(): String {
         return "relay_info"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableRelayInfo> = this.javaClass
+    override val tableClassInstance: TableRelayInfo = this
 
 }

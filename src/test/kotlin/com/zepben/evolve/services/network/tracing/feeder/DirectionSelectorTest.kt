@@ -9,19 +9,18 @@ package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 
-class DirectionSelectorTest {
+internal class DirectionSelectorTest {
 
     private val terminal = spy<Terminal>()
 
     @Test
-    fun testNormalDirectionSelectorGet() {
+    internal fun testNormalDirectionSelectorGet() {
         val ds = DirectionSelector.NORMAL_DIRECTION.select(terminal)
 
         ds.value
@@ -31,11 +30,11 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testNormalDirectionSelectorSet() {
+    internal fun testNormalDirectionSelectorSet() {
         val ds = DirectionSelector.NORMAL_DIRECTION.select(terminal)
 
-        assertThat(ds.set(FeederDirection.UPSTREAM), equalTo(true))
-        assertThat(ds.set(FeederDirection.UPSTREAM), equalTo(false))
+        assertThat("Setting normal direction of normally undirected terminal to UPSTREAM should true", ds.set(FeederDirection.UPSTREAM))
+        assertThat("Setting normal direction of normally upstream terminal to UPSTREAM should false", !ds.set(FeederDirection.UPSTREAM))
 
         val inOrder = inOrder(terminal)
 
@@ -48,12 +47,12 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testNormalDirectionSelectorAdd() {
+    internal fun testNormalDirectionSelectorAdd() {
         val ds = DirectionSelector.NORMAL_DIRECTION.select(terminal)
 
-        assertThat(ds.add(FeederDirection.UPSTREAM), equalTo(true))
-        assertThat(ds.add(FeederDirection.DOWNSTREAM), equalTo(true))
-        assertThat(ds.add(FeederDirection.DOWNSTREAM), equalTo(false))
+        assertThat("Adding normal upstream direction to normally undirected terminal should return true", ds.add(FeederDirection.UPSTREAM))
+        assertThat("Adding normal downstream direction to normally upstream terminal should return true", ds.add(FeederDirection.DOWNSTREAM))
+        assertThat("Adding normal downstream direction to normally bidirectional terminal should return false", !ds.add(FeederDirection.DOWNSTREAM))
 
         val inOrder = inOrder(terminal)
 
@@ -69,12 +68,12 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testNormalDirectionSelectorRemove() {
+    internal fun testNormalDirectionSelectorRemove() {
         val ds = DirectionSelector.NORMAL_DIRECTION.select(terminal)
 
-        assertThat(ds.set(FeederDirection.BOTH), equalTo(true))
-        assertThat(ds.remove(FeederDirection.DOWNSTREAM), equalTo(true))
-        assertThat(ds.remove(FeederDirection.DOWNSTREAM), equalTo(false))
+        assertThat("Setting normal direction of normally undirected terminal to BOTH should return true", ds.set(FeederDirection.BOTH))
+        assertThat("Removing normal downstream direction from normally bidirectional terminal should return true", ds.remove(FeederDirection.DOWNSTREAM))
+        assertThat("Removing normal downstream direction from normally upstream terminal should return false", !ds.remove(FeederDirection.DOWNSTREAM))
 
         val inOrder = inOrder(terminal)
 
@@ -90,7 +89,7 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testCurrentDirectionSelectorGet() {
+    internal fun testCurrentDirectionSelectorGet() {
         val ds = DirectionSelector.CURRENT_DIRECTION.select(terminal)
 
         ds.value
@@ -100,11 +99,11 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testCurrentDirectionSelectorSet() {
+    internal fun testCurrentDirectionSelectorSet() {
         val ds = DirectionSelector.CURRENT_DIRECTION.select(terminal)
 
-        assertThat(ds.set(FeederDirection.UPSTREAM), equalTo(true))
-        assertThat(ds.set(FeederDirection.UPSTREAM), equalTo(false))
+        assertThat("Setting direction of undirected terminal to UPSTREAM should true", ds.set(FeederDirection.UPSTREAM))
+        assertThat("Setting direction of upstream terminal to UPSTREAM should false", !ds.set(FeederDirection.UPSTREAM))
 
         val inOrder = inOrder(terminal)
 
@@ -117,12 +116,12 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testCurrentDirectionSelectorAdd() {
+    internal fun testCurrentDirectionSelectorAdd() {
         val ds = DirectionSelector.CURRENT_DIRECTION.select(terminal)
 
-        assertThat(ds.add(FeederDirection.UPSTREAM), equalTo(true))
-        assertThat(ds.add(FeederDirection.DOWNSTREAM), equalTo(true))
-        assertThat(ds.add(FeederDirection.DOWNSTREAM), equalTo(false))
+        assertThat("Adding upstream direction to undirected terminal should return true", ds.add(FeederDirection.UPSTREAM))
+        assertThat("Adding downstream direction to upstream terminal should return true", ds.add(FeederDirection.DOWNSTREAM))
+        assertThat("Adding downstream direction to bidirectional terminal should return false", !ds.add(FeederDirection.DOWNSTREAM))
 
         val inOrder = inOrder(terminal)
 
@@ -138,12 +137,12 @@ class DirectionSelectorTest {
     }
 
     @Test
-    fun testCurrentDirectionSelectorRemove() {
+    internal fun testCurrentDirectionSelectorRemove() {
         val ds = DirectionSelector.CURRENT_DIRECTION.select(terminal)
 
-        assertThat(ds.set(FeederDirection.BOTH), equalTo(true))
-        assertThat(ds.remove(FeederDirection.DOWNSTREAM), equalTo(true))
-        assertThat(ds.remove(FeederDirection.DOWNSTREAM), equalTo(false))
+        assertThat("Setting direction of undirected terminal to BOTH should return true", ds.set(FeederDirection.BOTH))
+        assertThat("Removing downstream direction from bidirectional terminal should return true", ds.remove(FeederDirection.DOWNSTREAM))
+        assertThat("Removing downstream direction from upstream terminal should return false", !ds.remove(FeederDirection.DOWNSTREAM))
 
         val inOrder = inOrder(terminal)
 

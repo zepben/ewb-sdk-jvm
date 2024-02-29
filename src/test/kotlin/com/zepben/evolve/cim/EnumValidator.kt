@@ -12,6 +12,7 @@ import com.google.protobuf.ProtocolMessageEnum
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
 import kotlin.enums.EnumEntries
 
 inline fun <reified T : Enum<T>, reified U : Enum<U>> validateEnum(cimEnum: EnumEntries<T>, pbEnum: EnumEntries<U>) {
@@ -19,7 +20,7 @@ inline fun <reified T : Enum<T>, reified U : Enum<U>> validateEnum(cimEnum: Enum
     System.err.println("   vs")
     System.err.println("pb ${pbEnum.toTypedArray()}'")
 
-    assertThat(cimEnum.size, equalTo(pbEnum.size - 1))
+    assertThat(cimEnum, hasSize(pbEnum.size - 1))
 
     val pbUnrecognized = pbEnum[cimEnum.size]
     assertThat(pbUnrecognized.name, equalTo("UNRECOGNIZED"))

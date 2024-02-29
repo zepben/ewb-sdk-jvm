@@ -667,6 +667,9 @@ fun EquivalentEquipment.fillFields(service: NetworkService, includeRuntime: Bool
 
 fun Analog.fillFields(service: NetworkService, includeRuntime: Boolean = true): Analog {
     (this as Measurement).fillFields(service, includeRuntime)
+
+    positiveFlowIn = true
+
     return this
 }
 

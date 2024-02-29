@@ -12,7 +12,7 @@ class TableAccumulators : TableMeasurements() {
         return "accumulators"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableAccumulators> = this.javaClass
+    override val tableClassInstance: TableAccumulators = this
 
 }

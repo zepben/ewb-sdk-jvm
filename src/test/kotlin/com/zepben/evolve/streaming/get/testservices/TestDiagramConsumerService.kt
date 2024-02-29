@@ -14,7 +14,7 @@ import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
 
-class TestDiagramConsumerService : DiagramConsumerGrpc.DiagramConsumerImplBase() {
+internal class TestDiagramConsumerService : DiagramConsumerGrpc.DiagramConsumerImplBase() {
 
     lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
     lateinit var onGetDiagramObjects: (request: GetDiagramObjectsRequest, response: StreamObserver<GetDiagramObjectsResponse>) -> Unit

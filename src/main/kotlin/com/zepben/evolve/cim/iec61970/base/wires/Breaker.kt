@@ -21,11 +21,11 @@ class Breaker @JvmOverloads constructor(mRID: String = "") : ProtectedSwitch(mRI
     /**
      * @return convenience function for detecting if this breaker is part of a substation.
      */
-    val isSubstationBreaker get() = substations.isNotEmpty()
+    val isSubstationBreaker: Boolean get() = substations.isNotEmpty()
 
     /**
      * @return convenience function for detecting if this breaker is at the head of a feeder.
      */
-    val isFeederHeadBreaker get() = normalFeeders.mapNotNull { it.normalHeadTerminal }.any { terminals.contains(it) }
+    val isFeederHeadBreaker: Boolean get() = normalFeeders.mapNotNull { it.normalHeadTerminal }.any { terminals.contains(it) }
 
 }

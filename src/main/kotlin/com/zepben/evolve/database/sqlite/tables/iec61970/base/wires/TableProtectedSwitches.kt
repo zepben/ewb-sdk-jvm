@@ -13,6 +13,6 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 abstract class TableProtectedSwitches : TableSwitches() {
 
-    val BREAKING_CAPACITY = Column(++columnIndex, "breaking_capacity", "INTEGER", NULL)
+    val BREAKING_CAPACITY: Column = Column(++columnIndex, "breaking_capacity", "INTEGER", NULL)
 
 }

@@ -14,10 +14,10 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableTerminals : TableAcDcTerminals() {
 
-    val CONDUCTING_EQUIPMENT_MRID = Column(++columnIndex, "conducting_equipment_mrid", "TEXT", NULL)
-    val SEQUENCE_NUMBER = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
-    val CONNECTIVITY_NODE_MRID = Column(++columnIndex, "connectivity_node_mrid", "TEXT", NULL)
-    val PHASES = Column(++columnIndex, "phases", "TEXT", NOT_NULL)
+    val CONDUCTING_EQUIPMENT_MRID: Column = Column(++columnIndex, "conducting_equipment_mrid", "TEXT", NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
+    val CONNECTIVITY_NODE_MRID: Column = Column(++columnIndex, "connectivity_node_mrid", "TEXT", NULL)
+    val PHASES: Column = Column(++columnIndex, "phases", "TEXT", NOT_NULL)
 
     override fun name(): String {
         return "terminals"
@@ -39,7 +39,7 @@ class TableTerminals : TableAcDcTerminals() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableTerminals> = this.javaClass
+    override val tableClassInstance: TableTerminals = this
 
 }

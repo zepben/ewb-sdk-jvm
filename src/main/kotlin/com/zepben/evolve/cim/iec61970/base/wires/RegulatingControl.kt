@@ -24,14 +24,14 @@ import com.zepben.evolve.services.common.extensions.validateReference
  *
  * The attribute minAllowedTargetValue and maxAllowedTargetValue are required in the following cases:
  * For a power generating module operated in power factor control mode to specify maximum and minimum power factor values;
- * Whenever it is necessary to have an off center target voltage for the tap changer regulator. For instance, due to long cables to off shore wind farms and the
- * need to have a simpler setup at the off shore transformer platform, the voltage is controlled from the land at the connection point for the off shore wind
+ * Whenever it is necessary to have an off center target voltage for the tap changer regulator. For instance, due to long cables to offshore wind farms and the
+ * need to have a simpler setup at the offshore transformer platform, the voltage is controlled from the land at the connection point for the offshore wind
  * farm.
  *
  * Since there usually is a voltage rise along the cable, there is typically an overvoltage of up 3-4 kV compared to the on shore station.
- * Thus in normal operation the tap changer on the on shore station is operated with a target set point, which is in the lower parts of the dead band.
+ * Thus, in normal operation the tap changer on the on shore station is operated with a target set point, which is in the lower parts of the dead band.
  *
- * The attributes minAllowedTargetValue and maxAllowedTargetValue are not related to the attribute targetDeadband and thus they are not treated as an
+ * The attributes minAllowedTargetValue and maxAllowedTargetValue are not related to the attribute targetDeadband, and thus they are not treated as an
  * alternative of the targetDeadband. They are needed due to limitations in the local substation controller.
  *
  * The attribute targetDeadband is used to prevent the power flow from move the tap position in circles (hunting) that is to be used regardless of the
@@ -42,7 +42,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * the units from a schedule.
  * @property monitoredPhase Phase voltage controlling this regulator, measured at regulator location.
  * @property targetDeadband This is a deadband used with discrete control to avoid excessive update of controls like tap changers and shunt compensator banks
- * while regulating. The units are the base units appropriate for the mode. The attribute shall be a positive value or zero. If RegulatingControl.discrete is
+ * while regulating. The units are the base units appropriate for the mode. The attribute shall be a positive value or zero. If [RegulatingControl.discrete] is
  * set to "false", the RegulatingControl.targetDeadband is to be ignored. Note that for instance, if the targetValue is 100 kV and the targetDeadband is 2 kV
  * the range is from 99 to 101 kV.
  * @property targetValue The target value specified for case input. This value can be used for the target value without the use of schedules. The value has the
@@ -76,7 +76,7 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     /**
      * Get the number of entries in the [RegulatingCondEq] collection.
      */
-    fun numRegulatingCondEqs() = _regulatingCondEqs?.size ?: 0
+    fun numRegulatingCondEqs(): Int = _regulatingCondEqs?.size ?: 0
 
     /**
      * [RegulatingCondEq]'s controlled by this [RegulatingControl].
@@ -84,7 +84,7 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
      * @param mRID the mRID of the required [RegulatingCondEq]
      * @return The [RegulatingCondEq] with the specified [mRID] if it exists, otherwise null
      */
-    fun getRegulatingCondEq(mRID: String) = _regulatingCondEqs.getByMRID(mRID)
+    fun getRegulatingCondEq(mRID: String): RegulatingCondEq? = _regulatingCondEqs.getByMRID(mRID)
 
     /**
      * @param regulatingCondEq the regulating conducting equipment controlled by this [RegulatingControl].

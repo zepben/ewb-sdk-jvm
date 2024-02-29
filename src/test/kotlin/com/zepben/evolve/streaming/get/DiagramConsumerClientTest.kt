@@ -18,20 +18,23 @@ import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
 import com.zepben.evolve.streaming.get.testservices.TestDiagramConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
+import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.dc.DiagramConsumerGrpc
-import com.zepben.protobuf.dc.DiagramIdentifiedObject
 import com.zepben.protobuf.dc.GetDiagramObjectsResponse
 import com.zepben.protobuf.dc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.dc.GetIdentifiedObjectsResponse
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
-import com.zepben.protobuf.nc.NetworkConsumerGrpc
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
+import io.grpc.Channel
 import io.grpc.StatusRuntimeException
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
@@ -87,10 +90,10 @@ internal class DiagramConsumerClientTest {
 
             val type = response.identifiedObjectsList[0].identifiedObjectCase
             if (isSupported(type)) {
-                assertThat(result.wasSuccessful, equalTo(true))
+                assertThat("getIdentifiedObject should succeed for supported type ${type.name}", result.wasSuccessful)
                 assertThat(result.value.mRID, equalTo(mRID))
             } else {
-                assertThat(result.wasFailure, equalTo(true))
+                assertThat("getIdentifiedObject should fail for unsupported type ${type.name}", result.wasFailure)
                 assertThat(result.thrown, instanceOf(StatusRuntimeException::class.java))
                 assertThat(result.thrown.cause, instanceOf(UnsupportedOperationException::class.java))
                 assertThat(result.thrown.cause?.message, equalTo("Identified object type $type is not supported by the diagram service"))
@@ -109,7 +112,7 @@ internal class DiagramConsumerClientTest {
         val result = consumerClient.getIdentifiedObject(mRID)
 
         verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
-        assertThat(result.wasFailure, equalTo(true))
+        assertThat("getIdentifiedObject should fail for mRID '$mRID', which isn't in the diagram", result.wasFailure)
         ExpectException.expect { throw result.thrown }
             .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID $mRID could be found.")
@@ -151,8 +154,8 @@ internal class DiagramConsumerClientTest {
 
         val result = consumerClient.getIdentifiedObjects(mRIDs.asSequence())
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.objects.size, equalTo(3))
+        assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
+        assertThat(result.value.objects, aMapWithSize(3))
         assertThat(result.value.objects[mRIDs[0]], instanceOf(Diagram::class.java))
         assertThat(result.value.objects[mRIDs[1]], instanceOf(Diagram::class.java))
         assertThat(result.value.objects[mRIDs[2]], instanceOf(DiagramObject::class.java))
@@ -194,8 +197,8 @@ internal class DiagramConsumerClientTest {
 
         val result = consumerClient.getIdentifiedObjects(mRIDs)
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.objects.size, equalTo(1))
+        assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
+        assertThat(result.value.objects, aMapWithSize(1))
         assertThat(result.value.objects["id1"], instanceOf(Diagram::class.java))
         assertThat(result.value.failed, containsInAnyOrder(mRIDs[1]))
 
@@ -219,7 +222,7 @@ internal class DiagramConsumerClientTest {
         assertThat(result.value.objects, hasEntry("id1", diagram))
         assertThat(result.value.objects, hasKey("id2"))
         assertThat(result.value.objects, hasKey("id3"))
-        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.objects, aMapWithSize(3))
         assertThat(result.value.failed, empty())
     }
 
@@ -235,14 +238,14 @@ internal class DiagramConsumerClientTest {
 
         val result = consumerClient.getDiagramObjects("io1").throwOnError()
 
-        assertThat(result.value.objects.size, equalTo(2))
-        assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, containsInAnyOrder("d1", "d2"))
+        assertThat(result.value.objects, aMapWithSize(2))
+        assertThat(service.listOf<IdentifiedObject>().map { it.mRID }, containsInAnyOrder("d1", "d2"))
     }
 
     @Test
     internal fun `runGetMetadata calls stub with arguments it's passed`() {
         val request = GetMetadataRequest.newBuilder().build()
-        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> { _ -> }
+        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> {}
         doNothing().`when`(stub).getMetadata(request, streamObserver)
 
         consumerClient.runGetMetadata(request, streamObserver)
@@ -258,6 +261,45 @@ internal class DiagramConsumerClientTest {
 
         verify(consumerService.onGetMetadataRequest).invoke(eq(GetMetadataRequest.newBuilder().build()), any())
         validateFailure(onErrorHandler, result, serverException)
+    }
+
+    @Test
+    internal fun `construct via Channel`() {
+        val diagramService = DiagramService().apply {
+            add(DiagramObject("d1").also { it.identifiedObjectMRID = "io1" })
+        }
+
+        configureResponses(diagramService)
+
+        val channel = mockk<Channel>()
+        mockkStatic(DiagramConsumerGrpc::class)
+        every { DiagramConsumerGrpc.newStub(channel) } returns stub
+
+        val clientViaChannel = DiagramConsumerClient(channel)
+        val result = clientViaChannel.getDiagramObjects("io1").throwOnError()
+
+        assertThat(result.value.objects, aMapWithSize(1))
+        assertThat(clientViaChannel.service.listOf<IdentifiedObject>().map { it.mRID }, contains("d1"))
+    }
+
+    @Test
+    internal fun `construct via GrpcChannel`() {
+        val diagramService = DiagramService().apply {
+            add(DiagramObject("d1").also { it.identifiedObjectMRID = "io1" })
+        }
+
+        configureResponses(diagramService)
+
+        val channel = mockk<Channel>()
+        val grpcChannel = GrpcChannel(channel)
+        mockkStatic(DiagramConsumerGrpc::class)
+        every { DiagramConsumerGrpc.newStub(channel) } returns stub
+
+        val clientViaGrpcChannel = DiagramConsumerClient(grpcChannel)
+        val result = clientViaGrpcChannel.getDiagramObjects("io1").throwOnError()
+
+        assertThat(result.value.objects, aMapWithSize(1))
+        assertThat(clientViaGrpcChannel.service.listOf<IdentifiedObject>().map { it.mRID }, contains("d1"))
     }
 
     private fun configureResponses(expectedDiagramService: DiagramService) {
@@ -280,7 +322,7 @@ internal class DiagramConsumerClientTest {
         return responses.iterator()
     }
 
-    private fun buildDIO(obj: IdentifiedObject, identifiedObjectBuilder: DiagramIdentifiedObject.Builder): DiagramIdentifiedObject? =
+    private fun buildDIO(obj: IdentifiedObject, identifiedObjectBuilder: DIO.Builder): DIO? =
         identifiedObjectBuilder.apply {
             whenDiagramServiceObject(
                 obj,

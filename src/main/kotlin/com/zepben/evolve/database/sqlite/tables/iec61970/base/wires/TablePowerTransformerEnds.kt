@@ -14,18 +14,18 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TablePowerTransformerEnds : TableTransformerEnds() {
 
-    val POWER_TRANSFORMER_MRID = Column(++columnIndex, "power_transformer_mrid", "TEXT", NULL)
-    val CONNECTION_KIND = Column(++columnIndex, "connection_kind", "TEXT", NOT_NULL)
-    val PHASE_ANGLE_CLOCK = Column(++columnIndex, "phase_angle_clock", "INTEGER", NULL)
-    val B = Column(++columnIndex, "b", "NUMBER", NULL)
-    val B0 = Column(++columnIndex, "b0", "NUMBER", NULL)
-    val G = Column(++columnIndex, "g", "NUMBER", NULL)
-    val G0 = Column(++columnIndex, "g0", "NUMBER", NULL)
-    val R = Column(++columnIndex, "R", "NUMBER", NULL)
-    val R0 = Column(++columnIndex, "R0", "NUMBER", NULL)
-    val RATED_U = Column(++columnIndex, "rated_u", "INTEGER", NULL)
-    val X = Column(++columnIndex, "X", "NUMBER", NULL)
-    val X0 = Column(++columnIndex, "X0", "NUMBER", NULL)
+    val POWER_TRANSFORMER_MRID: Column = Column(++columnIndex, "power_transformer_mrid", "TEXT", NULL)
+    val CONNECTION_KIND: Column = Column(++columnIndex, "connection_kind", "TEXT", NOT_NULL)
+    val PHASE_ANGLE_CLOCK: Column = Column(++columnIndex, "phase_angle_clock", "INTEGER", NULL)
+    val B: Column = Column(++columnIndex, "b", "NUMBER", NULL)
+    val B0: Column = Column(++columnIndex, "b0", "NUMBER", NULL)
+    val G: Column = Column(++columnIndex, "g", "NUMBER", NULL)
+    val G0: Column = Column(++columnIndex, "g0", "NUMBER", NULL)
+    val R: Column = Column(++columnIndex, "R", "NUMBER", NULL)
+    val R0: Column = Column(++columnIndex, "R0", "NUMBER", NULL)
+    val RATED_U: Column = Column(++columnIndex, "rated_u", "INTEGER", NULL)
+    val X: Column = Column(++columnIndex, "X", "NUMBER", NULL)
+    val X0: Column = Column(++columnIndex, "X0", "NUMBER", NULL)
 
     override fun name(): String {
         return "power_transformer_ends"
@@ -47,7 +47,7 @@ class TablePowerTransformerEnds : TableTransformerEnds() {
         return cols
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TablePowerTransformerEnds> = this.javaClass
+    override val tableClassInstance: TablePowerTransformerEnds = this
 
 }

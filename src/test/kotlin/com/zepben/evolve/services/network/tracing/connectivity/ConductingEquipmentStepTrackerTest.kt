@@ -11,7 +11,6 @@ package com.zepben.evolve.services.network.tracing.connectivity
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -24,29 +23,29 @@ internal class ConductingEquipmentStepTrackerTest {
     private val tracker = ConductingEquipmentStepTracker()
 
     @Test
-    fun `visited step is reported as visited`() {
+    internal fun `visited step is reported as visited`() {
         val step = ConductingEquipmentStep(Junction())
 
-        assertThat("hasVisited returns false for unvisited equipment", not(tracker.hasVisited(step)))
+        assertThat("hasVisited returns false for unvisited equipment", !tracker.hasVisited(step))
         assertThat("Visiting unvisited equipment returns true", tracker.visit(step))
         assertThat("hasVisited returns true for visited equipment", tracker.hasVisited(step))
-        assertThat("Revisiting visited equipment returns false", not(tracker.visit(step)))
+        assertThat("Revisiting visited equipment returns false", !tracker.visit(step))
     }
 
     @Test
-    fun `smaller step for same equipment is reported as unvisited`() {
+    internal fun `smaller step for same equipment is reported as unvisited`() {
         val ce = Junction()
         val step1 = ConductingEquipmentStep(ce, 1)
         val step2 = ConductingEquipmentStep(ce)
 
         tracker.visit(step1)
 
-        assertThat("hasVisited returns false for smaller step of visited", not(tracker.hasVisited(step2)))
+        assertThat("hasVisited returns false for smaller step of visited", !tracker.hasVisited(step2))
         assertThat("Visiting smaller step of visited returns true", tracker.visit(step2))
     }
 
     @Test
-    fun `larger step for same equipment is reported as visited`() {
+    internal fun `larger step for same equipment is reported as visited`() {
         val ce = Junction()
         val step1 = ConductingEquipmentStep(ce)
         val step2 = ConductingEquipmentStep(ce, 1)
@@ -54,17 +53,17 @@ internal class ConductingEquipmentStepTrackerTest {
         tracker.visit(step1)
 
         assertThat("hasVisited returns true for larger step of visited", tracker.hasVisited(step2))
-        assertThat("Visiting larger step of visited returns false", not(tracker.visit(step2)))
+        assertThat("Visiting larger step of visited returns false", !tracker.visit(step2))
     }
 
     @Test
-    fun `steps of different equipment are tracked separately`() {
+    internal fun `steps of different equipment are tracked separately`() {
         val step1 = ConductingEquipmentStep(Junction())
         val step2 = ConductingEquipmentStep(Junction())
 
         tracker.visit(step1)
 
-        assertThat("hasVisited returns false for same step on different equipment", not(tracker.hasVisited(step2)))
+        assertThat("hasVisited returns false for same step on different equipment", !tracker.hasVisited(step2))
         assertThat("Visiting same step on different equipment returns true", tracker.visit(step2))
     }
 

@@ -16,7 +16,7 @@ object SingleTransformerNetwork {
     //
     // s-tx
     //
-    fun create(sequenceNumber: Int) = NetworkService().also { networkService ->
+    fun create(sequenceNumber: Int): NetworkService = NetworkService().also { networkService ->
         val source = createSourceForConnecting(networkService, "s", 1)
         val transformer = createPowerTransformerForConnecting(networkService, "tx", 1, 1, 0)
 

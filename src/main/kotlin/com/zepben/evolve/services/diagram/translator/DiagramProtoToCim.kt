@@ -45,7 +45,7 @@ fun toCim(pb: PBDiagramObject, diagramService: DiagramService): DiagramObject =
         toCim(pb.io, this, diagramService)
     }
 
-fun toCim(pb: PBDiagramObjectPoint) =
+fun toCim(pb: PBDiagramObjectPoint): DiagramObjectPoint =
     DiagramObjectPoint(pb.xPosition, pb.yPosition)
 
 fun DiagramService.addFromPb(pb: PBDiagram): Diagram? = tryAddOrNull(toCim(pb, this))

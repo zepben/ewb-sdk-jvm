@@ -35,7 +35,7 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
     /**
      * Get the number of entries in the [endTerminals] collection.
      */
-    fun numEndTerminals() = _endTerminals?.size ?: 0
+    fun numEndTerminals(): Int = _endTerminals?.size ?: 0
 
     /**
      * Retrieve a [Terminal] from the [endTerminals] collection.
@@ -43,7 +43,7 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
      * @param mRID the mRID of the required [Terminal]
      * @return The [Terminal] with the specified [mRID] if it exists, otherwise null
      */
-    fun getEndTerminal(mRID: String) = _endTerminals.getByMRID(mRID)
+    fun getEndTerminal(mRID: String): Terminal? = _endTerminals.getByMRID(mRID)
 
     /**
      * @param endTerminal the [Terminal] to associate with this [Circuit].
@@ -87,7 +87,7 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
     /**
      * Get the number of entries in the [endSubstations] collection.
      */
-    fun numEndSubstations() = _endSubstations?.size ?: 0
+    fun numEndSubstations(): Int = _endSubstations?.size ?: 0
 
     /**
      * Retrieve a [Substation] that is associated with this [Circuit].
@@ -95,7 +95,7 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
      * @param mRID the mRID of the required [Substation]
      * @return The [Substation] with the specified [mRID] if it exists, otherwise null
      */
-    fun getEndSubstation(mRID: String) = _endSubstations.getByMRID(mRID)
+    fun getEndSubstation(mRID: String): Substation? = _endSubstations.getByMRID(mRID)
 
     /**
      * @param substation the [Substation] to associate with this [Circuit].

@@ -18,7 +18,7 @@ import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class RemoveDirectionTest {
+internal class RemoveDirectionTest {
 
     @JvmField
     @RegisterExtension

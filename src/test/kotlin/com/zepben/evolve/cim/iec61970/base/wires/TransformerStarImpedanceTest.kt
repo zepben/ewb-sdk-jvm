@@ -94,7 +94,7 @@ internal class TransformerStarImpedanceTest {
     @Test
     internal fun mergesResistanceReactanceWhenRequired() {
         val info = mock<TransformerEndInfo>()
-        doReturn(ResistanceReactance(null, 2.2, null, null)).`when`(info).calculateResistanceReactanceFromTests()
+        doReturn(ResistanceReactance(x = 2.2)).`when`(info).calculateResistanceReactanceFromTests()
 
         val rr = TransformerStarImpedance().apply {
             r = 1.1

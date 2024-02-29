@@ -40,7 +40,7 @@ object WithUsagePointsNetwork {
     // sw1: normally close, currently open
     // sw2: normally open, currently closed
     //
-    fun createLarge() = NetworkService().also { network ->
+    fun createLarge(): NetworkService = NetworkService().also { network ->
         val es = createSourceForConnecting(network, "es", 1)
         val iso = createPowerTransformerForConnecting(network, "iso", 2, 1, 2)
         val sw1 = createSwitchForConnecting(network, "sw1", 2)
@@ -74,34 +74,34 @@ object WithUsagePointsNetwork {
         sw1.setOpen(true, SinglePhaseKind.A)
         sw2.setOpen(false, SinglePhaseKind.A)
 
-        network.connect(es.getTerminal(1)!!, c0.getTerminal(1)!!)
-        network.connect(c0.getTerminal(2)!!, c1.getTerminal(1)!!)
-        network.connect(c1.getTerminal(2)!!, c2.getTerminal(1)!!)
-        network.connect(c2.getTerminal(2)!!, sw1.getTerminal(1)!!)
-        network.connect(sw1.getTerminal(2)!!, iso.getTerminal(1)!!)
-        network.connect(iso.getTerminal(2)!!, c3.getTerminal(1)!!)
-        network.connect(c3.getTerminal(2)!!, c4.getTerminal(1)!!)
-        network.connect(c4.getTerminal(2)!!, c5.getTerminal(1)!!)
-        network.connect(c5.getTerminal(2)!!, tx1.getTerminal(1)!!)
-        network.connect(c6.getTerminal(2)!!, tx2.getTerminal(1)!!)
-        network.connect(c7.getTerminal(2)!!, tx3.getTerminal(1)!!)
-        network.connect(c8.getTerminal(2)!!, sw2.getTerminal(1)!!)
-        network.connect(c9.getTerminal(2)!!, tx4.getTerminal(1)!!)
-        network.connect(c10.getTerminal(2)!!, tx5.getTerminal(1)!!)
-        network.connect(sw2.getTerminal(2)!!, c11.getTerminal(1)!!)
-        network.connect(c11.getTerminal(2)!!, c12.getTerminal(1)!!)
-        network.connect(c12.getTerminal(2)!!, c13.getTerminal(1)!!)
-        network.connect(c13.getTerminal(2)!!, tx6.getTerminal(1)!!)
-        network.connect(c14.getTerminal(2)!!, tx7.getTerminal(1)!!)
-        network.connect(c15.getTerminal(2)!!, tx8.getTerminal(1)!!)
+        network.connect(es.t1, c0.t1)
+        network.connect(c0.t2, c1.t1)
+        network.connect(c1.t2, c2.t1)
+        network.connect(c2.t2, sw1.t1)
+        network.connect(sw1.t2, iso.t1)
+        network.connect(iso.t2, c3.t1)
+        network.connect(c3.t2, c4.t1)
+        network.connect(c4.t2, c5.t1)
+        network.connect(c5.t2, tx1.t1)
+        network.connect(c6.t2, tx2.t1)
+        network.connect(c7.t2, tx3.t1)
+        network.connect(c8.t2, sw2.t1)
+        network.connect(c9.t2, tx4.t1)
+        network.connect(c10.t2, tx5.t1)
+        network.connect(sw2.t2, c11.t1)
+        network.connect(c11.t2, c12.t1)
+        network.connect(c12.t2, c13.t1)
+        network.connect(c13.t2, tx6.t1)
+        network.connect(c14.t2, tx7.t1)
+        network.connect(c15.t2, tx8.t1)
 
-        network.connect(c6.getTerminal(1)!!, Objects.requireNonNull(c0.getTerminal(2)!!.connectivityNodeId))
-        network.connect(c7.getTerminal(1)!!, Objects.requireNonNull(c1.getTerminal(2)!!.connectivityNodeId))
-        network.connect(c8.getTerminal(1)!!, Objects.requireNonNull(c2.getTerminal(2)!!.connectivityNodeId))
-        network.connect(c9.getTerminal(1)!!, Objects.requireNonNull(c3.getTerminal(2)!!.connectivityNodeId))
-        network.connect(c10.getTerminal(1)!!, Objects.requireNonNull(c4.getTerminal(2)!!.connectivityNodeId))
-        network.connect(c14.getTerminal(1)!!, Objects.requireNonNull(c11.getTerminal(2)!!.connectivityNodeId))
-        network.connect(c15.getTerminal(1)!!, Objects.requireNonNull(c12.getTerminal(2)!!.connectivityNodeId))
+        network.connect(c6.t1, Objects.requireNonNull(c0.t2.connectivityNodeId))
+        network.connect(c7.t1, Objects.requireNonNull(c1.t2.connectivityNodeId))
+        network.connect(c8.t1, Objects.requireNonNull(c2.t2.connectivityNodeId))
+        network.connect(c9.t1, Objects.requireNonNull(c3.t2.connectivityNodeId))
+        network.connect(c10.t1, Objects.requireNonNull(c4.t2.connectivityNodeId))
+        network.connect(c14.t1, Objects.requireNonNull(c11.t2.connectivityNodeId))
+        network.connect(c15.t1, Objects.requireNonNull(c12.t2.connectivityNodeId))
 
         Tracing.setPhases().run(network)
         es.addFeederDirections()
@@ -115,7 +115,7 @@ object WithUsagePointsNetwork {
     //       |
     //      ec2 [cpi1]
     //
-    inline fun <reified T : ConductingEquipment> createTxWithVirtual(virtualConnectionCategory: String) = NetworkService().also { network ->
+    inline fun <reified T : ConductingEquipment> createTxWithVirtual(virtualConnectionCategory: String): NetworkService = NetworkService().also { network ->
         val nameType = NameType("CPI").also { network.addNameType(it) }
         val es = createSourceForConnecting(network, "es", 1)
         val tx = PowerTransformer("tx").apply {
@@ -160,7 +160,7 @@ object WithUsagePointsNetwork {
     //                 LV
     // es - tx [cpi1] ---- ec [cpi2]
     //
-    fun createTxWithRealAndLv(connectionCategory: String? = null) = NetworkService().also { network ->
+    fun createTxWithRealAndLv(connectionCategory: String? = null): NetworkService = NetworkService().also { network ->
         val nameType = NameType("CPI").also { network.addNameType(it) }
         val es = createSourceForConnecting(network, "es", 1)
         val tx = PowerTransformer("tx").apply {

@@ -27,6 +27,7 @@ data class ResistanceReactance(
 
 }
 
+@Suppress("Destructure")
 internal fun ResistanceReactance.mergeIfIncomplete(toMerge: () -> ResistanceReactance?): ResistanceReactance {
     return when {
         isComplete() -> this

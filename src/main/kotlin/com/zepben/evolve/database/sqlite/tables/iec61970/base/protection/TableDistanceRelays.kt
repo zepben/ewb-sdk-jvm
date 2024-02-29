@@ -14,21 +14,21 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableDistanceRelays : TableProtectionRelayFunctions() {
 
-    val BACKWARD_BLIND = Column(++columnIndex, "backward_blind", "NUMBER", NULL)
-    val BACKWARD_REACH = Column(++columnIndex, "backward_reach", "NUMBER", NULL)
-    val BACKWARD_REACTANCE = Column(++columnIndex, "backward_reactance", "NUMBER", NULL)
-    val FORWARD_BLIND = Column(++columnIndex, "forward_blind", "NUMBER", NULL)
-    val FORWARD_REACH = Column(++columnIndex, "forward_reach", "NUMBER", NULL)
-    val FORWARD_REACTANCE = Column(++columnIndex, "forward_reactance", "NUMBER", NULL)
-    val OPERATION_PHASE_ANGLE1 = Column(++columnIndex, "operation_phase_angle1", "NUMBER", NULL)
-    val OPERATION_PHASE_ANGLE2 = Column(++columnIndex, "operation_phase_angle2", "NUMBER", NULL)
-    val OPERATION_PHASE_ANGLE3 = Column(++columnIndex, "operation_phase_angle3", "NUMBER", NULL)
+    val BACKWARD_BLIND: Column = Column(++columnIndex, "backward_blind", "NUMBER", NULL)
+    val BACKWARD_REACH: Column = Column(++columnIndex, "backward_reach", "NUMBER", NULL)
+    val BACKWARD_REACTANCE: Column = Column(++columnIndex, "backward_reactance", "NUMBER", NULL)
+    val FORWARD_BLIND: Column = Column(++columnIndex, "forward_blind", "NUMBER", NULL)
+    val FORWARD_REACH: Column = Column(++columnIndex, "forward_reach", "NUMBER", NULL)
+    val FORWARD_REACTANCE: Column = Column(++columnIndex, "forward_reactance", "NUMBER", NULL)
+    val OPERATION_PHASE_ANGLE1: Column = Column(++columnIndex, "operation_phase_angle1", "NUMBER", NULL)
+    val OPERATION_PHASE_ANGLE2: Column = Column(++columnIndex, "operation_phase_angle2", "NUMBER", NULL)
+    val OPERATION_PHASE_ANGLE3: Column = Column(++columnIndex, "operation_phase_angle3", "NUMBER", NULL)
 
     override fun name(): String {
         return "distance_relays"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableDistanceRelays> = this.javaClass
+    override val tableClassInstance: TableDistanceRelays = this
 
 }

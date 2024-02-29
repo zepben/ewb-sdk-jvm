@@ -11,7 +11,6 @@ import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.evolve.cim.iec61968.assets.AssetInfo
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import java.lang.Double.isNaN
 
 /**
  * Combination of conducting material with consistent electrical characteristics, building a single electrical system, used to carry current
@@ -23,7 +22,7 @@ abstract class Conductor(mRID: String = "") : ConductingEquipment(mRID) {
 
     var length: Double? = null
         set(value) {
-            require((value == null) || (value >= 0) || isNaN(value)) { "Conductor length cannot be negative." }
+            require((value == null) || (value >= 0) || value.isNaN()) { "Conductor length cannot be negative." }
             field = value
         }
 

@@ -19,19 +19,23 @@ import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
 import com.zepben.evolve.streaming.get.testdata.CustomerNetwork
 import com.zepben.evolve.streaming.get.testservices.TestCustomerConsumerService
 import com.zepben.evolve.streaming.grpc.CaptureLastRpcErrorHandler
+import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.cc.GetCustomersForContainerResponse
 import com.zepben.protobuf.cc.GetIdentifiedObjectsRequest
 import com.zepben.protobuf.cc.GetIdentifiedObjectsResponse
-import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
+import io.grpc.Channel
 import io.grpc.StatusRuntimeException
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
@@ -87,10 +91,10 @@ internal class CustomerConsumerClientTest {
 
             val type = response.identifiedObjectsList[0].identifiedObjectCase
             if (isSupported(type)) {
-                assertThat(result.wasSuccessful, equalTo(true))
+                assertThat("getIdentifiedObject should succeed for supported type ${type.name}", result.wasSuccessful)
                 assertThat(result.value.mRID, equalTo(mRID))
             } else {
-                assertThat(result.wasFailure, equalTo(true))
+                assertThat("getIdentifiedObject should fail for unsupported type ${type.name}", result.wasFailure)
                 assertThat(result.thrown, instanceOf(StatusRuntimeException::class.java))
                 assertThat(result.thrown.cause, instanceOf(UnsupportedOperationException::class.java))
                 assertThat(result.thrown.cause?.message, equalTo("Identified object type $type is not supported by the customer service"))
@@ -109,7 +113,7 @@ internal class CustomerConsumerClientTest {
         val result = consumerClient.getIdentifiedObject(mRID)
 
         verify(consumerService.onGetIdentifiedObjects).invoke(eq(GetIdentifiedObjectsRequest.newBuilder().addMrids(mRID).build()), any())
-        assertThat(result.wasFailure, equalTo(true))
+        assertThat("getIdentifiedObject should fail for mRID '$mRID', which isn't in the customer service", result.wasFailure)
         expect { throw result.thrown }
             .toThrow<NoSuchElementException>()
             .withMessage("No object with mRID $mRID could be found.")
@@ -151,8 +155,8 @@ internal class CustomerConsumerClientTest {
 
         val result = consumerClient.getIdentifiedObjects(mRIDs.asSequence())
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.objects.size, equalTo(3))
+        assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
+        assertThat(result.value.objects, aMapWithSize(3))
         assertThat(result.value.objects[mRIDs[0]], instanceOf(Customer::class.java))
         assertThat(result.value.objects[mRIDs[1]], instanceOf(Customer::class.java))
         assertThat(result.value.objects[mRIDs[2]], instanceOf(CustomerAgreement::class.java))
@@ -194,8 +198,8 @@ internal class CustomerConsumerClientTest {
 
         val result = consumerClient.getIdentifiedObjects(mRIDs)
 
-        assertThat(result.wasSuccessful, equalTo(true))
-        assertThat(result.value.objects.size, equalTo(1))
+        assertThat("getIdentifiedObjects should succeed", result.wasSuccessful)
+        assertThat(result.value.objects, aMapWithSize(1))
         assertThat(result.value.objects["id1"], instanceOf(Customer::class.java))
         assertThat(result.value.failed, containsInAnyOrder(mRIDs[1]))
 
@@ -219,7 +223,7 @@ internal class CustomerConsumerClientTest {
         assertThat(result.value.objects, hasEntry("id1", customer))
         assertThat(result.value.objects, hasKey("id2"))
         assertThat(result.value.objects, hasKey("id3"))
-        assertThat(result.value.objects.size, equalTo(3))
+        assertThat(result.value.objects, aMapWithSize(3))
         assertThat(result.value.failed, empty())
     }
 
@@ -228,17 +232,29 @@ internal class CustomerConsumerClientTest {
         val (_, expectedCustomerService) = CustomerNetwork.create()
         configureFeederResponses(expectedCustomerService)
 
-        val result = consumerClient.getCustomersForContainer("unused").throwOnError()
+        val result = consumerClient.getCustomersForContainer("customer1").throwOnError()
 
-        assertThat(result.value.objects.size, equalTo(service.num(Customer::class)))
-        assertThat(result.value.objects.size, equalTo(2))
-        assertThat(service.listOf(IdentifiedObject::class).map { it.mRID }, containsInAnyOrder("customer1", "customer2"))
+        assertThat(result.value.objects, aMapWithSize(1))
+        assertThat(service.num<Customer>(), equalTo(1))
+        assertThat(service.listOf<IdentifiedObject>().map { it.mRID }, contains("customer1"))
+    }
+
+    @Test
+    internal fun `getCustomersForContainers returns customers for given containers`() {
+        val (_, expectedCustomerService) = CustomerNetwork.create()
+        configureFeederResponses(expectedCustomerService)
+
+        val result = consumerClient.getCustomersForContainers(setOf("customer1", "customer2")).throwOnError()
+
+        assertThat(result.value.objects, aMapWithSize(2))
+        assertThat(service.num<Customer>(), equalTo(2))
+        assertThat(service.listOf<IdentifiedObject>().map { it.mRID }, containsInAnyOrder("customer1", "customer2"))
     }
 
     @Test
     internal fun `runGetMetadata calls stub with arguments it's passed`() {
         val request = GetMetadataRequest.newBuilder().build()
-        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> { _ -> }
+        val streamObserver = AwaitableStreamObserver<GetMetadataResponse> {}
         doNothing().`when`(stub).getMetadata(request, streamObserver)
 
         consumerClient.runGetMetadata(request, streamObserver)
@@ -256,11 +272,46 @@ internal class CustomerConsumerClientTest {
         validateFailure(onErrorHandler, result, serverException)
     }
 
+    @Test
+    internal fun `construct via Channel`() {
+        val (_, expectedCustomerService) = CustomerNetwork.create()
+        configureFeederResponses(expectedCustomerService)
+
+        val channel = mockk<Channel>()
+        mockkStatic(CustomerConsumerGrpc::class)
+        every { CustomerConsumerGrpc.newStub(channel) } returns stub
+
+        val clientViaChannel = CustomerConsumerClient(channel)
+        val result = clientViaChannel.getCustomersForContainer("customer1")
+
+        assertThat(result.value.objects, aMapWithSize(clientViaChannel.service.num<Customer>()))
+        assertThat(clientViaChannel.service.num<Customer>(), equalTo(1))
+        assertThat(clientViaChannel.service.listOf<IdentifiedObject>().map { it.mRID }, contains("customer1"))
+    }
+
+    @Test
+    internal fun `construct via GrpcChannel`() {
+        val (_, expectedCustomerService) = CustomerNetwork.create()
+        configureFeederResponses(expectedCustomerService)
+
+        val channel = mockk<Channel>()
+        val grpcChannel = GrpcChannel(channel)
+        mockkStatic(CustomerConsumerGrpc::class)
+        every { CustomerConsumerGrpc.newStub(channel) } returns stub
+
+        val clientViaGrpcChannel = CustomerConsumerClient(grpcChannel)
+        val result = clientViaGrpcChannel.getCustomersForContainer("customer1")
+
+        assertThat(result.value.objects, aMapWithSize(clientViaGrpcChannel.service.num<Customer>()))
+        assertThat(clientViaGrpcChannel.service.num<Customer>(), equalTo(1))
+        assertThat(clientViaGrpcChannel.service.listOf<IdentifiedObject>().map { it.mRID }, contains("customer1"))
+    }
+
     private fun configureFeederResponses(expectedCustomerService: CustomerService) {
 
-        consumerService.onGetCustomersForContainer = spy { _, response ->
+        consumerService.onGetCustomersForContainer = spy { request, response ->
             val objects = mutableListOf<Customer>()
-            expectedCustomerService.sequenceOf<Customer>().forEach { customer ->
+            expectedCustomerService.sequenceOf<Customer>().filter { it.mRID in request.mridsList }.forEach { customer ->
                 objects.add(customer)
             }
             responseOf(objects).forEach { response.onNext(it) }

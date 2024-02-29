@@ -37,7 +37,7 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
     /**
      * Get the number of entries in the [AssetOrganisationRole] collection.
      */
-    fun numOrganisationRoles() = _organisationRoles?.size ?: 0
+    fun numOrganisationRoles(): Int = _organisationRoles?.size ?: 0
 
     /**
      * All roles an organisation plays for this asset.
@@ -45,7 +45,7 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
      * @param mRID the mRID of the required [AssetOrganisationRole]
      * @return The [AssetOrganisationRole] with the specified [mRID] if it exists, otherwise null
      */
-    fun getOrganisationRole(mRID: String) = _organisationRoles.getByMRID(mRID)
+    fun getOrganisationRole(mRID: String): AssetOrganisationRole? = _organisationRoles.getByMRID(mRID)
 
     /**
      * @param organisationRole the [AssetOrganisationRole] to associate with this [Asset].

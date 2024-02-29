@@ -14,7 +14,7 @@ import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
 
-class TestCustomerConsumerService : CustomerConsumerGrpc.CustomerConsumerImplBase() {
+internal class TestCustomerConsumerService : CustomerConsumerGrpc.CustomerConsumerImplBase() {
 
     lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
     lateinit var onGetCustomersForContainer: (request: GetCustomersForContainerRequest, response: StreamObserver<GetCustomersForContainerResponse>) -> Unit

@@ -26,14 +26,14 @@ import org.hamcrest.Matchers.containsInAnyOrder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-class AssignToFeedersTest {
+internal class AssignToFeedersTest {
 
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    fun appliesToEquipmentOnHeadTerminalSide() {
+    internal fun appliesToEquipmentOnHeadTerminalSide() {
         val network = FeederStartPointBetweenConductorsNetwork.create()
         val feeder: Feeder = network["f"]!!
 
@@ -43,7 +43,7 @@ class AssignToFeedersTest {
     }
 
     @Test
-    fun stopsAtNormallyOpenPoints() {
+    internal fun stopsAtNormallyOpenPoints() {
         val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = true, currentlyOpen = false)
         val feeder: Feeder = network["f"]!!
 
@@ -54,7 +54,7 @@ class AssignToFeedersTest {
     }
 
     @Test
-    fun stopsAtCurrentlyOpenPoints() {
+    internal fun stopsAtCurrentlyOpenPoints() {
         val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = false, currentlyOpen = true)
         val feeder: Feeder = network["f"]!!
 
@@ -65,7 +65,7 @@ class AssignToFeedersTest {
     }
 
     @Test
-    fun stopsAtSubstationTransformers() {
+    internal fun stopsAtSubstationTransformers() {
         val network = FeederToSubstationTransformerNetwork.create()
         val feeder: Feeder = network["f"]!!
 
@@ -75,7 +75,7 @@ class AssignToFeedersTest {
     }
 
     @Test
-    fun stopsAtFeederStartPoints() {
+    internal fun stopsAtFeederStartPoints() {
         val network = DownstreamFeederStartPointNetwork.create(1)
         val feeder1: Feeder = network["f1"]!!
         val feeder2: Feeder = network["f2"]!!
@@ -87,7 +87,7 @@ class AssignToFeedersTest {
     }
 
     @Test
-    fun stopsAtFeederStartPointsReversedHeadTerminal() {
+    internal fun stopsAtFeederStartPointsReversedHeadTerminal() {
         val network = DownstreamFeederStartPointNetwork.create(2)
         val feeder1: Feeder = network["f1"]!!
         val feeder2: Feeder = network["f2"]!!
@@ -99,7 +99,7 @@ class AssignToFeedersTest {
     }
 
     @Test
-    fun handlesDroppedPhases() {
+    internal fun handlesDroppedPhases() {
         val network = DroppedPhasesNetwork.create()
         val feeder: Feeder = network["f"]!!
 
@@ -109,7 +109,7 @@ class AssignToFeedersTest {
     }
 
     @Test
-    fun stopsAtLvEquipment() {
+    internal fun stopsAtLvEquipment() {
         val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
         val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
@@ -132,7 +132,7 @@ class AssignToFeedersTest {
     }
 
     @Test
-    fun includesTransformers() {
+    internal fun includesTransformers() {
         val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
         val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
@@ -156,7 +156,7 @@ class AssignToFeedersTest {
     }
 
     @Test
-    fun `assigns AuxiliaryEquipment to Feeder`() {
+    internal fun `assigns AuxiliaryEquipment to Feeder`() {
         val network = TestNetworkBuilder()
             .fromBreaker() // b0
             .toAcls() // c1
@@ -175,7 +175,7 @@ class AssignToFeedersTest {
     }
 
     @Test
-    fun `assigns ProtectionEquipment to Feeder`() {
+    internal fun `assigns ProtectionEquipment to Feeder`() {
         val network = TestNetworkBuilder()
             .fromBreaker() // b0
             .addFeeder("b0")

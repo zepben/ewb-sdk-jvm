@@ -16,7 +16,7 @@ import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 
 /**
- * A class that creates commonly used connectivity based traces. These ignores phases, they are purely to trace equipment that are connected
+ * A class that creates commonly used connectivity based traces. These ignore phases, they are purely to trace equipment that are connected
  * in any way giving the connectivity between them. You can add custom step actions and stop conditions to the returned traversal.
  */
 object ConnectivityTrace {

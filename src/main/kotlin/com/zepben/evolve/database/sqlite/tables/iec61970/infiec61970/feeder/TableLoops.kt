@@ -15,7 +15,7 @@ class TableLoops : TableIdentifiedObjects() {
         return "loops"
     }
 
-    override val tableClass = this.javaClass
-    override val tableClassInstance = this
+    override val tableClass: Class<TableLoops> = this.javaClass
+    override val tableClassInstance: TableLoops = this
 
 }

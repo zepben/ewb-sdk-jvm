@@ -70,7 +70,7 @@ abstract class BaseCIMReader(private val baseService: BaseService) {
         // Because each service type loads all the name types, but not all services hold all identified objects, there can
         // be records in the names table that only apply to certain services. We attempt to find the IdentifiedObject on this
         // service and add a name for it if it exists, but ignore if it doesn't. Note that this can potentially lead to there being
-        // a name record that never gets used because that identified object doesn't exist in any service and currently we
+        // a name record that never gets used because that identified object doesn't exist in any service, and currently we
         // don't check or warn about that.
         baseService.get<IdentifiedObject>(resultSet.getString(table.IDENTIFIED_OBJECT_MRID.queryIndex))?.addName(nameType, nameName)
 
@@ -121,7 +121,7 @@ abstract class BaseCIMReader(private val baseService: BaseService) {
         }
     }
 
-    protected fun BaseService.addOrThrow(nameType: NameType): Boolean {
+    private fun BaseService.addOrThrow(nameType: NameType): Boolean {
         return if (addNameType(nameType)) {
             true
         } else {

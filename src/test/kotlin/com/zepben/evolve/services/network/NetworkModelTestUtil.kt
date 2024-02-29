@@ -200,7 +200,7 @@ class NetworkModelTestUtil {
         fun createFeeder(network: NetworkService, num: Int, feederStart: ConductingEquipment?, substation: Substation?): Feeder =
             Feeder("f$num")
                 .apply {
-                    normalHeadTerminal = feederStart?.let { it.getTerminal(1)!! }
+                    normalHeadTerminal = feederStart?.let { it.t1 }
                     name = "Feeder $num"
                     normalEnergizingSubstation = substation
                 }.also {

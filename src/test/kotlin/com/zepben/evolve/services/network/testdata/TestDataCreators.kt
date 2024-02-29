@@ -173,7 +173,7 @@ fun createFeeder(
         this.name = name
 
         if (feederStartPoint != null)
-            normalHeadTerminal = headTerminal ?: feederStartPoint.getTerminal(1)!!
+            normalHeadTerminal = headTerminal ?: feederStartPoint.t1
 
         if (substation != null) {
             normalEnergizingSubstation = substation

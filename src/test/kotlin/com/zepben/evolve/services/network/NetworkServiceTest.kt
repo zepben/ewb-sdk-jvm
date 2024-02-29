@@ -110,38 +110,38 @@ internal class NetworkServiceTest {
         // Connect 2 terminals.
         assertThat(
             "Two disconnected terminals should connect successfully",
-            network.connect(j0.getTerminal(1)!!, j1.getTerminal(1)!!)
+            network.connect(j0.t1, j1.t1)
         )
-        var connectivityNode = j0.getTerminal(1)!!.connectivityNode!!
+        var connectivityNode = j0.t1.connectivityNode!!
         assertThat(connectivityNode, notNullValue())
         assertThat(connectivityNode.mRID, containsString("generated_cn_"))
-        assertThat(j1.getTerminal(1)!!.connectivityNode, equalTo(connectivityNode))
+        assertThat(j1.t1.connectivityNode, equalTo(connectivityNode))
         assertThat(connectivityNode.numTerminals(), equalTo(2))
 
         // Add third terminal by linking to first.
         assertThat(
             "Should be able to connect disconnected terminal to connected terminal",
-            network.connect(j0.getTerminal(1)!!, j2.getTerminal(1)!!)
+            network.connect(j0.t1, j2.t1)
         )
-        assertThat(j0.getTerminal(1)!!.connectivityNode, equalTo(connectivityNode))
-        assertThat(j2.getTerminal(1)!!.connectivityNode, equalTo(connectivityNode))
+        assertThat(j0.t1.connectivityNode, equalTo(connectivityNode))
+        assertThat(j2.t1.connectivityNode, equalTo(connectivityNode))
         assertThat(connectivityNode.numTerminals(), equalTo(3))
 
         // Add fourth terminal by linking to the cn.
         assertThat(
             "Should be able to connect terminal to connectivity node",
-            network.connect(j3.getTerminal(1)!!, connectivityNode.mRID)
+            network.connect(j3.t1, connectivityNode.mRID)
         )
-        assertThat(j0.getTerminal(1)!!.connectivityNode, equalTo(connectivityNode))
-        assertThat(j3.getTerminal(1)!!.connectivityNode, equalTo(connectivityNode))
+        assertThat(j0.t1.connectivityNode, equalTo(connectivityNode))
+        assertThat(j3.t1.connectivityNode, equalTo(connectivityNode))
         assertThat(connectivityNode.numTerminals(), equalTo(4))
 
         // Create a single connection.
         assertThat(
             "Should be able to connect terminal to connectivity node by mRID",
-            network.connect(j4.getTerminal(1)!!, "test_cn_1")
+            network.connect(j4.t1, "test_cn_1")
         )
-        connectivityNode = j4.getTerminal(1)!!.connectivityNode!!
+        connectivityNode = j4.t1.connectivityNode!!
         assertThat(connectivityNode, notNullValue())
         assertThat(connectivityNode.mRID, equalTo("test_cn_1"))
         assertThat(connectivityNode.numTerminals(), equalTo(1))
@@ -149,29 +149,29 @@ internal class NetworkServiceTest {
         // Attempt to create a single connection with no connectivity nodes.
         assertThat(
             "Attempting to connect terminal to connectivity node with blank mRID should fail",
-            !network.connect(j5.getTerminal(1)!!, "")
+            !network.connect(j5.t1, "")
         )
 
         // Join 2 nodes that are already linked.
-        val beforeConnectivityNode = j0.getTerminal(1)!!.connectivityNode!!
+        val beforeConnectivityNode = j0.t1.connectivityNode!!
         assertThat(beforeConnectivityNode, notNullValue())
 
         val beforeSize = beforeConnectivityNode.numTerminals()
         assertThat(
             "Connecting already-connected terminals should return true",
-            network.connect(j0.getTerminal(1)!!, j1.getTerminal(1)!!)
+            network.connect(j0.t1, j1.t1)
         )
 
-        connectivityNode = j0.getTerminal(1)!!.connectivityNode!!
+        connectivityNode = j0.t1.connectivityNode!!
         assertThat(connectivityNode, notNullValue())
         assertThat(connectivityNode, equalTo(beforeConnectivityNode))
-        assertThat(j1.getTerminal(1)!!.connectivityNode, equalTo(connectivityNode))
+        assertThat(j1.t1.connectivityNode, equalTo(connectivityNode))
         assertThat(connectivityNode.numTerminals(), equalTo(beforeSize))
 
         // Attempt to join 2 nodes that are linked to different cn's.
         assertThat(
             "Should be able to connect two terminals that have different connectivity nodes",
-            !network.connect(j0.getTerminal(1)!!, j4.getTerminal(1)!!)
+            !network.connect(j0.t1, j4.t1)
         )
     }
 
@@ -186,33 +186,33 @@ internal class NetworkServiceTest {
         val j5 = createJunctionForConnecting(network, "j5", 2)
 
         // Connect up a network, so we can disconnect it :)
-        network.connect(j0.getTerminal(1)!!, "cn_1")
-        network.connect(j1.getTerminal(1)!!, "cn_1")
-        network.connect(j2.getTerminal(1)!!, "cn_1")
-        network.connect(j3.getTerminal(1)!!, "cn_2")
-        network.connect(j4.getTerminal(1)!!, "cn_2")
-        network.connect(j5.getTerminal(1)!!, "cn_2")
+        network.connect(j0.t1, "cn_1")
+        network.connect(j1.t1, "cn_1")
+        network.connect(j2.t1, "cn_1")
+        network.connect(j3.t1, "cn_2")
+        network.connect(j4.t1, "cn_2")
+        network.connect(j5.t1, "cn_2")
 
-        var connectivityNode = j0.getTerminal(1)!!.connectivityNode!!
+        var connectivityNode = j0.t1.connectivityNode!!
         assertThat(connectivityNode, notNullValue())
         assertThat("Network should contain connectivity node ${connectivityNode.mRID}", network.containsConnectivityNode(connectivityNode.mRID))
         assertThat(connectivityNode.numTerminals(), equalTo(3))
 
-        network.disconnect(j0.getTerminal(1)!!)
-        assertThat(j0.getTerminal(1)!!.connectivityNode, nullValue())
+        network.disconnect(j0.t1)
+        assertThat(j0.t1.connectivityNode, nullValue())
         assertThat(connectivityNode.numTerminals(), equalTo(2))
 
-        network.disconnect(j1.getTerminal(1)!!)
-        network.disconnect(j2.getTerminal(1)!!)
+        network.disconnect(j1.t1)
+        network.disconnect(j2.t1)
         assertThat("Connectivity node should be removed after all its terminals are disconnected", !network.containsConnectivityNode(connectivityNode.mRID))
         assertThat(connectivityNode.numTerminals(), equalTo(0))
 
-        connectivityNode = j3.getTerminal(1)!!.connectivityNode!!
+        connectivityNode = j3.t1.connectivityNode!!
         assertThat(connectivityNode, notNullValue())
         assertThat("Network should contain connectivity node ${connectivityNode.mRID}", network.containsConnectivityNode(connectivityNode.mRID))
         assertThat(connectivityNode.numTerminals(), equalTo(3))
         network.disconnect(connectivityNode.mRID)
-        assertThat(j3.getTerminal(1)!!.connectivityNode, nullValue())
+        assertThat(j3.t1.connectivityNode, nullValue())
         assertThat("Connectivity node should be removed after being disconnected", !network.containsConnectivityNode(connectivityNode.mRID))
         assertThat(connectivityNode.numTerminals(), equalTo(0))
     }
@@ -233,67 +233,67 @@ internal class NetworkServiceTest {
         val acLineSegment11 = network.get<AcLineSegment>("acLineSegment11")!!
         val expectedTerminals = mutableListOf<ConnectivityResult>()
 
-        expectedTerminals.add(ConnectivityResult.between(j0.getTerminal(1)!!, acLineSegment0.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.ABCN)))
-        assertThat(connectedTerminals(j0.getTerminal(1)!!, PhaseCode.ABCN), containsInAnyOrder(*expectedTerminals.toTypedArray()))
-        assertThat(connectedTerminals(j0.getTerminal(1)!!), containsInAnyOrder(*expectedTerminals.toTypedArray()))
-        assertThat(connectedTerminals(j0.getTerminal(1)!!, PhaseCode.ABCN.toSet()), containsInAnyOrder(*expectedTerminals.toTypedArray()))
+        expectedTerminals.add(ConnectivityResult.between(j0.t1, acLineSegment0.t1, PhasePathSet.implicit(PhaseCode.ABCN)))
+        assertThat(connectedTerminals(j0.t1, PhaseCode.ABCN), containsInAnyOrder(*expectedTerminals.toTypedArray()))
+        assertThat(connectedTerminals(j0.t1), containsInAnyOrder(*expectedTerminals.toTypedArray()))
+        assertThat(connectedTerminals(j0.t1, PhaseCode.ABCN.toSet()), containsInAnyOrder(*expectedTerminals.toTypedArray()))
 
         expectedTerminals.clear()
         expectedTerminals.add(
             ConnectivityResult.between(
-                acLineSegment0.getTerminal(2)!!,
-                acLineSegment1.getTerminal(1)!!,
+                acLineSegment0.t2,
+                acLineSegment1.t1,
                 PhasePathSet.implicit(PhaseCode.ABCN)
             )
         )
-        expectedTerminals.add(ConnectivityResult.between(acLineSegment0.getTerminal(2)!!, acLineSegment4.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.AB)))
-        assertThat(connectedTerminals(acLineSegment0.getTerminal(2)!!, PhaseCode.ABCN), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
+        expectedTerminals.add(ConnectivityResult.between(acLineSegment0.t2, acLineSegment4.t1, PhasePathSet.implicit(PhaseCode.AB)))
+        assertThat(connectedTerminals(acLineSegment0.t2, PhaseCode.ABCN), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
 
         expectedTerminals.clear()
         expectedTerminals.add(
             ConnectivityResult.between(
-                acLineSegment2.getTerminal(2)!!,
-                acLineSegment3.getTerminal(1)!!,
+                acLineSegment2.t2,
+                acLineSegment3.t1,
                 PhasePathSet.implicit(PhaseCode.ABCN)
             )
         )
-        expectedTerminals.add(ConnectivityResult.between(acLineSegment2.getTerminal(2)!!, acLineSegment9.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.BC)))
-        assertThat(connectedTerminals(acLineSegment2.getTerminal(2)!!, PhaseCode.ABCN), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
+        expectedTerminals.add(ConnectivityResult.between(acLineSegment2.t2, acLineSegment9.t2, PhasePathSet.implicit(PhaseCode.BC)))
+        assertThat(connectedTerminals(acLineSegment2.t2, PhaseCode.ABCN), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
 
         expectedTerminals.clear()
-        expectedTerminals.add(ConnectivityResult.between(acLineSegment9.getTerminal(2)!!, acLineSegment2.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.BC)))
-        expectedTerminals.add(ConnectivityResult.between(acLineSegment9.getTerminal(2)!!, acLineSegment3.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.BC)))
-        assertThat(connectedTerminals(acLineSegment9.getTerminal(2)!!, PhaseCode.BC), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
+        expectedTerminals.add(ConnectivityResult.between(acLineSegment9.t2, acLineSegment2.t2, PhasePathSet.implicit(PhaseCode.BC)))
+        expectedTerminals.add(ConnectivityResult.between(acLineSegment9.t2, acLineSegment3.t1, PhasePathSet.implicit(PhaseCode.BC)))
+        assertThat(connectedTerminals(acLineSegment9.t2, PhaseCode.BC), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
 
         expectedTerminals.clear()
-        expectedTerminals.add(ConnectivityResult.between(acLineSegment9.getTerminal(2)!!, acLineSegment2.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.B)))
-        expectedTerminals.add(ConnectivityResult.between(acLineSegment9.getTerminal(2)!!, acLineSegment3.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.B)))
-        assertThat(connectedTerminals(acLineSegment9.getTerminal(2)!!, PhaseCode.AB), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
+        expectedTerminals.add(ConnectivityResult.between(acLineSegment9.t2, acLineSegment2.t2, PhasePathSet.implicit(PhaseCode.B)))
+        expectedTerminals.add(ConnectivityResult.between(acLineSegment9.t2, acLineSegment3.t1, PhasePathSet.implicit(PhaseCode.B)))
+        assertThat(connectedTerminals(acLineSegment9.t2, PhaseCode.AB), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
 
         expectedTerminals.clear()
         expectedTerminals.add(
             ConnectivityResult.between(
-                j3.getTerminal(2)!!,
-                acLineSegment5.getTerminal(1)!!,
+                j3.t2,
+                acLineSegment5.t1,
                 PhasePathSet.from(PhaseCode.A).to(PhaseCode.X)
             )
         )
-        assertThat(connectedTerminals(j3.getTerminal(2)!!, PhaseCode.A), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
+        assertThat(connectedTerminals(j3.t2, PhaseCode.A), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
 
         expectedTerminals.clear()
         expectedTerminals.add(
             ConnectivityResult.between(
-                j3.getTerminal(2)!!,
-                acLineSegment5.getTerminal(1)!!,
+                j3.t2,
+                acLineSegment5.t1,
                 PhasePathSet.from(PhaseCode.B).to(PhaseCode.Y)
             )
         )
-        assertThat(connectedTerminals(j3.getTerminal(2)!!, PhaseCode.B), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
-        assertThat(connectedTerminals(j5.getTerminal(3)!!, PhaseCode.X), empty())
+        assertThat(connectedTerminals(j3.t2, PhaseCode.B), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
+        assertThat(connectedTerminals(j5.t3, PhaseCode.X), empty())
 
         expectedTerminals.clear()
-        expectedTerminals.add(ConnectivityResult.between(j5.getTerminal(3)!!, acLineSegment11.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.Y)))
-        assertThat(connectedTerminals(j5.getTerminal(3)!!, PhaseCode.Y), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
+        expectedTerminals.add(ConnectivityResult.between(j5.t3, acLineSegment11.t1, PhasePathSet.implicit(PhaseCode.Y)))
+        assertThat(connectedTerminals(j5.t3, PhaseCode.Y), containsInAnyOrder<Any>(*expectedTerminals.toTypedArray()))
     }
 
     @Test
@@ -320,77 +320,77 @@ internal class NetworkServiceTest {
         val acLineSegment11 = network.get<AcLineSegment>("acLineSegment11")!!
         val expectedAssets = mutableListOf<ConnectivityResult>()
 
-        expectedAssets.add(ConnectivityResult.between(acLineSegment0.getTerminal(1)!!, j0.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.ABCN)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment0.getTerminal(2)!!, acLineSegment1.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.ABCN)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment0.getTerminal(2)!!, acLineSegment4.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.AB)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment0.t1, j0.t1, PhasePathSet.implicit(PhaseCode.ABCN)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment0.t2, acLineSegment1.t1, PhasePathSet.implicit(PhaseCode.ABCN)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment0.t2, acLineSegment4.t1, PhasePathSet.implicit(PhaseCode.AB)))
         assertThat(connectedEquipment(acLineSegment0, PhaseCode.ABCN), containsInAnyOrder(*expectedAssets.toTypedArray()))
         assertThat(connectedEquipment(acLineSegment0), containsInAnyOrder(*expectedAssets.toTypedArray()))
         assertThat(connectedEquipment(acLineSegment0, PhaseCode.ABCN.toSet()), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(j4.getTerminal(1)!!, acLineSegment5.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.XY)))
-        expectedAssets.add(ConnectivityResult.between(j4.getTerminal(2)!!, acLineSegment6.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.XY)))
-        expectedAssets.add(ConnectivityResult.between(j4.getTerminal(3)!!, acLineSegment10.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.X)))
+        expectedAssets.add(ConnectivityResult.between(j4.t1, acLineSegment5.t2, PhasePathSet.implicit(PhaseCode.XY)))
+        expectedAssets.add(ConnectivityResult.between(j4.t2, acLineSegment6.t1, PhasePathSet.implicit(PhaseCode.XY)))
+        expectedAssets.add(ConnectivityResult.between(j4.t3, acLineSegment10.t1, PhasePathSet.implicit(PhaseCode.X)))
         assertThat(connectedEquipment(j4, PhaseCode.XY), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(j5.getTerminal(1)!!, acLineSegment6.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.XY)))
-        expectedAssets.add(ConnectivityResult.between(j5.getTerminal(2)!!, acLineSegment7.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.XY)))
-        expectedAssets.add(ConnectivityResult.between(j5.getTerminal(3)!!, acLineSegment11.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.Y)))
+        expectedAssets.add(ConnectivityResult.between(j5.t1, acLineSegment6.t2, PhasePathSet.implicit(PhaseCode.XY)))
+        expectedAssets.add(ConnectivityResult.between(j5.t2, acLineSegment7.t1, PhasePathSet.implicit(PhaseCode.XY)))
+        expectedAssets.add(ConnectivityResult.between(j5.t3, acLineSegment11.t1, PhasePathSet.implicit(PhaseCode.Y)))
         assertThat(connectedEquipment(j5, PhaseCode.XY), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(acLineSegment2.getTerminal(1)!!, j1.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.ABCN)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment2.getTerminal(2)!!, acLineSegment3.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.ABCN)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment2.getTerminal(2)!!, acLineSegment9.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.BC)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment2.t1, j1.t2, PhasePathSet.implicit(PhaseCode.ABCN)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment2.t2, acLineSegment3.t1, PhasePathSet.implicit(PhaseCode.ABCN)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment2.t2, acLineSegment9.t2, PhasePathSet.implicit(PhaseCode.BC)))
         assertThat(connectedEquipment(acLineSegment2, PhaseCode.ABCN), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(acLineSegment9.getTerminal(1)!!, j7.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.BC)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment9.getTerminal(2)!!, acLineSegment2.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.BC)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment9.getTerminal(2)!!, acLineSegment3.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.BC)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment9.t1, j7.t2, PhasePathSet.implicit(PhaseCode.BC)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment9.t2, acLineSegment2.t2, PhasePathSet.implicit(PhaseCode.BC)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment9.t2, acLineSegment3.t1, PhasePathSet.implicit(PhaseCode.BC)))
         assertThat(connectedEquipment(acLineSegment9, PhaseCode.BC), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
         expectedAssets.add(
             ConnectivityResult.between(
-                j7.getTerminal(1)!!,
-                acLineSegment8.getTerminal(2)!!,
+                j7.t1,
+                acLineSegment8.t2,
                 PhasePathSet.from(PhaseCode.BC).to(PhaseCode.XY)
             )
         )
-        expectedAssets.add(ConnectivityResult.between(j7.getTerminal(2)!!, acLineSegment9.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.BC)))
+        expectedAssets.add(ConnectivityResult.between(j7.t2, acLineSegment9.t1, PhasePathSet.implicit(PhaseCode.BC)))
         assertThat(connectedEquipment(j7, PhaseCode.BC), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(acLineSegment8.getTerminal(1)!!, j6.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.XY)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment8.t1, j6.t2, PhasePathSet.implicit(PhaseCode.XY)))
         expectedAssets.add(
             ConnectivityResult.between(
-                acLineSegment8.getTerminal(2)!!,
-                j7.getTerminal(1)!!,
+                acLineSegment8.t2,
+                j7.t1,
                 PhasePathSet.from(PhaseCode.XY).to(PhaseCode.BC)
             )
         )
         assertThat(connectedEquipment(acLineSegment8, PhaseCode.XY), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(j3.getTerminal(1)!!, acLineSegment4.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.A)))
-        expectedAssets.add(ConnectivityResult.between(j3.getTerminal(2)!!, acLineSegment5.getTerminal(1)!!, PhasePathSet.from(PhaseCode.A).to(PhaseCode.X)))
+        expectedAssets.add(ConnectivityResult.between(j3.t1, acLineSegment4.t2, PhasePathSet.implicit(PhaseCode.A)))
+        expectedAssets.add(ConnectivityResult.between(j3.t2, acLineSegment5.t1, PhasePathSet.from(PhaseCode.A).to(PhaseCode.X)))
         assertThat(connectedEquipment(j3, PhaseCode.A), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(j3.getTerminal(1)!!, acLineSegment4.getTerminal(2)!!, PhasePathSet.implicit(PhaseCode.B)))
-        expectedAssets.add(ConnectivityResult.between(j3.getTerminal(2)!!, acLineSegment5.getTerminal(1)!!, PhasePathSet.from(PhaseCode.B).to(PhaseCode.Y)))
+        expectedAssets.add(ConnectivityResult.between(j3.t1, acLineSegment4.t2, PhasePathSet.implicit(PhaseCode.B)))
+        expectedAssets.add(ConnectivityResult.between(j3.t2, acLineSegment5.t1, PhasePathSet.from(PhaseCode.B).to(PhaseCode.Y)))
         assertThat(connectedEquipment(j3, PhaseCode.B), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(acLineSegment5.getTerminal(1)!!, j3.getTerminal(2)!!, PhasePathSet.from(PhaseCode.X).to(PhaseCode.A)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment5.getTerminal(2)!!, j4.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.X)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment5.t1, j3.t2, PhasePathSet.from(PhaseCode.X).to(PhaseCode.A)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment5.t2, j4.t1, PhasePathSet.implicit(PhaseCode.X)))
         assertThat(connectedEquipment(acLineSegment5, PhaseCode.X), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(acLineSegment5.getTerminal(1)!!, j3.getTerminal(2)!!, PhasePathSet.from(PhaseCode.Y).to(PhaseCode.B)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment5.getTerminal(2)!!, j4.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.Y)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment5.t1, j3.t2, PhasePathSet.from(PhaseCode.Y).to(PhaseCode.B)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment5.t2, j4.t1, PhasePathSet.implicit(PhaseCode.Y)))
         assertThat(connectedEquipment(acLineSegment5, PhaseCode.Y), containsInAnyOrder(*expectedAssets.toTypedArray()))
     }
 
@@ -406,17 +406,17 @@ internal class NetworkServiceTest {
         val acLineSegment5 = network.get<AcLineSegment>("acLineSegment5")!!
         val expectedAssets = mutableListOf<ConnectivityResult>()
 
-        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(1)!!, acLineSegment1.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.ABCN)))
-        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(2)!!, acLineSegment2.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.A)))
-        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(3)!!, acLineSegment3.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.B)))
-        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(4)!!, acLineSegment4.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.N)))
-        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(5)!!, acLineSegment5.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.CN)))
+        expectedAssets.add(ConnectivityResult.between(j1.t1, acLineSegment1.t1, PhasePathSet.implicit(PhaseCode.ABCN)))
+        expectedAssets.add(ConnectivityResult.between(j1.t2, acLineSegment2.t1, PhasePathSet.implicit(PhaseCode.A)))
+        expectedAssets.add(ConnectivityResult.between(j1.t3, acLineSegment3.t1, PhasePathSet.implicit(PhaseCode.B)))
+        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(4)!!, acLineSegment4.t1, PhasePathSet.implicit(PhaseCode.N)))
+        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(5)!!, acLineSegment5.t1, PhasePathSet.implicit(PhaseCode.CN)))
         assertThat(connectedEquipment(j1, PhaseCode.ABCN), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(1)!!, acLineSegment1.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.AC)))
-        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(2)!!, acLineSegment2.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.A)))
-        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(5)!!, acLineSegment5.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.C)))
+        expectedAssets.add(ConnectivityResult.between(j1.t1, acLineSegment1.t1, PhasePathSet.implicit(PhaseCode.AC)))
+        expectedAssets.add(ConnectivityResult.between(j1.t2, acLineSegment2.t1, PhasePathSet.implicit(PhaseCode.A)))
+        expectedAssets.add(ConnectivityResult.between(j1.getTerminal(5)!!, acLineSegment5.t1, PhasePathSet.implicit(PhaseCode.C)))
         assertThat(connectedEquipment(j1, PhaseCode.AC), containsInAnyOrder(*expectedAssets.toTypedArray()))
     }
 
@@ -429,27 +429,27 @@ internal class NetworkServiceTest {
         val acLineSegment4 = network.get<AcLineSegment>("acLineSegment4")!!
         val expectedAssets = mutableListOf<ConnectivityResult>()
 
-        expectedAssets.add(ConnectivityResult.between(acLineSegment1.getTerminal(1)!!, acLineSegment2.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.AB)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment1.getTerminal(1)!!, acLineSegment3.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.AC)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment1.getTerminal(1)!!, acLineSegment4.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.BC)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment1.t1, acLineSegment2.t1, PhasePathSet.implicit(PhaseCode.AB)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment1.t1, acLineSegment3.t1, PhasePathSet.implicit(PhaseCode.AC)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment1.t1, acLineSegment4.t1, PhasePathSet.implicit(PhaseCode.BC)))
         assertThat(connectedEquipment(acLineSegment1, PhaseCode.ABCN), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(acLineSegment2.getTerminal(1)!!, acLineSegment1.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.AB)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment2.getTerminal(1)!!, acLineSegment3.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.A)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment2.getTerminal(1)!!, acLineSegment4.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.B)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment2.t1, acLineSegment1.t1, PhasePathSet.implicit(PhaseCode.AB)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment2.t1, acLineSegment3.t1, PhasePathSet.implicit(PhaseCode.A)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment2.t1, acLineSegment4.t1, PhasePathSet.implicit(PhaseCode.B)))
         assertThat(connectedEquipment(acLineSegment2, PhaseCode.AB), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(acLineSegment3.getTerminal(1)!!, acLineSegment1.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.AC)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment3.getTerminal(1)!!, acLineSegment2.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.A)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment3.getTerminal(1)!!, acLineSegment4.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.C)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment3.t1, acLineSegment1.t1, PhasePathSet.implicit(PhaseCode.AC)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment3.t1, acLineSegment2.t1, PhasePathSet.implicit(PhaseCode.A)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment3.t1, acLineSegment4.t1, PhasePathSet.implicit(PhaseCode.C)))
         assertThat(connectedEquipment(acLineSegment3, PhaseCode.AC), containsInAnyOrder(*expectedAssets.toTypedArray()))
 
         expectedAssets.clear()
-        expectedAssets.add(ConnectivityResult.between(acLineSegment4.getTerminal(1)!!, acLineSegment1.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.BC)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment4.getTerminal(1)!!, acLineSegment2.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.B)))
-        expectedAssets.add(ConnectivityResult.between(acLineSegment4.getTerminal(1)!!, acLineSegment3.getTerminal(1)!!, PhasePathSet.implicit(PhaseCode.C)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment4.t1, acLineSegment1.t1, PhasePathSet.implicit(PhaseCode.BC)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment4.t1, acLineSegment2.t1, PhasePathSet.implicit(PhaseCode.B)))
+        expectedAssets.add(ConnectivityResult.between(acLineSegment4.t1, acLineSegment3.t1, PhasePathSet.implicit(PhaseCode.C)))
         assertThat(connectedEquipment(acLineSegment4, PhaseCode.BC), containsInAnyOrder(*expectedAssets.toTypedArray()))
     }
 

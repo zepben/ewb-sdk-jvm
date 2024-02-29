@@ -40,12 +40,12 @@ object DroppedPhasesNetwork {
             Feeder("f").apply { normalHeadTerminal = fcb.getTerminal(2) }.also { networkService.add(it) }
         }
 
-        networkService.connect(fcb.getTerminal(2)!!, acls1.getTerminal(1)!!)
-        networkService.connect(acls1.getTerminal(2)!!, acls2.getTerminal(1)!!)
-        networkService.connect(acls2.getTerminal(2)!!, acls3.getTerminal(1)!!)
-        networkService.connect(acls3.getTerminal(2)!!, iso.getTerminal(1)!!)
-        networkService.connect(iso.getTerminal(2)!!, acls4.getTerminal(1)!!)
-        networkService.connect(acls4.getTerminal(2)!!, tx.getTerminal(1)!!)
+        networkService.connect(fcb.t2, acls1.t1)
+        networkService.connect(acls1.t2, acls2.t1)
+        networkService.connect(acls2.t2, acls3.t1)
+        networkService.connect(acls3.t2, iso.t1)
+        networkService.connect(iso.t2, acls4.t1)
+        networkService.connect(acls4.t2, tx.t1)
     }
 
     private fun addTerminals(networkService: NetworkService, conductingEquipment: ConductingEquipment, phaseCode: PhaseCode) {

@@ -25,9 +25,9 @@ object FeederToSubstationTransformerNetwork {
         val tz = createPowerTransformerForConnecting(networkService, "tz", 2, 0, 0)
         val c2 = createAcLineSegmentForConnecting(networkService, "c2")
 
-        networkService.connect(c1.getTerminal(1)!!, fsp.getTerminal(1)!!)
-        networkService.connect(c1.getTerminal(2)!!, tz.getTerminal(1)!!)
-        networkService.connect(c2.getTerminal(1)!!, tz.getTerminal(2)!!)
+        networkService.connect(c1.t1, fsp.t1)
+        networkService.connect(c1.t2, tz.t1)
+        networkService.connect(c2.t1, tz.t2)
 
         tz.addContainer(substation)
         createFeeder(networkService, "f", "f", substation, fsp, fsp.getTerminal(1))

@@ -102,4 +102,23 @@ abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
         }
         return false
     }
+
+    /**
+     * Helper to get the first terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
+     * when you know the terminal will be there.
+     */
+    val t1: Terminal get() = getTerminal(1)!!
+
+    /**
+     * Helper to get the second terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
+     * when you know the terminal will be there.
+     */
+    val t2: Terminal get() = getTerminal(2)!!
+
+    /**
+     * Helper to get the third terminal for a [ConductingEquipment]. Will throw a [NullPointerException] if the terminal does not exist, so only call it
+     * when you know the terminal will be there.
+     */
+    val t3: Terminal get() = getTerminal(3)!!
+    
 }

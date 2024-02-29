@@ -11,8 +11,8 @@ package com.zepben.evolve.database.sqlite.extensions
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import io.mockk.every
 import io.mockk.mockk
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import java.sql.ResultSet

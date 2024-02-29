@@ -16,7 +16,7 @@ import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.mockk.*
-import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.Matchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo

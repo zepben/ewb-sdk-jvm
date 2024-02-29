@@ -11,7 +11,7 @@ package com.zepben.evolve.cim.iec61970.base.protection
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.Matchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 

@@ -9,8 +9,8 @@
 package com.zepben.evolve.services.common.meta
 
 import io.mockk.*
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.isA
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.junit.jupiter.api.Test

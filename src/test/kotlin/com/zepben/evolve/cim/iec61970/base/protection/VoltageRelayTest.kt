@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.cim.iec61970.base.protection
 
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.not
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.not
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 

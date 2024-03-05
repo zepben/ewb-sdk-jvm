@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61968.metering
 
 class TableMeters : TableEndDevices() {
 
-    override fun name(): String {
-        return "meters"
-    }
-
-    override val tableClass: Class<TableMeters> = this.javaClass
-    override val tableClassInstance: TableMeters = this
+    override val name: String = "meters"
 
 }

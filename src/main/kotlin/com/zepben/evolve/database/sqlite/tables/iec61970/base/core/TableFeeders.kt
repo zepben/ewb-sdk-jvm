@@ -18,19 +18,11 @@ class TableFeeders : TableEquipmentContainers() {
     val NORMAL_ENERGIZING_SUBSTATION_MRID: Column =
         Column(++columnIndex, "normal_energizing_substation_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "feeders"
-    }
+    override val name: String = "feeders"
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(NORMAL_ENERGIZING_SUBSTATION_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableFeeders> = this.javaClass
-    override val tableClassInstance: TableFeeders = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(NORMAL_ENERGIZING_SUBSTATION_MRID))
+        }
 
 }

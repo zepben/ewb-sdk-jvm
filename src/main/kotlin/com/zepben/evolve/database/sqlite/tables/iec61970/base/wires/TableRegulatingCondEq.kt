@@ -9,7 +9,7 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.tables.Column
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.*
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 abstract class TableRegulatingCondEq : TableEnergyConnections() {

@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo
 
 class TableOverheadWireInfo : TableWireInfo() {
 
-    override fun name(): String {
-        return "overhead_wire_info"
-    }
-
-    override val tableClass: Class<TableOverheadWireInfo> = this.javaClass
-    override val tableClassInstance: TableOverheadWireInfo = this
+    override val name: String = "overhead_wire_info"
 
 }

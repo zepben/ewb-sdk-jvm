@@ -12,11 +12,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableConducti
 
 class TableGrounds : TableConductingEquipment() {
 
-    override fun name(): String {
-        return "grounds"
-    }
-
-    override val tableClass: Class<TableGrounds> = this.javaClass
-    override val tableClassInstance: TableGrounds = this
+    override val name: String = "grounds"
 
 }

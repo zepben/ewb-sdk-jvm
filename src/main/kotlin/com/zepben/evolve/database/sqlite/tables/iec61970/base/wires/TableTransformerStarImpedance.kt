@@ -21,19 +21,11 @@ class TableTransformerStarImpedance : TableIdentifiedObjects() {
     val X0: Column = Column(++columnIndex, "X0", "NUMBER", NULL)
     val TRANSFORMER_END_INFO_MRID: Column = Column(++columnIndex, "transformer_end_info_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "transformer_star_impedance"
-    }
+    override val name: String = "transformer_star_impedance"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
-
-        cols.add(listOf(TRANSFORMER_END_INFO_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableTransformerStarImpedance> = this.javaClass
-    override val tableClassInstance: TableTransformerStarImpedance = this
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(TRANSFORMER_END_INFO_MRID))
+        }
 
 }

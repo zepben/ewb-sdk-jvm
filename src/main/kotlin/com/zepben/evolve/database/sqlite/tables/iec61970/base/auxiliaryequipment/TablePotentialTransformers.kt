@@ -18,11 +18,6 @@ class TablePotentialTransformers : TableSensors() {
     val POTENTIAL_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "potential_transformer_info_mrid", "TEXT", NULL)
     val TYPE: Column = Column(++columnIndex, "type", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "potential_transformers"
-    }
-
-    override val tableClass: Class<TablePotentialTransformers> = this.javaClass
-    override val tableClassInstance: TablePotentialTransformers = this
+    override val name: String = "potential_transformers"
 
 }

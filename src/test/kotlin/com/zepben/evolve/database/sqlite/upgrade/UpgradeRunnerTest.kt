@@ -74,7 +74,7 @@ internal class UpgradeRunnerTest {
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"))
 
         verify(exactly = 1) { connectionProvider("driver:database") }
-        verify(exactly = 1) { connection.configureBatch(statementProvider) }
+        verify(exactly = 1) { connection.configureBatch() }
     }
 
 

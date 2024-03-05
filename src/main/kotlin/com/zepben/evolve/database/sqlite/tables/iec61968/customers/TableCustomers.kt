@@ -19,11 +19,6 @@ class TableCustomers : TableOrganisationRoles() {
     val KIND: Column = Column(++columnIndex, "kind", "TEXT", NOT_NULL)
     val NUM_END_DEVICES: Column = Column(++columnIndex, "num_end_devices", "INTEGER", NULL)
 
-    override fun name(): String {
-        return "customers"
-    }
-
-    override val tableClass: Class<TableCustomers> = this.javaClass
-    override val tableClassInstance: TableCustomers = this
+    override val name: String = "customers"
 
 }

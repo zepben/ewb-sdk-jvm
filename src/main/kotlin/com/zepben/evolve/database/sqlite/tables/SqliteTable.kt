@@ -9,47 +9,69 @@
 package com.zepben.evolve.database.sqlite.tables
 
 import org.slf4j.LoggerFactory
+import java.sql.PreparedStatement
 import java.util.*
 import kotlin.reflect.KProperty1
 import kotlin.reflect.jvm.kotlinProperty
 
 /**
  * Represents a table in a Sqlite Database
+ *
+ * @property name The name of the table in the actual database.
+ * @property description Readable description of the contents of the table for adding to logs.
+ * @property createTableSql The SQL statement that should be executed to create the table in the database.
+ * @property preparedInsertSql The SQL statement that should be used with a [PreparedStatement] to insert entries into the table.
+ * @property createIndexesSql The SQL statement that should be executed to create the indexes for the table in the database. Should be executed after all
+ *   entries are inserted into the table.
+ * @property selectSql The SQL statement that should be used to read the entries from the table in the database. This value is `open` to allow descendant
+ *   classes to modify the SQL to add things such as ordering when that is important.
+ * @property preparedUpdateSql The SQL statement that should be used with a [PreparedStatement] to update entries into the table.
  */
 abstract class SqliteTable {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+    //
+    // NOTE: `name` is defined as an abstract val, rather than a class member via the constructor, to avoid passing it between all abstract classes in the
+    // table class hierarchy, which removes a lot of boilerplate.
+    //
+    abstract val name: String
 
-    @JvmField
+    open val description: String by lazy { name.replace('_', ' ') }
+
+    val createTableSql: String by lazy { "CREATE TABLE $name (${columnSet.joinToString { it.sqlString() }})" }
+
+    val preparedInsertSql: String by lazy { "INSERT INTO $name (${columnNames.joinToString()}) VALUES (${columnNames.joinToString { "?" }})" }
+
+    val createIndexesSql: Collection<String> by lazy { uniqueIndexColumns.toCreateIndexSql(true) + nonUniqueIndexColumns.toCreateIndexSql(false) }
+
+    open val selectSql: String by lazy { "SELECT ${columnNames.joinToString()} FROM $name" }
+
+    val preparedUpdateSql: String by lazy { "UPDATE $name SET ${columnNames.joinToString { "$it = ?" }}" }
+
+    /**
+     * The index of the previously added column. Should be used to increment column indexes to avoid massive rework when adding columns to base classes.
+     *
+     * e.g.
+     * val MY_COL: Column = Column(++columnIndex, "my_col", "TEXT", NOT_NULL)
+     */
     protected var columnIndex: Int = 0
 
-    abstract fun name(): String
+    /**
+     * A list of column groups that require a unique index in the database.
+     */
+    protected open val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf()
 
-    open fun uniqueIndexColumns(): MutableList<List<Column>> {
-        return ArrayList()
-    }
+    /**
+     * A list of column groups that require a non-unique index in the database.
+     */
+    protected open val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf()
 
-    open fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        return ArrayList()
-    }
+    private val logger = LoggerFactory.getLogger(javaClass)
 
-    private fun columnSet(): SortedSet<Column> = createColumnSet(tableClass, tableClassInstance)
-
-    fun createTableSql(): String = buildCreateTableSql()
-
-    fun preparedInsertSql(): String = buildPreparedInsertSql()
-
-    fun createIndexesSql(): Collection<String> = buildCreateIndexSql()
-
-    open fun selectSql(): String = buildSelectSql()
-
-    fun preparedUpdateSql(): String = buildPreparedUpdateSql()
-
-    protected abstract val tableClass: Class<out SqliteTable>
-    protected abstract val tableClassInstance: SqliteTable
+    private val columnSet: SortedSet<Column> by lazy { createColumnSet(javaClass, this) }
+    private val columnNames: List<String> by lazy { columnSet.map { it.name } }
 
     @Suppress("UNCHECKED_CAST")
-    private fun createColumnSet(clazz: Class<*>, instance: Any): SortedSet<Column> {
+    private fun createColumnSet(clazz: Class<*>, instance: SqliteTable): SortedSet<Column> {
         // We sort by the queryIndex so insert and select statements can be addressed by a number
         val cols = sortedSetOf<Column>(Comparator.comparing { it.queryIndex })
         var repeatedField: Boolean
@@ -84,54 +106,11 @@ abstract class SqliteTable {
         return Collections.unmodifiableSortedSet(cols)
     }
 
-    private fun buildCreateTableSql(): String {
-        val joiner = StringJoiner(", ")
-        for (c in columnSet())
-            joiner.add(c.sqlString())
-
-        return "CREATE TABLE ${name()} ($joiner)"
-    }
-
-    private fun buildPreparedInsertSql(): String {
-        val cols = StringJoiner(", ")
-        val places = StringJoiner(", ")
-        for (c in columnSet()) {
-            cols.add(c.name)
-            places.add("?")
+    private fun MutableList<List<Column>>.toCreateIndexSql(isUnique: Boolean): List<String> =
+        map { indexCols ->
+            "CREATE ${if (isUnique) "UNIQUE " else ""}INDEX " +
+                "${name}_${indexCols.joinToString("_") { it.name }} " +
+                "ON $name (${indexCols.joinToString { it.name }})"
         }
-
-        return "INSERT INTO ${name()} ($cols) VALUES ($places)"
-    }
-
-    private fun buildSelectSql(): String {
-        val joiner = StringJoiner(", ")
-        for (c in columnSet())
-            joiner.add(c.name)
-
-        return "SELECT $joiner FROM ${name()}"
-    }
-
-    private fun buildPreparedUpdateSql(): String {
-        val joiner = StringJoiner(", ")
-        for (c in columnSet())
-            joiner.add("${c.name} = ?")
-
-        return "UPDATE ${name()} SET $joiner"
-    }
-
-    private fun buildCreateIndexSql(): Collection<String> =
-        uniqueIndexColumns().map { buildCreateIndexSql(it, true) } +
-            nonUniqueIndexColumns().map { buildCreateIndexSql(it, false) }
-
-    private fun buildCreateIndexSql(columns: List<Column>, isUnique: Boolean): String {
-        val colJoiner = StringJoiner(", ")
-        val idJoiner = StringJoiner("_")
-        for (c in columns) {
-            colJoiner.add(c.name)
-            idJoiner.add(c.name)
-        }
-
-        return "CREATE ${if (isUnique) "UNIQUE " else ""}INDEX ${name()}_$idJoiner ON ${name()} ($colJoiner)"
-    }
 
 }

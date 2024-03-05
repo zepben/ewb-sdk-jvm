@@ -46,11 +46,6 @@ class TablePowerElectronicsConnection : TableRegulatingCondEq() {
     val INV_REACTIVE_POWER_MODE: Column = Column(++columnIndex, "inv_reactive_power_mode", "BOOLEAN", NULL)
     val INV_FIX_REACTIVE_POWER: Column = Column(++columnIndex, "inv_fix_reactive_power", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "power_electronics_connection"
-    }
-
-    override val tableClass: Class<TablePowerElectronicsConnection> = this.javaClass
-    override val tableClassInstance: TablePowerElectronicsConnection = this
+    override val name: String = "power_electronics_connection"
 
 }

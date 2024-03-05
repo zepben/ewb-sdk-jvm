@@ -5,13 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
 package com.zepben.evolve.database.sqlite.common
 
+import com.zepben.evolve.database.sqlite.extensions.logFailure
+import com.zepben.evolve.database.sqlite.extensions.tryExecuteSingleUpdate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.PreparedStatement
 import java.sql.SQLException
-
 
 abstract class BaseWriter {
 
@@ -21,9 +23,9 @@ abstract class BaseWriter {
     /************ HELPERS ************/
     @Throws(SQLException::class)
     protected fun tryExecuteSingleUpdate(query: PreparedStatement, id: String, description: String): Boolean =
-        WriteValidator.tryExecuteSingleUpdate(query) {
+        query.tryExecuteSingleUpdate {
             failedIds.add(id)
-            WriteValidator.logFailure(logger, query, description)
+            query.logFailure(logger, description)
         }
 
 }

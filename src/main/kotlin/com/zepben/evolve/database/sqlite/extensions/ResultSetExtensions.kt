@@ -13,13 +13,13 @@ import java.sql.ResultSet
 import java.time.Instant
 
 
-internal fun ResultSet.getNullableBoolean(queryIndex: Int): Boolean? =
+fun ResultSet.getNullableBoolean(queryIndex: Int): Boolean? =
     getBoolean(queryIndex).takeUnless { wasNull() }
 
-internal fun ResultSet.getNullableString(queryIndex: Int): String? =
+fun ResultSet.getNullableString(queryIndex: Int): String? =
     getString(queryIndex).takeUnless { wasNull() }
 
-internal fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
+fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
     // Annoyingly getDouble will return 0.0 for string values, so we need to check all 0.0's for NaN.
     val dbl = getDouble(queryIndex).takeUnless { wasNull() }
     return if (dbl == 0.0) {
@@ -31,7 +31,7 @@ internal fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
         dbl
 }
 
-internal fun ResultSet.getNullableFloat(queryIndex: Int): Float? {
+fun ResultSet.getNullableFloat(queryIndex: Int): Float? {
     // Annoyingly getFloat will return 0.0 for string values, so we need to check all 0.0's for NaN.
     val float = getFloat(queryIndex).takeUnless { wasNull() }
     return if (float == 0.0f) {
@@ -43,16 +43,16 @@ internal fun ResultSet.getNullableFloat(queryIndex: Int): Float? {
         float
 }
 
-internal fun ResultSet.getNullableInt(queryIndex: Int): Int? =
+fun ResultSet.getNullableInt(queryIndex: Int): Int? =
     getInt(queryIndex).takeUnless { wasNull() }
 
-internal fun ResultSet.getNullableLong(queryIndex: Int): Long? =
+fun ResultSet.getNullableLong(queryIndex: Int): Long? =
     getLong(queryIndex).takeUnless { wasNull() }
 
-internal fun ResultSet.getInstant(queryIndex: Int): Instant? =
+fun ResultSet.getInstant(queryIndex: Int): Instant? =
     getString(queryIndex).takeUnless { wasNull() }?.let { Instant.parse(it) }
 
-internal fun ResultSet.getNullableRatio(numeratorIndex: Int, denominatorIndex: Int): Ratio? =
+fun ResultSet.getNullableRatio(numeratorIndex: Int, denominatorIndex: Int): Ratio? =
     getNullableDouble(denominatorIndex)?.let { denominator ->
         getNullableDouble(numeratorIndex)?.let { numerator -> Ratio(numerator, denominator) }
     }

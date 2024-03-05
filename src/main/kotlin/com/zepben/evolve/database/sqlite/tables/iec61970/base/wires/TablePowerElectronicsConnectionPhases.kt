@@ -21,17 +21,11 @@ class TablePowerElectronicsConnectionPhases : TablePowerSystemResources() {
     val PHASE: Column = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
     val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "power_electronics_connection_phase"
-    }
+    override val name: String = "power_electronics_connection_phase"
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-        cols.add(listOf(POWER_ELECTRONICS_CONNECTION_MRID))
-        return cols
-    }
-
-    override val tableClass: Class<TablePowerElectronicsConnectionPhases> = this.javaClass
-    override val tableClassInstance: TablePowerElectronicsConnectionPhases = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(POWER_ELECTRONICS_CONNECTION_MRID))
+        }
 
 }

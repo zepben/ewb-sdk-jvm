@@ -18,28 +18,17 @@ class TableCustomerAgreementsPricingStructures : SqliteTable() {
     val CUSTOMER_AGREEMENT_MRID: Column = Column(++columnIndex, "customer_agreement_mrid", "TEXT", NOT_NULL)
     val PRICING_STRUCTURE_MRID: Column = Column(++columnIndex, "pricing_structure_mrid", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "customer_agreements_pricing_structures"
-    }
+    override val name: String = "customer_agreements_pricing_structures"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(CUSTOMER_AGREEMENT_MRID, PRICING_STRUCTURE_MRID))
+        }
 
-        cols.add(listOf(CUSTOMER_AGREEMENT_MRID, PRICING_STRUCTURE_MRID))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(CUSTOMER_AGREEMENT_MRID))
-        cols.add(listOf(PRICING_STRUCTURE_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableCustomerAgreementsPricingStructures> = this.javaClass
-    override val tableClassInstance: TableCustomerAgreementsPricingStructures = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(CUSTOMER_AGREEMENT_MRID))
+            add(listOf(PRICING_STRUCTURE_MRID))
+        }
 
 }

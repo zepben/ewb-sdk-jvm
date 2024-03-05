@@ -18,11 +18,8 @@ import java.io.IOException
 import java.nio.file.*
 import java.sql.*
 
-@Suppress("SqlResolve")
 class UpgradeRunner @JvmOverloads constructor(
     private val getConnection: (String) -> Connection = DriverManager::getConnection,
-    private val getStatement: (Connection) -> Statement = Connection::createStatement,
-    private val getPreparedStatement: (Connection, String) -> PreparedStatement = Connection::prepareStatement,
     private val createBackup: (databaseFilename: Path, backupFilename: Path, copyOption: CopyOption) -> Unit = { f, b, o -> Files.copy(f, b, o) },
     internal val changeSets: List<ChangeSet> = listOf(
         changeSet44(),
@@ -38,13 +35,23 @@ class UpgradeRunner @JvmOverloads constructor(
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val minimumSupportedVersion = changeSets.firstOrNull()?.let { it.number - 1 } ?: tableVersion.SUPPORTED_VERSION
 
+    /**
+     * Get a connection to the database, and runm and required upgrade scripts to bring the schema into line.
+     *
+     * NOTE: The caller of this function is responsible for closing the returned [Connection]
+     *
+     * @param databaseDescriptor The JDBC connection string used to establish the [Connection] to the database.
+     * @param databaseFile The path to the database. Used to create backups and log progress.
+     *
+     * @return The [Connection] to the upgraded database.
+     */
     @Throws(UpgradeException::class)
     fun connectAndUpgrade(databaseDescriptor: String, databaseFile: Path): ConnectionResult {
-        val connection = runCatching { getConnection(databaseDescriptor).configureBatch(getStatement) }
+        val connection = runCatching { getConnection(databaseDescriptor).configureBatch() }
             .getOrElse { throw UpgradeException(it.message, it) }
 
         return try {
-            getStatement(connection).use { statement ->
+            connection.createStatement().use { statement ->
                 upgrade(databaseFile, statement, connection)
             }
 
@@ -68,7 +75,7 @@ class UpgradeRunner @JvmOverloads constructor(
             logger.info("Upgrading database '$databaseFile' from v$databaseVersion to v${changeSets.last().number}")
             createBackup(databaseFile, createBackupName(databaseFile, databaseVersion), StandardCopyOption.REPLACE_EXISTING)
 
-            getPreparedStatement(connection, tableVersion.preparedUpdateSql()).use { versionUpdateStatement ->
+            connection.prepareStatement(tableVersion.preparedUpdateSql).use { versionUpdateStatement ->
                 changeSets.asSequence()
                     .filter { databaseVersion < it.number }
                     .forEach { runUpgrade(it, statement, versionUpdateStatement) }
@@ -128,7 +135,7 @@ class UpgradeRunner @JvmOverloads constructor(
     @Throws(SQLException::class)
     private fun getVersion(statement: Statement): Int? =
         runCatching {
-            statement.executeConfiguredQuery(tableVersion.selectSql()).use { results ->
+            statement.executeConfiguredQuery(tableVersion.selectSql).use { results ->
                 results.getInt(tableVersion.VERSION.queryIndex)
             }
         }.getOrNull()

@@ -12,11 +12,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 
 class TableLocations : TableIdentifiedObjects() {
 
-    override fun name(): String {
-        return "locations"
-    }
-
-    override val tableClass: Class<TableLocations> = this.javaClass
-    override val tableClassInstance: TableLocations = this
+    override val name: String = "locations"
 
 }

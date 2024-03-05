@@ -6,11 +6,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-/*
- * Copyright (c) Zeppelin Bend Pty Ltd (Zepben) 2023 - All Rights Reserved.
- * Unauthorized use, copy, or distribution of this file or its contents, via any medium is strictly prohibited.
- */
-
 package com.zepben.evolve.database.sqlite.common
 
 import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
@@ -21,51 +16,52 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
 
-
+/**
+ * A base class for writing collections of object collections to a database.
+ *
+ * @property databaseTables The tables that are available in the database
+ * @property getStatement A callback for getting access to a [Statement] that can be used for executing SQL queries. NOTE: This class will close each statement
+ *   retrieved via this callback/
+ */
 abstract class BaseCollectionReader(
-    val databaseTables: DatabaseTables,
+    val databaseTables: BaseDatabaseTables,
     protected val getStatement: () -> Statement
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(javaClass)
+
     abstract fun load(): Boolean
 
-    protected fun <T : SqliteTable> loadEach(
-        description: String,
-        table: T,
-        processRow: (T, ResultSet, (String) -> String) -> Boolean
-    ): Boolean {
-        return loadTable(description, table) { results ->
+    protected inline fun <reified T : SqliteTable> Boolean.andLoadEach(crossinline processRow: (T, ResultSet, (String) -> String) -> Boolean): Boolean =
+        this and loadEach(processRow)
+
+    protected inline fun <reified T : SqliteTable> loadEach(crossinline processRow: (T, ResultSet, (String) -> String) -> Boolean): Boolean {
+        return databaseTables.getTable<T>().loadAll() { results ->
             var lastIdentifier: String? = null
             val setLastIdentifier = { identifier: String -> lastIdentifier = identifier; identifier }
 
             try {
                 var count = 0
                 while (results.next()) {
-                    if (processRow(table, results, setLastIdentifier)) {
+                    if (processRow(this, results, setLastIdentifier)) {
                         ++count
                     }
                 }
 
-                return@loadTable count
+                return@loadAll count
             } catch (e: SQLException) {
-                logger.error("Failed to load '" + lastIdentifier + "' from '" + table.name() + "': " + e.message)
+                logger.error("Failed to load '$lastIdentifier' from '$name': ${e.message}")
                 throw e
             }
         }
     }
 
-    private fun <T : SqliteTable> loadTable(
-        description: String,
-        table: T,
-        processRows: (ResultSet) -> Int
-    ): Boolean {
+    protected fun <T : SqliteTable> T.loadAll(processRows: T.(ResultSet) -> Int): Boolean {
         logger.info("Loading $description...")
-
 
         val thrown = try {
             val count = getStatement().use { statement ->
-                statement.executeConfiguredQuery(table.selectSql()).use { results ->
+                statement.executeConfiguredQuery(selectSql).use { results ->
                     processRows(results)
                 }
             }
@@ -82,7 +78,7 @@ abstract class BaseCollectionReader(
             }
         }
 
-        logger.error("Failed to read the $description from '${table.name()}': ${thrown.message}", thrown)
+        logger.error("Failed to read the $description from '$name': ${thrown.message}", thrown)
         return false
     }
 

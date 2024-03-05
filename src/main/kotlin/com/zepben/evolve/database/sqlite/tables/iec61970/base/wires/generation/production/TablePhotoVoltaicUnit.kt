@@ -11,11 +11,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.
 @Suppress("PropertyName")
 class TablePhotoVoltaicUnit : TablePowerElectronicsUnit() {
 
-    override fun name(): String {
-        return "photo_voltaic_unit"
-    }
-
-    override val tableClass: Class<TablePhotoVoltaicUnit> = this.javaClass
-    override val tableClassInstance: TablePhotoVoltaicUnit = this
+    override val name: String = "photo_voltaic_unit"
 
 }

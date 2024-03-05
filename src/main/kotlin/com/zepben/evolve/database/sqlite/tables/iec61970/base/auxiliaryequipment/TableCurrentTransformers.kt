@@ -17,11 +17,6 @@ class TableCurrentTransformers : TableSensors() {
     val CURRENT_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "current_transformer_info_mrid", "TEXT", NULL)
     val CORE_BURDEN: Column = Column(++columnIndex, "core_burden", "INTEGER", NULL)
 
-    override fun name(): String {
-        return "current_transformers"
-    }
-
-    override val tableClass: Class<TableCurrentTransformers> = this.javaClass
-    override val tableClassInstance: TableCurrentTransformers = this
+    override val name: String = "current_transformers"
 
 }

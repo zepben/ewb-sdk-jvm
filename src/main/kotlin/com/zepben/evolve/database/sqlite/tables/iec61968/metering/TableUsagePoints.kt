@@ -21,11 +21,6 @@ class TableUsagePoints : TableIdentifiedObjects() {
     val RATED_POWER: Column = Column(++columnIndex, "rated_power", "INTEGER", NULL)
     val APPROVED_INVERTER_CAPACITY: Column = Column(++columnIndex, "approved_inverter_capacity", "INTEGER", NULL)
 
-    override fun name(): String {
-        return "usage_points"
-    }
-
-    override val tableClass: Class<TableUsagePoints> = this.javaClass
-    override val tableClassInstance: TableUsagePoints = this
+    override val name: String = "usage_points"
 
 }

@@ -31,11 +31,6 @@ class TableEquivalentBranches : TableEquivalentEquipment() {
     var ZERO_X12: Column = Column(++columnIndex, "zero_x12", "NUMBER", NULL)
     var ZERO_X21: Column = Column(++columnIndex, "zero_x21", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "equivalent_branches"
-    }
-
-    override val tableClass: Class<TableEquivalentBranches> = this.javaClass
-    override val tableClassInstance: TableEquivalentBranches = this
+    override val name: String = "equivalent_branches"
 
 }

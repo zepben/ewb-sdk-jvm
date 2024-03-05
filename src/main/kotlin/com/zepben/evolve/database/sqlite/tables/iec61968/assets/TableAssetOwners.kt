@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61968.assets
 
 class TableAssetOwners : TableAssetOrganisationRoles() {
 
-    override fun name(): String {
-        return "asset_owners"
-    }
-
-    override val tableClass: Class<TableAssetOwners> = this.javaClass
-    override val tableClassInstance: TableAssetOwners = this
+    override val name: String = "asset_owners"
 
 }

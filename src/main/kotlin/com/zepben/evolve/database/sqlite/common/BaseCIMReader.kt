@@ -28,6 +28,11 @@ import org.slf4j.LoggerFactory
 import java.sql.ResultSet
 import java.sql.SQLException
 
+/**
+ * A base class for reading CIM objects from a database.
+ *
+ * @param baseService The [BaseService] used to store any items read from the database.
+ */
 abstract class BaseCIMReader(
     private val baseService: BaseService
 ) {
@@ -109,21 +114,16 @@ abstract class BaseCIMReader(
         } else {
             val duplicate = get<IdentifiedObject>(identifiedObject.mRID)
             throw DuplicateMRIDException(
-                "Failed to load ${identifiedObject.typeNameAndMRID()}. " +
-                    "Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})"
+                "Failed to load ${identifiedObject.typeNameAndMRID()}. Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})"
             )
         }
     }
 
     private fun BaseService.addOrThrow(nameType: NameType): Boolean {
-        return if (addNameType(nameType)) {
+        return if (addNameType(nameType))
             true
-        } else {
-            throw DuplicateNameTypeException(
-                "Failed to load NameType ${nameType.name}. " +
-                    "Unable to add to service '$name': duplicate NameType"
-            )
-        }
+        else
+            throw DuplicateNameTypeException("Failed to load NameType ${nameType.name}. Unable to add to service '$name': duplicate NameType")
     }
 
 }

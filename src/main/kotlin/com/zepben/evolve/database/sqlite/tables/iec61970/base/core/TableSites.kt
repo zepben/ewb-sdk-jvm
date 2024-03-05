@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.core
 
 class TableSites : TableEquipmentContainers() {
 
-    override fun name(): String {
-        return "sites"
-    }
-
-    override val tableClass: Class<TableSites> = this.javaClass
-    override val tableClassInstance: TableSites = this
+    override val name: String = "sites"
 
 }

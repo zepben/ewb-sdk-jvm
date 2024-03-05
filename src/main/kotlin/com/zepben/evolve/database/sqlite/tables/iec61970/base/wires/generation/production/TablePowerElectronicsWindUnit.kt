@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.
 
 class TablePowerElectronicsWindUnit : TablePowerElectronicsUnit() {
 
-    override fun name(): String {
-        return "power_electronics_wind_unit"
-    }
-
-    override val tableClass: Class<TablePowerElectronicsWindUnit> = this.javaClass
-    override val tableClassInstance: TablePowerElectronicsWindUnit = this
+    override val name: String = "power_electronics_wind_unit"
 
 }

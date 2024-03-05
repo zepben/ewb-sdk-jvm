@@ -18,28 +18,17 @@ class TableProtectionRelayFunctionsProtectedSwitches : SqliteTable() {
     val PROTECTION_RELAY_FUNCTION_MRID: Column = Column(++columnIndex, "protection_relay_function_mrid", "TEXT", NOT_NULL)
     val PROTECTED_SWITCH_MRID: Column = Column(++columnIndex, "protected_switch_mrid", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "protection_relay_functions_protected_switches"
-    }
+    override val name: String = "protection_relay_functions_protected_switches"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(PROTECTION_RELAY_FUNCTION_MRID, PROTECTED_SWITCH_MRID))
+        }
 
-        cols.add(listOf(PROTECTION_RELAY_FUNCTION_MRID, PROTECTED_SWITCH_MRID))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(PROTECTION_RELAY_FUNCTION_MRID))
-        cols.add(listOf(PROTECTED_SWITCH_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableProtectionRelayFunctionsProtectedSwitches> = this.javaClass
-    override val tableClassInstance: TableProtectionRelayFunctionsProtectedSwitches = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(PROTECTION_RELAY_FUNCTION_MRID))
+            add(listOf(PROTECTED_SWITCH_MRID))
+        }
 
 }

@@ -5,18 +5,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
 package com.zepben.evolve.database.sqlite.customer
 
 import com.zepben.evolve.database.sqlite.common.DatabaseReader
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionReader
-import com.zepben.evolve.database.sqlite.common.MetadataEntryReader
-import com.zepben.evolve.database.sqlite.common.metadataDatabaseTables
 import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import java.sql.Connection
 import java.sql.DriverManager
-import java.sql.Statement
 import java.util.*
 
 
@@ -32,16 +30,11 @@ class CustomerDatabaseReader(
     metadataCollection: MetadataCollection,
     databaseFile: String,
     getConnection: (String) -> Connection = DriverManager::getConnection,
-    getStatement: (Connection) -> Statement = Connection::createStatement,
     upgradeRunner: UpgradeRunner = UpgradeRunner(getConnection, getStatement),
-    metadataCollectionReader: MetadataCollectionReader = MetadataCollectionReader(
-        metadataDatabaseTables,
-        MetadataEntryReader(metadataCollection)
-    ) { getStatement(getConnection("jdbc:sqlite:$databaseFile")) },
-    customerServiceReader: CustomerServiceReader = CustomerServiceReader(
-        customerDatabaseTables,
-        CustomerCIMReader(customerService)
-    ) { getStatement(getConnection("jdbc:sqlite:$databaseFile")) },
+    metadataCollectionReader: MetadataCollectionReader = MetadataCollectionReader(metadataCollection) { connection.getStatement() },
+    customerServiceReader: CustomerServiceReader = CustomerServiceReader(CustomerCIMReader(customerService)) {
+        getStatement(getConnection("jdbc:sqlite:$databaseFile"))
+    },
 ) : DatabaseReader<CustomerServiceReader>(
     customerDatabaseTables,
     customerServiceReader,

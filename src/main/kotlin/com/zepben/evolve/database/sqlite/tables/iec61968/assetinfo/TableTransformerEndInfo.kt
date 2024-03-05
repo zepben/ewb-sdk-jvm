@@ -32,24 +32,16 @@ class TableTransformerEndInfo : TableAssetInfo() {
     val OPEN_END_OPEN_CIRCUIT_TESTS: Column = Column(++columnIndex, "open_end_open_circuit_tests", "TEXT", NULL)
     val ENERGISED_END_OPEN_CIRCUIT_TESTS: Column = Column(++columnIndex, "energised_end_open_circuit_tests", "TEXT", NULL)
 
-    override fun name(): String {
-        return "transformer_end_info"
-    }
+    override val name: String = "transformer_end_info"
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(TRANSFORMER_TANK_INFO_MRID))
-        cols.add(listOf(ENERGISED_END_NO_LOAD_TESTS))
-        cols.add(listOf(ENERGISED_END_SHORT_CIRCUIT_TESTS))
-        cols.add(listOf(GROUNDED_END_SHORT_CIRCUIT_TESTS))
-        cols.add(listOf(OPEN_END_OPEN_CIRCUIT_TESTS))
-        cols.add(listOf(ENERGISED_END_OPEN_CIRCUIT_TESTS))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableTransformerEndInfo> = this.javaClass
-    override val tableClassInstance: TableTransformerEndInfo = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(TRANSFORMER_TANK_INFO_MRID))
+            add(listOf(ENERGISED_END_NO_LOAD_TESTS))
+            add(listOf(ENERGISED_END_SHORT_CIRCUIT_TESTS))
+            add(listOf(GROUNDED_END_SHORT_CIRCUIT_TESTS))
+            add(listOf(OPEN_END_OPEN_CIRCUIT_TESTS))
+            add(listOf(ENERGISED_END_OPEN_CIRCUIT_TESTS))
+        }
 
 }

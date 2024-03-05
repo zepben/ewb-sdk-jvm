@@ -17,19 +17,11 @@ class TableSubstations : TableEquipmentContainers() {
     val SUB_GEOGRAPHICAL_REGION_MRID: Column =
         Column(++columnIndex, "sub_geographical_region_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "substations"
-    }
+    override val name: String = "substations"
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(SUB_GEOGRAPHICAL_REGION_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableSubstations> = this.javaClass
-    override val tableClassInstance: TableSubstations = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(SUB_GEOGRAPHICAL_REGION_MRID))
+        }
 
 }

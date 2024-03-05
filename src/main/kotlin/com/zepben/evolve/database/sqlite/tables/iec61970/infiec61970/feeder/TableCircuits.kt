@@ -17,19 +17,11 @@ class TableCircuits : TableLines() {
 
     val LOOP_MRID: Column = Column(++columnIndex, "loop_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "circuits"
-    }
+    override val name: String = "circuits"
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(LOOP_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableCircuits> = this.javaClass
-    override val tableClassInstance: TableCircuits = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(LOOP_MRID))
+        }
 
 }

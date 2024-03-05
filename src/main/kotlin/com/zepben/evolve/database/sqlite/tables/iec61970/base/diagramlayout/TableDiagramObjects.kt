@@ -21,20 +21,12 @@ class TableDiagramObjects : TableIdentifiedObjects() {
     val STYLE: Column = Column(++columnIndex, "style", "TEXT", NULL)
     val ROTATION: Column = Column(++columnIndex, "rotation", "NUMBER", NOT_NULL)
 
-    override fun name(): String {
-        return "diagram_objects"
-    }
+    override val name: String = "diagram_objects"
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(IDENTIFIED_OBJECT_MRID))
-        cols.add(listOf(DIAGRAM_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableDiagramObjects> = this.javaClass
-    override val tableClassInstance: TableDiagramObjects = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(IDENTIFIED_OBJECT_MRID))
+            add(listOf(DIAGRAM_MRID))
+        }
 
 }

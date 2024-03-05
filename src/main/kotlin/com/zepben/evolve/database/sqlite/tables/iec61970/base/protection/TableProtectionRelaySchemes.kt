@@ -17,11 +17,6 @@ class TableProtectionRelaySchemes : TableIdentifiedObjects() {
 
     val SYSTEM_MRID: Column = Column(++columnIndex, "system_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "protection_relay_schemes"
-    }
-
-    override val tableClass: Class<TableProtectionRelaySchemes> = this.javaClass
-    override val tableClassInstance: TableProtectionRelaySchemes = this
+    override val name: String = "protection_relay_schemes"
 
 }

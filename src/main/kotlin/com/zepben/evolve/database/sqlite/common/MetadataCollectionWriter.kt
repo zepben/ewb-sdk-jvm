@@ -8,26 +8,15 @@
 
 package com.zepben.evolve.database.sqlite.common
 
-import com.zepben.evolve.database.sqlite.common.WriteValidator.validateSave
 import com.zepben.evolve.services.common.meta.MetadataCollection
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class MetadataCollectionWriter(
     private val metadataCollection: MetadataCollection,
-    private val writer: MetadataEntryWriter = MetadataEntryWriter()
-) {
+    databaseTables: BaseDatabaseTables,
+    private val writer: MetadataEntryWriter = MetadataEntryWriter(databaseTables)
+) : BaseCollectionWriter() {
 
-    private val logger: Logger = LoggerFactory.getLogger(javaClass)
-
-    fun save(): Boolean {
-        var status = true
-
-        metadataCollection.dataSources.forEach {
-            status = status and validateSave(it, writer::save) { e -> logger.error("Failed to save DataSource '${it.source}': ${e.message}") }
-        }
-
-        return status
-    }
+    override fun save(): Boolean =
+        saveEach(metadataCollection.dataSources, writer::save) { it, e -> logger.error("Failed to save DataSource '${it.source}': ${e.message}") }
 
 }

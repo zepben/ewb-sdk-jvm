@@ -12,9 +12,11 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 import com.zepben.evolve.database.sqlite.tables.TableMetadataDataSources
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 
-val metadataDatabaseTables = object : DatabaseTables() {
-    override val tables: Map<Class<out SqliteTable>, SqliteTable> = listOf(
+open class BaseDatabaseTables : DatabaseTables() {
+
+    override val includedTables: Sequence<SqliteTable> = sequenceOf(
         TableMetadataDataSources(),
         TableVersion(),
-    ).associateBy { it::class.java }
+    )
+
 }

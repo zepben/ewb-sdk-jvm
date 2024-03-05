@@ -24,11 +24,6 @@ class TableTapChangerControls : TableRegulatingControls() {
     val TIME_DELAY: Column = Column(++columnIndex, "time_delay", "NUMBER", NULL)
     val CO_GENERATION_ENABLED: Column = Column(++columnIndex, "co_generation_enabled", "BOOLEAN", NULL)
 
-    override fun name(): String {
-        return "tap_changer_controls"
-    }
-
-    override val tableClass: Class<TableTapChangerControls> = this.javaClass
-    override val tableClassInstance: TableTapChangerControls = this
+    override val name: String = "tap_changer_controls"
 
 }

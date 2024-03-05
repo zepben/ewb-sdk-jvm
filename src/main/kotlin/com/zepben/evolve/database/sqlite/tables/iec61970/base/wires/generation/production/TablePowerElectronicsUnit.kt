@@ -19,10 +19,10 @@ abstract class TablePowerElectronicsUnit : TableEquipment() {
     val MAX_P: Column = Column(++columnIndex, "max_p", "NUMBER", NULL)
     val MIN_P: Column = Column(++columnIndex, "min_p", "NUMBER", NULL)
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-        cols.add(listOf(POWER_ELECTRONICS_CONNECTION_MRID))
-        return cols
-    }
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+    val cols = super.nonUniqueIndexColumns()
+    add(listOf(POWER_ELECTRONICS_CONNECTION_MRID))
+    return cols
+}
 
 }

@@ -9,7 +9,6 @@
 package com.zepben.evolve.database.sqlite.customer
 
 import com.zepben.evolve.database.sqlite.common.BaseServiceReader
-import com.zepben.evolve.database.sqlite.common.DatabaseTables
 import com.zepben.evolve.database.sqlite.tables.associations.TableCustomerAgreementsPricingStructures
 import com.zepben.evolve.database.sqlite.tables.associations.TablePricingStructuresTariffs
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableOrganisations
@@ -27,25 +26,18 @@ import java.sql.Statement
  * @property getStatement provider of statements for the connection.
  */
 class CustomerServiceReader(
-    databaseTables: DatabaseTables,
     reader: CustomerCIMReader,
+    databaseTables: CustomerDatabaseTables = CustomerDatabaseTables(),
     getStatement: () -> Statement,
 ) : BaseServiceReader<CustomerCIMReader>(databaseTables, getStatement, reader) {
 
-    override fun load(): Boolean {
-        var status = loadNameTypes(reader)
-
-        status = status and loadEach("organisations", TableOrganisations(), reader::load)
-        status = status and loadEach("customers", TableCustomers(), reader::load)
-        status = status and loadEach("customer agreements", TableCustomerAgreements(), reader::load)
-        status = status and loadEach("pricing structures", TablePricingStructures(), reader::load)
-        status = status and loadEach("tariffs", TableTariffs(), reader::load)
-        status = status and loadEach("customer agreement to pricing structure associations", TableCustomerAgreementsPricingStructures(), reader::load)
-        status = status and loadEach("pricing structure to tariff associations", TablePricingStructuresTariffs(), reader::load)
-
-        status = status and loadNames(reader)
-
-        return status
-    }
+    override fun doLoad(): Boolean =
+        loadEach<TableOrganisations>(reader::load)
+            .andLoadEach<TableCustomers>(reader::load)
+            .andLoadEach<TableCustomerAgreements>(reader::load)
+            .andLoadEach<TablePricingStructures>(reader::load)
+            .andLoadEach<TableTariffs>(reader::load)
+            .andLoadEach<TableCustomerAgreementsPricingStructures>(reader::load)
+            .andLoadEach<TablePricingStructuresTariffs>(reader::load)
 
 }

@@ -36,7 +36,10 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
-import com.zepben.evolve.services.common.*
+import com.zepben.evolve.services.common.BaseServiceComparator
+import com.zepben.evolve.services.common.ObjectDifference
+import com.zepben.evolve.services.common.ValueDifference
+import com.zepben.evolve.services.common.compareValues
 
 /**
  * @param options Indicates which optional checks to perform

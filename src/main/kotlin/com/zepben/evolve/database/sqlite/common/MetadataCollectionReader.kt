@@ -12,24 +12,19 @@ import com.zepben.evolve.database.sqlite.tables.TableMetadataDataSources
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import java.sql.Statement
 
-
 /**
  * Class for reading the [MetadataCollection] from the database.
  *
  * @property getStatement provider of statements for the connection.
  */
 class MetadataCollectionReader(
-    databaseTables: DatabaseTables,
-    val reader: MetadataEntryReader,
+    metadataCollection: MetadataCollection,
+    databaseTables: BaseDatabaseTables,
+    val reader: MetadataEntryReader = MetadataEntryReader(metadataCollection),
     getStatement: () -> Statement,
 ) : BaseCollectionReader(databaseTables, getStatement) {
 
-    override fun load(): Boolean {
-        var status = true
-
-        status = status and loadEach("metadata data sources", TableMetadataDataSources(), reader::load)
-
-        return status
-    }
+    override fun load(): Boolean =
+        loadEach<TableMetadataDataSources>(reader::load)
 
 }

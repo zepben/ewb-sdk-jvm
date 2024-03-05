@@ -16,19 +16,11 @@ class TableSubGeographicalRegions : TableIdentifiedObjects() {
 
     val GEOGRAPHICAL_REGION_MRID: Column = Column(++columnIndex, "geographical_region_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "sub_geographical_regions"
-    }
+    override val name: String = "sub_geographical_regions"
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(GEOGRAPHICAL_REGION_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableSubGeographicalRegions> = this.javaClass
-    override val tableClassInstance: TableSubGeographicalRegions = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(GEOGRAPHICAL_REGION_MRID))
+        }
 
 }

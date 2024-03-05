@@ -20,27 +20,16 @@ class TablePowerTransformerEndRatings : SqliteTable() {
     val COOLING_TYPE: Column = Column(++columnIndex, "cooling_type", "TEXT", NOT_NULL)
     val RATED_S: Column = Column(++columnIndex, "rated_s", "INTEGER", NOT_NULL)
 
-    override fun name(): String {
-        return "power_transformer_end_ratings"
-    }
+    override val name: String = "power_transformer_end_ratings"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(POWER_TRANSFORMER_END_MRID, COOLING_TYPE))
+        }
 
-        cols.add(listOf(POWER_TRANSFORMER_END_MRID, COOLING_TYPE))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(POWER_TRANSFORMER_END_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TablePowerTransformerEndRatings> = this.javaClass
-    override val tableClassInstance: TablePowerTransformerEndRatings = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(POWER_TRANSFORMER_END_MRID))
+        }
 
 }

@@ -25,7 +25,11 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNames
 import java.sql.PreparedStatement
 import java.sql.SQLException
 
-
+/**
+ * A base class for reading CIM objects from a database.
+ *
+ * @property databaseTables The tables that are available in the database.
+ */
 abstract class BaseCIMWriter(
     protected val databaseTables: DatabaseTables
 ) : BaseWriter() {

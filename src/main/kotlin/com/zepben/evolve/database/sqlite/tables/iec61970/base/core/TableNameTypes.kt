@@ -19,14 +19,9 @@ class TableNameTypes : SqliteTable() {
     val NAME: Column = Column(++columnIndex, "name", "TEXT", NOT_NULL)
     val DESCRIPTION: Column = Column(++columnIndex, "description", "TEXT", NULL)
 
-    override fun name(): String {
-        return "name_types"
-    }
+    override val name: String = "name_types"
 
-    override val tableClass: Class<TableNameTypes> = this.javaClass
-    override val tableClassInstance: TableNameTypes = this
-
-    override fun uniqueIndexColumns(): MutableList<List<Column>> = mutableListOf(
+    override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
         listOf(NAME)
     )
 

@@ -20,27 +20,16 @@ class TableTerminals : TableAcDcTerminals() {
     val CONNECTIVITY_NODE_MRID: Column = Column(++columnIndex, "connectivity_node_mrid", "TEXT", NULL)
     val PHASES: Column = Column(++columnIndex, "phases", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "terminals"
-    }
+    override val name: String = "terminals"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(CONDUCTING_EQUIPMENT_MRID, SEQUENCE_NUMBER))
+        }
 
-        cols.add(listOf(CONDUCTING_EQUIPMENT_MRID, SEQUENCE_NUMBER))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(CONNECTIVITY_NODE_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableTerminals> = this.javaClass
-    override val tableClassInstance: TableTerminals = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(CONNECTIVITY_NODE_MRID))
+        }
 
 }

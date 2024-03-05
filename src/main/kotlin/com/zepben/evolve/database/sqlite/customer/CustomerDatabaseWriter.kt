@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
 package com.zepben.evolve.database.sqlite.customer
 
 import com.zepben.evolve.database.sqlite.common.DatabaseWriter
@@ -13,8 +14,6 @@ import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import java.sql.Connection
 import java.sql.DriverManager
-import java.sql.PreparedStatement
-import java.sql.Statement
 
 
 /**
@@ -36,17 +35,11 @@ class CustomerDatabaseWriter @JvmOverloads constructor(
         { savedCommonMRIDs.add(it) }
     ),
     metadataCollectionWriter: MetadataCollectionWriter = MetadataCollectionWriter(metadataCollection),
-    getConnection: (String) -> Connection = DriverManager::getConnection,
-    getStatement: (Connection) -> Statement = Connection::createStatement,
-    getPreparedStatement: (Connection, String) -> PreparedStatement = Connection::prepareStatement,
-) : DatabaseWriter<CustomerServiceWriter>(
+    getConnection: (String) -> Connection = DriverManager::getConnection
+) : DatabaseWriter(
     customerDatabaseTables,
     customerServiceWriter,
-    { savedCommonMRIDs.contains(it) },
-    { savedCommonMRIDs.add(it) },
     metadataCollectionWriter,
     databaseFile,
-    getConnection,
-    getStatement,
-    getPreparedStatement
+    getConnection
 )

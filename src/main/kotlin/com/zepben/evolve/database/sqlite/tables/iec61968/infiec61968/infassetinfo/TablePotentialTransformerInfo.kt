@@ -23,11 +23,6 @@ class TablePotentialTransformerInfo : TableAssetInfo() {
     val RATED_VOLTAGE: Column = Column(++columnIndex, "rated_voltage", "INTEGER", NULL)
     val SECONDARY_RATIO: Column = Column(++columnIndex, "secondary_ratio", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "potential_transformer_info"
-    }
-
-    override val tableClass: Class<TablePotentialTransformerInfo> = this.javaClass
-    override val tableClassInstance: TablePotentialTransformerInfo = this
+    override val name: String = "potential_transformer_info"
 
 }

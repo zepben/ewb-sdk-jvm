@@ -41,11 +41,6 @@ class TableEnergySources : TableEnergyConnections() {
     val XN_MAX: Column = Column(++columnIndex, "xn_max", "NUMBER", NULL)
     val X0_MAX: Column = Column(++columnIndex, "x0_max", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "energy_sources"
-    }
-
-    override val tableClass: Class<TableEnergySources> = this.javaClass
-    override val tableClassInstance: TableEnergySources = this
+    override val name: String = "energy_sources"
 
 }

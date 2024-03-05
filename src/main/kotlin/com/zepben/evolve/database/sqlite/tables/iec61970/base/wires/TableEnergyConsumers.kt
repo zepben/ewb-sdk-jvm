@@ -23,11 +23,6 @@ class TableEnergyConsumers : TableEnergyConnections() {
     val Q_FIXED: Column = Column(++columnIndex, "q_fixed", "NUMBER", NULL)
     val PHASE_CONNECTION: Column = Column(++columnIndex, "phase_connection", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "energy_consumers"
-    }
-
-    override val tableClass: Class<TableEnergyConsumers> = this.javaClass
-    override val tableClassInstance: TableEnergyConsumers = this
+    override val name: String = "energy_consumers"
 
 }

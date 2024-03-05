@@ -16,11 +16,6 @@ class TableBaseVoltages : TableIdentifiedObjects() {
 
     val NOMINAL_VOLTAGE: Column = Column(++columnIndex, "nominal_voltage", "INTEGER", NOT_NULL)
 
-    override fun name(): String {
-        return "base_voltages"
-    }
-
-    override val tableClass: Class<TableBaseVoltages> = this.javaClass
-    override val tableClassInstance: TableBaseVoltages = this
+    override val name: String = "base_voltages"
 
 }

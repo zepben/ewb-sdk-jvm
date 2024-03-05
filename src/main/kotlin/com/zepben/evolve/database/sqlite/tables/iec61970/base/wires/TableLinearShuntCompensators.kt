@@ -19,11 +19,6 @@ class TableLinearShuntCompensators : TableShuntCompensators() {
     val G0_PER_SECTION: Column = Column(++columnIndex, "g0_per_section", "NUMBER", NULL)
     val G_PER_SECTION: Column = Column(++columnIndex, "g_per_section", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "linear_shunt_compensators"
-    }
-
-    override val tableClass: Class<TableLinearShuntCompensators> = this.javaClass
-    override val tableClassInstance: TableLinearShuntCompensators = this
+    override val name: String = "linear_shunt_compensators"
 
 }

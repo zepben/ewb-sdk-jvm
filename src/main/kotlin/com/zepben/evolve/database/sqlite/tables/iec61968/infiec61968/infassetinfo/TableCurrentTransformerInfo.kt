@@ -30,11 +30,6 @@ class TableCurrentTransformerInfo : TableAssetInfo() {
     val SECONDARY_RATIO: Column = Column(++columnIndex, "secondary_ratio", "NUMBER", NULL)
     val USAGE: Column = Column(++columnIndex, "usage", "TEXT", NULL)
 
-    override fun name(): String {
-        return "current_transformer_info"
-    }
-
-    override val tableClass: Class<TableCurrentTransformerInfo> = this.javaClass
-    override val tableClassInstance: TableCurrentTransformerInfo = this
+    override val name: String = "current_transformer_info"
 
 }

@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 class TableLoadBreakSwitches : TableProtectedSwitches() {
 
-    override fun name(): String {
-        return "load_break_switches"
-    }
-
-    override val tableClass: Class<TableLoadBreakSwitches> = this.javaClass
-    override val tableClassInstance: TableLoadBreakSwitches = this
+    override val name: String = "load_break_switches"
 
 }

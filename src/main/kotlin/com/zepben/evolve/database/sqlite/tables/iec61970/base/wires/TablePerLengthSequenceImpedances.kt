@@ -23,11 +23,6 @@ class TablePerLengthSequenceImpedances : TablePerLengthImpedances() {
     val B0CH: Column = Column(++columnIndex, "b0ch", "NUMBER", NULL)
     val G0CH: Column = Column(++columnIndex, "g0ch", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "per_length_sequence_impedances"
-    }
-
-    override val tableClass: Class<TablePerLengthSequenceImpedances> = this.javaClass
-    override val tableClassInstance: TablePerLengthSequenceImpedances = this
+    override val name: String = "per_length_sequence_impedances"
 
 }

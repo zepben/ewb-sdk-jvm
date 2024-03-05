@@ -16,11 +16,6 @@ class TableControls : TableIoPoints() {
 
     val POWER_SYSTEM_RESOURCE_MRID: Column = Column(++columnIndex, "power_system_resource_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "controls"
-    }
-
-    override val tableClass: Class<TableControls> = this.javaClass
-    override val tableClassInstance: TableControls = this
+    override val name: String = "controls"
 
 }

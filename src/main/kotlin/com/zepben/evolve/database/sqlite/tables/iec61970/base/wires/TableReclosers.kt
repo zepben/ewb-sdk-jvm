@@ -9,11 +9,6 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 class TableReclosers : TableProtectedSwitches() {
-    override fun name(): String {
-        return "reclosers"
-    }
-
-    override val tableClass: Class<TableReclosers> = this.javaClass
-    override val tableClassInstance: TableReclosers = this
+    override val name: String = "reclosers"
 
 }

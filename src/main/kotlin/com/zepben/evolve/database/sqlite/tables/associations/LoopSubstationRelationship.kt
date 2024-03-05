@@ -8,9 +8,9 @@
 
 package com.zepben.evolve.database.sqlite.tables.associations
 
-
 enum class LoopSubstationRelationship {
 
     SUBSTATION_ENERGIZES_LOOP,
     LOOP_ENERGIZES_SUBSTATION
+
 }

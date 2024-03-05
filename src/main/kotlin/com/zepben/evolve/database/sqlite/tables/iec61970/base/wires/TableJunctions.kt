@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 class TableJunctions : TableConnectors() {
 
-    override fun name(): String {
-        return "junctions"
-    }
-
-    override val tableClass: Class<TableJunctions> = this.javaClass
-    override val tableClassInstance: TableJunctions = this
+    override val name: String = "junctions"
 
 }

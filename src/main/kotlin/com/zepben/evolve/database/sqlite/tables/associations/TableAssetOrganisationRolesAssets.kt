@@ -15,33 +15,20 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 @Suppress("PropertyName")
 class TableAssetOrganisationRolesAssets : SqliteTable() {
 
-    val ASSET_ORGANISATION_ROLE_MRID: Column =
-        Column(++columnIndex, "asset_organisation_role_mrid", "TEXT", NOT_NULL)
-
+    val ASSET_ORGANISATION_ROLE_MRID: Column = Column(++columnIndex, "asset_organisation_role_mrid", "TEXT", NOT_NULL)
     val ASSET_MRID: Column = Column(++columnIndex, "asset_mrid", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "asset_organisation_roles_assets"
-    }
+    override val name = "asset_organisation_roles_assets"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(ASSET_ORGANISATION_ROLE_MRID, ASSET_MRID))
+        }
 
-        cols.add(listOf(ASSET_ORGANISATION_ROLE_MRID, ASSET_MRID))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(ASSET_ORGANISATION_ROLE_MRID))
-        cols.add(listOf(ASSET_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableAssetOrganisationRolesAssets> = this.javaClass
-    override val tableClassInstance: TableAssetOrganisationRolesAssets = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(ASSET_ORGANISATION_ROLE_MRID))
+            add(listOf(ASSET_MRID))
+        }
 
 }

@@ -17,11 +17,6 @@ class TableVersion : SqliteTable() {
 
     val VERSION: Column = Column(++columnIndex, "version", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "version"
-    }
-
-    override val tableClass: Class<TableVersion> = this.javaClass
-    override val tableClassInstance: TableVersion = this
+    override val name: String = "version"
 
 }

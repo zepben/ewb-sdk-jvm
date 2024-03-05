@@ -22,11 +22,6 @@ class TableSeriesCompensators : TableConductingEquipment() {
     val VARISTOR_RATED_CURRENT: Column = Column(++columnIndex, "varistor_rated_current", "INTEGER", NULL)
     val VARISTOR_VOLTAGE_THRESHOLD: Column = Column(++columnIndex, "varistor_voltage_threshold", "INTEGER", NULL)
 
-    override fun name(): String {
-        return "series_compensators"
-    }
-
-    override val tableClass: Class<TableSeriesCompensators> = this.javaClass
-    override val tableClassInstance: TableSeriesCompensators = this
+    override val name: String = "series_compensators"
 
 }

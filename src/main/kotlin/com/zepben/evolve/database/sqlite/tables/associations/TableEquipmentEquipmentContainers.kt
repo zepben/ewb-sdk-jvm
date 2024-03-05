@@ -18,28 +18,17 @@ class TableEquipmentEquipmentContainers : SqliteTable() {
     val EQUIPMENT_MRID: Column = Column(++columnIndex, "equipment_mrid", "TEXT", NOT_NULL)
     val EQUIPMENT_CONTAINER_MRID: Column = Column(++columnIndex, "equipment_container_mrid", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "equipment_equipment_containers"
-    }
+    override val name: String = "equipment_equipment_containers"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(EQUIPMENT_MRID, EQUIPMENT_CONTAINER_MRID))
+        }
 
-        cols.add(listOf(EQUIPMENT_MRID, EQUIPMENT_CONTAINER_MRID))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(EQUIPMENT_MRID))
-        cols.add(listOf(EQUIPMENT_CONTAINER_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableEquipmentEquipmentContainers> = this.javaClass
-    override val tableClassInstance: TableEquipmentEquipmentContainers = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(EQUIPMENT_MRID))
+            add(listOf(EQUIPMENT_CONTAINER_MRID))
+        }
 
 }

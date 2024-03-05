@@ -8,15 +8,15 @@
 
 package com.zepben.evolve.database.sqlite.common
 
-import com.zepben.evolve.database.sqlite.common.WriteValidator.logFailure
-import com.zepben.evolve.database.sqlite.common.WriteValidator.tryExecuteSingleUpdate
+import com.zepben.evolve.database.sqlite.extensions.logFailure
 import com.zepben.evolve.database.sqlite.extensions.setInstant
+import com.zepben.evolve.database.sqlite.extensions.tryExecuteSingleUpdate
 import com.zepben.evolve.database.sqlite.tables.TableMetadataDataSources
 import com.zepben.evolve.services.common.meta.DataSource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class MetadataEntryWriter(val databaseTables: DatabaseTables = metadataDatabaseTables) : BaseWriter() {
+class MetadataEntryWriter(val databaseTables: BaseDatabaseTables) : BaseWriter() {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -28,7 +28,7 @@ class MetadataEntryWriter(val databaseTables: DatabaseTables = metadataDatabaseT
         insert.setString(table.VERSION.queryIndex, dataSource.version)
         insert.setInstant(table.TIMESTAMP.queryIndex, dataSource.timestamp)
 
-        return tryExecuteSingleUpdate(insert) { logFailure(logger, insert, "data source") }
+        return insert.tryExecuteSingleUpdate { insert.logFailure(logger, "data source") }
     }
 
 }

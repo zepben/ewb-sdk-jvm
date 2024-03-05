@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 class TableDisconnectors : TableSwitches() {
 
-    override fun name(): String {
-        return "disconnectors"
-    }
-
-    override val tableClass: Class<TableDisconnectors> = this.javaClass
-    override val tableClassInstance: TableDisconnectors = this
+    override val name: String = "disconnectors"
 
 }

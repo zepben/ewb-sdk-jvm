@@ -20,11 +20,11 @@ abstract class TableIdentifiedObjects : SqliteTable() {
     val DESCRIPTION: Column = Column(++columnIndex, "description", "TEXT", NOT_NULL)
     val NUM_DIAGRAM_OBJECTS: Column = Column(++columnIndex, "num_diagram_objects", "INTEGER", NOT_NULL)
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> = mutableListOf(
+    override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
         listOf(MRID)
     )
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> = mutableListOf(
+    override val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
         listOf(NAME)
     )
 

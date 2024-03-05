@@ -17,20 +17,12 @@ class TableTransformerTankInfo : TableAssetInfo() {
 
     val POWER_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "power_transformer_info_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "transformer_tank_info"
-    }
+    override val name: String = "transformer_tank_info"
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(POWER_TRANSFORMER_INFO_MRID))
+        }
 
-        cols.add(listOf(POWER_TRANSFORMER_INFO_MRID))
-
-        return cols
-    }
-
-
-    override val tableClass: Class<TableTransformerTankInfo> = this.javaClass
-    override val tableClassInstance: TableTransformerTankInfo = this
 
 }

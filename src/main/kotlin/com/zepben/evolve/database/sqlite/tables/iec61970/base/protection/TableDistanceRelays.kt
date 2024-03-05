@@ -24,11 +24,6 @@ class TableDistanceRelays : TableProtectionRelayFunctions() {
     val OPERATION_PHASE_ANGLE2: Column = Column(++columnIndex, "operation_phase_angle2", "NUMBER", NULL)
     val OPERATION_PHASE_ANGLE3: Column = Column(++columnIndex, "operation_phase_angle3", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "distance_relays"
-    }
-
-    override val tableClass: Class<TableDistanceRelays> = this.javaClass
-    override val tableClassInstance: TableDistanceRelays = this
+    override val name: String = "distance_relays"
 
 }

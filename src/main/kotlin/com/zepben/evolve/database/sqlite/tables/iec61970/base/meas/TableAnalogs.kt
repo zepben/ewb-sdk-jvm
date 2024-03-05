@@ -16,11 +16,6 @@ class TableAnalogs : TableMeasurements() {
 
     val POSITIVE_FLOW_IN: Column = Column(++columnIndex, "positive_flow_in", "BOOLEAN", NOT_NULL)
 
-    override fun name(): String {
-        return "analogs"
-    }
-
-    override val tableClass: Class<TableAnalogs> = this.javaClass
-    override val tableClassInstance: TableAnalogs = this
+    override val name: String = "analogs"
 
 }

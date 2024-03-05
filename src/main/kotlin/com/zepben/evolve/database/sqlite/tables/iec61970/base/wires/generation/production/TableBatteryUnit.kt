@@ -19,11 +19,6 @@ class TableBatteryUnit : TablePowerElectronicsUnit() {
     val RATED_E: Column = Column(++columnIndex, "rated_e", "INTEGER", NULL)
     val STORED_E: Column = Column(++columnIndex, "stored_e", "INTEGER", NULL)
 
-    override fun name(): String {
-        return "battery_unit"
-    }
-
-    override val tableClass: Class<TableBatteryUnit> = this.javaClass
-    override val tableClassInstance: TableBatteryUnit = this
+    override val name: String = "battery_unit"
 
 }

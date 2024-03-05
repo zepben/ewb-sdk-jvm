@@ -23,27 +23,16 @@ class TableEnergyConsumerPhases : TablePowerSystemResources() {
     val P_FIXED: Column = Column(++columnIndex, "p_fixed", "NUMBER", NULL)
     val Q_FIXED: Column = Column(++columnIndex, "q_fixed", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "energy_consumer_phases"
-    }
+    override val name: String = "energy_consumer_phases"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(ENERGY_CONSUMER_MRID, PHASE))
+        }
 
-        cols.add(listOf(ENERGY_CONSUMER_MRID, PHASE))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(ENERGY_CONSUMER_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableEnergyConsumerPhases> = this.javaClass
-    override val tableClassInstance: TableEnergyConsumerPhases = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(ENERGY_CONSUMER_MRID))
+        }
 
 }

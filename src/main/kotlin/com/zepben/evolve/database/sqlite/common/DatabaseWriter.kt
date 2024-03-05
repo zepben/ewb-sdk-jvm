@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
 package com.zepben.evolve.database.sqlite.common
 
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
@@ -16,10 +17,7 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.sql.Connection
-import java.sql.PreparedStatement
 import java.sql.SQLException
-import java.sql.Statement
-
 
 /**
  * @property databaseFile the filename of the database to write.
@@ -27,17 +25,12 @@ import java.sql.Statement
  * @property getStatement provider of statements for the connection.
  * @property getPreparedStatement provider of prepared statements for the connection.
  */
-abstract class DatabaseWriter<T : BaseCollectionWriter>(
-    private val databaseTables: DatabaseTables,
-    private val writer: T,
-    private val hasCommon: (String) -> Boolean,
-    private val addCommon: (String) -> Boolean,
+abstract class DatabaseWriter(
+    private val databaseTables: BaseDatabaseTables,
+    private val baseServiceWriter: BaseServiceWriter<*, *>,
     private val metadataCollectionWriter: MetadataCollectionWriter,
     private val databaseFile: String,
-    private val getConnection: (String) -> Connection,
-    private val getStatement: (Connection) -> Statement,
-    private val getPreparedStatement: (Connection, String) -> PreparedStatement,
-    private val metadataTables: DatabaseTables = metadataDatabaseTables,
+    private val getConnection: (String) -> Connection
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -63,7 +56,7 @@ abstract class DatabaseWriter<T : BaseCollectionWriter>(
 
         val status = try {
             metadataCollectionWriter.save() and
-                writer.save()
+                baseServiceWriter.save()
         } catch (e: MissingTableConfigException) {
             logger.error("Unable to save database: " + e.message, e)
             false
@@ -95,7 +88,7 @@ abstract class DatabaseWriter<T : BaseCollectionWriter>(
 
     private fun connect(): Boolean {
         return try {
-            saveConnection = getConnection(databaseDescriptor).configureBatch(getStatement)
+            saveConnection = getConnection(databaseDescriptor).configureBatch()
             true
         } catch (e: SQLException) {
             logger.error("Failed to connect to the database for saving: " + e.message)
@@ -106,8 +99,7 @@ abstract class DatabaseWriter<T : BaseCollectionWriter>(
 
     private fun prepareInsertStatements(): Boolean {
         return try {
-            databaseTables.prepareInsertStatements(saveConnection, getPreparedStatement)
-            metadataTables.prepareInsertStatements(saveConnection, getPreparedStatement)
+            databaseTables.prepareInsertStatements(saveConnection)
             true
         } catch (e: SQLException) {
             logger.error("Failed to prepare insert statements: " + e.message, e)
@@ -118,34 +110,20 @@ abstract class DatabaseWriter<T : BaseCollectionWriter>(
 
     private fun create(): Boolean {
         try {
-            val versionTable = metadataTables.getTable<TableVersion>()
+            val versionTable = databaseTables.getTable<TableVersion>()
             logger.info("Creating database schema v${versionTable.SUPPORTED_VERSION}...")
 
-            getStatement(saveConnection).use { statement ->
+            saveConnection.createStatement().use { statement ->
                 statement.queryTimeout = 2
 
-                metadataTables.forEachTable {
-                    if (!hasCommon(it::class.simpleName!!)) {
-                        addCommon(it::class.simpleName!!)
-                        statement.executeUpdate(it.createTableSql())
-                    }
-                }
-
                 databaseTables.forEachTable {
-                    if (!hasCommon(it::class.simpleName!!)) {
-                        addCommon(it::class.simpleName!!)
-                        statement.executeUpdate(it.createTableSql())
-                    }
+                    statement.executeUpdate(it.createTableSql)
                 }
 
                 // Add the version number to the database.
-                if (!hasCommon("TableVersion:version_number")) {
-
-                    addCommon("TableVersion:version_number")
-                    getPreparedStatement(saveConnection, versionTable.preparedInsertSql()).use { insert ->
-                        insert.setInt(versionTable.VERSION.queryIndex, versionTable.SUPPORTED_VERSION)
-                        insert.executeUpdate()
-                    }
+                saveConnection.prepareStatement(versionTable.preparedInsertSql).use { insert ->
+                    insert.setInt(versionTable.VERSION.queryIndex, versionTable.SUPPORTED_VERSION)
+                    insert.executeUpdate()
                 }
 
                 saveConnection.commit()
@@ -174,11 +152,8 @@ abstract class DatabaseWriter<T : BaseCollectionWriter>(
 
             saveConnection.createStatement().use { statement ->
                 databaseTables.forEachTable { table ->
-                    table.createIndexesSql().forEach { sql ->
-                        if (!hasCommon("${table::class.simpleName!!}-index")) {
-                            statement.execute(sql)
-                            addCommon("${table::class.simpleName!!}-index")
-                        }
+                    table.createIndexesSql.forEach { sql ->
+                        statement.execute(sql)
                     }
                 }
             }

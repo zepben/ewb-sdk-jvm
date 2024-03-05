@@ -28,27 +28,16 @@ class TablePowerTransformerEnds : TableTransformerEnds() {
     val X: Column = Column(++columnIndex, "X", "NUMBER", NULL)
     val X0: Column = Column(++columnIndex, "X0", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "power_transformer_ends"
-    }
+    override val name: String = "power_transformer_ends"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(POWER_TRANSFORMER_MRID, END_NUMBER))
+        }
 
-        cols.add(listOf(POWER_TRANSFORMER_MRID, END_NUMBER))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(POWER_TRANSFORMER_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TablePowerTransformerEnds> = this.javaClass
-    override val tableClassInstance: TablePowerTransformerEnds = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(POWER_TRANSFORMER_MRID))
+        }
 
 }

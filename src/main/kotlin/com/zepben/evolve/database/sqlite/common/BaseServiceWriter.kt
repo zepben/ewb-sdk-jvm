@@ -13,91 +13,60 @@ import com.zepben.evolve.cim.iec61970.base.core.Name
 import com.zepben.evolve.cim.iec61970.base.core.NameType
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
-import kotlin.reflect.KClass
 
-abstract class BaseServiceWriter<T : BaseService, W : BaseCIMWriter>(
-    val service: T,
-    val writer: W,
-    protected val hasCommon: (String) -> Boolean,
-    protected val addCommon: (String) -> Boolean
+abstract class BaseServiceWriter<S : BaseService, W : BaseCIMWriter>(
+    val service: S,
+    val writer: W
 ) : BaseCollectionWriter() {
 
-    final override fun save(): Boolean {
-        return saveNameTypes() and doSave()
-    }
+    final override fun save(): Boolean =
+        saveNameTypes()
+            .andDoSave()
 
     protected abstract fun doSave(): Boolean
 
-    inline fun <reified S : IdentifiedObject> saveEach(saver: (S) -> Boolean): Boolean {
+    protected inline fun <reified T : IdentifiedObject> Boolean.andSaveEach(noinline saver: (T) -> Boolean): Boolean =
+        this and saveEach(saver)
+
+    protected inline fun <reified T : IdentifiedObject> saveEach(noinline saver: (T) -> Boolean): Boolean {
         var status = true
-        service.sequenceOf<S>().forEach { status = status && validateSave(it, saver) }
+        service.sequenceOf<T>().forEach { status = status && validateSave(it, saver) }
         return status
     }
 
     private fun saveNameTypes(): Boolean {
         var status = true
+
         service.nameTypes.forEach {
-            val typeNameId = "NameType:${it.name}"
-            if (!hasCommon(typeNameId)) {
-                status = status and (validateSave(it, writer::save) && addCommon(typeNameId))
-            }
+            status = status and validateSave(it, writer::save)
 
             it.names.forEach { name ->
-                val nameId = "Name:${name.type.name}:${name.name}:${name.identifiedObject.mRID}"
-                if (!hasCommon(nameId)) {
-                    status = status and (validateSave(name, writer::save) && addCommon(nameId))
-                }
+                status = status and validateSave(name, writer::save)
             }
         }
 
         return status
     }
 
-    protected inline fun <reified S : IdentifiedObject> trySaveCommon(save: (S) -> Boolean, obj: S): Boolean {
-        if (hasCommon(obj.mRID))
-            return true
-
-        if (!validateSave(obj, save))
-            return false
-
-        return addCommon(obj.mRID)
-    }
-
-    inline fun <reified T : IdentifiedObject> validateSave(
-        it: T,
-        saver: (T) -> Boolean
-    ): Boolean {
-        return WriteValidator.validateSave(it, saver) { e ->
+    protected inline fun <reified T : IdentifiedObject> validateSave(it: T, noinline saver: (T) -> Boolean): Boolean {
+        return validateSave(it, saver) { e ->
             logger.error("Failed to save ${it.typeNameAndMRID()}: ${e.message}")
         }
     }
 
-    inline fun <reified T : IdentifiedObject> validateSave(
-        clazz: KClass<T>,
-        it: T,
-        saver: (T) -> Boolean
-    ): Boolean {
-        return WriteValidator.validateSave(it, saver) { e ->
-            logger.error("Failed to save ${it.typeNameAndMRID()}: ${e.message}")
-        }
-    }
-
-    private inline fun validateSave(
-        nameType: NameType,
-        saver: (nameType: NameType) -> Boolean
-    ): Boolean {
-        return WriteValidator.validateSave(nameType, saver) { e ->
+    private fun validateSave(nameType: NameType, saver: (nameType: NameType) -> Boolean): Boolean {
+        return validateSave(nameType, saver) { e ->
             logger.error("Failed to save ${nameType.javaClass.simpleName} ${nameType.name}: ${e.message}")
         }
     }
 
-    private inline fun validateSave(
-        name: Name,
-        saver: (name: Name) -> Boolean
-    ): Boolean {
-        return WriteValidator.validateSave(name, saver) { e ->
+    private fun validateSave(name: Name, saver: (name: Name) -> Boolean): Boolean {
+        return validateSave(name, saver) { e ->
             logger.error("Failed to save ${name.javaClass.simpleName} ${name.name}: ${e.message}")
         }
     }
+
+    private fun Boolean.andDoSave(): Boolean =
+        this and doSave()
 
 }

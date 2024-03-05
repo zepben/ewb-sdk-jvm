@@ -6,37 +6,26 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-/*
- * Copyright (c) Zeppelin Bend Pty Ltd (Zepben) 2023 - All Rights Reserved.
- * Unauthorized use, copy, or distribution of this file or its contents, via any medium is strictly prohibited.
- */
-
 package com.zepben.evolve.database.sqlite.common
 
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNameTypes
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNames
 import java.sql.Statement
 
-
 abstract class BaseServiceReader<R : BaseCIMReader>(
-    databaseTables: DatabaseTables,
+    databaseTables: BaseDatabaseTables,
     getStatement: () -> Statement,
     val reader: R,
 ) : BaseCollectionReader(databaseTables, getStatement) {
 
-    fun loadNameTypes(reader: BaseCIMReader): Boolean {
-        var status = true
-        status = status and loadEach("name type", TableNameTypes(), reader::load)
+    final override fun load(): Boolean =
+        loadEach<TableNameTypes>(reader::load)
+            .andDoLoad()
+            .andLoadEach<TableNames>(reader::load)
 
-        return status
-    }
+    abstract fun doLoad(): Boolean
 
-    fun loadNames(reader: BaseCIMReader): Boolean {
-        var status = true
-        status = status and loadEach("name", TableNames(), reader::load)
-
-        return status
-    }
-
+    private fun Boolean.andDoLoad(): Boolean =
+        this and doLoad()
 
 }

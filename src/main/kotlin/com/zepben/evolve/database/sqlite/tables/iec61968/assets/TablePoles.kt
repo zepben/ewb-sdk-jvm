@@ -16,11 +16,6 @@ class TablePoles : TableStructures() {
 
     var CLASSIFICATION: Column = Column(++columnIndex, "classification", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "poles"
-    }
-
-    override val tableClass: Class<TablePoles> = this.javaClass
-    override val tableClassInstance: TablePoles = this
+    override val name: String = "poles"
 
 }

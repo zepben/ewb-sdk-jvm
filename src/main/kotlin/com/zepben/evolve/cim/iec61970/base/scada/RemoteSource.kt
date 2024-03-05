@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
 package com.zepben.evolve.cim.iec61970.base.scada
 
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
@@ -18,4 +19,3 @@ class RemoteSource @JvmOverloads constructor(mRID: String = "") : RemotePoint(mR
 
     var measurement: Measurement? = null
 }
-

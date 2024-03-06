@@ -8,38 +8,33 @@
 
 package com.zepben.evolve.database.sqlite.customer
 
-import com.zepben.evolve.database.sqlite.common.DatabaseWriter
+import com.zepben.evolve.database.sqlite.common.BaseDatabaseWriter
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionWriter
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import java.sql.Connection
 import java.sql.DriverManager
 
-
 /**
- * @property databaseFile the filename of the database to write.
- * @property getConnection provider of the connection to the specified database.
- * @property getStatement provider of statements for the connection.
- * @property getPreparedStatement provider of prepared statements for the connection.
- * @property savedCommonMRIDs Note this doesn't work if it's not common across all Service based database writers
+ * A class for writing the [CustomerService] objects and [MetadataCollection] to our customer database.
+ *
+ * @param databaseFile the filename of the database to write.
+ * @param metadata The [MetadataCollection] to save to the database.
+ * @param service The [CustomerService] to save to the database.
  */
+//todo all @JvmOverload in place?
 class CustomerDatabaseWriter @JvmOverloads constructor(
-    service: CustomerService,
-    metadataCollection: MetadataCollection,
     databaseFile: String,
-    savedCommonMRIDs: MutableSet<String>,
-    customerServiceWriter: CustomerServiceWriter = CustomerServiceWriter(
-        service,
-        CustomerCIMWriter(customerDatabaseTables),
-        { savedCommonMRIDs.contains(it) },
-        { savedCommonMRIDs.add(it) }
-    ),
-    metadataCollectionWriter: MetadataCollectionWriter = MetadataCollectionWriter(metadataCollection),
+    metadata: MetadataCollection,
+    service: CustomerService,
+    databaseTables: CustomerDatabaseTables = CustomerDatabaseTables(),
+    createMetadataWriter: (Connection) -> MetadataCollectionWriter = { MetadataCollectionWriter(metadata, databaseTables) },
+    createServiceWriter: (Connection) -> CustomerServiceWriter = { CustomerServiceWriter(service, databaseTables) },
     getConnection: (String) -> Connection = DriverManager::getConnection
-) : DatabaseWriter(
-    customerDatabaseTables,
-    customerServiceWriter,
-    metadataCollectionWriter,
+) : BaseDatabaseWriter(
     databaseFile,
+    databaseTables,
+    createMetadataWriter,
+    createServiceWriter,
     getConnection
 )

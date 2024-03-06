@@ -17,19 +17,23 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableCustomer
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TablePricingStructures
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableTariffs
 import com.zepben.evolve.services.customer.CustomerService
-import java.sql.Statement
-
+import java.sql.Connection
 
 /**
- * Class for reading a [CustomerService] from the database.
+ * A class for reading a [CustomerService] from the database.
  *
- * @property getStatement provider of statements for the connection.
+ * @param service The [CustomerService] to populate from the database.
+ * @param databaseTables The tables available in the database.
+ * @param connection A connection to the database.
+ *
+ * @property reader The [CustomerCIMReader] used to load the objects from the database.
  */
 class CustomerServiceReader(
-    reader: CustomerCIMReader,
-    databaseTables: CustomerDatabaseTables = CustomerDatabaseTables(),
-    getStatement: () -> Statement,
-) : BaseServiceReader<CustomerCIMReader>(databaseTables, getStatement, reader) {
+    service: CustomerService,
+    databaseTables: CustomerDatabaseTables,
+    connection: Connection,
+    override val reader: CustomerCIMReader = CustomerCIMReader(service)
+) : BaseServiceReader(databaseTables, connection, reader) {
 
     override fun doLoad(): Boolean =
         loadEach<TableOrganisations>(reader::load)

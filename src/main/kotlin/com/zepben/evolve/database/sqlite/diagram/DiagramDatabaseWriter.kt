@@ -8,46 +8,32 @@
 
 package com.zepben.evolve.database.sqlite.diagram
 
-import com.zepben.evolve.database.sqlite.common.DatabaseWriter
+import com.zepben.evolve.database.sqlite.common.BaseDatabaseWriter
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionWriter
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.diagram.DiagramService
 import java.sql.Connection
 import java.sql.DriverManager
-import java.sql.PreparedStatement
-import java.sql.Statement
-
 
 /**
- * @property databaseFile the filename of the database to write.
- * @property getConnection provider of the connection to the specified database.
- * @property getStatement provider of statements for the connection.
- * @property getPreparedStatement provider of prepared statements for the connection.
- * @property savedCommonMRIDs Note this doesn't work if it's not common across all Service based database writers
+ * A class for writing the [DiagramService] objects and [MetadataCollection] to our diagram database.
+ *
+ * @param databaseFile the filename of the database to write.
+ * @param metadata The [MetadataCollection] to save to the database.
+ * @param service The [DiagramService] to save to the database.
  */
 class DiagramDatabaseWriter @JvmOverloads constructor(
-    service: DiagramService,
-    metadataCollection: MetadataCollection,
     databaseFile: String,
-    savedCommonMRIDs: MutableSet<String>,
-    diagramServiceWriter: DiagramServiceWriter = DiagramServiceWriter(
-        service,
-        DiagramCIMWriter(diagramDatabaseTables),
-        { savedCommonMRIDs.contains(it) },
-        { savedCommonMRIDs.add(it) }
-    ),
-    metadataCollectionWriter: MetadataCollectionWriter = MetadataCollectionWriter(metadataCollection),
-    getConnection: (String) -> Connection = DriverManager::getConnection,
-    getStatement: (Connection) -> Statement = Connection::createStatement,
-    getPreparedStatement: (Connection, String) -> PreparedStatement = Connection::prepareStatement,
-) : DatabaseWriter<DiagramServiceWriter>(
-    diagramDatabaseTables,
-    diagramServiceWriter,
-    { savedCommonMRIDs.contains(it) },
-    { savedCommonMRIDs.add(it) },
-    metadataCollectionWriter,
+    metadata: MetadataCollection,
+    service: DiagramService,
+    databaseTables: DiagramDatabaseTables = DiagramDatabaseTables(),
+    createMetadataWriter: (Connection) -> MetadataCollectionWriter = { MetadataCollectionWriter(metadata, databaseTables) },
+    createServiceWriter: (Connection) -> DiagramServiceWriter = { DiagramServiceWriter(service, databaseTables) },
+    getConnection: (String) -> Connection = DriverManager::getConnection
+) : BaseDatabaseWriter(
     databaseFile,
-    getConnection,
-    getStatement,
-    getPreparedStatement
+    databaseTables,
+    createMetadataWriter,
+    createServiceWriter,
+    getConnection
 )

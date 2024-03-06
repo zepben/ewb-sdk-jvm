@@ -12,16 +12,35 @@ import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObjectPoint
 import com.zepben.evolve.database.sqlite.common.BaseCIMWriter
-import com.zepben.evolve.database.sqlite.common.DatabaseTables
 import com.zepben.evolve.database.sqlite.extensions.setNullableString
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjects
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagrams
+import com.zepben.evolve.services.diagram.DiagramService
+import java.sql.SQLException
 
+/**
+ * A class for writing the [DiagramService] tables to the database.
+ *
+ * @property databaseTables The tables available in the database.
+ */
+class DiagramCIMWriter(
+    override val databaseTables: DiagramDatabaseTables
+) : BaseCIMWriter(databaseTables) {
 
-class DiagramCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseTables) {
+    // ###########################
+    // # IEC61970 DIAGRAM LAYOUT #
+    // ###########################
 
-    /************ IEC61970 DIAGRAM LAYOUT ************/
+    /**
+     * Save the [Diagram] fields to [TableDiagrams].
+     *
+     * @param diagram The [Diagram] instance to write to the database.
+     *
+     * @return true if the [Diagram] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(diagram: Diagram): Boolean {
         val table = databaseTables.getTable<TableDiagrams>()
         val insert = databaseTables.getInsert<TableDiagrams>()
@@ -32,6 +51,15 @@ class DiagramCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, diagram, "diagram")
     }
 
+    /**
+     * Save the [DiagramObject] fields to [TableDiagramObjects].
+     *
+     * @param diagramObject The [DiagramObject] instance to write to the database.
+     *
+     * @return true if the [DiagramObject] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(diagramObject: DiagramObject): Boolean {
         val table = databaseTables.getTable<TableDiagramObjects>()
         val insert = databaseTables.getInsert<TableDiagramObjects>()
@@ -49,6 +77,7 @@ class DiagramCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and saveIdentifiedObject(table, insert, diagramObject, "diagram object")
     }
 
+    @Throws(SQLException::class)
     private fun saveDiagramObjectPoint(diagramObject: DiagramObject, diagramObjectPoint: DiagramObjectPoint, sequenceNumber: Int): Boolean {
         val table = databaseTables.getTable<TableDiagramObjectPoints>()
         val insert = databaseTables.getInsert<TableDiagramObjectPoints>()
@@ -58,10 +87,7 @@ class DiagramCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setDouble(table.X_POSITION.queryIndex, diagramObjectPoint.xPosition)
         insert.setDouble(table.Y_POSITION.queryIndex, diagramObjectPoint.yPosition)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${diagramObject.mRID}-point$sequenceNumber",
-            "diagram object point"
-        )
+        return insert.tryExecuteSingleUpdate("diagram object point")
     }
+
 }

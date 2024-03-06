@@ -8,45 +8,35 @@
 
 package com.zepben.evolve.database.sqlite.diagram
 
-import com.zepben.evolve.database.sqlite.common.DatabaseReader
+import com.zepben.evolve.database.sqlite.common.BaseDatabaseReader
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionReader
-import com.zepben.evolve.database.sqlite.common.MetadataEntryReader
-import com.zepben.evolve.database.sqlite.common.metadataDatabaseTables
 import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.diagram.DiagramService
 import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.Statement
-import java.util.*
-
 
 /**
- * @property databaseFile the filename of the database to write.
- * @property getConnection provider of the connection to the specified database.
- * @property getStatement provider of statements for the connection.
- * @property getPreparedStatement provider of prepared statements for the connection.
- * @property savedCommonMRIDs Note this doesn't work if it's not common across all Service based database writers
+ * A class for reading the [DiagramService] objects and [MetadataCollection] from our diagram database.
+ *
+ * @param databaseFile The filename of the database to read.
+ * @param metadata The [MetadataCollection] to populate with metadata from the database.
+ * @param service The [DiagramService] to populate with CIM objects from the database.
  */
 class DiagramDatabaseReader(
-    val diagramService: DiagramService,
-    metadataCollection: MetadataCollection,
     databaseFile: String,
-    getConnection: (String) -> Connection = DriverManager::getConnection,
-    getStatement: (Connection) -> Statement = Connection::createStatement,
-    upgradeRunner: UpgradeRunner = UpgradeRunner(getConnection, getStatement),
-    metadataCollectionReader: MetadataCollectionReader = MetadataCollectionReader(
-        metadataDatabaseTables,
-        MetadataEntryReader(metadataCollection)
-    ) { getStatement(getConnection("jdbc:sqlite:$databaseFile")) },
-    diagramServiceReader: DiagramServiceReader = DiagramServiceReader(
-        diagramDatabaseTables,
-        DiagramCIMReader(diagramService)
-    ) { getStatement(getConnection("jdbc:sqlite:$databaseFile")) },
-) : DatabaseReader<DiagramServiceReader>(
-    diagramDatabaseTables,
-    diagramServiceReader,
+    metadata: MetadataCollection,
+    service: DiagramService,
+    tables: DiagramDatabaseTables = DiagramDatabaseTables(),
+    createMetadataReader: (Connection) -> MetadataCollectionReader = { connection ->
+        MetadataCollectionReader(metadata, tables, connection)
+    },
+    createServiceReader: (Connection) -> DiagramServiceReader = { connection ->
+        DiagramServiceReader(service, tables, connection)
+    },
+    upgradeRunner: UpgradeRunner = UpgradeRunner()
+) : BaseDatabaseReader(
     databaseFile,
-    metadataCollectionReader,
+    createMetadataReader,
+    createServiceReader,
     upgradeRunner,
 )

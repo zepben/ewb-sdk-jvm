@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.diagram
 
-import com.zepben.evolve.database.sqlite.common.DatabaseTables
+import com.zepben.evolve.database.sqlite.common.BaseDatabaseTables
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNameTypes
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNames
@@ -16,12 +16,18 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.Tabl
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjects
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagrams
 
-val diagramDatabaseTables = object : DatabaseTables() {
-    override val tables: Map<Class<out SqliteTable>, SqliteTable> = listOf(
-        TableDiagramObjectPoints(),
-        TableDiagramObjects(),
-        TableDiagrams(),
-        TableNameTypes(),
-        TableNames(),
-    ).associateBy { it::class.java }
+/**
+ * The collection of tables for our diagram databases.
+ */
+class DiagramDatabaseTables : BaseDatabaseTables() {
+
+    override val includedTables: Sequence<SqliteTable> =
+        super.includedTables + sequenceOf(
+            TableDiagramObjectPoints(),
+            TableDiagramObjects(),
+            TableDiagrams(),
+            TableNameTypes(),
+            TableNames(),
+        )
+
 }

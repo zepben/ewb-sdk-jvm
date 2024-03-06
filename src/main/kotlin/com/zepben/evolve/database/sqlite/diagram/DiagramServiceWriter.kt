@@ -13,20 +13,20 @@ import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.database.sqlite.common.BaseServiceWriter
 import com.zepben.evolve.services.diagram.DiagramService
 
+/**
+ * A class for writing a [DiagramService] into the database.
+ *
+ * @param service The [DiagramService] to save to the database.
+ * @param databaseTables The [DiagramDatabaseTables] to add to the database.
+ */
 class DiagramServiceWriter(
-    service: DiagramService,
-    writer: DiagramCIMWriter,
-    hasCommon: (String) -> Boolean,
-    addCommon: (String) -> Boolean
-) : BaseServiceWriter<DiagramService, DiagramCIMWriter>(service, writer, hasCommon, addCommon) {
+    override val service: DiagramService,
+    databaseTables: DiagramDatabaseTables,
+    override val writer: DiagramCIMWriter = DiagramCIMWriter(databaseTables)
+) : BaseServiceWriter(service, writer) {
 
-    override fun doSave(): Boolean {
-        var status = true
-
-        status = status and saveEach<DiagramObject>(writer::save)
-        status = status and saveEach<Diagram>(writer::save)
-
-        return status
-    }
+    override fun doSave(): Boolean =
+        saveEach<DiagramObject>(writer::save)
+            .andSaveEach<Diagram>(writer::save)
 
 }

@@ -9,35 +9,32 @@
 package com.zepben.evolve.database.sqlite.diagram
 
 import com.zepben.evolve.database.sqlite.common.BaseServiceReader
-import com.zepben.evolve.database.sqlite.common.DatabaseTables
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjects
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagrams
 import com.zepben.evolve.services.diagram.DiagramService
-import java.sql.Statement
-
+import java.sql.Connection
 
 /**
- * Class for reading a [DiagramService] from the database.
+ * A class for reading a [DiagramService] from the database.
  *
- * @property getStatement provider of statements for the connection.
+ * @param service The [DiagramService] to populate from the database.
+ * @param databaseTables The tables available in the database.
+ * @param connection A connection to the database.
+ *
+ * @property reader The [DiagramCIMReader] used to load the objects from the database.
  */
 class DiagramServiceReader(
-    databaseTables: DatabaseTables,
-    reader: DiagramCIMReader,
-    getStatement: () -> Statement,
-) : BaseServiceReader<DiagramCIMReader>(databaseTables, getStatement, reader) {
+    service: DiagramService,
+    databaseTables: DiagramDatabaseTables,
+    connection: Connection,
+    override val reader: DiagramCIMReader = DiagramCIMReader(service)
+) : BaseServiceReader(databaseTables, connection, reader) {
 
-    override fun load(): Boolean {
-        var status = loadNameTypes(reader)
+    override fun doLoad(): Boolean =
 
-        status = status and loadEach("diagrams", TableDiagrams(), reader::load)
-        status = status and loadEach("diagram objects", TableDiagramObjects(), reader::load)
-        status = status and loadEach("diagram object points", TableDiagramObjectPoints(), reader::load)
-
-        status = status and loadNames(reader)
-
-        return status
-    }
+        loadEach<TableDiagrams>(reader::load)
+            .andLoadEach<TableDiagramObjects>(reader::load)
+            .andLoadEach<TableDiagramObjectPoints>(reader::load)
 
 }

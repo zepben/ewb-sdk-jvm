@@ -12,38 +12,62 @@ import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.SQLException
-import java.sql.Statement
 
 /**
- * A base class for writing collections of object collections to a database.
+ * A base class for reading collections of object collections from a database.
  *
  * @property databaseTables The tables that are available in the database
- * @property getStatement A callback for getting access to a [Statement] that can be used for executing SQL queries. NOTE: This class will close each statement
- *   retrieved via this callback/
+ * @property logger The logger to use for this collection reader.
+
+ * @param connection The connection to the database to read.
  */
 abstract class BaseCollectionReader(
     val databaseTables: BaseDatabaseTables,
-    protected val getStatement: () -> Statement
+    private val connection: Connection
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
+    /**
+     * Load all the objects for the available collections.
+     *
+     * @return true if the load was successful, otherwise false.
+     */
     abstract fun load(): Boolean
 
-    protected inline fun <reified T : SqliteTable> Boolean.andLoadEach(crossinline processRow: (T, ResultSet, (String) -> String) -> Boolean): Boolean =
+    /**
+     * Helper function for chaining [loadEach] calls using the [and] operator in a more readable manner.
+     *
+     * @param T The [SqliteTable] to read the objects from.
+     * @param processRow A callback for processing each row in the table. The callback will be provided with the table, the results for the row and a callback
+     *   to set the identifier for the row, which returns the same value, so it can be used fluently.
+     */
+    protected inline fun <reified T : SqliteTable> Boolean.andLoadEach(
+        crossinline processRow: (T, ResultSet, setIdentifier: (String) -> String) -> Boolean
+    ): Boolean =
         this and loadEach(processRow)
 
-    protected inline fun <reified T : SqliteTable> loadEach(crossinline processRow: (T, ResultSet, (String) -> String) -> Boolean): Boolean {
-        return databaseTables.getTable<T>().loadAll() { results ->
+    /**
+     * Load each row of a table.
+     *
+     * @param T The [SqliteTable] to read the objects from.
+     * @param processRow A callback for processing each row in the table. The callback will be provided with the table, the results for the row and a callback
+     *   to set the identifier for the row, which returns the same value, so it can be used fluently.
+     */
+    protected inline fun <reified T : SqliteTable> loadEach(
+        crossinline processRow: (T, ResultSet, setIdentifier: (String) -> String) -> Boolean
+    ): Boolean {
+        return databaseTables.getTable<T>().loadAll { results ->
             var lastIdentifier: String? = null
-            val setLastIdentifier = { identifier: String -> lastIdentifier = identifier; identifier }
+            val setIdentifier = { identifier: String -> lastIdentifier = identifier; identifier }
 
             try {
                 var count = 0
                 while (results.next()) {
-                    if (processRow(this, results, setLastIdentifier)) {
+                    if (processRow(this, results, setIdentifier)) {
                         ++count
                     }
                 }
@@ -56,11 +80,16 @@ abstract class BaseCollectionReader(
         }
     }
 
+    /**
+     * You really shouldn't need to use this function directly, use [loadEach] instead.
+     *
+     * NOTE: This is marked protected rather than private to allow the inline reified functions above to work.
+     */
     protected fun <T : SqliteTable> T.loadAll(processRows: T.(ResultSet) -> Int): Boolean {
         logger.info("Loading $description...")
 
         val thrown = try {
-            val count = getStatement().use { statement ->
+            val count = connection.createStatement().use { statement ->
                 statement.executeConfiguredQuery(selectSql).use { results ->
                     processRows(results)
                 }

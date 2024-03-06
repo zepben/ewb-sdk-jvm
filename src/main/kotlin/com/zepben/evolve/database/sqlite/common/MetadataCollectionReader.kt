@@ -10,19 +10,22 @@ package com.zepben.evolve.database.sqlite.common
 
 import com.zepben.evolve.database.sqlite.tables.TableMetadataDataSources
 import com.zepben.evolve.services.common.meta.MetadataCollection
-import java.sql.Statement
+import java.sql.Connection
 
 /**
  * Class for reading the [MetadataCollection] from the database.
  *
- * @property getStatement provider of statements for the connection.
+ * @param metadata The [MetadataCollection] to populate from the database.
+ * @param databaseTables The tables available in the database.
+ * @param connection The [Connection] to the database.
  */
+//todo move metadata to BaseService like names?
 class MetadataCollectionReader(
-    metadataCollection: MetadataCollection,
+    metadata: MetadataCollection,
     databaseTables: BaseDatabaseTables,
-    val reader: MetadataEntryReader = MetadataEntryReader(metadataCollection),
-    getStatement: () -> Statement,
-) : BaseCollectionReader(databaseTables, getStatement) {
+    connection: Connection,
+    private val reader: MetadataEntryReader = MetadataEntryReader(metadata),
+) : BaseCollectionReader(databaseTables, connection) {
 
     override fun load(): Boolean =
         loadEach<TableMetadataDataSources>(reader::load)

@@ -10,13 +10,19 @@ package com.zepben.evolve.database.sqlite.common
 
 import com.zepben.evolve.services.common.meta.MetadataCollection
 
+/**
+ * Class for writing the [MetadataCollection] to the database.
+ *
+ * @param metadata The [MetadataCollection] to save to the database.
+ * @param databaseTables The tables available in the database.
+ */
 class MetadataCollectionWriter(
-    private val metadataCollection: MetadataCollection,
+    private val metadata: MetadataCollection,
     databaseTables: BaseDatabaseTables,
     private val writer: MetadataEntryWriter = MetadataEntryWriter(databaseTables)
 ) : BaseCollectionWriter() {
 
     override fun save(): Boolean =
-        saveEach(metadataCollection.dataSources, writer::save) { it, e -> logger.error("Failed to save DataSource '${it.source}': ${e.message}") }
+        saveEach(metadata.dataSources, writer::save) { it, e -> logger.error("Failed to save DataSource '${it.source}': ${e.message}") }
 
 }

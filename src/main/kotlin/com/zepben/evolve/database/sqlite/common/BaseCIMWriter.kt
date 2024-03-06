@@ -26,15 +26,29 @@ import java.sql.PreparedStatement
 import java.sql.SQLException
 
 /**
- * A base class for reading CIM objects from a database.
+ * A base class for writing CIM objects to a database.
  *
  * @property databaseTables The tables that are available in the database.
  */
 abstract class BaseCIMWriter(
-    protected val databaseTables: DatabaseTables
-) : BaseWriter() {
+    protected open val databaseTables: BaseDatabaseTables
+) : BaseEntryWriter() {
 
-    /************ IEC61968 COMMON ************/
+    // ###################
+    // # IEC61968 COMMON #
+    // ###################
+
+    /**
+     * Save the [Document] fields to [TableDocuments].
+     *
+     * @param table The database table to write the [Document] fields to.
+     * @param insert The [PreparedStatement] to bind the field values to.
+     * @param document The [Document] instance to write to the database.
+     * @param description A readable version of the type of object being written for logging purposes.
+     *
+     * @return true if the [Document] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
     @Throws(SQLException::class)
     protected fun saveDocument(table: TableDocuments, insert: PreparedStatement, document: Document, description: String): Boolean {
         insert.setNullableString(table.TITLE.queryIndex, document.title)
@@ -47,6 +61,15 @@ abstract class BaseCIMWriter(
         return saveIdentifiedObject(table, insert, document, description)
     }
 
+    /**
+     * Save the [Organisation] fields to [TableOrganisations].
+     *
+     * @param organisation The [Organisation] instance to write to the database.
+     *
+     * @return true if the [Organisation] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(organisation: Organisation): Boolean {
         val table = databaseTables.getTable<TableOrganisations>()
         val insert = databaseTables.getInsert<TableOrganisations>()
@@ -54,6 +77,15 @@ abstract class BaseCIMWriter(
         return saveIdentifiedObject(table, insert, organisation, "organisation")
     }
 
+    /**
+     * Save the [NameType] fields to [TableNameTypes].
+     *
+     * @param nameType The [NameType] instance to write to the database.
+     *
+     * @return true if the [NameType] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(nameType: NameType): Boolean {
         val table = databaseTables.getTable<TableNameTypes>()
         val insert = databaseTables.getInsert<TableNameTypes>()
@@ -62,12 +94,14 @@ abstract class BaseCIMWriter(
     }
 
     /**
-     * Writes the [Name] object to the table. Name with no associated identified objects will not be written.
+     * Save the [Name] fields to [TableNames].
      *
-     * @param name The name object to be written to the table
+     * @param name The [Name] instance to write to the database.
      *
-     * @return true if the "write" was successful
+     * @return true if the [Name] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
      */
+    @Throws(SQLException::class)
     fun save(name: Name): Boolean {
         val table = databaseTables.getTable<TableNames>()
         val insert = databaseTables.getInsert<TableNames>()
@@ -75,24 +109,17 @@ abstract class BaseCIMWriter(
         return saveName(table, insert, name)
     }
 
-    private fun saveNameType(table: TableNameTypes, insert: PreparedStatement, nameType: NameType): Boolean {
-        insert.setString(table.NAME.queryIndex, nameType.name)
-        insert.setNullableString(table.DESCRIPTION.queryIndex, nameType.description)
-
-        return tryExecuteSingleUpdate(insert, nameType.name, "name type")
-    }
-
-    private fun saveName(table: TableNames, insert: PreparedStatement, name: Name): Boolean {
-        var status = true
-
-        insert.setString(table.NAME.queryIndex, name.name)
-        insert.setString(table.NAME_TYPE_NAME.queryIndex, name.type.name)
-        insert.setString(table.IDENTIFIED_OBJECT_MRID.queryIndex, name.identifiedObject.mRID)
-        status = status and tryExecuteSingleUpdate(insert, name.name, "name")
-
-        return status
-    }
-
+    /**
+     * Save the [OrganisationRole] fields to [TableOrganisationRoles].
+     *
+     * @param table The database table to write the [OrganisationRole] fields to.
+     * @param insert The [PreparedStatement] to bind the field values to.
+     * @param organisationRole The [OrganisationRole] instance to write to the database.
+     * @param description A readable version of the type of object being written for logging purposes.
+     *
+     * @return true if the [OrganisationRole] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
     @Throws(SQLException::class)
     protected fun saveOrganisationRole(
         table: TableOrganisationRoles,
@@ -105,7 +132,21 @@ abstract class BaseCIMWriter(
         return saveIdentifiedObject(table, insert, organisationRole, description)
     }
 
-    /************ IEC61970 CORE ************/
+    // #################
+    // # IEC61970 CORE #
+    // #################
+
+    /**
+     * Save the [IdentifiedObject] fields to [TableIdentifiedObjects].
+     *
+     * @param table The database table to write the [IdentifiedObject] fields to.
+     * @param insert The [PreparedStatement] to bind the field values to.
+     * @param identifiedObject The [IdentifiedObject] instance to write to the database.
+     * @param description A readable version of the type of object being written for logging purposes.
+     *
+     * @return true if the [IdentifiedObject] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
     @Throws(SQLException::class)
     protected fun saveIdentifiedObject(
         table: TableIdentifiedObjects,
@@ -118,7 +159,24 @@ abstract class BaseCIMWriter(
         insert.setString(table.DESCRIPTION.queryIndex, identifiedObject.description)
         insert.setInt(table.NUM_DIAGRAM_OBJECTS.queryIndex, identifiedObject.numDiagramObjects)
 
-        return tryExecuteSingleUpdate(insert, identifiedObject.mRID, description)
+        return insert.tryExecuteSingleUpdate(description)
+    }
+
+    @Throws(SQLException::class)
+    private fun saveNameType(table: TableNameTypes, insert: PreparedStatement, nameType: NameType): Boolean {
+        insert.setString(table.NAME.queryIndex, nameType.name)
+        insert.setNullableString(table.DESCRIPTION.queryIndex, nameType.description)
+
+        return insert.tryExecuteSingleUpdate("name type")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveName(table: TableNames, insert: PreparedStatement, name: Name): Boolean {
+        insert.setString(table.NAME.queryIndex, name.name)
+        insert.setString(table.NAME_TYPE_NAME.queryIndex, name.type.name)
+        insert.setString(table.IDENTIFIED_OBJECT_MRID.queryIndex, name.identifiedObject.mRID)
+
+        return insert.tryExecuteSingleUpdate("name")
     }
 
 }

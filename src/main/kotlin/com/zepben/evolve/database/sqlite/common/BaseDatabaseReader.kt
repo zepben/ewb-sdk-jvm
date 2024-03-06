@@ -10,6 +10,8 @@ package com.zepben.evolve.database.sqlite.common
 
 import com.zepben.evolve.database.sqlite.tables.MissingTableConfigException
 import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
+import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.services.common.meta.MetadataCollection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
@@ -17,30 +19,37 @@ import java.sql.Connection
 import java.sql.SQLException
 
 /**
- * @property databaseFile the filename of the database to write.
- * @property getConnection provider of the connection to the specified database.
- * @property getStatement provider of statements for the connection.
+ * A base class for reading objects from one of our databases.
+ *
+ * @property databaseFile the filename of the database to read.
+ * @property createMetadataReader Callback to create the reader for the [MetadataCollection] included in this database using the provided connection.
+ * @property createServiceReader Callback to create the reader for the [BaseService] supported by this database using the provided connection.
+ * @property upgradeRunner The [UpgradeRunner] used to ensure this database is on the correct schema version.
+ *
+ * @property logger The [Logger] to use for this reader.
+ * @property databaseDescriptor The JDBC descriptor for connecting to the database.
  */
-abstract class DatabaseReader<T : BaseCollectionReader>(
-    val databaseTables: DatabaseTables,
-    private val reader: T,
+abstract class BaseDatabaseReader(
     private val databaseFile: String,
-    private val metadataCollectionReader: MetadataCollectionReader,
+    private val createMetadataReader: (Connection) -> MetadataCollectionReader,
+    private val createServiceReader: (Connection) -> BaseServiceReader,
     private val upgradeRunner: UpgradeRunner,
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     private val databaseDescriptor: String = "jdbc:sqlite:$databaseFile"
-
     private lateinit var loadConnection: Connection
-
     private var hasBeenUsed: Boolean = false
 
-    protected open fun postLoad(): Boolean {
-        return true
-    }
+    /**
+     * Customisable function for performing actions after the database has been loaded.
+     */
+    protected open fun postLoad(): Boolean = true
 
+    /**
+     * Load the database.
+     */
     fun load(): Boolean {
         if (hasBeenUsed) {
             logger.error("You can only use the database reader once.")
@@ -56,8 +65,8 @@ abstract class DatabaseReader<T : BaseCollectionReader>(
 
         logger.info("Loading from database version v$databaseVersion")
         return try {
-            metadataCollectionReader.load() and
-                reader.load() and
+            createMetadataReader(loadConnection).load() and
+                createServiceReader(loadConnection).load() and
                 postLoad()
         } catch (e: MissingTableConfigException) {
             logger.error("Unable to load database: " + e.message)
@@ -67,8 +76,8 @@ abstract class DatabaseReader<T : BaseCollectionReader>(
         }
     }
 
-    private fun preLoad(): Int? {
-        return try {
+    private fun preLoad(): Int? =
+        try {
             upgradeRunner.connectAndUpgrade(databaseDescriptor, Paths.get(databaseFile))
                 .also { loadConnection = it.connection }
                 .version
@@ -77,7 +86,6 @@ abstract class DatabaseReader<T : BaseCollectionReader>(
             closeConnection()
             null
         }
-    }
 
     private fun closeConnection() {
         try {
@@ -87,6 +95,5 @@ abstract class DatabaseReader<T : BaseCollectionReader>(
             logger.error("Failed to close connection to database: " + e.message)
         }
     }
-
 
 }

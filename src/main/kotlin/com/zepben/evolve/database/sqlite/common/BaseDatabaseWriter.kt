@@ -20,74 +20,75 @@ import java.sql.Connection
 import java.sql.SQLException
 
 /**
- * @property databaseFile the filename of the database to write.
- * @property getConnection provider of the connection to the specified database.
- * @property getStatement provider of statements for the connection.
- * @property getPreparedStatement provider of prepared statements for the connection.
+ * A base class for writing objects to one of our databases.
+ *
+ * @param databaseFile The filename of the database to write.
+ * @param databaseTables The tables to create in the database.
+ * @param createMetadataWriter Create a [MetadataCollectionWriter] that uses the provided [Connection].
+ * @param createServiceWriter Create a [BaseServiceWriter] that uses the provided [Connection].
+ * @param getConnection Provider of the connection to the specified database.
+ *
+ * @property logger The logger to use for this database writer.
  */
-abstract class DatabaseWriter(
-    private val databaseTables: BaseDatabaseTables,
-    private val baseServiceWriter: BaseServiceWriter<*, *>,
-    private val metadataCollectionWriter: MetadataCollectionWriter,
+abstract class BaseDatabaseWriter(
     private val databaseFile: String,
+    private val databaseTables: BaseDatabaseTables,
+    private val createMetadataWriter: (Connection) -> MetadataCollectionWriter,
+    private val createServiceWriter: (Connection) -> BaseServiceWriter,
     private val getConnection: (String) -> Connection
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     private val databaseDescriptor: String = "jdbc:sqlite:$databaseFile"
-
     private lateinit var saveConnection: Connection
-
     private var hasBeenUsed: Boolean = false
 
-    //todo remove initialCreation and use separate file per database.
-    fun save(initialCreation: Boolean): Boolean {
+    /**
+     * Save the database using the [MetadataCollectionWriter] and [BaseServiceWriter].
+     *
+     * @return true if the database was successfully saved, otherwise false.
+     */
+    fun save(): Boolean {
         if (hasBeenUsed) {
             logger.error("You can only use the database writer once.")
             return false
         }
         hasBeenUsed = true
 
-        if (!preSave(initialCreation)) {
+        if (!preSave()) {
             closeConnection()
             return false
         }
 
         val status = try {
-            metadataCollectionWriter.save() and
-                baseServiceWriter.save()
+            createMetadataWriter(saveConnection).save() and
+                createServiceWriter(saveConnection).save()
         } catch (e: MissingTableConfigException) {
             logger.error("Unable to save database: " + e.message, e)
             false
         }
 
         return status and postSave()
-
     }
 
-    private fun preSave(initialCreation: Boolean): Boolean {
-        return removeExisting(initialCreation)
+    private fun preSave(): Boolean =
+        removeExisting()
             && connect()
             && create()
             && prepareInsertStatements()
-    }
 
-    private fun removeExisting(initialCreation: Boolean): Boolean {
-        if (initialCreation) {
-            return try {
-                Files.deleteIfExists(Paths.get(databaseFile))
-                true
-            } catch (e: IOException) {
-                logger.error("Unable to save database, failed to remove previous instance: " + e.message)
-                false
-            }
+    private fun removeExisting(): Boolean =
+        try {
+            Files.deleteIfExists(Paths.get(databaseFile))
+            true
+        } catch (e: IOException) {
+            logger.error("Unable to save database, failed to remove previous instance: " + e.message)
+            false
         }
-        return true
-    }
 
-    private fun connect(): Boolean {
-        return try {
+    private fun connect(): Boolean =
+        try {
             saveConnection = getConnection(databaseDescriptor).configureBatch()
             true
         } catch (e: SQLException) {
@@ -95,10 +96,9 @@ abstract class DatabaseWriter(
             closeConnection()
             false
         }
-    }
 
-    private fun prepareInsertStatements(): Boolean {
-        return try {
+    private fun prepareInsertStatements(): Boolean =
+        try {
             databaseTables.prepareInsertStatements(saveConnection)
             true
         } catch (e: SQLException) {
@@ -106,9 +106,8 @@ abstract class DatabaseWriter(
             closeConnection()
             false
         }
-    }
 
-    private fun create(): Boolean {
+    private fun create(): Boolean =
         try {
             val versionTable = databaseTables.getTable<TableVersion>()
             logger.info("Creating database schema v${versionTable.SUPPORTED_VERSION}...")
@@ -129,13 +128,11 @@ abstract class DatabaseWriter(
                 saveConnection.commit()
                 logger.info("Schema created.")
             }
+            true
         } catch (e: SQLException) {
             logger.error("Failed to create database schema: " + e.message)
-            return false
+            false
         }
-
-        return true
-    }
 
     private fun closeConnection() {
         try {
@@ -146,7 +143,7 @@ abstract class DatabaseWriter(
         }
     }
 
-    private fun postSave(): Boolean {
+    private fun postSave(): Boolean =
         try {
             logger.info("Adding indexes...")
 
@@ -164,14 +161,12 @@ abstract class DatabaseWriter(
             saveConnection.commit()
 
             logger.info("Done.")
+            true
         } catch (e: SQLException) {
             logger.error("Failed to finalise the database: " + e.message)
+            false
+        } finally {
             closeConnection()
-            return false
         }
-
-        closeConnection()
-        return true
-    }
 
 }

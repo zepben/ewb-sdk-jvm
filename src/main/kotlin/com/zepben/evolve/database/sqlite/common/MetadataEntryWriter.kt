@@ -13,13 +13,26 @@ import com.zepben.evolve.database.sqlite.extensions.setInstant
 import com.zepben.evolve.database.sqlite.extensions.tryExecuteSingleUpdate
 import com.zepben.evolve.database.sqlite.tables.TableMetadataDataSources
 import com.zepben.evolve.services.common.meta.DataSource
+import com.zepben.evolve.services.common.meta.MetadataCollection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class MetadataEntryWriter(val databaseTables: BaseDatabaseTables) : BaseWriter() {
+/**
+ * A class for reading the [MetadataCollection] entries from the database.
+ *
+ * @param databaseTables The tables that are available in the database.
+ */
+class MetadataEntryWriter(val databaseTables: BaseDatabaseTables) : BaseEntryWriter() {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
+    /**
+     * Save the [DataSource] fields to [TableMetadataDataSources].
+     *
+     * @param dataSource The [DataSource] to save to the database.
+     *
+     * @return true if the [DataSource] is successfully written to the database, otherwise false.
+     */
     fun save(dataSource: DataSource): Boolean {
         val table = databaseTables.getTable<TableMetadataDataSources>()
         val insert = databaseTables.getInsert<TableMetadataDataSources>()

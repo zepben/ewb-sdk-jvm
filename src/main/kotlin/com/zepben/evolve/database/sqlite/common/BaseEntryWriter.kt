@@ -15,17 +15,25 @@ import org.slf4j.LoggerFactory
 import java.sql.PreparedStatement
 import java.sql.SQLException
 
-abstract class BaseWriter {
+/**
+ * A base class for writing entries into tables of the database.
+ */
+abstract class BaseEntryWriter {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val failedIds: MutableSet<String> = mutableSetOf()
 
-    /************ HELPERS ************/
+    /**
+     * Helper function for writing the entry to the database and logging any failures.
+     *
+     * @receiver The [PreparedStatement] to execute.
+     * @param description A description of the object being written to use for logging of failures.
+     *
+     * @return true if the entry was successfully written to the database, otherwise false.
+     */
     @Throws(SQLException::class)
-    protected fun tryExecuteSingleUpdate(query: PreparedStatement, id: String, description: String): Boolean =
-        query.tryExecuteSingleUpdate {
-            failedIds.add(id)
-            query.logFailure(logger, description)
+    protected fun PreparedStatement.tryExecuteSingleUpdate(description: String): Boolean =
+        tryExecuteSingleUpdate {
+            logFailure(logger, description)
         }
 
 }

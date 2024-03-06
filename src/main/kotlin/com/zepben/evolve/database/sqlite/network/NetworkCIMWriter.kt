@@ -37,7 +37,6 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.common.BaseCIMWriter
-import com.zepben.evolve.database.sqlite.common.DatabaseTables
 import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
@@ -65,14 +64,31 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.p
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
+import com.zepben.evolve.services.network.NetworkService
 import java.sql.PreparedStatement
+import java.sql.SQLException
 
-
+/**
+ * A class for writing the [NetworkService] tables to the database.
+ *
+ * @property databaseTables The tables available in the database.
+ */
 @Suppress("SameParameterValue")
-class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseTables) {
+class NetworkCIMWriter(
+    override val databaseTables: NetworkDatabaseTables
+) : BaseCIMWriter(databaseTables) {
 
     /************ IEC61968 ASSET INFO ************/
 
+    /**
+     * Save the [CableInfo] fields to [TableCableInfo].
+     *
+     * @param cableInfo The [CableInfo] instance to write to the database.
+     *
+     * @return true if the [CableInfo] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(cableInfo: CableInfo): Boolean {
         val table = databaseTables.getTable<TableCableInfo>()
         val insert = databaseTables.getInsert<TableCableInfo>()
@@ -80,6 +96,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveWireInfo(table, insert, cableInfo, "cable info")
     }
 
+    /**
+     * Save the [NoLoadTest] fields to [TableNoLoadTests].
+     *
+     * @param noLoadTest The [NoLoadTest] instance to write to the database.
+     *
+     * @return true if the [NoLoadTest] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(noLoadTest: NoLoadTest): Boolean {
         val table = databaseTables.getTable<TableNoLoadTests>()
         val insert = databaseTables.getInsert<TableNoLoadTests>()
@@ -93,6 +118,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveTransformerTest(table, insert, noLoadTest, "no load test")
     }
 
+    /**
+     * Save the [OpenCircuitTest] fields to [TableOpenCircuitTests].
+     *
+     * @param openCircuitTest The [OpenCircuitTest] instance to write to the database.
+     *
+     * @return true if the [OpenCircuitTest] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(openCircuitTest: OpenCircuitTest): Boolean {
         val table = databaseTables.getTable<TableOpenCircuitTests>()
         val insert = databaseTables.getInsert<TableOpenCircuitTests>()
@@ -106,6 +140,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveTransformerTest(table, insert, openCircuitTest, "open circuit test")
     }
 
+    /**
+     * Save the [OverheadWireInfo] fields to [TableOverheadWireInfo].
+     *
+     * @param overheadWireInfo The [OverheadWireInfo] instance to write to the database.
+     *
+     * @return true if the [OverheadWireInfo] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(overheadWireInfo: OverheadWireInfo): Boolean {
         val table = databaseTables.getTable<TableOverheadWireInfo>()
         val insert = databaseTables.getInsert<TableOverheadWireInfo>()
@@ -113,6 +156,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveWireInfo(table, insert, overheadWireInfo, "overhead wire info")
     }
 
+    /**
+     * Save the [PowerTransformerInfo] fields to [TablePowerTransformerInfo].
+     *
+     * @param powerTransformerInfo The [PowerTransformerInfo] instance to write to the database.
+     *
+     * @return true if the [PowerTransformerInfo] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(powerTransformerInfo: PowerTransformerInfo): Boolean {
         val table = databaseTables.getTable<TablePowerTransformerInfo>()
         val insert = databaseTables.getInsert<TablePowerTransformerInfo>()
@@ -120,6 +172,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveAssetInfo(table, insert, powerTransformerInfo, "power transformer info")
     }
 
+    /**
+     * Save the [ShortCircuitTest] fields to [TableShortCircuitTests].
+     *
+     * @param shortCircuitTest The [ShortCircuitTest] instance to write to the database.
+     *
+     * @return true if the [ShortCircuitTest] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(shortCircuitTest: ShortCircuitTest): Boolean {
         val table = databaseTables.getTable<TableShortCircuitTests>()
         val insert = databaseTables.getInsert<TableShortCircuitTests>()
@@ -138,6 +199,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveTransformerTest(table, insert, shortCircuitTest, "short circuit test")
     }
 
+    /**
+     * Save the [ShuntCompensatorInfo] fields to [TableShuntCompensatorInfo].
+     *
+     * @param shuntCompensatorInfo The [ShuntCompensatorInfo] instance to write to the database.
+     *
+     * @return true if the [ShuntCompensatorInfo] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(shuntCompensatorInfo: ShuntCompensatorInfo): Boolean {
         val table = databaseTables.getTable<TableShuntCompensatorInfo>()
         val insert = databaseTables.getInsert<TableShuntCompensatorInfo>()
@@ -150,6 +220,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveAssetInfo(table, insert, shuntCompensatorInfo, "shunt compensator info")
     }
 
+    /**
+     * Save the [SwitchInfo] fields to [TableSwitchInfo].
+     *
+     * @param switchInfo The [SwitchInfo] instance to write to the database.
+     *
+     * @return true if the [SwitchInfo] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(switchInfo: SwitchInfo): Boolean {
         val table = databaseTables.getTable<TableSwitchInfo>()
         val insert = databaseTables.getInsert<TableSwitchInfo>()
@@ -159,6 +238,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveAssetInfo(table, insert, switchInfo, "switch info")
     }
 
+    /**
+     * Save the [TransformerEndInfo] fields to [TableTransformerEndInfo].
+     *
+     * @param transformerEndInfo The [TransformerEndInfo] instance to write to the database.
+     *
+     * @return true if the [TransformerEndInfo] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(transformerEndInfo: TransformerEndInfo): Boolean {
         val table = databaseTables.getTable<TableTransformerEndInfo>()
         val insert = databaseTables.getInsert<TableTransformerEndInfo>()
@@ -182,6 +270,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveAssetInfo(table, insert, transformerEndInfo, "transformer end info")
     }
 
+    /**
+     * Save the [TransformerTankInfo] fields to [TableTransformerTankInfo].
+     *
+     * @param transformerTankInfo The [TransformerTankInfo] instance to write to the database.
+     *
+     * @return true if the [TransformerTankInfo] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(transformerTankInfo: TransformerTankInfo): Boolean {
         val table = databaseTables.getTable<TableTransformerTankInfo>()
         val insert = databaseTables.getInsert<TableTransformerTankInfo>()
@@ -191,6 +288,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveAssetInfo(table, insert, transformerTankInfo, "transformer tank info")
     }
 
+    @Throws(SQLException::class)
     private fun saveTransformerTest(table: TableTransformerTest, insert: PreparedStatement, transformerTest: TransformerTest, description: String): Boolean {
         insert.setNullableInt(table.BASE_POWER.queryIndex, transformerTest.basePower)
         insert.setNullableDouble(table.TEMPERATURE.queryIndex, transformerTest.temperature)
@@ -198,6 +296,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, transformerTest, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveWireInfo(table: TableWireInfo, insert: PreparedStatement, wireInfo: WireInfo, description: String): Boolean {
         insert.setNullableInt(table.RATED_CURRENT.queryIndex, wireInfo.ratedCurrent)
         insert.setNullableString(table.MATERIAL.queryIndex, wireInfo.material.name)
@@ -207,6 +306,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
     /************ IEC61968 ASSETS ************/
 
+    @Throws(SQLException::class)
     private fun saveAsset(table: TableAssets, insert: PreparedStatement, asset: Asset, description: String): Boolean {
         var status = true
 
@@ -216,14 +316,17 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and saveIdentifiedObject(table, insert, asset, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveAssetContainer(table: TableAssetContainers, insert: PreparedStatement, assetContainer: AssetContainer, description: String): Boolean {
         return saveAsset(table, insert, assetContainer, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveAssetInfo(table: TableAssetInfo, insert: PreparedStatement, assetInfo: AssetInfo, description: String): Boolean {
         return saveIdentifiedObject(table, insert, assetInfo, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveAssetOrganisationRole(
         table: TableAssetOrganisationRoles,
         insert: PreparedStatement,
@@ -233,6 +336,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveOrganisationRole(table, insert, assetOrganisationRole, description)
     }
 
+    /**
+     * Save the [AssetOwner] fields to [TableAssetOwners].
+     *
+     * @param assetOwner The [AssetOwner] instance to write to the database.
+     *
+     * @return true if the [AssetOwner] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(assetOwner: AssetOwner): Boolean {
         val table = databaseTables.getTable<TableAssetOwners>()
         val insert = databaseTables.getInsert<TableAssetOwners>()
@@ -240,10 +352,20 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveAssetOrganisationRole(table, insert, assetOwner, "asset owner")
     }
 
+    @Throws(SQLException::class)
     private fun saveStructure(table: TableStructures, insert: PreparedStatement, structure: Structure, description: String): Boolean {
         return saveAssetContainer(table, insert, structure, description)
     }
 
+    /**
+     * Save the [Pole] fields to [TablePoles].
+     *
+     * @param pole The [Pole] instance to write to the database.
+     *
+     * @return true if the [Pole] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(pole: Pole): Boolean {
         val table = databaseTables.getTable<TablePoles>()
         val insert = databaseTables.getInsert<TablePoles>()
@@ -253,6 +375,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveStructure(table, insert, pole, "pole")
     }
 
+    /**
+     * Save the [Streetlight] fields to [TableStreetlights].
+     *
+     * @param streetlight The [Streetlight] instance to write to the database.
+     *
+     * @return true if the [Streetlight] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(streetlight: Streetlight): Boolean {
         val table = databaseTables.getTable<TableStreetlights>()
         val insert = databaseTables.getInsert<TableStreetlights>()
@@ -280,6 +411,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableString(table.STATE_OR_PROVINCE.queryIndex, townDetail?.stateOrProvince)
     }
 
+    /**
+     * Save the [Location] fields to [TableLocations].
+     *
+     * @param location The [Location] instance to write to the database.
+     *
+     * @return true if the [Location] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(location: Location): Boolean {
         val table = databaseTables.getTable<TableLocations>()
         val insert = databaseTables.getInsert<TableLocations>()
@@ -290,6 +430,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and saveIdentifiedObject(table, insert, location, "location")
     }
 
+    @Throws(SQLException::class)
     private fun saveLocationStreetAddress(
         location: Location,
         field: TableLocationStreetAddressField,
@@ -309,11 +450,11 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             table,
             insert,
             streetAddress,
-            "${location.mRID}-$field",
             description
         )
     }
 
+    @Throws(SQLException::class)
     private fun savePositionPoint(location: Location, sequenceNumber: Int, positionPoint: PositionPoint): Boolean {
         val table = databaseTables.getTable<TablePositionPoints>()
         val insert = databaseTables.getInsert<TablePositionPoints>()
@@ -323,18 +464,14 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setNullableDouble(table.X_POSITION.queryIndex, positionPoint.xPosition)
         insert.setNullableDouble(table.Y_POSITION.queryIndex, positionPoint.yPosition)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${location.mRID}-point$sequenceNumber",
-            "position point"
-        )
+        return insert.tryExecuteSingleUpdate("position point")
     }
 
+    @Throws(SQLException::class)
     private fun saveStreetAddress(
         table: TableStreetAddresses,
         insert: PreparedStatement,
         streetAddress: StreetAddress,
-        id: String,
         description: String
     ): Boolean {
         insert.setString(table.POSTAL_CODE.queryIndex, streetAddress.postalCode)
@@ -343,11 +480,20 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insertTownDetail(table, insert, streetAddress.townDetail)
         insertStreetDetail(table, insert, streetAddress.streetDetail)
 
-        return tryExecuteSingleUpdate(insert, id, description)
+        return insert.tryExecuteSingleUpdate(description)
     }
 
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
+    /**
+     * Save the [RelayInfo] fields to [TableRelayInfo].
+     *
+     * @param relayInfo The [RelayInfo] instance to write to the database.
+     *
+     * @return true if the [RelayInfo] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(relayInfo: RelayInfo): Boolean {
         val table = databaseTables.getTable<TableRelayInfo>()
         val insert = databaseTables.getInsert<TableRelayInfo>()
@@ -358,7 +504,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             recloseDelayInsert.setString(recloseDelayTable.RELAY_INFO_MRID.queryIndex, relayInfo.mRID)
             recloseDelayInsert.setInt(recloseDelayTable.SEQUENCE_NUMBER.queryIndex, idx)
             recloseDelayInsert.setDouble(recloseDelayTable.RECLOSE_DELAY.queryIndex, delay)
-            tryExecuteSingleUpdate(recloseDelayInsert, "${relayInfo.mRID}-rd-${idx}", "reclose delay")
+            recloseDelayInsert.tryExecuteSingleUpdate("reclose delay")
         }
 
         insert.setNullableString(table.CURVE_SETTING.queryIndex, relayInfo.curveSetting)
@@ -367,6 +513,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveAssetInfo(table, insert, relayInfo, "relay info")
     }
 
+    /**
+     * Save the [CurrentTransformerInfo] fields to [TableCurrentTransformerInfo].
+     *
+     * @param currentTransformerInfo The [CurrentTransformerInfo] instance to write to the database.
+     *
+     * @return true if the [CurrentTransformerInfo] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(currentTransformerInfo: CurrentTransformerInfo): Boolean {
         val table = databaseTables.getTable<TableCurrentTransformerInfo>()
         val insert = databaseTables.getInsert<TableCurrentTransformerInfo>()
@@ -387,6 +542,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveAssetInfo(table, insert, currentTransformerInfo, "current transformer info")
     }
 
+    /**
+     * Save the [PotentialTransformerInfo] fields to [TablePotentialTransformerInfo].
+     *
+     * @param potentialTransformerInfo The [PotentialTransformerInfo] instance to write to the database.
+     *
+     * @return true if the [PotentialTransformerInfo] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(potentialTransformerInfo: PotentialTransformerInfo): Boolean {
         val table = databaseTables.getTable<TablePotentialTransformerInfo>()
         val insert = databaseTables.getInsert<TablePotentialTransformerInfo>()
@@ -403,6 +567,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
     /************ IEC61968 METERING ************/
 
+    @Throws(SQLException::class)
     private fun saveEndDevice(table: TableEndDevices, insert: PreparedStatement, endDevice: EndDevice, description: String): Boolean {
         insert.setNullableString(table.CUSTOMER_MRID.queryIndex, endDevice.customerMRID)
         insert.setNullableString(table.SERVICE_LOCATION_MRID.queryIndex, endDevice.serviceLocation?.mRID)
@@ -413,6 +578,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and saveAssetContainer(table, insert, endDevice, description)
     }
 
+    /**
+     * Save the [Meter] fields to [TableMeters].
+     *
+     * @param meter The [Meter] instance to write to the database.
+     *
+     * @return true if the [Meter] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(meter: Meter): Boolean {
         val table = databaseTables.getTable<TableMeters>()
         val insert = databaseTables.getInsert<TableMeters>()
@@ -420,6 +594,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEndDevice(table, insert, meter, "meter")
     }
 
+    /**
+     * Save the [UsagePoint] fields to [TableUsagePoints].
+     *
+     * @param usagePoint The [UsagePoint] instance to write to the database.
+     *
+     * @return true if the [UsagePoint] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(usagePoint: UsagePoint): Boolean {
         val table = databaseTables.getTable<TableUsagePoints>()
         val insert = databaseTables.getInsert<TableUsagePoints>()
@@ -438,6 +621,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
     /************ IEC61968 OPERATIONS ************/
 
+    /**
+     * Save the [OperationalRestriction] fields to [TableOperationalRestrictions].
+     *
+     * @param operationalRestriction The [OperationalRestriction] instance to write to the database.
+     *
+     * @return true if the [OperationalRestriction] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(operationalRestriction: OperationalRestriction): Boolean {
         val table = databaseTables.getTable<TableOperationalRestrictions>()
         val insert = databaseTables.getInsert<TableOperationalRestrictions>()
@@ -450,6 +642,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
     /************ IEC61970 AUXILIARY EQUIPMENT ************/
 
+    @Throws(SQLException::class)
     private fun saveAuxiliaryEquipment(
         table: TableAuxiliaryEquipment,
         insert: PreparedStatement,
@@ -461,6 +654,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquipment(table, insert, auxiliaryEquipment, description)
     }
 
+    /**
+     * Save the [CurrentTransformer] fields to [TableCurrentTransformers].
+     *
+     * @param currentTransformer The [CurrentTransformer] instance to write to the database.
+     *
+     * @return true if the [CurrentTransformer] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(currentTransformer: CurrentTransformer): Boolean {
         val table = databaseTables.getTable<TableCurrentTransformers>()
         val insert = databaseTables.getInsert<TableCurrentTransformers>()
@@ -471,6 +673,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveSensor(table, insert, currentTransformer, "current transformer")
     }
 
+    /**
+     * Save the [FaultIndicator] fields to [TableFaultIndicators].
+     *
+     * @param faultIndicator The [FaultIndicator] instance to write to the database.
+     *
+     * @return true if the [FaultIndicator] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(faultIndicator: FaultIndicator): Boolean {
         val table = databaseTables.getTable<TableFaultIndicators>()
         val insert = databaseTables.getInsert<TableFaultIndicators>()
@@ -478,6 +689,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveAuxiliaryEquipment(table, insert, faultIndicator, "fault indicator")
     }
 
+    /**
+     * Save the [PotentialTransformer] fields to [TablePotentialTransformers].
+     *
+     * @param potentialTransformer The [PotentialTransformer] instance to write to the database.
+     *
+     * @return true if the [PotentialTransformer] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(potentialTransformer: PotentialTransformer): Boolean {
         val table = databaseTables.getTable<TablePotentialTransformers>()
         val insert = databaseTables.getInsert<TablePotentialTransformers>()
@@ -488,16 +708,27 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveSensor(table, insert, potentialTransformer, "potential transformer")
     }
 
+    @Throws(SQLException::class)
     private fun saveSensor(table: TableSensors, insert: PreparedStatement, sensor: Sensor, description: String): Boolean {
         return saveAuxiliaryEquipment(table, insert, sensor, description)
     }
 
     /************ IEC61970 CORE ************/
 
+    @Throws(SQLException::class)
     private fun saveAcDcTerminal(table: TableAcDcTerminals, insert: PreparedStatement, acDcTerminal: AcDcTerminal, description: String): Boolean {
         return saveIdentifiedObject(table, insert, acDcTerminal, description)
     }
 
+    /**
+     * Save the [BaseVoltage] fields to [TableBaseVoltages].
+     *
+     * @param baseVoltage The [BaseVoltage] instance to write to the database.
+     *
+     * @return true if the [BaseVoltage] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(baseVoltage: BaseVoltage): Boolean {
         val table = databaseTables.getTable<TableBaseVoltages>()
         val insert = databaseTables.getInsert<TableBaseVoltages>()
@@ -507,6 +738,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, baseVoltage, "base voltage")
     }
 
+    @Throws(SQLException::class)
     private fun saveConductingEquipment(
         table: TableConductingEquipment,
         insert: PreparedStatement,
@@ -518,6 +750,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquipment(table, insert, conductingEquipment, description)
     }
 
+    /**
+     * Save the [ConnectivityNode] fields to [TableConnectivityNodes].
+     *
+     * @param connectivityNode The [ConnectivityNode] instance to write to the database.
+     *
+     * @return true if the [ConnectivityNode] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(connectivityNode: ConnectivityNode): Boolean {
         val table = databaseTables.getTable<TableConnectivityNodes>()
         val insert = databaseTables.getInsert<TableConnectivityNodes>()
@@ -525,6 +766,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, connectivityNode, "connectivity node")
     }
 
+    @Throws(SQLException::class)
     private fun saveConnectivityNodeContainer(
         table: TableConnectivityNodeContainers,
         insert: PreparedStatement,
@@ -534,6 +776,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerSystemResource(table, insert, connectivityNodeContainer, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveEquipment(table: TableEquipment, insert: PreparedStatement, equipment: Equipment, description: String): Boolean {
         insert.setBoolean(table.NORMALLY_IN_SERVICE.queryIndex, equipment.normallyInService)
         insert.setBoolean(table.IN_SERVICE.queryIndex, equipment.inService)
@@ -548,6 +791,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and savePowerSystemResource(table, insert, equipment, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveEquipmentContainer(
         table: TableEquipmentContainers,
         insert: PreparedStatement,
@@ -557,6 +801,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConnectivityNodeContainer(table, insert, equipmentContainer, description)
     }
 
+    /**
+     * Save the [Feeder] fields to [TableFeeders].
+     *
+     * @param feeder The [Feeder] instance to write to the database.
+     *
+     * @return true if the [Feeder] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(feeder: Feeder): Boolean {
         val table = databaseTables.getTable<TableFeeders>()
         val insert = databaseTables.getInsert<TableFeeders>()
@@ -570,6 +823,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquipmentContainer(table, insert, feeder, "feeder")
     }
 
+    /**
+     * Save the [GeographicalRegion] fields to [TableGeographicalRegions].
+     *
+     * @param geographicalRegion The [GeographicalRegion] instance to write to the database.
+     *
+     * @return true if the [GeographicalRegion] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(geographicalRegion: GeographicalRegion): Boolean {
         val table = databaseTables.getTable<TableGeographicalRegions>()
         val insert = databaseTables.getInsert<TableGeographicalRegions>()
@@ -577,6 +839,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, geographicalRegion, "geographical region")
     }
 
+    @Throws(SQLException::class)
     private fun savePowerSystemResource(
         table: TablePowerSystemResources,
         insert: PreparedStatement,
@@ -589,6 +852,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, powerSystemResource, description)
     }
 
+    /**
+     * Save the [Site] fields to [TableSites].
+     *
+     * @param site The [Site] instance to write to the database.
+     *
+     * @return true if the [Site] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(site: Site): Boolean {
         val table = databaseTables.getTable<TableSites>()
         val insert = databaseTables.getInsert<TableSites>()
@@ -596,6 +868,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquipmentContainer(table, insert, site, "site")
     }
 
+    /**
+     * Save the [SubGeographicalRegion] fields to [TableSubGeographicalRegions].
+     *
+     * @param subGeographicalRegion The [SubGeographicalRegion] instance to write to the database.
+     *
+     * @return true if the [SubGeographicalRegion] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(subGeographicalRegion: SubGeographicalRegion): Boolean {
         val table = databaseTables.getTable<TableSubGeographicalRegions>()
         val insert = databaseTables.getInsert<TableSubGeographicalRegions>()
@@ -608,6 +889,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, subGeographicalRegion, "sub-geographical region")
     }
 
+    /**
+     * Save the [Substation] fields to [TableSubstations].
+     *
+     * @param substation The [Substation] instance to write to the database.
+     *
+     * @return true if the [Substation] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(substation: Substation): Boolean {
         val table = databaseTables.getTable<TableSubstations>()
         val insert = databaseTables.getInsert<TableSubstations>()
@@ -617,6 +907,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquipmentContainer(table, insert, substation, "substation")
     }
 
+    /**
+     * Save the [Terminal] fields to [TableTerminals].
+     *
+     * @param terminal The [Terminal] instance to write to the database.
+     *
+     * @return true if the [Terminal] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(terminal: Terminal): Boolean {
         val table = databaseTables.getTable<TableTerminals>()
         val insert = databaseTables.getInsert<TableTerminals>()
@@ -631,6 +930,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
     /************ IEC61970 WIRES ************/
 
+    /**
+     * Save the [EquivalentBranch] fields to [TableEquivalentBranches].
+     *
+     * @param equivalentBranch The [EquivalentBranch] instance to write to the database.
+     *
+     * @return true if the [EquivalentBranch] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(equivalentBranch: EquivalentBranch): Boolean {
         val table = databaseTables.getTable<TableEquivalentBranches>()
         val insert = databaseTables.getInsert<TableEquivalentBranches>()
@@ -655,6 +963,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquivalentEquipment(table, insert, equivalentBranch, "equivalent branch")
     }
 
+    @Throws(SQLException::class)
     private fun saveEquivalentEquipment(
         table: TableEquivalentEquipment,
         insert: PreparedStatement,
@@ -664,6 +973,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         saveConductingEquipment(table, insert, equivalentEquipment, description)
 
     /************ IEC61970 WIRES GENERATION PRODUCTION************/
+    /**
+     * Save the [EvChargingUnit] fields to [TableEvChargingUnits].
+     *
+     * @param evChargingUnit The [EvChargingUnit] instance to write to the database.
+     *
+     * @return true if the [EvChargingUnit] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(evChargingUnit: EvChargingUnit): Boolean {
         val table = databaseTables.getTable<TableEvChargingUnits>()
         val insert = databaseTables.getInsert<TableEvChargingUnits>()
@@ -671,6 +989,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerElectronicsUnit(table, insert, evChargingUnit, "ev charging unit")
     }
 
+    /**
+     * Save the [BatteryUnit] fields to [TableBatteryUnit].
+     *
+     * @param batteryUnit The [BatteryUnit] instance to write to the database.
+     *
+     * @return true if the [BatteryUnit] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(batteryUnit: BatteryUnit): Boolean {
         val table = databaseTables.getTable<TableBatteryUnit>()
         val insert = databaseTables.getInsert<TableBatteryUnit>()
@@ -682,6 +1009,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerElectronicsUnit(table, insert, batteryUnit, "battery unit")
     }
 
+    /**
+     * Save the [PhotoVoltaicUnit] fields to [TablePhotoVoltaicUnit].
+     *
+     * @param photoVoltaicUnit The [PhotoVoltaicUnit] instance to write to the database.
+     *
+     * @return true if the [PhotoVoltaicUnit] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(photoVoltaicUnit: PhotoVoltaicUnit): Boolean {
         val table = databaseTables.getTable<TablePhotoVoltaicUnit>()
         val insert = databaseTables.getInsert<TablePhotoVoltaicUnit>()
@@ -689,6 +1025,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerElectronicsUnit(table, insert, photoVoltaicUnit, "photo voltaic unit")
     }
 
+    @Throws(SQLException::class)
     private fun savePowerElectronicsUnit(
         table: TablePowerElectronicsUnit,
         insert: PreparedStatement,
@@ -702,6 +1039,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquipment(table, insert, powerElectronicsUnit, description)
     }
 
+    /**
+     * Save the [PowerElectronicsWindUnit] fields to [TablePowerElectronicsWindUnit].
+     *
+     * @param powerElectronicsWindUnit The [PowerElectronicsWindUnit] instance to write to the database.
+     *
+     * @return true if the [PowerElectronicsWindUnit] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean {
         val table = databaseTables.getTable<TablePowerElectronicsWindUnit>()
         val insert = databaseTables.getInsert<TablePowerElectronicsWindUnit>()
@@ -711,6 +1057,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
     /************ IEC61970 WIRES ************/
 
+    /**
+     * Save the [AcLineSegment] fields to [TableAcLineSegments].
+     *
+     * @param acLineSegment The [AcLineSegment] instance to write to the database.
+     *
+     * @return true if the [AcLineSegment] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(acLineSegment: AcLineSegment): Boolean {
         val table = databaseTables.getTable<TableAcLineSegments>()
         val insert = databaseTables.getInsert<TableAcLineSegments>()
@@ -723,6 +1078,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConductor(table, insert, acLineSegment, "AC line segment")
     }
 
+    /**
+     * Save the [Breaker] fields to [TableBreakers].
+     *
+     * @param breaker The [Breaker] instance to write to the database.
+     *
+     * @return true if the [Breaker] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(breaker: Breaker): Boolean {
         val table = databaseTables.getTable<TableBreakers>()
         val insert = databaseTables.getInsert<TableBreakers>()
@@ -732,6 +1096,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveProtectedSwitch(table, insert, breaker, "breaker")
     }
 
+    /**
+     * Save the [LoadBreakSwitch] fields to [TableLoadBreakSwitches].
+     *
+     * @param loadBreakSwitch The [LoadBreakSwitch] instance to write to the database.
+     *
+     * @return true if the [LoadBreakSwitch] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(loadBreakSwitch: LoadBreakSwitch): Boolean {
         val table = databaseTables.getTable<TableLoadBreakSwitches>()
         val insert = databaseTables.getInsert<TableLoadBreakSwitches>()
@@ -739,6 +1112,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveProtectedSwitch(table, insert, loadBreakSwitch, "load break switch")
     }
 
+    /**
+     * Save the [BusbarSection] fields to [TableBusbarSections].
+     *
+     * @param busbarSection The [BusbarSection] instance to write to the database.
+     *
+     * @return true if the [BusbarSection] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(busbarSection: BusbarSection): Boolean {
         val table = databaseTables.getTable<TableBusbarSections>()
         val insert = databaseTables.getInsert<TableBusbarSections>()
@@ -746,6 +1128,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConnector(table, insert, busbarSection, "busbar section")
     }
 
+    @Throws(SQLException::class)
     private fun saveConductor(table: TableConductors, insert: PreparedStatement, conductor: Conductor, description: String): Boolean {
         insert.setNullableDouble(table.LENGTH.queryIndex, conductor.length)
         insert.setNullableString(table.WIRE_INFO_MRID.queryIndex, conductor.assetInfo?.mRID)
@@ -753,10 +1136,20 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConductingEquipment(table, insert, conductor, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveConnector(table: TableConnectors, insert: PreparedStatement, connector: Connector, description: String): Boolean {
         return saveConductingEquipment(table, insert, connector, description)
     }
 
+    /**
+     * Save the [Disconnector] fields to [TableDisconnectors].
+     *
+     * @param disconnector The [Disconnector] instance to write to the database.
+     *
+     * @return true if the [Disconnector] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(disconnector: Disconnector): Boolean {
         val table = databaseTables.getTable<TableDisconnectors>()
         val insert = databaseTables.getInsert<TableDisconnectors>()
@@ -764,6 +1157,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveSwitch(table, insert, disconnector, "disconnector")
     }
 
+    @Throws(SQLException::class)
     private fun saveEnergyConnection(
         table: TableEnergyConnections,
         insert: PreparedStatement,
@@ -773,6 +1167,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConductingEquipment(table, insert, energyConnection, description)
     }
 
+    /**
+     * Save the [EnergyConsumer] fields to [TableEnergyConsumers].
+     *
+     * @param energyConsumer The [EnergyConsumer] instance to write to the database.
+     *
+     * @return true if the [EnergyConsumer] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(energyConsumer: EnergyConsumer): Boolean {
         val table = databaseTables.getTable<TableEnergyConsumers>()
         val insert = databaseTables.getInsert<TableEnergyConsumers>()
@@ -788,6 +1191,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEnergyConnection(table, insert, energyConsumer, "energy consumer")
     }
 
+    /**
+     * Save the [EnergyConsumerPhase] fields to [TableEnergyConsumerPhases].
+     *
+     * @param energyConsumerPhase The [EnergyConsumerPhase] instance to write to the database.
+     *
+     * @return true if the [EnergyConsumerPhase] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(energyConsumerPhase: EnergyConsumerPhase): Boolean {
         val table = databaseTables.getTable<TableEnergyConsumerPhases>()
         val insert = databaseTables.getInsert<TableEnergyConsumerPhases>()
@@ -802,6 +1214,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerSystemResource(table, insert, energyConsumerPhase, "energy consumer phase")
     }
 
+    /**
+     * Save the [EnergySource] fields to [TableEnergySources].
+     *
+     * @param energySource The [EnergySource] instance to write to the database.
+     *
+     * @return true if the [EnergySource] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(energySource: EnergySource): Boolean {
         val table = databaseTables.getTable<TableEnergySources>()
         val insert = databaseTables.getInsert<TableEnergySources>()
@@ -835,6 +1256,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEnergyConnection(table, insert, energySource, "energy source")
     }
 
+    /**
+     * Save the [EnergySourcePhase] fields to [TableEnergySourcePhases].
+     *
+     * @param energySourcePhase The [EnergySourcePhase] instance to write to the database.
+     *
+     * @return true if the [EnergySourcePhase] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(energySourcePhase: EnergySourcePhase): Boolean {
         val table = databaseTables.getTable<TableEnergySourcePhases>()
         val insert = databaseTables.getInsert<TableEnergySourcePhases>()
@@ -845,6 +1275,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerSystemResource(table, insert, energySourcePhase, "energy source phase")
     }
 
+    /**
+     * Save the [Fuse] fields to [TableFuses].
+     *
+     * @param fuse The [Fuse] instance to write to the database.
+     *
+     * @return true if the [Fuse] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(fuse: Fuse): Boolean {
         val table = databaseTables.getTable<TableFuses>()
         val insert = databaseTables.getInsert<TableFuses>()
@@ -854,6 +1293,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveSwitch(table, insert, fuse, "fuse")
     }
 
+    /**
+     * Save the [Ground] fields to [TableGrounds].
+     *
+     * @param ground The [Ground] instance to write to the database.
+     *
+     * @return true if the [Ground] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(ground: Ground): Boolean {
         val table = databaseTables.getTable<TableGrounds>()
         val insert = databaseTables.getInsert<TableGrounds>()
@@ -861,6 +1309,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConductingEquipment(table, insert, ground, "ground")
     }
 
+    /**
+     * Save the [GroundDisconnector] fields to [TableGroundDisconnectors].
+     *
+     * @param groundDisconnector The [GroundDisconnector] instance to write to the database.
+     *
+     * @return true if the [GroundDisconnector] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(groundDisconnector: GroundDisconnector): Boolean {
         val table = databaseTables.getTable<TableGroundDisconnectors>()
         val insert = databaseTables.getInsert<TableGroundDisconnectors>()
@@ -868,6 +1325,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveSwitch(table, insert, groundDisconnector, "ground disconnector")
     }
 
+    /**
+     * Save the [Jumper] fields to [TableJumpers].
+     *
+     * @param jumper The [Jumper] instance to write to the database.
+     *
+     * @return true if the [Jumper] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(jumper: Jumper): Boolean {
         val table = databaseTables.getTable<TableJumpers>()
         val insert = databaseTables.getInsert<TableJumpers>()
@@ -875,6 +1341,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveSwitch(table, insert, jumper, "jumper")
     }
 
+    /**
+     * Save the [Junction] fields to [TableJunctions].
+     *
+     * @param junction The [Junction] instance to write to the database.
+     *
+     * @return true if the [Junction] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(junction: Junction): Boolean {
         val table = databaseTables.getTable<TableJunctions>()
         val insert = databaseTables.getInsert<TableJunctions>()
@@ -882,10 +1357,20 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConnector(table, insert, junction, "junction")
     }
 
+    @Throws(SQLException::class)
     private fun saveLine(table: TableLines, insert: PreparedStatement, line: Line, description: String): Boolean {
         return saveEquipmentContainer(table, insert, line, description)
     }
 
+    /**
+     * Save the [LinearShuntCompensator] fields to [TableLinearShuntCompensators].
+     *
+     * @param linearShuntCompensator The [LinearShuntCompensator] instance to write to the database.
+     *
+     * @return true if the [LinearShuntCompensator] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(linearShuntCompensator: LinearShuntCompensator): Boolean {
         val table = databaseTables.getTable<TableLinearShuntCompensators>()
         val insert = databaseTables.getInsert<TableLinearShuntCompensators>()
@@ -898,6 +1383,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveShuntCompensator(table, insert, linearShuntCompensator, "linear shunt compensator")
     }
 
+    @Throws(SQLException::class)
     private fun savePerLengthImpedance(
         table: TablePerLengthImpedances,
         insert: PreparedStatement,
@@ -907,6 +1393,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePerLengthLineParameter(table, insert, perLengthImpedance, description)
     }
 
+    @Throws(SQLException::class)
     private fun savePerLengthLineParameter(
         table: TablePerLengthLineParameters,
         insert: PreparedStatement,
@@ -916,6 +1403,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, perLengthLineParameter, description)
     }
 
+    /**
+     * Save the [PerLengthSequenceImpedance] fields to [TablePerLengthSequenceImpedances].
+     *
+     * @param perLengthSequenceImpedance The [PerLengthSequenceImpedance] instance to write to the database.
+     *
+     * @return true if the [PerLengthSequenceImpedance] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean {
         val table = databaseTables.getTable<TablePerLengthSequenceImpedances>()
         val insert = databaseTables.getInsert<TablePerLengthSequenceImpedances>()
@@ -932,6 +1428,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePerLengthImpedance(table, insert, perLengthSequenceImpedance, "per length sequence impedance")
     }
 
+    /**
+     * Save the [PowerElectronicsConnection] fields to [TablePowerElectronicsConnection].
+     *
+     * @param powerElectronicsConnection The [PowerElectronicsConnection] instance to write to the database.
+     *
+     * @return true if the [PowerElectronicsConnection] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(powerElectronicsConnection: PowerElectronicsConnection): Boolean {
         val table = databaseTables.getTable<TablePowerElectronicsConnection>()
         val insert = databaseTables.getInsert<TablePowerElectronicsConnection>()
@@ -971,6 +1476,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveRegulatingCondEq(table, insert, powerElectronicsConnection, "power electronics connection")
     }
 
+    /**
+     * Save the [PowerElectronicsConnectionPhase] fields to [TablePowerElectronicsConnectionPhases].
+     *
+     * @param powerElectronicsConnectionPhase The [PowerElectronicsConnectionPhase] instance to write to the database.
+     *
+     * @return true if the [PowerElectronicsConnectionPhase] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): Boolean {
         val table = databaseTables.getTable<TablePowerElectronicsConnectionPhases>()
         val insert = databaseTables.getInsert<TablePowerElectronicsConnectionPhases>()
@@ -983,6 +1497,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerSystemResource(table, insert, powerElectronicsConnectionPhase, "power electronics connection phase")
     }
 
+    /**
+     * Save the [PowerTransformer] fields to [TablePowerTransformers].
+     *
+     * @param powerTransformer The [PowerTransformer] instance to write to the database.
+     *
+     * @return true if the [PowerTransformer] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(powerTransformer: PowerTransformer): Boolean {
         val table = databaseTables.getTable<TablePowerTransformers>()
         val insert = databaseTables.getInsert<TablePowerTransformers>()
@@ -996,6 +1519,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConductingEquipment(table, insert, powerTransformer, "power transformer")
     }
 
+    /**
+     * Save the [PowerTransformerEnd] fields to [TablePowerTransformerEnds].
+     *
+     * @param powerTransformerEnd The [PowerTransformerEnd] instance to write to the database.
+     *
+     * @return true if the [PowerTransformerEnd] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(powerTransformerEnd: PowerTransformerEnd): Boolean {
         val table = databaseTables.getTable<TablePowerTransformerEnds>()
         val insert = databaseTables.getInsert<TablePowerTransformerEnds>()
@@ -1019,18 +1551,28 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
             ratingsInsert.setString(ratingsTable.POWER_TRANSFORMER_END_MRID.queryIndex, powerTransformerEnd.mRID)
             ratingsInsert.setString(ratingsTable.COOLING_TYPE.queryIndex, it.coolingType.name)
             ratingsInsert.setInt(ratingsTable.RATED_S.queryIndex, it.ratedS)
-            tryExecuteSingleUpdate(ratingsInsert, "${powerTransformerEnd.mRID}-${it.coolingType.name}-${it.ratedS}", "transformer end ratedS")
+            ratingsInsert.tryExecuteSingleUpdate("transformer end ratedS")
         }
 
         return saveTransformerEnd(table, insert, powerTransformerEnd, "power transformer end")
     }
 
+    @Throws(SQLException::class)
     private fun saveProtectedSwitch(table: TableProtectedSwitches, insert: PreparedStatement, protectedSwitch: ProtectedSwitch, description: String): Boolean {
         insert.setNullableInt(table.BREAKING_CAPACITY.queryIndex, protectedSwitch.breakingCapacity)
 
         return saveSwitch(table, insert, protectedSwitch, description)
     }
 
+    /**
+     * Save the [RatioTapChanger] fields to [TableRatioTapChangers].
+     *
+     * @param ratioTapChanger The [RatioTapChanger] instance to write to the database.
+     *
+     * @return true if the [RatioTapChanger] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(ratioTapChanger: RatioTapChanger): Boolean {
         val table = databaseTables.getTable<TableRatioTapChangers>()
         val insert = databaseTables.getInsert<TableRatioTapChangers>()
@@ -1041,6 +1583,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveTapChanger(table, insert, ratioTapChanger, "ratio tap changer")
     }
 
+    /**
+     * Save the [Recloser] fields to [TableReclosers].
+     *
+     * @param recloser The [Recloser] instance to write to the database.
+     *
+     * @return true if the [Recloser] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(recloser: Recloser): Boolean {
         val table = databaseTables.getTable<TableReclosers>()
         val insert = databaseTables.getInsert<TableReclosers>()
@@ -1048,6 +1599,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveProtectedSwitch(table, insert, recloser, "recloser")
     }
 
+    @Throws(SQLException::class)
     private fun saveRegulatingCondEq(
         table: TableRegulatingCondEq,
         insert: PreparedStatement,
@@ -1060,6 +1612,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEnergyConnection(table, insert, regulatingCondEq, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveRegulatingControl(
         table: TableRegulatingControls,
         insert: PreparedStatement,
@@ -1080,6 +1633,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerSystemResource(table, insert, regulatingControl, description)
     }
 
+    /**
+     * Save the [SeriesCompensator] fields to [TableSeriesCompensators].
+     *
+     * @param seriesCompensator The [SeriesCompensator] instance to write to the database.
+     *
+     * @return true if the [SeriesCompensator] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(seriesCompensator: SeriesCompensator): Boolean {
         val table = databaseTables.getTable<TableSeriesCompensators>()
         val insert = databaseTables.getInsert<TableSeriesCompensators>()
@@ -1094,6 +1656,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConductingEquipment(table, insert, seriesCompensator, "series compensator")
     }
 
+    @Throws(SQLException::class)
     private fun saveShuntCompensator(
         table: TableShuntCompensators,
         insert: PreparedStatement,
@@ -1109,6 +1672,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveRegulatingCondEq(table, insert, shuntCompensator, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveSwitch(table: TableSwitches, insert: PreparedStatement, switch: Switch, description: String): Boolean {
         insert.setInt(table.NORMAL_OPEN.queryIndex, switch.normalOpen)
         insert.setInt(table.OPEN.queryIndex, switch.open)
@@ -1118,6 +1682,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveConductingEquipment(table, insert, switch, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveTapChanger(table: TableTapChangers, insert: PreparedStatement, tapChanger: TapChanger, description: String): Boolean {
         insert.setBoolean(table.CONTROL_ENABLED.queryIndex, tapChanger.controlEnabled)
         insert.setNullableInt(table.HIGH_STEP.queryIndex, tapChanger.highStep)
@@ -1131,6 +1696,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return savePowerSystemResource(table, insert, tapChanger, description)
     }
 
+    /**
+     * Save the [TapChangerControl] fields to [TableTapChangerControls].
+     *
+     * @param tapChangerControl The [TapChangerControl] instance to write to the database.
+     *
+     * @return true if the [TapChangerControl] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(tapChangerControl: TapChangerControl): Boolean {
         val table = databaseTables.getTable<TableTapChangerControls>()
         val insert = databaseTables.getInsert<TableTapChangerControls>()
@@ -1148,6 +1722,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveRegulatingControl(table, insert, tapChangerControl, "tap changer control")
     }
 
+    @Throws(SQLException::class)
     private fun saveTransformerEnd(
         table: TableTransformerEnds,
         insert: PreparedStatement,
@@ -1165,6 +1740,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, transformerEnd, description)
     }
 
+    /**
+     * Save the [TransformerStarImpedance] fields to [TableTransformerStarImpedance].
+     *
+     * @param transformerStarImpedance The [TransformerStarImpedance] instance to write to the database.
+     *
+     * @return true if the [TransformerStarImpedance] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(transformerStarImpedance: TransformerStarImpedance): Boolean {
         val table = databaseTables.getTable<TableTransformerStarImpedance>()
         val insert = databaseTables.getInsert<TableTransformerStarImpedance>()
@@ -1180,6 +1764,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
 
     /************ IEC61970 InfIEC61970 Feeder ************/
 
+    /**
+     * Save the [Circuit] fields to [TableCircuits].
+     *
+     * @param circuit The [Circuit] instance to write to the database.
+     *
+     * @return true if the [Circuit] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(circuit: Circuit): Boolean {
         val table = databaseTables.getTable<TableCircuits>()
         val insert = databaseTables.getInsert<TableCircuits>()
@@ -1193,6 +1786,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and saveLine(table, insert, circuit, "circuit")
     }
 
+    /**
+     * Save the [Loop] fields to [TableLoops].
+     *
+     * @param loop The [Loop] instance to write to the database.
+     *
+     * @return true if the [Loop] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(loop: Loop): Boolean {
         val table = databaseTables.getTable<TableLoops>()
         val insert = databaseTables.getInsert<TableLoops>()
@@ -1204,6 +1806,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and saveIdentifiedObject(table, insert, loop, "loop")
     }
 
+    /**
+     * Save the [LvFeeder] fields to [TableLvFeeders].
+     *
+     * @param lvFeeder The [LvFeeder] instance to write to the database.
+     *
+     * @return true if the [LvFeeder] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(lvFeeder: LvFeeder): Boolean {
         val table = databaseTables.getTable<TableLvFeeders>()
         val insert = databaseTables.getInsert<TableLvFeeders>()
@@ -1214,6 +1825,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61970 MEAS ************/
+    @Throws(SQLException::class)
     private fun saveMeasurement(
         table: TableMeasurements,
         insert: PreparedStatement,
@@ -1228,6 +1840,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIdentifiedObject(table, insert, measurement, description)
     }
 
+    /**
+     * Save the [Analog] fields to [TableAnalogs].
+     *
+     * @param analog The [Analog] instance to write to the database.
+     *
+     * @return true if the [Analog] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(analog: Analog): Boolean {
         val table = databaseTables.getTable<TableAnalogs>()
         val insert = databaseTables.getInsert<TableAnalogs>()
@@ -1237,6 +1858,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveMeasurement(table, insert, analog, "analog")
     }
 
+    /**
+     * Save the [Accumulator] fields to [TableAccumulators].
+     *
+     * @param accumulator The [Accumulator] instance to write to the database.
+     *
+     * @return true if the [Accumulator] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(accumulator: Accumulator): Boolean {
         val table = databaseTables.getTable<TableAccumulators>()
         val insert = databaseTables.getInsert<TableAccumulators>()
@@ -1244,6 +1874,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveMeasurement(table, insert, accumulator, "accumulator")
     }
 
+    /**
+     * Save the [Discrete] fields to [TableDiscretes].
+     *
+     * @param discrete The [Discrete] instance to write to the database.
+     *
+     * @return true if the [Discrete] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(discrete: Discrete): Boolean {
         val table = databaseTables.getTable<TableDiscretes>()
         val insert = databaseTables.getInsert<TableDiscretes>()
@@ -1251,6 +1890,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveMeasurement(table, insert, discrete, "discrete")
     }
 
+    /**
+     * Save the [Control] fields to [TableControls].
+     *
+     * @param control The [Control] instance to write to the database.
+     *
+     * @return true if the [Control] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(control: Control): Boolean {
         val table = databaseTables.getTable<TableControls>()
         val insert = databaseTables.getInsert<TableControls>()
@@ -1260,12 +1908,22 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveIoPoint(table, insert, control, "control")
     }
 
+    @Throws(SQLException::class)
     private fun saveIoPoint(table: TableIoPoints, insert: PreparedStatement, ioPoint: IoPoint, description: String): Boolean {
         return saveIdentifiedObject(table, insert, ioPoint, description)
     }
 
     /************ IEC61970 Base Protection ************/
 
+    /**
+     * Save the [CurrentRelay] fields to [TableCurrentRelays].
+     *
+     * @param currentRelay The [CurrentRelay] instance to write to the database.
+     *
+     * @return true if the [CurrentRelay] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(currentRelay: CurrentRelay): Boolean {
         val table = databaseTables.getTable<TableCurrentRelays>()
         val insert = databaseTables.getInsert<TableCurrentRelays>()
@@ -1277,6 +1935,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveProtectionRelayFunction(table, insert, currentRelay, "current relay")
     }
 
+    /**
+     * Save the [DistanceRelay] fields to [TableDistanceRelays].
+     *
+     * @param distanceRelay The [DistanceRelay] instance to write to the database.
+     *
+     * @return true if the [DistanceRelay] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(distanceRelay: DistanceRelay): Boolean {
         val table = databaseTables.getTable<TableDistanceRelays>()
         val insert = databaseTables.getInsert<TableDistanceRelays>()
@@ -1294,6 +1961,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveProtectionRelayFunction(table, insert, distanceRelay, "distance relay")
     }
 
+    @Throws(SQLException::class)
     private fun saveProtectionRelayFunction(
         table: TableProtectionRelayFunctions,
         insert: PreparedStatement,
@@ -1321,6 +1989,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and savePowerSystemResource(table, insert, protectionRelayFunction, description)
     }
 
+    @Throws(SQLException::class)
     private fun saveProtectionRelayFunctionThreshold(protectionRelayFunction: ProtectionRelayFunction, sequenceNumber: Int, threshold: RelaySetting): Boolean {
         val table = databaseTables.getTable<TableProtectionRelayFunctionThresholds>()
         val insert = databaseTables.getInsert<TableProtectionRelayFunctionThresholds>()
@@ -1331,13 +2000,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setDouble(table.VALUE.queryIndex, threshold.value)
         insert.setNullableString(table.NAME.queryIndex, threshold.name)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${protectionRelayFunction.mRID}-threshold$sequenceNumber",
-            "protection relay function threshold"
-        )
+        return insert.tryExecuteSingleUpdate("protection relay function threshold")
     }
 
+    @Throws(SQLException::class)
     private fun saveProtectionRelayFunctionTimeLimit(protectionRelayFunction: ProtectionRelayFunction, sequenceNumber: Int, timeLimit: Double): Boolean {
         val table = databaseTables.getTable<TableProtectionRelayFunctionTimeLimits>()
         val insert = databaseTables.getInsert<TableProtectionRelayFunctionTimeLimits>()
@@ -1346,13 +2012,18 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
         insert.setDouble(table.TIME_LIMIT.queryIndex, timeLimit)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${protectionRelayFunction.mRID}-timeLimit$sequenceNumber",
-            "protection relay function time limit"
-        )
+        return insert.tryExecuteSingleUpdate("protection relay function time limit")
     }
 
+    /**
+     * Save the [ProtectionRelayScheme] fields to [TableProtectionRelaySchemes].
+     *
+     * @param protectionRelayScheme The [ProtectionRelayScheme] instance to write to the database.
+     *
+     * @return true if the [ProtectionRelayScheme] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(protectionRelayScheme: ProtectionRelayScheme): Boolean {
         val table = databaseTables.getTable<TableProtectionRelaySchemes>()
         val insert = databaseTables.getInsert<TableProtectionRelaySchemes>()
@@ -1365,6 +2036,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return status and saveIdentifiedObject(table, insert, protectionRelayScheme, "protection relay scheme")
     }
 
+    /**
+     * Save the [ProtectionRelaySystem] fields to [TableProtectionRelaySystems].
+     *
+     * @param protectionRelaySystem The [ProtectionRelaySystem] instance to write to the database.
+     *
+     * @return true if the [ProtectionRelaySystem] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(protectionRelaySystem: ProtectionRelaySystem): Boolean {
         val table = databaseTables.getTable<TableProtectionRelaySystems>()
         val insert = databaseTables.getInsert<TableProtectionRelaySystems>()
@@ -1374,6 +2054,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveEquipment(table, insert, protectionRelaySystem, "protection relay system")
     }
 
+    /**
+     * Save the [VoltageRelay] fields to [TableVoltageRelays].
+     *
+     * @param voltageRelay The [VoltageRelay] instance to write to the database.
+     *
+     * @return true if the [VoltageRelay] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(voltageRelay: VoltageRelay): Boolean {
         val table = databaseTables.getTable<TableVoltageRelays>()
         val insert = databaseTables.getInsert<TableVoltageRelays>()
@@ -1382,6 +2071,15 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ IEC61970 SCADA ************/
+    /**
+     * Save the [RemoteControl] fields to [TableRemoteControls].
+     *
+     * @param remoteControl The [RemoteControl] instance to write to the database.
+     *
+     * @return true if the [RemoteControl] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(remoteControl: RemoteControl): Boolean {
         val table = databaseTables.getTable<TableRemoteControls>()
         val insert = databaseTables.getInsert<TableRemoteControls>()
@@ -1391,10 +2089,20 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         return saveRemotePoint(table, insert, remoteControl, "remote control")
     }
 
+    @Throws(SQLException::class)
     private fun saveRemotePoint(table: TableRemotePoints, insert: PreparedStatement, remotePoint: RemotePoint, description: String): Boolean {
         return saveIdentifiedObject(table, insert, remotePoint, description)
     }
 
+    /**
+     * Save the [RemoteSource] fields to [TableRemoteSources].
+     *
+     * @param remoteSource The [RemoteSource] instance to write to the database.
+     *
+     * @return true if the [RemoteSource] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
     fun save(remoteSource: RemoteSource): Boolean {
         val table = databaseTables.getTable<TableRemoteSources>()
         val insert = databaseTables.getInsert<TableRemoteSources>()
@@ -1405,6 +2113,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
     }
 
     /************ ASSOCIATIONS ************/
+    @Throws(SQLException::class)
     private fun saveAssociation(assetOrganisationRole: AssetOrganisationRole, asset: Asset): Boolean {
         val table = databaseTables.getTable<TableAssetOrganisationRolesAssets>()
         val insert = databaseTables.getInsert<TableAssetOrganisationRolesAssets>()
@@ -1412,13 +2121,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.ASSET_ORGANISATION_ROLE_MRID.queryIndex, assetOrganisationRole.mRID)
         insert.setString(table.ASSET_MRID.queryIndex, asset.mRID)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${assetOrganisationRole.mRID}-to-${asset.mRID}",
-            "asset organisation role to asset association"
-        )
+        return insert.tryExecuteSingleUpdate("asset organisation role to asset association")
     }
 
+    @Throws(SQLException::class)
     private fun saveAssociation(usagePoint: UsagePoint, endDevice: EndDevice): Boolean {
         val table = databaseTables.getTable<TableUsagePointsEndDevices>()
         val insert = databaseTables.getInsert<TableUsagePointsEndDevices>()
@@ -1426,13 +2132,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
         insert.setString(table.END_DEVICE_MRID.queryIndex, endDevice.mRID)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${usagePoint.mRID}-to-${endDevice.mRID}",
-            "usage point to end device association"
-        )
+        return insert.tryExecuteSingleUpdate("usage point to end device association")
     }
 
+    @Throws(SQLException::class)
     private fun saveAssociation(equipment: Equipment, usagePoint: UsagePoint): Boolean {
         val table = databaseTables.getTable<TableEquipmentUsagePoints>()
         val insert = databaseTables.getInsert<TableEquipmentUsagePoints>()
@@ -1440,13 +2143,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
         insert.setString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${equipment.mRID}-to-${usagePoint.mRID}",
-            "equipment to usage point association"
-        )
+        return insert.tryExecuteSingleUpdate("equipment to usage point association")
     }
 
+    @Throws(SQLException::class)
     private fun saveAssociation(equipment: Equipment, operationalRestriction: OperationalRestriction): Boolean {
         val table = databaseTables.getTable<TableEquipmentOperationalRestrictions>()
         val insert = databaseTables.getInsert<TableEquipmentOperationalRestrictions>()
@@ -1454,13 +2154,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
         insert.setString(table.OPERATIONAL_RESTRICTION_MRID.queryIndex, operationalRestriction.mRID)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${equipment.mRID}-to-${operationalRestriction.mRID}",
-            "equipment to operational restriction association"
-        )
+        return insert.tryExecuteSingleUpdate("equipment to operational restriction association")
     }
 
+    @Throws(SQLException::class)
     private fun saveAssociation(equipment: Equipment, equipmentContainer: EquipmentContainer): Boolean {
         val table = databaseTables.getTable<TableEquipmentEquipmentContainers>()
         val insert = databaseTables.getInsert<TableEquipmentEquipmentContainers>()
@@ -1468,13 +2165,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
         insert.setString(table.EQUIPMENT_CONTAINER_MRID.queryIndex, equipmentContainer.mRID)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${equipment.mRID}-to-${equipmentContainer.mRID}",
-            "equipment to equipment container association"
-        )
+        return insert.tryExecuteSingleUpdate("equipment to equipment container association")
     }
 
+    @Throws(SQLException::class)
     private fun saveAssociation(circuit: Circuit, substation: Substation): Boolean {
         val table = databaseTables.getTable<TableCircuitsSubstations>()
         val insert = databaseTables.getInsert<TableCircuitsSubstations>()
@@ -1482,13 +2176,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.CIRCUIT_MRID.queryIndex, circuit.mRID)
         insert.setString(table.SUBSTATION_MRID.queryIndex, substation.mRID)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${circuit.mRID}-to-${substation.mRID}",
-            "circuit to substation association"
-        )
+        return insert.tryExecuteSingleUpdate("circuit to substation association")
     }
 
+    @Throws(SQLException::class)
     private fun saveAssociation(circuit: Circuit, terminal: Terminal): Boolean {
         val table = databaseTables.getTable<TableCircuitsTerminals>()
         val insert = databaseTables.getInsert<TableCircuitsTerminals>()
@@ -1496,13 +2187,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.CIRCUIT_MRID.queryIndex, circuit.mRID)
         insert.setString(table.TERMINAL_MRID.queryIndex, terminal.mRID)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${circuit.mRID}-to-${terminal.mRID}",
-            "circuit to terminal association"
-        )
+        return insert.tryExecuteSingleUpdate("circuit to terminal association")
     }
 
+    @Throws(SQLException::class)
     private fun saveAssociation(loop: Loop, substation: Substation, relationship: LoopSubstationRelationship): Boolean {
         val table = databaseTables.getTable<TableLoopsSubstations>()
         val insert = databaseTables.getInsert<TableLoopsSubstations>()
@@ -1511,13 +2199,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.SUBSTATION_MRID.queryIndex, substation.mRID)
         insert.setString(table.RELATIONSHIP.queryIndex, relationship.name)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${loop.mRID}-to-${substation.mRID}",
-            "loop to substation association"
-        )
+        return insert.tryExecuteSingleUpdate("loop to substation association")
     }
 
+    @Throws(SQLException::class)
     private fun saveAssociation(protectionRelayFunction: ProtectionRelayFunction, protectedSwitch: ProtectedSwitch): Boolean {
         val table = databaseTables.getTable<TableProtectionRelayFunctionsProtectedSwitches>()
         val insert = databaseTables.getInsert<TableProtectionRelayFunctionsProtectedSwitches>()
@@ -1525,13 +2210,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
         insert.setString(table.PROTECTED_SWITCH_MRID.queryIndex, protectedSwitch.mRID)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${protectionRelayFunction.mRID}-to-${protectedSwitch.mRID}",
-            "protection relay function to protected switch association"
-        )
+        return insert.tryExecuteSingleUpdate("protection relay function to protected switch association")
     }
 
+    @Throws(SQLException::class)
     private fun saveAssociation(protectionRelayFunction: ProtectionRelayFunction, sensor: Sensor): Boolean {
         val table = databaseTables.getTable<TableProtectionRelayFunctionsSensors>()
         val insert = databaseTables.getInsert<TableProtectionRelayFunctionsSensors>()
@@ -1539,13 +2221,10 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
         insert.setString(table.SENSOR_MRID.queryIndex, sensor.mRID)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${protectionRelayFunction.mRID}-to-${sensor.mRID}",
-            "protection relay function to sensor association"
-        )
+        return insert.tryExecuteSingleUpdate("protection relay function to sensor association")
     }
 
+    @Throws(SQLException::class)
     private fun saveAssociation(protectionRelayScheme: ProtectionRelayScheme, protectionRelayFunction: ProtectionRelayFunction): Boolean {
         val table = databaseTables.getTable<TableProtectionRelaySchemesProtectionRelayFunctions>()
         val insert = databaseTables.getInsert<TableProtectionRelaySchemesProtectionRelayFunctions>()
@@ -1553,11 +2232,7 @@ class NetworkCIMWriter(databaseTables: DatabaseTables) : BaseCIMWriter(databaseT
         insert.setString(table.PROTECTION_RELAY_SCHEME_MRID.queryIndex, protectionRelayScheme.mRID)
         insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
 
-        return tryExecuteSingleUpdate(
-            insert,
-            "${protectionRelayScheme.mRID}-to-${protectionRelayFunction.mRID}",
-            "protection relay function to protection relay function association"
-        )
+        return insert.tryExecuteSingleUpdate("protection relay function to protection relay function association")
     }
 
 }

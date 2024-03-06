@@ -56,8 +56,8 @@ object SchemaNetworks {
     }
 
     fun createDataSourceTestServices(): NetworkModelTestUtil.Services = NetworkModelTestUtil.Services().apply {
-        metadataCollection.add(DataSource("source1", "v1", Instant.EPOCH))
-        metadataCollection.add(DataSource("source2", "v2", Instant.now()))
+        metadata.add(DataSource("source1", "v1", Instant.EPOCH))
+        metadata.add(DataSource("source2", "v2", Instant.now()))
     }
 
     fun <T : IdentifiedObject> customerServicesOf(factory: (mRID: String) -> T, filler: (T, CustomerService, Boolean) -> T): NetworkModelTestUtil.Services =

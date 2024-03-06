@@ -40,7 +40,7 @@ import java.time.Instant
 class NetworkModelTestUtil {
 
     data class Services @JvmOverloads constructor(
-        val metadataCollection: MetadataCollection = MetadataCollection(),
+        val metadata: MetadataCollection = MetadataCollection(),
         val networkService: NetworkService = NetworkService(),
         val diagramService: DiagramService = DiagramService(),
         val customerService: CustomerService = CustomerService(),
@@ -201,7 +201,7 @@ class NetworkModelTestUtil {
         fun createFeeder(network: NetworkService, num: Int, feederStart: ConductingEquipment?, substation: Substation?): Feeder =
             Feeder("f$num")
                 .apply {
-                    normalHeadTerminal = feederStart?.let { it.t1 }
+                    normalHeadTerminal = feederStart?.t1
                     name = "Feeder $num"
                     normalEnergizingSubstation = substation
                 }.also {

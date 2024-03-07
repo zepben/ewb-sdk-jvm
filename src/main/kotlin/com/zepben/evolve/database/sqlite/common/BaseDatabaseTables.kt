@@ -37,6 +37,8 @@ open class BaseDatabaseTables : AutoCloseable {
     protected open val includedTables: Sequence<SqliteTable> = sequenceOf(
         TableMetadataDataSources(),
         TableVersion(),
+        TableNameTypes(),
+        TableNames()
     )
 
     /**

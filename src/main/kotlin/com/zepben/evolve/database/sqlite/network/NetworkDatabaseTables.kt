@@ -10,8 +10,6 @@ package com.zepben.evolve.database.sqlite.network
 
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseTables
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
-import com.zepben.evolve.database.sqlite.tables.TableMetadataDataSources
-import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.tables.associations.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetOwners
@@ -114,10 +112,7 @@ class NetworkDatabaseTables : BaseDatabaseTables() {
             TableLoops(),
             TableLoopsSubstations(),
             TableLvFeeders(),
-            TableMetadataDataSources(),
             TableMeters(),
-            TableNameTypes(),
-            TableNames(),
             TableNoLoadTests(),
             TableOpenCircuitTests(),
             TableOperationalRestrictions(),
@@ -167,7 +162,6 @@ class NetworkDatabaseTables : BaseDatabaseTables() {
             TableTransformerTankInfo(),
             TableUsagePoints(),
             TableUsagePointsEndDevices(),
-            TableVersion(),
             TableVoltageRelays()
         )
 

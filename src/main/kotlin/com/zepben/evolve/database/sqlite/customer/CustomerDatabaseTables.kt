@@ -16,8 +16,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableOrganisatio
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableCustomerAgreements
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TablePricingStructures
 import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableTariffs
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNameTypes
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableNames
 
 /**
  * The collection of tables for our customer databases.
@@ -28,8 +26,6 @@ class CustomerDatabaseTables : BaseDatabaseTables() {
         super.includedTables + sequenceOf(
             TableCustomerAgreements(),
             TableCustomerAgreementsPricingStructures(),
-            TableNameTypes(),
-            TableNames(),
             TableOrganisations(),
             TablePricingStructures(),
             TablePricingStructuresTariffs(),

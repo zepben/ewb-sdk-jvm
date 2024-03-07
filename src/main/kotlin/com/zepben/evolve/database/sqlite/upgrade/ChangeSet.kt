@@ -8,33 +8,19 @@
 
 package com.zepben.evolve.database.sqlite.upgrade
 
-import java.sql.Statement
+import com.zepben.evolve.database.sqlite.tables.TableVersion
 
-abstract class ChangeSet {
-
-    abstract val number: Int
-    abstract val commands: List<String>
-
-    abstract fun preCommandsHook(statement: Statement)
-
-    abstract fun postCommandsHook(statement: Statement)
-
-    companion object {
-
-        operator fun invoke(
-            number: Int,
-            vararg commands: List<String>,
-            preCommandsHook: (Statement) -> Unit = { },
-            postCommandsHook: (Statement) -> Unit = { }
-        ): ChangeSet = object : ChangeSet() {
-
-            override val number = number
-            override val commands: List<String> = commands.toList().flatten()
-            override fun preCommandsHook(statement: Statement) = preCommandsHook(statement)
-            override fun postCommandsHook(statement: Statement) = postCommandsHook(statement)
-
-        }
-
-    }
-
-}
+/**
+ * A base class for all change sets used to upgrade the schema in our databases.
+ *
+ * @property number The number of the change set. Must be an incrementing number matching the target version defined in [TableVersion].
+ * @property commands The SQL commands to run for this change set.
+ * @property preCommandHooks The hooks to execute before the commands for this change set.
+ * @property postCommandHooks The hooks to execute after the commands for this change set.
+ */
+data class ChangeSet @JvmOverloads constructor(
+    val number: Int,
+    val commands: List<Change>,
+    val preCommandHooks: List<Hook> = emptyList(),
+    val postCommandHooks: List<Hook> = emptyList()
+)

@@ -18,10 +18,13 @@ import java.io.IOException
 import java.nio.file.*
 import java.sql.*
 
+/**
+ * Upgrade the schema in one of our databases to the latest version.
+ */
 class UpgradeRunner @JvmOverloads constructor(
     private val getConnection: (String) -> Connection = DriverManager::getConnection,
-    private val createBackup: (databaseFilename: Path, backupFilename: Path, copyOption: CopyOption) -> Unit = { f, b, o -> Files.copy(f, b, o) },
-    internal val changeSets: List<ChangeSet> = listOf(
+    private val copyFile: (source: Path, target: Path, copyOption: CopyOption) -> Unit = { f, b, o -> Files.copy(f, b, o) },
+    internal val preSplitChangeSets: List<ChangeSet> = listOf(
         changeSet44(),
         changeSet45(),
         changeSet46(),
@@ -29,11 +32,26 @@ class UpgradeRunner @JvmOverloads constructor(
         changeSet48(),
         changeSet49()
     ),
+    // Rename this to `changeSets` and remove database splitting logic next time we set a new minimum version of the database.
+    internal val postSplitChangeSets: List<ChangeSet> = listOf(
+        changeSet50()
+    ),
     private val tableVersion: TableVersion = TableVersion()
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val minimumSupportedVersion = changeSets.firstOrNull()?.let { it.number - 1 } ?: tableVersion.SUPPORTED_VERSION
+    private val minimumSupportedVersion = preSplitChangeSets.firstOrNull()?.let { it.number - 1 } ?: tableVersion.SUPPORTED_VERSION
+
+    // Remove this variable next time we set a new minimum version of the database. Also remove the note in NetworkDatabaseReader.
+    private val splitVersion = 49
+
+    init {
+        preSplitChangeSets.all { it.number <= splitVersion }
+        preSplitChangeSets.any { it.number == splitVersion }
+
+        postSplitChangeSets.all { it.number > splitVersion }
+        postSplitChangeSets.any { it.number == splitVersion + 1 }
+    }
 
     /**
      * Get a connection to the database, and runm and required upgrade scripts to bring the schema into line.
@@ -46,13 +64,21 @@ class UpgradeRunner @JvmOverloads constructor(
      * @return The [Connection] to the upgraded database.
      */
     @Throws(UpgradeException::class)
-    fun connectAndUpgrade(databaseDescriptor: String, databaseFile: Path): ConnectionResult {
+    fun connectAndUpgrade(databaseDescriptor: String, databaseFile: Path, type: EwbDatabaseType): ConnectionResult {
         val connection = runCatching { getConnection(databaseDescriptor).configureBatch() }
             .getOrElse { throw UpgradeException(it.message, it) }
 
         return try {
+            val wasPreSplit = connection.createStatement().use { statement ->
+                upgrade(databaseFile, statement, connection, type, preSplitChangeSets, true)
+            }
+
+            // This will copy the database file into the new split format. Remove it next time we set a new minimum version of the database.
+            if (wasPreSplit)
+                splitDatabase(databaseFile)
+
             connection.createStatement().use { statement ->
-                upgrade(databaseFile, statement, connection)
+                upgrade(databaseFile, statement, connection, type, postSplitChangeSets, !wasPreSplit)
             }
 
             ConnectionResult(connection, tableVersion.SUPPORTED_VERSION)
@@ -70,43 +96,51 @@ class UpgradeRunner @JvmOverloads constructor(
     }
 
     @Throws(SQLException::class, IOException::class, SecurityException::class)
-    private fun upgrade(databaseFile: Path, statement: Statement, connection: Connection) {
+    private fun upgrade(
+        databaseFile: Path,
+        statement: Statement,
+        connection: Connection,
+        type: EwbDatabaseType,
+        changeSets: List<ChangeSet>,
+        backupRequired: Boolean
+    ): Boolean =
         tryRunUpgrade(getVersion(statement)) { databaseVersion ->
             logger.info("Upgrading database '$databaseFile' from v$databaseVersion to v${changeSets.last().number}")
-            createBackup(databaseFile, createBackupName(databaseFile, databaseVersion), StandardCopyOption.REPLACE_EXISTING)
+
+            if (backupRequired)
+                copyFile(databaseFile, createBackupName(databaseFile, databaseVersion), StandardCopyOption.REPLACE_EXISTING)
 
             connection.prepareStatement(tableVersion.preparedUpdateSql).use { versionUpdateStatement ->
                 changeSets.asSequence()
                     .filter { databaseVersion < it.number }
-                    .forEach { runUpgrade(it, statement, versionUpdateStatement) }
+                    .forEach { runUpgrade(it, statement, versionUpdateStatement, type) }
             }
         }
-    }
 
-    private fun tryRunUpgrade(databaseVersion: Int?, upgradeBlock: (databaseVersion: Int) -> Unit) {
+    private fun tryRunUpgrade(databaseVersion: Int?, upgradeBlock: (databaseVersion: Int) -> Unit): Boolean =
         when {
-            databaseVersion == tableVersion.SUPPORTED_VERSION -> return
+            databaseVersion == tableVersion.SUPPORTED_VERSION -> false
             databaseVersion == null -> throwMissingVersionException()
             databaseVersion > tableVersion.SUPPORTED_VERSION -> throwFuturisticDatabaseException(databaseVersion)
             databaseVersion < minimumSupportedVersion -> throwUnsupportedUpgradeException(databaseVersion)
-            else -> upgradeBlock(databaseVersion)
+            else -> upgradeBlock(databaseVersion).let { true }
         }
-    }
 
     @Throws(SQLException::class, SecurityException::class)
     internal fun runUpgrade(
         changeSet: ChangeSet,
         statement: Statement,
-        versionUpdateStatement: PreparedStatement
+        versionUpdateStatement: PreparedStatement,
+        type: EwbDatabaseType
     ) {
         logger.info("Applying database change set ${changeSet.number}")
         statement.executeUpdate("PRAGMA foreign_keys=OFF")
 
-        changeSet.preCommandsHook(statement)
+        changeSet.preCommandHooks.filter { type in it.targetDatabases }.forEach { it(statement) }
 
-        changeSet.commands.forEach { statement.executeUpdate(it) }
+        changeSet.commands.filter { type in it.targetDatabases }.flatMap { it.commands }.forEach { statement.executeUpdate(it) }
 
-        changeSet.postCommandsHook(statement)
+        changeSet.postCommandHooks.filter { type in it.targetDatabases }.forEach { it(statement) }
 
         updateVersion(versionUpdateStatement, changeSet.number)
 
@@ -140,28 +174,63 @@ class UpgradeRunner @JvmOverloads constructor(
             }
         }.getOrNull()
 
-    private fun throwMissingVersionException() {
+    @Throws(SQLException::class, IOException::class, SecurityException::class)
+    private fun splitDatabase(networkDatabaseFile: Path) {
+        cloneAndUpgrade(networkDatabaseFile, EwbDatabaseType.CUSTOMER)
+        cloneAndUpgrade(networkDatabaseFile, EwbDatabaseType.DIAGRAM)
+    }
+
+    private fun cloneAndUpgrade(networkDatabaseFile: Path, targetType: EwbDatabaseType) {
+        val targetDatabaseFile = networkDatabaseFile.replace(EwbDatabaseType.NETWORK.fileDescriptor, targetType.fileDescriptor)
+
+        try {
+            copyFile(networkDatabaseFile, targetDatabaseFile, StandardCopyOption.REPLACE_EXISTING)
+        } catch (e: Exception) {
+            throw UpgradeException("Failed to split database. ${e.message}", e)
+        }
+
+        // We don't need to use the connection again, so just close it.
+        connectAndUpgrade("jdbc:sqlite:$targetDatabaseFile", targetDatabaseFile, targetType)
+            .connection
+            .close()
+    }
+
+    private fun throwMissingVersionException(): Nothing =
         throw UpgradeException(
             "Invalid EWB database detected, unable to read the version number from the database. Please ensure you only have databases " +
                 "in the EWB data directory that have been generated by a working migrator."
         )
-    }
 
-    private fun throwFuturisticDatabaseException(databaseVersion: Int) {
+    private fun throwFuturisticDatabaseException(databaseVersion: Int): Nothing =
         throw UpgradeException(
             "Selected database is a newer version [v$databaseVersion] than the supported version [v${tableVersion.SUPPORTED_VERSION}]. Either update the " +
                 "version of the server you are using, or downgrade the migrator."
         )
-    }
 
-    private fun throwUnsupportedUpgradeException(databaseVersion: Int) {
+    private fun throwUnsupportedUpgradeException(databaseVersion: Int): Nothing =
         throw UpgradeException(
             "Unable to upgrade obsolete database version [v$databaseVersion], upgrading a database before v$minimumSupportedVersion is unsupported. Please " +
                 "generate a new database from the source system using an updated migrator."
         )
-    }
 
+    private fun Path.replace(oldValue: String, newValue: String): Path =
+        Path.of(toString().replace(oldValue, newValue))
+
+
+    /**
+     * A connection to the database and its schema version number.
+     *
+     * @property connection The [Connection] to the database.
+     * @property version The schema version number of the database.
+     */
     class ConnectionResult(val connection: Connection, val version: Int)
+
+    /**
+     * An exception indicating the upgrade has failed.
+     *
+     * @param message A message indicating what error has occurred.
+     * @param cause Any underlying cause of the error.
+     */
     class UpgradeException(message: String?, cause: Throwable? = null) : Exception(message, cause)
 
 }

@@ -19,10 +19,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableLocationStr
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableLocations
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableOrganisations
 import com.zepben.evolve.database.sqlite.tables.iec61968.common.TablePositionPoints
-import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableCustomerAgreements
-import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableCustomers
-import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TablePricingStructures
-import com.zepben.evolve.database.sqlite.tables.iec61968.customers.TableTariffs
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
@@ -34,9 +30,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TableFaultIndicators
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipment.TablePotentialTransformers
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjects
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagrams
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.equivalents.TableEquivalentBranches
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAccumulators
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.meas.TableAnalogs
@@ -79,12 +72,6 @@ class NetworkDatabaseTables : BaseDatabaseTables() {
             TableCurrentRelays(),
             TableCurrentTransformerInfo(),
             TableCurrentTransformers(),
-            TableCustomerAgreements(),
-            TableCustomerAgreementsPricingStructures(),
-            TableCustomers(),
-            TableDiagramObjectPoints(),
-            TableDiagramObjects(),
-            TableDiagrams(),
             TableDisconnectors(),
             TableDiscretes(),
             TableDistanceRelays(),
@@ -131,8 +118,6 @@ class NetworkDatabaseTables : BaseDatabaseTables() {
             TablePowerTransformerEndRatings(),
             TablePowerTransformerInfo(),
             TablePowerTransformers(),
-            TablePricingStructures(),
-            TablePricingStructuresTariffs(),
             TableProtectionRelayFunctionThresholds(),
             TableProtectionRelayFunctionTimeLimits(),
             TableProtectionRelayFunctionsProtectedSwitches(),
@@ -155,7 +140,6 @@ class NetworkDatabaseTables : BaseDatabaseTables() {
             TableSubstations(),
             TableSwitchInfo(),
             TableTapChangerControls(),
-            TableTariffs(),
             TableTerminals(),
             TableTransformerEndInfo(),
             TableTransformerStarImpedance(),

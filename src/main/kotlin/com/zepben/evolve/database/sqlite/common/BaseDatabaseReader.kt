@@ -9,6 +9,7 @@
 package com.zepben.evolve.database.sqlite.common
 
 import com.zepben.evolve.database.sqlite.tables.MissingTableConfigException
+import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
 import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.meta.MetadataCollection
@@ -34,6 +35,7 @@ abstract class BaseDatabaseReader(
     private val createMetadataReader: (Connection) -> MetadataCollectionReader,
     private val createServiceReader: (Connection) -> BaseServiceReader,
     private val upgradeRunner: UpgradeRunner,
+    private val databaseType: EwbDatabaseType
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -78,7 +80,7 @@ abstract class BaseDatabaseReader(
 
     private fun preLoad(): Int? =
         try {
-            upgradeRunner.connectAndUpgrade(databaseDescriptor, Paths.get(databaseFile))
+            upgradeRunner.connectAndUpgrade(databaseDescriptor, Paths.get(databaseFile), databaseType)
                 .also { loadConnection = it.connection }
                 .version
         } catch (e: UpgradeRunner.UpgradeException) {

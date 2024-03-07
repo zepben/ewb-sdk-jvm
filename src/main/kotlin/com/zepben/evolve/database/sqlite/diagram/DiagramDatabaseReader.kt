@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.diagram
 
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseReader
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionReader
+import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
 import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.diagram.DiagramService
@@ -39,4 +40,5 @@ class DiagramDatabaseReader @JvmOverloads constructor(
     createMetadataReader,
     createServiceReader,
     upgradeRunner,
+    EwbDatabaseType.DIAGRAM
 )

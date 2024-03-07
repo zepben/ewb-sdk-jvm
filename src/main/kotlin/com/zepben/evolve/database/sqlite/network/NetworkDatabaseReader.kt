@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.network
 
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseReader
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionReader
+import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
 import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.network.NetworkService
@@ -43,4 +44,5 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     createMetadataReader,
     createServiceReader,
     upgradeRunner,
+    EwbDatabaseType.NETWORK
 )

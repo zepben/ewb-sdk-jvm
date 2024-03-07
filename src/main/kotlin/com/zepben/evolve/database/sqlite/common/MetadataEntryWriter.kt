@@ -22,7 +22,9 @@ import org.slf4j.LoggerFactory
  *
  * @param databaseTables The tables that are available in the database.
  */
-class MetadataEntryWriter(val databaseTables: BaseDatabaseTables) : BaseEntryWriter() {
+class MetadataEntryWriter(
+    val databaseTables: BaseDatabaseTables
+) : BaseEntryWriter() {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 

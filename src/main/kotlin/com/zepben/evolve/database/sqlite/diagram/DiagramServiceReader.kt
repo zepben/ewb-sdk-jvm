@@ -24,7 +24,7 @@ import java.sql.Connection
  *
  * @property reader The [DiagramCIMReader] used to load the objects from the database.
  */
-class DiagramServiceReader(
+class DiagramServiceReader @JvmOverloads constructor(
     service: DiagramService,
     databaseTables: DiagramDatabaseTables,
     connection: Connection,

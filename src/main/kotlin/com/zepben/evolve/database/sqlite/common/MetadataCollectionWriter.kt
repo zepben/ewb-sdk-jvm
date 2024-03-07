@@ -16,7 +16,7 @@ import com.zepben.evolve.services.common.meta.MetadataCollection
  * @param metadata The [MetadataCollection] to save to the database.
  * @param databaseTables The tables available in the database.
  */
-class MetadataCollectionWriter(
+class MetadataCollectionWriter @JvmOverloads constructor(
     private val metadata: MetadataCollection,
     databaseTables: BaseDatabaseTables,
     private val writer: MetadataEntryWriter = MetadataEntryWriter(databaseTables)

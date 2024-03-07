@@ -28,7 +28,7 @@ import java.sql.Connection
  *
  * @property reader The [CustomerCIMReader] used to load the objects from the database.
  */
-class CustomerServiceReader(
+class CustomerServiceReader @JvmOverloads constructor(
     service: CustomerService,
     databaseTables: CustomerDatabaseTables,
     connection: Connection,

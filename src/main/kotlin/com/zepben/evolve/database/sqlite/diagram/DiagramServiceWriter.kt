@@ -19,7 +19,7 @@ import com.zepben.evolve.services.diagram.DiagramService
  * @param service The [DiagramService] to save to the database.
  * @param databaseTables The [DiagramDatabaseTables] to add to the database.
  */
-class DiagramServiceWriter(
+class DiagramServiceWriter @JvmOverloads constructor(
     override val service: DiagramService,
     databaseTables: DiagramDatabaseTables,
     override val writer: DiagramCIMWriter = DiagramCIMWriter(databaseTables)

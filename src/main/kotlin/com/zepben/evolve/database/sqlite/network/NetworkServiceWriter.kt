@@ -49,7 +49,7 @@ import com.zepben.evolve.services.network.NetworkService
  * @param service The [NetworkService] to save to the database.
  * @param databaseTables The [NetworkDatabaseTables] to add to the database.
  */
-class NetworkServiceWriter(
+class NetworkServiceWriter @JvmOverloads constructor(
     override val service: NetworkService,
     databaseTables: NetworkDatabaseTables,
     override val writer: NetworkCIMWriter = NetworkCIMWriter(databaseTables)

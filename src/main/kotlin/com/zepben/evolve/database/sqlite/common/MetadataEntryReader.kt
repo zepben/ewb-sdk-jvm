@@ -20,7 +20,9 @@ import java.time.Instant
  *
  * @param metadata The [MetadataCollection] to populate from the database.
  */
-class MetadataEntryReader(private val metadata: MetadataCollection) {
+class MetadataEntryReader(
+    private val metadata: MetadataCollection
+) {
 
     /**
      * Populate the [DataSource] fields from [TableMetadataDataSources].

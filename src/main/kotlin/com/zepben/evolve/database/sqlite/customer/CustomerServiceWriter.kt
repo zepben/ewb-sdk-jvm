@@ -22,7 +22,7 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param service The [CustomerService] to save to the database.
  * @param databaseTables The [CustomerDatabaseTables] to add to the database.
  */
-class CustomerServiceWriter(
+class CustomerServiceWriter @JvmOverloads constructor(
     override val service: CustomerService,
     databaseTables: CustomerDatabaseTables,
     override val writer: CustomerCIMWriter = CustomerCIMWriter(databaseTables)

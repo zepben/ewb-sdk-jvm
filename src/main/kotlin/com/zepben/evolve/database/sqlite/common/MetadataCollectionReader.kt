@@ -20,7 +20,7 @@ import java.sql.Connection
  * @param connection The [Connection] to the database.
  */
 //todo move metadata to BaseService like names?
-class MetadataCollectionReader(
+class MetadataCollectionReader @JvmOverloads constructor(
     metadata: MetadataCollection,
     databaseTables: BaseDatabaseTables,
     connection: Connection,

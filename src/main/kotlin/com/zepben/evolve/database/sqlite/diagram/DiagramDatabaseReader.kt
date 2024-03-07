@@ -22,7 +22,7 @@ import java.sql.Connection
  * @param metadata The [MetadataCollection] to populate with metadata from the database.
  * @param service The [DiagramService] to populate with CIM objects from the database.
  */
-class DiagramDatabaseReader(
+class DiagramDatabaseReader @JvmOverloads constructor(
     databaseFile: String,
     metadata: MetadataCollection,
     service: DiagramService,

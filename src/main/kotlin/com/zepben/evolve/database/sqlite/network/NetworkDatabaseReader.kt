@@ -22,7 +22,7 @@ import java.sql.Connection
  * @param metadata The [MetadataCollection] to populate with metadata from the database.
  * @param service The [NetworkService] to populate with CIM objects from the database.
  */
-class NetworkDatabaseReader(
+class NetworkDatabaseReader @JvmOverloads constructor(
     databaseFile: String,
     metadata: MetadataCollection,
     service: NetworkService,

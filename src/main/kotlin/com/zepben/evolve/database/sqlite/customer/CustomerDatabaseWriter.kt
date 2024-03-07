@@ -22,7 +22,6 @@ import java.sql.DriverManager
  * @param metadata The [MetadataCollection] to save to the database.
  * @param service The [CustomerService] to save to the database.
  */
-//todo all @JvmOverload in place?
 class CustomerDatabaseWriter @JvmOverloads constructor(
     databaseFile: String,
     metadata: MetadataCollection,

@@ -58,7 +58,7 @@ import java.sql.Connection
  *
  * @property reader The [BaseCIMReader] used to load the objects from the database.
  */
-class NetworkServiceReader(
+class NetworkServiceReader @JvmOverloads constructor(
     service: NetworkService,
     databaseTables: NetworkDatabaseTables,
     connection: Connection,

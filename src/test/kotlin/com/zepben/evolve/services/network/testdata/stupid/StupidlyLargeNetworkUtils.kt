@@ -1,12 +1,12 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network
+package com.zepben.evolve.services.network.testdata.stupid
 
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
@@ -32,13 +32,15 @@ import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.measurement.MeasurementService
+import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.createTerminal
 import org.hamcrest.MatcherAssert.assertThat
 import java.time.Instant
 
 @Suppress("SameParameterValue", "MemberVisibilityCanBePrivate")
-class NetworkModelTestUtil {
+class StupidlyLargeNetworkUtils {
 
+    // Only used by the stupidly large network, so remove it if we ever fix that beast.
     data class Services @JvmOverloads constructor(
         val metadata: MetadataCollection = MetadataCollection(),
         val networkService: NetworkService = NetworkService(),

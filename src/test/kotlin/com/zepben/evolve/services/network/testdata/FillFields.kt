@@ -36,8 +36,6 @@ import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createRemoteSource
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locationOf
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import java.time.Instant
@@ -512,7 +510,7 @@ fun GeographicalRegion.fillFields(service: NetworkService, includeRuntime: Boole
 fun PowerSystemResource.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerSystemResource {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
-    location = locationOf(3.3, 4.4).also { service.add(it) }
+    location = Location().apply { addPoint(PositionPoint(3.3, 4.4)) }.also { service.add(it) }
     numControls = 5
 
     return this
@@ -705,7 +703,13 @@ fun Measurement.fillFields(service: NetworkService, includeRuntime: Boolean = tr
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     powerSystemResourceMRID = PowerTransformer().mRID
-    remoteSource = createRemoteSource(service, this)
+    remoteSource = RemoteSource().also {
+        remoteSource = it
+        it.measurement = this
+    }.also {
+        service.add(it)
+    }
+
     terminalMRID = Terminal().mRID
     phases = PhaseCode.ABCN
     unitSymbol = UnitSymbol.HENRYS

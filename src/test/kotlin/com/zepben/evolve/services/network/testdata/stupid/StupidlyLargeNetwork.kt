@@ -1,12 +1,12 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network.testdata
+package com.zepben.evolve.services.network.testdata.stupid
 
 import com.zepben.evolve.cim.iec61968.assetinfo.CableInfo
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
@@ -27,28 +27,30 @@ import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.measurement.MeasurementService
-import com.zepben.evolve.services.network.NetworkModelTestUtil
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.baseVoltageOf
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createAcLineSegment
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createAccumulator
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createAnalog
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createDiagram
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createDiagramObject
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createDiscrete
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createEnergySource
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createFeeder
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createFeederStart
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createGeographicalRegion
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createJunction
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createOperationalRestriction
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createService
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createSite
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createSubGeographicalRegion
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createSubstation
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createSwitch
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.createTransformer
-import com.zepben.evolve.services.network.NetworkModelTestUtil.Companion.locationOf
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.testdata.createAssetOwner
+import com.zepben.evolve.services.network.testdata.createTerminal
+import com.zepben.evolve.services.network.testdata.createTerminals
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.baseVoltageOf
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createAcLineSegment
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createAccumulator
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createAnalog
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createDiagram
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createDiagramObject
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createDiscrete
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createEnergySource
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createFeeder
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createFeederStart
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createGeographicalRegion
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createJunction
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createOperationalRestriction
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createService
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createSite
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createSubGeographicalRegion
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createSubstation
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createSwitch
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createTransformer
+import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.locationOf
 import com.zepben.evolve.services.network.tracing.Tracing
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -56,7 +58,7 @@ import org.hamcrest.Matchers.equalTo
 @Suppress("SameParameterValue", "BooleanLiteralArgument")
 object StupidlyLargeNetwork {
 
-    fun create(): NetworkModelTestUtil.Services {
+    fun create(): StupidlyLargeNetworkUtils.Services {
         val networkService = NetworkService()
         val diagramService = DiagramService()
         val customerService = CustomerService()
@@ -295,7 +297,7 @@ object StupidlyLargeNetwork {
         createAccumulator(networkService, transformer.getTerminal(1)?.mRID, isoTransformer1)
         createDiscrete(networkService, transformer.getTerminal(1)?.mRID, isoTransformer1)
 
-        return NetworkModelTestUtil.Services(MetadataCollection(), networkService, diagramService, customerService, measurementService)
+        return StupidlyLargeNetworkUtils.Services(MetadataCollection(), networkService, diagramService, customerService, measurementService)
     }
 
     private fun addSampleNetwork(networkService: NetworkService, diagramService: DiagramService, customerService: CustomerService) {
@@ -730,14 +732,14 @@ object StupidlyLargeNetwork {
         // NOTE: Due to the mapping issue described above, meter1 and meter2 are mapped to both tx1 and tx2
         //       to reflect the IRL data we receive, which is contrary to what the diagram indicates.
         //
-        NetworkModelTestUtil.addLvSimplification(tx1, usagePoint1, meter1, meter2)
-        NetworkModelTestUtil.addLvSimplification(tx1, usagePoint3, meter3)
-        NetworkModelTestUtil.addLvSimplification(tx1, usagePoint5, meter5, meter6)
-        NetworkModelTestUtil.addLvSimplification(tx1, usagePoint6)
-        NetworkModelTestUtil.addLvSimplification(tx2, usagePoint2, meter1, meter2)
-        NetworkModelTestUtil.addLvSimplification(tx2, usagePoint4, meter4)
-        NetworkModelTestUtil.addLvSimplification(tx3, usagePoint7, meter7)
-        NetworkModelTestUtil.addLvSimplification(tx4, usagePoint7, meter7)
+        StupidlyLargeNetworkUtils.addLvSimplification(tx1, usagePoint1, meter1, meter2)
+        StupidlyLargeNetworkUtils.addLvSimplification(tx1, usagePoint3, meter3)
+        StupidlyLargeNetworkUtils.addLvSimplification(tx1, usagePoint5, meter5, meter6)
+        StupidlyLargeNetworkUtils.addLvSimplification(tx1, usagePoint6)
+        StupidlyLargeNetworkUtils.addLvSimplification(tx2, usagePoint2, meter1, meter2)
+        StupidlyLargeNetworkUtils.addLvSimplification(tx2, usagePoint4, meter4)
+        StupidlyLargeNetworkUtils.addLvSimplification(tx3, usagePoint7, meter7)
+        StupidlyLargeNetworkUtils.addLvSimplification(tx4, usagePoint7, meter7)
     }
 
 }

@@ -14,7 +14,7 @@ package com.zepben.evolve.database.sqlite.upgrade
  * @property commands The SQL commands to run.
  * @property targetDatabases The database types that these commands should be run against.
  */
-data class Change @JvmOverloads constructor(
+data class Change(
     val commands: List<String>,
-    val targetDatabases: Set<EwbDatabaseType> = setOf(EwbDatabaseType.NETWORK),
+    val targetDatabases: Set<EwbDatabaseType>,
 )

@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.Change
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
+import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
 
 internal fun changeSet45() = ChangeSet(
     45,
@@ -44,7 +45,8 @@ private val `Create new columns on existing tables` = Change(
         "ALTER TABLE reclosers ADD breaking_capacity INTEGER NULL;",
 
         "ALTER TABLE breakers ADD in_transit_time NUMBER NULL;",
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -61,7 +63,8 @@ private val `Create switch_info table` = Change(
         """.trimIndent(),
         "CREATE UNIQUE INDEX switch_info_mrid ON switch_info (mrid);",
         "CREATE INDEX switch_info_name ON switch_info (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -78,7 +81,8 @@ private val `Create current_relay_info table` = Change(
         """.trimIndent(),
         "CREATE UNIQUE INDEX current_relay_info_mrid ON current_relay_info (mrid);",
         "CREATE INDEX current_relay_info_name ON current_relay_info (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -104,7 +108,8 @@ private val `Create current_relays table` = Change(
         """.trimIndent(),
         "CREATE UNIQUE INDEX current_relays_mrid ON current_relays (mrid);",
         "CREATE INDEX current_relays_name ON current_relays (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -122,5 +127,6 @@ private val `Create protection_equipment_protected_switches table` = Change(
         """.trimIndent(),
         "CREATE INDEX protection_equipment_protected_switches_protection_equipment_mrid ON protection_equipment_protected_switches (protection_equipment_mrid);",
         "CREATE INDEX protection_equipment_protected_switches_protected_switch_mrid ON protection_equipment_protected_switches (protected_switch_mrid);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )

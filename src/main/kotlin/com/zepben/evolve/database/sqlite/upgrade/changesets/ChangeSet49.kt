@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.Change
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
+import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
 
 internal fun changeSet49() = ChangeSet(
     49,
@@ -64,7 +65,8 @@ private val `Create distance_relays table` = Change(
         );""".trimIndent(),
         "CREATE UNIQUE INDEX distance_relays_mrid ON distance_relays (mrid);",
         "CREATE INDEX distance_relays_name ON distance_relays (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -79,7 +81,8 @@ private val `Create protection_relay_schemes table` = Change(
         );""".trimIndent(),
         "CREATE UNIQUE INDEX protection_relay_schemes_mrid ON protection_relay_schemes (mrid);",
         "CREATE INDEX protection_relay_schemes_name ON protection_relay_schemes (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -99,7 +102,8 @@ private val `Create protection_relay_systems table` = Change(
         );""".trimIndent(),
         "CREATE UNIQUE INDEX protection_relay_systems_mrid ON protection_relay_systems (mrid);",
         "CREATE INDEX protection_relay_systems_name ON protection_relay_systems (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -122,7 +126,8 @@ private val `Create voltage_relays table` = Change(
         );""".trimIndent(),
         "CREATE UNIQUE INDEX voltage_relays_mrid ON voltage_relays (mrid);",
         "CREATE INDEX voltage_relays_name ON voltage_relays (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -142,7 +147,8 @@ private val `Create grounds table` = Change(
         );""".trimIndent(),
         "CREATE UNIQUE INDEX grounds_mrid ON grounds (mrid);",
         "CREATE INDEX grounds_name ON grounds (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -166,7 +172,8 @@ private val `Create ground_disconnectors table` = Change(
         );""".trimIndent(),
         "CREATE UNIQUE INDEX ground_disconnectors_mrid ON ground_disconnectors (mrid);",
         "CREATE INDEX ground_disconnectors_name ON ground_disconnectors (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -192,7 +199,8 @@ private val `Create series_compensators table` = Change(
         );""".trimIndent(),
         "CREATE UNIQUE INDEX series_compensators_mrid ON series_compensators (mrid);",
         "CREATE INDEX series_compensators_name ON series_compensators (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -209,7 +217,8 @@ private val `Create protection_relay_function_thresholds table` = Change(
             ON protection_relay_function_thresholds (protection_relay_function_mrid, sequence_number);""".trimIndent(),
         """CREATE INDEX protection_relay_function_thresholds_protection_relay_function_mrid
             ON protection_relay_function_thresholds (protection_relay_function_mrid);""".trimIndent()
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -224,7 +233,8 @@ private val `Create protection_relay_function_time_limits table` = Change(
             ON protection_relay_function_time_limits (protection_relay_function_mrid, sequence_number);""".trimIndent(),
         """CREATE INDEX protection_relay_function_time_limits_protection_relay_function_mrid
             ON protection_relay_function_time_limits (protection_relay_function_mrid);""".trimIndent()
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -241,7 +251,8 @@ private val `Create protection_relay_functions_protected_switches` = Change(
         """CREATE INDEX protection_relay_functions_protected_switches_protected_switch_mrid
             ON protection_relay_functions_protected_switches (protected_switch_mrid);""".trimIndent()
 
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -257,7 +268,8 @@ private val `Create protection_relay_functions_sensors table` = Change(
             ON protection_relay_functions_sensors (protection_relay_function_mrid);""".trimIndent(),
         """CREATE INDEX protection_relay_functions_sensors_sensor_mrid
             ON protection_relay_functions_sensors (sensor_mrid);""".trimIndent()
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -273,7 +285,8 @@ private val `Create protection_relay_schemes_protection_relay_functions` = Chang
             ON protection_relay_schemes_protection_relay_functions (protection_relay_scheme_mrid);""".trimIndent(),
         """CREATE INDEX protection_relay_schemes_protection_relay_functions_protection_relay_function_mrid
             ON protection_relay_schemes_protection_relay_functions (protection_relay_function_mrid);""".trimIndent()
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -284,7 +297,8 @@ private val `Rename column current_relay_info_mrid to relay_info_mrid in reclose
         "DROP INDEX IF EXISTS reclose_delays_current_relay_info_mrid_sequence_number;",
         "CREATE UNIQUE INDEX reclose_delays_relay_info_mrid_sequence_number ON reclose_delays (relay_info_mrid, sequence_number);",
         "CREATE INDEX reclose_delays_relay_info_mrid ON reclose_delays (relay_info_mrid);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -296,7 +310,8 @@ private val `Rename table current_relay_info to relay_info and add column reclos
         "DROP INDEX IF EXISTS current_relay_info_name;",
         "CREATE UNIQUE INDEX relay_info_mrid ON relay_info (mrid);",
         "CREATE INDEX relay_info_name ON relay_info (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -305,26 +320,30 @@ private val `Add model and reclosing columns to current_relays and rename column
         "ALTER TABLE current_relays ADD model TEXT NULL;",
         "ALTER TABLE current_relays ADD reclosing BOOLEAN NULL;",
         "ALTER TABLE current_relays RENAME COLUMN current_relay_info_mrid TO relay_info_mrid;"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
 private val `Add function_mrid column to fuses table` = Change(
     listOf(
         "ALTER TABLE fuses ADD function_mrid TEXT NULL;"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
 private val `Add rated_current column to tap_changer_controls table` = Change(
     listOf(
         "ALTER TABLE tap_changer_controls ADD rated_current NUMBER NULL;"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
 private val `Drop protection_equipment_protected_switched table` = Change(
     listOf(
         "DROP TABLE protection_equipment_protected_switches;"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )

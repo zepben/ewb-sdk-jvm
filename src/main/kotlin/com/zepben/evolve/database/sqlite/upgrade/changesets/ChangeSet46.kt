@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.Change
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
+import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
 
 internal fun changeSet46() = ChangeSet(
     46,
@@ -60,5 +61,6 @@ private val `Make potential_transformers type non-null` = Change(
         "ALTER TABLE potential_transformers_new RENAME TO potential_transformers;",
         "CREATE UNIQUE INDEX potential_transformers_mrid ON potential_transformers (mrid);",
         "CREATE INDEX potential_transformers_name ON potential_transformers (name);"
-    )
+    ),
+    targetDatabases = setOf(EwbDatabaseType.NETWORK)
 )

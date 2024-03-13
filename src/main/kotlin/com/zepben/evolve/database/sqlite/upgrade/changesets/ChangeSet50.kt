@@ -18,11 +18,13 @@ internal fun changeSet50() = ChangeSet(
         // The shared data must be cleaned first to allow correct functioning of other queries.
         `Clean customer data from tables shared with network`,
         `Clean network data from tables shared with customer`,
+        `Clean organisation names from diagrams database`,
 
         // Clean out the names table for entries from the other services.
         `Clean customer names`,
         `Clean diagram names`,
         `Clean network names`,
+        `Clean unused name types`,
 
         // Drop unused tables.
         `Drop customer tables`,
@@ -38,6 +40,13 @@ internal fun changeSet50() = ChangeSet(
 @Suppress("ObjectPropertyName")
 private val `Clean customer data from tables shared with network` = Change(
     listOf(
+        """
+        DELETE FROM
+            names
+        WHERE
+            identified_object_mrid IN (SELECT mrid FROM organisations)
+            AND identified_object_mrid NOT IN (SELECT organisation_mrid FROM asset_owners);
+        """.trimIndent(),
         "DELETE FROM organisations WHERE mrid NOT IN (SELECT organisation_mrid FROM asset_owners);"
     ),
     targetDatabases = setOf(EwbDatabaseType.NETWORK)
@@ -46,9 +55,24 @@ private val `Clean customer data from tables shared with network` = Change(
 @Suppress("ObjectPropertyName")
 private val `Clean network data from tables shared with customer` = Change(
     listOf(
+        """
+        DELETE FROM
+            names
+        WHERE
+            identified_object_mrid IN (SELECT mrid FROM organisations)
+            AND identified_object_mrid NOT IN (SELECT organisation_mrid FROM customers);
+        """.trimIndent(),
         "DELETE FROM organisations WHERE mrid NOT IN (SELECT organisation_mrid FROM customers);"
     ),
     targetDatabases = setOf(EwbDatabaseType.CUSTOMER)
+)
+
+@Suppress("ObjectPropertyName")
+private val `Clean organisation names from diagrams database` = Change(
+    listOf(
+        "DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM organisations);"
+    ),
+    targetDatabases = setOf(EwbDatabaseType.DIAGRAM)
 )
 
 @Suppress("ObjectPropertyName")
@@ -57,16 +81,12 @@ private val `Clean customer names` = Change(
         """
         WITH mrids AS (
             SELECT mrid FROM customer_agreements
-            UNION SELECT mrid FROM customer_agreements_pricing_structures
             UNION SELECT mrid FROM customers
-            UNION SELECT mrid FROM organisations
             UNION SELECT mrid FROM pricing_structures
-            UNION SELECT mrid FROM pricing_structures_tariffs
             UNION SELECT mrid FROM tariffs
         )
-        DELETE FROM names WHERE identified_object_mrid NOT IN (SELECT mrid FROM mrids);
+        DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM mrids);
         """.trimIndent(),
-        "DELETE FROM name_types WHERE name NOT IN (SELECT name_type_name FROM names);"
     ),
     targetDatabases = setOf(EwbDatabaseType.DIAGRAM, EwbDatabaseType.NETWORK)
 )
@@ -79,9 +99,8 @@ private val `Clean diagram names` = Change(
             SELECT mrid FROM diagrams
             UNION SELECT mrid FROM diagram_objects
         )
-        DELETE FROM names WHERE identified_object_mrid NOT IN (SELECT mrid FROM mrids);
+        DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM mrids);
         """.trimIndent(),
-        "DELETE FROM name_types WHERE name NOT IN (SELECT name_type_name FROM names);"
     ),
     targetDatabases = setOf(EwbDatabaseType.CUSTOMER, EwbDatabaseType.NETWORK)
 )
@@ -94,7 +113,6 @@ private val `Clean network names` = Change(
             SELECT mrid FROM ac_line_segments
             UNION SELECT mrid FROM accumulators
             UNION SELECT mrid FROM analogs
-            UNION SELECT mrid FROM asset_organisation_roles_assets
             UNION SELECT mrid FROM asset_owners
             UNION SELECT mrid FROM base_voltages
             UNION SELECT mrid FROM battery_unit
@@ -102,8 +120,6 @@ private val `Clean network names` = Change(
             UNION SELECT mrid FROM busbar_sections
             UNION SELECT mrid FROM cable_info
             UNION SELECT mrid FROM circuits
-            UNION SELECT mrid FROM circuits_substations
-            UNION SELECT mrid FROM circuits_terminals
             UNION SELECT mrid FROM connectivity_nodes
             UNION SELECT mrid FROM controls
             UNION SELECT mrid FROM current_relays
@@ -116,9 +132,6 @@ private val `Clean network names` = Change(
             UNION SELECT mrid FROM energy_consumers
             UNION SELECT mrid FROM energy_source_phases
             UNION SELECT mrid FROM energy_sources
-            UNION SELECT mrid FROM equipment_equipment_containers
-            UNION SELECT mrid FROM equipment_operational_restrictions
-            UNION SELECT mrid FROM equipment_usage_points
             UNION SELECT mrid FROM equivalent_branches
             UNION SELECT mrid FROM ev_charging_units
             UNION SELECT mrid FROM fault_indicators
@@ -131,40 +144,29 @@ private val `Clean network names` = Change(
             UNION SELECT mrid FROM junctions
             UNION SELECT mrid FROM linear_shunt_compensators
             UNION SELECT mrid FROM load_break_switches
-            UNION SELECT mrid FROM location_street_addresses
             UNION SELECT mrid FROM locations
             UNION SELECT mrid FROM loops
-            UNION SELECT mrid FROM loops_substations
             UNION SELECT mrid FROM lv_feeders
             UNION SELECT mrid FROM meters
             UNION SELECT mrid FROM no_load_tests
             UNION SELECT mrid FROM open_circuit_tests
             UNION SELECT mrid FROM operational_restrictions
-            UNION SELECT mrid FROM organisations
             UNION SELECT mrid FROM overhead_wire_info
             UNION SELECT mrid FROM per_length_sequence_impedances
             UNION SELECT mrid FROM photo_voltaic_unit
             UNION SELECT mrid FROM poles
-            UNION SELECT mrid FROM position_points
             UNION SELECT mrid FROM potential_transformer_info
             UNION SELECT mrid FROM potential_transformers
             UNION SELECT mrid FROM power_electronics_connection
-            UNION SELECT mrid FROM power_electronics_connection_phases
+            UNION SELECT mrid FROM power_electronics_connection_phase
             UNION SELECT mrid FROM power_electronics_wind_unit
             UNION SELECT mrid FROM power_transformer_ends
-            UNION SELECT mrid FROM power_transformer_end_ratings
             UNION SELECT mrid FROM power_transformer_info
             UNION SELECT mrid FROM power_transformers
-            UNION SELECT mrid FROM protection_relay_function_thresholds
-            UNION SELECT mrid FROM protection_relay_function_time_limits
-            UNION SELECT mrid FROM protection_relay_functions_protected_switches
-            UNION SELECT mrid FROM protection_relay_functions_sensors
             UNION SELECT mrid FROM protection_relay_schemes
-            UNION SELECT mrid FROM protection_relay_schemes_protection_relay_functions
             UNION SELECT mrid FROM protection_relay_systems
             UNION SELECT mrid FROM ratio_tap_changers
             UNION SELECT mrid FROM reclosers
-            UNION SELECT mrid FROM reclose_delays
             UNION SELECT mrid FROM relay_info
             UNION SELECT mrid FROM remote_controls
             UNION SELECT mrid FROM remote_sources
@@ -182,14 +184,20 @@ private val `Clean network names` = Change(
             UNION SELECT mrid FROM transformer_star_impedance
             UNION SELECT mrid FROM transformer_tank_info
             UNION SELECT mrid FROM usage_points
-            UNION SELECT mrid FROM usage_points_end_devices
-            UNION SELECT mrid FROM voltage_relay
+            UNION SELECT mrid FROM voltage_relays
         )
-        DELETE FROM names WHERE identified_object_mrid NOT IN (SELECT mrid FROM mrids);
+        DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM mrids);
         """.trimIndent(),
-        "DELETE FROM name_types WHERE name NOT IN (SELECT name_type_name FROM names);"
     ),
     targetDatabases = setOf(EwbDatabaseType.CUSTOMER, EwbDatabaseType.DIAGRAM)
+)
+
+@Suppress("ObjectPropertyName")
+private val `Clean unused name types` = Change(
+    listOf(
+        "DELETE FROM name_types WHERE name NOT IN (SELECT name_type_name FROM names);"
+    ),
+    targetDatabases = setOf(EwbDatabaseType.CUSTOMER, EwbDatabaseType.DIAGRAM, EwbDatabaseType.NETWORK)
 )
 
 @Suppress("ObjectPropertyName")
@@ -209,7 +217,8 @@ private val `Drop customer tables` = Change(
 private val `Drop diagram tables` = Change(
     listOf(
         "DROP TABLE diagrams;",
-        "DROP TABLE diagram_objects;"
+        "DROP TABLE diagram_objects;",
+        "DROP TABLE diagram_object_points;"
     ),
     targetDatabases = setOf(EwbDatabaseType.CUSTOMER, EwbDatabaseType.NETWORK)
 )
@@ -274,7 +283,7 @@ private val `Drop network tables` = Change(
         "DROP TABLE potential_transformer_info;",
         "DROP TABLE potential_transformers;",
         "DROP TABLE power_electronics_connection;",
-        "DROP TABLE power_electronics_connection_phases;",
+        "DROP TABLE power_electronics_connection_phase;",
         "DROP TABLE power_electronics_wind_unit;",
         "DROP TABLE power_transformer_ends;",
         "DROP TABLE power_transformer_end_ratings;",
@@ -308,7 +317,7 @@ private val `Drop network tables` = Change(
         "DROP TABLE transformer_tank_info;",
         "DROP TABLE usage_points;",
         "DROP TABLE usage_points_end_devices;",
-        "DROP TABLE voltage_relay;",
+        "DROP TABLE voltage_relays;",
     ),
     targetDatabases = setOf(EwbDatabaseType.CUSTOMER, EwbDatabaseType.DIAGRAM)
 )
@@ -324,6 +333,10 @@ private val `Drop tables shared between customer and network` = Change(
 @Suppress("ObjectPropertyName")
 private val `Vacuum database` = Change(
     listOf(
-        "VACUUM;"
-    )
+        "PRAGMA foreign_key_check",
+        "COMMIT",
+        "VACUUM",
+        "BEGIN TRANSACTION",
+    ),
+    targetDatabases = setOf(EwbDatabaseType.CUSTOMER, EwbDatabaseType.DIAGRAM, EwbDatabaseType.NETWORK)
 )

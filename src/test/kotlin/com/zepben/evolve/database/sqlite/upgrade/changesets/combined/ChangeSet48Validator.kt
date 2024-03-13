@@ -1,17 +1,18 @@
 /*
- * Copyright 2022 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.upgrade.changesets
+package com.zepben.evolve.database.sqlite.upgrade.changesets.combined
 
 import com.zepben.evolve.database.getInstant
 import com.zepben.evolve.database.getNullableBoolean
 import com.zepben.evolve.database.getNullableDouble
 import com.zepben.evolve.database.getNullableString
+import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
@@ -315,7 +316,7 @@ object ChangeSet48Validator : ChangeSetValidator {
             "reclose_delays_current_relay_info_mrid", "power_transformer_end_ratings_power_transformer_end_mrid_cooling_type",
             "power_transformer_end_ratings_power_transformer_end_mrid"
         )
-        ensureColumn(statement, "power_transformer_ends", "rated_s", present = false)
+        ensureColumns(statement, "power_transformer_ends", "rated_s", present = false)
 
         validateRows(statement, "SELECT * FROM reclose_delays",
             { rs ->

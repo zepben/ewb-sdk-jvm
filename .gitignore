@@ -66,4 +66,10 @@ site.7z
 **/.docusaurus/
 docs/build
 docs/node_modules
+
+/src/test/resources/test-customer-database.txt
+/src/test/resources/test-diagram-database.txt
+/src/test/resources/test-network-database.txt
+
+# Obsolete variant that is kept here to stop people commit old files they leave lying around.
 /src/test/resources/test-database.txt

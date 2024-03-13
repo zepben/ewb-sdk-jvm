@@ -6,8 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.upgrade.changesets
+package com.zepben.evolve.database.sqlite.upgrade.changesets.combined
 
+import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
@@ -173,7 +174,8 @@ object ChangeSet49Validator : ChangeSetValidator {
                 assertThat(rs.getDouble("time_delay_1"), equalTo(5.5))
             }
         )
-        validateRows(statement, "SELECT * FROM distance_relays",
+        validateRows(
+            statement, "SELECT * FROM distance_relays",
             { rs ->
                 assertThat(rs.getString("mrid"), equalTo("id7"))
                 assertThat(rs.getString("name"), equalTo("name"))

@@ -45,16 +45,8 @@ class UpgradeRunner @JvmOverloads constructor(
     // Remove this variable next time we set a new minimum version of the database. Also remove the note in NetworkDatabaseReader.
     private val splitVersion = 49
 
-    init {
-        preSplitChangeSets.all { it.number <= splitVersion }
-        preSplitChangeSets.any { it.number == splitVersion }
-
-        postSplitChangeSets.all { it.number > splitVersion }
-        postSplitChangeSets.any { it.number == splitVersion + 1 }
-    }
-
     /**
-     * Get a connection to the database, and runm and required upgrade scripts to bring the schema into line.
+     * Get a connection to the database, and run any required upgrade scripts to bring the schema into line.
      *
      * NOTE: The caller of this function is responsible for closing the returned [Connection]
      *
@@ -69,16 +61,18 @@ class UpgradeRunner @JvmOverloads constructor(
             .getOrElse { throw UpgradeException(it.message, it) }
 
         return try {
-            val wasPreSplit = connection.createStatement().use { statement ->
+            val status = connection.createStatement().use { statement ->
                 upgrade(databaseFile, statement, connection, type, preSplitChangeSets, true)
             }
 
             // This will copy the database file into the new split format. Remove it next time we set a new minimum version of the database.
-            if (wasPreSplit)
-                splitDatabase(databaseFile)
+            // Unless we are already past the split, split the database. Take a backup only if we haven't done so in upgrading to the split.
+            if (status != UpgradeState.AHEAD_OF_TARGET_VERSION)
+                splitDatabase(databaseFile, status == UpgradeState.ALREADY_AT_TARGET_VERSION)
 
             connection.createStatement().use { statement ->
-                upgrade(databaseFile, statement, connection, type, postSplitChangeSets, !wasPreSplit)
+                // We only need to take a backup if it wasn't already done as part of the upgrade to the split database.
+                upgrade(databaseFile, statement, connection, type, postSplitChangeSets, status == UpgradeState.AHEAD_OF_TARGET_VERSION)
             }
 
             ConnectionResult(connection, tableVersion.SUPPORTED_VERSION)
@@ -103,8 +97,8 @@ class UpgradeRunner @JvmOverloads constructor(
         type: EwbDatabaseType,
         changeSets: List<ChangeSet>,
         backupRequired: Boolean
-    ): Boolean =
-        tryRunUpgrade(getVersion(statement)) { databaseVersion ->
+    ): UpgradeState =
+        tryRunUpgrade(getVersion(statement), changeSets.last().number) { databaseVersion ->
             logger.info("Upgrading database '$databaseFile' from v$databaseVersion to v${changeSets.last().number}")
 
             if (backupRequired)
@@ -117,13 +111,14 @@ class UpgradeRunner @JvmOverloads constructor(
             }
         }
 
-    private fun tryRunUpgrade(databaseVersion: Int?, upgradeBlock: (databaseVersion: Int) -> Unit): Boolean =
+    private fun tryRunUpgrade(databaseVersion: Int?, targetVersion: Int, upgradeBlock: (databaseVersion: Int) -> Unit): UpgradeState =
         when {
-            databaseVersion == tableVersion.SUPPORTED_VERSION -> false
+            databaseVersion == targetVersion -> UpgradeState.ALREADY_AT_TARGET_VERSION
             databaseVersion == null -> throwMissingVersionException()
             databaseVersion > tableVersion.SUPPORTED_VERSION -> throwFuturisticDatabaseException(databaseVersion)
             databaseVersion < minimumSupportedVersion -> throwUnsupportedUpgradeException(databaseVersion)
-            else -> upgradeBlock(databaseVersion).let { true }
+            databaseVersion > targetVersion -> UpgradeState.AHEAD_OF_TARGET_VERSION
+            else -> upgradeBlock(databaseVersion).let { UpgradeState.UPGRADED_TO_TARGET_VERSION }
         }
 
     @Throws(SQLException::class, SecurityException::class)
@@ -138,7 +133,9 @@ class UpgradeRunner @JvmOverloads constructor(
 
         changeSet.preCommandHooks.filter { type in it.targetDatabases }.forEach { it(statement) }
 
-        changeSet.commands.filter { type in it.targetDatabases }.flatMap { it.commands }.forEach { statement.executeUpdate(it) }
+        changeSet.commands.filter { type in it.targetDatabases }.flatMap { it.commands }.forEach {
+            statement.executeUpdate(it)
+        }
 
         changeSet.postCommandHooks.filter { type in it.targetDatabases }.forEach { it(statement) }
 
@@ -175,7 +172,10 @@ class UpgradeRunner @JvmOverloads constructor(
         }.getOrNull()
 
     @Throws(SQLException::class, IOException::class, SecurityException::class)
-    private fun splitDatabase(networkDatabaseFile: Path) {
+    private fun splitDatabase(networkDatabaseFile: Path, requiresBackup: Boolean) {
+        if (requiresBackup)
+            copyFile(networkDatabaseFile, createBackupName(networkDatabaseFile, splitVersion), StandardCopyOption.REPLACE_EXISTING)
+
         cloneAndUpgrade(networkDatabaseFile, EwbDatabaseType.CUSTOMER)
         cloneAndUpgrade(networkDatabaseFile, EwbDatabaseType.DIAGRAM)
     }
@@ -189,10 +189,13 @@ class UpgradeRunner @JvmOverloads constructor(
             throw UpgradeException("Failed to split database. ${e.message}", e)
         }
 
-        // We don't need to use the connection again, so just close it.
-        connectAndUpgrade("jdbc:sqlite:$targetDatabaseFile", targetDatabaseFile, targetType)
-            .connection
-            .close()
+        runCatching { getConnection("jdbc:sqlite:$targetDatabaseFile").configureBatch() }
+            .getOrElse { throw UpgradeException(it.message, it) }
+            .use { connection ->
+                connection.createStatement().use { statement ->
+                    upgrade(targetDatabaseFile, statement, connection, targetType, postSplitChangeSets, false)
+                }
+            }
     }
 
     private fun throwMissingVersionException(): Nothing =
@@ -232,5 +235,11 @@ class UpgradeRunner @JvmOverloads constructor(
      * @param cause Any underlying cause of the error.
      */
     class UpgradeException(message: String?, cause: Throwable? = null) : Exception(message, cause)
+
+    private enum class UpgradeState {
+        ALREADY_AT_TARGET_VERSION,
+        UPGRADED_TO_TARGET_VERSION,
+        AHEAD_OF_TARGET_VERSION
+    }
 
 }

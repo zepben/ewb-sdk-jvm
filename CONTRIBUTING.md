@@ -2,8 +2,7 @@
 
 Contributions are always welcome, however at a minimum must meet the following conditions:
 
-1. All new classes should be written in Kotlin. Java code will only be accepted if it's a minor addition to an existing
-   java file. Conversion of java code to Kotlin is welcome, but will only be accepted if it's relevant to the change being made.
+1. All new classes should be written in Kotlin. Java code will only be accepted if it's an interop test.
 2. All changes must follow the code style. For Intellij this can be imported from [here](TODO)
 3. MPL headers must be added to all new code files.
 4. All patches must have tests.
@@ -32,17 +31,36 @@ Our main style requirements are:
 5. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required.
 6. Database:
     1. Table class(es) updated. - `com.zepben.evolve.database.sqlite.tables`
-    2. New tables added to DatabaseTables - `DatabaseTables.kt`
-    3. Writer updated. - `com.zepben.evolve.database.sqlite.writers`
-    4. Reader updated. - `com.zepben.evolve.database.sqlite.readers`
-    5. ServiceReader updated if a new class was added. - `com.zepben.evolve.database.sqlite.readers.*ServiceReader`
-    6. ServiceWriter updated if a new class was added. - `com.zepben.evolve.database.sqlite.writers.*ServiceWriter`
-    7. DB version updated. - `TableVersion.kt`
+   2. New tables added to appropriate database table collections:
+       * `com.zepben.evolve.database.sqlite.customer.CustomerDatabaseTables`
+       * `com.zepben.evolve.database.sqlite.diagram.DiagramDatabaseTables`
+       * `com.zepben.evolve.database.sqlite.network.NetworkDatabaseTables`
+   3. Appropriate CIM writer updated:
+       * `com.zepben.evolve.database.sqlite.customer.CustomerCimWriter`
+       * `com.zepben.evolve.database.sqlite.diagram.DiagramCimWriter`
+       * `com.zepben.evolve.database.sqlite.network.NetworkCimWriter`
+   4. Appropriate CIM reader updated:
+       * `com.zepben.evolve.database.sqlite.customer.CustomerCimReader`
+       * `com.zepben.evolve.database.sqlite.diagram.DiagramCimReader`
+       * `com.zepben.evolve.database.sqlite.network.NetworkCimReader`
+   5. Appropriate service writer updated if a new class was added:
+       * `com.zepben.evolve.database.sqlite.customer.CustomerServiceWriter`
+       * `com.zepben.evolve.database.sqlite.diagram.DiagramServiceWriter`
+       * `com.zepben.evolve.database.sqlite.network.NetworkServiceWriter`
+   6. Appropriate service reader updated if a new class was added:
+       * `com.zepben.evolve.database.sqlite.customer.CustomerServiceReader`
+       * `com.zepben.evolve.database.sqlite.diagram.DiagramServiceReader`
+       * `com.zepben.evolve.database.sqlite.network.NetworkServiceReader`
+   7. DB version updated. - `com.zepben.evolve.database.sqlite.tables.TableVersion`
     8. Migration written. - `com.zepben.evolve.database.sqlite.upgrade`
-        1. ChangeSet added to UpgradeRunner. - `com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner`
-        2. ChangeSetValidator written for ChangeSet. - `com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet*Validator`
-        3. ChangeSetValidator added to changeSetValidators. - `com.zepben.evolve.database.sqlite.upgrade.ChangeSetTest`
-    9. Add schema tests - `DatabaseSqliteTest.kt`
+        1. ChangeSet written. - `com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet*`
+        2. ChangeSet added to UpgradeRunner. - `com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner`
+        3. ChangeSetValidator written for ChangeSet. - `com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet*Validator`
+        4. ChangeSetValidator added to changeSetValidators. - `com.zepben.evolve.database.sqlite.upgrade.ChangeSetTest`
+   9. Add schema tests:
+       * `com.zepben.evolve.database.sqlite.customer.CustomerDatabaseSchemaTest`
+       * `com.zepben.evolve.database.sqlite.diagram.DiagramDatabaseSchemaTest`
+       * `com.zepben.evolve.database.sqlite.network.NetworkDatabaseSchemaTest`
 7. Reference resolver(s) added (if new associations).
 8. Protobuf/gRPC
     1. *CimToProto(s) updated (including java wrapper).

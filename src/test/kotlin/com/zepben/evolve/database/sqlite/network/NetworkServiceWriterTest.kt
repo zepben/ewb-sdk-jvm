@@ -24,7 +24,7 @@ internal class NetworkServiceWriterTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val networkService = NetworkService()
-    private val cimWriter = mockk<NetworkCIMWriter> { every { save(any<Circuit>()) } returns true }
+    private val cimWriter = mockk<NetworkCimWriter> { every { save(any<Circuit>()) } returns true }
     private val networkServiceWriter = NetworkServiceWriter(networkService, mockk(), cimWriter)
 
     //

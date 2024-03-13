@@ -22,7 +22,7 @@ import com.zepben.evolve.services.diagram.DiagramService
 class DiagramServiceWriter @JvmOverloads constructor(
     override val service: DiagramService,
     databaseTables: DiagramDatabaseTables,
-    override val writer: DiagramCIMWriter = DiagramCIMWriter(databaseTables)
+    override val writer: DiagramCimWriter = DiagramCimWriter(databaseTables)
 ) : BaseServiceWriter(service, writer) {
 
     override fun doSave(): Boolean =

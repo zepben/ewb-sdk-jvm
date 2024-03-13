@@ -24,7 +24,7 @@ internal class DiagramServiceWriterTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val diagramService = DiagramService()
-    private val cimWriter = mockk<DiagramCIMWriter> { every { save(any<Diagram>()) } returns true }
+    private val cimWriter = mockk<DiagramCimWriter> { every { save(any<Diagram>()) } returns true }
     private val diagramServiceWriter = DiagramServiceWriter(diagramService, mockk(), cimWriter)
 
     //

@@ -24,7 +24,7 @@ internal class CustomerServiceWriterTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val customerService = CustomerService()
-    private val cimWriter = mockk<CustomerCIMWriter> { every { save(any<Customer>()) } returns true }
+    private val cimWriter = mockk<CustomerCimWriter> { every { save(any<Customer>()) } returns true }
     private val customerServiceWriter = CustomerServiceWriter(customerService, mockk(), cimWriter)
 
     //

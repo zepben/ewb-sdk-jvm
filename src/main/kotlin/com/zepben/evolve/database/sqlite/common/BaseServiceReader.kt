@@ -19,12 +19,12 @@ import java.sql.Connection
  * @param databaseTables The tables available in the database.
  * @param connection A connection to the database.
  *
- * @property reader The [BaseCIMReader] used to load the objects from the database.
+ * @property reader The [BaseCimReader] used to load the objects from the database.
  */
 abstract class BaseServiceReader(
     databaseTables: BaseDatabaseTables,
     connection: Connection,
-    protected open val reader: BaseCIMReader,
+    protected open val reader: BaseCimReader,
 ) : BaseCollectionReader(databaseTables, connection) {
 
     final override fun load(): Boolean =

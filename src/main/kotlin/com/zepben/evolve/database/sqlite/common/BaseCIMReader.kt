@@ -36,7 +36,7 @@ import java.sql.SQLException
  * @param service The [BaseService] used to store any items read from the database.
  * @property logger The [Logger] to use for this reader.
  */
-abstract class BaseCIMReader(
+abstract class BaseCimReader(
     protected open val service: BaseService
 ) {
 

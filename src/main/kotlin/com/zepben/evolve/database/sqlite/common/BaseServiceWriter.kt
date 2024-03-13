@@ -22,7 +22,7 @@ import com.zepben.evolve.services.common.extensions.typeNameAndMRID
  */
 abstract class BaseServiceWriter(
     protected open val service: BaseService,
-    protected open val writer: BaseCIMWriter
+    protected open val writer: BaseCimWriter
 ) : BaseCollectionWriter() {
 
     final override fun save(): Boolean =

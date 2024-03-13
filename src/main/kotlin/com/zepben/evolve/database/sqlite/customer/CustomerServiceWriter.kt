@@ -25,7 +25,7 @@ import com.zepben.evolve.services.customer.CustomerService
 class CustomerServiceWriter @JvmOverloads constructor(
     override val service: CustomerService,
     databaseTables: CustomerDatabaseTables,
-    override val writer: CustomerCIMWriter = CustomerCIMWriter(databaseTables)
+    override val writer: CustomerCimWriter = CustomerCimWriter(databaseTables)
 ) : BaseServiceWriter(service, writer) {
 
     override fun doSave(): Boolean =

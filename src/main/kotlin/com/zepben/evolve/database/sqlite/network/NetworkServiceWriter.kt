@@ -52,7 +52,7 @@ import com.zepben.evolve.services.network.NetworkService
 class NetworkServiceWriter @JvmOverloads constructor(
     override val service: NetworkService,
     databaseTables: NetworkDatabaseTables,
-    override val writer: NetworkCIMWriter = NetworkCIMWriter(databaseTables)
+    override val writer: NetworkCimWriter = NetworkCimWriter(databaseTables)
 ) : BaseServiceWriter(service, writer) {
 
     override fun doSave(): Boolean =

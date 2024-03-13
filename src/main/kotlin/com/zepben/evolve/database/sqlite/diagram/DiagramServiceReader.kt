@@ -22,13 +22,13 @@ import java.sql.Connection
  * @param databaseTables The tables available in the database.
  * @param connection A connection to the database.
  *
- * @property reader The [DiagramCIMReader] used to load the objects from the database.
+ * @property reader The [DiagramCimReader] used to load the objects from the database.
  */
 class DiagramServiceReader @JvmOverloads constructor(
     service: DiagramService,
     databaseTables: DiagramDatabaseTables,
     connection: Connection,
-    override val reader: DiagramCIMReader = DiagramCIMReader(service)
+    override val reader: DiagramCimReader = DiagramCimReader(service)
 ) : BaseServiceReader(databaseTables, connection, reader) {
 
     override fun doLoad(): Boolean =

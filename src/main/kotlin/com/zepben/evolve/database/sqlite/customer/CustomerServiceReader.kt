@@ -26,13 +26,13 @@ import java.sql.Connection
  * @param databaseTables The tables available in the database.
  * @param connection A connection to the database.
  *
- * @property reader The [CustomerCIMReader] used to load the objects from the database.
+ * @property reader The [CustomerCimReader] used to load the objects from the database.
  */
 class CustomerServiceReader @JvmOverloads constructor(
     service: CustomerService,
     databaseTables: CustomerDatabaseTables,
     connection: Connection,
-    override val reader: CustomerCIMReader = CustomerCIMReader(service)
+    override val reader: CustomerCimReader = CustomerCimReader(service)
 ) : BaseServiceReader(databaseTables, connection, reader) {
 
     override fun doLoad(): Boolean =

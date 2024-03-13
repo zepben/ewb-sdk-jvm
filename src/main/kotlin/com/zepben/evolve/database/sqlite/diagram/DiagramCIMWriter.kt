@@ -11,7 +11,7 @@ package com.zepben.evolve.database.sqlite.diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObjectPoint
-import com.zepben.evolve.database.sqlite.common.BaseCIMWriter
+import com.zepben.evolve.database.sqlite.common.BaseCimWriter
 import com.zepben.evolve.database.sqlite.extensions.setNullableString
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.diagramlayout.TableDiagramObjects
@@ -24,9 +24,9 @@ import java.sql.SQLException
  *
  * @property databaseTables The tables available in the database.
  */
-class DiagramCIMWriter(
+class DiagramCimWriter(
     override val databaseTables: DiagramDatabaseTables
-) : BaseCIMWriter(databaseTables) {
+) : BaseCimWriter(databaseTables) {
 
     // ###########################
     // # IEC61970 DIAGRAM LAYOUT #

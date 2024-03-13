@@ -26,7 +26,7 @@ import java.sql.Connection
 class CustomerDatabaseReader @JvmOverloads constructor(
     databaseFile: String,
     metadata: MetadataCollection,
-    service: CustomerService,
+    override val service: CustomerService,
     tables: CustomerDatabaseTables = CustomerDatabaseTables(),
     createMetadataReader: (Connection) -> MetadataCollectionReader = { connection ->
         MetadataCollectionReader(metadata, tables, connection)
@@ -39,6 +39,7 @@ class CustomerDatabaseReader @JvmOverloads constructor(
     databaseFile,
     createMetadataReader,
     createServiceReader,
+    service,
     upgradeRunner,
     EwbDatabaseType.CUSTOMER
 )

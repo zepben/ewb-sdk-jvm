@@ -8,13 +8,24 @@
 
 package com.zepben.evolve.database.sqlite.network
 
+import com.zepben.evolve.cim.iec61970.base.core.Equipment
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseReader
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionReader
 import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
 import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
+import com.zepben.evolve.services.common.extensions.nameAndMRID
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
+import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
+import com.zepben.evolve.services.network.tracing.feeder.SetDirection
+import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
+import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import java.sql.Connection
+import java.util.*
 
 /**
  * A class for reading the [NetworkService] objects and [MetadataCollection] from our network database.
@@ -30,7 +41,7 @@ import java.sql.Connection
 class NetworkDatabaseReader @JvmOverloads constructor(
     databaseFile: String,
     metadata: MetadataCollection,
-    service: NetworkService,
+    override val service: NetworkService,
     tables: NetworkDatabaseTables = NetworkDatabaseTables(),
     createMetadataReader: (Connection) -> MetadataCollectionReader = { connection ->
         MetadataCollectionReader(metadata, tables, connection)
@@ -38,11 +49,90 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     createServiceReader: (Connection) -> NetworkServiceReader = { connection ->
         NetworkServiceReader(service, tables, connection)
     },
-    upgradeRunner: UpgradeRunner = UpgradeRunner()
+    upgradeRunner: UpgradeRunner = UpgradeRunner(),
+    private val setDirection: SetDirection = SetDirection(),
+    private val setPhases: SetPhases = SetPhases(),
+    private val phaseInferrer: PhaseInferrer = PhaseInferrer(),
+    private val assignToFeeders: AssignToFeeders = AssignToFeeders(),
+    private val assignToLvFeeders: AssignToLvFeeders = AssignToLvFeeders()
 ) : BaseDatabaseReader(
     databaseFile,
     createMetadataReader,
     createServiceReader,
+    service,
     upgradeRunner,
     EwbDatabaseType.NETWORK
-)
+) {
+
+    override fun postLoad(): Boolean =
+        super.postLoad().also {
+            logger.info("Applying feeder direction to network...")
+            setDirection.run(service)
+            logger.info("Feeder direction applied to network.")
+
+            logger.info("Applying phases to network...")
+            setPhases.run(service)
+            phaseInferrer.run(service)
+            logger.info("Phasing applied to network.")
+
+            logger.info("Assigning equipment to feeders...")
+            assignToFeeders.run(service)
+            logger.info("Equipment assigned to feeders.")
+
+            logger.info("Assigning equipment to LV feeders...")
+            assignToLvFeeders.run(service)
+            logger.info("Equipment assigned to LV feeders.")
+
+            logger.info("Validating that each equipment is assigned to a container...")
+            validateEquipmentContainers(service)
+            logger.info("Equipment containers validated.")
+
+            logger.info("Validating primary sources vs feeders...")
+            validateSources(service)
+            logger.info("Sources vs feeders validated.")
+        }
+
+    private fun validateEquipmentContainers(networkService: NetworkService) {
+        val missingContainers = networkService.listOf<Equipment> { it.containers.isEmpty() }
+        val countByClass = mutableMapOf<String, Int>()
+        missingContainers.forEach {
+            countByClass.getOrPut(it.javaClass.simpleName) { 0 }
+            countByClass[it.javaClass.simpleName] = countByClass[it.javaClass.simpleName]!! + 1
+        }
+        countByClass.forEach { (className, count) ->
+            logger.warn("$count ${className}s were missing an equipment container.")
+        }
+        if (countByClass.isNotEmpty())
+            logger.warn("A total of ${missingContainers.size} equipment had no associated equipment container. Debug logging will show more details.")
+        missingContainers.forEach { equipment ->
+            logger.debug("${equipment.typeNameAndMRID()} was not assigned to any equipment container.")
+        }
+    }
+
+    private fun validateSources(networkService: NetworkService) {
+        // We do not want to warn about sources attached directly to the feeder start point.
+        val feederStartPoints = networkService
+            .sequenceOf<Feeder>()
+            .mapNotNull { it.normalHeadTerminal?.conductingEquipment?.mRID }
+            .toSet()
+
+        val hasBeenAssignedToFeeder = { energySource: EnergySource ->
+            energySource.isExternalGrid
+                && energySource.isOnFeeder()
+                && Collections.disjoint(feederStartPoints, NetworkService.connectedEquipment(energySource).mapNotNull { it.to?.mRID })
+        }
+
+        networkService.sequenceOf<EnergySource>()
+            .filter(hasBeenAssignedToFeeder)
+            .forEach { es ->
+                logger.warn(
+                    "External grid source ${es.nameAndMRID()} has been assigned to the following feeders: normal [${es.normalFeeders.joinToString { it.mRID }}], " +
+                        "current [${es.currentFeeders.joinToString { it.mRID }}]"
+                )
+            }
+    }
+
+    private fun EnergySource.isOnFeeder(): Boolean =
+        normalFeeders.isNotEmpty() || currentFeeders.isNotEmpty()
+
+}

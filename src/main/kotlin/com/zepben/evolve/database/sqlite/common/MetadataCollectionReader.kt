@@ -19,7 +19,6 @@ import java.sql.Connection
  * @param databaseTables The tables available in the database.
  * @param connection The [Connection] to the database.
  */
-//todo move metadata to BaseService like names?
 class MetadataCollectionReader @JvmOverloads constructor(
     metadata: MetadataCollection,
     databaseTables: BaseDatabaseTables,

@@ -26,7 +26,7 @@ import java.sql.Connection
 class DiagramDatabaseReader @JvmOverloads constructor(
     databaseFile: String,
     metadata: MetadataCollection,
-    service: DiagramService,
+    override val service: DiagramService,
     tables: DiagramDatabaseTables = DiagramDatabaseTables(),
     createMetadataReader: (Connection) -> MetadataCollectionReader = { connection ->
         MetadataCollectionReader(metadata, tables, connection)
@@ -39,6 +39,7 @@ class DiagramDatabaseReader @JvmOverloads constructor(
     databaseFile,
     createMetadataReader,
     createServiceReader,
+    service,
     upgradeRunner,
     EwbDatabaseType.DIAGRAM
 )

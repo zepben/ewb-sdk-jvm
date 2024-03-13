@@ -123,14 +123,8 @@ abstract class BaseCIMReader(
         setLastName("$nameTypeName:$nameName")
 
         val nameType = service.getNameTypeOrThrow(nameTypeName)
-
-        //todo each service should now have its own table so all names should find their objects or error.
-        // Because each service type loads all the name types, but not all services hold all identified objects, there can
-        // be records in the names table that only apply to certain services. We attempt to find the IdentifiedObject on this
-        // service and add a name for it if it exists, but ignore if it doesn't. Note that this can potentially lead to there being
-        // a name record that never gets used because that identified object doesn't exist in any service, and currently we
-        // don't check or warn about that.
-        service.get<IdentifiedObject>(resultSet.getString(table.IDENTIFIED_OBJECT_MRID.queryIndex))?.addName(nameType, nameName)
+        service.getOrThrow<IdentifiedObject>(resultSet.getString(table.IDENTIFIED_OBJECT_MRID.queryIndex), "Name $nameName [$nameTypeName]")
+            .addName(nameType, nameName)
 
         return true
     }

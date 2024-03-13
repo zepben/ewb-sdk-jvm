@@ -990,7 +990,7 @@ class NetworkCIMWriter(
     }
 
     /**
-     * Save the [BatteryUnit] fields to [TableBatteryUnit].
+     * Save the [BatteryUnit] fields to [TableBatteryUnits].
      *
      * @param batteryUnit The [BatteryUnit] instance to write to the database.
      *
@@ -999,8 +999,8 @@ class NetworkCIMWriter(
      */
     @Throws(SQLException::class)
     fun save(batteryUnit: BatteryUnit): Boolean {
-        val table = databaseTables.getTable<TableBatteryUnit>()
-        val insert = databaseTables.getInsert<TableBatteryUnit>()
+        val table = databaseTables.getTable<TableBatteryUnits>()
+        val insert = databaseTables.getInsert<TableBatteryUnits>()
 
         insert.setString(table.BATTERY_STATE.queryIndex, batteryUnit.batteryState.name)
         insert.setNullableLong(table.RATED_E.queryIndex, batteryUnit.ratedE)
@@ -1010,7 +1010,7 @@ class NetworkCIMWriter(
     }
 
     /**
-     * Save the [PhotoVoltaicUnit] fields to [TablePhotoVoltaicUnit].
+     * Save the [PhotoVoltaicUnit] fields to [TablePhotoVoltaicUnits].
      *
      * @param photoVoltaicUnit The [PhotoVoltaicUnit] instance to write to the database.
      *
@@ -1019,8 +1019,8 @@ class NetworkCIMWriter(
      */
     @Throws(SQLException::class)
     fun save(photoVoltaicUnit: PhotoVoltaicUnit): Boolean {
-        val table = databaseTables.getTable<TablePhotoVoltaicUnit>()
-        val insert = databaseTables.getInsert<TablePhotoVoltaicUnit>()
+        val table = databaseTables.getTable<TablePhotoVoltaicUnits>()
+        val insert = databaseTables.getInsert<TablePhotoVoltaicUnits>()
 
         return savePowerElectronicsUnit(table, insert, photoVoltaicUnit, "photo voltaic unit")
     }
@@ -1040,7 +1040,7 @@ class NetworkCIMWriter(
     }
 
     /**
-     * Save the [PowerElectronicsWindUnit] fields to [TablePowerElectronicsWindUnit].
+     * Save the [PowerElectronicsWindUnit] fields to [TablePowerElectronicsWindUnits].
      *
      * @param powerElectronicsWindUnit The [PowerElectronicsWindUnit] instance to write to the database.
      *
@@ -1049,8 +1049,8 @@ class NetworkCIMWriter(
      */
     @Throws(SQLException::class)
     fun save(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean {
-        val table = databaseTables.getTable<TablePowerElectronicsWindUnit>()
-        val insert = databaseTables.getInsert<TablePowerElectronicsWindUnit>()
+        val table = databaseTables.getTable<TablePowerElectronicsWindUnits>()
+        val insert = databaseTables.getInsert<TablePowerElectronicsWindUnits>()
 
         return savePowerElectronicsUnit(table, insert, powerElectronicsWindUnit, "power electronics wind unit")
     }
@@ -1429,7 +1429,7 @@ class NetworkCIMWriter(
     }
 
     /**
-     * Save the [PowerElectronicsConnection] fields to [TablePowerElectronicsConnection].
+     * Save the [PowerElectronicsConnection] fields to [TablePowerElectronicsConnections].
      *
      * @param powerElectronicsConnection The [PowerElectronicsConnection] instance to write to the database.
      *
@@ -1438,8 +1438,8 @@ class NetworkCIMWriter(
      */
     @Throws(SQLException::class)
     fun save(powerElectronicsConnection: PowerElectronicsConnection): Boolean {
-        val table = databaseTables.getTable<TablePowerElectronicsConnection>()
-        val insert = databaseTables.getInsert<TablePowerElectronicsConnection>()
+        val table = databaseTables.getTable<TablePowerElectronicsConnections>()
+        val insert = databaseTables.getInsert<TablePowerElectronicsConnections>()
 
         insert.setNullableInt(table.MAX_I_FAULT.queryIndex, powerElectronicsConnection.maxIFault)
         insert.setNullableDouble(table.MAX_Q.queryIndex, powerElectronicsConnection.maxQ)
@@ -1741,7 +1741,7 @@ class NetworkCIMWriter(
     }
 
     /**
-     * Save the [TransformerStarImpedance] fields to [TableTransformerStarImpedance].
+     * Save the [TransformerStarImpedance] fields to [TableTransformerStarImpedances].
      *
      * @param transformerStarImpedance The [TransformerStarImpedance] instance to write to the database.
      *
@@ -1750,8 +1750,8 @@ class NetworkCIMWriter(
      */
     @Throws(SQLException::class)
     fun save(transformerStarImpedance: TransformerStarImpedance): Boolean {
-        val table = databaseTables.getTable<TableTransformerStarImpedance>()
-        val insert = databaseTables.getInsert<TableTransformerStarImpedance>()
+        val table = databaseTables.getTable<TableTransformerStarImpedances>()
+        val insert = databaseTables.getInsert<TableTransformerStarImpedances>()
 
         insert.setNullableDouble(table.R.queryIndex, transformerStarImpedance.r)
         insert.setNullableDouble(table.R0.queryIndex, transformerStarImpedance.r0)

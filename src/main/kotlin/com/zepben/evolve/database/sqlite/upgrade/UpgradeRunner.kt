@@ -34,7 +34,8 @@ class UpgradeRunner @JvmOverloads constructor(
     ),
     // Rename this to `changeSets` and remove database splitting logic next time we set a new minimum version of the database.
     internal val postSplitChangeSets: List<ChangeSet> = listOf(
-        changeSet50()
+        changeSet50(),
+        changeSet51()
     ),
     private val tableVersion: TableVersion = TableVersion()
 ) {

@@ -21,7 +21,7 @@ class TablePowerElectronicsConnectionPhases : TablePowerSystemResources() {
     val PHASE: Column = Column(++columnIndex, "phase", "TEXT", NOT_NULL)
     val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)
 
-    override val name: String = "power_electronics_connection_phase"
+    override val name: String = "power_electronics_connection_phases"
 
     override val nonUniqueIndexColumns: MutableList<List<Column>> =
         super.nonUniqueIndexColumns.apply {

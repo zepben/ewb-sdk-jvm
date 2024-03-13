@@ -10,10 +10,12 @@ package com.zepben.evolve.database.sqlite.upgrade
 
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.NoChanges
 import com.zepben.evolve.database.sqlite.upgrade.changesets.combined.*
 import com.zepben.evolve.database.sqlite.upgrade.changesets.customer.ChangeSet50CustomerValidator
 import com.zepben.evolve.database.sqlite.upgrade.changesets.diagram.ChangeSet50DiagramValidator
 import com.zepben.evolve.database.sqlite.upgrade.changesets.network.ChangeSet50NetworkValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.network.ChangeSet51NetworkValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -41,16 +43,19 @@ internal class ChangeSetTest {
         49 to ChangeSet49Validator
     )
 
-    private val customerChangeSetValidators = mapOf<Int, ChangeSetValidator>(
-        50 to ChangeSet50CustomerValidator
+    private val customerChangeSetValidators = mapOf(
+        50 to ChangeSet50CustomerValidator,
+        51 to NoChanges
     )
 
-    private val diagramChangeSetValidators = mapOf<Int, ChangeSetValidator>(
-        50 to ChangeSet50DiagramValidator
+    private val diagramChangeSetValidators = mapOf(
+        50 to ChangeSet50DiagramValidator,
+        51 to NoChanges
     )
 
-    private val networkChangeSetValidators = mapOf<Int, ChangeSetValidator>(
-        50 to ChangeSet50NetworkValidator
+    private val networkChangeSetValidators = mapOf(
+        50 to ChangeSet50NetworkValidator,
+        51 to ChangeSet51NetworkValidator
     )
 
     @Test

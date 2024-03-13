@@ -39,10 +39,10 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnits
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableEvChargingUnits
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnit
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnits
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
@@ -121,15 +121,15 @@ class NetworkServiceReader @JvmOverloads constructor(
             .andLoadEach<TableLinearShuntCompensators>(reader::load)
             .andLoadEach<TablePowerTransformers>(reader::load)
             .andLoadEach<TableReclosers>(reader::load)
-            .andLoadEach<TablePowerElectronicsConnection>(reader::load)
+            .andLoadEach<TablePowerElectronicsConnections>(reader::load)
             .andLoadEach<TableTerminals>(reader::load)
             .andLoadEach<TableTapChangerControls>(reader::load)
             .andLoadEach<TablePowerElectronicsConnectionPhases>(reader::load)
-            .andLoadEach<TableBatteryUnit>(reader::load)
-            .andLoadEach<TablePhotoVoltaicUnit>(reader::load)
-            .andLoadEach<TablePowerElectronicsWindUnit>(reader::load)
+            .andLoadEach<TableBatteryUnits>(reader::load)
+            .andLoadEach<TablePhotoVoltaicUnits>(reader::load)
+            .andLoadEach<TablePowerElectronicsWindUnits>(reader::load)
             .andLoadEach<TableEvChargingUnits>(reader::load)
-            .andLoadEach<TableTransformerStarImpedance>(reader::load)
+            .andLoadEach<TableTransformerStarImpedances>(reader::load)
             .andLoadEach<TablePowerTransformerEnds>(reader::load)
             .andLoadEach<TablePowerTransformerEndRatings>(reader::load)
             .andLoadEach<TableRatioTapChangers>(reader::load)

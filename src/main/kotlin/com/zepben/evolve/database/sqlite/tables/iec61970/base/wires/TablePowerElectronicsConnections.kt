@@ -12,7 +12,7 @@ import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
-class TablePowerElectronicsConnection : TableRegulatingCondEq() {
+class TablePowerElectronicsConnections : TableRegulatingCondEq() {
 
     val MAX_I_FAULT: Column = Column(++columnIndex, "max_i_fault", "NUMBER", NULL)
     val MAX_Q: Column = Column(++columnIndex, "max_q", "NUMBER", NULL)
@@ -46,6 +46,6 @@ class TablePowerElectronicsConnection : TableRegulatingCondEq() {
     val INV_REACTIVE_POWER_MODE: Column = Column(++columnIndex, "inv_reactive_power_mode", "BOOLEAN", NULL)
     val INV_FIX_REACTIVE_POWER: Column = Column(++columnIndex, "inv_fix_reactive_power", "NUMBER", NULL)
 
-    override val name: String = "power_electronics_connection"
+    override val name: String = "power_electronics_connections"
 
 }

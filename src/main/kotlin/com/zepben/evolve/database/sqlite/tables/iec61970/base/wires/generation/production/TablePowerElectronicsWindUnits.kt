@@ -8,9 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production
 
-@Suppress("PropertyName")
-class TablePhotoVoltaicUnit : TablePowerElectronicsUnit() {
+class TablePowerElectronicsWindUnits : TablePowerElectronicsUnit() {
 
-    override val name: String = "photo_voltaic_unit"
+    override val name: String = "power_electronics_wind_units"
 
 }

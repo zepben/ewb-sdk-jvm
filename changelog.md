@@ -1,11 +1,14 @@
 # Zepben EWB SDK changelog
 
 ## [0.18.0] - UNRELEASED
+
 ### Breaking Changes
+
 * Updated to super-pom version 0.34.x.
-* `IdentifiedObject.addName` has been refactored to take in a `NameType` and a `String`. This is doing the same thing under the hood as previous `addName()` function,
+* `IdentifiedObject.addName` has been refactored to take in a `NameType` and a `String`. This is doing the same thing under the hood as previous `addName()`
+  function,
   but simplifies the input by lowering the amount of objects that needed to be created prior to adding names.
-  Example usage change: 
+  Example usage change:
   `obj.addName(nameType, "name", obj))` or `obj.addName(nameType.getOrAddName("name", obj))` becomes `obj.addName(nameType, "name")`
 * `addName()`/`removeName()` related function for both `IdentifiedObject` and `NameType` will now also perform the same function on the other object type.
   i.e. Removing a name from the identified object will remove it from the name type and vice versa. Same interaction is also applied to adding a name.
@@ -14,17 +17,30 @@
   becomes `CurrentRelay` &rarr; `ProtectionRelayFunction`.
 * Removed symmetric relation `ProtectionEquipment` &harr; `ProtectedSwitch`.
 * Renamed `CurrentRelayInfo` to `RelayInfo`.
-  * The override `assetInfo: RelayInfo?` has been moved from `CurrentRelay` to its new parent class, `ProtectionRelayFunction`.
-  * Renamed `RelayInfo.removeDelay` to `RelayInfo.removeDelayAt`. The original method name has been repurposed to remove a delay by its value rather than its
-    index.
+    * The override `assetInfo: RelayInfo?` has been moved from `CurrentRelay` to its new parent class, `ProtectionRelayFunction`.
+    * Renamed `RelayInfo.removeDelay` to `RelayInfo.removeDelayAt`. The original method name has been repurposed to remove a delay by its value rather than its
+      index.
 * Reworked values for enumerable type `ProtectionKind`.
 * Removed `IdentifiedObject.removeNamesFromTypes()`. Use `IdentifiedObject.clearNames()` instead.
 * Removed `DiagramServiceInstanceCache` and `NetworkServiceInstanceCache`.
+* The database has been split into three databases, which will change the imports of most related classes:
+    1. The existing database containing the network model (`*-network-model.sqlite`) with classes in the `network` package.
+    2. A new database containing the customer information (`*-customers.sqlite`) with classes in the `customer` package.
+    3. A new database containing the diagrams (`*-diagrams.sqlite`) with classes in the `diagram` package.
+* The database split has resulted in the database classes also being split, e.g. `DatabaseReader` is now `NetworkDatabaseReader`, `CustomerDatabaseReader` and `
+  DiagramDatabaseReader`.
+* Renamed the following tables (and their associated indexes):
+    * `battery_unit` to `battery_units`
+    * `photo_voltaic_unit` to `photo_voltaic_units`
+    * `power_electronics_connection` to `power_electronics_connections`
+    * `power_electronics_connection_phase` to `power_electronics_connection_phases`
+    * `power_electronics_wind_unit` to `power_electronics_wind_units`
+    * `transformer_star_impedance` to `transformer_star_impedances`
 
 ### New Features
 
 * Added `getNames(IdentifiedObject)` to `NameType` to retrieve all names associated with the `NameType` that belongs to an `IdentifiedObject`.
-* Added `getNames(NameType)` and `getNames(String)` to `IdentifiedObject` so user can retrieve all names for a given `NameType` of the `IdentifiedObject` 
+* Added `getNames(NameType)` and `getNames(String)` to `IdentifiedObject` so user can retrieve all names for a given `NameType` of the `IdentifiedObject`
 * Added new classes and fields to support advanced modelling of protection relays:
     * `SeriesCompensator`: A series capacitor or reactor or an AC transmission line without charging susceptance.
     * `Ground`: A point where the system is grounded used for connecting conducting equipment to ground.
@@ -45,10 +61,10 @@
 ### Enhancements
 
 * Added missing collection methods for `RelayInfo.recloseDelays` (`RelayInfo` was previously named `CurrentRelayInfo`):
-  * `RelayInfo.getDelay(sequenceNumber: Int): Double?`
-  * `RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit)`
-  * `RelayInfo.removeDelay(delay: Double?): Boolean`
-    * The original method with this name has been renamed to `RelayInfo.removeDelayAt(index: Int): Double?`.
+    * `RelayInfo.getDelay(sequenceNumber: Int): Double?`
+    * `RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit)`
+    * `RelayInfo.removeDelay(delay: Double?): Boolean`
+        * The original method with this name has been renamed to `RelayInfo.removeDelayAt(index: Int): Double?`.
 * Cleaned up code using IntelliJ code inspection. Some typos in documentation have also been fixed.
 * Added missing `@JvmOverloads` for the constructors of the following CIM classes: `NoLoadTest`, `OpenCircuitTest`, `PowerTransformerInfo`, `ShortCircuitTest`,
   `ShuntCompensatorInfo`, `SwitchInfo`, `TransformerEndInfo`, `TransformerTankInfo`, `Pole`, `Streetlight`, `TapChangerControl`, `TransformerStarImpedance`,
@@ -65,22 +81,29 @@
 * None.
 
 ## [0.17.1] - 2024-01-12
+
 ### Breaking Changes
+
 * None.
 
 ### New Features
+
 * Allow setting gRPC `maxInboundMessageSize` via `GrpcChannelBuilder.build`.
 
 ### Enhancements
+
 * None.
 
 ### Fixes
+
 * Accept larger protobuf messages up to 20MB in size by default.
 
 ### Notes
+
 * None.
 
 ## [0.17.0] - 2023-11-23
+
 ### Breaking Changes
 
 * None.

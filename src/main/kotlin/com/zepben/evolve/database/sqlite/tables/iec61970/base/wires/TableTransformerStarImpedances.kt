@@ -13,7 +13,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifiedObjects
 
 @Suppress("PropertyName")
-class TableTransformerStarImpedance : TableIdentifiedObjects() {
+class TableTransformerStarImpedances : TableIdentifiedObjects() {
 
     val R: Column = Column(++columnIndex, "R", "NUMBER", NULL)
     val R0: Column = Column(++columnIndex, "R0", "NUMBER", NULL)
@@ -21,7 +21,7 @@ class TableTransformerStarImpedance : TableIdentifiedObjects() {
     val X0: Column = Column(++columnIndex, "X0", "NUMBER", NULL)
     val TRANSFORMER_END_INFO_MRID: Column = Column(++columnIndex, "transformer_end_info_mrid", "TEXT", NULL)
 
-    override val name: String = "transformer_star_impedance"
+    override val name: String = "transformer_star_impedances"
 
     override val uniqueIndexColumns: MutableList<List<Column>> =
         super.uniqueIndexColumns.apply {

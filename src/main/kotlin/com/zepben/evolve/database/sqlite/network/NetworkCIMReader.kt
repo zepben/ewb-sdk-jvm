@@ -1395,7 +1395,7 @@ class NetworkCIMReader(
     // #############################################
 
     /**
-     * Create a [BatteryUnit] and populate its fields from [TableBatteryUnit].
+     * Create a [BatteryUnit] and populate its fields from [TableBatteryUnits].
      *
      * @param table The database table to read the [BatteryUnit] fields from.
      * @param resultSet The record in the database table containing the fields for this [BatteryUnit].
@@ -1405,7 +1405,7 @@ class NetworkCIMReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableBatteryUnit, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun load(table: TableBatteryUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val batteryUnit = BatteryUnit(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             batteryState = BatteryStateKind.valueOf(resultSet.getString(table.BATTERY_STATE.queryIndex))
             ratedE = resultSet.getNullableLong(table.RATED_E.queryIndex)
@@ -1433,7 +1433,7 @@ class NetworkCIMReader(
     }
 
     /**
-     * Create a [PhotoVoltaicUnit] and populate its fields from [TablePhotoVoltaicUnit].
+     * Create a [PhotoVoltaicUnit] and populate its fields from [TablePhotoVoltaicUnits].
      *
      * @param table The database table to read the [PhotoVoltaicUnit] fields from.
      * @param resultSet The record in the database table containing the fields for this [PhotoVoltaicUnit].
@@ -1443,7 +1443,7 @@ class NetworkCIMReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePhotoVoltaicUnit, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun load(table: TablePhotoVoltaicUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val photoVoltaicUnit = PhotoVoltaicUnit(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
         return loadPowerElectronicsUnit(photoVoltaicUnit, table, resultSet) && service.addOrThrow(photoVoltaicUnit)
@@ -1466,7 +1466,7 @@ class NetworkCIMReader(
     }
 
     /**
-     * Create a [PowerElectronicsWindUnit] and populate its fields from [TablePowerElectronicsWindUnit].
+     * Create a [PowerElectronicsWindUnit] and populate its fields from [TablePowerElectronicsWindUnits].
      *
      * @param table The database table to read the [PowerElectronicsWindUnit] fields from.
      * @param resultSet The record in the database table containing the fields for this [PowerElectronicsWindUnit].
@@ -1476,7 +1476,7 @@ class NetworkCIMReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePowerElectronicsWindUnit, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun load(table: TablePowerElectronicsWindUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val powerElectronicsWindUnit = PowerElectronicsWindUnit(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
         return loadPowerElectronicsUnit(powerElectronicsWindUnit, table, resultSet) && service.addOrThrow(powerElectronicsWindUnit)
@@ -1880,7 +1880,7 @@ class NetworkCIMReader(
     }
 
     /**
-     * Create a [PowerElectronicsConnection] and populate its fields from [TablePowerElectronicsConnection].
+     * Create a [PowerElectronicsConnection] and populate its fields from [TablePowerElectronicsConnections].
      *
      * @param table The database table to read the [PowerElectronicsConnection] fields from.
      * @param resultSet The record in the database table containing the fields for this [PowerElectronicsConnection].
@@ -1890,7 +1890,7 @@ class NetworkCIMReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePowerElectronicsConnection, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun load(table: TablePowerElectronicsConnections, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val powerElectronicsConnection = PowerElectronicsConnection(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             maxIFault = resultSet.getNullableInt(table.MAX_I_FAULT.queryIndex)
             maxQ = resultSet.getNullableDouble(table.MAX_Q.queryIndex)
@@ -2245,7 +2245,7 @@ class NetworkCIMReader(
     }
 
     /**
-     * Create a [TransformerStarImpedance] and populate its fields from [TableTransformerStarImpedance].
+     * Create a [TransformerStarImpedance] and populate its fields from [TableTransformerStarImpedances].
      *
      * @param table The database table to read the [TransformerStarImpedance] fields from.
      * @param resultSet The record in the database table containing the fields for this [TransformerStarImpedance].
@@ -2255,7 +2255,7 @@ class NetworkCIMReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableTransformerStarImpedance, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun load(table: TableTransformerStarImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val transformerStarImpedance = TransformerStarImpedance(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             r = resultSet.getNullableDouble(table.R.queryIndex)
             r0 = resultSet.getNullableDouble(table.R0.queryIndex)

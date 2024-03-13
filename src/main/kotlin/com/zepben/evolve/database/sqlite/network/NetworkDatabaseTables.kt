@@ -39,10 +39,10 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.protection.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteControls
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnits
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableEvChargingUnits
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnit
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnit
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnits
+import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
@@ -60,7 +60,7 @@ class NetworkDatabaseTables : BaseDatabaseTables() {
             TableAssetOrganisationRolesAssets(),
             TableAssetOwners(),
             TableBaseVoltages(),
-            TableBatteryUnit(),
+            TableBatteryUnits(),
             TableBreakers(),
             TableBusbarSections(),
             TableCableInfo(),
@@ -106,14 +106,14 @@ class NetworkDatabaseTables : BaseDatabaseTables() {
             TableOrganisations(),
             TableOverheadWireInfo(),
             TablePerLengthSequenceImpedances(),
-            TablePhotoVoltaicUnit(),
+            TablePhotoVoltaicUnits(),
             TablePoles(),
             TablePositionPoints(),
             TablePotentialTransformerInfo(),
             TablePotentialTransformers(),
-            TablePowerElectronicsConnection(),
+            TablePowerElectronicsConnections(),
             TablePowerElectronicsConnectionPhases(),
-            TablePowerElectronicsWindUnit(),
+            TablePowerElectronicsWindUnits(),
             TablePowerTransformerEnds(),
             TablePowerTransformerEndRatings(),
             TablePowerTransformerInfo(),
@@ -142,7 +142,7 @@ class NetworkDatabaseTables : BaseDatabaseTables() {
             TableTapChangerControls(),
             TableTerminals(),
             TableTransformerEndInfo(),
-            TableTransformerStarImpedance(),
+            TableTransformerStarImpedances(),
             TableTransformerTankInfo(),
             TableUsagePoints(),
             TableUsagePointsEndDevices(),

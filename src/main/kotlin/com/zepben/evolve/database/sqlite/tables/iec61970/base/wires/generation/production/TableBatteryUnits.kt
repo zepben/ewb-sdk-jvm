@@ -13,12 +13,12 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
-class TableBatteryUnit : TablePowerElectronicsUnit() {
+class TableBatteryUnits : TablePowerElectronicsUnit() {
 
     val BATTERY_STATE: Column = Column(++columnIndex, "battery_state", "TEXT", NOT_NULL)
     val RATED_E: Column = Column(++columnIndex, "rated_e", "INTEGER", NULL)
     val STORED_E: Column = Column(++columnIndex, "stored_e", "INTEGER", NULL)
 
-    override val name: String = "battery_unit"
+    override val name: String = "battery_units"
 
 }

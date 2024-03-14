@@ -1063,7 +1063,6 @@ class NetworkCimReader(
     // # IEC61970 Base Meas #
     // ######################
 
-    //todo move to measurment service version
     /**
      * Create an [Accumulator] and populate its fields from [TableAccumulators].
      *

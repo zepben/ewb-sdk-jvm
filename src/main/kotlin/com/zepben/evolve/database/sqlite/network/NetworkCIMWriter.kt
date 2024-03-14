@@ -995,7 +995,6 @@ class NetworkCimWriter(
     // # IEC61970 Base Meas #
     // ######################
 
-    //todo move to measurement service version
     @Throws(SQLException::class)
     private fun saveMeasurement(
         table: TableMeasurements,

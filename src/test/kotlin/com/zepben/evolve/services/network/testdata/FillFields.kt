@@ -857,11 +857,6 @@ fun BatteryUnit.fillFields(service: NetworkService, includeRuntime: Boolean = tr
     return this
 }
 
-fun EvChargingUnit.fillFields(service: NetworkService, includeRuntime: Boolean = true): EvChargingUnit {
-    (this as PowerElectronicsUnit).fillFields(service, includeRuntime)
-    return this
-}
-
 fun PhotoVoltaicUnit.fillFields(service: NetworkService, includeRuntime: Boolean = true): PhotoVoltaicUnit {
     (this as PowerElectronicsUnit).fillFields(service, includeRuntime)
     return this
@@ -1421,5 +1416,12 @@ fun LvFeeder.fillFields(service: NetworkService, includeRuntime: Boolean = true)
         clearEquipment()
     }
 
+    return this
+}
+
+/************ IEC61970 InfIEC61970 WIRES GENERATION PRODUCTION ************/
+
+fun EvChargingUnit.fillFields(service: NetworkService, includeRuntime: Boolean = true): EvChargingUnit {
+    (this as PowerElectronicsUnit).fillFields(service, includeRuntime)
     return this
 }

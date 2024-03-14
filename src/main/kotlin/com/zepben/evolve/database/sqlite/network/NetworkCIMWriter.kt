@@ -64,6 +64,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.p
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.wires.generation.production.TableEvChargingUnits
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.PreparedStatement
 import java.sql.SQLException
@@ -78,7 +79,9 @@ class NetworkCimWriter(
     override val databaseTables: NetworkDatabaseTables
 ) : BaseCimWriter(databaseTables) {
 
-    /************ IEC61968 ASSET INFO ************/
+    // #######################
+    // # IEC61968 Asset Info #
+    // #######################
 
     /**
      * Save the [CableInfo] fields to [TableCableInfo].
@@ -304,7 +307,9 @@ class NetworkCimWriter(
         return saveAssetInfo(table, insert, wireInfo, description)
     }
 
-    /************ IEC61968 ASSETS ************/
+    // ###################
+    // # IEC61968 Assets #
+    // ###################
 
     @Throws(SQLException::class)
     private fun saveAsset(table: TableAssets, insert: PreparedStatement, asset: Asset, description: String): Boolean {
@@ -394,7 +399,9 @@ class NetworkCimWriter(
         return saveAsset(table, insert, streetlight, "streetlight")
     }
 
-    /************ IEC61968 COMMON ************/
+    // ###################
+    // # IEC61968 Common #
+    // ###################
 
     private fun insertStreetDetail(table: TableStreetAddresses, insert: PreparedStatement, streetDetail: StreetDetail?) {
         insert.setNullableString(table.BUILDING_NAME.queryIndex, streetDetail?.buildingName)
@@ -483,7 +490,9 @@ class NetworkCimWriter(
         return insert.tryExecuteSingleUpdate(description)
     }
 
-    /************ IEC61968 infIEC61968 InfAssetInfo ************/
+    // #####################################
+    // # IEC61968 infIEC61968 InfAssetInfo #
+    // #####################################
 
     /**
      * Save the [RelayInfo] fields to [TableRelayInfo].
@@ -565,7 +574,9 @@ class NetworkCimWriter(
         return saveAssetInfo(table, insert, potentialTransformerInfo, "potential transformer info")
     }
 
-    /************ IEC61968 METERING ************/
+    // #####################
+    // # IEC61968 Metering #
+    // #####################
 
     @Throws(SQLException::class)
     private fun saveEndDevice(table: TableEndDevices, insert: PreparedStatement, endDevice: EndDevice, description: String): Boolean {
@@ -619,7 +630,9 @@ class NetworkCimWriter(
         return status and saveIdentifiedObject(table, insert, usagePoint, "usage point")
     }
 
-    /************ IEC61968 OPERATIONS ************/
+    // #######################
+    // # IEC61968 Operations #
+    // #######################
 
     /**
      * Save the [OperationalRestriction] fields to [TableOperationalRestrictions].
@@ -640,7 +653,9 @@ class NetworkCimWriter(
         return status and saveDocument(table, insert, operationalRestriction, "operational restriction")
     }
 
-    /************ IEC61970 AUXILIARY EQUIPMENT ************/
+    // #####################################
+    // # IEC61970 Base Auxiliary Equipment #
+    // #####################################
 
     @Throws(SQLException::class)
     private fun saveAuxiliaryEquipment(
@@ -713,7 +728,9 @@ class NetworkCimWriter(
         return saveAuxiliaryEquipment(table, insert, sensor, description)
     }
 
-    /************ IEC61970 CORE ************/
+    // ######################
+    // # IEC61970 Base Core #
+    // ######################
 
     @Throws(SQLException::class)
     private fun saveAcDcTerminal(table: TableAcDcTerminals, insert: PreparedStatement, acDcTerminal: AcDcTerminal, description: String): Boolean {
@@ -928,7 +945,9 @@ class NetworkCimWriter(
         return saveAcDcTerminal(table, insert, terminal, "terminal")
     }
 
-    /************ IEC61970 WIRES ************/
+    // #############################
+    // # IEC61970 Base Equivalents #
+    // #############################
 
     /**
      * Save the [EquivalentBranch] fields to [TableEquivalentBranches].
@@ -972,22 +991,306 @@ class NetworkCimWriter(
     ): Boolean =
         saveConductingEquipment(table, insert, equivalentEquipment, description)
 
-    /************ IEC61970 WIRES GENERATION PRODUCTION************/
+    // ######################
+    // # IEC61970 Base Meas #
+    // ######################
+
+    //todo move to measurement service version
+    @Throws(SQLException::class)
+    private fun saveMeasurement(
+        table: TableMeasurements,
+        insert: PreparedStatement,
+        measurement: Measurement,
+        description: String
+    ): Boolean {
+        insert.setNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex, measurement.powerSystemResourceMRID)
+        insert.setNullableString(table.REMOTE_SOURCE_MRID.queryIndex, measurement.remoteSource?.mRID)
+        insert.setNullableString(table.TERMINAL_MRID.queryIndex, measurement.terminalMRID)
+        insert.setString(table.PHASES.queryIndex, measurement.phases.name)
+        insert.setString(table.UNIT_SYMBOL.queryIndex, measurement.unitSymbol.name)
+        return saveIdentifiedObject(table, insert, measurement, description)
+    }
+
     /**
-     * Save the [EvChargingUnit] fields to [TableEvChargingUnits].
+     * Save the [Analog] fields to [TableAnalogs].
      *
-     * @param evChargingUnit The [EvChargingUnit] instance to write to the database.
+     * @param analog The [Analog] instance to write to the database.
      *
-     * @return true if the [EvChargingUnit] was successfully written to the database, otherwise false.
+     * @return true if the [Analog] was successfully written to the database, otherwise false.
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(evChargingUnit: EvChargingUnit): Boolean {
-        val table = databaseTables.getTable<TableEvChargingUnits>()
-        val insert = databaseTables.getInsert<TableEvChargingUnits>()
+    fun save(analog: Analog): Boolean {
+        val table = databaseTables.getTable<TableAnalogs>()
+        val insert = databaseTables.getInsert<TableAnalogs>()
 
-        return savePowerElectronicsUnit(table, insert, evChargingUnit, "ev charging unit")
+        insert.setBoolean(table.POSITIVE_FLOW_IN.queryIndex, analog.positiveFlowIn)
+
+        return saveMeasurement(table, insert, analog, "analog")
     }
+
+    /**
+     * Save the [Accumulator] fields to [TableAccumulators].
+     *
+     * @param accumulator The [Accumulator] instance to write to the database.
+     *
+     * @return true if the [Accumulator] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(accumulator: Accumulator): Boolean {
+        val table = databaseTables.getTable<TableAccumulators>()
+        val insert = databaseTables.getInsert<TableAccumulators>()
+
+        return saveMeasurement(table, insert, accumulator, "accumulator")
+    }
+
+    /**
+     * Save the [Discrete] fields to [TableDiscretes].
+     *
+     * @param discrete The [Discrete] instance to write to the database.
+     *
+     * @return true if the [Discrete] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(discrete: Discrete): Boolean {
+        val table = databaseTables.getTable<TableDiscretes>()
+        val insert = databaseTables.getInsert<TableDiscretes>()
+
+        return saveMeasurement(table, insert, discrete, "discrete")
+    }
+
+    /**
+     * Save the [Control] fields to [TableControls].
+     *
+     * @param control The [Control] instance to write to the database.
+     *
+     * @return true if the [Control] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(control: Control): Boolean {
+        val table = databaseTables.getTable<TableControls>()
+        val insert = databaseTables.getInsert<TableControls>()
+
+        insert.setNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex, control.powerSystemResourceMRID)
+
+        return saveIoPoint(table, insert, control, "control")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveIoPoint(table: TableIoPoints, insert: PreparedStatement, ioPoint: IoPoint, description: String): Boolean {
+        return saveIdentifiedObject(table, insert, ioPoint, description)
+    }
+
+    // ############################
+    // # IEC61970 Base Protection #
+    // ############################
+
+    /**
+     * Save the [CurrentRelay] fields to [TableCurrentRelays].
+     *
+     * @param currentRelay The [CurrentRelay] instance to write to the database.
+     *
+     * @return true if the [CurrentRelay] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(currentRelay: CurrentRelay): Boolean {
+        val table = databaseTables.getTable<TableCurrentRelays>()
+        val insert = databaseTables.getInsert<TableCurrentRelays>()
+
+        insert.setNullableDouble(table.CURRENT_LIMIT_1.queryIndex, currentRelay.currentLimit1)
+        insert.setNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex, currentRelay.inverseTimeFlag)
+        insert.setNullableDouble(table.TIME_DELAY_1.queryIndex, currentRelay.timeDelay1)
+
+        return saveProtectionRelayFunction(table, insert, currentRelay, "current relay")
+    }
+
+    /**
+     * Save the [DistanceRelay] fields to [TableDistanceRelays].
+     *
+     * @param distanceRelay The [DistanceRelay] instance to write to the database.
+     *
+     * @return true if the [DistanceRelay] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(distanceRelay: DistanceRelay): Boolean {
+        val table = databaseTables.getTable<TableDistanceRelays>()
+        val insert = databaseTables.getInsert<TableDistanceRelays>()
+
+        insert.setNullableDouble(table.BACKWARD_BLIND.queryIndex, distanceRelay.backwardBlind)
+        insert.setNullableDouble(table.BACKWARD_REACH.queryIndex, distanceRelay.backwardReach)
+        insert.setNullableDouble(table.BACKWARD_REACTANCE.queryIndex, distanceRelay.backwardReactance)
+        insert.setNullableDouble(table.FORWARD_BLIND.queryIndex, distanceRelay.forwardBlind)
+        insert.setNullableDouble(table.FORWARD_REACH.queryIndex, distanceRelay.forwardReach)
+        insert.setNullableDouble(table.FORWARD_REACTANCE.queryIndex, distanceRelay.forwardReactance)
+        insert.setNullableDouble(table.OPERATION_PHASE_ANGLE1.queryIndex, distanceRelay.operationPhaseAngle1)
+        insert.setNullableDouble(table.OPERATION_PHASE_ANGLE2.queryIndex, distanceRelay.operationPhaseAngle2)
+        insert.setNullableDouble(table.OPERATION_PHASE_ANGLE3.queryIndex, distanceRelay.operationPhaseAngle3)
+
+        return saveProtectionRelayFunction(table, insert, distanceRelay, "distance relay")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveProtectionRelayFunction(
+        table: TableProtectionRelayFunctions,
+        insert: PreparedStatement,
+        protectionRelayFunction: ProtectionRelayFunction,
+        description: String
+    ): Boolean {
+        insert.setNullableString(table.MODEL.queryIndex, protectionRelayFunction.model)
+        insert.setNullableBoolean(table.RECLOSING.queryIndex, protectionRelayFunction.reclosing)
+        insert.setNullableDouble(table.RELAY_DELAY_TIME.queryIndex, protectionRelayFunction.relayDelayTime)
+        insert.setString(table.PROTECTION_KIND.queryIndex, protectionRelayFunction.protectionKind.name)
+        insert.setNullableBoolean(table.DIRECTABLE.queryIndex, protectionRelayFunction.directable)
+        insert.setString(table.POWER_DIRECTION.queryIndex, protectionRelayFunction.powerDirection.name)
+        insert.setNullableString(table.RELAY_INFO_MRID.queryIndex, protectionRelayFunction.assetInfo?.mRID)
+
+        var status = true
+        protectionRelayFunction.protectedSwitches.forEach { status = status and saveAssociation(protectionRelayFunction, it) }
+        protectionRelayFunction.sensors.forEach { status = status and saveAssociation(protectionRelayFunction, it) }
+        protectionRelayFunction.thresholds.forEachIndexed { sequenceNumber, threshold ->
+            status = status and saveProtectionRelayFunctionThreshold(protectionRelayFunction, sequenceNumber, threshold)
+        }
+        protectionRelayFunction.timeLimits.forEachIndexed { sequenceNumber, timeLimit ->
+            status = status and saveProtectionRelayFunctionTimeLimit(protectionRelayFunction, sequenceNumber, timeLimit)
+        }
+
+        return status and savePowerSystemResource(table, insert, protectionRelayFunction, description)
+    }
+
+    @Throws(SQLException::class)
+    private fun saveProtectionRelayFunctionThreshold(protectionRelayFunction: ProtectionRelayFunction, sequenceNumber: Int, threshold: RelaySetting): Boolean {
+        val table = databaseTables.getTable<TableProtectionRelayFunctionThresholds>()
+        val insert = databaseTables.getInsert<TableProtectionRelayFunctionThresholds>()
+
+        insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
+        insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
+        insert.setString(table.UNIT_SYMBOL.queryIndex, threshold.unitSymbol.name)
+        insert.setDouble(table.VALUE.queryIndex, threshold.value)
+        insert.setNullableString(table.NAME.queryIndex, threshold.name)
+
+        return insert.tryExecuteSingleUpdate("protection relay function threshold")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveProtectionRelayFunctionTimeLimit(protectionRelayFunction: ProtectionRelayFunction, sequenceNumber: Int, timeLimit: Double): Boolean {
+        val table = databaseTables.getTable<TableProtectionRelayFunctionTimeLimits>()
+        val insert = databaseTables.getInsert<TableProtectionRelayFunctionTimeLimits>()
+
+        insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
+        insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
+        insert.setDouble(table.TIME_LIMIT.queryIndex, timeLimit)
+
+        return insert.tryExecuteSingleUpdate("protection relay function time limit")
+    }
+
+    /**
+     * Save the [ProtectionRelayScheme] fields to [TableProtectionRelaySchemes].
+     *
+     * @param protectionRelayScheme The [ProtectionRelayScheme] instance to write to the database.
+     *
+     * @return true if the [ProtectionRelayScheme] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(protectionRelayScheme: ProtectionRelayScheme): Boolean {
+        val table = databaseTables.getTable<TableProtectionRelaySchemes>()
+        val insert = databaseTables.getInsert<TableProtectionRelaySchemes>()
+
+        insert.setNullableString(table.SYSTEM_MRID.queryIndex, protectionRelayScheme.system?.mRID)
+
+        var status = true
+        protectionRelayScheme.functions.forEach { status = status and saveAssociation(protectionRelayScheme, it) }
+
+        return status and saveIdentifiedObject(table, insert, protectionRelayScheme, "protection relay scheme")
+    }
+
+    /**
+     * Save the [ProtectionRelaySystem] fields to [TableProtectionRelaySystems].
+     *
+     * @param protectionRelaySystem The [ProtectionRelaySystem] instance to write to the database.
+     *
+     * @return true if the [ProtectionRelaySystem] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(protectionRelaySystem: ProtectionRelaySystem): Boolean {
+        val table = databaseTables.getTable<TableProtectionRelaySystems>()
+        val insert = databaseTables.getInsert<TableProtectionRelaySystems>()
+
+        insert.setString(table.PROTECTION_KIND.queryIndex, protectionRelaySystem.protectionKind.name)
+
+        return saveEquipment(table, insert, protectionRelaySystem, "protection relay system")
+    }
+
+    /**
+     * Save the [VoltageRelay] fields to [TableVoltageRelays].
+     *
+     * @param voltageRelay The [VoltageRelay] instance to write to the database.
+     *
+     * @return true if the [VoltageRelay] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(voltageRelay: VoltageRelay): Boolean {
+        val table = databaseTables.getTable<TableVoltageRelays>()
+        val insert = databaseTables.getInsert<TableVoltageRelays>()
+
+        return saveProtectionRelayFunction(table, insert, voltageRelay, "voltage relay")
+    }
+
+    // ############################
+    // # IEC61970 Base SCADA #
+    // ############################
+
+    /**
+     * Save the [RemoteControl] fields to [TableRemoteControls].
+     *
+     * @param remoteControl The [RemoteControl] instance to write to the database.
+     *
+     * @return true if the [RemoteControl] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(remoteControl: RemoteControl): Boolean {
+        val table = databaseTables.getTable<TableRemoteControls>()
+        val insert = databaseTables.getInsert<TableRemoteControls>()
+
+        insert.setNullableString(table.CONTROL_MRID.queryIndex, remoteControl.control?.mRID)
+
+        return saveRemotePoint(table, insert, remoteControl, "remote control")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveRemotePoint(table: TableRemotePoints, insert: PreparedStatement, remotePoint: RemotePoint, description: String): Boolean {
+        return saveIdentifiedObject(table, insert, remotePoint, description)
+    }
+
+    /**
+     * Save the [RemoteSource] fields to [TableRemoteSources].
+     *
+     * @param remoteSource The [RemoteSource] instance to write to the database.
+     *
+     * @return true if the [RemoteSource] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(remoteSource: RemoteSource): Boolean {
+        val table = databaseTables.getTable<TableRemoteSources>()
+        val insert = databaseTables.getInsert<TableRemoteSources>()
+
+        insert.setNullableString(table.MEASUREMENT_MRID.queryIndex, remoteSource.measurement?.mRID)
+
+        return saveRemotePoint(table, insert, remoteSource, "remote source")
+    }
+
+    // #############################################
+    // # IEC61970 Base Wires Generation Production #
+    // #############################################
 
     /**
      * Save the [BatteryUnit] fields to [TableBatteryUnits].
@@ -1055,7 +1358,9 @@ class NetworkCimWriter(
         return savePowerElectronicsUnit(table, insert, powerElectronicsWindUnit, "power electronics wind unit")
     }
 
-    /************ IEC61970 WIRES ************/
+    // #######################
+    // # IEC61970 Base Wires #
+    // #######################
 
     /**
      * Save the [AcLineSegment] fields to [TableAcLineSegments].
@@ -1094,22 +1399,6 @@ class NetworkCimWriter(
         insert.setNullableDouble(table.IN_TRANSIT_TIME.queryIndex, breaker.inTransitTime)
 
         return saveProtectedSwitch(table, insert, breaker, "breaker")
-    }
-
-    /**
-     * Save the [LoadBreakSwitch] fields to [TableLoadBreakSwitches].
-     *
-     * @param loadBreakSwitch The [LoadBreakSwitch] instance to write to the database.
-     *
-     * @return true if the [LoadBreakSwitch] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(loadBreakSwitch: LoadBreakSwitch): Boolean {
-        val table = databaseTables.getTable<TableLoadBreakSwitches>()
-        val insert = databaseTables.getInsert<TableLoadBreakSwitches>()
-
-        return saveProtectedSwitch(table, insert, loadBreakSwitch, "load break switch")
     }
 
     /**
@@ -1381,6 +1670,22 @@ class NetworkCimWriter(
         insert.setNullableDouble(table.G_PER_SECTION.queryIndex, linearShuntCompensator.gPerSection)
 
         return saveShuntCompensator(table, insert, linearShuntCompensator, "linear shunt compensator")
+    }
+
+    /**
+     * Save the [LoadBreakSwitch] fields to [TableLoadBreakSwitches].
+     *
+     * @param loadBreakSwitch The [LoadBreakSwitch] instance to write to the database.
+     *
+     * @return true if the [LoadBreakSwitch] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(loadBreakSwitch: LoadBreakSwitch): Boolean {
+        val table = databaseTables.getTable<TableLoadBreakSwitches>()
+        val insert = databaseTables.getInsert<TableLoadBreakSwitches>()
+
+        return saveProtectedSwitch(table, insert, loadBreakSwitch, "load break switch")
     }
 
     @Throws(SQLException::class)
@@ -1762,7 +2067,9 @@ class NetworkCimWriter(
         return saveIdentifiedObject(table, insert, transformerStarImpedance, "transformer star impedance")
     }
 
-    /************ IEC61970 InfIEC61970 Feeder ************/
+    // ###############################
+    // # IEC61970 InfIEC61970 Feeder #
+    // ###############################
 
     /**
      * Save the [Circuit] fields to [TableCircuits].
@@ -1824,295 +2131,30 @@ class NetworkCimWriter(
         return saveEquipmentContainer(table, insert, lvFeeder, "lv feeder")
     }
 
-    /************ IEC61970 MEAS ************/
-    @Throws(SQLException::class)
-    private fun saveMeasurement(
-        table: TableMeasurements,
-        insert: PreparedStatement,
-        measurement: Measurement,
-        description: String
-    ): Boolean {
-        insert.setNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex, measurement.powerSystemResourceMRID)
-        insert.setNullableString(table.REMOTE_SOURCE_MRID.queryIndex, measurement.remoteSource?.mRID)
-        insert.setNullableString(table.TERMINAL_MRID.queryIndex, measurement.terminalMRID)
-        insert.setString(table.PHASES.queryIndex, measurement.phases.name)
-        insert.setString(table.UNIT_SYMBOL.queryIndex, measurement.unitSymbol.name)
-        return saveIdentifiedObject(table, insert, measurement, description)
-    }
+    // ####################################################
+    // # IEC61970 infIEC61970 Wires Generation Production #
+    // ####################################################
 
     /**
-     * Save the [Analog] fields to [TableAnalogs].
+     * Save the [EvChargingUnit] fields to [TableEvChargingUnits].
      *
-     * @param analog The [Analog] instance to write to the database.
+     * @param evChargingUnit The [EvChargingUnit] instance to write to the database.
      *
-     * @return true if the [Analog] was successfully written to the database, otherwise false.
+     * @return true if the [EvChargingUnit] was successfully written to the database, otherwise false.
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(analog: Analog): Boolean {
-        val table = databaseTables.getTable<TableAnalogs>()
-        val insert = databaseTables.getInsert<TableAnalogs>()
+    fun save(evChargingUnit: EvChargingUnit): Boolean {
+        val table = databaseTables.getTable<TableEvChargingUnits>()
+        val insert = databaseTables.getInsert<TableEvChargingUnits>()
 
-        insert.setBoolean(table.POSITIVE_FLOW_IN.queryIndex, analog.positiveFlowIn)
-
-        return saveMeasurement(table, insert, analog, "analog")
+        return savePowerElectronicsUnit(table, insert, evChargingUnit, "ev charging unit")
     }
 
-    /**
-     * Save the [Accumulator] fields to [TableAccumulators].
-     *
-     * @param accumulator The [Accumulator] instance to write to the database.
-     *
-     * @return true if the [Accumulator] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(accumulator: Accumulator): Boolean {
-        val table = databaseTables.getTable<TableAccumulators>()
-        val insert = databaseTables.getInsert<TableAccumulators>()
+    // ################
+    // # ASSOCIATIONS #
+    // ################
 
-        return saveMeasurement(table, insert, accumulator, "accumulator")
-    }
-
-    /**
-     * Save the [Discrete] fields to [TableDiscretes].
-     *
-     * @param discrete The [Discrete] instance to write to the database.
-     *
-     * @return true if the [Discrete] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(discrete: Discrete): Boolean {
-        val table = databaseTables.getTable<TableDiscretes>()
-        val insert = databaseTables.getInsert<TableDiscretes>()
-
-        return saveMeasurement(table, insert, discrete, "discrete")
-    }
-
-    /**
-     * Save the [Control] fields to [TableControls].
-     *
-     * @param control The [Control] instance to write to the database.
-     *
-     * @return true if the [Control] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(control: Control): Boolean {
-        val table = databaseTables.getTable<TableControls>()
-        val insert = databaseTables.getInsert<TableControls>()
-
-        insert.setNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex, control.powerSystemResourceMRID)
-
-        return saveIoPoint(table, insert, control, "control")
-    }
-
-    @Throws(SQLException::class)
-    private fun saveIoPoint(table: TableIoPoints, insert: PreparedStatement, ioPoint: IoPoint, description: String): Boolean {
-        return saveIdentifiedObject(table, insert, ioPoint, description)
-    }
-
-    /************ IEC61970 Base Protection ************/
-
-    /**
-     * Save the [CurrentRelay] fields to [TableCurrentRelays].
-     *
-     * @param currentRelay The [CurrentRelay] instance to write to the database.
-     *
-     * @return true if the [CurrentRelay] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(currentRelay: CurrentRelay): Boolean {
-        val table = databaseTables.getTable<TableCurrentRelays>()
-        val insert = databaseTables.getInsert<TableCurrentRelays>()
-
-        insert.setNullableDouble(table.CURRENT_LIMIT_1.queryIndex, currentRelay.currentLimit1)
-        insert.setNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex, currentRelay.inverseTimeFlag)
-        insert.setNullableDouble(table.TIME_DELAY_1.queryIndex, currentRelay.timeDelay1)
-
-        return saveProtectionRelayFunction(table, insert, currentRelay, "current relay")
-    }
-
-    /**
-     * Save the [DistanceRelay] fields to [TableDistanceRelays].
-     *
-     * @param distanceRelay The [DistanceRelay] instance to write to the database.
-     *
-     * @return true if the [DistanceRelay] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(distanceRelay: DistanceRelay): Boolean {
-        val table = databaseTables.getTable<TableDistanceRelays>()
-        val insert = databaseTables.getInsert<TableDistanceRelays>()
-
-        insert.setNullableDouble(table.BACKWARD_BLIND.queryIndex, distanceRelay.backwardBlind)
-        insert.setNullableDouble(table.BACKWARD_REACH.queryIndex, distanceRelay.backwardReach)
-        insert.setNullableDouble(table.BACKWARD_REACTANCE.queryIndex, distanceRelay.backwardReactance)
-        insert.setNullableDouble(table.FORWARD_BLIND.queryIndex, distanceRelay.forwardBlind)
-        insert.setNullableDouble(table.FORWARD_REACH.queryIndex, distanceRelay.forwardReach)
-        insert.setNullableDouble(table.FORWARD_REACTANCE.queryIndex, distanceRelay.forwardReactance)
-        insert.setNullableDouble(table.OPERATION_PHASE_ANGLE1.queryIndex, distanceRelay.operationPhaseAngle1)
-        insert.setNullableDouble(table.OPERATION_PHASE_ANGLE2.queryIndex, distanceRelay.operationPhaseAngle2)
-        insert.setNullableDouble(table.OPERATION_PHASE_ANGLE3.queryIndex, distanceRelay.operationPhaseAngle3)
-
-        return saveProtectionRelayFunction(table, insert, distanceRelay, "distance relay")
-    }
-
-    @Throws(SQLException::class)
-    private fun saveProtectionRelayFunction(
-        table: TableProtectionRelayFunctions,
-        insert: PreparedStatement,
-        protectionRelayFunction: ProtectionRelayFunction,
-        description: String
-    ): Boolean {
-        insert.setNullableString(table.MODEL.queryIndex, protectionRelayFunction.model)
-        insert.setNullableBoolean(table.RECLOSING.queryIndex, protectionRelayFunction.reclosing)
-        insert.setNullableDouble(table.RELAY_DELAY_TIME.queryIndex, protectionRelayFunction.relayDelayTime)
-        insert.setString(table.PROTECTION_KIND.queryIndex, protectionRelayFunction.protectionKind.name)
-        insert.setNullableBoolean(table.DIRECTABLE.queryIndex, protectionRelayFunction.directable)
-        insert.setString(table.POWER_DIRECTION.queryIndex, protectionRelayFunction.powerDirection.name)
-        insert.setNullableString(table.RELAY_INFO_MRID.queryIndex, protectionRelayFunction.assetInfo?.mRID)
-
-        var status = true
-        protectionRelayFunction.protectedSwitches.forEach { status = status and saveAssociation(protectionRelayFunction, it) }
-        protectionRelayFunction.sensors.forEach { status = status and saveAssociation(protectionRelayFunction, it) }
-        protectionRelayFunction.thresholds.forEachIndexed { sequenceNumber, threshold ->
-            status = status and saveProtectionRelayFunctionThreshold(protectionRelayFunction, sequenceNumber, threshold)
-        }
-        protectionRelayFunction.timeLimits.forEachIndexed { sequenceNumber, timeLimit ->
-            status = status and saveProtectionRelayFunctionTimeLimit(protectionRelayFunction, sequenceNumber, timeLimit)
-        }
-
-        return status and savePowerSystemResource(table, insert, protectionRelayFunction, description)
-    }
-
-    @Throws(SQLException::class)
-    private fun saveProtectionRelayFunctionThreshold(protectionRelayFunction: ProtectionRelayFunction, sequenceNumber: Int, threshold: RelaySetting): Boolean {
-        val table = databaseTables.getTable<TableProtectionRelayFunctionThresholds>()
-        val insert = databaseTables.getInsert<TableProtectionRelayFunctionThresholds>()
-
-        insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
-        insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
-        insert.setString(table.UNIT_SYMBOL.queryIndex, threshold.unitSymbol.name)
-        insert.setDouble(table.VALUE.queryIndex, threshold.value)
-        insert.setNullableString(table.NAME.queryIndex, threshold.name)
-
-        return insert.tryExecuteSingleUpdate("protection relay function threshold")
-    }
-
-    @Throws(SQLException::class)
-    private fun saveProtectionRelayFunctionTimeLimit(protectionRelayFunction: ProtectionRelayFunction, sequenceNumber: Int, timeLimit: Double): Boolean {
-        val table = databaseTables.getTable<TableProtectionRelayFunctionTimeLimits>()
-        val insert = databaseTables.getInsert<TableProtectionRelayFunctionTimeLimits>()
-
-        insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
-        insert.setInt(table.SEQUENCE_NUMBER.queryIndex, sequenceNumber)
-        insert.setDouble(table.TIME_LIMIT.queryIndex, timeLimit)
-
-        return insert.tryExecuteSingleUpdate("protection relay function time limit")
-    }
-
-    /**
-     * Save the [ProtectionRelayScheme] fields to [TableProtectionRelaySchemes].
-     *
-     * @param protectionRelayScheme The [ProtectionRelayScheme] instance to write to the database.
-     *
-     * @return true if the [ProtectionRelayScheme] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(protectionRelayScheme: ProtectionRelayScheme): Boolean {
-        val table = databaseTables.getTable<TableProtectionRelaySchemes>()
-        val insert = databaseTables.getInsert<TableProtectionRelaySchemes>()
-
-        insert.setNullableString(table.SYSTEM_MRID.queryIndex, protectionRelayScheme.system?.mRID)
-
-        var status = true
-        protectionRelayScheme.functions.forEach { status = status and saveAssociation(protectionRelayScheme, it) }
-
-        return status and saveIdentifiedObject(table, insert, protectionRelayScheme, "protection relay scheme")
-    }
-
-    /**
-     * Save the [ProtectionRelaySystem] fields to [TableProtectionRelaySystems].
-     *
-     * @param protectionRelaySystem The [ProtectionRelaySystem] instance to write to the database.
-     *
-     * @return true if the [ProtectionRelaySystem] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(protectionRelaySystem: ProtectionRelaySystem): Boolean {
-        val table = databaseTables.getTable<TableProtectionRelaySystems>()
-        val insert = databaseTables.getInsert<TableProtectionRelaySystems>()
-
-        insert.setString(table.PROTECTION_KIND.queryIndex, protectionRelaySystem.protectionKind.name)
-
-        return saveEquipment(table, insert, protectionRelaySystem, "protection relay system")
-    }
-
-    /**
-     * Save the [VoltageRelay] fields to [TableVoltageRelays].
-     *
-     * @param voltageRelay The [VoltageRelay] instance to write to the database.
-     *
-     * @return true if the [VoltageRelay] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(voltageRelay: VoltageRelay): Boolean {
-        val table = databaseTables.getTable<TableVoltageRelays>()
-        val insert = databaseTables.getInsert<TableVoltageRelays>()
-
-        return saveProtectionRelayFunction(table, insert, voltageRelay, "voltage relay")
-    }
-
-    /************ IEC61970 SCADA ************/
-    /**
-     * Save the [RemoteControl] fields to [TableRemoteControls].
-     *
-     * @param remoteControl The [RemoteControl] instance to write to the database.
-     *
-     * @return true if the [RemoteControl] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(remoteControl: RemoteControl): Boolean {
-        val table = databaseTables.getTable<TableRemoteControls>()
-        val insert = databaseTables.getInsert<TableRemoteControls>()
-
-        insert.setNullableString(table.CONTROL_MRID.queryIndex, remoteControl.control?.mRID)
-
-        return saveRemotePoint(table, insert, remoteControl, "remote control")
-    }
-
-    @Throws(SQLException::class)
-    private fun saveRemotePoint(table: TableRemotePoints, insert: PreparedStatement, remotePoint: RemotePoint, description: String): Boolean {
-        return saveIdentifiedObject(table, insert, remotePoint, description)
-    }
-
-    /**
-     * Save the [RemoteSource] fields to [TableRemoteSources].
-     *
-     * @param remoteSource The [RemoteSource] instance to write to the database.
-     *
-     * @return true if the [RemoteSource] was successfully written to the database, otherwise false.
-     * @throws SQLException For any errors encountered writing to the database.
-     */
-    @Throws(SQLException::class)
-    fun save(remoteSource: RemoteSource): Boolean {
-        val table = databaseTables.getTable<TableRemoteSources>()
-        val insert = databaseTables.getInsert<TableRemoteSources>()
-
-        insert.setNullableString(table.MEASUREMENT_MRID.queryIndex, remoteSource.measurement?.mRID)
-
-        return saveRemotePoint(table, insert, remoteSource, "remote source")
-    }
-
-    /************ ASSOCIATIONS ************/
     @Throws(SQLException::class)
     private fun saveAssociation(assetOrganisationRole: AssetOrganisationRole, asset: Asset): Boolean {
         val table = databaseTables.getTable<TableAssetOrganisationRolesAssets>()

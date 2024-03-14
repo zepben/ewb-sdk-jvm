@@ -35,7 +35,7 @@ abstract class BaseCimWriter(
 ) : BaseEntryWriter() {
 
     // ###################
-    // # IEC61968 COMMON #
+    // # IEC61968 Common #
     // ###################
 
     /**
@@ -132,9 +132,9 @@ abstract class BaseCimWriter(
         return saveIdentifiedObject(table, insert, organisationRole, description)
     }
 
-    // #################
-    // # IEC61970 CORE #
-    // #################
+    // ######################
+    // # IEC61970 Base Core #
+    // ######################
 
     /**
      * Save the [IdentifiedObject] fields to [TableIdentifiedObjects].

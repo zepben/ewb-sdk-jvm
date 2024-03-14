@@ -14,7 +14,7 @@ import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableTapChangerControls : TableRegulatingControls() {
 
-    val LIMIT_VOLTAGE: Column = Column(++columnIndex, "limit_voltage", "NUMBER", NULL)
+    val LIMIT_VOLTAGE: Column = Column(++columnIndex, "limit_voltage", "INTEGER", NULL)
     val LINE_DROP_COMPENSATION: Column = Column(++columnIndex, "line_drop_compensation", "BOOLEAN", NULL)
     val LINE_DROP_R: Column = Column(++columnIndex, "line_drop_r", "NUMBER", NULL)
     val LINE_DROP_X: Column = Column(++columnIndex, "line_drop_x", "NUMBER", NULL)

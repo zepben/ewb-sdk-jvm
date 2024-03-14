@@ -30,10 +30,7 @@ internal fun changeSet50() = ChangeSet(
         `Drop customer tables`,
         `Drop diagram tables`,
         `Drop network tables`,
-        `Drop tables shared between customer and network`,
-
-        // Finally vacuum the database to reclaim unused space.
-        `Vacuum database`
+        `Drop tables shared between customer and network`
     )
 )
 
@@ -328,15 +325,4 @@ private val `Drop tables shared between customer and network` = Change(
         "DROP TABLE organisations;"
     ),
     targetDatabases = setOf(EwbDatabaseType.DIAGRAM)
-)
-
-@Suppress("ObjectPropertyName")
-private val `Vacuum database` = Change(
-    listOf(
-        "PRAGMA foreign_key_check",
-        "COMMIT",
-        "VACUUM",
-        "BEGIN TRANSACTION",
-    ),
-    targetDatabases = setOf(EwbDatabaseType.CUSTOMER, EwbDatabaseType.DIAGRAM, EwbDatabaseType.NETWORK)
 )

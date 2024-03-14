@@ -12,8 +12,10 @@ import java.sql.Statement
 
 /**
  * Helper class for changeset that do not impact a database.
+ *
+ * NOTE: This doesn't actually check that no changes were made, it is just a convenient way to create a changeset with no expected changes.
  */
-object NoChanges : ChangeSetValidator {
+open class NoChanges : ChangeSetValidator {
 
     override fun setUpStatements(): List<String> = emptyList()
     override fun populateStatements(): List<String> = emptyList()

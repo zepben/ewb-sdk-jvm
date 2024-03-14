@@ -17,9 +17,9 @@ import com.zepben.evolve.database.sqlite.tables.SqliteTable
 class TableDiagramObjectPoints : SqliteTable() {
 
     val DIAGRAM_OBJECT_MRID: Column = Column(++columnIndex, "diagram_object_mrid", "TEXT", NOT_NULL)
-    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "TEXT", NOT_NULL)
-    val X_POSITION: Column = Column(++columnIndex, "x_position", "TEXT", NULL)
-    val Y_POSITION: Column = Column(++columnIndex, "y_position", "TEXT", NULL)
+    val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
+    val X_POSITION: Column = Column(++columnIndex, "x_position", "NUMBER", NULL)
+    val Y_POSITION: Column = Column(++columnIndex, "y_position", "NUMBER", NULL)
 
     override val name: String = "diagram_object_points"
 

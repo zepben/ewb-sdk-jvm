@@ -31,7 +31,7 @@ class DiagramCimReader(
 ) : BaseCimReader(service) {
 
     // ###########################
-    // # IEC61970 DIAGRAM LAYOUT #
+    // # IEC61970 Diagram Layout #
     // ###########################
 
     /**

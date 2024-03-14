@@ -1214,15 +1214,6 @@ fun SeriesCompensator.toPb(): PBSeriesCompensator = toPb(this, PBSeriesCompensat
 fun TapChangerControl.toPb(): PBTapChangerControl = toPb(this, PBTapChangerControl.newBuilder()).build()
 fun TransformerStarImpedance.toPb(): PBTransformerStarImpedance = toPb(this, PBTransformerStarImpedance.newBuilder()).build()
 
-/************ IEC61970 InfIEC61970 Wires.Generation.Production ************/
-
-fun toPb(cim: EvChargingUnit, pb: PBEvChargingUnit.Builder): PBEvChargingUnit.Builder =
-    pb.apply {
-        toPb(cim, peuBuilder)
-    }
-
-fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBuilder()).build()
-
 /************ IEC61970 InfIEC61970 Feeder ************/
 
 fun toPb(cim: Circuit, pb: PBCircuit.Builder): PBCircuit.Builder =
@@ -1265,6 +1256,15 @@ fun toPb(cim: LvFeeder, pb: PBLvFeeder.Builder): PBLvFeeder.Builder =
 fun Circuit.toPb(): PBCircuit = toPb(this, PBCircuit.newBuilder()).build()
 fun Loop.toPb(): PBLoop = toPb(this, PBLoop.newBuilder()).build()
 fun LvFeeder.toPb(): PBLvFeeder = toPb(this, PBLvFeeder.newBuilder()).build()
+
+/************ IEC61970 InfIEC61970 Wires.Generation.Production ************/
+
+fun toPb(cim: EvChargingUnit, pb: PBEvChargingUnit.Builder): PBEvChargingUnit.Builder =
+    pb.apply {
+        toPb(cim, peuBuilder)
+    }
+
+fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBuilder()).build()
 
 /************ Class for Java friendly usage ************/
 

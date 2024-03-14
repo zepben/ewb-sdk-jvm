@@ -37,7 +37,9 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
-import com.zepben.evolve.services.common.*
+import com.zepben.evolve.services.common.BaseServiceComparatorTest
+import com.zepben.evolve.services.common.ObjectDifference
+import com.zepben.evolve.services.common.ValueDifference
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.utils.ServiceComparatorValidator
 import org.junit.jupiter.api.Test
@@ -983,7 +985,6 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     internal fun compareLinearShuntCompensator() {
         compareShuntCompensator { LinearShuntCompensator(it) }
 
-
         comparatorValidator.validateProperty(LinearShuntCompensator::b0PerSection, { LinearShuntCompensator(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(LinearShuntCompensator::bPerSection, { LinearShuntCompensator(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(LinearShuntCompensator::g0PerSection, { LinearShuntCompensator(it) }, { 1.0 }, { 2.0 })
@@ -1183,6 +1184,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareEnergyConnection(createRegulatingCondEq)
 
         comparatorValidator.validateProperty(RegulatingCondEq::controlEnabled, createRegulatingCondEq, { false }, { true })
+        comparatorValidator.validateProperty(
+            RegulatingCondEq::regulatingControl,
+            createRegulatingCondEq,
+            { TapChangerControl("tcc1") },
+            { TapChangerControl("tcc2") })
     }
 
     private fun compareRegulatingControl(createRegulatingControl: (String) -> RegulatingControl) {

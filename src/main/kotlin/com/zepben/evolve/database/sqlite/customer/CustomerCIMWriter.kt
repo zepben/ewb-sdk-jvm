@@ -37,7 +37,7 @@ class CustomerCimWriter(
 ) : BaseCimWriter(databaseTables) {
 
     // ###################
-    // # IEC61968 COMMON #
+    // # IEC61968 Common #
     // ###################
 
     @Suppress("SameParameterValue")
@@ -47,7 +47,7 @@ class CustomerCimWriter(
     }
 
     // ######################
-    // # IEC61968 CUSTOMERS #
+    // # IEC61968 Customers #
     // ######################
 
     /**
@@ -126,7 +126,7 @@ class CustomerCimWriter(
     }
 
     // ################
-    // # ASSOCIATIONS #
+    // # Associations #
     // ################
 
     @Throws(SQLException::class)

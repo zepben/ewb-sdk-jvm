@@ -35,7 +35,7 @@ class CustomerCimReader(
 ) : BaseCimReader(service) {
 
     // ###################
-    // # IEC61968 COMMON #
+    // # IEC61968 Common #
     // ###################
 
     @Throws(SQLException::class)
@@ -44,7 +44,7 @@ class CustomerCimReader(
     }
 
     // ######################
-    // # IEC61968 CUSTOMERS #
+    // # IEC61968 Customers #
     // ######################
 
     /**
@@ -122,7 +122,7 @@ class CustomerCimReader(
     }
 
     // ################
-    // # ASSOCIATIONS #
+    // # Associations #
     // ################
 
     /**

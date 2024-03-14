@@ -62,6 +62,7 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.p
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.wires.generation.production.TableEvChargingUnits
 import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.extensions.*
 import com.zepben.evolve.services.network.NetworkService
@@ -78,7 +79,7 @@ class NetworkCimReader(
 ) : BaseCimReader(service) {
 
     // #######################
-    // # IEC61968 ASSET INFO #
+    // # IEC61968 Asset Info #
     // #######################
 
     /**
@@ -325,7 +326,7 @@ class NetworkCimReader(
     }
 
     // ###################
-    // # IEC61968 ASSETS #
+    // # IEC61968 Assets #
     // ###################
 
     @Throws(SQLException::class)
@@ -420,7 +421,7 @@ class NetworkCimReader(
     }
 
     // ###################
-    // # IEC61968 COMMON #
+    // # IEC61968 Common #
     // ###################
 
     /**
@@ -558,7 +559,7 @@ class NetworkCimReader(
      */
     @Throws(SQLException::class)
     fun load(table: TableRecloseDelays, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        // Note TablePowerTransformerEndRatings.selectSql ensures we process ratings in the correct order.
+        // Note TableRecloseDelays.selectSql ensures we process ratings in the correct order.
         val relayInfoMRID = resultSet.getString(table.RELAY_INFO_MRID.queryIndex)
         val recloseDelay = resultSet.getDouble(table.RECLOSE_DELAY.queryIndex)
         setIdentifier("$relayInfoMRID.s$recloseDelay")
@@ -624,7 +625,7 @@ class NetworkCimReader(
     }
 
     // #####################
-    // # IEC61968 METERING #
+    // # IEC61968 Metering #
     // #####################
 
     @Throws(SQLException::class)
@@ -681,7 +682,7 @@ class NetworkCimReader(
     }
 
     // #######################
-    // # IEC61968 OPERATIONS #
+    // # IEC61968 Operations #
     // #######################
 
     /**
@@ -702,7 +703,7 @@ class NetworkCimReader(
     }
 
     // #####################################
-    // # IEC61970 BASE AUXILIARY EQUIPMENT #
+    // # IEC61970 Base Auxiliary Equipment #
     // #####################################
 
     @Throws(SQLException::class)
@@ -781,7 +782,7 @@ class NetworkCimReader(
         loadAuxiliaryEquipment(sensor, table, resultSet)
 
     // ######################
-    // # IEC61970 BASE CORE #
+    // # IEC61970 Base Core #
     // ######################
 
     @Throws(SQLException::class)
@@ -1017,7 +1018,7 @@ class NetworkCimReader(
     }
 
     // #############################
-    // # IEC61970 BASE EQUIVALENTS #
+    // # IEC61970 Base Equivalents #
     // #############################
 
     /**
@@ -1059,9 +1060,10 @@ class NetworkCimReader(
         loadConductingEquipment(equivalentEquipment, table, resultSet)
 
     // ######################
-    // # IEC61970 BASE MEAS #
+    // # IEC61970 Base Meas #
     // ######################
 
+    //todo move to measurment service version
     /**
      * Create an [Accumulator] and populate its fields from [TableAccumulators].
      *
@@ -1345,7 +1347,7 @@ class NetworkCimReader(
     }
 
     // #######################
-    // # IEC61970 BASE SCADA #
+    // # IEC61970 Base SCADA #
     // #######################
 
     /**
@@ -1391,7 +1393,7 @@ class NetworkCimReader(
     }
 
     // #############################################
-    // # IEC61970 BASE WIRES GENERATION PRODUCTION #
+    // # IEC61970 Base Wires Generation Production #
     // #############################################
 
     /**
@@ -1413,23 +1415,6 @@ class NetworkCimReader(
         }
 
         return loadPowerElectronicsUnit(batteryUnit, table, resultSet) && service.addOrThrow(batteryUnit)
-    }
-
-    /**
-     * Create an [EvChargingUnit] and populate its fields from [TableEvChargingUnits].
-     *
-     * @param table The database table to read the [EvChargingUnit] fields from.
-     * @param resultSet The record in the database table containing the fields for this [EvChargingUnit].
-     * @param setIdentifier A callback to register the mRID of this [EvChargingUnit] for logging purposes.
-     *
-     * @return true if the [EvChargingUnit] was successfully read from the database and added to the service.
-     * @throws SQLException For any errors encountered reading from the database.
-     */
-    @Throws(SQLException::class)
-    fun load(table: TableEvChargingUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val evChargingUnit = EvChargingUnit(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
-
-        return loadPowerElectronicsUnit(evChargingUnit, table, resultSet) && service.addOrThrow(evChargingUnit)
     }
 
     /**
@@ -1483,7 +1468,7 @@ class NetworkCimReader(
     }
 
     // #######################
-    // # IEC61970 BASE WIRES #
+    // # IEC61970 Base Wires #
     // #######################
 
     /**
@@ -2332,8 +2317,29 @@ class NetworkCimReader(
         return loadEquipmentContainer(lvFeeder, table, resultSet) && service.addOrThrow(lvFeeder)
     }
 
+    // ####################################################
+    // # IEC61970 InfIEC61970 Wires Generation Production #
+    // ####################################################
+
+    /**
+     * Create an [EvChargingUnit] and populate its fields from [TableEvChargingUnits].
+     *
+     * @param table The database table to read the [EvChargingUnit] fields from.
+     * @param resultSet The record in the database table containing the fields for this [EvChargingUnit].
+     * @param setIdentifier A callback to register the mRID of this [EvChargingUnit] for logging purposes.
+     *
+     * @return true if the [EvChargingUnit] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableEvChargingUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val evChargingUnit = EvChargingUnit(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadPowerElectronicsUnit(evChargingUnit, table, resultSet) && service.addOrThrow(evChargingUnit)
+    }
+
     // ################
-    // # ASSOCIATIONS #
+    // # Associations #
     // ################
 
     /**

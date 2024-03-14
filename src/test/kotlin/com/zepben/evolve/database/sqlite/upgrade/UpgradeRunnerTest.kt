@@ -199,6 +199,8 @@ internal class UpgradeRunnerTest {
             validateChangeSetExecuted(firstPostSplitChangeSet, splitVersion + 1)
             validateChangeSetExecuted(postSplitChangeSet, maxSupportedVersion - 1)
             validateChangeSetExecuted(maxChangeSet, maxSupportedVersion)
+
+            statement.executeUpdate("VACUUM")
         }
     }
 
@@ -500,6 +502,8 @@ internal class UpgradeRunnerTest {
         statement.executeUpdate("BEGIN TRANSACTION")
         statement.executeUpdate("PRAGMA foreign_keys=ON")
         statement.close()
+        statement.executeUpdate("VACUUM")
+        statement.close()
     }
 
     private fun upgradeRealFile(fileNameSource: String, type: EwbDatabaseType) {
@@ -509,6 +513,5 @@ internal class UpgradeRunnerTest {
 
         UpgradeRunner().connectAndUpgrade("jdbc:sqlite:$databaseFile", Paths.get(databaseFile), type)
     }
-
 
 }

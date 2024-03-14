@@ -10,12 +10,16 @@ package com.zepben.evolve.database.sqlite.upgrade
 
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
-import com.zepben.evolve.database.sqlite.upgrade.changesets.NoChanges
 import com.zepben.evolve.database.sqlite.upgrade.changesets.combined.*
 import com.zepben.evolve.database.sqlite.upgrade.changesets.customer.ChangeSet50CustomerValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.customer.ChangeSet51CustomerValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.customer.ChangeSet52CustomerValidator
 import com.zepben.evolve.database.sqlite.upgrade.changesets.diagram.ChangeSet50DiagramValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.diagram.ChangeSet51DiagramValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.diagram.ChangeSet52DiagramValidator
 import com.zepben.evolve.database.sqlite.upgrade.changesets.network.ChangeSet50NetworkValidator
 import com.zepben.evolve.database.sqlite.upgrade.changesets.network.ChangeSet51NetworkValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.network.ChangeSet52NetworkValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -45,17 +49,20 @@ internal class ChangeSetTest {
 
     private val customerChangeSetValidators = mapOf(
         50 to ChangeSet50CustomerValidator,
-        51 to NoChanges
+        51 to ChangeSet51CustomerValidator,
+        52 to ChangeSet52CustomerValidator
     )
 
     private val diagramChangeSetValidators = mapOf(
         50 to ChangeSet50DiagramValidator,
-        51 to NoChanges
+        51 to ChangeSet51DiagramValidator,
+        52 to ChangeSet52DiagramValidator
     )
 
     private val networkChangeSetValidators = mapOf(
         50 to ChangeSet50NetworkValidator,
-        51 to ChangeSet51NetworkValidator
+        51 to ChangeSet51NetworkValidator,
+        52 to ChangeSet52NetworkValidator
     )
 
     @Test

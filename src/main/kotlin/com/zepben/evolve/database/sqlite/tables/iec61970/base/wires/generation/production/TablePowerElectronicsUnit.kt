@@ -16,8 +16,8 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableEquipmen
 abstract class TablePowerElectronicsUnit : TableEquipment() {
 
     val POWER_ELECTRONICS_CONNECTION_MRID: Column = Column(++columnIndex, "power_electronics_connection_mrid", "TEXT", NULL)
-    val MAX_P: Column = Column(++columnIndex, "max_p", "NUMBER", NULL)
-    val MIN_P: Column = Column(++columnIndex, "min_p", "NUMBER", NULL)
+    val MAX_P: Column = Column(++columnIndex, "max_p", "INTEGER", NULL)
+    val MIN_P: Column = Column(++columnIndex, "min_p", "INTEGER", NULL)
 
     override val nonUniqueIndexColumns: MutableList<List<Column>> =
         super.nonUniqueIndexColumns.apply {

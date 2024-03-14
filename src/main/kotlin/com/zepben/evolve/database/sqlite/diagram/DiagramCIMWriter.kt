@@ -29,7 +29,7 @@ class DiagramCimWriter(
 ) : BaseCimWriter(databaseTables) {
 
     // ###########################
-    // # IEC61970 DIAGRAM LAYOUT #
+    // # IEC61970 Diagram Layout #
     // ###########################
 
     /**

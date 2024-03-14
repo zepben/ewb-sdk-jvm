@@ -1280,15 +1280,6 @@ fun NetworkService.addFromPb(pb: PBSeriesCompensator): SeriesCompensator? = tryA
 fun NetworkService.addFromPb(pb: PBTapChangerControl): TapChangerControl? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = tryAddOrNull(toCim(pb, this))
 
-/************ IEC61970 InfIEC61970 Wires.Generation.Production ************/
-
-fun toCim(pb: PBEvChargingUnit, networkService: NetworkService): EvChargingUnit =
-    EvChargingUnit(pb.mRID()).apply {
-        toCim(pb.peu, this, networkService)
-    }
-
-fun NetworkService.addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = tryAddOrNull(toCim(pb, this))
-
 /************ IEC61970 InfIEC61970 Feeder ************/
 
 fun toCim(pb: PBCircuit, networkService: NetworkService): Circuit =
@@ -1331,6 +1322,15 @@ fun toCim(pb: PBLvFeeder, networkService: NetworkService): LvFeeder =
 fun NetworkService.addFromPb(pb: PBCircuit): Circuit? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLoop): Loop? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLvFeeder): LvFeeder? = tryAddOrNull(toCim(pb, this))
+
+/************ IEC61970 InfIEC61970 Wires.Generation.Production ************/
+
+fun toCim(pb: PBEvChargingUnit, networkService: NetworkService): EvChargingUnit =
+    EvChargingUnit(pb.mRID()).apply {
+        toCim(pb.peu, this, networkService)
+    }
+
+fun NetworkService.addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = tryAddOrNull(toCim(pb, this))
 
 /************ Class for Java friendly usage ************/
 

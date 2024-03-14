@@ -21,8 +21,7 @@ class TableLocationStreetAddresses : TableStreetAddresses() {
 
     override val uniqueIndexColumns: MutableList<List<Column>> =
         super.uniqueIndexColumns.apply {
-            // todo: https://app.clickup.com/t/6929263/EWB-4407 add in indexes and create appropriate change set.
-            //add(listOf(LOCATION_MRID, ADDRESS_FIELD))
+            add(listOf(LOCATION_MRID, ADDRESS_FIELD))
         }
 
     override val nonUniqueIndexColumns: MutableList<List<Column>> =

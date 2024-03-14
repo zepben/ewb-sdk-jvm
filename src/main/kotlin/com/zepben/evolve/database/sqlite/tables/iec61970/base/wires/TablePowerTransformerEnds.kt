@@ -22,11 +22,11 @@ class TablePowerTransformerEnds : TableTransformerEnds() {
     val B0: Column = Column(++columnIndex, "b0", "NUMBER", NULL)
     val G: Column = Column(++columnIndex, "g", "NUMBER", NULL)
     val G0: Column = Column(++columnIndex, "g0", "NUMBER", NULL)
-    val R: Column = Column(++columnIndex, "R", "NUMBER", NULL)
-    val R0: Column = Column(++columnIndex, "R0", "NUMBER", NULL)
+    val R: Column = Column(++columnIndex, "r", "NUMBER", NULL)
+    val R0: Column = Column(++columnIndex, "r0", "NUMBER", NULL)
     val RATED_U: Column = Column(++columnIndex, "rated_u", "INTEGER", NULL)
-    val X: Column = Column(++columnIndex, "X", "NUMBER", NULL)
-    val X0: Column = Column(++columnIndex, "X0", "NUMBER", NULL)
+    val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)
+    val X0: Column = Column(++columnIndex, "x0", "NUMBER", NULL)
 
     override val name: String = "power_transformer_ends"
 

@@ -35,7 +35,8 @@ class UpgradeRunner @JvmOverloads constructor(
     // Rename this to `changeSets` and remove database splitting logic next time we set a new minimum version of the database.
     internal val postSplitChangeSets: List<ChangeSet> = listOf(
         changeSet50(),
-        changeSet51()
+        changeSet51(),
+        changeSet52()
     ),
     private val tableVersion: TableVersion = TableVersion()
 ) {
@@ -62,19 +63,21 @@ class UpgradeRunner @JvmOverloads constructor(
             .getOrElse { throw UpgradeException(it.message, it) }
 
         return try {
-            val status = connection.createStatement().use { statement ->
+            val preSplitStatus = connection.createStatement().use { statement ->
                 upgrade(databaseFile, statement, connection, type, preSplitChangeSets, true)
             }
 
             // This will copy the database file into the new split format. Remove it next time we set a new minimum version of the database.
             // Unless we are already past the split, split the database. Take a backup only if we haven't done so in upgrading to the split.
-            if (status != UpgradeState.AHEAD_OF_TARGET_VERSION)
-                splitDatabase(databaseFile, status == UpgradeState.ALREADY_AT_TARGET_VERSION)
+            if (preSplitStatus != UpgradeState.AHEAD_OF_TARGET_VERSION)
+                splitDatabase(databaseFile, preSplitStatus == UpgradeState.ALREADY_AT_TARGET_VERSION)
 
-            connection.createStatement().use { statement ->
+            val postSplitStatus = connection.createStatement().use { statement ->
                 // We only need to take a backup if it wasn't already done as part of the upgrade to the split database.
-                upgrade(databaseFile, statement, connection, type, postSplitChangeSets, status == UpgradeState.AHEAD_OF_TARGET_VERSION)
+                upgrade(databaseFile, statement, connection, type, postSplitChangeSets, preSplitStatus == UpgradeState.AHEAD_OF_TARGET_VERSION)
+
             }
+            connection.vacuumDatabase(postSplitStatus == UpgradeState.UPGRADED_TO_TARGET_VERSION)
 
             ConnectionResult(connection, tableVersion.SUPPORTED_VERSION)
         } catch (e: Exception) {
@@ -196,6 +199,7 @@ class UpgradeRunner @JvmOverloads constructor(
                 connection.createStatement().use { statement ->
                     upgrade(targetDatabaseFile, statement, connection, targetType, postSplitChangeSets, false)
                 }
+                connection.vacuumDatabase(true)
             }
     }
 
@@ -220,6 +224,11 @@ class UpgradeRunner @JvmOverloads constructor(
     private fun Path.replace(oldValue: String, newValue: String): Path =
         Path.of(toString().replace(oldValue, newValue))
 
+    private fun Connection.vacuumDatabase(shouldVacuum: Boolean) {
+        // Vacuum the database to reclaim unused space if requested.
+        if (shouldVacuum)
+            createStatement().use { it.executeUpdate("VACUUM") }
+    }
 
     /**
      * A connection to the database and its schema version number.

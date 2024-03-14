@@ -43,7 +43,7 @@ abstract class BaseCimReader(
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     // ###################
-    // # IEC61968 COMMON #
+    // # IEC61968 Common #
     // ###################
 
     /**
@@ -151,9 +151,9 @@ abstract class BaseCimReader(
         return loadIdentifiedObject(organisationRole, table, resultSet)
     }
 
-    // #################
-    // # IEC61970 CORE #
-    // #################
+    // ######################
+    // # IEC61970 Base Core #
+    // ######################
 
     /**
      * Populate the [IdentifiedObject] fields from [TableIdentifiedObjects].

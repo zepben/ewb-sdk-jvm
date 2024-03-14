@@ -9,10 +9,8 @@
 package com.zepben.evolve.database.sqlite.upgrade.changesets.diagram
 
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
-import org.hamcrest.MatcherAssert
-import org.hamcrest.MatcherAssert.*
-import org.hamcrest.Matchers
-import org.hamcrest.Matchers.*
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
 
 object ChangeSet52DiagramValidator : ChangeSetValidator {

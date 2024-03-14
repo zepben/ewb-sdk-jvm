@@ -40,12 +40,12 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteC
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TableBatteryUnits
-import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.wires.generation.production.TableEvChargingUnits
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnits
 import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.feeder.TableLvFeeders
+import com.zepben.evolve.database.sqlite.tables.iec61970.infiec61970.wires.generation.production.TableEvChargingUnits
 
 /**
  * The collection of tables for our network databases.

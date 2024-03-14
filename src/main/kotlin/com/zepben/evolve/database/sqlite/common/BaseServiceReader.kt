@@ -29,8 +29,8 @@ abstract class BaseServiceReader(
 
     final override fun load(): Boolean =
         //todo try reorder to name types after doLoad
-        loadEach<TableNameTypes>(reader::load)
-            .andDoLoad()
+        doLoad()
+            .andLoadEach<TableNameTypes>(reader::load)
             .andLoadEach<TableNames>(reader::load)
 
     /**
@@ -39,8 +39,5 @@ abstract class BaseServiceReader(
      * @return true if the objects were successfully loaded from the database, otherwise false
      */
     abstract fun doLoad(): Boolean
-
-    private fun Boolean.andDoLoad(): Boolean =
-        this and doLoad()
 
 }

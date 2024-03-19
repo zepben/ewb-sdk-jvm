@@ -36,6 +36,8 @@
     * `power_electronics_connection_phase` to `power_electronics_connection_phases`
     * `power_electronics_wind_unit` to `power_electronics_wind_units`
     * `transformer_star_impedance` to `transformer_star_impedances`
+* The `UpgradeRunner` is no longer used by the database readers. You must now call it directly if you want a database to upgrade. This change has been put in
+  place due to the splitting of the database.
 
 ### New Features
 

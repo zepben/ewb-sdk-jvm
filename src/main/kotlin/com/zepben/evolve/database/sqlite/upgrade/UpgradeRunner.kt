@@ -9,7 +9,6 @@
 package com.zepben.evolve.database.sqlite.upgrade
 
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
-import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.*
 import org.slf4j.Logger
@@ -63,20 +62,16 @@ class UpgradeRunner @JvmOverloads constructor(
             .getOrElse { throw UpgradeException(it.message, it) }
 
         return try {
-            val preSplitStatus = connection.createStatement().use { statement ->
-                upgrade(databaseFile, statement, connection, type, preSplitChangeSets, true)
-            }
+            val preSplitStatus = upgrade(databaseFile, connection, type, preSplitChangeSets, true)
 
             // This will copy the database file into the new split format. Remove it next time we set a new minimum version of the database.
             // Unless we are already past the split, split the database. Take a backup only if we haven't done so in upgrading to the split.
             if (preSplitStatus != UpgradeState.AHEAD_OF_TARGET_VERSION)
                 splitDatabase(databaseFile, preSplitStatus == UpgradeState.ALREADY_AT_TARGET_VERSION)
 
-            val postSplitStatus = connection.createStatement().use { statement ->
-                // We only need to take a backup if it wasn't already done as part of the upgrade to the split database.
-                upgrade(databaseFile, statement, connection, type, postSplitChangeSets, preSplitStatus == UpgradeState.AHEAD_OF_TARGET_VERSION)
+            // We only need to take a backup if it wasn't already done as part of the upgrade to the split database.
+            val postSplitStatus = upgrade(databaseFile, connection, type, postSplitChangeSets, preSplitStatus == UpgradeState.AHEAD_OF_TARGET_VERSION)
 
-            }
             connection.vacuumDatabase(postSplitStatus == UpgradeState.UPGRADED_TO_TARGET_VERSION)
 
             ConnectionResult(connection, tableVersion.SUPPORTED_VERSION)
@@ -96,22 +91,23 @@ class UpgradeRunner @JvmOverloads constructor(
     @Throws(SQLException::class, IOException::class, SecurityException::class)
     private fun upgrade(
         databaseFile: Path,
-        statement: Statement,
         connection: Connection,
         type: EwbDatabaseType,
         changeSets: List<ChangeSet>,
         backupRequired: Boolean
     ): UpgradeState =
-        tryRunUpgrade(getVersion(statement), changeSets.last().number) { databaseVersion ->
-            logger.info("Upgrading database '$databaseFile' from v$databaseVersion to v${changeSets.last().number}")
+        connection.createStatement().use { statement ->
+            tryRunUpgrade(tableVersion.getVersion(statement), changeSets.last().number) { databaseVersion ->
+                logger.info("Upgrading database '$databaseFile' from v$databaseVersion to v${changeSets.last().number}")
 
-            if (backupRequired)
-                copyFile(databaseFile, createBackupName(databaseFile, databaseVersion), StandardCopyOption.REPLACE_EXISTING)
+                if (backupRequired)
+                    copyFile(databaseFile, createBackupName(databaseFile, databaseVersion), StandardCopyOption.REPLACE_EXISTING)
 
-            connection.prepareStatement(tableVersion.preparedUpdateSql).use { versionUpdateStatement ->
-                changeSets.asSequence()
-                    .filter { databaseVersion < it.number }
-                    .forEach { runUpgrade(it, statement, versionUpdateStatement, type) }
+                connection.prepareStatement(tableVersion.preparedUpdateSql).use { versionUpdateStatement ->
+                    changeSets.asSequence()
+                        .filter { databaseVersion < it.number }
+                        .forEach { runUpgrade(it, statement, versionUpdateStatement, type) }
+                }
             }
         }
 
@@ -167,14 +163,6 @@ class UpgradeRunner @JvmOverloads constructor(
         versionUpdateStatement.executeUpdate()
     }
 
-    @Throws(SQLException::class)
-    private fun getVersion(statement: Statement): Int? =
-        runCatching {
-            statement.executeConfiguredQuery(tableVersion.selectSql).use { results ->
-                results.getInt(tableVersion.VERSION.queryIndex)
-            }
-        }.getOrNull()
-
     @Throws(SQLException::class, IOException::class, SecurityException::class)
     private fun splitDatabase(networkDatabaseFile: Path, requiresBackup: Boolean) {
         if (requiresBackup)
@@ -196,9 +184,7 @@ class UpgradeRunner @JvmOverloads constructor(
         runCatching { getConnection("jdbc:sqlite:$targetDatabaseFile").configureBatch() }
             .getOrElse { throw UpgradeException(it.message, it) }
             .use { connection ->
-                connection.createStatement().use { statement ->
-                    upgrade(targetDatabaseFile, statement, connection, targetType, postSplitChangeSets, false)
-                }
+                upgrade(targetDatabaseFile, connection, targetType, postSplitChangeSets, false)
                 connection.vacuumDatabase(true)
             }
     }

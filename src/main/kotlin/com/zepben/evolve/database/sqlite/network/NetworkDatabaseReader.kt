@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseReader
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionReader
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
+import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
 import com.zepben.evolve.services.common.extensions.nameAndMRID
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
@@ -25,6 +25,7 @@ import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import java.sql.Connection
+import java.sql.DriverManager
 import java.util.*
 
 /**
@@ -49,7 +50,8 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     createServiceReader: (Connection) -> NetworkServiceReader = { connection ->
         NetworkServiceReader(service, tables, connection)
     },
-    upgradeRunner: UpgradeRunner = UpgradeRunner(),
+    createConnection: (String) -> Connection = DriverManager::getConnection,
+    tableVersion: TableVersion = TableVersion(),
     private val setDirection: SetDirection = SetDirection(),
     private val setPhases: SetPhases = SetPhases(),
     private val phaseInferrer: PhaseInferrer = PhaseInferrer(),
@@ -60,8 +62,8 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     createMetadataReader,
     createServiceReader,
     service,
-    upgradeRunner,
-    EwbDatabaseType.NETWORK
+    createConnection,
+    tableVersion
 ) {
 
     override fun postLoad(): Boolean =

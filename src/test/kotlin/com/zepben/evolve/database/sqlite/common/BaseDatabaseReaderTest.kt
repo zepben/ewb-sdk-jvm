@@ -10,19 +10,14 @@ package com.zepben.evolve.database.sqlite.common
 
 import com.zepben.evolve.database.sqlite.tables.MissingTableConfigException
 import com.zepben.evolve.database.sqlite.tables.TableVersion
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
-import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
 import com.zepben.testutils.junit.SystemLogExtension
-import io.mockk.confirmVerified
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.nio.file.Paths
 import java.sql.Connection
+import java.sql.Statement
 
 internal class BaseDatabaseReaderTest {
 
@@ -32,17 +27,19 @@ internal class BaseDatabaseReaderTest {
 
     private val databaseFile = "databaseFile"
     private val metadataReader = mockk<MetadataCollectionReader>().also { every { it.load() } returns true }
-    private val databaseReader = mockk<BaseServiceReader>().also { every { it.load() } returns true }
+    private val serviceReader = mockk<BaseServiceReader>().also { every { it.load() } returns true }
 
-    private val connection = mockk<Connection>(relaxed = true)
-    private val connectionResult = mockk<UpgradeRunner.ConnectionResult>().also {
-        every { it.connection } returns connection
-        every { it.version } returns TableVersion().SUPPORTED_VERSION
+    private val statement = mockk<Statement> { justRun { close() } }
+    private val connection = mockk<Connection> {
+        every { createStatement() } returns statement
+        justRun { close() }
     }
-    private val upgradeRunner = mockk<UpgradeRunner>().also { every { it.connectAndUpgrade(any(), any(), any()) } returns connectionResult }
+    private val createConnection = mockk<(String) -> Connection>().also { every { it(any()) } returns connection }
 
-    private val databaseTables = mockk<BaseDatabaseTables>()
-    private val ewbDatabaseType = EwbDatabaseType.NETWORK
+    private val tableVersion = mockk<TableVersion> {
+        every { getVersion(any()) } returns 1
+        every { SUPPORTED_VERSION } returns 1
+    }
 
     private var postLoadResult = true
     private var postLoadCalled = false
@@ -50,10 +47,10 @@ internal class BaseDatabaseReaderTest {
     private val reader = object : BaseDatabaseReader(
         databaseFile,
         { metadataReader },
-        { databaseReader },
+        { serviceReader },
         mockk(), // Services won't be used as we have replaced the postLoad implementation. The real function is tested by each descendant class.
-        upgradeRunner,
-        ewbDatabaseType
+        createConnection,
+        tableVersion
     ) {
         override fun postLoad(): Boolean {
             postLoadCalled = true
@@ -62,39 +59,66 @@ internal class BaseDatabaseReaderTest {
     }
 
     @Test
-    internal fun load() {
+    internal fun `can load from valid database`() {
         assertThat("Should have loaded", reader.load())
 
-        verify(exactly = 1) { upgradeRunner.connectAndUpgrade("jdbc:sqlite:$databaseFile", Paths.get(databaseFile), ewbDatabaseType) }
-        verify(exactly = 1) { connectionResult.version }
-        verify(exactly = 1) { connectionResult.connection }
-        verifyLoad()
-        verify(exactly = 1) { connection.close() }
-        confirmVerified(connection, databaseTables)
+        verifyReadersCalled()
+        assertThat("postLoad should have been called", postLoadCalled)
     }
 
     @Test
     fun `can only run once`() {
-        assertThat("Should have loaded", reader.load())
-        assertThat("Should not have run a second time", !reader.load())
+        assertThat("Should have loaded the first time", reader.load())
+        assertThat("Shouldn't have loaded a second time", !reader.load())
+
         assertThat(systemErr.log, containsString("You can only use the database reader once."))
     }
 
     @Test
-    internal fun `detect invalid databases`() {
-        every { upgradeRunner.connectAndUpgrade(any(), any(), ewbDatabaseType) } throws UpgradeRunner.UpgradeException("Test Error")
+    internal fun `detect missing databases`() {
+        every { createConnection(any()) } throws Exception("Test Error")
 
         assertThat("Should not have loaded", !reader.load())
         assertThat(systemErr.log, containsString("Failed to connect to the database for reading: Test Error"))
 
-        verify(exactly = 1) { upgradeRunner.connectAndUpgrade("jdbc:sqlite:$databaseFile", Paths.get(databaseFile), ewbDatabaseType) }
-        verify(exactly = 0) { connectionResult.version }
-        verify(exactly = 0) { connectionResult.connection }
-        verify(exactly = 0) { metadataReader.load() }
-        verify(exactly = 0) { databaseReader.load() }
-        assertThat("postLoad should not have been called", !postLoadCalled)
-        verify(exactly = 0) { connection.close() }
-        confirmVerified(connection, databaseTables)
+        confirmVerified(connection, metadataReader, serviceReader)
+        assertThat("postLoad shouldn't have been called", !postLoadCalled)
+    }
+
+    @Test
+    internal fun `detect old databases`() {
+        every { tableVersion.getVersion(any()) } returns 0
+
+        assertThat("Should not have loaded", !reader.load())
+        assertThat(
+            systemErr.log,
+            containsString("Unable to load from database $databaseFile [found v0, expected v1]. Consider using the UpgradeRunner if you wish to support this database.")
+        )
+
+        verifyInvalidVersionCalls()
+    }
+
+    @Test
+    internal fun `detect future databases`() {
+        every { tableVersion.getVersion(any()) } returns 2
+
+        assertThat("Should not have loaded", !reader.load())
+        assertThat(
+            systemErr.log,
+            containsString("Unable to load from database $databaseFile [found v2, expected v1]. You need to use a newer version of the SDK to load this database.")
+        )
+
+        verifyInvalidVersionCalls()
+    }
+
+    @Test
+    internal fun `detect invalid databases`() {
+        every { tableVersion.getVersion(any()) } returns null
+
+        assertThat("Should not have loaded", !reader.load())
+        assertThat(systemErr.log, containsString("Failed to read the version number form the selected database. Are you sure it is a EWB database?"))
+
+        verifyInvalidVersionCalls()
     }
 
     @Test
@@ -103,16 +127,18 @@ internal class BaseDatabaseReaderTest {
 
         assertThat("Should not have loaded", !reader.load())
 
-        verifyLoad()
+        verifyReadersCalled()
+        assertThat("postLoad shouldn't have been called", !postLoadCalled)
     }
 
     @Test
     internal fun `detect reader failure`() {
-        every { databaseReader.load() } returns false
+        every { serviceReader.load() } returns false
 
         assertThat("Should not have loaded", !reader.load())
 
-        verifyLoad()
+        verifyReadersCalled()
+        assertThat("postLoad shouldn't have been called", !postLoadCalled)
     }
 
     @Test
@@ -121,22 +147,46 @@ internal class BaseDatabaseReaderTest {
 
         assertThat("Should not have loaded", !reader.load())
 
-        verifyLoad()
+        verifyReadersCalled()
+        assertThat("postLoad should have been called", postLoadCalled)
     }
 
     @Test
     internal fun `detect missing tables`() {
-        every { databaseReader.load() } throws MissingTableConfigException("Test Error")
+        every { serviceReader.load() } throws MissingTableConfigException("Test Error")
 
         assertThat("Should not have loaded", !reader.load())
 
         assertThat(systemErr.log, containsString("Unable to load database: Test Error"))
     }
 
-    private fun verifyLoad() {
-        verify(exactly = 1) { metadataReader.load() }
-        verify(exactly = 1) { databaseReader.load() }
-        assertThat("postLoad should have been called", postLoadCalled)
+    private fun verifyReadersCalled() {
+        verifySequence {
+            tableVersion.SUPPORTED_VERSION
+            createConnection("jdbc:sqlite:$databaseFile")
+            connection.createStatement()
+            tableVersion.getVersion(statement)
+            statement.close()
+
+            metadataReader.load()
+            serviceReader.load()
+
+            connection.close()
+        }
+    }
+
+    private fun verifyInvalidVersionCalls() {
+        verifySequence {
+            tableVersion.SUPPORTED_VERSION
+            createConnection(any())
+            connection.createStatement()
+            tableVersion.getVersion(statement)
+            statement.close()
+            connection.close()
+        }
+
+        confirmVerified(metadataReader, serviceReader)
+        assertThat("postLoad shouldn't have been called", !postLoadCalled)
     }
 
 }

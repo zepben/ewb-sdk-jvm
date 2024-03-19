@@ -9,21 +9,22 @@
 package com.zepben.evolve.database.sqlite.upgrade
 
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
-import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsString
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.IOException
 import java.nio.file.*
-import java.sql.*
+import java.sql.Connection
+import java.sql.PreparedStatement
+import java.sql.SQLException
+import java.sql.Statement
 
 internal class UpgradeRunnerTest {
 
@@ -34,17 +35,7 @@ internal class UpgradeRunnerTest {
     private var currentVersion = 0
     private var nextVersion = 0
 
-    private val rs = mockk<ResultSet> {
-        every { isClosed } returns false
-        justRun { fetchDirection = ResultSet.FETCH_FORWARD }
-        justRun { close() }
-
-        // Only thing we read is the database version.
-        every { next() } returns true
-        every { getInt(1) } answers { currentVersion }
-    }
     private val statement = mockk<Statement> {
-        every { executeQuery(any()) } returns rs
         // For database control commands that we run such as "BEGIN TRANSACTION", "COMMIT" etc.
         every { executeUpdate(any()) } returns 1
         justRun { close() }
@@ -79,7 +70,7 @@ internal class UpgradeRunnerTest {
     private val splitVersion = 49
     private val maxSupportedVersion = 52
 
-    // Pre-split change sets must be before (and including) splitVersion
+    // Pre-split changesets must be before (and including) splitVersion
     private val minChangeSet = changeSetOf(minSupportedVersion)
     private val preSplitChangeSet = changeSetOf(minSupportedVersion + 1)
     private val lastPreSplitChangeSet = changeSetOf(splitVersion)
@@ -92,12 +83,15 @@ internal class UpgradeRunnerTest {
     private val preSplitChangeSets = listOf(minChangeSet, preSplitChangeSet, lastPreSplitChangeSet)
     private val postSplitChangeSets = listOf(firstPostSplitChangeSet, postSplitChangeSet, maxChangeSet)
 
-    private val column = mockk<Column> { every { queryIndex } returns 1 }
+    private val versionColumn = mockk<Column> { every { queryIndex } returns 1 }
     private val tableVersion = mockk<TableVersion> {
         every { SUPPORTED_VERSION } returns maxSupportedVersion
-        every { VERSION } returns column
+        every { VERSION } returns versionColumn
         every { selectSql } returns "select version"
         every { preparedUpdateSql } returns "update statement"
+
+        // Don't use a `returns` here as we don't want to cache the value.
+        every { getVersion(any()) } answers { currentVersion }
     }
 
     private val upgradeRunner = UpgradeRunner(connectionProvider, copyFile, preSplitChangeSets, postSplitChangeSets, tableVersion)
@@ -124,7 +118,7 @@ internal class UpgradeRunnerTest {
     }
 
     @Test
-    internal fun `has change sets for each supported version in order`() {
+    internal fun `has changesets for each supported version in order`() {
         // Revert this test to the commented out version next time we set a new minimum version of the database.
 //        val actualChangeSets = UpgradeRunner().changeSets
 //
@@ -156,51 +150,33 @@ internal class UpgradeRunnerTest {
     }
 
     @Test
-    internal fun `runs each change set in transactions`() {
+    internal fun `runs each changeset in transactions`() {
+        val networkFile = "something-${EwbDatabaseType.NETWORK.fileDescriptor}.sqlite"
+        val databaseDescriptor = "driver:database:$networkFile"
         currentVersion = minSupportedVersion - 1
 
-        val connectionResult = upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-network-model.sqlite"), EwbDatabaseType.NETWORK)
+        val connectionResult = upgradeRunner.connectAndUpgrade(databaseDescriptor, Paths.get(networkFile), EwbDatabaseType.NETWORK)
 
-        assertThat(connectionResult.connection, equalTo(connection))
+        assertThat(connectionResult.connection, sameInstance(connection))
         assertThat(connectionResult.version, equalTo(maxSupportedVersion))
 
-        assertThat(systemErr.log, containsString("Upgrading database 'something-network-model.sqlite' from v${minSupportedVersion - 1} to v$splitVersion"))
+        verifySequence {
+            // Checks the minimum supported changeset number.
+            minChangeSet.number
 
-        verifyOrder {
-            // Takes a backup
-            copyFile(databaseOfType(EwbDatabaseType.NETWORK), databaseOfType(EwbDatabaseType.NETWORK, "-v${minSupportedVersion - 1}"), any())
-            tableVersion.preparedUpdateSql
+            validateConnectionToDatabase(EwbDatabaseType.NETWORK)
+            validatePreSplitChangesets()
 
-            // Runs the pre-split commands on the network database.
-            validateChangeSetExecuted(minChangeSet, minSupportedVersion)
-            validateChangeSetExecuted(preSplitChangeSet, minSupportedVersion + 1)
-            validateChangeSetExecuted(lastPreSplitChangeSet, splitVersion)
-
-            // Clones the database into the customer variant and runs the post-split commands.
-            copyFile(databaseOfType(EwbDatabaseType.NETWORK), databaseOfType(EwbDatabaseType.CUSTOMER), any())
-            assertThat(systemErr.log, containsString("Upgrading database 'something-customers.sqlite' from v$splitVersion to v${maxSupportedVersion}"))
-            tableVersion.preparedUpdateSql
-            validateChangeSetExecuted(firstPostSplitChangeSet, splitVersion + 1)
-            validateChangeSetExecuted(postSplitChangeSet, maxSupportedVersion - 1)
-            validateChangeSetExecuted(maxChangeSet, maxSupportedVersion)
-            connection.close()
-
-            // Clones the database into the diagram variant and runs the post-split commands.
-            copyFile(databaseOfType(EwbDatabaseType.NETWORK), databaseOfType(EwbDatabaseType.DIAGRAM), any())
-            assertThat(systemErr.log, containsString("Upgrading database 'something-diagrams.sqlite' from v$splitVersion to v${maxSupportedVersion}"))
-            tableVersion.preparedUpdateSql
-            validateChangeSetExecuted(firstPostSplitChangeSet, splitVersion + 1)
-            validateChangeSetExecuted(postSplitChangeSet, maxSupportedVersion - 1)
-            validateChangeSetExecuted(maxChangeSet, maxSupportedVersion)
-            connection.close()
+            // Clones the database into the customer and diagram variants and runs the post-split commands on them.
+            validateCloneAndUpgrade(EwbDatabaseType.CUSTOMER)
+            validateCloneAndUpgrade(EwbDatabaseType.DIAGRAM)
 
             // Continues to run the post-split commands on the network database.
-            assertThat(systemErr.log, containsString("Upgrading database 'something-network-model.sqlite' from v$splitVersion to v${maxSupportedVersion}"))
-            validateChangeSetExecuted(firstPostSplitChangeSet, splitVersion + 1)
-            validateChangeSetExecuted(postSplitChangeSet, maxSupportedVersion - 1)
-            validateChangeSetExecuted(maxChangeSet, maxSupportedVersion)
+            validatePostSplitChangesets(EwbDatabaseType.NETWORK)
+            validateVacuum()
 
-            statement.executeUpdate("VACUUM")
+            // Returns the upgraded version number
+            tableVersion.SUPPORTED_VERSION
         }
     }
 
@@ -223,7 +199,7 @@ internal class UpgradeRunnerTest {
     }
 
     @Test
-    internal fun `only runs change sets if required`() {
+    internal fun `only runs changesets if required`() {
         currentVersion = maxSupportedVersion - 1
 
         preSplitChangeSets.forEach { clearMocks(it, answers = false) }
@@ -275,8 +251,7 @@ internal class UpgradeRunnerTest {
                         "migrator."
                 )
 
-            verify(exactly = 1) { statement.executeConfiguredQuery("select version") }
-            verify(exactly = 0) { statement.executeQuery("SELECT major FROM version") }
+            verify(exactly = 1) { tableVersion.getVersion(any()) }
         }
     }
 
@@ -293,14 +268,14 @@ internal class UpgradeRunnerTest {
                         "version [v${maxSupportedVersion}]. Either update the version of the server you are using, or downgrade the migrator."
                 )
 
-            verify(exactly = 1) { statement.executeConfiguredQuery("select version") }
+            verify(exactly = 1) { tableVersion.getVersion(any()) }
         }
     }
 
     @Test
     internal fun `reports missing version numbers`() {
         mockkStatic("com.zepben.evolve.database.sqlite.extensions.StatementExtensionsKt") {
-            every { rs.getInt(1) } throws Exception()
+            every { tableVersion.getVersion(any()) } returns null
 
             expect {
                 upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
@@ -310,7 +285,7 @@ internal class UpgradeRunnerTest {
                         "ensure you only have databases in the EWB data directory that have been generated by a working migrator."
                 )
 
-            verify(exactly = 1) { statement.executeConfiguredQuery("select version") }
+            verify(exactly = 1) { tableVersion.getVersion(any()) }
         }
     }
 
@@ -403,7 +378,7 @@ internal class UpgradeRunnerTest {
     }
 
     @Test
-    internal fun `only runs change sets on appropriate database`() {
+    internal fun `only runs changesets on appropriate database`() {
         val custOnly = Change(listOf("c-1", "c-2"), setOf(EwbDatabaseType.CUSTOMER))
         val diagOnly = Change(listOf("d-1", "d-2"), setOf(EwbDatabaseType.DIAGRAM))
         val netOnly = Change(listOf("n-1", "n-2"), setOf(EwbDatabaseType.NETWORK))
@@ -417,24 +392,24 @@ internal class UpgradeRunnerTest {
         currentVersion = maxSupportedVersion - 1
 
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-customers.sqlite"), EwbDatabaseType.CUSTOMER)
-        verifySequence { validateChangesExecuted(listOf(custOnly, custDiag, custNet)) }
+        validateChangesExecuted(listOf(custOnly, custDiag, custNet))
 
         clearAllMocks(answers = false)
         currentVersion = maxSupportedVersion - 1
 
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-diagrams.sqlite"), EwbDatabaseType.DIAGRAM)
-        verifySequence { validateChangesExecuted(listOf(diagOnly, custDiag, diagNet)) }
+        validateChangesExecuted(listOf(diagOnly, custDiag, diagNet))
 
         clearAllMocks(answers = false)
         currentVersion = maxSupportedVersion - 1
 
         upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-network-model.sqlite"), EwbDatabaseType.NETWORK)
-        verifySequence { validateChangesExecuted(listOf(netOnly, custNet, diagNet)) }
+        validateChangesExecuted(listOf(netOnly, custNet, diagNet))
     }
 
     @Test
     internal fun `creates split database when upgrading for the split version`() {
-        // This test is here as the first implementation didn't run the split if none of the pre-split change sets were applied, even when the version
+        // This test is here as the first implementation didn't run the split if none of the pre-split changesets were applied, even when the version
         // required the split.
         currentVersion = splitVersion
 
@@ -454,12 +429,25 @@ internal class UpgradeRunnerTest {
         every { postCommandHooks } returns emptyList()
     }
 
-    private fun MockKVerificationScope.databaseOfType(type: EwbDatabaseType, extra: String = ""): Path =
-        match { it.toString().contains("${type.fileDescriptor}$extra.sqlite") }
+    private fun Path.databaseOfType(type: EwbDatabaseType, extra: String = ""): Boolean =
+        toString().databaseOfType(type, extra)
 
-    // NOTE: We pass the change set number instead of getting it off the ChangeSet to avoid using the mockk.
+    private fun String.databaseOfType(type: EwbDatabaseType, extra: String = ""): Boolean =
+        contains("${type.fileDescriptor}$extra.sqlite")
+
+    // NOTE: We pass the changeset number instead of getting it off the ChangeSet to avoid using the mockk.
     private fun validateChangeSetExecuted(changeSet: ChangeSet, changeSetNumber: Int) {
+        // Check if we need to run the changeset.
+        changeSet.number
+
+        // Log that we are running the changeset.
+        changeSet.number
+
+        // Turn off any foreign key processing to improve speed (even though we don't have any).
         statement.executeUpdate("PRAGMA foreign_keys=OFF")
+
+        // Run any pre-command hooks
+        changeSet.preCommandHooks
 
         // Check the commands were retrieved.
         changeSet.commands
@@ -468,42 +456,23 @@ internal class UpgradeRunnerTest {
         statement.executeUpdate("$changeSetNumber-1")
         statement.executeUpdate("$changeSetNumber-2")
 
+        // Run any post-command hooks
+        changeSet.postCommandHooks
+
+        // Update the version number in the database
+        changeSet.number
+        tableVersion.VERSION
+        versionColumn.queryIndex
         preparedStatement.setInt(1, changeSetNumber)
         preparedStatement.executeUpdate()
 
+        // Commit the transaction for this changeset.
         statement.executeUpdate("PRAGMA foreign_key_check")
         statement.executeUpdate("COMMIT")
+
+        // Start a new transaction for the next changeset, turning foreign keys back on to prevent issues in turning  them off.
         statement.executeUpdate("BEGIN TRANSACTION")
         statement.executeUpdate("PRAGMA foreign_keys=ON")
-    }
-
-    private fun validateChangesExecuted(changes: List<Change>) {
-        // All calls to statement before we get to the actual changes.
-        statement.executeUpdate("PRAGMA journal_mode = OFF")
-        statement.executeUpdate("PRAGMA synchronous = OFF")
-        statement.close()
-        statement.queryTimeout = 30
-        statement.fetchSize = 10000
-        statement.executeQuery("select version")
-        statement.close()
-        statement.queryTimeout = 30
-        statement.fetchSize = 10000
-        statement.executeQuery("select version")
-        statement.executeUpdate("PRAGMA foreign_keys=OFF")
-
-        // Confirm the changes were run in order.
-        changes.flatMap { it.commands }.forEach {
-            statement.executeUpdate(it)
-        }
-
-        // All calls to statement after the changes.
-        statement.executeUpdate("PRAGMA foreign_key_check")
-        statement.executeUpdate("COMMIT")
-        statement.executeUpdate("BEGIN TRANSACTION")
-        statement.executeUpdate("PRAGMA foreign_keys=ON")
-        statement.close()
-        statement.executeUpdate("VACUUM")
-        statement.close()
     }
 
     private fun upgradeRealFile(fileNameSource: String, type: EwbDatabaseType) {
@@ -512,6 +481,124 @@ internal class UpgradeRunnerTest {
         val databaseFile = Files.readString(Path.of("src", "test", "resources", fileNameSource)).trim().trim('"')
 
         UpgradeRunner().connectAndUpgrade("jdbc:sqlite:$databaseFile", Paths.get(databaseFile), type)
+    }
+
+    private fun MockKVerificationScope.validateConnectionToDatabase(targetType: EwbDatabaseType) {
+        // Connects to the new database.
+        connectionProvider(match { it.databaseOfType(targetType) })
+
+        // Configure batch processing on the connection.
+        connection.createStatement()
+        statement.executeUpdate("PRAGMA journal_mode = OFF")
+        statement.executeUpdate("PRAGMA synchronous = OFF")
+        statement.close()
+        connection.autoCommit = false
+    }
+
+    private fun MockKVerificationScope.validatePreSplitChangesets() {
+        validateUpdateRequiredChecks(EwbDatabaseType.NETWORK, lastPreSplitChangeSet, minSupportedVersion - 1, splitVersion)
+
+        // Take a backup
+        copyFile(
+            match { it.databaseOfType(EwbDatabaseType.NETWORK) },
+            match { it.databaseOfType(EwbDatabaseType.NETWORK, "-v${minSupportedVersion - 1}") },
+            any()
+        )
+
+        // Prepare the version update statement.
+        tableVersion.preparedUpdateSql
+        connection.prepareStatement("update statement")
+
+        // Runs the pre-split commands on the network database.
+        validateChangeSetExecuted(minChangeSet, minSupportedVersion)
+        validateChangeSetExecuted(preSplitChangeSet, minSupportedVersion + 1)
+        validateChangeSetExecuted(lastPreSplitChangeSet, splitVersion)
+
+        // Finished with the statements for the pre-split changes.
+        preparedStatement.close()
+        statement.close()
+    }
+
+    private fun MockKVerificationScope.validateCloneAndUpgrade(targetType: EwbDatabaseType) {
+        // Clones the network database.
+        copyFile(match { it.databaseOfType(EwbDatabaseType.NETWORK) }, match { it.databaseOfType(targetType) }, any())
+
+        validateConnectionToDatabase(targetType)
+        validatePostSplitChangesets(targetType)
+        validateVacuum()
+
+        // Closes the connection as we no longer need it.
+        connection.close()
+    }
+
+    private fun validatePostSplitChangesets(targetType: EwbDatabaseType) {
+        validateUpdateRequiredChecks(targetType, maxChangeSet, splitVersion, maxSupportedVersion)
+
+        // Prepare the version update statement.
+        tableVersion.preparedUpdateSql
+        connection.prepareStatement("update statement")
+
+        // Runs the post-split commands on the target database.
+        validateChangeSetExecuted(firstPostSplitChangeSet, splitVersion + 1)
+        validateChangeSetExecuted(postSplitChangeSet, maxSupportedVersion - 1)
+        validateChangeSetExecuted(maxChangeSet, maxSupportedVersion)
+
+        // Finished with the statements for the post-split changes.
+        preparedStatement.close()
+        statement.close()
+    }
+
+    private fun validateUpdateRequiredChecks(databaseType: EwbDatabaseType, targetChangeSet: ChangeSet, fromVersion: Int, toVersion: Int) {
+        // Create statement for pre-split changesets.
+        connection.createStatement()
+
+        // Check to see if we need to run any pre-split upgrades
+        tableVersion.getVersion(statement)
+        targetChangeSet.number
+
+        // Check the database is not past the maximum upgrade version
+        tableVersion.SUPPORTED_VERSION
+
+        // Get target version for logging
+        targetChangeSet.number
+        assertThat(
+            systemErr.log,
+            containsString("Upgrading database 'something-${databaseType.fileDescriptor}.sqlite' from v$fromVersion to v$toVersion")
+        )
+    }
+
+    private fun validateVacuum() {
+        connection.createStatement()
+        statement.executeUpdate("VACUUM")
+        statement.close()
+    }
+
+    private fun validateChangesExecuted(changes: List<Change>) {
+        //
+        // NOTE: We are only checking the statement as the connection interactions and version updates have been checked elsewhere.
+        //
+        verifySequence {
+            // All calls to statement and connection before we get to the actual changes.
+            statement.executeUpdate("PRAGMA journal_mode = OFF")
+            statement.executeUpdate("PRAGMA synchronous = OFF")
+            statement.close()
+            statement.close()
+            statement.executeUpdate("PRAGMA foreign_keys=OFF")
+
+            // Confirm the changes were run in order.
+            changes.flatMap { it.commands }.forEach {
+                statement.executeUpdate(it)
+            }
+
+            // All calls to statement after the changes.
+            statement.executeUpdate("PRAGMA foreign_key_check")
+            statement.executeUpdate("COMMIT")
+            statement.executeUpdate("BEGIN TRANSACTION")
+            statement.executeUpdate("PRAGMA foreign_keys=ON")
+            statement.close()
+            statement.executeUpdate("VACUUM")
+            statement.close()
+        }
     }
 
 }

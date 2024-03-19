@@ -10,11 +10,11 @@ package com.zepben.evolve.database.sqlite.diagram
 
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseReader
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionReader
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
-import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
+import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.diagram.DiagramService
 import java.sql.Connection
+import java.sql.DriverManager
 
 /**
  * A class for reading the [DiagramService] objects and [MetadataCollection] from our diagram database.
@@ -34,12 +34,13 @@ class DiagramDatabaseReader @JvmOverloads constructor(
     createServiceReader: (Connection) -> DiagramServiceReader = { connection ->
         DiagramServiceReader(service, tables, connection)
     },
-    upgradeRunner: UpgradeRunner = UpgradeRunner()
+    createConnection: (String) -> Connection = DriverManager::getConnection,
+    tableVersion: TableVersion = TableVersion()
 ) : BaseDatabaseReader(
     databaseFile,
     createMetadataReader,
     createServiceReader,
     service,
-    upgradeRunner,
-    EwbDatabaseType.DIAGRAM
+    createConnection,
+    tableVersion
 )

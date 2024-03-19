@@ -10,8 +10,6 @@ package com.zepben.evolve.database.sqlite.network
 
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionReader
 import com.zepben.evolve.database.sqlite.tables.TableVersion
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
-import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
@@ -27,8 +25,8 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.nio.file.Paths
 import java.sql.Connection
+import java.sql.Statement
 
 internal class NetworkDatabaseReaderTest {
 
@@ -42,12 +40,17 @@ internal class NetworkDatabaseReaderTest {
     private val metadataReader = mockk<MetadataCollectionReader>().also { every { it.load() } returns true }
     private val networkServiceReader = mockk<NetworkServiceReader>().also { every { it.load() } returns true }
 
-    private val connection = mockk<Connection> { justRun { close() } }
-    private val connectionResult = mockk<UpgradeRunner.ConnectionResult>().also {
-        every { it.connection } returns connection
-        every { it.version } returns TableVersion().SUPPORTED_VERSION
+    private val statement = mockk<Statement> { justRun { close() } }
+    private val connection = mockk<Connection> {
+        every { createStatement() } returns statement
+        justRun { close() }
     }
-    private val upgradeRunner = mockk<UpgradeRunner>().also { every { it.connectAndUpgrade(any(), any(), any()) } returns connectionResult }
+    private val createConnection = mockk<(String) -> Connection>().also { every { it(any()) } returns connection }
+
+    private val tableVersion = mockk<TableVersion> {
+        every { getVersion(any()) } returns 1
+        every { SUPPORTED_VERSION } returns 1
+    }
 
     private val setDirection = mockk<SetDirection> { justRun { run(service) } }
     private val setPhases = mockk<SetPhases> { justRun { run(service) } }
@@ -62,7 +65,8 @@ internal class NetworkDatabaseReaderTest {
         mockk(), // tables should not be used if we provide the rest of the parameters, so provide a mockk that will throw if used.
         { metadataReader },
         { networkServiceReader },
-        upgradeRunner,
+        createConnection,
+        tableVersion,
         setDirection,
         setPhases,
         phaseInferrer,
@@ -91,10 +95,16 @@ internal class NetworkDatabaseReaderTest {
         assertThat(systemErr.log, containsString("Equipment assigned to LV feeders."))
 
         verifySequence {
-            upgradeRunner.connectAndUpgrade(match { it.contains(databaseFile) }, Paths.get(databaseFile), EwbDatabaseType.NETWORK)
+            tableVersion.SUPPORTED_VERSION
+            createConnection(match { it.contains(databaseFile) })
+            connection.createStatement()
+            tableVersion.getVersion(statement)
+            statement.close()
+
             metadataReader.load()
             networkServiceReader.load()
             service.unresolvedReferences()
+
             setDirection.run(service)
             setPhases.run(service)
             phaseInferrer.run(service)

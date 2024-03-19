@@ -10,11 +10,11 @@ package com.zepben.evolve.database.sqlite.customer
 
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseReader
 import com.zepben.evolve.database.sqlite.common.MetadataCollectionReader
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
-import com.zepben.evolve.database.sqlite.upgrade.UpgradeRunner
+import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.customer.CustomerService
 import java.sql.Connection
+import java.sql.DriverManager
 
 /**
  * A class for reading the [CustomerService] objects and [MetadataCollection] from our customer database.
@@ -34,12 +34,13 @@ class CustomerDatabaseReader @JvmOverloads constructor(
     createServiceReader: (Connection) -> CustomerServiceReader = { connection ->
         CustomerServiceReader(service, tables, connection)
     },
-    upgradeRunner: UpgradeRunner = UpgradeRunner()
+    createConnection: (String) -> Connection = DriverManager::getConnection,
+    tableVersion: TableVersion = TableVersion()
 ) : BaseDatabaseReader(
     databaseFile,
     createMetadataReader,
     createServiceReader,
     service,
-    upgradeRunner,
-    EwbDatabaseType.CUSTOMER
+    createConnection,
+    tableVersion
 )

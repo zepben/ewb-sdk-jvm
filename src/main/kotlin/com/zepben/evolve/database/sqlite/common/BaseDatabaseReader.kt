@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.database.sqlite.common
 
-import com.zepben.evolve.database.sqlite.tables.MissingTableConfigException
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
@@ -20,26 +19,26 @@ import java.sql.Connection
 /**
  * A base class for reading objects from one of our databases.
  *
- * @property databaseFile the filename of the database to read.
- * @property createMetadataReader Callback to create the reader for the [MetadataCollection] included in this database using the provided connection.
- * @property createServiceReader Callback to create the reader for the [BaseService] supported by this database using the provided connection.
+ * @property connection The connection to the database.
+ * @property metadataReader The reader for the [MetadataCollection] included in the database.
+ * @property serviceReader The reader for the [BaseService] supported by the database.
  * @property service The [BaseService] that will be populated by the [BaseServiceReader]. Used for post-processing.
+ * @property databaseDescription The description of the database for logging (e.g. filename).
+ * @property tableVersion The version table object for checking the database version number.
  *
  * @property logger The [Logger] to use for this reader.
- * @property databaseDescriptor The JDBC descriptor for connecting to the database.
  */
 abstract class BaseDatabaseReader(
-    private val databaseFile: String,
-    private val createMetadataReader: (Connection) -> MetadataCollectionReader,
-    private val createServiceReader: (Connection) -> BaseServiceReader,
+    private val connection: Connection,
+    private val metadataReader: MetadataCollectionReader,
+    private val serviceReader: BaseServiceReader,
     protected open val service: BaseService,
-    private val createConnection: (String) -> Connection,
+    private val databaseDescription: String,
     private val tableVersion: TableVersion
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    private val databaseDescriptor: String = "jdbc:sqlite:$databaseFile"
     private var hasBeenUsed: Boolean = false
 
     private val supportedVersion = tableVersion.SUPPORTED_VERSION
@@ -63,54 +62,39 @@ abstract class BaseDatabaseReader(
     /**
      * Load the database.
      */
-    fun load(): Boolean {
-        if (hasBeenUsed) {
-            logger.error("You can only use the database reader once.")
-            return false
-        }
-        hasBeenUsed = true
-
-        return preLoad()?.use { connection ->
-            try {
-                // NOTE: We only want to post process if we correctly read from the database.
-                loadFromReaders(connection)
-                    && postLoad()
-            } catch (e: MissingTableConfigException) {
-                logger.error("Unable to load database: " + e.message)
-                false
-            }
-        } ?: false
-    }
-
-    private fun preLoad(): Connection? =
+    fun load(): Boolean =
         try {
-            val connection = createConnection(databaseDescriptor)
-            if (connection.checkVersion())
-                connection
-            else {
-                connection.close()
-                null
+            require(!hasBeenUsed) { "You can only use the database reader once." }
+            hasBeenUsed = true
+
+            preLoad()
+                && loadFromReaders()
+                && postLoad()
+        } catch (e: Exception) {
+            logger.error("Unable to load database: " + e.message)
+            false
+        }
+
+    private fun preLoad(): Boolean =
+        try {
+            connection.createStatement().use { statement ->
+                val version = tableVersion.getVersion(statement)
+                if (version == supportedVersion) {
+                    logger.info("Loading from database version v$version")
+                    true
+                } else {
+                    logger.error(formatVersionError(version))
+                    false
+                }
             }
         } catch (e: Exception) {
             logger.error("Failed to connect to the database for reading: " + e.message, e)
-            null
+            false
         }
 
-    private fun loadFromReaders(connection: Connection) =
-        createMetadataReader(connection).load() and
-            createServiceReader(connection).load()
-
-    private fun Connection.checkVersion(): Boolean =
-        createStatement().use { statement ->
-            val version = tableVersion.getVersion(statement)
-            if (version == supportedVersion) {
-                logger.info("Loading from database version v$version")
-                true
-            } else {
-                logger.error(formatVersionError(version))
-                false
-            }
-        }
+    private fun loadFromReaders() =
+        metadataReader.load() and
+            serviceReader.load()
 
     private fun formatVersionError(version: Int?): String =
         when {
@@ -121,6 +105,6 @@ abstract class BaseDatabaseReader(
 
 
     private fun unexpectedVersion(version: Int?, action: String) =
-        "Unable to load from database $databaseFile [found v$version, expected v$supportedVersion]. $action"
+        "Unable to load from database $databaseDescription [found v$version, expected v$supportedVersion]. $action"
 
 }

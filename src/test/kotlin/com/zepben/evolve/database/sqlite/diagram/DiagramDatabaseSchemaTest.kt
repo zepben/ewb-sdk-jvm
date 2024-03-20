@@ -20,7 +20,6 @@ import com.zepben.evolve.services.common.testdata.SchemaServices
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.diagram.DiagramServiceComparator
 import com.zepben.evolve.services.diagram.testdata.fillFields
-import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -33,6 +32,7 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.sql.DriverManager
 
 class DiagramDatabaseSchemaTest {
 
@@ -59,14 +59,16 @@ class DiagramDatabaseSchemaTest {
         systemErr.unmute()
 
         // Put the name of the database you want to load in src/test/resources/test-diagram-database.txt
-        val databaseFileName = Files.readString(Path.of("src", "test", "resources", "test-diagram-database.txt")).trim().trim('"')
+        val databaseFile = Files.readString(Path.of("src", "test", "resources", "test-diagram-database.txt")).trim().trim('"')
 
-        assertThat("database must exist", Files.exists(Paths.get(databaseFileName)))
+        assertThat("database must exist", Files.exists(Paths.get(databaseFile)))
 
         val metadata = MetadataCollection()
         val diagramService = DiagramService()
 
-        assertThat("Database should have loaded", DiagramDatabaseReader(databaseFileName, metadata, diagramService).load())
+        DriverManager.getConnection("jdbc:sqlite:$databaseFile").use { connection ->
+            assertThat("Database should have loaded", DiagramDatabaseReader(connection, metadata, diagramService, databaseFile).load())
+        }
 
         logger.info("Sleeping...")
         try {
@@ -101,15 +103,18 @@ class DiagramDatabaseSchemaTest {
             resolveOrDeferReference(Resolvers.diagram(DiagramObject("do1")), "diagram1")
         }
 
-        expect {
-            // We need to save the database to get a valid schema to read, even though there is no data to write.
-            DiagramDatabaseWriter(schemaTestFile, metadata, diagramService).save()
-            DiagramDatabaseReader(schemaTestFile, metadata, diagramService).load()
-        }.toThrow<IllegalStateException>()
-            .withMessage(
+        // We save the database to get a valid schema to read, even though there is no data to write.
+        DiagramDatabaseWriter(schemaTestFile, metadata, diagramService).save()
+
+        assertThat("Load should have failed", !readDatabase(metadata, diagramService))
+
+        assertThat(
+            systemErr.log,
+            containsString(
                 "Unresolved references found in diagram service after load - this should not occur. " +
                     "Failing reference was from DiagramObject do1 resolving Diagram diagram1"
             )
+        )
     }
 
     @Test
@@ -127,7 +132,7 @@ class DiagramDatabaseSchemaTest {
             error("Failed to save the schema test database.")
 
         systemErr.clearCapturedLog()
-        assertThat("read should have failed", !DiagramDatabaseReader(schemaTestFile, MetadataCollection(), readServices).load())
+        assertThat("read should have failed", !readDatabase(MetadataCollection(), readServices))
         assertThat(
             systemErr.log,
             containsString("Failed to load ${diagram.typeNameAndMRID()}. Unable to add to service '${readServices.name}': duplicate MRID")
@@ -145,7 +150,7 @@ class DiagramDatabaseSchemaTest {
         val diagramService = DiagramService()
         val metadata = MetadataCollection()
 
-        assertThat(" Database should have loaded", DiagramDatabaseReader(schemaTestFile, metadata, diagramService).load())
+        assertThat(" Database should have loaded", readDatabase(metadata, diagramService))
 
         validateMetadata(metadata, expectedMetadata)
         validateService(diagramService, expectedService) { DiagramServiceComparator() }
@@ -169,5 +174,10 @@ class DiagramDatabaseSchemaTest {
         assertThat("unexpected modifications", differences.modifications(), anEmptyMap())
         assertThat("objects missing from loaded service", differences.missingFromSource(), empty())
     }
+
+    private fun DiagramDatabaseSchemaTest.readDatabase(metadata: MetadataCollection, service: DiagramService): Boolean =
+        DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
+            DiagramDatabaseReader(connection, metadata, service, schemaTestFile).load()
+        }
 
 }

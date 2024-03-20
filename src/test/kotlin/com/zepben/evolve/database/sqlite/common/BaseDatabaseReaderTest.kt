@@ -34,7 +34,6 @@ internal class BaseDatabaseReaderTest {
         every { createStatement() } returns statement
         justRun { close() }
     }
-    private val createConnection = mockk<(String) -> Connection>().also { every { it(any()) } returns connection }
 
     private val tableVersion = mockk<TableVersion> {
         every { getVersion(any()) } returns 1
@@ -45,11 +44,11 @@ internal class BaseDatabaseReaderTest {
     private var postLoadCalled = false
 
     private val reader = object : BaseDatabaseReader(
-        databaseFile,
-        { metadataReader },
-        { serviceReader },
+        connection,
+        metadataReader,
+        serviceReader,
         mockk(), // Services won't be used as we have replaced the postLoad implementation. The real function is tested by each descendant class.
-        createConnection,
+        databaseFile,
         tableVersion
     ) {
         override fun postLoad(): Boolean {
@@ -76,11 +75,12 @@ internal class BaseDatabaseReaderTest {
 
     @Test
     internal fun `detect missing databases`() {
-        every { createConnection(any()) } throws Exception("Test Error")
+        every { connection.createStatement() } throws Exception("Test Error")
 
         assertThat("Should not have loaded", !reader.load())
         assertThat(systemErr.log, containsString("Failed to connect to the database for reading: Test Error"))
 
+        verify { connection.createStatement() }
         confirmVerified(connection, metadataReader, serviceReader)
         assertThat("postLoad shouldn't have been called", !postLoadCalled)
     }
@@ -163,26 +163,21 @@ internal class BaseDatabaseReaderTest {
     private fun verifyReadersCalled() {
         verifySequence {
             tableVersion.SUPPORTED_VERSION
-            createConnection("jdbc:sqlite:$databaseFile")
             connection.createStatement()
             tableVersion.getVersion(statement)
             statement.close()
 
             metadataReader.load()
             serviceReader.load()
-
-            connection.close()
         }
     }
 
     private fun verifyInvalidVersionCalls() {
         verifySequence {
             tableVersion.SUPPORTED_VERSION
-            createConnection(any())
             connection.createStatement()
             tableVersion.getVersion(statement)
             statement.close()
-            connection.close()
         }
 
         confirmVerified(metadataReader, serviceReader)

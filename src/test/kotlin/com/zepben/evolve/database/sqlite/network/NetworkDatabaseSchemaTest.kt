@@ -53,7 +53,6 @@ import com.zepben.evolve.services.network.NetworkServiceComparator
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetwork
 import com.zepben.evolve.services.network.tracing.Tracing
-import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -66,6 +65,7 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.sql.DriverManager
 
 class NetworkDatabaseSchemaTest {
 
@@ -92,14 +92,16 @@ class NetworkDatabaseSchemaTest {
         systemErr.unmute()
 
         // Put the name of the database you want to load in src/test/resources/test-network-database.txt
-        val databaseFileName = Files.readString(Path.of("src", "test", "resources", "test-network-database.txt")).trim().trim('"')
+        val databaseFile = Files.readString(Path.of("src", "test", "resources", "test-network-database.txt")).trim().trim('"')
 
-        assertThat("database must exist", Files.exists(Paths.get(databaseFileName)))
+        assertThat("database must exist", Files.exists(Paths.get(databaseFile)))
 
         val metadata = MetadataCollection()
         val networkService = NetworkService()
 
-        assertThat("Database should have loaded", NetworkDatabaseReader(databaseFileName, metadata, networkService).load())
+        DriverManager.getConnection("jdbc:sqlite:$databaseFile").use { connection ->
+            assertThat("Database should have loaded", NetworkDatabaseReader(connection, metadata, networkService, databaseFile).load())
+        }
 
         logger.info("Sleeping...")
         try {
@@ -250,14 +252,18 @@ class NetworkDatabaseSchemaTest {
             resolveOrDeferReference(Resolvers.regulatingControl(PowerElectronicsConnection("pec1")), "tcc")
         }
 
-        expect {
-            NetworkDatabaseWriter(schemaTestFile, metadata, networkService).save()
-            NetworkDatabaseReader(schemaTestFile, metadata, networkService).load()
-        }.toThrow<IllegalStateException>()
-            .withMessage(
+        // We save the database to get a valid schema to read, even though there is no data to write.
+        NetworkDatabaseWriter(schemaTestFile, metadata, networkService).save()
+
+        assertThat("Load should have failed", !readDatabase(metadata, networkService))
+
+        assertThat(
+            systemErr.log,
+            containsString(
                 "Unresolved references found in network service after load - this should not occur. " +
                     "Failing reference was from PowerElectronicsConnection pec1 resolving RegulatingControl tcc"
             )
+        )
     }
 
     @Test
@@ -275,7 +281,7 @@ class NetworkDatabaseSchemaTest {
             error("Failed to save the schema test database.")
 
         systemErr.clearCapturedLog()
-        assertThat("read should have failed", !NetworkDatabaseReader(schemaTestFile, MetadataCollection(), readServices).load())
+        assertThat("read should have failed", !readDatabase(MetadataCollection(), readServices))
         assertThat(
             systemErr.log,
             containsString("Failed to load ${junction.typeNameAndMRID()}. Unable to add to service '${readServices.name}': duplicate MRID")
@@ -293,7 +299,7 @@ class NetworkDatabaseSchemaTest {
         val networkService = NetworkService()
         val metadata = MetadataCollection()
 
-        assertThat(" Database should have loaded", NetworkDatabaseReader(schemaTestFile, metadata, networkService).load())
+        assertThat(" Database should have loaded", readDatabase(metadata, networkService))
 
         validateMetadata(metadata, expectedMetadata)
         validateService(networkService, expectedService) { NetworkServiceComparator() }
@@ -317,5 +323,10 @@ class NetworkDatabaseSchemaTest {
         assertThat("unexpected modifications", differences.modifications(), anEmptyMap())
         assertThat("objects missing from loaded network", differences.missingFromSource(), empty())
     }
+
+    private fun NetworkDatabaseSchemaTest.readDatabase(metadata: MetadataCollection, service: NetworkService): Boolean =
+        DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
+            NetworkDatabaseReader(connection, metadata, service, schemaTestFile).load()
+        }
 
 }

@@ -13,12 +13,18 @@ import com.zepben.evolve.services.network.testdata.LoopingNetwork
 import com.zepben.evolve.services.network.testdata.addFeederDirections
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.feeder.DirectionLogger
+import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.*
 
 internal class DownstreamTreeTest {
+
+    @JvmField
+    @RegisterExtension
+    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
     internal fun downstreamTreeTest() {

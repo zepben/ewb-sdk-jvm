@@ -14,33 +14,22 @@ import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.diagram.DiagramService
 import java.sql.Connection
-import java.sql.DriverManager
 
 /**
  * A class for reading the [DiagramService] objects and [MetadataCollection] from our diagram database.
  *
- * @param databaseFile The filename of the database to read.
+ * @param connection The connection to the database.
  * @param metadata The [MetadataCollection] to populate with metadata from the database.
  * @param service The [DiagramService] to populate with CIM objects from the database.
+ * @param databaseDescription The description of the database for logging (e.g. filename).
  */
 class DiagramDatabaseReader @JvmOverloads constructor(
-    databaseFile: String,
+    connection: Connection,
     metadata: MetadataCollection,
     override val service: DiagramService,
+    databaseDescription: String,
     tables: DiagramDatabaseTables = DiagramDatabaseTables(),
-    createMetadataReader: (Connection) -> MetadataCollectionReader = { connection ->
-        MetadataCollectionReader(metadata, tables, connection)
-    },
-    createServiceReader: (Connection) -> DiagramServiceReader = { connection ->
-        DiagramServiceReader(service, tables, connection)
-    },
-    createConnection: (String) -> Connection = DriverManager::getConnection,
+    metadataReader: MetadataCollectionReader = MetadataCollectionReader(metadata, tables, connection),
+    serviceReader: DiagramServiceReader = DiagramServiceReader(service, tables, connection),
     tableVersion: TableVersion = TableVersion()
-) : BaseDatabaseReader(
-    databaseFile,
-    createMetadataReader,
-    createServiceReader,
-    service,
-    createConnection,
-    tableVersion
-)
+) : BaseDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion)

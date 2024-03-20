@@ -59,13 +59,13 @@ internal class NetworkDatabaseReaderTest {
     private val assignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
 
     private val reader = NetworkDatabaseReader(
+        connection,
+        mockk(),
+        service, // Metadata is unused if we provide a metadataReader.
         databaseFile,
-        mockk(), // Metadata is unused if we provide a metadataReader.
-        service,
         mockk(), // tables should not be used if we provide the rest of the parameters, so provide a mockk that will throw if used.
-        { metadataReader },
-        { networkServiceReader },
-        createConnection,
+        metadataReader,
+        networkServiceReader,
         tableVersion,
         setDirection,
         setPhases,
@@ -96,7 +96,6 @@ internal class NetworkDatabaseReaderTest {
 
         verifySequence {
             tableVersion.SUPPORTED_VERSION
-            createConnection(match { it.contains(databaseFile) })
             connection.createStatement()
             tableVersion.getVersion(statement)
             statement.close()
@@ -110,7 +109,6 @@ internal class NetworkDatabaseReaderTest {
             phaseInferrer.run(service)
             assignToFeeders.run(service)
             assignToLvFeeders.run(service)
-            connection.close()
         }
     }
 

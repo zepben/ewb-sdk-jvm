@@ -47,13 +47,13 @@ internal class CustomerDatabaseReaderTest {
     }
 
     private val reader = CustomerDatabaseReader(
-        databaseFile,
+        connection,
         mockk(), // The metadata is unused if we provide a metadataReader.
         service,
+        databaseFile,
         mockk(), // tables should not be used if we provide the rest of the parameters, so provide a mockk that will throw if used.
-        { metadataReader },
-        { customerServiceReader },
-        createConnection,
+        metadataReader,
+        customerServiceReader,
         tableVersion
     )
 
@@ -67,7 +67,6 @@ internal class CustomerDatabaseReaderTest {
 
         verifySequence {
             tableVersion.SUPPORTED_VERSION
-            createConnection(match { it.contains(databaseFile) })
             connection.createStatement()
             tableVersion.getVersion(statement)
             statement.close()
@@ -75,7 +74,6 @@ internal class CustomerDatabaseReaderTest {
             metadataReader.load()
             customerServiceReader.load()
             service.unresolvedReferences()
-            connection.close()
         }
     }
 

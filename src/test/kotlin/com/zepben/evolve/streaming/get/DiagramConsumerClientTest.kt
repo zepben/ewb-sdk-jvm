@@ -50,7 +50,7 @@ internal class DiagramConsumerClientTest {
 
     @JvmField
     @RegisterExtension
-    var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
+    var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @JvmField
     @Rule

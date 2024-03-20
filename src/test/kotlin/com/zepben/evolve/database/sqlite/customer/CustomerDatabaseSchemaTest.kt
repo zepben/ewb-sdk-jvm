@@ -24,7 +24,6 @@ import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.customer.CustomerServiceComparator
 import com.zepben.evolve.services.customer.testdata.fillFields
-import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -37,6 +36,7 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.sql.DriverManager
 
 class CustomerDatabaseSchemaTest {
 
@@ -63,14 +63,16 @@ class CustomerDatabaseSchemaTest {
         systemErr.unmute()
 
         // Put the name of the database you want to load in src/test/resources/test-customer-database.txt
-        val databaseFileName = Files.readString(Path.of("src", "test", "resources", "test-customer-database.txt")).trim().trim('"')
+        val databaseFile = Files.readString(Path.of("src", "test", "resources", "test-customer-database.txt")).trim().trim('"')
 
-        assertThat("database must exist", Files.exists(Paths.get(databaseFileName)))
+        assertThat("database must exist", Files.exists(Paths.get(databaseFile)))
 
         val metadata = MetadataCollection()
         val customerService = CustomerService()
 
-        assertThat("Database should have loaded", CustomerDatabaseReader(databaseFileName, metadata, customerService).load())
+        DriverManager.getConnection("jdbc:sqlite:$databaseFile").use { connection ->
+            assertThat("Database should have loaded", CustomerDatabaseReader(connection, metadata, customerService, databaseFile).load())
+        }
 
         logger.info("Sleeping...")
         try {
@@ -111,14 +113,18 @@ class CustomerDatabaseSchemaTest {
             resolveOrDeferReference(Resolvers.tariffs(PricingStructure("ps1")), "tar1")
         }
 
-        expect {
-            CustomerDatabaseWriter(schemaTestFile, metadata, customerService).save()
-            CustomerDatabaseReader(schemaTestFile, metadata, customerService).load()
-        }.toThrow<IllegalStateException>()
-            .withMessage(
+        // We save the database to get a valid schema to read, even though there is no data to write.
+        CustomerDatabaseWriter(schemaTestFile, metadata, customerService).save()
+
+        assertThat("Load should have failed", !readDatabase(metadata, customerService))
+
+        assertThat(
+            systemErr.log,
+            containsString(
                 "Unresolved references found in customer service after load - this should not occur. " +
                     "Failing reference was from PricingStructure ps1 resolving Tariff tar1"
             )
+        )
     }
 
     @Test
@@ -136,7 +142,7 @@ class CustomerDatabaseSchemaTest {
             error("Failed to save the schema test database.")
 
         systemErr.clearCapturedLog()
-        assertThat("read should have failed", !CustomerDatabaseReader(schemaTestFile, MetadataCollection(), readServices).load())
+        assertThat("read should have failed", !readDatabase(MetadataCollection(), readServices))
         assertThat(
             systemErr.log,
             containsString("Failed to load ${customer.typeNameAndMRID()}. Unable to add to service '${readServices.name}': duplicate MRID")
@@ -154,7 +160,7 @@ class CustomerDatabaseSchemaTest {
         val customerService = CustomerService()
         val metadata = MetadataCollection()
 
-        assertThat(" Database should have loaded", CustomerDatabaseReader(schemaTestFile, metadata, customerService).load())
+        assertThat(" Database should have loaded", readDatabase(metadata, customerService))
 
         validateMetadata(metadata, expectedMetadata)
         validateService(customerService, expectedService) { CustomerServiceComparator() }
@@ -178,5 +184,10 @@ class CustomerDatabaseSchemaTest {
         assertThat("unexpected modifications", differences.modifications(), anEmptyMap())
         assertThat("objects missing from loaded service", differences.missingFromSource(), empty())
     }
+
+    private fun CustomerDatabaseSchemaTest.readDatabase(metadata: MetadataCollection, service: CustomerService): Boolean =
+        DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
+            CustomerDatabaseReader(connection, metadata, service, schemaTestFile).load()
+        }
 
 }

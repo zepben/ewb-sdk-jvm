@@ -25,7 +25,6 @@ import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import java.sql.Connection
-import java.sql.DriverManager
 import java.util.*
 
 /**
@@ -35,36 +34,26 @@ import java.util.*
  *   and will create the other databases as part of the upgrade. This warning can be removed once we set a new minimum version of the database and
  *   remove the split database logic - Check [UpgradeRunner] to see if this is still required.
  *
- * @param databaseFile The filename of the database to read.
+ * @param connection The connection to the database.
  * @param metadata The [MetadataCollection] to populate with metadata from the database.
  * @param service The [NetworkService] to populate with CIM objects from the database.
+ * @param databaseDescription The description of the database for logging (e.g. filename).
  */
 class NetworkDatabaseReader @JvmOverloads constructor(
-    databaseFile: String,
+    connection: Connection,
     metadata: MetadataCollection,
     override val service: NetworkService,
+    databaseDescription: String,
     tables: NetworkDatabaseTables = NetworkDatabaseTables(),
-    createMetadataReader: (Connection) -> MetadataCollectionReader = { connection ->
-        MetadataCollectionReader(metadata, tables, connection)
-    },
-    createServiceReader: (Connection) -> NetworkServiceReader = { connection ->
-        NetworkServiceReader(service, tables, connection)
-    },
-    createConnection: (String) -> Connection = DriverManager::getConnection,
+    metadataReader: MetadataCollectionReader = MetadataCollectionReader(metadata, tables, connection),
+    serviceReader: NetworkServiceReader = NetworkServiceReader(service, tables, connection),
     tableVersion: TableVersion = TableVersion(),
     private val setDirection: SetDirection = SetDirection(),
     private val setPhases: SetPhases = SetPhases(),
     private val phaseInferrer: PhaseInferrer = PhaseInferrer(),
     private val assignToFeeders: AssignToFeeders = AssignToFeeders(),
     private val assignToLvFeeders: AssignToLvFeeders = AssignToLvFeeders()
-) : BaseDatabaseReader(
-    databaseFile,
-    createMetadataReader,
-    createServiceReader,
-    service,
-    createConnection,
-    tableVersion
-) {
+) : BaseDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion) {
 
     override fun postLoad(): Boolean =
         super.postLoad().also {

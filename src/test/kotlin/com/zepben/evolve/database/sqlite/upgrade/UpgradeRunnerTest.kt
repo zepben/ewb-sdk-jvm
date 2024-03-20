@@ -569,6 +569,7 @@ internal class UpgradeRunnerTest {
 
     private fun validateVacuum() {
         connection.createStatement()
+        statement.executeUpdate("COMMIT")
         statement.executeUpdate("VACUUM")
         statement.close()
     }
@@ -596,6 +597,7 @@ internal class UpgradeRunnerTest {
             statement.executeUpdate("BEGIN TRANSACTION")
             statement.executeUpdate("PRAGMA foreign_keys=ON")
             statement.close()
+            statement.executeUpdate("COMMIT")
             statement.executeUpdate("VACUUM")
             statement.close()
         }

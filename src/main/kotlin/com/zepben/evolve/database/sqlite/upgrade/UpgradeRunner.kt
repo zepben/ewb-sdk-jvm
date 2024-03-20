@@ -213,7 +213,10 @@ class UpgradeRunner @JvmOverloads constructor(
     private fun Connection.vacuumDatabase(shouldVacuum: Boolean) {
         // Vacuum the database to reclaim unused space if requested.
         if (shouldVacuum)
-            createStatement().use { it.executeUpdate("VACUUM") }
+            createStatement().use {
+                it.executeUpdate("COMMIT")
+                it.executeUpdate("VACUUM")
+            }
     }
 
     /**

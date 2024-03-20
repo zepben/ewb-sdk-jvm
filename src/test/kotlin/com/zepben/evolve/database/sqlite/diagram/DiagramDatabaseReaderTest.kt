@@ -39,7 +39,6 @@ internal class DiagramDatabaseReaderTest {
         every { createStatement() } returns statement
         justRun { close() }
     }
-    private val createConnection = mockk<(String) -> Connection>().also { every { it(any()) } returns connection }
 
     private val tableVersion = mockk<TableVersion> {
         every { getVersion(any()) } returns 1

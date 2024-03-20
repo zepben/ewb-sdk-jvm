@@ -36,7 +36,7 @@ class TableVersion : SqliteTable() {
     fun getVersion(statement: Statement): Int? =
         runCatching {
             statement.executeConfiguredQuery(selectSql).use { results ->
-                results.next() // todo needed? it wasn't here originally so how did that work?
+                results.next()
                 results.getInt(VERSION.queryIndex)
             }
         }.getOrNull()

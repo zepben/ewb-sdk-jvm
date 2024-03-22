@@ -8,20 +8,37 @@
 
 package com.zepben.evolve.database.sqlite.tables
 
+import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import java.sql.SQLException
+import java.sql.Statement
 
+/**
+ * Code representation of the `version` table.
+ *
+ * @property SUPPORTED_VERSION The supported schema version.
+ *
+ * @property VERSION Column definition.
+ */
 @Suppress("PropertyName")
 class TableVersion : SqliteTable() {
 
-    val SUPPORTED_VERSION: Int = 49
+    val SUPPORTED_VERSION: Int = 52
 
     val VERSION: Column = Column(++columnIndex, "version", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "version"
-    }
+    override val name: String = "version"
 
-    override val tableClass: Class<TableVersion> = this.javaClass
-    override val tableClassInstance: TableVersion = this
+    /**
+     * Helper function to read the version from the database.
+     */
+    @Throws(SQLException::class)
+    fun getVersion(statement: Statement): Int? =
+        runCatching {
+            statement.executeConfiguredQuery(selectSql).use { results ->
+                results.next()
+                results.getInt(VERSION.queryIndex)
+            }
+        }.getOrNull()
 
 }

@@ -18,11 +18,6 @@ class TableRelayInfo : TableAssetInfo() {
     val CURVE_SETTING: Column = Column(++columnIndex, "curve_setting", "TEXT", NULL)
     val RECLOSE_FAST: Column = Column(++columnIndex, "reclose_fast", "BOOLEAN", NULL)
 
-    override fun name(): String {
-        return "relay_info"
-    }
-
-    override val tableClass: Class<TableRelayInfo> = this.javaClass
-    override val tableClassInstance: TableRelayInfo = this
+    override val name: String = "relay_info"
 
 }

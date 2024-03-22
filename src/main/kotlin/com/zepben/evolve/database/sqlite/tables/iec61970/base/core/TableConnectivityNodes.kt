@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.core
 
 class TableConnectivityNodes : TableIdentifiedObjects() {
 
-    override fun name(): String {
-        return "connectivity_nodes"
-    }
-
-    override val tableClass: Class<TableConnectivityNodes> = this.javaClass
-    override val tableClassInstance: TableConnectivityNodes = this
+    override val name: String = "connectivity_nodes"
 
 }

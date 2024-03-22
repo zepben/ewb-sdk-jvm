@@ -16,8 +16,8 @@ import com.zepben.evolve.streaming.grpc.GrpcResult
 import com.zepben.protobuf.metadata.GetMetadataRequest
 import com.zepben.protobuf.metadata.GetMetadataResponse
 import io.mockk.*
-import org.hamcrest.Matchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
@@ -26,7 +26,7 @@ internal class TestCimConsumerClient {
     private val baseConsumerClient = mockk<CimConsumerClient<BaseService, BaseProtoToCim>>()
 
     @Test
-    internal fun `getMetaData returns non-cached response, and caches it`() {
+    internal fun `getMetadata returns non-cached response, and caches it`() {
         val metadataResponse = GetMetadataResponse.newBuilder().apply {
             serviceInfoBuilder.apply {
                 title = "test title"
@@ -87,7 +87,7 @@ internal class TestCimConsumerClient {
     }
 
     @Test
-    internal fun `getMetaData returns cached response`() {
+    internal fun `getMetadata returns cached response`() {
         val uncachedServiceInfo = mockk<ServiceInfo>()
 
         val cachedResponse = PBServiceInfo.newBuilder().apply {

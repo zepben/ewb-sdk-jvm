@@ -231,16 +231,19 @@ internal class PowerTransformerEndTest {
     @Test
     internal fun `ratedS setter coverage`() {
         val pte = PowerTransformerEnd()
+        @Suppress("DEPRECATION")
         pte.ratedS = 10
         assertThat(pte.ratedS, equalTo(10))
         assertThat(pte.numRatings(), equalTo(1))
         assertThat(pte.sRatings.first().ratedS, equalTo(10))
 
+        @Suppress("DEPRECATION")
         pte.ratedS = 20
         assertThat(pte.ratedS, equalTo(20))
         assertThat(pte.numRatings(), equalTo(1))
         assertThat(pte.sRatings.first().ratedS, equalTo(20))
 
+        @Suppress("DEPRECATION")
         pte.ratedS = null
         assertThat(pte.ratedS, nullValue())
         assertThat(pte.numRatings(), equalTo(0))

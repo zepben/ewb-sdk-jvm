@@ -16,11 +16,6 @@ class TableBreakers : TableProtectedSwitches() {
 
     val IN_TRANSIT_TIME: Column = Column(++columnIndex, "in_transit_time", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "breakers"
-    }
-
-    override val tableClass: Class<TableBreakers> = this.javaClass
-    override val tableClassInstance: TableBreakers = this
+    override val name: String = "breakers"
 
 }

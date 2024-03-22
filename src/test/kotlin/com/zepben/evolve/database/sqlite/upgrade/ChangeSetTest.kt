@@ -9,7 +9,17 @@
 package com.zepben.evolve.database.sqlite.upgrade
 
 import com.zepben.evolve.database.sqlite.tables.TableVersion
-import com.zepben.evolve.database.sqlite.upgrade.changesets.*
+import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.combined.*
+import com.zepben.evolve.database.sqlite.upgrade.changesets.customer.ChangeSet50CustomerValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.customer.ChangeSet51CustomerValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.customer.ChangeSet52CustomerValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.diagram.ChangeSet50DiagramValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.diagram.ChangeSet51DiagramValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.diagram.ChangeSet52DiagramValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.network.ChangeSet50NetworkValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.network.ChangeSet51NetworkValidator
+import com.zepben.evolve.database.sqlite.upgrade.changesets.network.ChangeSet52NetworkValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -28,7 +38,7 @@ internal class ChangeSetTest {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private val changeSetValidators = mapOf(
+    private val preSplitChangeSetValidators = mapOf(
         44 to ChangeSet44Validator,
         45 to ChangeSet45Validator,
         46 to ChangeSet46Validator,
@@ -37,18 +47,70 @@ internal class ChangeSetTest {
         49 to ChangeSet49Validator
     )
 
+    private val customerChangeSetValidators = mapOf(
+        50 to ChangeSet50CustomerValidator,
+        51 to ChangeSet51CustomerValidator,
+        52 to ChangeSet52CustomerValidator
+    )
+
+    private val diagramChangeSetValidators = mapOf(
+        50 to ChangeSet50DiagramValidator,
+        51 to ChangeSet51DiagramValidator,
+        52 to ChangeSet52DiagramValidator
+    )
+
+    private val networkChangeSetValidators = mapOf(
+        50 to ChangeSet50NetworkValidator,
+        51 to ChangeSet51NetworkValidator,
+        52 to ChangeSet52NetworkValidator
+    )
+
     @Test
     internal fun `test change sets`() {
-        val conn = createBaseDB()
+        // All pre-split change sets are for the network database, as that is the only database that existed.
+        validateChangeSets(createBaseCombinedDB(), preSplitChangeSetValidators, UpgradeRunner::preSplitChangeSets, EwbDatabaseType.NETWORK)
+
+        validateChangeSets(createBaseDB(EwbDatabaseType.CUSTOMER), customerChangeSetValidators, UpgradeRunner::postSplitChangeSets, EwbDatabaseType.CUSTOMER)
+        validateChangeSets(createBaseDB(EwbDatabaseType.DIAGRAM), diagramChangeSetValidators, UpgradeRunner::postSplitChangeSets, EwbDatabaseType.DIAGRAM)
+        validateChangeSets(createBaseDB(EwbDatabaseType.NETWORK), networkChangeSetValidators, UpgradeRunner::postSplitChangeSets, EwbDatabaseType.NETWORK)
+    }
+
+    /**
+     * Creates an in memory sqlite database using the base combined schema (from version 43).
+     */
+    private fun createBaseCombinedDB(): Connection =
+        createDatabaseFromScript("src/test/data/base-schema.sql")
+
+    /**
+     * Creates an in memory sqlite database using the base network schema (from version 49).
+     */
+    private fun createBaseDB(type: EwbDatabaseType): Connection =
+        createDatabaseFromScript("src/test/data/base-${type.fileDescriptor}-schema.sql")
+
+    private fun createDatabaseFromScript(script: String): Connection =
+        getConnection("jdbc:sqlite::memory:").apply {
+            createStatement().use { statement ->
+                File(script).readLines().forEach {
+                    statement.executeUpdate(it)
+                }
+            }
+        }
+
+    private fun validateChangeSets(
+        conn: Connection,
+        changeSetValidators: Map<Int, ChangeSetValidator>,
+        changesSets: UpgradeRunner.() -> List<ChangeSet>,
+        type: EwbDatabaseType
+    ) {
         val runner = UpgradeRunner()
         val tableVersion = TableVersion()
 
         conn.createStatement().use { stmt ->
-            conn.prepareStatement(tableVersion.preparedUpdateSql()).use { versionUpdateStatement ->
-                runner.changeSets.forEach { cs ->
+            conn.prepareStatement(tableVersion.preparedUpdateSql).use { versionUpdateStatement ->
+                runner.changesSets().forEach { cs ->
 
                     val validator = changeSetValidators[cs.number]
-                        ?: throw IllegalStateException("Validator for ${cs.number} missing. Have you added a ChangeSetValidator for your latest model update?")
+                        ?: throw IllegalStateException("Validator for change set ${cs.number} is missing. Have you added a ChangeSetValidator for your latest model update?")
 
                     logger.info("Preparing for update ${cs.number}.")
                     validator.setUpStatements().forEach {
@@ -57,7 +119,7 @@ internal class ChangeSetTest {
 
                     stmt.executeUpdate("BEGIN TRANSACTION")
                     stmt.executeUpdate("PRAGMA foreign_keys=ON")
-                    runner.runUpgrade(cs, stmt, versionUpdateStatement)
+                    runner.runUpgrade(cs, stmt, versionUpdateStatement, type)
 
                     logger.info("Populating after update ${cs.number}.")
                     validator.populateStatements().forEach {
@@ -80,21 +142,6 @@ internal class ChangeSetTest {
                 }
             }
         }
-    }
-
-    /**
-     * Creates an in memory sqlite database using the base schema (from version 43).
-     */
-    private fun createBaseDB(): Connection {
-        val f = File("src/test/data/base-schema.sql")
-        val lines = f.readLines()
-        val conn = getConnection("jdbc:sqlite::memory:")
-        conn.createStatement().use { statement ->
-            lines.forEach {
-                statement.executeUpdate(it)
-            }
-        }
-        return conn
     }
 
 }

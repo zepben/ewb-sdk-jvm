@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.meas
 
 class TableDiscretes : TableMeasurements() {
 
-    override fun name(): String {
-        return "discretes"
-    }
-
-    override val tableClass: Class<TableDiscretes> = this.javaClass
-    override val tableClassInstance: TableDiscretes = this
+    override val name: String = "discretes"
 
 }

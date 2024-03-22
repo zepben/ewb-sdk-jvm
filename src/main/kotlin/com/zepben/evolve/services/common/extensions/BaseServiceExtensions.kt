@@ -10,8 +10,8 @@ package com.zepben.evolve.services.common.extensions
 
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.NameType
-import com.zepben.evolve.database.sqlite.readers.MRIDLookupException
-import com.zepben.evolve.database.sqlite.readers.NameTypeLookupException
+import com.zepben.evolve.database.sqlite.common.MRIDLookupException
+import com.zepben.evolve.database.sqlite.common.NameTypeLookupException
 import com.zepben.evolve.services.common.BaseService
 
 

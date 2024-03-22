@@ -17,19 +17,11 @@ class TableRatioTapChangers : TableTapChangers() {
     val TRANSFORMER_END_MRID: Column = Column(++columnIndex, "transformer_end_mrid", "TEXT", NULL)
     val STEP_VOLTAGE_INCREMENT: Column = Column(++columnIndex, "step_voltage_increment", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "ratio_tap_changers"
-    }
+    override val name: String = "ratio_tap_changers"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
-
-        cols.add(listOf(TRANSFORMER_END_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableRatioTapChangers> = this.javaClass
-    override val tableClassInstance: TableRatioTapChangers = this
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(TRANSFORMER_END_MRID))
+        }
 
 }

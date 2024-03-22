@@ -12,11 +12,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.assets.TableAssetInfo
 
 class TablePowerTransformerInfo : TableAssetInfo() {
 
-    override fun name(): String {
-        return "power_transformer_info"
-    }
-
-    override val tableClass: Class<TablePowerTransformerInfo> = this.javaClass
-    override val tableClassInstance: TablePowerTransformerInfo = this
+    override val name: String = "power_transformer_info"
 
 }

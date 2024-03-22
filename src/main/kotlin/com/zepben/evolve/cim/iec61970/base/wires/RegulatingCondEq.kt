@@ -11,6 +11,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 /**
  * A type of conducting equipment that can regulate a quantity (i.e. voltage or flow) at a specific point in the network.
  * @property controlEnabled Specifies the regulation status of the equipment.  True is regulating, false is not regulating.
+ * @property regulatingControl The [RegulatingControl] associated with this [RegulatingCondEq]
  */
 abstract class RegulatingCondEq(mRID: String = "") : EnergyConnection(mRID) {
 

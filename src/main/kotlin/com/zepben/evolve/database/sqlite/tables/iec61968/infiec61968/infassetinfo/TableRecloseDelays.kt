@@ -19,31 +19,19 @@ class TableRecloseDelays : SqliteTable() {
     val RECLOSE_DELAY: Column = Column(++columnIndex, "reclose_delay", "NUMBER", NOT_NULL)
     val SEQUENCE_NUMBER: Column = Column(++columnIndex, "sequence_number", "INTEGER", NOT_NULL)
 
-    override fun name(): String {
-        return "reclose_delays"
-    }
+    override val name: String = "reclose_delays"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(RELAY_INFO_MRID, SEQUENCE_NUMBER))
+        }
 
-        cols.add(listOf(RELAY_INFO_MRID, SEQUENCE_NUMBER))
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(RELAY_INFO_MRID))
+        }
 
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(RELAY_INFO_MRID))
-
-        return cols
-    }
-
-    override fun selectSql(): String {
-        return "${super.selectSql()} ORDER BY relay_info_mrid, sequence_number ASC;"
-    }
-
-    override val tableClass: Class<TableRecloseDelays> = this.javaClass
-    override val tableClassInstance: TableRecloseDelays = this
+    override val selectSql: String =
+        "${super.selectSql} ORDER BY relay_info_mrid, sequence_number ASC;"
 
 }

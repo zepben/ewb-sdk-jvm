@@ -17,11 +17,6 @@ class TableProtectionRelaySystems : TableEquipment() {
 
     val PROTECTION_KIND: Column = Column(++columnIndex, "protection_kind", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "protection_relay_systems"
-    }
-
-    override val tableClass: Class<TableProtectionRelaySystems> = this.javaClass
-    override val tableClassInstance: TableProtectionRelaySystems = this
+    override val name: String = "protection_relay_systems"
 
 }

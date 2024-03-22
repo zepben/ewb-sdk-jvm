@@ -17,11 +17,6 @@ class TableMetadataDataSources : SqliteTable() {
     val VERSION: Column = Column(++columnIndex, "version", "TEXT", NOT_NULL)
     val TIMESTAMP: Column = Column(++columnIndex, "timestamp", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "metadata_data_sources"
-    }
-
-    override val tableClass: Class<TableMetadataDataSources> = this.javaClass
-    override val tableClassInstance: TableMetadataDataSources = this
+    override val name: String = "metadata_data_sources"
 
 }

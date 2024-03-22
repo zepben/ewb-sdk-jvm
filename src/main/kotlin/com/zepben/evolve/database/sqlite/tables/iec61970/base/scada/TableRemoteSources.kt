@@ -16,11 +16,6 @@ class TableRemoteSources : TableRemotePoints() {
 
     val MEASUREMENT_MRID: Column = Column(++columnIndex, "measurement_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "remote_sources"
-    }
-
-    override val tableClass: Class<TableRemoteSources> = this.javaClass
-    override val tableClassInstance: TableRemoteSources = this
+    override val name: String = "remote_sources"
 
 }

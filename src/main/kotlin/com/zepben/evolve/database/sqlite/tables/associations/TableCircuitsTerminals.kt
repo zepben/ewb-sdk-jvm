@@ -18,28 +18,17 @@ class TableCircuitsTerminals : SqliteTable() {
     val CIRCUIT_MRID: Column = Column(++columnIndex, "circuit_mrid", "TEXT", NOT_NULL)
     val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "circuits_terminals"
-    }
+    override val name: String = "circuits_terminals"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(CIRCUIT_MRID, TERMINAL_MRID))
+        }
 
-        cols.add(listOf(CIRCUIT_MRID, TERMINAL_MRID))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(CIRCUIT_MRID))
-        cols.add(listOf(TERMINAL_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableCircuitsTerminals> = this.javaClass
-    override val tableClassInstance: TableCircuitsTerminals = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(CIRCUIT_MRID))
+            add(listOf(TERMINAL_MRID))
+        }
 
 }

@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.core
 
 class TableGeographicalRegions : TableIdentifiedObjects() {
 
-    override fun name(): String {
-        return "geographical_regions"
-    }
-
-    override val tableClass: Class<TableGeographicalRegions> = this.javaClass
-    override val tableClassInstance: TableGeographicalRegions = this
+    override val name: String = "geographical_regions"
 
 }

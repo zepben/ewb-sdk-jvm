@@ -36,7 +36,10 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
-import com.zepben.evolve.services.common.*
+import com.zepben.evolve.services.common.BaseServiceComparator
+import com.zepben.evolve.services.common.ObjectDifference
+import com.zepben.evolve.services.common.ValueDifference
+import com.zepben.evolve.services.common.compareValues
 
 /**
  * @param options Indicates which optional checks to perform
@@ -917,6 +920,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareEnergyConnection()
 
             compareValues(RegulatingCondEq::controlEnabled)
+            compareIdReferences(RegulatingCondEq::regulatingControl)
         }
 
     private fun ObjectDifference<out RegulatingControl>.compareRegulatingControl(): ObjectDifference<out RegulatingControl> =
@@ -1020,13 +1024,6 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(TransformerStarImpedance::transformerEndInfo)
         }
 
-    /************ IEC61970 INFIEC61970 BASE WIRES GENERATION PRODUCTION ************/
-
-    private fun compareEvChargingUnit(source: EvChargingUnit, target: EvChargingUnit): ObjectDifference<EvChargingUnit> =
-        ObjectDifference(source, target).apply {
-            comparePowerElectronicsUnit()
-        }
-
     /************ IEC61970 InfIEC61970 Feeder ************/
 
     private fun compareCircuit(source: Circuit, target: Circuit): ObjectDifference<Circuit> =
@@ -1052,6 +1049,13 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferenceCollections(LvFeeder::normalEnergizingFeeders)
             if (options.compareFeederEquipment)
                 compareIdReferenceCollections(LvFeeder::currentEquipment)
+        }
+
+    /************ IEC61970 InfIEC61970 WIRES GENERATION PRODUCTION ************/
+
+    private fun compareEvChargingUnit(source: EvChargingUnit, target: EvChargingUnit): ObjectDifference<EvChargingUnit> =
+        ObjectDifference(source, target).apply {
+            comparePowerElectronicsUnit()
         }
 
     private fun compareOpenStatus(source: Switch, target: Switch, openTest: (Switch, SinglePhaseKind) -> Boolean): ValueDifference? {

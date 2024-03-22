@@ -20,11 +20,6 @@ class TableOpenCircuitTests : TableTransformerTest() {
     val OPEN_END_VOLTAGE: Column = Column(++columnIndex, "open_end_voltage", "INTEGER", NULL)
     val PHASE_SHIFT: Column = Column(++columnIndex, "phase_shift", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "open_circuit_tests"
-    }
-
-    override val tableClass: Class<TableOpenCircuitTests> = this.javaClass
-    override val tableClassInstance: TableOpenCircuitTests = this
+    override val name: String = "open_circuit_tests"
 
 }

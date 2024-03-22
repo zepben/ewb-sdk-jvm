@@ -18,11 +18,6 @@ class TableDiagrams : TableIdentifiedObjects() {
     val DIAGRAM_STYLE: Column = Column(++columnIndex, "diagram_style", "TEXT", NOT_NULL)
     val ORIENTATION_KIND: Column = Column(++columnIndex, "orientation_kind", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "diagrams"
-    }
-
-    override val tableClass: Class<TableDiagrams> = this.javaClass
-    override val tableClassInstance: TableDiagrams = this
+    override val name: String = "diagrams"
 
 }

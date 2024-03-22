@@ -16,11 +16,6 @@ class TableRemoteControls : TableRemotePoints() {
 
     val CONTROL_MRID: Column = Column(++columnIndex, "control_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "remote_controls"
-    }
-
-    override val tableClass: Class<TableRemoteControls> = this.javaClass
-    override val tableClassInstance: TableRemoteControls = this
+    override val name: String = "remote_controls"
 
 }

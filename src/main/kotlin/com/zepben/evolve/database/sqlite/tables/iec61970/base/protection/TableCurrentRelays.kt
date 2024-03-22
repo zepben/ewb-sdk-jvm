@@ -18,11 +18,6 @@ class TableCurrentRelays : TableProtectionRelayFunctions() {
     val INVERSE_TIME_FLAG: Column = Column(++columnIndex, "inverse_time_flag", "BOOLEAN", NULL)
     val TIME_DELAY_1: Column = Column(++columnIndex, "time_delay_1", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "current_relays"
-    }
-
-    override val tableClass: Class<TableCurrentRelays> = this.javaClass
-    override val tableClassInstance: TableCurrentRelays = this
+    override val name: String = "current_relays"
 
 }

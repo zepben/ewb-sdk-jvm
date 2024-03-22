@@ -20,19 +20,11 @@ class TablePositionPoints : SqliteTable() {
     val X_POSITION: Column = Column(++columnIndex, "x_position", "NUMBER", NOT_NULL)
     val Y_POSITION: Column = Column(++columnIndex, "y_position", "NUMBER", NOT_NULL)
 
-    override fun name(): String {
-        return "position_points"
-    }
+    override val name: String = "position_points"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
-
-        cols.add(listOf(LOCATION_MRID, SEQUENCE_NUMBER))
-
-        return cols
-    }
-
-    override val tableClass: Class<TablePositionPoints> = this.javaClass
-    override val tableClassInstance: TablePositionPoints = this
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(LOCATION_MRID, SEQUENCE_NUMBER))
+        }
 
 }

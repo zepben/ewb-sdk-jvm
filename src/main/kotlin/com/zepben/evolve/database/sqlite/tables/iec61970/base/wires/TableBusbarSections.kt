@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 class TableBusbarSections : TableConnectors() {
 
-    override fun name(): String {
-        return "busbar_sections"
-    }
-
-    override val tableClass: Class<TableBusbarSections> = this.javaClass
-    override val tableClassInstance: TableBusbarSections = this
+    override val name: String = "busbar_sections"
 
 }

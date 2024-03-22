@@ -61,8 +61,4 @@ internal class TokenCallCredentialsTest {
         verify { applier.fail(errorStatus) }
     }
 
-    @Test
-    internal fun thisUsesUnstableApiCoverage() {
-        TokenCallCredentials { "token" }.thisUsesUnstableApi()
-    }
 }

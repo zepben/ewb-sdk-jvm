@@ -9,12 +9,13 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.tables.Column
-import com.zepben.evolve.database.sqlite.tables.Column.Nullable.*
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 abstract class TableRegulatingCondEq : TableEnergyConnections() {
 
-    val CONTROL_ENABLED: Column = Column(++columnIndex, "control_enabled", "BOOLEAN")
+    val CONTROL_ENABLED: Column = Column(++columnIndex, "control_enabled", "BOOLEAN", NOT_NULL)
     val REGULATING_CONTROL_MRID: Column = Column(++columnIndex, "regulating_control_mrid", "TEXT", NULL)
 
 }

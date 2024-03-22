@@ -17,19 +17,11 @@ class TableCustomerAgreements : TableAgreements() {
 
     val CUSTOMER_MRID: Column = Column(++columnIndex, "customer_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "customer_agreements"
-    }
+    override val name: String = "customer_agreements"
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(CUSTOMER_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableCustomerAgreements> = this.javaClass
-    override val tableClassInstance: TableCustomerAgreements = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(CUSTOMER_MRID))
+        }
 
 }

@@ -22,27 +22,16 @@ class TableProtectionRelayFunctionThresholds : SqliteTable() {
     val VALUE: Column = Column(++columnIndex, "value", "NUMBER", NOT_NULL)
     val NAME: Column = Column(++columnIndex, "name", "TEXT", NULL)
 
-    override fun name(): String {
-        return "protection_relay_function_thresholds"
-    }
+    override val name: String = "protection_relay_function_thresholds"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(PROTECTION_RELAY_FUNCTION_MRID, SEQUENCE_NUMBER))
+        }
 
-        cols.add(listOf(PROTECTION_RELAY_FUNCTION_MRID, SEQUENCE_NUMBER))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(PROTECTION_RELAY_FUNCTION_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableProtectionRelayFunctionThresholds> = this.javaClass
-    override val tableClassInstance: TableProtectionRelayFunctionThresholds = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(PROTECTION_RELAY_FUNCTION_MRID))
+        }
 
 }

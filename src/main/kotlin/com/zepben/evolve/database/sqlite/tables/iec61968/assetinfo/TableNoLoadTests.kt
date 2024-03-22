@@ -20,11 +20,6 @@ class TableNoLoadTests : TableTransformerTest() {
     val LOSS: Column = Column(++columnIndex, "loss", "INTEGER", NULL)
     val LOSS_ZERO: Column = Column(++columnIndex, "loss_zero", "INTEGER", NULL)
 
-    override fun name(): String {
-        return "no_load_tests"
-    }
-
-    override val tableClass: Class<TableNoLoadTests> = this.javaClass
-    override val tableClassInstance: TableNoLoadTests = this
+    override val name: String = "no_load_tests"
 
 }

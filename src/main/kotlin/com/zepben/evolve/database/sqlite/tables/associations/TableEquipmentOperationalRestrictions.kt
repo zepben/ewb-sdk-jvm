@@ -19,28 +19,17 @@ class TableEquipmentOperationalRestrictions : SqliteTable() {
     val OPERATIONAL_RESTRICTION_MRID: Column =
         Column(++columnIndex, "operational_restriction_mrid", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "equipment_operational_restrictions"
-    }
+    override val name: String = "equipment_operational_restrictions"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(EQUIPMENT_MRID, OPERATIONAL_RESTRICTION_MRID))
+        }
 
-        cols.add(listOf(EQUIPMENT_MRID, OPERATIONAL_RESTRICTION_MRID))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(EQUIPMENT_MRID))
-        cols.add(listOf(OPERATIONAL_RESTRICTION_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableEquipmentOperationalRestrictions> = this.javaClass
-    override val tableClassInstance: TableEquipmentOperationalRestrictions = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(EQUIPMENT_MRID))
+            add(listOf(OPERATIONAL_RESTRICTION_MRID))
+        }
 
 }

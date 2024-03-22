@@ -19,18 +19,13 @@ class TableNames : SqliteTable() {
     val IDENTIFIED_OBJECT_MRID: Column = Column(++columnIndex, "identified_object_mrid", "TEXT", NOT_NULL)
     val NAME_TYPE_NAME: Column = Column(++columnIndex, "name_type_name", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "names"
-    }
+    override val name: String = "names"
 
-    override val tableClass: Class<TableNames> = this.javaClass
-    override val tableClassInstance: TableNames = this
-
-    override fun uniqueIndexColumns(): MutableList<List<Column>> = mutableListOf(
+    override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
         listOf(IDENTIFIED_OBJECT_MRID, NAME_TYPE_NAME, NAME)
     )
 
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> = mutableListOf(
+    override val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
         listOf(IDENTIFIED_OBJECT_MRID),
         listOf(NAME),
         listOf(NAME_TYPE_NAME)

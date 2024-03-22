@@ -20,11 +20,6 @@ class TableShuntCompensatorInfo : TableAssetInfo() {
     val RATED_REACTIVE_POWER: Column = Column(++columnIndex, "rated_reactive_power", "INTEGER", NULL)
     val RATED_VOLTAGE: Column = Column(++columnIndex, "rated_voltage", "INTEGER", NULL)
 
-    override fun name(): String {
-        return "shunt_compensator_info"
-    }
-
-    override val tableClass: Class<TableShuntCompensatorInfo> = this.javaClass
-    override val tableClassInstance: TableShuntCompensatorInfo = this
+    override val name: String = "shunt_compensator_info"
 
 }

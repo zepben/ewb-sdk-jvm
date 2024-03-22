@@ -22,33 +22,22 @@ class TablePowerTransformerEnds : TableTransformerEnds() {
     val B0: Column = Column(++columnIndex, "b0", "NUMBER", NULL)
     val G: Column = Column(++columnIndex, "g", "NUMBER", NULL)
     val G0: Column = Column(++columnIndex, "g0", "NUMBER", NULL)
-    val R: Column = Column(++columnIndex, "R", "NUMBER", NULL)
-    val R0: Column = Column(++columnIndex, "R0", "NUMBER", NULL)
+    val R: Column = Column(++columnIndex, "r", "NUMBER", NULL)
+    val R0: Column = Column(++columnIndex, "r0", "NUMBER", NULL)
     val RATED_U: Column = Column(++columnIndex, "rated_u", "INTEGER", NULL)
-    val X: Column = Column(++columnIndex, "X", "NUMBER", NULL)
-    val X0: Column = Column(++columnIndex, "X0", "NUMBER", NULL)
+    val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)
+    val X0: Column = Column(++columnIndex, "x0", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "power_transformer_ends"
-    }
+    override val name: String = "power_transformer_ends"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(POWER_TRANSFORMER_MRID, END_NUMBER))
+        }
 
-        cols.add(listOf(POWER_TRANSFORMER_MRID, END_NUMBER))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(POWER_TRANSFORMER_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TablePowerTransformerEnds> = this.javaClass
-    override val tableClassInstance: TablePowerTransformerEnds = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(POWER_TRANSFORMER_MRID))
+        }
 
 }

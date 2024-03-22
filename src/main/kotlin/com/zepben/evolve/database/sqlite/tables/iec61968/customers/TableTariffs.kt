@@ -12,11 +12,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableDocuments
 
 class TableTariffs : TableDocuments() {
 
-    override fun name(): String {
-        return "tariffs"
-    }
-
-    override val tableClass: Class<TableTariffs> = this.javaClass
-    override val tableClassInstance: TableTariffs = this
+    override val name: String = "tariffs"
 
 }

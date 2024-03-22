@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.auxiliaryequipmen
 
 class TableFaultIndicators : TableAuxiliaryEquipment() {
 
-    override fun name(): String {
-        return "fault_indicators"
-    }
-
-    override val tableClass: Class<TableFaultIndicators> = this.javaClass
-    override val tableClassInstance: TableFaultIndicators = this
+    override val name: String = "fault_indicators"
 
 }

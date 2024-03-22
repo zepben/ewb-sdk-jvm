@@ -17,27 +17,16 @@ class TableLocationStreetAddresses : TableStreetAddresses() {
     val LOCATION_MRID: Column = Column(++columnIndex, "location_mrid", "TEXT", NOT_NULL)
     val ADDRESS_FIELD: Column = Column(++columnIndex, "address_field", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "location_street_addresses"
-    }
+    override val name: String = "location_street_addresses"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(LOCATION_MRID, ADDRESS_FIELD))
+        }
 
-        cols.add(listOf(LOCATION_MRID, ADDRESS_FIELD))
-
-        return super.uniqueIndexColumns()
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(LOCATION_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableLocationStreetAddresses> = this.javaClass
-    override val tableClassInstance: TableLocationStreetAddresses = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(LOCATION_MRID))
+        }
 
 }

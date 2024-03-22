@@ -12,11 +12,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.TableIdentifi
 
 class TableLoops : TableIdentifiedObjects() {
 
-    override fun name(): String {
-        return "loops"
-    }
-
-    override val tableClass: Class<TableLoops> = this.javaClass
-    override val tableClassInstance: TableLoops = this
+    override val name: String = "loops"
 
 }

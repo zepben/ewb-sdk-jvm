@@ -17,10 +17,5 @@ class TableLvFeeders : TableEquipmentContainers() {
 
     val NORMAL_HEAD_TERMINAL_MRID: Column = Column(++columnIndex, "normal_head_terminal_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "lv_feeders"
-    }
-
-    override val tableClass: Class<TableLvFeeders> = this.javaClass
-    override val tableClassInstance: TableLvFeeders = this
+    override val name: String = "lv_feeders"
 }

@@ -10,11 +10,6 @@ package com.zepben.evolve.database.sqlite.tables.iec61970.base.protection
 
 class TableVoltageRelays : TableProtectionRelayFunctions() {
 
-    override fun name(): String {
-        return "voltage_relays"
-    }
-
-    override val tableClass: Class<TableVoltageRelays> = this.javaClass
-    override val tableClassInstance: TableVoltageRelays = this
+    override val name: String = "voltage_relays"
 
 }

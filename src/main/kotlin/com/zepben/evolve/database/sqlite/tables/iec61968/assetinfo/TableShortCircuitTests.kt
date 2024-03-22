@@ -25,11 +25,6 @@ class TableShortCircuitTests : TableTransformerTest() {
     val VOLTAGE: Column = Column(++columnIndex, "voltage", "NUMBER", NULL)
     val VOLTAGE_OHMIC_PART: Column = Column(++columnIndex, "voltage_ohmic_part", "NUMBER", NULL)
 
-    override fun name(): String {
-        return "short_circuit_tests"
-    }
-
-    override val tableClass: Class<TableShortCircuitTests> = this.javaClass
-    override val tableClassInstance: TableShortCircuitTests = this
+    override val name: String = "short_circuit_tests"
 
 }

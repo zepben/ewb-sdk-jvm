@@ -22,11 +22,6 @@ class TablePowerTransformers : TableConductingEquipment() {
     val FUNCTION: Column = Column(++columnIndex, "function", "TEXT", NOT_NULL)
     val POWER_TRANSFORMER_INFO_MRID: Column = Column(++columnIndex, "power_transformer_info_mrid", "TEXT", NULL)
 
-    override fun name(): String {
-        return "power_transformers"
-    }
-
-    override val tableClass: Class<TablePowerTransformers> = this.javaClass
-    override val tableClassInstance: TablePowerTransformers = this
+    override val name: String = "power_transformers"
 
 }

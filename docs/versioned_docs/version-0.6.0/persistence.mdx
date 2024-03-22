@@ -28,18 +28,18 @@ void saveToDb(String dbFile,
               DiagramService diagramService,
               CustomerService customerService) {
     // All service are saved to the given dbFile file
-    MetadataCollection metaData = new MetadataCollection();
-    metaData.add(new DataSource("Name of source (e.g. GisExtractor)", "0.1", Instant.now()));
-    new DatabaseWriter(dbFile).save(metaData, Arrays.asList(networkService, diagramService, customerService));
+    MetadataCollection metadata = new MetadataCollection();
+    metadata.add(new DataSource("Name of source (e.g. GisExtractor)", "0.1", Instant.now()));
+    new DatabaseWriter(dbFile).save(metadata, Arrays.asList(networkService, diagramService, customerService));
 }
 
 void readFromDb(String dbFile,
-                MetadataCollection metaData,
+                MetadataCollection metadata,
                 NetworkService networkService,
                 DiagramService diagramService,
                 CustomerService customerService) {
     // All the services will be loaded with their respective objects from dbFile
-    new DatabaseReader(dbFile).load(metaData, networkService, diagramService, customerService)
+    new DatabaseReader(dbFile).load(metadata, networkService, diagramService, customerService)
 }
 ```
 
@@ -54,19 +54,19 @@ fun saveToDb(
     customerService: CustomerService
 ) {
     // The metadata and all service are saved to the given dbFile file
-    val metaData = MetadataCollection().apply { add(DataSource("Name of source (e.g. GisExtractor)", version = "0.1")) }
-    DatabaseWriter(dbFile).save(metaData, listOf(networkService, diagramService, customerService))
+    val metadata = MetadataCollection().apply { add(DataSource("Name of source (e.g. GisExtractor)", version = "0.1")) }
+    DatabaseWriter(dbFile).save(metadata, listOf(networkService, diagramService, customerService))
 }
 
 fun readFromDb(
     dbFile: String,
-    metaData: MetadataCollection,
+    metadata: MetadataCollection,
     networkService: NetworkService,
     diagramService: DiagramService,
     customerService: CustomerService
 ) {
     // The metadata and all the services will be loaded with their respective objects from dbFile
-    DatabaseReader(dbFile).load(metaData, networkService, diagramService, customerService)
+    DatabaseReader(dbFile).load(metadata, networkService, diagramService, customerService)
 }
 ```
 
@@ -133,5 +133,3 @@ GrpcChannelFactory.create(ConnectionConfig(host, port)).use {
 This section covers things to keep in mind when attempting to save the model:
 
 - TODO
-
-

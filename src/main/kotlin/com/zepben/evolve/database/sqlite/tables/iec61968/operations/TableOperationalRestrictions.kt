@@ -12,11 +12,6 @@ import com.zepben.evolve.database.sqlite.tables.iec61968.common.TableDocuments
 
 class TableOperationalRestrictions : TableDocuments() {
 
-    override fun name(): String {
-        return "operational_restrictions"
-    }
-
-    override val tableClass: Class<TableOperationalRestrictions> = this.javaClass
-    override val tableClassInstance: TableOperationalRestrictions = this
+    override val name: String = "operational_restrictions"
 
 }

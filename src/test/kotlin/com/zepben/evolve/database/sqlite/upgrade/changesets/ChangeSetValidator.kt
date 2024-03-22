@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.not
 import java.sql.ResultSet
 import java.sql.Statement
 
@@ -59,7 +60,7 @@ interface ChangeSetValidator {
     fun ensureIndexes(statement: Statement, vararg expectedIndexes: String, present: Boolean = true) {
         expectedIndexes.forEach {
             statement.executeQuery("pragma index_info('$it')").use { rs ->
-                assertThat(rs.next(), equalTo(present))
+                assertThat("Does index '$it' exist", rs.next(), equalTo(present))
             }
         }
     }
@@ -67,19 +68,25 @@ interface ChangeSetValidator {
     fun ensureTables(statement: Statement, vararg tableNames: String, present: Boolean = true) {
         tableNames.forEach {
             statement.executeQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='$it';").use { rs ->
-                assertThat("Table $it was not created.", rs.next(), equalTo(present))
+                assertThat("Does table '$it' exist", rs.next(), equalTo(present))
+            }
+            if (present) {
+                statement.executeQuery("SELECT count(*) FROM $it;").use { rs ->
+                    rs.next()
+                    assertThat("Table '$it' should still be populated", rs.getInt(1), not(equalTo(0)))
+                }
             }
         }
     }
 
-    fun ensureColumn(statement: Statement, table: String, vararg expectedColumns: String, present: Boolean = true) {
+    fun ensureColumns(statement: Statement, table: String, vararg expectedColumns: String, present: Boolean = true) {
         statement.executeQuery("pragma table_info('$table')").use { rs ->
             val columns = mutableListOf<String>()
             while (rs.next()) {
                 columns.add(rs.getString("name"))
             }
             expectedColumns.forEach {
-                assertThat(it in columns, equalTo(present))
+                assertThat("Does column '$table.$it' exist", it in columns, equalTo(present))
             }
         }
     }

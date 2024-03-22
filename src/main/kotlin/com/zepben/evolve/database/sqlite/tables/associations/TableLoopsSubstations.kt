@@ -19,28 +19,17 @@ class TableLoopsSubstations : SqliteTable() {
     val SUBSTATION_MRID: Column = Column(++columnIndex, "substation_mrid", "TEXT", NOT_NULL)
     val RELATIONSHIP: Column = Column(++columnIndex, "relationship", "TEXT", NOT_NULL)
 
-    override fun name(): String {
-        return "loops_substations"
-    }
+    override val name: String = "loops_substations"
 
-    override fun uniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.uniqueIndexColumns()
+    override val uniqueIndexColumns: MutableList<List<Column>> =
+        super.uniqueIndexColumns.apply {
+            add(listOf(LOOP_MRID, SUBSTATION_MRID))
+        }
 
-        cols.add(listOf(LOOP_MRID, SUBSTATION_MRID))
-
-        return cols
-    }
-
-    override fun nonUniqueIndexColumns(): MutableList<List<Column>> {
-        val cols = super.nonUniqueIndexColumns()
-
-        cols.add(listOf(LOOP_MRID))
-        cols.add(listOf(SUBSTATION_MRID))
-
-        return cols
-    }
-
-    override val tableClass: Class<TableLoopsSubstations> = this.javaClass
-    override val tableClassInstance: TableLoopsSubstations = this
+    override val nonUniqueIndexColumns: MutableList<List<Column>> =
+        super.nonUniqueIndexColumns.apply {
+            add(listOf(LOOP_MRID))
+            add(listOf(SUBSTATION_MRID))
+        }
 
 }

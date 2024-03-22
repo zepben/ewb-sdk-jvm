@@ -9,11 +9,6 @@
 package com.zepben.evolve.database.sqlite.tables.iec61970.base.meas
 
 class TableAccumulators : TableMeasurements() {
-    override fun name(): String {
-        return "accumulators"
-    }
-
-    override val tableClass: Class<TableAccumulators> = this.javaClass
-    override val tableClassInstance: TableAccumulators = this
+    override val name: String = "accumulators"
 
 }

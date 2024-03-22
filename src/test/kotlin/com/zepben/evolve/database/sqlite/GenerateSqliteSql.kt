@@ -8,38 +8,67 @@
 
 package com.zepben.evolve.database.sqlite
 
+import com.zepben.evolve.database.sqlite.customer.CustomerDatabaseTables
+import com.zepben.evolve.database.sqlite.diagram.DiagramDatabaseTables
+import com.zepben.evolve.database.sqlite.network.NetworkDatabaseTables
 import com.zepben.evolve.database.sqlite.tables.SqliteTable
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.slf4j.LoggerFactory
 
 class GenerateSqliteSql {
 
-    private val logger = LoggerFactory.getLogger(GenerateSqliteSql::class.java)
+    //
+    // NOTE: These tests are deliberately disabled as they simply print the database SQL statements which
+    //       just clogs up the test log. You should selectively run them if you need the statements.
+    //
 
     @Test
     @Disabled
-    fun runThisFunctionAsATestToGetSqlForAnSqliteDatabase() {
-        DatabaseTables().forEachTable { table: SqliteTable -> printSqlFields(table) }
+    fun `print database create statements`() {
+        printStatements { table ->
+            println(table.createTableSql + ";")
+            table.createIndexesSql.forEach { println("$it;") }
+            println("")
+        }
     }
 
-    private fun printSqlFields(table: SqliteTable) {
+    @Test
+    @Disabled
+    fun `print database select statements`() {
+        printStatements { table ->
+            println(table.selectSql + ";")
+        }
+    }
 
-        logger.info(table.createTableSql() + ";")
-        logger.info("")
+    @Test
+    @Disabled
+    fun `print database insert statements`() {
+        printStatements { table ->
+            println(table.preparedInsertSql + ";")
+        }
+    }
 
-        for (sql in table.createIndexesSql())
-            logger.info("$sql;")
-        logger.info("")
+    @Test
+    @Disabled
+    fun `print database update statements`() {
+        printStatements { table ->
+            println(table.preparedUpdateSql + ";")
+        }
+    }
 
-        logger.info(table.preparedInsertSql() + ";")
-        logger.info("")
-
-        logger.info(table.selectSql() + ";")
-        logger.info("")
-
-        logger.info(table.preparedUpdateSql() + ";")
-        logger.info("")
+    private fun printStatements(action: (SqliteTable) -> Unit) {
+        println("******** Customer Database ********")
+        println("")
+        CustomerDatabaseTables().forEachTable(action)
+        println("")
+        println("******** Diagram Database ********")
+        println("")
+        DiagramDatabaseTables().forEachTable(action)
+        println("")
+        println("******** Network Database ********")
+        println("")
+        NetworkDatabaseTables().forEachTable(action)
+        println("")
     }
 
 }

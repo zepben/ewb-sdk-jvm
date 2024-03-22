@@ -11,9 +11,9 @@ package com.zepben.evolve.database.sqlite.extensions
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import io.mockk.every
 import io.mockk.mockk
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import java.sql.ResultSet
 import java.time.Instant
@@ -31,9 +31,8 @@ internal class ResultSetExtensionsTest {
 
     @Test
     internal fun `getNullableBoolean returns a null`() {
-        val rs = createMockResultSet(true) {
+        val rs = createMockResultSet(wasNull = true) {
             every { it.getBoolean(any<Int>()) } returns true
-
         }
 
         assertThat(rs.getNullableBoolean(1), nullValue())
@@ -50,7 +49,7 @@ internal class ResultSetExtensionsTest {
 
     @Test
     internal fun `getNullableDouble returns a null`() {
-        val rs = createMockResultSet(true) {
+        val rs = createMockResultSet(wasNull = true) {
             every { it.getDouble(any<Int>()) } returns 0.0
         }
 
@@ -88,7 +87,7 @@ internal class ResultSetExtensionsTest {
 
     @Test
     internal fun `getNullableFloat returns a null`() {
-        val rs = createMockResultSet(true) {
+        val rs = createMockResultSet(wasNull = true) {
             every { it.getFloat(any<Int>()) } returns 0.0f
         }
 
@@ -127,7 +126,7 @@ internal class ResultSetExtensionsTest {
 
     @Test
     internal fun `getNullableInt returns a null`() {
-        val rs = createMockResultSet(true) {
+        val rs = createMockResultSet(wasNull = true) {
             every { it.getInt(any<Int>()) } returns 0
         }
 
@@ -145,7 +144,7 @@ internal class ResultSetExtensionsTest {
 
     @Test
     internal fun `getNullableString returns a null`() {
-        val rs = createMockResultSet(true) {
+        val rs = createMockResultSet(wasNull = true) {
             every { it.getString(any<Int>()) } returns null
         }
 
@@ -163,7 +162,7 @@ internal class ResultSetExtensionsTest {
 
     @Test
     internal fun `getNullableLong returns a null`() {
-        val rs = createMockResultSet(true) {
+        val rs = createMockResultSet(wasNull = true) {
             every { it.getLong(any<Int>()) } returns 0L
         }
 
@@ -181,7 +180,7 @@ internal class ResultSetExtensionsTest {
 
     @Test
     internal fun `getInstant returns a null`() {
-        val rs = createMockResultSet(true) {
+        val rs = createMockResultSet(wasNull = true) {
             every { it.getString(any<Int>()) } returns ""
         }
 
@@ -199,7 +198,7 @@ internal class ResultSetExtensionsTest {
 
     @Test
     internal fun `getNullableRatio returns a null`() {
-        val rs = createMockResultSet(true) {
+        val rs = createMockResultSet(wasNull = true) {
             every { it.getDouble(any<Int>()) } returns 0.0
         }
 

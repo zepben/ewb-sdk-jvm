@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.19.0](#v0190)| `08 April 2024` |
 |[0.18.0](#v0180)| `08 April 2024` |
 | [0.17.1](#v0171)       | `11 January 2024`   |
 | [0.17.0](#v0170)       | `22 November 2023`  |
@@ -26,6 +27,13 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.19.0]
+
+### Enhancements
+* Update super-pom to 0.36.0 for lucene and ktor dependencies.
 
 ---
 

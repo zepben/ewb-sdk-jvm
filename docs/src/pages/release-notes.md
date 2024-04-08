@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.18.0](#v0180)| `08 April 2024` |
 | [0.17.1](#v0171)       | `11 January 2024`   |
 | [0.17.0](#v0170)       | `22 November 2023`  |
 | [0.16.0](#v0160)       | `13 September 2023` |
@@ -25,6 +26,91 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.18.0]
+
+
+### Breaking Changes
+
+* Updated to super-pom version 0.34.x.
+* `IdentifiedObject.addName` has been refactored to take in a `NameType` and a `String`. This is doing the same thing under the hood as previous `addName()`
+  function,
+  but simplifies the input by lowering the amount of objects that needed to be created prior to adding names.
+  Example usage change:
+  `obj.addName(nameType, "name", obj))` or `obj.addName(nameType.getOrAddName("name", obj))` becomes `obj.addName(nameType, "name")`
+* `addName()`/`removeName()` related function for both `IdentifiedObject` and `NameType` will now also perform the same function on the other object type.
+  i.e. Removing a name from the identified object will remove it from the name type and vice versa. Same interaction is also applied to adding a name.
+* Removed `ProtectionEquipment`.
+* Change of inheritance: `CurrentRelay` &rarr; `ProtectionEquipment`.
+  becomes `CurrentRelay` &rarr; `ProtectionRelayFunction`.
+* Removed symmetric relation `ProtectionEquipment` &harr; `ProtectedSwitch`.
+* Renamed `CurrentRelayInfo` to `RelayInfo`.
+    * The override `assetInfo: RelayInfo?` has been moved from `CurrentRelay` to its new parent class, `ProtectionRelayFunction`.
+    * Renamed `RelayInfo.removeDelay` to `RelayInfo.removeDelayAt`. The original method name has been repurposed to remove a delay by its value rather than its
+      index.
+* Reworked values for enumerable type `ProtectionKind`.
+* Removed `IdentifiedObject.removeNamesFromTypes()`. Use `IdentifiedObject.clearNames()` instead.
+* Removed `DiagramServiceInstanceCache` and `NetworkServiceInstanceCache`.
+* The database has been split into three databases, which will change the imports of most related classes:
+    1. The existing database containing the network model (`*-network-model.sqlite`) with classes in the `network` package.
+    2. A new database containing the customer information (`*-customers.sqlite`) with classes in the `customer` package.
+    3. A new database containing the diagrams (`*-diagrams.sqlite`) with classes in the `diagram` package.
+* The database split has resulted in the database classes also being split, e.g. `DatabaseReader` is now `NetworkDatabaseReader`, `CustomerDatabaseReader` and `
+  DiagramDatabaseReader`.
+* Renamed the following tables (and their associated indexes):
+    * `battery_unit` to `battery_units`
+    * `photo_voltaic_unit` to `photo_voltaic_units`
+    * `power_electronics_connection` to `power_electronics_connections`
+    * `power_electronics_connection_phase` to `power_electronics_connection_phases`
+    * `power_electronics_wind_unit` to `power_electronics_wind_units`
+    * `transformer_star_impedance` to `transformer_star_impedances`
+* The `UpgradeRunner` is no longer used by the database readers. You must now call it directly if you want a database to upgrade. This change has been put in
+  place due to the splitting of the database.
+
+### New Features
+
+* Added `getNames(IdentifiedObject)` to `NameType` to retrieve all names associated with the `NameType` that belongs to an `IdentifiedObject`.
+* Added `getNames(NameType)` and `getNames(String)` to `IdentifiedObject` so user can retrieve all names for a given `NameType` of the `IdentifiedObject`
+* Added new classes and fields to support advanced modelling of protection relays:
+    * `SeriesCompensator`: A series capacitor or reactor or an AC transmission line without charging susceptance.
+    * `Ground`: A point where the system is grounded used for connecting conducting equipment to ground.
+    * `GroundDisconnector`: A manually operated or motor operated mechanical switching device used for isolating a circuit
+      or equipment from ground.
+    * `ProtectionRelayScheme`: A scheme that a group of relay functions implement. For example, typically schemes are
+      primary and secondary, or main and failsafe.
+    * `ProtectionRelayFunction`: A function that a relay implements to protect equipment.
+    * `ProtectionRelaySystem`: A relay system for controlling `ProtectedSwitch`es.
+    * `RelaySetting`: The threshold settings for a given relay.
+    * `VoltageRelay`: A device that detects when the voltage in an AC circuit reaches a preset voltage.
+    * `DistanceRelay`: A protective device used in power systems that measures the impedance of a transmission line to
+      determine the distance to a fault, and initiates circuit breaker tripping to isolate the faulty
+      section and safeguard the power system.
+    * `RelayInfo.recloseFast`: True if recloseDelays are associated with a fast Curve, False otherwise.
+    * `RegulatingControl.ratedCurrent`: The rated current of associated CT in amps for a RegulatingControl.
+
+### Enhancements
+
+* Added missing collection methods for `RelayInfo.recloseDelays` (`RelayInfo` was previously named `CurrentRelayInfo`):
+    * `RelayInfo.getDelay(sequenceNumber: Int): Double?`
+    * `RelayInfo.forEachDelay(action: (sequenceNumber: Int, delay: Double) -> Unit)`
+    * `RelayInfo.removeDelay(delay: Double?): Boolean`
+        * The original method with this name has been renamed to `RelayInfo.removeDelayAt(index: Int): Double?`.
+* Cleaned up code using IntelliJ code inspection. Some typos in documentation have also been fixed.
+* Added missing `@JvmOverloads` for the constructors of the following CIM classes: `NoLoadTest`, `OpenCircuitTest`, `PowerTransformerInfo`, `ShortCircuitTest`,
+  `ShuntCompensatorInfo`, `SwitchInfo`, `TransformerEndInfo`, `TransformerTankInfo`, `Pole`, `Streetlight`, `TapChangerControl`, `TransformerStarImpedance`,
+  `BatteryUnit`, `PhotoVoltaicUnit`, `PowerElectronicsWindUnit`, and `EvChargingUnit`.
+* Added helper properties `t1`, `t2`, and `t3` to `ConductingEquipment` which get the first, second, and third terminal respectively. A `NullPointerException`
+  is thrown if there is no such terminal (e.g. evaluating `br.t3` for a breaker `br` that has only two terminals).
+
+### Fixes
+
+* Fixed transitive bug that made a database round-trip test fail on Windows due to an issue in `sqlitejdbc.dll`.
+
+### Notes
+
+* None.
 
 ---
 

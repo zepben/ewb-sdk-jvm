@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [0.19.0] - UNRELEASED
+## [0.19.0] - 2024-04-08
 ### Enhancements
 * Update super-pom to 0.36.0 for lucene and ktor dependencies.
 

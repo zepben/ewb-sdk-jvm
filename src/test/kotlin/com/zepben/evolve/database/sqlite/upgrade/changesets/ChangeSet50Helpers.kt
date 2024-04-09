@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.upgrade.changesets
 
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
+import com.zepben.evolve.database.filepaths.PathType
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
@@ -57,23 +57,25 @@ object ChangeSet50Helpers {
     /**
      * Returns a pair of expected (should have been kept) and unexpected (should have been removed) tables.
      */
-    fun tables(type: EwbDatabaseType): Pair<Set<String>, Set<String>> = when (type) {
+    fun tables(type: PathType): Pair<Set<String>, Set<String>> = when (type) {
         // Filter out the organisations table from the network tables as it is also kept by customer databases.
-        EwbDatabaseType.CUSTOMER -> listOf(populateCommonTables(), populateCustomerTables(), populateSharedTables()).extractTables() to
+        PathType.CUSTOMERS -> listOf(populateCommonTables(), populateCustomerTables(), populateSharedTables()).extractTables() to
             listOf(populateDiagramTables(), populateNetworkTables().filter { !it.contains("INSERT INTO organisations ") }).extractTables()
 
-        EwbDatabaseType.DIAGRAM -> listOf(populateCommonTables(), populateDiagramTables()).extractTables() to
+        PathType.DIAGRAMS -> listOf(populateCommonTables(), populateDiagramTables()).extractTables() to
             listOf(populateCustomerTables(), populateNetworkTables(), populateSharedTables()).extractTables()
 
         // Filter out the organisations table from the customer tables as it is also kept by network databases.
-        EwbDatabaseType.NETWORK -> listOf(populateCommonTables(), populateNetworkTables(), populateSharedTables()).extractTables() to
+        PathType.NETWORK_MODEL -> listOf(populateCommonTables(), populateNetworkTables(), populateSharedTables()).extractTables() to
             listOf(populateCustomerTables().filter { !it.contains("INSERT INTO organisations ") }, populateDiagramTables()).extractTables()
+
+        else -> throw IllegalStateException("Only excepts CUSTOMERS/DIAGRAMS/NETWORK_MODEL")
     }
 
     /**
      * Ensure the names and name_types for the database have been kept, and the other database names have been removed.
      */
-    fun ensureNames(statement: Statement, type: EwbDatabaseType) {
+    fun ensureNames(statement: Statement, type: PathType) {
         val (expectedNameTypes, unexpectedNameTypes) = findExpectedNameTypeValues(type)
         expectedNameTypes.forEach { statement.ensureSelect("name_types", "name = '$it'") }
         unexpectedNameTypes.forEach { statement.ensureSelect("name_types", "name = '$it'", expectedCount = 0) }
@@ -364,8 +366,8 @@ object ChangeSet50Helpers {
         "INSERT INTO junctions VALUES ('junction_mrid_6', 'name', 'description', 1, 'location_mrid', 1, true, true, 'commissioned_date', 'base_voltage_mrid');",
     )
 
-    private fun findExpectedNameTypeValues(type: EwbDatabaseType): Pair<List<String>, List<String>> = when (type) {
-        EwbDatabaseType.CUSTOMER ->
+    private fun findExpectedNameTypeValues(type: PathType): Pair<List<String>, List<String>> = when (type) {
+        PathType.CUSTOMERS ->
             listOf(
                 populateCommonNameType(),
                 populateCustomerNameType(),
@@ -378,7 +380,7 @@ object ChangeSet50Helpers {
                     populateSharedNameTypeDiagramNetwork(),
                 ).extractValues()
 
-        EwbDatabaseType.DIAGRAM ->
+        PathType.DIAGRAMS ->
             listOf(
                 populateCommonNameType(),
                 populateDiagramNameType(),
@@ -391,7 +393,7 @@ object ChangeSet50Helpers {
                     populateSharedNameTypeCustomerNetwork(),
                 ).extractValues()
 
-        EwbDatabaseType.NETWORK ->
+        PathType.NETWORK_MODEL ->
             listOf(
                 populateCommonNameType(),
                 populateNetworkNameType(),
@@ -403,10 +405,12 @@ object ChangeSet50Helpers {
                     populateDiagramNameType(),
                     populateSharedNameTypeCustomerDiagram(),
                 ).extractValues()
+
+        else -> throw IllegalStateException("Only excepts CUSTOMERS/DIAGRAMS/NETWORK_MODEL")
     }
 
-    private fun findExpectedNameValues(type: EwbDatabaseType): Pair<List<String>, List<String>> = when (type) {
-        EwbDatabaseType.CUSTOMER ->
+    private fun findExpectedNameValues(type: PathType): Pair<List<String>, List<String>> = when (type) {
+        PathType.CUSTOMERS ->
             listOf(
                 populateCommonNames().filter { it.contains("customer_mrid") },
                 populateCustomerNames(),
@@ -421,7 +425,7 @@ object ChangeSet50Helpers {
                     populateSharedNamesDiagramNetwork()
                 ).extractValues()
 
-        EwbDatabaseType.DIAGRAM ->
+        PathType.DIAGRAMS ->
             listOf(
                 populateCommonNames().filter { it.contains("diagram_mrid") },
                 populateDiagramNames(),
@@ -436,7 +440,7 @@ object ChangeSet50Helpers {
                     populateSharedNamesDiagramNetwork().filter { !it.contains("diagram_mrid") }
                 ).extractValues()
 
-        EwbDatabaseType.NETWORK ->
+        PathType.NETWORK_MODEL ->
             listOf(
                 populateCommonNames().filter { it.contains("junction_mrid") },
                 populateNetworkNames(),
@@ -450,6 +454,8 @@ object ChangeSet50Helpers {
                     populateSharedNamesCustomerNetwork().filter { !it.contains("junction_mrid") },
                     populateSharedNamesDiagramNetwork().filter { !it.contains("junction_mrid") }
                 ).extractValues()
+
+        else -> throw IllegalStateException("Only excepts CUSTOMERS/DIAGRAMS/NETWORK_MODEL")
     }
 
     private fun Iterable<List<String>>.extractTables(): Set<String> =

@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.upgrade
 
+import com.zepben.evolve.database.filepaths.PathType
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
 import com.zepben.evolve.database.sqlite.upgrade.changesets.combined.*
@@ -68,11 +69,11 @@ internal class ChangeSetTest {
     @Test
     internal fun `test change sets`() {
         // All pre-split change sets are for the network database, as that is the only database that existed.
-        validateChangeSets(createBaseCombinedDB(), preSplitChangeSetValidators, UpgradeRunner::preSplitChangeSets, EwbDatabaseType.NETWORK)
+        validateChangeSets(createBaseCombinedDB(), preSplitChangeSetValidators, UpgradeRunner::preSplitChangeSets, PathType.NETWORK_MODEL)
 
-        validateChangeSets(createBaseDB(EwbDatabaseType.CUSTOMER), customerChangeSetValidators, UpgradeRunner::postSplitChangeSets, EwbDatabaseType.CUSTOMER)
-        validateChangeSets(createBaseDB(EwbDatabaseType.DIAGRAM), diagramChangeSetValidators, UpgradeRunner::postSplitChangeSets, EwbDatabaseType.DIAGRAM)
-        validateChangeSets(createBaseDB(EwbDatabaseType.NETWORK), networkChangeSetValidators, UpgradeRunner::postSplitChangeSets, EwbDatabaseType.NETWORK)
+        validateChangeSets(createBaseDB(PathType.CUSTOMERS), customerChangeSetValidators, UpgradeRunner::postSplitChangeSets, PathType.CUSTOMERS)
+        validateChangeSets(createBaseDB(PathType.DIAGRAMS), diagramChangeSetValidators, UpgradeRunner::postSplitChangeSets, PathType.DIAGRAMS)
+        validateChangeSets(createBaseDB(PathType.NETWORK_MODEL), networkChangeSetValidators, UpgradeRunner::postSplitChangeSets, PathType.NETWORK_MODEL)
     }
 
     /**
@@ -84,7 +85,7 @@ internal class ChangeSetTest {
     /**
      * Creates an in memory sqlite database using the base network schema (from version 49).
      */
-    private fun createBaseDB(type: EwbDatabaseType): Connection =
+    private fun createBaseDB(type: PathType): Connection =
         createDatabaseFromScript("src/test/data/base-${type.fileDescriptor}-schema.sql")
 
     private fun createDatabaseFromScript(script: String): Connection =
@@ -100,7 +101,7 @@ internal class ChangeSetTest {
         conn: Connection,
         changeSetValidators: Map<Int, ChangeSetValidator>,
         changesSets: UpgradeRunner.() -> List<ChangeSet>,
-        type: EwbDatabaseType
+        type: PathType
     ) {
         val runner = UpgradeRunner()
         val tableVersion = TableVersion()

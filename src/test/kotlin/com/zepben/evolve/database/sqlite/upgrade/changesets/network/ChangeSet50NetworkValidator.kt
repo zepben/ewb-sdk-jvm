@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.upgrade.changesets.network
 
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
+import com.zepben.evolve.database.filepaths.PathType
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet50Helpers
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
 import java.sql.Statement
@@ -24,15 +24,15 @@ object ChangeSet50NetworkValidator : ChangeSetValidator {
         //
         // NOTE: We are being lazy and assuming if the table was left behind, then so were its indexes.
         //
-        val (expectedTables, unexpectedTables) = ChangeSet50Helpers.tables(EwbDatabaseType.NETWORK)
+        val (expectedTables, unexpectedTables) = ChangeSet50Helpers.tables(PathType.NETWORK_MODEL)
         ensureTables(statement, *expectedTables.toTypedArray(), present = true)
         ensureTables(statement, *unexpectedTables.toTypedArray(), present = false)
 
-        ChangeSet50Helpers.ensureNames(statement, EwbDatabaseType.NETWORK)
+        ChangeSet50Helpers.ensureNames(statement, PathType.NETWORK_MODEL)
     }
 
     override fun tearDownStatements(): List<String> =
-        ChangeSet50Helpers.tables(EwbDatabaseType.NETWORK).first.map {
+        ChangeSet50Helpers.tables(PathType.NETWORK_MODEL).first.map {
             "DELETE FROM $it"
         }
 

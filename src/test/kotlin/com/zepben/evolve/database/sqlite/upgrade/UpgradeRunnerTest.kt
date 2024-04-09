@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.upgrade
 
+import com.zepben.evolve.database.filepaths.PathType
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import com.zepben.evolve.database.sqlite.tables.Column
 import com.zepben.evolve.database.sqlite.tables.TableVersion
@@ -100,21 +101,21 @@ internal class UpgradeRunnerTest {
     @Test
     internal fun `upgrade real customer file`() {
         // Put the name of the database you want to load in src/test/resources/test-customer-database.txt
-        upgradeRealFile("test-customer-database.txt", EwbDatabaseType.CUSTOMER)
+        upgradeRealFile("test-customer-database.txt", PathType.CUSTOMERS)
     }
 
     @Disabled
     @Test
     internal fun `upgrade real diagram file`() {
         // Put the name of the database you want to load in src/test/resources/test-diagram-database.txt
-        upgradeRealFile("test-diagram-database.txt", EwbDatabaseType.DIAGRAM)
+        upgradeRealFile("test-diagram-database.txt", PathType.DIAGRAMS)
     }
 
     @Disabled
     @Test
     internal fun `upgrade real network file`() {
         // Put the name of the database you want to load in src/test/resources/test-network-database.txt
-        upgradeRealFile("test-network-database.txt", EwbDatabaseType.NETWORK)
+        upgradeRealFile("test-network-database.txt", PathType.NETWORK_MODEL)
     }
 
     @Test
@@ -142,7 +143,7 @@ internal class UpgradeRunnerTest {
         mockkStatic("com.zepben.evolve.database.sqlite.extensions.ConnectionExtensionsKt") {
             currentVersion = maxSupportedVersion - 1
 
-            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
 
             verify(exactly = 1) { connectionProvider("driver:database") }
             verify(exactly = 1) { connection.configureBatch() }
@@ -151,11 +152,11 @@ internal class UpgradeRunnerTest {
 
     @Test
     internal fun `runs each changeset in transactions`() {
-        val networkFile = "something-${EwbDatabaseType.NETWORK.fileDescriptor}.sqlite"
+        val networkFile = "something-${PathType.NETWORK_MODEL.fileDescriptor}.sqlite"
         val databaseDescriptor = "driver:database:$networkFile"
         currentVersion = minSupportedVersion - 1
 
-        val connectionResult = upgradeRunner.connectAndUpgrade(databaseDescriptor, Paths.get(networkFile), EwbDatabaseType.NETWORK)
+        val connectionResult = upgradeRunner.connectAndUpgrade(databaseDescriptor, Paths.get(networkFile), PathType.NETWORK_MODEL)
 
         assertThat(connectionResult.connection, sameInstance(connection))
         assertThat(connectionResult.version, equalTo(maxSupportedVersion))
@@ -164,15 +165,15 @@ internal class UpgradeRunnerTest {
             // Checks the minimum supported changeset number.
             minChangeSet.number
 
-            validateConnectionToDatabase(EwbDatabaseType.NETWORK)
+            validateConnectionToDatabase(PathType.NETWORK_MODEL)
             validatePreSplitChangesets()
 
             // Clones the database into the customer and diagram variants and runs the post-split commands on them.
-            validateCloneAndUpgrade(EwbDatabaseType.CUSTOMER)
-            validateCloneAndUpgrade(EwbDatabaseType.DIAGRAM)
+            validateCloneAndUpgrade(PathType.CUSTOMERS)
+            validateCloneAndUpgrade(PathType.DIAGRAMS)
 
             // Continues to run the post-split commands on the network database.
-            validatePostSplitChangesets(EwbDatabaseType.NETWORK)
+            validatePostSplitChangesets(PathType.NETWORK_MODEL)
             validateVacuum()
 
             // Returns the upgraded version number
@@ -184,7 +185,7 @@ internal class UpgradeRunnerTest {
     internal fun `doesn't run upgrade if current version`() {
         currentVersion = maxSupportedVersion
 
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
 
         // Should check the changeset number in the following cases:
         // 1. of the minimum changeset to determine the minimum supported version.
@@ -205,7 +206,7 @@ internal class UpgradeRunnerTest {
         preSplitChangeSets.forEach { clearMocks(it, answers = false) }
         postSplitChangeSets.forEach { clearMocks(it, answers = false) }
 
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
 
         verify(exactly = 1) { copyFile(any(), any(), any()) }
 
@@ -243,7 +244,7 @@ internal class UpgradeRunnerTest {
             currentVersion = minSupportedVersion - 2
 
             expect {
-                upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+                upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
             }.toThrow<UpgradeRunner.UpgradeException>()
                 .withMessage(
                     "Failed to execute upgrade scripts. Unable to upgrade obsolete database version [v${minSupportedVersion - 2}], upgrading a " +
@@ -261,7 +262,7 @@ internal class UpgradeRunnerTest {
             currentVersion = maxSupportedVersion + 1
 
             expect {
-                upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+                upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
             }.toThrow<UpgradeRunner.UpgradeException>()
                 .withMessage(
                     "Failed to execute upgrade scripts. Selected database is a newer version [v${maxSupportedVersion + 1}] than the supported " +
@@ -278,7 +279,7 @@ internal class UpgradeRunnerTest {
             every { tableVersion.getVersion(any()) } returns null
 
             expect {
-                upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+                upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
             }.toThrow<UpgradeRunner.UpgradeException>()
                 .withMessage(
                     "Failed to execute upgrade scripts. Invalid EWB database detected, unable to read the version number from the database. Please " +
@@ -296,7 +297,7 @@ internal class UpgradeRunnerTest {
         every { connectionProvider(any()) } throws exception
 
         expect {
-            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
         }.toThrow<UpgradeRunner.UpgradeException>()
             .withMessage(exceptionMessage)
             .exception.apply {
@@ -312,7 +313,7 @@ internal class UpgradeRunnerTest {
         currentVersion = minSupportedVersion - 1
 
         expect {
-            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
         }.toThrow<UpgradeRunner.UpgradeException>()
             .withMessage("Failed to execute upgrade scripts. sql message")
     }
@@ -323,13 +324,13 @@ internal class UpgradeRunnerTest {
         val version = splitVersion + 1
 
         currentVersion = version
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
 
         currentVersion = version
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database.db"), EwbDatabaseType.NETWORK)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database.db"), PathType.NETWORK_MODEL)
 
         currentVersion = version
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("with/path/database.sqlite"), EwbDatabaseType.NETWORK)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("with/path/database.sqlite"), PathType.NETWORK_MODEL)
 
         verifySequence {
             copyFile(Paths.get("database"), Paths.get("database-v$version"), StandardCopyOption.REPLACE_EXISTING)
@@ -346,7 +347,7 @@ internal class UpgradeRunnerTest {
         every { copyFile(any(), any(), any()) } throws exception
 
         expect {
-            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
         }.toThrow<UpgradeRunner.UpgradeException>()
             .withMessage("Failed to create database backup. io error")
     }
@@ -359,7 +360,7 @@ internal class UpgradeRunnerTest {
         every { copyFile(any(), any(), any()) } throws exception
 
         expect {
-            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
         }.toThrow<UpgradeRunner.UpgradeException>()
             .withMessage("Failed to create database backup. security error")
     }
@@ -371,7 +372,7 @@ internal class UpgradeRunnerTest {
         currentVersion = minSupportedVersion - 1
 
         expect {
-            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), EwbDatabaseType.NETWORK)
+            upgradeRunner.connectAndUpgrade("driver:database", Paths.get("database"), PathType.NETWORK_MODEL)
         }.toThrowAny().exception.also {
             assertThat(it, equalTo(exception))
         }
@@ -379,31 +380,31 @@ internal class UpgradeRunnerTest {
 
     @Test
     internal fun `only runs changesets on appropriate database`() {
-        val custOnly = Change(listOf("c-1", "c-2"), setOf(EwbDatabaseType.CUSTOMER))
-        val diagOnly = Change(listOf("d-1", "d-2"), setOf(EwbDatabaseType.DIAGRAM))
-        val netOnly = Change(listOf("n-1", "n-2"), setOf(EwbDatabaseType.NETWORK))
-        val custDiag = Change(listOf("cd-1", "cd-2"), setOf(EwbDatabaseType.CUSTOMER, EwbDatabaseType.DIAGRAM))
-        val custNet = Change(listOf("cn-1", "cn-2"), setOf(EwbDatabaseType.CUSTOMER, EwbDatabaseType.NETWORK))
-        val diagNet = Change(listOf("dn-1", "dn-2"), setOf(EwbDatabaseType.DIAGRAM, EwbDatabaseType.NETWORK))
+        val custOnly = Change(listOf("c-1", "c-2"), setOf(PathType.CUSTOMERS))
+        val diagOnly = Change(listOf("d-1", "d-2"), setOf(PathType.DIAGRAMS))
+        val netOnly = Change(listOf("n-1", "n-2"), setOf(PathType.NETWORK_MODEL))
+        val custDiag = Change(listOf("cd-1", "cd-2"), setOf(PathType.CUSTOMERS, PathType.DIAGRAMS))
+        val custNet = Change(listOf("cn-1", "cn-2"), setOf(PathType.CUSTOMERS, PathType.NETWORK_MODEL))
+        val diagNet = Change(listOf("dn-1", "dn-2"), setOf(PathType.DIAGRAMS, PathType.NETWORK_MODEL))
 
         every { maxChangeSet.commands } returns listOf(custOnly, diagOnly, netOnly, custDiag, custNet, diagNet)
 
         clearAllMocks(answers = false)
         currentVersion = maxSupportedVersion - 1
 
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-customers.sqlite"), EwbDatabaseType.CUSTOMER)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-customers.sqlite"), PathType.CUSTOMERS)
         validateChangesExecuted(listOf(custOnly, custDiag, custNet))
 
         clearAllMocks(answers = false)
         currentVersion = maxSupportedVersion - 1
 
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-diagrams.sqlite"), EwbDatabaseType.DIAGRAM)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-diagrams.sqlite"), PathType.DIAGRAMS)
         validateChangesExecuted(listOf(diagOnly, custDiag, diagNet))
 
         clearAllMocks(answers = false)
         currentVersion = maxSupportedVersion - 1
 
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-network-model.sqlite"), EwbDatabaseType.NETWORK)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-network-model.sqlite"), PathType.NETWORK_MODEL)
         validateChangesExecuted(listOf(netOnly, custNet, diagNet))
     }
 
@@ -413,7 +414,7 @@ internal class UpgradeRunnerTest {
         // required the split.
         currentVersion = splitVersion
 
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-network-model.sqlite"), EwbDatabaseType.NETWORK)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-network-model.sqlite"), PathType.NETWORK_MODEL)
 
         verifySequence {
             copyFile(Paths.get("something-network-model.sqlite"), Paths.get("something-network-model-v$splitVersion.sqlite"), any())
@@ -425,14 +426,14 @@ internal class UpgradeRunnerTest {
     private fun changeSetOf(num: Int) = mockk<ChangeSet> {
         every { number } returns num
         every { preCommandHooks } returns emptyList()
-        every { commands } returns listOf(Change(listOf("$num-1", "$num-2"), setOf(EwbDatabaseType.CUSTOMER, EwbDatabaseType.DIAGRAM, EwbDatabaseType.NETWORK)))
+        every { commands } returns listOf(Change(listOf("$num-1", "$num-2"), setOf(PathType.CUSTOMERS, PathType.DIAGRAMS, PathType.NETWORK_MODEL)))
         every { postCommandHooks } returns emptyList()
     }
 
-    private fun Path.databaseOfType(type: EwbDatabaseType, extra: String = ""): Boolean =
+    private fun Path.databaseOfType(type: PathType, extra: String = ""): Boolean =
         toString().databaseOfType(type, extra)
 
-    private fun String.databaseOfType(type: EwbDatabaseType, extra: String = ""): Boolean =
+    private fun String.databaseOfType(type: PathType, extra: String = ""): Boolean =
         contains("${type.fileDescriptor}$extra.sqlite")
 
     // NOTE: We pass the changeset number instead of getting it off the ChangeSet to avoid using the mockk.
@@ -475,7 +476,7 @@ internal class UpgradeRunnerTest {
         statement.executeUpdate("PRAGMA foreign_keys=ON")
     }
 
-    private fun upgradeRealFile(fileNameSource: String, type: EwbDatabaseType) {
+    private fun upgradeRealFile(fileNameSource: String, type: PathType) {
         systemErr.unmute()
 
         val databaseFile = Files.readString(Path.of("src", "test", "resources", fileNameSource)).trim().trim('"')
@@ -483,7 +484,7 @@ internal class UpgradeRunnerTest {
         UpgradeRunner().connectAndUpgrade("jdbc:sqlite:$databaseFile", Paths.get(databaseFile), type)
     }
 
-    private fun MockKVerificationScope.validateConnectionToDatabase(targetType: EwbDatabaseType) {
+    private fun MockKVerificationScope.validateConnectionToDatabase(targetType: PathType) {
         // Connects to the new database.
         connectionProvider(match { it.databaseOfType(targetType) })
 
@@ -496,12 +497,12 @@ internal class UpgradeRunnerTest {
     }
 
     private fun MockKVerificationScope.validatePreSplitChangesets() {
-        validateUpdateRequiredChecks(EwbDatabaseType.NETWORK, lastPreSplitChangeSet, minSupportedVersion - 1, splitVersion)
+        validateUpdateRequiredChecks(PathType.NETWORK_MODEL, lastPreSplitChangeSet, minSupportedVersion - 1, splitVersion)
 
         // Take a backup
         copyFile(
-            match { it.databaseOfType(EwbDatabaseType.NETWORK) },
-            match { it.databaseOfType(EwbDatabaseType.NETWORK, "-v${minSupportedVersion - 1}") },
+            match { it.databaseOfType(PathType.NETWORK_MODEL) },
+            match { it.databaseOfType(PathType.NETWORK_MODEL, "-v${minSupportedVersion - 1}") },
             any()
         )
 
@@ -519,9 +520,9 @@ internal class UpgradeRunnerTest {
         statement.close()
     }
 
-    private fun MockKVerificationScope.validateCloneAndUpgrade(targetType: EwbDatabaseType) {
+    private fun MockKVerificationScope.validateCloneAndUpgrade(targetType: PathType) {
         // Clones the network database.
-        copyFile(match { it.databaseOfType(EwbDatabaseType.NETWORK) }, match { it.databaseOfType(targetType) }, any())
+        copyFile(match { it.databaseOfType(PathType.NETWORK_MODEL) }, match { it.databaseOfType(targetType) }, any())
 
         validateConnectionToDatabase(targetType)
         validatePostSplitChangesets(targetType)
@@ -531,7 +532,7 @@ internal class UpgradeRunnerTest {
         connection.close()
     }
 
-    private fun validatePostSplitChangesets(targetType: EwbDatabaseType) {
+    private fun validatePostSplitChangesets(targetType: PathType) {
         validateUpdateRequiredChecks(targetType, maxChangeSet, splitVersion, maxSupportedVersion)
 
         // Prepare the version update statement.
@@ -548,7 +549,7 @@ internal class UpgradeRunnerTest {
         statement.close()
     }
 
-    private fun validateUpdateRequiredChecks(databaseType: EwbDatabaseType, targetChangeSet: ChangeSet, fromVersion: Int, toVersion: Int) {
+    private fun validateUpdateRequiredChecks(databaseType: PathType, targetChangeSet: ChangeSet, fromVersion: Int, toVersion: Int) {
         // Create statement for pre-split changesets.
         connection.createStatement()
 

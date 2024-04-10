@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.upgrade
 
-import com.zepben.evolve.database.filepaths.PathType
+import com.zepben.evolve.database.paths.DatabaseType
 
 /**
  * A class containing a list of SQL commands required to upgrade the schema, and which databases these changes should be run against.
@@ -18,5 +18,5 @@ import com.zepben.evolve.database.filepaths.PathType
  */
 data class Change(
     val commands: List<String>,
-    val targetDatabases: Set<PathType>,
+    val targetDatabases: Set<DatabaseType>,
 )

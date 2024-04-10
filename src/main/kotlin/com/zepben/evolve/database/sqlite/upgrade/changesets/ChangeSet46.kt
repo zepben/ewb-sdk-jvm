@@ -10,7 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.Change
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
-import com.zepben.evolve.database.filepaths.PathType
+import com.zepben.evolve.database.paths.DatabaseType
 
 internal fun changeSet46() = ChangeSet(
     46,
@@ -62,5 +62,5 @@ private val `Make potential_transformers type non-null` = Change(
         "CREATE UNIQUE INDEX potential_transformers_mrid ON potential_transformers (mrid);",
         "CREATE INDEX potential_transformers_name ON potential_transformers (name);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )

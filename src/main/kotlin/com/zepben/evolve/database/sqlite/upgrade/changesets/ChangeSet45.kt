@@ -10,7 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.Change
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
-import com.zepben.evolve.database.filepaths.PathType
+import com.zepben.evolve.database.paths.DatabaseType
 
 internal fun changeSet45() = ChangeSet(
     45,
@@ -46,7 +46,7 @@ private val `Create new columns on existing tables` = Change(
 
         "ALTER TABLE breakers ADD in_transit_time NUMBER NULL;",
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -64,7 +64,7 @@ private val `Create switch_info table` = Change(
         "CREATE UNIQUE INDEX switch_info_mrid ON switch_info (mrid);",
         "CREATE INDEX switch_info_name ON switch_info (name);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -82,7 +82,7 @@ private val `Create current_relay_info table` = Change(
         "CREATE UNIQUE INDEX current_relay_info_mrid ON current_relay_info (mrid);",
         "CREATE INDEX current_relay_info_name ON current_relay_info (name);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -109,7 +109,7 @@ private val `Create current_relays table` = Change(
         "CREATE UNIQUE INDEX current_relays_mrid ON current_relays (mrid);",
         "CREATE INDEX current_relays_name ON current_relays (name);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -128,5 +128,5 @@ private val `Create protection_equipment_protected_switches table` = Change(
         "CREATE INDEX protection_equipment_protected_switches_protection_equipment_mrid ON protection_equipment_protected_switches (protection_equipment_mrid);",
         "CREATE INDEX protection_equipment_protected_switches_protected_switch_mrid ON protection_equipment_protected_switches (protected_switch_mrid);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )

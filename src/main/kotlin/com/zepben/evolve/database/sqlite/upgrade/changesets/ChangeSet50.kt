@@ -10,7 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.Change
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
-import com.zepben.evolve.database.filepaths.PathType
+import com.zepben.evolve.database.paths.DatabaseType
 
 internal fun changeSet50() = ChangeSet(
     50,
@@ -46,7 +46,7 @@ private val `Clean customer data from tables shared with network` = Change(
         """.trimIndent(),
         "DELETE FROM organisations WHERE mrid NOT IN (SELECT organisation_mrid FROM asset_owners);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -61,7 +61,7 @@ private val `Clean network data from tables shared with customer` = Change(
         """.trimIndent(),
         "DELETE FROM organisations WHERE mrid NOT IN (SELECT organisation_mrid FROM customers);"
     ),
-    targetDatabases = setOf(PathType.CUSTOMERS)
+    targetDatabases = setOf(DatabaseType.CUSTOMERS)
 )
 
 @Suppress("ObjectPropertyName")
@@ -69,7 +69,7 @@ private val `Clean organisation names from diagrams database` = Change(
     listOf(
         "DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM organisations);"
     ),
-    targetDatabases = setOf(PathType.DIAGRAMS)
+    targetDatabases = setOf(DatabaseType.DIAGRAMS)
 )
 
 @Suppress("ObjectPropertyName")
@@ -85,7 +85,7 @@ private val `Clean customer names` = Change(
         DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM mrids);
         """.trimIndent(),
     ),
-    targetDatabases = setOf(PathType.DIAGRAMS, PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.DIAGRAMS, DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -99,7 +99,7 @@ private val `Clean diagram names` = Change(
         DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM mrids);
         """.trimIndent(),
     ),
-    targetDatabases = setOf(PathType.CUSTOMERS, PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.CUSTOMERS, DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -186,7 +186,7 @@ private val `Clean network names` = Change(
         DELETE FROM names WHERE identified_object_mrid IN (SELECT mrid FROM mrids);
         """.trimIndent(),
     ),
-    targetDatabases = setOf(PathType.CUSTOMERS, PathType.DIAGRAMS)
+    targetDatabases = setOf(DatabaseType.CUSTOMERS, DatabaseType.DIAGRAMS)
 )
 
 @Suppress("ObjectPropertyName")
@@ -194,7 +194,7 @@ private val `Clean unused name types` = Change(
     listOf(
         "DELETE FROM name_types WHERE name NOT IN (SELECT name_type_name FROM names);"
     ),
-    targetDatabases = setOf(PathType.CUSTOMERS, PathType.DIAGRAMS, PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.CUSTOMERS, DatabaseType.DIAGRAMS, DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -207,7 +207,7 @@ private val `Drop customer tables` = Change(
         "DROP TABLE pricing_structures_tariffs;",
         "DROP TABLE tariffs;",
     ),
-    targetDatabases = setOf(PathType.DIAGRAMS, PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.DIAGRAMS, DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -217,7 +217,7 @@ private val `Drop diagram tables` = Change(
         "DROP TABLE diagram_objects;",
         "DROP TABLE diagram_object_points;"
     ),
-    targetDatabases = setOf(PathType.CUSTOMERS, PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.CUSTOMERS, DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -316,7 +316,7 @@ private val `Drop network tables` = Change(
         "DROP TABLE usage_points_end_devices;",
         "DROP TABLE voltage_relays;",
     ),
-    targetDatabases = setOf(PathType.CUSTOMERS, PathType.DIAGRAMS)
+    targetDatabases = setOf(DatabaseType.CUSTOMERS, DatabaseType.DIAGRAMS)
 )
 
 @Suppress("ObjectPropertyName")
@@ -324,5 +324,5 @@ private val `Drop tables shared between customer and network` = Change(
     listOf(
         "DROP TABLE organisations;"
     ),
-    targetDatabases = setOf(PathType.DIAGRAMS)
+    targetDatabases = setOf(DatabaseType.DIAGRAMS)
 )

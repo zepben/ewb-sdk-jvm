@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.upgrade
 
-import com.zepben.evolve.database.filepaths.PathType
+import com.zepben.evolve.database.paths.DatabaseType
 import java.sql.Statement
 
 /**
@@ -19,7 +19,7 @@ import java.sql.Statement
  * @property action The execution block of the hook.
  */
 data class Hook @JvmOverloads constructor(
-    val targetDatabases: Set<PathType> = setOf(PathType.NETWORK_MODEL),
+    val targetDatabases: Set<DatabaseType> = setOf(DatabaseType.NETWORK_MODEL),
     val action: (Statement) -> Unit = { },
 ) {
 

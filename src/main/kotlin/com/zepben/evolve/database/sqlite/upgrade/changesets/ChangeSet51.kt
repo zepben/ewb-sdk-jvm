@@ -10,7 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.Change
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
-import com.zepben.evolve.database.filepaths.PathType
+import com.zepben.evolve.database.paths.DatabaseType
 
 internal fun changeSet51() = ChangeSet(
     51,
@@ -37,7 +37,7 @@ private val `Rename battery_unit to battery_units` = Change(
         "CREATE INDEX battery_units_name ON battery_units (name);",
         "CREATE INDEX battery_units_power_electronics_connection_mrid ON battery_units (power_electronics_connection_mrid);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -53,7 +53,7 @@ private val `Rename photo_voltaic_unit to photo_voltaic_units` = Change(
         "CREATE INDEX photo_voltaic_units_name ON photo_voltaic_units (name);",
         "CREATE INDEX photo_voltaic_units_power_electronics_connection_mrid ON photo_voltaic_units (power_electronics_connection_mrid);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -67,7 +67,7 @@ private val `Rename power_electronics_connection to power_electronics_connection
         "CREATE UNIQUE INDEX power_electronics_connections_mrid ON power_electronics_connections (mrid);",
         "CREATE INDEX power_electronics_connections_name ON power_electronics_connections (name);",
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -83,7 +83,7 @@ private val `Rename power_electronics_connection_phase to power_electronics_conn
         "CREATE INDEX power_electronics_connection_phases_name ON power_electronics_connection_phases (name);",
         "CREATE INDEX power_electronics_connection_phases_power_electronics_connection_mrid ON power_electronics_connection_phases (power_electronics_connection_mrid);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -99,7 +99,7 @@ private val `Rename power_electronics_wind_unit to power_electronics_wind_units`
         "CREATE INDEX power_electronics_wind_units_name ON power_electronics_wind_units (name);",
         "CREATE INDEX power_electronics_wind_units_power_electronics_connection_mrid ON power_electronics_wind_units (power_electronics_connection_mrid);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -115,5 +115,5 @@ private val `Rename transformer_star_impedance to transformer_star_impedances` =
         "CREATE UNIQUE INDEX transformer_star_impedances_transformer_end_info_mrid ON transformer_star_impedances (transformer_end_info_mrid);",
         "CREATE INDEX transformer_star_impedances_name ON transformer_star_impedances (name);"
     ),
-    targetDatabases = setOf(PathType.NETWORK_MODEL)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )

@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.upgrade
 
-import com.zepben.evolve.database.filepaths.PathType
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.*
@@ -58,7 +58,7 @@ class UpgradeRunner @JvmOverloads constructor(
      * @return The [Connection] to the upgraded database.
      */
     @Throws(UpgradeException::class)
-    fun connectAndUpgrade(databaseDescriptor: String, databaseFile: Path, type: PathType): ConnectionResult {
+    fun connectAndUpgrade(databaseDescriptor: String, databaseFile: Path, type: DatabaseType): ConnectionResult {
         val connection = runCatching { getConnection(databaseDescriptor).configureBatch() }
             .getOrElse { throw UpgradeException(it.message, it) }
 
@@ -93,7 +93,7 @@ class UpgradeRunner @JvmOverloads constructor(
     private fun upgrade(
         databaseFile: Path,
         connection: Connection,
-        type: PathType,
+        type: DatabaseType,
         changeSets: List<ChangeSet>,
         backupRequired: Boolean
     ): UpgradeState =
@@ -127,7 +127,7 @@ class UpgradeRunner @JvmOverloads constructor(
         changeSet: ChangeSet,
         statement: Statement,
         versionUpdateStatement: PreparedStatement,
-        type: PathType
+        type: DatabaseType
     ) {
         logger.info("Applying database change set ${changeSet.number}")
         statement.executeUpdate("PRAGMA foreign_keys=OFF")
@@ -169,12 +169,12 @@ class UpgradeRunner @JvmOverloads constructor(
         if (requiresBackup)
             copyFile(networkDatabaseFile, createBackupName(networkDatabaseFile, splitVersion), StandardCopyOption.REPLACE_EXISTING)
 
-        cloneAndUpgrade(networkDatabaseFile, PathType.CUSTOMERS)
-        cloneAndUpgrade(networkDatabaseFile, PathType.DIAGRAMS)
+        cloneAndUpgrade(networkDatabaseFile, DatabaseType.CUSTOMERS)
+        cloneAndUpgrade(networkDatabaseFile, DatabaseType.DIAGRAMS)
     }
 
-    private fun cloneAndUpgrade(networkDatabaseFile: Path, targetType: PathType) {
-        val targetDatabaseFile = networkDatabaseFile.replace(PathType.NETWORK_MODEL.fileDescriptor, targetType.fileDescriptor)
+    private fun cloneAndUpgrade(networkDatabaseFile: Path, targetType: DatabaseType) {
+        val targetDatabaseFile = networkDatabaseFile.replace(DatabaseType.NETWORK_MODEL.fileDescriptor, targetType.fileDescriptor)
 
         try {
             copyFile(networkDatabaseFile, targetDatabaseFile, StandardCopyOption.REPLACE_EXISTING)

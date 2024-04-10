@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.upgrade
 
-import com.zepben.evolve.database.filepaths.PathType
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.tables.TableVersion
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
 import com.zepben.evolve.database.sqlite.upgrade.changesets.combined.*
@@ -69,11 +69,11 @@ internal class ChangeSetTest {
     @Test
     internal fun `test change sets`() {
         // All pre-split change sets are for the network database, as that is the only database that existed.
-        validateChangeSets(createBaseCombinedDB(), preSplitChangeSetValidators, UpgradeRunner::preSplitChangeSets, PathType.NETWORK_MODEL)
+        validateChangeSets(createBaseCombinedDB(), preSplitChangeSetValidators, UpgradeRunner::preSplitChangeSets, DatabaseType.NETWORK_MODEL)
 
-        validateChangeSets(createBaseDB(PathType.CUSTOMERS), customerChangeSetValidators, UpgradeRunner::postSplitChangeSets, PathType.CUSTOMERS)
-        validateChangeSets(createBaseDB(PathType.DIAGRAMS), diagramChangeSetValidators, UpgradeRunner::postSplitChangeSets, PathType.DIAGRAMS)
-        validateChangeSets(createBaseDB(PathType.NETWORK_MODEL), networkChangeSetValidators, UpgradeRunner::postSplitChangeSets, PathType.NETWORK_MODEL)
+        validateChangeSets(createBaseDB(DatabaseType.CUSTOMERS), customerChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.CUSTOMERS)
+        validateChangeSets(createBaseDB(DatabaseType.DIAGRAMS), diagramChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.DIAGRAMS)
+        validateChangeSets(createBaseDB(DatabaseType.NETWORK_MODEL), networkChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.NETWORK_MODEL)
     }
 
     /**
@@ -85,7 +85,7 @@ internal class ChangeSetTest {
     /**
      * Creates an in memory sqlite database using the base network schema (from version 49).
      */
-    private fun createBaseDB(type: PathType): Connection =
+    private fun createBaseDB(type: DatabaseType): Connection =
         createDatabaseFromScript("src/test/data/base-${type.fileDescriptor}-schema.sql")
 
     private fun createDatabaseFromScript(script: String): Connection =
@@ -101,7 +101,7 @@ internal class ChangeSetTest {
         conn: Connection,
         changeSetValidators: Map<Int, ChangeSetValidator>,
         changesSets: UpgradeRunner.() -> List<ChangeSet>,
-        type: PathType
+        type: DatabaseType
     ) {
         val runner = UpgradeRunner()
         val tableVersion = TableVersion()

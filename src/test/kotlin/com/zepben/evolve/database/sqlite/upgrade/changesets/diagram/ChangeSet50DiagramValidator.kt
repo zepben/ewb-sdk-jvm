@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.upgrade.changesets.diagram
 
-import com.zepben.evolve.database.filepaths.PathType
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet50Helpers
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
 import java.sql.Statement
@@ -24,15 +24,15 @@ object ChangeSet50DiagramValidator : ChangeSetValidator {
         //
         // NOTE: We are being lazy and assuming if the table was left behind, then so were its indexes.
         //
-        val (expectedTables, unexpectedTables) = ChangeSet50Helpers.tables(PathType.DIAGRAMS)
+        val (expectedTables, unexpectedTables) = ChangeSet50Helpers.tables(DatabaseType.DIAGRAMS)
         ensureTables(statement, *expectedTables.toTypedArray(), present = true)
         ensureTables(statement, *unexpectedTables.toTypedArray(), present = false)
 
-        ChangeSet50Helpers.ensureNames(statement, PathType.DIAGRAMS)
+        ChangeSet50Helpers.ensureNames(statement, DatabaseType.DIAGRAMS)
     }
 
     override fun tearDownStatements(): List<String> =
-        ChangeSet50Helpers.tables(PathType.DIAGRAMS).first.map {
+        ChangeSet50Helpers.tables(DatabaseType.DIAGRAMS).first.map {
             "DELETE FROM $it"
         }
 

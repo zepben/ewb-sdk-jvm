@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.filepaths
+package com.zepben.evolve.database.paths
 
 import java.io.IOException
 import java.nio.file.Files
@@ -48,7 +48,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "customers" database.
      * @return The path to the "customers" database for the specified date.
      */
-    fun customers(date: LocalDate): Path = date.toDatedPath(PathType.CUSTOMERS.fileDescriptor)
+    fun customers(date: LocalDate): Path = date.toDatedPath(DatabaseType.CUSTOMERS.fileDescriptor)
 
     /**
      * Determine the path to the "diagrams" database for the specified date.
@@ -56,7 +56,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "diagrams" database.
      * @return The path to the "diagrams" database for the specified date.
      */
-    fun diagrams(date: LocalDate): Path = date.toDatedPath(PathType.DIAGRAMS.fileDescriptor)
+    fun diagrams(date: LocalDate): Path = date.toDatedPath(DatabaseType.DIAGRAMS.fileDescriptor)
 
     /**
      * Determine the path to the "measurements" database for the specified date.
@@ -64,7 +64,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "measurements" database.
      * @return The path to the "measurements" database for the specified date.
      */
-    fun measurements(date: LocalDate): Path = date.toDatedPath(PathType.MEASUREMENTS.fileDescriptor)
+    fun measurements(date: LocalDate): Path = date.toDatedPath(DatabaseType.MEASUREMENTS.fileDescriptor)
 
     /**
      * Determine the path to the "network model" database for the specified date.
@@ -72,7 +72,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "network model" database.
      * @return The path to the "network model" database for the specified date.
      */
-    fun networkModel(date: LocalDate): Path = date.toDatedPath(PathType.NETWORK_MODEL.fileDescriptor)
+    fun networkModel(date: LocalDate): Path = date.toDatedPath(DatabaseType.NETWORK_MODEL.fileDescriptor)
 
     /**
      * Determine the path to the "tile cache" database for the specified date.
@@ -80,7 +80,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "tile cache" database.
      * @return The path to the "tile cache" database for the specified date.
      */
-    fun tileCache(date: LocalDate): Path = date.toDatedPath(PathType.TILE_CACHE.fileDescriptor)
+    fun tileCache(date: LocalDate): Path = date.toDatedPath(DatabaseType.TILE_CACHE.fileDescriptor)
 
     /**
      * Determine the path to the "energy readings" database for the specified date.
@@ -88,35 +88,35 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "energy readings" database.
      * @return The path to the "energy readings" database for the specified date.
      */
-    fun energyReadings(date: LocalDate): Path = date.toDatedPath(PathType.ENERGY_READINGS.fileDescriptor)
+    fun energyReadings(date: LocalDate): Path = date.toDatedPath(DatabaseType.ENERGY_READINGS.fileDescriptor)
 
     /**
      * Determine the path to the "energy readings index" database.
      *
      * @return The path to the "energy readings index" database.
      */
-    fun energyReadingsIndex(): Path = baseDir.resolve(PathType.ENERGY_READINGS_INDEX.fileDescriptor + ".sqlite")
+    fun energyReadingsIndex(): Path = baseDir.resolve(DatabaseType.ENERGY_READINGS_INDEX.fileDescriptor + ".sqlite")
 
     /**
      * Determine the path to the "load aggregator meters-by-date" database.
      *
      * @return The path to the "load aggregator meters-by-date" database.
      */
-    fun loadAggregatorMetersByDate(): Path = baseDir.resolve(PathType.LOAD_AGGREGATOR_METERS_BY_DATE.fileDescriptor + ".sqlite")
+    fun loadAggregatorMetersByDate(): Path = baseDir.resolve(DatabaseType.LOAD_AGGREGATOR_METERS_BY_DATE.fileDescriptor + ".sqlite")
 
     /**
      * Determine the path to the "weather readings" database.
      *
      * @return The path to the "weather readings" database.
      */
-    fun weatherReadings(): Path = baseDir.resolve(PathType.WEATHER_READINGS.fileDescriptor + ".sqlite")
+    fun weatherReadings(): Path = baseDir.resolve(DatabaseType.WEATHER_READINGS.fileDescriptor + ".sqlite")
 
     /**
      * Determine the path to the "results cache" database.
      *
      * @return The path to the "results cache" database.
      */
-    fun resultsCache(): Path = baseDir.resolve(PathType.RESULTS_CACHE.fileDescriptor + ".sqlite")
+    fun resultsCache(): Path = baseDir.resolve(DatabaseType.RESULTS_CACHE.fileDescriptor + ".sqlite")
 
     /**
      * Create the directories required to have a valid path for the specified date.
@@ -144,7 +144,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @return The closest [LocalDate] to [date] with a valid database of [type] within the search parameters, or null if no valid database was found.
      */
     @JvmOverloads
-    fun findClosest(type: PathType, maxDaysToSearch: Int = 999999, date: LocalDate = LocalDate.now(), searchForwards: Boolean = false): LocalDate? {
+    fun findClosest(type: DatabaseType, maxDaysToSearch: Int = 999999, date: LocalDate = LocalDate.now(), searchForwards: Boolean = false): LocalDate? {
         // We do not want to return a date for non date based files.
         if (!type.perDate)
             return null
@@ -177,14 +177,14 @@ class EwbDataFilePaths @JvmOverloads constructor(
      *
      * @return True if a database of the specified [type] and [date] exits in the date path.
      */
-    fun checkExists(type: PathType, date: LocalDate): Boolean {
+    fun checkExists(type: DatabaseType, date: LocalDate): Boolean {
         val modelPath = when (type) {
-            PathType.CUSTOMERS -> customers(date)
-            PathType.DIAGRAMS -> diagrams(date)
-            PathType.MEASUREMENTS -> measurements(date)
-            PathType.NETWORK_MODEL -> networkModel(date)
-            PathType.TILE_CACHE -> tileCache(date)
-            PathType.ENERGY_READINGS -> energyReadings(date)
+            DatabaseType.CUSTOMERS -> customers(date)
+            DatabaseType.DIAGRAMS -> diagrams(date)
+            DatabaseType.MEASUREMENTS -> measurements(date)
+            DatabaseType.NETWORK_MODEL -> networkModel(date)
+            DatabaseType.TILE_CACHE -> tileCache(date)
+            DatabaseType.ENERGY_READINGS -> energyReadings(date)
             else -> throw IllegalStateException("INTERNAL ERROR: Should only be calling `checkExists` for `perDate` files, which should all be covered above, so go ahead and add it.")
         }
         return exists(modelPath)
@@ -193,7 +193,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
     private fun LocalDate.toDatedPath(file: String): Path =
         toString().let { dateStr -> Paths.get(baseDir.toString(), dateStr, "$dateStr-$file.sqlite") }
 
-    internal fun getAvailableDatesFor(type: PathType): List<LocalDate> {
+    internal fun getAvailableDatesFor(type: DatabaseType): List<LocalDate> {
         if (!type.perDate)
             throw IllegalStateException("INTERNAL ERROR: Should only be calling `getAvailableDatesFor` for `perDate` files, which should all be covered above, so go ahead and add it.")
 
@@ -222,9 +222,9 @@ class EwbDataFilePaths @JvmOverloads constructor(
     fun getAvailableNetworkModels(excludeCustomers: Boolean = false): List<LocalDate> {
         var customers: List<LocalDate>? = null
         if (!excludeCustomers)
-            customers = getAvailableDatesFor(PathType.CUSTOMERS)
-        return getAvailableDatesFor(PathType.NETWORK_MODEL).let { networks ->
-            getAvailableDatesFor(PathType.DIAGRAMS).filter { diagram ->
+            customers = getAvailableDatesFor(DatabaseType.CUSTOMERS)
+        return getAvailableDatesFor(DatabaseType.NETWORK_MODEL).let { networks ->
+            getAvailableDatesFor(DatabaseType.DIAGRAMS).filter { diagram ->
                 networks.contains(diagram) && (customers?.contains(diagram) ?: true)
             }
         }

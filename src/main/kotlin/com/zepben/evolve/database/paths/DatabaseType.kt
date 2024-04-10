@@ -6,9 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.filepaths
+package com.zepben.evolve.database.paths
 
-enum class PathType(val perDate: Boolean, val fileDescriptor: String)
+enum class DatabaseType(val perDate: Boolean, val fileDescriptor: String)
 {
     CUSTOMERS(perDate = true, fileDescriptor="customers"),
     DIAGRAMS(perDate = true, fileDescriptor="diagrams"),

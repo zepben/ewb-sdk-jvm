@@ -13,7 +13,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
-import java.time.format.DateTimeParseException
 import kotlin.io.path.name
 
 
@@ -177,7 +176,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      *
      * @return True if a database of the specified [type] and [date] exits in the date path.
      */
-    fun checkExists(type: DatabaseType, date: LocalDate): Boolean {
+    private fun checkExists(type: DatabaseType, date: LocalDate): Boolean {
         val modelPath = when (type) {
             DatabaseType.CUSTOMERS -> customers(date)
             DatabaseType.DIAGRAMS -> diagrams(date)
@@ -200,33 +199,16 @@ class EwbDataFilePaths @JvmOverloads constructor(
         return listFiles(baseDir)
             .asSequence()
             .filter { isDirectory(it) }
-            .mapNotNull {
-                try {
-                    LocalDate.parse(it.name)
-                } catch (e: DateTimeParseException) {
-                    null
-                }
-            }
+            .mapNotNull { runCatching { LocalDate.parse(it.name) }.getOrNull() }
             .filter { exists(it.toDatedPath(type.fileDescriptor)) }
             .sorted()
             .toList()
     }
 
     /**
-     * Find available network models in data path.
+     * Find available network-model databases in data path.
      *
-     * @param excludeCustomers When true, the returned list includes network models without associated "customers" databases.
-     *
-     * @return A list of [LocalDate]'s for which network models exist in the data path.
+     * @return A list of [LocalDate]'s for which network-model databases exist in the data path.
      */
-    fun getAvailableNetworkModels(excludeCustomers: Boolean = false): List<LocalDate> {
-        var customers: List<LocalDate>? = null
-        if (!excludeCustomers)
-            customers = getAvailableDatesFor(DatabaseType.CUSTOMERS)
-        return getAvailableDatesFor(DatabaseType.NETWORK_MODEL).let { networks ->
-            getAvailableDatesFor(DatabaseType.DIAGRAMS).filter { diagram ->
-                networks.contains(diagram) && (customers?.contains(diagram) ?: true)
-            }
-        }
-    }
+    fun getNetworkModelDatabases(): List<LocalDate> = getAvailableDatesFor(DatabaseType.NETWORK_MODEL)
 }

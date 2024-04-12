@@ -69,7 +69,7 @@ object ChangeSet50Helpers {
         DatabaseType.NETWORK_MODEL -> listOf(populateCommonTables(), populateNetworkTables(), populateSharedTables()).extractTables() to
             listOf(populateCustomerTables().filter { !it.contains("INSERT INTO organisations ") }, populateDiagramTables()).extractTables()
 
-        else -> throw IllegalStateException("Only excepts CUSTOMERS/DIAGRAMS/NETWORK_MODEL")
+        else -> throw IllegalStateException("Only accepts the follow database types: CUSTOMERS, DIAGRAMS, NETWORK_MODEL. Received: $type")
     }
 
     /**
@@ -406,7 +406,7 @@ object ChangeSet50Helpers {
                     populateSharedNameTypeCustomerDiagram(),
                 ).extractValues()
 
-        else -> throw IllegalStateException("Only excepts CUSTOMERS/DIAGRAMS/NETWORK_MODEL")
+        else -> throw IllegalStateException("Only accepts the follow database types: CUSTOMERS, DIAGRAMS, NETWORK_MODEL. Received: $type")
     }
 
     private fun findExpectedNameValues(type: DatabaseType): Pair<List<String>, List<String>> = when (type) {
@@ -455,7 +455,7 @@ object ChangeSet50Helpers {
                     populateSharedNamesDiagramNetwork().filter { !it.contains("junction_mrid") }
                 ).extractValues()
 
-        else -> throw IllegalStateException("Only excepts CUSTOMERS/DIAGRAMS/NETWORK_MODEL")
+        else -> throw IllegalStateException("Only accepts the follow database types: CUSTOMERS, DIAGRAMS, NETWORK_MODEL. Received: $type")
     }
 
     private fun Iterable<List<String>>.extractTables(): Set<String> =

@@ -187,12 +187,16 @@ class EwbDataFilePathsTest {
         val usableDirectories = listOf("2001-02-03", "2001-02-04", "2011-03-09")
         val emptyDirectories = listOf("2111-11-11", "2222-12-14")
         val nonDateDirectories = listOf("other_data", "2002-02-04-backup", "backup-2011-03-09")
-        val nonDirectoryFiles = listOf("config.json", "other", "run.sh")
+        val nonDirectoryFiles = listOf("config.json", "other", "run.sh", "1234-11-22")
 
         val allFiles = (usableDirectories + emptyDirectories + nonDateDirectories + nonDirectoryFiles)
         val dateDirectories = (usableDirectories + emptyDirectories)
 
         every { listFiles(baseDir) } answers { allFiles.map { Paths.get(baseDir.toString(), it) }.iterator() }
+
+        nonDirectoryFiles.forEach {
+            every { isDirectory(Paths.get(baseDir.toString(), it)) } returns false
+        }
 
         emptyDirectories.forEach {
             every { exists(baseDir.datedPath(LocalDate.parse(it), dbType.fileDescriptor)) } returns false
@@ -212,7 +216,7 @@ class EwbDataFilePathsTest {
     }
 
     @Test
-    internal fun `get available network models sorts the returned dates`() {
+    internal fun `getAvailableDatesFor() sorts the returned dates`() {
         val directories = listOf(
             Path.of("2001-02-03"),
             Path.of("2032-05-07"),
@@ -223,7 +227,7 @@ class EwbDataFilePathsTest {
         every { listFiles(baseDir) } answers { directories.iterator() }
 
         assertThat(
-            ewbPaths.getAvailableNetworkModels(), equalTo(
+            ewbPaths.getAvailableDatesFor(DatabaseType.NETWORK_MODEL), equalTo(
                 listOf(
                     LocalDate.parse("2001-02-03"),
                     LocalDate.parse("2009-05-08"),
@@ -235,41 +239,30 @@ class EwbDataFilePathsTest {
     }
 
     @Test
-    internal fun `get available follows excludeCustomers flag`() {
-        val directories = listOf(
-            Path.of("2111-01-11"),
-            Path.of("2111-02-12"),
-            Path.of("2111-03-13"),
-            Path.of("4444-04-14"),
-            Path.of("5555-05-15"),
-            Path.of("6666-06-16")
+    internal fun `getNetworkModelDatabases coverage`() {
+        clearMocks(isDirectory, exists, listFiles, answers = false)
 
-        )
-        every { listFiles(baseDir) } answers { directories.iterator() }
-        every { exists(baseDir.datedPath(LocalDate.parse("4444-04-14"), DatabaseType.CUSTOMERS.fileDescriptor)) } returns false
-        every { exists(baseDir.datedPath(LocalDate.parse("5555-05-15"), DatabaseType.NETWORK_MODEL.fileDescriptor)) } returns false
-        every { exists(baseDir.datedPath(LocalDate.parse("6666-06-16"), DatabaseType.DIAGRAMS.fileDescriptor)) } returns false
+        val hasNetworkDirectories = listOf("2111-02-03")
+        val emptyDirectories = listOf("2555-11-11")
 
-        assertThat(
-            ewbPaths.getAvailableNetworkModels(excludeCustomers = false), equalTo(
-                listOf(
-                    LocalDate.parse("2111-01-11"),
-                    LocalDate.parse("2111-02-12"),
-                    LocalDate.parse("2111-03-13"),
-                )
-            )
-        )
-        //includes 4444-04-14 that was only missing customers db
-        assertThat(
-            ewbPaths.getAvailableNetworkModels(excludeCustomers = true), equalTo(
-                listOf(
-                    LocalDate.parse("2111-01-11"),
-                    LocalDate.parse("2111-02-12"),
-                    LocalDate.parse("2111-03-13"),
-                    LocalDate.parse("4444-04-14")
-                )
-            )
-        )
+        val allDirectories = (hasNetworkDirectories + emptyDirectories)
+
+        every { listFiles(baseDir) } answers { allDirectories.map { Paths.get(baseDir.toString(), it) }.iterator() }
+
+        every { exists(any()) } returns false
+        hasNetworkDirectories.forEach {
+            every { exists(baseDir.datedPath(LocalDate.parse(it), DatabaseType.NETWORK_MODEL.fileDescriptor)) } returns true
+        }
+
+        assertThat(ewbPaths.getNetworkModelDatabases(), equalTo(hasNetworkDirectories.map { LocalDate.parse(it) }))
+
+        verifySequence {
+            listFiles(baseDir)
+            allDirectories.forEach {
+                isDirectory(Paths.get(baseDir.toString(), it))
+                exists(baseDir.datedPath(LocalDate.parse(it), DatabaseType.NETWORK_MODEL.fileDescriptor))
+            }
+        }
     }
 
     private fun validateClosest(expectedDate: LocalDate?, expectedExistCalls: Int, searchForwards: Boolean = false) {
@@ -289,5 +282,4 @@ class EwbDataFilePathsTest {
 
     private fun Path.datedPath(date: LocalDate, name: String): Path =
         resolve(date.toString()).resolve("$date-$name.sqlite")
-
 }

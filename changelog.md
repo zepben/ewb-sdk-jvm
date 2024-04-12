@@ -79,6 +79,7 @@
       section and safeguard the power system.
     * `RelayInfo.recloseFast`: True if recloseDelays are associated with a fast Curve, False otherwise.
     * `RegulatingControl.ratedCurrent`: The rated current of associated CT in amps for a RegulatingControl.
+* Added `EwbDataFilePaths` for working with files and folders used by EWB.
 
 ### Enhancements
 

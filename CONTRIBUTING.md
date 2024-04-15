@@ -53,19 +53,19 @@ Our main style requirements are:
       * `com.zepben.evolve.database.sqlite.cim.network.NetworkServiceReader`
    7. DB version updated. - `com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion`
    8. Migration written. - `com.zepben.evolve.database.sqlite.cim.upgrade`
-       1. ChangeSet written. - `com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSet*`
-       2. ChangeSet added to UpgradeRunner. - `com.zepben.evolve.database.sqlite.cim.upgrade.UpgradeRunner`
-       3. ChangeSetValidator written for ChangeSet. - `com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSet*Validator`
-       4. ChangeSetValidator added to changeSetValidators. - `com.zepben.evolve.database.sqlite.cim.upgrade.ChangeSetTest`
+      1. ChangeSet written. - `com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSet*`
+      2. ChangeSet added to UpgradeRunner. - `com.zepben.evolve.database.sqlite.cim.upgrade.UpgradeRunner`
+      3. ChangeSetValidator written for ChangeSet. - `com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSet*Validator`
+      4. ChangeSetValidator added to changeSetValidators. - `com.zepben.evolve.database.sqlite.cim.upgrade.ChangeSetTest`
    9. Add schema tests:
       * `com.zepben.evolve.database.sqlite.cim.customer.CustomerDatabaseSchemaTest`
       * `com.zepben.evolve.database.sqlite.cim.diagram.DiagramDatabaseSchemaTest`
       * `com.zepben.evolve.database.sqlite.cim.network.NetworkDatabaseSchemaTest`
 7. Reference resolver(s) added (if new associations).
 8. Protobuf/gRPC
-    1. *CimToProto(s) updated (including java wrapper).
-    2. *ProtoToCim(s) updated (including java wrapper).
-    3. *TranslatorTest(s) updated.
+   1. *CimToProto(s) updated (including java wrapper).
+   2. *ProtoToCim(s) updated (including java wrapper).
+   3. *TranslatorTest(s) updated.
 
 NOTE: Do not update the StupidlyLargeNetwork file, this will be phased out.
 

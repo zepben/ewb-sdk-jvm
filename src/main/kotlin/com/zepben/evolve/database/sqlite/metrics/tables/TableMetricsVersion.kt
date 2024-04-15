@@ -6,11 +6,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.cim.tables
+package com.zepben.evolve.database.sqlite.metrics.tables
 
 import com.zepben.evolve.database.sqlite.common.TableVersion
 
 /**
- * The `version` table in the CIM databases. Increment this when doing a schema update.
+ * The `version` table in the metrics database.
  */
-val tableCimVersion: TableVersion = TableVersion(52)
+val tableMetricsVersion: TableVersion = TableVersion(1)

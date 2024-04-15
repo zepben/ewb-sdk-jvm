@@ -32,7 +32,8 @@ import java.sql.SQLException
 abstract class BaseDatabaseWriter(
     private val databaseFile: String,
     private val databaseTables: BaseDatabaseTables,
-    private val getConnection: (String) -> Connection
+    private val getConnection: (String) -> Connection,
+    private val persistFile: Boolean = false
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -40,6 +41,7 @@ abstract class BaseDatabaseWriter(
     private val databaseDescriptor: String = "jdbc:sqlite:$databaseFile"
     private lateinit var saveConnection: Connection
     private var hasBeenUsed: Boolean = false
+    private var writingToExistingFile = false
 
     /**
      * Save the database using the [MetadataCollectionWriter] and [BaseServiceWriter].
@@ -59,7 +61,7 @@ abstract class BaseDatabaseWriter(
         }
 
         val status = try {
-            saveWithConnection(saveConnection)
+            saveSchema()
         } catch (e: MissingTableConfigException) {
             logger.error("Unable to save database: " + e.message, e)
             false
@@ -67,14 +69,22 @@ abstract class BaseDatabaseWriter(
 
         return status and postSave()
     }
-    
+
     abstract fun saveWithConnection(connection: Connection): Boolean
 
+    abstract fun saveSchema(): Boolean
+
     private fun preSave(): Boolean =
-        removeExisting()
-            && connect()
-            && create()
-            && prepareInsertStatements()
+        if (persistFile && Files.exists(Paths.get(databaseFile))) {
+            writingToExistingFile = true
+            logger.info("Connecting to existing database $databaseFile...")
+            connect() && versionMatches() && prepareInsertStatements()
+        } else {
+            removeExisting()
+                && connect()
+                && create()
+                && prepareInsertStatements()
+        }
 
     private fun removeExisting(): Boolean =
         try {
@@ -132,6 +142,25 @@ abstract class BaseDatabaseWriter(
             false
         }
 
+    private fun versionMatches(): Boolean {
+        saveConnection.createStatement().use { statement ->
+            val tableVersion = databaseTables.getTable<TableVersion>()
+            statement.executeQuery(tableVersion.selectSql).use { rs ->
+                if (rs.next()) {
+                    val version = rs.getInt(tableVersion.VERSION.queryIndex)
+                    return if (version == tableVersion.supportedVersion) true
+                    else {
+                        logger.error("Unsupported version in database file (got $version, expected ${tableVersion.supportedVersion}).")
+                        false
+                    }
+                } else {
+                    logger.error("Missing version table in database file, cannot check compatibility")
+                    return false
+                }
+            }
+        }
+    }
+
     private fun closeConnection() {
         try {
             if (::saveConnection.isInitialized)
@@ -143,17 +172,19 @@ abstract class BaseDatabaseWriter(
 
     private fun postSave(): Boolean =
         try {
-            logger.info("Adding indexes...")
+            if (!writingToExistingFile) {
+                logger.info("Adding indexes...")
 
-            saveConnection.createStatement().use { statement ->
-                databaseTables.forEachTable { table ->
-                    table.createIndexesSql.forEach { sql ->
-                        statement.execute(sql)
+                saveConnection.createStatement().use { statement ->
+                    databaseTables.forEachTable { table ->
+                        table.createIndexesSql.forEach { sql ->
+                            statement.execute(sql)
+                        }
                     }
                 }
-            }
 
-            logger.info("Indexes added.")
+                logger.info("Indexes added.")
+            }
             logger.info("Committing...")
 
             saveConnection.commit()

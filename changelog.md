@@ -1,10 +1,10 @@
 # Zepben EWB SDK changelog
 ## [0.20.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Removed `EwbDatabaseType`. Use `DatabaseType` instead.
 
 ### New Features
-* None.
+* Added `EwbDataFilePaths` for working with files and folders used by EWB.
 
 ### Enhancements
 * None.
@@ -58,7 +58,6 @@
     * `transformer_star_impedance` to `transformer_star_impedances`
 * The `UpgradeRunner` is no longer used by the database readers. You must now call it directly if you want a database to upgrade. This change has been put in
   place due to the splitting of the database.
-* Removed `EwbDatabaseType`. Use `DatabaseType` instead.
 
 ### New Features
 
@@ -80,7 +79,6 @@
       section and safeguard the power system.
     * `RelayInfo.recloseFast`: True if recloseDelays are associated with a fast Curve, False otherwise.
     * `RegulatingControl.ratedCurrent`: The rated current of associated CT in amps for a RegulatingControl.
-* Added `EwbDataFilePaths` for working with files and folders used by EWB.
 
 ### Enhancements
 

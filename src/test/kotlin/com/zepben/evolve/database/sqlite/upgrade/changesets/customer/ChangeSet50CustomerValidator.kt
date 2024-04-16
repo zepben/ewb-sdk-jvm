@@ -24,15 +24,15 @@ object ChangeSet50CustomerValidator : ChangeSetValidator {
         //
         // NOTE: We are being lazy and assuming if the table was left behind, then so were its indexes.
         //
-        val (expectedTables, unexpectedTables) = ChangeSet50Helpers.tables(DatabaseType.CUSTOMERS)
+        val (expectedTables, unexpectedTables) = ChangeSet50Helpers.tables(DatabaseType.CUSTOMER)
         ensureTables(statement, *expectedTables.toTypedArray(), present = true)
         ensureTables(statement, *unexpectedTables.toTypedArray(), present = false)
 
-        ChangeSet50Helpers.ensureNames(statement, DatabaseType.CUSTOMERS)
+        ChangeSet50Helpers.ensureNames(statement, DatabaseType.CUSTOMER)
     }
 
     override fun tearDownStatements(): List<String> =
-        ChangeSet50Helpers.tables(DatabaseType.CUSTOMERS).first.map {
+        ChangeSet50Helpers.tables(DatabaseType.CUSTOMER).first.map {
             "DELETE FROM $it"
         }
 

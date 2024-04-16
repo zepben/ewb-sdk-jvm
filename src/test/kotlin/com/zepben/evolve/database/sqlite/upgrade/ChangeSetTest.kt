@@ -71,8 +71,8 @@ internal class ChangeSetTest {
         // All pre-split change sets are for the network database, as that is the only database that existed.
         validateChangeSets(createBaseCombinedDB(), preSplitChangeSetValidators, UpgradeRunner::preSplitChangeSets, DatabaseType.NETWORK_MODEL)
 
-        validateChangeSets(createBaseDB(DatabaseType.CUSTOMERS), customerChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.CUSTOMERS)
-        validateChangeSets(createBaseDB(DatabaseType.DIAGRAMS), diagramChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.DIAGRAMS)
+        validateChangeSets(createBaseDB(DatabaseType.CUSTOMER), customerChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.CUSTOMER)
+        validateChangeSets(createBaseDB(DatabaseType.DIAGRAM), diagramChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.DIAGRAM)
         validateChangeSets(createBaseDB(DatabaseType.NETWORK_MODEL), networkChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.NETWORK_MODEL)
     }
 

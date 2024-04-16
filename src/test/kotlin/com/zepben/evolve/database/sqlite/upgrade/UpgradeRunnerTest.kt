@@ -101,14 +101,14 @@ internal class UpgradeRunnerTest {
     @Test
     internal fun `upgrade real customer file`() {
         // Put the name of the database you want to load in src/test/resources/test-customer-database.txt
-        upgradeRealFile("test-customer-database.txt", DatabaseType.CUSTOMERS)
+        upgradeRealFile("test-customer-database.txt", DatabaseType.CUSTOMER)
     }
 
     @Disabled
     @Test
     internal fun `upgrade real diagram file`() {
         // Put the name of the database you want to load in src/test/resources/test-diagram-database.txt
-        upgradeRealFile("test-diagram-database.txt", DatabaseType.DIAGRAMS)
+        upgradeRealFile("test-diagram-database.txt", DatabaseType.DIAGRAM)
     }
 
     @Disabled
@@ -169,8 +169,8 @@ internal class UpgradeRunnerTest {
             validatePreSplitChangesets()
 
             // Clones the database into the customer and diagram variants and runs the post-split commands on them.
-            validateCloneAndUpgrade(DatabaseType.CUSTOMERS)
-            validateCloneAndUpgrade(DatabaseType.DIAGRAMS)
+            validateCloneAndUpgrade(DatabaseType.CUSTOMER)
+            validateCloneAndUpgrade(DatabaseType.DIAGRAM)
 
             // Continues to run the post-split commands on the network database.
             validatePostSplitChangesets(DatabaseType.NETWORK_MODEL)
@@ -380,25 +380,25 @@ internal class UpgradeRunnerTest {
 
     @Test
     internal fun `only runs changesets on appropriate database`() {
-        val custOnly = Change(listOf("c-1", "c-2"), setOf(DatabaseType.CUSTOMERS))
-        val diagOnly = Change(listOf("d-1", "d-2"), setOf(DatabaseType.DIAGRAMS))
+        val custOnly = Change(listOf("c-1", "c-2"), setOf(DatabaseType.CUSTOMER))
+        val diagOnly = Change(listOf("d-1", "d-2"), setOf(DatabaseType.DIAGRAM))
         val netOnly = Change(listOf("n-1", "n-2"), setOf(DatabaseType.NETWORK_MODEL))
-        val custDiag = Change(listOf("cd-1", "cd-2"), setOf(DatabaseType.CUSTOMERS, DatabaseType.DIAGRAMS))
-        val custNet = Change(listOf("cn-1", "cn-2"), setOf(DatabaseType.CUSTOMERS, DatabaseType.NETWORK_MODEL))
-        val diagNet = Change(listOf("dn-1", "dn-2"), setOf(DatabaseType.DIAGRAMS, DatabaseType.NETWORK_MODEL))
+        val custDiag = Change(listOf("cd-1", "cd-2"), setOf(DatabaseType.CUSTOMER, DatabaseType.DIAGRAM))
+        val custNet = Change(listOf("cn-1", "cn-2"), setOf(DatabaseType.CUSTOMER, DatabaseType.NETWORK_MODEL))
+        val diagNet = Change(listOf("dn-1", "dn-2"), setOf(DatabaseType.DIAGRAM, DatabaseType.NETWORK_MODEL))
 
         every { maxChangeSet.commands } returns listOf(custOnly, diagOnly, netOnly, custDiag, custNet, diagNet)
 
         clearAllMocks(answers = false)
         currentVersion = maxSupportedVersion - 1
 
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-customers.sqlite"), DatabaseType.CUSTOMERS)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-customers.sqlite"), DatabaseType.CUSTOMER)
         validateChangesExecuted(listOf(custOnly, custDiag, custNet))
 
         clearAllMocks(answers = false)
         currentVersion = maxSupportedVersion - 1
 
-        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-diagrams.sqlite"), DatabaseType.DIAGRAMS)
+        upgradeRunner.connectAndUpgrade("driver:database", Paths.get("something-diagrams.sqlite"), DatabaseType.DIAGRAM)
         validateChangesExecuted(listOf(diagOnly, custDiag, diagNet))
 
         clearAllMocks(answers = false)
@@ -426,7 +426,7 @@ internal class UpgradeRunnerTest {
     private fun changeSetOf(num: Int) = mockk<ChangeSet> {
         every { number } returns num
         every { preCommandHooks } returns emptyList()
-        every { commands } returns listOf(Change(listOf("$num-1", "$num-2"), setOf(DatabaseType.CUSTOMERS, DatabaseType.DIAGRAMS, DatabaseType.NETWORK_MODEL)))
+        every { commands } returns listOf(Change(listOf("$num-1", "$num-2"), setOf(DatabaseType.CUSTOMER, DatabaseType.DIAGRAM, DatabaseType.NETWORK_MODEL)))
         every { postCommandHooks } returns emptyList()
     }
 

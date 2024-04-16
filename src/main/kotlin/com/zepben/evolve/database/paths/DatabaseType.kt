@@ -10,8 +10,8 @@ package com.zepben.evolve.database.paths
 
 enum class DatabaseType(val perDate: Boolean, val fileDescriptor: String)
 {
-    CUSTOMERS(perDate = true, fileDescriptor="customers"),
-    DIAGRAMS(perDate = true, fileDescriptor="diagrams"),
+    CUSTOMER(perDate = true, fileDescriptor="customers"),
+    DIAGRAM(perDate = true, fileDescriptor="diagrams"),
     MEASUREMENTS(perDate = true, fileDescriptor="measurements"),
     NETWORK_MODEL(perDate = true, fileDescriptor="network-model"),
     TILE_CACHE(perDate = true, fileDescriptor="tile-cache"),

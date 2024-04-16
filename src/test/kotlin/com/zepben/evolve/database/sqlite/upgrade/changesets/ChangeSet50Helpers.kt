@@ -59,10 +59,10 @@ object ChangeSet50Helpers {
      */
     fun tables(type: DatabaseType): Pair<Set<String>, Set<String>> = when (type) {
         // Filter out the organisations table from the network tables as it is also kept by customer databases.
-        DatabaseType.CUSTOMERS -> listOf(populateCommonTables(), populateCustomerTables(), populateSharedTables()).extractTables() to
+        DatabaseType.CUSTOMER -> listOf(populateCommonTables(), populateCustomerTables(), populateSharedTables()).extractTables() to
             listOf(populateDiagramTables(), populateNetworkTables().filter { !it.contains("INSERT INTO organisations ") }).extractTables()
 
-        DatabaseType.DIAGRAMS -> listOf(populateCommonTables(), populateDiagramTables()).extractTables() to
+        DatabaseType.DIAGRAM -> listOf(populateCommonTables(), populateDiagramTables()).extractTables() to
             listOf(populateCustomerTables(), populateNetworkTables(), populateSharedTables()).extractTables()
 
         // Filter out the organisations table from the customer tables as it is also kept by network databases.
@@ -367,7 +367,7 @@ object ChangeSet50Helpers {
     )
 
     private fun findExpectedNameTypeValues(type: DatabaseType): Pair<List<String>, List<String>> = when (type) {
-        DatabaseType.CUSTOMERS ->
+        DatabaseType.CUSTOMER ->
             listOf(
                 populateCommonNameType(),
                 populateCustomerNameType(),
@@ -380,7 +380,7 @@ object ChangeSet50Helpers {
                     populateSharedNameTypeDiagramNetwork(),
                 ).extractValues()
 
-        DatabaseType.DIAGRAMS ->
+        DatabaseType.DIAGRAM ->
             listOf(
                 populateCommonNameType(),
                 populateDiagramNameType(),
@@ -410,7 +410,7 @@ object ChangeSet50Helpers {
     }
 
     private fun findExpectedNameValues(type: DatabaseType): Pair<List<String>, List<String>> = when (type) {
-        DatabaseType.CUSTOMERS ->
+        DatabaseType.CUSTOMER ->
             listOf(
                 populateCommonNames().filter { it.contains("customer_mrid") },
                 populateCustomerNames(),
@@ -425,7 +425,7 @@ object ChangeSet50Helpers {
                     populateSharedNamesDiagramNetwork()
                 ).extractValues()
 
-        DatabaseType.DIAGRAMS ->
+        DatabaseType.DIAGRAM ->
             listOf(
                 populateCommonNames().filter { it.contains("diagram_mrid") },
                 populateDiagramNames(),

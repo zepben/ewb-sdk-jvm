@@ -47,7 +47,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "customers" database.
      * @return The path to the "customers" database for the specified date.
      */
-    fun customers(date: LocalDate): Path = date.toDatedPath(DatabaseType.CUSTOMERS.fileDescriptor)
+    fun customers(date: LocalDate): Path = date.toDatedPath(DatabaseType.CUSTOMER.fileDescriptor)
 
     /**
      * Determine the path to the "diagrams" database for the specified date.
@@ -55,7 +55,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "diagrams" database.
      * @return The path to the "diagrams" database for the specified date.
      */
-    fun diagrams(date: LocalDate): Path = date.toDatedPath(DatabaseType.DIAGRAMS.fileDescriptor)
+    fun diagrams(date: LocalDate): Path = date.toDatedPath(DatabaseType.DIAGRAM.fileDescriptor)
 
     /**
      * Determine the path to the "measurements" database for the specified date.
@@ -178,8 +178,8 @@ class EwbDataFilePaths @JvmOverloads constructor(
      */
     private fun checkExists(type: DatabaseType, date: LocalDate): Boolean {
         val modelPath = when (type) {
-            DatabaseType.CUSTOMERS -> customers(date)
-            DatabaseType.DIAGRAMS -> diagrams(date)
+            DatabaseType.CUSTOMER -> customers(date)
+            DatabaseType.DIAGRAM -> diagrams(date)
             DatabaseType.MEASUREMENTS -> measurements(date)
             DatabaseType.NETWORK_MODEL -> networkModel(date)
             DatabaseType.TILE_CACHE -> tileCache(date)

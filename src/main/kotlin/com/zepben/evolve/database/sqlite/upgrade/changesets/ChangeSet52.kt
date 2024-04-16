@@ -196,5 +196,5 @@ private val `Change column types in diagram_object_points` = Change(
         "CREATE UNIQUE INDEX diagram_object_points_diagram_object_mrid_sequence_number ON diagram_object_points (diagram_object_mrid, sequence_number);",
         "CREATE INDEX diagram_object_points_diagram_object_mrid ON diagram_object_points (diagram_object_mrid);",
     ),
-    targetDatabases = setOf(DatabaseType.DIAGRAMS)
+    targetDatabases = setOf(DatabaseType.DIAGRAM)
 )

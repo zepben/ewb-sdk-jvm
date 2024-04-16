@@ -169,8 +169,8 @@ class UpgradeRunner @JvmOverloads constructor(
         if (requiresBackup)
             copyFile(networkDatabaseFile, createBackupName(networkDatabaseFile, splitVersion), StandardCopyOption.REPLACE_EXISTING)
 
-        cloneAndUpgrade(networkDatabaseFile, DatabaseType.CUSTOMERS)
-        cloneAndUpgrade(networkDatabaseFile, DatabaseType.DIAGRAMS)
+        cloneAndUpgrade(networkDatabaseFile, DatabaseType.CUSTOMER)
+        cloneAndUpgrade(networkDatabaseFile, DatabaseType.DIAGRAM)
     }
 
     private fun cloneAndUpgrade(networkDatabaseFile: Path, targetType: DatabaseType) {

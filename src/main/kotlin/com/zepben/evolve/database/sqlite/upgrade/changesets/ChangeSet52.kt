@@ -10,7 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.Change
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
+import com.zepben.evolve.database.paths.DatabaseType
 
 internal fun changeSet52() = ChangeSet(
     52,
@@ -47,7 +47,7 @@ private val `Add missing index for location_street_addresses` = Change(
     listOf(
         "CREATE UNIQUE INDEX location_street_addresses_location_mrid_address_field ON location_street_addresses (location_mrid, address_field);"
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -58,7 +58,7 @@ private val `Rename columns in power_transformer_ends` = Change(
         "ALTER TABLE power_transformer_ends RENAME COLUMN X to x;",
         "ALTER TABLE power_transformer_ends RENAME COLUMN X0 to x0;",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -72,7 +72,7 @@ private val `Change column types in battery_units` = Change(
         "CREATE INDEX battery_units_name ON battery_units (name);",
         "CREATE INDEX battery_units_power_electronics_connection_mrid ON battery_units (power_electronics_connection_mrid);",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -86,7 +86,7 @@ private val `Change column types in ev_charging_units` = Change(
         "CREATE INDEX ev_charging_units_name ON ev_charging_units (name);",
         "CREATE INDEX ev_charging_units_power_electronics_connection_mrid ON ev_charging_units (power_electronics_connection_mrid);",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -100,7 +100,7 @@ private val `Change column types in photo_voltaic_units` = Change(
         "CREATE INDEX photo_voltaic_units_name ON photo_voltaic_units (name);",
         "CREATE INDEX photo_voltaic_units_power_electronics_connection_mrid ON photo_voltaic_units (power_electronics_connection_mrid);",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -114,7 +114,7 @@ private val `Change column types in power_electronics_wind_units` = Change(
         "CREATE INDEX power_electronics_wind_units_name ON power_electronics_wind_units (name);",
         "CREATE INDEX power_electronics_wind_units_power_electronics_connection_mrid ON power_electronics_wind_units (power_electronics_connection_mrid);",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -127,7 +127,7 @@ private val `Change column types in streetlights` = Change(
         "CREATE UNIQUE INDEX streetlights_mrid ON streetlights (mrid);",
         "CREATE INDEX streetlights_name ON streetlights (name);",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -140,7 +140,7 @@ private val `Change column types in tap_changer_controls` = Change(
         "CREATE UNIQUE INDEX tap_changer_controls_mrid ON tap_changer_controls (mrid);",
         "CREATE INDEX tap_changer_controls_name ON tap_changer_controls (name);",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -153,7 +153,7 @@ private val `Change column nullability in linear_shunt_compensators` = Change(
         "CREATE UNIQUE INDEX linear_shunt_compensators_mrid ON linear_shunt_compensators (mrid);",
         "CREATE INDEX linear_shunt_compensators_name ON linear_shunt_compensators (name);",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -166,7 +166,7 @@ private val `Change column nullability in power_transformer_end_ratings` = Chang
         "CREATE UNIQUE INDEX power_transformer_end_ratings_power_transformer_end_mrid_cooling_type ON power_transformer_end_ratings (power_transformer_end_mrid, cooling_type);",
         "CREATE INDEX power_transformer_end_ratings_power_transformer_end_mrid ON power_transformer_end_ratings (power_transformer_end_mrid);",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -179,7 +179,7 @@ private val `Change column types and nullability in power_electronics_connection
         "CREATE UNIQUE INDEX power_electronics_connections_mrid ON power_electronics_connections (mrid);",
         "CREATE INDEX power_electronics_connections_name ON power_electronics_connections (name);",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 // ###################
@@ -196,5 +196,5 @@ private val `Change column types in diagram_object_points` = Change(
         "CREATE UNIQUE INDEX diagram_object_points_diagram_object_mrid_sequence_number ON diagram_object_points (diagram_object_mrid, sequence_number);",
         "CREATE INDEX diagram_object_points_diagram_object_mrid ON diagram_object_points (diagram_object_mrid);",
     ),
-    targetDatabases = setOf(EwbDatabaseType.DIAGRAM)
+    targetDatabases = setOf(DatabaseType.DIAGRAM)
 )

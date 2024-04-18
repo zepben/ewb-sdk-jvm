@@ -8,9 +8,9 @@
 
 package com.zepben.evolve.database.sqlite.upgrade.changesets
 
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.upgrade.Change
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
 
 internal fun changeSet47() = ChangeSet(
     47,
@@ -26,5 +26,5 @@ private val `Delete all reclose sequences` = Change(
         "DROP INDEX IF EXISTS reclose_sequences_name;",
         "DROP TABLE IF EXISTS reclose_sequences;",
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )

@@ -10,7 +10,7 @@ package com.zepben.evolve.database.sqlite.upgrade.changesets
 
 import com.zepben.evolve.database.sqlite.upgrade.Change
 import com.zepben.evolve.database.sqlite.upgrade.ChangeSet
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
+import com.zepben.evolve.database.paths.DatabaseType
 
 internal fun changeSet44() = ChangeSet(
     44,
@@ -52,7 +52,7 @@ private val `Create current_transformer_info table` = Change(
         "CREATE UNIQUE INDEX current_transformer_info_mrid ON current_transformer_info (mrid);",
         "CREATE INDEX current_transformer_info_name ON current_transformer_info (name);"
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -76,7 +76,7 @@ private val `Create potential_transformer_info table` = Change(
         "CREATE UNIQUE INDEX potential_transformer_info_mrid ON potential_transformer_info (mrid);",
         "CREATE INDEX potential_transformer_info_name ON potential_transformer_info (name);"
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -100,7 +100,7 @@ private val `Create current_transformers table` = Change(
         "CREATE UNIQUE INDEX current_transformers_mrid ON current_transformers (mrid);",
         "CREATE INDEX current_transformers_name ON current_transformers (name);"
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
 @Suppress("ObjectPropertyName")
@@ -124,5 +124,5 @@ private val `Create potential_transformers table` = Change(
         "CREATE UNIQUE INDEX potential_transformers_mrid ON potential_transformers (mrid);",
         "CREATE INDEX potential_transformers_name ON potential_transformers (name);"
     ),
-    targetDatabases = setOf(EwbDatabaseType.NETWORK)
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )

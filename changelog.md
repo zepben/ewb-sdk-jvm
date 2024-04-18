@@ -1,10 +1,12 @@
 # Zepben EWB SDK changelog
 ## [0.20.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Removed `EwbDatabaseType`. Use `DatabaseType` instead. 
+* The filename of the `results cache` database has been changed to `results-cache` from `results_cache`. Any existing `results cache` database files will need to be renamed to `results-cache` to continue to be used.
+
 
 ### New Features
-* None.
+* Added `EwbDataFilePaths` for working with files and folders used by EWB.
 
 ### Enhancements
 * None.

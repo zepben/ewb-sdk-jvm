@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.upgrade.changesets.customer
 
-import com.zepben.evolve.database.sqlite.upgrade.EwbDatabaseType
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSet50Helpers
 import com.zepben.evolve.database.sqlite.upgrade.changesets.ChangeSetValidator
 import java.sql.Statement
@@ -24,15 +24,15 @@ object ChangeSet50CustomerValidator : ChangeSetValidator {
         //
         // NOTE: We are being lazy and assuming if the table was left behind, then so were its indexes.
         //
-        val (expectedTables, unexpectedTables) = ChangeSet50Helpers.tables(EwbDatabaseType.CUSTOMER)
+        val (expectedTables, unexpectedTables) = ChangeSet50Helpers.tables(DatabaseType.CUSTOMER)
         ensureTables(statement, *expectedTables.toTypedArray(), present = true)
         ensureTables(statement, *unexpectedTables.toTypedArray(), present = false)
 
-        ChangeSet50Helpers.ensureNames(statement, EwbDatabaseType.CUSTOMER)
+        ChangeSet50Helpers.ensureNames(statement, DatabaseType.CUSTOMER)
     }
 
     override fun tearDownStatements(): List<String> =
-        ChangeSet50Helpers.tables(EwbDatabaseType.CUSTOMER).first.map {
+        ChangeSet50Helpers.tables(DatabaseType.CUSTOMER).first.map {
             "DELETE FROM $it"
         }
 

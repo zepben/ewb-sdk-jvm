@@ -12,13 +12,13 @@ enum class DatabaseType(val perDate: Boolean, val fileDescriptor: String)
 {
     CUSTOMER(perDate = true, fileDescriptor="customers"),
     DIAGRAM(perDate = true, fileDescriptor="diagrams"),
-    MEASUREMENTS(perDate = true, fileDescriptor="measurements"),
+    MEASUREMENT(perDate = true, fileDescriptor="measurements"),
     NETWORK_MODEL(perDate = true, fileDescriptor="network-model"),
     TILE_CACHE(perDate = true, fileDescriptor="tile-cache"),
-    ENERGY_READINGS(perDate = true, fileDescriptor="load-readings"),
+    ENERGY_READING(perDate = true, fileDescriptor="load-readings"),
 
     ENERGY_READINGS_INDEX(perDate = false, fileDescriptor="load-readings-index"),
     LOAD_AGGREGATOR_METERS_BY_DATE(perDate = false, fileDescriptor="load-aggregator-mbd"),
-    WEATHER_READINGS(perDate = false, fileDescriptor="weather-readings"),
-    RESULTS_CACHE(perDate = false, fileDescriptor="results_cache"),
+    WEATHER_READING(perDate = false, fileDescriptor="weather-readings"),
+    RESULTS_CACHE(perDate = false, fileDescriptor="results-cache"),
 }

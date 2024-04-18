@@ -47,7 +47,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "customers" database.
      * @return The path to the "customers" database for the specified date.
      */
-    fun customers(date: LocalDate): Path = date.toDatedPath(DatabaseType.CUSTOMER.fileDescriptor)
+    fun customer(date: LocalDate): Path = date.toDatedPath(DatabaseType.CUSTOMER.fileDescriptor)
 
     /**
      * Determine the path to the "diagrams" database for the specified date.
@@ -55,7 +55,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "diagrams" database.
      * @return The path to the "diagrams" database for the specified date.
      */
-    fun diagrams(date: LocalDate): Path = date.toDatedPath(DatabaseType.DIAGRAM.fileDescriptor)
+    fun diagram(date: LocalDate): Path = date.toDatedPath(DatabaseType.DIAGRAM.fileDescriptor)
 
     /**
      * Determine the path to the "measurements" database for the specified date.
@@ -63,7 +63,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "measurements" database.
      * @return The path to the "measurements" database for the specified date.
      */
-    fun measurements(date: LocalDate): Path = date.toDatedPath(DatabaseType.MEASUREMENTS.fileDescriptor)
+    fun measurement(date: LocalDate): Path = date.toDatedPath(DatabaseType.MEASUREMENT.fileDescriptor)
 
     /**
      * Determine the path to the "network model" database for the specified date.
@@ -87,7 +87,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @param date The date to use for the "energy readings" database.
      * @return The path to the "energy readings" database for the specified date.
      */
-    fun energyReadings(date: LocalDate): Path = date.toDatedPath(DatabaseType.ENERGY_READINGS.fileDescriptor)
+    fun energyReading(date: LocalDate): Path = date.toDatedPath(DatabaseType.ENERGY_READING.fileDescriptor)
 
     /**
      * Determine the path to the "energy readings index" database.
@@ -108,7 +108,7 @@ class EwbDataFilePaths @JvmOverloads constructor(
      *
      * @return The path to the "weather readings" database.
      */
-    fun weatherReadings(): Path = baseDir.resolve(DatabaseType.WEATHER_READINGS.fileDescriptor + ".sqlite")
+    fun weatherReading(): Path = baseDir.resolve(DatabaseType.WEATHER_READING.fileDescriptor + ".sqlite")
 
     /**
      * Determine the path to the "results cache" database.
@@ -178,12 +178,12 @@ class EwbDataFilePaths @JvmOverloads constructor(
      */
     private fun checkExists(type: DatabaseType, date: LocalDate): Boolean {
         val modelPath = when (type) {
-            DatabaseType.CUSTOMER -> customers(date)
-            DatabaseType.DIAGRAM -> diagrams(date)
-            DatabaseType.MEASUREMENTS -> measurements(date)
+            DatabaseType.CUSTOMER -> customer(date)
+            DatabaseType.DIAGRAM -> diagram(date)
+            DatabaseType.MEASUREMENT -> measurement(date)
             DatabaseType.NETWORK_MODEL -> networkModel(date)
             DatabaseType.TILE_CACHE -> tileCache(date)
-            DatabaseType.ENERGY_READINGS -> energyReadings(date)
+            DatabaseType.ENERGY_READING -> energyReading(date)
             else -> throw IllegalStateException("INTERNAL ERROR: Should only be calling `checkExists` for `perDate` files, which should all be covered above, so go ahead and add it.")
         }
         return exists(modelPath)

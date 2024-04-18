@@ -75,17 +75,17 @@ class EwbDataFilePathsTest {
 
     @Test
     internal fun `formats paths`() {
-        assertThat(ewbPaths.customers(today), equalTo(baseDir.datedPath(today, "customers")))
-        assertThat(ewbPaths.diagrams(today), equalTo(baseDir.datedPath(today, "diagrams")))
-        assertThat(ewbPaths.measurements(today), equalTo(baseDir.datedPath(today, "measurements")))
+        assertThat(ewbPaths.customer(today), equalTo(baseDir.datedPath(today, "customers")))
+        assertThat(ewbPaths.diagram(today), equalTo(baseDir.datedPath(today, "diagrams")))
+        assertThat(ewbPaths.measurement(today), equalTo(baseDir.datedPath(today, "measurements")))
         assertThat(ewbPaths.networkModel(today), equalTo(baseDir.datedPath(today, "network-model")))
         assertThat(ewbPaths.tileCache(today), equalTo(baseDir.datedPath(today, "tile-cache")))
-        assertThat(ewbPaths.energyReadings(today), equalTo(baseDir.datedPath(today, "load-readings")))
+        assertThat(ewbPaths.energyReading(today), equalTo(baseDir.datedPath(today, "load-readings")))
 
         assertThat(ewbPaths.energyReadingsIndex(), equalTo(baseDir.resolve("load-readings-index.sqlite")))
         assertThat(ewbPaths.loadAggregatorMetersByDate(), equalTo(baseDir.resolve("load-aggregator-mbd.sqlite")))
-        assertThat(ewbPaths.weatherReadings(), equalTo(baseDir.resolve("weather-readings.sqlite")))
-        assertThat(ewbPaths.resultsCache(), equalTo(baseDir.resolve("results_cache.sqlite")))
+        assertThat(ewbPaths.weatherReading(), equalTo(baseDir.resolve("weather-readings.sqlite")))
+        assertThat(ewbPaths.resultsCache(), equalTo(baseDir.resolve("results-cache.sqlite")))
     }
 
     @Test
@@ -109,7 +109,7 @@ class EwbDataFilePathsTest {
         // Should return null without checking a file as they are not date based, even if the file exists.
         validateClosest(DatabaseType.ENERGY_READINGS_INDEX, null, 0)
         validateClosest(DatabaseType.LOAD_AGGREGATOR_METERS_BY_DATE, null, 0)
-        validateClosest(DatabaseType.WEATHER_READINGS, null, 0)
+        validateClosest(DatabaseType.WEATHER_READING, null, 0)
         validateClosest(DatabaseType.RESULTS_CACHE, null, 0)
     }
 

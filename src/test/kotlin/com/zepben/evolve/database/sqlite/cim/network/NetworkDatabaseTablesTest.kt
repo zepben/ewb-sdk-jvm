@@ -9,7 +9,6 @@
 package com.zepben.evolve.database.sqlite.cim.network
 
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseTables
-import com.zepben.evolve.database.sqlite.cim.network.NetworkDatabaseTables
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 

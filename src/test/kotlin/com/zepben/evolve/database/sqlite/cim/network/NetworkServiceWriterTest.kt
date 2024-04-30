@@ -9,8 +9,6 @@
 package com.zepben.evolve.database.sqlite.cim.network
 
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
-import com.zepben.evolve.database.sqlite.cim.network.NetworkCimWriter
-import com.zepben.evolve.database.sqlite.cim.network.NetworkServiceWriter
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every

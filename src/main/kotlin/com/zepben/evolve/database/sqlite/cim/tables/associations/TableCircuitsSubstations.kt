@@ -18,7 +18,7 @@ class TableCircuitsSubstations : SqliteTable() {
     val CIRCUIT_MRID: Column = Column(++columnIndex, "circuit_mrid", "TEXT", NOT_NULL)
     val SUBSTATION_MRID: Column = Column(++columnIndex, "substation_mrid", "TEXT", NOT_NULL)
 
-    override val name = "circuits_substations"
+    override val name: String = "circuits_substations"
 
     override val uniqueIndexColumns: MutableList<List<Column>> =
         super.uniqueIndexColumns.apply {

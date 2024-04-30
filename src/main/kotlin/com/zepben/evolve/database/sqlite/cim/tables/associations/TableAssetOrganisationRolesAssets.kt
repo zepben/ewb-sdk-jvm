@@ -18,7 +18,7 @@ class TableAssetOrganisationRolesAssets : SqliteTable() {
     val ASSET_ORGANISATION_ROLE_MRID: Column = Column(++columnIndex, "asset_organisation_role_mrid", "TEXT", NOT_NULL)
     val ASSET_MRID: Column = Column(++columnIndex, "asset_mrid", "TEXT", NOT_NULL)
 
-    override val name = "asset_organisation_roles_assets"
+    override val name: String = "asset_organisation_roles_assets"
 
     override val uniqueIndexColumns: MutableList<List<Column>> =
         super.uniqueIndexColumns.apply {

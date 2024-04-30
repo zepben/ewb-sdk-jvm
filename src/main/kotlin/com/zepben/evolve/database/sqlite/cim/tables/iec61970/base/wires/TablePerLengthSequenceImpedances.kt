@@ -12,7 +12,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 
 @Suppress("PropertyName")
-class TablePerLengthSequenceImpedances : com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.TablePerLengthImpedances() {
+class TablePerLengthSequenceImpedances : TablePerLengthImpedances() {
 
     val R: Column = Column(++columnIndex, "r", "NUMBER", NULL)
     val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)

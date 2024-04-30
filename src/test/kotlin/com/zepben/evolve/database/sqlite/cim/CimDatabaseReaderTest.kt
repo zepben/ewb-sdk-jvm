@@ -6,12 +6,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.common
+package com.zepben.evolve.database.sqlite.cim
 
-import com.zepben.evolve.database.sqlite.cim.BaseServiceReader
-import com.zepben.evolve.database.sqlite.cim.CimDatabaseReader
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionReader
 import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
+import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat

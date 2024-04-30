@@ -8,9 +8,10 @@
 
 package com.zepben.evolve.database.sqlite.common
 
+import com.zepben.evolve.database.sqlite.cim.BaseServiceWriter
+import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionWriter
+import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
-import com.zepben.evolve.database.sqlite.tables.MissingTableConfigException
-import com.zepben.evolve.database.sqlite.tables.TableVersion
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -24,8 +25,6 @@ import java.sql.SQLException
  *
  * @param databaseFile The filename of the database to write.
  * @param databaseTables The tables to create in the database.
- * @param createMetadataWriter Create a [MetadataCollectionWriter] that uses the provided [Connection].
- * @param createServiceWriter Create a [BaseServiceWriter] that uses the provided [Connection].
  * @param getConnection Provider of the connection to the specified database.
  *
  * @property logger The logger to use for this database writer.
@@ -33,8 +32,6 @@ import java.sql.SQLException
 abstract class BaseDatabaseWriter(
     private val databaseFile: String,
     private val databaseTables: BaseDatabaseTables,
-    private val createMetadataWriter: (Connection) -> MetadataCollectionWriter,
-    private val createServiceWriter: (Connection) -> BaseServiceWriter,
     private val getConnection: (String) -> Connection
 ) {
 
@@ -62,8 +59,7 @@ abstract class BaseDatabaseWriter(
         }
 
         val status = try {
-            createMetadataWriter(saveConnection).save() and
-                createServiceWriter(saveConnection).save()
+            saveWithConnection(saveConnection)
         } catch (e: MissingTableConfigException) {
             logger.error("Unable to save database: " + e.message, e)
             false
@@ -71,6 +67,8 @@ abstract class BaseDatabaseWriter(
 
         return status and postSave()
     }
+    
+    abstract fun saveWithConnection(connection: Connection): Boolean
 
     private fun preSave(): Boolean =
         removeExisting()
@@ -110,7 +108,7 @@ abstract class BaseDatabaseWriter(
     private fun create(): Boolean =
         try {
             val versionTable = databaseTables.getTable<TableVersion>()
-            logger.info("Creating database schema v${versionTable.SUPPORTED_VERSION}...")
+            logger.info("Creating database schema v${versionTable.supportedVersion}...")
 
             saveConnection.createStatement().use { statement ->
                 statement.queryTimeout = 2
@@ -121,7 +119,7 @@ abstract class BaseDatabaseWriter(
 
                 // Add the version number to the database.
                 saveConnection.prepareStatement(versionTable.preparedInsertSql).use { insert ->
-                    insert.setInt(versionTable.VERSION.queryIndex, versionTable.SUPPORTED_VERSION)
+                    insert.setInt(versionTable.VERSION.queryIndex, versionTable.supportedVersion)
                     insert.executeUpdate()
                 }
 
@@ -170,3 +168,4 @@ abstract class BaseDatabaseWriter(
         }
 
 }
+

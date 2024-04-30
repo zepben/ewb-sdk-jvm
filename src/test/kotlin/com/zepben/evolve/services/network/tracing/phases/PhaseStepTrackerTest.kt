@@ -11,7 +11,6 @@ package com.zepben.evolve.services.network.tracing.phases
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 
 internal class PhaseStepTrackerTest {

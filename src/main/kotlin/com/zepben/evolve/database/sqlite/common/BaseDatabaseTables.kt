@@ -8,14 +8,12 @@
 
 package com.zepben.evolve.database.sqlite.common
 
-import com.zepben.evolve.database.sqlite.tables.MissingTableConfigException
-import com.zepben.evolve.database.sqlite.tables.SqliteTable
-import com.zepben.evolve.database.sqlite.tables.TableMetadataDataSources
-import com.zepben.evolve.database.sqlite.tables.TableVersion
-import com.zepben.evolve.database.sqlite.tables.associations.*
-import com.zepben.evolve.database.sqlite.tables.iec61968.assetinfo.*
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.core.*
-import com.zepben.evolve.database.sqlite.tables.iec61970.base.wires.*
+import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
+import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.cim.tables.associations.*
+import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.*
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.*
 import java.sql.Connection
 import java.sql.PreparedStatement
 import kotlin.reflect.KClass
@@ -34,12 +32,7 @@ open class BaseDatabaseTables : AutoCloseable {
     var insertStatements: Map<KClass<out SqliteTable>, PreparedStatement> = mapOf()
         private set
 
-    protected open val includedTables: Sequence<SqliteTable> = sequenceOf(
-        TableMetadataDataSources(),
-        TableVersion(),
-        TableNameTypes(),
-        TableNames()
-    )
+    protected open val includedTables: Sequence<SqliteTable> = sequenceOf()
 
     /**
      * Helper function for getting the table of the specified type.

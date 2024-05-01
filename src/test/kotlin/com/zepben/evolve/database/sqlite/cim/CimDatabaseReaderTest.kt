@@ -18,7 +18,6 @@ import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.sql.Connection
-import java.sql.Statement
 
 internal class CimDatabaseReaderTest {
 
@@ -30,9 +29,7 @@ internal class CimDatabaseReaderTest {
     private val metadataReader = mockk<MetadataCollectionReader>().also { every { it.load() } returns true }
     private val serviceReader = mockk<BaseServiceReader>().also { every { it.load() } returns true }
 
-    private val statement = mockk<Statement> { justRun { close() } }
     private val connection = mockk<Connection> {
-        every { createStatement() } returns statement
         justRun { close() }
     }
 
@@ -76,12 +73,14 @@ internal class CimDatabaseReaderTest {
 
     @Test
     internal fun `detect missing databases`() {
-        every { connection.createStatement() } throws Exception("Test Error")
+        every { tableVersion.getVersion(any()) } answers { callOriginal() }
+        every { tableVersion.selectSql } returns "SELECT"
+        every { connection.prepareStatement(any()) } throws Exception("Test Error")
 
         assertThat("Should not have loaded", !reader.load())
         assertThat(systemErr.log, containsString("Failed to connect to the database for reading: Test Error"))
 
-        verify { connection.createStatement() }
+        verify { connection.prepareStatement(any()) }
         confirmVerified(connection, metadataReader, serviceReader)
         assertThat("postLoad shouldn't have been called", !postLoadCalled)
     }
@@ -117,7 +116,7 @@ internal class CimDatabaseReaderTest {
         every { tableVersion.getVersion(any()) } returns null
 
         assertThat("Should not have loaded", !reader.load())
-        assertThat(systemErr.log, containsString("Failed to read the version number form the selected database. Are you sure it is a EWB database?"))
+        assertThat(systemErr.log, containsString("Failed to read the version number from the selected database. Are you sure it is a EWB database?"))
 
         verifyInvalidVersionCalls()
     }
@@ -164,9 +163,7 @@ internal class CimDatabaseReaderTest {
     private fun verifyReadersCalled() {
         verifySequence {
             tableVersion.supportedVersion
-            connection.createStatement()
-            tableVersion.getVersion(statement)
-            statement.close()
+            tableVersion.getVersion(connection)
 
             metadataReader.load()
             serviceReader.load()
@@ -176,9 +173,7 @@ internal class CimDatabaseReaderTest {
     private fun verifyInvalidVersionCalls() {
         verifySequence {
             tableVersion.supportedVersion
-            connection.createStatement()
-            tableVersion.getVersion(statement)
-            statement.close()
+            tableVersion.getVersion(connection)
         }
 
         confirmVerified(metadataReader, serviceReader)

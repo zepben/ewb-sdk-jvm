@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.cim.network
 
-import com.zepben.evolve.database.sqlite.cim.CimReader
 import com.zepben.evolve.database.sqlite.cim.BaseServiceReader
+import com.zepben.evolve.database.sqlite.cim.CimReader
 import com.zepben.evolve.database.sqlite.cim.tables.associations.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableAssetOwners

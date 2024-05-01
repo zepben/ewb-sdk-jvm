@@ -9,7 +9,6 @@
 package com.zepben.evolve.database.sqlite.cim.upgrade
 
 import com.zepben.evolve.database.paths.DatabaseType
-import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion
 import com.zepben.evolve.database.sqlite.common.TableVersion
@@ -556,7 +555,7 @@ internal class UpgradeRunnerTest {
         connection.createStatement()
 
         // Check to see if we need to run any pre-split upgrades
-        tableVersion.getVersion(statement)
+        tableVersion.getVersion(connection)
         targetChangeSet.number
 
         // Check the database is not past the maximum upgrade version

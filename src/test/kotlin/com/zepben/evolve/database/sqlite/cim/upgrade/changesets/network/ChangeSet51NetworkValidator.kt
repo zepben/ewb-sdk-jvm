@@ -48,8 +48,7 @@ object ChangeSet51NetworkValidator : ChangeSetValidator {
             "power_electronics_connections",
             "power_electronics_connection_phases",
             "power_electronics_wind_units",
-            "transformer_star_impedances",
-            present = true
+            "transformer_star_impedances"
         )
 
         ensureIndexes(
@@ -70,8 +69,7 @@ object ChangeSet51NetworkValidator : ChangeSetValidator {
             "power_electronics_wind_units_power_electronics_connection_mrid",
             "transformer_star_impedances_mrid",
             "transformer_star_impedances_transformer_end_info_mrid",
-            "transformer_star_impedances_name",
-            present = true
+            "transformer_star_impedances_name"
         )
     }
 

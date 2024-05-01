@@ -18,11 +18,14 @@
   * `BaseDatabaseWriter` as `CimDatabaseWriter`
   * `BaseCimReader` as `CimReader`
   * `BaseCimWriter` as `CimWriter`
-* Moved `TableVersion` to `com.zepben.evolve.database.sqlite.common`. The instance for CIM is found in `com.zepben.evolve.database.sqlite.cim.tables` as
-  `tableCimVersion`.
+* Moved `TableVersion` to `com.zepben.evolve.database.sqlite.common`. Instances for CIM and metrics are in `com.zepben.evolve.database.sqlite.cim.tables`
+  and `com.zepben.evolve.database.sqlite.metrics.tables` respectively.
 
 ### New Features
 * Added `EwbDataFilePaths` for working with files and folders used by EWB.
+* Added tables for metrics database (`MetricsDatabaseTables`) and model for ingestion job (`IngestionJob`).
+  * Using `MetricsDatabaseWriter`, A single `IngestionJob` may be saved to the database along with its metrics and job sources.
+* Added `METRICS` to the `DatabaseType` enum.
 
 ### Enhancements
 * None.

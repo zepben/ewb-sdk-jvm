@@ -70,8 +70,6 @@ abstract class BaseDatabaseWriter(
         return status and postSave()
     }
 
-    abstract fun saveWithConnection(connection: Connection): Boolean
-
     abstract fun saveSchema(): Boolean
 
     private fun preSave(): Boolean =

@@ -12,19 +12,19 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 
-class AutoMapTest {
+internal class AutoMapTest {
 
-    val autoMap = object : AutoMap<String, MutableList<Int>>() {
+    private val autoMap = object : AutoMap<String, MutableList<Int>>() {
         override fun defaultValue(): MutableList<Int> = mutableListOf(5)
     }
 
     @Test
-    fun defaultValue() {
+    internal fun defaultValue() {
         assertThat(autoMap["abc"], contains(5))
     }
 
     @Test
-    fun getEntries() {
+    internal fun getEntries() {
         assertThat(autoMap.entries, empty())
         autoMap["abc"]
         autoMap["xyz"].add(6)
@@ -35,7 +35,7 @@ class AutoMapTest {
     }
 
     @Test
-    fun getKeys() {
+    internal fun getKeys() {
         assertThat(autoMap.keys, empty())
         autoMap["abc"]
         autoMap["xyz"].add(6)
@@ -43,7 +43,7 @@ class AutoMapTest {
     }
 
     @Test
-    fun getSize() {
+    internal fun getSize() {
         assertThat(autoMap.size, equalTo(0))
         autoMap["abc"]
         autoMap["xyz"].add(6)
@@ -51,7 +51,7 @@ class AutoMapTest {
     }
 
     @Test
-    fun getValues() {
+    internal fun getValues() {
         assertThat(autoMap.values, empty())
         autoMap["abc"]
         autoMap["xyz"].add(6)
@@ -59,21 +59,21 @@ class AutoMapTest {
     }
 
     @Test
-    fun isEmpty() {
+    internal fun isEmpty() {
         assertThat("AutoMap should start empty", autoMap.isEmpty())
         autoMap["abc"]
         assertThat("AutoMap should not be empty after first access", autoMap.isNotEmpty())
     }
 
     @Test
-    fun get() {
+    internal fun get() {
         autoMap["xyz"].add(6)
         assertThat(autoMap["abc"], contains(5))
         assertThat(autoMap["xyz"], contains(5, 6))
     }
 
     @Test
-    fun containsValue() {
+    internal fun containsValue() {
         assertThat("AutoMap does not contain default value before access", not(autoMap.containsValue(listOf(5))))
         autoMap["abc"]
         autoMap["xyz"].add(6)
@@ -82,7 +82,7 @@ class AutoMapTest {
     }
 
     @Test
-    fun containsKey() {
+    internal fun containsKey() {
         assertThat("AutoMap does not contain key before access", not(autoMap.containsKey("abc")))
         autoMap["abc"]
         assertThat("AutoMap does contains key after access", not(autoMap.containsKey("abc")))

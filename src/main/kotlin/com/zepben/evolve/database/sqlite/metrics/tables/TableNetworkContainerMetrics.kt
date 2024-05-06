@@ -21,11 +21,11 @@ class TableNetworkContainerMetrics : MultiJobTable() {
     val METRIC_VALUE: Column = Column(++columnIndex, "metric_value", "NUMBER", NOT_NULL)
 
     override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
-        listOf(JOB_ID, HIERARCHY_ID, METRIC_NAME)
+        listOf(JOB_ID, HIERARCHY_ID, CONTAINER_TYPE, METRIC_NAME)
     )
 
     override val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
-        listOf(HIERARCHY_ID, METRIC_NAME)
+        listOf(HIERARCHY_ID, CONTAINER_TYPE, METRIC_NAME)
     )
 
     override val name: String = "network_container_metrics"

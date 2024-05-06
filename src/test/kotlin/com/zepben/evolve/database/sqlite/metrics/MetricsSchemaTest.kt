@@ -45,7 +45,7 @@ internal class MetricsSchemaTest {
     }
 
     @Test
-    internal fun `test schema base job`() {
+    internal fun `test schema`() {
         validateJob(
             baseJob(),
             "jobs",
@@ -74,11 +74,30 @@ internal class MetricsSchemaTest {
             listOf(uuidString, "fdr", "feeder", "Feeder", "abc", 1.2)
         )
 
+        // Ensure the network metrics table can handle Feeder & FeederTotal for same feeder and metric, same with Substation and SubstationTotal
+        validateJob(
+            baseJob().apply {
+                networkMetrics[PartialNetworkContainer(NetworkLevel.Feeder, "fdr", "feeder")]["abc"] = 1.2
+                networkMetrics[PartialNetworkContainer(NetworkLevel.FeederTotal, "fdr", "feeder")]["abc"] = 1.3
+            },
+            "network_container_metrics",
+            listOf(uuidString, "fdr", "feeder", "Feeder", "abc", 1.2),
+            listOf(uuidString, "fdr", "feeder", "FeederTotal", "abc", 1.3)
+        )
+        validateJob(
+            baseJob().apply {
+                networkMetrics[PartialNetworkContainer(NetworkLevel.Substation, "sub", "substation")]["abc"] = 1.2
+                networkMetrics[PartialNetworkContainer(NetworkLevel.SubstationTotal, "sub", "substation")]["abc"] = 1.3
+            },
+            "network_container_metrics",
+            listOf(uuidString, "sub", "substation", "Substation", "abc", 1.2),
+            listOf(uuidString, "sub", "substation", "SubstationTotal", "abc", 1.3),
+        )
     }
 
     private fun baseJob() = IngestionJob(uuid, metadata = IngestionMetadata(Instant.EPOCH, "source", "application", "applicationVersion"))
 
-    private fun validateJob(expectedJob: IngestionJob, tableName: String, values: List<Any>) {
+    private fun validateJob(expectedJob: IngestionJob, tableName: String, vararg rows: List<Any>) {
         systemErr.clearCapturedLog()
 
         assertThat("Database should have been saved", MetricsDatabaseWriter(schemaTestFile, expectedJob).save())
@@ -89,9 +108,11 @@ internal class MetricsSchemaTest {
         DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
             connection.createStatement().use { statement ->
                 statement.executeQuery("SELECT * FROM $tableName").use { rs ->
-                    assertThat("Row should exist for $tableName", rs.next())
-                    values.forEachIndexed { i, value ->
-                        assertThat(rs.getObject(i + 1), equalTo(value))
+                    rows.forEachIndexed { i, values ->
+                        assertThat("Row no. ${i + 1} should exist for $tableName", rs.next())
+                        values.forEachIndexed { j, value ->
+                            assertThat(rs.getObject(j + 1), equalTo(value))
+                        }
                     }
                 }
             }

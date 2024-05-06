@@ -78,7 +78,8 @@ public class IngestionJobExample {
         ingestionJob.getSources().get("ABC_feeder.xml").setTimestamp(Instant.parse("2020-01-02T10:30:00.00Z"));
         ingestionJob.getSources().get("ABC_feeder.xml").setFileHash(digest.digest("file contents".getBytes()));
         ingestionJob.getNetworkMetrics().get(TotalNetworkContainer.INSTANCE).put("total cable length", 123.45);
-        ingestionJob.getNetworkMetrics().get(networkContainer(feeder)).put("total cable length", 123.45);
+        ingestionJob.getNetworkMetrics().get(networkContainer(feeder)).put("total cable length", 12.345);
+        ingestionJob.getNetworkMetrics().get(networkContainer(feeder, true)).put("total cable length", 123.45);
 
         if (new MetricsDatabaseWriter("metrics.sqlite", ingestionJob).save()) {
             System.out.println("Ingestion job saved successfully");
@@ -118,7 +119,8 @@ val ingestionJob = IngestionJob(UUID.randomUUID()).apply {
     sources["ABC_feeder.xml"].timestamp = Instant.parse("2020-01-02T10:30:00.00Z")
     sources["ABC_feeder.xml"].fileHash = MessageDigest.getInstance("SHA-256").digest("file contents".toByteArray())
     networkMetrics[TotalNetworkContainer]["total cable length"] = 123.45
-    networkMetrics[feeder.toNetworkContainer()]["total cable length"] = 123.45
+    networkMetrics[feeder.toNetworkContainer()]["total cable length"] = 12.345
+    networkMetrics[feeder.toNetworkContainer(includeDownstream = true)]["total cable length"] = 123.45
 }
 
 fun main() {

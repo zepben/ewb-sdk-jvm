@@ -24,13 +24,17 @@ internal class NetworkContainerTest {
         val fromGeoRegion = GeographicalRegion("GR").apply { name = "geoRegion" }.toNetworkContainer()
         val fromSubGeoRegion = SubGeographicalRegion("SGR").apply { name = "subGeoRegion" }.toNetworkContainer()
         val fromSubstation = Substation("SS").apply { name = "substation" }.toNetworkContainer()
+        val fromSubstationTotal = Substation("SS2").apply { name = "substation2" }.toNetworkContainer(includeDownstream = true)
         val fromFeeder = Feeder("FDR").apply { name = "feeder" }.toNetworkContainer()
+        val fromFeederTotal = Feeder("FDR2").apply { name = "feeder2" }.toNetworkContainer(includeDownstream = true)
         val fromLvFeeder = LvFeeder("LVF").apply { name = "lvFeeder" }.toNetworkContainer()
 
         assertThat(fromGeoRegion, equalTo(PartialNetworkContainer(NetworkLevel.GeographicalRegion, "GR", "geoRegion")))
         assertThat(fromSubGeoRegion, equalTo(PartialNetworkContainer(NetworkLevel.SubGeographicalRegion, "SGR", "subGeoRegion")))
         assertThat(fromSubstation, equalTo(PartialNetworkContainer(NetworkLevel.Substation, "SS", "substation")))
+        assertThat(fromSubstationTotal, equalTo(PartialNetworkContainer(NetworkLevel.SubstationTotal, "SS2", "substation2")))
         assertThat(fromFeeder, equalTo(PartialNetworkContainer(NetworkLevel.Feeder, "FDR", "feeder")))
+        assertThat(fromFeederTotal, equalTo(PartialNetworkContainer(NetworkLevel.FeederTotal, "FDR2", "feeder2")))
         assertThat(fromLvFeeder, equalTo(PartialNetworkContainer(NetworkLevel.LvFeeder, "LVF", "lvFeeder")))
     }
 
@@ -47,13 +51,17 @@ internal class NetworkContainerTest {
         val fromGeoRegion = networkContainer(GeographicalRegion("GR").apply { name = "geoRegion" })
         val fromSubGeoRegion = networkContainer(SubGeographicalRegion("SGR").apply { name = "subGeoRegion" })
         val fromSubstation = networkContainer(Substation("SS").apply { name = "substation" })
+        val fromSubstationTotal = networkContainer(Substation("SS2").apply { name = "substation2" }, true)
         val fromFeeder = networkContainer(Feeder("FDR").apply { name = "feeder" })
+        val fromFeederTotal = networkContainer(Feeder("FDR2").apply { name = "feeder2" }, true)
         val fromLvFeeder = networkContainer(LvFeeder("LVF").apply { name = "lvFeeder" })
 
         assertThat(fromGeoRegion, equalTo(PartialNetworkContainer(NetworkLevel.GeographicalRegion, "GR", "geoRegion")))
         assertThat(fromSubGeoRegion, equalTo(PartialNetworkContainer(NetworkLevel.SubGeographicalRegion, "SGR", "subGeoRegion")))
         assertThat(fromSubstation, equalTo(PartialNetworkContainer(NetworkLevel.Substation, "SS", "substation")))
+        assertThat(fromSubstationTotal, equalTo(PartialNetworkContainer(NetworkLevel.SubstationTotal, "SS2", "substation2")))
         assertThat(fromFeeder, equalTo(PartialNetworkContainer(NetworkLevel.Feeder, "FDR", "feeder")))
+        assertThat(fromFeederTotal, equalTo(PartialNetworkContainer(NetworkLevel.FeederTotal, "FDR2", "feeder2")))
         assertThat(fromLvFeeder, equalTo(PartialNetworkContainer(NetworkLevel.LvFeeder, "LVF", "lvFeeder")))
     }
 

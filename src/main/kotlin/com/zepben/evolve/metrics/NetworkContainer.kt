@@ -31,7 +31,9 @@ enum class NetworkLevel {
     GeographicalRegion,
     SubGeographicalRegion,
     Substation,
+    SubstationTotal,
     Feeder,
+    FeederTotal,
     LvFeeder
 }
 
@@ -39,16 +41,22 @@ fun GeographicalRegion.toNetworkContainer(): PartialNetworkContainer =
     PartialNetworkContainer(NetworkLevel.GeographicalRegion, mRID, name)
 fun SubGeographicalRegion.toNetworkContainer(): PartialNetworkContainer =
     PartialNetworkContainer(NetworkLevel.SubGeographicalRegion, mRID, name)
-fun Substation.toNetworkContainer(): PartialNetworkContainer =
-    PartialNetworkContainer(NetworkLevel.Substation, mRID, name)
-fun Feeder.toNetworkContainer(): PartialNetworkContainer =
-    PartialNetworkContainer(NetworkLevel.Feeder, mRID, name)
+fun Substation.toNetworkContainer(includeDownstream: Boolean = false): PartialNetworkContainer =
+    PartialNetworkContainer(if (includeDownstream) NetworkLevel.SubstationTotal else NetworkLevel.Substation, mRID, name)
+fun Feeder.toNetworkContainer(includeDownstream: Boolean = false): PartialNetworkContainer =
+    PartialNetworkContainer(if (includeDownstream) NetworkLevel.FeederTotal else NetworkLevel.Feeder, mRID, name)
 fun LvFeeder.toNetworkContainer(): PartialNetworkContainer =
     PartialNetworkContainer(NetworkLevel.LvFeeder, mRID, name)
 
 // Java interop
 fun networkContainer(geographicalRegion: GeographicalRegion) = geographicalRegion.toNetworkContainer()
+
 fun networkContainer(subGeographicalRegion: SubGeographicalRegion) = subGeographicalRegion.toNetworkContainer()
-fun networkContainer(substation: Substation) = substation.toNetworkContainer()
-fun networkContainer(feeder: Feeder) = feeder.toNetworkContainer()
+
+@JvmOverloads
+fun networkContainer(substation: Substation, includeDownstream: Boolean = false) = substation.toNetworkContainer(includeDownstream)
+
+@JvmOverloads
+fun networkContainer(feeder: Feeder, includeDownstream: Boolean = false) = feeder.toNetworkContainer(includeDownstream)
+
 fun networkContainer(lvFeeder: LvFeeder) = lvFeeder.toNetworkContainer()

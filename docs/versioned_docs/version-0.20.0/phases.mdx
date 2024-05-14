@@ -1,0 +1,199 @@
+---
+id: sdk-phases
+title: Phases and Feeder Directions
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Introduction
+
+There are three different types of phases stored/calculated by the SDK:
+
+| Phase Type | SDK Field                                                   | Field Type  | Description                                                                                                                                                                                                                |
+|------------|-------------------------------------------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Nominal    | `Terminal.phases`                                           | `PhaseCode` | The nominal phases of the network indicate how the network is connected. The nominal phases can include the "unknown" phases `X` and `Y`. <br/><br/>This is the phase field that you are most likely to be interested in.  |
+| Normal     | `Terminal.normalPhases` or `Terminal.tracedPhases.normal`   | `Traced`    | The normal phases indicate the energised phases of the network in its normal state. There will not be any unknown phases in the normal phases, however; any de-energised areas of the network will not have normal phases. |
+| Current    | `Terminal.currentPhases` or `Terminal.tracedPhases.current` | `Traced`    | The current phases indicate the energised phases of the network in the current state. It has the same caveats as the normal phases.                                                                                        |
+
+There are two different feeder directions calculated by the SDK:
+
+| Feeder Direction Type | SDK Field                         | Field Type        | Description                                                             |
+|-----------------------|-----------------------------------|-------------------|-------------------------------------------------------------------------|
+| Normal                | `Terminal.normalFeederDirection`  | `FeederDirection` | The direction of the feeder head with the network in its normal state.  |
+| Current               | `Terminal.currentFeederDirection` | `FeederDirection` | The direction of the feeder head with the network in its current state. |
+
+## Traced Phases
+
+Traced phases should be considered '_read-only_' (even though they have setters). The traced phases will be automatically set if you load a database from disk,
+otherwise you should make use of the `SetPhases` class. If you are implementing network modification algorithms, you can also make use of the `RemovePhases`
+class if required.
+
+There are two methods for accessing the traced phases:
+1. As a `PhaseCode`. If the traced phases do not form a valid phase code this will return `null`.
+2. Per nominal phase.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+class PhaseLogger {
+    void logPhases(Terminal terminal) {
+        @Nullable PhaseCode phaseCode = terminal.getNormalPhases().asPhaseCode();
+        if (phaseCode != null)
+            System.out.printf("Found phases for %s. nominal: %s, normal: %s\n", terminal, terminal.getPhases(), phaseCode);
+        else {
+            System.out.printf("Found partial phases %s:\n", terminal);
+            terminal.getPhases().forEach(nominalPhase -> {
+                System.out.printf("   nominal: %s, normal: %s\n", nominalPhase, terminal.getNormalPhases().get(nominalPhase));
+            });
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem value="kotlin">
+
+```kotlin
+class PhaseLogger {
+    fun logPhases(terminal: Terminal) {
+        val phaseCode = terminal.normalPhases.asPhaseCode()
+        if (phaseCode != null)
+            println("Found phases for $terminal. nominal: ${terminal.phases}, normal: $phaseCode")
+        else {
+            println("Found partial phases $terminal:")
+            terminal.phases.forEach {
+                println("   nominal: $it, normal: ${terminal.normalPhases[it]}")
+            }
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Feeder Direction
+
+Feeder direction can be set to one of the following values:
+
+| Value        | Description                                                                                                               |
+|--------------|---------------------------------------------------------------------------------------------------------------------------|
+| `UPSTREAM`   | Traversing from this terminal will lead you towards the feeder head.                                                      |
+| `DOWNSTREAM` | Traversing from this terminal will lead you away from the feeder head.                                                    |
+| `BOTH`       | This terminal is part of a loop and traversing from this terminal can both lead you towards or away from the feeder head. |
+| `NONE`       | This terminal is not on a feeder. e.g. De-energised sections or EHV.                                                      |
+
+_**NOTE**_: A terminal only has a single feeder direction for each state of the network, so if there is unganged switching, not all nominal phases may
+trace in the direction specified. A direction of `BOTH` can be formed from some phases tracing `UPSTREAM`, with others tracing `DOWNSTREAM`.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+class DirectionLogger {
+    void logDirection(Terminal terminal) {
+        System.out.printf("%s: normal=%s, current=%s\n", terminal, terminal.getNormalFeederDirection(), terminal.getCurrentFeederDirection());
+    }
+}
+```
+
+</TabItem>
+<TabItem value="kotlin">
+
+```kotlin
+class DirectionLogger {
+    fun logDirection(terminal: Terminal) {
+        println("$terminal: normal=${terminal.normalFeederDirection}, current=${terminal.currentFeederDirection}")
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Previous Versions
+
+Previously, traced phases and feeder directions were stored together and could only be accessed per nominal phase. Below are some examples of converting from
+the old format to the current:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// Old
+class PhaseAndDirectionLoggerOld {
+    void log(Terminal terminal) {
+        System.out.printf("%s:\n", terminal);
+        terminal.getPhases().singlePhases().forEach(phase -> {
+            PhaseStatus nps = terminal.normalPhases(phase);
+            PhaseStatus cps = terminal.currentPhases(phase);
+
+            System.out.printf("   %s: n:%s:%s, c:%s:%s\n", phase, nps.getPhase(), nps.getDirection(), cps.getPhase(), cps.getDirection());
+        });
+    }
+}
+
+// Becomes
+class PhaseAndDirectionLoggerOld {
+    void log(Terminal terminal) {
+        System.out.printf("%s: dn:%s, dc:%s:\n", terminal, terminal.getNormalFeederDirection(), terminal.getCurrentFeederDirection());
+        terminal.getPhases().forEach(phase -> {
+            System.out.printf("   %s: n:%s, c:%s\n", phase, terminal.getNormalPhases().get(phase), terminal.getCurrentPhases().get(phase));
+        });
+    }
+}
+```
+
+</TabItem>
+<TabItem value="kotlin">
+
+```kotlin
+// Old
+class PhaseAndDirectionLoggerOld {
+    fun log(terminal: Terminal) {
+        println("$terminal:")
+        terminal.phases.singlePhases().forEach{
+            val nps = terminal.normalPhases(it)
+            val cps = terminal.currentPhases(it)
+
+            println("   $it: n:${nps.phase}:${nps.direction}, c:${cps.phase}:${cps.direction}")
+        }
+    }
+}
+
+// Becomes
+internal class PhaseAndDirectionLoggerOld {
+    fun log(terminal: Terminal) {
+        println("$terminal: dn:${terminal.normalFeederDirection}, dc:${terminal.currentFeederDirection}:")
+        terminal.phases.forEach {
+            println("   $it: n:${terminal.normalPhases[it]}, c:${terminal.currentPhases[it]}")
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>

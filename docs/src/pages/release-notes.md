@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.20.0](#v0200)| `14 May 2024` |
 |[0.19.0](#v0190)| `08 April 2024` |
 |[0.18.0](#v0180)| `08 April 2024` |
 | [0.17.1](#v0171)       | `11 January 2024`   |
@@ -27,6 +28,54 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.20.0]
+
+
+### Breaking Changes
+
+* This is the last release using an artifact ID of `evolve-sdk`, future releases will be made as `ewb-sdk`.
+* Removed `EwbDatabaseType`. Use `DatabaseType` instead.
+* The filename of the `results cache` database has been changed to `results-cache` from `results_cache`. Any existing `results cache` database files will need
+  to be renamed to `results-cache` to continue to be used.
+* Moved the following modules under `com.zepben.evolve.database.sqlite` to `com.zepben.evolve.database.sqlite.cim`:
+  * `customer`
+  * `diagram`
+  * `metadata`
+  * `network`
+  * `tables`
+  * `upgrade`
+* Moved (with some renaming) the following classes from `com.zepben.evolve.database.sqlite.common` to `com.zepben.evolve.database.sqlite.cim`:
+  * `BaseServiceReader`
+  * `BaseServiceWriter`
+  * `BaseDatabaseReader` as `CimDatabaseReader`
+  * `BaseDatabaseTables` as `CimDatabaseTables`
+  * `BaseDatabaseWriter` as `CimDatabaseWriter`
+  * `BaseCimReader` as `CimReader`
+  * `BaseCimWriter` as `CimWriter`
+* Moved `TableVersion` to `com.zepben.evolve.database.sqlite.common`. Instances for CIM and metrics are in `com.zepben.evolve.database.sqlite.cim.tables`
+  and `com.zepben.evolve.database.sqlite.metrics.tables` respectively.
+
+### New Features
+
+* Added `EwbDataFilePaths` for working with files and folders used by EWB.
+* Added tables for metrics database (`MetricsDatabaseTables`) and model for ingestion job (`IngestionJob`).
+  * Using `MetricsDatabaseWriter`, A single `IngestionJob` may be saved to the database along with its metrics and job sources.
+* Added `METRICS` to the `DatabaseType` enum.
+
+### Enhancements
+
+* None.
+
+### Fixes
+
+* None.
+
+### Notes
+
+* None.
 
 ---
 

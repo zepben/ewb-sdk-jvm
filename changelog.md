@@ -1,20 +1,27 @@
 # Zepben EWB SDK changelog
+
 ## [0.21.0] - UNRELEASED
+
 ### Breaking Changes
+
 * None.
 
 ### New Features
+
 * None.
 
 ### Enhancements
-* None.
+
+* Added `designTemperature` and `designRating` to `Conductor` to capture limitations in the conductor based on the
+  network design and physical surrounds of the conductor.
 
 ### Fixes
+
 * Use latest version of ewb-conn for fix to issuer key in auth configuration endpoint
 
 ### Notes
-* None.
 
+* None.
 
 ## [0.20.0] - 2024-05-14
 

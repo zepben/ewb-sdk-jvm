@@ -848,6 +848,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareConductingEquipment(createConductor)
 
         comparatorValidator.validateProperty(Conductor::length, createConductor, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(Conductor::designTemperature, createConductor, { 1 }, { 2 })
+        comparatorValidator.validateProperty(Conductor::designRating, createConductor, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(Conductor::assetInfo, createConductor, { CableInfo("c1") }, { CableInfo("c2") })
     }
 

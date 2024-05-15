@@ -846,6 +846,8 @@ fun toPb(cim: BusbarSection, pb: PBBusbarSection.Builder): PBBusbarSection.Build
 fun toPb(cim: Conductor, pb: PBConductor.Builder): PBConductor.Builder =
     pb.apply {
         length = cim.length ?: UNKNOWN_DOUBLE
+        designTemperature = cim.designTemperature ?: UNKNOWN_INT
+        designRating = cim.designRating ?: UNKNOWN_DOUBLE
         toPb(cim, ceBuilder)
     }
 

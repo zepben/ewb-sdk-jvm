@@ -891,6 +891,8 @@ fun toCim(pb: PBBusbarSection, networkService: NetworkService): BusbarSection =
 fun toCim(pb: PBConductor, cim: Conductor, networkService: NetworkService): Conductor =
     cim.apply {
         length = pb.length.takeUnless { it == UNKNOWN_DOUBLE }
+        designTemperature = pb.designTemperature.takeUnless { it == UNKNOWN_INT }
+        designRating = pb.designRating.takeUnless { it == UNKNOWN_DOUBLE }
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
         toCim(pb.ce, this, networkService)
     }

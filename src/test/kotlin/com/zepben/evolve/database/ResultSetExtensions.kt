@@ -29,5 +29,8 @@ internal fun ResultSet.getNullableDouble(columnName: String): Double? {
         dbl
 }
 
+internal fun ResultSet.getNullableInt(columnName: String): Int? =
+    getInt(columnName).takeUnless { wasNull() }
+
 internal fun ResultSet.getInstant(columnName: String): Instant? =
     getString(columnName).takeUnless { wasNull() }?.let { Instant.parse(it) }

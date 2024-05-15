@@ -37,7 +37,6 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.cim.CimWriter
-import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.cim.tables.associations.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.*
@@ -65,6 +64,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLvFeeders
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.wires.generation.production.TableEvChargingUnits
+import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.PreparedStatement
 import java.sql.SQLException
@@ -1419,6 +1419,8 @@ class NetworkCimWriter(
     @Throws(SQLException::class)
     private fun saveConductor(table: TableConductors, insert: PreparedStatement, conductor: Conductor, description: String): Boolean {
         insert.setNullableDouble(table.LENGTH.queryIndex, conductor.length)
+        insert.setNullableInt(table.DESIGN_TEMPERATURE.queryIndex, conductor.designTemperature)
+        insert.setNullableDouble(table.DESIGN_RATING.queryIndex, conductor.designRating)
         insert.setNullableString(table.WIRE_INFO_MRID.queryIndex, conductor.assetInfo?.mRID)
 
         return saveConductingEquipment(table, insert, conductor, description)

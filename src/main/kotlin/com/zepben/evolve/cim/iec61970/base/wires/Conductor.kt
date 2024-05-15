@@ -18,6 +18,9 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
  * between points in the power system.
  *
  * @property length Segment length for calculating line section capabilities.
+ * @property designTemperature ZBEX: The temperature for the network design of this conductor.
+ * @property designRating ZBEX: The current rating in Amperes at the specified design temperature that can be used without the conductor breaching physical network
+ *   design limits.
  */
 abstract class Conductor(mRID: String = "") : ConductingEquipment(mRID) {
 
@@ -26,6 +29,9 @@ abstract class Conductor(mRID: String = "") : ConductingEquipment(mRID) {
             require((value == null) || (value >= 0) || value.isNaN()) { "Conductor length cannot be negative." }
             field = value
         }
+
+    var designTemperature: Int? = null
+    var designRating: Double? = null
 
     /**
      * Override the [AssetInfo] as [WireInfo].

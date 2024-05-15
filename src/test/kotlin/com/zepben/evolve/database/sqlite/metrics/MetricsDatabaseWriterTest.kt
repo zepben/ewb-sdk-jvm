@@ -21,7 +21,7 @@ import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlin.io.path.notExists
 
-internal class MetricsDatabaseWriterTest {
+internal class MetricsDatabaseWriterTest : MetricsSchemaTest() {
 
     @TempDir
     lateinit var modelPath: Path
@@ -36,7 +36,7 @@ internal class MetricsDatabaseWriterTest {
             "databaseFile",
             mockk(), // ingestion job isn't actually used to create the MetricsWriter
             metricsWriter = writer
-        ).saveSchema()
+        ).populateTables()
 
         assertThat("Should have saved successfully", result)
 
@@ -81,5 +81,7 @@ internal class MetricsDatabaseWriterTest {
 
         verify { writer.save() }
     }
+
+    override fun save(file: String, job: IngestionJob): Boolean = MetricsDatabaseWriter(file, job).save()
 
 }

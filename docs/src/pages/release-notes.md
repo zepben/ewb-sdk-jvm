@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.21.0](#v0210)| `15 May 2024` |
 |[0.20.0](#v0200)| `14 May 2024` |
 |[0.19.0](#v0190)| `08 April 2024` |
 |[0.18.0](#v0180)| `08 April 2024` |
@@ -28,6 +29,32 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.21.0]
+
+
+### Breaking Changes
+
+* None.
+
+### New Features
+
+* None.
+
+### Enhancements
+
+* Added `designTemperature` and `designRating` to `Conductor` to capture limitations in the conductor based on the
+  network design and physical surrounds of the conductor.
+
+### Fixes
+
+* Use latest version of ewb-conn for fix to issuer key in auth configuration endpoint
+
+### Notes
+
+* None.
 
 ---
 

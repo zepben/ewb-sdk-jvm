@@ -10,7 +10,7 @@
 * None.
 
 ### Fixes
-* None.
+* Use latest version of ewb-conn for fix to issuer key in auth configuration endpoint
 
 ### Notes
 * None.

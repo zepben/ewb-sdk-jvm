@@ -15,12 +15,15 @@ import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.combined.*
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet50CustomerValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet51CustomerValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet52CustomerValidator
+import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet53CustomerValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet50DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet51DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet52DiagramValidator
+import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet53DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet50NetworkValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet51NetworkValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet52NetworkValidator
+import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet53NetworkValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -51,19 +54,22 @@ internal class ChangeSetTest {
     private val customerChangeSetValidators = mapOf(
         50 to ChangeSet50CustomerValidator,
         51 to ChangeSet51CustomerValidator,
-        52 to ChangeSet52CustomerValidator
+        52 to ChangeSet52CustomerValidator,
+        53 to ChangeSet53CustomerValidator
     )
 
     private val diagramChangeSetValidators = mapOf(
         50 to ChangeSet50DiagramValidator,
         51 to ChangeSet51DiagramValidator,
-        52 to ChangeSet52DiagramValidator
+        52 to ChangeSet52DiagramValidator,
+        53 to ChangeSet53DiagramValidator,
     )
 
     private val networkChangeSetValidators = mapOf(
         50 to ChangeSet50NetworkValidator,
         51 to ChangeSet51NetworkValidator,
-        52 to ChangeSet52NetworkValidator
+        52 to ChangeSet52NetworkValidator,
+        53 to ChangeSet53NetworkValidator
     )
 
     @Test

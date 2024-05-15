@@ -959,6 +959,8 @@ fun Conductor.fillFields(service: NetworkService, includeRuntime: Boolean = true
     (this as ConductingEquipment).fillFields(service, includeRuntime)
 
     length = 1.1
+    designTemperature = 2
+    designRating = 3.3
     assetInfo = CableInfo().also { service.add(it) }
 
     return this

@@ -37,12 +37,18 @@ internal class ConductorTest {
 
         assertThat(conductor.assetInfo, nullValue())
         assertThat(conductor.length, nullValue())
+        assertThat(conductor.designTemperature, nullValue())
+        assertThat(conductor.designRating, nullValue())
 
         conductor.assetInfo = wireInfo
         conductor.length = 12.3
+        conductor.designTemperature = 45
+        conductor.designRating = 67.8
 
         assertThat(conductor.assetInfo, equalTo(wireInfo))
         assertThat(conductor.length, equalTo(12.3))
+        assertThat(conductor.designTemperature, equalTo(45))
+        assertThat(conductor.designRating, equalTo(67.8))
     }
 
     @Test

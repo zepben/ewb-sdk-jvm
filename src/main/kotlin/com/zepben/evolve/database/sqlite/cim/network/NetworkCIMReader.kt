@@ -35,7 +35,6 @@ import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.cim.CimReader
-import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.database.sqlite.cim.tables.associations.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.*
@@ -63,6 +62,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLvFeeders
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.wires.generation.production.TableEvChargingUnits
+import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.extensions.*
 import com.zepben.evolve.services.network.NetworkService
@@ -1550,6 +1550,8 @@ class NetworkCimReader(
     private fun loadConductor(conductor: Conductor, table: TableConductors, resultSet: ResultSet): Boolean {
         conductor.apply {
             length = resultSet.getNullableDouble(table.LENGTH.queryIndex)
+            designTemperature = resultSet.getNullableInt(table.DESIGN_TEMPERATURE.queryIndex)
+            designRating = resultSet.getNullableDouble(table.DESIGN_RATING.queryIndex)
             assetInfo = service.ensureGet(
                 resultSet.getNullableString(table.WIRE_INFO_MRID.queryIndex),
                 typeNameAndMRID()

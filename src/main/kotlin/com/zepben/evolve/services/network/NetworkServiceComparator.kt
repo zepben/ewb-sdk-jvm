@@ -663,7 +663,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
         apply {
             compareConductingEquipment()
 
-            compareValues(Conductor::length)
+            compareValues(Conductor::length, Conductor::designTemperature, Conductor::designRating)
         }
 
     private fun ObjectDifference<out Connector>.compareConnector(): ObjectDifference<out Connector> =

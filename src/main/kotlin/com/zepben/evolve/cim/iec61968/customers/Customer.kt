@@ -18,13 +18,15 @@ import com.zepben.evolve.services.common.extensions.validateReference
  *
  * @property kind Kind of customer.
  * @property numEndDevices The number of end devices associated with this customer.
+ * @property specialNeed A special service need such as life support, hospitals, etc.
  */
 class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(mRID) {
 
     var kind: CustomerKind = CustomerKind.UNKNOWN
-    private var _customerAgreements: MutableList<CustomerAgreement>? = null
-
     var numEndDevices: Int? = null
+    var specialNeed: String? = null
+
+    private var _customerAgreements: MutableList<CustomerAgreement>? = null
 
     /**
      * @return True if this [Customer] has at least 1 EndDevice associated with it, false otherwise.
@@ -49,6 +51,12 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
      */
     fun getAgreement(mRID: String): CustomerAgreement? = _customerAgreements?.getByMRID(mRID)
 
+    /**
+     *  Add a [CustomerAgreement] to this [Customer].
+     *
+     * @param customerAgreement The [CustomerAgreement] to add.
+     * @return this [Customer].
+     */
     fun addAgreement(customerAgreement: CustomerAgreement): Customer {
         if (validateReference(customerAgreement, ::getAgreement, "A CustomerAgreement"))
             return this
@@ -59,12 +67,22 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
         return this
     }
 
+    /**
+     * Remove a customerAgreement from this [Customer].
+     *
+     * @param customerAgreement The [CustomerAgreement] to remove.
+     * @return true if [customerAgreement] is removed from the collection.
+     */
     fun removeAgreement(customerAgreement: CustomerAgreement?): Boolean {
         val ret = _customerAgreements?.remove(customerAgreement) == true
         if (_customerAgreements.isNullOrEmpty()) _customerAgreements = null
         return ret
     }
 
+    /**
+     * Clear all [CustomerAgreement]'s from this [Customer].
+     * @return this [Customer].
+     */
     fun clearAgreements(): Customer {
         _customerAgreements = null
         return this

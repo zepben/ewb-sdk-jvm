@@ -14,8 +14,6 @@ import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
 import com.zepben.evolve.database.sqlite.cim.CimWriter
-import com.zepben.evolve.database.sqlite.extensions.setNullableInt
-import com.zepben.evolve.database.sqlite.extensions.setNullableString
 import com.zepben.evolve.database.sqlite.cim.tables.associations.TableCustomerAgreementsPricingStructures
 import com.zepben.evolve.database.sqlite.cim.tables.associations.TablePricingStructuresTariffs
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableAgreements
@@ -23,6 +21,8 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableCust
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableCustomers
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TablePricingStructures
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableTariffs
+import com.zepben.evolve.database.sqlite.extensions.setNullableInt
+import com.zepben.evolve.database.sqlite.extensions.setNullableString
 import com.zepben.evolve.services.customer.CustomerService
 import java.sql.PreparedStatement
 import java.sql.SQLException
@@ -65,6 +65,7 @@ class CustomerCimWriter(
 
         insert.setNullableString(table.KIND.queryIndex, customer.kind.name)
         insert.setNullableInt(table.NUM_END_DEVICES.queryIndex, customer.numEndDevices)
+        insert.setNullableString(table.SPECIAL_NEED.queryIndex, customer.specialNeed)
 
         return saveOrganisationRole(table, insert, customer, "customer")
     }

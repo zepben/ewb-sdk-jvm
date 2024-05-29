@@ -14,6 +14,7 @@ import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidat
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.NoChanges
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.combined.*
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet50CustomerValidator
+import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet54CustomerValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet50DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet52DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet50NetworkValidator
@@ -51,21 +52,24 @@ internal class ChangeSetTest {
         ChangeSet50CustomerValidator,
         NoChanges(DatabaseType.CUSTOMER, 51),
         NoChanges(DatabaseType.CUSTOMER, 52),
-        NoChanges(DatabaseType.CUSTOMER, 53)
+        NoChanges(DatabaseType.CUSTOMER, 53),
+        ChangeSet54CustomerValidator
     ).associateBy { it.version }
 
     private val diagramChangeSetValidators = listOf(
         ChangeSet50DiagramValidator,
         NoChanges(DatabaseType.DIAGRAM, 51),
         ChangeSet52DiagramValidator,
-        NoChanges(DatabaseType.DIAGRAM, 53)
+        NoChanges(DatabaseType.DIAGRAM, 53),
+        NoChanges(DatabaseType.DIAGRAM, 54)
     ).associateBy { it.version }
 
     private val networkChangeSetValidators = listOf(
         ChangeSet50NetworkValidator,
         ChangeSet51NetworkValidator,
         ChangeSet52NetworkValidator,
-        ChangeSet53NetworkValidator
+        ChangeSet53NetworkValidator,
+        NoChanges(DatabaseType.NETWORK_MODEL, 54)
     ).associateBy { it.version }
 
     @Test

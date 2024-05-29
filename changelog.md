@@ -1,20 +1,26 @@
 # Zepben EWB SDK changelog
+
 ## [0.22.0] - UNRELEASED
+
 ### Breaking Changes
+
 * None.
 
 ### New Features
+
 * None.
 
 ### Enhancements
-* None.
+
+* Added `specialNeed` to `Customer` to capture any special needs of the customer, e.g. life support.
 
 ### Fixes
+
 * None.
 
 ### Notes
-* None.
 
+* None.
 
 ## [0.21.0] - 2024-05-16
 

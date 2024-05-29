@@ -36,6 +36,7 @@ fun toPb(cim: Customer, pb: PBCustomer.Builder): PBCustomer.Builder =
         clearCustomerAgreementMRIDs()
         cim.agreements.forEach { addCustomerAgreementMRIDs(it.mRID) }
         numEndDevices = cim.numEndDevices ?: UNKNOWN_INT
+        cim.specialNeed?.let { specialNeed = it } ?: clearSpecialNeed()
         toPb(cim, orBuilder)
     }
 

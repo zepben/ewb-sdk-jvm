@@ -29,6 +29,7 @@ fun Customer.fillFields(service: CustomerService, includeRuntime: Boolean = true
 
     kind = CustomerKind.enterprise
     numEndDevices = 1
+    specialNeed = "my need"
 
     for (i in 0..1) {
         addAgreement(CustomerAgreement().also {

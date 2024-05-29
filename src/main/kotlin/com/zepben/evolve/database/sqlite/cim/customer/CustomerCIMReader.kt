@@ -11,7 +11,6 @@ package com.zepben.evolve.database.sqlite.cim.customer
 import com.zepben.evolve.cim.iec61968.common.Agreement
 import com.zepben.evolve.cim.iec61968.customers.*
 import com.zepben.evolve.database.sqlite.cim.CimReader
-import com.zepben.evolve.database.sqlite.extensions.getNullableInt
 import com.zepben.evolve.database.sqlite.cim.tables.associations.TableCustomerAgreementsPricingStructures
 import com.zepben.evolve.database.sqlite.cim.tables.associations.TablePricingStructuresTariffs
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableAgreements
@@ -19,6 +18,8 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableCust
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableCustomers
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TablePricingStructures
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableTariffs
+import com.zepben.evolve.database.sqlite.extensions.getNullableInt
+import com.zepben.evolve.database.sqlite.extensions.getNullableString
 import com.zepben.evolve.services.common.extensions.ensureGet
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.customer.CustomerService
@@ -62,6 +63,7 @@ class CustomerCimReader(
         val customer = Customer(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             kind = CustomerKind.valueOf(resultSet.getString(table.KIND.queryIndex))
             numEndDevices = resultSet.getNullableInt(table.NUM_END_DEVICES.queryIndex)
+            specialNeed = resultSet.getNullableString(table.SPECIAL_NEED.queryIndex)
         }
 
         return loadOrganisationRole(customer, table, resultSet) && service.addOrThrow(customer)

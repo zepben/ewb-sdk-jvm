@@ -45,14 +45,17 @@ internal class CustomerTest {
 
         assertThat(customer.kind, equalTo(CustomerKind.UNKNOWN))
         assertThat(customer.numEndDevices, nullValue())
+        assertThat(customer.specialNeed, nullValue())
 
         customer.apply {
             kind = CustomerKind.enterprise
             numEndDevices = 4
+            specialNeed = "my need"
         }
 
         assertThat(customer.kind, equalTo(CustomerKind.enterprise))
         assertThat(customer.numEndDevices, equalTo(4))
+        assertThat(customer.specialNeed, equalTo("my need"))
     }
 
     @Test
@@ -68,4 +71,5 @@ internal class CustomerTest {
             Customer::clearAgreements
         )
     }
+
 }

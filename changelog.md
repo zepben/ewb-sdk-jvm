@@ -7,7 +7,7 @@
 * None.
 
 ### Enhancements
-* Added feature matrix in documentation.
+* Added feature list in documentation.
 
 ### Fixes
 * None.

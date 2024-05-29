@@ -8,38 +8,81 @@
 
 package com.zepben.evolve.database.sqlite.cim.upgrade.changesets
 
+import com.zepben.evolve.database.paths.DatabaseType
+import com.zepben.evolve.database.sqlite.cim.upgrade.UpgradeRunner
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import java.sql.ResultSet
 import java.sql.Statement
 
+/**
+ * A class for validating a change set.
+ *
+ * @param databaseType The type of database the changeset should be validated against.
+ * @property version The version number of the changeset to validate.
+ * @param expectChanges Indicates if the changeset should have any changes.
+ */
+abstract class ChangeSetValidator(
+    private val databaseType: DatabaseType,
+    val version: Int,
+    private val expectChanges: Boolean = true
+) {
 
-interface ChangeSetValidator {
+    private val description: String by lazy { "$databaseType [$version]" }
 
     /**
      * Set up prior to applying the ChangeSet.
      * @return A list of statements to run on the database to which the ChangeSet will be applied.
      */
-    fun setUpStatements(): List<String>
+    abstract fun setUpStatements(): List<String>
 
     /**
      * Populate any tables or fields with data after applying the ChangeSet.
      * @return A list of statements to run on the database to which the ChangeSet has been applied.
      */
-    fun populateStatements(): List<String>
+    abstract fun populateStatements(): List<String>
 
     /**
      * Validation after applying the ChangeSet
      * @param statement A statement that can be used to run queries against the database to which the ChangeSet has been applied.
      */
-    fun validate(statement: Statement)
+    fun validate(statement: Statement) {
+        val changeSet = UpgradeRunner().run { preSplitChangeSets + postSplitChangeSets }.first { it.number == version }
+
+        val totalChanges = changeSet.preCommandHooks.count { databaseType in it.targetDatabases } +
+            changeSet.commands.count { databaseType in it.targetDatabases } +
+            changeSet.postCommandHooks.count { databaseType in it.targetDatabases }
+
+        if (expectChanges) {
+            assertThat(
+                "$description: Validator has expected changes but no preCommandHooks, commands or postCommandHooks were found in the change set. " +
+                    "Should you be using a NoChanges validator instead?",
+                totalChanges,
+                greaterThan(0)
+            )
+        } else {
+            assertThat(
+                "$description: Validator had no expected changes but preCommandHooks, commands or postCommandHooks were found [$totalChanges]. " +
+                    "Have you used a NoChanges validator instead of creating an actual validator?",
+                totalChanges,
+                equalTo(0)
+            )
+        }
+
+        validateChanges(statement)
+    }
 
     /**
      * Tear down after validating the ChangeSet.
      * @return A list of statements to remove any data from the database to which the ChangeSet was applied.
      */
-    fun tearDownStatements(): List<String>
+    abstract fun tearDownStatements(): List<String>
+
+    /**
+     * Validate the changes have actually been applied when applying the ChangeSet
+     * @param statement A statement that can be used to run queries against the database to which the ChangeSet has been applied.
+     */
+    protected abstract fun validateChanges(statement: Statement)
 
     /**
      * Validate each row returned from a query.
@@ -47,7 +90,7 @@ interface ChangeSetValidator {
      * @param sql The query string.
      * @param validators A list of validators, one per expected row in the query.
      */
-    fun validateRows(statement: Statement, sql: String, vararg validators: (ResultSet) -> Unit) {
+    protected fun validateRows(statement: Statement, sql: String, vararg validators: (ResultSet) -> Unit) {
         statement.executeQuery(sql).use { rs ->
             validators.forEach {
                 assertThat(rs.next(), equalTo(true))
@@ -57,7 +100,14 @@ interface ChangeSetValidator {
         }
     }
 
-    fun ensureIndexes(statement: Statement, vararg expectedIndexes: String, present: Boolean = true) {
+    /**
+     * Ensure the presence of indexes in the database.
+     *
+     * @param statement The statement used to run the check.
+     * @param expectedIndexes A list of indexes to check.
+     * @param present Indicates if the indexes are expected to be found or not.
+     */
+    protected fun ensureIndexes(statement: Statement, vararg expectedIndexes: String, present: Boolean = true) {
         expectedIndexes.forEach {
             statement.executeQuery("pragma index_info('$it')").use { rs ->
                 assertThat("Does index '$it' exist", rs.next(), equalTo(present))
@@ -65,8 +115,15 @@ interface ChangeSetValidator {
         }
     }
 
-    fun ensureTables(statement: Statement, vararg tableNames: String, present: Boolean = true) {
-        tableNames.forEach {
+    /**
+     * Ensure the presence of tables in the database.
+     *
+     * @param statement The statement used to run the check.
+     * @param expectedTables A list of tables to check.
+     * @param present Indicates if the tables are expected to be found or not.
+     */
+    protected fun ensureTables(statement: Statement, vararg expectedTables: String, present: Boolean = true) {
+        expectedTables.forEach {
             statement.executeQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='$it';").use { rs ->
                 assertThat("Does table '$it' exist", rs.next(), equalTo(present))
             }
@@ -79,7 +136,16 @@ interface ChangeSetValidator {
         }
     }
 
-    fun ensureColumns(statement: Statement, table: String, vararg expectedColumns: String, present: Boolean = true) {
+    /**
+     * Ensure the presence of columns in a table of the database.
+     *
+     * @param statement The statement used to run the check.
+     * @param table The table containing the columns to check.
+     * @param expectedColumns A list of columns to check.
+     * @param present Indicates if the columns are expected to be found or not.
+     */
+    @Suppress("SameParameterValue")
+    protected fun ensureColumns(statement: Statement, table: String, vararg expectedColumns: String, present: Boolean = true) {
         statement.executeQuery("pragma table_info('$table')").use { rs ->
             val columns = mutableListOf<String>()
             while (rs.next()) {

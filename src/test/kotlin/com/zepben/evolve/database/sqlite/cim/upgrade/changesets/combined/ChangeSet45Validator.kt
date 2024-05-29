@@ -8,13 +8,14 @@
 
 package com.zepben.evolve.database.sqlite.cim.upgrade.changesets.combined
 
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import java.sql.Statement
 
-object ChangeSet45Validator : ChangeSetValidator {
+object ChangeSet45Validator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 45) {
     override fun setUpStatements(): List<String> = listOf(
         """
         INSERT INTO breakers (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, base_voltage_mrid,
@@ -98,7 +99,7 @@ object ChangeSet45Validator : ChangeSetValidator {
         """.trimIndent()
     )
 
-    override fun validate(statement: Statement) {
+    override fun validateChanges(statement: Statement) {
         ensureIndexes(
             statement,
             "switch_info_mrid",

@@ -8,12 +8,13 @@
 
 package com.zepben.evolve.database.sqlite.cim.upgrade.changesets.combined
 
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
 
-object ChangeSet44Validator : ChangeSetValidator {
+object ChangeSet44Validator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 44) {
 
     override fun setUpStatements(): List<String> = emptyList()
 
@@ -33,7 +34,7 @@ object ChangeSet44Validator : ChangeSetValidator {
             "potential_transformer_info_mrid, type) VALUES ('id', 'name', 'desc', 1, 'l_id', 2, true, false, 't_id', 'pti_id', 'T')"
     )
 
-    override fun validate(statement: Statement) {
+    override fun validateChanges(statement: Statement) {
         ensureIndexes(
             statement,
             "current_transformer_info_mrid",

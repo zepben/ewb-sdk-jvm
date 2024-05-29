@@ -11,15 +11,11 @@ package com.zepben.evolve.database.sqlite.cim.upgrade
 import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
+import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.NoChanges
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.combined.*
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet50CustomerValidator
-import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet51CustomerValidator
-import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet52CustomerValidator
-import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet53CustomerValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet50DiagramValidator
-import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet51DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet52DiagramValidator
-import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet53DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet50NetworkValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet51NetworkValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet52NetworkValidator
@@ -42,35 +38,35 @@ internal class ChangeSetTest {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private val preSplitChangeSetValidators = mapOf(
-        44 to ChangeSet44Validator,
-        45 to ChangeSet45Validator,
-        46 to ChangeSet46Validator,
-        47 to ChangeSet47Validator,
-        48 to ChangeSet48Validator,
-        49 to ChangeSet49Validator
-    )
+    private val preSplitChangeSetValidators = listOf(
+        ChangeSet44Validator,
+        ChangeSet45Validator,
+        ChangeSet46Validator,
+        ChangeSet47Validator,
+        ChangeSet48Validator,
+        ChangeSet49Validator
+    ).associateBy { it.version }
 
-    private val customerChangeSetValidators = mapOf(
-        50 to ChangeSet50CustomerValidator,
-        51 to ChangeSet51CustomerValidator,
-        52 to ChangeSet52CustomerValidator,
-        53 to ChangeSet53CustomerValidator
-    )
+    private val customerChangeSetValidators = listOf(
+        ChangeSet50CustomerValidator,
+        NoChanges(DatabaseType.CUSTOMER, 51),
+        NoChanges(DatabaseType.CUSTOMER, 52),
+        NoChanges(DatabaseType.CUSTOMER, 53)
+    ).associateBy { it.version }
 
-    private val diagramChangeSetValidators = mapOf(
-        50 to ChangeSet50DiagramValidator,
-        51 to ChangeSet51DiagramValidator,
-        52 to ChangeSet52DiagramValidator,
-        53 to ChangeSet53DiagramValidator,
-    )
+    private val diagramChangeSetValidators = listOf(
+        ChangeSet50DiagramValidator,
+        NoChanges(DatabaseType.DIAGRAM, 51),
+        ChangeSet52DiagramValidator,
+        NoChanges(DatabaseType.DIAGRAM, 53)
+    ).associateBy { it.version }
 
-    private val networkChangeSetValidators = mapOf(
-        50 to ChangeSet50NetworkValidator,
-        51 to ChangeSet51NetworkValidator,
-        52 to ChangeSet52NetworkValidator,
-        53 to ChangeSet53NetworkValidator
-    )
+    private val networkChangeSetValidators = listOf(
+        ChangeSet50NetworkValidator,
+        ChangeSet51NetworkValidator,
+        ChangeSet52NetworkValidator,
+        ChangeSet53NetworkValidator
+    ).associateBy { it.version }
 
     @Test
     internal fun `test change sets`() {
@@ -116,8 +112,10 @@ internal class ChangeSetTest {
             conn.prepareStatement(tableVersion.preparedUpdateSql).use { versionUpdateStatement ->
                 runner.changesSets().forEach { cs ->
 
-                    val validator = changeSetValidators[cs.number]
-                        ?: throw IllegalStateException("Validator for change set ${cs.number} is missing. Have you added a ChangeSetValidator for your latest model update?")
+                    val validator = requireNotNull(changeSetValidators[cs.number]) {
+                        "Validator for change set ${cs.number} is missing for $type. Have you added a ChangeSetValidator for your latest model update and " +
+                            "made sure its version is set correctly?"
+                    }
 
                     logger.info("Preparing for update ${cs.number}.")
                     validator.setUpStatements().forEach {

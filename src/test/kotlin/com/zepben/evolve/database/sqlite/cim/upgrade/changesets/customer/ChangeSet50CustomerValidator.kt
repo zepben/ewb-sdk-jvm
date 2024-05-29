@@ -9,18 +9,18 @@
 package com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer
 
 import com.zepben.evolve.database.paths.DatabaseType
-import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSet50Helpers
+import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import java.sql.Statement
 
-object ChangeSet50CustomerValidator : ChangeSetValidator {
+object ChangeSet50CustomerValidator : ChangeSetValidator(DatabaseType.CUSTOMER, 50) {
 
     override fun setUpStatements(): List<String> = ChangeSet50Helpers.setUpStatements
 
     // We do not need to populate anything as we are not changing any of the table structures.
     override fun populateStatements(): List<String> = emptyList()
 
-    override fun validate(statement: Statement) {
+    override fun validateChanges(statement: Statement) {
         //
         // NOTE: We are being lazy and assuming if the table was left behind, then so were its indexes.
         //

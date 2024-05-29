@@ -8,10 +8,11 @@
 
 package com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network
 
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import java.sql.Statement
 
-object ChangeSet51NetworkValidator : ChangeSetValidator {
+object ChangeSet51NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 51) {
 
     override fun setUpStatements(): List<String> = listOf(
         "INSERT INTO battery_unit (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, power_electronics_connection_mrid, max_p, min_p, battery_state, rated_e, stored_e) VALUES ('mrid', 'name', 'description', 1, 'location_mrid', 1, true, true, 'commissioned_date', 'power_electronics_connection_mrid', 1.1, 1.1, 'battery_state', 1, 1);",
@@ -25,7 +26,7 @@ object ChangeSet51NetworkValidator : ChangeSetValidator {
     // We do not need to populate anything as we are not changing any of the table structures, just renaming them.
     override fun populateStatements(): List<String> = emptyList()
 
-    override fun validate(statement: Statement) {
+    override fun validateChanges(statement: Statement) {
         ensureNewAdded(statement)
         ensureOldRemoved(statement)
     }

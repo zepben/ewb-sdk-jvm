@@ -8,12 +8,13 @@
 
 package com.zepben.evolve.database.sqlite.cim.upgrade.changesets.combined
 
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
 
-object ChangeSet49Validator : ChangeSetValidator {
+object ChangeSet49Validator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 49) {
 
     override fun setUpStatements(): List<String> = listOf(
         "INSERT INTO reclose_delays (current_relay_info_mrid, reclose_delay, sequence_number) VALUES ('id1', 1.1, 2)",
@@ -71,7 +72,7 @@ object ChangeSet49Validator : ChangeSetValidator {
         "INSERT INTO protection_relay_schemes_protection_relay_functions (protection_relay_scheme_mrid, protection_relay_function_mrid) VALUES ('id8', 'id7')"
     )
 
-    override fun validate(statement: Statement) {
+    override fun validateChanges(statement: Statement) {
         ensureIndexes(
             statement,
             "distance_relays_mrid",

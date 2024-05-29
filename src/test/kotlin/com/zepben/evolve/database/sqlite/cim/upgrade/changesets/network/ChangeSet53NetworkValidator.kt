@@ -10,13 +10,14 @@ package com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network
 
 import com.zepben.evolve.database.getNullableDouble
 import com.zepben.evolve.database.getNullableInt
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import java.sql.Statement
 
-object ChangeSet53NetworkValidator : ChangeSetValidator {
+object ChangeSet53NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 53) {
 
     //
     // NOTE: In the validators we are only checking the columns that were actually changed.
@@ -38,7 +39,7 @@ object ChangeSet53NetworkValidator : ChangeSetValidator {
         """.trimIndent(),
     )
 
-    override fun validate(statement: Statement) {
+    override fun validateChanges(statement: Statement) {
         validateRows(statement, "SELECT * FROM ac_line_segments",
             { rs ->
                 assertThat(rs.getString("mrid"), equalTo("id1"))

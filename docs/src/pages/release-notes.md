@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.22.0](#v0220)| `30 May 2024` |
 |[0.21.0](#v0210)| `15 May 2024` |
 |[0.20.0](#v0200)| `14 May 2024` |
 |[0.19.0](#v0190)| `08 April 2024` |
@@ -29,6 +30,31 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.22.0]
+
+
+### Breaking Changes
+
+* None.
+
+### New Features
+
+* None.
+
+### Enhancements
+
+* Added `specialNeed` to `Customer` to capture any special needs of the customer, e.g. life support.
+
+### Fixes
+
+* None.
+
+### Notes
+
+* None.
 
 ---
 

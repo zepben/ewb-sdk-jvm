@@ -11,7 +11,8 @@ package com.zepben.evolve.cim.extensions
 /**
  * Indicates that a member or class is a Zepben extension added to the CIM standard.
  *
- * This class should be linked into documentation of all our CIM extensions. Once this has been
- * linked everywhere you will be able to use find usages to see all of our extension attributes.
+ * All Zepben extensions should be annotated with @ZBEX, and have [ZBEX] linked into their docstring. Once this has been linked
+ * everywhere, you will be able to use "find usages" to see all of our extension attributes/classes.
  */
-object ZBEX
+@MustBeDocumented
+annotation class ZBEX

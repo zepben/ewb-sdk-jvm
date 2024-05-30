@@ -30,7 +30,9 @@ abstract class Conductor(mRID: String = "") : ConductingEquipment(mRID) {
             field = value
         }
 
+    @ZBEX
     var designTemperature: Int? = null
+    @ZBEX
     var designRating: Double? = null
 
     /**

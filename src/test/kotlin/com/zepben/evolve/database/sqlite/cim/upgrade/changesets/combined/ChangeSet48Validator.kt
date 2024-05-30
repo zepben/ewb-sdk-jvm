@@ -12,13 +12,14 @@ import com.zepben.evolve.database.getInstant
 import com.zepben.evolve.database.getNullableBoolean
 import com.zepben.evolve.database.getNullableDouble
 import com.zepben.evolve.database.getNullableString
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
 import java.time.Instant
 
-object ChangeSet48Validator : ChangeSetValidator {
+object ChangeSet48Validator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 48) {
     override fun setUpStatements(): List<String> = listOf(
         """
            INSERT INTO power_transformer_ends (mrid, name, description, num_diagram_objects, end_number, terminal_mrid, base_voltage_mrid, grounded, 
@@ -307,7 +308,7 @@ object ChangeSet48Validator : ChangeSetValidator {
 
         )
 
-    override fun validate(statement: Statement) {
+    override fun validateChanges(statement: Statement) {
         ensureTables(statement, "tap_changer_controls", "ev_charging_units", "reclose_delays", "power_transformer_end_ratings")
 
         ensureIndexes(

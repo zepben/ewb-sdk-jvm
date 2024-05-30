@@ -8,13 +8,14 @@
 
 package com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network
 
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.ResultSet
 import java.sql.Statement
 
-object ChangeSet52NetworkValidator : ChangeSetValidator {
+object ChangeSet52NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 52) {
 
     //
     // NOTE: In the validators we are only checking the columns that were actually changed.
@@ -66,7 +67,7 @@ object ChangeSet52NetworkValidator : ChangeSetValidator {
             "VALUES ('id2', 'name', 'description', 2, 'location_mrid', 2, true, true, 'commissioned_date', 'base_voltage_mrid', true, 'regulating_control_mrid', 2, 2, 2, 2, 2, 2, 2, 'inverter_standard', 2, 2, 2, true, 2, 2, 2, 2, 2, 2, 2, 2, true, 2, 2, 2, 2, 2, 2, 2, 2, true, 2);",
     )
 
-    override fun validate(statement: Statement) {
+    override fun validateChanges(statement: Statement) {
         // Ensure new indexes were added.
         ensureIndexes(statement, "location_street_addresses_location_mrid_address_field")
 

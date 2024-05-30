@@ -34,6 +34,7 @@ internal class CustomerServiceComparatorTest : BaseServiceComparatorTest() {
             { CustomerAgreement("1").apply { customer = it } },
             { CustomerAgreement("2").apply { customer = it } })
         comparatorValidator.validateProperty(Customer::numEndDevices, { Customer(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(Customer::specialNeed, { Customer(it) }, { "1" }, { "2" })
     }
 
     @Test

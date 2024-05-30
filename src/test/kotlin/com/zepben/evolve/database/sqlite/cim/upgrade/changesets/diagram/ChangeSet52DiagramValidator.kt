@@ -8,12 +8,13 @@
 
 package com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram
 
+import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
 
-object ChangeSet52DiagramValidator : ChangeSetValidator {
+object ChangeSet52DiagramValidator : ChangeSetValidator(DatabaseType.DIAGRAM, 52) {
 
     override fun setUpStatements(): List<String> = listOf(
         "INSERT INTO diagram_object_points (diagram_object_mrid, sequence_number, x_position, y_position) VALUES ('id1', '2', '3.3', '4.4')"
@@ -23,7 +24,7 @@ object ChangeSet52DiagramValidator : ChangeSetValidator {
         "INSERT INTO diagram_object_points (diagram_object_mrid, sequence_number, x_position, y_position) VALUES ('id2', 3, 4.4, 5.5)"
     )
 
-    override fun validate(statement: Statement) {
+    override fun validateChanges(statement: Statement) {
         // Make sure the indexes were recreated.
         ensureIndexes(statement, "diagram_object_points_diagram_object_mrid_sequence_number", "diagram_object_points_diagram_object_mrid")
 

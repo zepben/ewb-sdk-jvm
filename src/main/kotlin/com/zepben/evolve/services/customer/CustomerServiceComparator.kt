@@ -16,11 +16,13 @@ import com.zepben.evolve.cim.iec61968.customers.Tariff
 import com.zepben.evolve.services.common.BaseServiceComparator
 import com.zepben.evolve.services.common.ObjectDifference
 
-//
-// NOTE: Unused functions have been suppressed for this class as they are access by reflection rather than directly. This
-//       means they are always flagged as unused. By suppressing the warning it also means you might not be testing every
-//       function, so make sure you check the code coverage
-//
+/**
+ * A class for comparing the contents of a [CustomerService].
+ *
+ * NOTE: Unused functions have been suppressed for this class as they are access by reflection rather than directly. This
+ *       means they are always flagged as unused. By suppressing the warning it also means you might not be testing every
+ *       function, so make sure you check the code coverage
+ */
 @Suppress("unused")
 class CustomerServiceComparator : BaseServiceComparator() {
 
@@ -31,7 +33,7 @@ class CustomerServiceComparator : BaseServiceComparator() {
         ObjectDifference(source, target).apply {
             compareOrganisationRole()
 
-            compareValues(Customer::kind, Customer::numEndDevices)
+            compareValues(Customer::kind, Customer::numEndDevices, Customer::specialNeed)
             compareIdReferenceCollections(Customer::agreements)
         }
 
@@ -52,4 +54,5 @@ class CustomerServiceComparator : BaseServiceComparator() {
 
     private fun compareTariff(source: Tariff, target: Tariff): ObjectDifference<Tariff> =
         ObjectDifference(source, target).apply { compareDocument() }
+
 }

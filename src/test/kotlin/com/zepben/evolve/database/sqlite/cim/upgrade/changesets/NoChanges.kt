@@ -8,18 +8,23 @@
 
 package com.zepben.evolve.database.sqlite.cim.upgrade.changesets
 
+import com.zepben.evolve.database.paths.DatabaseType
 import java.sql.Statement
 
 /**
  * Helper class for changeset that do not impact a database.
  *
- * NOTE: This doesn't actually check that no changes were made, it is just a convenient way to create a changeset with no expected changes.
+ * @param databaseType The type of database that shouldn't have changes.
+ * @param version The version for the [databaseType] that shouldn't have changes.
  */
-open class NoChanges : ChangeSetValidator {
+class NoChanges(
+    databaseType: DatabaseType,
+    version: Int
+) : ChangeSetValidator(databaseType, version, expectChanges = false) {
 
     override fun setUpStatements(): List<String> = emptyList()
     override fun populateStatements(): List<String> = emptyList()
-    override fun validate(statement: Statement) {}
+    override fun validateChanges(statement: Statement) {}
     override fun tearDownStatements(): List<String> = emptyList()
 
 }

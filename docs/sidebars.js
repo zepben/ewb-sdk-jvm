@@ -8,6 +8,7 @@
 
 module.exports = {
   someSidebar: [
+    "sdk-overview",
     "sdk-data-model", 
     "sdk-services", 
     "sdk-phases",

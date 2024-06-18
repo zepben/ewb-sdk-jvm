@@ -13,6 +13,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
+import java.util.*
 import kotlin.io.path.name
 
 
@@ -88,6 +89,8 @@ class EwbDataFilePaths @JvmOverloads constructor(
      * @return The path to the "energy readings" database for the specified date.
      */
     fun energyReading(date: LocalDate): Path = date.toDatedPath(DatabaseType.ENERGY_READING.fileDescriptor)
+
+    fun jobDescriptor(date: LocalDate, jobId: UUID): Path = date.toDatedPath(jobId.toString())
 
     /**
      * Determine the path to the "energy readings index" database.

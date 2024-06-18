@@ -9,11 +9,6 @@
 package com.zepben.evolve.metrics
 
 /**
- * A map from metric names to their values.
- */
-typealias NetworkContainerMetrics = MutableMap<String, Double>
-
-/**
  * Type holding a network container (partial or total) and its corresponding metrics.
  */
 typealias NetworkMetric = Map.Entry<NetworkContainer, NetworkContainerMetrics>

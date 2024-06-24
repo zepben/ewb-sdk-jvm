@@ -6,6 +6,7 @@
     * `issuerDomain` has been renamed to `issuer`;
   * `Connect.connectWithPassword`:
     * `issuerDomain` has been renamed to `issuer`;
+* Renamed `TablePowerElectronicsUnit` to `TablePowerElectronicsUnits`.
 
 ### New Features
 * A file named after the ID of an ingestion job is now created when running `MetricsDatabaseWriter.save()`. For this feature to take effect, a `modelPath` must

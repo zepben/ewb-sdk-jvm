@@ -12,4 +12,4 @@ fun interface StepAction<T> {
     fun apply(item: T, context: StepContext)
 }
 
-abstract class StepActionWithContextData<T, U> : StepAction<T>, TypedContextDataComputer<T, U>
+abstract class StepActionWithContextValue<T, U> : StepAction<T>, TypedContextValueComputer<T, U>

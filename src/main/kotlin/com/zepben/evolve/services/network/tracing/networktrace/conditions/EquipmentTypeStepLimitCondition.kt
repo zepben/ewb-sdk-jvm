@@ -11,12 +11,12 @@ package com.zepben.evolve.services.network.tracing.networktrace.conditions
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversalV2.StopConditionWithContextData
+import com.zepben.evolve.services.network.tracing.traversalV2.StopConditionWithContextValue
 
 class EquipmentTypeStepLimitCondition<T>(
     private val limit: Int,
     private val equipmentType: Class<out ConductingEquipment>
-) : StopConditionWithContextData<NetworkTraceStep<T>, Int>() {
+) : StopConditionWithContextValue<NetworkTraceStep<T>, Int>() {
     override fun shouldStop(item: NetworkTraceStep<T>, context: StepContext): Boolean {
         return (context.getData<Int>(key) ?: 0) >= limit
     }

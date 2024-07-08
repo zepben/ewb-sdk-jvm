@@ -12,4 +12,4 @@ fun interface StopCondition<T> {
     fun shouldStop(item: T, context: StepContext): Boolean
 }
 
-abstract class StopConditionWithContextData<T, U> : StopCondition<T>, TypedContextDataComputer<T, U>
+abstract class StopConditionWithContextValue<T, U> : StopCondition<T>, TypedContextValueComputer<T, U>

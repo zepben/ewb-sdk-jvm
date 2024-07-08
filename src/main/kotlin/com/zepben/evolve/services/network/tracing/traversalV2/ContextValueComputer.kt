@@ -9,7 +9,7 @@
 package com.zepben.evolve.services.network.tracing.traversalV2
 
 // TODO: I don't really like this name. Someone please suggest something else...
-interface ContextDataComputer<T> {
+interface ContextValueComputer<T> {
     val key: String
 
     fun computeInitialValue(nextItem: T): Any?
@@ -17,7 +17,7 @@ interface ContextDataComputer<T> {
     fun computeNextValue(nextItem: T, stepValue: Any?)
 }
 
-interface TypedContextDataComputer<T, U> : ContextDataComputer<T> {
+interface TypedContextValueComputer<T, U> : ContextValueComputer<T> {
     @Suppress("UNCHECKED_CAST")
     override fun computeNextValue(nextItem: T, stepValue: Any?) {
         computeNextValue(nextItem, stepValue as U)

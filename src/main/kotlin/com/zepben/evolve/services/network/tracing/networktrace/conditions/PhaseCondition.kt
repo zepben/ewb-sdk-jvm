@@ -13,12 +13,12 @@ import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResul
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.TerminalToTerminalPath
-import com.zepben.evolve.services.network.tracing.traversalV2.QueueConditionWithContextData
+import com.zepben.evolve.services.network.tracing.traversalV2.QueueConditionWithContextValue
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 
 internal class PhaseCondition<T>(
     val phases: PhaseCode
-) : QueueConditionWithContextData<NetworkTraceStep<T>, ConnectivityResult> {
+) : QueueConditionWithContextValue<NetworkTraceStep<T>, ConnectivityResult> {
 
     private val terminalConnectivity = TerminalConnectivityConnected()
     private var precalculatedResult: ConnectivityResult? = null

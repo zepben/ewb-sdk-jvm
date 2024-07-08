@@ -54,7 +54,7 @@ abstract class Traversal<T, D : Traversal<T, D>>(
     private val queueConditions = mutableListOf<QueueCondition<T>>()
     private val stepActions = mutableListOf<StepAction<T>>()
 
-    private val computeNextContextFuns: MutableMap<String, ContextDataComputer<T>> = mutableMapOf()
+    private val computeNextContextFuns: MutableMap<String, ContextValueComputer<T>> = mutableMapOf()
     private val contexts: IdentityHashMap<T, StepContext> = IdentityHashMap()
 
     protected abstract fun getDerivedThis(): D
@@ -72,7 +72,7 @@ abstract class Traversal<T, D : Traversal<T, D>>(
      */
     fun addStopCondition(condition: StopCondition<T>): D {
         stopConditions.add(condition)
-        if (condition is StopConditionWithContextData<T, *>) {
+        if (condition is StopConditionWithContextValue<T, *>) {
             computeNextContextFuns[condition.key] = condition
         }
         return getDerivedThis()
@@ -114,7 +114,7 @@ abstract class Traversal<T, D : Traversal<T, D>>(
 
     fun addQueueCondition(condition: QueueCondition<T>): D {
         queueConditions.add(condition)
-        if (condition is QueueConditionWithContextData<T, *>) {
+        if (condition is QueueConditionWithContextValue<T, *>) {
             computeNextContextFuns[condition.key] = condition
         }
         return getDerivedThis()
@@ -143,7 +143,7 @@ abstract class Traversal<T, D : Traversal<T, D>>(
      */
     fun addStepAction(action: StepAction<T>): D {
         stepActions.add(action)
-        if (action is StepActionWithContextData<T, *>) {
+        if (action is StepActionWithContextValue<T, *>) {
             computeNextContextFuns[action.key] = action
         }
         return getDerivedThis()
@@ -203,7 +203,7 @@ abstract class Traversal<T, D : Traversal<T, D>>(
         return getDerivedThis()
     }
 
-    fun setContextDataComputer(key: String, computer: ContextDataComputer<T>?): D {
+    fun setContextDataComputer(key: String, computer: ContextValueComputer<T>?): D {
         if (computer != null)
             computeNextContextFuns[key] = computer
         else
@@ -222,19 +222,27 @@ abstract class Traversal<T, D : Traversal<T, D>>(
         return getDerivedThis()
     }
 
-    private fun computeNextContext(nextStep: T, context: StepContext?): StepContext {
+    private fun computeInitialContext(nextStep: T): StepContext {
         var newContextData: MutableMap<String, Any?>? = null
 
         for ((key, computer) in computeNextContextFuns) {
             newContextData = newContextData ?: mutableMapOf()
-            if (context == null)
-                newContextData[key] = computer.computeInitialValue(nextStep)
-            else
-                newContextData[key] = computer.computeNextValue(nextStep, context.getData(key))
+            newContextData[key] = computer.computeInitialValue(nextStep)
         }
 
-        val nextStepNum = if (context == null) 0 else context.stepNumber + 1
-        return StepContext(context == null, nextStepNum, newContextData)
+        return StepContext(true, 0, newContextData)
+    }
+
+
+    private fun computeNextContext(context: StepContext, nextStep: T): StepContext {
+        var newContextData: MutableMap<String, Any?>? = null
+
+        for ((key, computer) in computeNextContextFuns) {
+            newContextData = newContextData ?: mutableMapOf()
+            newContextData[key] = computer.computeNextValue(nextStep, context.getData(key))
+        }
+
+        return StepContext(false, context.stepNumber + 1, newContextData)
     }
 
     fun addStartItem(item: T): D {
@@ -291,7 +299,7 @@ abstract class Traversal<T, D : Traversal<T, D>>(
             val startItem = startItems.removeFirst()
             queue.add(startItem)
             var canStop = canStopOnStartItem
-            contexts[startItem] = computeNextContext(startItem, null)
+            contexts[startItem] = computeInitialContext(startItem)
 
             while (queue.hasNext()) {
                 queue.next()?.let { current ->
@@ -305,7 +313,7 @@ abstract class Traversal<T, D : Traversal<T, D>>(
                             val queueNextItem = { nextItem: T ->
                                 val queued = queueItem(nextItem, context)
                                 if (queued) {
-                                    contexts[nextItem] = computeNextContext(nextItem, context)
+                                    contexts[nextItem] = computeNextContext(context, nextItem)
                                 }
                                 queued
                             }
@@ -327,7 +335,7 @@ abstract class Traversal<T, D : Traversal<T, D>>(
             false
     }
 
-    private fun ContextDataComputer<*>.isStandaloneComputer() =
+    private fun ContextValueComputer<*>.isStandaloneComputer() =
         this !is StepAction<*> && this !is StopCondition<*> && this !is QueueCondition<*>
 
 }

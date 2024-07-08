@@ -12,4 +12,4 @@ fun interface QueueCondition<T> {
     fun shouldQueue(nextItem: T, currentContext: StepContext): Boolean
 }
 
-interface QueueConditionWithContextData<T, U> : QueueCondition<T>, TypedContextDataComputer<T, U>
+interface QueueConditionWithContextValue<T, U> : QueueCondition<T>, TypedContextValueComputer<T, U>

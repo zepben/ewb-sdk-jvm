@@ -12,6 +12,7 @@ import com.zepben.auth.client.AuthProviderConfig
 import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.client.createTokenFetcher
 import com.zepben.auth.client.createTokenFetcherManagedIdentity
+import com.zepben.auth.common.AuthMethod
 import io.mockk.*
 import io.vertx.core.json.JsonObject
 import org.hamcrest.MatcherAssert.assertThat
@@ -115,6 +116,7 @@ internal class ConnectTest {
             "https://login.microsoftonline.com/contoso.onmicrosoft.com/v2.0",
             "hostname",
             1234,
+            authMethod = AuthMethod.ENTRAID,
             caFilename = "caFilename"
         )
 
@@ -124,7 +126,6 @@ internal class ConnectTest {
                 JsonObject(
                     """
                         {
-                            "scope": "audience/.default",
                             "client_id": "clientId",
                             "client_secret": "clientSecret",
                             "grant_type": "client_credentials"
@@ -190,6 +191,7 @@ internal class ConnectTest {
             "https://login.microsoftonline.com/contoso.onmicrosoft.com/v2.0",
             host = "hostname",
             rpcPort = 1234,
+            authMethod = AuthMethod.ENTRAID,
             caFilename = "caFilename"
         )
 
@@ -249,14 +251,14 @@ internal class ConnectTest {
     internal fun connectWithSecretAndAuthConfJvmOverloadsCoverage() {
         mockkStatic(Connect::class)
         every {
-            Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", 50051, null, null)
+            Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", 50051, AuthMethod.ENTRAID, null)
         } returns grpcChannelWithAuth
 
-        assertThat(Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain"), equalTo(grpcChannelWithAuth))
-        assertThat(Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost"), equalTo(grpcChannelWithAuth))
-        assertThat(Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", 50051), equalTo(grpcChannelWithAuth))
+        assertThat(Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", authMethod = AuthMethod.ENTRAID), equalTo(grpcChannelWithAuth))
+        assertThat(Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", authMethod = AuthMethod.ENTRAID), equalTo(grpcChannelWithAuth))
+        assertThat(Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", 50051, authMethod = AuthMethod.ENTRAID), equalTo(grpcChannelWithAuth))
         assertThat(
-            Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", 50051),
+            Connect.connectWithSecret("clientId", "clientSecret", "audience", "issuerDomain", "localhost", 50051, authMethod = AuthMethod.ENTRAID),
             equalTo(grpcChannelWithAuth)
         )
     }
@@ -280,17 +282,17 @@ internal class ConnectTest {
     internal fun connectWithPasswordAndAuthConfJvmOverloadsCoverage() {
         mockkStatic(Connect::class)
         every {
-            Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost", 50051, null, null)
+            Connect.connectWithPassword("clientId", "username", "password", "audience", "issuer", "localhost", 50051, AuthMethod.ENTRAID, null)
         } returns grpcChannelWithAuth
 
-        assertThat(Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain"), equalTo(grpcChannelWithAuth))
-        assertThat(Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost"), equalTo(grpcChannelWithAuth))
+        assertThat(Connect.connectWithPassword("clientId", "username", "password", "audience", "issuer", authMethod = AuthMethod.ENTRAID), equalTo(grpcChannelWithAuth))
+        assertThat(Connect.connectWithPassword("clientId", "username", "password", "audience", "issuer", "localhost", authMethod = AuthMethod.ENTRAID), equalTo(grpcChannelWithAuth))
         assertThat(
-            Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost", 50051),
+            Connect.connectWithPassword("clientId", "username", "password", "audience", "issuer", "localhost", 50051, authMethod = AuthMethod.ENTRAID),
             equalTo(grpcChannelWithAuth)
         )
         assertThat(
-            Connect.connectWithPassword("clientId", "username", "password", "audience", "issuerDomain", "localhost", 50051),
+            Connect.connectWithPassword("clientId", "username", "password", "audience", "issuer", "localhost", 50051, authMethod = AuthMethod.ENTRAID),
             equalTo(grpcChannelWithAuth)
         )
     }

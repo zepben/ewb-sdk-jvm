@@ -48,8 +48,8 @@ internal class MetricsDatabaseWriterTest {
         MetricsDatabaseWriter(
             "databaseFile",
             IngestionJob(uuid),
-            metricsWriter = writer,
-            modelPath = modelPath
+            modelPath = modelPath,
+            metricsWriter = writer
         ).saveSchema()
 
         assertThat("Job ID file should exist", modelPath.resolve(uuid.toString()).exists())

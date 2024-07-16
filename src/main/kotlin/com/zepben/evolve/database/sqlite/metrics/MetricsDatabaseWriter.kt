@@ -19,18 +19,18 @@ import java.sql.DriverManager
  *
  * @param databaseFile The filename of the metrics database.
  * @param job The ingestion job to write.
- * @param databaseTables The tables in the database.
- * @param metricsWriter The metrics writer to use.
  * @param modelPath The directory containing the output model files for the ingestion job. If specified, a file will be created in this directory and
  *                  named using the UUID of the ingestion job.
+ * @param databaseTables The tables in the database.
+ * @param metricsWriter The metrics writer to use.
  * @param getConnection Provider of the connection to the specified database.
  */
 class MetricsDatabaseWriter @JvmOverloads constructor(
     databaseFile: String,
     private val job: IngestionJob,
+    private val modelPath: Path? = null,
     databaseTables: MetricsDatabaseTables = MetricsDatabaseTables(),
     private val metricsWriter: MetricsWriter = MetricsWriter(job, databaseTables),
-    private val modelPath: Path? = null,
     getConnection: (String) -> Connection = DriverManager::getConnection
 ) : BaseDatabaseWriter(databaseFile, databaseTables, getConnection, persistFile = true) {
 

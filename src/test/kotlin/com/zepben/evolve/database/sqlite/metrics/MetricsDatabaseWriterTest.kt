@@ -8,13 +8,21 @@
 
 package com.zepben.evolve.database.sqlite.metrics
 
+import com.zepben.evolve.metrics.IngestionJob
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Path
+import java.util.*
+import kotlin.io.path.exists
 
 internal class MetricsDatabaseWriterTest {
+
+    @TempDir
+    lateinit var modelPath: Path
 
     private val writer = mockk<MetricsWriter> {
         every { save() } returns true
@@ -29,6 +37,22 @@ internal class MetricsDatabaseWriterTest {
         ).saveSchema()
 
         assertThat("Should have saved successfully", result)
+
+        verify { writer.save() }
+    }
+
+    @Test
+    internal fun createsJobIdFile() {
+        val uuid = UUID.randomUUID()
+
+        MetricsDatabaseWriter(
+            "databaseFile",
+            IngestionJob(uuid),
+            metricsWriter = writer,
+            modelPath = modelPath
+        ).saveSchema()
+
+        assertThat("Job ID file should exist", modelPath.resolve(uuid.toString()).exists())
 
         verify { writer.save() }
     }

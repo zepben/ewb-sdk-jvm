@@ -38,10 +38,10 @@ class MetricsDatabaseWriter @JvmOverloads constructor(
      * Save the ingestion job (and associated data).
      */
     override fun saveSchema(): Boolean = metricsWriter.save() && run {
-        createMetadataFile()
+        createJobIdFile()
         true
     }
 
-    private fun createMetadataFile() = modelPath?.resolve(job.id.toString())?.toFile()?.createNewFile()
+    private fun createJobIdFile() = modelPath?.resolve(job.id.toString())?.toFile()?.createNewFile()
 
 }

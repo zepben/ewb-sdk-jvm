@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.metrics
 
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseWriter
 import com.zepben.evolve.metrics.IngestionJob
+import java.nio.file.Path
 import java.sql.Connection
 import java.sql.DriverManager
 
@@ -20,19 +21,27 @@ import java.sql.DriverManager
  * @param job The ingestion job to write.
  * @param databaseTables The tables in the database.
  * @param metricsWriter The metrics writer to use.
+ * @param modelPath The directory containing the output model files for the ingestion job. If specified, a file will be created in this directory and
+ *                  named using the UUID of the ingestion job.
  * @param getConnection Provider of the connection to the specified database.
  */
 class MetricsDatabaseWriter @JvmOverloads constructor(
     databaseFile: String,
-    job: IngestionJob,
+    private val job: IngestionJob,
     databaseTables: MetricsDatabaseTables = MetricsDatabaseTables(),
     private val metricsWriter: MetricsWriter = MetricsWriter(job, databaseTables),
+    private val modelPath: Path? = null,
     getConnection: (String) -> Connection = DriverManager::getConnection
 ) : BaseDatabaseWriter(databaseFile, databaseTables, getConnection, persistFile = true) {
 
     /**
      * Save the ingestion job (and associated data).
      */
-    override fun saveSchema(): Boolean = metricsWriter.save()
+    override fun saveSchema(): Boolean = metricsWriter.save() && run {
+        createMetadataFile()
+        true
+    }
+
+    private fun createMetadataFile() = modelPath?.resolve(job.id.toString())?.toFile()?.createNewFile()
 
 }

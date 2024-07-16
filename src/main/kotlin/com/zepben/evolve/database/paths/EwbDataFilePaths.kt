@@ -90,8 +90,6 @@ class EwbDataFilePaths @JvmOverloads constructor(
      */
     fun energyReading(date: LocalDate): Path = date.toDatedPath(DatabaseType.ENERGY_READING.fileDescriptor)
 
-    fun jobDescriptor(date: LocalDate, jobId: UUID): Path = date.toDatedPath(jobId.toString())
-
     /**
      * Determine the path to the "energy readings index" database.
      *

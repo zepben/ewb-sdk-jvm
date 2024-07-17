@@ -9,6 +9,13 @@
 
 ### Enhancements
 * Added feature list in documentation.
+* Added extension functions for `NetworkContainerMetrics` to assist in writing metrics creators:
+  * `NetworkContainerMetrics::increase(key: String, delta: Number = 1.0)`: Increases a metric by a certain value. If the metric doesn't exist yet, it is
+    automatically created and set to zero before being increased. A negative value may be used for `delta` to decrease the metric.
+  * `NetworkContainerMetrics.set(key: String, n: Int)`: Allows setting a metric using an integer rather than a double-precision float:
+    ```
+    metrics[TotalNetworkContainer]["metric-name"] = 3
+    ```
 
 ### Fixes
 * None.

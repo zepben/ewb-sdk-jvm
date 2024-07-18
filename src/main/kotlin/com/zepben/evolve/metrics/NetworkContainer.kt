@@ -49,14 +49,14 @@ fun LvFeeder.toNetworkContainer(): PartialNetworkContainer =
     PartialNetworkContainer(NetworkLevel.LvFeeder, mRID, name)
 
 // Java interop
-fun networkContainer(geographicalRegion: GeographicalRegion) = geographicalRegion.toNetworkContainer()
+fun networkContainer(geographicalRegion: GeographicalRegion): PartialNetworkContainer = geographicalRegion.toNetworkContainer()
 
-fun networkContainer(subGeographicalRegion: SubGeographicalRegion) = subGeographicalRegion.toNetworkContainer()
-
-@JvmOverloads
-fun networkContainer(substation: Substation, includeDownstream: Boolean = false) = substation.toNetworkContainer(includeDownstream)
+fun networkContainer(subGeographicalRegion: SubGeographicalRegion): PartialNetworkContainer = subGeographicalRegion.toNetworkContainer()
 
 @JvmOverloads
-fun networkContainer(feeder: Feeder, includeDownstream: Boolean = false) = feeder.toNetworkContainer(includeDownstream)
+fun networkContainer(substation: Substation, includeDownstream: Boolean = false): PartialNetworkContainer = substation.toNetworkContainer(includeDownstream)
 
-fun networkContainer(lvFeeder: LvFeeder) = lvFeeder.toNetworkContainer()
+@JvmOverloads
+fun networkContainer(feeder: Feeder, includeDownstream: Boolean = false): PartialNetworkContainer = feeder.toNetworkContainer(includeDownstream)
+
+fun networkContainer(lvFeeder: LvFeeder): PartialNetworkContainer = lvFeeder.toNetworkContainer()

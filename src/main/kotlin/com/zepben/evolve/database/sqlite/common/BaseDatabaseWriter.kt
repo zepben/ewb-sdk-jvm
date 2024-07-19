@@ -41,7 +41,6 @@ abstract class BaseDatabaseWriter(
     private val databaseDescriptor: String = "jdbc:sqlite:$databaseFile"
     private lateinit var saveConnection: Connection
     private var hasBeenUsed: Boolean = false
-    private var writingToExistingFile = false
 
     /**
      * Save the database using the [MetadataCollectionWriter] and [BaseServiceWriter].
@@ -74,10 +73,11 @@ abstract class BaseDatabaseWriter(
 
     private fun preSave(): Boolean =
         if (persistFile && Files.exists(Paths.get(databaseFile))) {
-            writingToExistingFile = true
             logger.info("Connecting to existing database $databaseFile...")
             connect() && versionMatches() && prepareInsertStatements()
         } else {
+            logger.info("Persist file: $persistFile")
+            logger.info("File ($databaseFile) exists: ${Files.exists(Paths.get(databaseFile))}")
             removeExisting()
                 && connect()
                 && create()
@@ -123,6 +123,10 @@ abstract class BaseDatabaseWriter(
 
                 databaseTables.forEachTable {
                     statement.executeUpdate(it.createTableSql)
+
+                    it.createIndexesSql.forEach { sql ->
+                        statement.execute(sql)
+                    }
                 }
 
                 // Add the version number to the database.
@@ -170,19 +174,6 @@ abstract class BaseDatabaseWriter(
 
     private fun postSave(): Boolean =
         try {
-            if (!writingToExistingFile) {
-                logger.info("Adding indexes...")
-
-                saveConnection.createStatement().use { statement ->
-                    databaseTables.forEachTable { table ->
-                        table.createIndexesSql.forEach { sql ->
-                            statement.execute(sql)
-                        }
-                    }
-                }
-
-                logger.info("Indexes added.")
-            }
             logger.info("Committing...")
 
             saveConnection.commit()

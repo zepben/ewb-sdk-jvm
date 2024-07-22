@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.metrics
 
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseWriter
 import com.zepben.evolve.metrics.IngestionJob
+import java.io.IOException
 import java.nio.file.Path
 import java.sql.Connection
 import java.sql.DriverManager
@@ -37,11 +38,15 @@ class MetricsDatabaseWriter @JvmOverloads constructor(
     /**
      * Save the ingestion job (and associated data).
      */
-    override fun saveSchema(): Boolean = metricsWriter.save() && run {
-        createJobIdFile()
-        true
-    }
+    override fun saveSchema(): Boolean = metricsWriter.save() && createJobIdFile()
 
-    private fun createJobIdFile() = modelPath?.resolve(job.id.toString())?.toFile()?.createNewFile()
+    private fun createJobIdFile(): Boolean = modelPath?.resolve(job.id.toString())?.toFile()?.let { jobIdFile ->
+        try {
+            jobIdFile.createNewFile()
+        } catch (e: IOException) {
+            logger.error("Could not save job ID file at ${jobIdFile.absolutePath}.")
+            false
+        }
+    } ?: true
 
 }

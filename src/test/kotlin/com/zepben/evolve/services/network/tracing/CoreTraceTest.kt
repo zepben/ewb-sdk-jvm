@@ -89,7 +89,7 @@ internal class CoreTraceTest {
         // Test from partway downstream to make sure we don't go upstream
         start = n["j1"]!!
         visited = normalDownstreamTrace(start, SinglePhaseKind.A)
-        var visitedMRIDs = visited.map { it.conductingEquipment.mRID }
+        val visitedMRIDs = visited.map { it.conductingEquipment.mRID }
         assertThat(visited, hasSize(4))
         assertThat(visited, hasItems(createResultItem(n, "j1", SinglePhaseKind.A), createResultItem(n, "j2", SinglePhaseKind.A)))
         assertThat(visitedMRIDs, not(contains("acLineSegment1")))

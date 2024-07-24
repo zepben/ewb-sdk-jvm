@@ -299,10 +299,10 @@ class NetworkDatabaseSchemaTest {
         val networkService = NetworkService()
         val metadata = MetadataCollection()
 
-        assertThat(" Database should have loaded", readDatabase(metadata, networkService))
+        assertThat("Database should have loaded", readDatabase(metadata, networkService))
 
         validateMetadata(metadata, expectedMetadata)
-        validateService(networkService, expectedService) { NetworkServiceComparator() }
+        validateService(networkService, expectedService, NetworkServiceComparator())
     }
 
     private fun validateMetadata(metadata: MetadataCollection, expectedMetadataCollection: MetadataCollection) {
@@ -312,9 +312,9 @@ class NetworkDatabaseSchemaTest {
     private fun validateService(
         service: BaseService,
         expectedService: BaseService,
-        getComparator: () -> BaseServiceComparator
+        serviceComparator: BaseServiceComparator
     ) {
-        val differences = getComparator().compare(service, expectedService)
+        val differences = serviceComparator.compare(service, expectedService)
 
         if (differences.modifications().isNotEmpty())
             System.err.println(differences.toString())

@@ -160,10 +160,10 @@ class CustomerDatabaseSchemaTest {
         val customerService = CustomerService()
         val metadata = MetadataCollection()
 
-        assertThat(" Database should have loaded", readDatabase(metadata, customerService))
+        assertThat("Database should have loaded", readDatabase(metadata, customerService))
 
         validateMetadata(metadata, expectedMetadata)
-        validateService(customerService, expectedService) { CustomerServiceComparator() }
+        validateService(customerService, expectedService, CustomerServiceComparator())
     }
 
     private fun validateMetadata(metadata: MetadataCollection, expectedMetadataCollection: MetadataCollection) {
@@ -173,9 +173,9 @@ class CustomerDatabaseSchemaTest {
     private fun validateService(
         service: BaseService,
         expectedService: BaseService,
-        getComparator: () -> BaseServiceComparator
+        serviceComparator: BaseServiceComparator
     ) {
-        val differences = getComparator().compare(service, expectedService)
+        val differences = serviceComparator.compare(service, expectedService)
 
         if (differences.modifications().isNotEmpty())
             System.err.println(differences.toString())

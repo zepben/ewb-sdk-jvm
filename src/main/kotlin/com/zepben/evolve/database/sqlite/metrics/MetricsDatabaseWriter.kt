@@ -14,6 +14,12 @@ import java.io.IOException
 import java.nio.file.Path
 import java.sql.Connection
 import java.sql.DriverManager
+import kotlin.io.path.absolute
+import kotlin.io.path.createFile
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.listDirectoryEntries
+
+internal const val JOB_ID_FILE_EXTENSION = "zjid"
 
 /**
  * Class for writing an ingestion job (and associated metadata, metrics, and sources) to a metrics database.
@@ -40,13 +46,26 @@ class MetricsDatabaseWriter @JvmOverloads constructor(
      */
     override fun saveSchema(): Boolean = metricsWriter.save() && createJobIdFile()
 
-    private fun createJobIdFile(): Boolean = modelPath?.resolve(job.id.toString())?.toFile()?.let { jobIdFile ->
-        try {
-            jobIdFile.createNewFile()
-        } catch (e: IOException) {
-            logger.error("Could not save job ID file at ${jobIdFile.absolutePath}.")
-            false
+    private fun createJobIdFile(): Boolean {
+        if (modelPath == null) return true
+
+        // To avoid multiple job ID files in a single directory, we delete any leftover from previous runs
+        modelPath.listDirectoryEntries("*.$JOB_ID_FILE_EXTENSION").forEach { jobIdFile ->
+            try {
+                jobIdFile.deleteIfExists()
+            } catch (e: IOException) {
+                logger.error("Could not delete existing job ID file at ${jobIdFile.absolute()}. Please ensure the program has the correct permissions.")
+            }
         }
-    } ?: true
+
+        val newJobIdFile = modelPath.resolve("${job.id}.$JOB_ID_FILE_EXTENSION")
+        try {
+            newJobIdFile.createFile()
+        } catch (e: IOException) {
+            logger.error("Could not create job ID file at ${newJobIdFile.absolute()}. Please ensure the program has the correct permissions.")
+            return false
+        }
+        return true
+    }
 
 }

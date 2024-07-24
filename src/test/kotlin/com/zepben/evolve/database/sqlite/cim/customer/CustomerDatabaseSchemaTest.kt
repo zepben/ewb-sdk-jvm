@@ -185,7 +185,7 @@ class CustomerDatabaseSchemaTest {
         assertThat("objects missing from loaded service", differences.missingFromSource(), empty())
     }
 
-    private fun CustomerDatabaseSchemaTest.readDatabase(metadata: MetadataCollection, service: CustomerService): Boolean =
+    private fun readDatabase(metadata: MetadataCollection, service: CustomerService): Boolean =
         DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
             CustomerDatabaseReader(connection, metadata, service, schemaTestFile).load()
         }

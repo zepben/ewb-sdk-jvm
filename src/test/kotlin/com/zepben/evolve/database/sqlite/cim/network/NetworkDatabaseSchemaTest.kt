@@ -324,7 +324,7 @@ class NetworkDatabaseSchemaTest {
         assertThat("objects missing from loaded network", differences.missingFromSource(), empty())
     }
 
-    private fun NetworkDatabaseSchemaTest.readDatabase(metadata: MetadataCollection, service: NetworkService): Boolean =
+    private fun readDatabase(metadata: MetadataCollection, service: NetworkService): Boolean =
         DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
             NetworkDatabaseReader(connection, metadata, service, schemaTestFile).load()
         }

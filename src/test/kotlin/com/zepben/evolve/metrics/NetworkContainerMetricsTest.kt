@@ -54,7 +54,8 @@ internal class NetworkContainerMetricsTest {
         val ncMetrics = NetworkContainerMetrics(mutableMapOf("a" to 1.5))
         ncMetrics["a"] = 3
         ncMetrics["b"] = 5
-        assertThat(ncMetrics, equalTo(mapOf("a" to 3.0, "b" to 5.0)))
+        ncMetrics["c"] = 1.23
+        assertThat(ncMetrics, equalTo(mapOf("a" to 3.0, "b" to 5.0, "c" to 1.23)))
     }
 
 }

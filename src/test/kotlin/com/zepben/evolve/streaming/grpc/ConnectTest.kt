@@ -36,7 +36,7 @@ internal class ConnectTest {
     private val tokenRequestData = JsonObject()
 
     @BeforeEach
-    fun beforeEach() {
+    internal fun beforeEach() {
         tokenRequestData.clear()
 
         every { gcbWithAddress.makeSecure("caFilename") } returns gcbWithTls

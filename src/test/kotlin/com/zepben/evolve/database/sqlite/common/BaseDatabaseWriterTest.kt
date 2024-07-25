@@ -29,12 +29,12 @@ internal class BaseDatabaseWriterTest {
     private val dbTestFile = "src/test/data/dbTest.sqlite"
 
     @BeforeEach
-    fun beforeEach() {
+    internal fun beforeEach() {
         Files.deleteIfExists(Paths.get(dbTestFile))
     }
 
     @AfterEach
-    fun afterEach() {
+    internal fun afterEach() {
         Files.deleteIfExists(Paths.get(dbTestFile))
     }
 

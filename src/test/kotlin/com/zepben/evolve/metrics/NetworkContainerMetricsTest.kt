@@ -15,29 +15,43 @@ import org.junit.jupiter.api.Test
 internal class NetworkContainerMetricsTest {
 
     @Test
-    internal fun increaseMissing() {
-        val ncMetrics = mutableMapOf<String, Double>()
-        assertThat(ncMetrics.increase("a"), equalTo(1.0))
-        assertThat(ncMetrics.increase("b", 2.5), equalTo(2.5))
-        assertThat(ncMetrics.increase("c", 0), equalTo(0.0))
-        assertThat(ncMetrics.increase("d", -3.3), equalTo(-3.3))
+    internal fun plus() {
+        val ncMetrics = NetworkContainerMetrics()
+            .plus("a")
+            .plus("b", 2.5)
+            .plus("c", 0)
+            .plus("d", -3.3)
         assertThat(ncMetrics, equalTo(mapOf("a" to 1.0, "b" to 2.5, "c" to 0.0, "d" to -3.3)))
     }
 
     @Test
-    internal fun increaseExisting() {
-        val ncMetrics = mutableMapOf("a" to 1.0)
-        assertThat(ncMetrics.increase("a"), equalTo(2.0))
-        assertThat(ncMetrics, equalTo(mapOf("a" to 2.0)))
-        assertThat(ncMetrics.increase("a", -2), equalTo(0.0))
-        assertThat(ncMetrics, equalTo(mapOf("a" to 0.0)))
-        assertThat(ncMetrics.increase("a", 1.5), equalTo(1.5))
+    internal fun plusExisting() {
+        val ncMetrics = NetworkContainerMetrics(mutableMapOf("a" to 1.0)).plus("a")
+        assertThat(ncMetrics["a"], equalTo(2.0))
+        ncMetrics.plus("a", -2)
+        assertThat(ncMetrics["a"], equalTo(0.0))
+        ncMetrics.plus("a", 1.5)
+        assertThat(ncMetrics["a"], equalTo(1.5))
         assertThat(ncMetrics, equalTo(mapOf("a" to 1.5)))
     }
 
     @Test
+    internal fun inc() {
+        val ncMetrics = NetworkContainerMetrics().inc("a")
+
+        assertThat(ncMetrics, equalTo(mapOf("a" to 1.0)))
+    }
+
+    @Test
+    internal fun incExisting() {
+        val ncMetrics = NetworkContainerMetrics(mutableMapOf("a" to 1.5)).inc("a")
+
+        assertThat(ncMetrics, equalTo(mapOf("a" to 2.5)))
+    }
+
+    @Test
     internal fun set() {
-        val ncMetrics = mutableMapOf("a" to 1.5)
+        val ncMetrics = NetworkContainerMetrics(mutableMapOf("a" to 1.5))
         ncMetrics["a"] = 3
         ncMetrics["b"] = 5
         assertThat(ncMetrics, equalTo(mapOf("a" to 3.0, "b" to 5.0)))

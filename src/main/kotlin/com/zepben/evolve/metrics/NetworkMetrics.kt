@@ -18,6 +18,6 @@ typealias NetworkMetric = Map.Entry<NetworkContainer, NetworkContainerMetrics>
  */
 class NetworkMetrics : AutoMap<NetworkContainer, NetworkContainerMetrics>() {
 
-    override fun defaultValue(): NetworkContainerMetrics = mutableMapOf()
+    override fun defaultValue(): NetworkContainerMetrics = NetworkContainerMetrics()
 
 }

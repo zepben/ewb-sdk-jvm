@@ -11,22 +11,27 @@ package com.zepben.evolve.metrics
 /**
  * A map from metric names to their values.
  */
-typealias NetworkContainerMetrics = MutableMap<String, Double>
+class NetworkContainerMetrics(private val map: MutableMap<String, Double> = mutableMapOf()) : MutableMap<String, Double> by map {
 
-/**
- * Increases a metric by name and delta. If no metric by that name is found, it defaults to 0 first before the addition of the delta.
- *
- * @param key The name of the metric to increase.
- * @param delta The amount to increase the metric by. This value may be negative.
- *
- * @return The new value of the metric.
- */
-fun NetworkContainerMetrics.increase(key: String, delta: Number = 1.0): Double = compute(key) { _, n -> (n ?: 0.0) + delta.toDouble() }!!
+    /**
+     * Increment the value of the metric named [key]. If no such metric exists, it is automatically created with an initial value of zero.
+     */
+    fun inc(key: String): NetworkContainerMetrics = plus(key, 1.0)
 
-/**
- * Helper function to set a metric to an integer value.
- *
- * @param key The name of the metric to set.
- * @param n The value to set the metric to.
- */
-operator fun NetworkContainerMetrics.set(key: String, n: Int) { this[key] = n.toDouble() }
+    /**
+     * Increase the value of the metric named [key] by [amount]. If no such metric exists, it is automatically created with an initial value of zero.
+     */
+    fun plus(key: String, amount: Number = 1.0): NetworkContainerMetrics = apply { merge(key, amount.toDouble(), Double::plus) }
+
+    /**
+     * Set the value of the metric named [key] to [value].
+     */
+    operator fun set(key: String, value: Int) {
+        this[key] = value.toDouble()
+    }
+
+    // Make this work as the map.
+    override fun hashCode(): Int = map.hashCode()
+    override fun equals(other: Any?): Boolean = map == other
+    override fun toString(): String = map.toString()
+}

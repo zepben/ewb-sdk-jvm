@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 internal class DiagramDatabaseTablesTest {
 
     @Test
-    fun `contains base tables`() {
+    internal fun `contains base tables`() {
         val tables = DiagramDatabaseTables().tables.keys
         val baseTables = (object : CimDatabaseTables() {}).tables.keys
 

@@ -58,7 +58,7 @@ internal class BaseServiceTest {
     private val acLineSegment2 = AcLineSegment().also { service.add(it) }
 
     @BeforeEach
-    fun beforeEach() {
+    internal fun beforeEach() {
         breaker2.name = "breaker"
         acLineSegment1.name = "acLineSegment2"
     }

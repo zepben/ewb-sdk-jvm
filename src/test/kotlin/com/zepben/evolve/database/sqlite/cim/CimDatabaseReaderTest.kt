@@ -64,7 +64,7 @@ internal class CimDatabaseReaderTest {
     }
 
     @Test
-    fun `can only run once`() {
+    internal fun `can only run once`() {
         assertThat("Should have loaded the first time", reader.load())
         assertThat("Shouldn't have loaded a second time", !reader.load())
 

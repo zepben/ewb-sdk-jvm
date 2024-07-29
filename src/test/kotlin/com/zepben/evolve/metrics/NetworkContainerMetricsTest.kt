@@ -17,7 +17,7 @@ internal class NetworkContainerMetricsTest {
     @Test
     internal fun plus() {
         val ncMetrics = NetworkContainerMetrics()
-            .plus("a")
+            .plus("a", 1)
             .plus("b", 2.5)
             .plus("c", 0)
             .plus("d", -3.3)
@@ -26,7 +26,7 @@ internal class NetworkContainerMetricsTest {
 
     @Test
     internal fun plusExisting() {
-        val ncMetrics = NetworkContainerMetrics(mutableMapOf("a" to 1.0)).plus("a")
+        val ncMetrics = NetworkContainerMetrics(mutableMapOf("a" to 1.0)).plus("a", 1)
         assertThat(ncMetrics["a"], equalTo(2.0))
         ncMetrics.plus("a", -2)
         assertThat(ncMetrics["a"], equalTo(0.0))

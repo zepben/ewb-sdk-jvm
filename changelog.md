@@ -10,7 +10,7 @@
 ### Enhancements
 * Added feature list in documentation.
 * Changed `NetworkContainerMetrics` to a delegate type to assist in writing metrics creators:
-  * `NetworkContainerMetrics::plus(key: String, amount: Number = 1.0)`: Increases a metric by a certain value. If the metric doesn't exist yet, it is
+  * `NetworkContainerMetrics::plus(key: String, amount: Number)`: Increases a metric by a certain value. If the metric doesn't exist yet, it is
     automatically created and set to zero before being increased. A negative value may be used for `amount` to decrease the metric.
   * `NetworkContainerMetrics::inc(key: String)`: Equivalent to `NetworkContainerMetrics.plus(key, 1.0)`
   * `NetworkContainerMetrics::set(key: String, value: Int)`: Allows setting a metric using an integer rather than a double-precision float:

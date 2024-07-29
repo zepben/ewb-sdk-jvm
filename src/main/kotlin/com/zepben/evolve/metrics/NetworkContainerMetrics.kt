@@ -28,7 +28,7 @@ class NetworkContainerMetrics(private val map: MutableMap<String, Double> = muta
      * @param amount The amount to increase the metric by. A negative value will decrease the metric.
      * @return This object, for fluent use
      */
-    fun plus(key: String, amount: Number = 1.0): NetworkContainerMetrics = apply { merge(key, amount.toDouble(), Double::plus) }
+    fun plus(key: String, amount: Number): NetworkContainerMetrics = apply { merge(key, amount.toDouble(), Double::plus) }
 
     /**
      * Set the value of the metric named [key] to [value].

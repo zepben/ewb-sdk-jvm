@@ -4,10 +4,19 @@
 * None.
 
 ### New Features
-* None.
+* A file named after the ID of an ingestion job is now created when running `MetricsDatabaseWriter.save()`. For this feature to take effect, a `modelPath` must
+  be provided when constructing the `MetricsDatabaseWriter`.
 
 ### Enhancements
 * Added feature list in documentation.
+* Changed `NetworkContainerMetrics` to a delegate type to assist in writing metrics creators:
+  * `NetworkContainerMetrics::plus(key: String, amount: Number)`: Increases a metric by a certain value. If the metric doesn't exist yet, it is
+    automatically created and set to zero before being increased. A negative value may be used for `amount` to decrease the metric.
+  * `NetworkContainerMetrics::inc(key: String)`: Equivalent to `NetworkContainerMetrics.plus(key, 1.0)`
+  * `NetworkContainerMetrics::set(key: String, value: Int)`: Allows setting a metric using an integer rather than a double-precision float:
+    ```
+    metrics[TotalNetworkContainer]["metric-name"] = 3
+    ```
 
 ### Fixes
 * None.

@@ -81,7 +81,12 @@ public class IngestionJobExample {
         ingestionJob.getNetworkMetrics().get(networkContainer(feeder)).put("total cable length", 12.345);
         ingestionJob.getNetworkMetrics().get(networkContainer(feeder, true)).put("total cable length", 123.45);
 
-        if (new MetricsDatabaseWriter("metrics.sqlite", ingestionJob).save()) {
+        MetricsDatabaseWriter metricsDatabaseWriter = new MetricsDatabaseWriter(
+            "metrics.sqlite", // Database file to create/update
+            ingestionJob, // Ingestion job to write
+            Path.of("path/to/model") // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
+        );
+        if (metricsDatabaseWriter.save()) {
             System.out.println("Ingestion job saved successfully");
         } else {
             System.out.println("Ingestion job could not be saved successfully");
@@ -124,7 +129,12 @@ val ingestionJob = IngestionJob(UUID.randomUUID()).apply {
 }
 
 fun main() {
-    if (MetricsDatabaseWriter("metrics.sqlite", ingestionJob).save()) {
+    val metricsDatabaseWriter = MetricsDatabaseWriter(
+        "metrics.sqlite", // Database file to create/update
+        ingestionJob, // Ingestion job to write
+        Path.of("path/to/model") // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
+    )
+    if (metricsDatabaseWriter.save()) {
         println("Ingestion job saved successfully")
     } else {
         println("Ingestion job could not be saved successfully")
@@ -136,4 +146,5 @@ fun main() {
 </Tabs>
 
 Each job in a metrics database should have a unique UUID. If you attempt to save a job to an existing database, it will be added to it rather than replacing the
-entire database.
+entire database. Additionally, calling `save()` will create a file named using the UUID of the job at the path of the model, if one is provided upon
+constructing the `MetricsDatabaseWriter`.

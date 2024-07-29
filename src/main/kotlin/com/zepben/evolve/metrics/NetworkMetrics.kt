@@ -9,11 +9,6 @@
 package com.zepben.evolve.metrics
 
 /**
- * A map from metric names to their values.
- */
-typealias NetworkContainerMetrics = MutableMap<String, Double>
-
-/**
  * Type holding a network container (partial or total) and its corresponding metrics.
  */
 typealias NetworkMetric = Map.Entry<NetworkContainer, NetworkContainerMetrics>
@@ -23,6 +18,6 @@ typealias NetworkMetric = Map.Entry<NetworkContainer, NetworkContainerMetrics>
  */
 class NetworkMetrics : AutoMap<NetworkContainer, NetworkContainerMetrics>() {
 
-    override fun defaultValue(): NetworkContainerMetrics = mutableMapOf()
+    override fun defaultValue(): NetworkContainerMetrics = NetworkContainerMetrics()
 
 }

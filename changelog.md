@@ -1,7 +1,11 @@
 # Zepben EWB SDK changelog
 ## [0.23.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Updated to latest ewb-conn, and hence the signature of these helper functions have changed:
+  * `Connect.connectWithSecret`:
+    * `issuerDomain` has been renamed to `issuer`;
+  * `Connect.connectWithPassword`:
+    * `issuerDomain` has been renamed to `issuer`;
 
 ### New Features
 * A file named after the ID of an ingestion job is now created when running `MetricsDatabaseWriter.save()`. For this feature to take effect, a `modelPath` must
@@ -104,7 +108,6 @@
 * Added `METRICS` to the `DatabaseType` enum.
 
 ### Enhancements
-
 * None.
 
 ### Fixes

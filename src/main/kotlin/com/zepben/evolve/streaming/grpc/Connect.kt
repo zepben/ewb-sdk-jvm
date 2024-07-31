@@ -126,7 +126,7 @@ object Connect {
 
         val authClient = authCAFilename?.let {
             HttpClient.newBuilder().sslContext(SSLContextUtils.singleCACertSSLContext(it)).build()
-        } ?: HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build()
+        } ?: HttpClient.newBuilder().build()
         val tokenFetcher = createTokenFetcher(authMethod = authMethod, audience = audience, issuer = issuer, authClient = authClient, verifyCertificates = false)
         return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, caFilename)
     }
@@ -200,7 +200,7 @@ object Connect {
     ): GrpcChannel {
         val authClient = authCAFilename?.let {
             HttpClient.newBuilder().sslContext(SSLContextUtils.singleCACertSSLContext(it)).build()
-        } ?: HttpClient.newBuilder().sslContext(SSLContextUtils.allTrustingSSLContext()).build()
+        } ?: HttpClient.newBuilder().build()
         val tokenFetcher = createTokenFetcher(authMethod = authMethod, audience = audience, issuer = issuer, authClient = authClient, verifyCertificates = false)
 
         return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, caFilename)

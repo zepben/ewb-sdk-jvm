@@ -8,11 +8,10 @@
 
 package com.zepben.evolve.streaming.grpc
 
-import com.zepben.auth.client.AuthProviderConfig
-import com.zepben.auth.client.ZepbenTokenFetcher
-import com.zepben.auth.client.createTokenFetcher
-import com.zepben.auth.client.createTokenFetcherManagedIdentity
+import com.zepben.auth.client.*
+import com.zepben.auth.common.AuthException
 import com.zepben.auth.common.AuthMethod
+import com.zepben.testutils.exception.ExpectException
 import io.mockk.*
 import io.vertx.core.json.JsonObject
 import org.hamcrest.MatcherAssert.assertThat
@@ -20,6 +19,8 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.net.http.HttpClient
+import javax.net.ssl.SSLContext
 
 internal class ConnectTest {
 
@@ -101,25 +102,55 @@ internal class ConnectTest {
     }
 
     @Test
-    internal fun connectWithSecretWithKnownTokenFetcherConfig() {
-        mockkConstructor(ZepbenTokenFetcher::class)
-        every {
-            anyConstructed<ZepbenTokenFetcher>().tokenRequestData
-        } returns tokenRequestData
+    internal fun connectWithSecretFailsIfNoAuth() {
+        mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
 
-        every { gcbWithTls.withTokenFetcher(any()) } returns gcbWithAuth
+        every {
+            createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), true)
+        } throws AuthException(
+            1,
+            "Detected Auth set to NONE, this is not supported for fetching tokens! Check your configuration matches confAddress"
+        )
+        ExpectException.expect {
+            Connect.connectWithSecret("clientId", "clientSecret", "hostname", 1234, "confAddress", "confCAFilename", "authCAFilename", "caFilename")
+        }.toThrow<AuthException>().withMessage("Detected Auth set to NONE, this is not supported for fetching tokens! Check your configuration matches confAddress")
+    }
+
+
+    @Test
+    internal fun connectWithSecretWithKnownTokenFetcherConfig() {
+        val httpClient = mockk<HttpClient>()
+        val sslContext = mockk<SSLContext>()
+
+        val builder = mockk<HttpClient.Builder>().also {
+            every { it.sslContext(sslContext) } returns it
+            every { it.build() } returns httpClient
+        }
+
+        mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
+        every {
+            createTokenFetcher(AuthMethod.ENTRAID, "https://logi/contoso.onmicrosoft.not.real/v2.0", "audience2", httpClient, false)
+        } returns tokenFetcher
+
+        mockkStatic(HttpClient::newBuilder)
+        every { HttpClient.newBuilder() } returns builder
+
+        mockkObject(SSLContextUtils)
+        every { SSLContextUtils.singleCACertSSLContext("authCaFilename") } returns sslContext
+
+        every { tokenFetcher.tokenRequestData } returns tokenRequestData
 
         val grpcChannel = Connect.connectWithSecret(
             "clientId",
             "clientSecret",
-            "audience",
-            "https://login.microsoftonline.com/contoso.onmicrosoft.com/v2.0",
+            "audience2",
+            "https://logi/contoso.onmicrosoft.not.real/v2.0",
             "hostname",
             1234,
             authMethod = AuthMethod.ENTRAID,
-            caFilename = "caFilename"
+            caFilename = "caFilename",
+            authCAFilename = "authCaFilename"
         )
-
         assertThat(grpcChannel, equalTo(grpcChannelWithAuth))
         assertThat(
             tokenRequestData, equalTo(
@@ -134,6 +165,16 @@ internal class ConnectTest {
                 )
             )
         )
+
+        verifySequence {
+            HttpClient.newBuilder()
+            SSLContextUtils.singleCACertSSLContext("authCaFilename")
+            builder.sslContext(sslContext)
+            builder.build()
+            createTokenFetcher(AuthMethod.ENTRAID, "https://logi/contoso.onmicrosoft.not.real/v2.0", "audience2", httpClient, false)
+            sslContext wasNot called
+            httpClient wasNot called
+        }
     }
 
     @Test
@@ -174,21 +215,53 @@ internal class ConnectTest {
     }
 
     @Test
-    internal fun connectWithPasswordWithKnownTokenFetcherConfig() {
-        mockkConstructor(ZepbenTokenFetcher::class)
+    internal fun connectWithPasswordConnectsFailsIfNoAuth() {
+        mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
+
         every {
-            anyConstructed<ZepbenTokenFetcher>().tokenRequestData
-        } returns tokenRequestData
+            createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), true)
+        } throws AuthException(
+            1,
+            "Detected Auth set to NONE, this is not supported for fetching tokens! Check your configuration matches confAddress"
+        )
 
-        every { gcbWithTls.withTokenFetcher(any()) } returns gcbWithAuth
+        mockkStatic(Connect::class)
+        every {
+            Connect.connectTls("hostname", 1234, "caFilename")
+        } returns grpcChannel
 
-        // Use real issuer to fetch _some_ provider config
+        ExpectException.expect {
+            Connect.connectWithPassword("clientId", "username", "password", "hostname", 1234, "confAddress", "confCAFilename", "authCAFilename", "caFilename")
+        }.toThrow<AuthException>()
+            .withMessage("Detected Auth set to NONE, this is not supported for fetching tokens! Check your configuration matches confAddress")
+    }
+
+    @Test
+    internal fun connectWithPasswordWithKnownTokenFetcherConfig() {
+        val httpClient = mockk<HttpClient>()
+        val sslContext = mockk<SSLContext>()
+
+        val builder = mockk<HttpClient.Builder>().also {
+            every { it.sslContext(sslContext) } returns it
+            every { it.build() } returns httpClient
+        }
+
+        mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
+        every {
+            createTokenFetcher(AuthMethod.ENTRAID, "httpz://offline_test", "audience", httpClient, false)
+        } returns tokenFetcher
+
+        mockkStatic(HttpClient::newBuilder)
+        every { HttpClient.newBuilder() } returns builder
+
+        every { tokenFetcher.tokenRequestData } returns tokenRequestData
+
         val grpcChannel = Connect.connectWithPassword(
             "clientId",
             "username",
             "password",
             "audience",
-            "https://login.microsoftonline.com/contoso.onmicrosoft.com/v2.0",
+            "httpz://offline_test",
             host = "hostname",
             rpcPort = 1234,
             authMethod = AuthMethod.ENTRAID,
@@ -211,6 +284,13 @@ internal class ConnectTest {
                 )
             )
         )
+        verifySequence {
+            HttpClient.newBuilder()
+            builder.build()
+            createTokenFetcher(AuthMethod.ENTRAID, "httpz://offline_test", "audience", httpClient, false)
+            sslContext wasNot called
+            httpClient wasNot called
+        }
     }
 
     @Test

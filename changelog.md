@@ -29,7 +29,7 @@
 
 ### Breaking Changes
 
-* None.
+* Updated to latest evolve-grpc major version.
 
 ### New Features
 

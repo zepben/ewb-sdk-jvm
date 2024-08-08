@@ -67,8 +67,8 @@ class Diagram @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mR
     /**
      * @param diagramObject The diagram object to remove from the [DiagramObject] collection.
      */
-    fun removeDiagramObject(diagramObject: DiagramObject?): Boolean {
-        val ret = _diagramObjects?.remove(diagramObject?.mRID) != null
+    fun removeDiagramObject(diagramObject: DiagramObject): Boolean {
+        val ret = _diagramObjects?.remove(diagramObject.mRID) != null
         if (_diagramObjects.isNullOrEmpty()) clearDiagramObjects()
         return ret
     }

@@ -61,7 +61,7 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
      * @param circuit the [Circuit] to disassociate with this [Loop].
      * @return `true` if [circuit] has been successfully removed; `false` if it was not present.
      */
-    fun removeCircuit(circuit: Circuit?): Boolean {
+    fun removeCircuit(circuit: Circuit): Boolean {
         val ret = _circuits?.remove(circuit) == true
         if (_circuits.isNullOrEmpty()) _circuits = null
         return ret
@@ -113,7 +113,7 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
      * @param substation the [Substation] no longer powered by this [Loop].
      * @return `true` if [substation] has been successfully removed; `false` if it was not present.
      */
-    fun removeSubstation(substation: Substation?): Boolean {
+    fun removeSubstation(substation: Substation): Boolean {
         val ret = _substations?.remove(substation) == true
         if (_substations.isNullOrEmpty()) _substations = null
         return ret
@@ -165,7 +165,7 @@ class Loop @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID)
      * @param substation the [Substation] that is no longer energizing this [Loop].
      * @return `true` if [substation] has been successfully removed; `false` if it was not present.
      */
-    fun removeEnergizingSubstation(substation: Substation?): Boolean {
+    fun removeEnergizingSubstation(substation: Substation): Boolean {
         val ret = _energizingSubstations?.remove(substation) == true
         if (_energizingSubstations.isNullOrEmpty()) _energizingSubstations = null
         return ret

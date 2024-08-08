@@ -63,7 +63,7 @@ abstract class Sensor(mRID: String = "") : AuxiliaryEquipment(mRID) {
      * @param relayFunction The [ProtectionRelayFunction] to disassociate from this [Sensor].
      * @return true if the [ProtectionRelayFunction] was disassociated.
      */
-    fun removeRelayFunction(relayFunction: ProtectionRelayFunction?): Boolean {
+    fun removeRelayFunction(relayFunction: ProtectionRelayFunction): Boolean {
         val ret = _relayFunctions.safeRemove(relayFunction)
         if (_relayFunctions.isNullOrEmpty()) _relayFunctions = null
         return ret

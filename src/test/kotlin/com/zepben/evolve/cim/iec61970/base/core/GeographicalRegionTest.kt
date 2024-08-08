@@ -52,12 +52,12 @@ internal class GeographicalRegionTest {
 
     @Test
     internal fun subGeographicalRegions() {
-        PrivateCollectionValidator.validate(
-            { GeographicalRegion() },
-            { id, _ -> SubGeographicalRegion(id) },
+        PrivateCollectionValidator.validateUnordered(
+            ::GeographicalRegion,
+            ::SubGeographicalRegion,
+            GeographicalRegion::subGeographicalRegions,
             GeographicalRegion::numSubGeographicalRegions,
             GeographicalRegion::getSubGeographicalRegion,
-            GeographicalRegion::subGeographicalRegions,
             GeographicalRegion::addSubGeographicalRegion,
             GeographicalRegion::removeSubGeographicalRegion,
             GeographicalRegion::clearSubGeographicalRegions

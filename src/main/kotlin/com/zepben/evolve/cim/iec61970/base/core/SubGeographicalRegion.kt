@@ -62,7 +62,7 @@ class SubGeographicalRegion @JvmOverloads constructor(mRID: String = "") : Ident
      * @param substation the [Substation] to disassociate with this [SubGeographicalRegion].
      * @return true if the substation is disassociated.
      */
-    fun removeSubstation(substation: Substation?): Boolean {
+    fun removeSubstation(substation: Substation): Boolean {
         val ret = _substations.safeRemove(substation)
         if (_substations.isNullOrEmpty()) _substations = null
         return ret

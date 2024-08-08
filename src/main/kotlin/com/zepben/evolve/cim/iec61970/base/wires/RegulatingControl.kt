@@ -106,7 +106,7 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
      * @param regulatingCondEq the regulating conducting equipment to disassociate from this [RegulatingControl].
      * @return this [RegulatingControl]
      */
-    fun removeRegulatingCondEq(regulatingCondEq: RegulatingCondEq?): Boolean {
+    fun removeRegulatingCondEq(regulatingCondEq: RegulatingCondEq): Boolean {
         val ret = _regulatingCondEqs?.remove(regulatingCondEq) == true
         if (_regulatingCondEqs.isNullOrEmpty()) _regulatingCondEqs = null
         return ret

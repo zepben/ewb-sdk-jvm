@@ -81,7 +81,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
      * @param equipmentContainer the equipment container to disassociate with this equipment.
      * @return `true` if [equipmentContainer] has been successfully removed; `false` if it was not present in the set.
      */
-    fun removeContainer(equipmentContainer: EquipmentContainer?): Boolean {
+    fun removeContainer(equipmentContainer: EquipmentContainer): Boolean {
         val ret = _equipmentContainers?.remove(equipmentContainer) == true
         if (_equipmentContainers.isNullOrEmpty()) _equipmentContainers = null
         return ret
@@ -132,7 +132,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
      * @param equipmentContainer the equipment container to disassociate with this equipment.
      * @return `true` if [equipmentContainer] has been successfully removed; `false` if it was not present in the set.
      */
-    fun removeCurrentContainer(equipmentContainer: EquipmentContainer?): Boolean {
+    fun removeCurrentContainer(equipmentContainer: EquipmentContainer): Boolean {
         val ret = _currentContainers?.remove(equipmentContainer) == true
         if (_currentContainers.isNullOrEmpty()) _currentContainers = null
         return ret
@@ -184,7 +184,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
      * @param usagePoint the usage point to disconnect from this equipment.
      * @return this [Equipment]
      */
-    fun removeUsagePoint(usagePoint: UsagePoint?): Boolean {
+    fun removeUsagePoint(usagePoint: UsagePoint): Boolean {
         val ret = _usagePoints?.remove(usagePoint) == true
         if (_usagePoints.isNullOrEmpty()) _usagePoints = null
         return ret
@@ -239,7 +239,7 @@ abstract class Equipment(mRID: String = "") : PowerSystemResource(mRID) {
      * @param restriction The operational restriction to be removed.
      * @return this [Equipment]
      */
-    fun removeOperationalRestriction(restriction: OperationalRestriction?): Boolean {
+    fun removeOperationalRestriction(restriction: OperationalRestriction): Boolean {
         val ret = _operationalRestrictions?.remove(restriction) == true
         if (_operationalRestrictions.isNullOrEmpty()) _operationalRestrictions = null
         return ret

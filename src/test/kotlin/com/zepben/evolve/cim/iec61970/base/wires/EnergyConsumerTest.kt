@@ -80,12 +80,12 @@ internal class EnergyConsumerTest {
 
     @Test
     internal fun energyConsumerPhases() {
-        PrivateCollectionValidator.validate(
-            { EnergyConsumer() },
-            { id, _ -> EnergyConsumerPhase(id) },
+        PrivateCollectionValidator.validateUnordered(
+            ::EnergyConsumer,
+            ::EnergyConsumerPhase,
+            EnergyConsumer::phases,
             EnergyConsumer::numPhases,
             EnergyConsumer::getPhase,
-            EnergyConsumer::phases,
             EnergyConsumer::addPhase,
             EnergyConsumer::removePhase,
             EnergyConsumer::clearPhases

@@ -46,12 +46,12 @@ internal class TransformerTankInfoTest {
 
     @Test
     internal fun transformerEndInfo() {
-        PrivateCollectionValidator.validate(
-            { TransformerTankInfo() },
-            { id, info -> TransformerEndInfo(id).apply { transformerTankInfo = info } },
+        PrivateCollectionValidator.validateUnordered(
+            ::TransformerTankInfo,
+            ::TransformerEndInfo,
+            TransformerTankInfo::transformerEndInfos,
             TransformerTankInfo::numTransformerEndInfos,
             TransformerTankInfo::getTransformerEndInfo,
-            TransformerTankInfo::transformerEndInfos,
             TransformerTankInfo::addTransformerEndInfo,
             TransformerTankInfo::removeTransformerEndInfo,
             TransformerTankInfo::clearTransformerEndInfos

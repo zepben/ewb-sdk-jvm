@@ -41,12 +41,12 @@ internal class PoleTest {
 
     @Test
     internal fun streetlights() {
-        PrivateCollectionValidator.validate(
-            { Pole() },
-            { id, _ -> Streetlight(id) },
+        PrivateCollectionValidator.validateUnordered(
+            ::Pole,
+            ::Streetlight,
+            Pole::streetlights,
             Pole::numStreetlights,
             Pole::getStreetlight,
-            Pole::streetlights,
             Pole::addStreetlight,
             Pole::removeStreetlight,
             Pole::clearStreetlights

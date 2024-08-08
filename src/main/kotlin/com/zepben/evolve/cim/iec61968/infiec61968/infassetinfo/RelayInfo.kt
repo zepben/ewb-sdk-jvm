@@ -95,7 +95,7 @@ class RelayInfo @JvmOverloads constructor(mRID: String = "") : AssetInfo(mRID) {
      * @param delay The value of the delay to remove.
      * @return true if a delay was removed, false otherwise.
      */
-    fun removeDelay(delay: Double?): Boolean {
+    fun removeDelay(delay: Double): Boolean {
         val ret = _recloseDelays?.remove(delay) == true
         if (_recloseDelays.isNullOrEmpty()) _recloseDelays = null
         return ret

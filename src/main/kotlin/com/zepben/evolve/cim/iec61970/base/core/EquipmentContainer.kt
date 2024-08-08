@@ -53,8 +53,8 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     /**
      * @param equipment the equipment to disassociate from this equipment container.
      */
-    fun removeEquipment(equipment: Equipment?): Boolean {
-        val ret = _equipmentById?.remove(equipment?.mRID) != null
+    fun removeEquipment(equipment: Equipment): Boolean {
+        val ret = _equipmentById?.remove(equipment.mRID) != null
         if (_equipmentById.isNullOrEmpty()) _equipmentById = null
         return ret
     }
@@ -115,7 +115,7 @@ abstract class EquipmentContainer(mRID: String = "") : ConnectivityNodeContainer
     /**
      * @param equipment the equipment to disassociate from this equipment container in the current state of the network.
      */
-    open fun removeCurrentEquipment(equipment: Equipment?): Boolean = removeEquipment(equipment)
+    open fun removeCurrentEquipment(equipment: Equipment): Boolean = removeEquipment(equipment)
 
     /**
      * Clear all Equipment associated with this [Feeder]

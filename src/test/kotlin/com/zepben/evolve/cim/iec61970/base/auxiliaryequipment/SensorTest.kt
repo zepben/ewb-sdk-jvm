@@ -31,12 +31,12 @@ internal class SensorTest {
 
     @Test
     internal fun relayFunctions() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : Sensor() {} },
-            { id, _ -> object : ProtectionRelayFunction(id) {} },
+            { id -> object : ProtectionRelayFunction(id) {} },
+            Sensor::relayFunctions,
             Sensor::numRelayFunctions,
             Sensor::getRelayFunction,
-            Sensor::relayFunctions,
             Sensor::addRelayFunction,
             Sensor::removeRelayFunction,
             Sensor::clearRelayFunctions

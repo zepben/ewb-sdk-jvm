@@ -57,7 +57,7 @@ class ConnectivityNode @JvmOverloads constructor(mRID: String = "") : Identified
      * @param terminal The [Terminal] to remove
      * @return true if [terminal] is removed from the collection
      */
-    fun removeTerminal(terminal: Terminal?): Boolean = _terminals.remove(terminal)
+    fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal)
 
     /**
      * Clear all [Terminal]'s from this [ConnectivityNode}

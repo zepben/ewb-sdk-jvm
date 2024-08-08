@@ -51,12 +51,12 @@ internal class FeederTest {
 
     @Test
     internal fun currentEquipment() {
-        PrivateCollectionValidator.validate(
-            { Feeder() },
-            { id, _ -> object : Equipment(id) {} },
+        PrivateCollectionValidator.validateUnordered(
+            ::Feeder,
+            { id -> object : Equipment(id) {} },
+            Feeder::currentEquipment,
             Feeder::numCurrentEquipment,
             Feeder::getCurrentEquipment,
-            Feeder::currentEquipment,
             Feeder::addCurrentEquipment,
             Feeder::removeCurrentEquipment,
             Feeder::clearCurrentEquipment
@@ -65,12 +65,12 @@ internal class FeederTest {
 
     @Test
     internal fun normalEnergizedLvFeeders() {
-        PrivateCollectionValidator.validate(
-            { Feeder() },
-            { id, _ -> LvFeeder(id) },
+        PrivateCollectionValidator.validateUnordered(
+            ::Feeder,
+            ::LvFeeder,
+            Feeder::normalEnergizedLvFeeders,
             Feeder::numNormalEnergizedLvFeeders,
             Feeder::getNormalEnergizedLvFeeder,
-            Feeder::normalEnergizedLvFeeders,
             Feeder::addNormalEnergizedLvFeeder,
             Feeder::removeNormalEnergizedLvFeeder,
             Feeder::clearNormalEnergizedLvFeeders

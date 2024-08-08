@@ -7,10 +7,21 @@
   * `Connect.connectWithPassword`:
     * `issuerDomain` has been renamed to `issuer`;
 * Renamed `TablePowerElectronicsUnit` to `TablePowerElectronicsUnits`.
+* CIM object removal functions no longer support `null`. e.g. You must pass a valid `Terminal` to `ConductingEquipment.removeTerminal` rather than a nullable
+  object.
+* `DiagramObject.getPoint` no longer throws an `IndexOutOfRange` exception for an invalid sequence number, and returns `null` to match other functions of this
+  type.
+* Removed the `PowerTransformer.getRating` overload which took a rating value. You can still get a rating via its `TransformerCoolingType`.
+* Removed `PowerTransformer.forEachRating` which looped over the collection with an index that made no sense. Please loop over `PowerTransformer.sRatings`
+  instead.
 
 ### New Features
 * A file named after the ID of an ingestion job is now created when running `MetricsDatabaseWriter.save()`. For this feature to take effect, a `modelPath` must
   be provided when constructing the `MetricsDatabaseWriter`.
+* You can now remove the following by index:
+  * `PositionPoint` from a `Location`.
+  * `DiagramObjectPoint` from a `DiagramObject`.
+  * `RelaySetting` from a `ProtectionRelayFunction`.
 
 ### Enhancements
 * Added feature list in documentation.

@@ -69,7 +69,7 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
      * @param usagePoint the usage point to disassociate with this end device.
      * @return true if the usage point is disassociated.
      */
-    fun removeUsagePoint(usagePoint: UsagePoint?): Boolean {
+    fun removeUsagePoint(usagePoint: UsagePoint): Boolean {
         val ret = _usagePoints?.remove(usagePoint) == true
         if (_usagePoints.isNullOrEmpty()) _usagePoints = null
         return ret

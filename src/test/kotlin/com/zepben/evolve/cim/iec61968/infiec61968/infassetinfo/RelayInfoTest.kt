@@ -40,10 +40,10 @@ internal class RelayInfoTest {
 
     @Test
     internal fun recloseDelays() {
-        var delay = 0.0
-        PrivateCollectionValidator.validate(
-            { RelayInfo() },
-            { delay++ },
+        PrivateCollectionValidator.validateOrdered(
+            ::RelayInfo,
+            { it.toDouble() },
+            RelayInfo::recloseDelays,
             RelayInfo::numDelays,
             RelayInfo::getDelay,
             RelayInfo::forEachDelay,

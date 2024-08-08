@@ -50,12 +50,12 @@ internal class EquipmentTest {
 
     @Test
     internal fun equipmentContainers() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : Equipment() {} },
-            { id, _ -> object : EquipmentContainer(id) {} },
+            { id -> object : EquipmentContainer(id) {} },
+            Equipment::containers,
             Equipment::numContainers,
             Equipment::getContainer,
-            Equipment::containers,
             Equipment::addContainer,
             Equipment::removeContainer,
             Equipment::clearContainers
@@ -64,12 +64,12 @@ internal class EquipmentTest {
 
     @Test
     internal fun usagePoints() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : Equipment() {} },
-            { id, _ -> UsagePoint(id) },
+            ::UsagePoint,
+            Equipment::usagePoints,
             Equipment::numUsagePoints,
             Equipment::getUsagePoint,
-            Equipment::usagePoints,
             Equipment::addUsagePoint,
             Equipment::removeUsagePoint,
             Equipment::clearUsagePoints
@@ -78,12 +78,12 @@ internal class EquipmentTest {
 
     @Test
     internal fun operationalRestrictions() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : Equipment() {} },
-            { id, _ -> OperationalRestriction(id) },
+            ::OperationalRestriction,
+            Equipment::operationalRestrictions,
             Equipment::numOperationalRestrictions,
             Equipment::getOperationalRestriction,
-            Equipment::operationalRestrictions,
             Equipment::addOperationalRestriction,
             Equipment::removeOperationalRestriction,
             Equipment::clearOperationalRestrictions
@@ -92,12 +92,12 @@ internal class EquipmentTest {
 
     @Test
     internal fun currentContainers() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : Equipment() {} },
-            { id, _ -> object : EquipmentContainer(id) {} },
+            { id -> object : EquipmentContainer(id) {} },
+            Equipment::currentContainers,
             Equipment::numCurrentContainers,
             Equipment::getCurrentContainer,
-            Equipment::currentContainers,
             Equipment::addCurrentContainer,
             Equipment::removeCurrentContainer,
             Equipment::clearCurrentContainers

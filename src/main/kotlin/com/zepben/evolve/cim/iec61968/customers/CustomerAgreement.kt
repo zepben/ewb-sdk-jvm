@@ -58,7 +58,7 @@ class CustomerAgreement @JvmOverloads constructor(mRID: String = "") : Agreement
         return this
     }
 
-    fun removePricingStructure(pricingStructure: PricingStructure?): Boolean {
+    fun removePricingStructure(pricingStructure: PricingStructure): Boolean {
         val ret = _pricingStructures?.remove(pricingStructure) == true
         if (_pricingStructures.isNullOrEmpty()) _pricingStructures = null
         return ret

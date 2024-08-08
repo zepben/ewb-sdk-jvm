@@ -42,12 +42,12 @@ internal class CircuitTest {
 
     @Test
     internal fun endTerminalAssociations() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             ::Circuit,
-            { id, _ -> Terminal(id) },
+            ::Terminal,
+            Circuit::endTerminals,
             Circuit::numEndTerminals,
             Circuit::getEndTerminal,
-            Circuit::endTerminals,
             Circuit::addEndTerminal,
             Circuit::removeEndTerminal,
             Circuit::clearEndTerminals
@@ -56,12 +56,12 @@ internal class CircuitTest {
 
     @Test
     internal fun endSubstationAssociations() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             ::Circuit,
-            { id, _ -> Substation(id) },
+            ::Substation,
+            Circuit::endSubstations,
             Circuit::numEndSubstations,
             Circuit::getEndSubstation,
-            Circuit::endSubstations,
             Circuit::addEndSubstation,
             Circuit::removeEndSubstation,
             Circuit::clearEndSubstations

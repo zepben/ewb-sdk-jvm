@@ -62,12 +62,12 @@ internal class RegulatingControlTest {
 
     @Test
     internal fun regulatingCondEqs() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : RegulatingControl() {} },
-            { id, _ -> object : RegulatingCondEq(id) {} },
-            RegulatingControl::numRegulatingCondEqs,
-            { rc, mRID -> rc.getRegulatingCondEq(mRID) },
+            { id -> object : RegulatingCondEq(id) {} },
             RegulatingControl::regulatingCondEqs,
+            RegulatingControl::numRegulatingCondEqs,
+            RegulatingControl::getRegulatingCondEq,
             RegulatingControl::addRegulatingCondEq,
             RegulatingControl::removeRegulatingCondEq,
             RegulatingControl::clearRegulatingCondEqs

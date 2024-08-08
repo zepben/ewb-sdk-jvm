@@ -65,17 +65,17 @@ internal class ConductingEquipmentTest {
 
     @Test
     internal fun terminals() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateOrdered(
             { object : ConductingEquipment() {} },
-            { id, it, sn -> Terminal(id).apply { conductingEquipment = it; sn?.let { sequenceNumber = it } } },
-            ConductingEquipment::numTerminals,
-            { ce, mRID -> ce.getTerminal(mRID) },
-            { ce, seq -> ce.getTerminal(seq) },
+            { id, sn -> Terminal(id).apply { sequenceNumber = sn } },
             ConductingEquipment::terminals,
+            ConductingEquipment::numTerminals,
+            ConductingEquipment::getTerminal,
+            ConductingEquipment::getTerminal,
             ConductingEquipment::addTerminal,
             ConductingEquipment::removeTerminal,
-            ConductingEquipment::clearTerminals
-
+            ConductingEquipment::clearTerminals,
+            Terminal::sequenceNumber
         )
     }
 

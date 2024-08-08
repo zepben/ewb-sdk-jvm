@@ -232,12 +232,12 @@ internal class PowerElectronicsConnectionTest {
 
     @Test
     internal fun powerElectronicsConnectionUnits() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { PowerElectronicsConnection() },
             { id, _ -> object : PowerElectronicsUnit(id) {} },
+            PowerElectronicsConnection::units,
             PowerElectronicsConnection::numUnits,
             PowerElectronicsConnection::getUnit,
-            PowerElectronicsConnection::units,
             PowerElectronicsConnection::addUnit,
             PowerElectronicsConnection::removeUnit,
             PowerElectronicsConnection::clearUnits
@@ -246,12 +246,12 @@ internal class PowerElectronicsConnectionTest {
 
     @Test
     internal fun powerElectronicsConnectionPhases() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { PowerElectronicsConnection() },
             { id, _ -> PowerElectronicsConnectionPhase(id) },
+            PowerElectronicsConnection::phases,
             PowerElectronicsConnection::numPhases,
             PowerElectronicsConnection::getPhase,
-            PowerElectronicsConnection::phases,
             PowerElectronicsConnection::addPhase,
             PowerElectronicsConnection::removePhase,
             PowerElectronicsConnection::clearPhases

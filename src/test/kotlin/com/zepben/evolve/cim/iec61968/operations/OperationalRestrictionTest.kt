@@ -31,12 +31,12 @@ internal class OperationalRestrictionTest {
 
     @Test
     internal fun equipment() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { OperationalRestriction() },
             { id, _ -> object : Equipment(id) {} },
+            OperationalRestriction::equipment,
             OperationalRestriction::numEquipment,
             OperationalRestriction::getEquipment,
-            OperationalRestriction::equipment,
             OperationalRestriction::addEquipment,
             OperationalRestriction::removeEquipment,
             OperationalRestriction::clearEquipment

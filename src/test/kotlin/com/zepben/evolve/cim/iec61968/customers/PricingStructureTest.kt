@@ -30,12 +30,12 @@ internal class PricingStructureTest {
 
     @Test
     internal fun tariffs() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { PricingStructure() },
             { id, _ -> Tariff(id) },
+            PricingStructure::tariffs,
             PricingStructure::numTariffs,
             PricingStructure::getTariff,
-            PricingStructure::tariffs,
             PricingStructure::addTariff,
             PricingStructure::removeTariff,
             PricingStructure::clearTariffs

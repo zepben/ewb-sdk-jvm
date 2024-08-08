@@ -65,12 +65,12 @@ internal class SubstationTest {
 
     @Test
     internal fun feederAssociations() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { Substation() },
             { id, _ -> Feeder(id) },
+            Substation::feeders,
             Substation::numFeeders,
             Substation::getFeeder,
-            Substation::feeders,
             Substation::addFeeder,
             Substation::removeFeeder,
             Substation::clearFeeders
@@ -79,12 +79,12 @@ internal class SubstationTest {
 
     @Test
     internal fun circuitAssociations() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { Substation() },
             { id, _ -> Circuit(id) },
+            Substation::circuits,
             Substation::numCircuits,
             Substation::getCircuit,
-            Substation::circuits,
             Substation::addCircuit,
             Substation::removeCircuit,
             Substation::clearCircuits
@@ -93,12 +93,12 @@ internal class SubstationTest {
 
     @Test
     internal fun loopAssociations() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { Substation() },
             { id, _ -> Loop(id) },
+            Substation::loops,
             Substation::numLoops,
             Substation::getLoop,
-            Substation::loops,
             Substation::addLoop,
             Substation::removeLoop,
             Substation::clearLoops
@@ -107,12 +107,12 @@ internal class SubstationTest {
 
     @Test
     internal fun energizedLoopAssociations() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { Substation() },
             { id, _ -> Loop(id) },
+            Substation::energizedLoops,
             Substation::numEnergizedLoops,
             Substation::getEnergizedLoop,
-            Substation::energizedLoops,
             Substation::addEnergizedLoop,
             Substation::removeEnergizedLoop,
             Substation::clearEnergizedLoops

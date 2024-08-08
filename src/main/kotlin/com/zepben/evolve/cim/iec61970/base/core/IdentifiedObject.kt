@@ -108,10 +108,10 @@ abstract class IdentifiedObject(mRID: String = "") {
      * @param name the [Name] to be removed from the [IdentifiedObject]
      * @return A [Boolean] to indicate if the [name] is successfully removed
      */
-    fun removeName(name: Name?): Boolean {
+    fun removeName(name: Name): Boolean {
         val ret = _names?.remove(name) == true
         // Remove names from nameType if nameType contains the name
-        if (ret) name!!.type.removeName(name)
+        if (ret) name.type.removeName(name)
         if (_names.isNullOrEmpty()) _names = null
         return ret
     }

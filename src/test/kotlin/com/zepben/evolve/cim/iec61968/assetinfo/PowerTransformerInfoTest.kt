@@ -27,12 +27,12 @@ internal class PowerTransformerInfoTest {
 
     @Test
     internal fun transformerTankInfo() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { PowerTransformerInfo() },
             { id, info -> TransformerTankInfo(id).apply { powerTransformerInfo = info } },
+            PowerTransformerInfo::transformerTankInfos,
             PowerTransformerInfo::numTransformerTankInfos,
             PowerTransformerInfo::getTransformerTankInfo,
-            PowerTransformerInfo::transformerTankInfos,
             PowerTransformerInfo::addTransformerTankInfo,
             PowerTransformerInfo::removeTransformerTankInfo,
             PowerTransformerInfo::clearTransformerTankInfos

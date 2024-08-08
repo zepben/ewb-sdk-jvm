@@ -51,7 +51,7 @@ class PricingStructure @JvmOverloads constructor(mRID: String = "") : Document(m
         return this
     }
 
-    fun removeTariff(tariff: Tariff?): Boolean {
+    fun removeTariff(tariff: Tariff): Boolean {
         val ret = _tariffs?.remove(tariff) == true
         if (_tariffs.isNullOrEmpty()) _tariffs = null
         return ret

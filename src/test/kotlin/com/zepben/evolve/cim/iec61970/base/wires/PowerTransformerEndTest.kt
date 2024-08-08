@@ -184,18 +184,16 @@ internal class PowerTransformerEndTest {
     internal fun sRatings() {
         var rating = 0
         val coolingTypes = TransformerCoolingType.entries
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered2(
             { PowerTransformerEnd() },
             { TransformerEndRatedS(coolingTypes[rating], rating++) },
+            PowerTransformerEnd::sRatings,
             PowerTransformerEnd::numRatings,
-            { pte: PowerTransformerEnd, idx: Int -> pte.getRating(idx) },
-            PowerTransformerEnd::forEachRating,
+            PowerTransformerEnd::getRating,
             PowerTransformerEnd::addRating,
-            null,
-            { pte, r: TransformerEndRatedS? -> pte.removeRating(r) },
-            null,
+            PowerTransformerEnd::removeRating,
             PowerTransformerEnd::clearRatings,
-            supportsDuplicates = false
+            TransformerEndRatedS::coolingType
         )
     }
 

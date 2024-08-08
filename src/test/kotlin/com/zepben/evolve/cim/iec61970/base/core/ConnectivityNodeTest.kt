@@ -30,12 +30,12 @@ internal class ConnectivityNodeTest {
 
     @Test
     internal fun terminals() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { ConnectivityNode() },
             { id, _ -> Terminal(id) },
+            ConnectivityNode::terminals,
             ConnectivityNode::numTerminals,
             ConnectivityNode::getTerminal,
-            ConnectivityNode::terminals,
             ConnectivityNode::addTerminal,
             ConnectivityNode::removeTerminal,
             ConnectivityNode::clearTerminals

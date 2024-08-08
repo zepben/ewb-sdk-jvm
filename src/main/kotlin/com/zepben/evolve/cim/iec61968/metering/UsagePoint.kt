@@ -68,7 +68,7 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
         return this
     }
 
-    fun removeEquipment(equipment: Equipment?): Boolean {
+    fun removeEquipment(equipment: Equipment): Boolean {
         val ret = _equipment?.remove(equipment) == true
         if (_equipment.isNullOrEmpty()) _equipment = null
         return ret
@@ -107,7 +107,7 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
         return this
     }
 
-    fun removeEndDevice(endDevice: EndDevice?): Boolean {
+    fun removeEndDevice(endDevice: EndDevice): Boolean {
         val ret = _endDevices?.remove(endDevice) == true
         if (_endDevices.isNullOrEmpty()) _endDevices = null
         return ret

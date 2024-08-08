@@ -60,7 +60,7 @@ class GeographicalRegion @JvmOverloads constructor(mRID: String = "") : Identifi
      * @param subGeographicalRegion The sub geographical region to disassociate from this geographical region.
      * @return True if the subGeographicalRegion existed and was removed from this GeographicalRegion, false otherwise
      */
-    fun removeSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion?): Boolean {
+    fun removeSubGeographicalRegion(subGeographicalRegion: SubGeographicalRegion): Boolean {
         val ret = _subGeographicalRegions.safeRemove(subGeographicalRegion)
         if (_subGeographicalRegions.isNullOrEmpty()) _subGeographicalRegions = null
         return ret

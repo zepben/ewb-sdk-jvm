@@ -43,7 +43,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
     var protectionKind: ProtectionKind = ProtectionKind.UNKNOWN
     var directable: Boolean? = null
     var powerDirection: PowerDirectionKind = PowerDirectionKind.UNKNOWN_DIRECTION
-    
+
     private var _timeLimits: MutableList<Double>? = null
     private var _protectedSwitches: MutableList<ProtectedSwitch>? = null
     private var _sensors: MutableList<Sensor>? = null
@@ -118,7 +118,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      * @param timeLimit The time limit to remove.
      * @return true if the time limit was found and removed.
      */
-    fun removeTimeLimit(timeLimit: Double?): Boolean {
+    fun removeTimeLimit(timeLimit: Double): Boolean {
         val ret = _timeLimits?.remove(timeLimit) ?: false
         if (_sensors.isNullOrEmpty()) _sensors = null
         return ret
@@ -197,10 +197,31 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      * @param threshold The threshold [RelaySetting] to disassociate from this [ProtectionRelayFunction].
      * @return true if the threshold [RelaySetting] was disassociated.
      */
-    fun removeThreshold(threshold: RelaySetting?): Boolean {
+    fun removeThreshold(threshold: RelaySetting): Boolean {
         val ret = _thresholds?.remove(threshold) == true
         if (_thresholds.isNullOrEmpty()) _thresholds = null
         return ret
+    }
+
+    /**
+     * Remove a threshold [RelaySetting] from this [ProtectionRelayFunction] by its sequence number.
+     *
+     * NOTE: This will update the sequence numbers of all items located after the removed sequence number.
+     *
+     * @param sequenceNumber The sequence number of the threshold [RelaySetting] to disassociate from this [ProtectionRelayFunction].
+     * @return the threshold [RelaySetting] that was disassociated, or null if there was no threshold [RelaySetting] for the given [sequenceNumber].
+     */
+    fun removeThreshold(sequenceNumber: Int): RelaySetting? {
+        _thresholds?.apply {
+            if (sequenceNumber >= size)
+                return null
+
+            val ret = removeAt(sequenceNumber)
+            if (isNullOrEmpty()) _thresholds = null
+            return ret
+        }
+
+        return null
     }
 
     /**
@@ -252,7 +273,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      * @param protectedSwitch The [ProtectedSwitch] to disassociate from this [ProtectionRelayFunction].
      * @return true if the [ProtectedSwitch] was disassociated.
      */
-    fun removeProtectedSwitch(protectedSwitch: ProtectedSwitch?): Boolean {
+    fun removeProtectedSwitch(protectedSwitch: ProtectedSwitch): Boolean {
         val ret = _protectedSwitches.safeRemove(protectedSwitch)
         if (_protectedSwitches.isNullOrEmpty()) _protectedSwitches = null
         return ret
@@ -307,7 +328,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      * @param sensor The [Sensor] to disassociate from this [ProtectionRelayFunction].
      * @return true if the [Sensor] was disassociated.
      */
-    fun removeSensor(sensor: Sensor?): Boolean {
+    fun removeSensor(sensor: Sensor): Boolean {
         val ret = _sensors.safeRemove(sensor)
         if (_sensors.isNullOrEmpty()) _sensors = null
         return ret
@@ -362,7 +383,7 @@ abstract class ProtectionRelayFunction(mRID: String = "") : PowerSystemResource(
      * @param scheme The [ProtectionRelayScheme] to disassociate from this [ProtectionRelayFunction].
      * @return true if the [ProtectionRelayScheme] was disassociated.
      */
-    fun removeScheme(scheme: ProtectionRelayScheme?): Boolean {
+    fun removeScheme(scheme: ProtectionRelayScheme): Boolean {
         val ret = _schemes.safeRemove(scheme)
         if (_schemes.isNullOrEmpty()) _schemes = null
         return ret

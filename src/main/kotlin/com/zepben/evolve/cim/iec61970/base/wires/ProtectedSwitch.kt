@@ -64,7 +64,7 @@ abstract class ProtectedSwitch(mRID: String = "") : Switch(mRID) {
      * @param relayFunction The [ProtectionRelayFunction] to disassociate from this [ProtectedSwitch].
      * @return true if the [ProtectionRelayFunction] was disassociated.
      */
-    fun removeRelayFunction(relayFunction: ProtectionRelayFunction?): Boolean {
+    fun removeRelayFunction(relayFunction: ProtectionRelayFunction): Boolean {
         val ret = _relayFunctions.safeRemove(relayFunction)
         if (_relayFunctions.isNullOrEmpty()) _relayFunctions = null
         return ret

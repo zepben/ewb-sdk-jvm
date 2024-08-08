@@ -38,12 +38,12 @@ internal class ProtectionRelaySystemTest {
 
     @Test
     internal fun schemes() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { ProtectionRelaySystem() },
             { id, _ -> ProtectionRelayScheme(id) },
+            ProtectionRelaySystem::schemes,
             ProtectionRelaySystem::numSchemes,
             ProtectionRelaySystem::getScheme,
-            ProtectionRelaySystem::schemes,
             ProtectionRelaySystem::addScheme,
             ProtectionRelaySystem::removeScheme,
             ProtectionRelaySystem::clearSchemes

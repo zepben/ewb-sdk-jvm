@@ -55,9 +55,10 @@ internal class ProtectionRelayFunctionTest {
     @Test
     internal fun timeLimits() {
         var timeLimit = 0.0
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateOrdered2(
             { object : ProtectionRelayFunction() {} },
             { timeLimit++ },
+            ProtectionRelayFunction::timeLimits,
             ProtectionRelayFunction::numTimeLimits,
             ProtectionRelayFunction::getTimeLimit,
             ProtectionRelayFunction::forEachTimeLimits,
@@ -72,28 +73,29 @@ internal class ProtectionRelayFunctionTest {
     @Test
     internal fun thresholds() {
         var thresholdNumber = 0.0
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateOrdered2(
             { object : ProtectionRelayFunction() {} },
             { RelaySetting(UnitSymbol.W, thresholdNumber++) },
+            ProtectionRelayFunction::thresholds,
             ProtectionRelayFunction::numThresholds,
             ProtectionRelayFunction::getThreshold,
             ProtectionRelayFunction::forEachThreshold,
             ProtectionRelayFunction::addThreshold,
             ProtectionRelayFunction::addThreshold,
             ProtectionRelayFunction::removeThreshold,
-            null,
+            ProtectionRelayFunction::removeThreshold,
             ProtectionRelayFunction::clearThresholds
         )
     }
 
     @Test
     internal fun protectedSwitches() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : ProtectionRelayFunction() {} },
             { id, _ -> object : ProtectedSwitch(id) {} },
+            ProtectionRelayFunction::protectedSwitches,
             ProtectionRelayFunction::numProtectedSwitches,
             ProtectionRelayFunction::getProtectedSwitch,
-            ProtectionRelayFunction::protectedSwitches,
             ProtectionRelayFunction::addProtectedSwitch,
             ProtectionRelayFunction::removeProtectedSwitch,
             ProtectionRelayFunction::clearProtectedSwitches
@@ -102,12 +104,12 @@ internal class ProtectionRelayFunctionTest {
 
     @Test
     internal fun sensors() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : ProtectionRelayFunction() {} },
             { id, _ -> object : Sensor(id) {} },
+            ProtectionRelayFunction::sensors,
             ProtectionRelayFunction::numSensors,
             ProtectionRelayFunction::getSensor,
-            ProtectionRelayFunction::sensors,
             ProtectionRelayFunction::addSensor,
             ProtectionRelayFunction::removeSensor,
             ProtectionRelayFunction::clearSensors
@@ -116,12 +118,12 @@ internal class ProtectionRelayFunctionTest {
 
     @Test
     internal fun schemes() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : ProtectionRelayFunction() {} },
             { id, _ -> ProtectionRelayScheme(id) },
+            ProtectionRelayFunction::schemes,
             ProtectionRelayFunction::numSchemes,
             ProtectionRelayFunction::getScheme,
-            ProtectionRelayFunction::schemes,
             ProtectionRelayFunction::addScheme,
             ProtectionRelayFunction::removeScheme,
             ProtectionRelayFunction::clearSchemes

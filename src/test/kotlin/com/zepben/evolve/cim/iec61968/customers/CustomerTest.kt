@@ -60,12 +60,12 @@ internal class CustomerTest {
 
     @Test
     internal fun customerAgreements() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { Customer() },
             { id, _ -> CustomerAgreement(id) },
+            Customer::agreements,
             Customer::numAgreements,
             Customer::getAgreement,
-            Customer::agreements,
             Customer::addAgreement,
             Customer::removeAgreement,
             Customer::clearAgreements

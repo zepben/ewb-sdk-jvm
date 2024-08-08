@@ -52,6 +52,11 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
         _positionPoints?.forEachIndexed(action::accept)
     }
 
+    /**
+     * Add a [PositionPoint] to this [Location]
+     * @param positionPoint The [PositionPoint] to add
+     * @param sequenceNumber The sequence number of the [PositionPoint].
+     */
     @JvmOverloads
     fun addPoint(positionPoint: PositionPoint, sequenceNumber: Int = numPoints()): Location {
         require(sequenceNumber in 0..(numPoints())) {
@@ -66,12 +71,41 @@ class Location @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(m
         return this
     }
 
-    fun removePoint(positionPoint: PositionPoint?): Boolean {
+    /**
+     * Remove a [PositionPoint] from this [Location]
+     * @param positionPoint The [PositionPoint] to remove.
+     * @return true if the [PositionPoint] was removed.
+     */
+    fun removePoint(positionPoint: PositionPoint): Boolean {
         val ret = _positionPoints?.remove(positionPoint) == true
         if (_positionPoints.isNullOrEmpty()) _positionPoints = null
         return ret
     }
 
+    /**
+     * Remove a [PositionPoint] from this [Location] by its sequence number.
+     *
+     * NOTE: This will update the sequence numbers of all items located after the removed sequence number.
+     *
+     * @param sequenceNumber The sequence number of the [PositionPoint] to remove.
+     * @return the [PositionPoint] that was removed, or null if there was no [PositionPoint] for the given [sequenceNumber].
+     */
+    fun removePoint(sequenceNumber: Int): PositionPoint? {
+        _positionPoints?.apply {
+            if (sequenceNumber >= size)
+                return null
+
+            val ret = removeAt(sequenceNumber)
+            if (isNullOrEmpty()) _positionPoints = null
+            return ret
+        }
+
+        return null
+    }
+
+    /**
+     * Clear all [PositionPoint]'s from this [Location]
+     */
     fun clearPoints(): Location {
         _positionPoints = null
         return this

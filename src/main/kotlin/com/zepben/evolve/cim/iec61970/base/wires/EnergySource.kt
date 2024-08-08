@@ -112,7 +112,7 @@ class EnergySource @JvmOverloads constructor(mRID: String = "") : EnergyConnecti
         return this
     }
 
-    fun removePhase(phase: EnergySourcePhase?): Boolean {
+    fun removePhase(phase: EnergySourcePhase): Boolean {
         val ret = _energySourcePhases?.remove(phase) == true
         if (_energySourcePhases.isNullOrEmpty()) _energySourcePhases = null
         return ret

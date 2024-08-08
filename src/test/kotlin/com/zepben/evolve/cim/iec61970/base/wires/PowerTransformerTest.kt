@@ -82,16 +82,17 @@ internal class PowerTransformerTest {
 
     @Test
     internal fun powerTransformerEnds() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateOrdered(
             { PowerTransformer() },
-            { id, pt, en -> PowerTransformerEnd(id).apply { powerTransformer = pt; en?.let { endNumber = it } } },
-            PowerTransformer::numEnds,
-            { pt, mRID -> pt.getEnd(mRID) },
-            { pt, endNum -> pt.getEnd(endNum) },
+            { id, pt, en -> PowerTransformerEnd(id).apply { powerTransformer = pt; endNumber = en } },
             PowerTransformer::ends,
+            PowerTransformer::numEnds,
+            PowerTransformer::getEnd,
+            PowerTransformer::getEnd,
             PowerTransformer::addEnd,
             PowerTransformer::removeEnd,
-            PowerTransformer::clearEnds
+            PowerTransformer::clearEnds,
+            PowerTransformerEnd::endNumber
         )
     }
 

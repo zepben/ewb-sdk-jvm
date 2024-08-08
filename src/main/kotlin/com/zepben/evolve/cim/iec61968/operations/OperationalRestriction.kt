@@ -67,7 +67,7 @@ class OperationalRestriction @JvmOverloads constructor(mRID: String = "") : Docu
      *
      * @param equipment The equipment tor remove.
      */
-    fun removeEquipment(equipment: Equipment?): Boolean {
+    fun removeEquipment(equipment: Equipment): Boolean {
         val ret = _equipment?.remove(equipment) == true
         if (_equipment.isNullOrEmpty()) _equipment = null
         return ret

@@ -23,238 +23,298 @@ internal class PrivateCollectionValidator {
         /**
          * Validate the internal collection for an associated [IdentifiedObject] that has no order significance.
          */
-        internal inline fun <reified T : IdentifiedObject, reified U : IdentifiedObject> validate(
+        internal fun <T : IdentifiedObject, U : IdentifiedObject> validateUnordered(
             createIt: () -> T,
             createOther: (String, T) -> U,
-            num: (T) -> Int,
-            get: (T, String) -> U?,
             getAll: (T) -> Collection<U>,
-            crossinline add: (T, U) -> T,
-            remove: (T, U?) -> Boolean,
+            num: (T) -> Int,
+            getById: (T, String) -> U?,
+            add: (T, U) -> T,
+            remove: (T, U) -> Boolean,
             clear: (T) -> T
         ) {
             val it = createIt()
             val other1 = createOther("1", it)
             val other2 = createOther("2", it)
             val other3 = createOther("3", it)
-            val duplicate1 = createOther("1", it)
+            val otherDuplicateId = createOther("1", it)
 
-            assertThat(other1, not(equalTo(other2)))
-            assertThat(other1, not(equalTo(other3)))
-            assertThat(other2, not(equalTo(other3)))
+            val expectedDuplicateErrors = mapOf(
+                otherDuplicateId to "An? (current )?${getName(other1.javaClass)} with mRID ${other1.mRID} already exists in ${it.typeNameAndMRID()}."
+            )
 
-            assertThat(num(it), equalTo(0))
-
-            add(it, other1)
-            add(it, other2)
-            add(it, other3)
-            assertThat(num(it), equalTo(3))
-            expect { add(it, duplicate1) }
-                .toThrow<IllegalArgumentException>()
-                .withMessage(Pattern.compile("An? (current )?${getName(other1.javaClass)} with mRID ${other1.mRID} already exists in ${it.typeNameAndMRID()}."))
-
-            assertThat(num(it), equalTo(3))
-
-            assertThat("remove should return true for previously-added object", remove(it, other1))
-            assertThat("remove should return false for already-removed object", !remove(it, other1))
-            assertThat("remove should return false for null", !remove(it, null))
-            assertThat(num(it), equalTo(2))
-
-            assertThat(get(it, other2.mRID), equalTo(other2))
-
-            assertThat(getAll(it), containsInAnyOrder(other2, other3))
-
-            clear(it)
-            assertThat(num(it), equalTo(0))
-
-            // Make sure you can add an item back after it has been removed
-            add(it, other1)
-            assertThat(num(it), equalTo(1))
-
-            // Make sure adding an already-added item does not change the collection
-            add(it, other1)
-            assertThat(num(it), equalTo(1))
-
-            remove(it, other1)
-            assertThat(num(it), equalTo(0))
-
-            // Make sure you can call remove on an empty list.
-            remove(it, other2)
-            assertThat(num(it), equalTo(0))
+            validate(
+                it,
+                listOf(other1, other2, other3),
+                getAll,
+                num,
+                add,
+                remove,
+                clear,
+                validateCollection = ::assertUnordered,
+                performDuplicateValidation = createDuplicatesThrowValidator(it, expectedDuplicateErrors, add),
+                beforeRemovalValidation = {
+                    assertThat(getById(it, "1"), equalTo(other1))
+                    assertThat(getById(it, "2"), equalTo(other2))
+                },
+                afterRemovalValidation = {
+                    assertThat(getById(it, "1"), nullValue())
+                    assertThat(getById(it, "2"), equalTo(other2))
+                }
+            )
         }
 
         /**
-         * Validate the internal collection for an associated [IdentifiedObject] that has order significance.
+         * Validate the internal collection for an associated object that is not an [IdentifiedObject] that has no order significance.
          */
-        internal inline fun <reified T : IdentifiedObject, reified U : IdentifiedObject> validate(
+        internal fun <T : IdentifiedObject, U : Any, K : Any> validateUnordered2(
             createIt: () -> T,
-            createOther: (String, T, Int?) -> U,
+            createOther: (Int) -> U,
+            getAll: (T) -> Collection<U>,
+            num: (T) -> Int,
+            getByKey: (T, K) -> U?,
+            add: (T, U) -> T,
+            remove: (T, U) -> Boolean,
+            clear: (T) -> T,
+            getKey: (U) -> K
+        ) {
+            val it = createIt()
+            val other1 = createOther(1)
+            val other2 = createOther(2)
+            val other3 = createOther(3)
+            val otherDuplicateKey = createOther(1)
+
+            require(other1 !is IdentifiedObject) { "do not use this function with identified 'other', use one of the other variants instead." }
+
+            // Just check that the duplicate key is in the error message.
+            val expectedDuplicateErrors = mapOf(otherDuplicateKey to getKey(otherDuplicateKey).toString())
+
+            validate(
+                it,
+                listOf(other1, other2, other3),
+                getAll,
+                num,
+                add,
+                remove,
+                clear,
+                validateCollection = ::assertUnordered,
+                performDuplicateValidation = createDuplicatesThrowValidator(it, expectedDuplicateErrors, add),
+                beforeRemovalValidation = {
+                    assertThat(getByKey(it, getKey(other1)), equalTo(other1))
+                    assertThat(getByKey(it, getKey(other2)), equalTo(other2))
+                },
+                afterRemovalValidation = {
+                    assertThat(getByKey(it, getKey(other1)), nullValue())
+                    assertThat(getByKey(it, getKey(other2)), equalTo(other2))
+                }
+            )
+        }
+
+        /**
+         * Validate the internal collection for an associated [IdentifiedObject] that has order significance, baked into the object itself, not just
+         * the placement in the collection.
+         */
+        internal fun <T : IdentifiedObject, U : IdentifiedObject> validateOrdered(
+            createIt: () -> T,
+            createOther: (String, T, Int) -> U,
+            getAll: (T) -> Collection<U>,
             num: (T) -> Int,
             getById: (T, String) -> U?,
             getByIndex: (T, Int) -> U?,
-            getAll: (T) -> Collection<U>,
-            crossinline add: (T, U) -> T,
-            remove: (T, U?) -> Boolean,
-            clear: (T) -> T
+            add: (T, U) -> T,
+            remove: (T, U) -> Boolean,
+            clear: (T) -> T,
+            indexOf: (U) -> Int
         ) {
             val it = createIt()
             val other1 = createOther("1", it, 1)
-            val other2 = createOther("2", it, 1)
-            val other3 = createOther("3", it, 3)
-            val other4 = createOther("3", it, null)
-            val duplicate1 = createOther("1", it, 1)
+            val other2 = createOther("2", it, 2)
+            val otherAuto = createOther("3", it, 0)
+            val otherDuplicateId = createOther("1", it, 4)
+            val otherDuplicateIndex = createOther("4", it, 1)
 
-            assertThat(other1, not(equalTo(other2)))
-            assertThat(other1, not(equalTo(other3)))
-            assertThat(other2, not(equalTo(other3)))
+            // Make sure all the objects have the indexes we provided so our checks will work.
+            assertThat(listOf(other1, other2, otherAuto, otherDuplicateId, otherDuplicateIndex).map(indexOf), contains(1, 2, 0, 4, 1))
 
-            assertThat(num(it), equalTo(0))
+            val expectedDuplicateErrors = mapOf(
+                otherDuplicateId to "An? (current )?${getName(other1.javaClass)} with mRID 1 already exists in ${it.typeNameAndMRID()}.",
+                otherDuplicateIndex to "Unable to add ${otherDuplicateIndex.typeNameAndMRID()} to ${it.typeNameAndMRID()}. A ${other1.typeNameAndMRID()} already exists with \\w+ 1."
+            )
 
-            add(it, other1)
-            add(it, other3)
-            assertThat(num(it), equalTo(2))
+            validate(
+                it,
+                listOf(other1, other2, otherAuto),
+                getAll,
+                num,
+                add,
+                remove,
+                clear,
+                validateCollection = ::assertOrdered,
+                performDuplicateValidation = createDuplicatesThrowValidator(it, expectedDuplicateErrors, add),
+                beforeRemovalValidation = {
+                    assertThat(getById(it, other1.mRID), equalTo(other1))
+                    assertThat(getById(it, other2.mRID), equalTo(other2))
 
-            expect { add(it, duplicate1) }
-                .toThrow<IllegalArgumentException>()
-                .withMessage(Pattern.compile("An? (current )?${getName(other1.javaClass)} with mRID ${other1.mRID} already exists in ${it.typeNameAndMRID()}."))
+                    // Adding the auto indexed object should have set its index, which was 0 above.
+                    assertThat(indexOf(otherAuto), equalTo(3))
 
-            assertThat(num(it), equalTo(2))
+                    // We should be able to get each item by its index, and nulls for invalid indexes.
+                    assertThat(getByIndex(it, 0), nullValue())
+                    assertThat(getByIndex(it, 1), equalTo(other1))
+                    assertThat(getByIndex(it, 2), equalTo(other2))
+                    assertThat(getByIndex(it, 3), equalTo(otherAuto))
+                    assertThat(getByIndex(it, 4), nullValue())
+                },
+                afterRemovalValidation = {
+                    assertThat(getById(it, other1.mRID), nullValue())
+                    assertThat(getById(it, other2.mRID), equalTo(other2))
 
-            assertThat("remove should return true for previously-added object", remove(it, other1))
-            assertThat("remove should return false for already-removed object", !remove(it, other1))
-            assertThat("remove should return false for null", !remove(it, null))
-            assertThat(num(it), equalTo(1))
-
-            assertThat(getById(it, other3.mRID), equalTo(other3))
-            assertThat(getByIndex(it, 0), nullValue())
-            assertThat(getByIndex(it, 3), equalTo(other3))
-
-            add(it, other1)
-            val list = mutableListOf<U>()
-            getAll(it).forEach(list::add)
-            assertThat(list, containsInRelativeOrder(other1, other3))
-
-            clear(it)
-            assertThat(num(it), equalTo(0))
-
-            // Make sure you can add an item back after it has been removed
-            add(it, other1)
-            assertThat(num(it), equalTo(1))
-
-            expect { add(it, other2) }
-                .toThrowAny()
-                .withMessage(
-                    Pattern.compile(
-                        "Unable to add ${other2.typeNameAndMRID()} to ${it.typeNameAndMRID()}. A ${other1.typeNameAndMRID()} already exists with \\w+ \\d+."
-                    )
-                )
-            add(it, other4)
-            assertThat(num(it), equalTo(2))
-            assertThat(getAll(it).last(), equalTo(other4))
-
-            remove(it, other1)
-            assertThat(num(it), equalTo(1))
-
-            // Make sure you can call remove on an empty list.
-            remove(it, other4)
-            assertThat(num(it), equalTo(0))
+                    assertThat(getByIndex(it, 1), nullValue())
+                    assertThat(getByIndex(it, 2), equalTo(other2))
+                }
+            )
         }
 
         /**
-         * Validate the internal collection for an associated object that is not an [IdentifiedObject] that has order significance.
+         * Validate the internal collection for an associated object that is not an [IdentifiedObject] that has order significance based on its index
+         * in the collection.
          */
-        internal inline fun <reified T : IdentifiedObject, reified U : Any> validate(
+        internal fun <T : IdentifiedObject, U : Any> validateOrdered2(
             createIt: () -> T,
-            createOther: (T) -> U,
+            createOther: (Int) -> U,
+            getAll: (T) -> Collection<U>,
             num: (T) -> Int,
-            get: (T, Int) -> U?,
+            getByIndex: (T, Int) -> U?,
             forEach: (T, (Int, U) -> Unit) -> Unit,
             add: (T, U) -> T,
-            noinline addWithIndex: ((T, U, Int) -> T)?,
-            remove: (T, U?) -> Boolean,
-            noinline removeAtIndex: ((T, Int) -> U?)?,
-            clear: (T) -> T,
-            supportsDuplicates: Boolean = true,
+            addWithIndex: ((T, U, Int) -> T),
+            remove: (T, U) -> Boolean,
+            removeAtIndex: ((T, Int) -> U?),
+            clear: (T) -> T
         ) {
-            require(U::class !is IdentifiedObject) { "do not use this function with identified 'other', use one of the other variants instead." }
-
             val it = createIt()
-            val other1 = createOther(it)
-            val other2 = createOther(it)
-            val other3 = createOther(it)
+            val other1 = createOther(1)
+            val other2 = createOther(2)
+            val other3 = createOther(3)
+            val others = listOf(other1, other2, other3)
 
-            assertThat(other1, not(equalTo(other2)))
-            assertThat(other1, not(equalTo(other3)))
-            assertThat(other2, not(equalTo(other3)))
+            require(other1 !is IdentifiedObject) { "do not use this function with identified 'other', use one of the other variants instead." }
 
+            validate(
+                it,
+                others,
+                getAll,
+                num,
+                add,
+                remove,
+                clear,
+                validateCollection = ::assertOrdered,
+                performDuplicateValidation = createDuplicatesSupportedValidator(it, others, other1, getAll, num, add, remove, ::assertOrdered),
+                beforeRemovalValidation = {
+                    val looped = mutableListOf<U>()
+                    forEach(it) { index, item ->
+                        assertThat(index, equalTo(looped.size))
+                        looped.add(item)
+                    }
+                    assertThat(looped, contains(other1, other2, other3))
+
+                    val other4 = createOther(4)
+                    addWithIndex(it, other4, 1)
+
+                    assertThat(num(it), equalTo(4))
+                    assertThat(getAll(it), contains(other1, other4, other2, other3))
+                    assertThat(getByIndex(it, 1), equalTo(other4))
+
+                    // Put the collection back to how it was before we added the duplicate for future tests.
+                    assertThat(removeAtIndex(it, 1), sameInstance(other4))
+
+                    // Adding to an invalid index is not valid.
+                    expect { addWithIndex(it, other4, 5) }
+                        .toThrow<IllegalArgumentException>()
+                        .withMessage(
+                            Pattern.compile(
+                                "Unable to add ${other4.javaClass.simpleName} to ${it.typeNameAndMRID()}. " +
+                                    "\\w* number 5 is invalid. Expected a value between 0 and ${num(it)}. " +
+                                    "Make sure you are adding the items in order and there are no gaps in the numbering."
+                            )
+                        )
+
+                    // Removing an invalid index returns null, not an IndexOutOfBounds exception.
+                    assertThat(removeAtIndex(it, 5), nullValue())
+
+                    assertThat(getByIndex(it, 1), equalTo(other1))
+                    assertThat(getByIndex(it, 2), equalTo(other2))
+                },
+                afterRemovalValidation = {
+                    assertThat(getByIndex(it, 1), nullValue())
+                    assertThat(getByIndex(it, 2), equalTo(other2))
+                }
+            )
+        }
+
+        private fun <T, U> validate(
+            it: T,
+            others: List<U>,
+            getAll: (T) -> Collection<U>,
+            num: (T) -> Int,
+            add: (T, U) -> T,
+            remove: (T, U) -> Boolean,
+            clear: (T) -> T,
+            validateCollection: (Collection<U>, List<U>) -> Unit,
+            performDuplicateValidation: () -> Unit,
+            beforeRemovalValidation: () -> Unit,
+            afterRemovalValidation: () -> Unit
+        ) {
+            // Make sure all the objects are not equal.
+            assertThat(others.toSet(), hasSize(others.size))
+
+            // Make sure the item under test is empty to being with, so nothing messes with our tests.
             assertThat(num(it), equalTo(0))
+            assertThat(getAll(it), empty())
 
+            val (other1, other2, other3) = others
             add(it, other1)
             add(it, other2)
             add(it, other3)
+
             assertThat(num(it), equalTo(3))
-            assertThat(get(it, 2), equalTo(other3))
+            validateCollection(getAll(it), listOf(other1, other2, other3))
 
-            var numObjects = 3
-            if (supportsDuplicates) {
-                // objects can be added more than once
-                add(it, other1)
-                assertThat(num(it), equalTo(++numObjects))
-            }
+            performDuplicateValidation()
 
-            assertThat("remove should return true for previously-added object", remove(it, other2))
-            assertThat("remove should return false for already-removed object", !remove(it, other2))
-            assertThat("remove should return false for null", !remove(it, null))
-            assertThat(num(it), equalTo(--numObjects))
+            // Ensure there are no changes to our collection after the duplicate testing, otherwise it may provide false positives below.
+            assertThat(num(it), equalTo(3))
+            validateCollection(getAll(it), listOf(other1, other2, other3))
 
-            val list = mutableListOf<U>()
-            forEach(it, list::add)
-            if (supportsDuplicates)
-                assertThat(list, contains(other1, other3, other1))
-            else
-                assertThat(list, containsInAnyOrder(other1, other3))
+            beforeRemovalValidation()
 
-            addWithIndex?.let { awi ->
-                awi(it, other2, 1)
-                assertThat(num(it), equalTo(++numObjects))
-                assertThat(get(it, 1), equalTo(other2))
-            }
+            assertThat("remove should return true for previously-added object", remove(it, other1))
+            assertThat("remove should return false for already-removed object", !remove(it, other1))
+
+            // Make sure the items is fully removed.
+            assertThat(num(it), equalTo(2))
+            validateCollection(getAll(it), listOf(other2, other3))
+
+            afterRemovalValidation()
+
+            // Make sure we can add the item back in, and it ends up in the correct spot in the collection.
+            add(it, other1)
+            assertThat(num(it), equalTo(3))
+            validateCollection(getAll(it), listOf(other1, other2, other3))
 
             clear(it)
             assertThat(num(it), equalTo(0))
-
-            // Make sure you can add an item back after it has been removed
-            add(it, other2)
-            assertThat(num(it), equalTo(1))
-
-            addWithIndex?.also { awi ->
-                expect { awi(it, other3, 20) }
-                    .toThrowAny()
-                    .withMessage(
-                        Pattern.compile(
-                            "Unable to add ${other3.javaClass.simpleName} to ${it.typeNameAndMRID()}. " +
-                                "\\w* number 20 is invalid. Expected a value between 0 and ${num(it)}. " +
-                                "Make sure you are adding the items in order and there are no gaps in the numbering."
-                        )
-                    )
-            }
-
-            remove(it, other2)
-            assertThat(num(it), equalTo(0))
+            assertThat(getAll(it), empty())
 
             // Make sure you can call remove on an empty list.
-            remove(it, other2)
+            remove(it, other3)
             assertThat(num(it), equalTo(0))
+            assertThat(getAll(it), empty())
 
-            removeAtIndex?.let { rai ->
-                add(it, other1)
-                add(it, other2)
-                add(it, other3)
-                assertThat(rai(it, 1), equalTo(other2))
-                assertThat(num(it), equalTo(2))
-                assertThat(get(it, 1), equalTo(other3))
-                assertThat(rai(it, 2), nullValue())
-            }
+            // Make sure you can add an item back after it has been cleared
+            add(it, other1)
+            assertThat(num(it), equalTo(1))
+            validateCollection(getAll(it), listOf(other1))
         }
 
         private fun getName(clazz: Class<*>?): String {
@@ -266,5 +326,45 @@ internal class PrivateCollectionValidator {
             } ?: ""
         }
 
+        private fun <U> assertUnordered(actual: Collection<U>, expected: List<U>) {
+            // We don't want to make everything inlined/reified just to compare a list, we map to the matchers ourselves since we can't spread the
+            // list, and if we change expected to an Array, you can't create it.
+            assertThat(actual, containsInAnyOrder(*expected.map { equalTo(it) }.toTypedArray()))
+        }
+
+        private fun <U> assertOrdered(actual: Collection<U>, expected: List<U>) {
+            // We don't want to make everything inlined/reified just to compare a list, we map to the matchers ourselves since we can't spread the
+            // list, and if we change expected to an Array, you can't create it.
+            assertThat(actual, contains(*expected.map { equalTo(it) }.toTypedArray()))
+        }
+
+        private fun <T, U> createDuplicatesThrowValidator(it: T, expectedDuplicateErrors: Map<U, String>, add: (T, U) -> T): () -> Unit = {
+            expectedDuplicateErrors.forEach { (otherDuplicate, expectedError) ->
+                expect { add(it, otherDuplicate) }
+                    .toThrow<IllegalArgumentException>()
+                    .withMessage(Pattern.compile(expectedError))
+            }
+        }
+
+        private fun <T, U> createDuplicatesSupportedValidator(
+            it: T,
+            others: List<U>,
+            duplicate: U,
+            getAll: (T) -> Collection<U>,
+            num: (T) -> Int,
+            add: (T, U) -> T,
+            remove: (T, U) -> Boolean,
+            validateCollection: (Collection<U>, List<U>) -> Unit,
+        ): () -> Unit = {
+            add(it, duplicate)
+
+            assertThat(num(it), equalTo(others.size + 1))
+            validateCollection(getAll(it), others + duplicate)
+
+            // Put the collection back to how it was before we added the duplicate for future tests.
+            assertThat("Should be able to remove the duplicate", remove(it, duplicate))
+        }
+
     }
+
 }

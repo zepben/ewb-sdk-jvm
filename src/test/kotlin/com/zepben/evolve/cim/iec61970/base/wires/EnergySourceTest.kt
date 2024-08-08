@@ -134,12 +134,12 @@ internal class EnergySourceTest {
 
     @Test
     internal fun energySourcePhases() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { EnergySource() },
             { id, _ -> EnergySourcePhase(id) },
+            EnergySource::phases,
             EnergySource::numPhases,
             EnergySource::getPhase,
-            EnergySource::phases,
             EnergySource::addPhase,
             EnergySource::removePhase,
             EnergySource::clearPhases

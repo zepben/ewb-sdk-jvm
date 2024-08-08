@@ -66,7 +66,7 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
      * @param organisationRole the [AssetOrganisationRole] to disassociate with this [Asset].
      * @return true if the organisation role is disassociated.
      */
-    fun removeOrganisationRole(organisationRole: AssetOrganisationRole?): Boolean {
+    fun removeOrganisationRole(organisationRole: AssetOrganisationRole): Boolean {
         val ret = _organisationRoles.safeRemove(organisationRole)
         if (_organisationRoles.isNullOrEmpty()) _organisationRoles = null
         return ret

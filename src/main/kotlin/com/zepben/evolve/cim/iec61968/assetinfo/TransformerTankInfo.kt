@@ -65,7 +65,7 @@ class TransformerTankInfo @JvmOverloads constructor(mRID: String = "") : AssetIn
      * @param transformerEndInfo The [TransformerEndInfo] to remove
      * @return true if [transformerEndInfo] is removed from the collection
      */
-    fun removeTransformerEndInfo(transformerEndInfo: TransformerEndInfo?): Boolean {
+    fun removeTransformerEndInfo(transformerEndInfo: TransformerEndInfo): Boolean {
         val ret = _transformerEndInfos.safeRemove(transformerEndInfo)
         if (_transformerEndInfos.isNullOrEmpty()) _transformerEndInfos = null
         return ret

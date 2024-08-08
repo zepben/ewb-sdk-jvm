@@ -11,7 +11,6 @@ package com.zepben.evolve.cim.iec61970.base.wires
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.network.ResistanceReactance
 import com.zepben.evolve.services.network.mergeIfIncomplete
-import java.util.function.BiConsumer
 
 /**
  * A PowerTransformerEnd is associated with each Terminal of a PowerTransformer.
@@ -102,13 +101,6 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
 
     fun getRating(coolingType: TransformerCoolingType): TransformerEndRatedS? = _sRatings?.find { it.coolingType == coolingType }
 
-    fun getRating(ratedS: Int): TransformerEndRatedS? = _sRatings?.find { it.ratedS == ratedS }
-
-
-    fun forEachRating(action: BiConsumer<Int, TransformerEndRatedS>) {
-        _sRatings?.forEachIndexed(action::accept)
-    }
-
     fun numRatings(): Int = _sRatings?.size ?: 0
 
     /**
@@ -141,7 +133,7 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
      * @param rating The [TransformerEndRatedS] to remove.
      * @return true if [rating] was removed.
      */
-    fun removeRating(rating: TransformerEndRatedS?): Boolean {
+    fun removeRating(rating: TransformerEndRatedS): Boolean {
         val ret = _sRatings?.remove(rating) == true
         if (_sRatings.isNullOrEmpty()) _sRatings = null
         return ret
@@ -184,7 +176,5 @@ class PowerTransformerEnd @JvmOverloads constructor(mRID: String = "") : Transfo
         }
 
 }
-
-fun PowerTransformerEnd.forEachRating(action: (sequenceNumber: Int, rating: TransformerEndRatedS) -> Unit): Unit = forEachRating(BiConsumer(action))
 
 data class TransformerEndRatedS(val coolingType: TransformerCoolingType, val ratedS: Int)

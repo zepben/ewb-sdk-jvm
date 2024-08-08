@@ -136,7 +136,7 @@ class NameType(val name: String) {
      *
      * @return true if a matching name was removed.
      */
-    fun removeNames(name: String?): Boolean {
+    fun removeNames(name: String): Boolean {
         // Calling removeName from identifiedObject will remove the name from both the identifiedObject and the nameType
         namesIndex[name]?.let { n ->
             return n.identifiedObject.removeName(n)

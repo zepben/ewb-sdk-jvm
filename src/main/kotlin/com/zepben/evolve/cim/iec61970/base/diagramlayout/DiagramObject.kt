@@ -90,10 +90,31 @@ class DiagramObject @JvmOverloads constructor(mRID: String = "") : IdentifiedObj
      * @param diagramObjectPoint The [DiagramObjectPoint] to remove.
      * @return true if the [DiagramObjectPoint] was removed.
      */
-    fun removePoint(diagramObjectPoint: DiagramObjectPoint?): Boolean {
+    fun removePoint(diagramObjectPoint: DiagramObjectPoint): Boolean {
         val ret = _diagramObjectPoints?.remove(diagramObjectPoint) == true
         if (_diagramObjectPoints.isNullOrEmpty()) _diagramObjectPoints = null
         return ret
+    }
+
+    /**
+     * Remove a [DiagramObjectPoint] from this [DiagramObject] by its sequence number.
+     *
+     * NOTE: This will update the sequence numbers of all items located after the removed sequence number.
+     *
+     * @param sequenceNumber The sequence number of the [DiagramObjectPoint] to remove.
+     * @return the [DiagramObjectPoint] that was removed, or null if there was no [DiagramObjectPoint] for the given [sequenceNumber].
+     */
+    fun removePoint(sequenceNumber: Int): DiagramObjectPoint? {
+        _diagramObjectPoints?.apply {
+            if (sequenceNumber >= size)
+                return null
+
+            val ret = removeAt(sequenceNumber)
+            if (isNullOrEmpty()) _diagramObjectPoints = null
+            return ret
+        }
+
+        return null
     }
 
     /**

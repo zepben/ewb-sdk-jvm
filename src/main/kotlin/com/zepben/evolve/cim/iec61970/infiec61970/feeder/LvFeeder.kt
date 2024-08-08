@@ -74,8 +74,8 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
      * @param feeder the HV/MV feeder to disassociate from this LV feeder in the normal state of the network.
      * @return true if a matching feeder is removed from the collection.
      */
-    fun removeNormalEnergizingFeeder(feeder: Feeder?): Boolean {
-        val ret = _normalEnergizingFeedersById?.remove(feeder?.mRID)
+    fun removeNormalEnergizingFeeder(feeder: Feeder): Boolean {
+        val ret = _normalEnergizingFeedersById?.remove(feeder.mRID)
         if (_normalEnergizingFeedersById.isNullOrEmpty()) _normalEnergizingFeedersById = null
         return ret != null
     }
@@ -128,8 +128,8 @@ class LvFeeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer
      *
      * @param equipment the equipment to disassociate with this LV feeder in the current state of the network.
      */
-    override fun removeCurrentEquipment(equipment: Equipment?): Boolean {
-        val ret = _currentEquipmentById?.remove(equipment?.mRID)
+    override fun removeCurrentEquipment(equipment: Equipment): Boolean {
+        val ret = _currentEquipmentById?.remove(equipment.mRID)
         if (_currentEquipmentById.isNullOrEmpty()) _currentEquipmentById = null
         return ret != null
     }

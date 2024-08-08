@@ -84,7 +84,7 @@ abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
         return this
     }
 
-    fun removeTerminal(terminal: Terminal?): Boolean = _terminals.remove(terminal)
+    fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal)
 
     fun clearTerminals(): ConductingEquipment {
         _terminals.clear()

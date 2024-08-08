@@ -64,7 +64,7 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
      * @param endTerminal the [Terminal] to disassociate with this [Circuit].
      * @return `true` if [endTerminal] has been successfully removed; `false` if it was not present.
      */
-    fun removeEndTerminal(endTerminal: Terminal?): Boolean {
+    fun removeEndTerminal(endTerminal: Terminal): Boolean {
         val ret = _endTerminals?.remove(endTerminal) == true
         if (_endTerminals.isNullOrEmpty()) _endTerminals = null
         return ret
@@ -116,7 +116,7 @@ class Circuit @JvmOverloads constructor(mRID: String = "") : Line(mRID) {
      * @param substation the [Substation] to disassociate with this [Circuit].
      * @return `true` if [substation] has been successfully removed; `false` if it was not present.
      */
-    fun removeEndSubstation(substation: Substation?): Boolean {
+    fun removeEndSubstation(substation: Substation): Boolean {
         val ret = _endSubstations?.remove(substation) == true
         if (_endSubstations.isNullOrEmpty()) _endSubstations = null
         return ret

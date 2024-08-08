@@ -124,7 +124,6 @@ internal class IdentifiedObjectTest {
 
         assertThat("name1 successfully removed from nameType", identifiedObject.removeName(name1))
         assertThat("name1 can not be removed from nameType", !identifiedObject.removeName(name1))
-        assertThat("can not remove name null from identifiedObject", !identifiedObject.removeName(null))
         assertThat(identifiedObject.numNames(), equalTo(2))
         assertThat("should not have had name 1", !nameType.hasName("1"))
 
@@ -153,7 +152,7 @@ internal class IdentifiedObjectTest {
         val nameType = NameType("type")
 
         identifiedObject.addName(nameType, "1")
-        val name1 = identifiedObject.getName("type", "1")
+        val name1 = identifiedObject.getName("type", "1")!!
         identifiedObject.clearNames()
 
         identifiedObject.removeName(name1)
@@ -166,7 +165,7 @@ internal class IdentifiedObjectTest {
         val nameType = NameType("type")
 
         identifiedObject.addName(nameType, "1")
-        val name1 = identifiedObject.getName("type", "1")
+        val name1 = identifiedObject.getName("type", "1")!!
         assertThat(identifiedObject.numNames(), equalTo(1))
 
         identifiedObject.removeName(name1)

@@ -60,7 +60,7 @@ class Pole @JvmOverloads constructor(mRID: String = "") : Structure(mRID) {
      * @param streetlight The [Streetlight] to remove from this [Pole].
      * @return true if the streetlight is removed.
      */
-    fun removeStreetlight(streetlight: Streetlight?): Boolean {
+    fun removeStreetlight(streetlight: Streetlight): Boolean {
         val ret = _streetlights.safeRemove(streetlight)
         if (_streetlights.isNullOrEmpty()) _streetlights = null
         return ret

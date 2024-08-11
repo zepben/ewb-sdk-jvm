@@ -10,7 +10,7 @@
 
     <groupId>com.zepben</groupId>
     <artifactId>evolve-sdk</artifactId>
-    <version>0.23.0-SNAPSHOT4</version>
+    <version>0.23.0-SNAPSHOT5</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>SDK for interaction with the evolve platform</description>

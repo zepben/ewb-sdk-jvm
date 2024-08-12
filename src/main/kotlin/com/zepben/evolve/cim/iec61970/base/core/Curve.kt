@@ -13,12 +13,10 @@ import com.zepben.evolve.services.common.extensions.asUnmodifiable
 
 /**
  * The Curve class is a multipurpose functional relationship between an independent variable (X-axis) and dependent (Y-axis) variables.
- *
- * @property _curveDatas The point data values that define this curve.
  */
 abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
 
-    private var _curveDatas: MutableList<CurveData>? = null
+    private var _curveData: MutableList<CurveData>? = null
 
     /**
      * Add a curveData to the Curve.
@@ -31,11 +29,11 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
      * @throws IllegalArgumentException if a curveData for the provided [x] value already exists for this Curve.
      */
     fun addCurveData(x: Float, y1: Float, y2: Float? = null, y3: Float? = null): Curve {
-        if (_curveDatas?.any { cd -> cd.getXValue() == x } == true)
+        if (_curveData?.any { cd -> cd.xValue == x } == true)
             throw IllegalArgumentException("A CurveData with x point $x already exists, please remove it first.")
-        _curveDatas = _curveDatas ?: mutableListOf()
-        _curveDatas!!.add(CurveData(x, y1, y2, y3))
-        _curveDatas!!.sortBy { it.getXValue() }
+        _curveData = _curveData ?: mutableListOf()
+        _curveData!!.add(CurveData(x, y1, y2, y3))
+        _curveData!!.sortBy { it.xValue }
 
         return this
     }
@@ -43,38 +41,38 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
     /**
      * The individual curves for this synchronous machines. The returned collection is read only.
      */
-    val data: Collection<CurveData> get() = _curveDatas.asUnmodifiable()
+    val data: Collection<CurveData> get() = _curveData.asUnmodifiable()
 
-    fun getCurveData(x: Float): CurveData? = _curveDatas?.find { it.getXValue() == x }
+    fun getCurveData(x: Float): CurveData? = _curveData?.find { it.xValue == x }
 
-    fun hasCurveData(): Boolean = (_curveDatas != null)
+    fun hasCurveData(): Boolean = (_curveData != null)
 
-    fun addCurveData(curveData: CurveData): Curve = addCurveData(curveData.getXValue(), curveData.getY1Value(), curveData.getY2Value(), curveData.getY3Value())
+    fun addCurveData(curveData: CurveData): Curve = addCurveData(curveData.xValue, curveData.y1Value, curveData.y2Value, curveData.y3Value)
 
     /**
-     * Remove [curveData] from the [_curveDatas] collection.
+     * Remove [curveData] from the this [Curve].
      *
      * @return true if [curveData] was removed.
      */
     fun removeCurveData(curveData: CurveData): Boolean {
-        val ret = _curveDatas?.remove(curveData) == true
-        if (_curveDatas.isNullOrEmpty()) _curveDatas = null
+        val ret = _curveData?.remove(curveData) == true
+        if (_curveData.isNullOrEmpty()) _curveData = null
         return ret
     }
 
     fun removeCurveData(x: Float): Boolean {
-        val ret = _curveDatas?.firstOrNull { it.getXValue() == x }?.let {
-            _curveDatas?.remove(it)
+        val ret = _curveData?.firstOrNull { it.xValue == x }?.let {
+            _curveData?.remove(it)
         } ?: false
-        if (_curveDatas.isNullOrEmpty()) _curveDatas = null
+        if (_curveData.isNullOrEmpty()) _curveData = null
         return ret
     }
 
     /**
-     * Clear the [_curveDatas] for this Curve.
+     * Clear the [CurveData] for this Curve.
      */
-    fun clearCurveDatas(): Curve {
-        _curveDatas = null
+    fun clearCurveData(): Curve {
+        _curveData = null
         return this
     }
 

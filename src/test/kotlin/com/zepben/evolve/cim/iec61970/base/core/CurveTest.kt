@@ -91,7 +91,7 @@ internal class CurveTest {
         curve.fillFields(NetworkService())
         assertThat(curve.hasCurveData(), equalTo(true))
 
-        curve.clearCurveDatas()
+        curve.clearCurveData()
         assertThat(curve.hasCurveData(), equalTo(false))
     }
 }

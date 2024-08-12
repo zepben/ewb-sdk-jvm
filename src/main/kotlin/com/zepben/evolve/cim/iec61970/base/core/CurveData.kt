@@ -17,11 +17,4 @@ package com.zepben.evolve.cim.iec61970.base.core
  * @property y2Value The data value of the second Y-axis variable (if present), depending on the Y-axis units.
  * @property y3Value The data value of the third Y-axis variable (if present), depending on the Y-axis units.
  */
-data class CurveData(private val xValue: Float, private val y1Value: Float, private val y2Value: Float? = null, private val y3Value: Float? = null) {
-
-    fun getXValue(): Float = xValue
-    fun getY1Value(): Float = y1Value
-    fun getY2Value(): Float? = y2Value
-    fun getY3Value(): Float? = y3Value
-
-}
+data class CurveData(val xValue: Float, val y1Value: Float, val y2Value: Float? = null, val y3Value: Float? = null)

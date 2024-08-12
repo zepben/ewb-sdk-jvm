@@ -553,10 +553,10 @@ fun toPb(cim: Curve, pb: PBCurve.Builder): PBCurve.Builder =
 
 fun toPb(cim: CurveData, pb: PBCurveData.Builder): PBCurveData.Builder =
     pb.apply {
-        xvalue = cim.getXValue()
-        y1Value = cim.getY1Value()
-        cim.getY2Value()?.let { y2Value = it }
-        cim.getY3Value()?.let { y3Value = it }
+        xvalue = cim.xValue
+        y1Value = cim.y1Value
+        cim.y2Value?.let { y2Value = it }
+        cim.y3Value?.let { y3Value = it }
     }
 
 fun toPb(cim: Equipment, pb: PBEquipment.Builder): PBEquipment.Builder =

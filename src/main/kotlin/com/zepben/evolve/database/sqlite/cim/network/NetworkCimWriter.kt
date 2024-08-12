@@ -2138,10 +2138,10 @@ class NetworkCimWriter(
         val insert = databaseTables.getInsert<TableCurveData>()
 
         insert.setNullableString(table.CURVE_MRID.queryIndex, curve.mRID)
-        insert.setNullableFloat(table.X_VALUE.queryIndex, curveData.getXValue())
-        insert.setNullableFloat(table.Y1_VALUE.queryIndex, curveData.getY1Value())
-        insert.setNullableFloat(table.Y2_VALUE.queryIndex, curveData.getY2Value())
-        insert.setNullableFloat(table.Y3_VALUE.queryIndex, curveData.getY3Value())
+        insert.setNullableFloat(table.X_VALUE.queryIndex, curveData.xValue)
+        insert.setNullableFloat(table.Y1_VALUE.queryIndex, curveData.y1Value)
+        insert.setNullableFloat(table.Y2_VALUE.queryIndex, curveData.y2Value)
+        insert.setNullableFloat(table.Y3_VALUE.queryIndex, curveData.y3Value)
 
         return insert.tryExecuteSingleUpdate("curve data")
     }

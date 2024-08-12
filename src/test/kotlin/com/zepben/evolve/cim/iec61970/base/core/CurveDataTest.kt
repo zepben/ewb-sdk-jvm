@@ -24,10 +24,10 @@ internal class CurveDataTest {
     internal fun accessorCoverage() {
         val curveData = CurveData(1f,1f)
 
-        assertThat(curveData.getXValue(), equalTo(1f))
-        assertThat(curveData.getY1Value(), equalTo(1f))
-        assertThat(curveData.getY2Value(), equalTo(null))
-        assertThat(curveData.getY3Value(), equalTo(null))
+        assertThat(curveData.xValue, equalTo(1f))
+        assertThat(curveData.y1Value, equalTo(1f))
+        assertThat(curveData.y2Value, equalTo(null))
+        assertThat(curveData.y3Value, equalTo(null))
 
     }
 

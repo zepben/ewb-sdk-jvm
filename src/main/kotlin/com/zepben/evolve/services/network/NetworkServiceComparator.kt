@@ -370,6 +370,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private fun ObjectDifference<out ConnectivityNodeContainer>.compareConnectivityNodeContainer(): ObjectDifference<out ConnectivityNodeContainer> =
         apply { comparePowerSystemResource() }
 
+    private fun ObjectDifference<out Curve>.compareCurve(): ObjectDifference<out Curve> =
+        apply { compareIdentifiedObject() }
+
     private fun ObjectDifference<out Equipment>.compareEquipment(): ObjectDifference<out Equipment> =
         apply {
             comparePowerSystemResource()
@@ -753,6 +756,24 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareConductingEquipment()
         }
 
+    private fun compareGroundingImpedance(source: GroundingImpedance, target: GroundingImpedance): ObjectDifference<GroundingImpedance> =
+        ObjectDifference(source, target).apply {
+            compareEarthFaultCompensator()
+
+            compareValues(
+                GroundingImpedance::x
+            )
+        }
+
+    private fun ObjectDifference<out EarthFaultCompensator>.compareEarthFaultCompensator(): ObjectDifference<out EarthFaultCompensator> =
+        apply {
+            compareConductingEquipment()
+
+            compareValues(
+                EarthFaultCompensator::r
+            )
+        }
+
     private fun compareGroundDisconnector(source: GroundDisconnector, target: GroundDisconnector): ObjectDifference<GroundDisconnector> =
         ObjectDifference(source, target).apply {
             compareSwitch()
@@ -803,6 +824,15 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 PerLengthSequenceImpedance::x0,
                 PerLengthSequenceImpedance::b0ch,
                 PerLengthSequenceImpedance::g0ch
+            )
+        }
+
+    private fun comparePetersenCoil(source: PetersenCoil, target: PetersenCoil): ObjectDifference<PetersenCoil> =
+        ObjectDifference(source, target).apply {
+            compareEarthFaultCompensator()
+
+            compareValues(
+                PetersenCoil::xGroundNominal
             )
         }
 
@@ -942,6 +972,10 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferenceCollections(RegulatingControl::regulatingCondEqs)
         }
 
+    private fun compareReactiveCapabilityCurve(source: ReactiveCapabilityCurve, target: ReactiveCapabilityCurve): ObjectDifference<ReactiveCapabilityCurve> =
+        ObjectDifference(source, target).apply { compareCurve() }
+
+
     private fun compareSeriesCompensator(source: SeriesCompensator, target: SeriesCompensator): ObjectDifference<SeriesCompensator> =
         ObjectDifference(source, target).apply {
             compareConductingEquipment()
@@ -986,6 +1020,48 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 TapChanger::step
             )
             compareIdReferences(TapChanger::tapChangerControl)
+        }
+
+    private fun compareSynchronousMachine(source: SynchronousMachine, target: SynchronousMachine): ObjectDifference<SynchronousMachine> =
+        ObjectDifference(source, target).apply {
+            compareRotatingMachine()
+
+            compareValues(
+                SynchronousMachine::baseQ,
+                SynchronousMachine::condenserP,
+                SynchronousMachine::earthing,
+                SynchronousMachine::earthingStarPointR,
+                SynchronousMachine::earthingStarPointX,
+                SynchronousMachine::ikk,
+                SynchronousMachine::maxQ,
+                SynchronousMachine::maxU,
+                SynchronousMachine::minQ,
+                SynchronousMachine::minU,
+                SynchronousMachine::mu,
+                SynchronousMachine::r,
+                SynchronousMachine::r0,
+                SynchronousMachine::r2,
+                SynchronousMachine::satDirectSubtransX,
+                SynchronousMachine::satDirectSyncX,
+                SynchronousMachine::satDirectTransX,
+                SynchronousMachine::x0,
+                SynchronousMachine::x2,
+                SynchronousMachine::type,
+                SynchronousMachine::operatingMode
+            )
+        }
+
+    private fun ObjectDifference<out RotatingMachine>.compareRotatingMachine(): ObjectDifference<out RotatingMachine> =
+        apply {
+            compareRegulatingCondEq()
+
+            compareValues(
+                RotatingMachine::ratedPowerFactor,
+                RotatingMachine::ratedS,
+                RotatingMachine::ratedU,
+                RotatingMachine::p,
+                RotatingMachine::q
+            )
         }
 
     private fun compareTapChangerControl(source: TapChangerControl, target: TapChangerControl): ObjectDifference<TapChangerControl> =

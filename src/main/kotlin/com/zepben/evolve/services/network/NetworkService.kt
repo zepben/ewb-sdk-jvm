@@ -298,6 +298,9 @@ class NetworkService : BaseService("network") {
     fun add(groundDisconnector: GroundDisconnector): Boolean = super.add(groundDisconnector)
     fun remove(groundDisconnector: GroundDisconnector): Boolean = super.remove(groundDisconnector)
 
+    fun add(groundingImpedance: GroundingImpedance): Boolean = super.add(groundingImpedance)
+    fun remove(groundingImpedance: GroundingImpedance): Boolean = super.remove(groundingImpedance)
+
     fun add(jumper: Jumper): Boolean = super.add(jumper)
     fun remove(jumper: Jumper): Boolean = super.remove(jumper)
 
@@ -309,6 +312,9 @@ class NetworkService : BaseService("network") {
 
     fun add(loadBreakSwitch: LoadBreakSwitch): Boolean = super.add(loadBreakSwitch)
     fun remove(loadBreakSwitch: LoadBreakSwitch): Boolean = super.remove(loadBreakSwitch)
+
+    fun add(petersenCoil: PetersenCoil): Boolean = super.add(petersenCoil)
+    fun remove(petersenCoil: PetersenCoil): Boolean = super.remove(petersenCoil)
 
     fun add(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.add(perLengthSequenceImpedance)
     fun remove(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.remove(perLengthSequenceImpedance)
@@ -328,11 +334,17 @@ class NetworkService : BaseService("network") {
     fun add(ratioTapChanger: RatioTapChanger): Boolean = super.add(ratioTapChanger)
     fun remove(ratioTapChanger: RatioTapChanger): Boolean = super.remove(ratioTapChanger)
 
+    fun add(reactiveCapabilityCurve: ReactiveCapabilityCurve): Boolean = super.add(reactiveCapabilityCurve)
+    fun remove(reactiveCapabilityCurve: ReactiveCapabilityCurve): Boolean = super.remove(reactiveCapabilityCurve)
+
     fun add(recloser: Recloser): Boolean = super.add(recloser)
     fun remove(recloser: Recloser): Boolean = super.remove(recloser)
 
     fun add(seriesCompensator: SeriesCompensator): Boolean = super.add(seriesCompensator)
     fun remove(seriesCompensator: SeriesCompensator): Boolean = super.remove(seriesCompensator)
+
+    fun add(synchronousMachine: SynchronousMachine): Boolean = super.add(synchronousMachine)
+    fun remove(synchronousMachine: SynchronousMachine): Boolean = super.remove(synchronousMachine)
 
     fun add(tapChangerControl: TapChangerControl): Boolean = super.add(tapChangerControl)
     fun remove(tapChangerControl: TapChangerControl): Boolean = super.remove(tapChangerControl)

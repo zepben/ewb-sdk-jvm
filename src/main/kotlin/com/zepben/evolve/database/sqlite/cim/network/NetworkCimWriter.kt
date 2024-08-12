@@ -1600,6 +1600,36 @@ class NetworkCimWriter(
     }
 
     /**
+     * Save the [GroundingImpedance] fields to [TableGroundingImpedances].
+     *
+     * @param groundingImpedance The [GroundingImpedance] instance to write to the database.
+     *
+     * @return true if the [GroundingImpedance] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(groundingImpedance: GroundingImpedance): Boolean {
+        val table = databaseTables.getTable<TableGroundingImpedances>()
+        val insert = databaseTables.getInsert<TableGroundingImpedances>()
+
+        insert.setNullableDouble(table.X.queryIndex, groundingImpedance.x)
+
+        return saveEarthFaultCompensator(table, insert, groundingImpedance, "ground disconnector")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveEarthFaultCompensator(
+        table: TableEarthFaultCompensators,
+        insert: PreparedStatement,
+        earthFaultCompensator: EarthFaultCompensator,
+        description: String
+    ): Boolean {
+        insert.setNullableDouble(table.R.queryIndex, earthFaultCompensator.r)
+
+        return saveConductingEquipment(table, insert, earthFaultCompensator, description)
+    }
+
+    /**
      * Save the [GroundDisconnector] fields to [TableGroundDisconnectors].
      *
      * @param groundDisconnector The [GroundDisconnector] instance to write to the database.
@@ -1732,6 +1762,24 @@ class NetworkCimWriter(
         insert.setNullableDouble(table.G0CH.queryIndex, perLengthSequenceImpedance.g0ch)
 
         return savePerLengthImpedance(table, insert, perLengthSequenceImpedance, "per length sequence impedance")
+    }
+
+    /**
+     * Save the [PetersenCoil] fields to [TablePetersenCoils].
+     *
+     * @param petersenCoil The [PetersenCoil] instance to write to the database.
+     *
+     * @return true if the [PetersenCoil] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(petersenCoil: PetersenCoil): Boolean {
+        val table = databaseTables.getTable<TablePetersenCoils>()
+        val insert = databaseTables.getInsert<TablePetersenCoils>()
+
+        insert.setNullableDouble(table.X_GROUND_NOMINAL.queryIndex, petersenCoil.xGroundNominal)
+
+        return saveEarthFaultCompensator(table, insert, petersenCoil, "petersen coil")
     }
 
     /**
@@ -2000,6 +2048,102 @@ class NetworkCimWriter(
         insert.setNullableString(table.TAP_CHANGER_CONTROL_MRID.queryIndex, tapChanger.tapChangerControl?.mRID)
 
         return savePowerSystemResource(table, insert, tapChanger, description)
+    }
+
+    /**
+     * Save the [SynchronousMachine] fields to [TableSynchronousMachines].
+     *
+     * @param synchronousMachine The [SynchronousMachine] instance to write to the database.
+     *
+     * @return true if the [SynchronousMachine] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(synchronousMachine: SynchronousMachine): Boolean {
+        val table = databaseTables.getTable<TableSynchronousMachines>()
+        val insert = databaseTables.getInsert<TableSynchronousMachines>()
+        var status = synchronousMachine.curves.isEmpty()
+
+        insert.setNullableDouble(table.BASE_Q.queryIndex, synchronousMachine.baseQ)
+        insert.setNullableInt(table.CONDENSER_P.queryIndex, synchronousMachine.condenserP)
+        insert.setNullableBoolean(table.EARTHING.queryIndex, synchronousMachine.earthing)
+        insert.setNullableDouble(table.EARTHING_STAR_POINT_R.queryIndex, synchronousMachine.earthingStarPointR)
+        insert.setNullableDouble(table.EARTHING_STAR_POINT_X.queryIndex, synchronousMachine.earthingStarPointX)
+        insert.setNullableDouble(table.IKK.queryIndex, synchronousMachine.ikk)
+        insert.setNullableDouble(table.MAX_Q.queryIndex, synchronousMachine.maxQ)
+        insert.setNullableInt(table.MAX_U.queryIndex, synchronousMachine.maxU)
+        insert.setNullableDouble(table.MIN_Q.queryIndex, synchronousMachine.minQ)
+        insert.setNullableInt(table.MIN_U.queryIndex, synchronousMachine.minU)
+        insert.setNullableDouble(table.MU.queryIndex, synchronousMachine.mu)
+        insert.setNullableDouble(table.R.queryIndex, synchronousMachine.r)
+        insert.setNullableDouble(table.R0.queryIndex, synchronousMachine.r0)
+        insert.setNullableDouble(table.R2.queryIndex, synchronousMachine.r2)
+        insert.setNullableDouble(table.SAT_DIRECT_SUBTRANS_X.queryIndex, synchronousMachine.satDirectSubtransX)
+        insert.setNullableDouble(table.SAT_DIRECT_SYNC_X.queryIndex, synchronousMachine.satDirectSyncX)
+        insert.setNullableDouble(table.SAT_DIRECT_TRANS_X.queryIndex, synchronousMachine.satDirectTransX)
+        insert.setNullableDouble(table.X0.queryIndex, synchronousMachine.x0)
+        insert.setNullableDouble(table.X2.queryIndex, synchronousMachine.x2)
+        insert.setNullableString(table.TYPE.queryIndex, synchronousMachine.type.name)
+        insert.setNullableString(table.OPERATING_MODE.queryIndex, synchronousMachine.operatingMode.name)
+
+        synchronousMachine.curves.forEach { rcc ->
+            status = saveAssociation(synchronousMachine, rcc)
+        }
+
+        return status and saveRotatingMachine(table, insert, synchronousMachine, "synchronous machine")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveRotatingMachine(table: TableRotatingMachines, insert: PreparedStatement, rotatingMachine: RotatingMachine, description: String): Boolean {
+        insert.setNullableDouble(table.RATED_POWER_FACTOR.queryIndex, rotatingMachine.ratedPowerFactor)
+        insert.setNullableDouble(table.RATED_S.queryIndex, rotatingMachine.ratedS)
+        insert.setNullableDouble(table.RATED_U.queryIndex, rotatingMachine.ratedU)
+        insert.setNullableDouble(table.P.queryIndex, rotatingMachine.p)
+        insert.setNullableDouble(table.Q.queryIndex, rotatingMachine.q)
+
+        return saveRegulatingCondEq(table, insert, rotatingMachine, description)
+    }
+
+    /**
+     * Save the [ReactiveCapabilityCurve] fields to [TableReactiveCapabilityCurves].
+     *
+     * @param reactiveCapabilityCurve The [ReactiveCapabilityCurve] instance to write to the database.
+     *
+     * @return true if the [ReactiveCapabilityCurve] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+
+
+    @Throws(SQLException::class)
+    fun save(reactiveCapabilityCurve: ReactiveCapabilityCurve): Boolean {
+        val table = databaseTables.getTable<TableReactiveCapabilityCurves>()
+        val insert = databaseTables.getInsert<TableReactiveCapabilityCurves>()
+
+        return saveCurve(table, insert, reactiveCapabilityCurve, "reactive capability curve")
+    }
+
+    @Throws(SQLException::class)
+    fun saveCurve(table: TableCurves, insert: PreparedStatement, curve: Curve, description: String): Boolean {
+        var status = true
+        curve.data.forEach { curveData ->
+            status = status and saveCurveData(curve, curveData)
+        }
+
+        return status and saveIdentifiedObject(table, insert, curve, description)
+    }
+
+    @Throws(SQLException::class)
+    private fun saveCurveData(curve: Curve, curveData: CurveData): Boolean {
+        val table = databaseTables.getTable<TableCurveData>()
+        val insert = databaseTables.getInsert<TableCurveData>()
+
+        insert.setNullableString(table.CURVE_MRID.queryIndex, curve.mRID)
+        insert.setNullableFloat(table.X_VALUE.queryIndex, curveData.getXValue())
+        insert.setNullableFloat(table.Y1_VALUE.queryIndex, curveData.getY1Value())
+        insert.setNullableFloat(table.Y2_VALUE.queryIndex, curveData.getY2Value())
+        insert.setNullableFloat(table.Y3_VALUE.queryIndex, curveData.getY3Value())
+
+        return insert.tryExecuteSingleUpdate("curve data")
     }
 
     /**
@@ -2276,6 +2420,17 @@ class NetworkCimWriter(
         insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
 
         return insert.tryExecuteSingleUpdate("protection relay function to protection relay function association")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveAssociation(synchronousMachine: SynchronousMachine, reactiveCapabilityCurve: ReactiveCapabilityCurve): Boolean {
+        val table = databaseTables.getTable<TableSynchronousMachineReactiveCapabilityCurves>()
+        val insert = databaseTables.getInsert<TableSynchronousMachineReactiveCapabilityCurves>()
+
+        insert.setString(table.SYNCHRONOUS_MACHINE_MRID.queryIndex, synchronousMachine.mRID)
+        insert.setString(table.REACTIVE_CAPABILITY_CURVE_MRID.queryIndex, reactiveCapabilityCurve.mRID)
+
+        return insert.tryExecuteSingleUpdate("synchronous machine to reactivity curve")
     }
 
     private fun EquipmentContainer.shouldExportContainerContents(): Boolean = when (this) {

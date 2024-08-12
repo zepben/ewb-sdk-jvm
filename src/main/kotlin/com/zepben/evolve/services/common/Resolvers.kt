@@ -507,4 +507,7 @@ object Resolvers {
     fun assetInfo(protectionRelayFunction: ProtectionRelayFunction): BoundReferenceResolver<ProtectionRelayFunction, RelayInfo> =
         BoundReferenceResolver(protectionRelayFunction, ProtectionRelayFunctionToRelayInfoResolver, null)
 
+    @JvmStatic
+    fun reactiveCapabilityCurve(synchronousMachine: SynchronousMachine): BoundReferenceResolver<SynchronousMachine, ReactiveCapabilityCurve> =
+        BoundReferenceResolver(synchronousMachine, SynchronousMachineToReactiveCapabilityCurveResolver, null)
 }

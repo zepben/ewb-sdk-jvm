@@ -1018,8 +1018,12 @@ internal class NetworkConsumerClientTest {
                 isSeriesCompensator = { seriesCompensator = it.toPb() },
                 isGround = { ground = it.toPb() },
                 isGroundDisconnector = { groundDisconnector = it.toPb() },
+                isGroundingImpedance = { groundingImpedance = it.toPb() },
+                isPetersenCoil = { petersenCoil = it.toPb() },
                 isProtectionRelayScheme = { protectionRelayScheme = it.toPb() },
                 isProtectionRelaySystem = { protectionRelaySystem = it.toPb() },
+                isReactiveCapabilityCurve = { reactiveCapabilityCurve = it.toPb() },
+                isSynchronousMachine = { synchronousMachine = it.toPb() },
                 isVoltageRelay = { voltageRelay = it.toPb() },
                 isDistanceRelay = { distanceRelay = it.toPb() },
             )

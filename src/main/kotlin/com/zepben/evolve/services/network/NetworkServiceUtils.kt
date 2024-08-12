@@ -210,10 +210,14 @@ inline fun <R> whenNetworkServiceObject(
     isEvChargingUnit: (EvChargingUnit) -> R,
     isTapChangerControl: (TapChangerControl) -> R,
     isSeriesCompensator: (SeriesCompensator) -> R,
+    isSynchronousMachine: (SynchronousMachine) -> R,
     isGround: (Ground) -> R,
     isGroundDisconnector: (GroundDisconnector) -> R,
+    isGroundingImpedance: (GroundingImpedance) -> R,
+    isPetersenCoil: (PetersenCoil) -> R,
     isProtectionRelayScheme: (ProtectionRelayScheme) -> R,
     isProtectionRelaySystem: (ProtectionRelaySystem) -> R,
+    isReactiveCapabilityCurve: (ReactiveCapabilityCurve) -> R,
     isVoltageRelay: (VoltageRelay) -> R,
     isDistanceRelay: (DistanceRelay) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
@@ -290,10 +294,14 @@ inline fun <R> whenNetworkServiceObject(
     is EvChargingUnit -> isEvChargingUnit(identifiedObject)
     is TapChangerControl -> isTapChangerControl(identifiedObject)
     is SeriesCompensator -> isSeriesCompensator(identifiedObject)
+    is SynchronousMachine -> isSynchronousMachine(identifiedObject)
     is Ground -> isGround(identifiedObject)
     is GroundDisconnector -> isGroundDisconnector(identifiedObject)
+    is GroundingImpedance -> isGroundingImpedance(identifiedObject)
+    is PetersenCoil -> isPetersenCoil(identifiedObject)
     is ProtectionRelayScheme -> isProtectionRelayScheme(identifiedObject)
     is ProtectionRelaySystem -> isProtectionRelaySystem(identifiedObject)
+    is ReactiveCapabilityCurve -> isReactiveCapabilityCurve(identifiedObject)
     is VoltageRelay -> isVoltageRelay(identifiedObject)
     is DistanceRelay -> isDistanceRelay(identifiedObject)
     else -> isOther(identifiedObject)

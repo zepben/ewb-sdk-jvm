@@ -342,6 +342,7 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
     connectionCategory = "connectionCategory"
     ratedPower = 2000
     approvedInverterCapacity = 5000
+    phaseCode = PhaseCode.AN
 
     for (i in 0..1) {
         addEquipment(Junction().also {
@@ -971,8 +972,24 @@ fun Connector.fillFields(service: NetworkService, includeRuntime: Boolean = true
     return this
 }
 
+fun Curve.fillFields(service: NetworkService, includeRuntime: Boolean = true): Curve {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+
+    addCurveData(1f, 1f)
+
+    return this
+}
+
 fun Disconnector.fillFields(service: NetworkService, includeRuntime: Boolean = true): Disconnector {
     (this as Switch).fillFields(service, includeRuntime)
+    return this
+}
+
+fun EarthFaultCompensator.fillFields(service: NetworkService, includeRuntime: Boolean = true): EarthFaultCompensator {
+    (this as ConductingEquipment).fillFields(service, includeRuntime)
+
+    r = 1.0
+
     return this
 }
 
@@ -1084,6 +1101,14 @@ fun Ground.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
     return this
 }
 
+fun GroundingImpedance.fillFields(service: NetworkService, includeRuntime: Boolean = true): GroundingImpedance {
+    (this as EarthFaultCompensator).fillFields(service, includeRuntime)
+
+    x = 1.0
+
+    return this
+}
+
 fun GroundDisconnector.fillFields(service: NetworkService, includeRuntime: Boolean = true): GroundDisconnector {
     (this as Switch).fillFields(service, includeRuntime)
     return this
@@ -1141,6 +1166,14 @@ fun PerLengthSequenceImpedance.fillFields(service: NetworkService, includeRuntim
     x0 = 6.6
     b0ch = 7.7
     g0ch = 8.8
+
+    return this
+}
+
+fun PetersenCoil.fillFields(service: NetworkService, includeRuntime: Boolean = true): PetersenCoil {
+    (this as EarthFaultCompensator).fillFields(service, includeRuntime)
+
+    xGroundNominal = 1.0
 
     return this
 }
@@ -1213,6 +1246,12 @@ fun RatioTapChanger.fillFields(service: NetworkService, includeRuntime: Boolean 
     return this
 }
 
+fun ReactiveCapabilityCurve.fillFields(service: NetworkService, includeRuntime: Boolean = true): ReactiveCapabilityCurve {
+    (this as Curve).fillFields(service, includeRuntime)
+
+    return this
+}
+
 fun Recloser.fillFields(service: NetworkService, includeRuntime: Boolean = true): Recloser {
     (this as ProtectedSwitch).fillFields(service, includeRuntime)
     return this
@@ -1241,6 +1280,18 @@ fun RegulatingControl.fillFields(service: NetworkService, includeRuntime: Boolea
     ratedCurrent = 10.0
     terminal = Terminal().also { service.add(it) }
     addRegulatingCondEq(PowerElectronicsConnection().also { it.regulatingControl = this; service.add(it) })
+
+    return this
+}
+
+fun RotatingMachine.fillFields(service: NetworkService, includeRuntime: Boolean = true): RotatingMachine {
+    (this as RegulatingCondEq).fillFields(service, includeRuntime)
+
+    ratedPowerFactor = 1.1
+    ratedS = 2.2
+    ratedU = 3.3
+    p = 4.4
+    q = 5.5
 
     return this
 }
@@ -1282,6 +1333,34 @@ fun Switch.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
     // when unganged support is added to protobuf
     //    normalOpen = 2
     //    open = 3
+
+    return this
+}
+
+fun SynchronousMachine.fillFields(service: NetworkService, includeRuntime: Boolean = true): SynchronousMachine {
+    (this as RotatingMachine).fillFields(service, includeRuntime)
+
+    baseQ = 1.1
+    condenserP = 2
+    earthing = false
+    earthingStarPointR = 3.3
+    earthingStarPointX = 4.4
+    ikk = 5.5
+    maxQ = 6.6
+    maxU = 7
+    minQ = 8.8
+    minU = 9
+    mu = 10.10
+    r = 11.11
+    r0 = 12.12
+    r2 = 13.13
+    satDirectSubtransX = 14.14
+    satDirectSyncX = 15.15
+    satDirectTransX = 16.16
+    x0 = 17.17
+    x2 = 18.18
+    type = SynchronousMachineKind.generatorOrMotor
+    operatingMode = SynchronousMachineKind.generator
 
     return this
 }

@@ -15,10 +15,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableAssetOwners
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TablePoles
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableStreetlights
-import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableLocationStreetAddresses
-import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableLocations
-import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableOrganisations
-import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TablePositionPoints
+import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
@@ -69,6 +66,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableCircuitsTerminals(),
             TableConnectivityNodes(),
             TableControls(),
+            TableCurveData(),
             TableCurrentRelays(),
             TableCurrentTransformerInfo(),
             TableCurrentTransformers(),
@@ -90,6 +88,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableGeographicalRegions(),
             TableGrounds(),
             TableGroundDisconnectors(),
+            TableGroundingImpedances(),
             TableJumpers(),
             TableJunctions(),
             TableLinearShuntCompensators(),
@@ -106,6 +105,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableOrganisations(),
             TableOverheadWireInfo(),
             TablePerLengthSequenceImpedances(),
+            TablePetersenCoils(),
             TablePhotoVoltaicUnits(),
             TablePoles(),
             TablePositionPoints(),
@@ -124,8 +124,10 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableProtectionRelayFunctionsSensors(),
             TableProtectionRelaySchemes(),
             TableProtectionRelaySchemesProtectionRelayFunctions(),
+            TableSynchronousMachineReactiveCapabilityCurves(),
             TableProtectionRelaySystems(),
             TableRatioTapChangers(),
+            TableReactiveCapabilityCurves(),
             TableReclosers(),
             TableRecloseDelays(),
             TableRelayInfo(),
@@ -139,6 +141,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableSubGeographicalRegions(),
             TableSubstations(),
             TableSwitchInfo(),
+            TableSynchronousMachines(),
             TableTapChangerControls(),
             TableTerminals(),
             TableTransformerEndInfo(),

@@ -464,6 +464,10 @@ internal object ProtectionRelayFunctionToRelayInfoResolver : ReferenceResolver<P
     ProtectionRelayFunction::class, RelayInfo::class, ProtectionRelayFunction::assetInfo.setter
 )
 
+internal object SynchronousMachineToReactiveCapabilityCurveResolver : ReferenceResolver<SynchronousMachine, ReactiveCapabilityCurve> by KReferenceResolver(
+    SynchronousMachine::class, ReactiveCapabilityCurve::class, SynchronousMachine::addCurve
+)
+
 //-------------------------------------------//
 
 class KReferenceResolver<T : IdentifiedObject, R : IdentifiedObject>(

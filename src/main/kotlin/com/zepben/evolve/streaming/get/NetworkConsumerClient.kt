@@ -633,6 +633,10 @@ class NetworkConsumerClient(
             PROTECTIONRELAYSYSTEM -> extractResult(io.protectionRelaySystem.mRID()) { addFromPb(io.protectionRelaySystem) }
             VOLTAGERELAY -> extractResult(io.voltageRelay.mRID()) { addFromPb(io.voltageRelay) }
             DISTANCERELAY -> extractResult(io.distanceRelay.mRID()) { addFromPb(io.distanceRelay) }
+            REACTIVECAPABILITYCURVE -> extractResult(io.reactiveCapabilityCurve.mRID()) { addFromPb(io.reactiveCapabilityCurve) }
+            SYNCHRONOUSMACHINE -> extractResult(io.synchronousMachine.mRID()) { addFromPb(io.synchronousMachine) }
+            GROUNDINGIMPEDANCE -> extractResult(io.groundingImpedance.mRID()) { addFromPb(io.groundingImpedance) }
+            PETERSENCOIL -> extractResult(io.petersenCoil.mRID()) { addFromPb(io.petersenCoil) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )

@@ -48,6 +48,7 @@ import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerFunc
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.PotentialTransformerKind
 import com.zepben.protobuf.cim.iec61970.base.wires.PhaseShuntConnectionKind
 import com.zepben.protobuf.cim.iec61970.base.wires.SinglePhaseKind
+import com.zepben.protobuf.cim.iec61970.base.wires.SynchronousMachineKind
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerCoolingType
 import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
@@ -98,6 +99,8 @@ import com.zepben.protobuf.cim.iec61970.base.core.BaseVoltage as PBBaseVoltage
 import com.zepben.protobuf.cim.iec61970.base.core.ConductingEquipment as PBConductingEquipment
 import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNode as PBConnectivityNode
 import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNodeContainer as PBConnectivityNodeContainer
+import com.zepben.protobuf.cim.iec61970.base.core.Curve as PBCurve
+import com.zepben.protobuf.cim.iec61970.base.core.CurveData as PBCurveData
 import com.zepben.protobuf.cim.iec61970.base.core.Equipment as PBEquipment
 import com.zepben.protobuf.cim.iec61970.base.core.EquipmentContainer as PBEquipmentContainer
 import com.zepben.protobuf.cim.iec61970.base.core.Feeder as PBFeeder
@@ -133,6 +136,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSect
 import com.zepben.protobuf.cim.iec61970.base.wires.Conductor as PBConductor
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
 import com.zepben.protobuf.cim.iec61970.base.wires.Disconnector as PBDisconnector
+import com.zepben.protobuf.cim.iec61970.base.wires.EarthFaultCompensator as PBEarthFaultCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConnection as PBEnergyConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConsumer as PBEnergyConsumer
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConsumerPhase as PBEnergyConsumerPhase
@@ -141,6 +145,8 @@ import com.zepben.protobuf.cim.iec61970.base.wires.EnergySourcePhase as PBEnergy
 import com.zepben.protobuf.cim.iec61970.base.wires.Fuse as PBFuse
 import com.zepben.protobuf.cim.iec61970.base.wires.Ground as PBGround
 import com.zepben.protobuf.cim.iec61970.base.wires.GroundDisconnector as PBGroundDisconnector
+import com.zepben.protobuf.cim.iec61970.base.wires.GroundingImpedance as PBGroundingImpedance
+import com.zepben.protobuf.cim.iec61970.base.wires.PetersenCoil as PBPetersenCoil
 import com.zepben.protobuf.cim.iec61970.base.wires.Jumper as PBJumper
 import com.zepben.protobuf.cim.iec61970.base.wires.Junction as PBJunction
 import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
@@ -155,6 +161,9 @@ import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTr
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformerEnd as PBPowerTransformerEnd
 import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch as PBProtectedSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.RatioTapChanger as PBRatioTapChanger
+import com.zepben.protobuf.cim.iec61970.base.wires.RotatingMachine as PBRotatingMachine
+import com.zepben.protobuf.cim.iec61970.base.wires.ReactiveCapabilityCurve as PBReactiveCapabilityCurve
+import com.zepben.protobuf.cim.iec61970.base.wires.SynchronousMachine as PBSynchronousMachine
 import com.zepben.protobuf.cim.iec61970.base.wires.Recloser as PBRecloser
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingCondEq as PBRegulatingCondEq
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingControl as PBRegulatingControl
@@ -536,6 +545,20 @@ fun toPb(cim: ConnectivityNode, pb: PBConnectivityNode.Builder): PBConnectivityN
 fun toPb(cim: ConnectivityNodeContainer, pb: PBConnectivityNodeContainer.Builder): PBConnectivityNodeContainer.Builder =
     pb.apply { toPb(cim, psrBuilder) }
 
+fun toPb(cim: Curve, pb: PBCurve.Builder): PBCurve.Builder =
+    pb.apply {
+        cim.data.forEachIndexed { i, data -> addCurveDataBuilder(i).apply { toPb(data, this) } }
+        toPb(cim, ioBuilder)
+    }
+
+fun toPb(cim: CurveData, pb: PBCurveData.Builder): PBCurveData.Builder =
+    pb.apply {
+        xvalue = cim.getXValue()
+        y1Value = cim.getY1Value()
+        cim.getY2Value()?.let { y2Value = it }
+        cim.getY3Value()?.let { y3Value = it }
+    }
+
 fun toPb(cim: Equipment, pb: PBEquipment.Builder): PBEquipment.Builder =
     pb.apply {
         inService = cim.inService
@@ -857,6 +880,12 @@ fun toPb(cim: Connector, pb: PBConnector.Builder): PBConnector.Builder =
 fun toPb(cim: Disconnector, pb: PBDisconnector.Builder): PBDisconnector.Builder =
     pb.apply { toPb(cim, swBuilder) }
 
+fun toPb(cim: EarthFaultCompensator, pb: PBEarthFaultCompensator.Builder): PBEarthFaultCompensator.Builder =
+    pb.apply {
+        r = cim.r ?: UNKNOWN_DOUBLE
+        toPb(cim, ceBuilder)
+    }
+
 fun toPb(cim: EnergyConnection, pb: PBEnergyConnection.Builder): PBEnergyConnection.Builder =
     pb.apply { toPb(cim, ceBuilder) }
 
@@ -937,6 +966,18 @@ fun toPb(cim: Ground, pb: PBGround.Builder): PBGround.Builder =
 
 fun toPb(cim: GroundDisconnector, pb: PBGroundDisconnector.Builder): PBGroundDisconnector.Builder =
     pb.apply { toPb(cim, swBuilder) }
+
+fun toPb(cim: GroundingImpedance, pb: PBGroundingImpedance.Builder): PBGroundingImpedance.Builder =
+    pb.apply {
+        x = cim.x ?: UNKNOWN_DOUBLE
+        toPb(cim, efcBuilder)
+    }
+
+fun toPb(cim: PetersenCoil, pb: PBPetersenCoil.Builder): PBPetersenCoil.Builder =
+    pb.apply {
+        xGroundNominal = cim.xGroundNominal ?: UNKNOWN_DOUBLE
+        toPb(cim, efcBuilder)
+    }
 
 fun toPb(cim: Jumper, pb: PBJumper.Builder): PBJumper.Builder =
     pb.apply { toPb(cim, swBuilder) }
@@ -1055,6 +1096,16 @@ fun toPb(cim: PowerTransformerEnd, pb: PBPowerTransformerEnd.Builder): PBPowerTr
         toPb(cim, teBuilder)
     }
 
+fun toPb(cim: RotatingMachine, pb: PBRotatingMachine.Builder): PBRotatingMachine.Builder =
+    pb.apply {
+        ratedPowerFactor = cim.ratedPowerFactor ?: UNKNOWN_DOUBLE
+        ratedS = cim.ratedS ?: UNKNOWN_DOUBLE
+        ratedU = cim.ratedU ?: UNKNOWN_DOUBLE
+        p = cim.p ?: UNKNOWN_DOUBLE
+        q = cim.q ?: UNKNOWN_DOUBLE
+        toPb(cim, rceBuilder)
+    }
+
 fun toPb(cim: SeriesCompensator, pb: PBSeriesCompensator.Builder): PBSeriesCompensator.Builder =
     pb.apply {
         r = cim.r ?: UNKNOWN_DOUBLE
@@ -1064,6 +1115,33 @@ fun toPb(cim: SeriesCompensator, pb: PBSeriesCompensator.Builder): PBSeriesCompe
         varistorRatedCurrent = cim.varistorRatedCurrent ?: UNKNOWN_INT
         varistorVoltageThreshold = cim.varistorVoltageThreshold ?: UNKNOWN_INT
         toPb(cim, ceBuilder)
+    }
+
+fun toPb(cim: SynchronousMachine, pb: PBSynchronousMachine.Builder): PBSynchronousMachine.Builder =
+    pb.apply {
+        baseQ = cim.baseQ ?: UNKNOWN_DOUBLE
+        condenserP = cim.condenserP ?: UNKNOWN_INT
+        cim.earthing?.let { earthing = it }
+        earthingStarPointR = cim.earthingStarPointR ?: UNKNOWN_DOUBLE
+        earthingStarPointX = cim.earthingStarPointX ?: UNKNOWN_DOUBLE
+        ikk = cim.ikk ?: UNKNOWN_DOUBLE
+        maxQ = cim.maxQ ?: UNKNOWN_DOUBLE
+        maxU = cim.maxU ?: UNKNOWN_INT
+        minQ = cim.minQ ?: UNKNOWN_DOUBLE
+        minU = cim.minU ?: UNKNOWN_INT
+        mu = cim.mu ?: UNKNOWN_DOUBLE
+        r = cim.r ?: UNKNOWN_DOUBLE
+        r0 = cim.r0 ?: UNKNOWN_DOUBLE
+        r2 = cim.r2 ?: UNKNOWN_DOUBLE
+        satDirectSubtransX = cim.satDirectSubtransX ?: UNKNOWN_DOUBLE
+        satDirectSyncX = cim.satDirectSyncX ?: UNKNOWN_DOUBLE
+        satDirectTransX = cim.satDirectTransX ?: UNKNOWN_DOUBLE
+        x0 = cim.x0 ?: UNKNOWN_DOUBLE
+        x2 = cim.x2 ?: UNKNOWN_DOUBLE
+        type = SynchronousMachineKind.Enum.valueOf(cim.type.name)
+        operatingMode = SynchronousMachineKind.Enum.valueOf(cim.operatingMode.name)
+
+        toPb(cim, rmBuilder)
     }
 
 fun toPb(cim: TransformerEndRatedS): PBTransformerEndRatedS.Builder =
@@ -1084,6 +1162,11 @@ fun toPb(cim: RatioTapChanger, pb: PBRatioTapChanger.Builder): PBRatioTapChanger
         cim.transformerEnd?.let { transformerEndMRID = it.mRID } ?: clearTransformerEndMRID()
         stepVoltageIncrement = cim.stepVoltageIncrement ?: UNKNOWN_DOUBLE
         toPb(cim, tcBuilder)
+    }
+
+fun toPb(cim: ReactiveCapabilityCurve, pb: PBReactiveCapabilityCurve.Builder): PBReactiveCapabilityCurve.Builder =
+    pb.apply {
+        toPb(cim, cBuilder)
     }
 
 fun toPb(cim: Recloser, pb: PBRecloser.Builder): PBRecloser.Builder =
@@ -1201,6 +1284,8 @@ fun EnergySourcePhase.toPb(): PBEnergySourcePhase = toPb(this, PBEnergySourcePha
 fun Fuse.toPb(): PBFuse = toPb(this, PBFuse.newBuilder()).build()
 fun Ground.toPb(): PBGround = toPb(this, PBGround.newBuilder()).build()
 fun GroundDisconnector.toPb(): PBGroundDisconnector = toPb(this, PBGroundDisconnector.newBuilder()).build()
+fun GroundingImpedance.toPb(): PBGroundingImpedance = toPb(this, PBGroundingImpedance.newBuilder()).build()
+fun PetersenCoil.toPb(): PBPetersenCoil = toPb(this, PBPetersenCoil.newBuilder()).build()
 fun Jumper.toPb(): PBJumper = toPb(this, PBJumper.newBuilder()).build()
 fun Junction.toPb(): PBJunction = toPb(this, PBJunction.newBuilder()).build()
 fun LinearShuntCompensator.toPb(): PBLinearShuntCompensator = toPb(this, PBLinearShuntCompensator.newBuilder()).build()
@@ -1211,8 +1296,10 @@ fun PowerElectronicsConnectionPhase.toPb(): PBPowerElectronicsConnectionPhase = 
 fun PowerTransformer.toPb(): PBPowerTransformer = toPb(this, PBPowerTransformer.newBuilder()).build()
 fun PowerTransformerEnd.toPb(): PBPowerTransformerEnd = toPb(this, PBPowerTransformerEnd.newBuilder()).build()
 fun RatioTapChanger.toPb(): PBRatioTapChanger = toPb(this, PBRatioTapChanger.newBuilder()).build()
+fun ReactiveCapabilityCurve.toPb(): PBReactiveCapabilityCurve = toPb(this, PBReactiveCapabilityCurve.newBuilder()).build()
 fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
 fun SeriesCompensator.toPb(): PBSeriesCompensator = toPb(this, PBSeriesCompensator.newBuilder()).build()
+fun SynchronousMachine.toPb(): PBSynchronousMachine = toPb(this, PBSynchronousMachine.newBuilder()).build()
 fun TapChangerControl.toPb(): PBTapChangerControl = toPb(this, PBTapChangerControl.newBuilder()).build()
 fun TransformerStarImpedance.toPb(): PBTransformerStarImpedance = toPb(this, PBTransformerStarImpedance.newBuilder()).build()
 

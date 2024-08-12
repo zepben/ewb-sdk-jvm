@@ -23,6 +23,17 @@
   * `PositionPoint` from a `Location`.
   * `DiagramObjectPoint` from a `DiagramObject`.
   * `RelaySetting` from a `ProtectionRelayFunction`.
+* Data Model change:
+  * Add PhaseCode variable to UsagePoint
+  * Added new classes:
+    * EarthFaultCompensator
+    * GroundingImpedance
+    * PetersenCoil
+    * RotatingMachine
+    * SynchronousMachine
+    * Curve
+    * CurveData
+    * ReactiveCapabilityCurve
 
 ### Enhancements
 * Added feature list in documentation.

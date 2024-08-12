@@ -425,6 +425,33 @@ class NetworkCimReader(
     // ###################
 
     /**
+     * Create a [setIdentifier] and populate its fields from [TableCurveData].
+     *
+     * @param table The database table to read the [setIdentifier] fields from.
+     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
+     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
+     *
+     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableCurveData, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val curveMRID = setIdentifier(resultSet.getString(table.CURVE_MRID.queryIndex))
+        val id = setIdentifier("$curveMRID-x-${resultSet.getFloat(table.X_VALUE.queryIndex)}")
+
+        val curve = service.getOrThrow<Curve>(curveMRID, "CurveData to curve association $id")
+
+        curve.addCurveData(
+            resultSet.getFloat(table.X_VALUE.queryIndex),
+            resultSet.getFloat(table.Y1_VALUE.queryIndex),
+            resultSet.getNullableFloat(table.Y2_VALUE.queryIndex),
+            resultSet.getNullableFloat(table.Y3_VALUE.queryIndex)
+        )
+
+        return true
+    }
+
+    /**
      * Create a [Location] and populate its fields from [TableLocations].
      *
      * @param table The database table to read the [Location] fields from.
@@ -676,6 +703,7 @@ class NetworkCimReader(
             connectionCategory = resultSet.getNullableString(table.CONNECTION_CATEGORY.queryIndex)
             ratedPower = resultSet.getNullableInt(table.RATED_POWER.queryIndex)
             approvedInverterCapacity = resultSet.getNullableInt(table.APPROVED_INVERTER_CAPACITY.queryIndex)
+            phaseCode = PhaseCode.valueOf(resultSet.getNullableString(table.PHASE_CODE.queryIndex) ?: "NONE")
         }
 
         return loadIdentifiedObject(usagePoint, table, resultSet) && service.addOrThrow(usagePoint)
@@ -1766,6 +1794,38 @@ class NetworkCimReader(
     }
 
     /**
+     * Create a [GroundingImpedance] and populate its fields from [TableGroundingImpedances].
+     *
+     * @param table The database table to read the [GroundingImpedance] fields from.
+     * @param resultSet The record in the database table containing the fields for this [GroundingImpedance].
+     * @param setIdentifier A callback to register the mRID of this [GroundingImpedance] for logging purposes.
+     *
+     * @return true if the [GroundingImpedance] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableGroundingImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val groundingImpedance = GroundingImpedance(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            x = resultSet.getNullableDouble(table.X.queryIndex)
+        }
+
+        return loadEarthFaultCompensator(groundingImpedance, table, resultSet) && service.addOrThrow(groundingImpedance)
+    }
+
+    @Throws(SQLException::class)
+    private fun loadEarthFaultCompensator(
+        earthFaultCompensator: EarthFaultCompensator,
+        table: TableEarthFaultCompensators,
+        resultSet: ResultSet
+    ): Boolean {
+        earthFaultCompensator.apply {
+            r = resultSet.getNullableDouble(table.R.queryIndex)
+        }
+
+        return loadConductingEquipment(earthFaultCompensator, table, resultSet)
+    }
+
+    /**
      * Create a [Jumper] and populate its fields from [TableJumpers].
      *
      * @param table The database table to read the [Jumper] fields from.
@@ -1863,6 +1923,25 @@ class NetworkCimReader(
         return loadPerLengthImpedance(perLengthSequenceImpedance, table, resultSet) && service.addOrThrow(
             perLengthSequenceImpedance
         )
+    }
+
+    /**
+     * Create a [PetersenCoil] and populate its fields from [TablePetersenCoils].
+     *
+     * @param table The database table to read the [PetersenCoil] fields from.
+     * @param resultSet The record in the database table containing the fields for this [PetersenCoil].
+     * @param setIdentifier A callback to register the mRID of this [PetersenCoil] for logging purposes.
+     *
+     * @return true if the [PetersenCoil] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TablePetersenCoils, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val petersencoil = PetersenCoil(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            xGroundNominal = resultSet.getNullableDouble(table.X_GROUND_NOMINAL.queryIndex)
+        }
+
+        return loadEarthFaultCompensator(petersencoil, table, resultSet) && service.addOrThrow(petersencoil)
     }
 
     /**
@@ -2062,6 +2141,33 @@ class NetworkCimReader(
     }
 
     /**
+     * Create a [ReactiveCapabilityCurve] and populate its fields from [TableReactiveCapabilityCurves].
+     *
+     * @param table The database table to read the [ReactiveCapabilityCurve] fields from.
+     * @param resultSet The record in the database table containing the fields for this [ReactiveCapabilityCurve].
+     * @param setIdentifier A callback to register the mRID of this [ReactiveCapabilityCurve] for logging purposes.
+     *
+     * @return true if the [ReactiveCapabilityCurve] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableReactiveCapabilityCurves, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val reactiveCapabilityCurve = ReactiveCapabilityCurve(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadCurve(reactiveCapabilityCurve, table, resultSet) && service.addOrThrow(reactiveCapabilityCurve)
+    }
+
+    @Throws(SQLException::class)
+    private fun loadCurve(
+        curve: Curve,
+        table: TableCurves,
+        resultSet: ResultSet
+    ): Boolean {
+
+        return loadIdentifiedObject(curve, table, resultSet)
+    }
+
+    /**
      * Create a [Recloser] and populate its fields from [TableReclosers].
      *
      * @param table The database table to read the [Recloser] fields from.
@@ -2187,6 +2293,61 @@ class NetworkCimReader(
         }
 
         return loadPowerSystemResource(tapChanger, table, resultSet)
+    }
+
+    /**
+     * Create a [SynchronousMachine] and populate its fields from [TableSynchronousMachines].
+     *
+     * @param table The database table to read the [SynchronousMachine] fields from.
+     * @param resultSet The record in the database table containing the fields for this [SynchronousMachine].
+     * @param setIdentifier A callback to register the mRID of this [SynchronousMachine] for logging purposes.
+     *
+     * @return true if the [SynchronousMachine] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableSynchronousMachines, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val synschronousMachine = SynchronousMachine(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            baseQ = resultSet.getNullableDouble(table.BASE_Q.queryIndex)
+            condenserP = resultSet.getNullableInt(table.CONDENSER_P.queryIndex)
+            earthing = resultSet.getNullableBoolean(table.EARTHING.queryIndex)
+            earthingStarPointR = resultSet.getNullableDouble(table.EARTHING_STAR_POINT_R.queryIndex)
+            earthingStarPointX = resultSet.getNullableDouble(table.EARTHING_STAR_POINT_X.queryIndex)
+            ikk = resultSet.getNullableDouble(table.IKK.queryIndex)
+            maxQ = resultSet.getNullableDouble(table.MAX_Q.queryIndex)
+            maxU = resultSet.getNullableInt(table.MAX_U.queryIndex)
+            minQ = resultSet.getNullableDouble(table.MIN_Q.queryIndex)
+            minU = resultSet.getNullableInt(table.MIN_U.queryIndex)
+            mu = resultSet.getNullableDouble(table.MU.queryIndex)
+            r = resultSet.getNullableDouble(table.R.queryIndex)
+            r0 = resultSet.getNullableDouble(table.R0.queryIndex)
+            r2 = resultSet.getNullableDouble(table.R2.queryIndex)
+            satDirectSubtransX = resultSet.getNullableDouble(table.SAT_DIRECT_SUBTRANS_X.queryIndex)
+            satDirectSyncX = resultSet.getNullableDouble(table.SAT_DIRECT_SYNC_X.queryIndex)
+            satDirectTransX = resultSet.getNullableDouble(table.SAT_DIRECT_TRANS_X.queryIndex)
+            x0 = resultSet.getNullableDouble(table.X0.queryIndex)
+            x2 = resultSet.getNullableDouble(table.X2.queryIndex)
+            type = SynchronousMachineKind.valueOf(resultSet.getString(table.TYPE.queryIndex))
+            operatingMode = SynchronousMachineKind.valueOf(resultSet.getString(table.OPERATING_MODE.queryIndex))
+        }
+
+        return loadRotatingMachine(synschronousMachine, table, resultSet) && service.addOrThrow(synschronousMachine)
+    }
+
+    @Throws(SQLException::class)
+    private fun loadRotatingMachine(
+        rotatingMachine: RotatingMachine,
+        table: TableRotatingMachines,
+        resultSet: ResultSet
+    ): Boolean {
+        rotatingMachine.apply {
+            ratedPowerFactor = resultSet.getNullableDouble(table.RATED_POWER_FACTOR.queryIndex)
+            ratedS = resultSet.getNullableDouble(table.RATED_S.queryIndex)
+            ratedU = resultSet.getNullableDouble(table.RATED_U.queryIndex)
+            p = resultSet.getNullableDouble(table.P.queryIndex)
+            q = resultSet.getNullableDouble(table.Q.queryIndex)
+        }
+        return loadRegulatingCondEq(rotatingMachine, table, resultSet)
     }
 
     /**
@@ -2654,6 +2815,33 @@ class NetworkCimReader(
 
         protectionRelayScheme.addFunction(protectionRelayFunction)
         protectionRelayFunction.addScheme(protectionRelayScheme)
+
+        return true
+    }
+
+    /**
+     * Create a [setIdentifier] and populate its fields from [TableSynchronousMachineReactiveCapabilityCurves].
+     *
+     * @param table The database table to read the [setIdentifier] fields from.
+     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
+     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
+     *
+     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableSynchronousMachineReactiveCapabilityCurves, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val synchronousMachineMRID = setIdentifier(resultSet.getString(table.SYNCHRONOUS_MACHINE_MRID.queryIndex))
+        setIdentifier("${synchronousMachineMRID}-to-UNKNOWN")
+
+        val curveMRID = resultSet.getString(table.REACTIVE_CAPABILITY_CURVE_MRID.queryIndex)
+        val id = setIdentifier("${synchronousMachineMRID}-to-${curveMRID}")
+
+        val typeNameAndMRID = "SynchronousMachine to ReactiveCapabilityCurve association $id"
+        val synchronousMachine = service.getOrThrow<SynchronousMachine>(synchronousMachineMRID, typeNameAndMRID)
+        val curve = service.getOrThrow<ReactiveCapabilityCurve>(curveMRID, typeNameAndMRID)
+
+        synchronousMachine.addCurve(curve)
 
         return true
     }

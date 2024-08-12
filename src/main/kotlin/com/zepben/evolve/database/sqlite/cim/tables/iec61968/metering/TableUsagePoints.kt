@@ -20,6 +20,7 @@ class TableUsagePoints : TableIdentifiedObjects() {
     val CONNECTION_CATEGORY: Column = Column(++columnIndex, "connection_category", "TEXT", NULL)
     val RATED_POWER: Column = Column(++columnIndex, "rated_power", "INTEGER", NULL)
     val APPROVED_INVERTER_CAPACITY: Column = Column(++columnIndex, "approved_inverter_capacity", "INTEGER", NULL)
+    val PHASE_CODE: Column = Column(++columnIndex, "phase_code", "TEXT", NULL)
 
     override val name: String = "usage_points"
 

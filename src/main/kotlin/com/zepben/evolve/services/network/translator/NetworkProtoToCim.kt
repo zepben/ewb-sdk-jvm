@@ -86,6 +86,7 @@ import com.zepben.protobuf.cim.iec61970.base.core.BaseVoltage as PBBaseVoltage
 import com.zepben.protobuf.cim.iec61970.base.core.ConductingEquipment as PBConductingEquipment
 import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNode as PBConnectivityNode
 import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNodeContainer as PBConnectivityNodeContainer
+import com.zepben.protobuf.cim.iec61970.base.core.Curve as PBCurve
 import com.zepben.protobuf.cim.iec61970.base.core.Equipment as PBEquipment
 import com.zepben.protobuf.cim.iec61970.base.core.EquipmentContainer as PBEquipmentContainer
 import com.zepben.protobuf.cim.iec61970.base.core.Feeder as PBFeeder
@@ -120,6 +121,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSect
 import com.zepben.protobuf.cim.iec61970.base.wires.Conductor as PBConductor
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
 import com.zepben.protobuf.cim.iec61970.base.wires.Disconnector as PBDisconnector
+import com.zepben.protobuf.cim.iec61970.base.wires.EarthFaultCompensator as PBEarthFaultCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConnection as PBEnergyConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConsumer as PBEnergyConsumer
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConsumerPhase as PBEnergyConsumerPhase
@@ -128,6 +130,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.EnergySourcePhase as PBEnergy
 import com.zepben.protobuf.cim.iec61970.base.wires.Fuse as PBFuse
 import com.zepben.protobuf.cim.iec61970.base.wires.Ground as PBGround
 import com.zepben.protobuf.cim.iec61970.base.wires.GroundDisconnector as PBGroundDisconnector
+import com.zepben.protobuf.cim.iec61970.base.wires.GroundingImpedance as PBGroundingImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.Jumper as PBJumper
 import com.zepben.protobuf.cim.iec61970.base.wires.Junction as PBJunction
 import com.zepben.protobuf.cim.iec61970.base.wires.Line as PBLine
@@ -136,18 +139,22 @@ import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBrea
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthImpedance as PBPerLengthImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthLineParameter as PBPerLengthLineParameter
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthSequenceImpedance as PBPerLengthSequenceImpedance
+import com.zepben.protobuf.cim.iec61970.base.wires.PetersenCoil as PBPetersenCoil
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnection as PBPowerElectronicsConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnectionPhase as PBPowerElectronicsConnectionPhase
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformerEnd as PBPowerTransformerEnd
 import com.zepben.protobuf.cim.iec61970.base.wires.ProtectedSwitch as PBProtectedSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.RatioTapChanger as PBRatioTapChanger
+import com.zepben.protobuf.cim.iec61970.base.wires.ReactiveCapabilityCurve as PBReactiveCapabilityCurve
 import com.zepben.protobuf.cim.iec61970.base.wires.Recloser as PBRecloser
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingCondEq as PBRegulatingCondEq
 import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingControl as PBRegulatingControl
+import com.zepben.protobuf.cim.iec61970.base.wires.RotatingMachine as PBRotatingMachine
 import com.zepben.protobuf.cim.iec61970.base.wires.SeriesCompensator as PBSeriesCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
+import com.zepben.protobuf.cim.iec61970.base.wires.SynchronousMachine as PBSynchronousMachine
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChangerControl as PBTapChangerControl
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerEnd as PBTransformerEnd
@@ -541,6 +548,14 @@ fun toCim(pb: PBConnectivityNode, networkService: NetworkService): ConnectivityN
 fun toCim(pb: PBConnectivityNodeContainer, cim: ConnectivityNodeContainer, networkService: NetworkService): ConnectivityNodeContainer =
     cim.apply { toCim(pb.psr, this, networkService) }
 
+fun toCim(pb: PBCurve, cim: Curve, networkService: NetworkService): Curve =
+    cim.apply {
+        pb.curveDataList.forEach {
+            addCurveData(CurveData(it.xvalue, it.y1Value, it.y2Value, it.y3Value))
+        }
+        toCim(pb.io, this, networkService)
+    }
+
 fun toCim(pb: PBEquipment, cim: Equipment, networkService: NetworkService): Equipment =
     cim.apply {
         inService = pb.inService
@@ -905,6 +920,12 @@ fun toCim(pb: PBDisconnector, networkService: NetworkService): Disconnector =
         toCim(pb.sw, this, networkService)
     }
 
+fun toCim(pb: PBEarthFaultCompensator, cim: EarthFaultCompensator, networkService: NetworkService): EarthFaultCompensator =
+    cim.apply {
+        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
+        toCim(pb.ce, this, networkService)
+    }
+
 fun toCim(pb: PBEnergyConnection, cim: EnergyConnection, networkService: NetworkService): EnergyConnection =
     cim.apply { toCim(pb.ce, this, networkService) }
 
@@ -988,6 +1009,12 @@ fun toCim(pb: PBGround, networkService: NetworkService): Ground =
         toCim(pb.ce, this, networkService)
     }
 
+fun toCim(pb: PBGroundingImpedance, networkService: NetworkService): GroundingImpedance =
+    GroundingImpedance(pb.mRID()).apply {
+        x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
+        toCim(pb.efc, this, networkService)
+    }
+
 fun toCim(pb: PBGroundDisconnector, networkService: NetworkService): GroundDisconnector =
     GroundDisconnector(pb.mRID()).apply {
         toCim(pb.sw, this, networkService)
@@ -1032,6 +1059,12 @@ fun toCim(pb: PBPerLengthSequenceImpedance, networkService: NetworkService): Per
         b0ch = pb.b0Ch.takeUnless { it == UNKNOWN_DOUBLE }
         g0ch = pb.g0Ch.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.pli, this, networkService)
+    }
+
+fun toCim(pb: PBPetersenCoil, networkService: NetworkService): PetersenCoil =
+    PetersenCoil(pb.mRID()).apply {
+        xGroundNominal = pb.xGroundNominal.takeUnless { it == UNKNOWN_DOUBLE }
+        toCim(pb.efc, this, networkService)
     }
 
 fun toCim(pb: PBPowerElectronicsConnection, networkService: NetworkService): PowerElectronicsConnection =
@@ -1138,6 +1171,11 @@ fun toCim(pb: PBRatioTapChanger, networkService: NetworkService): RatioTapChange
         toCim(pb.tc, this, networkService)
     }
 
+fun toCim(pb: PBReactiveCapabilityCurve, networkService: NetworkService): ReactiveCapabilityCurve =
+    ReactiveCapabilityCurve(pb.mRID()).apply {
+        toCim(pb.c, this, networkService)
+    }
+
 fun toCim(pb: PBRecloser, networkService: NetworkService): Recloser =
     Recloser(pb.mRID()).apply {
         toCim(pb.sw, this, networkService)
@@ -1169,6 +1207,16 @@ fun toCim(pb: PBRegulatingControl, cim: RegulatingControl, networkService: Netwo
         toCim(pb.psr, this, networkService)
     }
 
+fun toCim(pb: PBRotatingMachine, cim: RotatingMachine, networkService: NetworkService): RotatingMachine =
+    cim.apply {
+        ratedPowerFactor = pb.ratedPowerFactor.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedS = pb.ratedS.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedU = pb.ratedU.takeUnless { it == UNKNOWN_DOUBLE }
+        p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
+        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
+        toCim(pb.rce, this, networkService)
+    }
+
 fun toCim(pb: PBSeriesCompensator, networkService: NetworkService): SeriesCompensator =
     SeriesCompensator(pb.mRID()).apply {
         r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
@@ -1178,6 +1226,36 @@ fun toCim(pb: PBSeriesCompensator, networkService: NetworkService): SeriesCompen
         varistorRatedCurrent = pb.varistorRatedCurrent.takeUnless { it == UNKNOWN_INT }
         varistorVoltageThreshold = pb.varistorVoltageThreshold.takeUnless { it == UNKNOWN_INT }
         toCim(pb.ce, this, networkService)
+    }
+
+fun toCim(pb: PBSynchronousMachine, networkService: NetworkService): SynchronousMachine =
+    SynchronousMachine(pb.mRID()).apply {
+        pb.reactiveCapabilityCurveMRIDsList.forEach { reactiveCapabilityCurveMRID ->
+            networkService.resolveOrDeferReference(Resolvers.reactiveCapabilityCurve(this), reactiveCapabilityCurveMRID.mRID())
+        }
+        baseQ = pb.baseQ.takeUnless { it == UNKNOWN_DOUBLE }
+        condenserP = pb.condenserP.takeUnless { it == UNKNOWN_INT }
+        earthing = pb.earthing
+        earthingStarPointR = pb.earthingStarPointR.takeUnless { it == UNKNOWN_DOUBLE }
+        earthingStarPointX = pb.earthingStarPointX.takeUnless { it == UNKNOWN_DOUBLE }
+        ikk = pb.ikk.takeUnless { it == UNKNOWN_DOUBLE }
+        maxQ = pb.maxQ.takeUnless { it == UNKNOWN_DOUBLE }
+        maxU = pb.maxU.takeUnless { it == UNKNOWN_INT }
+        minQ = pb.minQ.takeUnless { it == UNKNOWN_DOUBLE }
+        minU = pb.minU.takeUnless { it == UNKNOWN_INT }
+        mu = pb.mu.takeUnless { it == UNKNOWN_DOUBLE }
+        r = pb.r.takeUnless { it == UNKNOWN_DOUBLE }
+        r0 = pb.r0.takeUnless { it == UNKNOWN_DOUBLE }
+        r2 = pb.r2.takeUnless { it == UNKNOWN_DOUBLE }
+        satDirectSubtransX = pb.satDirectSubtransX.takeUnless { it == UNKNOWN_DOUBLE }
+        satDirectSyncX = pb.satDirectSyncX.takeUnless { it == UNKNOWN_DOUBLE }
+        satDirectTransX = pb.satDirectTransX.takeUnless { it == UNKNOWN_DOUBLE }
+        x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
+        x2 = pb.x2.takeUnless { it == UNKNOWN_DOUBLE }
+
+        type = SynchronousMachineKind.valueOf(pb.type.name)
+        operatingMode = SynchronousMachineKind.valueOf(pb.operatingMode.name)
+        toCim(pb.rm, this, networkService)
     }
 
 fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: NetworkService): ShuntCompensator =
@@ -1266,19 +1344,23 @@ fun NetworkService.addFromPb(pb: PBEnergySource): EnergySource? = tryAddOrNull(t
 fun NetworkService.addFromPb(pb: PBEnergySourcePhase): EnergySourcePhase? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBFuse): Fuse? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBGround): Ground? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBGroundingImpedance): GroundingImpedance? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBGroundDisconnector): GroundDisconnector? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBJumper): Jumper? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBJunction): Junction? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensator? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLoadBreakSwitch): LoadBreakSwitch? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPerLengthSequenceImpedance): PerLengthSequenceImpedance? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBPetersenCoil): PetersenCoil? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPowerElectronicsConnection): PowerElectronicsConnection? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPowerElectronicsConnectionPhase): PowerElectronicsConnectionPhase? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPowerTransformer): PowerTransformer? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBReactiveCapabilityCurve): ReactiveCapabilityCurve? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBRecloser): Recloser? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBSeriesCompensator): SeriesCompensator? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBSynchronousMachine): SynchronousMachine? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTapChangerControl): TapChangerControl? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = tryAddOrNull(toCim(pb, this))
 
@@ -1423,19 +1505,23 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
     fun addFromPb(pb: PBEnergySourcePhase): EnergySourcePhase? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBFuse): Fuse? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBGround): Ground? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBGroundingImpedance): GroundingImpedance? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBGroundDisconnector): GroundDisconnector? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBJumper): Jumper? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBJunction): Junction? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensator? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBLoadBreakSwitch): LoadBreakSwitch? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPerLengthSequenceImpedance): PerLengthSequenceImpedance? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBPetersenCoil): PetersenCoil? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerElectronicsConnection): PowerElectronicsConnection? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerElectronicsConnectionPhase): PowerElectronicsConnectionPhase? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerTransformer): PowerTransformer? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBPowerTransformerEnd): PowerTransformerEnd? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRatioTapChanger): RatioTapChanger? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBReactiveCapabilityCurve): ReactiveCapabilityCurve? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBRecloser): Recloser? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBSeriesCompensator): SeriesCompensator? = networkService.addFromPb(pb)
+    fun addFromPb(pb: PBSynchronousMachine): SynchronousMachine? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTapChangerControl): TapChangerControl? = networkService.addFromPb(pb)
     fun addFromPb(pb: PBTransformerStarImpedance): TransformerStarImpedance? = networkService.addFromPb(pb)
 

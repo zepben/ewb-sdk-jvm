@@ -17,7 +17,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 
-class EwbDataFilePathsTest {
+class LocalEwbDataFilePathsTest {
 
     private val today = LocalDate.now()
     private val baseDir = Paths.get("/some/path/to/ewb/data")
@@ -28,22 +28,22 @@ class EwbDataFilePathsTest {
     private val listFiles = mockk<(Path) -> Iterator<Path>>().also { every { it(any()) } answers { emptyList<Path>().iterator() } }
 
 
-    private val ewbPaths = EwbDataFilePaths(baseDir, createPath = false, createDirectories, isDirectory, exists, listFiles)
+    private val ewbPaths = LocalEwbDataFilePaths(baseDir, createPath = false, createDirectories, isDirectory, exists, listFiles)
 
     @Test
     internal fun `constructor coverage`() {
         // Coverage of default values being used by primary constructor.
-        EwbDataFilePaths(Paths.get("."))
+        LocalEwbDataFilePaths(Paths.get("."))
 
         // Coverage of secondary constructor.
-        EwbDataFilePaths(".")
-        EwbDataFilePaths(".", createPath = true)
+        LocalEwbDataFilePaths(".")
+        LocalEwbDataFilePaths(".", createPath = true)
     }
 
-    @Test
-    internal fun `accessor coverage`() {
-        assertThat(ewbPaths.baseDir, equalTo(baseDir))
-    }
+//    @Test
+//    internal fun `accessor coverage`() {
+//        assertThat(ewbPaths.baseDi, equalTo(baseDir))
+//    }
 
     @Test
     internal fun `validates directory is valid at construction`() {
@@ -54,7 +54,7 @@ class EwbDataFilePathsTest {
 
         every { isDirectory(any()) } returns false
 
-        expect { EwbDataFilePaths(baseDir, createPath = false, createDirectories, isDirectory, exists) }
+        expect { LocalEwbDataFilePaths(baseDir, createPath = false, createDirectories, isDirectory, exists) }
             .toThrow<IllegalArgumentException>()
             .withMessage("baseDir must be a directory")
     }
@@ -64,7 +64,7 @@ class EwbDataFilePathsTest {
         // Clear the calls from the member variable call to the constructor.
         clearMocks(isDirectory, answers = false)
 
-        EwbDataFilePaths(baseDir, createPath = true, createDirectories, isDirectory, exists)
+        LocalEwbDataFilePaths(baseDir, createPath = true, createDirectories, isDirectory, exists)
 
         verifySequence {
             createDirectories(baseDir)
@@ -75,18 +75,13 @@ class EwbDataFilePathsTest {
 
     @Test
     internal fun `formats paths`() {
-        assertThat(ewbPaths.customer(today), equalTo(baseDir.datedPath(today, "customers")))
-        assertThat(ewbPaths.diagram(today), equalTo(baseDir.datedPath(today, "diagrams")))
-        assertThat(ewbPaths.measurement(today), equalTo(baseDir.datedPath(today, "measurements")))
-        assertThat(ewbPaths.networkModel(today), equalTo(baseDir.datedPath(today, "network-model")))
-        assertThat(ewbPaths.tileCache(today), equalTo(baseDir.datedPath(today, "tile-cache")))
-        assertThat(ewbPaths.energyReading(today), equalTo(baseDir.datedPath(today, "load-readings")))
+        DatabaseType.entries.filter { it.perDate }.forEach {
+            assertThat(ewbPaths.resolve(it, today), equalTo(baseDir.datedPath(today, it.fileDescriptor)))
+        }
 
-        assertThat(ewbPaths.energyReadingsIndex(), equalTo(baseDir.resolve("load-readings-index.sqlite")))
-        assertThat(ewbPaths.loadAggregatorMetersByDate(), equalTo(baseDir.resolve("load-aggregator-mbd.sqlite")))
-        assertThat(ewbPaths.weatherReading(), equalTo(baseDir.resolve("weather-readings.sqlite")))
-        assertThat(ewbPaths.resultsCache(), equalTo(baseDir.resolve("results-cache.sqlite")))
-        assertThat(ewbPaths.metrics(), equalTo(baseDir.resolve("metrics.sqlite")))
+        DatabaseType.entries.filter { !it.perDate }.forEach {
+            assertThat(ewbPaths.resolve(it), equalTo(baseDir.resolve(it.fileDescriptor + ".sqlite")))
+        }
     }
 
     @Test

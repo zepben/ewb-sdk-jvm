@@ -40,17 +40,17 @@ internal class LocationTest {
 
     @Test
     internal fun positionPoints() {
-        var pointNumber = 0.0
-        PrivateCollectionValidator.validate(
-            { Location() },
-            { PositionPoint(pointNumber, pointNumber++) },
+        PrivateCollectionValidator.validateOrdered(
+            ::Location,
+            { PositionPoint(it.toDouble(), it.toDouble()) },
+            Location::points,
             Location::numPoints,
             Location::getPoint,
             Location::forEachPoint,
             Location::addPoint,
             Location::addPoint,
             Location::removePoint,
-            null,
+            Location::removePoint,
             Location::clearPoints
         )
     }

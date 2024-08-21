@@ -73,7 +73,7 @@ class Customer @JvmOverloads constructor(mRID: String = "") : OrganisationRole(m
      * @param customerAgreement The [CustomerAgreement] to remove.
      * @return true if [customerAgreement] is removed from the collection.
      */
-    fun removeAgreement(customerAgreement: CustomerAgreement?): Boolean {
+    fun removeAgreement(customerAgreement: CustomerAgreement): Boolean {
         val ret = _customerAgreements?.remove(customerAgreement) == true
         if (_customerAgreements.isNullOrEmpty()) _customerAgreements = null
         return ret

@@ -51,7 +51,7 @@ abstract class CimDatabaseReader(
         logger.info("Ensuring all references resolved...")
         service.unresolvedReferences().forEach {
             throw IllegalStateException(
-                "Unresolved references found in ${service.name} service after load - this should not occur. Failing reference was from " +
+                "Unresolved references were found in ${service.name} service after load - this should not occur. Failing reference was from " +
                     "${it.from.typeNameAndMRID()} resolving ${it.resolver.toClass.simpleName} ${it.toMrid}"
             )
         }

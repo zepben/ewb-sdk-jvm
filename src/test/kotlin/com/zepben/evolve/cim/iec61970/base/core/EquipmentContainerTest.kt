@@ -30,12 +30,12 @@ internal class EquipmentContainerTest {
 
     @Test
     internal fun equipment() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : EquipmentContainer() {} },
-            { id, _ -> object : Equipment(id) {} },
+            { id -> object : Equipment(id) {} },
+            EquipmentContainer::equipment,
             EquipmentContainer::numEquipment,
             EquipmentContainer::getEquipment,
-            EquipmentContainer::equipment,
             EquipmentContainer::addEquipment,
             EquipmentContainer::removeEquipment,
             EquipmentContainer::clearEquipment
@@ -44,12 +44,12 @@ internal class EquipmentContainerTest {
 
     @Test
     internal fun currentEquipment() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : EquipmentContainer() {} },
-            { id, _ -> object : Equipment(id) {} },
+            { id -> object : Equipment(id) {} },
+            EquipmentContainer::currentEquipment,
             EquipmentContainer::numCurrentEquipment,
             EquipmentContainer::getCurrentEquipment,
-            EquipmentContainer::currentEquipment,
             EquipmentContainer::addCurrentEquipment,
             EquipmentContainer::removeCurrentEquipment,
             EquipmentContainer::clearCurrentEquipment

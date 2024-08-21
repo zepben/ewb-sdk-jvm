@@ -41,12 +41,12 @@ internal class CustomerAgreementTest {
 
     @Test
     internal fun pricingStructures() {
-        PrivateCollectionValidator.validate(
-            { CustomerAgreement() },
-            { id, _ -> PricingStructure(id) },
+        PrivateCollectionValidator.validateUnordered(
+            ::CustomerAgreement,
+            ::PricingStructure,
+            CustomerAgreement::pricingStructures,
             CustomerAgreement::numPricingStructures,
             CustomerAgreement::getPricingStructure,
-            CustomerAgreement::pricingStructures,
             CustomerAgreement::addPricingStructure,
             CustomerAgreement::removePricingStructure,
             CustomerAgreement::clearPricingStructures

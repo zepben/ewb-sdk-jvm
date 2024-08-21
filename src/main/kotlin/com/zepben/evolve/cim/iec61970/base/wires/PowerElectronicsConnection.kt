@@ -204,7 +204,7 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
         return this
     }
 
-    fun removeUnit(unit: PowerElectronicsUnit?): Boolean {
+    fun removeUnit(unit: PowerElectronicsUnit): Boolean {
         val ret = _powerElectronicsUnits?.remove(unit) == true
         if (_powerElectronicsUnits.isNullOrEmpty()) _powerElectronicsUnits = null
         return ret
@@ -245,7 +245,7 @@ class PowerElectronicsConnection @JvmOverloads constructor(mRID: String = "") : 
         return this
     }
 
-    fun removePhase(phase: PowerElectronicsConnectionPhase?): Boolean {
+    fun removePhase(phase: PowerElectronicsConnectionPhase): Boolean {
         val ret = _powerElectronicsConnectionPhases?.remove(phase) == true
         if (_powerElectronicsConnectionPhases.isNullOrEmpty()) _powerElectronicsConnectionPhases = null
         return ret

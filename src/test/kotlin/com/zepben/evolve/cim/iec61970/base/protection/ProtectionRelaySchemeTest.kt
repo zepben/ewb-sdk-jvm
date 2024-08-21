@@ -11,8 +11,8 @@ package com.zepben.evolve.cim.iec61970.base.protection
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
-import org.hamcrest.Matchers.*
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 
 internal class ProtectionRelaySchemeTest {
@@ -36,12 +36,12 @@ internal class ProtectionRelaySchemeTest {
 
     @Test
     internal fun functions() {
-        PrivateCollectionValidator.validate(
-            { ProtectionRelayScheme() },
-            { id, _ -> object : ProtectionRelayFunction(id) {} },
+        PrivateCollectionValidator.validateUnordered(
+            ::ProtectionRelayScheme,
+            { id -> object : ProtectionRelayFunction(id) {} },
+            ProtectionRelayScheme::functions,
             ProtectionRelayScheme::numFunctions,
             ProtectionRelayScheme::getFunction,
-            ProtectionRelayScheme::functions,
             ProtectionRelayScheme::addFunction,
             ProtectionRelayScheme::removeFunction,
             ProtectionRelayScheme::clearFunctions

@@ -63,12 +63,12 @@ internal class SubGeographicalRegionTest {
 
     @Test
     internal fun substations() {
-        PrivateCollectionValidator.validate(
-            { SubGeographicalRegion() },
-            { id, _ -> Substation(id) },
+        PrivateCollectionValidator.validateUnordered(
+            ::SubGeographicalRegion,
+            ::Substation,
+            SubGeographicalRegion::substations,
             SubGeographicalRegion::numSubstations,
             SubGeographicalRegion::getSubstation,
-            SubGeographicalRegion::substations,
             SubGeographicalRegion::addSubstation,
             SubGeographicalRegion::removeSubstation,
             SubGeographicalRegion::clearSubstations

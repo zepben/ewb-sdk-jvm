@@ -169,7 +169,7 @@ class PowerTransformer @JvmOverloads constructor(mRID: String = "") : Conducting
         return this
     }
 
-    fun removeEnd(end: PowerTransformerEnd?): Boolean {
+    fun removeEnd(end: PowerTransformerEnd): Boolean {
         val ret = _powerTransformerEnds.safeRemove(end)
         if (_powerTransformerEnds.isNullOrEmpty()) _powerTransformerEnds = null
         return ret

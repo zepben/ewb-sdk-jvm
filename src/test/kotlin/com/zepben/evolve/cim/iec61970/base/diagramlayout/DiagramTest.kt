@@ -66,12 +66,12 @@ internal class DiagramTest {
 
     @Test
     internal fun diagramObjects() {
-        PrivateCollectionValidator.validate(
-            { Diagram() },
-            { id, it -> DiagramObject(id).apply { diagram = it } },
+        PrivateCollectionValidator.validateUnordered(
+            ::Diagram,
+            ::DiagramObject,
+            Diagram::diagramObjects,
             { it.numDiagramObjects() },
             Diagram::getDiagramObject,
-            Diagram::diagramObjects,
             Diagram::addDiagramObject,
             Diagram::removeDiagramObject,
             Diagram::clearDiagramObjects

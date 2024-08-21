@@ -64,7 +64,7 @@ class ProtectionRelaySystem @JvmOverloads constructor(mRID: String = "") : Equip
      * @param scheme The [ProtectionRelayScheme] to remove.
      * @return true if the scheme was removed.
      */
-    fun removeScheme(scheme: ProtectionRelayScheme?): Boolean {
+    fun removeScheme(scheme: ProtectionRelayScheme): Boolean {
         val ret = _schemes.safeRemove(scheme)
         if (_schemes.isNullOrEmpty()) _schemes = null
         return ret

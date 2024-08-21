@@ -12,8 +12,7 @@ import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
 import com.zepben.evolve.cim.iec61968.assets.Streetlight
-import com.zepben.evolve.cim.iec61968.common.Location
-import com.zepben.evolve.cim.iec61968.common.Organisation
+import com.zepben.evolve.cim.iec61968.common.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
@@ -40,11 +39,8 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
-import com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion
-import com.zepben.evolve.services.common.BaseService
-import com.zepben.evolve.services.common.BaseServiceComparator
+import com.zepben.evolve.database.sqlite.cim.CimDatabaseSchemaTest
 import com.zepben.evolve.services.common.Resolvers
-import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.common.testdata.SchemaServices
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
@@ -53,38 +49,35 @@ import com.zepben.evolve.services.network.NetworkServiceComparator
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetwork
 import com.zepben.evolve.services.network.tracing.Tracing
-import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
+import org.hamcrest.Matchers.containsString
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
-import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.sql.Connection
 import java.sql.DriverManager
 
-class NetworkDatabaseSchemaTest {
+class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkDatabaseWriter, NetworkDatabaseReader, NetworkServiceComparator>() {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    override fun createService(): NetworkService = NetworkService()
 
-    private val logger = LoggerFactory.getLogger(javaClass)
-    private val schemaTestFile = "src/test/data/schemaTest.sqlite"
+    override fun createWriter(filename: String, metadata: MetadataCollection, service: NetworkService): NetworkDatabaseWriter =
+        NetworkDatabaseWriter(filename, metadata, service)
 
-    @BeforeEach
-    fun beforeEach() {
-        Files.deleteIfExists(Paths.get(schemaTestFile))
-    }
+    override fun createReader(
+        connection: Connection,
+        metadata: MetadataCollection,
+        service: NetworkService,
+        databaseDescription: String
+    ): NetworkDatabaseReader =
+        NetworkDatabaseReader(connection, metadata, service, databaseDescription)
 
-    @AfterEach
-    fun afterEach() {
-        Files.deleteIfExists(Paths.get(schemaTestFile))
-    }
+    override fun createComparator(): NetworkServiceComparator = NetworkServiceComparator()
+
+    override fun createIdentifiedObject(): IdentifiedObject = Junction()
 
     @Test
     @Disabled
@@ -112,7 +105,7 @@ class NetworkDatabaseSchemaTest {
     }
 
     @Test
-    fun testStupidlyLargeSchema() {
+    internal fun testStupidlyLargeSchema() {
         // TODO - This needs to be replaced with a test for assigning to feeders and checking the below error. This should be
         //        done in a separate task to monitor code coverage drops.
         validateSchema(StupidlyLargeNetwork.create().networkService)
@@ -124,7 +117,7 @@ class NetworkDatabaseSchemaTest {
     }
 
     @Test
-    fun `test schema for each supported type`() {
+    internal fun `test schema for each supported type`() {
         /************ IEC61968 ASSET INFO ************/
         validateSchema(SchemaServices.networkServicesOf(::CableInfo, CableInfo::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::NoLoadTest, NoLoadTest::fillFields))
@@ -235,98 +228,31 @@ class NetworkDatabaseSchemaTest {
     }
 
     @Test
-    fun testMetadataDataSourceSchema() {
-        validateSchema(expectedMetadata = SchemaServices.createDataSourceTestServices())
-    }
-
-    @Test
-    fun `test Name and NameType schema`() {
+    internal fun `test Name and NameType schema`() {
         validateSchema(SchemaServices.createNameTestService<NetworkService, Junction>())
     }
 
     @Test
     internal fun `post process fails with unresolved references`() {
-        val metadata = MetadataCollection()
-        val networkService = NetworkService().apply {
-            // Add an unresolved reference that should trigger the post load check.
+        validateUnresolvedFailure("PowerElectronicsConnection pec1", "RegulatingControl tcc") {
             resolveOrDeferReference(Resolvers.regulatingControl(PowerElectronicsConnection("pec1")), "tcc")
         }
-
-        // We save the database to get a valid schema to read, even though there is no data to write.
-        NetworkDatabaseWriter(schemaTestFile, metadata, networkService).save()
-
-        assertThat("Load should have failed", !readDatabase(metadata, networkService))
-
-        assertThat(
-            systemErr.log,
-            containsString(
-                "Unresolved references found in network service after load - this should not occur. " +
-                    "Failing reference was from PowerElectronicsConnection pec1 resolving RegulatingControl tcc"
-            )
-        )
     }
 
     @Test
-    internal fun `check for error on duplicate id added to network service`() {
-        val writeServices = NetworkService()
-        val readServices = NetworkService()
-
-        val junction = Junction("junction1")
-        writeServices.add(junction)
-        readServices.add(junction)
-
-        assertThat("write should have succeed", NetworkDatabaseWriter(schemaTestFile, MetadataCollection(), writeServices).save())
-
-        if (!Files.exists(Paths.get(schemaTestFile)))
-            error("Failed to save the schema test database.")
-
-        systemErr.clearCapturedLog()
-        assertThat("read should have failed", !readDatabase(MetadataCollection(), readServices))
-        assertThat(
-            systemErr.log,
-            containsString("Failed to load ${junction.typeNameAndMRID()}. Unable to add to service '${readServices.name}': duplicate MRID")
-        )
-    }
-
-    private fun validateSchema(expectedService: NetworkService = NetworkService(), expectedMetadata: MetadataCollection = MetadataCollection()) {
-        systemErr.clearCapturedLog()
-
-        assertThat("Database should have been saved", NetworkDatabaseWriter(schemaTestFile, expectedMetadata, expectedService).save())
-
-        assertThat(systemErr.log, containsString("Creating database schema v${tableCimVersion.supportedVersion}"))
-        assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
-
-        val networkService = NetworkService()
-        val metadata = MetadataCollection()
-
-        assertThat(" Database should have loaded", readDatabase(metadata, networkService))
-
-        validateMetadata(metadata, expectedMetadata)
-        validateService(networkService, expectedService) { NetworkServiceComparator() }
-    }
-
-    private fun validateMetadata(metadata: MetadataCollection, expectedMetadataCollection: MetadataCollection) {
-        assertThat(metadata.dataSources, containsInAnyOrder(*expectedMetadataCollection.dataSources.toTypedArray()))
-    }
-
-    private fun validateService(
-        service: BaseService,
-        expectedService: BaseService,
-        getComparator: () -> BaseServiceComparator
-    ) {
-        val differences = getComparator().compare(service, expectedService)
-
-        if (differences.modifications().isNotEmpty())
-            System.err.println(differences.toString())
-
-        assertThat("unexpected objects found in loaded network", differences.missingFromTarget(), empty())
-        assertThat("unexpected modifications", differences.modifications(), anEmptyMap())
-        assertThat("objects missing from loaded network", differences.missingFromSource(), empty())
-    }
-
-    private fun NetworkDatabaseSchemaTest.readDatabase(metadata: MetadataCollection, service: NetworkService): Boolean =
-        DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
-            NetworkDatabaseReader(connection, metadata, service, schemaTestFile).load()
+    internal fun `only loads street address fields if required`() {
+        // This test is here to make sure the database reading correctly removes the parts of loaded street addresses that are not filled out.
+        val writeService = NetworkService().apply {
+            add(Location(mRID = "loc1").apply { mainAddress = StreetAddress(townDetail = TownDetail(), streetDetail = StreetDetail()) })
         }
+
+        validateWriteRead(writeService) { readService, _ ->
+            assertThat(
+                "Expected a default street address as blank parts should have been removed during teh database read",
+                readService.get<Location>("loc1")!!.mainAddress,
+                equalTo(StreetAddress())
+            )
+        }
+    }
 
 }

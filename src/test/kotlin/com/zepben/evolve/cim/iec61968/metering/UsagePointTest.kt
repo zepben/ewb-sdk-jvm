@@ -51,12 +51,12 @@ internal class UsagePointTest {
 
     @Test
     internal fun endDevices() {
-        PrivateCollectionValidator.validate(
-            { UsagePoint() },
-            { id, _ -> object : EndDevice(id) {} },
+        PrivateCollectionValidator.validateUnordered(
+            ::UsagePoint,
+            { id -> object : EndDevice(id) {} },
+            UsagePoint::endDevices,
             UsagePoint::numEndDevices,
             UsagePoint::getEndDevice,
-            UsagePoint::endDevices,
             UsagePoint::addEndDevice,
             UsagePoint::removeEndDevice,
             UsagePoint::clearEndDevices
@@ -65,12 +65,12 @@ internal class UsagePointTest {
 
     @Test
     internal fun equipment() {
-        PrivateCollectionValidator.validate(
-            { UsagePoint() },
-            { id, _ -> object : Equipment(id) {} },
+        PrivateCollectionValidator.validateUnordered(
+            ::UsagePoint,
+            { id -> object : Equipment(id) {} },
+            UsagePoint::equipment,
             UsagePoint::numEquipment,
             UsagePoint::getEquipment,
-            UsagePoint::equipment,
             UsagePoint::addEquipment,
             UsagePoint::removeEquipment,
             UsagePoint::clearEquipment

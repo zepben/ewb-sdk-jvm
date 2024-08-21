@@ -13,49 +13,42 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
-import com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion
-import com.zepben.evolve.services.common.BaseService
-import com.zepben.evolve.services.common.BaseServiceComparator
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.database.sqlite.cim.CimDatabaseSchemaTest
 import com.zepben.evolve.services.common.Resolvers
-import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.common.testdata.SchemaServices
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.customer.CustomerServiceComparator
 import com.zepben.evolve.services.customer.testdata.fillFields
-import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
-import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.sql.Connection
 import java.sql.DriverManager
 
-class CustomerDatabaseSchemaTest {
+class CustomerDatabaseSchemaTest : CimDatabaseSchemaTest<CustomerService, CustomerDatabaseWriter, CustomerDatabaseReader, CustomerServiceComparator>() {
 
-    @JvmField
-    @RegisterExtension
-    val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+    override fun createService(): CustomerService = CustomerService()
 
-    private val logger = LoggerFactory.getLogger(javaClass)
-    private val schemaTestFile = "src/test/data/schemaTest.sqlite"
+    override fun createWriter(filename: String, metadata: MetadataCollection, service: CustomerService): CustomerDatabaseWriter =
+        CustomerDatabaseWriter(filename, metadata, service)
 
-    @BeforeEach
-    fun beforeEach() {
-        Files.deleteIfExists(Paths.get(schemaTestFile))
-    }
+    override fun createReader(
+        connection: Connection,
+        metadata: MetadataCollection,
+        service: CustomerService,
+        databaseDescription: String
+    ): CustomerDatabaseReader =
+        CustomerDatabaseReader(connection, metadata, service, databaseDescription)
 
-    @AfterEach
-    fun afterEach() {
-        Files.deleteIfExists(Paths.get(schemaTestFile))
-    }
+    override fun createComparator(): CustomerServiceComparator = CustomerServiceComparator()
+
+    override fun createIdentifiedObject(): IdentifiedObject = Customer()
 
     @Test
     @Disabled
@@ -83,7 +76,7 @@ class CustomerDatabaseSchemaTest {
     }
 
     @Test
-    fun `test schema for each supported type`() {
+    internal fun `test schema for each supported type`() {
         /************ IEC61968 CUSTOMERS ************/
         validateSchema(SchemaServices.customerServicesOf(::Customer, Customer::fillFields))
         validateSchema(SchemaServices.customerServicesOf(::CustomerAgreement, CustomerAgreement::fillFields))
@@ -96,98 +89,15 @@ class CustomerDatabaseSchemaTest {
     }
 
     @Test
-    fun testMetadataDataSourceSchema() {
-        validateSchema(expectedMetadata = SchemaServices.createDataSourceTestServices())
-    }
-
-    @Test
-    fun `test Name and NameType schema`() {
+    internal fun `test Name and NameType schema`() {
         validateSchema(SchemaServices.createNameTestService<CustomerService, Customer>())
     }
 
     @Test
     internal fun `post process fails with unresolved references`() {
-        val metadata = MetadataCollection()
-        val customerService = CustomerService().apply {
-            // Add an unresolved reference that should trigger the post load check.
+        validateUnresolvedFailure("PricingStructure ps1", "Tariff tar1") {
             resolveOrDeferReference(Resolvers.tariffs(PricingStructure("ps1")), "tar1")
         }
-
-        // We save the database to get a valid schema to read, even though there is no data to write.
-        CustomerDatabaseWriter(schemaTestFile, metadata, customerService).save()
-
-        assertThat("Load should have failed", !readDatabase(metadata, customerService))
-
-        assertThat(
-            systemErr.log,
-            containsString(
-                "Unresolved references found in customer service after load - this should not occur. " +
-                    "Failing reference was from PricingStructure ps1 resolving Tariff tar1"
-            )
-        )
     }
-
-    @Test
-    internal fun `check for error on duplicate id added to customer service`() {
-        val writeServices = CustomerService()
-        val readServices = CustomerService()
-
-        val customer = Customer("customer1")
-        writeServices.add(customer)
-        readServices.add(customer)
-
-        assertThat("write should have succeed", CustomerDatabaseWriter(schemaTestFile, MetadataCollection(), writeServices).save())
-
-        if (!Files.exists(Paths.get(schemaTestFile)))
-            error("Failed to save the schema test database.")
-
-        systemErr.clearCapturedLog()
-        assertThat("read should have failed", !readDatabase(MetadataCollection(), readServices))
-        assertThat(
-            systemErr.log,
-            containsString("Failed to load ${customer.typeNameAndMRID()}. Unable to add to service '${readServices.name}': duplicate MRID")
-        )
-    }
-
-    private fun validateSchema(expectedService: CustomerService = CustomerService(), expectedMetadata: MetadataCollection = MetadataCollection()) {
-        systemErr.clearCapturedLog()
-
-        assertThat("Database should have been saved", CustomerDatabaseWriter(schemaTestFile, expectedMetadata, expectedService).save())
-
-        assertThat(systemErr.log, containsString("Creating database schema v${tableCimVersion.supportedVersion}"))
-        assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
-
-        val customerService = CustomerService()
-        val metadata = MetadataCollection()
-
-        assertThat(" Database should have loaded", readDatabase(metadata, customerService))
-
-        validateMetadata(metadata, expectedMetadata)
-        validateService(customerService, expectedService) { CustomerServiceComparator() }
-    }
-
-    private fun validateMetadata(metadata: MetadataCollection, expectedMetadataCollection: MetadataCollection) {
-        assertThat(metadata.dataSources, containsInAnyOrder(*expectedMetadataCollection.dataSources.toTypedArray()))
-    }
-
-    private fun validateService(
-        service: BaseService,
-        expectedService: BaseService,
-        getComparator: () -> BaseServiceComparator
-    ) {
-        val differences = getComparator().compare(service, expectedService)
-
-        if (differences.modifications().isNotEmpty())
-            System.err.println(differences.toString())
-
-        assertThat("unexpected objects found in loaded service", differences.missingFromTarget(), empty())
-        assertThat("unexpected modifications", differences.modifications(), anEmptyMap())
-        assertThat("objects missing from loaded service", differences.missingFromSource(), empty())
-    }
-
-    private fun CustomerDatabaseSchemaTest.readDatabase(metadata: MetadataCollection, service: CustomerService): Boolean =
-        DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
-            CustomerDatabaseReader(connection, metadata, service, schemaTestFile).load()
-        }
 
 }

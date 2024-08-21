@@ -48,6 +48,7 @@ internal class CimDatabaseTablesTest {
     @Test
     internal fun `throws on missing tables`() {
         expect { tables.getTable<MissingTable>() }.toThrow<MissingTableConfigException>()
+        expect { tables.getInsert<MissingTable>() }.toThrow<MissingTableConfigException>()
     }
 
     private class MissingTable : SqliteTable() {

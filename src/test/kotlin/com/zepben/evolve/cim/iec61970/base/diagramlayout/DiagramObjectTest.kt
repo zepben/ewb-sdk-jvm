@@ -52,17 +52,17 @@ internal class DiagramObjectTest {
 
     @Test
     internal fun diagramObjectPoints() {
-        var pointNumber = 0.0
-        PrivateCollectionValidator.validate(
-            { DiagramObject() },
-            { DiagramObjectPoint(pointNumber, pointNumber++) },
+        PrivateCollectionValidator.validateOrdered(
+            ::DiagramObject,
+            { DiagramObjectPoint(it.toDouble(), it.toDouble()) },
+            DiagramObject::points,
             DiagramObject::numPoints,
             DiagramObject::getPoint,
             DiagramObject::forEachPoint,
             DiagramObject::addPoint,
             DiagramObject::addPoint,
             DiagramObject::removePoint,
-            null,
+            DiagramObject::removePoint,
             DiagramObject::clearPoints
         )
     }

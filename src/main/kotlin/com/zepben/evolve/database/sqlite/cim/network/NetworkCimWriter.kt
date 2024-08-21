@@ -800,10 +800,10 @@ class NetworkCimWriter(
         insert.setInstant(table.COMMISSIONED_DATE.queryIndex, equipment.commissionedDate)
 
         var status = true
-        equipment.containers.forEach {
-            if (it !is Feeder)
-                status = status and saveAssociation(equipment, it)
-        }
+        equipment.containers
+            .asSequence()
+            .filter { it.shouldExportContainerContents() }
+            .forEach { status = status and saveAssociation(equipment, it) }
 
         return status and savePowerSystemResource(table, insert, equipment, description)
     }
@@ -1329,7 +1329,7 @@ class NetworkCimWriter(
 
     @Throws(SQLException::class)
     private fun savePowerElectronicsUnit(
-        table: TablePowerElectronicsUnit,
+        table: TablePowerElectronicsUnits,
         insert: PreparedStatement,
         powerElectronicsUnit: PowerElectronicsUnit,
         description: String
@@ -2276,6 +2276,11 @@ class NetworkCimWriter(
         insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
 
         return insert.tryExecuteSingleUpdate("protection relay function to protection relay function association")
+    }
+
+    private fun EquipmentContainer.shouldExportContainerContents(): Boolean = when (this) {
+        is Site, is Substation, is Circuit -> true
+        else -> false
     }
 
 }

@@ -42,12 +42,12 @@ internal class AssetTest {
 
     @Test
     internal fun organisationRoles() {
-        PrivateCollectionValidator.validate(
+        PrivateCollectionValidator.validateUnordered(
             { object : Asset() {} },
-            { id, _ -> object : AssetOrganisationRole(id) {} },
+            { id -> object : AssetOrganisationRole(id) {} },
+            Asset::organisationRoles,
             Asset::numOrganisationRoles,
             Asset::getOrganisationRole,
-            Asset::organisationRoles,
             Asset::addOrganisationRole,
             Asset::removeOrganisationRole,
             Asset::clearOrganisationRoles

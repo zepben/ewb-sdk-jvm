@@ -39,7 +39,7 @@
   encountered but no successful responses is received from the known services, a `GrpcConnectionException` is thrown.
 
 ### Fixes
-* None.
+* Update superpom for dokka plugin upgrade so maven central deploy works again.
 
 ### Notes
 * None.

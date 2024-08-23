@@ -12,6 +12,13 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
+/**
+ * A class representing the association between Equipment and EquipmentContainers.
+ *
+ * @property EQUIPMENT_MRID A column storing the mRID of Equipment.
+ * @property EQUIPMENT_CONTAINER_MRID A column storing the mRID of EquipmentContainers.
+ */
+
 @Suppress("PropertyName")
 class TableEquipmentEquipmentContainers : SqliteTable() {
 

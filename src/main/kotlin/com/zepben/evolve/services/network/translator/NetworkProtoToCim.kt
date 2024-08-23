@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -87,6 +87,7 @@ import com.zepben.protobuf.cim.iec61970.base.core.ConductingEquipment as PBCondu
 import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNode as PBConnectivityNode
 import com.zepben.protobuf.cim.iec61970.base.core.ConnectivityNodeContainer as PBConnectivityNodeContainer
 import com.zepben.protobuf.cim.iec61970.base.core.Curve as PBCurve
+import com.zepben.protobuf.cim.iec61970.base.core.CurveData as PBCurveData
 import com.zepben.protobuf.cim.iec61970.base.core.Equipment as PBEquipment
 import com.zepben.protobuf.cim.iec61970.base.core.EquipmentContainer as PBEquipmentContainer
 import com.zepben.protobuf.cim.iec61970.base.core.Feeder as PBFeeder
@@ -550,11 +551,17 @@ fun toCim(pb: PBConnectivityNodeContainer, cim: ConnectivityNodeContainer, netwo
 
 fun toCim(pb: PBCurve, cim: Curve, networkService: NetworkService): Curve =
     cim.apply {
-        pb.curveDataList.forEach {
-            addCurveData(CurveData(it.xvalue, it.y1Value, it.y2Value, it.y3Value))
-        }
+        pb.curveDataList.forEach { addData(toCim(it)) }
         toCim(pb.io, this, networkService)
     }
+
+fun toCim(pb: PBCurveData): CurveData =
+    CurveData(
+        pb.xValue,
+        pb.y1Value,
+        pb.y2Value.takeUnless { it == UNKNOWN_FLOAT },
+        pb.y3Value.takeUnless { it == UNKNOWN_FLOAT }
+    )
 
 fun toCim(pb: PBEquipment, cim: Equipment, networkService: NetworkService): Equipment =
     cim.apply {
@@ -1009,15 +1016,15 @@ fun toCim(pb: PBGround, networkService: NetworkService): Ground =
         toCim(pb.ce, this, networkService)
     }
 
+fun toCim(pb: PBGroundDisconnector, networkService: NetworkService): GroundDisconnector =
+    GroundDisconnector(pb.mRID()).apply {
+        toCim(pb.sw, this, networkService)
+    }
+
 fun toCim(pb: PBGroundingImpedance, networkService: NetworkService): GroundingImpedance =
     GroundingImpedance(pb.mRID()).apply {
         x = pb.x.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.efc, this, networkService)
-    }
-
-fun toCim(pb: PBGroundDisconnector, networkService: NetworkService): GroundDisconnector =
-    GroundDisconnector(pb.mRID()).apply {
-        toCim(pb.sw, this, networkService)
     }
 
 fun toCim(pb: PBJumper, networkService: NetworkService): Jumper =
@@ -1152,9 +1159,6 @@ fun toCim(pb: PBPowerTransformerEnd, networkService: NetworkService): PowerTrans
         toCim(pb.te, this, networkService)
     }
 
-fun toCim(pb: PBTransformerEndRatedS): TransformerEndRatedS =
-    TransformerEndRatedS(TransformerCoolingType.valueOf(pb.coolingType.name), pb.ratedS)
-
 fun toCim(pb: PBProtectedSwitch, cim: ProtectedSwitch, networkService: NetworkService): ProtectedSwitch =
     cim.apply {
         pb.relayFunctionMRIDsList.forEach { relayFunctionMRID ->
@@ -1211,7 +1215,7 @@ fun toCim(pb: PBRotatingMachine, cim: RotatingMachine, networkService: NetworkSe
     cim.apply {
         ratedPowerFactor = pb.ratedPowerFactor.takeUnless { it == UNKNOWN_DOUBLE }
         ratedS = pb.ratedS.takeUnless { it == UNKNOWN_DOUBLE }
-        ratedU = pb.ratedU.takeUnless { it == UNKNOWN_DOUBLE }
+        ratedU = pb.ratedU.takeUnless { it == UNKNOWN_INT }
         p = pb.p.takeUnless { it == UNKNOWN_DOUBLE }
         q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.rce, this, networkService)
@@ -1225,6 +1229,28 @@ fun toCim(pb: PBSeriesCompensator, networkService: NetworkService): SeriesCompen
         x0 = pb.x0.takeUnless { it == UNKNOWN_DOUBLE }
         varistorRatedCurrent = pb.varistorRatedCurrent.takeUnless { it == UNKNOWN_INT }
         varistorVoltageThreshold = pb.varistorVoltageThreshold.takeUnless { it == UNKNOWN_INT }
+        toCim(pb.ce, this, networkService)
+    }
+
+fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: NetworkService): ShuntCompensator =
+    cim.apply {
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
+        sections = pb.sections.takeUnless { it == UNKNOWN_DOUBLE }
+        grounded = pb.grounded
+        nomU = pb.nomU.takeUnless { it == UNKNOWN_INT }
+        phaseConnection = PhaseShuntConnectionKind.valueOf(pb.phaseConnection.name)
+        toCim(pb.rce, this, networkService)
+    }
+
+fun toCim(pb: PBSwitch, cim: Switch, networkService: NetworkService): Switch =
+    cim.apply {
+        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
+        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_UINT }
+        setNormallyOpen(pb.normalOpen)
+        setOpen(pb.open)
+        // when unganged support is added to protobuf
+        // normalOpen = pb.normalOpen
+        // open = pb.open
         toCim(pb.ce, this, networkService)
     }
 
@@ -1256,28 +1282,6 @@ fun toCim(pb: PBSynchronousMachine, networkService: NetworkService): Synchronous
         type = SynchronousMachineKind.valueOf(pb.type.name)
         operatingMode = SynchronousMachineKind.valueOf(pb.operatingMode.name)
         toCim(pb.rm, this, networkService)
-    }
-
-fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: NetworkService): ShuntCompensator =
-    cim.apply {
-        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
-        sections = pb.sections.takeUnless { it == UNKNOWN_DOUBLE }
-        grounded = pb.grounded
-        nomU = pb.nomU.takeUnless { it == UNKNOWN_INT }
-        phaseConnection = PhaseShuntConnectionKind.valueOf(pb.phaseConnection.name)
-        toCim(pb.rce, this, networkService)
-    }
-
-fun toCim(pb: PBSwitch, cim: Switch, networkService: NetworkService): Switch =
-    cim.apply {
-        networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
-        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_UINT }
-        setNormallyOpen(pb.normalOpen)
-        setOpen(pb.open)
-        // when unganged support is added to protobuf
-        // normalOpen = pb.normalOpen
-        // open = pb.open
-        toCim(pb.ce, this, networkService)
     }
 
 fun toCim(pb: PBTapChanger, cim: TapChanger, networkService: NetworkService): TapChanger =
@@ -1324,6 +1328,9 @@ fun toCim(pb: PBTransformerEnd, cim: TransformerEnd, networkService: NetworkServ
         toCim(pb.io, this, networkService)
     }
 
+fun toCim(pb: PBTransformerEndRatedS): TransformerEndRatedS =
+    TransformerEndRatedS(TransformerCoolingType.valueOf(pb.coolingType.name), pb.ratedS)
+
 fun toCim(pb: PBTransformerStarImpedance, networkService: NetworkService): TransformerStarImpedance =
     TransformerStarImpedance(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.transformerEndInfo(this), pb.transformerEndInfoMRID)
@@ -1344,8 +1351,8 @@ fun NetworkService.addFromPb(pb: PBEnergySource): EnergySource? = tryAddOrNull(t
 fun NetworkService.addFromPb(pb: PBEnergySourcePhase): EnergySourcePhase? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBFuse): Fuse? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBGround): Ground? = tryAddOrNull(toCim(pb, this))
-fun NetworkService.addFromPb(pb: PBGroundingImpedance): GroundingImpedance? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBGroundDisconnector): GroundDisconnector? = tryAddOrNull(toCim(pb, this))
+fun NetworkService.addFromPb(pb: PBGroundingImpedance): GroundingImpedance? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBJumper): Jumper? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBJunction): Junction? = tryAddOrNull(toCim(pb, this))
 fun NetworkService.addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensator? = tryAddOrNull(toCim(pb, this))

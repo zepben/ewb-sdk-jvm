@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires
 
-import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableCurves
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableCurves
 
 
 class TableReactiveCapabilityCurves : TableCurves() {

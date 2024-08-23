@@ -12,8 +12,15 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
+/**
+ * A class representing the association between SynchronousMachines and ReactiveCapabilityCurves.
+ *
+ * @property SYNCHRONOUS_MACHINE_MRID A column storing the mRID of SynchronousMachines.
+ * @property REACTIVE_CAPABILITY_CURVE_MRID A column storing the mRID of ReactiveCapabilityCurves.
+ */
+
 @Suppress("PropertyName")
-class TableSynchronousMachineReactiveCapabilityCurves : SqliteTable() {
+class TableSynchronousMachinesReactiveCapabilityCurves : SqliteTable() {
 
     val SYNCHRONOUS_MACHINE_MRID: Column = Column(++columnIndex, "synchronous_machine_mrid", "TEXT", NOT_NULL)
     val REACTIVE_CAPABILITY_CURVE_MRID: Column = Column(++columnIndex, "reactive_capability_curve_mrid", "TEXT", NOT_NULL)

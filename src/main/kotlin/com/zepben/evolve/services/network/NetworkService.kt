@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -313,11 +313,11 @@ class NetworkService : BaseService("network") {
     fun add(loadBreakSwitch: LoadBreakSwitch): Boolean = super.add(loadBreakSwitch)
     fun remove(loadBreakSwitch: LoadBreakSwitch): Boolean = super.remove(loadBreakSwitch)
 
-    fun add(petersenCoil: PetersenCoil): Boolean = super.add(petersenCoil)
-    fun remove(petersenCoil: PetersenCoil): Boolean = super.remove(petersenCoil)
-
     fun add(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.add(perLengthSequenceImpedance)
     fun remove(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.remove(perLengthSequenceImpedance)
+
+    fun add(petersenCoil: PetersenCoil): Boolean = super.add(petersenCoil)
+    fun remove(petersenCoil: PetersenCoil): Boolean = super.remove(petersenCoil)
 
     fun add(powerElectronicsConnection: PowerElectronicsConnection): Boolean = super.add(powerElectronicsConnection)
     fun remove(powerElectronicsConnection: PowerElectronicsConnection): Boolean = super.remove(powerElectronicsConnection)

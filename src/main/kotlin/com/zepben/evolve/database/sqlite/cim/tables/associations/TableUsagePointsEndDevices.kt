@@ -12,6 +12,13 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
+/**
+ * A class representing the association between UsagePoints and EndDevices.
+ *
+ * @property USAGE_POINT_MRID A column storing the mRID of UsagePoints.
+ * @property END_DEVICE_MRID A column storing the mRID of EndDevices.
+ */
+
 @Suppress("PropertyName")
 class TableUsagePointsEndDevices : SqliteTable() {
 

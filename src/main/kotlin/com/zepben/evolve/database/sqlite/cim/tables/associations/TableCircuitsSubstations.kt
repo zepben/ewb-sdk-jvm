@@ -12,6 +12,13 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
+/**
+ * A class representing the association between Circuits and Substations.
+ *
+ * @property CIRCUIT_MRID A column storing the mRID of Circuits.
+ * @property SUBSTATION_MRID A column storing the mRID of Substations.
+ */
+
 @Suppress("PropertyName")
 class TableCircuitsSubstations : SqliteTable() {
 

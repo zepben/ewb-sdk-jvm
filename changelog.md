@@ -24,16 +24,16 @@
   * `DiagramObjectPoint` from a `DiagramObject`.
   * `RelaySetting` from a `ProtectionRelayFunction`.
 * Data Model change:
-  * Add PhaseCode variable to UsagePoint
+  * Add `phaseCode` variable to `UsagePoint`
   * Added new classes:
-    * EarthFaultCompensator
-    * GroundingImpedance
-    * PetersenCoil
-    * RotatingMachine
-    * SynchronousMachine
-    * Curve
-    * CurveData
-    * ReactiveCapabilityCurve
+    * `Curve`
+    * `CurveData`
+    * `EarthFaultCompensator`
+    * `GroundingImpedance`
+    * `PetersenCoil`
+    * `ReactiveCapabilityCurve`
+    * `RotatingMachine`
+    * `SynchronousMachine`
 
 ### Enhancements
 * Added feature list in documentation.

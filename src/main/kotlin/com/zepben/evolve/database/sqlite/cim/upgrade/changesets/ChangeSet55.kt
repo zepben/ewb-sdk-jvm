@@ -130,7 +130,7 @@ private val `Create table synchronous_machines` = Change(
             regulating_control_mrid TEXT NULL,
             rated_power_factor NUMBER NULL,
             rated_s NUMBER NULL,
-            rated_u NUMBER NULL,
+            rated_u INTEGER NULL,
             p NUMBER NULL,
             q NUMBER NULL,
             base_q NUMBER NULL,
@@ -152,8 +152,8 @@ private val `Create table synchronous_machines` = Change(
             sat_direct_trans_x NUMBER NULL,
             x0 NUMBER NULL,
             x2 NUMBER NULL,
-            type TEXT NULL,
-            operating_mode TEXT NULL
+            type TEXT NOT NULL,
+            operating_mode TEXT NOT NULL
         );""".trimIndent(),
         "CREATE UNIQUE INDEX synchronous_machines_mrid ON synchronous_machines (mrid);"
     ),

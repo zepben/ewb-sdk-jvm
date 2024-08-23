@@ -15,7 +15,10 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableAssetOwners
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TablePoles
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableStreetlights
-import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.*
+import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableLocationStreetAddresses
+import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableLocations
+import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableOrganisations
+import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TablePositionPoints
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TableCurrentTransformerInfo
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
@@ -155,7 +158,7 @@ class NetworkServiceReader @JvmOverloads constructor(
             .andLoadEach<TableProtectionRelayFunctionsProtectedSwitches>(reader::load)
             .andLoadEach<TableProtectionRelayFunctionsSensors>(reader::load)
             .andLoadEach<TableProtectionRelaySchemesProtectionRelayFunctions>(reader::load)
-            .andLoadEach<TableSynchronousMachineReactiveCapabilityCurves>(reader::load)
+            .andLoadEach<TableSynchronousMachinesReactiveCapabilityCurves>(reader::load)
             .andLoadEach<TableControls>(reader::load)
             .andLoadEach<TableRemoteControls>(reader::load)
             .andLoadEach<TableRemoteSources>(reader::load)

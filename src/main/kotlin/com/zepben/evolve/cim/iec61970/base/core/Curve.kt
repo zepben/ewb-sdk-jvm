@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,6 +9,7 @@
 package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 
 
 /**
@@ -16,63 +17,85 @@ import com.zepben.evolve.services.common.extensions.asUnmodifiable
  */
 abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
 
-    private var _curveData: MutableList<CurveData>? = null
+    private var _data: MutableList<CurveData>? = null
 
     /**
-     * Add a curveData to the Curve.
-     * The curveData in the underlying collection will be sorted by [x] Value in ascending order.
+     * Add a data point to this [Curve].
      *
      * @param x The data value of the X-axis variable, depending on the X-axis units.
      * @param y1 The data value of the first Y-axis variable, depending on the Y-axis units.
      * @param y2 The data value of the second Y-axis variable (if present), depending on the Y-axis units.
      * @param y3 The data value of the third Y-axis variable (if present), depending on the Y-axis units.
-     * @throws IllegalArgumentException if a curveData for the provided [x] value already exists for this Curve.
+     * @throws IllegalArgumentException if a [CurveData] for the provided [x] value already exists for this Curve.
      */
-    fun addCurveData(x: Float, y1: Float, y2: Float? = null, y3: Float? = null): Curve {
-        if (_curveData?.any { cd -> cd.xValue == x } == true)
-            throw IllegalArgumentException("A CurveData with x point $x already exists, please remove it first.")
-        _curveData = _curveData ?: mutableListOf()
-        _curveData!!.add(CurveData(x, y1, y2, y3))
-        _curveData!!.sortBy { it.xValue }
-
+    fun addData(x: Float, y1: Float, y2: Float? = null, y3: Float? = null): Curve {
+        require(_data.isNullOrEmpty() || _data?.none { cd -> cd.xValue == x } == true) {
+            "Unable to add datapoint to ${typeNameAndMRID()}. " +
+                "xValue $x is invalid. as data with same xValue already exist in this Curve. "
+        }
+        _data = _data.or(::mutableListOf) {
+            add(CurveData(x, y1, y2, y3))
+            sortBy { it.xValue }
+        }
         return this
     }
 
     /**
-     * The individual curves for this synchronous machines. The returned collection is read only.
+     * Add a data point to this [Curve].
      */
-    val data: Collection<CurveData> get() = _curveData.asUnmodifiable()
-
-    fun getCurveData(x: Float): CurveData? = _curveData?.find { it.xValue == x }
-
-    fun hasCurveData(): Boolean = (_curveData != null)
-
-    fun addCurveData(curveData: CurveData): Curve = addCurveData(curveData.xValue, curveData.y1Value, curveData.y2Value, curveData.y3Value)
+    fun addData(curveData: CurveData): Curve = addData(curveData.xValue, curveData.y1Value, curveData.y2Value, curveData.y3Value)
 
     /**
-     * Remove [curveData] from the this [Curve].
-     *
-     * @return true if [curveData] was removed.
+     * The point data values that define this curve. The returned collection is read only.
+     * The curveData in the underlying collection will be sorted by xValue in ascending order.
      */
-    fun removeCurveData(curveData: CurveData): Boolean {
-        val ret = _curveData?.remove(curveData) == true
-        if (_curveData.isNullOrEmpty()) _curveData = null
+    val data: List<CurveData> get() = _data.asUnmodifiable()
+
+    /**
+     * Get point data values by its xValue.
+     */
+    fun getData(x: Float): CurveData? = _data?.find { it.xValue == x }
+
+    /**
+     * A curve object can have 0 or more curveData, index in the list indicates nth x value of stored curveData.
+     */
+    private fun getData(sequenceNumber: Int): CurveData? = _data?.get(sequenceNumber)
+
+    /**
+     * Get point data values by its sequenceNumber.
+     */
+    operator fun get(sequenceNumber: Int): CurveData? = getData(sequenceNumber)
+
+    /**
+     * Remove data point from the this [Curve].
+     *
+     * @return true if data point was removed.
+     */
+    fun removeData(curveData: CurveData): Boolean {
+        val ret = _data?.remove(curveData) == true
+        if (_data.isNullOrEmpty()) _data = null
         return ret
     }
 
-    fun removeCurveData(x: Float): Boolean {
-        val ret = _curveData?.firstOrNull { it.xValue == x }?.let {
-            _curveData?.remove(it)
+    /**
+     * Remove data point from the this [Curve].
+     *
+     * @property x xValue of the data point to be removed
+     * @return true if data point was removed.
+     */
+    fun removeData(x: Float): Boolean {
+        val ret = _data?.firstOrNull { it.xValue == x }?.let {
+            _data?.remove(it)
         } ?: false
-        if (_curveData.isNullOrEmpty()) _curveData = null
+        if (_data.isNullOrEmpty()) _data = null
         return ret
     }
 
     /**
      * Clear the [CurveData] for this Curve.
      */
-    fun clearCurveData(): Curve {
-        _curveData = null
+    fun clearData(): Curve {
+        _data = null
         return this
     }
 

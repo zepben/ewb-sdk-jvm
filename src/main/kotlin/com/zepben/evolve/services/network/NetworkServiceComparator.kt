@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -371,7 +371,11 @@ class NetworkServiceComparator @JvmOverloads constructor(
         apply { comparePowerSystemResource() }
 
     private fun ObjectDifference<out Curve>.compareCurve(): ObjectDifference<out Curve> =
-        apply { compareIdentifiedObject() }
+        apply {
+            compareIdentifiedObject()
+
+            compareIndexedValueCollections(Curve::data)
+        }
 
     private fun ObjectDifference<out Equipment>.compareEquipment(): ObjectDifference<out Equipment> =
         apply {
@@ -675,6 +679,13 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private fun compareDisconnector(source: Disconnector, target: Disconnector): ObjectDifference<Disconnector> =
         ObjectDifference(source, target).apply { compareSwitch() }
 
+    private fun ObjectDifference<out EarthFaultCompensator>.compareEarthFaultCompensator(): ObjectDifference<out EarthFaultCompensator> =
+        apply {
+            compareConductingEquipment()
+
+            compareValues(EarthFaultCompensator::r)
+        }
+
     private fun ObjectDifference<out EnergyConnection>.compareEnergyConnection(): ObjectDifference<out EnergyConnection> =
         apply { compareConductingEquipment() }
 
@@ -756,27 +767,16 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareConductingEquipment()
         }
 
+    private fun compareGroundDisconnector(source: GroundDisconnector, target: GroundDisconnector): ObjectDifference<GroundDisconnector> =
+        ObjectDifference(source, target).apply {
+            compareSwitch()
+        }
+
     private fun compareGroundingImpedance(source: GroundingImpedance, target: GroundingImpedance): ObjectDifference<GroundingImpedance> =
         ObjectDifference(source, target).apply {
             compareEarthFaultCompensator()
 
-            compareValues(
-                GroundingImpedance::x
-            )
-        }
-
-    private fun ObjectDifference<out EarthFaultCompensator>.compareEarthFaultCompensator(): ObjectDifference<out EarthFaultCompensator> =
-        apply {
-            compareConductingEquipment()
-
-            compareValues(
-                EarthFaultCompensator::r
-            )
-        }
-
-    private fun compareGroundDisconnector(source: GroundDisconnector, target: GroundDisconnector): ObjectDifference<GroundDisconnector> =
-        ObjectDifference(source, target).apply {
-            compareSwitch()
+            compareValues(GroundingImpedance::x)
         }
 
     private fun compareJumper(source: Jumper, target: Jumper): ObjectDifference<Jumper> =
@@ -831,9 +831,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
         ObjectDifference(source, target).apply {
             compareEarthFaultCompensator()
 
-            compareValues(
-                PetersenCoil::xGroundNominal
-            )
+            compareValues(PetersenCoil::xGroundNominal)
         }
 
     private fun comparePowerElectronicsConnection(
@@ -975,6 +973,12 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private fun compareReactiveCapabilityCurve(source: ReactiveCapabilityCurve, target: ReactiveCapabilityCurve): ObjectDifference<ReactiveCapabilityCurve> =
         ObjectDifference(source, target).apply { compareCurve() }
 
+    private fun ObjectDifference<out RotatingMachine>.compareRotatingMachine(): ObjectDifference<out RotatingMachine> =
+        apply {
+            compareRegulatingCondEq()
+
+            compareValues(RotatingMachine::ratedPowerFactor, RotatingMachine::ratedS, RotatingMachine::ratedU, RotatingMachine::p, RotatingMachine::q)
+        }
 
     private fun compareSeriesCompensator(source: SeriesCompensator, target: SeriesCompensator): ObjectDifference<SeriesCompensator> =
         ObjectDifference(source, target).apply {
@@ -1049,19 +1053,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 SynchronousMachine::type,
                 SynchronousMachine::operatingMode
             )
-        }
-
-    private fun ObjectDifference<out RotatingMachine>.compareRotatingMachine(): ObjectDifference<out RotatingMachine> =
-        apply {
-            compareRegulatingCondEq()
-
-            compareValues(
-                RotatingMachine::ratedPowerFactor,
-                RotatingMachine::ratedS,
-                RotatingMachine::ratedU,
-                RotatingMachine::p,
-                RotatingMachine::q
-            )
+            compareIdReferenceCollections(SynchronousMachine::curves)
         }
 
     private fun compareTapChangerControl(source: TapChangerControl, target: TapChangerControl): ObjectDifference<TapChangerControl> =

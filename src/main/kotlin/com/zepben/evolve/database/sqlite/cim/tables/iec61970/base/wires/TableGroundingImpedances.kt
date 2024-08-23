@@ -11,11 +11,17 @@ package com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires
 import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 
+/**
+ * A class representing the customer columns required for the database table.
+ *
+ * @property X A column storing the Reactance of device in ohms.
+ */
+
 @Suppress("PropertyName")
 class TableGroundingImpedances : TableEarthFaultCompensators() {
 
     val X: Column = Column(++columnIndex, "x", "NUMBER", NULL)
 
-    override val name: String = "grounding_impedance"
+    override val name: String = "grounding_impedances"
 
 }

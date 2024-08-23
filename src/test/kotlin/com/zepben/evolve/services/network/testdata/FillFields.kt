@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -975,7 +975,7 @@ fun Connector.fillFields(service: NetworkService, includeRuntime: Boolean = true
 fun Curve.fillFields(service: NetworkService, includeRuntime: Boolean = true): Curve {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
-    addCurveData(1f, 1f)
+    addData(1f, 1f)
 
     return this
 }
@@ -1289,7 +1289,7 @@ fun RotatingMachine.fillFields(service: NetworkService, includeRuntime: Boolean 
 
     ratedPowerFactor = 1.1
     ratedS = 2.2
-    ratedU = 3.3
+    ratedU = 3
     p = 4.4
     q = 5.5
 

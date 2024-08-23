@@ -12,6 +12,13 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
+/**
+ * A class representing the association between AssetOrganisationRoles and Assets.
+ *
+ * @property ASSET_ORGANISATION_ROLE_MRID A column storing the mRID of AssetOrganisationRoles.
+ * @property ASSET_MRID A column storing the mRID of Assets.
+ */
+
 @Suppress("PropertyName")
 class TableAssetOrganisationRolesAssets : SqliteTable() {
 

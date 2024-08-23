@@ -12,11 +12,15 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableConductingEquipment
 
+/**
+ * An abstract class for EarthFaultCompensator Tables.
+ *
+ * @property R A column storing the Nominal resistance of device in ohms.
+ */
+
 @Suppress("PropertyName")
 abstract class TableEarthFaultCompensators : TableConductingEquipment() {
 
     val R: Column = Column(++columnIndex, "r", "NUMBER", NULL)
-
-    override val name: String = "earth_fault_compensator"
 
 }

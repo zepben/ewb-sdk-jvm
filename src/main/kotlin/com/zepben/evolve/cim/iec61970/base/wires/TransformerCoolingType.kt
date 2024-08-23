@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,31 +11,62 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 /**
  * Transformer cooling types.
- *
- * @property UNKNOWN_COOLING_TYPE Default
- * @property ONAN Oil natural, air natural
- * @property ONAF Oil natural, air forced
- * @property OFAF Oil forced, air forced
- * @property OFWF Oil forced, water forced
- * @property ODAF Oil directed, air forced
- * @property KNAN Non-mineral oil natural, air natural
- * @property KNAF Non-mineral oil natural, air forced
- * @property KFAF Non-mineral oil forced, air forced
- * @property KFWF Non-mineral oil forced, water forced
- * @property KDAF Non-mineral oil directed, air forced
  */
 enum class TransformerCoolingType {
 
+    /**
+     * Default
+     */
     UNKNOWN_COOLING_TYPE,
+
+    /**
+     * Oil natural, air natural
+     */
     ONAN,
+
+    /**
+     * Oil natural, air forced
+     */
     ONAF,
+
+    /**
+     * Oil forced, air forced
+     */
     OFAF,
+
+    /**
+     * Oil forced, water forced
+     */
     OFWF,
+
+    /**
+     * Oil directed, air forced
+     */
     ODAF,
+
+    /**
+     * Non-mineral oil natural, air natural
+     */
     KNAN,
+
+    /**
+     * Non-mineral oil natural, air forced
+     */
     KNAF,
+
+    /**
+     * Non-mineral oil forced, air forced
+     */
     KFAF,
+
+    /**
+     * Non-mineral oil forced, water forced
+     */
     KFWF,
+
+    /**
+     * Non-mineral oil directed, air forced
+     */
     KDAF
 
 }

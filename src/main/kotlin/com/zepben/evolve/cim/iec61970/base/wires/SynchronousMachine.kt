@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -46,7 +46,7 @@ import com.zepben.evolve.services.common.extensions.getByMRID
  */
 class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : RotatingMachine(mRID) {
 
-    private var _reactiveCapabilityCurveMRIDs: MutableList<ReactiveCapabilityCurve>? = null
+    private var _reactiveCapabilityCurve: MutableList<ReactiveCapabilityCurve>? = null
 
     var baseQ: Double? = null
     var condenserP: Int? = null
@@ -76,39 +76,54 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
     var operatingMode: SynchronousMachineKind = SynchronousMachineKind.UNKNOWN
 
     /**
-     * The individual curves for this synchronous machines. The returned collection is read only.
+     * All available [ReactiveCapabilityCurve] for this synchronous machine.
+     * First entry is the default [ReactiveCapabilityCurve]
      */
-    val curves: Collection<ReactiveCapabilityCurve> get() = _reactiveCapabilityCurveMRIDs.asUnmodifiable()
+    val curves: Collection<ReactiveCapabilityCurve> get() = _reactiveCapabilityCurve.asUnmodifiable()
 
     /**
      * Get the number of entries in the [ReactiveCapabilityCurve] collection.
      */
-    fun numCurves(): Int = _reactiveCapabilityCurveMRIDs?.size ?: 0
+    fun numCurves(): Int = _reactiveCapabilityCurve?.size ?: 0
 
     /**
-     * The individual reactive capability curves for this energy consumer.
+     * The individual [ReactiveCapabilityCurve] for this [SynchronousMachine]
      *
      * @param mRID the mRID of the required [ReactiveCapabilityCurve]
      * @return The [ReactiveCapabilityCurve] with the specified [mRID] if it exists, otherwise null
      */
-    fun getCurve(mRID: String): ReactiveCapabilityCurve? = _reactiveCapabilityCurveMRIDs?.getByMRID(mRID)
+    fun getCurve(mRID: String): ReactiveCapabilityCurve? = _reactiveCapabilityCurve?.getByMRID(mRID)
 
+    /**
+     * Add a [ReactiveCapabilityCurve] for this [SynchronousMachine]
+     *
+     * @param rcc the [ReactiveCapabilityCurve] to be added from this [SynchronousMachine]
+     */
     fun addCurve(rcc: ReactiveCapabilityCurve): SynchronousMachine {
 
-        _reactiveCapabilityCurveMRIDs = _reactiveCapabilityCurveMRIDs ?: mutableListOf()
-        _reactiveCapabilityCurveMRIDs!!.add(rcc)
+        _reactiveCapabilityCurve = _reactiveCapabilityCurve ?: mutableListOf()
+        _reactiveCapabilityCurve!!.add(rcc)
 
         return this
     }
 
+    /**
+     * Remove a [ReactiveCapabilityCurve] for this [SynchronousMachine]
+     *
+     * @param curve the [ReactiveCapabilityCurve] to be removed from this [SynchronousMachine]
+     * @return true if [ReactiveCapabilityCurve] has been removed from this [SynchronousMachine]
+     */
     fun removeCurve(curve: ReactiveCapabilityCurve?): Boolean {
-        val ret = _reactiveCapabilityCurveMRIDs?.remove(curve) == true
-        if (_reactiveCapabilityCurveMRIDs.isNullOrEmpty()) _reactiveCapabilityCurveMRIDs = null
+        val ret = _reactiveCapabilityCurve?.remove(curve) == true
+        if (_reactiveCapabilityCurve.isNullOrEmpty()) _reactiveCapabilityCurve = null
         return ret
     }
 
+    /**
+     * Clear all [ReactiveCapabilityCurve] for this [SynchronousMachine].
+     */
     fun clearCurve(): SynchronousMachine {
-        _reactiveCapabilityCurveMRIDs = null
+        _reactiveCapabilityCurve = null
         return this
     }
 

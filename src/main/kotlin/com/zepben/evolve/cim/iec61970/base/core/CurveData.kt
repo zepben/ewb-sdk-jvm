@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -17,4 +17,9 @@ package com.zepben.evolve.cim.iec61970.base.core
  * @property y2Value The data value of the second Y-axis variable (if present), depending on the Y-axis units.
  * @property y3Value The data value of the third Y-axis variable (if present), depending on the Y-axis units.
  */
-data class CurveData(val xValue: Float, val y1Value: Float, val y2Value: Float? = null, val y3Value: Float? = null)
+data class CurveData(
+    val xValue: Float,
+    val y1Value: Float,
+    val y2Value: Float? = null,
+    val y3Value: Float? = null
+)

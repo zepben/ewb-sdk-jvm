@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -28,15 +28,54 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind.*
 @Suppress("EnumEntryName")
 enum class SinglePhaseKind(val value: Int, val maskIndex: Int) {
 
+    /**
+     * no phase specified.
+     */
     NONE(0, -1),
+
+    /**
+     * Phase A.
+     */
     A(1, 0),
+
+    /**
+     * Phase B.
+     */
     B(2, 1),
+
+    /**
+     * Phase C.
+     */
     C(3, 2),
+
+    /**
+     * Neutral.
+     */
     N(4, 3),
+
+    /**
+     * An unknown primary phase.
+     */
     X(5, 0),
+
+    /**
+     * An unknown primary phase.
+     */
     Y(6, 1),
+
+    /**
+     * Secondary phase 1.
+     */
     s1(7, 0),
+
+    /**
+     * Secondary phase 2.
+     */
     s2(8, 1),
+
+    /**
+     * Invalid phase. Caused by trying to energise with multiple phases simultaneously.
+     */
     INVALID(9, -1);
 
     companion object {

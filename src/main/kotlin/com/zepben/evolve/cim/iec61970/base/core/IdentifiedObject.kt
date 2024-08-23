@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -133,4 +133,7 @@ abstract class IdentifiedObject(mRID: String = "") {
     private fun Iterable<Name>?.getByTypeAndName(type: String, name: String): Name? {
         return this?.firstOrNull { it.type.name == type && it.name == name }
     }
+
+    internal fun <T> T?.or(createEmpty: () -> T, block: T.() -> Unit): T =
+        (this ?: createEmpty()).apply(block)
 }

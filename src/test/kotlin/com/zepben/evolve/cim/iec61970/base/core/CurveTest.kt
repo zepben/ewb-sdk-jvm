@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -33,30 +33,30 @@ internal class CurveTest {
     internal fun accessorCoverage() {
         val curve = object : Curve() {}
 
-        assertThat(curve.hasCurveData(), equalTo(false))
+        assertThat(curve.data.isNotEmpty(), equalTo(false))
 
         curve.fillFields(NetworkService())
 
-        assertThat(curve.hasCurveData(), equalTo(true))
+        assertThat(curve.data.isNotEmpty(), equalTo(true))
     }
 
     @Test
     internal fun `add curveData`() {
         val curve = object : Curve() {}
-        assertThat(curve.hasCurveData(), equalTo(false))
+        assertThat(curve.data.isNotEmpty(), equalTo(false))
 
-        curve.addCurveData(CurveData(1f, 1f, 2f, 3f))
+        curve.addData(CurveData(1f, 1f, 2f, 3f))
 
-        assertThat(curve.hasCurveData(), equalTo(true))
+        assertThat(curve.data.isNotEmpty(), equalTo(true))
     }
 
     @Test
     internal fun `add curveData by passing in the values`() {
         val curve = object : Curve() {}
 
-        curve.addCurveData(1f, 1f, 2f, 3f)
+        curve.addData(1f, 1f, 2f, 3f)
 
-        assertThat(curve.hasCurveData(), equalTo(true))
+        assertThat(curve.data.isNotEmpty(), equalTo(true))
     }
 
     @Test
@@ -64,7 +64,7 @@ internal class CurveTest {
         val curve = object : Curve() {}
         curve.fillFields(NetworkService())
 
-        assertThat(curve.getCurveData(1f), not(equalTo(null)))
+        assertThat(curve.getData(1f), not(equalTo(null)))
     }
 
     @Test
@@ -73,8 +73,8 @@ internal class CurveTest {
         val curve = object : Curve() {}
         curve.fillFields(NetworkService())
 
-        assertThat(curve.removeCurveData(curveData), equalTo(true))
-        assertThat(curve.hasCurveData(), equalTo(false))
+        assertThat(curve.removeData(curveData), equalTo(true))
+        assertThat(curve.data.isNotEmpty(), equalTo(false))
     }
 
     @Test
@@ -82,16 +82,16 @@ internal class CurveTest {
         val curve = object : Curve() {}
         curve.fillFields(NetworkService())
 
-        assertThat(curve.removeCurveData(1f), equalTo(true))
+        assertThat(curve.removeData(1f), equalTo(true))
     }
 
     @Test
     internal fun `clear curveData`() {
         val curve = object : Curve() {}
         curve.fillFields(NetworkService())
-        assertThat(curve.hasCurveData(), equalTo(true))
+        assertThat(curve.data.isNotEmpty(), equalTo(true))
 
-        curve.clearCurveData()
-        assertThat(curve.hasCurveData(), equalTo(false))
+        curve.clearData()
+        assertThat(curve.data.isNotEmpty(), equalTo(false))
     }
 }

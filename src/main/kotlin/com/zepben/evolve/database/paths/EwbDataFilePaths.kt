@@ -18,7 +18,7 @@ import kotlin.io.path.name
 /**
  * Provides paths to all the various data files / folders used by EWB.
  */
-abstract class EwbDataFilePaths {
+interface EwbDataFilePaths {
 
     /**
      * Resolves the [Path] to the database file for the specified [DatabaseType] that has
@@ -53,7 +53,7 @@ abstract class EwbDataFilePaths {
      * @return The [Path] to the directory for the [date].
      */
     @Throws(IOException::class)
-    abstract fun createDirectories(date: LocalDate): Path
+    fun createDirectories(date: LocalDate): Path
 
     /**
      * Find the closest date with a usable database of the specified type.
@@ -70,18 +70,19 @@ abstract class EwbDataFilePaths {
         if (!type.perDate)
             return null
 
-        if (checkExists(type, date))
+        val descendants = enumerateDescendants().asSequence().toList()
+        if (checkExists(descendants, type, date))
             return date
 
         var offset = 1L
         while (offset <= maxDaysToSearch) {
             val previousDate = date.minusDays(offset)
-            if (checkExists(type, previousDate))
+            if (checkExists(descendants, type, previousDate))
                 return previousDate
 
             if (searchForwards) {
                 val forwardDate = date.plusDays(offset)
-                if (checkExists(type, forwardDate))
+                if (checkExists(descendants, type, forwardDate))
                     return forwardDate
             }
             ++offset
@@ -98,21 +99,22 @@ abstract class EwbDataFilePaths {
      *
      * @return True if a database of the specified [dbType] and [date] exits in the date path.
      */
-    private fun checkExists(dbType: DatabaseType, date: LocalDate): Boolean =
-        locationExists(date.toDatedPath(dbType.fileDescriptor))
+    private fun checkExists(descendants: List<Path>, dbType: DatabaseType, date: LocalDate): Boolean =
+        descendants.any { cp -> cp.endsWith(date.toDatedPath(dbType.fileDescriptor)) }
 
     private fun LocalDate.toDatedPath(file: String): Path =
         toString().let { dateStr -> Paths.get(dateStr).resolve("$dateStr-$file.sqlite") }
 
-    internal fun getAvailableDatesFor(type: DatabaseType): List<LocalDate> {
+    fun getAvailableDatesFor(type: DatabaseType): List<LocalDate> {
         if (!type.perDate)
             throw IllegalStateException("INTERNAL ERROR: Should only be calling `getAvailableDatesFor` for `perDate` files, which should all be covered above, so go ahead and add it.")
 
-        return enumerateSubdirectories()
-            .mapNotNull { runCatching { LocalDate.parse(it.name) }.getOrNull() }
-            .filter { locationExists(it.toDatedPath(type.fileDescriptor)) }
-            .sorted()
-            .toList()
+        val descendants = enumerateDescendants().asSequence().toList()
+        return descendants
+                .filter { it.name.endsWith("${type.fileDescriptor}.sqlite") }
+                .mapNotNull { it.parent.runCatching { LocalDate.parse(name) }.getOrNull() }
+                .sorted()
+                .toList()
     }
 
     /**
@@ -127,14 +129,7 @@ abstract class EwbDataFilePaths {
      *
      * @return collection of child items.
      */
-    protected abstract fun enumerateSubdirectories(): Sequence<Path>
-
-    /**
-     * Check if the specified [Path] exists in source location.
-     *
-     * @return True if [Path] exists.
-     */
-    protected abstract fun locationExists(path: Path): Boolean
+    fun enumerateDescendants(): Iterator<Path>
 
     /**
      * Resolves the database in the specified source [Path].
@@ -142,5 +137,5 @@ abstract class EwbDataFilePaths {
      * @param path [Path] to the source database file.
      * @return [Path] to the local database file.
      */
-    protected abstract fun resolveDatabase(path: Path): Path
+    fun resolveDatabase(path: Path): Path
 }

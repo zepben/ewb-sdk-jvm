@@ -9,6 +9,7 @@
 package com.zepben.evolve.database.paths
 
 import java.io.IOException
+import java.nio.file.FileVisitOption
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -16,14 +17,14 @@ import java.time.LocalDate
 
 
 // LocalFileSystemEwbDataFilePaths("/data/ewb")
-class LocalEwbDataFilePaths(
+class LocalEwbDataFilePaths  @JvmOverloads constructor(
     private val baseDir: Path,
     createPath: Boolean = false,
     private val createDirectories: (Path) -> Path = { Files.createDirectories(it) },
-    private val isDirectory: (Path) -> Boolean = { Files.isDirectory(it) },
+    isDirectory: (Path) -> Boolean = { Files.isDirectory(it) },
     private val exists: (Path) -> Boolean = { Files.exists(it) },
-    private val listFiles: (Path) -> Iterator<Path> = { Files.list(it).iterator() }
-) : EwbDataFilePaths() {
+    private val listFiles: (Path) -> Iterator<Path> = { Files.walk(it, 2, FileVisitOption.FOLLOW_LINKS).iterator() }
+) : EwbDataFilePaths {
 
     init {
         if (createPath)
@@ -44,8 +45,8 @@ class LocalEwbDataFilePaths(
             createDirectories(datePath)
     }
 
-    override fun enumerateSubdirectories(): Sequence<Path> = listFiles(baseDir).asSequence().filter { isDirectory(it) }
-    override fun locationExists(path: Path): Boolean = exists(baseDir.resolve(path))
+    override fun enumerateDescendants(): Iterator<Path> =
+        listFiles(baseDir)
 
     override fun resolveDatabase(path: Path): Path =
         baseDir.resolve(path)

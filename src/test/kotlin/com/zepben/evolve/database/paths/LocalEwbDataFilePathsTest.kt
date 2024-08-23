@@ -12,6 +12,8 @@ import com.zepben.testutils.exception.ExpectException.Companion.expect
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.`is`
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -39,11 +41,6 @@ class LocalEwbDataFilePathsTest {
         LocalEwbDataFilePaths(".")
         LocalEwbDataFilePaths(".", createPath = true)
     }
-
-//    @Test
-//    internal fun `accessor coverage`() {
-//        assertThat(ewbPaths.baseDi, equalTo(baseDir))
-//    }
 
     @Test
     internal fun `validates directory is valid at construction`() {
@@ -100,13 +97,20 @@ class LocalEwbDataFilePathsTest {
 
     @Test
     internal fun `finds specified date if it exists`() {
-        validateClosest(today, 1)
+        val descendants = mutableListOf<Path>()
+        // Files for today.
+        DatabaseType.entries.filter { it.perDate }.forEach{
+            descendants.add(Path.of(today.toString(), "${today}-${it.fileDescriptor}.sqlite"))
+        }
+
+        every { listFiles(baseDir) } answers { descendants.iterator() }
+        validateClosest(today)
 
         // Should return null without checking a file as they are not date based, even if the file exists.
-        validateClosest(DatabaseType.ENERGY_READINGS_INDEX, null, 0)
-        validateClosest(DatabaseType.LOAD_AGGREGATOR_METERS_BY_DATE, null, 0)
-        validateClosest(DatabaseType.WEATHER_READING, null, 0)
-        validateClosest(DatabaseType.RESULTS_CACHE, null, 0)
+        validateClosest(DatabaseType.ENERGY_READINGS_INDEX, null)
+        validateClosest(DatabaseType.LOAD_AGGREGATOR_METERS_BY_DATE, null)
+        validateClosest(DatabaseType.WEATHER_READING, null)
+        validateClosest(DatabaseType.RESULTS_CACHE, null)
     }
 
     @Test
@@ -114,11 +118,15 @@ class LocalEwbDataFilePathsTest {
         // NOTE: We want to use two days ago rather than yesterday to make sure it searches more than one day.
         val twoDaysAgo = today.minusDays(2)
 
-        // Only find files for yesterday.
-        every { exists(any()) } returns false
-        every { exists(match { it.toString().contains(twoDaysAgo.toString()) }) } returns true
+        val descendants = mutableListOf<Path>()
+        // Files for 2 days ago.
+        DatabaseType.entries.filter { it.perDate }.forEach{
+            descendants.add(Path.of(twoDaysAgo.toString(), "${twoDaysAgo}-${it.fileDescriptor}.sqlite"))
+        }
 
-        validateClosest(twoDaysAgo, 3)
+        every { listFiles(baseDir) } answers { descendants.iterator() }
+
+        validateClosest(twoDaysAgo)
     }
 
     @Test
@@ -129,7 +137,7 @@ class LocalEwbDataFilePathsTest {
         every { exists(any()) } returns false
         every { exists(match { it.toString().contains(elevenDaysAgo.toString()) }) } returns true
 
-        validateClosest(null, 11)
+        validateClosest(null)
     }
 
     @Test
@@ -139,12 +147,17 @@ class LocalEwbDataFilePathsTest {
         val twoDaysFromNow = today.plusDays(2)
         val threeDaysAgo = today.minusDays(3)
 
-        // Find files for 2 days from now and 3 days ago.
-        every { exists(any()) } returns false
-        every { exists(match { it.toString().contains(twoDaysFromNow.toString()) }) } returns true
-        every { exists(match { it.toString().contains(threeDaysAgo.toString()) }) } returns true
+        val descendants = mutableListOf<Path>()
 
-        validateClosest(twoDaysFromNow, 5, searchForwards = true)
+        // Files for 2 days from now and 3 days ago.
+        DatabaseType.entries.filter { it.perDate }.forEach{
+            descendants.add(Path.of(twoDaysFromNow.toString(), "${twoDaysFromNow}-${it.fileDescriptor}.sqlite"))
+            descendants.add(Path.of(threeDaysAgo.toString(), "${threeDaysAgo}-${it.fileDescriptor}.sqlite"))
+        }
+
+        every { listFiles(baseDir) } answers { descendants.iterator() }
+
+        validateClosest(twoDaysFromNow, searchForwards = true)
     }
 
     @Test
@@ -152,10 +165,14 @@ class LocalEwbDataFilePathsTest {
         val tomorrow = today.plusDays(1)
         val twoDaysAgo = today.minusDays(2)
 
-        // Find files for tomorrow and 2 days ago.
-        every { exists(any()) } returns false
-        every { exists(match { it.toString().contains(tomorrow.toString()) }) } returns true
-        every { exists(match { it.toString().contains(twoDaysAgo.toString()) }) } returns true
+        val descendants = mutableListOf<Path>()
+        // Files for tomorrow and 2 days ago.
+        DatabaseType.entries.filter { it.perDate }.forEach{
+            descendants.add(Path.of(twoDaysAgo.toString(), "${twoDaysAgo}-${it.fileDescriptor}.sqlite"))
+            descendants.add(Path.of(tomorrow.toString(), "${tomorrow}-${it.fileDescriptor}.sqlite"))
+        }
+
+        every { listFiles(baseDir) } answers { descendants.iterator() }
 
         // Should find two days ago as it doesn't search forward by default.
         assertThat(ewbPaths.findClosest(DatabaseType.NETWORK_MODEL), equalTo(twoDaysAgo))
@@ -185,39 +202,24 @@ class LocalEwbDataFilePathsTest {
         val nonDateDirectories = listOf("other_data", "2002-02-04-backup", "backup-2011-03-09")
         val nonDirectoryFiles = listOf("config.json", "other", "run.sh", "1234-11-22")
 
-        val allFiles = (usableDirectories + emptyDirectories + nonDateDirectories + nonDirectoryFiles)
-        val dateDirectories = (usableDirectories + emptyDirectories)
+        val otherPaths = (emptyDirectories + nonDateDirectories + nonDirectoryFiles)
 
-        every { listFiles(baseDir) } answers { allFiles.map { Paths.get(baseDir.toString(), it) }.iterator() }
-
-        nonDirectoryFiles.forEach {
-            every { isDirectory(Paths.get(baseDir.toString(), it)) } returns false
-        }
-
-        emptyDirectories.forEach {
-            every { exists(baseDir.datedPath(LocalDate.parse(it), dbType.fileDescriptor)) } returns false
-        }
+        every { listFiles(baseDir) } answers {
+            (usableDirectories.map { Paths.get(baseDir.toString(), it, "${dbType.fileDescriptor}.sqlite") } +
+                otherPaths.map { Paths.get(baseDir.toString(), it) }).iterator() }
 
         assertThat(ewbPaths.getAvailableDatesFor(dbType), equalTo(usableDirectories.map { LocalDate.parse(it) }))
 
-        verifySequence {
-            listFiles(baseDir)
-            allFiles.forEach {
-                isDirectory(Paths.get(baseDir.toString(),it))
-                if (it in dateDirectories) {
-                    exists(baseDir.datedPath(LocalDate.parse(it), dbType.fileDescriptor))
-                }
-            }
-        }
+        verify { listFiles(baseDir) }
     }
 
     @Test
     internal fun `getAvailableDatesFor() sorts the returned dates`() {
         val directories = listOf(
-            Path.of("2001-02-03"),
-            Path.of("2032-05-07"),
-            Path.of("2009-05-09"),
-            Path.of("2009-05-08")
+            Path.of("2001-02-03", "network-model.sqlite"),
+            Path.of("2032-05-07", "network-model.sqlite"),
+            Path.of("2009-05-09", "network-model.sqlite"),
+            Path.of("2009-05-08", "network-model.sqlite")
         )
 
         every { listFiles(baseDir) } answers { directories.iterator() }
@@ -241,41 +243,51 @@ class LocalEwbDataFilePathsTest {
         val hasNetworkDirectories = listOf("2111-02-03")
         val emptyDirectories = listOf("2555-11-11")
 
-        val allDirectories = (hasNetworkDirectories + emptyDirectories)
-
-        every { listFiles(baseDir) } answers { allDirectories.map { Paths.get(baseDir.toString(), it) }.iterator() }
-
-        every { exists(any()) } returns false
-        hasNetworkDirectories.forEach {
-            every { exists(baseDir.datedPath(LocalDate.parse(it), DatabaseType.NETWORK_MODEL.fileDescriptor)) } returns true
-        }
+        every { listFiles(baseDir) } answers {
+            (hasNetworkDirectories.map { Paths.get(baseDir.toString(), it, "${it}-network-model.sqlite") } +
+                emptyDirectories.map { Paths.get(baseDir.toString(), it) }).iterator() }
 
         assertThat(ewbPaths.getNetworkModelDatabases(), equalTo(hasNetworkDirectories.map { LocalDate.parse(it) }))
 
-        verifySequence {
-            listFiles(baseDir)
-            allDirectories.forEach {
-                isDirectory(Paths.get(baseDir.toString(), it))
-                exists(baseDir.datedPath(LocalDate.parse(it), DatabaseType.NETWORK_MODEL.fileDescriptor))
-            }
-        }
+        verify { listFiles(baseDir) }
     }
 
-    private fun validateClosest(expectedDate: LocalDate?, expectedExistCalls: Int, searchForwards: Boolean = false) {
+    private fun validateClosest(expectedDate: LocalDate?, searchForwards: Boolean = false) {
         DatabaseType.entries.filter { it.perDate }.forEach {
-            validateClosest(it, expectedDate, expectedExistCalls, searchForwards)
+            validateClosest(it, expectedDate, searchForwards)
         }
     }
 
-    private fun validateClosest(type: DatabaseType, expectedDate: LocalDate?, expectedExistCalls: Int, searchForwards: Boolean = false) {
-        // Clear the calls, so we are not affected by previous calls that may not have been validated.
-        clearMocks(exists, answers = false)
-
+    private fun validateClosest(type: DatabaseType, expectedDate: LocalDate?, searchForwards: Boolean = false) {
         assertThat(ewbPaths.findClosest(type, 10, today, searchForwards), equalTo(expectedDate))
-
-        verify(exactly = expectedExistCalls) { exists(any()) }
     }
 
     private fun Path.datedPath(date: LocalDate, name: String): Path =
         resolve(date.toString()).resolve("$date-$name.sqlite")
+
+    @Test
+    internal fun enumerateDescendants() {
+        val descendants = listOf(
+            Path.of(today.toString(), "${today}-network-model.sqlite"),
+            Path.of(today.toString(), "${today}-customer.sqlite"),
+            Path.of("results-cache.sqlite"),
+            Path.of("weather-readings.sqlite")
+        )
+
+        every { listFiles(baseDir) } answers { descendants.iterator() }
+
+        val result = ewbPaths.enumerateDescendants()
+        assertThat(result.asSequence().count(), `is`(descendants.size))
+        ewbPaths.enumerateDescendants().forEach {
+            assertTrue(descendants.contains(it))
+        }
+
+    }
+
+    @Test
+    internal fun resolveDatabase() {
+        val path = "2333-11-22"
+
+        assertThat(ewbPaths.resolveDatabase(Paths.get(path)), `is`(baseDir.resolve(path)))
+    }
 }

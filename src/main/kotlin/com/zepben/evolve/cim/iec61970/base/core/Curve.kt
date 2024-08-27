@@ -42,29 +42,30 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
 
     /**
      * Add a data point to this [Curve].
+     *
+     * @param curveData data to be added to this curve
      */
     fun addData(curveData: CurveData): Curve = addData(curveData.xValue, curveData.y1Value, curveData.y2Value, curveData.y3Value)
 
     /**
      * The point data values that define this curve. The returned collection is read only.
-     * The curveData in the underlying collection will be sorted by xValue in ascending order.
+     * The returned collection is read only, sorted by [CurveData.xValue] in ascending order.
      */
     val data: List<CurveData> get() = _data.asUnmodifiable()
 
     /**
      * Get point data values by its xValue.
+     *
+     * @param x xValue of requested data
      */
     fun getData(x: Float): CurveData? = _data?.find { it.xValue == x }
 
     /**
-     * A curve object can have 0 or more curveData, index in the list indicates nth x value of stored curveData.
+     * Get point data values by its xValue.
+     *
+     * @param x xValue of requested data
      */
-    private fun getData(sequenceNumber: Int): CurveData? = _data?.get(sequenceNumber)
-
-    /**
-     * Get point data values by its sequenceNumber.
-     */
-    operator fun get(sequenceNumber: Int): CurveData? = getData(sequenceNumber)
+    operator fun get(x: Float): CurveData? = getData(x)
 
     /**
      * Remove data point from the this [Curve].

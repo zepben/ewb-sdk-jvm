@@ -676,7 +676,7 @@ class NetworkCimReader(
             connectionCategory = resultSet.getNullableString(table.CONNECTION_CATEGORY.queryIndex)
             ratedPower = resultSet.getNullableInt(table.RATED_POWER.queryIndex)
             approvedInverterCapacity = resultSet.getNullableInt(table.APPROVED_INVERTER_CAPACITY.queryIndex)
-            phaseCode = resultSet.getNullableString(table.PHASE_CODE.queryIndex)?.let { PhaseCode.valueOf(it) }
+            phaseCode = resultSet.getString(table.PHASE_CODE.queryIndex).let { PhaseCode.valueOf(it) }
         }
 
         return loadIdentifiedObject(usagePoint, table, resultSet) && service.addOrThrow(usagePoint)

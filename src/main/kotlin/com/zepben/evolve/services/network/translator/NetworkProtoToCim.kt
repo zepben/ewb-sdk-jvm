@@ -458,6 +458,7 @@ fun toCim(pb: PBUsagePoint, networkService: NetworkService): UsagePoint =
         connectionCategory = pb.connectionCategory.takeIf { it.isNotBlank() }
         ratedPower = pb.ratedPower.takeIf { it != UNKNOWN_INT }
         approvedInverterCapacity = pb.approvedInverterCapacity.takeIf { it != UNKNOWN_INT }
+        pb.phaseCode?.name?.let { phaseCode = PhaseCode.valueOf(it) }
 
         pb.equipmentMRIDsList.forEach { equipmentMRID ->
             networkService.resolveOrDeferReference(Resolvers.equipment(this), equipmentMRID)

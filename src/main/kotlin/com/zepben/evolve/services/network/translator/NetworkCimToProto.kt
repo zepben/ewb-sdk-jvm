@@ -469,6 +469,7 @@ fun toPb(cim: UsagePoint, pb: PBUsagePoint.Builder): PBUsagePoint.Builder =
         isVirtual = cim.isVirtual
         ratedPower = cim.ratedPower ?: UNKNOWN_INT
         approvedInverterCapacity = cim.approvedInverterCapacity ?: UNKNOWN_INT
+        phaseCode = PBPhaseCode.valueOf(cim.phaseCode.name)
         cim.connectionCategory?.let { connectionCategory = it } ?: clearConnectionCategory()
         clearEquipmentMRIDs()
         cim.equipment.forEach { addEquipmentMRIDs(it.mRID) }

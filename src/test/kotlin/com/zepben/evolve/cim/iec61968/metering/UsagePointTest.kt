@@ -40,7 +40,7 @@ internal class UsagePointTest {
         assertThat(usagePoint.connectionCategory, nullValue())
         assertThat(usagePoint.ratedPower, nullValue())
         assertThat(usagePoint.approvedInverterCapacity, nullValue())
-        assertThat(usagePoint.phaseCode, nullValue())
+        assertThat(usagePoint.phaseCode, equalTo(PhaseCode.NONE))
 
         usagePoint.fillFields(NetworkService())
 

@@ -291,7 +291,13 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdentifiedObject()
 
             compareIdReferences(UsagePoint::usagePointLocation)
-            compareValues(UsagePoint::isVirtual, UsagePoint::connectionCategory, UsagePoint::ratedPower, UsagePoint::approvedInverterCapacity)
+            compareValues(
+                UsagePoint::isVirtual,
+                UsagePoint::connectionCategory,
+                UsagePoint::ratedPower,
+                UsagePoint::approvedInverterCapacity,
+                UsagePoint::phaseCode
+            )
             if (options.compareLvSimplification)
                 compareIdReferenceCollections(UsagePoint::equipment, UsagePoint::endDevices)
         }

@@ -623,6 +623,7 @@ class NetworkCimWriter(
         insert.setNullableString(table.CONNECTION_CATEGORY.queryIndex, usagePoint.connectionCategory)
         insert.setNullableInt(table.RATED_POWER.queryIndex, usagePoint.ratedPower)
         insert.setNullableInt(table.APPROVED_INVERTER_CAPACITY.queryIndex, usagePoint.approvedInverterCapacity)
+        insert.setString(table.PHASE_CODE.queryIndex, usagePoint.phaseCode.name)
 
         var status = true
         usagePoint.equipment.forEach { status = status and saveAssociation(it, usagePoint) }

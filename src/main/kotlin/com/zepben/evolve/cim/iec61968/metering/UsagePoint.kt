@@ -39,7 +39,7 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     var connectionCategory: String? = null
     var ratedPower: Int? = null
     var approvedInverterCapacity: Int? = null
-    var phaseCode: PhaseCode? = null
+    var phaseCode: PhaseCode = PhaseCode.NONE
 
     private var _equipment: MutableList<Equipment>? = null
     private var _endDevices: MutableList<EndDevice>? = null

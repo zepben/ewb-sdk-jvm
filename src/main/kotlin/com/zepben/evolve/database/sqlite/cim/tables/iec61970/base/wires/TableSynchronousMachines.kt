@@ -13,7 +13,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 
 /**
- * A class representing the PetersenCoil columns required for the database table.
+ * A class representing the SynchronousMachine columns required for the Datdatabaseabase table.
  *
  * @property BASE_Q Default base reactive power value in VAr. This value represents the initial reactive power that can be used by any application function.
  * @property CONDENSER_P Active power consumed (watts) when in condenser mode operation.

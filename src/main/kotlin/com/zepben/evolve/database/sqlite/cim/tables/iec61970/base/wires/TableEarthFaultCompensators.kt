@@ -13,7 +13,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableConductingEquipment
 
 /**
- * An abstract class for EarthFaultCompensator Tables.
+ * A class representing the EarthFaultCompensator columns required for the database table.
  *
  * @property R A column storing the Nominal resistance of device in ohms.
  */

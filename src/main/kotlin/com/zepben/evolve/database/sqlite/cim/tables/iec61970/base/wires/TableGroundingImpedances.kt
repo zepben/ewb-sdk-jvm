@@ -12,7 +12,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 
 /**
- * A class representing the customer columns required for the database table.
+ * A class representing the GroundingImpedance columns required for the database table.
  *
  * @property X A column storing the Reactance of device in ohms.
  */

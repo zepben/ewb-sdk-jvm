@@ -14,7 +14,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
 /**
- * A class representing the CurveData columns required for the Database table.
+ * A class representing the CurveData columns required for the database table.
  *
  * @property CURVE_MRID A column storing the curve mRID.
  * @property X_VALUE A column storing the xValue of this curve data point.

@@ -20,6 +20,25 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
     private var _data: MutableList<CurveData>? = null
 
     /**
+     * The point data values that define this curve. The returned collection is read only, sorted by [CurveData.xValue] in ascending order.
+     */
+    val data: List<CurveData> get() = _data.asUnmodifiable()
+
+    /**
+     * Get point data values by its xValue.
+     *
+     * @param x xValue of requested data
+     */
+    fun getData(x: Float): CurveData? = _data?.find { it.xValue == x }
+
+    /**
+     * Get point data values by its xValue.
+     *
+     * @param x xValue of requested data
+     */
+    operator fun get(x: Float): CurveData? = getData(x)
+
+    /**
      * Add a data point to this [Curve].
      *
      * @param x The data value of the X-axis variable, depending on the X-axis units.
@@ -46,25 +65,6 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
      * @param curveData data to be added to this curve
      */
     fun addData(curveData: CurveData): Curve = addData(curveData.xValue, curveData.y1Value, curveData.y2Value, curveData.y3Value)
-
-    /**
-     * The point data values that define this curve. The returned collection is read only, sorted by [CurveData.xValue] in ascending order.
-     */
-    val data: List<CurveData> get() = _data.asUnmodifiable()
-
-    /**
-     * Get point data values by its xValue.
-     *
-     * @param x xValue of requested data
-     */
-    fun getData(x: Float): CurveData? = _data?.find { it.xValue == x }
-
-    /**
-     * Get point data values by its xValue.
-     *
-     * @param x xValue of requested data
-     */
-    operator fun get(x: Float): CurveData? = getData(x)
 
     /**
      * Remove data point from the this [Curve].

@@ -20,12 +20,11 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
  * @property P Active power injection in watts. Load sign convention is used, i.e. positive sign means flow out from a node. Starting value for a steady state solution.
  * @property Q Reactive power injection in VAr. Load sign convention is used, i.e. positive sign means flow out from a node. Starting value for a steady state solution.
  */
-
 @Suppress("PropertyName")
 abstract class TableRotatingMachines : TableRegulatingCondEq() {
 
     val RATED_POWER_FACTOR: Column = Column(++columnIndex, "rated_power_factor", "NUMBER", NULL)
-    val RATED_S: Column = Column(++columnIndex, "rated_s", "INTEGER", NULL)
+    val RATED_S: Column = Column(++columnIndex, "rated_s", "NUMBER", NULL)
     val RATED_U: Column = Column(++columnIndex, "rated_u", "INTEGER", NULL)
     val P: Column = Column(++columnIndex, "p", "NUMBER", NULL)
     val Q: Column = Column(++columnIndex, "q", "NUMBER", NULL)

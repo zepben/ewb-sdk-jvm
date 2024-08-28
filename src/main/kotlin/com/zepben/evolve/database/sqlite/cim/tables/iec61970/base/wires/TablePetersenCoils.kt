@@ -17,7 +17,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
  * @property X_GROUND_NOMINAL A column storing the nominal reactance in ohms. This is the operating point (normally over compensation) that is defined based
  * on the resonance point in the healthy network condition. The impedance is calculated based on nominal voltage divided by position current.
  */
-
 @Suppress("PropertyName")
 class TablePetersenCoils : TableEarthFaultCompensators() {
 

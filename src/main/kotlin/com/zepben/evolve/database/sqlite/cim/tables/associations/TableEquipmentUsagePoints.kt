@@ -18,7 +18,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * @property EQUIPMENT_MRID A column storing the mRID of Equipment.
  * @property USAGE_POINT_MRID A column storing the mRID of UsagePoints.
  */
-
 @Suppress("PropertyName")
 class TableEquipmentUsagePoints : SqliteTable() {
 

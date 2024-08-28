@@ -16,7 +16,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
  *
  * @property X A column storing the Reactance of device in ohms.
  */
-
 @Suppress("PropertyName")
 class TableGroundingImpedances : TableEarthFaultCompensators() {
 

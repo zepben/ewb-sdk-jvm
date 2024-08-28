@@ -10,6 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
+import com.zepben.evolve.services.common.extensions.validateReference
 
 /**
  * An electromechanical device that operates with shaft rotating synchronously with the network. It is a single machine operating either as a generator or
@@ -46,11 +47,11 @@ import com.zepben.evolve.services.common.extensions.getByMRID
  */
 class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : RotatingMachine(mRID) {
 
-    private var _reactiveCapabilityCurve: MutableList<ReactiveCapabilityCurve>? = null
+    private var _reactiveCapabilityCurves: MutableList<ReactiveCapabilityCurve>? = null
 
     var baseQ: Double? = null
     var condenserP: Int? = null
-    var earthing: Boolean? = null
+    var earthing: Boolean = false
     var earthingStarPointR: Double? = null
     var earthingStarPointX: Double? = null
     var ikk: Double? = null
@@ -79,12 +80,12 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
      * All available [ReactiveCapabilityCurve] for this synchronous machine.
      * First entry is the default [ReactiveCapabilityCurve]
      */
-    val curves: Collection<ReactiveCapabilityCurve> get() = _reactiveCapabilityCurve.asUnmodifiable()
+    val curves: Collection<ReactiveCapabilityCurve> get() = _reactiveCapabilityCurves.asUnmodifiable()
 
     /**
      * Get the number of entries in the [ReactiveCapabilityCurve] collection.
      */
-    fun numCurves(): Int = _reactiveCapabilityCurve?.size ?: 0
+    fun numCurves(): Int = _reactiveCapabilityCurves?.size ?: 0
 
     /**
      * The individual [ReactiveCapabilityCurve] for this [SynchronousMachine]
@@ -92,7 +93,7 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
      * @param mRID the mRID of the required [ReactiveCapabilityCurve]
      * @return The [ReactiveCapabilityCurve] with the specified [mRID] if it exists, otherwise null
      */
-    fun getCurve(mRID: String): ReactiveCapabilityCurve? = _reactiveCapabilityCurve?.getByMRID(mRID)
+    fun getCurve(mRID: String): ReactiveCapabilityCurve? = _reactiveCapabilityCurves?.getByMRID(mRID)
 
     /**
      * Add a [ReactiveCapabilityCurve] for this [SynchronousMachine]
@@ -100,9 +101,10 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
      * @param rcc the [ReactiveCapabilityCurve] to be added from this [SynchronousMachine]
      */
     fun addCurve(rcc: ReactiveCapabilityCurve): SynchronousMachine {
+        if (validateReference(rcc, ::getCurve, "A ReactiveCapabilityCurve"))
+            return this
 
-        _reactiveCapabilityCurve = _reactiveCapabilityCurve ?: mutableListOf()
-        _reactiveCapabilityCurve!!.add(rcc)
+        _reactiveCapabilityCurves = _reactiveCapabilityCurves.or(::mutableListOf) { add(rcc) }
 
         return this
     }
@@ -114,8 +116,8 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
      * @return true if [ReactiveCapabilityCurve] has been removed from this [SynchronousMachine]
      */
     fun removeCurve(curve: ReactiveCapabilityCurve?): Boolean {
-        val ret = _reactiveCapabilityCurve?.remove(curve) == true
-        if (_reactiveCapabilityCurve.isNullOrEmpty()) _reactiveCapabilityCurve = null
+        val ret = _reactiveCapabilityCurves?.remove(curve) == true
+        if (_reactiveCapabilityCurves.isNullOrEmpty()) _reactiveCapabilityCurves = null
         return ret
     }
 
@@ -123,7 +125,7 @@ class SynchronousMachine @JvmOverloads constructor(mRID: String = "") : Rotating
      * Clear all [ReactiveCapabilityCurve] for this [SynchronousMachine].
      */
     fun clearCurve(): SynchronousMachine {
-        _reactiveCapabilityCurve = null
+        _reactiveCapabilityCurves = null
         return this
     }
 

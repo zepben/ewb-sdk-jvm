@@ -18,7 +18,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * @property CIRCUIT_MRID A column storing the mRID of Circuits.
  * @property TERMINAL_MRID A column storing the mRID of Terminals.
  */
-
 @Suppress("PropertyName")
 class TableCircuitsTerminals : SqliteTable() {
 

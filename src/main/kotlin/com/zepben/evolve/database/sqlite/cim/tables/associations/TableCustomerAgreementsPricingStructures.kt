@@ -18,7 +18,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * @property CUSTOMER_AGREEMENT_MRID A column storing the mRID of CustomerAgreements.
  * @property PRICING_STRUCTURE_MRID A column storing the mRID of PricingStructures.
  */
-
 @Suppress("PropertyName")
 class TableCustomerAgreementsPricingStructures : SqliteTable() {
 

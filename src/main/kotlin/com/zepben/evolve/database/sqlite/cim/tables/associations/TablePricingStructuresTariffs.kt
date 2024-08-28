@@ -18,7 +18,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * @property PRICING_STRUCTURE_MRID A column storing the mRID of PricingStructures.
  * @property TARIFF_MRID A column storing the mRID of Tariffs.
  */
-
 @Suppress("PropertyName")
 class TablePricingStructuresTariffs : SqliteTable() {
 

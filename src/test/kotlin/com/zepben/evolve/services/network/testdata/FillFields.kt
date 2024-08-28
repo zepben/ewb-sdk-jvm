@@ -1342,7 +1342,7 @@ fun SynchronousMachine.fillFields(service: NetworkService, includeRuntime: Boole
 
     baseQ = 1.1
     condenserP = 2
-    earthing = false
+    earthing = true
     earthingStarPointR = 3.3
     earthingStarPointX = 4.4
     ikk = 5.5

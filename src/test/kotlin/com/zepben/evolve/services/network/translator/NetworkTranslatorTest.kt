@@ -64,17 +64,20 @@ internal class NetworkTranslatorTest {
     private val abstractCreators = mapOf<Class<*>, (String) -> IdentifiedObject>(
         AssetOrganisationRole::class.java to { AssetOwner(it) },
         ConductingEquipment::class.java to { Junction(it) },
+        Curve::class.java to { ReactiveCapabilityCurve(it) },
         EndDevice::class.java to { Meter(it) },
         Equipment::class.java to { Junction(it) },
         EquipmentContainer::class.java to { Site(it) },
+        EarthFaultCompensator::class.java to { GroundingImpedance(it) },
         Measurement::class.java to { Discrete(it) },
-        TransformerEnd::class.java to { PowerTransformerEnd(it) },
-        WireInfo::class.java to { OverheadWireInfo(it) },
         ProtectionRelayFunction::class.java to { CurrentRelay(it) },
         ProtectedSwitch::class.java to { Breaker(it) },
         RegulatingControl::class.java to { TapChangerControl(it) },
         RegulatingCondEq::class.java to { PowerElectronicsConnection(it) },
-        Sensor::class.java to { CurrentTransformer(it) }
+        RotatingMachine::class.java to { SynchronousMachine(it) },
+        Sensor::class.java to { CurrentTransformer(it) },
+        TransformerEnd::class.java to { PowerTransformerEnd(it) },
+        WireInfo::class.java to { OverheadWireInfo(it) },
     )
 
     @Test
@@ -168,16 +171,20 @@ internal class NetworkTranslatorTest {
         validate({ Fuse() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Ground() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ GroundDisconnector() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ GroundingImpedance() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Jumper() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Junction() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ LinearShuntCompensator() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ LoadBreakSwitch() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ PerLengthSequenceImpedance() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ PetersenCoil() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ PowerTransformer() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ PowerTransformerEnd() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ RatioTapChanger() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ ReactiveCapabilityCurve() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ Recloser() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ SeriesCompensator() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
+        validate({ SynchronousMachine() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ TransformerStarImpedance() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
         validate({ TapChangerControl() }, { ns, it -> it.fillFields(ns) }, { ns, it -> ns.addFromPb(nsToPb.toPb(it)) })
 

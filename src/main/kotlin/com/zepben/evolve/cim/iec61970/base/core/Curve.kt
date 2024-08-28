@@ -48,8 +48,7 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
     fun addData(curveData: CurveData): Curve = addData(curveData.xValue, curveData.y1Value, curveData.y2Value, curveData.y3Value)
 
     /**
-     * The point data values that define this curve. The returned collection is read only.
-     * The returned collection is read only, sorted by [CurveData.xValue] in ascending order.
+     * The point data values that define this curve. The returned collection is read only, sorted by [CurveData.xValue] in ascending order.
      */
     val data: List<CurveData> get() = _data.asUnmodifiable()
 

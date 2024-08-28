@@ -2124,7 +2124,7 @@ class NetworkCimWriter(
 
         var status = true
         synchronousMachine.curves.forEach { rcc ->
-            status = status && saveAssociation(synchronousMachine, rcc)
+            status = status and saveAssociation(synchronousMachine, rcc)
         }
 
         return status and saveRotatingMachine(table, insert, synchronousMachine, "synchronous machine")

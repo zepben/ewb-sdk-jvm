@@ -35,7 +35,7 @@ internal class SynchronousMachineTest {
 
         assertThat(synchronousMachine.baseQ, equalTo(null))
         assertThat(synchronousMachine.condenserP, equalTo(null))
-        assertThat(synchronousMachine.earthing, equalTo(null))
+        assertThat(synchronousMachine.earthing, equalTo(false))
         assertThat(synchronousMachine.earthingStarPointR, equalTo(null))
         assertThat(synchronousMachine.earthingStarPointX, equalTo(null))
         assertThat(synchronousMachine.ikk, equalTo(null))
@@ -59,7 +59,7 @@ internal class SynchronousMachineTest {
 
         assertThat(synchronousMachine.baseQ, equalTo(1.1))
         assertThat(synchronousMachine.condenserP, equalTo(2))
-        assertThat(synchronousMachine.earthing, equalTo(false))
+        assertThat(synchronousMachine.earthing, equalTo(true))
         assertThat(synchronousMachine.earthingStarPointR, equalTo(3.3))
         assertThat(synchronousMachine.earthingStarPointX, equalTo(4.4))
         assertThat(synchronousMachine.ikk, equalTo(5.5))

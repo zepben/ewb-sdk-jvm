@@ -22,7 +22,7 @@ internal fun changeSet55() = ChangeSet(
         `Create table petersen_coils`,
         `Create table reactive_capability_curves`,
         `Create table synchronous_machines`,
-        `Create table synchronous_machine_reactive_capability_curves`,
+        `Create table synchronous_machines_reactive_capability_curves`,
     )
 )
 
@@ -135,7 +135,7 @@ private val `Create table synchronous_machines` = Change(
             q NUMBER NULL,
             base_q NUMBER NULL,
             condenser_p INTEGER NULL,
-            earthing BOOLEAN NULL,
+            earthing BOOLEAN NOT NULL,
             earthing_star_point_r NUMBER NULL,
             earthing_star_point_x NUMBER NULL,
             ikk NUMBER NULL,
@@ -165,15 +165,15 @@ private val `Create table synchronous_machines` = Change(
 // #######################
 
 @Suppress("ObjectPropertyName")
-private val `Create table synchronous_machine_reactive_capability_curves` = Change(
+private val `Create table synchronous_machines_reactive_capability_curves` = Change(
     listOf(
-        """CREATE TABLE synchronous_machine_reactive_capability_curves (
+        """CREATE TABLE synchronous_machines_reactive_capability_curves (
             SYNCHRONOUS_MACHINE_MRID TEXT NOT_NULL,
             REACTIVE_CAPABILITY_CURVE_MRID TEXT NOT_NULL
         );""".trimIndent(),
-        "CREATE UNIQUE INDEX synchronous_machines_mrid_reactive_capability_curve_mrid ON synchronous_machine_reactive_capability_curves (synchronous_machine_mrid, reactive_capability_curve_mrid);",
-        "CREATE INDEX synchronous_machine_reactive_capability_curves_synchronous_machine_mrid ON synchronous_machine_reactive_capability_curves (synchronous_machine_mrid);",
-        "CREATE INDEX synchronous_machine_reactive_capability_curves_reactive_capability_curve_mrid ON synchronous_machine_reactive_capability_curves (reactive_capability_curve_mrid);"
+        "CREATE UNIQUE INDEX synchronous_machines_mrid_reactive_capability_curve_mrid ON synchronous_machines_reactive_capability_curves (synchronous_machine_mrid, reactive_capability_curve_mrid);",
+        "CREATE INDEX synchronous_machines_reactive_capability_curves_synchronous_machine_mrid ON synchronous_machines_reactive_capability_curves (synchronous_machine_mrid);",
+        "CREATE INDEX synchronous_machines_reactive_capability_curves_reactive_capability_curve_mrid ON synchronous_machines_reactive_capability_curves (reactive_capability_curve_mrid);"
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )

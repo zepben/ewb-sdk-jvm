@@ -18,7 +18,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * @property PROTECTION_RELAY_SCHEME_MRID A column storing the mRID of ProtectionRelaySchemes.
  * @property PROTECTION_RELAY_FUNCTION_MRID A column storing the mRID of ProtectionRelayFunctions.
  */
-
 @Suppress("PropertyName")
 class TableProtectionRelaySchemesProtectionRelayFunctions : SqliteTable() {
 

@@ -19,7 +19,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * @property SUBSTATION_MRID A column storing the mRID of Substations.
  * @property RELATIONSHIP A column storing the type of relationships between the Loop and the Substation.
  */
-
 @Suppress("PropertyName")
 class TableLoopsSubstations : SqliteTable() {
 

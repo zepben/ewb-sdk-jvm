@@ -29,7 +29,7 @@ object ChangeSet55NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         "INSERT INTO petersen_coils (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, r, x_ground_nominal) VALUES ('mrid', 'name', 'description', 1, 'location_mrid', 1, true, true, 'commissioned_date', 'base_voltage_mrid', 3.0, 3.0);",
         "INSERT INTO reactive_capability_curves (mrid, name, description, num_diagram_objects) VALUES ('mrid', 'name', 'description', 1);",
         "INSERT INTO synchronous_machines (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, control_enabled, regulating_control_mrid, rated_power_factor, rated_s, rated_u, p, q, base_q, condenser_p, earthing, earthing_star_point_r, earthing_star_point_x, ikk, max_q, max_u, min_q, min_u, mu, r, r0, r2, sat_direct_subtrans_x, sat_direct_sync_x, sat_direct_trans_x, x0, x2, type, operating_mode) VALUES ('mrid', 'name', 'description', 1, 'location_mrid', 1, true, true, 'commissioned_date', 'base_voltage_mrid', true, 'regulating_control_mrid', 1.0, 1.0, 1, 1.0, 1.0, 1.0, 1, true, 1.0, 1.0, 1.0, 1.0, 1, 1.0, 1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 'generator', 'generator');",
-        "INSERT INTO synchronous_machine_reactive_capability_curves (synchronous_machine_mrid, reactive_capability_curve_mrid) VALUES ('synchronous_machine_mrid', 'reactive_capability_curve_mrid');"
+        "INSERT INTO synchronous_machines_reactive_capability_curves (synchronous_machine_mrid, reactive_capability_curve_mrid) VALUES ('synchronous_machine_mrid', 'reactive_capability_curve_mrid');"
     )
 
     override fun validateChanges(statement: Statement) {
@@ -58,7 +58,7 @@ object ChangeSet55NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
             "DELETE FROM reactive_capability_curves;",
             "DELETE FROM synchronous_machines;",
             "DELETE FROM usage_points",
-            "DELETE FROM synchronous_machine_reactive_capability_curves"
+            "DELETE FROM synchronous_machines_reactive_capability_curves"
         )
 
     private fun ensureNewAdded(statement: Statement) {
@@ -69,7 +69,7 @@ object ChangeSet55NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
             "petersen_coils",
             "reactive_capability_curves",
             "synchronous_machines",
-            "synchronous_machine_reactive_capability_curves"
+            "synchronous_machines_reactive_capability_curves"
         )
 
         ensureIndexes(
@@ -80,8 +80,8 @@ object ChangeSet55NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
             "petersen_coils_mrid",
             "reactive_capability_curves_mrid",
             "synchronous_machines_mrid",
-            "synchronous_machine_reactive_capability_curves_synchronous_machine_mrid",
-            "synchronous_machine_reactive_capability_curves_reactive_capability_curve_mrid"
+            "synchronous_machines_reactive_capability_curves_synchronous_machine_mrid",
+            "synchronous_machines_reactive_capability_curves_reactive_capability_curve_mrid"
         )
     }
 }

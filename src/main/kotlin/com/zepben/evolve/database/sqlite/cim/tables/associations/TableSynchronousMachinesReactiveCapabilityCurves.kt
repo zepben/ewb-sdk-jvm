@@ -18,14 +18,13 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * @property SYNCHRONOUS_MACHINE_MRID A column storing the mRID of SynchronousMachines.
  * @property REACTIVE_CAPABILITY_CURVE_MRID A column storing the mRID of ReactiveCapabilityCurves.
  */
-
 @Suppress("PropertyName")
 class TableSynchronousMachinesReactiveCapabilityCurves : SqliteTable() {
 
     val SYNCHRONOUS_MACHINE_MRID: Column = Column(++columnIndex, "synchronous_machine_mrid", "TEXT", NOT_NULL)
     val REACTIVE_CAPABILITY_CURVE_MRID: Column = Column(++columnIndex, "reactive_capability_curve_mrid", "TEXT", NOT_NULL)
 
-    override val name: String = "synchronous_machine_reactive_capability_curves"
+    override val name: String = "synchronous_machines_reactive_capability_curves"
 
     override val uniqueIndexColumns: MutableList<List<Column>> =
         super.uniqueIndexColumns.apply {

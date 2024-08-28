@@ -18,7 +18,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * @property ASSET_ORGANISATION_ROLE_MRID A column storing the mRID of AssetOrganisationRoles.
  * @property ASSET_MRID A column storing the mRID of Assets.
  */
-
 @Suppress("PropertyName")
 class TableAssetOrganisationRolesAssets : SqliteTable() {
 

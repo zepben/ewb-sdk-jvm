@@ -22,7 +22,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * @property Y2_VALUE A column storing the y2Value of this curve data point.
  * @property Y3_VALUE A column storing the y3Value of this curve data point.
  */
-
 @Suppress("PropertyName")
 class TableCurveData : SqliteTable() {
 

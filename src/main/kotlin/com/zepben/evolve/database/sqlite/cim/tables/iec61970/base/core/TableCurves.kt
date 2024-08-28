@@ -11,5 +11,4 @@ package com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core
 /**
  * An abstract class for Curve Tables.
  */
-
 abstract class TableCurves : TableIdentifiedObjects()

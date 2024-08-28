@@ -2321,7 +2321,7 @@ class NetworkCimReader(
         val synschronousMachine = SynchronousMachine(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             baseQ = resultSet.getNullableDouble(table.BASE_Q.queryIndex)
             condenserP = resultSet.getNullableInt(table.CONDENSER_P.queryIndex)
-            earthing = resultSet.getNullableBoolean(table.EARTHING.queryIndex)
+            earthing = resultSet.getBoolean(table.EARTHING.queryIndex)
             earthingStarPointR = resultSet.getNullableDouble(table.EARTHING_STAR_POINT_R.queryIndex)
             earthingStarPointX = resultSet.getNullableDouble(table.EARTHING_STAR_POINT_X.queryIndex)
             ikk = resultSet.getNullableDouble(table.IKK.queryIndex)

@@ -42,13 +42,12 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
  * @property TYPE Modes that this synchronous machine can operate in.
  * @property OPERATING_MODE Current mode of operation.
  */
-
 @Suppress("PropertyName")
 class TableSynchronousMachines : TableRotatingMachines() {
 
     val BASE_Q: Column = Column(++columnIndex, "base_q", "NUMBER", NULL)
     val CONDENSER_P: Column = Column(++columnIndex, "condenser_p", "INTEGER", NULL)
-    val EARTHING: Column = Column(++columnIndex, "earthing", "BOOLEAN", NULL)
+    val EARTHING: Column = Column(++columnIndex, "earthing", "BOOLEAN", NOT_NULL)
     val EARTHING_STAR_POINT_R: Column = Column(++columnIndex, "earthing_star_point_r", "NUMBER", NULL)
     val EARTHING_STAR_POINT_X: Column = Column(++columnIndex, "earthing_star_point_x", "NUMBER", NULL)
     val IKK: Column = Column(++columnIndex, "ikk", "NUMBER", NULL)
@@ -68,6 +67,6 @@ class TableSynchronousMachines : TableRotatingMachines() {
     val TYPE: Column = Column(++columnIndex, "type", "TEXT", NOT_NULL)
     val OPERATING_MODE: Column = Column(++columnIndex, "operating_mode", "TEXT", NOT_NULL)
 
-    override val name: String = "synchronous_rotating_machines"
+    override val name: String = "synchronous_machines"
 
 }

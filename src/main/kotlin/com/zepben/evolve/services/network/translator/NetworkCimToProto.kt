@@ -1191,7 +1191,7 @@ fun toPb(cim: SynchronousMachine, pb: PBSynchronousMachine.Builder): PBSynchrono
     pb.apply {
         baseQ = cim.baseQ ?: UNKNOWN_DOUBLE
         condenserP = cim.condenserP ?: UNKNOWN_INT
-        cim.earthing?.let { earthing = it }
+        earthing = cim.earthing
         earthingStarPointR = cim.earthingStarPointR ?: UNKNOWN_DOUBLE
         earthingStarPointX = cim.earthingStarPointX ?: UNKNOWN_DOUBLE
         ikk = cim.ikk ?: UNKNOWN_DOUBLE
@@ -1401,6 +1401,7 @@ class NetworkCimToProto : BaseCimToProto() {
     // IEC61970 BASE CORE
     fun toPb(cim: BaseVoltage): PBBaseVoltage = cim.toPb()
     fun toPb(cim: ConnectivityNode): PBConnectivityNode = cim.toPb()
+    fun toPb(cim: CurveData): PBCurveData = cim.toPb()
     fun toPb(cim: Feeder): PBFeeder = cim.toPb()
     fun toPb(cim: GeographicalRegion): PBGeographicalRegion = cim.toPb()
     fun toPb(cim: Site): PBSite = cim.toPb()
@@ -1445,18 +1446,22 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: Fuse): PBFuse = cim.toPb()
     fun toPb(cim: Ground): PBGround = cim.toPb()
     fun toPb(cim: GroundDisconnector): PBGroundDisconnector = cim.toPb()
+    fun toPb(cim: GroundingImpedance): PBGroundingImpedance = cim.toPb()
     fun toPb(cim: Jumper): PBJumper = cim.toPb()
     fun toPb(cim: Junction): PBJunction = cim.toPb()
     fun toPb(cim: LinearShuntCompensator): PBLinearShuntCompensator = cim.toPb()
     fun toPb(cim: LoadBreakSwitch): PBLoadBreakSwitch = cim.toPb()
     fun toPb(cim: PerLengthSequenceImpedance): PBPerLengthSequenceImpedance = cim.toPb()
+    fun toPb(cim: PetersenCoil): PBPetersenCoil = cim.toPb()
     fun toPb(cim: PowerElectronicsConnection): PBPowerElectronicsConnection = cim.toPb()
     fun toPb(cim: PowerElectronicsConnectionPhase): PBPowerElectronicsConnectionPhase = cim.toPb()
     fun toPb(cim: PowerTransformer): PBPowerTransformer = cim.toPb()
     fun toPb(cim: PowerTransformerEnd): PBPowerTransformerEnd = cim.toPb()
     fun toPb(cim: RatioTapChanger): PBRatioTapChanger = cim.toPb()
+    fun toPb(cim: ReactiveCapabilityCurve): PBReactiveCapabilityCurve = cim.toPb()
     fun toPb(cim: Recloser): PBRecloser = cim.toPb()
     fun toPb(cim: SeriesCompensator): PBSeriesCompensator = cim.toPb()
+    fun toPb(cim: SynchronousMachine): PBSynchronousMachine = cim.toPb()
     fun toPb(cim: TapChangerControl): PBTapChangerControl = cim.toPb()
     fun toPb(cim: TransformerStarImpedance): PBTransformerStarImpedance = cim.toPb()
 

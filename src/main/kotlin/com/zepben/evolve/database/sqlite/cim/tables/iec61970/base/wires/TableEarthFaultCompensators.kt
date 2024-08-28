@@ -17,7 +17,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableCond
  *
  * @property R A column storing the Nominal resistance of device in ohms.
  */
-
 @Suppress("PropertyName")
 abstract class TableEarthFaultCompensators : TableConductingEquipment() {
 

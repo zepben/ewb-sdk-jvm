@@ -18,7 +18,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * @property EQUIPMENT_MRID A column storing the mRID of Equipment.
  * @property OPERATIONAL_RESTRICTION_MRID A column storing the mRID of OperationalRestrictions.
  */
-
 @Suppress("PropertyName")
 class TableEquipmentOperationalRestrictions : SqliteTable() {
 

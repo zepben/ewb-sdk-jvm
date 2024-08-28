@@ -10,7 +10,9 @@ package com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableCurves
 
-
+/**
+ * A class representing the ReactiveCapabilityCurve columns required for the database table.
+ */
 class TableReactiveCapabilityCurves : TableCurves() {
 
     override val name: String = "reactive_capability_curves"

@@ -18,6 +18,9 @@
 * Removed `PowerTransformer.forEachRating` which looped over the collection with an index that made no sense. Please loop over `PowerTransformer.sRatings`
   instead.
 * `Equipment` to `EquipmentContainer` links for LV feeders are no longer written to the database, they should never have been.
+*  Refactored `EwbDataFilePaths`: 
+  * The `EwbDataFilePaths` class has been refactored into an interface to enhance flexibility and abstraction. 
+  * A new class, `LocalEwbDataFilePaths`, has been introduced to specifically handle the resolution of database paths for the local file system.
 
 ### New Features
 * A file named after the ID of an ingestion job is now created when running `MetricsDatabaseWriter.save()`. For this feature to take effect, a `modelPath` must

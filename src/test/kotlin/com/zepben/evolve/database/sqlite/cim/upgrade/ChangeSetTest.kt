@@ -130,7 +130,7 @@ internal class ChangeSetTest {
         changeSetValidators: Map<Int, ChangeSetValidator>,
         changesSets: UpgradeRunner.() -> List<ChangeSet>,
         type: DatabaseType,
-        expectedTable: BaseDatabaseTables? = null
+        expectedTables: BaseDatabaseTables? = null
     ) {
         val runner = UpgradeRunner()
         val tableVersion = tableCimVersion
@@ -177,7 +177,7 @@ internal class ChangeSetTest {
 
         // We are using the tables rather than the database reader because setting up the reader is more complex than it needs to be
         logger.info("Validating finalized database against expected tables")
-        expectedTable?.tables?.forEach {
+        expectedTables?.tables?.forEach {
             conn.prepareStatement(it.value.preparedInsertSql)
         }
     }

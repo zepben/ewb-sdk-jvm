@@ -14,6 +14,9 @@ package com.zepben.evolve.cim.iec61970.base.wires
 @Suppress("EnumEntryName")
 enum class SynchronousMachineKind {
 
+    /**
+     * Indicates the synchronous machine operates in an unknown manner.
+     */
     UNKNOWN,
 
     /**

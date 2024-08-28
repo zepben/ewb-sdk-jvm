@@ -174,7 +174,8 @@ internal class ChangeSetTest {
                 }
             }
         }
-        // Check finalized database against all expected tables
+
+        // We are using the tables rather than the database reader because setting up the reader is more complex than it needs to be
         logger.info("Validating finalized database against expected tables")
         expectedTable?.tables?.forEach {
             conn.prepareStatement(it.value.preparedInsertSql)

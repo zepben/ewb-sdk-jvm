@@ -18,11 +18,11 @@ import java.util.*
  * @param getWeight     A method to extract the weight of an item being added to the queue.
  */
 class WeightedPriorityQueue<T>(
-    private val queueProvider: () -> Queue<T>,
+    private val queueProvider: () -> TraversalQueue<T>,
     private val getWeight: (T) -> Int
 ) : TraversalQueue<T> {
 
-    private val queue: MutableMap<Int, Queue<T>> = TreeMap(Collections.reverseOrder())
+    private val queue: MutableMap<Int, TraversalQueue<T>> = TreeMap(Collections.reverseOrder())
 
     override fun hasNext(): Boolean = queue.isNotEmpty()
 
@@ -32,7 +32,7 @@ class WeightedPriorityQueue<T>(
         val iterator = queue.entries.iterator()
         while (iterator.hasNext() && next == null) {
             val subQueue = iterator.next().value
-            next = subQueue.poll()
+            next = subQueue.next()
 
             if (subQueue.peek() == null)
                 iterator.remove()
@@ -54,7 +54,7 @@ class WeightedPriorityQueue<T>(
     override fun peek(): T? {
         var next: T? = null
 
-        val iterator: Iterator<Map.Entry<Int, Queue<T>>> = queue.entries.iterator()
+        val iterator: Iterator<Map.Entry<Int, TraversalQueue<T>>> = queue.entries.iterator()
         while (iterator.hasNext() && next == null)
             next = iterator.next().value.peek()
 
@@ -71,14 +71,14 @@ class WeightedPriorityQueue<T>(
          * Special priority queue that queues items with the largest weight as the highest priority.
          */
         @JvmStatic
-        fun <T> processQueue(getWeight: (T) -> Int): TraversalQueue<T> = WeightedPriorityQueue({ Collections.asLifoQueue(ArrayDeque()) }, getWeight)
+        fun <T> processQueue(getWeight: (T) -> Int): TraversalQueue<T> = WeightedPriorityQueue({ BasicQueue.depthFirst() }, getWeight)
 
         /**
          * Special priority queue that queues branch items with the largest weight on the starting item as the highest priority.
          */
         @JvmStatic
         fun <T> branchQueue(getWeight: (T) -> Int): TraversalQueue<Traversal<T>> = WeightedPriorityQueue(
-            { ArrayDeque() },
+            { BasicQueue.breadthFirst() },
             { traversal -> traversal.startItem?.let { getWeight(it) } ?: -1 }
         )
 

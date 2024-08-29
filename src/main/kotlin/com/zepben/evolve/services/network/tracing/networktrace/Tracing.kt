@@ -10,12 +10,14 @@ package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
+import com.zepben.evolve.services.network.tracing.traversals.Tracker
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 
 object Tracing {
 
     fun <T> connectedEquipmentTrace(
         queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
+        tracker: Tracker<NetworkTraceStep<T>> = NetworkTraceTracker { it.path.toEquipment },
         computeNextT: (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T,
     ): NetworkTrace<T> {
         val queueNext = NetworkTrace.QueueNext { ts, ctx, queueItem, t ->
@@ -40,7 +42,7 @@ object Tracing {
                 .forEach { queueItem(it) }
         }
 
-        return NetworkTrace(queueNext, queue, NetworkTraceTracker { it.path.toEquipment })
+        return NetworkTrace(queueNext, queue, tracker)
     }
 
     fun connectedEquipmentTrace(queue: TraversalQueue<NetworkTraceStep<Unit>> = BasicQueue.depthFirst()): NetworkTrace<Unit> =
@@ -48,6 +50,7 @@ object Tracing {
 
     fun <T> connectedTerminalTrace(
         queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
+        tracker: Tracker<NetworkTraceStep<T>> = NetworkTraceTracker { it.path.toTerminal },
         computeNextT: (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T,
     ): NetworkTrace<T> {
         val queueNext = NetworkTrace.QueueNext { ts, ctx, queueItem, t ->
@@ -72,7 +75,7 @@ object Tracing {
             }
         }
 
-        return NetworkTrace(queueNext, queue, NetworkTraceTracker { it.path.toTerminal })
+        return NetworkTrace(queueNext, queue, tracker)
     }
 
     fun connectedTerminalTrace(queue: TraversalQueue<NetworkTraceStep<Unit>> = BasicQueue.depthFirst()): NetworkTrace<Unit> =

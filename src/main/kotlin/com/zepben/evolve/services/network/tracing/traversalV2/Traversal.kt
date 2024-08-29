@@ -39,10 +39,6 @@ abstract class Traversal<T, D : Traversal<T, D>>(
         fun accept(item: T, context: StepContext, queueItem: (T) -> Boolean, traversal: D)
     }
 
-
-    /**
-     * The item the traversal will start at, or `null` if it has not been set.
-     */
     private val startItems: ArrayDeque<T> = ArrayDeque()
 
     @Volatile

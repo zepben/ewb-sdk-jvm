@@ -25,6 +25,11 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
     val data: List<CurveData> get() = _data.asUnmodifiable()
 
     /**
+     * Returns number of data point for this [Curve].
+     */
+    fun numData(): Int = _data?.size ?: 0
+
+    /**
      * Get point data values by its xValue.
      *
      * @param x xValue of requested data
@@ -65,11 +70,6 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
      * @param curveData data to be added to this curve
      */
     fun addData(curveData: CurveData): Curve = addData(curveData.xValue, curveData.y1Value, curveData.y2Value, curveData.y3Value)
-
-    /**
-     * Returns number of data point for this [Curve].
-     */
-    fun numData(): Int = _data?.size ?: 0
 
     /**
      * Remove data point from the this [Curve].

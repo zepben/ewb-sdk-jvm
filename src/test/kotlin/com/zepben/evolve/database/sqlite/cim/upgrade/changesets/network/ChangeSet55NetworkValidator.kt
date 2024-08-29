@@ -58,31 +58,6 @@ object ChangeSet55NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
             "DELETE FROM usage_points"
         )
 
-    private fun ensureAddedCurveData(statement: Statement) {
-        ensureTables(statement, "curve_data")
-        ensureIndexes(statement, "curve_data_curve_mrid_x_value", "curve_data_curve_mrid")
-    }
-
-    private fun ensureAddedGroundingImpedances(statement: Statement) {
-        ensureTables(statement, "grounding_impedances")
-        ensureIndexes(statement, "grounding_impedances_mrid")
-    }
-
-    private fun ensureAddedPetersenCoils(statement: Statement) {
-        ensureTables(statement, "petersen_coils")
-        ensureIndexes(statement, "petersen_coils_mrid")
-    }
-
-    private fun ensureAddedReactiveCapabilityCurves(statement: Statement) {
-        ensureTables(statement, "reactive_capability_curves")
-        ensureIndexes(statement, "reactive_capability_curves_mrid")
-    }
-
-    private fun ensureAddedSynchronousMachines(statement: Statement) {
-        ensureTables(statement, "synchronous_machines")
-        ensureIndexes(statement, "synchronous_machines_mrid")
-    }
-
     private fun ensureModifiedUsagePoints(statement: Statement) {
         validateRows(statement, "SELECT * FROM usage_points",
             { rs ->
@@ -110,6 +85,31 @@ object ChangeSet55NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
                 assertThat(rs.getString("phase_code"), equalTo("AN"))
             }
         )
+    }
+
+    private fun ensureAddedCurveData(statement: Statement) {
+        ensureTables(statement, "curve_data")
+        ensureIndexes(statement, "curve_data_curve_mrid_x_value", "curve_data_curve_mrid")
+    }
+
+    private fun ensureAddedGroundingImpedances(statement: Statement) {
+        ensureTables(statement, "grounding_impedances")
+        ensureIndexes(statement, "grounding_impedances_mrid")
+    }
+
+    private fun ensureAddedPetersenCoils(statement: Statement) {
+        ensureTables(statement, "petersen_coils")
+        ensureIndexes(statement, "petersen_coils_mrid")
+    }
+
+    private fun ensureAddedReactiveCapabilityCurves(statement: Statement) {
+        ensureTables(statement, "reactive_capability_curves")
+        ensureIndexes(statement, "reactive_capability_curves_mrid")
+    }
+
+    private fun ensureAddedSynchronousMachines(statement: Statement) {
+        ensureTables(statement, "synchronous_machines")
+        ensureIndexes(statement, "synchronous_machines_mrid")
     }
 
     private fun ensureAddedSynchronousMachinesReactiveCapabilityCurves(statement: Statement) {

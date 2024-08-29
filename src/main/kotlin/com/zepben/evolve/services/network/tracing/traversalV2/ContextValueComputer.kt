@@ -8,22 +8,25 @@
 
 package com.zepben.evolve.services.network.tracing.traversalV2
 
-// TODO: I don't really like this name. Someone please suggest something else...
+// NOTE: This doesn't specific a Generic R here, because the [StepContext] stores its values as Any? and these computers are how we compute and place the step values
 interface ContextValueComputer<T> {
     val key: String
 
     fun computeInitialValue(nextItem: T): Any?
 
-    fun computeNextValue(nextItem: T, stepValue: Any?)
+    fun computeNextValue(nextItem: T, currentValue: Any?): Any?
 }
 
+/**
+ * Using this allows you to create a ContextValueComputer without having to handle messy unchecked casts.
+ */
 interface TypedContextValueComputer<T, U> : ContextValueComputer<T> {
-    @Suppress("UNCHECKED_CAST")
-    override fun computeNextValue(nextItem: T, stepValue: Any?) {
-        computeNextValue(nextItem, stepValue as U)
-    }
-
     override fun computeInitialValue(nextItem: T): U
 
-    fun computeNextValue(nextItem: T, value: U): U
+    @Suppress("UNCHECKED_CAST")
+    override fun computeNextValue(nextItem: T, currentValue: Any?): Any? {
+        return computeNextValueTyped(nextItem, currentValue as U)
+    }
+
+    fun computeNextValueTyped(nextItem: T, currentValue: U): U
 }

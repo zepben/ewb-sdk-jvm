@@ -47,7 +47,7 @@ internal class PhaseCondition<T>(
         }
     }
 
-    override fun computeNextValue(nextItem: NetworkTraceStep<T>, value: ConnectivityResult): ConnectivityResult {
+    override fun computeNextValueTyped(nextItem: NetworkTraceStep<T>, currentValue: ConnectivityResult): ConnectivityResult {
         val result = precalculatedResult ?: error("INTERNAL ERROR: value should have been stored as part of queuing")
         // Clear the result as this function should only ever be called once by the traversal for each call to shouldQueue.
         // If that ever changes the assumption made by this class means this class needs to change and by making this null
@@ -66,5 +66,5 @@ internal class PhaseCondition<T>(
 
 // TODO: Is this a suitable function name?
 fun StepContext.terminalConnectivity(): ConnectivityResult {
-    return this.getData(PhaseCondition.contextKey) ?: error("Your trace needs to have PhaseCondition added to access this")
+    return this.getValue(PhaseCondition.contextKey) ?: error("Your trace needs to have PhaseCondition added to access this")
 }

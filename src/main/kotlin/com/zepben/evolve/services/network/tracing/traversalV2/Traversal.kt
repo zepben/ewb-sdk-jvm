@@ -294,37 +294,39 @@ abstract class Traversal<T, D : Traversal<T, D>>(
             contexts[startItem] = computeInitialContext(startItem)
 
             while (queue.hasNext()) {
-                queue.next()?.let { current ->
-                    if (tracker.visit(current)) {
-                        val context = contexts[current] ?: error { "INTERNAL ERROR: Traversal item should always have a context" }
-                        context.isStopping = canStop && matchesAnyStopCondition(current, context)
+                val current = queue.next()
+                if (tracker.visit(current)) {
+                    val context = contexts[current] ?: error { "INTERNAL ERROR: Traversal item should always have a context" }
+                    context.isStopping = canStop && matchesAnyStopCondition(current, context)
 
-                        applyStepActions(current, context)
+                    applyStepActions(current, context)
 
-                        if (!context.isStopping) {
-                            val queueNextItem = { nextItem: T ->
-                                val queued = queueItem(nextItem, context)
-                                if (queued) {
-                                    contexts[nextItem] = computeNextContext(context, nextItem)
-                                }
-                                queued
+                    if (!context.isStopping) {
+                        val queueNextItem = { nextItem: T ->
+                            val queued = queueItem(nextItem, context)
+                            if (queued) {
+                                contexts[nextItem] = computeNextContext(context, nextItem)
                             }
-
-                            queueNext.accept(current, context, queueNextItem, getDerivedThis())
+                            queued
                         }
 
-                        canStop = true
+
+
+                        queueNext.accept(current, context, queueNextItem, getDerivedThis())
                     }
+
+                    canStop = true
                 }
             }
         }
     }
 
     private fun queueItem(nextItem: T, currentContext: StepContext): Boolean {
-        return if (matchesAllQueueConditions(nextItem, currentContext))
-            queue.add(nextItem)
-        else
-            false
+        return when {
+            tracker.hasVisited(nextItem) -> false // Don't even bother queuing if we've already visited the item
+            matchesAllQueueConditions(nextItem, currentContext) -> queue.add(nextItem)
+            else -> false
+        }
     }
 
     private fun ContextValueComputer<*>.isStandaloneComputer() =

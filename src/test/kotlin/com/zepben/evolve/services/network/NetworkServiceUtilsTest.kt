@@ -134,14 +134,14 @@ internal class NetworkServiceUtilsTest {
         isSeriesCompensator: (SeriesCompensator) -> String,
         isGround: (Ground) -> String,
         isGroundDisconnector: (GroundDisconnector) -> String,
-        isGroundingImpedance: (GroundingImpedance) -> String,
-        isPetersenCoil: (PetersenCoil) -> String,
         isProtectionRelayScheme: (ProtectionRelayScheme) -> String,
         isProtectionRelaySystem: (ProtectionRelaySystem) -> String,
-        isReactiveCapabilityCurve: (ReactiveCapabilityCurve) -> String,
-        isSynchronousMachine: (SynchronousMachine) -> String,
         isVoltageRelay: (VoltageRelay) -> String,
         isDistanceRelay: (DistanceRelay) -> String,
+        isGroundingImpedance: (GroundingImpedance) -> String,
+        isPetersenCoil: (PetersenCoil) -> String,
+        isReactiveCapabilityCurve: (ReactiveCapabilityCurve) -> String,
+        isSynchronousMachine: (SynchronousMachine) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -217,14 +217,14 @@ internal class NetworkServiceUtilsTest {
         isSeriesCompensator = isSeriesCompensator,
         isGround = isGround,
         isGroundDisconnector = isGroundDisconnector,
-        isGroundingImpedance = isGroundingImpedance,
-        isPetersenCoil = isPetersenCoil,
         isProtectionRelayScheme = isProtectionRelayScheme,
         isProtectionRelaySystem = isProtectionRelaySystem,
-        isReactiveCapabilityCurve = isReactiveCapabilityCurve,
-        isSynchronousMachine = isSynchronousMachine,
         isVoltageRelay = isVoltageRelay,
         isDistanceRelay = isDistanceRelay,
+        isGroundingImpedance = isGroundingImpedance,
+        isPetersenCoil = isPetersenCoil,
+        isReactiveCapabilityCurve = isReactiveCapabilityCurve,
+        isSynchronousMachine = isSynchronousMachine,
         isOther = isOther
     )
 
@@ -302,14 +302,14 @@ internal class NetworkServiceUtilsTest {
         isSeriesCompensator: InvokeChecker<SeriesCompensator> = NeverInvokedChecker(),
         isGround: InvokeChecker<Ground> = NeverInvokedChecker(),
         isGroundDisconnector: InvokeChecker<GroundDisconnector> = NeverInvokedChecker(),
-        isGroundingImpedance: InvokeChecker<GroundingImpedance> = NeverInvokedChecker(),
-        isPetersenCoil: InvokeChecker<PetersenCoil> = NeverInvokedChecker(),
         isProtectionRelayScheme: InvokeChecker<ProtectionRelayScheme> = NeverInvokedChecker(),
         isProtectionRelaySystem: InvokeChecker<ProtectionRelaySystem> = NeverInvokedChecker(),
-        isReactiveCapabilityCurve: InvokeChecker<ReactiveCapabilityCurve> = NeverInvokedChecker(),
-        isSynchronousMachine: InvokeChecker<SynchronousMachine> = NeverInvokedChecker(),
         isVoltageRelay: InvokeChecker<VoltageRelay> = NeverInvokedChecker(),
         isDistanceRelay: InvokeChecker<DistanceRelay> = NeverInvokedChecker(),
+        isGroundingImpedance: InvokeChecker<GroundingImpedance> = NeverInvokedChecker(),
+        isPetersenCoil: InvokeChecker<PetersenCoil> = NeverInvokedChecker(),
+        isReactiveCapabilityCurve: InvokeChecker<ReactiveCapabilityCurve> = NeverInvokedChecker(),
+        isSynchronousMachine: InvokeChecker<SynchronousMachine> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -386,14 +386,14 @@ internal class NetworkServiceUtilsTest {
             isSeriesCompensator = isSeriesCompensator,
             isGround = isGround,
             isGroundDisconnector = isGroundDisconnector,
-            isGroundingImpedance = isGroundingImpedance,
-            isPetersenCoil = isPetersenCoil,
             isProtectionRelayScheme = isProtectionRelayScheme,
             isProtectionRelaySystem = isProtectionRelaySystem,
-            isReactiveCapabilityCurve = isReactiveCapabilityCurve,
-            isSynchronousMachine = isSynchronousMachine,
             isVoltageRelay = isVoltageRelay,
             isDistanceRelay = isDistanceRelay,
+            isGroundingImpedance = isGroundingImpedance,
+            isPetersenCoil = isPetersenCoil,
+            isReactiveCapabilityCurve = isReactiveCapabilityCurve,
+            isSynchronousMachine = isSynchronousMachine,
             isOther = isOther
         )
 
@@ -467,6 +467,17 @@ internal class NetworkServiceUtilsTest {
         isCurrentRelay.verifyInvoke()
         isEvChargingUnit.verifyInvoke()
         isTapChangerControl.verifyInvoke()
+        isSeriesCompensator.verifyInvoke()
+        isGround.verifyInvoke()
+        isGroundDisconnector.verifyInvoke()
+        isProtectionRelayScheme.verifyInvoke()
+        isProtectionRelaySystem.verifyInvoke()
+        isVoltageRelay.verifyInvoke()
+        isDistanceRelay.verifyInvoke()
+        isGroundingImpedance.verifyInvoke()
+        isPetersenCoil.verifyInvoke()
+        isReactiveCapabilityCurve.verifyInvoke()
+        isSynchronousMachine.verifyInvoke()
         isOther.verifyInvoke()
     }
 
@@ -549,14 +560,14 @@ internal class NetworkServiceUtilsTest {
         SeriesCompensator().also { whenNetworkServiceObjectTester(it, isSeriesCompensator = InvokedChecker(it)) }
         Ground().also { whenNetworkServiceObjectTester(it, isGround = InvokedChecker(it)) }
         GroundDisconnector().also { whenNetworkServiceObjectTester(it, isGroundDisconnector = InvokedChecker(it)) }
-        GroundingImpedance().also { whenNetworkServiceObjectTester(it, isGroundingImpedance = InvokedChecker(it)) }
-        PetersenCoil().also { whenNetworkServiceObjectTester(it, isPetersenCoil = InvokedChecker(it)) }
         ProtectionRelayScheme().also { whenNetworkServiceObjectTester(it, isProtectionRelayScheme = InvokedChecker(it)) }
         ProtectionRelaySystem().also { whenNetworkServiceObjectTester(it, isProtectionRelaySystem = InvokedChecker(it)) }
-        ReactiveCapabilityCurve().also { whenNetworkServiceObjectTester(it, isReactiveCapabilityCurve = InvokedChecker(it)) }
-        SynchronousMachine().also { whenNetworkServiceObjectTester(it, isSynchronousMachine = InvokedChecker(it)) }
         VoltageRelay().also { whenNetworkServiceObjectTester(it, isVoltageRelay = InvokedChecker(it)) }
         DistanceRelay().also { whenNetworkServiceObjectTester(it, isDistanceRelay = InvokedChecker(it)) }
+        GroundingImpedance().also { whenNetworkServiceObjectTester(it, isGroundingImpedance = InvokedChecker(it)) }
+        PetersenCoil().also { whenNetworkServiceObjectTester(it, isPetersenCoil = InvokedChecker(it)) }
+        ReactiveCapabilityCurve().also { whenNetworkServiceObjectTester(it, isReactiveCapabilityCurve = InvokedChecker(it)) }
+        SynchronousMachine().also { whenNetworkServiceObjectTester(it, isSynchronousMachine = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

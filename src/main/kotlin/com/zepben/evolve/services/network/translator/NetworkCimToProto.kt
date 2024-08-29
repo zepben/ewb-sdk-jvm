@@ -1190,6 +1190,7 @@ fun toPb(cim: Switch, pb: PBSwitch.Builder): PBSwitch.Builder =
 
 fun toPb(cim: SynchronousMachine, pb: PBSynchronousMachine.Builder): PBSynchronousMachine.Builder =
     pb.apply {
+        cim.curves.forEach { curve -> addReactiveCapabilityCurveMRIDsBuilder().apply { toPb(curve, this) } }
         baseQ = cim.baseQ ?: UNKNOWN_DOUBLE
         condenserP = cim.condenserP ?: UNKNOWN_INT
         earthing = cim.earthing

@@ -1340,6 +1340,8 @@ fun Switch.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
 fun SynchronousMachine.fillFields(service: NetworkService, includeRuntime: Boolean = true): SynchronousMachine {
     (this as RotatingMachine).fillFields(service, includeRuntime)
 
+    addCurve(ReactiveCapabilityCurve().also { service.add(it) })
+
     baseQ = 1.1
     condenserP = 2
     earthing = true

@@ -10,6 +10,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -81,57 +82,16 @@ internal class SynchronousMachineTest {
     }
 
     @Test
-    internal fun `add reactiveCapabilityCurve`() {
-        val synchronousMachine = SynchronousMachine()
-        val rcc = ReactiveCapabilityCurve("default-curve")
-
-        synchronousMachine.addCurve(rcc)
-
-        assertThat(synchronousMachine.curves.contains(rcc), equalTo(true))
+    internal fun curves() {
+        PrivateCollectionValidator.validateUnordered(
+            ::SynchronousMachine,
+            ::ReactiveCapabilityCurve,
+            SynchronousMachine::curves,
+            SynchronousMachine::numCurves,
+            SynchronousMachine::getCurve,
+            SynchronousMachine::addCurve,
+            SynchronousMachine::removeCurve,
+            SynchronousMachine::clearCurve
+        )
     }
-
-    @Test
-    internal fun `numbCurves() shows the number of reactiveCapabilityCurve associated with this synchronous machine`() {
-        val synchronousMachine = SynchronousMachine()
-        val rcc = ReactiveCapabilityCurve("default-curve")
-        assertThat(synchronousMachine.numCurves(), equalTo(0))
-
-        synchronousMachine.addCurve(rcc)
-
-        assertThat(synchronousMachine.numCurves(), equalTo(1))
-    }
-
-    @Test
-    internal fun `get reactiveCapabilityCurve`() {
-        val synchronousMachine = SynchronousMachine()
-        val rcc = ReactiveCapabilityCurve("default-curve")
-
-        synchronousMachine.addCurve(rcc)
-
-        assertThat(synchronousMachine.getCurve("default-curve"), equalTo(rcc))
-    }
-
-    @Test
-    internal fun `remove synchronousMachineData by removing the same synchronousMachineData`() {
-        val synchronousMachine = SynchronousMachine()
-        val rcc = ReactiveCapabilityCurve("default-curve")
-        assertThat(synchronousMachine.removeCurve(rcc), equalTo(false))
-
-        synchronousMachine.addCurve(rcc)
-
-        assertThat(synchronousMachine.removeCurve(rcc), equalTo(true))
-    }
-
-    @Test
-    internal fun `remove synchronousMachineData with same x value`() {
-        val synchronousMachine = SynchronousMachine()
-        val rcc = ReactiveCapabilityCurve("default-curve")
-        synchronousMachine.addCurve(rcc)
-        assertThat(synchronousMachine.numCurves(), equalTo(1))
-
-        synchronousMachine.clearCurve()
-
-        assertThat(synchronousMachine.numCurves(), equalTo(0))
-    }
-
 }

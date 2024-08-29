@@ -311,6 +311,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(UsagePoint::connectionCategory, { UsagePoint(it) }, { "first" }, { "second" })
         comparatorValidator.validateProperty(UsagePoint::ratedPower, { UsagePoint(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(UsagePoint::approvedInverterCapacity, { UsagePoint(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(UsagePoint::phaseCode, { UsagePoint(it) }, { PhaseCode.NONE }, { PhaseCode.AB })
         comparatorValidator.validateCollection(
             UsagePoint::endDevices,
             UsagePoint::addEndDevice,

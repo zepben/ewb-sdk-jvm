@@ -33,7 +33,7 @@ internal fun changeSet55() = ChangeSet(
 @Suppress("ObjectPropertyName")
 private val `Add phase code columns for usage_points` = Change(
     listOf(
-        "ALTER TABLE usage_points ADD COLUMN phase_code TEXT NOT NULL;"
+        "ALTER TABLE usage_points ADD COLUMN phase_code TEXT NOT NULL DEFAULT 'NONE';"
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )

@@ -8,8 +8,7 @@
 
 package com.zepben.evolve.cim.iec61970.base.core
 
-import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -30,68 +29,37 @@ internal class CurveTest {
     }
 
     @Test
-    internal fun accessorCoverage() {
-        val curve = object : Curve() {}
-
-        assertThat(curve.data.isNotEmpty(), equalTo(false))
-
-        curve.fillFields(NetworkService())
-
-        assertThat(curve.data.isNotEmpty(), equalTo(true))
+    internal fun curveData() {
+        // NOTE: We test the curve data collection with "unordered" even though it is actually sorted since the "index" of this collection is the
+        //       xValue which is a float and acts like a key. We will run a separate test to check the ordering and additional `addData` call.
+        PrivateCollectionValidator.validateUnordered(
+            { object : Curve() {} },
+            { CurveData(it + 0.1f, it + 0.2f, it + 0.3f, it + 0.4f) },
+            Curve::data,
+            Curve::numData,
+            Curve::getData,
+            Curve::addData,
+            Curve::removeData,
+            Curve::clearData,
+            CurveData::xValue
+        )
     }
 
     @Test
-    internal fun `add curveData`() {
-        val curve = object : Curve() {}
-        assertThat(curve.data.isNotEmpty(), equalTo(false))
-
-        curve.addData(CurveData(1f, 1f, 2f, 3f))
-
-        assertThat(curve.data.isNotEmpty(), equalTo(true))
-    }
-
-    @Test
-    internal fun `add curveData by passing in the values`() {
+    internal fun `add curveData by passing in the values and data is sorted by xValue in ascending order when retrieved`() {
         val curve = object : Curve() {}
 
+        curve.addData(4f, 3f, 2f, 1f)
+        curve.addData(2f, 1f, 2f, 3f)
         curve.addData(1f, 1f, 2f, 3f)
+        curve.addData(3f, 1f, 2f, 3f)
 
-        assertThat(curve.data.isNotEmpty(), equalTo(true))
-    }
+        assertThat(curve.numData(), equalTo(4))
 
-    @Test
-    internal fun `get curveData with x values`() {
-        val curve = object : Curve() {}
-        curve.fillFields(NetworkService())
-
-        assertThat(curve.getData(1f), not(equalTo(null)))
-    }
-
-    @Test
-    internal fun `remove curveData by removing the same curveData`() {
-        val curveData = CurveData(1f, 1f)
-        val curve = object : Curve() {}
-        curve.fillFields(NetworkService())
-
-        assertThat(curve.removeData(curveData), equalTo(true))
-        assertThat(curve.data.isNotEmpty(), equalTo(false))
-    }
-
-    @Test
-    internal fun `remove curveData with same x value`() {
-        val curve = object : Curve() {}
-        curve.fillFields(NetworkService())
-
-        assertThat(curve.removeData(1f), equalTo(true))
-    }
-
-    @Test
-    internal fun `clear curveData`() {
-        val curve = object : Curve() {}
-        curve.fillFields(NetworkService())
-        assertThat(curve.data.isNotEmpty(), equalTo(true))
-
-        curve.clearData()
-        assertThat(curve.data.isNotEmpty(), equalTo(false))
+        curve.data.also { curveData ->
+            repeat(4) { index ->
+                assertThat("retrieved data should be sorted", curveData[index].xValue == index.inc().toFloat())
+            }
+        }
     }
 }

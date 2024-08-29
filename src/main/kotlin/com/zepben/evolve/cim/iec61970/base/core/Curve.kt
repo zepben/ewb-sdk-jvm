@@ -67,6 +67,11 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
     fun addData(curveData: CurveData): Curve = addData(curveData.xValue, curveData.y1Value, curveData.y2Value, curveData.y3Value)
 
     /**
+     * Returns number of data point for this [Curve].
+     */
+    fun numData(): Int = _data?.size ?: 0
+
+    /**
      * Remove data point from the this [Curve].
      *
      * @return true if data point was removed.

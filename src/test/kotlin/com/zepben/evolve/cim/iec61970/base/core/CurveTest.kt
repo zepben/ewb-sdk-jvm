@@ -8,11 +8,12 @@
 
 package com.zepben.evolve.cim.iec61970.base.core
 
+import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.utils.PrivateCollectionValidator
+import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -54,12 +55,29 @@ internal class CurveTest {
         curve.addData(1f, 1f, 2f, 3f)
         curve.addData(3f, 1f, 2f, 3f)
 
-        assertThat(curve.numData(), equalTo(4))
-
-        curve.data.also { curveData ->
-            repeat(4) { index ->
-                assertThat("retrieved data should be sorted", curveData[index].xValue == index.inc().toFloat())
-            }
-        }
+        assertThat(curve.data.map { it.xValue }, contains(1f, 2f, 3f, 4f))
     }
+
+    @Test
+    internal fun `can't add duplicate curve data`() {
+        val curve = object : Curve() {}
+
+        curve.addData(1f, 1f, 2f, 3f)
+        curve.validateDuplicateError(1f) { addData(1f, 1.1f, 2.1f, 3.1f) }
+        curve.validateDuplicateError(1f) { addData(CurveData(1f, 1.2f, 2.2f, 3.2f)) }
+
+        curve.addData(CurveData(2f, 1f, 2f, 3f))
+        curve.validateDuplicateError(2f) { addData(2f, 1.1f, 2.1f, 3.1f) }
+        curve.validateDuplicateError(2f) { addData(CurveData(2f, 1.2f, 2.2f, 3.2f)) }
+    }
+
+    private fun Curve.validateDuplicateError(x: Float, addData: Curve.() -> Unit) {
+        expect { addData() }
+            .toThrow<IllegalArgumentException>()
+            .withMessage(
+                "Unable to add datapoint to ${typeNameAndMRID()}. " +
+                    "xValue $x is invalid. as data with same xValue already exist in this Curve. "
+            )
+    }
+
 }

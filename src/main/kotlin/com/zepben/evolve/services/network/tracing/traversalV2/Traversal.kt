@@ -199,12 +199,8 @@ abstract class Traversal<T, D : Traversal<T, D>>(
         return getDerivedThis()
     }
 
-    fun setContextDataComputer(key: String, computer: ContextValueComputer<T>?): D {
-        if (computer != null)
-            computeNextContextFuns[key] = computer
-        else
-            computeNextContextFuns.remove(key)
-
+    fun addContextDataComputer(computer: ContextValueComputer<T>): D {
+        computeNextContextFuns[computer.key] = computer
         return getDerivedThis()
     }
 
@@ -235,7 +231,7 @@ abstract class Traversal<T, D : Traversal<T, D>>(
 
         for ((key, computer) in computeNextContextFuns) {
             newContextData = newContextData ?: mutableMapOf()
-            newContextData[key] = computer.computeNextValue(nextStep, context.getData(key))
+            newContextData[key] = computer.computeNextValue(nextStep, context.getValue(key))
         }
 
         return StepContext(false, context.stepNumber + 1, newContextData)

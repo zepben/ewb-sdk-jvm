@@ -9,6 +9,7 @@
 package com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering
 
 import com.zepben.evolve.database.sqlite.cim.tables.Column
+import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableIdentifiedObjects
 
@@ -20,6 +21,7 @@ class TableUsagePoints : TableIdentifiedObjects() {
     val CONNECTION_CATEGORY: Column = Column(++columnIndex, "connection_category", "TEXT", NULL)
     val RATED_POWER: Column = Column(++columnIndex, "rated_power", "INTEGER", NULL)
     val APPROVED_INVERTER_CAPACITY: Column = Column(++columnIndex, "approved_inverter_capacity", "INTEGER", NULL)
+    val PHASE_CODE: Column = Column(++columnIndex, "phase_code", "TEXT", NOT_NULL)
 
     override val name: String = "usage_points"
 

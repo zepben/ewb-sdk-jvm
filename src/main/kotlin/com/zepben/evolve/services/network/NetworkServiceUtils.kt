@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -135,6 +135,10 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isProtectionRelaySystem Handler when the [identifiedObject] is a [ProtectionRelaySystem]
  * @param isVoltageRelay Handler when the [identifiedObject] is a [VoltageRelay]
  * @param isDistanceRelay Handler when the [identifiedObject] is a [DistanceRelay]
+ * @param isGroundingImpedance Handler when the [identifiedObject] is a [GroundingImpedance]
+ * @param isPetersenCoil Handler when the [identifiedObject] is a [PetersenCoil]
+ * @param isReactiveCapabilityCurve Handler when the [identifiedObject] is a [ReactiveCapabilityCurve]
+ * @param isSynchronousMachine Handler when the [identifiedObject] is a [SynchronousMachine]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -216,6 +220,10 @@ inline fun <R> whenNetworkServiceObject(
     isProtectionRelaySystem: (ProtectionRelaySystem) -> R,
     isVoltageRelay: (VoltageRelay) -> R,
     isDistanceRelay: (DistanceRelay) -> R,
+    isGroundingImpedance: (GroundingImpedance) -> R,
+    isPetersenCoil: (PetersenCoil) -> R,
+    isReactiveCapabilityCurve: (ReactiveCapabilityCurve) -> R,
+    isSynchronousMachine: (SynchronousMachine) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -296,5 +304,9 @@ inline fun <R> whenNetworkServiceObject(
     is ProtectionRelaySystem -> isProtectionRelaySystem(identifiedObject)
     is VoltageRelay -> isVoltageRelay(identifiedObject)
     is DistanceRelay -> isDistanceRelay(identifiedObject)
+    is GroundingImpedance -> isGroundingImpedance(identifiedObject)
+    is PetersenCoil -> isPetersenCoil(identifiedObject)
+    is ReactiveCapabilityCurve -> isReactiveCapabilityCurve(identifiedObject)
+    is SynchronousMachine -> isSynchronousMachine(identifiedObject)
     else -> isOther(identifiedObject)
 }

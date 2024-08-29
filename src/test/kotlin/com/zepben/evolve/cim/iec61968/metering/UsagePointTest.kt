@@ -9,6 +9,7 @@
 package com.zepben.evolve.cim.iec61968.metering
 
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
+import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
@@ -39,6 +40,7 @@ internal class UsagePointTest {
         assertThat(usagePoint.connectionCategory, nullValue())
         assertThat(usagePoint.ratedPower, nullValue())
         assertThat(usagePoint.approvedInverterCapacity, nullValue())
+        assertThat(usagePoint.phaseCode, equalTo(PhaseCode.NONE))
 
         usagePoint.fillFields(NetworkService())
 
@@ -47,6 +49,7 @@ internal class UsagePointTest {
         assertThat(usagePoint.connectionCategory, equalTo("connectionCategory"))
         assertThat(usagePoint.ratedPower, equalTo(2000))
         assertThat(usagePoint.approvedInverterCapacity, equalTo(5000))
+        assertThat(usagePoint.phaseCode, equalTo(PhaseCode.AN))
     }
 
     @Test

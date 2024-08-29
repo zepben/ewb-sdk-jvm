@@ -11,6 +11,7 @@ package com.zepben.evolve.cim.iec61968.metering
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
 import com.zepben.evolve.services.common.extensions.validateReference
@@ -28,6 +29,8 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * @property connectionCategory A code used to specify the connection category, e.g., low voltage or low pressure, where the usage point is defined.
  * @property ratedPower Active power that this usage point is configured to deliver in watts.
  * @property approvedInverterCapacity The approved inverter capacity at this UsagePoint in volt-amperes.
+ * @property phaseCode Phase code. Number of wires and specific nominal phases can be deduced from enumeration literal values. For example, ABCN is three-phase,
+ *                     four-wire, s12n (splitSecondary12N) is single-phase, three-wire, and s1n and s2n are single-phase, two-wire.
  */
 class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
 
@@ -36,6 +39,7 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     var connectionCategory: String? = null
     var ratedPower: Int? = null
     var approvedInverterCapacity: Int? = null
+    var phaseCode: PhaseCode = PhaseCode.NONE
 
     private var _equipment: MutableList<Equipment>? = null
     private var _endDevices: MutableList<EndDevice>? = null

@@ -31,13 +31,13 @@ abstract class ChangeSetValidator(
     private val description: String by lazy { "$databaseType [$version]" }
 
     /**
-     * Set up prior to applying the ChangeSet.
+     * Set up prior to applying the ChangeSet. These should populate all tables that will be modified by applying the ChangeSet.
      * @return A list of statements to run on the database to which the ChangeSet will be applied.
      */
     abstract fun setUpStatements(): List<String>
 
     /**
-     * Populate any tables or fields with data after applying the ChangeSet.
+     * Populate any tables or fields with data after applying the ChangeSet. These should populate all modified or new tables.
      * @return A list of statements to run on the database to which the ChangeSet has been applied.
      */
     abstract fun populateStatements(): List<String>
@@ -73,7 +73,7 @@ abstract class ChangeSetValidator(
     }
 
     /**
-     * Tear down after validating the ChangeSet.
+     * Tear down after validating the ChangeSet. These should remove all data that has been added, leaving the database ready for the next changeset.
      * @return A list of statements to remove any data from the database to which the ChangeSet was applied.
      */
     abstract fun tearDownStatements(): List<String>

@@ -12,6 +12,13 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
+/**
+ * A class representing the association between Loops and Substations.
+ *
+ * @property LOOP_MRID A column storing the mRID of Loops.
+ * @property SUBSTATION_MRID A column storing the mRID of Substations.
+ * @property RELATIONSHIP A column storing the type of relationships between the Loop and the Substation.
+ */
 @Suppress("PropertyName")
 class TableLoopsSubstations : SqliteTable() {
 

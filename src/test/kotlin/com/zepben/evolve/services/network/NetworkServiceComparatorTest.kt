@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -311,6 +311,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(UsagePoint::connectionCategory, { UsagePoint(it) }, { "first" }, { "second" })
         comparatorValidator.validateProperty(UsagePoint::ratedPower, { UsagePoint(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(UsagePoint::approvedInverterCapacity, { UsagePoint(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(UsagePoint::phaseCode, { UsagePoint(it) }, { PhaseCode.NONE }, { PhaseCode.AB })
         comparatorValidator.validateCollection(
             UsagePoint::endDevices,
             UsagePoint::addEndDevice,
@@ -446,6 +447,17 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
     private fun compareConnectivityNodeContainer(createConnectivityNodeContainer: (String) -> ConnectivityNodeContainer) {
         comparePowerSystemResource(createConnectivityNodeContainer)
+    }
+
+    private fun compareCurve(createCurve: (String) -> Curve) {
+        compareIdentifiedObject(createCurve)
+
+        comparatorValidator.validateIndexedCollection(
+            Curve::data,
+            Curve::addData,
+            createCurve,
+            { CurveData(1f, 2f) },
+            { CurveData(3f, 4f) })
     }
 
     private fun compareEquipment(createEquipment: (String) -> Equipment) {
@@ -862,6 +874,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareSwitch { Disconnector(it) }
     }
 
+    private fun compareEarthFaultCompensator(createEarthFaultCompensator: (String) -> EarthFaultCompensator) {
+        compareConductingEquipment(createEarthFaultCompensator)
+
+        comparatorValidator.validateProperty(EarthFaultCompensator::r, createEarthFaultCompensator, { 1.0 }, { 2.0 })
+    }
+
     private fun compareEnergyConnection(createEnergyConnection: (String) -> EnergyConnection) {
         compareConductingEquipment(createEnergyConnection)
     }
@@ -970,6 +988,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     }
 
     @Test
+    internal fun compareGroundingImpedance() {
+        compareEarthFaultCompensator { GroundingImpedance(it) }
+
+        comparatorValidator.validateProperty(GroundingImpedance::x, { GroundingImpedance(it) }, { 1.0 }, { 2.0 })
+    }
+
+    @Test
     internal fun compareJumper() {
         compareSwitch { Jumper(it) }
     }
@@ -1013,6 +1038,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(PerLengthSequenceImpedance::x0, { PerLengthSequenceImpedance(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PerLengthSequenceImpedance::b0ch, { PerLengthSequenceImpedance(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(PerLengthSequenceImpedance::g0ch, { PerLengthSequenceImpedance(it) }, { 1.0 }, { 2.0 })
+    }
+
+    @Test
+    internal fun comparePetersenCoil() {
+        compareEarthFaultCompensator { PetersenCoil(it) }
+
+        comparatorValidator.validateProperty(PetersenCoil::xGroundNominal, { PetersenCoil(it) }, { 1.0 }, { 2.0 })
     }
 
     @Test
@@ -1178,6 +1210,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     }
 
     @Test
+    internal fun compareReactiveCapabilityCurve() {
+        compareCurve { ReactiveCapabilityCurve(it) }
+    }
+
+    @Test
     internal fun compareRecloser() {
         compareProtectedSwitch { Recloser(it) }
     }
@@ -1218,6 +1255,16 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { object : RegulatingCondEq("rce1") {} },
             { object : RegulatingCondEq("rce2") {} }
         )
+    }
+
+    private fun compareRotatingMachine(createRotatingMachine: (String) -> RotatingMachine) {
+        compareRegulatingCondEq(createRotatingMachine)
+
+        comparatorValidator.validateProperty(RotatingMachine::ratedPowerFactor, createRotatingMachine, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(RotatingMachine::ratedS, createRotatingMachine, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(RotatingMachine::ratedU, createRotatingMachine, { 1 }, { 2 })
+        comparatorValidator.validateProperty(RotatingMachine::p, createRotatingMachine, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(RotatingMachine::q, createRotatingMachine, { 1.0 }, { 2.0 })
     }
 
     @Test
@@ -1271,6 +1318,48 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         }
 
         comparatorValidator.validateCompare(closedSwitch, openSwitch, expectModification = difference)
+    }
+
+    @Test
+    internal fun compareSynchronousMachine() {
+        compareRotatingMachine { SynchronousMachine(it) }
+
+        comparatorValidator.validateProperty(SynchronousMachine::baseQ, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::condenserP, { SynchronousMachine(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(SynchronousMachine::earthing, { SynchronousMachine(it) }, { true }, { false })
+        comparatorValidator.validateProperty(SynchronousMachine::earthingStarPointR, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::earthingStarPointX, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::ikk, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::maxQ, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::maxU, { SynchronousMachine(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(SynchronousMachine::minQ, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::minU, { SynchronousMachine(it) }, { 1 }, { 2 })
+        comparatorValidator.validateProperty(SynchronousMachine::mu, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::r, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::r0, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::r2, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::satDirectSubtransX, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::satDirectSyncX, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::satDirectTransX, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::x0, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(SynchronousMachine::x2, { SynchronousMachine(it) }, { 1.1 }, { 2.2 })
+        comparatorValidator.validateProperty(
+            SynchronousMachine::type,
+            { SynchronousMachine(it) },
+            { SynchronousMachineKind.generator },
+            { SynchronousMachineKind.motor })
+        comparatorValidator.validateProperty(
+            SynchronousMachine::operatingMode,
+            { SynchronousMachine(it) },
+            { SynchronousMachineKind.generator },
+            { SynchronousMachineKind.motor })
+
+        comparatorValidator.validateCollection(
+            SynchronousMachine::curves,
+            SynchronousMachine::addCurve,
+            { SynchronousMachine(it) },
+            { ReactiveCapabilityCurve("rcc1") },
+            { ReactiveCapabilityCurve("rcc2") })
     }
 
     private fun compareTapChanger(createTapChanger: (String) -> TapChanger) {

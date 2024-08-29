@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -676,6 +676,7 @@ class NetworkCimReader(
             connectionCategory = resultSet.getNullableString(table.CONNECTION_CATEGORY.queryIndex)
             ratedPower = resultSet.getNullableInt(table.RATED_POWER.queryIndex)
             approvedInverterCapacity = resultSet.getNullableInt(table.APPROVED_INVERTER_CAPACITY.queryIndex)
+            phaseCode = resultSet.getString(table.PHASE_CODE.queryIndex).let { PhaseCode.valueOf(it) }
         }
 
         return loadIdentifiedObject(usagePoint, table, resultSet) && service.addOrThrow(usagePoint)
@@ -848,6 +849,38 @@ class NetworkCimReader(
         resultSet: ResultSet
     ): Boolean =
         loadPowerSystemResource(connectivityNodeContainer, table, resultSet)
+
+    @Throws(SQLException::class)
+    private fun loadCurve(curve: Curve, table: TableCurves, resultSet: ResultSet): Boolean =
+        loadIdentifiedObject(curve, table, resultSet)
+
+    /**
+     * Create a [CurveData] and populate its fields from [TableCurveData] then add it to associated [Curve].
+     *
+     * @param table The database table to read the [CurveData] fields from.
+     * @param resultSet The record in the database table containing the fields for this [CurveData].
+     * @param setIdentifier A callback to register the mRID of this [CurveData] and its associated [Curve] for logging purposes.
+     *
+     * @return true if the [CurveData] was successfully read from the database and added to associated [Curve].
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableCurveData, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val curveMRID = setIdentifier(resultSet.getString(table.CURVE_MRID.queryIndex))
+        val xValue = resultSet.getFloat(table.X_VALUE.queryIndex)
+        val id = setIdentifier("$curveMRID-x-$xValue")
+
+        val curve = service.getOrThrow<Curve>(curveMRID, "Curve to CurveData association $id")
+
+        curve.addData(
+            xValue,
+            resultSet.getFloat(table.Y1_VALUE.queryIndex),
+            resultSet.getNullableFloat(table.Y2_VALUE.queryIndex),
+            resultSet.getNullableFloat(table.Y3_VALUE.queryIndex)
+        )
+
+        return true
+    }
 
     @Throws(SQLException::class)
     private fun loadEquipment(equipment: Equipment, table: TableEquipment, resultSet: ResultSet): Boolean {
@@ -1513,23 +1546,6 @@ class NetworkCimReader(
     }
 
     /**
-     * Create a [LoadBreakSwitch] and populate its fields from [TableLoadBreakSwitches].
-     *
-     * @param table The database table to read the [LoadBreakSwitch] fields from.
-     * @param resultSet The record in the database table containing the fields for this [LoadBreakSwitch].
-     * @param setIdentifier A callback to register the mRID of this [LoadBreakSwitch] for logging purposes.
-     *
-     * @return true if the [LoadBreakSwitch] was successfully read from the database and added to the service.
-     * @throws SQLException For any errors encountered reading from the database.
-     */
-    @Throws(SQLException::class)
-    fun load(table: TableLoadBreakSwitches, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val loadBreakSwitch = LoadBreakSwitch(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
-
-        return loadProtectedSwitch(loadBreakSwitch, table, resultSet) && service.addOrThrow(loadBreakSwitch)
-    }
-
-    /**
      * Create a [BusbarSection] and populate its fields from [TableBusbarSections].
      *
      * @param table The database table to read the [BusbarSection] fields from.
@@ -1580,6 +1596,19 @@ class NetworkCimReader(
         val disconnector = Disconnector(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
         return loadSwitch(disconnector, table, resultSet) && service.addOrThrow(disconnector)
+    }
+
+    @Throws(SQLException::class)
+    private fun loadEarthFaultCompensator(
+        earthFaultCompensator: EarthFaultCompensator,
+        table: TableEarthFaultCompensators,
+        resultSet: ResultSet
+    ): Boolean {
+        earthFaultCompensator.apply {
+            r = resultSet.getNullableDouble(table.R.queryIndex)
+        }
+
+        return loadConductingEquipment(earthFaultCompensator, table, resultSet)
     }
 
     @Throws(SQLException::class)
@@ -1766,6 +1795,25 @@ class NetworkCimReader(
     }
 
     /**
+     * Create a [GroundingImpedance] and populate its fields from [TableGroundingImpedances].
+     *
+     * @param table The database table to read the [GroundingImpedance] fields from.
+     * @param resultSet The record in the database table containing the fields for this [GroundingImpedance].
+     * @param setIdentifier A callback to register the mRID of this [GroundingImpedance] for logging purposes.
+     *
+     * @return true if the [GroundingImpedance] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableGroundingImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val groundingImpedance = GroundingImpedance(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            x = resultSet.getNullableDouble(table.X.queryIndex)
+        }
+
+        return loadEarthFaultCompensator(groundingImpedance, table, resultSet) && service.addOrThrow(groundingImpedance)
+    }
+
+    /**
      * Create a [Jumper] and populate its fields from [TableJumpers].
      *
      * @param table The database table to read the [Jumper] fields from.
@@ -1828,6 +1876,23 @@ class NetworkCimReader(
         )
     }
 
+    /**
+     * Create a [LoadBreakSwitch] and populate its fields from [TableLoadBreakSwitches].
+     *
+     * @param table The database table to read the [LoadBreakSwitch] fields from.
+     * @param resultSet The record in the database table containing the fields for this [LoadBreakSwitch].
+     * @param setIdentifier A callback to register the mRID of this [LoadBreakSwitch] for logging purposes.
+     *
+     * @return true if the [LoadBreakSwitch] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableLoadBreakSwitches, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val loadBreakSwitch = LoadBreakSwitch(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadProtectedSwitch(loadBreakSwitch, table, resultSet) && service.addOrThrow(loadBreakSwitch)
+    }
+
     @Throws(SQLException::class)
     private fun loadPerLengthImpedance(perLengthImpedance: PerLengthImpedance, table: TablePerLengthImpedances, resultSet: ResultSet): Boolean =
         loadPerLengthLineParameter(perLengthImpedance, table, resultSet)
@@ -1863,6 +1928,25 @@ class NetworkCimReader(
         return loadPerLengthImpedance(perLengthSequenceImpedance, table, resultSet) && service.addOrThrow(
             perLengthSequenceImpedance
         )
+    }
+
+    /**
+     * Create a [PetersenCoil] and populate its fields from [TablePetersenCoils].
+     *
+     * @param table The database table to read the [PetersenCoil] fields from.
+     * @param resultSet The record in the database table containing the fields for this [PetersenCoil].
+     * @param setIdentifier A callback to register the mRID of this [PetersenCoil] for logging purposes.
+     *
+     * @return true if the [PetersenCoil] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TablePetersenCoils, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val petersencoil = PetersenCoil(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            xGroundNominal = resultSet.getNullableDouble(table.X_GROUND_NOMINAL.queryIndex)
+        }
+
+        return loadEarthFaultCompensator(petersencoil, table, resultSet) && service.addOrThrow(petersencoil)
     }
 
     /**
@@ -2062,6 +2146,23 @@ class NetworkCimReader(
     }
 
     /**
+     * Create a [ReactiveCapabilityCurve] and populate its fields from [TableReactiveCapabilityCurves].
+     *
+     * @param table The database table to read the [ReactiveCapabilityCurve] fields from.
+     * @param resultSet The record in the database table containing the fields for this [ReactiveCapabilityCurve].
+     * @param setIdentifier A callback to register the mRID of this [ReactiveCapabilityCurve] for logging purposes.
+     *
+     * @return true if the [ReactiveCapabilityCurve] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableReactiveCapabilityCurves, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val reactiveCapabilityCurve = ReactiveCapabilityCurve(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadCurve(reactiveCapabilityCurve, table, resultSet) && service.addOrThrow(reactiveCapabilityCurve)
+    }
+
+    /**
      * Create a [Recloser] and populate its fields from [TableReclosers].
      *
      * @param table The database table to read the [Recloser] fields from.
@@ -2114,6 +2215,22 @@ class NetworkCimReader(
         }
 
         return loadPowerSystemResource(regulatingControl, table, resultSet)
+    }
+
+    @Throws(SQLException::class)
+    private fun loadRotatingMachine(
+        rotatingMachine: RotatingMachine,
+        table: TableRotatingMachines,
+        resultSet: ResultSet
+    ): Boolean {
+        rotatingMachine.apply {
+            ratedPowerFactor = resultSet.getNullableDouble(table.RATED_POWER_FACTOR.queryIndex)
+            ratedS = resultSet.getNullableDouble(table.RATED_S.queryIndex)
+            ratedU = resultSet.getNullableInt(table.RATED_U.queryIndex)
+            p = resultSet.getNullableDouble(table.P.queryIndex)
+            q = resultSet.getNullableDouble(table.Q.queryIndex)
+        }
+        return loadRegulatingCondEq(rotatingMachine, table, resultSet)
     }
 
     /**
@@ -2187,6 +2304,45 @@ class NetworkCimReader(
         }
 
         return loadPowerSystemResource(tapChanger, table, resultSet)
+    }
+
+    /**
+     * Create a [SynchronousMachine] and populate its fields from [TableSynchronousMachines].
+     *
+     * @param table The database table to read the [SynchronousMachine] fields from.
+     * @param resultSet The record in the database table containing the fields for this [SynchronousMachine].
+     * @param setIdentifier A callback to register the mRID of this [SynchronousMachine] for logging purposes.
+     *
+     * @return true if the [SynchronousMachine] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableSynchronousMachines, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val synschronousMachine = SynchronousMachine(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            baseQ = resultSet.getNullableDouble(table.BASE_Q.queryIndex)
+            condenserP = resultSet.getNullableInt(table.CONDENSER_P.queryIndex)
+            earthing = resultSet.getBoolean(table.EARTHING.queryIndex)
+            earthingStarPointR = resultSet.getNullableDouble(table.EARTHING_STAR_POINT_R.queryIndex)
+            earthingStarPointX = resultSet.getNullableDouble(table.EARTHING_STAR_POINT_X.queryIndex)
+            ikk = resultSet.getNullableDouble(table.IKK.queryIndex)
+            maxQ = resultSet.getNullableDouble(table.MAX_Q.queryIndex)
+            maxU = resultSet.getNullableInt(table.MAX_U.queryIndex)
+            minQ = resultSet.getNullableDouble(table.MIN_Q.queryIndex)
+            minU = resultSet.getNullableInt(table.MIN_U.queryIndex)
+            mu = resultSet.getNullableDouble(table.MU.queryIndex)
+            r = resultSet.getNullableDouble(table.R.queryIndex)
+            r0 = resultSet.getNullableDouble(table.R0.queryIndex)
+            r2 = resultSet.getNullableDouble(table.R2.queryIndex)
+            satDirectSubtransX = resultSet.getNullableDouble(table.SAT_DIRECT_SUBTRANS_X.queryIndex)
+            satDirectSyncX = resultSet.getNullableDouble(table.SAT_DIRECT_SYNC_X.queryIndex)
+            satDirectTransX = resultSet.getNullableDouble(table.SAT_DIRECT_TRANS_X.queryIndex)
+            x0 = resultSet.getNullableDouble(table.X0.queryIndex)
+            x2 = resultSet.getNullableDouble(table.X2.queryIndex)
+            type = SynchronousMachineKind.valueOf(resultSet.getString(table.TYPE.queryIndex))
+            operatingMode = SynchronousMachineKind.valueOf(resultSet.getString(table.OPERATING_MODE.queryIndex))
+        }
+
+        return loadRotatingMachine(synschronousMachine, table, resultSet) && service.addOrThrow(synschronousMachine)
     }
 
     /**
@@ -2344,18 +2500,18 @@ class NetworkCimReader(
     // ################
 
     /**
-     * Create a [setIdentifier] and populate its fields from [TableAssetOrganisationRolesAssets].
+     * Create a [AssetOrganisationRole] to [Asset] association from [TableAssetOrganisationRolesAssets].
      *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
      *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
+     * @return true if the association was successfully read from the database and added to the service.
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
     fun load(table: TableAssetOrganisationRolesAssets, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val assetOrganisationRoleMRID = setIdentifier(resultSet.getString(table.ASSET_ORGANISATION_ROLE_MRID.queryIndex))
+        val assetOrganisationRoleMRID = resultSet.getString(table.ASSET_ORGANISATION_ROLE_MRID.queryIndex)
         setIdentifier("${assetOrganisationRoleMRID}-to-UNKNOWN")
 
         val assetMRID = resultSet.getString(table.ASSET_MRID.queryIndex)
@@ -2371,130 +2527,18 @@ class NetworkCimReader(
     }
 
     /**
-     * Create a [setIdentifier] and populate its fields from [TableEquipmentEquipmentContainers].
+     * Create a [Circuit] to [Substation] association from [TableCircuitsSubstations].
      *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
      *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
-     * @throws SQLException For any errors encountered reading from the database.
-     */
-    @Throws(SQLException::class)
-    fun load(table: TableEquipmentEquipmentContainers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val equipmentMRID = setIdentifier(resultSet.getString(table.EQUIPMENT_MRID.queryIndex))
-        setIdentifier("${equipmentMRID}-to-UNKNOWN")
-
-        val equipmentContainerMRID = resultSet.getString(table.EQUIPMENT_CONTAINER_MRID.queryIndex)
-        val id = setIdentifier("${equipmentMRID}-to-${equipmentContainerMRID}")
-
-        val typeNameAndMRID = "Equipment to EquipmentContainer association $id"
-        val equipment = service.getOrThrow<Equipment>(equipmentMRID, typeNameAndMRID)
-        val equipmentContainer = service.getOrThrow<EquipmentContainer>(equipmentContainerMRID, typeNameAndMRID)
-
-        equipmentContainer.addEquipment(equipment)
-        equipment.addContainer(equipmentContainer)
-
-        return true
-    }
-
-    /**
-     * Create a [setIdentifier] and populate its fields from [TableEquipmentOperationalRestrictions].
-     *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
-     *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
-     * @throws SQLException For any errors encountered reading from the database.
-     */
-    @Throws(SQLException::class)
-    fun load(table: TableEquipmentOperationalRestrictions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val equipmentMRID = setIdentifier(resultSet.getString(table.EQUIPMENT_MRID.queryIndex))
-        setIdentifier("${equipmentMRID}-to-UNKNOWN")
-
-        val operationalRestrictionMRID = resultSet.getString(table.OPERATIONAL_RESTRICTION_MRID.queryIndex)
-        val id = setIdentifier("${equipmentMRID}-to-${operationalRestrictionMRID}")
-
-        val typeNameAndMRID = "Equipment to OperationalRestriction association $id"
-        val equipment = service.getOrThrow<Equipment>(equipmentMRID, typeNameAndMRID)
-        val operationalRestriction = service.getOrThrow<OperationalRestriction>(operationalRestrictionMRID, typeNameAndMRID)
-
-        operationalRestriction.addEquipment(equipment)
-        equipment.addOperationalRestriction(operationalRestriction)
-
-        return true
-    }
-
-    /**
-     * Create a [setIdentifier] and populate its fields from [TableEquipmentUsagePoints].
-     *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
-     *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
-     * @throws SQLException For any errors encountered reading from the database.
-     */
-    @Throws(SQLException::class)
-    fun load(table: TableEquipmentUsagePoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val equipmentMRID = setIdentifier(resultSet.getString(table.EQUIPMENT_MRID.queryIndex))
-        setIdentifier("${equipmentMRID}-to-UNKNOWN")
-
-        val usagePointMRID = resultSet.getString(table.USAGE_POINT_MRID.queryIndex)
-        val id = setIdentifier("${equipmentMRID}-to-${usagePointMRID}")
-
-        val typeNameAndMRID = "Equipment to UsagePoint association $id"
-        val equipment = service.getOrThrow<Equipment>(equipmentMRID, typeNameAndMRID)
-        val usagePoint = service.getOrThrow<UsagePoint>(usagePointMRID, typeNameAndMRID)
-
-        usagePoint.addEquipment(equipment)
-        equipment.addUsagePoint(usagePoint)
-
-        return true
-    }
-
-    /**
-     * Create a [setIdentifier] and populate its fields from [TableUsagePointsEndDevices].
-     *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
-     *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
-     * @throws SQLException For any errors encountered reading from the database.
-     */
-    @Throws(SQLException::class)
-    fun load(table: TableUsagePointsEndDevices, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val usagePointMRID = setIdentifier(resultSet.getString(table.USAGE_POINT_MRID.queryIndex))
-        setIdentifier("${usagePointMRID}-to-UNKNOWN")
-
-        val endDeviceMRID = resultSet.getString(table.END_DEVICE_MRID.queryIndex)
-        val id = setIdentifier("${usagePointMRID}-to-${endDeviceMRID}")
-
-        val typeNameAndMRID = "UsagePoint to EndDevice association $id"
-        val usagePoint = service.getOrThrow<UsagePoint>(usagePointMRID, typeNameAndMRID)
-        val endDevice = service.getOrThrow<EndDevice>(endDeviceMRID, typeNameAndMRID)
-
-        endDevice.addUsagePoint(usagePoint)
-        usagePoint.addEndDevice(endDevice)
-
-        return true
-    }
-
-    /**
-     * Create a [setIdentifier] and populate its fields from [TableCircuitsSubstations].
-     *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
-     *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
+     * @return true if the association was successfully read from the database and added to the service.
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
     fun load(table: TableCircuitsSubstations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val circuitMRID = setIdentifier(resultSet.getString(table.CIRCUIT_MRID.queryIndex))
+        val circuitMRID = resultSet.getString(table.CIRCUIT_MRID.queryIndex)
         setIdentifier("${circuitMRID}-to-UNKNOWN")
 
         val substationMRID = resultSet.getString(table.SUBSTATION_MRID.queryIndex)
@@ -2511,18 +2555,18 @@ class NetworkCimReader(
     }
 
     /**
-     * Create a [setIdentifier] and populate its fields from [TableCircuitsTerminals].
+     * Create a [Circuit] to [Terminal] association from [TableCircuitsTerminals].
      *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
      *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
+     * @return true if the association was successfully read from the database and added to the service.
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
     fun load(table: TableCircuitsTerminals, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val circuitMRID = setIdentifier(resultSet.getString(table.CIRCUIT_MRID.queryIndex))
+        val circuitMRID = resultSet.getString(table.CIRCUIT_MRID.queryIndex)
         setIdentifier("${circuitMRID}-to-UNKNOWN")
 
         val terminalMRID = resultSet.getString(table.TERMINAL_MRID.queryIndex)
@@ -2538,18 +2582,102 @@ class NetworkCimReader(
     }
 
     /**
-     * Create a [setIdentifier] and populate its fields from [TableLoopsSubstations].
+     * Create a [Equipment] to [EquipmentContainer] association from [TableEquipmentEquipmentContainers].
      *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
      *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
+     * @return true if the association was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableEquipmentEquipmentContainers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val equipmentMRID = resultSet.getString(table.EQUIPMENT_MRID.queryIndex)
+        setIdentifier("${equipmentMRID}-to-UNKNOWN")
+
+        val equipmentContainerMRID = resultSet.getString(table.EQUIPMENT_CONTAINER_MRID.queryIndex)
+        val id = setIdentifier("${equipmentMRID}-to-${equipmentContainerMRID}")
+
+        val typeNameAndMRID = "Equipment to EquipmentContainer association $id"
+        val equipment = service.getOrThrow<Equipment>(equipmentMRID, typeNameAndMRID)
+        val equipmentContainer = service.getOrThrow<EquipmentContainer>(equipmentContainerMRID, typeNameAndMRID)
+
+        equipmentContainer.addEquipment(equipment)
+        equipment.addContainer(equipmentContainer)
+
+        return true
+    }
+
+    /**
+     * Create a [Equipment] to [OperationalRestriction] association from [TableEquipmentOperationalRestrictions].
+     *
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
+     *
+     * @return true if the association was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableEquipmentOperationalRestrictions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val equipmentMRID = resultSet.getString(table.EQUIPMENT_MRID.queryIndex)
+        setIdentifier("${equipmentMRID}-to-UNKNOWN")
+
+        val operationalRestrictionMRID = resultSet.getString(table.OPERATIONAL_RESTRICTION_MRID.queryIndex)
+        val id = setIdentifier("${equipmentMRID}-to-${operationalRestrictionMRID}")
+
+        val typeNameAndMRID = "Equipment to OperationalRestriction association $id"
+        val equipment = service.getOrThrow<Equipment>(equipmentMRID, typeNameAndMRID)
+        val operationalRestriction = service.getOrThrow<OperationalRestriction>(operationalRestrictionMRID, typeNameAndMRID)
+
+        operationalRestriction.addEquipment(equipment)
+        equipment.addOperationalRestriction(operationalRestriction)
+
+        return true
+    }
+
+    /**
+     * Create a [Equipment] to [UsagePoint] association from [TableEquipmentUsagePoints].
+     *
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
+     *
+     * @return true if the association was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableEquipmentUsagePoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val equipmentMRID = resultSet.getString(table.EQUIPMENT_MRID.queryIndex)
+        setIdentifier("${equipmentMRID}-to-UNKNOWN")
+
+        val usagePointMRID = resultSet.getString(table.USAGE_POINT_MRID.queryIndex)
+        val id = setIdentifier("${equipmentMRID}-to-${usagePointMRID}")
+
+        val typeNameAndMRID = "Equipment to UsagePoint association $id"
+        val equipment = service.getOrThrow<Equipment>(equipmentMRID, typeNameAndMRID)
+        val usagePoint = service.getOrThrow<UsagePoint>(usagePointMRID, typeNameAndMRID)
+
+        usagePoint.addEquipment(equipment)
+        equipment.addUsagePoint(usagePoint)
+
+        return true
+    }
+
+    /**
+     * Create a [Loop] to [Substation] association from [TableLoopsSubstations].
+     *
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
+     *
+     * @return true if the association was successfully read from the database and added to the service.
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
     fun load(table: TableLoopsSubstations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val assetOrganisationRoleMRID = setIdentifier(resultSet.getString(table.LOOP_MRID.queryIndex))
+        val assetOrganisationRoleMRID = resultSet.getString(table.LOOP_MRID.queryIndex)
         setIdentifier("${assetOrganisationRoleMRID}-to-UNKNOWN")
 
         val assetMRID = resultSet.getString(table.SUBSTATION_MRID.queryIndex)
@@ -2575,18 +2703,18 @@ class NetworkCimReader(
     }
 
     /**
-     * Create a [setIdentifier] and populate its fields from [TableProtectionRelayFunctionsProtectedSwitches].
+     * Create a [ProtectionRelayFunction] to [ProtectedSwitch] association from [TableProtectionRelayFunctionsProtectedSwitches].
      *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
      *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
+     * @return true if the association was successfully read from the database and added to the service.
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
     fun load(table: TableProtectionRelayFunctionsProtectedSwitches, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val protectionRelayFunctionMRID = setIdentifier(resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex))
+        val protectionRelayFunctionMRID = resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex)
         setIdentifier("${protectionRelayFunctionMRID}-to-UNKNOWN")
 
         val protectedSwitchMRID = resultSet.getString(table.PROTECTED_SWITCH_MRID.queryIndex)
@@ -2603,18 +2731,18 @@ class NetworkCimReader(
     }
 
     /**
-     * Create a [setIdentifier] and populate its fields from [TableProtectionRelayFunctionsSensors].
+     * Create a [ProtectionRelayFunction] to [Sensor] association from [TableProtectionRelayFunctionsSensors].
      *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
      *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
+     * @return true if the association was successfully read from the database and added to the service.
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
     fun load(table: TableProtectionRelayFunctionsSensors, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val protectionRelayFunctionMRID = setIdentifier(resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex))
+        val protectionRelayFunctionMRID = resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex)
         setIdentifier("${protectionRelayFunctionMRID}-to-UNKNOWN")
 
         val sensorMRID = resultSet.getString(table.SENSOR_MRID.queryIndex)
@@ -2631,18 +2759,18 @@ class NetworkCimReader(
     }
 
     /**
-     * Create a [setIdentifier] and populate its fields from [TableProtectionRelaySchemesProtectionRelayFunctions].
+     * Create a [ProtectionRelayScheme] to [ProtectionRelayFunction] association from [TableProtectionRelaySchemesProtectionRelayFunctions].
      *
-     * @param table The database table to read the [setIdentifier] fields from.
-     * @param resultSet The record in the database table containing the fields for this [setIdentifier].
-     * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
      *
-     * @return true if the [setIdentifier] was successfully read from the database and added to the service.
+     * @return true if the association was successfully read from the database and added to the service.
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
     fun load(table: TableProtectionRelaySchemesProtectionRelayFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val protectionRelaySchemeMRID = setIdentifier(resultSet.getString(table.PROTECTION_RELAY_SCHEME_MRID.queryIndex))
+        val protectionRelaySchemeMRID = resultSet.getString(table.PROTECTION_RELAY_SCHEME_MRID.queryIndex)
         setIdentifier("${protectionRelaySchemeMRID}-to-UNKNOWN")
 
         val protectionRelayFunctionMRID = resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex)
@@ -2654,6 +2782,61 @@ class NetworkCimReader(
 
         protectionRelayScheme.addFunction(protectionRelayFunction)
         protectionRelayFunction.addScheme(protectionRelayScheme)
+
+        return true
+    }
+
+    /**
+     * Create a [SynchronousMachine] to [ReactiveCapabilityCurve] association from [TableSynchronousMachinesReactiveCapabilityCurves].
+     *
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
+     *
+     * @return true if the association was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableSynchronousMachinesReactiveCapabilityCurves, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val synchronousMachineMRID = resultSet.getString(table.SYNCHRONOUS_MACHINE_MRID.queryIndex)
+        setIdentifier("${synchronousMachineMRID}-to-UNKNOWN")
+
+        val curveMRID = resultSet.getString(table.REACTIVE_CAPABILITY_CURVE_MRID.queryIndex)
+        val id = setIdentifier("${synchronousMachineMRID}-to-${curveMRID}")
+
+        val typeNameAndMRID = "SynchronousMachine to ReactiveCapabilityCurve association $id"
+        val synchronousMachine = service.getOrThrow<SynchronousMachine>(synchronousMachineMRID, typeNameAndMRID)
+        val curve = service.getOrThrow<ReactiveCapabilityCurve>(curveMRID, typeNameAndMRID)
+
+        synchronousMachine.addCurve(curve)
+
+        return true
+    }
+
+    /**
+     * Create a [UsagePoint] to [EndDevice] association from [TableUsagePointsEndDevices].
+     *
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
+     *
+     * @return true if the association was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableUsagePointsEndDevices, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val usagePointMRID = resultSet.getString(table.USAGE_POINT_MRID.queryIndex)
+        setIdentifier("${usagePointMRID}-to-UNKNOWN")
+
+        val endDeviceMRID = resultSet.getString(table.END_DEVICE_MRID.queryIndex)
+        val id = setIdentifier("${usagePointMRID}-to-${endDeviceMRID}")
+
+        val typeNameAndMRID = "UsagePoint to EndDevice association $id"
+        val usagePoint = service.getOrThrow<UsagePoint>(usagePointMRID, typeNameAndMRID)
+        val endDevice = service.getOrThrow<EndDevice>(endDeviceMRID, typeNameAndMRID)
+
+        endDevice.addUsagePoint(usagePoint)
+        usagePoint.addEndDevice(endDevice)
 
         return true
     }

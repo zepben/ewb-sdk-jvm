@@ -12,6 +12,12 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
+/**
+ * A class representing the association between Equipment and OperationalRestrictions.
+ *
+ * @property EQUIPMENT_MRID A column storing the mRID of Equipment.
+ * @property OPERATIONAL_RESTRICTION_MRID A column storing the mRID of OperationalRestrictions.
+ */
 @Suppress("PropertyName")
 class TableEquipmentOperationalRestrictions : SqliteTable() {
 

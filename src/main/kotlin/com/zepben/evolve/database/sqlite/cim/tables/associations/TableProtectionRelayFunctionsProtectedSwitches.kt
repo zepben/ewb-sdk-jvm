@@ -12,6 +12,12 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
+/**
+ * A class representing the association between ProtectionRelayFunctions and ProtectedSwitches.
+ *
+ * @property PROTECTION_RELAY_FUNCTION_MRID A column storing the mRID of ProtectionRelayFunctions.
+ * @property PROTECTED_SWITCH_MRID A column storing the mRID of ProtectedSwitches.
+ */
 @Suppress("PropertyName")
 class TableProtectionRelayFunctionsProtectedSwitches : SqliteTable() {
 

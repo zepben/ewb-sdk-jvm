@@ -623,6 +623,7 @@ class NetworkCimWriter(
         insert.setNullableString(table.CONNECTION_CATEGORY.queryIndex, usagePoint.connectionCategory)
         insert.setNullableInt(table.RATED_POWER.queryIndex, usagePoint.ratedPower)
         insert.setNullableInt(table.APPROVED_INVERTER_CAPACITY.queryIndex, usagePoint.approvedInverterCapacity)
+        insert.setString(table.PHASE_CODE.queryIndex, usagePoint.phaseCode.name)
 
         var status = true
         usagePoint.equipment.forEach { status = status and saveAssociation(it, usagePoint) }
@@ -791,6 +792,30 @@ class NetworkCimWriter(
         description: String
     ): Boolean {
         return savePowerSystemResource(table, insert, connectivityNodeContainer, description)
+    }
+
+    @Throws(SQLException::class)
+    private fun saveCurve(table: TableCurves, insert: PreparedStatement, curve: Curve, description: String): Boolean {
+        var status = true
+        curve.data.forEach { curveData ->
+            status = status and saveCurveData(curve, curveData)
+        }
+
+        return status and saveIdentifiedObject(table, insert, curve, description)
+    }
+
+    @Throws(SQLException::class)
+    private fun saveCurveData(curve: Curve, curveData: CurveData): Boolean {
+        val table = databaseTables.getTable<TableCurveData>()
+        val insert = databaseTables.getInsert<TableCurveData>()
+
+        insert.setNullableString(table.CURVE_MRID.queryIndex, curve.mRID)
+        insert.setNullableFloat(table.X_VALUE.queryIndex, curveData.xValue)
+        insert.setNullableFloat(table.Y1_VALUE.queryIndex, curveData.y1Value)
+        insert.setNullableFloat(table.Y2_VALUE.queryIndex, curveData.y2Value)
+        insert.setNullableFloat(table.Y3_VALUE.queryIndex, curveData.y3Value)
+
+        return insert.tryExecuteSingleUpdate("curve data")
     }
 
     @Throws(SQLException::class)
@@ -1448,6 +1473,18 @@ class NetworkCimWriter(
     }
 
     @Throws(SQLException::class)
+    private fun saveEarthFaultCompensator(
+        table: TableEarthFaultCompensators,
+        insert: PreparedStatement,
+        earthFaultCompensator: EarthFaultCompensator,
+        description: String
+    ): Boolean {
+        insert.setNullableDouble(table.R.queryIndex, earthFaultCompensator.r)
+
+        return saveConductingEquipment(table, insert, earthFaultCompensator, description)
+    }
+
+    @Throws(SQLException::class)
     private fun saveEnergyConnection(
         table: TableEnergyConnections,
         insert: PreparedStatement,
@@ -1616,6 +1653,24 @@ class NetworkCimWriter(
     }
 
     /**
+     * Save the [GroundingImpedance] fields to [TableGroundingImpedances].
+     *
+     * @param groundingImpedance The [GroundingImpedance] instance to write to the database.
+     *
+     * @return true if the [GroundingImpedance] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(groundingImpedance: GroundingImpedance): Boolean {
+        val table = databaseTables.getTable<TableGroundingImpedances>()
+        val insert = databaseTables.getInsert<TableGroundingImpedances>()
+
+        insert.setNullableDouble(table.X.queryIndex, groundingImpedance.x)
+
+        return saveEarthFaultCompensator(table, insert, groundingImpedance, "ground disconnector")
+    }
+
+    /**
      * Save the [Jumper] fields to [TableJumpers].
      *
      * @param jumper The [Jumper] instance to write to the database.
@@ -1732,6 +1787,24 @@ class NetworkCimWriter(
         insert.setNullableDouble(table.G0CH.queryIndex, perLengthSequenceImpedance.g0ch)
 
         return savePerLengthImpedance(table, insert, perLengthSequenceImpedance, "per length sequence impedance")
+    }
+
+    /**
+     * Save the [PetersenCoil] fields to [TablePetersenCoils].
+     *
+     * @param petersenCoil The [PetersenCoil] instance to write to the database.
+     *
+     * @return true if the [PetersenCoil] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(petersenCoil: PetersenCoil): Boolean {
+        val table = databaseTables.getTable<TablePetersenCoils>()
+        val insert = databaseTables.getInsert<TablePetersenCoils>()
+
+        insert.setNullableDouble(table.X_GROUND_NOMINAL.queryIndex, petersenCoil.xGroundNominal)
+
+        return saveEarthFaultCompensator(table, insert, petersenCoil, "petersen coil")
     }
 
     /**
@@ -1890,6 +1963,22 @@ class NetworkCimWriter(
     }
 
     /**
+     * Save the [ReactiveCapabilityCurve] fields to [TableReactiveCapabilityCurves].
+     *
+     * @param reactiveCapabilityCurve The [ReactiveCapabilityCurve] instance to write to the database.
+     *
+     * @return true if the [ReactiveCapabilityCurve] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(reactiveCapabilityCurve: ReactiveCapabilityCurve): Boolean {
+        val table = databaseTables.getTable<TableReactiveCapabilityCurves>()
+        val insert = databaseTables.getInsert<TableReactiveCapabilityCurves>()
+
+        return saveCurve(table, insert, reactiveCapabilityCurve, "reactive capability curve")
+    }
+
+    /**
      * Save the [Recloser] fields to [TableReclosers].
      *
      * @param recloser The [Recloser] instance to write to the database.
@@ -1939,6 +2028,17 @@ class NetworkCimWriter(
         return savePowerSystemResource(table, insert, regulatingControl, description)
     }
 
+    @Throws(SQLException::class)
+    private fun saveRotatingMachine(table: TableRotatingMachines, insert: PreparedStatement, rotatingMachine: RotatingMachine, description: String): Boolean {
+        insert.setNullableDouble(table.RATED_POWER_FACTOR.queryIndex, rotatingMachine.ratedPowerFactor)
+        insert.setNullableDouble(table.RATED_S.queryIndex, rotatingMachine.ratedS)
+        insert.setNullableInt(table.RATED_U.queryIndex, rotatingMachine.ratedU)
+        insert.setNullableDouble(table.P.queryIndex, rotatingMachine.p)
+        insert.setNullableDouble(table.Q.queryIndex, rotatingMachine.q)
+
+        return saveRegulatingCondEq(table, insert, rotatingMachine, description)
+    }
+
     /**
      * Save the [SeriesCompensator] fields to [TableSeriesCompensators].
      *
@@ -1986,6 +2086,49 @@ class NetworkCimWriter(
         insert.setNullableString(table.SWITCH_INFO_MRID.queryIndex, switch.assetInfo?.mRID)
 
         return saveConductingEquipment(table, insert, switch, description)
+    }
+
+    /**
+     * Save the [SynchronousMachine] fields to [TableSynchronousMachines].
+     *
+     * @param synchronousMachine The [SynchronousMachine] instance to write to the database.
+     *
+     * @return true if the [SynchronousMachine] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(synchronousMachine: SynchronousMachine): Boolean {
+        val table = databaseTables.getTable<TableSynchronousMachines>()
+        val insert = databaseTables.getInsert<TableSynchronousMachines>()
+
+        insert.setNullableDouble(table.BASE_Q.queryIndex, synchronousMachine.baseQ)
+        insert.setNullableInt(table.CONDENSER_P.queryIndex, synchronousMachine.condenserP)
+        insert.setNullableBoolean(table.EARTHING.queryIndex, synchronousMachine.earthing)
+        insert.setNullableDouble(table.EARTHING_STAR_POINT_R.queryIndex, synchronousMachine.earthingStarPointR)
+        insert.setNullableDouble(table.EARTHING_STAR_POINT_X.queryIndex, synchronousMachine.earthingStarPointX)
+        insert.setNullableDouble(table.IKK.queryIndex, synchronousMachine.ikk)
+        insert.setNullableDouble(table.MAX_Q.queryIndex, synchronousMachine.maxQ)
+        insert.setNullableInt(table.MAX_U.queryIndex, synchronousMachine.maxU)
+        insert.setNullableDouble(table.MIN_Q.queryIndex, synchronousMachine.minQ)
+        insert.setNullableInt(table.MIN_U.queryIndex, synchronousMachine.minU)
+        insert.setNullableDouble(table.MU.queryIndex, synchronousMachine.mu)
+        insert.setNullableDouble(table.R.queryIndex, synchronousMachine.r)
+        insert.setNullableDouble(table.R0.queryIndex, synchronousMachine.r0)
+        insert.setNullableDouble(table.R2.queryIndex, synchronousMachine.r2)
+        insert.setNullableDouble(table.SAT_DIRECT_SUBTRANS_X.queryIndex, synchronousMachine.satDirectSubtransX)
+        insert.setNullableDouble(table.SAT_DIRECT_SYNC_X.queryIndex, synchronousMachine.satDirectSyncX)
+        insert.setNullableDouble(table.SAT_DIRECT_TRANS_X.queryIndex, synchronousMachine.satDirectTransX)
+        insert.setNullableDouble(table.X0.queryIndex, synchronousMachine.x0)
+        insert.setNullableDouble(table.X2.queryIndex, synchronousMachine.x2)
+        insert.setNullableString(table.TYPE.queryIndex, synchronousMachine.type.name)
+        insert.setNullableString(table.OPERATING_MODE.queryIndex, synchronousMachine.operatingMode.name)
+
+        var status = true
+        synchronousMachine.curves.forEach { rcc ->
+            status = status and saveAssociation(synchronousMachine, rcc)
+        }
+
+        return status and saveRotatingMachine(table, insert, synchronousMachine, "synchronous machine")
     }
 
     @Throws(SQLException::class)
@@ -2168,50 +2311,6 @@ class NetworkCimWriter(
     }
 
     @Throws(SQLException::class)
-    private fun saveAssociation(usagePoint: UsagePoint, endDevice: EndDevice): Boolean {
-        val table = databaseTables.getTable<TableUsagePointsEndDevices>()
-        val insert = databaseTables.getInsert<TableUsagePointsEndDevices>()
-
-        insert.setString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
-        insert.setString(table.END_DEVICE_MRID.queryIndex, endDevice.mRID)
-
-        return insert.tryExecuteSingleUpdate("usage point to end device association")
-    }
-
-    @Throws(SQLException::class)
-    private fun saveAssociation(equipment: Equipment, usagePoint: UsagePoint): Boolean {
-        val table = databaseTables.getTable<TableEquipmentUsagePoints>()
-        val insert = databaseTables.getInsert<TableEquipmentUsagePoints>()
-
-        insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
-        insert.setString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
-
-        return insert.tryExecuteSingleUpdate("equipment to usage point association")
-    }
-
-    @Throws(SQLException::class)
-    private fun saveAssociation(equipment: Equipment, operationalRestriction: OperationalRestriction): Boolean {
-        val table = databaseTables.getTable<TableEquipmentOperationalRestrictions>()
-        val insert = databaseTables.getInsert<TableEquipmentOperationalRestrictions>()
-
-        insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
-        insert.setString(table.OPERATIONAL_RESTRICTION_MRID.queryIndex, operationalRestriction.mRID)
-
-        return insert.tryExecuteSingleUpdate("equipment to operational restriction association")
-    }
-
-    @Throws(SQLException::class)
-    private fun saveAssociation(equipment: Equipment, equipmentContainer: EquipmentContainer): Boolean {
-        val table = databaseTables.getTable<TableEquipmentEquipmentContainers>()
-        val insert = databaseTables.getInsert<TableEquipmentEquipmentContainers>()
-
-        insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
-        insert.setString(table.EQUIPMENT_CONTAINER_MRID.queryIndex, equipmentContainer.mRID)
-
-        return insert.tryExecuteSingleUpdate("equipment to equipment container association")
-    }
-
-    @Throws(SQLException::class)
     private fun saveAssociation(circuit: Circuit, substation: Substation): Boolean {
         val table = databaseTables.getTable<TableCircuitsSubstations>()
         val insert = databaseTables.getInsert<TableCircuitsSubstations>()
@@ -2231,6 +2330,39 @@ class NetworkCimWriter(
         insert.setString(table.TERMINAL_MRID.queryIndex, terminal.mRID)
 
         return insert.tryExecuteSingleUpdate("circuit to terminal association")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveAssociation(equipment: Equipment, equipmentContainer: EquipmentContainer): Boolean {
+        val table = databaseTables.getTable<TableEquipmentEquipmentContainers>()
+        val insert = databaseTables.getInsert<TableEquipmentEquipmentContainers>()
+
+        insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
+        insert.setString(table.EQUIPMENT_CONTAINER_MRID.queryIndex, equipmentContainer.mRID)
+
+        return insert.tryExecuteSingleUpdate("equipment to equipment container association")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveAssociation(equipment: Equipment, operationalRestriction: OperationalRestriction): Boolean {
+        val table = databaseTables.getTable<TableEquipmentOperationalRestrictions>()
+        val insert = databaseTables.getInsert<TableEquipmentOperationalRestrictions>()
+
+        insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
+        insert.setString(table.OPERATIONAL_RESTRICTION_MRID.queryIndex, operationalRestriction.mRID)
+
+        return insert.tryExecuteSingleUpdate("equipment to operational restriction association")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveAssociation(equipment: Equipment, usagePoint: UsagePoint): Boolean {
+        val table = databaseTables.getTable<TableEquipmentUsagePoints>()
+        val insert = databaseTables.getInsert<TableEquipmentUsagePoints>()
+
+        insert.setString(table.EQUIPMENT_MRID.queryIndex, equipment.mRID)
+        insert.setString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
+
+        return insert.tryExecuteSingleUpdate("equipment to usage point association")
     }
 
     @Throws(SQLException::class)
@@ -2276,6 +2408,28 @@ class NetworkCimWriter(
         insert.setString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex, protectionRelayFunction.mRID)
 
         return insert.tryExecuteSingleUpdate("protection relay function to protection relay function association")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveAssociation(synchronousMachine: SynchronousMachine, reactiveCapabilityCurve: ReactiveCapabilityCurve): Boolean {
+        val table = databaseTables.getTable<TableSynchronousMachinesReactiveCapabilityCurves>()
+        val insert = databaseTables.getInsert<TableSynchronousMachinesReactiveCapabilityCurves>()
+
+        insert.setString(table.SYNCHRONOUS_MACHINE_MRID.queryIndex, synchronousMachine.mRID)
+        insert.setString(table.REACTIVE_CAPABILITY_CURVE_MRID.queryIndex, reactiveCapabilityCurve.mRID)
+
+        return insert.tryExecuteSingleUpdate("synchronous machine to reactivity curve association")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveAssociation(usagePoint: UsagePoint, endDevice: EndDevice): Boolean {
+        val table = databaseTables.getTable<TableUsagePointsEndDevices>()
+        val insert = databaseTables.getInsert<TableUsagePointsEndDevices>()
+
+        insert.setString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
+        insert.setString(table.END_DEVICE_MRID.queryIndex, endDevice.mRID)
+
+        return insert.tryExecuteSingleUpdate("usage point to end device association association")
     }
 
     private fun EquipmentContainer.shouldExportContainerContents(): Boolean = when (this) {

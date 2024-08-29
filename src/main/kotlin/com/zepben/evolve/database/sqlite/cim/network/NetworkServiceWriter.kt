@@ -132,5 +132,9 @@ class NetworkServiceWriter @JvmOverloads constructor(
             .andSaveEach<Ground>(writer::save)
             .andSaveEach<GroundDisconnector>(writer::save)
             .andSaveEach<SeriesCompensator>(writer::save)
+            .andSaveEach<SynchronousMachine>(writer::save)
+            .andSaveEach<PetersenCoil>(writer::save)
+            .andSaveEach<GroundingImpedance>(writer::save)
+            .andSaveEach<ReactiveCapabilityCurve>(writer::save)
 
 }

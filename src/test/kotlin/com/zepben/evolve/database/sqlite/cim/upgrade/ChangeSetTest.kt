@@ -9,6 +9,9 @@
 package com.zepben.evolve.database.sqlite.cim.upgrade
 
 import com.zepben.evolve.database.paths.DatabaseType
+import com.zepben.evolve.database.sqlite.cim.customer.CustomerDatabaseTables
+import com.zepben.evolve.database.sqlite.cim.diagram.DiagramDatabaseTables
+import com.zepben.evolve.database.sqlite.cim.network.NetworkDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.NoChanges
@@ -17,10 +20,8 @@ import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeS
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeSet54CustomerValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet50DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet52DiagramValidator
-import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet50NetworkValidator
-import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet51NetworkValidator
-import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet52NetworkValidator
-import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.ChangeSet53NetworkValidator
+import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.*
+import com.zepben.evolve.database.sqlite.common.BaseDatabaseTables
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -53,7 +54,8 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.CUSTOMER, 51),
         NoChanges(DatabaseType.CUSTOMER, 52),
         NoChanges(DatabaseType.CUSTOMER, 53),
-        ChangeSet54CustomerValidator
+        ChangeSet54CustomerValidator,
+        NoChanges(DatabaseType.CUSTOMER, 55)
     ).associateBy { it.version }
 
     private val diagramChangeSetValidators = listOf(
@@ -61,7 +63,8 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.DIAGRAM, 51),
         ChangeSet52DiagramValidator,
         NoChanges(DatabaseType.DIAGRAM, 53),
-        NoChanges(DatabaseType.DIAGRAM, 54)
+        NoChanges(DatabaseType.DIAGRAM, 54),
+        NoChanges(DatabaseType.DIAGRAM, 55)
     ).associateBy { it.version }
 
     private val networkChangeSetValidators = listOf(
@@ -69,7 +72,8 @@ internal class ChangeSetTest {
         ChangeSet51NetworkValidator,
         ChangeSet52NetworkValidator,
         ChangeSet53NetworkValidator,
-        NoChanges(DatabaseType.NETWORK_MODEL, 54)
+        NoChanges(DatabaseType.NETWORK_MODEL, 54),
+        ChangeSet55NetworkValidator
     ).associateBy { it.version }
 
     @Test
@@ -77,9 +81,27 @@ internal class ChangeSetTest {
         // All pre-split change sets are for the network database, as that is the only database that existed.
         validateChangeSets(createBaseCombinedDB(), preSplitChangeSetValidators, UpgradeRunner::preSplitChangeSets, DatabaseType.NETWORK_MODEL)
 
-        validateChangeSets(createBaseDB(DatabaseType.CUSTOMER), customerChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.CUSTOMER)
-        validateChangeSets(createBaseDB(DatabaseType.DIAGRAM), diagramChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.DIAGRAM)
-        validateChangeSets(createBaseDB(DatabaseType.NETWORK_MODEL), networkChangeSetValidators, UpgradeRunner::postSplitChangeSets, DatabaseType.NETWORK_MODEL)
+        validateChangeSets(
+            createBaseDB(DatabaseType.CUSTOMER),
+            customerChangeSetValidators,
+            UpgradeRunner::postSplitChangeSets,
+            DatabaseType.CUSTOMER,
+            CustomerDatabaseTables()
+        )
+        validateChangeSets(
+            createBaseDB(DatabaseType.DIAGRAM),
+            diagramChangeSetValidators,
+            UpgradeRunner::postSplitChangeSets,
+            DatabaseType.DIAGRAM,
+            DiagramDatabaseTables()
+        )
+        validateChangeSets(
+            createBaseDB(DatabaseType.NETWORK_MODEL),
+            networkChangeSetValidators,
+            UpgradeRunner::postSplitChangeSets,
+            DatabaseType.NETWORK_MODEL,
+            NetworkDatabaseTables()
+        )
     }
 
     /**
@@ -107,7 +129,8 @@ internal class ChangeSetTest {
         conn: Connection,
         changeSetValidators: Map<Int, ChangeSetValidator>,
         changesSets: UpgradeRunner.() -> List<ChangeSet>,
-        type: DatabaseType
+        type: DatabaseType,
+        expectedTables: BaseDatabaseTables? = null
     ) {
         val runner = UpgradeRunner()
         val tableVersion = tableCimVersion
@@ -150,6 +173,12 @@ internal class ChangeSetTest {
                     }
                 }
             }
+        }
+
+        // We are using the tables rather than the database reader because setting up the reader is more complex than it needs to be
+        logger.info("Validating finalized database against expected tables")
+        expectedTables?.tables?.forEach {
+            conn.prepareStatement(it.value.preparedInsertSql)
         }
     }
 

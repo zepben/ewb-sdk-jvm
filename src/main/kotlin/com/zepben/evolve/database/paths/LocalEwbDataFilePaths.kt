@@ -15,8 +15,17 @@ import java.nio.file.Paths
 import java.time.LocalDate
 
 
-// LocalFileSystemEwbDataFilePaths("/data/ewb")
-class LocalEwbDataFilePaths  @JvmOverloads constructor(
+/**
+ * Provides paths to all the various data files / folders in the local file system used by EWB.
+ *
+ * @param baseDir The root directory of the EWB data structure.
+ * @param createPath Create the root directory (and any missing parent folders) if it does not exist.
+ * @param createDirectories Function for directory creation.
+ * @param isDirectory Function to determine if the supplied path is a directory .
+ * @param exists Function to determine if the supplied path exists.
+ * @param listFiles Function for listing directories and files under the supplied path.
+ */
+class LocalEwbDataFilePaths @JvmOverloads constructor(
     private val baseDir: Path,
     createPath: Boolean = false,
     private val createDirectories: (Path) -> Path = { Files.createDirectories(it) },

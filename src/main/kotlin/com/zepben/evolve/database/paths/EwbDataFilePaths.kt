@@ -24,27 +24,26 @@ interface EwbDataFilePaths {
      * Resolves the [Path] to the database file for the specified [DatabaseType] that has
      * [DatabaseType.perDate] set to true and the specified [LocalDate].
      *
-     * @param dbType The [DatabaseType] to use for the database [Path].
+     * @param type The [DatabaseType] to use for the database [Path].
      * @param date The [LocalDate] to use for the database [Path].
      * @return The [Path] to the [DatabaseType] database file.
      */
-    fun resolve(dbType: DatabaseType, date: LocalDate): Path {
-        require(dbType.perDate) { "dbType must have its perDate set to true to use this method." }
-        return resolveDatabase(date.toDatedPath(dbType.fileDescriptor))
+    fun resolve(type: DatabaseType, date: LocalDate): Path {
+        require(type.perDate) { "type must have its perDate set to true to use this method." }
+        return resolveDatabase(date.toDatedPath(type))
     }
 
     /**
      * Resolves the [Path] to the database file for the specified [DatabaseType] that has
      * [DatabaseType.perDate] set to false.
      *
-     * @param dbType The [DatabaseType] to use for the database [Path].
+     * @param type The [DatabaseType] to use for the database [Path].
      * @return The [Path] to the [DatabaseType] database file.
      */
-    fun resolve(dbType: DatabaseType): Path {
-        require(!dbType.perDate) { "dbType must have its perDate set to false to use this method." }
-        return resolveDatabase(Paths.get(dbType.fileDescriptor + ".sqlite"))
+    fun resolve(type: DatabaseType): Path {
+        require(!type.perDate) { "type must have its perDate set to false to use this method." }
+        return resolveDatabase(Paths.get(type.databaseName()))
     }
-
 
     /**
      * Create the directories required to have a valid path for the specified date.
@@ -92,37 +91,23 @@ interface EwbDataFilePaths {
     }
 
     /**
-     * Check if a database [Path] of the specified [DatabaseType] and [LocalDate] exists.
+     * Find available databases specified by [DatabaseType] in data path.
      *
-     * @param dbType The type of database to search for.
-     * @param date The date to check.
+     * @param type The type of database to search for.
      *
-     * @return True if a database of the specified [dbType] and [date] exits in the date path.
+     * @return list of [LocalDate]'s for which this specified [DatabaseType] databases exist in the data path.
      */
-    private fun checkExists(descendants: List<Path>, dbType: DatabaseType, date: LocalDate): Boolean =
-        descendants.any { cp -> cp.endsWith(date.toDatedPath(dbType.fileDescriptor)) }
-
-    private fun LocalDate.toDatedPath(file: String): Path =
-        toString().let { dateStr -> Paths.get(dateStr).resolve("$dateStr-$file.sqlite") }
-
     fun getAvailableDatesFor(type: DatabaseType): List<LocalDate> {
         if (!type.perDate)
             throw IllegalStateException("INTERNAL ERROR: Should only be calling `getAvailableDatesFor` for `perDate` files, which should all be covered above, so go ahead and add it.")
 
         val descendants = enumerateDescendants().asSequence().toList()
         return descendants
-                .filter { it.name.endsWith("${type.fileDescriptor}.sqlite") }
-                .mapNotNull { it.parent.runCatching { LocalDate.parse(name) }.getOrNull() }
-                .sorted()
-                .toList()
+            .filter { it.name.endsWith(type.databaseName()) }
+            .mapNotNull { it.parent.runCatching { LocalDate.parse(name) }.getOrNull() }
+            .sorted()
+            .toList()
     }
-
-    /**
-     * Find available network-model databases in data path.
-     *
-     * @return A list of [LocalDate]'s for which network-model databases exist in the data path.
-     */
-    fun getNetworkModelDatabases(): List<LocalDate> = getAvailableDatesFor(DatabaseType.NETWORK_MODEL)
 
     /**
      * Lists the child items of source location.
@@ -138,4 +123,21 @@ interface EwbDataFilePaths {
      * @return [Path] to the local database file.
      */
     fun resolveDatabase(path: Path): Path
+
+    /**
+     * Check if a database [Path] of the specified [DatabaseType] and [LocalDate] exists.
+     *
+     * @param descendants A list of [Path] representing the descendant paths.
+     * @param type The type of database to search for.
+     * @param date The date to check.
+     *
+     * @return True if a database of the specified [type] and [date] exits in the date path.
+     */
+    private fun checkExists(descendants: List<Path>, type: DatabaseType, date: LocalDate): Boolean =
+        descendants.any { cp -> cp.endsWith(date.toDatedPath(type)) }
+
+    private fun LocalDate.toDatedPath(type: DatabaseType): Path =
+        toString().let { dateStr -> Paths.get(dateStr).resolve("$dateStr-${type.databaseName()}") }
+
+    private fun DatabaseType.databaseName(): String = "${this.fileDescriptor}.sqlite"
 }

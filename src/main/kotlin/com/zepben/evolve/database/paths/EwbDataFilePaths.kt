@@ -14,7 +14,6 @@ import java.nio.file.Paths
 import java.time.LocalDate
 import kotlin.io.path.name
 
-
 /**
  * Provides paths to all the various data files / folders used by EWB.
  */
@@ -42,7 +41,7 @@ interface EwbDataFilePaths {
      */
     fun resolve(type: DatabaseType): Path {
         require(!type.perDate) { "type must have its perDate set to false to use this method." }
-        return resolveDatabase(Paths.get(type.databaseName()))
+        return resolveDatabase(Paths.get(type.databaseName))
     }
 
     /**
@@ -103,7 +102,7 @@ interface EwbDataFilePaths {
 
         val descendants = enumerateDescendants().asSequence().toList()
         return descendants
-            .filter { it.name.endsWith(type.databaseName()) }
+            .filter { it.name.endsWith(type.databaseName) }
             .mapNotNull { it.parent.runCatching { LocalDate.parse(name) }.getOrNull() }
             .sorted()
             .toList()
@@ -137,7 +136,8 @@ interface EwbDataFilePaths {
         descendants.any { cp -> cp.endsWith(date.toDatedPath(type)) }
 
     private fun LocalDate.toDatedPath(type: DatabaseType): Path =
-        toString().let { dateStr -> Paths.get(dateStr).resolve("$dateStr-${type.databaseName()}") }
+        toString().let { dateStr -> Paths.get(dateStr).resolve("$dateStr-${type.databaseName}") }
 
-    private fun DatabaseType.databaseName(): String = "${this.fileDescriptor}.sqlite"
+    private val DatabaseType.databaseName: String get() = "$fileDescriptor.sqlite"
+
 }

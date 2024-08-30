@@ -12,7 +12,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 
 /**
- * An abstract class for RotatingMachine Tables.
+ * A class representing the RotatingMachine columns required for the database table.
  *
  * @property RATED_POWER_FACTOR Power factor (nameplate data). It is primarily used for short circuit data exchange according to IEC 60909. The attribute cannot be a negative value.
  * @property RATED_S Nameplate apparent power rating for the unit in volt-amperes (VA). The attribute shall have a positive value.

@@ -1,6 +1,9 @@
 # Zepben EWB SDK changelog
 ## [0.23.0] - UNRELEASED
 ### Breaking Changes
+* Updated to latest evolve-grpc major version.
+* Removed unused AuthType enum.
+* Removed unused kotlinx-serialization-json dependency.
 * Updated to latest ewb-conn, and hence the signature of these helper functions have changed:
   * `Connect.connectWithSecret`:
     * `issuerDomain` has been renamed to `issuer`;

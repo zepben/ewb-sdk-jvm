@@ -8,20 +8,18 @@
 
 package com.zepben.evolve.services.network.tracing.traversals
 
-import com.zepben.annotations.EverythingIsNonnullByDefault
 import java.util.*
 import java.util.function.Supplier
 
 /**
  * A simple queue implementation for use with traversals.
  */
-@EverythingIsNonnullByDefault
-open class BasicQueue<T> protected constructor(
+class BasicQueue<T> private constructor(
     private val queue: Queue<T>
 ) : TraversalQueue<T> {
 
     override fun hasNext(): Boolean {
-        return queue.peek() != null
+        return queue.isNotEmpty()
     }
 
     override fun next(): T? {

@@ -25,20 +25,25 @@ import kotlin.collections.ArrayDeque
  *
  * @param T Object type to be traversed.
  */
-abstract class Traversal<T, D : Traversal<T, D>>(
-    private val queueNext: QueueNext<T, D>,
-    private val queue: TraversalQueue<T>,
-    val tracker: Tracker<T>
+abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
+    protected val queueNext: QueueNext<T>,
+    protected val queueFactory: () -> TraversalQueue<T>,
+    protected val branchQueueFactory: () -> TraversalQueue<D>,
+    protected val trackerFactory: () -> Tracker<T>,
+    protected val parent: D? = null
 ) {
     /**
      * Represents a consumer that takes the current item of the traversal, and the traversal instance so items can be queued.
      *
      * @param T The type of object being traversed.
      */
-    fun interface QueueNext<T, D : Traversal<T, D>> {
-        fun accept(item: T, context: StepContext, queueItem: (T) -> Boolean, traversal: D)
+    fun interface QueueNext<T> {
+        fun accept(item: T, context: StepContext, queueItem: (T) -> Boolean, queueBranch: (T) -> Boolean)
     }
 
+    private val queue = queueFactory()
+    private val branchQueue = branchQueueFactory()
+    private val tracker: RecursiveTracker<T> = RecursiveTracker(parent?.tracker, trackerFactory())
     private val startItems: ArrayDeque<T> = ArrayDeque()
 
     @Volatile
@@ -49,11 +54,13 @@ abstract class Traversal<T, D : Traversal<T, D>>(
     private val stopConditions = mutableListOf<StopCondition<T>>()
     private val queueConditions = mutableListOf<QueueCondition<T>>()
     private val stepActions = mutableListOf<StepAction<T>>()
+    private val branchStartActions = mutableListOf<StepAction<T>>()
 
     private val computeNextContextFuns: MutableMap<String, ContextValueComputer<T>> = mutableMapOf()
     private val contexts: IdentityHashMap<T, StepContext> = IdentityHashMap()
 
     protected abstract fun getDerivedThis(): D
+    protected abstract fun createNewThis(): D
 
     /**
      *
@@ -199,18 +206,38 @@ abstract class Traversal<T, D : Traversal<T, D>>(
         return getDerivedThis()
     }
 
-    fun addContextDataComputer(computer: ContextValueComputer<T>): D {
+    fun addContextValueComputer(computer: ContextValueComputer<T>): D {
         computeNextContextFuns[computer.key] = computer
         return getDerivedThis()
     }
 
-    fun clearContextDataComputers(): D {
+    fun clearContextValueComputers(): D {
         computeNextContextFuns.entries.removeIf { it.value.isStandaloneComputer() }
         return getDerivedThis()
     }
 
-    fun copyContextDataComputers(other: Traversal<T, D>): D {
+    fun copyContextValueComputers(other: Traversal<T, D>): D {
         computeNextContextFuns.putAll(other.computeNextContextFuns.filter { it.value.isStandaloneComputer() })
+        return getDerivedThis()
+    }
+
+    fun addBranchStartAction(onBranchStart: StepAction<T>): D {
+        branchStartActions.add(onBranchStart)
+        return getDerivedThis()
+    }
+
+    fun clearBranchStartActions(): D {
+        branchStartActions.clear()
+        return getDerivedThis()
+    }
+
+    fun copyBranchStartActions(other: Traversal<T, D>): D {
+        branchStartActions.addAll(other.branchStartActions)
+        return getDerivedThis()
+    }
+
+    private fun applyBranchStartActions(item: T, context: StepContext): D {
+        branchStartActions.forEach { it.apply(item, context) }
         return getDerivedThis()
     }
 
@@ -281,6 +308,7 @@ abstract class Traversal<T, D : Traversal<T, D>>(
         hasRun = false
 
         queue.clear()
+        branchQueue.clear()
         tracker.clear()
 
         return getDerivedThis()
@@ -291,45 +319,114 @@ abstract class Traversal<T, D : Traversal<T, D>>(
             val startItem = startItems.removeFirst()
             queue.add(startItem)
             var canStop = canStopOnStartItem
-            contexts[startItem] = computeInitialContext(startItem)
+
+            // This is a getOrPut because if this is a branch traversal it will already have a context
+            contexts.getOrPut(startItem) { computeInitialContext(startItem) }
 
             while (queue.hasNext()) {
-                val current = queue.next()
-                if (tracker.visit(current)) {
-                    val context = contexts[current] ?: error { "INTERNAL ERROR: Traversal item should always have a context" }
-                    context.isStopping = canStop && matchesAnyStopCondition(current, context)
+                queue.next()?.let { current ->
+                    if (tracker.visit(current)) {
+                        val context = contexts[current] ?: error { "INTERNAL ERROR: Traversal item should always have a context" }
+                        context.isStopping = canStop && matchesAnyStopCondition(current, context)
 
-                    applyStepActions(current, context)
-
-                    if (!context.isStopping) {
-                        val queueNextItem = { nextItem: T ->
-                            val queued = queueItem(nextItem, context)
-                            if (queued) {
-                                contexts[nextItem] = computeNextContext(context, nextItem)
-                            }
-                            queued
+                        if (parent != null && current === startItem) {
+                            applyBranchStartActions(current, context)
                         }
 
+                        applyStepActions(current, context)
 
+                        if (!context.isStopping) {
+                            queueNext(current, context)
+                        }
 
-                        queueNext.accept(current, context, queueNextItem, getDerivedThis())
+                        canStop = true
                     }
-
-                    canStop = true
                 }
             }
         }
+
+        traverseBranches()
     }
 
-    private fun queueItem(nextItem: T, currentContext: StepContext): Boolean {
-        return when {
-            tracker.hasVisited(nextItem) -> false // Don't even bother queuing if we've already visited the item
-            matchesAllQueueConditions(nextItem, currentContext) -> queue.add(nextItem)
-            else -> false
+    private fun queueNext(current: T, context: StepContext) {
+        val queueNextItem = { nextItem: T ->
+            if (canQueueItem(nextItem, context) && queue.add(nextItem)) {
+                contexts[nextItem] = computeNextContext(context, nextItem)
+                true
+            } else {
+                false
+            }
         }
+
+        val queueBranch = { nextItem: T ->
+            if (canQueueItem(nextItem, context)) {
+                val nextContext = computeNextContext(context, nextItem)
+                val branch = createNewThis().also {
+                    it.addStartItem(nextItem)
+                    it.contexts[nextItem] = nextContext
+
+                    it.copyQueueConditions(this)
+                    it.copyStepActions(this)
+                    it.copyStopConditions(this)
+                    it.copyContextValueComputers(this)
+                    it.copyBranchStartActions(this)
+                }
+
+                branchQueue.add(branch)
+                true
+            } else {
+                false
+            }
+        }
+
+        queueNext.accept(current, context, queueNextItem, queueBranch)
+    }
+
+    private fun traverseBranches() {
+        while (branchQueue.hasNext()) {
+            branchQueue.next()?.run()
+        }
+    }
+
+    private fun canQueueItem(nextItem: T, currentContext: StepContext): Boolean {
+        return matchesAllQueueConditions(nextItem, currentContext)
     }
 
     private fun ContextValueComputer<*>.isStandaloneComputer() =
         this !is StepAction<*> && this !is StopCondition<*> && this !is QueueCondition<*>
+}
 
+private class RecursiveTracker<T>(val parent: RecursiveTracker<T>?, val delegate: Tracker<T>) : Tracker<T> {
+    override fun hasVisited(item: T): Boolean {
+        return delegate.hasVisited(item) || run {
+            var current = parent
+            while (current != null) {
+                if (current.hasVisited(item))
+                    return true
+                current = current.parent
+            }
+            return false
+        }
+    }
+
+    override fun visit(item: T): Boolean {
+        var parent = parent
+        while (parent != null) {
+            if (parent.hasVisited(item))
+                return false
+            parent = parent.parent
+        }
+
+        return delegate.visit(item)
+    }
+
+    override fun clear() {
+        var parent = parent
+        while (parent != null) {
+            parent.clear()
+            parent = parent.parent
+        }
+
+        return delegate.clear()
+    }
 }

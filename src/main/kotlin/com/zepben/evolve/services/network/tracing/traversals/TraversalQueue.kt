@@ -21,12 +21,12 @@ interface TraversalQueue<T> {
     operator fun hasNext(): Boolean
 
     /**
-     * Returns the next item in the queue. Most implementations of this interface will return
+     * Removes and returns the next item in the queue. Most implementations of this interface will return
      * null is this is called when the queue is empty, however it is not enforced.
      *
      * @return The next item in the queue.
      */
-    operator fun next(): T
+    operator fun next(): T?
 
     /**
      * Adds an item to the queue.

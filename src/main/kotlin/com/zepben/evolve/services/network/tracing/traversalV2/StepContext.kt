@@ -11,18 +11,18 @@ package com.zepben.evolve.services.network.tracing.traversalV2
 class StepContext(
     val isStartItem: Boolean,
     val stepNumber: Int = 0,
-    private var customValues: MutableMap<String, Any?>? = null
+    private var values: MutableMap<String, Any?>? = null
 ) {
     var isStopping: Boolean = false
         internal set
 
     fun setValue(key: String, value: Any?) {
-        customValues = customValues ?: mutableMapOf()
-        customValues!![key] = value
+        values = values ?: mutableMapOf()
+        values!![key] = value
     }
 
     @Suppress("UNCHECKED_CAST")
     fun <T> getValue(key: String): T? {
-        return customValues?.get(key) as? T?
+        return values?.get(key) as? T?
     }
 }

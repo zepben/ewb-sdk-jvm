@@ -10,14 +10,14 @@ package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.services.network.tracing.traversals.Tracker
 
-class NetworkTraceTracker<T, K>(
-    private val keyExtractor: (NetworkTraceStep<T>) -> K,
+class NetworkTraceTracker<T>(
+    private val keySelector: (NetworkTraceStep<T>) -> Any?,
 ) : Tracker<NetworkTraceStep<T>> {
-    private val visited = mutableSetOf<K>()
+    private val visited = mutableSetOf<Any?>()
 
-    override fun hasVisited(item: NetworkTraceStep<T>): Boolean = visited.contains(keyExtractor(item))
+    override fun hasVisited(item: NetworkTraceStep<T>): Boolean = visited.contains(keySelector(item))
 
-    override fun visit(item: NetworkTraceStep<T>): Boolean = visited.add(keyExtractor(item))
+    override fun visit(item: NetworkTraceStep<T>): Boolean = visited.add(keySelector(item))
 
     override fun clear() {
         visited.clear()

@@ -26,7 +26,7 @@ class TracingTest {
         Tracing.connectedEquipmentTrace()
 
 //        fun connectedEquipmentBreadthTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newConnectedEquipmentBreadthTrace()
-        Tracing.connectedEquipmentTrace(queue = BasicQueue.breadthFirst())
+        Tracing.connectedEquipmentTrace(queueFactory = { BasicQueue.breadthFirst() })
 
 //        fun normalConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newNormalConnectedEquipmentTrace()
         Tracing.connectedEquipmentTrace()
@@ -87,7 +87,7 @@ class TracingTest {
             }
 
 //        fun connectivityBreadthTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newConnectivityBreadthTrace()
-        Tracing.connectedEquipmentTrace(BasicQueue.breadthFirst())
+        Tracing.connectedEquipmentTrace({ BasicQueue.breadthFirst() })
             .withPhases(PhaseCode.ABCN)
 
 //        fun normalConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newNormalConnectivityTrace()

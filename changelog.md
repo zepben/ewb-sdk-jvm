@@ -40,6 +40,7 @@
     * `ReactiveCapabilityCurve`
     * `RotatingMachine`
     * `SynchronousMachine`
+* The evolve-grpc version now includes the failure opendss report type.
 
 ### Enhancements
 * Added feature list in documentation.

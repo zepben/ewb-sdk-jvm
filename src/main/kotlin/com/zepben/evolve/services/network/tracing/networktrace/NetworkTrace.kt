@@ -20,12 +20,12 @@ import com.zepben.evolve.services.network.tracing.traversals.Tracker
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 
 class NetworkTrace<T>(
-    queueNext: QueueNext<T>,
-    queue: TraversalQueue<NetworkTraceStep<T>>,
-    tracker: Tracker<NetworkTraceStep<T>>,
-) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueNext, queue, tracker) {
-
-    fun interface QueueNext<T> : Traversal.QueueNext<NetworkTraceStep<T>, NetworkTrace<T>>
+    queueNext: QueueNext<NetworkTraceStep<T>>,
+    queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
+    branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
+    trackerFactory: () -> Tracker<NetworkTraceStep<T>>,
+    parent: NetworkTrace<T>? = null
+) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueNext, queueFactory, branchQueueFactory, trackerFactory, parent) {
 
     fun run(start: Terminal, canStopOnStartItem: Boolean = true, context: T) {
         addStartItem(NetworkTraceStep(TerminalToTerminalPath(start, start, 0, 0), context))
@@ -85,6 +85,10 @@ class NetworkTrace<T>(
     }
 
     override fun getDerivedThis(): NetworkTrace<T> = this
+
+    override fun createNewThis(): NetworkTrace<T> {
+        return NetworkTrace(queueNext, queueFactory, branchQueueFactory, trackerFactory, this)
+    }
 }
 
 fun NetworkTrace<Unit>.run(start: Terminal, canStopOnStartItem: Boolean = true) {

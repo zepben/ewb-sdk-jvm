@@ -26,23 +26,26 @@ object Tracing {
     ): NetworkTrace<T> {
         val queueNext = NetworkTraceQueueNext { ts, ctx, queueItem, queueBranch ->
             val path = ts.path
-            val nextSteps = path.toEquipment.terminals
+            val nextSteps = path.toEquipment.terminals.asSequence()
                 .filter { it != path.toTerminal }
-                .flatMap { it.connectedTerminals() }
-                .map {
-                    val nextPath = when (path) {
-                        is TerminalToTerminalPath -> {
-                            TerminalToTerminalPath(
-                                path.toTerminal,
-                                it,
-                                path.numTerminalSteps + 1,
-                                path.numEquipmentSteps + 1,
-                            )
+                .flatMap { fromTerminal ->
+                    fromTerminal.connectedTerminals().map { nextTerminal ->
+                        val nextPath = when (path) {
+                            is TerminalToTerminalPath -> {
+                                TerminalToTerminalPath(
+                                    fromTerminal,
+                                    nextTerminal,
+                                    // TODO: What number makes sense here - you can effectively jump terminals
+                                    path.numTerminalSteps + 1,
+                                    path.numEquipmentSteps + 1,
+                                )
+                            }
                         }
-                    }
 
-                    NetworkTraceStep(nextPath, computeNextT(ts, ctx, nextPath))
+                        NetworkTraceStep(nextPath, computeNextT(ts, ctx, nextPath))
+                    }
                 }
+                .toList()
 
             if (branching && nextSteps.size > 1) {
                 nextSteps.forEach {

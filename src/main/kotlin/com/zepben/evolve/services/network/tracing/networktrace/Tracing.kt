@@ -14,7 +14,8 @@ import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.Tracker
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 
-typealias NetworkTraceQueueNext<T> = Traversal.QueueNext<NetworkTraceStep<T>>
+private typealias NetworkTraceQueueNext<T> = Traversal.QueueNext<NetworkTraceStep<T>>
+private typealias ComputeNextT<T> = (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T
 
 object Tracing {
 
@@ -22,38 +23,18 @@ object Tracing {
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { BasicQueue.depthFirst() },
         trackerFactory: () -> Tracker<NetworkTraceStep<T>> = { NetworkTraceTracker { it.path.toEquipment } },
         branching: Boolean = false,
-        computeNextT: (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T,
+        computeNextT: ComputeNextT<T>,
     ): NetworkTrace<T> {
         val queueNext = NetworkTraceQueueNext { ts, ctx, queueItem, queueBranch ->
-            val path = ts.path
-            val nextSteps = path.toEquipment.terminals.asSequence()
-                .filter { it != path.toTerminal }
-                .flatMap { fromTerminal ->
-                    fromTerminal.connectedTerminals().map { nextTerminal ->
-                        val nextPath = when (path) {
-                            is TerminalToTerminalPath -> {
-                                TerminalToTerminalPath(
-                                    fromTerminal,
-                                    nextTerminal,
-                                    // TODO: What number makes sense here - you can effectively jump terminals
-                                    path.numTerminalSteps + 1,
-                                    path.numEquipmentSteps + 1,
-                                )
-                            }
-                        }
-
-                        NetworkTraceStep(nextPath, computeNextT(ts, ctx, nextPath))
-                    }
-                }
-                .toList()
-
-            if (branching && nextSteps.size > 1) {
-                nextSteps.forEach {
-                    queueBranch(it)
-                }
+            if (!branching) {
+                val nextSteps = nextConductingEquipmentSteps(ts, ctx, computeNextT)
+                nextSteps.forEach { queueItem(it) }
             } else {
-                nextSteps.forEach {
-                    queueItem(it)
+                val nextSteps = nextConductingEquipmentSteps(ts, ctx, computeNextT).toList()
+                if (nextSteps.size > 1) {
+                    nextSteps.forEach { queueBranch(it) }
+                } else {
+                    nextSteps.forEach { queueItem(it) }
                 }
             }
         }
@@ -68,6 +49,33 @@ object Tracing {
     ): NetworkTrace<Unit> =
         connectedEquipmentTrace(queueFactory, trackerFactory, branching) { _, _, _ -> }
 
+    private fun <T> nextConductingEquipmentSteps(
+        currentStep: NetworkTraceStep<T>,
+        currentContext: StepContext,
+        computeNextT: ComputeNextT<T>
+    ): Sequence<NetworkTraceStep<T>> {
+        val path = currentStep.path
+        return path.toEquipment.terminals.asSequence()
+            .filter { it != path.toTerminal }
+            .flatMap { fromTerminal ->
+                fromTerminal.connectedTerminals().map { nextTerminal ->
+                    val nextPath = when (path) {
+                        is TerminalToTerminalPath -> {
+                            TerminalToTerminalPath(
+                                fromTerminal,
+                                nextTerminal,
+                                // TODO: What number makes sense here - you can effectively jump terminals
+                                path.numTerminalSteps + 1,
+                                path.numEquipmentSteps + 1,
+                            )
+                        }
+                    }
+
+                    NetworkTraceStep(nextPath, computeNextT(currentStep, currentContext, nextPath))
+                }
+            }
+    }
+
     fun <T> connectedTerminalTrace(
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { BasicQueue.depthFirst() },
         trackerFactory: () -> Tracker<NetworkTraceStep<T>> = { NetworkTraceTracker { it.path.toTerminal } },
@@ -75,32 +83,15 @@ object Tracing {
         computeNextT: (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T,
     ): NetworkTrace<T> {
         val queueNext = NetworkTraceQueueNext { ts, ctx, queueItem, queueBranch ->
-            // Check if we last moved between equipment, or across it.
-            // TODO: Should we handle the TerminalToTerminalTraceStep cast here?
-            val path = ts.path
-            val terminals = if (path.tracedInternally) path.toTerminal?.connectedTerminals() else path.toTerminal?.otherTerminals()
-            val nextSteps = (terminals ?: emptySequence()).map {
-                val nextPath = when (path) {
-                    is TerminalToTerminalPath -> {
-                        TerminalToTerminalPath(
-                            path.toTerminal,
-                            it,
-                            path.numTerminalSteps + 1,
-                            if (path.tracedInternally) path.numEquipmentSteps else path.numEquipmentSteps + 1,
-                        )
-                    }
-                }
-
-                NetworkTraceStep(nextPath, computeNextT(ts, ctx, nextPath))
-            }.toList()
-
-            if (branching && nextSteps.size > 1) {
-                nextSteps.forEach {
-                    queueBranch(it)
-                }
+            if (!branching) {
+                val nextSteps = nextTerminalSteps(ts, ctx, computeNextT)
+                nextSteps.forEach { queueItem(it) }
             } else {
-                nextSteps.forEach {
-                    queueItem(it)
+                val nextSteps = nextTerminalSteps(ts, ctx, computeNextT).toList()
+                if (nextSteps.size > 1) {
+                    nextSteps.forEach { queueBranch(it) }
+                } else {
+                    nextSteps.forEach { queueItem(it) }
                 }
             }
         }
@@ -115,4 +106,27 @@ object Tracing {
     ): NetworkTrace<Unit> =
         connectedTerminalTrace(queueFactory, trackerFactory, branching) { _, _, _ -> }
 
+    private fun <T> nextTerminalSteps(
+        currentStep: NetworkTraceStep<T>,
+        currentContext: StepContext,
+        computeNextT: ComputeNextT<T>
+    ): Sequence<NetworkTraceStep<T>> {
+        val path = currentStep.path
+        // Check if we last moved between equipment, or across it.
+        val terminals = if (path.tracedInternally) path.toTerminal?.connectedTerminals() else path.toTerminal?.otherTerminals()
+        return (terminals ?: emptySequence()).map {
+            val nextPath = when (path) {
+                is TerminalToTerminalPath -> {
+                    TerminalToTerminalPath(
+                        path.toTerminal,
+                        it,
+                        path.numTerminalSteps + 1,
+                        if (path.tracedInternally) path.numEquipmentSteps else path.numEquipmentSteps + 1,
+                    )
+                }
+            }
+
+            NetworkTraceStep(nextPath, computeNextT(currentStep, currentContext, nextPath))
+        }
+    }
 }

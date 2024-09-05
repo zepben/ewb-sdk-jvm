@@ -26,7 +26,7 @@ class DownstreamTree(
 
     private val traversal: NetworkTrace<TreeNode> = Tracing.connectedEquipmentTrace(
         { WeightedPriorityQueue.processQueue { it.data.sortWeight } },
-        branching = true,
+        { WeightedPriorityQueue.branchQueueV2 { it.data.sortWeight } },
         computeNextT = this::createNextTreeNode
     )
         .addQueueCondition(this::canQueue)

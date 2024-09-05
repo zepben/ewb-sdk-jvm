@@ -9,6 +9,7 @@
 package com.zepben.evolve.services.network.tracing.traversals
 
 import java.util.*
+import com.zepben.evolve.services.network.tracing.traversalV2.Traversal as TraversalV2
 
 /**
  * A traversal queue which uses a weighted order. The higher the weight, the higher the priority.
@@ -80,6 +81,11 @@ class WeightedPriorityQueue<T>(
         fun <T> branchQueue(getWeight: (T) -> Int): TraversalQueue<Traversal<T>> = WeightedPriorityQueue(
             { BasicQueue.breadthFirst() },
             { traversal -> traversal.startItem?.let { getWeight(it) } ?: -1 }
+        )
+
+        fun <T, U : TraversalV2<T, *>> branchQueueV2(getWeight: (T) -> Int): TraversalQueue<U> = WeightedPriorityQueue(
+            { BasicQueue.breadthFirst() },
+            { traversal -> traversal.startItems().firstOrNull()?.let { getWeight(it) } ?: -1 }
         )
 
     }

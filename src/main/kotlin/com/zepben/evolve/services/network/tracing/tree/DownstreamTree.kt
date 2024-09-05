@@ -9,13 +9,14 @@
 package com.zepben.evolve.services.network.tracing.tree
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
-import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.StepPath
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
 
 class DownstreamTree(
@@ -23,72 +24,33 @@ class DownstreamTree(
     private val directionSelector: DirectionSelector
 ) {
 
-    private val traversal = BranchRecursiveTraversal(
-        this::addAndQueueNext,
-        { WeightedPriorityQueue.processQueue(TreeNode::sortWeight) },
-        { TreeNodeTracker() },
-        { WeightedPriorityQueue.branchQueue(TreeNode::sortWeight) }
+    private val traversal: NetworkTrace<TreeNode> = Tracing.connectedEquipmentTrace(
+        { WeightedPriorityQueue.processQueue { it.data.sortWeight } },
+        branching = true,
+        computeNextT = this::createNextTreeNode
     )
+        .addQueueCondition(this::canQueue)
+        .addStepAction(this::addItemAsChild)
 
-    fun run(start: ConductingEquipment?): TreeNode {
-        val root = TreeNode(start!!, null)
-        traversal.run(root)
+    fun run(start: ConductingEquipment): TreeNode {
+        val root = TreeNode(start, null)
+        traversal.run(root.conductingEquipment, false, root)
         return root
     }
 
-    private fun addAndQueueNext(current: TreeNode?, traversal: BranchRecursiveTraversal<TreeNode>) {
-        // Loop through each of the terminals on the current conducting equipment
-        current?.conductingEquipment?.terminals?.forEach { downTerminal: Terminal ->
-            // Find all the nominal phases which are going out
-            val downPhases = getDownPhases(downTerminal)
-            if (downPhases.isNotEmpty())
-                queueConnectedTerminals(traversal, current, downTerminal, downPhases)
-        }
+    private fun createNextTreeNode(currentItem: NetworkTraceStep<TreeNode>, context: StepContext, nextPath: StepPath): TreeNode {
+        // We don't add the new tree node as a child here as we may not actually visit it based on other conditions.
+        return TreeNode(nextPath.toEquipment, currentItem.data)
     }
 
-    private fun getDownPhases(terminal: Terminal): Set<SinglePhaseKind> {
-        val direction = directionSelector.select(terminal).value
-        if (FeederDirection.DOWNSTREAM !in direction)
-            return mutableSetOf()
-
-        val conductingEquipment = terminal.conductingEquipment!!
-        return terminal.phases.singlePhases
-            .asSequence()
-            .filter { !openTest.isOpen(conductingEquipment, it) }
-            .toSet()
+    private fun canQueue(item: NetworkTraceStep<TreeNode>, context: StepContext): Boolean {
+        val fromTerminal = item.path.fromTerminal ?: return false
+        return !openTest.isOpen(item.path.fromEquipment, null) && FeederDirection.DOWNSTREAM in directionSelector.select(fromTerminal).value
     }
 
-    private fun queueConnectedTerminals(
-        traversal: BranchRecursiveTraversal<TreeNode>,
-        current: TreeNode,
-        downTerminal: Terminal,
-        downPhases: Set<SinglePhaseKind>
-    ) {
-        // Get all the terminals connected to terminals with phases going out
-        val upTerminals = NetworkService.connectedTerminals(downTerminal, downPhases)
-
-        // Make sure we do not loop back out the incoming terminal if its direction is both.
-        if (upTerminals.any { it.to == current.parent?.conductingEquipment })
-            return
-
-        val queueNext = if (upTerminals.size > 1 || downTerminal.conductingEquipment!!.numTerminals() > 2)
-            { next: TreeNode -> traversal.branchQueue.add(traversal.branchSupplier().setStart(next)) }
-        else
-            { next: TreeNode -> traversal.queue.add(next) }
-
-        upTerminals
-            .asSequence()
-            .mapNotNull { it.to }
-            .forEach {
-                val next = TreeNode(it, current)
-
-                // Only branch to the next item if we have not already been there.
-                if (!traversal.hasVisited(next)) {
-                    current.addChild(next)
-                    queueNext(next)
-                }
-            }
-
+    private fun addItemAsChild(item: NetworkTraceStep<TreeNode>, context: StepContext) {
+        // If we visit a node, we add it as a child to its parent
+        item.data.parent?.addChild(item.data)
     }
 
 }

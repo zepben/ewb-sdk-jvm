@@ -18,6 +18,8 @@ fun interface DirectionSelector {
 
     fun select(terminal: Terminal): DirectionStatus
 
+    fun selectOrNull(terminal: Terminal?): DirectionStatus? = terminal?.let { select(it) }
+
     // Constant common implements of ActivePhaseSelector
     companion object {
 

@@ -25,24 +25,38 @@ import kotlin.collections.ArrayDeque
  *
  * @param T Object type to be traversed.
  */
-abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
-    protected val queueNext: QueueNext<T>,
+abstract class Traversal<T, D : Traversal<T, D>> protected constructor(
+    protected val queueNext: QueueNext<T>?,
+    protected val branchingQueueNext: BranchingQueueNext<T>?,
     protected val queueFactory: () -> TraversalQueue<T>,
-    protected val branchQueueFactory: () -> TraversalQueue<D>,
+    protected val branchQueueFactory: (() -> TraversalQueue<D>)?,
     protected val trackerFactory: () -> Tracker<T>,
     protected val parent: D? = null
 ) {
-    /**
-     * Represents a consumer that takes the current item of the traversal, and the traversal instance so items can be queued.
-     *
-     * @param T The type of object being traversed.
-     */
+    protected constructor(
+        queueNext: QueueNext<T>?,
+        queue: TraversalQueue<T>,
+        tracker: Tracker<T>,
+    ) : this(queueNext, null, { queue }, null, { tracker }, null)
+
+    protected constructor(
+        queueNext: BranchingQueueNext<T>,
+        queueFactory: () -> TraversalQueue<T>,
+        branchQueueFactory: (() -> TraversalQueue<D>),
+        trackerFactory: () -> Tracker<T>,
+        parent: D? = null
+    ) : this(null, queueNext, queueFactory, branchQueueFactory, trackerFactory, parent)
+
     fun interface QueueNext<T> {
+        fun accept(item: T, context: StepContext, queueItem: (T) -> Boolean)
+    }
+
+    fun interface BranchingQueueNext<T> {
         fun accept(item: T, context: StepContext, queueItem: (T) -> Boolean, queueBranch: (T) -> Boolean)
     }
 
     private val queue = queueFactory()
-    private val branchQueue = branchQueueFactory()
+    private val branchQueue = branchQueueFactory?.invoke()
     private val tracker: RecursiveTracker<T> = RecursiveTracker(parent?.tracker, trackerFactory())
     private val startItems: ArrayDeque<T> = ArrayDeque()
 
@@ -58,6 +72,16 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
 
     private val computeNextContextFuns: MutableMap<String, ContextValueComputer<T>> = mutableMapOf()
     private val contexts: IdentityHashMap<T, StepContext> = IdentityHashMap()
+
+    init {
+        require(queueNext != null || branchingQueueNext != null) {
+            "One of 'queueNext' or 'branchingQueueNext' must be supplied"
+        }
+
+        require(branchingQueueNext == null || branchQueueFactory != null) {
+            "'branchQueueFactory' must not be null if 'branchingQueueNext' is not null"
+        }
+    }
 
     protected abstract fun getDerivedThis(): D
     protected abstract fun createNewThis(): D
@@ -284,6 +308,8 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         return getDerivedThis()
     }
 
+    fun startItems(): Collection<T> = startItems
+
     fun run(startItem: T, canStopOnStartItem: Boolean = true) {
         startItems.add(startItem)
         run(canStopOnStartItem)
@@ -313,7 +339,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         hasRun = false
 
         queue.clear()
-        branchQueue.clear()
+        branchQueue?.clear()
         tracker.clear()
 
         return getDerivedThis()
@@ -363,31 +389,36 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
             }
         }
 
-        val queueBranch = { nextItem: T ->
-            if (canQueueItem(nextItem, context)) {
-                val nextContext = computeNextContext(context, nextItem)
-                val branch = createNewThis().also {
-                    it.addStartItem(nextItem)
-                    it.contexts[nextItem] = nextContext
+        if (queueNext != null) {
+            queueNext.accept(current, context, queueNextItem)
+        } else if (branchingQueueNext != null) {
+            val queueBranch = { nextItem: T ->
+                if (canQueueItem(nextItem, context)) {
+                    val nextContext = computeNextContext(context, nextItem)
+                    val branch = createNewThis().also {
+                        it.addStartItem(nextItem)
+                        it.contexts[nextItem] = nextContext
 
-                    it.copyQueueConditions(this)
-                    it.copyStepActions(this)
-                    it.copyStopConditions(this)
-                    it.copyContextValueComputers(this)
-                    it.copyBranchStartActions(this)
+                        it.copyQueueConditions(this)
+                        it.copyStepActions(this)
+                        it.copyStopConditions(this)
+                        it.copyContextValueComputers(this)
+                        it.copyBranchStartActions(this)
+                    }
+
+                    branchQueue?.add(branch)
+                    true
+                } else {
+                    false
                 }
-
-                branchQueue.add(branch)
-                true
-            } else {
-                false
             }
-        }
 
-        queueNext.accept(current, context, queueNextItem, queueBranch)
+            branchingQueueNext.accept(current, context, queueNextItem, queueBranch)
+        }
     }
 
     private fun traverseBranches() {
+        branchQueue ?: return
         while (branchQueue.hasNext()) {
             branchQueue.next()?.run()
         }

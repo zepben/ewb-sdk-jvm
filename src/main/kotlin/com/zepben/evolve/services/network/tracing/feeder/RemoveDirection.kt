@@ -10,7 +10,9 @@ package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.OpenCondition
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
@@ -22,16 +24,15 @@ import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQue
 @Suppress("MemberVisibilityCanBePrivate")
 class RemoveDirection {
 
-    val normalTraversal: NetworkTrace<FeederDirection> = createTrace(DirectionSelector.NORMAL_DIRECTION)
-    val currentTraversal: NetworkTrace<FeederDirection> = createTrace(DirectionSelector.CURRENT_DIRECTION)
+    val normalTraversal: NetworkTrace<FeederDirection> = createTrace(DirectionSelector.NORMAL_DIRECTION, OpenTest.NORMALLY_OPEN)
+    val currentTraversal: NetworkTrace<FeederDirection> = createTrace(DirectionSelector.CURRENT_DIRECTION, OpenTest.CURRENTLY_OPEN)
 
-    private fun createTrace(directionSelector: DirectionSelector): NetworkTrace<FeederDirection> {
+    private fun createTrace(directionSelector: DirectionSelector, openTest: OpenTest): NetworkTrace<FeederDirection> {
         return Tracing.connectedTerminalTrace(
-            { WeightedPriorityQueue.processQueue { it.path.toTerminal?.phases?.numPhases() ?: 1 } },
-            branching = false,
+            WeightedPriorityQueue.processQueue { it.path.toTerminal?.phases?.numPhases() ?: 1 },
             computeNextT = computeNextDirectionToRemove(directionSelector)
         )
-            .stopAtCurrentlyOpen()
+            .addQueueCondition(OpenCondition(openTest))
             .addStepAction { item, _ -> removeDirection(item, directionSelector) }
             .addQueueCondition { item, _ -> item.data != FeederDirection.NONE }
     }

@@ -17,7 +17,7 @@ import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.StepPath
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
+import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue
 
 class DownstreamTree(
     private val openTest: OpenTest,
@@ -26,7 +26,7 @@ class DownstreamTree(
 
     private val traversal: NetworkTrace<TreeNode> = Tracing.connectedEquipmentTrace(
         { WeightedPriorityQueue.processQueue { it.data.sortWeight } },
-        { WeightedPriorityQueue.branchQueueV2 { it.data.sortWeight } },
+        { WeightedPriorityQueue.branchQueue { it.data.sortWeight } },
         computeNextT = this::createNextTreeNode
     )
         .addQueueCondition(this::canQueue)

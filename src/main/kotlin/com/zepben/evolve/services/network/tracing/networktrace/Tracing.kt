@@ -9,13 +9,9 @@
 package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.Tracker
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
-
-private typealias NetworkTraceQueueNext<T> = Traversal.QueueNext<NetworkTraceStep<T>>
-private typealias BranchingNetworkTraceQueueNext<T> = Traversal.BranchingQueueNext<NetworkTraceStep<T>>
 
 // TODO: Should these be fun interfaces? Names could probably be better too.
 typealias ComputeNextT<T> = (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T
@@ -23,6 +19,8 @@ typealias ComputeNextTNextPaths<T> = (currentStep: NetworkTraceStep<T>, currentC
 
 object Tracing {
 
+    @JvmStatic
+    @JvmOverloads
     fun <T> connectedEquipmentTrace(
         queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
         tracker: Tracker<NetworkTraceStep<T>> = NetworkTraceTracker { it.path.toEquipment },
@@ -52,12 +50,10 @@ object Tracing {
         computeNextT: ComputeNextT<T>?,
         computeNextTNextPaths: ComputeNextTNextPaths<T>?,
     ): NetworkTrace<T> {
-        val queueNext = NetworkTraceQueueNext { ts, ctx, queueItem ->
+        return NetworkTrace(queue, tracker) { ts, ctx, queueItem ->
             val nextSteps = nextConductingEquipmentSteps(ts, ctx, computeNextT, computeNextTNextPaths)
             nextSteps.forEach { queueItem(it) }
         }
-
-        return NetworkTrace(queueNext, queue, tracker)
     }
 
     fun <T> connectedEquipmentTrace(
@@ -98,7 +94,7 @@ object Tracing {
         computeNextT: ComputeNextT<T>?,
         computeNextTNextPaths: ComputeNextTNextPaths<T>?,
     ): NetworkTrace<T> {
-        val queueNext = BranchingNetworkTraceQueueNext { ts, ctx, queueItem, queueBranch ->
+        return NetworkTrace(queueFactory, branchQueueFactory, trackerFactory) { ts, ctx, queueItem, queueBranch ->
             val nextSteps = nextConductingEquipmentSteps(ts, ctx, computeNextT, computeNextTNextPaths).toList()
             if (nextSteps.size > 1) {
                 nextSteps.forEach { queueBranch(it) }
@@ -106,8 +102,6 @@ object Tracing {
                 nextSteps.forEach { queueItem(it) }
             }
         }
-
-        return NetworkTrace(queueNext, queueFactory, branchQueueFactory, trackerFactory)
     }
 
     private fun <T> nextConductingEquipmentSteps(
@@ -167,12 +161,10 @@ object Tracing {
         computeNextT: ComputeNextT<T>?,
         computeNextTNextPaths: ComputeNextTNextPaths<T>?,
     ): NetworkTrace<T> {
-        val queueNext = NetworkTraceQueueNext { ts, ctx, queueItem ->
+        return NetworkTrace(queue, tracker) { ts, ctx, queueItem ->
             val nextSteps = nextTerminalSteps(ts, ctx, computeNextT, computeNextTNextPaths)
             nextSteps.forEach { queueItem(it) }
         }
-
-        return NetworkTrace(queueNext, queue, tracker)
     }
 
     fun <T> connectedTerminalTrace(
@@ -181,7 +173,7 @@ object Tracing {
         trackerFactory: () -> Tracker<NetworkTraceStep<T>> = { NetworkTraceTracker { it.path.toTerminal } },
         computeNextT: ComputeNextT<T>,
     ): NetworkTrace<T> {
-        return connectedTerminalTraceBranching(queueFactory, trackerFactory, branchQueueFactory, computeNextT, null)
+        return connectedTerminalTraceBranching(queueFactory, branchQueueFactory, trackerFactory, computeNextT, null)
     }
 
     fun <T> connectedTerminalTrace(
@@ -190,13 +182,13 @@ object Tracing {
         trackerFactory: () -> Tracker<NetworkTraceStep<T>> = { NetworkTraceTracker { it.path.toTerminal } },
         computeNextT: ComputeNextTNextPaths<T>,
     ): NetworkTrace<T> {
-        return connectedTerminalTraceBranching(queueFactory, trackerFactory, branchQueueFactory, null, computeNextT)
+        return connectedTerminalTraceBranching(queueFactory, branchQueueFactory, trackerFactory, null, computeNextT)
     }
 
     fun connectedTerminalTrace(
         queueFactory: () -> TraversalQueue<NetworkTraceStep<Unit>> = { BasicQueue.depthFirst() },
-        trackerFactory: () -> Tracker<NetworkTraceStep<Unit>> = { NetworkTraceTracker { it.path.toTerminal } },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<Unit>> = { BasicQueue.breadthFirst() },
+        trackerFactory: () -> Tracker<NetworkTraceStep<Unit>> = { NetworkTraceTracker { it.path.toTerminal } },
     ): NetworkTrace<Unit> {
         return connectedTerminalTrace(
             queueFactory,
@@ -207,12 +199,12 @@ object Tracing {
 
     private fun <T> connectedTerminalTraceBranching(
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { BasicQueue.depthFirst() },
-        trackerFactory: () -> Tracker<NetworkTraceStep<T>> = { NetworkTraceTracker { it.path.toTerminal } },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { BasicQueue.breadthFirst() },
+        trackerFactory: () -> Tracker<NetworkTraceStep<T>> = { NetworkTraceTracker { it.path.toTerminal } },
         computeNextT: ComputeNextT<T>?,
         computeNextTNextPaths: ComputeNextTNextPaths<T>?,
     ): NetworkTrace<T> {
-        val queueNext = BranchingNetworkTraceQueueNext { ts, ctx, queueItem, queueBranch ->
+        return NetworkTrace(queueFactory, branchQueueFactory, trackerFactory) { ts, ctx, queueItem, queueBranch ->
             val nextSteps = nextTerminalSteps(ts, ctx, computeNextT, computeNextTNextPaths).toList()
             if (nextSteps.size > 1) {
                 nextSteps.forEach { queueBranch(it) }
@@ -220,8 +212,6 @@ object Tracing {
                 nextSteps.forEach { queueItem(it) }
             }
         }
-
-        return NetworkTrace(queueNext, queueFactory, branchQueueFactory, trackerFactory)
     }
 
     private fun <T> nextTerminalSteps(

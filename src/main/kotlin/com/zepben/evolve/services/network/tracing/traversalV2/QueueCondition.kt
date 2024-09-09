@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.traversalV2
 
-fun interface QueueCondition<T> {
+fun interface QueueCondition<T> : TraversalCondition<T> {
     fun shouldQueue(nextItem: T, currentContext: StepContext): Boolean
 }
 

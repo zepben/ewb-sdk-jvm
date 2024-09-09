@@ -6,8 +6,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network.tracing.traversals
+package com.zepben.evolve.services.network.tracing.traversalV2
 
+import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
+import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 import java.util.*
 
 /**
@@ -76,11 +78,9 @@ class WeightedPriorityQueue<T>(
         /**
          * Special priority queue that queues branch items with the largest weight on the starting item as the highest priority.
          */
-        @Deprecated("use v2 and remove this once everything is ported")
-        @JvmStatic
-        fun <T> branchQueue(getWeight: (T) -> Int): TraversalQueue<Traversal<T>> = WeightedPriorityQueue(
+        fun <T, U : Traversal<T, *>> branchQueue(getWeight: (T) -> Int): TraversalQueue<U> = WeightedPriorityQueue(
             { BasicQueue.breadthFirst() },
-            { traversal -> traversal.startItem?.let { getWeight(it) } ?: -1 }
+            { traversal -> traversal.startItems().firstOrNull()?.let { getWeight(it) } ?: -1 }
         )
 
     }

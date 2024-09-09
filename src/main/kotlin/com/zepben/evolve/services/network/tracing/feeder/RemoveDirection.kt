@@ -14,12 +14,10 @@ import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.networktrace.*
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.OpenCondition
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
 
 /**
  * Convenience class that provides methods for removing feeder direction on a [NetworkService]
- * This class is backed by a [BranchRecursiveTraversal].
  */
 @Suppress("MemberVisibilityCanBePrivate")
 class RemoveDirection {
@@ -98,8 +96,8 @@ class RemoveDirection {
             }
         }
 
-    private fun removeDirection(item: NetworkTraceStep<FeederDirection>, directionSelector: DirectionSelector): Boolean {
-        return directionSelector.selectOrNull(item.path.toTerminal)?.remove(item.data) == true
+    private fun removeDirection(item: NetworkTraceStep<FeederDirection>, directionSelector: DirectionSelector) {
+        directionSelector.selectOrNull(item.path.toTerminal)?.remove(item.data)
     }
 
     private fun FeederDirection.orElse(default: FeederDirection): FeederDirection =

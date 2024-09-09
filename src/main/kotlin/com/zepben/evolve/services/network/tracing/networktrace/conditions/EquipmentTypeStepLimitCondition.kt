@@ -12,10 +12,11 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversalV2.StopConditionWithContextValue
+import kotlin.reflect.KClass
 
-class EquipmentTypeStepLimitCondition<T>(
+internal class EquipmentTypeStepLimitCondition<T>(
     private val limit: Int,
-    private val equipmentType: Class<out ConductingEquipment>
+    private val equipmentType: KClass<out ConductingEquipment>
 ) : StopConditionWithContextValue<NetworkTraceStep<T>, Int>() {
     override fun shouldStop(item: NetworkTraceStep<T>, context: StepContext): Boolean {
         return (context.getValue<Int>(key) ?: 0) >= limit
@@ -28,7 +29,7 @@ class EquipmentTypeStepLimitCondition<T>(
     override fun computeNextValueTyped(nextItem: NetworkTraceStep<T>, currentValue: Int): Int {
         return when {
             nextItem.path.tracedInternally -> currentValue
-            nextItem.path.toEquipment::class.java.isAssignableFrom(equipmentType) -> (currentValue) + 1
+            nextItem.path.toEquipment::class.java.isAssignableFrom(equipmentType.java) -> (currentValue) + 1
             else -> currentValue
         }
     }

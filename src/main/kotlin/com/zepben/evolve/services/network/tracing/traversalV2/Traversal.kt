@@ -87,10 +87,21 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     protected abstract fun getDerivedThis(): D
     protected abstract fun createNewThis(): D
 
-    // TODO: Play with a common condition marker interface
-//    fun addCondition(condition: TraversalCondition) {
-//         check type here and add to appropriate condition
-//    }
+    fun addConditions(vararg conditions: TraversalCondition<T>) {
+        conditions.forEach { addCondition(it) }
+    }
+
+    fun addConditions(conditions: Collection<TraversalCondition<T>>) {
+        conditions.forEach { addCondition(it) }
+    }
+
+    fun addCondition(condition: TraversalCondition<T>): D {
+        when (condition) {
+            is QueueCondition -> addQueueCondition(condition)
+            is StopCondition -> addStopCondition(condition)
+        }
+        return getDerivedThis()
+    }
 
     /**
      *

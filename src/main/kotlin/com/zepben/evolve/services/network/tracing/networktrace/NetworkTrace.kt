@@ -20,26 +20,23 @@ import com.zepben.evolve.services.network.tracing.traversals.Tracker
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 
 class NetworkTrace<T> private constructor(
-    queueNext: QueueNext<NetworkTraceStep<T>>?,
-    branchingQueueNext: BranchingQueueNext<NetworkTraceStep<T>>?,
-    queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
-    branchQueueFactory: (() -> TraversalQueue<NetworkTrace<T>>)?,
+    queueType: QueueType<NetworkTraceStep<T>, NetworkTrace<T>>,
     trackerFactory: () -> Tracker<NetworkTraceStep<T>>,
-    parent: NetworkTrace<T>? = null
-) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueNext, branchingQueueNext, queueFactory, branchQueueFactory, trackerFactory, parent) {
+    parent: NetworkTrace<T>?
+) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, trackerFactory, parent) {
 
-    constructor(
-        queueNext: QueueNext<NetworkTraceStep<T>>,
+    internal constructor(
         queue: TraversalQueue<NetworkTraceStep<T>>,
         tracker: Tracker<NetworkTraceStep<T>>,
-    ) : this(queueNext, null, { queue }, null, { tracker }, null)
+        queueNext: QueueNext<NetworkTraceStep<T>>,
+    ) : this(BasicQueueType(queueNext, queue), { tracker }, null)
 
-    constructor(
-        branchingQueueNext: BranchingQueueNext<NetworkTraceStep<T>>,
+    internal constructor(
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
         trackerFactory: () -> Tracker<NetworkTraceStep<T>>,
-    ) : this(null, branchingQueueNext, queueFactory, branchQueueFactory, trackerFactory, null)
+        branchingQueueNext: BranchingQueueNext<NetworkTraceStep<T>>,
+    ) : this(BranchingQueueType(branchingQueueNext, queueFactory, branchQueueFactory), trackerFactory, null)
 
     fun run(start: Terminal, canStopOnStartItem: Boolean = true, context: T) {
         addStartItem(NetworkTraceStep(TerminalToTerminalPath(start, start, 0, 0), context))
@@ -101,7 +98,7 @@ class NetworkTrace<T> private constructor(
     override fun getDerivedThis(): NetworkTrace<T> = this
 
     override fun createNewThis(): NetworkTrace<T> {
-        return NetworkTrace(queueNext, branchingQueueNext, queueFactory, branchQueueFactory, trackerFactory, this)
+        return NetworkTrace(queueType, trackerFactory, this)
     }
 }
 

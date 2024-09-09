@@ -9,12 +9,7 @@
 package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.tracing.OpenTest
-import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.*
 import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
 import com.zepben.evolve.services.network.tracing.traversals.Tracker
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
@@ -48,51 +43,6 @@ class NetworkTrace<T> private constructor(
             addStartItem(NetworkTraceStep(TerminalToTerminalPath(it, it, 0, 0), context))
         }
         run(canStopOnStartItem)
-    }
-
-    fun normallyUpstream(): NetworkTrace<T> {
-        addQueueCondition(DirectionCondition(FeederDirection.UPSTREAM, Terminal::normalFeederDirection))
-        return this
-    }
-
-    fun currentlyUpstream(): NetworkTrace<T> {
-        addQueueCondition(DirectionCondition(FeederDirection.UPSTREAM, Terminal::currentFeederDirection))
-        return this
-    }
-
-    fun normallyDownstream(): NetworkTrace<T> {
-        addQueueCondition(DirectionCondition(FeederDirection.DOWNSTREAM, Terminal::normalFeederDirection))
-        return this
-    }
-
-    fun currentlyDownstream(): NetworkTrace<T> {
-        addQueueCondition(DirectionCondition(FeederDirection.DOWNSTREAM, Terminal::currentFeederDirection))
-        return this
-    }
-
-    fun stopAtNormallyOpen(phase: SinglePhaseKind? = null): NetworkTrace<T> {
-        addQueueCondition(OpenCondition(OpenTest.NORMALLY_OPEN, phase))
-        return this
-    }
-
-    fun stopAtCurrentlyOpen(phase: SinglePhaseKind? = null): NetworkTrace<T> {
-        addQueueCondition(OpenCondition(OpenTest.CURRENTLY_OPEN, phase))
-        return this
-    }
-
-    fun limitEquipmentSteps(limit: Int): NetworkTrace<T> {
-        addStopCondition(EquipmentStepLimitCondition(limit))
-        return this
-    }
-
-    fun limitEquipmentSteps(limit: Int, equipmentType: Class<out ConductingEquipment>): NetworkTrace<T> {
-        addStopCondition(EquipmentTypeStepLimitCondition(limit, equipmentType))
-        return this
-    }
-
-    fun withPhases(phases: PhaseCode): NetworkTrace<T> {
-        addQueueCondition(PhaseCondition(phases))
-        return this
     }
 
     override fun getDerivedThis(): NetworkTrace<T> = this

@@ -17,6 +17,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtCurrentlyOpen
+import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtNormallyOpen
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 
 /**
@@ -26,8 +28,8 @@ import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
  */
 class AssignToFeeders {
 
-    private val normalTraversal = Tracing.connectedTerminalTrace().stopAtNormallyOpen()
-    private val currentTraversal = Tracing.connectedTerminalTrace().stopAtCurrentlyOpen()
+    private val normalTraversal = Tracing.connectedTerminalTrace().addCondition(stopAtNormallyOpen())
+    private val currentTraversal = Tracing.connectedTerminalTrace().addCondition(stopAtCurrentlyOpen())
 
     private lateinit var activeFeeder: Feeder
 

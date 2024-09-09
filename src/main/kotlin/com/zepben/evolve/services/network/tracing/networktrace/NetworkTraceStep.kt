@@ -41,18 +41,6 @@ data class TerminalToTerminalPath(
         get() = toTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
 }
 
-//data class TerminalStartPath(
-//    override val toTerminal: Terminal
-//) : StepPath {
-//    override val fromTerminal: Terminal? = null
-//    override val numTerminalSteps: Int = 0
-//    override val numEquipmentSteps: Int = 0
-//    override val fromEquipment: ConductingEquipment
-//        get() = toTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
-//    override val toEquipment: ConductingEquipment
-//        get() = toTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
-//}
-
 /**
  * Here for future clamp support. Clamps will always connect equipment to equipment without terminals with AcLineSegment.
  * It probably needs a better name before it is introduced though!

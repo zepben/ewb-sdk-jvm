@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace.conditions
 
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.TerminalToTerminalPath
@@ -16,17 +16,17 @@ import com.zepben.evolve.services.network.tracing.traversalV2.QueueCondition
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 
 internal class DirectionCondition<T>(
-    val direction: FeederDirection,
-    val getDirection: Terminal.() -> FeederDirection
+    private val direction: FeederDirection,
+    private val directionSelector: DirectionSelector
 ) : QueueCondition<NetworkTraceStep<T>> {
 
     override fun shouldQueue(nextItem: NetworkTraceStep<T>, currentContext: StepContext): Boolean =
         when (val path = nextItem.path) {
             is TerminalToTerminalPath -> {
                 if (path.tracedInternally) {
-                    direction in path.toTerminal.getDirection()
+                    direction in directionSelector.select(path.toTerminal).value
                 } else {
-                    direction in path.fromTerminal.getDirection()
+                    direction in directionSelector.select(path.fromTerminal).value
                 }
             }
         }

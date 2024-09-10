@@ -24,7 +24,7 @@ import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 /**
  * Convenience class that provides methods for assigning HV/MV feeders on a [NetworkService].
  * Requires that a Feeder have a normalHeadTerminal with associated ConductingEquipment.
- * This class is backed by a [BasicTraversal].
+ * This class is backed by a [NetworkTrace].
  */
 class AssignToFeeders {
 
@@ -105,6 +105,7 @@ class AssignToFeeders {
                         is ProtectedSwitch ->
                             eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
                                 system.addContainer(feeder)
+                                feeder.addEquipment(system)
                             }
                     }
                 },
@@ -128,6 +129,7 @@ class AssignToFeeders {
                         is ProtectedSwitch ->
                             eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
                                 system.addCurrentContainer(feeder)
+                                feeder.addCurrentEquipment(system)
                             }
                     }
                 },

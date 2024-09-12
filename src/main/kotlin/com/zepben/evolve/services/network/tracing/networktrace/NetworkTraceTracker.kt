@@ -10,7 +10,7 @@ package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.services.network.tracing.traversals.Tracker
 
-class NetworkTraceTracker<T>(
+internal class NetworkTraceTracker<T>(
     private val keySelector: (NetworkTraceStep<T>) -> Any?,
 ) : Tracker<NetworkTraceStep<T>> {
     private val visited = mutableSetOf<Any?>()
@@ -21,5 +21,10 @@ class NetworkTraceTracker<T>(
 
     override fun clear() {
         visited.clear()
+    }
+
+    companion object {
+        fun <T> terminalTracker(): NetworkTraceTracker<T> = NetworkTraceTracker { it.path.toTerminal }
+        fun <T> equipmentTracker(): NetworkTraceTracker<T> = NetworkTraceTracker { it.path.toEquipment }
     }
 }

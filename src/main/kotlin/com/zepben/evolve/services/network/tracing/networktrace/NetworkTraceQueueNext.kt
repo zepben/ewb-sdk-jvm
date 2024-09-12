@@ -18,7 +18,7 @@ internal object NetworkTraceQueueNext {
         }
     }
 
-    fun <T> basic(computeNextT: ComputeNextTNextPaths<T>): Traversal.QueueNext<NetworkTraceStep<T>> {
+    fun <T> basic(computeNextT: ComputeNextTWithPaths<T>): Traversal.QueueNext<NetworkTraceStep<T>> {
         return Traversal.QueueNext { item, context, queueItem ->
             nextTraceSteps(item, context, computeNextT).forEach { queueItem(it) }
         }
@@ -30,7 +30,7 @@ internal object NetworkTraceQueueNext {
         }
     }
 
-    fun <T> branching(computeNextT: ComputeNextTNextPaths<T>): Traversal.BranchingQueueNext<NetworkTraceStep<T>> {
+    fun <T> branching(computeNextT: ComputeNextTWithPaths<T>): Traversal.BranchingQueueNext<NetworkTraceStep<T>> {
         return Traversal.BranchingQueueNext { item, context, queueItem, queueBranch ->
             queueNextStepsBranching(nextTraceSteps(item, context, computeNextT), queueItem, queueBranch)
         }
@@ -52,16 +52,16 @@ internal object NetworkTraceQueueNext {
         currentContext: StepContext,
         computeNextT: ComputeNextT<T>,
     ): Sequence<NetworkTraceStep<T>> {
-        return nextStepPaths(currentStep.path).map { NetworkTraceStep(it, computeNextT(currentStep, currentContext, it)) }
+        return nextStepPaths(currentStep.path).map { NetworkTraceStep(it, computeNextT.compute(currentStep, currentContext, it)) }
     }
 
     private fun <T> nextTraceSteps(
         currentStep: NetworkTraceStep<T>,
         currentContext: StepContext,
-        computeNextTNextPaths: ComputeNextTNextPaths<T>,
+        computeNextT: ComputeNextTWithPaths<T>,
     ): List<NetworkTraceStep<T>> {
         val nextPaths = nextStepPaths(currentStep.path).toList()
-        return nextPaths.map { NetworkTraceStep(it, computeNextTNextPaths(currentStep, currentContext, it, nextPaths)) }
+        return nextPaths.map { NetworkTraceStep(it, computeNextT.compute(currentStep, currentContext, it, nextPaths)) }
     }
 
     private fun nextStepPaths(path: StepPath): Sequence<StepPath> {

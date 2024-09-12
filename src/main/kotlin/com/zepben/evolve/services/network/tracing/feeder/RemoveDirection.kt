@@ -64,8 +64,8 @@ class RemoveDirection {
         traversal.reset().run(start, directionToRemove, false)
     }
 
-    private fun computeNextDirectionToRemove(directionSelector: DirectionSelector): ComputeNextTNextPaths<FeederDirection> =
-        { currentStep: NetworkTraceStep<FeederDirection>, _: StepContext, nextPath: StepPath, nextPaths: List<StepPath> ->
+    private fun computeNextDirectionToRemove(directionSelector: DirectionSelector): ComputeNextTWithPaths<FeederDirection> =
+        ComputeNextTWithPaths { currentStep: NetworkTraceStep<FeederDirection>, _: StepContext, nextPath: StepPath, nextPaths: List<StepPath> ->
             when (currentStep.data) {
                 FeederDirection.NONE -> FeederDirection.NONE
                 FeederDirection.BOTH -> FeederDirection.BOTH

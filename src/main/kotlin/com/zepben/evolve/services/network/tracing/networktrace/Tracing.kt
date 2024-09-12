@@ -10,14 +10,9 @@ package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
-
-// TODO: Should these be fun interfaces? Names could probably be better too.
-typealias ComputeNextT<T> = (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath) -> T
-typealias ComputeNextTNextPaths<T> = (currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath, nextPaths: List<StepPath>) -> T
 
 object Tracing {
 
@@ -32,7 +27,7 @@ object Tracing {
 
     fun <T> connectedEquipmentTrace(
         queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
-        computeNextT: ComputeNextTNextPaths<T>,
+        computeNextT: ComputeNextTWithPaths<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(queue, true, computeNextT)
     }
@@ -54,7 +49,7 @@ object Tracing {
     fun <T> connectedEquipmentTrace(
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { BasicQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { BasicQueue.breadthFirst() },
-        computeNextT: ComputeNextTNextPaths<T>,
+        computeNextT: ComputeNextTWithPaths<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(queueFactory, branchQueueFactory, true, null, computeNextT)
     }
@@ -75,7 +70,7 @@ object Tracing {
 
     fun <T> connectedTerminalTrace(
         queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
-        computeNextT: ComputeNextTNextPaths<T>,
+        computeNextT: ComputeNextTWithPaths<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(queue, false, computeNextT)
     }
@@ -97,7 +92,7 @@ object Tracing {
     fun <T> connectedTerminalTrace(
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { BasicQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { BasicQueue.breadthFirst() },
-        computeNextT: ComputeNextTNextPaths<T>,
+        computeNextT: ComputeNextTWithPaths<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(queueFactory, branchQueueFactory, false, null, computeNextT)
     }

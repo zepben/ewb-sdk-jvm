@@ -17,7 +17,6 @@ import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.StepPath
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue
 
 class DownstreamTree(
@@ -28,26 +27,20 @@ class DownstreamTree(
     private val traversal: NetworkTrace<TreeNode> = Tracing.connectedEquipmentTrace(
         { WeightedPriorityQueue.processQueue { it.data.sortWeight } },
         { WeightedPriorityQueue.branchQueue { it.data.sortWeight } },
-        computeNextT = ::createNextTreeNode
+        computeNextT = { currentItem: NetworkTraceStep<TreeNode>, _, nextPath: StepPath ->
+            TreeNode(nextPath.toEquipment, currentItem.data)
+        }
     )
         .addConditions(downstream(directionSelector), stopAtOpen(openTest))
-        .addStepAction(::addItemAsChild)
+        .addStepAction { (_, treeNode), _ ->
+            // If we visit a node, we add it as a child to its parent
+            treeNode.parent?.addChild(treeNode)
+        }
 
     fun run(start: ConductingEquipment): TreeNode {
         val root = TreeNode(start, null)
         traversal.run(root.conductingEquipment, root, false)
         return root
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    private fun createNextTreeNode(currentItem: NetworkTraceStep<TreeNode>, unused: StepContext, nextPath: StepPath): TreeNode {
-        return TreeNode(nextPath.toEquipment, currentItem.data)
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    private fun addItemAsChild(item: NetworkTraceStep<TreeNode>, context: StepContext) {
-        // If we visit a node, we add it as a child to its parent
-        item.data.parent?.addChild(item.data)
     }
 
 }

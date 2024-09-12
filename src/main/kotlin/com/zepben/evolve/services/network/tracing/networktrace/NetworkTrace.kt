@@ -33,7 +33,7 @@ class NetworkTrace<T> private constructor(
     internal constructor(
         queue: TraversalQueue<NetworkTraceStep<T>>,
         onlyActionEquipment: Boolean,
-        computeNextT: ComputeNextTNextPaths<T>,
+        computeNextT: ComputeNextTWithPaths<T>,
     ) : this(BasicQueueType(NetworkTraceQueueNext.basic(computeNextT.wrapped(onlyActionEquipment)), queue), null, onlyActionEquipment)
 
     internal constructor(
@@ -53,7 +53,7 @@ class NetworkTrace<T> private constructor(
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
         onlyActionEquipment: Boolean,
         parent: NetworkTrace<T>?,
-        computeNextT: ComputeNextTNextPaths<T>,
+        computeNextT: ComputeNextTWithPaths<T>,
     ) : this(
         BranchingQueueType(NetworkTraceQueueNext.branching(computeNextT.wrapped(onlyActionEquipment)), queueFactory, branchQueueFactory),
         parent,
@@ -94,22 +94,22 @@ fun NetworkTrace<Unit>.run(start: ConductingEquipment, canStopOnStartItem: Boole
 }
 
 private fun <T> ComputeNextT<T>.wrapped(onlyActionEquipment: Boolean): ComputeNextT<T> = if (onlyActionEquipment) {
-    { currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath ->
+    ComputeNextT { currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath ->
         if (nextPath.tracedInternally)
             currentStep.data
         else
-            this(currentStep, currentContext, nextPath)
+            this.compute(currentStep, currentContext, nextPath)
     }
 } else {
     this
 }
 
-private fun <T> ComputeNextTNextPaths<T>.wrapped(onlyActionEquipment: Boolean): ComputeNextTNextPaths<T> = if (onlyActionEquipment) {
-    { currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath, nextPaths: List<StepPath> ->
+private fun <T> ComputeNextTWithPaths<T>.wrapped(onlyActionEquipment: Boolean): ComputeNextTWithPaths<T> = if (onlyActionEquipment) {
+    ComputeNextTWithPaths { currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath, nextPaths: List<StepPath> ->
         if (nextPath.tracedInternally)
             currentStep.data
         else
-            this(currentStep, currentContext, nextPath, nextPaths)
+            this.compute(currentStep, currentContext, nextPath, nextPaths)
     }
 } else {
     this

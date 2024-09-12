@@ -61,7 +61,7 @@ class RemoveDirection {
     }
 
     private fun runFromTerminal(traversal: NetworkTrace<FeederDirection>, start: Terminal, directionToRemove: FeederDirection) {
-        traversal.reset().run(start, false, directionToRemove)
+        traversal.reset().run(start, directionToRemove, false)
     }
 
     private fun computeNextDirectionToRemove(directionSelector: DirectionSelector): ComputeNextTNextPaths<FeederDirection> =

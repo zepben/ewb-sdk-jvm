@@ -15,7 +15,10 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 class NetworkTraceStep<T>(
     val path: StepPath,
     val data: T
-)
+) {
+    operator fun component1(): StepPath = path
+    operator fun component2(): T = data
+}
 
 sealed interface StepPath {
     val fromTerminal: Terminal?

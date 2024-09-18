@@ -191,9 +191,6 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.
 fun toPb(cim: CableInfo, pb: PBCableInfo.Builder): PBCableInfo.Builder =
     pb.apply { toPb(cim, wiBuilder) }
 
-fun toPb(cim: OverheadWireInfo, pb: PBOverheadWireInfo.Builder): PBOverheadWireInfo.Builder =
-    pb.apply { toPb(cim, wiBuilder) }
-
 fun toPb(cim: NoLoadTest, pb: PBNoLoadTest.Builder): PBNoLoadTest.Builder =
     pb.apply {
         energisedEndVoltage = cim.energisedEndVoltage ?: UNKNOWN_INT
@@ -213,6 +210,9 @@ fun toPb(cim: OpenCircuitTest, pb: PBOpenCircuitTest.Builder): PBOpenCircuitTest
         phaseShift = cim.phaseShift ?: UNKNOWN_DOUBLE
         toPb(cim, ttBuilder)
     }
+
+fun toPb(cim: OverheadWireInfo, pb: PBOverheadWireInfo.Builder): PBOverheadWireInfo.Builder =
+    pb.apply { toPb(cim, wiBuilder) }
 
 fun toPb(cim: PowerTransformerInfo, pb: PBPowerTransformerInfo.Builder): PBPowerTransformerInfo.Builder =
     pb.apply {
@@ -235,7 +235,6 @@ fun toPb(cim: ShortCircuitTest, pb: PBShortCircuitTest.Builder): PBShortCircuitT
         voltageOhmicPart = cim.voltageOhmicPart ?: UNKNOWN_DOUBLE
         toPb(cim, ttBuilder)
     }
-
 
 fun toPb(cim: ShuntCompensatorInfo, pb: PBShuntCompensatorInfo.Builder): PBShuntCompensatorInfo.Builder =
     pb.apply {
@@ -399,14 +398,6 @@ fun Location.toPb(): PBLocation = toPb(this, PBLocation.newBuilder()).build()
 
 /************ IEC61968 infIEC61968 InfAssetInfo ************/
 
-fun toPb(cim: RelayInfo, pb: PBRelayInfo.Builder): PBRelayInfo.Builder =
-    pb.apply {
-        cim.curveSetting?.let { curveSetting = it } ?: clearCurveSetting()
-        cim.recloseFast?.let { recloseFastSet = it } ?: run { recloseFastNull = NullValue.NULL_VALUE }
-        cim.recloseDelays.forEach { addRecloseDelays(it) }
-        toPb(cim, aiBuilder)
-    }
-
 fun toPb(cim: CurrentTransformerInfo, pb: PBCurrentTransformerInfo.Builder): PBCurrentTransformerInfo.Builder =
     pb.apply {
         cim.accuracyClass?.let { accuracyClass = it } ?: clearAccuracyClass()
@@ -435,9 +426,17 @@ fun toPb(cim: PotentialTransformerInfo, pb: PBPotentialTransformerInfo.Builder):
         toPb(cim, aiBuilder)
     }
 
-fun RelayInfo.toPb(): PBRelayInfo = toPb(this, PBRelayInfo.newBuilder()).build()
+fun toPb(cim: RelayInfo, pb: PBRelayInfo.Builder): PBRelayInfo.Builder =
+    pb.apply {
+        cim.curveSetting?.let { curveSetting = it } ?: clearCurveSetting()
+        cim.recloseFast?.let { recloseFastSet = it } ?: run { recloseFastNull = NullValue.NULL_VALUE }
+        cim.recloseDelays.forEach { addRecloseDelays(it) }
+        toPb(cim, aiBuilder)
+    }
+
 fun CurrentTransformerInfo.toPb(): PBCurrentTransformerInfo = toPb(this, PBCurrentTransformerInfo.newBuilder()).build()
 fun PotentialTransformerInfo.toPb(): PBPotentialTransformerInfo = toPb(this, PBPotentialTransformerInfo.newBuilder()).build()
+fun RelayInfo.toPb(): PBRelayInfo = toPb(this, PBRelayInfo.newBuilder()).build()
 
 /************ IEC61968 infIEC61968 InfCommon ************/
 
@@ -690,15 +689,6 @@ fun EquivalentBranch.toPb(): PBEquivalentBranch = toPb(this, PBEquivalentBranch.
 
 /************ IEC61970 BASE MEAS ************/
 
-fun toPb(cim: Control, pb: PBControl.Builder): PBControl.Builder =
-    pb.apply {
-        cim.remoteControl?.let { remoteControlMRID = it.mRID } ?: clearRemoteControlMRID()
-        cim.powerSystemResourceMRID?.let { powerSystemResourceMRID = it } ?: clearPowerSystemResourceMRID()
-        toPb(cim, ipBuilder)
-    }
-
-fun toPb(cim: IoPoint, pb: PBIoPoint.Builder): PBIoPoint.Builder = pb.apply { toPb(cim, ioBuilder) }
-
 fun toPb(cim: Accumulator, pb: PBAccumulator.Builder): PBAccumulator.Builder = pb.apply { toPb(cim, measurementBuilder) }
 
 fun toPb(cim: Analog, pb: PBAnalog.Builder): PBAnalog.Builder =
@@ -707,7 +697,16 @@ fun toPb(cim: Analog, pb: PBAnalog.Builder): PBAnalog.Builder =
         toPb(cim, measurementBuilder)
     }
 
+fun toPb(cim: Control, pb: PBControl.Builder): PBControl.Builder =
+    pb.apply {
+        cim.remoteControl?.let { remoteControlMRID = it.mRID } ?: clearRemoteControlMRID()
+        cim.powerSystemResourceMRID?.let { powerSystemResourceMRID = it } ?: clearPowerSystemResourceMRID()
+        toPb(cim, ipBuilder)
+    }
+
 fun toPb(cim: Discrete, pb: PBDiscrete.Builder): PBDiscrete.Builder = pb.apply { toPb(cim, measurementBuilder) }
+
+fun toPb(cim: IoPoint, pb: PBIoPoint.Builder): PBIoPoint.Builder = pb.apply { toPb(cim, ioBuilder) }
 
 fun toPb(cim: Measurement, pb: PBMeasurement.Builder): PBMeasurement.Builder =
     pb.apply {
@@ -818,14 +817,6 @@ fun RemoteSource.toPb(): PBRemoteSource = toPb(this, PBRemoteSource.newBuilder()
 
 /************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
 
-fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder): PBPowerElectronicsUnit.Builder =
-    pb.apply {
-        cim.powerElectronicsConnection?.let { powerElectronicsConnectionMRID = it.mRID } ?: clearPowerElectronicsConnectionMRID()
-        maxP = cim.maxP ?: UNKNOWN_INT
-        minP = cim.minP ?: UNKNOWN_INT
-        toPb(cim, eqBuilder)
-    }
-
 fun toPb(cim: BatteryUnit, pb: PBBatteryUnit.Builder): PBBatteryUnit.Builder =
     pb.apply {
         batteryState = BatteryStateKind.valueOf(cim.batteryState.name)
@@ -837,6 +828,14 @@ fun toPb(cim: BatteryUnit, pb: PBBatteryUnit.Builder): PBBatteryUnit.Builder =
 fun toPb(cim: PhotoVoltaicUnit, pb: PBPhotoVoltaicUnit.Builder): PBPhotoVoltaicUnit.Builder =
     pb.apply {
         toPb(cim, peuBuilder)
+    }
+
+fun toPb(cim: PowerElectronicsUnit, pb: PBPowerElectronicsUnit.Builder): PBPowerElectronicsUnit.Builder =
+    pb.apply {
+        cim.powerElectronicsConnection?.let { powerElectronicsConnectionMRID = it.mRID } ?: clearPowerElectronicsConnectionMRID()
+        maxP = cim.maxP ?: UNKNOWN_INT
+        minP = cim.minP ?: UNKNOWN_INT
+        toPb(cim, eqBuilder)
     }
 
 fun toPb(cim: PowerElectronicsWindUnit, pb: PBPowerElectronicsWindUnit.Builder): PBPowerElectronicsWindUnit.Builder =
@@ -861,9 +860,6 @@ fun toPb(cim: Breaker, pb: PBBreaker.Builder): PBBreaker.Builder =
         inTransitTime = cim.inTransitTime ?: UNKNOWN_DOUBLE
         toPb(cim, swBuilder)
     }
-
-fun toPb(cim: LoadBreakSwitch, pb: PBLoadBreakSwitch.Builder): PBLoadBreakSwitch.Builder =
-    pb.apply { toPb(cim, psBuilder) }
 
 fun toPb(cim: BusbarSection, pb: PBBusbarSection.Builder): PBBusbarSection.Builder =
     pb.apply { toPb(cim, cnBuilder) }
@@ -993,11 +989,14 @@ fun toPb(cim: LinearShuntCompensator, pb: PBLinearShuntCompensator.Builder): PBL
         toPb(cim, scBuilder)
     }
 
-fun toPb(cim: PerLengthLineParameter, pb: PBPerLengthLineParameter.Builder): PBPerLengthLineParameter.Builder =
-    pb.apply { toPb(cim, ioBuilder) }
+fun toPb(cim: LoadBreakSwitch, pb: PBLoadBreakSwitch.Builder): PBLoadBreakSwitch.Builder =
+    pb.apply { toPb(cim, psBuilder) }
 
 fun toPb(cim: PerLengthImpedance, pb: PBPerLengthImpedance.Builder): PBPerLengthImpedance.Builder =
     pb.apply { toPb(cim, lpBuilder) }
+
+fun toPb(cim: PerLengthLineParameter, pb: PBPerLengthLineParameter.Builder): PBPerLengthLineParameter.Builder =
+    pb.apply { toPb(cim, ioBuilder) }
 
 fun toPb(cim: PerLengthSequenceImpedance, pb: PBPerLengthSequenceImpedance.Builder): PBPerLengthSequenceImpedance.Builder =
     pb.apply {
@@ -1119,7 +1118,6 @@ fun toPb(cim: ReactiveCapabilityCurve, pb: PBReactiveCapabilityCurve.Builder): P
 
 fun toPb(cim: Recloser, pb: PBRecloser.Builder): PBRecloser.Builder =
     pb.apply { toPb(cim, swBuilder) }
-
 
 fun toPb(cim: RegulatingCondEq, pb: PBRegulatingCondEq.Builder): PBRegulatingCondEq.Builder =
     pb.apply {

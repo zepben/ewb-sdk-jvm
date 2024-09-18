@@ -42,7 +42,7 @@
     * `ReactiveCapabilityCurve`
     * `RotatingMachine`
     * `SynchronousMachine`
-* The evolve-grpc version now includes the failure opendss report type.
+* Added `OpenDssReportBatch` and a new `failure` OpenDSS report type to the hosting capacity API.
 
 ### Enhancements
 * Added feature list in documentation.

@@ -1326,7 +1326,7 @@ fun Switch.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
     (this as ConductingEquipment).fillFields(service, includeRuntime)
 
     assetInfo = SwitchInfo().also { service.add(it) }
-    ratedCurrent = 1
+    ratedCurrent = 1.1
 
     setNormallyOpen(true)
     setOpen(true)

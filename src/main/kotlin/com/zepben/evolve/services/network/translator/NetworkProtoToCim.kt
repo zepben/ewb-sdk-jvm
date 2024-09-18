@@ -1246,7 +1246,7 @@ fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: Network
 fun toCim(pb: PBSwitch, cim: Switch, networkService: NetworkService): Switch =
     cim.apply {
         networkService.resolveOrDeferReference(Resolvers.assetInfo(this), pb.assetInfoMRID())
-        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_UINT }
+        ratedCurrent = pb.ratedCurrent.takeUnless { it == UNKNOWN_DOUBLE }
         setNormallyOpen(pb.normalOpen)
         setOpen(pb.open)
         // when unganged support is added to protobuf
@@ -1258,7 +1258,7 @@ fun toCim(pb: PBSwitch, cim: Switch, networkService: NetworkService): Switch =
 fun toCim(pb: PBSynchronousMachine, networkService: NetworkService): SynchronousMachine =
     SynchronousMachine(pb.mRID()).apply {
         pb.reactiveCapabilityCurveMRIDsList.forEach { reactiveCapabilityCurveMRID ->
-            networkService.resolveOrDeferReference(Resolvers.reactiveCapabilityCurve(this), reactiveCapabilityCurveMRID.mRID())
+            networkService.resolveOrDeferReference(Resolvers.reactiveCapabilityCurve(this), reactiveCapabilityCurveMRID)
         }
         baseQ = pb.baseQ.takeUnless { it == UNKNOWN_DOUBLE }
         condenserP = pb.condenserP.takeUnless { it == UNKNOWN_INT }

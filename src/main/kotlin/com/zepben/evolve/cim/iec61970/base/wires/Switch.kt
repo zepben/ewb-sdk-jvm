@@ -29,7 +29,7 @@ abstract class Switch(mRID: String = "") : ConductingEquipment(mRID) {
 
     override var assetInfo: SwitchInfo? = null
 
-    var ratedCurrent: Int? = null
+    var ratedCurrent: Double? = null
     internal var normalOpen: Int = 0
     internal var open: Int = 0
 

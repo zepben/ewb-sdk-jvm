@@ -2082,7 +2082,7 @@ class NetworkCimWriter(
     private fun saveSwitch(table: TableSwitches, insert: PreparedStatement, switch: Switch, description: String): Boolean {
         insert.setInt(table.NORMAL_OPEN.queryIndex, switch.normalOpen)
         insert.setInt(table.OPEN.queryIndex, switch.open)
-        insert.setNullableInt(table.RATED_CURRENT.queryIndex, switch.ratedCurrent)
+        insert.setNullableDouble(table.RATED_CURRENT.queryIndex, switch.ratedCurrent)
         insert.setNullableString(table.SWITCH_INFO_MRID.queryIndex, switch.assetInfo?.mRID)
 
         return saveConductingEquipment(table, insert, switch, description)

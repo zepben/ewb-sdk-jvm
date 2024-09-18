@@ -2282,7 +2282,7 @@ class NetworkCimReader(
     private fun loadSwitch(switch: Switch, table: TableSwitches, resultSet: ResultSet): Boolean {
         switch.apply {
             assetInfo = service.ensureGet(resultSet.getNullableString(table.SWITCH_INFO_MRID.queryIndex), typeNameAndMRID())
-            ratedCurrent = resultSet.getNullableInt(table.RATED_CURRENT.queryIndex)
+            ratedCurrent = resultSet.getNullableDouble(table.RATED_CURRENT.queryIndex)
             normalOpen = resultSet.getInt(table.NORMAL_OPEN.queryIndex)
             open = resultSet.getInt(table.OPEN.queryIndex)
         }

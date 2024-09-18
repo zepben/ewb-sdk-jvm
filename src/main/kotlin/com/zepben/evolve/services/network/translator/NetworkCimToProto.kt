@@ -1178,7 +1178,7 @@ fun toPb(cim: ShuntCompensator, pb: PBShuntCompensator.Builder): PBShuntCompensa
 
 fun toPb(cim: Switch, pb: PBSwitch.Builder): PBSwitch.Builder =
     pb.apply {
-        ratedCurrent = cim.ratedCurrent ?: UNKNOWN_UINT
+        ratedCurrent = cim.ratedCurrent ?: UNKNOWN_DOUBLE
         normalOpen = cim.isNormallyOpen()
         open = cim.isOpen()
         // when unganged support is added to protobuf
@@ -1187,10 +1187,10 @@ fun toPb(cim: Switch, pb: PBSwitch.Builder): PBSwitch.Builder =
         toPb(cim, ceBuilder)
     }
 
-
 fun toPb(cim: SynchronousMachine, pb: PBSynchronousMachine.Builder): PBSynchronousMachine.Builder =
     pb.apply {
-        cim.curves.forEach { curve -> addReactiveCapabilityCurveMRIDsBuilder().apply { toPb(curve, this) } }
+        clearReactiveCapabilityCurveMRIDs()
+        cim.curves.forEach { addReactiveCapabilityCurveMRIDs(it.mRID) }
         baseQ = cim.baseQ ?: UNKNOWN_DOUBLE
         condenserP = cim.condenserP ?: UNKNOWN_INT
         earthing = cim.earthing

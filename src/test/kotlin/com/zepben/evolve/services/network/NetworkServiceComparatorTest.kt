@@ -1302,7 +1302,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareConductingEquipment(createSwitch)
 
         comparatorValidator.validateProperty(Switch::assetInfo, createSwitch, { SwitchInfo("si1") }, { SwitchInfo("si2") })
-        comparatorValidator.validateProperty(Switch::ratedCurrent, createSwitch, { 1 }, { 2 })
+        comparatorValidator.validateProperty(Switch::ratedCurrent, createSwitch, { 1.0 }, { 2.0 })
 
         val closedSwitch = createSwitch("mRID").apply { setNormallyOpen(false); setOpen(true) }
         val openSwitch = createSwitch("mRID").apply { setNormallyOpen(true); setOpen(false) }

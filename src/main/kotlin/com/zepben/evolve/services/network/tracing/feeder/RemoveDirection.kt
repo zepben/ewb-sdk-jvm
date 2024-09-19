@@ -22,6 +22,7 @@ import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQue
 @Suppress("MemberVisibilityCanBePrivate")
 class RemoveDirection {
 
+    val directionRemovedKey = "DIRECTION_REMOVED"
     val normalTraversal: NetworkTrace<FeederDirection> = createTrace(DirectionSelector.NORMAL_DIRECTION, OpenTest.NORMALLY_OPEN)
     val currentTraversal: NetworkTrace<FeederDirection> = createTrace(DirectionSelector.CURRENT_DIRECTION, OpenTest.CURRENTLY_OPEN)
 
@@ -31,8 +32,10 @@ class RemoveDirection {
             computeNextT = computeNextDirectionToRemove(directionSelector)
         )
             .addQueueCondition(OpenCondition(openTest))
-            .addStepAction { item, _ -> removeDirection(item, directionSelector) }
-            .addQueueCondition { item, _ -> item.data != FeederDirection.NONE }
+            .addStepAction { item, context -> removeDirection(item, context, directionSelector) }
+            .addQueueCondition { item, context ->
+                item.data != FeederDirection.NONE && context.getValue<Boolean>(directionRemovedKey) == true
+            }
     }
 
     /**
@@ -96,8 +99,9 @@ class RemoveDirection {
             }
         }
 
-    private fun removeDirection(item: NetworkTraceStep<FeederDirection>, directionSelector: DirectionSelector) {
-        directionSelector.selectOrNull(item.path.toTerminal)?.remove(item.data)
+    private fun removeDirection(item: NetworkTraceStep<FeederDirection>, context: StepContext, directionSelector: DirectionSelector) {
+        val wasRemoved = directionSelector.selectOrNull(item.path.toTerminal)?.remove(item.data)
+        context.setValue(directionRemovedKey, wasRemoved ?: false)
     }
 
     private fun FeederDirection.orElse(default: FeederDirection): FeederDirection =

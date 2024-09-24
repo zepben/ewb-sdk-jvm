@@ -70,7 +70,7 @@ internal class SetDirectionTest {
             .toAcls() // c4
             .network
 
-        SetDirection().run(n.getT("c0", 2))
+        SetDirection().run(n.getT("c0", 2).andSetDownstream())
         DirectionLogger.trace(n["c0"])
 
         n.getT("c0", 1).validateDirections(NONE)
@@ -254,7 +254,7 @@ internal class SetDirectionTest {
             .connect("c12", "j6", 2, 2)
             .network
 
-        SetDirection().run(n.getT("j0", 1))
+        SetDirection().run(n.getT("j0", 1).andSetDownstream())
         DirectionLogger.trace(n["j0"])
 
         // To avoid reprocessing all BOTH loops in larger networks we do not process anything with a direction already set. This means this test will apply
@@ -327,7 +327,7 @@ internal class SetDirectionTest {
             .connect("c12", "j6", 2, 2)
             .network
 
-        SetDirection().run(n.getT("j0", 1))
+        SetDirection().run(n.getT("j0", 1).andSetDownstream())
         DirectionLogger.trace(n["j0"])
 
         // To avoid reprocessing all BOTH loops in larger networks we do not process anything with a direction already set. This means this test will apply
@@ -373,7 +373,7 @@ internal class SetDirectionTest {
             .toAcls(nominalPhases = PhaseCode.A) // c2
             .network
 
-        SetDirection().run(n.getT("j0", 1))
+        SetDirection().run(n.getT("j0", 1).andSetDownstream())
         DirectionLogger.trace(n["j0"])
 
         n.getT("j0", 1).validateDirections(DOWNSTREAM)
@@ -395,7 +395,7 @@ internal class SetDirectionTest {
             .toAcls(nominalPhases = PhaseCode.NONE) // c2
             .network
 
-        SetDirection().run(n.getT("j0", 1))
+        SetDirection().run(n.getT("j0", 1).andSetDownstream())
         DirectionLogger.trace(n["j0"])
 
         n.getT("j0", 1).validateDirections(DOWNSTREAM)
@@ -414,6 +414,12 @@ internal class SetDirectionTest {
 
     private fun NetworkService.getT(id: String, terminalId: Int) =
         get<ConductingEquipment>(id)!!.getTerminal(terminalId)!!
+
+    private fun Terminal.andSetDownstream(): Terminal {
+        normalFeederDirection = DOWNSTREAM
+        currentFeederDirection = DOWNSTREAM
+        return this
+    }
 
     private fun checkExpectedDirection(t: Terminal, normalDirection: FeederDirection, currentDirection: FeederDirection = normalDirection) {
         checkExpectedDirection(t, normalDirection, DirectionSelector.NORMAL_DIRECTION)

@@ -22,6 +22,7 @@ import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQue
 @Suppress("MemberVisibilityCanBePrivate")
 class RemoveDirection {
 
+    // TODO: Remove combined normal and current
     val directionRemovedKey = "DIRECTION_REMOVED"
     val normalTraversal: NetworkTrace<FeederDirection> = createTrace(DirectionSelector.NORMAL_DIRECTION, OpenTest.NORMALLY_OPEN)
     val currentTraversal: NetworkTrace<FeederDirection> = createTrace(DirectionSelector.CURRENT_DIRECTION, OpenTest.CURRENTLY_OPEN)

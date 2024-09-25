@@ -93,8 +93,9 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         return getDerivedThis()
     }
 
-    fun addConditions(conditions: Collection<TraversalCondition<T>>) {
+    fun addConditions(conditions: Collection<TraversalCondition<T>>): D {
         conditions.forEach { addCondition(it) }
+        return getDerivedThis()
     }
 
     fun addCondition(condition: TraversalCondition<T>): D {

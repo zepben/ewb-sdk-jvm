@@ -244,8 +244,8 @@ object Tracing {
      *
      * @return A new traversal instance.
      */
-    @JvmStatic
-    fun setDirection(): SetDirection = SetDirection()
+//    @JvmStatic
+//    fun setDirection(): SetDirection = Tracing.normalSetDirection()
 
     /**
      * Returns an instance of [PhaseInferrer] convenience class for inferring phases on a network.

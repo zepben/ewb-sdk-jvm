@@ -16,14 +16,10 @@ import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
-import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.testutils.junit.SystemLogExtension
-import io.mockk.every
-import io.mockk.justRun
-import io.mockk.mockk
-import io.mockk.verifySequence
+import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
@@ -51,11 +47,15 @@ internal class NetworkDatabaseReaderTest {
         every { this@mockk.supportedVersion } returns 1
     }
 
-    private val setDirection = mockk<SetDirection> { justRun { run(service) } }
+    private val setFeederDirections = mockk<(NetworkService) -> Unit>()
     private val setPhases = mockk<SetPhases> { justRun { run(service) } }
     private val phaseInferrer = mockk<PhaseInferrer> { justRun { run(service) } }
     private val assignToFeeders = mockk<AssignToFeeders> { justRun { run(service) } }
     private val assignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
+
+    init {
+        every { setFeederDirections(service) } just runs
+    }
 
     private val reader = NetworkDatabaseReader(
         connection,
@@ -65,7 +65,7 @@ internal class NetworkDatabaseReaderTest {
         metadataReader,
         networkServiceReader,
         tableVersion,
-        setDirection,
+        setFeederDirections,
         setPhases,
         phaseInferrer,
         assignToFeeders,
@@ -106,7 +106,7 @@ internal class NetworkDatabaseReaderTest {
             networkServiceReader.load()
             service.unresolvedReferences()
 
-            setDirection.run(service)
+            setFeederDirections(service)
             setPhases.run(service)
             phaseInferrer.run(service)
             assignToFeeders.run(service)

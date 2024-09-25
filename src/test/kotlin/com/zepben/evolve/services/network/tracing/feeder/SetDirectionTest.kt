@@ -14,9 +14,9 @@ package com.zepben.evolve.services.network.tracing.feeder
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
-import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.DirectionValidator.validateDirections
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection.*
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -410,14 +410,14 @@ internal class SetDirectionTest {
     }
 
     private fun doSetDirectionTrace(terminal: Terminal) {
-        SetDirection(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION).run(terminal)
-        SetDirection(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION).run(terminal)
+        SetDirection(NetworkStateOperators.NORMAL).run(terminal)
+        SetDirection(NetworkStateOperators.CURRENT).run(terminal)
         DirectionLogger.trace(terminal.conductingEquipment!!)
     }
 
     private fun doSetDirectionTrace(n: NetworkService) {
-        val normal = SetDirection(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION)
-        val current = SetDirection(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
+        val normal = SetDirection(NetworkStateOperators.NORMAL)
+        val current = SetDirection(NetworkStateOperators.CURRENT)
         n.sequenceOf<Feeder>().forEach {
             normal.run(it.normalHeadTerminal!!)
             current.run(it.normalHeadTerminal!!)

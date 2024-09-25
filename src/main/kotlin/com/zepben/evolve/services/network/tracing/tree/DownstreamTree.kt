@@ -9,18 +9,16 @@
 package com.zepben.evolve.services.network.tracing.tree
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.downstream
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.StepPath
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue
 
+
 class DownstreamTree(
-    openTest: OpenTest,
     directionSelector: DirectionSelector
 ) {
 
@@ -31,7 +29,8 @@ class DownstreamTree(
             TreeNode(nextPath.toEquipment, currentItem.data)
         }
     )
-        .addConditions(downstream(directionSelector), stopAtOpen(openTest))
+        // TODO: Can we remove open test?
+        .addConditions(downstream(directionSelector))
         .addStepAction { (_, treeNode), _ ->
             // If we visit a node, we add it as a child to its parent
             treeNode.parent?.addChild(treeNode)

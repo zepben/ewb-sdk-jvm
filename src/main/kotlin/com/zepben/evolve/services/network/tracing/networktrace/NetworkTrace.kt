@@ -61,8 +61,7 @@ class NetworkTrace<T> private constructor(
     )
 
     fun run(start: Terminal, context: T, canStopOnStartItem: Boolean = true) {
-        addStartItem(NetworkTraceStep(TerminalToTerminalPath(start, start, 0, 0), context))
-        run(canStopOnStartItem)
+        run(NetworkTraceStep(TerminalToTerminalPath(start, start, 0, 0), context), canStopOnStartItem)
     }
 
     fun run(start: ConductingEquipment, context: T, canStopOnStartItem: Boolean = true) {

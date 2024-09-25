@@ -22,7 +22,7 @@ import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
-import com.zepben.evolve.services.network.tracing.feeder.SetDirection
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import java.sql.Connection
@@ -47,7 +47,7 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     metadataReader: MetadataCollectionReader = MetadataCollectionReader(service, tables, connection),
     serviceReader: NetworkServiceReader = NetworkServiceReader(service, tables, connection),
     tableVersion: TableVersion = tableCimVersion,
-    private val setDirection: SetDirection = SetDirection(),
+    private val setFeederDirection: (NetworkService) -> Unit = Tracing::applyFeederDirections,
     private val setPhases: SetPhases = SetPhases(),
     private val phaseInferrer: PhaseInferrer = PhaseInferrer(),
     private val assignToFeeders: AssignToFeeders = AssignToFeeders(),
@@ -57,7 +57,7 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     override fun postLoad(): Boolean =
         super.postLoad().also {
             logger.info("Applying feeder direction to network...")
-            setDirection.run(service)
+            setFeederDirection(service)
             logger.info("Feeder direction applied to network.")
 
             logger.info("Applying phases to network...")

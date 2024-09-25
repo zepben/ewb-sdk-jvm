@@ -160,7 +160,9 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         /************ IEC61970 BASE CORE ************/
         validateSchema(SchemaServices.networkServicesOf(::BaseVoltage, BaseVoltage::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::ConnectivityNode, ConnectivityNode::fillFields))
-        validateSchema(SchemaServices.networkServicesOf(::Feeder, Feeder::fillFields).also { Tracing.setDirection().run(it) })
+        validateSchema(
+            SchemaServices.networkServicesOf(::Feeder, Feeder::fillFields)
+                .also { com.zepben.evolve.services.network.tracing.networktrace.Tracing.applyFeederDirections(it) })
         validateSchema(SchemaServices.networkServicesOf(::GeographicalRegion, GeographicalRegion::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Site, Site::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::SubGeographicalRegion, SubGeographicalRegion::fillFields))

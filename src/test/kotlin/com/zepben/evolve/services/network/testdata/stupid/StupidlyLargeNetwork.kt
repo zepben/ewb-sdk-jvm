@@ -276,7 +276,7 @@ object StupidlyLargeNetwork {
         networkService.add(transformerWithTypeNonRevReg)
         networkService.add(transformerWithTypeZone)
 
-        Tracing.setDirection().run(networkService)
+        com.zepben.evolve.services.network.tracing.networktrace.Tracing.applyFeederDirections(networkService)
         Tracing.setPhases().run(networkService)
         Tracing.assignEquipmentToFeeders().run(networkService)
 

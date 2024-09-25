@@ -38,7 +38,7 @@ class TracingTest {
 
 //        fun normalConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newNormalConnectedEquipmentTrace()
         Tracing.connectedEquipmentTrace()
-            .addConditions(normallyUpstream(), stopAtNormallyOpen())
+            .addConditions(stopAtNormallyOpen())
 
 //        fun currentConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newCurrentConnectedEquipmentTrace()
         Tracing.connectedEquipmentTrace()
@@ -121,20 +121,19 @@ class TracingTest {
         Tracing.connectedEquipmentTrace()
             .addConditions(currentlyUpstream(), withPhases(PhaseCode.ABCN))
 
+//        fun setDirection(): SetDirection = SetDirection()
+//        fun removeDirection(): RemoveDirection = RemoveDirection()
+
         /**
          * TODO: Where do we want to define these now?
          * Need to look at the rest of these.
-         * Have not yet looked at BranchRecursiveTraversal which will be needed for some of these.
          */
 //        fun setPhases(): SetPhases = SetPhases()
 
-//        fun setDirection(): SetDirection = SetDirection()
 
 //        fun phaseInferrer(): PhaseInferrer = PhaseInferrer()
 
 //        fun removePhases(): RemovePhases = RemovePhases()
-
-//        fun removeDirection(): RemoveDirection = RemoveDirection()
 
 //        fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
 

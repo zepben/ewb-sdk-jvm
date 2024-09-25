@@ -325,7 +325,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
 
     fun startItems(): Collection<T> = startItems
 
-    fun run(startItem: T, canStopOnStartItem: Boolean = true) {
+    protected fun run(startItem: T, canStopOnStartItem: Boolean = true) {
         startItems.add(startItem)
         run(canStopOnStartItem)
     }

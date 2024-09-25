@@ -122,7 +122,14 @@ class TracingTest {
             .addConditions(currentlyUpstream(), withPhases(PhaseCode.ABCN))
 
 //        fun setDirection(): SetDirection = SetDirection()
-//        fun removeDirection(): RemoveDirection = RemoveDirection()
+        Tracing.normalSetDirection()
+        Tracing.currentSetDirection()
+
+        // fun normalDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION)
+        Tracing.normalDownstreamTree()
+
+        // fun currentDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
+        Tracing.currentDownstreamTree()
 
         /**
          * TODO: Where do we want to define these now?
@@ -130,6 +137,7 @@ class TracingTest {
          */
 //        fun setPhases(): SetPhases = SetPhases()
 
+//        fun removeDirection(): RemoveDirection = RemoveDirection()
 
 //        fun phaseInferrer(): PhaseInferrer = PhaseInferrer()
 
@@ -138,10 +146,6 @@ class TracingTest {
 //        fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
 
 //        fun assignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
-
-//        fun normalDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION)
-
-//        fun currentDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
 
 //        fun findWithUsagePoints(): FindWithUsagePoints = FindWithUsagePoints()
     }

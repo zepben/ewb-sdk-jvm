@@ -295,7 +295,7 @@ object Tracing {
      * @return A new traversal instance.
      */
     @JvmStatic
-    fun normalDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION)
+    fun normalDownstreamTree(): DownstreamTree = DownstreamTree(DirectionSelector.NORMAL_DIRECTION)
 
     /**
      * Returns an instance of [DownstreamTree] convenience class for tracing using the
@@ -304,7 +304,7 @@ object Tracing {
      * @return A new traversal instance.
      */
     @JvmStatic
-    fun currentDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
+    fun currentDownstreamTree(): DownstreamTree = DownstreamTree(DirectionSelector.CURRENT_DIRECTION)
 
     /**
      * Returns an instance of [FindWithUsagePoints] convenience class for finding conducting equipment with attached usage points.

@@ -293,19 +293,19 @@ internal class RemoveDirectionTest {
     }
 
     private fun NetworkService.validateDirections(
-        j1: FeederDirection,
+        j0: FeederDirection,
         c1t1: FeederDirection,
         c1t2: FeederDirection,
         c2t1: FeederDirection,
         c2t2: FeederDirection,
-        c3: FeederDirection
+        j3: FeederDirection
     ) {
-        getT("j0", 1).validateDirections(j1)
+        getT("j0", 1).validateDirections(j0)
         getT("c1", 1).validateDirections(c1t1)
         getT("c1", 2).validateDirections(c1t2)
         getT("c2", 1).validateDirections(c2t1)
         getT("c2", 2).validateDirections(c2t2)
-        getT("j3", 1).validateDirections(c3)
+        getT("j3", 1).validateDirections(j3)
     }
 
     private fun NetworkService.getT(ce: String, t: Int): Terminal =

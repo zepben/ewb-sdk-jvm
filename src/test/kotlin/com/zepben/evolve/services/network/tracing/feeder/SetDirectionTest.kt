@@ -376,6 +376,39 @@ internal class SetDirectionTest {
         n.getT("c3", 2).validateDirections(NONE)
     }
 
+    @Test
+    internal fun handlesMultiFeeds() {
+        //
+        // j0 --c1-- --c2-- j3
+        //          |
+        //          c4
+        //          |
+        //           --c5--
+        //
+        val n = TestNetworkBuilder()
+            .fromJunction(PhaseCode.A, 1) // j0
+            .toAcls(PhaseCode.A) // c1
+            .toAcls(PhaseCode.A) // c2
+            .toJunction(PhaseCode.A, 1) // j3
+            .branchFrom("c1")
+            .toAcls(PhaseCode.A) // c4
+            .toAcls(PhaseCode.A) // c5
+            .addFeeder("j0")
+            .addFeeder("j3")
+            .build()
+
+        n.getT("j0", 1).validateDirections(BOTH)
+        n.getT("c1", 1).validateDirections(BOTH)
+        n.getT("c1", 2).validateDirections(BOTH)
+        n.getT("c2", 1).validateDirections(BOTH)
+        n.getT("c2", 2).validateDirections(BOTH)
+        n.getT("j3", 1).validateDirections(BOTH)
+        n.getT("c4", 1).validateDirections(UPSTREAM)
+        n.getT("c4", 2).validateDirections(DOWNSTREAM)
+        n.getT("c5", 1).validateDirections(UPSTREAM)
+        n.getT("c5", 2).validateDirections(DOWNSTREAM)
+    }
+
     private fun doSetDirectionTrace(terminal: Terminal) {
         SetDirection(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION).run(terminal)
         SetDirection(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION).run(terminal)
@@ -394,12 +427,6 @@ internal class SetDirectionTest {
 
     private fun NetworkService.getT(id: String, terminalId: Int) =
         get<ConductingEquipment>(id)!!.getTerminal(terminalId)!!
-
-    private fun Terminal.andSetDownstream(): Terminal {
-        normalFeederDirection = DOWNSTREAM
-        currentFeederDirection = DOWNSTREAM
-        return this
-    }
 
     private fun checkExpectedDirection(t: Terminal, normalDirection: FeederDirection, currentDirection: FeederDirection = normalDirection) {
         checkExpectedDirection(t, normalDirection, DirectionSelector.NORMAL_DIRECTION)

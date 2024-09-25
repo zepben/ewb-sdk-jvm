@@ -8,8 +8,11 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
+import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
@@ -106,5 +109,30 @@ object Tracing {
 
     fun normalDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION)
     fun currentDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
+
+    fun normalSetDirection(): SetDirection = SetDirection(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION)
+    fun currentSetDirection(): SetDirection = SetDirection(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
+
+    /**
+     * Apply feeder directions from all feeder head terminals in the network.
+     *
+     * @param network The network in which to apply feeder directions.
+     */
+    fun applyFeederDirections(network: NetworkService) {
+        val normal = normalSetDirection()
+        val current = currentSetDirection()
+
+        network.sequenceOf<Feeder>()
+            .mapNotNull { it.normalHeadTerminal }
+            .forEach {
+                val feederHead = requireNotNull(it.conductingEquipment) { "head terminals require conducting equipment to apply feeder directions" }
+
+                if (!normal.openTest.isOpen(feederHead, null))
+                    normal.run(it)
+
+                if (!current.openTest.isOpen(feederHead, null))
+                    current.run(it)
+            }
+    }
 
 }

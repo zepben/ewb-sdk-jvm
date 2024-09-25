@@ -193,7 +193,7 @@ internal class CoreTraceTest {
 
     private fun getNetwork() = PhaseSwapLoopNetwork.create().also {
         Tracing.setPhases().run(it)
-        Tracing.setDirection().run(it)
+        com.zepben.evolve.services.network.tracing.networktrace.Tracing.applyFeederDirections(it)
     }
 
     private fun currentNonDirectionalTrace(start: ConductingEquipment, vararg phases: SinglePhaseKind): Set<PhaseStep> {

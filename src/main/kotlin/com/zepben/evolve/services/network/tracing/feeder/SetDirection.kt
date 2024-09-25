@@ -12,8 +12,8 @@ import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
@@ -23,9 +23,9 @@ import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQu
  * Convenience class that provides methods for setting feeder direction on a [NetworkService]
  */
 class SetDirection(
-    internal val openTest: OpenTest,
-    private val directionSelector: DirectionSelector,
+    internal val networkStateOperators: NetworkStateOperators,
 ) {
+    private val directionSelector: DirectionSelector = networkStateOperators.directionSelector
 
     private val traversal: NetworkTrace<FeederDirection> = Tracing.connectedTerminalTrace(
         { WeightedPriorityQueue.processQueue { it.path.toTerminal?.phases?.numPhases() ?: 1 } },
@@ -47,7 +47,7 @@ class SetDirection(
                 nextDirection
         }
     )
-        .addCondition(stopAtOpen(openTest))
+        .addCondition(stopAtOpen(networkStateOperators.openTest))
         .addStopCondition { (path), _ ->
             isFeederHeadTerminal(path.toTerminal) || reachedSubstationTransformer(path.toTerminal)
         }

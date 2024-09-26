@@ -14,6 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.DirectionValidator.validateDirections
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection.*
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
@@ -42,7 +43,7 @@ internal class RemoveDirectionTest {
 
         n.validateDirections(DOWNSTREAM, UPSTREAM, DOWNSTREAM, UPSTREAM, DOWNSTREAM, UPSTREAM)
 
-        RemoveDirection().run(n.getT("c1", 2))
+        removeDirections(n.getT("c1", 2))
 
         DirectionLogger.trace(n["j0"])
         n.validateDirections(DOWNSTREAM, UPSTREAM, NONE, NONE, NONE, NONE)
@@ -56,7 +57,7 @@ internal class RemoveDirectionTest {
 
         n.validateDirections(DOWNSTREAM, UPSTREAM, DOWNSTREAM, UPSTREAM, DOWNSTREAM, UPSTREAM)
 
-        RemoveDirection().run(n.getT("c2", 1))
+        removeDirections(n.getT("c2", 1))
 
         DirectionLogger.trace(n["j0"])
         n.validateDirections(NONE, NONE, NONE, NONE, DOWNSTREAM, UPSTREAM)
@@ -71,7 +72,7 @@ internal class RemoveDirectionTest {
 
         n.validateDirections(BOTH, BOTH, BOTH, BOTH, BOTH, BOTH)
 
-        RemoveDirection().run(n.getT("c1", 2))
+        removeDirections(n.getT("c1", 2))
 
         DirectionLogger.trace(n["j0"])
         n.validateDirections(BOTH, BOTH, NONE, NONE, NONE, NONE)
@@ -86,7 +87,7 @@ internal class RemoveDirectionTest {
 
         n.validateDirections(BOTH, BOTH, BOTH, BOTH, BOTH, BOTH)
 
-        RemoveDirection().run(n.getT("j0", 1), DOWNSTREAM)
+        removeDirections(n.getT("j0", 1), DOWNSTREAM)
 
         DirectionLogger.trace(n["j0"])
         n.validateDirections(UPSTREAM, DOWNSTREAM, UPSTREAM, DOWNSTREAM, UPSTREAM, DOWNSTREAM)
@@ -101,7 +102,7 @@ internal class RemoveDirectionTest {
 
         n.validateDirections(BOTH, BOTH, BOTH, BOTH, BOTH, BOTH)
 
-        RemoveDirection().run(n.getT("j0", 1), UPSTREAM)
+        removeDirections(n.getT("j0", 1), UPSTREAM)
 
         DirectionLogger.trace(n["j0"])
         n.validateDirections(DOWNSTREAM, UPSTREAM, DOWNSTREAM, UPSTREAM, DOWNSTREAM, UPSTREAM)
@@ -130,7 +131,7 @@ internal class RemoveDirectionTest {
         n.getT("c5", 1).validateDirections(UPSTREAM)
         n.getT("c5", 2).validateDirections(DOWNSTREAM)
 
-        RemoveDirection().run(n.getT("c5", 1))
+        removeDirections(n.getT("c5", 1))
         DirectionLogger.trace(n["j0"])
 
         n.validateDirections(BOTH, BOTH, BOTH, BOTH, BOTH, BOTH)
@@ -163,7 +164,7 @@ internal class RemoveDirectionTest {
         n.getT("c5", 1).validateDirections(UPSTREAM)
         n.getT("c5", 2).validateDirections(DOWNSTREAM)
 
-        RemoveDirection().run(n.getT("j0", 1), DOWNSTREAM)
+        removeDirections(n.getT("j0", 1), DOWNSTREAM)
         DirectionLogger.trace(n["j0"])
 
         n.validateDirections(UPSTREAM, DOWNSTREAM, UPSTREAM, DOWNSTREAM, UPSTREAM, DOWNSTREAM)
@@ -204,7 +205,7 @@ internal class RemoveDirectionTest {
         n.getT("c7", 1).validateDirections(UPSTREAM)
         n.getT("c7", 2).validateDirections(DOWNSTREAM)
 
-        RemoveDirection().run(n.getT("j0", 1), BOTH)
+        removeDirections(n.getT("j0", 1), BOTH)
         DirectionLogger.trace(listOf(n["j0"], n["j6"]))
 
         n.validateDirections(NONE, NONE, NONE, NONE, NONE, NONE)
@@ -251,7 +252,7 @@ internal class RemoveDirectionTest {
         n.getT("j4", 1).validateDirections(BOTH)
         n.getT("j6", 1).validateDirections(BOTH)
 
-        RemoveDirection().run(n.getT("j0", 1), DOWNSTREAM)
+        removeDirections(n.getT("j0", 1), DOWNSTREAM)
         DirectionLogger.trace(n["j0"])
 
         n.getT("j0", 1).validateDirections(UPSTREAM)
@@ -262,34 +263,9 @@ internal class RemoveDirectionTest {
         n.getT("j6", 1).validateDirections(BOTH)
     }
 
-    @Test
-    internal fun canRemoveFromEntireNetwork() {
-        //
-        // j0 --c1-- --c2-- j3
-        //
-        // j4 --c5--
-        //
-        val n = nb
-            .fromJunction(PhaseCode.B) // j4
-            .toAcls(PhaseCode.B) // c5
-            .addFeeder("j0")
-            .addFeeder("j4", 2)
-            .buildAndLog("j0", "j4")
-
-        n.validateDirections(DOWNSTREAM, UPSTREAM, DOWNSTREAM, UPSTREAM, DOWNSTREAM, UPSTREAM)
-        n.getT("j4", 1).validateDirections(NONE)
-        n.getT("j4", 2).validateDirections(DOWNSTREAM)
-        n.getT("c5", 1).validateDirections(UPSTREAM)
-        n.getT("c5", 2).validateDirections(DOWNSTREAM)
-
-        RemoveDirection().run(n)
-        DirectionLogger.trace(listOf(n["j0"], n["j4"]))
-
-        n.validateDirections(NONE, NONE, NONE, NONE, NONE, NONE)
-        n.getT("j4", 1).validateDirections(NONE)
-        n.getT("j4", 2).validateDirections(NONE)
-        n.getT("c5", 1).validateDirections(NONE)
-        n.getT("c5", 2).validateDirections(NONE)
+    private fun removeDirections(terminal: Terminal, feederDirection: FeederDirection = NONE) {
+        RemoveDirection(NetworkStateOperators.NORMAL).run(terminal, feederDirection)
+        RemoveDirection(NetworkStateOperators.CURRENT).run(terminal, feederDirection)
     }
 
     private fun NetworkService.validateDirections(

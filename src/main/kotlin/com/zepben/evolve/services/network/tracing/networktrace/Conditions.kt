@@ -15,10 +15,12 @@ import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.*
+import com.zepben.evolve.services.network.tracing.traversalV2.QueueCondition
 import com.zepben.evolve.services.network.tracing.traversalV2.TraversalCondition
 import kotlin.reflect.KClass
 
 private typealias NetworkTraceCondition<T> = TraversalCondition<NetworkTraceStep<T>>
+private typealias NetworkTraceQueueCondition<T> = QueueCondition<NetworkTraceStep<T>>
 
 object Conditions {
 
@@ -40,7 +42,7 @@ object Conditions {
     fun <T> currentlyDownstream(): NetworkTraceCondition<T> =
         downstream(DirectionSelector.CURRENT_DIRECTION)
 
-    fun <T> stopAtOpen(openTest: OpenTest, phase: SinglePhaseKind? = null): NetworkTraceCondition<T> =
+    fun <T> stopAtOpen(openTest: OpenTest, phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =
         OpenCondition(openTest, phase)
 
     fun <T> stopAtNormallyOpen(phase: SinglePhaseKind? = null): NetworkTraceCondition<T> =

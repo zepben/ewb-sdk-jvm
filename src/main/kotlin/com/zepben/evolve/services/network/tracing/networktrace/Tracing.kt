@@ -64,6 +64,7 @@ object Tracing {
         return connectedEquipmentTrace(queueFactory, branchQueueFactory) { _, _, _, _ -> }
     }
 
+    // TODO [Review]: Remove "TerminalTrace" and "connectedEquipmentTrace" and just have "networkTrace" which takes the onlyActionEquipment flag
     fun <T> connectedTerminalTrace(
         queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
         computeNextT: ComputeNextT<T>,

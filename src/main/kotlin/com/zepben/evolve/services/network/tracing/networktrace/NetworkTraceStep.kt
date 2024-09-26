@@ -20,29 +20,35 @@ class NetworkTraceStep<T>(
     operator fun component2(): T = data
 }
 
-sealed interface StepPath {
-    val fromTerminal: Terminal?
-    val fromEquipment: ConductingEquipment
-    val toTerminal: Terminal?
-    val toEquipment: ConductingEquipment
-    val numTerminalSteps: Int
-    val numEquipmentSteps: Int
+sealed class StepPath {
+    protected abstract val fromTerminal: Terminal?
+    abstract val fromEquipment: ConductingEquipment
+    protected abstract val toTerminal: Terminal?
+    abstract val toEquipment: ConductingEquipment
+    abstract val numTerminalSteps: Int
+    abstract val numEquipmentSteps: Int
+    // This will need to be added when we add clamps to the model. The proposed idea is that if an AcLineSegment has multiple clamps and your current
+    // path is one of the clamps, one of the next StepPaths will be another clamp on the AcLineSegment, essentially jumping over the AcLineSegment for the Path.
+    // If there is a cut on the AcLineSegment, you may need to know about it, primarily the cut could create an open point between the clamps that needs
+    // to prevent queuing as part of an "open test".
+    // abstract val viaSegment: AcLineSegment
 
     val tracedInternally: Boolean
         get() = fromTerminal != null && toTerminal != null && fromEquipment == toEquipment
 }
 
-data class TerminalToTerminalPath(
-    override val fromTerminal: Terminal,
-    override val toTerminal: Terminal,
-    override val numTerminalSteps: Int,
-    override val numEquipmentSteps: Int,
-) : StepPath {
-    override val fromEquipment: ConductingEquipment
-        get() = fromTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
-    override val toEquipment: ConductingEquipment
-        get() = toTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
-}
+// TODO [Review]: This can be removed and we just have one StepPath. fromTerminal and toTerminal will always be non null.
+//data class TerminalToTerminalPath(
+//    public override val fromTerminal: Terminal,
+//    public override val toTerminal: Terminal,
+//    override val numTerminalSteps: Int,
+//    override val numEquipmentSteps: Int,
+//) : StepPath() {
+//    override val fromEquipment: ConductingEquipment
+//        get() = fromTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
+//    override val toEquipment: ConductingEquipment
+//        get() = toTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
+//}
 
 /**
  * Here for future clamp support. Clamps will always connect equipment to equipment without terminals with AcLineSegment.

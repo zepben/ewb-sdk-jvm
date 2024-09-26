@@ -24,7 +24,11 @@ internal class NetworkTraceTracker<T>(
     }
 
     companion object {
-        fun <T> terminalTracker(): NetworkTraceTracker<T> = NetworkTraceTracker { it.path.toTerminal }
+        fun <T> terminalTracker(): NetworkTraceTracker<T> = NetworkTraceTracker {
+            when (it.path) {
+                is TerminalToTerminalPath -> it.path.toTerminal
+            }
+        }
         fun <T> equipmentTracker(): NetworkTraceTracker<T> = NetworkTraceTracker { it.path.toEquipment }
     }
 }

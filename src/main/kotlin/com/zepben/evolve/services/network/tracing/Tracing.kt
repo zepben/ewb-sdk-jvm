@@ -268,8 +268,8 @@ object Tracing {
      *
      * @return A new traversal instance.
      */
-    @JvmStatic
-    fun removeDirection(): RemoveDirection = RemoveDirection()
+//    @JvmStatic
+//    fun removeDirection(): RemoveDirection = RemoveDirection()
 
     /**
      * Returns an instance of [AssignToFeeders] convenience class for assigning equipment containers to HV/MV feeders on a network.

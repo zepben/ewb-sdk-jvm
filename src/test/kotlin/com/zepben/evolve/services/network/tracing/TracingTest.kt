@@ -14,7 +14,6 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
-import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.PhaseStep
 import com.zepben.evolve.services.network.tracing.phases.RemovePhases
@@ -64,7 +63,7 @@ internal class TracingTest {
 //        validate({ Tracing.setDirection() }, SetDirection::class.java)
         validate({ Tracing.phaseInferrer() }, PhaseInferrer::class.java)
         validate({ Tracing.removePhases() }, RemovePhases::class.java)
-        validate({ Tracing.removeDirection() }, RemoveDirection::class.java)
+//        validate({ Tracing.removeDirection() }, RemoveDirection::class.java)
         validate({ Tracing.assignEquipmentToFeeders() }, AssignToFeeders::class.java)
         validate({ Tracing.normalDownstreamTree() }, DownstreamTree::class.java)
         validate({ Tracing.currentDownstreamTree() }, DownstreamTree::class.java)

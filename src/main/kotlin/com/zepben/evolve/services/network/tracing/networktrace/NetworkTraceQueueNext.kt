@@ -66,21 +66,15 @@ internal object NetworkTraceQueueNext {
 
     private fun nextStepPaths(path: StepPath): Sequence<StepPath> {
         // Check if we last moved between equipment, or across it.
-        val terminals = if (path.tracedInternally) path.toTerminal?.connectedTerminals() else path.toTerminal?.otherTerminals()
-        if (terminals == null)
-            return emptySequence()
+        val terminals = if (path.tracedInternally) path.toTerminal.connectedTerminals() else path.toTerminal.otherTerminals()
 
         return terminals.map {
-            when (path) {
-                is TerminalToTerminalPath -> {
-                    TerminalToTerminalPath(
-                        path.toTerminal,
-                        it,
-                        path.numTerminalSteps + 1,
-                        if (path.tracedInternally) path.numEquipmentSteps else path.numEquipmentSteps + 1,
-                    )
-                }
-            }
+            StepPath(
+                path.toTerminal,
+                it,
+                path.numTerminalSteps + 1,
+                if (path.tracedInternally) path.numEquipmentSteps else path.numEquipmentSteps + 1,
+            )
         }
     }
 }

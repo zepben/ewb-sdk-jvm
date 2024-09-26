@@ -10,37 +10,39 @@ package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.tracing.OpenTest
-import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.*
+import com.zepben.evolve.services.network.tracing.traversalV2.QueueCondition
 import com.zepben.evolve.services.network.tracing.traversalV2.TraversalCondition
 import kotlin.reflect.KClass
 
 private typealias NetworkTraceCondition<T> = TraversalCondition<NetworkTraceStep<T>>
+private typealias NetworkTraceQueueCondition<T> = QueueCondition<NetworkTraceStep<T>>
 
 object Conditions {
 
-    fun <T> upstream(directionSelector: DirectionSelector): NetworkTraceCondition<T> =
-        DirectionCondition(FeederDirection.UPSTREAM, directionSelector)
+    fun <T> upstream(getDirection: (Terminal) -> FeederDirection): NetworkTraceCondition<T> =
+        DirectionCondition(FeederDirection.UPSTREAM, getDirection)
 
     fun <T> normallyUpstream(): NetworkTraceCondition<T> =
-        upstream(DirectionSelector.NORMAL_DIRECTION)
+        upstream(NetworkStateOperators.NORMAL::getDirection)
 
     fun <T> currentlyUpstream(): NetworkTraceCondition<T> =
-        upstream(DirectionSelector.CURRENT_DIRECTION)
+        upstream(NetworkStateOperators.CURRENT::getDirection)
 
-    fun <T> downstream(directionSelector: DirectionSelector): NetworkTraceCondition<T> =
-        DirectionCondition(FeederDirection.DOWNSTREAM, directionSelector)
+    fun <T> downstream(getDirection: (Terminal) -> FeederDirection): NetworkTraceCondition<T> =
+        DirectionCondition(FeederDirection.DOWNSTREAM, getDirection)
 
     fun <T> normallyDownstream(): NetworkTraceCondition<T> =
-        downstream(DirectionSelector.NORMAL_DIRECTION)
+        downstream(NetworkStateOperators.NORMAL::getDirection)
 
     fun <T> currentlyDownstream(): NetworkTraceCondition<T> =
-        downstream(DirectionSelector.CURRENT_DIRECTION)
+        downstream(NetworkStateOperators.CURRENT::getDirection)
 
-    fun <T> stopAtOpen(openTest: OpenTest, phase: SinglePhaseKind? = null): NetworkTraceCondition<T> =
+    fun <T> stopAtOpen(openTest: OpenTest, phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =
         OpenCondition(openTest, phase)
 
     fun <T> stopAtNormallyOpen(phase: SinglePhaseKind? = null): NetworkTraceCondition<T> =

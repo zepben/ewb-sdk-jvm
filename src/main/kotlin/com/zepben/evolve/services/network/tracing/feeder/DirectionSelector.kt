@@ -26,7 +26,6 @@ fun interface DirectionSelector {
         @JvmField
         val NORMAL_DIRECTION: DirectionSelector = DirectionSelector { terminal: Terminal ->
             object : DirectionStatus {
-
                 override val value: FeederDirection
                     get() = terminal.normalFeederDirection
 

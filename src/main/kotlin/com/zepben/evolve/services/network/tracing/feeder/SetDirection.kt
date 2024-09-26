@@ -25,11 +25,10 @@ import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQu
 class SetDirection(
     internal val networkStateOperators: NetworkStateOperators,
 ) {
-    private val directionSelector: DirectionSelector = networkStateOperators.directionSelector
 
     private val traversal: NetworkTrace<FeederDirection> = Tracing.connectedTerminalTrace(
-        { WeightedPriorityQueue.processQueue { it.path.toTerminal?.phases?.numPhases() ?: 1 } },
-        { WeightedPriorityQueue.branchQueue { it.path.toTerminal?.phases?.numPhases() ?: 1 } },
+        { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
+        { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
         computeNextT = { step: NetworkTraceStep<FeederDirection>, _, nextPath ->
             val directionApplied = step.data
             val nextDirection = when (directionApplied) {
@@ -39,15 +38,13 @@ class SetDirection(
                 else -> FeederDirection.NONE
             }
 
-            if (nextDirection == FeederDirection.NONE ||
-                directionSelector.selectOrNull(nextPath.toTerminal)?.value?.contains(nextDirection) == true
-            )
+            if (nextDirection == FeederDirection.NONE || nextDirection in networkStateOperators.getDirection(nextPath.toTerminal))
                 FeederDirection.NONE
             else
                 nextDirection
         }
     )
-        .addCondition(stopAtOpen(networkStateOperators.openTest))
+        .addCondition(stopAtOpen(networkStateOperators::isOpen))
         .addStopCondition { (path), _ ->
             isFeederHeadTerminal(path.toTerminal) || reachedSubstationTransformer(path.toTerminal)
         }
@@ -55,7 +52,7 @@ class SetDirection(
             directionToApply != FeederDirection.NONE
         }
         .addStepAction { (path, directionToApply), _ ->
-            directionSelector.selectOrNull(path.toTerminal)?.add(directionToApply)
+            networkStateOperators.addDirection(path.toTerminal, directionToApply)
         }
 
     /**

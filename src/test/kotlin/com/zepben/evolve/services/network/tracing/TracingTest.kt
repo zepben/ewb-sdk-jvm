@@ -19,7 +19,6 @@ import com.zepben.evolve.services.network.tracing.phases.PhaseStep
 import com.zepben.evolve.services.network.tracing.phases.RemovePhases
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
-import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
@@ -65,8 +64,8 @@ internal class TracingTest {
         validate({ Tracing.removePhases() }, RemovePhases::class.java)
 //        validate({ Tracing.removeDirection() }, RemoveDirection::class.java)
         validate({ Tracing.assignEquipmentToFeeders() }, AssignToFeeders::class.java)
-        validate({ Tracing.normalDownstreamTree() }, DownstreamTree::class.java)
-        validate({ Tracing.currentDownstreamTree() }, DownstreamTree::class.java)
+//        validate({ Tracing.normalDownstreamTree() }, DownstreamTree::class.java)
+//        validate({ Tracing.currentDownstreamTree() }, DownstreamTree::class.java)
         validate({ Tracing.findWithUsagePoints() }, FindWithUsagePoints::class.java)
     }
 

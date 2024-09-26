@@ -131,13 +131,16 @@ class TracingTest {
         // fun currentDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
         Tracing.currentDownstreamTree()
 
+//        fun removeDirection(): RemoveDirection = RemoveDirection()
+        Tracing.normalRemoveDirection()
+        Tracing.currentRemoveDirection()
+
         /**
          * TODO: Where do we want to define these now?
          * Need to look at the rest of these.
          */
 //        fun setPhases(): SetPhases = SetPhases()
 
-//        fun removeDirection(): RemoveDirection = RemoveDirection()
 
 //        fun phaseInferrer(): PhaseInferrer = PhaseInferrer()
 

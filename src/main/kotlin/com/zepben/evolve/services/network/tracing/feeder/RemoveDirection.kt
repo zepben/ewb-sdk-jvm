@@ -11,7 +11,7 @@ package com.zepben.evolve.services.network.tracing.feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.*
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.OpenCondition
+import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
 
@@ -24,17 +24,17 @@ class RemoveDirection(
     networkStateOperators: NetworkStateOperators
 ) {
 
-    val directionRemovedKey = RemoveDirection::class.simpleName + "::REMOVED"
-    private val directionSelector = networkStateOperators.directionSelector
+    private val directionRemovedKey = RemoveDirection::class.simpleName + "::REMOVED"
+    private val directionOperators: FeederDirectionStateOperations = networkStateOperators
 
     private val traversal: NetworkTrace<DirectionToRemove> = Tracing.connectedTerminalTrace(
-        WeightedPriorityQueue.processQueue { it.path.toTerminal?.phases?.numPhases() ?: 1 },
+        WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() },
         computeNextT = ::computeNextDirectionToRemove
     )
-        .addQueueCondition(OpenCondition(networkStateOperators.openTest))
+        .addCondition(stopAtOpen(networkStateOperators::isOpen))
         .addStepAction { item, context ->
-            val wasRemoved = directionSelector.selectOrNull(item.path.toTerminal)?.remove(item.data)
-            context.setValue(directionRemovedKey, wasRemoved ?: false)
+            val wasRemoved = directionOperators.removeDirection(item.path.toTerminal, item.data)
+            context.setValue(directionRemovedKey, wasRemoved)
         }
         .addQueueCondition { (_, directionToRemove), context ->
             directionToRemove != FeederDirection.NONE && context.getValue<Boolean>(directionRemovedKey) == true
@@ -49,7 +49,7 @@ class RemoveDirection(
      */
     @JvmOverloads
     fun run(terminal: Terminal, direction: FeederDirection = FeederDirection.NONE) {
-        val directionToRemove = direction.takeUnless { it == FeederDirection.NONE } ?: directionSelector.select(terminal).value
+        val directionToRemove = direction.takeUnless { it == FeederDirection.NONE } ?: directionOperators.getDirection(terminal)
         traversal.reset().run(terminal, directionToRemove, false)
     }
 
@@ -75,13 +75,12 @@ class RemoveDirection(
                     //    2+: do not queue or remove anything else as everything is still valid.
                     //
                     val matchingTerminals = nextPaths.count {
-                        it.toTerminal != currentStep.path.toTerminal &&
-                            directionSelector.selectOrNull(it.toTerminal)?.value?.contains(directionRemoved) == true
+                        it.toTerminal != currentStep.path.toTerminal && directionRemoved in directionOperators.getDirection(it.toTerminal)
                     }
 
                     when {
                         matchingTerminals == 0 -> directionRemoved.findOpposite()
-                        matchingTerminals == 1 && directionSelector.selectOrNull(nextPath.toTerminal)?.value?.contains(currentStep.data) == true -> directionRemoved.findOpposite()
+                        matchingTerminals == 1 && directionRemoved in directionOperators.getDirection(nextPath.toTerminal) -> directionRemoved.findOpposite()
                         else -> FeederDirection.NONE
                     }
                 }

@@ -10,7 +10,6 @@ package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
 import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
@@ -64,6 +63,7 @@ object Tracing {
         return connectedEquipmentTrace(queueFactory, branchQueueFactory) { _, _, _, _ -> }
     }
 
+    // TODO [Review]: Remove "TerminalTrace" and "connectedEquipmentTrace" and just have "networkTrace" which takes the onlyActionEquipment flag
     fun <T> connectedTerminalTrace(
         queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
         computeNextT: ComputeNextT<T>,
@@ -108,8 +108,8 @@ object Tracing {
     }
 
     // TODO Create some sort of network state test/selector/whatever grouping object that points to the appropriate network state tests/selectors/whateverers (NetworkStateOperators?)
-    fun normalDownstreamTree(): DownstreamTree = DownstreamTree(DirectionSelector.NORMAL_DIRECTION)
-    fun currentDownstreamTree(): DownstreamTree = DownstreamTree(DirectionSelector.CURRENT_DIRECTION)
+    fun normalDownstreamTree(): DownstreamTree = DownstreamTree(NetworkStateOperators.NORMAL::getDirection)
+    fun currentDownstreamTree(): DownstreamTree = DownstreamTree(NetworkStateOperators.CURRENT::getDirection)
 
     fun normalSetDirection(): SetDirection = SetDirection(NetworkStateOperators.NORMAL)
     fun currentSetDirection(): SetDirection = SetDirection(NetworkStateOperators.CURRENT)
@@ -128,10 +128,10 @@ object Tracing {
             .forEach {
                 val feederHead = requireNotNull(it.conductingEquipment) { "head terminals require conducting equipment to apply feeder directions" }
 
-                if (!normal.networkStateOperators.openTest.isOpen(feederHead, null))
+                if (!normal.networkStateOperators.isOpen(feederHead, null))
                     normal.run(it)
 
-                if (!current.networkStateOperators.openTest.isOpen(feederHead, null))
+                if (!current.networkStateOperators.isOpen(feederHead, null))
                     current.run(it)
             }
     }

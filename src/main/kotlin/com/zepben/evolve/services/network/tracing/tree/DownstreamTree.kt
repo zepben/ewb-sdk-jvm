@@ -9,7 +9,8 @@
 package com.zepben.evolve.services.network.tracing.tree
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.downstream
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
@@ -19,7 +20,7 @@ import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQu
 
 
 class DownstreamTree(
-    directionSelector: DirectionSelector
+    getDirection: (Terminal) -> FeederDirection
 ) {
 
     private val traversal: NetworkTrace<TreeNode> = Tracing.connectedEquipmentTrace(
@@ -30,7 +31,7 @@ class DownstreamTree(
         }
     )
         // TODO: Can we remove open test?
-        .addConditions(downstream(directionSelector))
+        .addConditions(downstream(getDirection))
         .addStepAction { (_, treeNode), _ ->
             // If we visit a node, we add it as a child to its parent
             treeNode.parent?.addChild(treeNode)

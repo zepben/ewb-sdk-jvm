@@ -28,15 +28,12 @@ class RemoveDirection(
     private val directionOperators: FeederDirectionStateOperations = networkStateOperators
 
     private val traversal: NetworkTrace<DirectionToRemove> = Tracing.connectedTerminalTrace(
-        WeightedPriorityQueue.processQueue { it.path.toTerminal?.phases?.numPhases() ?: 1 },
+        WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() },
         computeNextT = ::computeNextDirectionToRemove
     )
         .addCondition(stopAtOpen(networkStateOperators::isOpen))
         .addStepAction { item, context ->
-            val wasRemoved = when (item.path) {
-                is TerminalToTerminalPath -> directionOperators.removeDirection(item.path.toTerminal, item.data)
-            }
-
+            val wasRemoved = directionOperators.removeDirection(item.path.toTerminal, item.data)
             context.setValue(directionRemovedKey, wasRemoved)
         }
         .addQueueCondition { (_, directionToRemove), context ->
@@ -78,18 +75,12 @@ class RemoveDirection(
                     //    2+: do not queue or remove anything else as everything is still valid.
                     //
                     val matchingTerminals = nextPaths.count {
-                        when (it) {
-                            is TerminalToTerminalPath -> when (currentStep.path) {
-                                is TerminalToTerminalPath -> it.toTerminal != currentStep.path.toTerminal && directionRemoved in directionOperators.getDirection(
-                                    it.toTerminal
-                                )
-                            }
-                        }
+                        it.toTerminal != currentStep.path.toTerminal && directionRemoved in directionOperators.getDirection(it.toTerminal)
                     }
 
                     when {
                         matchingTerminals == 0 -> directionRemoved.findOpposite()
-                        matchingTerminals == 1 && nextPath.toTerminal?.let { directionRemoved in directionOperators.getDirection(it) } == true -> directionRemoved.findOpposite()
+                        matchingTerminals == 1 && directionRemoved in directionOperators.getDirection(nextPath.toTerminal) -> directionRemoved.findOpposite()
                         else -> FeederDirection.NONE
                     }
                 }

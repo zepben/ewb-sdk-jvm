@@ -11,7 +11,6 @@ package com.zepben.evolve.services.network.tracing.networktrace
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 
-// TODO: Decent doco about why this is private and why we have other constructors. That is future proofing for Clamps.
 class NetworkTraceStep<T>(
     val path: StepPath,
     val data: T
@@ -20,24 +19,29 @@ class NetworkTraceStep<T>(
     operator fun component2(): T = data
 }
 
-sealed class StepPath {
-    protected abstract val fromTerminal: Terminal?
-    abstract val fromEquipment: ConductingEquipment
-    protected abstract val toTerminal: Terminal?
-    abstract val toEquipment: ConductingEquipment
-    abstract val numTerminalSteps: Int
-    abstract val numEquipmentSteps: Int
+data class StepPath(
+    val fromTerminal: Terminal,
+    val toTerminal: Terminal,
+    val numTerminalSteps: Int,
+    val numEquipmentSteps: Int,
     // This will need to be added when we add clamps to the model. The proposed idea is that if an AcLineSegment has multiple clamps and your current
     // path is one of the clamps, one of the next StepPaths will be another clamp on the AcLineSegment, essentially jumping over the AcLineSegment for the Path.
-    // If there is a cut on the AcLineSegment, you may need to know about it, primarily the cut could create an open point between the clamps that needs
+    // If there is a cut on the AcLineSegment, you may need to know about it, primarily because the cut could create an open point between the clamps that needs
     // to prevent queuing as part of an "open test".
-    // abstract val viaSegment: AcLineSegment
+    // abstract val viaSegment: AcLineSegment? = null,
+) {
+    val fromEquipment: ConductingEquipment
+        get() = fromTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
+    val toEquipment: ConductingEquipment
+        get() = toTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
+
 
     val tracedInternally: Boolean
-        get() = fromTerminal != null && toTerminal != null && fromEquipment == toEquipment
+        get() = fromEquipment == toEquipment
 }
 
 // TODO [Review]: This can be removed and we just have one StepPath. fromTerminal and toTerminal will always be non null.
+//  MONDAY! Delete this, make the StepPath a final data class and fix everything!
 //data class TerminalToTerminalPath(
 //    public override val fromTerminal: Terminal,
 //    public override val toTerminal: Terminal,

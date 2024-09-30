@@ -69,7 +69,7 @@ interface FeederDirectionStateOperations {
     fun getDirection(terminal: Terminal): FeederDirection
     fun setDirection(terminal: Terminal, direction: FeederDirection): Boolean
     fun addDirection(terminal: Terminal, direction: FeederDirection): Boolean
-    fun removeDirection(terminal: Terminal?, direction: FeederDirection): Boolean
+    fun removeDirection(terminal: Terminal, direction: FeederDirection): Boolean
 
     companion object {
         val NORMAL: FeederDirectionStateOperations = object : FeederDirectionStateOperations {
@@ -93,7 +93,7 @@ interface FeederDirectionStateOperations {
                 return true
             }
 
-            override fun removeDirection(terminal: Terminal?, direction: FeederDirection): Boolean {
+            override fun removeDirection(terminal: Terminal, direction: FeederDirection): Boolean {
                 val previous = terminal.normalFeederDirection
                 val new = previous - direction
                 if (new == previous)

@@ -13,16 +13,31 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 
 /**
- * Interface to query or set the phase for a core on a [Terminal].
+ * Class that holds the traced phase statuses for a nominal phase on a [Terminal].
+ *
+ * @property phaseStatusInternal
  */
-abstract class PhaseStatus(private val terminal: Terminal) {
+class PhaseStatus(private val terminal: Terminal) {
+
+    /**
+     * The underlying implementation value tracking the phase status for nominal phases of a terminal.
+     * It is exposed internally for data serialisation and debugging within official EWB libraries and utilities.
+     *
+     * This property should be considered internal and not for public use as the underlying
+     * data structure to store the status could change at any time (and thus be a breaking change).
+     * Use directly at your own risk.
+     *
+     * See [TracedPhasesBitManipulation] for details on bit representation for phaseStatusInternal and how we track phases status.
+     */
+    internal var phaseStatusInternal: UShort = 0u
 
     /**
      * Get the traced phase for the specified [nominalPhase].
      *
      * @param nominalPhase The nominal phase you are interested in querying.
      */
-    abstract operator fun get(nominalPhase: SinglePhaseKind): SinglePhaseKind
+    operator fun get(nominalPhase: SinglePhaseKind): SinglePhaseKind =
+        TracedPhasesBitManipulation.get(phaseStatusInternal, nominalPhase.validate())
 
     /**
      * Set the traced phase for the specified [nominalPhase].
@@ -32,7 +47,32 @@ abstract class PhaseStatus(private val terminal: Terminal) {
      *
      * @return True if the phase is updated, otherwise false.
      */
-    abstract operator fun set(nominalPhase: SinglePhaseKind, singlePhaseKind: SinglePhaseKind): Boolean
+    operator fun set(nominalPhase: SinglePhaseKind, singlePhaseKind: SinglePhaseKind): Boolean =
+        get(nominalPhase).let {
+            if (it == singlePhaseKind)
+                false
+            else if ((it == SinglePhaseKind.NONE) || (singlePhaseKind == SinglePhaseKind.NONE)) {
+                phaseStatusInternal = TracedPhasesBitManipulation.set(
+                    phaseStatusInternal,
+                    nominalPhase,
+                    singlePhaseKind
+                )
+                true
+            } else
+                throw UnsupportedOperationException("Crossing Phases.")
+        }
+
+    override fun toString(): String {
+        val codes = PhaseCode.ABCN.singlePhases.joinToString(prefix = "{", postfix = "}") { "${get(it)}" }
+        return "PhaseStatus($codes)"
+    }
+
+    private fun SinglePhaseKind.validate(): SinglePhaseKind {
+        when (this) {
+            SinglePhaseKind.A, SinglePhaseKind.B, SinglePhaseKind.C, SinglePhaseKind.N, SinglePhaseKind.X, SinglePhaseKind.Y, SinglePhaseKind.s1, SinglePhaseKind.s2 -> return this
+            SinglePhaseKind.NONE, SinglePhaseKind.INVALID -> throw IllegalArgumentException("INTERNAL ERROR: Phase $this is invalid.")
+        }
+    }
 
     /**
      * Get the traced phase for each nominal phase as a [PhaseCode].

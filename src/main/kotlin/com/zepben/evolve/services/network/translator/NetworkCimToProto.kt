@@ -1126,7 +1126,7 @@ fun toPb(cim: Terminal, pb: PBTerminal.Builder): PBTerminal.Builder =
         sequenceNumber = cim.sequenceNumber
         normalFeederDirection = FeederDirection.valueOf(cim.normalFeederDirection.name)
         currentFeederDirection = FeederDirection.valueOf(cim.currentFeederDirection.name)
-        tracedPhases = cim.tracedPhases.phaseStatusInternal.toInt()
+        tracedPhases = (cim.currentPhases.phaseStatusInternal.toInt() shl 16) + cim.normalPhases.phaseStatusInternal.toInt()
         toPb(cim, adBuilder)
     }
 

@@ -128,15 +128,13 @@ class TerminalConnectivityConnected @JvmOverloads constructor(
 
     private fun checkTracedPhases(step: XyPhaseStep, candidatePhases: XyCandidatePhasePaths): Boolean {
         var foundTraced = false
-        step.terminal.tracedPhases.apply {
-            normal[SPK.X].takeIf { it != SPK.NONE }?.also {
-                candidatePhases.addKnown(SPK.X, it)
-                foundTraced = true
-            }
-            normal[SPK.Y].takeIf { it != SPK.NONE }?.also {
-                candidatePhases.addKnown(SPK.Y, it)
-                foundTraced = true
-            }
+        step.terminal.normalPhases[SPK.X].takeIf { it != SPK.NONE }?.also {
+            candidatePhases.addKnown(SPK.X, it)
+            foundTraced = true
+        }
+        step.terminal.normalPhases[SPK.Y].takeIf { it != SPK.NONE }?.also {
+            candidatePhases.addKnown(SPK.Y, it)
+            foundTraced = true
         }
         return foundTraced
     }

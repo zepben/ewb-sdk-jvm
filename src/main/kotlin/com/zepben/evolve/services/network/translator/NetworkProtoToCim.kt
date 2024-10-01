@@ -1159,7 +1159,8 @@ fun toCim(pb: PBTerminal, networkService: NetworkService): Terminal =
         sequenceNumber = pb.sequenceNumber
         normalFeederDirection = FeederDirection.valueOf(pb.normalFeederDirection.name)
         currentFeederDirection = FeederDirection.valueOf(pb.currentFeederDirection.name)
-        tracedPhases.phaseStatusInternal = pb.tracedPhases.toUInt()
+        normalPhases.phaseStatusInternal = (pb.tracedPhases and 0xFFFF).toUShort()
+        currentPhases.phaseStatusInternal = ((pb.tracedPhases shr 16) and 0xFFFF).toUShort()
 
         // Sequence number must be set before adding the terminal to the conducting equipment to prevent it from being auto set
         networkService.resolveOrDeferReference(Resolvers.conductingEquipment(this), pb.conductingEquipmentMRID)

@@ -579,19 +579,28 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             0x00000010 to 0x00000020,
             0x00000100 to 0x00000200,
             0x00001000 to 0x00002000,
-            0x00010000 to 0x00020000,
-            0x00100000 to 0x00200000,
-            0x01000000 to 0x02000000,
-            0x10000000 to 0x20000000,
         ).forEach { (first, second) ->
             comparatorValidator.validateValProperty(
-                Terminal::tracedPhases,
+                Terminal::normalPhases,
                 { Terminal(it) },
-                { _, tracedPhases -> tracedPhases.phaseStatusInternal = first.toUInt() },
-                { _, tracedPhases -> tracedPhases.phaseStatusInternal = second.toUInt() }
+                { _, phaseStatus -> phaseStatus.phaseStatusInternal = first.toUShort() },
+                { _, phaseStatus -> phaseStatus.phaseStatusInternal = second.toUShort() },
             )
         }
 
+        sequenceOf(
+            0x00000001 to 0x00000002,
+            0x00000010 to 0x00000020,
+            0x00000100 to 0x00000200,
+            0x00001000 to 0x00002000,
+        ).forEach { (first, second) ->
+            comparatorValidator.validateValProperty(
+                Terminal::currentPhases,
+                { Terminal(it) },
+                { _, phaseStatus -> phaseStatus.phaseStatusInternal = first.toUShort() },
+                { _, phaseStatus -> phaseStatus.phaseStatusInternal = second.toUShort() },
+            )
+        }
     }
 
     /************ IEC61970 BASE EQUIVALENTS ************/

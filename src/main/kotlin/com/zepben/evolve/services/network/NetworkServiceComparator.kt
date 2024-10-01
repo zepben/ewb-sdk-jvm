@@ -463,8 +463,8 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(Terminal::conductingEquipment, Terminal::connectivityNode)
             compareValues(Terminal::phases, Terminal::sequenceNumber, Terminal::normalFeederDirection, Terminal::currentFeederDirection)
 
-            // TracedPhases is not comparable directly
-            addIfDifferent(Terminal::tracedPhases.name, Terminal::tracedPhases.compareValues(source, target) { it.phaseStatusInternal })
+            addIfDifferent(Terminal::normalPhases.name, Terminal::normalPhases.compareValues(source, target) { it.phaseStatusInternal })
+            addIfDifferent(Terminal::currentPhases.name, Terminal::currentPhases.compareValues(source, target) { it.phaseStatusInternal })
         }
 
     /************ IEC61970 BASE EQUIVALENTS ************/

@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
 
@@ -65,16 +67,33 @@ internal object NetworkTraceQueueNext {
     }
 
     private fun nextStepPaths(path: StepPath): Sequence<StepPath> {
-        // Check if we last moved between equipment, or across it.
-        val terminals = if (path.tracedInternally) path.toTerminal.connectedTerminals() else path.toTerminal.otherTerminals()
+        val terminals = if (path.tracedInternally) {
+            // We need to step externally to connected terminals. However:
+            // Busbars are only modelled with a single terminal. So if we find any we need to step to them before the
+            // other (non busbar) equipment connected to the same connectivity node. Once the busbar has been
+            // visited we then step to the other non busbar terminals connected to the same connectivity node.
+            if (path.toTerminal.hasConnectedBusbars())
+                path.toTerminal.connectedTerminals().filter { it.conductingEquipment is BusbarSection }
+            else
+                path.toTerminal.connectedTerminals()
+        } else {
+            // If we just visited a busbar, we step to the other terminals that share the same connectivity node.
+            // Otherwise, we internally step to the other terminals on the equipment
+            if (path.toEquipment is BusbarSection) {
+                // TODO [Review]: Is it safe to assume a single terminal as this is how it is supposed to be modelled?
+                // We don't need to step to terminals that are busbars as they would have been queued at the same time this busbar step was.
+                path.toTerminal.connectedTerminals().filter { it.conductingEquipment !is BusbarSection }
+            } else {
+                path.toTerminal.otherTerminals()
+            }
+        }
 
-        return terminals.map {
-            StepPath(
-                path.toTerminal,
-                it,
-                path.numTerminalSteps + 1,
-                if (path.tracedInternally) path.numEquipmentSteps else path.numEquipmentSteps + 1,
-            )
+        val nextNumEquipmentSteps = if (path.tracedInternally) path.numEquipmentSteps else path.numEquipmentSteps + 1
+        return terminals.map { nextTerminal ->
+            StepPath(path.toTerminal, nextTerminal, path.numTerminalSteps + 1, nextNumEquipmentSteps)
         }
     }
+
+    private fun Terminal.hasConnectedBusbars(): Boolean =
+        connectivityNode?.terminals?.any { it !== this && it.conductingEquipment is BusbarSection } ?: false
 }

@@ -248,8 +248,8 @@ switch.setOpen(false)
 Phases in CIM are set on a [Terminal](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Terminal). The `phases`
 property on the terminal should be considered as the terminal's 'nominal' phases. The vast majority of the time, this will
 be the actual active phases at that terminal. However, due to the dynamic nature of the network, it's possible that when
-tracing connectivity that the active phase at the terminal is different. The phase can be tracked using the `tracedPhases`
-property on the terminal. 
+tracing connectivity that the active phase at the terminal is different. The phase can be tracked using the `normalPhases`
+and `currentPhases` properties on the terminal.
 
 :::tip
 There are a number of helpful functions for tracing phases based on connectivity. See [tracing](./sdk-tracing) for more details.

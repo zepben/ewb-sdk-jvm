@@ -27,7 +27,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
  *               |  1 bit  |  1 bit  |  1 bit  |  1 bit  |
  * Actual Phase: |    N    |    C    |    B    |    A    |
  */
-object TracedPhasesBitManipulation {
+internal object TracedPhasesBitManipulation {
 
     /**
      * Bitwise mask for selecting the actual phases from a nominal phase A/B/C/N, X/Y/N or s1/s2/N

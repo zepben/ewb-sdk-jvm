@@ -9,7 +9,6 @@
 package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
-import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
@@ -39,7 +38,8 @@ internal class TerminalTest {
         assertThat(terminal.phases, equalTo(PhaseCode.ABC))
         assertThat(terminal.sequenceNumber, equalTo(0))
         assertThat(terminal.connectivityNode, nullValue())
-        assertThat(terminal.tracedPhases.phaseStatusInternal, equalTo(0u))
+        assertThat(terminal.normalPhases.phaseStatusInternal, equalTo(0u))
+        assertThat(terminal.currentPhases.phaseStatusInternal, equalTo(0u))
         assertThat(terminal.normalFeederDirection, equalTo(FeederDirection.NONE))
         assertThat(terminal.currentFeederDirection, equalTo(FeederDirection.NONE))
 
@@ -49,7 +49,8 @@ internal class TerminalTest {
         assertThat(terminal.phases, equalTo(PhaseCode.X))
         assertThat(terminal.sequenceNumber, equalTo(1))
         assertThat(terminal.connectivityNode, notNullValue())
-        assertThat(terminal.tracedPhases.phaseStatusInternal, equalTo(2u))
+        assertThat(terminal.normalPhases.phaseStatusInternal, equalTo(1u))
+        assertThat(terminal.currentPhases.phaseStatusInternal, equalTo(2u))
         assertThat(terminal.normalFeederDirection, equalTo(FeederDirection.UPSTREAM))
         assertThat(terminal.currentFeederDirection, equalTo(FeederDirection.DOWNSTREAM))
     }
@@ -115,43 +116,9 @@ internal class TerminalTest {
     }
 
     @Test
-    internal fun tracedPhases() {
+    internal fun normalAndCurrentPhasesAreDifferentStatuses() {
         val terminal = Terminal()
-
-        validatePhases(terminal, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
-
-        terminal.tracedPhases.setNormal(SinglePhaseKind.A, SinglePhaseKind.B)
-        validatePhases(terminal, SinglePhaseKind.B, SinglePhaseKind.NONE)
-
-        terminal.tracedPhases.setCurrent(SinglePhaseKind.A, SinglePhaseKind.A)
-        validatePhases(terminal, SinglePhaseKind.B, SinglePhaseKind.A)
-    }
-
-    @Test
-    internal fun tracedPhasesOperators() {
-        val terminal = Terminal()
-
-        validatePhases(terminal, SinglePhaseKind.NONE, SinglePhaseKind.NONE)
-
-        terminal.tracedPhases.normal[SinglePhaseKind.A] = SinglePhaseKind.B
-        validatePhases(terminal, SinglePhaseKind.B, SinglePhaseKind.NONE)
-
-        terminal.tracedPhases.current[SinglePhaseKind.A] = SinglePhaseKind.A
-        validatePhases(terminal, SinglePhaseKind.B, SinglePhaseKind.A)
-    }
-
-    private fun validatePhases(
-        terminal: Terminal,
-        normalPhase: SinglePhaseKind,
-        currentPhase: SinglePhaseKind,
-    ) {
-        assertThat(terminal.normalPhases[SinglePhaseKind.A], equalTo(normalPhase))
-        assertThat(terminal.tracedPhases.normal[SinglePhaseKind.A], equalTo(normalPhase))
-        assertThat(terminal.tracedPhases.normal(SinglePhaseKind.A), equalTo(normalPhase))
-
-        assertThat(terminal.currentPhases[SinglePhaseKind.A], equalTo(currentPhase))
-        assertThat(terminal.tracedPhases.current[SinglePhaseKind.A], equalTo(currentPhase))
-        assertThat(terminal.tracedPhases.current(SinglePhaseKind.A), equalTo(currentPhase))
+        assertThat(terminal.normalPhases, not(sameInstance(terminal.currentPhases)))
     }
 
 }

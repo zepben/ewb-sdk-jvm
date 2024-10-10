@@ -10,11 +10,11 @@ import TabItem from '@theme/TabItem';
 
 There are three different types of phases stored/calculated by the SDK:
 
-| Phase Type | SDK Field                                                   | Field Type  | Description                                                                                                                                                                                                                |
-|------------|-------------------------------------------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Nominal    | `Terminal.phases`                                           | `PhaseCode` | The nominal phases of the network indicate how the network is connected. The nominal phases can include the "unknown" phases `X` and `Y`. <br/><br/>This is the phase field that you are most likely to be interested in.  |
-| Normal     | `Terminal.normalPhases` or `Terminal.tracedPhases.normal`   | `Traced`    | The normal phases indicate the energised phases of the network in its normal state. There will not be any unknown phases in the normal phases, however; any de-energised areas of the network will not have normal phases. |
-| Current    | `Terminal.currentPhases` or `Terminal.tracedPhases.current` | `Traced`    | The current phases indicate the energised phases of the network in the current state. It has the same caveats as the normal phases.                                                                                        |
+| Phase Type | SDK Field                                                   | Field Type    | Description                                                                                                                                                                                                                |
+|------------|-------------------------------------------------------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Nominal    | `Terminal.phases`                                           | `PhaseCode`   | The nominal phases of the network indicate how the network is connected. The nominal phases can include the "unknown" phases `X` and `Y`. <br/><br/>This is the phase field that you are most likely to be interested in.  |
+| Normal     | `Terminal.normalPhases`                                     | `PhaseStatus` | The normal phases indicate the energised phases of the network in its normal state. There will not be any unknown phases in the normal phases, however; any de-energised areas of the network will not have normal phases. |
+| Current    | `Terminal.currentPhases`                                    | `PhaseStatus` | The current phases indicate the energised phases of the network in the current state. It has the same caveats as the normal phases.                                                                                        |
 
 There are two different feeder directions calculated by the SDK:
 

@@ -9,7 +9,6 @@
 package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
-import com.zepben.evolve.services.network.tracing.phases.PhaseSelector
 import com.zepben.evolve.services.network.tracing.phases.PhaseStatus
 import com.zepben.evolve.services.network.tracing.phases.TracedPhases
 import java.lang.ref.WeakReference
@@ -43,7 +42,11 @@ class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID)
     var normalFeederDirection: FeederDirection = FeederDirection.NONE
     var currentFeederDirection: FeederDirection = FeederDirection.NONE
 
-    val tracedPhases: TracedPhases = TracedPhases(terminal = this)
+    @Deprecated(
+        message = "Replaced by direct use of `normalPhases` and `currentPhases`.",
+        replaceWith = ReplaceWith("/* See [TracedPhases.normal] and [TracedPhases.current] for direct replacement suggestions */"),
+    )
+    val tracedPhases: TracedPhases get() = TracedPhases(terminal = this)
 
     // The reference to the connectivity node is weak so if a Network object goes out of scope, holding a single conducting equipment
     // reference does not cause everything connected to it in the network to stay in memory.
@@ -68,18 +71,18 @@ class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID)
     val isConnected: Boolean; get() = connectivityNode != null
 
     /**
-     * Convenience method for accessing the normal phases.
+     * The status of phases as traced for the normal state of the network
      *
      * @return the [PhaseStatus] for the terminal in the normal state of the network.
      */
-    val normalPhases: PhaseStatus = PhaseSelector.NORMAL_PHASES.phases(this)
+    val normalPhases: PhaseStatus = PhaseStatus(this)
 
     /**
-     * Convenience method for accessing the current phases.
+     * The status of phases as traced for the current state of the network
      *
-     * @return the [PhaseStatus] for the terminal in the normal state of the network.
+     * @return the [PhaseStatus] for the terminal in the current state of the network.
      */
-    val currentPhases: PhaseStatus = PhaseSelector.CURRENT_PHASES.phases(this)
+    val currentPhases: PhaseStatus = PhaseStatus(this)
 
     /**
      * Get the terminals that are connected to this [Terminal].

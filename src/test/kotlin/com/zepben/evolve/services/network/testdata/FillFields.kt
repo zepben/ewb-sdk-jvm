@@ -625,7 +625,8 @@ fun Terminal.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     }
 
     if (includeRuntime) {
-        tracedPhases.phaseStatusInternal = 2u
+        normalPhases.phaseStatusInternal = 1u
+        currentPhases.phaseStatusInternal = 2u
         normalFeederDirection = FeederDirection.UPSTREAM
         currentFeederDirection = FeederDirection.DOWNSTREAM
     }

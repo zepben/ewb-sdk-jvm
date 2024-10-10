@@ -23,6 +23,8 @@
   * A new class, `LocalEwbDataFilePaths`, has been introduced to specifically handle the resolution of database paths for the local file system.
 * `Switch.ratedCurrent` has been converted to a `double` (used to be an `integer`). Type safe languages will need to be updated to support floating point
   arithmatic/syntax.
+* Deprecated `TracedPhases`, however the internal constructor property has been removed. `Terminal.normalPhases`
+  and `Terminal.currentPhases` should be used instead of `Terminal.tracedPhases` going forward.
 
 ### New Features
 * A file named after the ID of an ingestion job is now created when running `MetricsDatabaseWriter.save()`. For this feature to take effect, a `modelPath` must

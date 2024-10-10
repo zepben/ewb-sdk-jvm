@@ -60,7 +60,8 @@ class RemovePhases {
      */
     fun run(networkService: NetworkService) {
         networkService.sequenceOf<Terminal>().forEach {
-            it.tracedPhases.phaseStatusInternal = 0u
+            it.normalPhases.phaseStatusInternal = 0u
+            it.currentPhases.phaseStatusInternal = 0u
         }
     }
 

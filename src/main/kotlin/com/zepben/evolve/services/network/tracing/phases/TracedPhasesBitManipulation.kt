@@ -27,7 +27,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
  *               |  1 bit  |  1 bit  |  1 bit  |  1 bit  |
  * Actual Phase: |    N    |    C    |    B    |    A    |
  */
-object TracedPhasesBitManipulation {
+internal object TracedPhasesBitManipulation {
 
     /**
      * Bitwise mask for selecting the actual phases from a nominal phase A/B/C/N, X/Y/N or s1/s2/N
@@ -40,8 +40,8 @@ object TracedPhasesBitManipulation {
     private val phaseMasks = listOf(1u, 2u, 4u, 8u)
 
     @JvmStatic
-    fun get(status: UInt, nominalPhase: SinglePhaseKind): SinglePhaseKind {
-        return when ((status shr nominalPhase.byteSelector()) and 15u) {
+    fun get(status: UShort, nominalPhase: SinglePhaseKind): SinglePhaseKind {
+        return when ((status.toUInt() shr nominalPhase.byteSelector()) and 15u) {
             1u -> SinglePhaseKind.A
             2u -> SinglePhaseKind.B
             4u -> SinglePhaseKind.C
@@ -51,11 +51,14 @@ object TracedPhasesBitManipulation {
     }
 
     @JvmStatic
-    fun set(status: UInt, nominalPhase: SinglePhaseKind, singlePhaseKind: SinglePhaseKind): UInt =
-        if (singlePhaseKind == SinglePhaseKind.NONE)
-            (status and nominalPhaseMasks[nominalPhase.maskIndex].inv())
+    fun set(status: UShort, nominalPhase: SinglePhaseKind, singlePhaseKind: SinglePhaseKind): UShort {
+        val newStatus = if (singlePhaseKind == SinglePhaseKind.NONE)
+            (status.toUInt() and nominalPhaseMasks[nominalPhase.maskIndex].inv())
         else
-            (status and nominalPhaseMasks[nominalPhase.maskIndex].inv()) or singlePhaseKind.shiftedValue(nominalPhase)
+            (status.toUInt() and nominalPhaseMasks[nominalPhase.maskIndex].inv()) or singlePhaseKind.shiftedValue(nominalPhase)
+
+        return newStatus.toUShort()
+    }
 
     private fun SinglePhaseKind.byteSelector() = maskIndex * 4
 

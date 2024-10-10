@@ -22,10 +22,10 @@ fun interface PhaseSelector {
     companion object {
 
         @JvmField
-        val NORMAL_PHASES: PhaseSelector = PhaseSelector { terminal -> terminal.tracedPhases.normal }
+        val NORMAL_PHASES: PhaseSelector = PhaseSelector { it.normalPhases }
 
         @JvmField
-        val CURRENT_PHASES: PhaseSelector = PhaseSelector { terminal -> terminal.tracedPhases.current }
+        val CURRENT_PHASES: PhaseSelector = PhaseSelector { it.currentPhases }
 
     }
 

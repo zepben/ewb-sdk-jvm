@@ -289,8 +289,8 @@ internal class TerminalConnectivityConnectedTest {
 
     private fun Terminal.replaceNormalPhases(normalPhases: PhaseCode) {
         phases.singlePhases.filterIndexed { index, phase ->
-            tracedPhases.setNormal(phase, SPK.NONE)
-            tracedPhases.setNormal(phase, normalPhases.singlePhases[index])
+            this.normalPhases[phase] = SPK.NONE
+            this.normalPhases.set(phase, normalPhases.singlePhases[index])
         }
     }
 

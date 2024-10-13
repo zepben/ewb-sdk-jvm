@@ -55,7 +55,7 @@ abstract class Curve @JvmOverloads constructor(mRID: String = "") : IdentifiedOb
     fun addData(x: Float, y1: Float, y2: Float? = null, y3: Float? = null): Curve {
         require(_data.isNullOrEmpty() || _data?.none { cd -> cd.xValue == x } == true) {
             "Unable to add datapoint to ${typeNameAndMRID()}. " +
-                "xValue $x is invalid. as data with same xValue already exist in this Curve. "
+                "xValue $x is invalid, as data with same xValue already exist in this Curve. "
         }
         _data = _data.or(::mutableListOf) {
             add(CurveData(x, y1, y2, y3))

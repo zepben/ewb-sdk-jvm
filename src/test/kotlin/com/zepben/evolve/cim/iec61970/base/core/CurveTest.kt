@@ -76,7 +76,7 @@ internal class CurveTest {
             .toThrow<IllegalArgumentException>()
             .withMessage(
                 "Unable to add datapoint to ${typeNameAndMRID()}. " +
-                    "xValue $x is invalid. as data with same xValue already exist in this Curve. "
+                    "xValue $x is invalid, as data with same xValue already exist in this Curve. "
             )
     }
 

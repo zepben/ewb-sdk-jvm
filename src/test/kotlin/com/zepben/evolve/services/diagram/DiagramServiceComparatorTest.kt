@@ -26,9 +26,9 @@ internal class DiagramServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(Diagram::diagramStyle, { Diagram(it) }, { DiagramStyle.SCHEMATIC }, { DiagramStyle.GEOGRAPHIC })
         comparatorValidator.validateProperty(Diagram::orientationKind, { Diagram(it) }, { OrientationKind.POSITIVE }, { OrientationKind.NEGATIVE })
-        comparatorValidator.validateProperty(Diagram::orientationKind, { Diagram(it) }, { OrientationKind.POSITIVE }, { OrientationKind.NEGATIVE })
         comparatorValidator.validateCollection(
-            Diagram::diagramObjects, Diagram::addDiagramObject,
+            Diagram::diagramObjects,
+            Diagram::addDiagramObject,
             { Diagram(it) },
             { DiagramObject("1").apply { diagram = it } },
             { DiagramObject("2").apply { diagram = it } })
@@ -43,7 +43,11 @@ internal class DiagramServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(DiagramObject::style, { DiagramObject(it) }, { "JUNCTION" }, { "CB" })
         comparatorValidator.validateProperty(DiagramObject::rotation, { DiagramObject(it) }, { 0.0 }, { 1.1 })
         comparatorValidator.validateIndexedCollection(
-            DiagramObject::points, DiagramObject::addPoint,
-            { DiagramObject(it) }, { DiagramObjectPoint(1.0, 2.0) }, { DiagramObjectPoint(3.0, 4.0) })
+            DiagramObject::points,
+            DiagramObject::addPoint,
+            { DiagramObject(it) },
+            { DiagramObjectPoint(1.0, 2.0) },
+            { DiagramObjectPoint(3.0, 4.0) }
+        )
     }
 }

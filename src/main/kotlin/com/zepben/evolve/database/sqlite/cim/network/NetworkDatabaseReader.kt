@@ -20,8 +20,6 @@ import com.zepben.evolve.services.common.extensions.nameAndMRID
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
-import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
@@ -47,11 +45,11 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     metadataReader: MetadataCollectionReader = MetadataCollectionReader(service, tables, connection),
     serviceReader: NetworkServiceReader = NetworkServiceReader(service, tables, connection),
     tableVersion: TableVersion = tableCimVersion,
-    private val setFeederDirection: (NetworkService) -> Unit = Tracing::applyFeederDirections,
+    private val setFeederDirection: (NetworkService) -> Unit = Tracing::setFeederDirections,
     private val setPhases: SetPhases = SetPhases(),
     private val phaseInferrer: PhaseInferrer = PhaseInferrer(),
-    private val assignToFeeders: AssignToFeeders = AssignToFeeders(),
-    private val assignToLvFeeders: AssignToLvFeeders = AssignToLvFeeders()
+    private val assignToFeeders: (NetworkService) -> Unit = Tracing::assignEquipmentToFeeders,
+    private val assignToLvFeeders: (NetworkService) -> Unit = Tracing::assignEquipmentToLvFeeders,
 ) : CimDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion) {
 
     override fun postLoad(): Boolean =
@@ -66,11 +64,11 @@ class NetworkDatabaseReader @JvmOverloads constructor(
             logger.info("Phasing applied to network.")
 
             logger.info("Assigning equipment to feeders...")
-            assignToFeeders.run(service)
+            assignToFeeders(service)
             logger.info("Equipment assigned to feeders.")
 
             logger.info("Assigning equipment to LV feeders...")
-            assignToLvFeeders.run(service)
+            assignToLvFeeders(service)
             logger.info("Equipment assigned to LV feeders.")
 
             logger.info("Validating that each equipment is assigned to a container...")

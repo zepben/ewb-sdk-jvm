@@ -14,8 +14,6 @@ import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionReader
 import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
-import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.testutils.junit.SystemLogExtension
@@ -50,11 +48,13 @@ internal class NetworkDatabaseReaderTest {
     private val setFeederDirections = mockk<(NetworkService) -> Unit>()
     private val setPhases = mockk<SetPhases> { justRun { run(service) } }
     private val phaseInferrer = mockk<PhaseInferrer> { justRun { run(service) } }
-    private val assignToFeeders = mockk<AssignToFeeders> { justRun { run(service) } }
-    private val assignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
+    private val assignToFeeders = mockk<(NetworkService) -> Unit>()
+    private val assignToLvFeeders = mockk<(NetworkService) -> Unit>()
 
     init {
         every { setFeederDirections(service) } just runs
+        every { assignToFeeders(service) } just runs
+        every { assignToLvFeeders(service) } just runs
     }
 
     private val reader = NetworkDatabaseReader(
@@ -109,8 +109,8 @@ internal class NetworkDatabaseReaderTest {
             setFeederDirections(service)
             setPhases.run(service)
             phaseInferrer.run(service)
-            assignToFeeders.run(service)
-            assignToLvFeeders.run(service)
+            assignToFeeders(service)
+            assignToLvFeeders(service)
 
             // calls for _validate_equipment_containers()
             service.listOf<Equipment>(any<(Equipment) -> Boolean>())

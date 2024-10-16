@@ -10,11 +10,13 @@ package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 
 /**
@@ -22,16 +24,13 @@ import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
  * Requires that a Feeder have a normalHeadTerminal with associated ConductingEquipment.
  * This class is backed by a [BasicTraversal].
  */
-class AssignToLvFeeders {
-
-    private val normalTraversal = AssociatedTerminalTrace.newNormalTrace()
-    private val currentTraversal = AssociatedTerminalTrace.newCurrentTrace()
-    private lateinit var activeLvFeeder: LvFeeder
-
+class AssignToLvFeeders(
+    private val networkStateOperators: NetworkStateOperators
+) {
     fun run(network: NetworkService) {
         val terminalToAuxEquipment = network.sequenceOf<AuxiliaryEquipment>()
             .filter { it.terminal != null }
-            .groupBy { it.terminal!!.mRID }
+            .groupBy { it.terminal!! }
 
         val lvFeederStartPoints = network.sequenceOf<LvFeeder>()
             .mapNotNull { lvFeeder ->
@@ -48,128 +47,66 @@ class AssignToLvFeeders {
             }
             .toSet()
 
-        configureStepActions(normalTraversal, terminalToAuxEquipment)
-        configureStepActions(currentTraversal, terminalToAuxEquipment)
-
-        configureStopConditions(normalTraversal, lvFeederStartPoints)
-        configureStopConditions(currentTraversal, lvFeederStartPoints)
-
-        network.sequenceOf<LvFeeder>().forEach(::run)
+        network.sequenceOf<LvFeeder>().forEach { run(it, lvFeederStartPoints, terminalToAuxEquipment) }
     }
 
-    private fun run(lvFeeder: LvFeeder) {
-        activeLvFeeder = lvFeeder
-
+    private fun run(
+        lvFeeder: LvFeeder,
+        feederStartPoints: Set<ConductingEquipment>,
+        terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
+    ) {
         val headTerminal = lvFeeder.normalHeadTerminal ?: return
-
-        run(normalTraversal, headTerminal)
-        run(currentTraversal, headTerminal)
+        val traversal = createTrace(terminalToAuxEquipment, feederStartPoints, listOf(lvFeeder))
+        traversal.run(headTerminal, canStopOnStartItem = false)
     }
 
-    private fun run(traversal: BasicTraversal<Terminal>, headTerminal: Terminal) {
-        traversal.reset()
-
-        traversal.tracker.visit(headTerminal)
-        traversal.applyStepActions(headTerminal, false)
-        AssociatedTerminalTrace.queueAssociated(traversal, headTerminal)
-
-        traversal.run()
+    private fun createTrace(
+        terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
+        lvFeederStartPoints: Set<ConductingEquipment>,
+        lvFeedersToAssign: List<LvFeeder>,
+    ): NetworkTrace<Unit> {
+        return Tracing.connectedTerminalTrace(networkStateOperators)
+            .addNetworkCondition { stopAtOpen() }
+            .addStopCondition { (path), _ -> lvFeederStartPoints.contains(path.toEquipment) }
+            .addQueueCondition { (path), _ -> !reachedHv(path.toEquipment) }
+            .addStepAction { (path), context -> process(path, context, terminalToAuxEquipment, lvFeederStartPoints, lvFeedersToAssign) }
     }
 
-    private fun configureStepActions(traversal: BasicTraversal<Terminal>, terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>) {
-        traversal.clearStepActions()
-        normalTraversal.addStepAction(processNormal(terminalToAuxEquipment))
-        currentTraversal.addStepAction(processCurrent(terminalToAuxEquipment))
+    private val reachedHv: (ConductingEquipment) -> Boolean = { ce ->
+        ce.baseVoltage?.let { it.nominalVoltage >= 1000 } ?: false
     }
-
-    private fun configureStopConditions(traversal: BasicTraversal<Terminal>, lvFeederStartPoints: Set<ConductingEquipment>) {
-        traversal.clearStopConditions()
-        traversal.addStopCondition(reachedEquipment(lvFeederStartPoints))
-        traversal.addStopCondition(reachedHv)
-    }
-
-    private val reachedEquipment: (Set<ConductingEquipment>) -> (Terminal) -> Boolean = { { terminal: Terminal -> it.contains(terminal.conductingEquipment) } }
-
-    private val reachedHv: (Terminal) -> Boolean = { terminal ->
-        terminal.conductingEquipment?.baseVoltage?.let { it.nominalVoltage >= 1000 } ?: false
-    }
-
-    private fun processNormal(terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>): (Terminal, Boolean) -> Unit =
-        { terminal, isStopping ->
-            process(
-                terminal,
-                { eq, feeder ->
-                    eq.addContainer(feeder)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                system.addContainer(feeder)
-                            }
-                    }
-                },
-                { feeder, eq ->
-                    feeder.addEquipment(eq)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                feeder.addEquipment(system)
-                            }
-                    }
-                },
-                isStopping,
-                terminalToAuxEquipment
-            )
-        }
-
-    private fun processCurrent(terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>): (Terminal, Boolean) -> Unit =
-        { terminal, isStopping ->
-            process(
-                terminal,
-                { eq, feeder ->
-                    eq.addCurrentContainer(feeder)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                system.addContainer(feeder)
-                            }
-                    }
-                },
-                { feeder, eq ->
-                    feeder.addCurrentEquipment(eq)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                feeder.addCurrentEquipment(system)
-                            }
-                    }
-                },
-                isStopping,
-                terminalToAuxEquipment
-            )
-        }
 
     private fun process(
-        terminal: Terminal,
-        assignLvFeederToEquipment: (Equipment, LvFeeder) -> Unit,
-        assignEquipmentToLvFeeder: (LvFeeder, Equipment) -> Unit,
-        isStopping: Boolean,
-        terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
+        stepPath: StepPath,
+        stepContext: StepContext,
+        terminalToAuxEquipment: Map<Terminal, Collection<AuxiliaryEquipment>>,
+        lvFeederStartPoints: Set<ConductingEquipment>,
+        lvFeedersToAssign: List<LvFeeder>
     ) {
-        if (isStopping && reachedHv(terminal))
+        if (stepPath.tracedInternally && !stepContext.isStartItem)
             return
 
-        terminalToAuxEquipment[terminal.mRID]?.forEach {
-            assignLvFeederToEquipment(it, activeLvFeeder)
-            assignEquipmentToLvFeeder(activeLvFeeder, it)
+        if (lvFeederStartPoints.contains(stepPath.toEquipment)) {
+            stepPath.toEquipment.normalFeeders.forEach { feeder ->
+                lvFeedersToAssign.forEach { lvFeeder ->
+                    feeder.addNormalEnergizedLvFeeder(lvFeeder)
+                    lvFeeder.addNormalEnergizingFeeder(feeder)
+                }
+            }
         }
 
-        terminal.conductingEquipment?.let {
-            assignLvFeederToEquipment(it, activeLvFeeder)
-            assignEquipmentToLvFeeder(activeLvFeeder, it)
+        terminalToAuxEquipment[stepPath.toTerminal]?.forEach { auxEq ->
+            lvFeedersToAssign.forEach { feeder -> networkStateOperators.associateEquipmentAndContainer(auxEq, feeder) }
+        }
+
+        lvFeedersToAssign.forEach { feeder -> networkStateOperators.associateEquipmentAndContainer(stepPath.toEquipment, feeder) }
+
+        if (stepPath.toEquipment is ProtectedSwitch) {
+            stepPath.toEquipment.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
+                lvFeedersToAssign.forEach {
+                    networkStateOperators.associateEquipmentAndContainer(system, it)
+                }
+            }
         }
     }
 

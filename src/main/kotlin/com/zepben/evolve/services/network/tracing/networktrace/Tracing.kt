@@ -10,6 +10,8 @@ package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
+import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
@@ -131,7 +133,7 @@ object Tracing {
      *
      * @param network The network in which to apply feeder directions.
      */
-    fun applyFeederDirections(network: NetworkService) {
+    fun setFeederDirections(network: NetworkService) {
         val normal = normalSetDirection()
         val current = currentSetDirection()
 
@@ -150,5 +152,21 @@ object Tracing {
 
     fun normalRemoveDirection(): RemoveDirection = RemoveDirection(NetworkStateOperators.NORMAL)
     fun currentRemoveDirection(): RemoveDirection = RemoveDirection(NetworkStateOperators.CURRENT)
+
+    fun normalAssignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders(NetworkStateOperators.NORMAL)
+    fun currentAssignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders(NetworkStateOperators.CURRENT)
+
+    fun assignEquipmentToFeeders(network: NetworkService) {
+        val normal = normalAssignEquipmentToFeeders().run(network)
+        val current = currentAssignEquipmentToFeeders().run(network)
+    }
+
+    fun normalAssignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders(NetworkStateOperators.NORMAL)
+    fun currentAssignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders(NetworkStateOperators.CURRENT)
+
+    fun assignEquipmentToLvFeeders(network: NetworkService) {
+        val normal = normalAssignEquipmentToLvFeeders().run(network)
+        val current = currentAssignEquipmentToLvFeeders().run(network)
+    }
 
 }

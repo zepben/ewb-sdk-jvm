@@ -18,7 +18,7 @@ import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.testdata.*
-import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -37,7 +37,7 @@ internal class AssignToFeedersTest {
         val network = FeederStartPointBetweenConductorsNetwork.create()
         val feeder: Feeder = network["f"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
 
         validateEquipment(feeder.equipment, "fsp", "c2")
     }
@@ -47,10 +47,10 @@ internal class AssignToFeedersTest {
         val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = true, currentlyOpen = false)
         val feeder: Feeder = network["f"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
 
         validateEquipment(feeder.equipment, "fsp", "c1", "op")
-        validateEquipment(feeder.currentEquipment, "fsp", "c1", "op", "c2")
+        validateEquipment(feeder.currentEquipment)
     }
 
     @Test
@@ -58,9 +58,9 @@ internal class AssignToFeedersTest {
         val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = false, currentlyOpen = true)
         val feeder: Feeder = network["f"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.CURRENT).run(network)
 
-        validateEquipment(feeder.equipment, "fsp", "c1", "op", "c2")
+        validateEquipment(feeder.equipment)
         validateEquipment(feeder.currentEquipment, "fsp", "c1", "op")
     }
 
@@ -69,7 +69,7 @@ internal class AssignToFeedersTest {
         val network = FeederToSubstationTransformerNetwork.create()
         val feeder: Feeder = network["f"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
 
         validateEquipment(feeder.equipment, "fsp", "c1")
     }
@@ -80,7 +80,7 @@ internal class AssignToFeedersTest {
         val feeder1: Feeder = network["f1"]!!
         val feeder2: Feeder = network["f2"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
 
         validateEquipment(feeder1.equipment, "fsp1", "c2", "fsp2")
         validateEquipment(feeder2.equipment, "fsp1", "c2", "fsp2")
@@ -92,7 +92,7 @@ internal class AssignToFeedersTest {
         val feeder1: Feeder = network["f1"]!!
         val feeder2: Feeder = network["f2"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
 
         validateEquipment(feeder1.equipment, "fsp1", "c2", "fsp2")
         validateEquipment(feeder2.equipment, "fsp2", "c3")
@@ -103,7 +103,7 @@ internal class AssignToFeedersTest {
         val network = DroppedPhasesNetwork.create()
         val feeder: Feeder = network["f"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
 
         validateEquipment(feeder.equipment, "fcb", "acls1", "acls2", "acls3", "iso", "acls4", "tx")
     }
@@ -126,7 +126,7 @@ internal class AssignToFeedersTest {
 
         val feeder: Feeder = network["fdr3"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
 
         validateEquipment(feeder.equipment, "b0", "c1")
     }
@@ -150,7 +150,7 @@ internal class AssignToFeedersTest {
 
         val feeder: Feeder = network["fdr4"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
 
         validateEquipment(feeder.equipment, "b0", "c1", "tx2")
     }
@@ -169,7 +169,7 @@ internal class AssignToFeedersTest {
 
         val feeder: Feeder = network["fdr2"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
 
         validateEquipment(feeder.equipment, "b0", "c1", "a1", "a2")
     }
@@ -199,7 +199,7 @@ internal class AssignToFeedersTest {
 
         val feeder: Feeder = network["fdr1"]!!
 
-        Tracing.assignEquipmentToFeeders().run(network)
+        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
 
         validateEquipment(feeder.equipment, "b0", "prsys3")
     }

@@ -162,7 +162,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         validateSchema(SchemaServices.networkServicesOf(::ConnectivityNode, ConnectivityNode::fillFields))
         validateSchema(
             SchemaServices.networkServicesOf(::Feeder, Feeder::fillFields)
-                .also { com.zepben.evolve.services.network.tracing.networktrace.Tracing.applyFeederDirections(it) })
+                .also { com.zepben.evolve.services.network.tracing.networktrace.Tracing.setFeederDirections(it) })
         validateSchema(SchemaServices.networkServicesOf(::GeographicalRegion, GeographicalRegion::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Site, Site::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::SubGeographicalRegion, SubGeographicalRegion::fillFields))

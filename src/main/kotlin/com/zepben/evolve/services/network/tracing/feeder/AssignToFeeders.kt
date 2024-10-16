@@ -10,7 +10,6 @@ package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
@@ -25,61 +24,43 @@ import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
  * Requires that a Feeder have a normalHeadTerminal with associated ConductingEquipment.
  * This class is backed by a [NetworkTrace].
  */
-class AssignToFeeders {
-
-    private val normalTraversal = Tracing.connectedTerminalTrace(NetworkStateOperators.NORMAL).addNetworkCondition { stopAtOpen() }
-    private val currentTraversal = Tracing.connectedTerminalTrace(NetworkStateOperators.CURRENT).addNetworkCondition { stopAtOpen() }
-
-    private lateinit var activeFeeder: Feeder
-
+class AssignToFeeders(
+    private val networkStateOperators: NetworkStateOperators
+) {
     fun run(network: NetworkService) {
         val terminalToAuxEquipment = network.sequenceOf<AuxiliaryEquipment>()
             .filter { it.terminal != null }
-            .groupBy { it.terminal!!.mRID }
+            .groupBy { it.terminal!! }
 
         val feederStartPoints = network.sequenceOf<Feeder>()
-            .mapNotNull { it.normalHeadTerminal }
-            .mapNotNull { it.conductingEquipment }
+            .mapNotNull { it.normalHeadTerminal?.conductingEquipment }
             .toSet()
 
-        configureStepActions(normalTraversal, terminalToAuxEquipment)
-        configureStepActions(currentTraversal, terminalToAuxEquipment)
-
-        configureStopConditions(normalTraversal, feederStartPoints)
-        configureStopConditions(currentTraversal, feederStartPoints)
-
-        network.sequenceOf<Feeder>().forEach(::run)
+        network.sequenceOf<Feeder>().forEach { run(it, feederStartPoints, terminalToAuxEquipment) }
     }
 
-    private fun run(feeder: Feeder) {
-        activeFeeder = feeder
-
+    private fun run(
+        feeder: Feeder,
+        feederStartPoints: Set<ConductingEquipment>,
+        terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
+    ) {
         val headTerminal = feeder.normalHeadTerminal ?: return
-
-        run(normalTraversal, headTerminal)
-        run(currentTraversal, headTerminal)
-    }
-
-    private fun run(traversal: NetworkTrace<Unit>, headTerminal: Terminal) {
-        traversal.reset()
+        val traversal = createTrace(terminalToAuxEquipment, feederStartPoints, listOf(feeder))
         traversal.run(headTerminal, canStopOnStartItem = false)
     }
 
-    private fun configureStepActions(traversal: NetworkTrace<*>, terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>) {
-        traversal.clearStepActions()
-        normalTraversal.addStepAction(processNormal(terminalToAuxEquipment))
-        currentTraversal.addStepAction(processCurrent(terminalToAuxEquipment))
+    private fun createTrace(
+        terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
+        feederStartPoints: Set<ConductingEquipment>,
+        feedersToAssign: List<Feeder>,
+    ): NetworkTrace<Unit> {
+        return Tracing.connectedTerminalTrace(networkStateOperators)
+            .addNetworkCondition { stopAtOpen() }
+            .addStopCondition { (path), _ -> feederStartPoints.contains(path.toEquipment) }
+            .addQueueCondition { (path), _ -> !reachedSubstationTransformer(path.toEquipment) }
+            .addQueueCondition { (path), _ -> !reachedLv(path.toEquipment) }
+            .addStepAction { (path), context -> process(path, context, terminalToAuxEquipment, feedersToAssign) }
     }
-
-    private fun configureStopConditions(traversal: NetworkTrace<Unit>, feederStartPoints: Set<ConductingEquipment>) {
-        traversal.clearStopConditions()
-        traversal.addStopCondition(reachedEquipment(feederStartPoints))
-        traversal.addStopCondition { step, _ -> reachedSubstationTransformer(step.path.toEquipment) }
-        traversal.addStopCondition { step, _ -> reachedLv(step.path.toEquipment) }
-    }
-
-    private val reachedEquipment: (Set<ConductingEquipment>) -> (NetworkTraceStep<Unit>, StepContext) -> Boolean =
-        { { step, _ -> it.contains(step.path.toEquipment) } }
 
     private val reachedSubstationTransformer: (ConductingEquipment) -> Boolean = { ce ->
         ce is PowerTransformer && ce.substations.isNotEmpty()
@@ -89,72 +70,28 @@ class AssignToFeeders {
         ce.baseVoltage?.let { it.nominalVoltage < 1000 } ?: false
     }
 
-    private fun processNormal(
-        terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
-    ): (NetworkTraceStep<Unit>, StepContext) -> Unit =
-        { step, context ->
-            process(
-                step.path,
-                context,
-                { eq, feeder ->
-                    feeder.addEquipment(eq)
-                    eq.addContainer(feeder)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                system.addContainer(feeder)
-                                feeder.addEquipment(system)
-                            }
-                    }
-                },
-                context.isStopping,
-                terminalToAuxEquipment
-            )
-        }
-
-    private fun processCurrent(
-        terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
-    ): (NetworkTraceStep<Unit>, StepContext) -> Unit =
-        { step, context ->
-            process(
-                step.path,
-                context,
-                { eq, feeder ->
-                    feeder.addCurrentEquipment(eq)
-                    eq.addCurrentContainer(feeder)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                system.addCurrentContainer(feeder)
-                                feeder.addCurrentEquipment(system)
-                            }
-                    }
-                },
-                context.isStopping,
-                terminalToAuxEquipment
-            )
-        }
-
     private fun process(
         stepPath: StepPath,
         stepContext: StepContext,
-        associateFeederAndEquipment: (Equipment, Feeder) -> Unit,
-        isStopping: Boolean,
-        terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
+        terminalToAuxEquipment: Map<Terminal, Collection<AuxiliaryEquipment>>,
+        feedersToAssign: List<Feeder>
     ) {
         if (stepPath.tracedInternally && !stepContext.isStartItem)
             return
 
-        if (isStopping && (reachedLv(stepPath.toEquipment) || reachedSubstationTransformer(stepPath.toEquipment)))
-            return
-
-        terminalToAuxEquipment[stepPath.toTerminal.mRID]?.forEach {
-            associateFeederAndEquipment(it, activeFeeder)
+        terminalToAuxEquipment[stepPath.toTerminal]?.forEach { auxEq ->
+            feedersToAssign.forEach { feeder -> networkStateOperators.associateEquipmentAndContainer(auxEq, feeder) }
         }
 
-        associateFeederAndEquipment(stepPath.toEquipment, activeFeeder)
+        feedersToAssign.forEach { feeder -> networkStateOperators.associateEquipmentAndContainer(stepPath.toEquipment, feeder) }
+        when (stepPath.toEquipment) {
+            is ProtectedSwitch ->
+                stepPath.toEquipment.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
+                    feedersToAssign.forEach {
+                        networkStateOperators.associateEquipmentAndContainer(system, it)
+                    }
+                }
+        }
     }
 
 }

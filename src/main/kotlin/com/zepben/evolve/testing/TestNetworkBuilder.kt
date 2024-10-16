@@ -15,7 +15,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import kotlin.reflect.full.primaryConstructor
 
 /**
@@ -502,17 +502,17 @@ open class TestNetworkBuilder {
      * @return The [NetworkService] created by this [TestNetworkBuilder]
      */
     fun build(applyDirectionsFromSources: Boolean = true): NetworkService {
-        com.zepben.evolve.services.network.tracing.networktrace.Tracing.applyFeederDirections(network)
-        Tracing.setPhases().run(network)
+        Tracing.setFeederDirections(network)
+        com.zepben.evolve.services.network.tracing.Tracing.setPhases().run(network)
 
         if (applyDirectionsFromSources)
             network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach {
-                com.zepben.evolve.services.network.tracing.networktrace.Tracing.normalSetDirection().run(it)
-                com.zepben.evolve.services.network.tracing.networktrace.Tracing.currentSetDirection().run(it)
+                Tracing.normalSetDirection().run(it)
+                Tracing.currentSetDirection().run(it)
             }
 
-        Tracing.assignEquipmentToFeeders().run(network)
-        Tracing.assignEquipmentToLvFeeders().run(network)
+        Tracing.assignEquipmentToFeeders(network)
+        Tracing.assignEquipmentToLvFeeders(network)
 
         return network
     }

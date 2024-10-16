@@ -9,7 +9,9 @@
 package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.traversalV2.RecursiveTracker
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
@@ -86,14 +88,17 @@ class NetworkTrace<T> private constructor(
         onlyActionEquipment
     )
 
-    fun run(start: Terminal, context: T, canStopOnStartItem: Boolean = true) {
-        run(NetworkTraceStep(StepPath(start, start, 0, 0), context), canStopOnStartItem)
+    fun run(start: Terminal, context: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+        val startPath = StepPath(start, start, 0, 0, startNominalPhasePath(phases))
+        run(NetworkTraceStep(startPath, context), canStopOnStartItem)
     }
 
-    fun run(start: ConductingEquipment, context: T, canStopOnStartItem: Boolean = true) {
-        start.terminals.forEach {
-            addStartItem(NetworkTraceStep(StepPath(it, it, 0, 0), context))
+    fun run(start: ConductingEquipment, context: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+        start.terminals.forEach { terminal ->
+            val startPath = StepPath(terminal, terminal, 0, 0, startNominalPhasePath(phases))
+            addStartItem(NetworkTraceStep(startPath, context))
         }
+
         run(canStopOnStartItem)
     }
 
@@ -119,14 +124,17 @@ class NetworkTrace<T> private constructor(
     override fun getDerivedThis(): NetworkTrace<T> = this
     override fun createNewThis(): NetworkTrace<T> = NetworkTrace(networkStateOperators, queueType, this, onlyActionEquipment)
 
+    private fun startNominalPhasePath(phases: PhaseCode?): List<NominalPhasePath> =
+        phases?.singlePhases?.map { NominalPhasePath(it, it) } ?: emptyList()
+
 }
 
-fun NetworkTrace<Unit>.run(start: Terminal, canStopOnStartItem: Boolean = true) {
-    this.run(start, Unit, canStopOnStartItem)
+fun NetworkTrace<Unit>.run(start: Terminal, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+    this.run(start, Unit, phases, canStopOnStartItem)
 }
 
-fun NetworkTrace<Unit>.run(start: ConductingEquipment, canStopOnStartItem: Boolean = true) {
-    this.run(start, Unit, canStopOnStartItem)
+fun NetworkTrace<Unit>.run(start: ConductingEquipment, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+    this.run(start, Unit, phases, canStopOnStartItem)
 }
 
 private fun <T> ComputeNextT<T>.wrapped(onlyActionEquipment: Boolean): ComputeNextT<T> = if (onlyActionEquipment) {

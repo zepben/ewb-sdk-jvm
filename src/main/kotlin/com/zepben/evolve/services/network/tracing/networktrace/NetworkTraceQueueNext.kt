@@ -11,6 +11,7 @@ package com.zepben.evolve.services.network.tracing.networktrace
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
+import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
 
@@ -72,6 +73,22 @@ internal object NetworkTraceQueueNext {
     }
 
     private fun nextStepPaths(isInService: CheckInService, path: StepPath): Sequence<StepPath> {
+        val nextTerminals = nextTerminals(isInService, path)
+        val nextNumEquipmentSteps = if (path.tracedInternally) path.numEquipmentSteps + 1 else path.numEquipmentSteps
+        val nextNumTerminalSteps = path.numTerminalSteps + 1
+
+        return if (path.nominalPhasePaths.isNotEmpty()) {
+            val phasePaths = path.nominalPhasePaths.map { it.to }.toSet()
+            nextTerminals
+                .map { nextTerminal -> tcc.terminalConnectivity(path.toTerminal, nextTerminal, phasePaths) }
+                .filter { it.nominalPhasePaths.isNotEmpty() }
+                .map { StepPath(path.toTerminal, it.toTerminal, nextNumTerminalSteps, nextNumEquipmentSteps, it.nominalPhasePaths) }
+        } else {
+            nextTerminals.map { StepPath(path.toTerminal, it, nextNumTerminalSteps, nextNumEquipmentSteps) }
+        }
+    }
+
+    private fun nextTerminals(isInService: CheckInService, path: StepPath): Sequence<Terminal> {
         val nextTerminals = if (path.tracedInternally) {
             // We need to step externally to connected terminals. However:
             // Busbars are only modelled with a single terminal. So if we find any we need to step to them before the
@@ -93,13 +110,11 @@ internal object NetworkTraceQueueNext {
             }
         }
 
-        val nextNumEquipmentSteps = if (path.tracedInternally) path.numEquipmentSteps else path.numEquipmentSteps + 1
-        val nextNumTerminalSteps = path.numTerminalSteps + 1
-        return nextTerminals
-            .filter { terminal -> terminal.conductingEquipment?.let { isInService(it) } == true }
-            .map { StepPath(path.toTerminal, it, nextNumTerminalSteps, nextNumEquipmentSteps) }
+        return nextTerminals.filter { terminal -> terminal.conductingEquipment?.let { isInService(it) } == true }
     }
 
     private fun Terminal.hasConnectedBusbars(): Boolean =
         connectivityNode?.terminals?.any { it !== this && it.conductingEquipment is BusbarSection } ?: false
+
+    private val tcc = TerminalConnectivityConnected()
 }

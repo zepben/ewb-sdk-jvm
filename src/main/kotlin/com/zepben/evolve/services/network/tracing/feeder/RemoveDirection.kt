@@ -51,7 +51,7 @@ class RemoveDirection(
     @JvmOverloads
     fun run(terminal: Terminal, direction: FeederDirection = FeederDirection.NONE) {
         val directionToRemove = direction.takeUnless { it == FeederDirection.NONE } ?: directionOperators.getDirection(terminal)
-        traversal.reset().run(terminal, directionToRemove, false)
+        traversal.reset().run(terminal, directionToRemove, canStopOnStartItem = false)
     }
 
     private fun computeNextDirectionToRemove(

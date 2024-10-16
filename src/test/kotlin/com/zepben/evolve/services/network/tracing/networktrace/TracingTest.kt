@@ -7,8 +7,6 @@ import com.zepben.evolve.services.network.tracing.networktrace.Conditions.downst
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.limitEquipmentSteps
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.upstream
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.withPhases
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.terminalConnectivity
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import org.junit.jupiter.api.Test
 
@@ -17,7 +15,7 @@ class TracingTest {
     @Test
     fun playground() {
         Tracing.connectedEquipmentTrace()
-            .run(Terminal(), false)
+            .run(Terminal(), canStopOnStartItem = false)
     }
 
     @Test
@@ -84,47 +82,47 @@ class TracingTest {
 //        fun connectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newConnectivityTrace()
 //        fun phaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newTrace()
         Tracing.connectedEquipmentTrace()
-            .addCondition(withPhases(PhaseCode.ABCN))
+//            .addCondition(withPhases(PhaseCode.ABCN))
             .addStepAction { step, ctx ->
-                // This is the ConnectivityResult you used to get as the step item in the ConnectivityTrace
-                val connectivityResult = ctx.terminalConnectivity()
+                val phasePaths = step.path.nominalPhasePaths
             }
+            .run(Terminal(), PhaseCode.ABC)
 
 //        fun connectivityBreadthTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newConnectivityBreadthTrace()
         Tracing.connectedEquipmentTrace(queue = BasicQueue.breadthFirst())
-            .addCondition(withPhases(PhaseCode.ABCN))
+            .run(Terminal(), PhaseCode.ABC)
 
 //        fun normalConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newNormalConnectivityTrace()
 //        fun normalPhaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalTrace()
         Tracing.connectedEquipmentTrace()
             .addNetworkCondition { stopAtOpen() }
-            .addCondition(withPhases(PhaseCode.ABCN))
+            .run(Terminal(), PhaseCode.ABC)
 
 //        fun currentConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newCurrentConnectivityTrace()
 //        fun currentPhaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentTrace()
         Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
             .addNetworkCondition { stopAtOpen() }
-            .addCondition(withPhases(PhaseCode.ABCN))
+            .run(Terminal(), PhaseCode.ABC)
 
 //        fun normalDownstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalDownstreamTrace()
         Tracing.connectedEquipmentTrace()
             .addNetworkCondition { downstream() }
-            .addCondition(withPhases(PhaseCode.ABCN))
+            .run(Terminal(), PhaseCode.ABC)
 
 //        fun currentDownstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentDownstreamTrace()
         Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
             .addNetworkCondition { downstream() }
-            .addCondition(withPhases(PhaseCode.ABCN))
+            .run(Terminal(), PhaseCode.ABC)
 
 //        fun normalUpstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalUpstreamTrace()
         Tracing.connectedEquipmentTrace()
             .addNetworkCondition { upstream() }
-            .addConditions(withPhases(PhaseCode.ABCN))
+            .run(Terminal(), PhaseCode.ABC)
 
 //        fun currentUpstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentUpstreamTrace()
         Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
             .addNetworkCondition { upstream() }
-            .addCondition(withPhases(PhaseCode.ABCN))
+            .run(Terminal(), PhaseCode.ABC)
 
 //        fun setDirection(): SetDirection = SetDirection()
         Tracing.normalSetDirection()

@@ -62,7 +62,7 @@ class SetDirection(
      * @param terminal The terminal to start applying direction from.
      */
     fun run(terminal: Terminal) {
-        traversal.reset().run(terminal, FeederDirection.DOWNSTREAM, false)
+        traversal.reset().run(terminal, FeederDirection.DOWNSTREAM, canStopOnStartItem = false)
     }
 
     private fun isFeederHeadTerminal(terminal: Terminal?): Boolean =

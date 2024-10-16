@@ -34,7 +34,7 @@ class DownstreamTree(
 
     fun run(start: ConductingEquipment): TreeNode {
         val root = TreeNode(start, null)
-        traversal.run(root.conductingEquipment, root, false)
+        traversal.run(root.conductingEquipment, root, canStopOnStartItem = false)
         return root
     }
 

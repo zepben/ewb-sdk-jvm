@@ -9,11 +9,11 @@
 package com.zepben.evolve.services.network.tracing.tree
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.testdata.LoopingNetwork
 import com.zepben.evolve.services.network.testdata.addFeederDirections
 import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.feeder.DirectionLogger
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -36,7 +36,7 @@ internal class DownstreamTreeTest {
 
         val start: ConductingEquipment = n["j1"]!!
         assertThat(start, notNullValue())
-        val root = DownstreamTree(Terminal::normalFeederDirection).run(start)
+        val root = DownstreamTree(NetworkStateOperators.NORMAL).run(start)
 
         assertThat(root, notNullValue())
         assertTreeAsset(root, n["j1"], null, arrayOf(n["acLineSegment1"], n["acLineSegment3"]))

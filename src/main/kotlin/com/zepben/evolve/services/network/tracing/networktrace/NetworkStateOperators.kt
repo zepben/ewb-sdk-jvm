@@ -16,19 +16,35 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 
-interface NetworkStateOperators : OpenStateOperators, FeederDirectionStateOperations, EquipmentContainerStateOperations {
+interface NetworkStateOperators : OpenStateOperators, FeederDirectionStateOperations, EquipmentContainerStateOperations, ServiceStateOperators {
     // TODO [Review]: Should OpenTest become OpenOperators and DirectionSelector become DirectionOperators?
 
     companion object {
         val NORMAL: NetworkStateOperators = object : NetworkStateOperators,
             OpenStateOperators by OpenStateOperators.NORMAL,
             FeederDirectionStateOperations by FeederDirectionStateOperations.NORMAL,
-            EquipmentContainerStateOperations by EquipmentContainerStateOperations.NORMAL {}
+            EquipmentContainerStateOperations by EquipmentContainerStateOperations.NORMAL,
+            ServiceStateOperators by ServiceStateOperators.NORMAL {}
 
         val CURRENT: NetworkStateOperators = object : NetworkStateOperators,
             OpenStateOperators by OpenStateOperators.CURRENT,
             FeederDirectionStateOperations by FeederDirectionStateOperations.CURRENT,
-            EquipmentContainerStateOperations by EquipmentContainerStateOperations.CURRENT {}
+            EquipmentContainerStateOperations by EquipmentContainerStateOperations.CURRENT,
+            ServiceStateOperators by ServiceStateOperators.CURRENT {}
+    }
+}
+
+interface ServiceStateOperators {
+    fun isInService(conductingEquipment: ConductingEquipment): Boolean
+
+    companion object {
+        val NORMAL: ServiceStateOperators = object : ServiceStateOperators {
+            override fun isInService(conductingEquipment: ConductingEquipment): Boolean = conductingEquipment.normallyInService
+        }
+
+        val CURRENT: ServiceStateOperators = object : ServiceStateOperators {
+            override fun isInService(conductingEquipment: ConductingEquipment): Boolean = conductingEquipment.inService
+        }
     }
 }
 

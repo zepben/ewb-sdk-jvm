@@ -28,10 +28,11 @@ class RemoveDirection(
     private val directionOperators: FeederDirectionStateOperations = networkStateOperators
 
     private val traversal: NetworkTrace<DirectionToRemove> = Tracing.connectedTerminalTrace(
-        WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() },
+        networkStateOperators = networkStateOperators,
+        queue = WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() },
         computeNextT = ::computeNextDirectionToRemove
     )
-        .addCondition(stopAtOpen(networkStateOperators::isOpen))
+        .addNetworkCondition { stopAtOpen() }
         .addStepAction { item, context ->
             val wasRemoved = directionOperators.removeDirection(item.path.toTerminal, item.data)
             context.setValue(directionRemovedKey, wasRemoved)

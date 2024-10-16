@@ -8,33 +8,36 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
 
+private typealias CheckInService = (ConductingEquipment) -> Boolean
+
 internal object NetworkTraceQueueNext {
-    fun <T> basic(computeNextT: ComputeNextT<T>): Traversal.QueueNext<NetworkTraceStep<T>> {
+    fun <T> basic(isInService: CheckInService, computeNextT: ComputeNextT<T>): Traversal.QueueNext<NetworkTraceStep<T>> {
         return Traversal.QueueNext { item, context, queueItem ->
-            nextTraceSteps(item, context, computeNextT).forEach { queueItem(it) }
+            nextTraceSteps(isInService, item, context, computeNextT).forEach { queueItem(it) }
         }
     }
 
-    fun <T> basic(computeNextT: ComputeNextTWithPaths<T>): Traversal.QueueNext<NetworkTraceStep<T>> {
+    fun <T> basic(isInService: CheckInService, computeNextT: ComputeNextTWithPaths<T>): Traversal.QueueNext<NetworkTraceStep<T>> {
         return Traversal.QueueNext { item, context, queueItem ->
-            nextTraceSteps(item, context, computeNextT).forEach { queueItem(it) }
+            nextTraceSteps(isInService, item, context, computeNextT).forEach { queueItem(it) }
         }
     }
 
-    fun <T> branching(computeNextT: ComputeNextT<T>): Traversal.BranchingQueueNext<NetworkTraceStep<T>> {
+    fun <T> branching(isInService: CheckInService, computeNextT: ComputeNextT<T>): Traversal.BranchingQueueNext<NetworkTraceStep<T>> {
         return Traversal.BranchingQueueNext { item, context, queueItem, queueBranch ->
-            queueNextStepsBranching(nextTraceSteps(item, context, computeNextT).toList(), queueItem, queueBranch)
+            queueNextStepsBranching(nextTraceSteps(isInService, item, context, computeNextT).toList(), queueItem, queueBranch)
         }
     }
 
-    fun <T> branching(computeNextT: ComputeNextTWithPaths<T>): Traversal.BranchingQueueNext<NetworkTraceStep<T>> {
+    fun <T> branching(isInService: CheckInService, computeNextT: ComputeNextTWithPaths<T>): Traversal.BranchingQueueNext<NetworkTraceStep<T>> {
         return Traversal.BranchingQueueNext { item, context, queueItem, queueBranch ->
-            queueNextStepsBranching(nextTraceSteps(item, context, computeNextT), queueItem, queueBranch)
+            queueNextStepsBranching(nextTraceSteps(isInService, item, context, computeNextT), queueItem, queueBranch)
         }
     }
 
@@ -50,24 +53,26 @@ internal object NetworkTraceQueueNext {
     }
 
     private fun <T> nextTraceSteps(
+        isInService: CheckInService,
         currentStep: NetworkTraceStep<T>,
         currentContext: StepContext,
         computeNextT: ComputeNextT<T>,
     ): Sequence<NetworkTraceStep<T>> {
-        return nextStepPaths(currentStep.path).map { NetworkTraceStep(it, computeNextT.compute(currentStep, currentContext, it)) }
+        return nextStepPaths(isInService, currentStep.path).map { NetworkTraceStep(it, computeNextT.compute(currentStep, currentContext, it)) }
     }
 
     private fun <T> nextTraceSteps(
+        isInService: CheckInService,
         currentStep: NetworkTraceStep<T>,
         currentContext: StepContext,
         computeNextT: ComputeNextTWithPaths<T>,
     ): List<NetworkTraceStep<T>> {
-        val nextPaths = nextStepPaths(currentStep.path).toList()
+        val nextPaths = nextStepPaths(isInService, currentStep.path).toList()
         return nextPaths.map { NetworkTraceStep(it, computeNextT.compute(currentStep, currentContext, it, nextPaths)) }
     }
 
-    private fun nextStepPaths(path: StepPath): Sequence<StepPath> {
-        val terminals = if (path.tracedInternally) {
+    private fun nextStepPaths(isInService: CheckInService, path: StepPath): Sequence<StepPath> {
+        val nextTerminals = if (path.tracedInternally) {
             // We need to step externally to connected terminals. However:
             // Busbars are only modelled with a single terminal. So if we find any we need to step to them before the
             // other (non busbar) equipment connected to the same connectivity node. Once the busbar has been
@@ -89,9 +94,10 @@ internal object NetworkTraceQueueNext {
         }
 
         val nextNumEquipmentSteps = if (path.tracedInternally) path.numEquipmentSteps else path.numEquipmentSteps + 1
-        return terminals.map { nextTerminal ->
-            StepPath(path.toTerminal, nextTerminal, path.numTerminalSteps + 1, nextNumEquipmentSteps)
-        }
+        val nextNumTerminalSteps = path.numTerminalSteps + 1
+        return nextTerminals
+            .filter { terminal -> terminal.conductingEquipment?.let { isInService(it) } == true }
+            .map { StepPath(path.toTerminal, it, nextNumTerminalSteps, nextNumEquipmentSteps) }
     }
 
     private fun Terminal.hasConnectedBusbars(): Boolean =

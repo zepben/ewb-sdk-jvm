@@ -27,6 +27,7 @@ class SetDirection(
 ) {
 
     private val traversal: NetworkTrace<FeederDirection> = Tracing.connectedTerminalTrace(
+        networkStateOperators = networkStateOperators,
         { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
         { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
         computeNextT = { step: NetworkTraceStep<FeederDirection>, _, nextPath ->

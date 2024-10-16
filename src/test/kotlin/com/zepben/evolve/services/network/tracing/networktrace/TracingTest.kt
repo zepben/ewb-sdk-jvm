@@ -3,13 +3,10 @@ package com.zepben.evolve.services.network.tracing.networktrace
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.currentlyDownstream
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.currentlyUpstream
+import com.zepben.evolve.services.network.tracing.networktrace.Conditions.downstream
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.limitEquipmentSteps
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.normallyDownstream
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.normallyUpstream
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtCurrentlyOpen
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtNormallyOpen
+import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.networktrace.Conditions.upstream
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.withPhases
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.terminalConnectivity
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
@@ -34,15 +31,15 @@ class TracingTest {
         Tracing.connectedEquipmentTrace()
 
 //        fun connectedEquipmentBreadthTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newConnectedEquipmentBreadthTrace()
-        Tracing.connectedEquipmentTrace(BasicQueue.breadthFirst())
+        Tracing.connectedEquipmentTrace(queue = BasicQueue.breadthFirst())
 
 //        fun normalConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newNormalConnectedEquipmentTrace()
         Tracing.connectedEquipmentTrace()
-            .addConditions(stopAtNormallyOpen())
+            .addNetworkCondition { stopAtOpen() }
 
 //        fun currentConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newCurrentConnectedEquipmentTrace()
-        Tracing.connectedEquipmentTrace()
-            .addCondition(stopAtCurrentlyOpen())
+        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+            .addNetworkCondition { stopAtOpen() }
 
         /*
          TODO: Investigate more how the limited trace work. I don't think what I've done matches what is there,
@@ -50,32 +47,34 @@ class TracingTest {
          */
 //        fun normalLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace = ConnectedEquipmentTrace.newNormalLimitedConnectedEquipmentTrace()
         Tracing.connectedEquipmentTrace()
-            .addConditions(stopAtNormallyOpen(), limitEquipmentSteps(10))
+            .addNetworkCondition { stopAtOpen() }
+            .addCondition(limitEquipmentSteps(10))
 
 
 //        fun currentLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace = ConnectedEquipmentTrace.newCurrentLimitedConnectedEquipmentTrace()
-        Tracing.connectedEquipmentTrace()
-            .addConditions(stopAtCurrentlyOpen(), limitEquipmentSteps(10, Switch::class)) // If you want to limit to 10 switches
+        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+            .addNetworkCondition { stopAtOpen() }
+            .addCondition(limitEquipmentSteps(10, Switch::class)) // If you want to limit to 10 switches
 
 //        fun normalDownstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = BasicQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
 //            ConnectedEquipmentTrace.newNormalDownstreamEquipmentTrace(queue)
         Tracing.connectedEquipmentTrace()
-            .addCondition(normallyDownstream())
+            .addNetworkCondition { downstream() }
 
 //        fun currentDownstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = BasicQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
 //            ConnectedEquipmentTrace.newCurrentDownstreamEquipmentTrace(queue)
-        Tracing.connectedEquipmentTrace()
-            .addCondition(currentlyDownstream())
+        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+            .addNetworkCondition { downstream() }
 
 //        fun normalUpstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = BasicQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
 //            ConnectedEquipmentTrace.newNormalUpstreamEquipmentTrace(queue)
         Tracing.connectedEquipmentTrace()
-            .addCondition(normallyUpstream())
+            .addNetworkCondition { upstream() }
 
 //        fun currentUpstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = BasicQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
 //            ConnectedEquipmentTrace.newCurrentUpstreamEquipmentTrace(queue)
-        Tracing.connectedEquipmentTrace()
-            .addCondition(currentlyUpstream())
+        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+            .addNetworkCondition { upstream() }
 
         // NOTE: The new phase tracing doesn't map 1 to 1 to what was previously there. When we reviewed the
         //       difference between 'connectivity trace' and 'phase trace' and their use cases we felt they
@@ -92,34 +91,40 @@ class TracingTest {
             }
 
 //        fun connectivityBreadthTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newConnectivityBreadthTrace()
-        Tracing.connectedEquipmentTrace(BasicQueue.breadthFirst())
+        Tracing.connectedEquipmentTrace(queue = BasicQueue.breadthFirst())
             .addCondition(withPhases(PhaseCode.ABCN))
 
 //        fun normalConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newNormalConnectivityTrace()
 //        fun normalPhaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalTrace()
         Tracing.connectedEquipmentTrace()
-            .addConditions(stopAtNormallyOpen(), withPhases(PhaseCode.ABCN))
+            .addNetworkCondition { stopAtOpen() }
+            .addCondition(withPhases(PhaseCode.ABCN))
 
 //        fun currentConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newCurrentConnectivityTrace()
 //        fun currentPhaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentTrace()
-        Tracing.connectedEquipmentTrace()
-            .addConditions(stopAtCurrentlyOpen(), withPhases(PhaseCode.ABCN))
+        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+            .addNetworkCondition { stopAtOpen() }
+            .addCondition(withPhases(PhaseCode.ABCN))
 
 //        fun normalDownstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalDownstreamTrace()
         Tracing.connectedEquipmentTrace()
-            .addConditions(normallyDownstream(), withPhases(PhaseCode.ABCN))
+            .addNetworkCondition { downstream() }
+            .addCondition(withPhases(PhaseCode.ABCN))
 
 //        fun currentDownstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentDownstreamTrace()
-        Tracing.connectedEquipmentTrace()
-            .addConditions(currentlyDownstream(), withPhases(PhaseCode.ABCN))
+        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+            .addNetworkCondition { downstream() }
+            .addCondition(withPhases(PhaseCode.ABCN))
 
 //        fun normalUpstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalUpstreamTrace()
         Tracing.connectedEquipmentTrace()
-            .addConditions(normallyUpstream(), withPhases(PhaseCode.ABCN))
+            .addNetworkCondition { upstream() }
+            .addConditions(withPhases(PhaseCode.ABCN))
 
 //        fun currentUpstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentUpstreamTrace()
-        Tracing.connectedEquipmentTrace()
-            .addConditions(currentlyUpstream(), withPhases(PhaseCode.ABCN))
+        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+            .addNetworkCondition { upstream() }
+            .addCondition(withPhases(PhaseCode.ABCN))
 
 //        fun setDirection(): SetDirection = SetDirection()
         Tracing.normalSetDirection()

@@ -36,12 +36,11 @@ data class StepPath(
     // to prevent queuing as part of an "open test".
     // abstract val viaSegment: AcLineSegment? = null,
 ) {
-    val fromEquipment: ConductingEquipment
-        get() = fromTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
+    val fromEquipment: ConductingEquipment =
+        fromTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
 
-    val toEquipment: ConductingEquipment
-        get() = toTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
+    val toEquipment: ConductingEquipment =
+        toTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
 
-    val tracedInternally: Boolean
-        get() = fromEquipment == toEquipment
+    val tracedInternally: Boolean = fromEquipment == toEquipment
 }

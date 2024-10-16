@@ -12,7 +12,6 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.ConnectivityNode
 import com.zepben.evolve.services.network.tracing.connectivity.*
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
-import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.phases.*
@@ -279,16 +278,16 @@ object Tracing {
      *
      * @return A new traversal instance.
      */
-    @JvmStatic
-    fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
+//    @JvmStatic
+//    fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
 
     /**
      * Returns an instance of [AssignToFeeders] convenience class for assigning equipment containers to LV feeders on a network.
      *
      * @return A new traversal instance.
      */
-    @JvmStatic
-    fun assignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
+//    @JvmStatic
+//    fun assignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
 
     /**
      * Returns an instance of [DownstreamTree] convenience class for tracing using the

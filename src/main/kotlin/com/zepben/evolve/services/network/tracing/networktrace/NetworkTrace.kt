@@ -13,49 +13,75 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.tracing.traversalV2.RecursiveTracker
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
+import com.zepben.evolve.services.network.tracing.traversalV2.TraversalCondition
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 
 class NetworkTrace<T> private constructor(
+    val networkStateOperators: NetworkStateOperators,
     queueType: QueueType<NetworkTraceStep<T>, NetworkTrace<T>>,
     parent: NetworkTrace<T>? = null,
-    private val onlyActionEquipment: Boolean
+    private val onlyActionEquipment: Boolean,
 ) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, { NetworkTraceTracker.terminalTracker() }, parent) {
 
     private val equipmentTracker: RecursiveTracker<NetworkTraceStep<T>>? =
         if (onlyActionEquipment) RecursiveTracker(parent?.equipmentTracker, NetworkTraceTracker.equipmentTracker()) else null
 
     internal constructor(
+        networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
         onlyActionEquipment: Boolean,
         computeNextT: ComputeNextT<T>,
-    ) : this(BasicQueueType(NetworkTraceQueueNext.basic(computeNextT.wrapped(onlyActionEquipment)), queue), null, onlyActionEquipment)
+    ) : this(
+        networkStateOperators,
+        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT.wrapped(onlyActionEquipment)), queue),
+        null,
+        onlyActionEquipment
+    )
 
     internal constructor(
+        networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
         onlyActionEquipment: Boolean,
         computeNextT: ComputeNextTWithPaths<T>,
-    ) : this(BasicQueueType(NetworkTraceQueueNext.basic(computeNextT.wrapped(onlyActionEquipment)), queue), null, onlyActionEquipment)
+    ) : this(
+        networkStateOperators,
+        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT.wrapped(onlyActionEquipment)), queue),
+        null,
+        onlyActionEquipment
+    )
 
     internal constructor(
+        networkStateOperators: NetworkStateOperators,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
         onlyActionEquipment: Boolean,
         parent: NetworkTrace<T>?,
         computeNextT: ComputeNextT<T>,
     ) : this(
-        BranchingQueueType(NetworkTraceQueueNext.branching(computeNextT.wrapped(onlyActionEquipment)), queueFactory, branchQueueFactory),
+        networkStateOperators,
+        BranchingQueueType(
+            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT.wrapped(onlyActionEquipment)),
+            queueFactory,
+            branchQueueFactory
+        ),
         parent,
         onlyActionEquipment
     )
 
     internal constructor(
+        networkStateOperators: NetworkStateOperators,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
         onlyActionEquipment: Boolean,
         parent: NetworkTrace<T>?,
         computeNextT: ComputeNextTWithPaths<T>,
     ) : this(
-        BranchingQueueType(NetworkTraceQueueNext.branching(computeNextT.wrapped(onlyActionEquipment)), queueFactory, branchQueueFactory),
+        networkStateOperators,
+        BranchingQueueType(
+            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT.wrapped(onlyActionEquipment)),
+            queueFactory,
+            branchQueueFactory
+        ),
         parent,
         onlyActionEquipment
     )
@@ -71,6 +97,17 @@ class NetworkTrace<T> private constructor(
         run(canStopOnStartItem)
     }
 
+    // TODO [Review]: Should this just be addCondition?
+    fun addNetworkCondition(block: NetworkStateOperators.() -> TraversalCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
+        addCondition(networkStateOperators.block())
+        return this
+    }
+
+    fun addStepAction(action: (NetworkTraceStep<T>, StepContext, NetworkStateOperators) -> Unit): NetworkTrace<T> {
+        addStepAction { item, ctx -> action(item, ctx, networkStateOperators) }
+        return this
+    }
+
     override fun canActionItem(item: NetworkTraceStep<T>, context: StepContext): Boolean {
         return context.isStartItem or (equipmentTracker?.visit(item) ?: super.canActionItem(item, context))
     }
@@ -80,7 +117,7 @@ class NetworkTrace<T> private constructor(
     }
 
     override fun getDerivedThis(): NetworkTrace<T> = this
-    override fun createNewThis(): NetworkTrace<T> = NetworkTrace(queueType, this, onlyActionEquipment)
+    override fun createNewThis(): NetworkTrace<T> = NetworkTrace(networkStateOperators, queueType, this, onlyActionEquipment)
 
 }
 

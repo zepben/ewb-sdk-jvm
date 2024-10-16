@@ -17,8 +17,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.*
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtCurrentlyOpen
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtNormallyOpen
+import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 
 /**
@@ -28,8 +27,8 @@ import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
  */
 class AssignToFeeders {
 
-    private val normalTraversal = Tracing.connectedTerminalTrace().addCondition(stopAtNormallyOpen())
-    private val currentTraversal = Tracing.connectedTerminalTrace().addCondition(stopAtCurrentlyOpen())
+    private val normalTraversal = Tracing.connectedTerminalTrace(NetworkStateOperators.NORMAL).addNetworkCondition { stopAtOpen() }
+    private val currentTraversal = Tracing.connectedTerminalTrace(NetworkStateOperators.CURRENT).addNetworkCondition { stopAtOpen() }
 
     private lateinit var activeFeeder: Feeder
 
@@ -151,10 +150,8 @@ class AssignToFeeders {
         if (isStopping && (reachedLv(stepPath.toEquipment) || reachedSubstationTransformer(stepPath.toEquipment)))
             return
 
-        stepPath.toTerminal?.let { terminal ->
-            terminalToAuxEquipment[terminal.mRID]?.forEach {
-                associateFeederAndEquipment(it, activeFeeder)
-            }
+        terminalToAuxEquipment[stepPath.toTerminal.mRID]?.forEach {
+            associateFeederAndEquipment(it, activeFeeder)
         }
 
         associateFeederAndEquipment(stepPath.toEquipment, activeFeeder)

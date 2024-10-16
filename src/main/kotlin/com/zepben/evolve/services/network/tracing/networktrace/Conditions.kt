@@ -27,29 +27,20 @@ object Conditions {
     fun <T> upstream(getDirection: (Terminal) -> FeederDirection): NetworkTraceCondition<T> =
         DirectionCondition(FeederDirection.UPSTREAM, getDirection)
 
-    fun <T> normallyUpstream(): NetworkTraceCondition<T> =
-        upstream(NetworkStateOperators.NORMAL::getDirection)
-
-    fun <T> currentlyUpstream(): NetworkTraceCondition<T> =
-        upstream(NetworkStateOperators.CURRENT::getDirection)
+    fun <T> FeederDirectionStateOperations.upstream(): NetworkTraceCondition<T> =
+        upstream(this::getDirection)
 
     fun <T> downstream(getDirection: (Terminal) -> FeederDirection): NetworkTraceCondition<T> =
         DirectionCondition(FeederDirection.DOWNSTREAM, getDirection)
 
-    fun <T> normallyDownstream(): NetworkTraceCondition<T> =
-        downstream(NetworkStateOperators.NORMAL::getDirection)
-
-    fun <T> currentlyDownstream(): NetworkTraceCondition<T> =
-        downstream(NetworkStateOperators.CURRENT::getDirection)
+    fun <T> FeederDirectionStateOperations.downstream(): NetworkTraceCondition<T> =
+        downstream(this::getDirection)
 
     fun <T> stopAtOpen(openTest: OpenTest, phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =
         OpenCondition(openTest, phase)
 
-    fun <T> stopAtNormallyOpen(phase: SinglePhaseKind? = null): NetworkTraceCondition<T> =
-        stopAtOpen(OpenTest.NORMALLY_OPEN, phase)
-
-    fun <T> stopAtCurrentlyOpen(phase: SinglePhaseKind? = null): NetworkTraceCondition<T> =
-        stopAtOpen(OpenTest.CURRENTLY_OPEN, phase)
+    fun <T> OpenStateOperators.stopAtOpen(phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =
+        stopAtOpen(this::isOpen, phase)
 
     fun <T> limitEquipmentSteps(limit: Int): NetworkTraceCondition<T> =
         EquipmentStepLimitCondition(limit)

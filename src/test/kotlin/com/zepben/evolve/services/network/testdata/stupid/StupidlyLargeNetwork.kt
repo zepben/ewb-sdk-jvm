@@ -50,7 +50,7 @@ import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUt
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createSwitch
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createTransformer
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.locationOf
-import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 
@@ -276,9 +276,9 @@ object StupidlyLargeNetwork {
         networkService.add(transformerWithTypeNonRevReg)
         networkService.add(transformerWithTypeZone)
 
-        com.zepben.evolve.services.network.tracing.networktrace.Tracing.applyFeederDirections(networkService)
-        Tracing.setPhases().run(networkService)
-        Tracing.assignEquipmentToFeeders().run(networkService)
+        Tracing.setFeederDirections(networkService)
+        com.zepben.evolve.services.network.tracing.Tracing.setPhases().run(networkService)
+        Tracing.assignEquipmentToFeeders(networkService)
 
         networkService.add(OperationalRestriction("OperationalRestriction2").apply {
             name = "Operational Restriction 2"

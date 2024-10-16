@@ -62,7 +62,7 @@ class AssignToFeeders {
 
     private fun run(traversal: NetworkTrace<Unit>, headTerminal: Terminal) {
         traversal.reset()
-        traversal.run(headTerminal, false)
+        traversal.run(headTerminal, canStopOnStartItem = false)
     }
 
     private fun configureStepActions(traversal: NetworkTrace<*>, terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>) {

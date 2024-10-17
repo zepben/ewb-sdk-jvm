@@ -45,6 +45,7 @@
     * `RotatingMachine`
     * `SynchronousMachine`
 * Added `OpenDssReportBatch` and a new `failure` OpenDSS report type to the hosting capacity API.
+* Updated grpc to support `InterventionConfig` and initial implementation of `SwitchState`.
 
 ### Enhancements
 * Added feature list in documentation.

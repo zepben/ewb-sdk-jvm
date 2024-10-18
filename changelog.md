@@ -25,6 +25,15 @@
   arithmatic/syntax.
 * Deprecated `TracedPhases`, however the internal constructor property has been removed. `Terminal.normalPhases`
   and `Terminal.currentPhases` should be used instead of `Terminal.tracedPhases` going forward.
+* `JWTAuthoriser.authorise` no longer accepts a permissions claims field, instead it will attempt to retrieve claims from the "permissions" field if it exists
+  in the token, or the "roles" field if the "permissions" field doesn't exist.
+* `JWTAuthenticator` has a new signature to accept a list of trusted domains rather than a single domain, and a `JWTMultiIssuerVerifierBuilder` rather than a
+  `UrlJwkProvider`.
+* `Auth0AuthHandler` has a new signature and no longer accepts a `permissionsField` to pass onto `JWTAuthoriser.authorise`. (See above change to
+  `JWTAuthoriser.authorise`)
+* `AuthRoute.routeFactory` has a new signature. Now accepts a list of `TrustedIssuer`'s in place of a `urlJwkProvider` and `issuer`.
+* Removed obsolete `SwitchStateClient` and corresponding `SwitchStateUpdate` which only communicated with a server implementation that logged the functionality
+  was not implemented.
 
 ### New Features
 * A file named after the ID of an ingestion job is now created when running `MetricsDatabaseWriter.save()`. For this feature to take effect, a `modelPath` must
@@ -46,6 +55,11 @@
     * `SynchronousMachine`
 * Added `OpenDssReportBatch` and a new `failure` OpenDSS report type to the hosting capacity API.
 * Updated grpc to support `InterventionConfig` and initial implementation of `SwitchState`.
+* `JWTAuthenticator` now supports authenticating tokens from multiple different issues via the use of `JWTMultiIssuerVerifierBuilder`.
+* `JWTMultiIssuerVerifierBuilder` will create a JWTVerifier based on the `iss` (issuer) of the token provided to `getVerifier()`. The returned JWTVerifier will
+  also validate that the audience claim matches the `requiredAudience` supplied to the `JWTMultiIssuerVerifierBuilder`.
+* `TrustedIssuer` now supports lazy fetching of `TrustedIssuer.providerDetails` by accepting a lambda that takes an issuer domain and returns a
+  `ProviderDetails`.
 
 ### Enhancements
 * Added feature list in documentation.

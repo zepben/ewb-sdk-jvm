@@ -8,6 +8,4 @@ jobs:
     with:
       private: false
       product-key: "jvm-sdk"
-      licencecheck: true
     secrets: inherit
-

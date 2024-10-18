@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [0.23.0] - UNRELEASED
+## [0.23.0] - 2024-10-18
 ### Breaking Changes
 * Updated to latest evolve-grpc major version.
 * Removed unused AuthType enum.

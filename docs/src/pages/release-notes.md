@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.23.0](#v0230)| `18 October 2024` |
 |[0.22.0](#v0220)| `30 May 2024` |
 |[0.21.0](#v0210)| `15 May 2024` |
 |[0.20.0](#v0200)| `14 May 2024` |
@@ -30,6 +31,91 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.23.0]
+
+### Breaking Changes
+* Updated to latest evolve-grpc major version.
+* Removed unused AuthType enum.
+* Removed unused kotlinx-serialization-json dependency.
+* Updated to latest ewb-conn, and hence the signature of these helper functions have changed:
+  * `Connect.connectWithSecret`:
+    * `issuerDomain` has been renamed to `issuer`;
+  * `Connect.connectWithPassword`:
+    * `issuerDomain` has been renamed to `issuer`;
+* Renamed `TablePowerElectronicsUnit` to `TablePowerElectronicsUnits`.
+* CIM object removal functions no longer support `null`. e.g. You must pass a valid `Terminal` to `ConductingEquipment.removeTerminal` rather than a nullable
+  object.
+* `DiagramObject.getPoint` no longer throws an `IndexOutOfRange` exception for an invalid sequence number, and returns `null` to match other functions of this
+  type.
+* Removed the `PowerTransformer.getRating` overload which took a rating value. You can still get a rating via its `TransformerCoolingType`.
+* Removed `PowerTransformer.forEachRating` which looped over the collection with an index that made no sense. Please loop over `PowerTransformer.sRatings`
+  instead.
+* `Equipment` to `EquipmentContainer` links for LV feeders are no longer written to the database, they should never have been.
+*  Refactored `EwbDataFilePaths`: 
+  * The `EwbDataFilePaths` class has been refactored into an interface to enhance flexibility and abstraction. 
+  * A new class, `LocalEwbDataFilePaths`, has been introduced to specifically handle the resolution of database paths for the local file system.
+* `Switch.ratedCurrent` has been converted to a `double` (used to be an `integer`). Type safe languages will need to be updated to support floating point
+  arithmatic/syntax.
+* Deprecated `TracedPhases`, however the internal constructor property has been removed. `Terminal.normalPhases`
+  and `Terminal.currentPhases` should be used instead of `Terminal.tracedPhases` going forward.
+* `JWTAuthoriser.authorise` no longer accepts a permissions claims field, instead it will attempt to retrieve claims from the "permissions" field if it exists
+  in the token, or the "roles" field if the "permissions" field doesn't exist.
+* `JWTAuthenticator` has a new signature to accept a list of trusted domains rather than a single domain, and a `JWTMultiIssuerVerifierBuilder` rather than a
+  `UrlJwkProvider`.
+* `Auth0AuthHandler` has a new signature and no longer accepts a `permissionsField` to pass onto `JWTAuthoriser.authorise`. (See above change to
+  `JWTAuthoriser.authorise`)
+* `AuthRoute.routeFactory` has a new signature. Now accepts a list of `TrustedIssuer`'s in place of a `urlJwkProvider` and `issuer`.
+* Removed obsolete `SwitchStateClient` and corresponding `SwitchStateUpdate` which only communicated with a server implementation that logged the functionality
+  was not implemented.
+
+### New Features
+* A file named after the ID of an ingestion job is now created when running `MetricsDatabaseWriter.save()`. For this feature to take effect, a `modelPath` must
+  be provided when constructing the `MetricsDatabaseWriter`.
+* You can now remove the following by index:
+  * `PositionPoint` from a `Location`.
+  * `DiagramObjectPoint` from a `DiagramObject`.
+  * `RelaySetting` from a `ProtectionRelayFunction`.
+* Data Model change:
+  * Add `phaseCode` variable to `UsagePoint`
+  * Added new classes:
+    * `Curve`
+    * `CurveData`
+    * `EarthFaultCompensator`
+    * `GroundingImpedance`
+    * `PetersenCoil`
+    * `ReactiveCapabilityCurve`
+    * `RotatingMachine`
+    * `SynchronousMachine`
+* Added `OpenDssReportBatch` and a new `failure` OpenDSS report type to the hosting capacity API.
+* Updated grpc to support `InterventionConfig` and initial implementation of `SwitchState`.
+* `JWTAuthenticator` now supports authenticating tokens from multiple different issues via the use of `JWTMultiIssuerVerifierBuilder`.
+* `JWTMultiIssuerVerifierBuilder` will create a JWTVerifier based on the `iss` (issuer) of the token provided to `getVerifier()`. The returned JWTVerifier will
+  also validate that the audience claim matches the `requiredAudience` supplied to the `JWTMultiIssuerVerifierBuilder`.
+* `TrustedIssuer` now supports lazy fetching of `TrustedIssuer.providerDetails` by accepting a lambda that takes an issuer domain and returns a
+  `ProviderDetails`.
+
+### Enhancements
+* Added feature list in documentation.
+* Changed `NetworkContainerMetrics` to a delegate type to assist in writing metrics creators:
+  * `NetworkContainerMetrics::plus(key: String, amount: Number)`: Increases a metric by a certain value. If the metric doesn't exist yet, it is
+    automatically created and set to zero before being increased. A negative value may be used for `amount` to decrease the metric.
+  * `NetworkContainerMetrics::inc(key: String)`: Equivalent to `NetworkContainerMetrics.plus(key, 1.0)`
+  * `NetworkContainerMetrics::set(key: String, value: Int)`: Allows setting a metric using an integer rather than a double-precision float:
+    ```
+    metrics[TotalNetworkContainer]["metric-name"] = 3
+    ```
+* `GrpcChannelBuilder` tests the connectivity of newly created channels before returning them. This is done by calling `getMetadata()` against all known
+  services. The channel is returned after the first successful response. Any connectivity errors will be propagated to the user. If no connectivity errors are
+  encountered but no successful responses is received from the known services, a `GrpcConnectionException` is thrown.
+
+### Fixes
+* Update superpom for dokka plugin upgrade so maven central deploy works again.
+
+### Notes
+* None.
 
 ---
 

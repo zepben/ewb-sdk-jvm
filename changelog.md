@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [0.24.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [0.23.0] - 2024-10-18
 ### Breaking Changes
 * Updated to latest evolve-grpc major version.

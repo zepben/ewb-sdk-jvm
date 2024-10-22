@@ -16,7 +16,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 /**
  * Helper class for finding the paths through equipment.
  */
-class TerminalConnectivityInternal {
+object TerminalConnectivityInternal {
 
     /**
      * Find the connectivity between the two terminals. The function assumes they are on the same conducting equipment.

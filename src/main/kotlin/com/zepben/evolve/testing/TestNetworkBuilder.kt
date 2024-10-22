@@ -503,7 +503,7 @@ open class TestNetworkBuilder {
      */
     fun build(applyDirectionsFromSources: Boolean = true): NetworkService {
         Tracing.setFeederDirections(network)
-        com.zepben.evolve.services.network.tracing.Tracing.setPhases().run(network)
+        Tracing.setPhases(network)
 
         if (applyDirectionsFromSources)
             network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach {

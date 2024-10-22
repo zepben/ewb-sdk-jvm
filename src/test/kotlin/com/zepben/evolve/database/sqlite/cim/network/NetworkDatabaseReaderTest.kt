@@ -15,7 +15,6 @@ import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionReader
 import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
-import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
@@ -46,7 +45,7 @@ internal class NetworkDatabaseReaderTest {
     }
 
     private val setFeederDirections = mockk<(NetworkService) -> Unit>()
-    private val setPhases = mockk<SetPhases> { justRun { run(service) } }
+    private val setPhases = mockk<(NetworkService) -> Unit>()
     private val phaseInferrer = mockk<PhaseInferrer> { justRun { run(service) } }
     private val assignToFeeders = mockk<(NetworkService) -> Unit>()
     private val assignToLvFeeders = mockk<(NetworkService) -> Unit>()
@@ -55,6 +54,7 @@ internal class NetworkDatabaseReaderTest {
         every { setFeederDirections(service) } just runs
         every { assignToFeeders(service) } just runs
         every { assignToLvFeeders(service) } just runs
+        every { setPhases(service) } just runs
     }
 
     private val reader = NetworkDatabaseReader(
@@ -107,7 +107,7 @@ internal class NetworkDatabaseReaderTest {
             service.unresolvedReferences()
 
             setFeederDirections(service)
-            setPhases.run(service)
+            setPhases(service)
             phaseInferrer.run(service)
             assignToFeeders(service)
             assignToLvFeeders(service)

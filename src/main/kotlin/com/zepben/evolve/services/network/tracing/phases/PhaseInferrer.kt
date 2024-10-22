@@ -12,12 +12,12 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhasePaths
 import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhasePaths.Companion.isAfter
 import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhasePaths.Companion.isBefore
 import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
 import org.slf4j.LoggerFactory
 
 class PhaseInferrer {
@@ -182,16 +182,16 @@ class PhaseInferrer {
     }
 
     private fun continuePhases(terminal: Terminal, phaseSelector: PhaseSelector) {
-        terminal.conductingEquipment?.also { ce ->
-            ce.terminals
-                .asSequence()
-                .filter { it != terminal }
-                .forEach { other ->
-                    Tracing.setPhases().apply {
-                        spreadPhases(terminal, other, phaseSelector = phaseSelector)
-                        run(other, phaseSelector)
-                    }
-                }
+        // TODO [Review]: Fix this when porting to network trace
+        val operators = when (phaseSelector) {
+            PhaseSelector.NORMAL_PHASES -> NetworkStateOperators.NORMAL
+            PhaseSelector.CURRENT_PHASES -> NetworkStateOperators.CURRENT
+            else -> throw UnsupportedOperationException()
+        }
+
+        val setPhasesTrace = SetPhases(operators)
+        terminal.otherTerminals().forEach { other ->
+            setPhasesTrace.run(terminal, other, terminal.phases.singlePhases)
         }
     }
 

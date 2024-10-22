@@ -24,8 +24,6 @@ internal class TerminalConnectivityInternalTest {
     @RegisterExtension
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
-    private val connectivity = TerminalConnectivityInternal()
-
     @Test
     internal fun pathsThroughHv3Tx() {
         validateTxPaths(PhaseCode.ABC, PhaseCode.ABC)
@@ -302,12 +300,12 @@ internal class TerminalConnectivityInternalTest {
 
         if (traced != PhaseCode.NONE) {
             assertThat(
-                connectivity.between(primaryTerminal, secondaryTerminal).nominalPhasePaths.map { it.to },
+                TerminalConnectivityInternal.between(primaryTerminal, secondaryTerminal).nominalPhasePaths.map { it.to },
                 containsInAnyOrder(*traced.singlePhases.toTypedArray())
             )
         } else {
             assertThat(
-                connectivity.between(primaryTerminal, secondaryTerminal).nominalPhasePaths,
+                TerminalConnectivityInternal.between(primaryTerminal, secondaryTerminal).nominalPhasePaths,
                 empty()
             )
         }

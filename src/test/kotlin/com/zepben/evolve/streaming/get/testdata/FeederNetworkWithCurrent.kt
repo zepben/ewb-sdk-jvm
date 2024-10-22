@@ -63,7 +63,7 @@ object FeederNetworkWithCurrent {
         networkService.connect(sw.t2, c4.t1)
         networkService.connect(c4.t2, tx2.t1)
 
-        com.zepben.evolve.services.network.tracing.Tracing.setPhases().run(networkService)
+        Tracing.setPhases(networkService)
         Tracing.assignEquipmentToFeeders(networkService)
 
         return networkService

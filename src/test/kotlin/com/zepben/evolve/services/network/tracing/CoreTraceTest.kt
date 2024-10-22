@@ -192,7 +192,7 @@ internal class CoreTraceTest {
     }
 
     private fun getNetwork() = PhaseSwapLoopNetwork.create().also {
-        Tracing.setPhases().run(it)
+        com.zepben.evolve.services.network.tracing.networktrace.Tracing.setPhases(it)
         com.zepben.evolve.services.network.tracing.networktrace.Tracing.setFeederDirections(it)
     }
 

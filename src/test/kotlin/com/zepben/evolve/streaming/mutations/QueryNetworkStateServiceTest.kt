@@ -11,6 +11,9 @@ package com.zepben.evolve.streaming.mutations
 import com.google.protobuf.Timestamp
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.services.common.translator.toTimestamp
+import com.zepben.evolve.streaming.data.CurrentStateEvent
+import com.zepben.evolve.streaming.data.SwitchAction
+import com.zepben.evolve.streaming.data.SwitchStateEvent
 import com.zepben.protobuf.ns.GetCurrentStatesRequest
 import com.zepben.protobuf.ns.GetCurrentStatesResponse
 import io.grpc.stub.StreamObserver
@@ -21,7 +24,6 @@ import org.hamcrest.Matchers.contains
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
-import java.util.stream.Stream
 
 class QueryNetworkStateServiceTest {
     private val currentStateEvents = listOf<CurrentStateEvent>(
@@ -37,8 +39,8 @@ class QueryNetworkStateServiceTest {
         every { it(any(), any()) } returns responseCurrentStateEvents.asSequence()
     }
 
-    private val onGetCurrentStatesStream = mockk<(from: LocalDateTime, to: LocalDateTime) -> Stream<List<CurrentStateEvent>>>().also {
-        every { it(any(), any()) } returns responseCurrentStateEvents.stream()
+    private val onGetCurrentStatesStream = mockk<QueryNetworkStateService.GetCurrentStates>().also {
+        every { it.get(any(), any()) } returns responseCurrentStateEvents.stream()
     }
 
     private val responseSlot = mutableListOf<GetCurrentStatesResponse>()
@@ -47,8 +49,8 @@ class QueryNetworkStateServiceTest {
         justRun { it.onCompleted() }
     }
 
-    private val serviceSequence = QueryNetworkStateService(onGetCurrentStates = onGetCurrentStatesSequence)
-    private val serviceStream = QueryNetworkStateService(onGetCurrentStatesJava = onGetCurrentStatesStream)
+    private val serviceSequence = QueryNetworkStateService(onGetCurrentStatesSequence)
+    private val serviceStream = QueryNetworkStateService(onGetCurrentStatesStream)
 
     private val request = GetCurrentStatesRequest.newBuilder().apply {
         messageId = 1

@@ -9,7 +9,6 @@
 package com.zepben.evolve.streaming.mutations
 
 import com.zepben.evolve.services.common.translator.toLocalDateTime
-import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.evolve.streaming.data.CurrentStateEvent
 import com.zepben.evolve.streaming.data.SwitchStateEvent
 import com.zepben.protobuf.ns.*
@@ -17,10 +16,6 @@ import io.grpc.stub.StreamObserver
 import java.time.LocalDateTime
 import java.util.stream.Stream
 import kotlin.streams.asSequence
-import com.zepben.protobuf.ns.data.CurrentStateEvent as PBCurrentStateEvent
-import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
-import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
-import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 
 /**
  * A service class that provides a simplified interface for retrieving current state events
@@ -33,7 +28,7 @@ import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
  * [CurrentStateEvent] objects within the specified time range.
  */
 class QueryNetworkStateService(
-    private val onGetCurrentStates: ((from: LocalDateTime, to: LocalDateTime) -> Sequence<List<CurrentStateEvent>>)
+    private val onGetCurrentStates: (from: LocalDateTime, to: LocalDateTime) -> Sequence<List<CurrentStateEvent>>
 ) : QueryNetworkStateServiceGrpc.QueryNetworkStateServiceImplBase() {
 
     /**
@@ -59,7 +54,7 @@ class QueryNetworkStateService(
      * }
      * ```
      */
-    constructor(onGetCurrentStates: GetCurrentStates) : this({from, to -> onGetCurrentStates.get(from, to).asSequence() })
+    constructor(onGetCurrentStates: GetCurrentStates) : this({ from, to -> onGetCurrentStates.get(from, to).asSequence() })
 
     /**
      * Handles the incoming request for retrieving current state events.
@@ -82,36 +77,29 @@ class QueryNetworkStateService(
         val from = request.from.toLocalDateTime()
         val to = request.to.toLocalDateTime()
 
-        require(from != null) { "GetCurrentStatesRequest.from is not valid" }
-        require(to != null) { "GetCurrentStatesRequest.to is not valid" }
-        require(to >= from) { "End time (GetCurrentStatesRequest.to) must not be before start time (GetCurrentStatesRequest.from)" }
+        require(from != null) { "'GetCurrentStatesRequest.from' is not valid" }
+        require(to != null) { "'GetCurrentStatesRequest.to' is not valid" }
+        require(to >= from) { "End time 'GetCurrentStatesRequest.to' must not be before start time 'GetCurrentStatesRequest.from'" }
 
         onGetCurrentStates(from, to).forEach { sendResponse(it, request.messageId, responseObserver) }
 
         responseObserver.onCompleted()
     }
 
-    private fun sendResponse(currentStateEvents: List<CurrentStateEvent>, messageId: Long, responseObserver: StreamObserver<GetCurrentStatesResponse>){
-        val builder = GetCurrentStatesResponse.newBuilder()
-        builder.setMessageId(messageId)
+    private fun sendResponse(currentStateEvents: List<CurrentStateEvent>, messageId: Long, responseObserver: StreamObserver<GetCurrentStatesResponse>) {
+        val responseBuilder = GetCurrentStatesResponse.newBuilder()
+        responseBuilder.setMessageId(messageId)
 
-        currentStateEvents.forEach { currentStateEvent: CurrentStateEvent ->
-            builder.addEvent(PBCurrentStateEvent.newBuilder().apply {
-                eventId = currentStateEvent.eventId
-                timestamp = currentStateEvent.timestamp.toTimestamp()
-                when (currentStateEvent) {
-                    is SwitchStateEvent -> switch = PBSwitchStateEvent.newBuilder().apply {
-                        mrid = currentStateEvent.mRID
-                        action = PBSwitchAction.valueOf(currentStateEvent.action.name)
-                        phases = PBPhaseCode.valueOf(currentStateEvent.phases.name)
-                    }.build()
-
-                    else -> throw NotImplementedError("There is currently no implementation of ${currentStateEvent::class.simpleName}.")
+        currentStateEvents.forEach {
+            responseBuilder.addEvent(
+                when (it) {
+                    is SwitchStateEvent -> it.toPb()
+                    else -> throw NotImplementedError("There is currently no implementation of ${it::class.simpleName}.")
                 }
-            }.build())
+            )
         }
 
-        responseObserver.onNext(builder.build())
+        responseObserver.onNext(responseBuilder.build())
     }
 
     /**
@@ -123,7 +111,7 @@ class QueryNetworkStateService(
      * to fetch current state events based on the provided start and end
      * timestamps.
      */
-    interface GetCurrentStates{
+    interface GetCurrentStates {
         /**
          * Retrieves a stream of lists of current state events that occur
          * between the specified time range.
@@ -136,7 +124,7 @@ class QueryNetworkStateService(
          * represent the current states within the specified time range.
          * If no events are found, an empty stream is returned.
          */
-        fun get (from: LocalDateTime, to: LocalDateTime) : Stream<List<CurrentStateEvent>>
+        fun get(from: LocalDateTime, to: LocalDateTime): Stream<List<CurrentStateEvent>>
     }
 
 }

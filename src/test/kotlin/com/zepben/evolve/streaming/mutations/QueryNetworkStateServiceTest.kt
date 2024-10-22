@@ -59,7 +59,7 @@ class QueryNetworkStateServiceTest {
     }.build()
 
     @Test
-    fun getCurrentStates(){
+    fun getCurrentStates() {
         serviceSequence.getCurrentStates(request, responseObserver)
         assertResponse()
 
@@ -70,35 +70,49 @@ class QueryNetworkStateServiceTest {
     }
 
     @Test
-    fun `getCurrentStates throws NotImpelemntedError when processing unsupported CurrentStateEvent`(){
-        every { onGetCurrentStatesSequence(any(), any()) } returns listOf(listOf(TestStateEvent())).asSequence()
+    fun `getCurrentStates throws NotImpelemntedError when processing unsupported CurrentStateEvent`() {
+        every { onGetCurrentStatesSequence(any(), any()) } returns listOf(listOf(mockk<CurrentStateEvent>())).asSequence()
 
-        assertThrows<NotImplementedError> {  serviceSequence.getCurrentStates(request, responseObserver) }
+        assertThrows<NotImplementedError> { serviceSequence.getCurrentStates(request, responseObserver) }
     }
 
     @Test
     fun `getCurrentStates throws IllegalArgumentException when GetCurrentStatesRequest properties 'from' and 'to' is invalid`() {
+        // from is 0
         val requestBuilder = GetCurrentStatesRequest.newBuilder().apply {
             messageId = 1
             to = Timestamp.newBuilder().apply { nanos = 1 }.build()
         }
-
-        assertThat(
-            assertThrows<IllegalArgumentException> { serviceSequence.getCurrentStates(requestBuilder.build(), responseObserver) }.message,
-            equalTo("GetCurrentStatesRequest.from is not valid")
+        assertIllegalArgument(
+            requestBuilder.build(),
+            "'GetCurrentStatesRequest.from' is not valid"
         )
-
+        // to is 0
         requestBuilder.apply {
             from = Timestamp.newBuilder().apply { seconds = 1 }.build()
             clearTo()
         }
-        assertThat(
-            assertThrows<IllegalArgumentException> { serviceStream.getCurrentStates(requestBuilder.build(), responseObserver) }.message,
-            equalTo("GetCurrentStatesRequest.to is not valid")
+        assertIllegalArgument(
+            requestBuilder.build(),
+            "'GetCurrentStatesRequest.to' is not valid"
+        )
+        // to is less than from
+        requestBuilder.apply {
+            to = Timestamp.newBuilder().apply { nanos = 1 }.build()
+        }
+        assertIllegalArgument(
+            requestBuilder.build(),
+            "End time 'GetCurrentStatesRequest.to' must not be before start time 'GetCurrentStatesRequest.from'"
         )
     }
 
-    private fun assertResponse(){
+    private fun assertIllegalArgument(request: GetCurrentStatesRequest, message: String) =
+        assertThat(
+            assertThrows<IllegalArgumentException> { serviceSequence.getCurrentStates(request, responseObserver) }.message,
+            equalTo(message)
+        )
+
+    private fun assertResponse() {
         assertThat(responseSlot.map { it.messageId }, contains(1, 1))
         responseSlot.flatMap { it.eventList }.let {
             assertThat(it.map { it.eventId }, contains(*currentStateEvents.map { it.eventId }.toTypedArray()))
@@ -108,6 +122,4 @@ class QueryNetworkStateServiceTest {
             assertThat(it.map { it.switch.phases.name }, contains(*switchStateEvents.map { it.phases.name }.toTypedArray()))
         }
     }
-
-    private class TestStateEvent: CurrentStateEvent("test event", LocalDateTime.now())
 }

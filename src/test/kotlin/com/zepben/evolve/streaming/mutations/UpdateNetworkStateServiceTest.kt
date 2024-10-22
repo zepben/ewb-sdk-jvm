@@ -8,5 +8,13 @@
 
 package com.zepben.evolve.streaming.mutations
 
+import com.zepben.evolve.streaming.data.CurrentStateEvent
+import com.zepben.evolve.streaming.data.SetCurrentStatesStatus
+import io.mockk.mockk
+
 class UpdateNetworkStateServiceTest {
+    private val onSetCurrentStates = mockk<(events: List<CurrentStateEvent>) -> SetCurrentStatesStatus>()
+    private val service = UpdateNetworkStateService(onSetCurrentStates)
+
+
 }

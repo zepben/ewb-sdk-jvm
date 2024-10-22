@@ -559,7 +559,7 @@ class NetworkService : BaseService("network") {
         @JvmStatic
         @JvmOverloads
         fun connectedTerminals(terminal: Terminal, phases: Iterable<SinglePhaseKind> = terminal.phases.singlePhases): List<ConnectivityResult> =
-            TerminalConnectivityConnected().connectedTerminals(terminal, phases)
+            TerminalConnectivityConnected.connectedTerminals(terminal, phases)
 
     }
 

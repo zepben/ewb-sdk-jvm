@@ -238,8 +238,8 @@ object Tracing {
      *
      * @return A new traversal instance.
      */
-    @JvmStatic
-    fun setPhases(): SetPhases = SetPhases()
+//    @JvmStatic
+//    fun setPhases(): SetPhases = SetPhases()
 
     /**
      * Returns an instance of [SetDirection] convenience class for setting feeder directions on a network.

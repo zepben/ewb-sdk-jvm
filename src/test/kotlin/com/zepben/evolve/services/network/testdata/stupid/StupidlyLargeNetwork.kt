@@ -277,7 +277,7 @@ object StupidlyLargeNetwork {
         networkService.add(transformerWithTypeZone)
 
         Tracing.setFeederDirections(networkService)
-        com.zepben.evolve.services.network.tracing.Tracing.setPhases().run(networkService)
+        Tracing.setPhases(networkService)
         Tracing.assignEquipmentToFeeders(networkService)
 
         networkService.add(OperationalRestriction("OperationalRestriction2").apply {

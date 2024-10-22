@@ -47,7 +47,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetwork
-import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
@@ -152,9 +152,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         /************ IEC61970 BASE CORE ************/
         validateSchema(SchemaServices.networkServicesOf(::BaseVoltage, BaseVoltage::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::ConnectivityNode, ConnectivityNode::fillFields))
-        validateSchema(
-            SchemaServices.networkServicesOf(::Feeder, Feeder::fillFields)
-                .also { com.zepben.evolve.services.network.tracing.networktrace.Tracing.setFeederDirections(it) })
+        validateSchema(SchemaServices.networkServicesOf(::Feeder, Feeder::fillFields).also { Tracing.setFeederDirections(it) })
         validateSchema(SchemaServices.networkServicesOf(::GeographicalRegion, GeographicalRegion::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Site, Site::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::SubGeographicalRegion, SubGeographicalRegion::fillFields))
@@ -195,7 +193,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         validateSchema(SchemaServices.networkServicesOf(::Disconnector, Disconnector::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::EnergyConsumer, EnergyConsumer::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::EnergyConsumerPhase, EnergyConsumerPhase::fillFields))
-        validateSchema(SchemaServices.networkServicesOf(::EnergySource, EnergySource::fillFields).also { Tracing.setPhases().run(it) })
+        validateSchema(SchemaServices.networkServicesOf(::EnergySource, EnergySource::fillFields).also { Tracing.setPhases(it) })
         validateSchema(SchemaServices.networkServicesOf(::EnergySourcePhase, EnergySourcePhase::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Fuse, Fuse::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Ground, Ground::fillFields))

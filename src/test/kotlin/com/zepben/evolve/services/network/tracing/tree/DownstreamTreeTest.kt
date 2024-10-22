@@ -11,7 +11,6 @@ package com.zepben.evolve.services.network.tracing.tree
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.network.testdata.LoopingNetwork
 import com.zepben.evolve.services.network.testdata.addFeederDirections
-import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.feeder.DirectionLogger
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
 import com.zepben.testutils.junit.SystemLogExtension
@@ -31,7 +30,6 @@ internal class DownstreamTreeTest {
     internal fun downstreamTreeTest() {
         val n = LoopingNetwork.create()
 
-        Tracing.setPhases().run(n)
         n.get<ConductingEquipment>("j0")!!.addFeederDirections().also { DirectionLogger.trace(it) }
 
         val start: ConductingEquipment = n["j1"]!!

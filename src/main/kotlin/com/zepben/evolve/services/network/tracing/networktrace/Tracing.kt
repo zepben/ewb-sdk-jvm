@@ -14,6 +14,7 @@ import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
+import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
@@ -157,16 +158,24 @@ object Tracing {
     fun currentAssignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders(NetworkStateOperators.CURRENT)
 
     fun assignEquipmentToFeeders(network: NetworkService) {
-        val normal = normalAssignEquipmentToFeeders().run(network)
-        val current = currentAssignEquipmentToFeeders().run(network)
+        normalAssignEquipmentToFeeders().run(network)
+        currentAssignEquipmentToFeeders().run(network)
     }
 
     fun normalAssignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders(NetworkStateOperators.NORMAL)
     fun currentAssignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders(NetworkStateOperators.CURRENT)
 
     fun assignEquipmentToLvFeeders(network: NetworkService) {
-        val normal = normalAssignEquipmentToLvFeeders().run(network)
-        val current = currentAssignEquipmentToLvFeeders().run(network)
+        normalAssignEquipmentToLvFeeders().run(network)
+        currentAssignEquipmentToLvFeeders().run(network)
+    }
+
+    fun normalSetPhases(): SetPhases = SetPhases(NetworkStateOperators.NORMAL)
+    fun currentSetPhases(): SetPhases = SetPhases(NetworkStateOperators.CURRENT)
+
+    fun setPhases(network: NetworkService) {
+        normalSetPhases().run(network)
+        currentSetPhases().run(network)
     }
 
 }

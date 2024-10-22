@@ -3,6 +3,7 @@ package com.zepben.evolve.services.network.tracing.networktrace
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
+import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.downstream
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.limitEquipmentSteps
 import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtOpen
@@ -138,20 +139,27 @@ class TracingTest {
         Tracing.normalRemoveDirection()
         Tracing.currentRemoveDirection()
 
+//        fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
+        Tracing.normalAssignEquipmentToFeeders()
+        Tracing.currentAssignEquipmentToFeeders()
+        Tracing.assignEquipmentToFeeders(NetworkService())
+
+//        fun assignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
+        Tracing.normalAssignEquipmentToLvFeeders()
+        Tracing.currentAssignEquipmentToLvFeeders()
+        Tracing.assignEquipmentToLvFeeders(NetworkService())
+
+        //        fun setPhases(): SetPhases = SetPhases()
+
         /**
          * TODO: Where do we want to define these now?
          * Need to look at the rest of these.
          */
-//        fun setPhases(): SetPhases = SetPhases()
 
 
 //        fun phaseInferrer(): PhaseInferrer = PhaseInferrer()
 
 //        fun removePhases(): RemovePhases = RemovePhases()
-
-//        fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
-
-//        fun assignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
 
 //        fun findWithUsagePoints(): FindWithUsagePoints = FindWithUsagePoints()
     }

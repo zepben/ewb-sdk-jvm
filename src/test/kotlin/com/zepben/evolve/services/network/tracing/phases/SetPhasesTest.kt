@@ -19,6 +19,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
@@ -36,7 +37,8 @@ internal class SetPhasesTest {
     internal fun setPhasesTest() {
         val n = PhaseSwapLoopNetwork.create()
 
-        SetPhases().run(n)
+        SetPhases(NetworkStateOperators.NORMAL).run(n)
+        SetPhases(NetworkStateOperators.CURRENT).run(n)
         PhaseLogger.trace(n.listOf<EnergySource>())
 
         // Check various points to make sure phases have been applied during the trace.
@@ -144,7 +146,10 @@ internal class SetPhasesTest {
             .toAcls(PhaseCode.ABCN) // c2
             .buildAndLog()
 
-        SetPhases().run(n.getT("c1", 2))
+        n.getT("c1", 2).also {
+            SetPhases(NetworkStateOperators.NORMAL).run(it, it.phases)
+            SetPhases(NetworkStateOperators.CURRENT).run(it, it.phases)
+        }
 
         PhaseValidator.validatePhases(n, "c0", PhaseCode.NONE, PhaseCode.NONE)
         PhaseValidator.validatePhases(n, "c1", PhaseCode.NONE, PhaseCode.ABCN)
@@ -162,7 +167,8 @@ internal class SetPhasesTest {
             .buildAndLog()
 
         expect {
-            SetPhases().run(n.getT("c0", 2), PhaseCode.AB)
+            SetPhases(NetworkStateOperators.NORMAL).run(n.getT("c0", 2), PhaseCode.AB)
+            SetPhases(NetworkStateOperators.CURRENT).run(n.getT("c0", 2), PhaseCode.AB)
         }.toThrow<IllegalArgumentException>()
             .withMessage(
                 "Attempted to apply phases [A, B] to Terminal{id='c0-t2'} with nominal phases A. Number of phases to apply must match the number of " +
@@ -183,7 +189,8 @@ internal class SetPhasesTest {
         val c1: AcLineSegment = n["c1"]!!
 
         expect {
-            SetPhases().run(n.getT("c0", 2))
+            SetPhases(NetworkStateOperators.NORMAL).run(n.getT("c0", 2))
+            SetPhases(NetworkStateOperators.CURRENT).run(n.getT("c0", 2))
         }.toThrow<IllegalStateException>()
             .withMessage(
                 "Attempted to flow conflicting phase A onto B on nominal phase A. This occurred while flowing from " +
@@ -207,7 +214,8 @@ internal class SetPhasesTest {
         val c2: AcLineSegment = n["c2"]!!
 
         expect {
-            SetPhases().run(n.getT("c0", 2))
+            SetPhases(NetworkStateOperators.NORMAL).run(n.getT("c0", 2))
+            SetPhases(NetworkStateOperators.CURRENT).run(n.getT("c0", 2))
         }.toThrow<IllegalStateException>()
             .withMessage(
                 "Attempted to flow conflicting phase A onto B on nominal phase A. This occurred while flowing between " +

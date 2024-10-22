@@ -22,7 +22,6 @@ import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
-import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import java.sql.Connection
 import java.util.*
 
@@ -46,7 +45,7 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     serviceReader: NetworkServiceReader = NetworkServiceReader(service, tables, connection),
     tableVersion: TableVersion = tableCimVersion,
     private val setFeederDirection: (NetworkService) -> Unit = Tracing::setFeederDirections,
-    private val setPhases: SetPhases = SetPhases(),
+    private val setPhases: (NetworkService) -> Unit = Tracing::setPhases,
     private val phaseInferrer: PhaseInferrer = PhaseInferrer(),
     private val assignToFeeders: (NetworkService) -> Unit = Tracing::assignEquipmentToFeeders,
     private val assignToLvFeeders: (NetworkService) -> Unit = Tracing::assignEquipmentToLvFeeders,
@@ -59,7 +58,7 @@ class NetworkDatabaseReader @JvmOverloads constructor(
             logger.info("Feeder direction applied to network.")
 
             logger.info("Applying phases to network...")
-            setPhases.run(service)
+            setPhases(service)
             phaseInferrer.run(service)
             logger.info("Phasing applied to network.")
 

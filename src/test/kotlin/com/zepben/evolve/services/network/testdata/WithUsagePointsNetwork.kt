@@ -17,7 +17,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.EnergyConsumer
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import java.util.*
 import kotlin.reflect.full.createInstance
 
@@ -104,7 +104,7 @@ object WithUsagePointsNetwork {
         network.connect(c14.t1, Objects.requireNonNull(c11.t2.connectivityNodeId))
         network.connect(c15.t1, Objects.requireNonNull(c12.t2.connectivityNodeId))
 
-        Tracing.setPhases().run(network)
+        Tracing.setPhases(network)
         es.addFeederDirections()
     }
 
@@ -153,7 +153,7 @@ object WithUsagePointsNetwork {
         network.connect(lv.terminals[1], ec1.terminals[0])
         network.connect(hv.terminals[1], ec2.terminals[0])
 
-        Tracing.setPhases().run(network)
+        Tracing.setPhases(network)
         es.addFeederDirections()
     }
 
@@ -187,7 +187,7 @@ object WithUsagePointsNetwork {
         network.connect(tx.terminals[1], lv.terminals[0])
         network.connect(lv.terminals[1], ec.terminals[0])
 
-        Tracing.setPhases().run(network)
+        Tracing.setPhases(network)
         es.addFeederDirections()
     }
 

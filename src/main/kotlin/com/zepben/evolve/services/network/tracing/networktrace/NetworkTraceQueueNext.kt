@@ -80,7 +80,7 @@ internal object NetworkTraceQueueNext {
         return if (path.nominalPhasePaths.isNotEmpty()) {
             val phasePaths = path.nominalPhasePaths.map { it.to }.toSet()
             nextTerminals
-                .map { nextTerminal -> tcc.terminalConnectivity(path.toTerminal, nextTerminal, phasePaths) }
+                .map { nextTerminal -> TerminalConnectivityConnected.terminalConnectivity(path.toTerminal, nextTerminal, phasePaths) }
                 .filter { it.nominalPhasePaths.isNotEmpty() }
                 .map { StepPath(path.toTerminal, it.toTerminal, nextNumTerminalSteps, nextNumEquipmentSteps, it.nominalPhasePaths) }
         } else {
@@ -116,5 +116,4 @@ internal object NetworkTraceQueueNext {
     private fun Terminal.hasConnectedBusbars(): Boolean =
         connectivityNode?.terminals?.any { it !== this && it.conductingEquipment is BusbarSection } ?: false
 
-    private val tcc = TerminalConnectivityConnected()
 }

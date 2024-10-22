@@ -589,7 +589,7 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
         @JvmStatic
         @JvmOverloads
         fun connectedTerminals(terminal: Terminal, phases: Iterable<SinglePhaseKind> = terminal.phases.singlePhases): List<ConnectivityResult> =
-            TerminalConnectivityConnected().connectedTerminals(terminal, phases)
+            TerminalConnectivityConnected.connectedTerminals(terminal, phases)
 
     }
 

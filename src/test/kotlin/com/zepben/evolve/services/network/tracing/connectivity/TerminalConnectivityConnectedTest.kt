@@ -28,7 +28,7 @@ internal class TerminalConnectivityConnectedTest {
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
     val networkService = NetworkService()
-    val connectivity = TerminalConnectivityConnected()
+    val connectivity = TerminalConnectivityConnected
 
     @Test
     internal fun straightConnections() {

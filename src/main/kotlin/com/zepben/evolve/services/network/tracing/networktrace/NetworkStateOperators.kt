@@ -15,8 +15,14 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
+import com.zepben.evolve.services.network.tracing.phases.PhaseStatus
 
-interface NetworkStateOperators : OpenStateOperators, FeederDirectionStateOperations, EquipmentContainerStateOperations, ServiceStateOperators {
+interface NetworkStateOperators :
+    OpenStateOperators,
+    FeederDirectionStateOperations,
+    EquipmentContainerStateOperations,
+    ServiceStateOperators,
+    PhaseStateOperators {
     // TODO [Review]: Should OpenTest become OpenOperators and DirectionSelector become DirectionOperators?
 
     companion object {
@@ -24,13 +30,15 @@ interface NetworkStateOperators : OpenStateOperators, FeederDirectionStateOperat
             OpenStateOperators by OpenStateOperators.NORMAL,
             FeederDirectionStateOperations by FeederDirectionStateOperations.NORMAL,
             EquipmentContainerStateOperations by EquipmentContainerStateOperations.NORMAL,
-            ServiceStateOperators by ServiceStateOperators.NORMAL {}
+            ServiceStateOperators by ServiceStateOperators.NORMAL,
+            PhaseStateOperators by PhaseStateOperators.NORMAL {}
 
         val CURRENT: NetworkStateOperators = object : NetworkStateOperators,
             OpenStateOperators by OpenStateOperators.CURRENT,
             FeederDirectionStateOperations by FeederDirectionStateOperations.CURRENT,
             EquipmentContainerStateOperations by EquipmentContainerStateOperations.CURRENT,
-            ServiceStateOperators by ServiceStateOperators.CURRENT {}
+            ServiceStateOperators by ServiceStateOperators.CURRENT,
+            PhaseStateOperators by PhaseStateOperators.CURRENT {}
     }
 }
 
@@ -150,6 +158,20 @@ interface FeederDirectionStateOperations {
                 terminal.currentFeederDirection = new
                 return true
             }
+        }
+    }
+}
+
+interface PhaseStateOperators {
+    fun phaseStatus(terminal: Terminal): PhaseStatus
+
+    companion object {
+        val NORMAL = object : PhaseStateOperators {
+            override fun phaseStatus(terminal: Terminal): PhaseStatus = terminal.normalPhases
+        }
+
+        val CURRENT = object : PhaseStateOperators {
+            override fun phaseStatus(terminal: Terminal): PhaseStatus = terminal.currentPhases
         }
     }
 }

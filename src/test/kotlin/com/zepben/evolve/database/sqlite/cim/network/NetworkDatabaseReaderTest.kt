@@ -16,9 +16,16 @@ import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionReader
 import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
+import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
+import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
+import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.testutils.junit.SystemLogExtension
-import io.mockk.*
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.verifySequence
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
@@ -46,19 +53,16 @@ internal class NetworkDatabaseReaderTest {
         every { this@mockk.supportedVersion } returns 1
     }
 
-    private val setFeederDirections = mockk<(NetworkService) -> Unit>()
-    private val setPhases = mockk<(NetworkService) -> Unit>()
+    private val normalSetFeederDirections = mockk<SetDirection> { justRun { run(service) } }
+    private val currentSetFeederDirections = mockk<SetDirection> { justRun { run(service) } }
+    private val normalSetPhases = mockk<SetPhases> { justRun { run(service) } }
+    private val currentSetPhases = mockk<SetPhases> { justRun { run(service) } }
     private val normalPhaseInferrer = mockk<PhaseInferrer>()
     private val currentPhaseInferrer = mockk<PhaseInferrer>()
-    private val assignToFeeders = mockk<(NetworkService) -> Unit>()
-    private val assignToLvFeeders = mockk<(NetworkService) -> Unit>()
-
-    init {
-        every { setFeederDirections(service) } just runs
-        every { assignToFeeders(service) } just runs
-        every { assignToLvFeeders(service) } just runs
-        every { setPhases(service) } just runs
-    }
+    private val normalAssignToFeeders = mockk<AssignToFeeders> { justRun { run(service) } }
+    private val currentAssignToFeeders = mockk<AssignToFeeders> { justRun { run(service) } }
+    private val normalAssignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
+    private val currentAssignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
 
     private val reader = NetworkDatabaseReader(
         connection,
@@ -68,12 +72,16 @@ internal class NetworkDatabaseReaderTest {
         metadataReader,
         networkServiceReader,
         tableVersion,
-        setFeederDirections,
-        setPhases,
+        normalSetFeederDirections,
+        currentSetFeederDirections,
+        normalSetPhases,
+        currentSetPhases,
         normalPhaseInferrer,
         currentPhaseInferrer,
-        assignToFeeders,
-        assignToLvFeeders
+        normalAssignToFeeders,
+        currentAssignToFeeders,
+        normalAssignToLvFeeders,
+        currentAssignToLvFeeders,
     )
 
     //
@@ -113,12 +121,20 @@ internal class NetworkDatabaseReaderTest {
             networkServiceReader.load()
             service.unresolvedReferences()
 
-            setFeederDirections(service)
-            setPhases(service)
+            normalSetFeederDirections.run(service)
+            currentSetFeederDirections.run(service)
+
+            normalSetPhases.run(service)
+            currentSetPhases.run(service)
+
             normalPhaseInferrer.run(service)
             currentPhaseInferrer.run(service)
-            assignToFeeders(service)
-            assignToLvFeeders(service)
+
+            normalAssignToFeeders.run(service)
+            currentAssignToFeeders.run(service)
+
+            normalAssignToLvFeeders.run(service)
+            currentAssignToLvFeeders.run(service)
 
             // calls for _validate_equipment_containers()
             service.listOf<Equipment>(any<(Equipment) -> Boolean>())

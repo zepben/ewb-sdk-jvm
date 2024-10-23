@@ -9,8 +9,12 @@
 package com.zepben.evolve.services.network.tracing.tree
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.services.network.tracing.networktrace.*
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.downstream
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.StepPath
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue
 
 

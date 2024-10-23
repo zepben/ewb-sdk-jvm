@@ -3,10 +3,11 @@ package com.zepben.evolve.services.network.tracing.networktrace
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.downstream
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.limitEquipmentSteps
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtOpen
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.upstream
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.limitEquipmentSteps
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.upstream
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import org.junit.jupiter.api.Test
 
@@ -164,5 +165,6 @@ class TracingTest {
          */
 
 //        fun findWithUsagePoints(): FindWithUsagePoints = FindWithUsagePoints()
+
     }
 }

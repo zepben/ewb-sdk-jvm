@@ -18,7 +18,7 @@ import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.testdata.*
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat

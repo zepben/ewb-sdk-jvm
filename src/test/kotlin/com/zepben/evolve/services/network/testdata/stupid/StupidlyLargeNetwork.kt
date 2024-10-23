@@ -27,9 +27,7 @@ import com.zepben.evolve.services.Services
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.testdata.createAssetOwner
-import com.zepben.evolve.services.network.testdata.createTerminal
-import com.zepben.evolve.services.network.testdata.createTerminals
+import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.baseVoltageOf
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createAcLineSegment
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createAccumulator
@@ -50,7 +48,6 @@ import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUt
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createSwitch
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.createTransformer
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetworkUtils.Companion.locationOf
-import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 
@@ -276,9 +273,9 @@ object StupidlyLargeNetwork {
         networkService.add(transformerWithTypeNonRevReg)
         networkService.add(transformerWithTypeZone)
 
-        Tracing.setFeederDirections(networkService)
-        Tracing.setPhases(networkService)
-        Tracing.assignEquipmentToFeeders(networkService)
+        networkService.setFeederDirections()
+        networkService.setPhases()
+        networkService.assignEquipmentToFeeders()
 
         networkService.add(OperationalRestriction("OperationalRestriction2").apply {
             name = "Operational Restriction 2"

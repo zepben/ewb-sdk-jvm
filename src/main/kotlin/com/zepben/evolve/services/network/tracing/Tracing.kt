@@ -254,8 +254,8 @@ object Tracing {
      *
      * @return A new traversal instance.
      */
-    @JvmStatic
-    fun phaseInferrer(): PhaseInferrer = PhaseInferrer()
+//    @JvmStatic
+//    fun phaseInferrer(): PhaseInferrer = PhaseInferrer()
 
     /**
      * Returns an instance of [RemovePhases] convenience class for removing phases from a network.

@@ -20,6 +20,7 @@ import com.zepben.evolve.services.common.extensions.nameAndMRID
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import java.sql.Connection
@@ -44,9 +45,11 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     metadataReader: MetadataCollectionReader = MetadataCollectionReader(service, tables, connection),
     serviceReader: NetworkServiceReader = NetworkServiceReader(service, tables, connection),
     tableVersion: TableVersion = tableCimVersion,
+    // TODO [Review]: This should probably have a normal and a current versions for all these things, not just the PhaseInferrer
     private val setFeederDirection: (NetworkService) -> Unit = Tracing::setFeederDirections,
     private val setPhases: (NetworkService) -> Unit = Tracing::setPhases,
-    private val phaseInferrer: PhaseInferrer = PhaseInferrer(),
+    private val normalPhaseInferrer: PhaseInferrer = PhaseInferrer(NetworkStateOperators.NORMAL),
+    private val currentPhaseInferrer: PhaseInferrer = PhaseInferrer(NetworkStateOperators.CURRENT),
     private val assignToFeeders: (NetworkService) -> Unit = Tracing::assignEquipmentToFeeders,
     private val assignToLvFeeders: (NetworkService) -> Unit = Tracing::assignEquipmentToLvFeeders,
 ) : CimDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion) {
@@ -59,7 +62,7 @@ class NetworkDatabaseReader @JvmOverloads constructor(
 
             logger.info("Applying phases to network...")
             setPhases(service)
-            phaseInferrer.run(service)
+            logInferredPhases(normalPhaseInferrer.run(service), currentPhaseInferrer.run(service))
             logger.info("Phasing applied to network.")
 
             logger.info("Assigning equipment to feeders...")
@@ -78,6 +81,18 @@ class NetworkDatabaseReader @JvmOverloads constructor(
             validateSources(service)
             logger.info("Sources vs feeders validated.")
         }
+
+    private fun logInferredPhases(
+        normalInferredPhases: Collection<PhaseInferrer.InferredPhase>,
+        currentInferredPhases: Collection<PhaseInferrer.InferredPhase>
+    ) {
+        val inferredPhases = normalInferredPhases.associateBy { it.conductingEquipment }.toMutableMap()
+        currentInferredPhases.forEach {
+            inferredPhases.merge(it.conductingEquipment, it) { left, right -> left.takeIf { left.suspect } ?: right }
+        }
+
+        inferredPhases.values.forEach { logger.warn("*** Action Required *** ${it.description()}") }
+    }
 
     private fun validateEquipmentContainers(networkService: NetworkService) {
         val missingContainers = networkService.listOf<Equipment> { it.containers.isEmpty() }

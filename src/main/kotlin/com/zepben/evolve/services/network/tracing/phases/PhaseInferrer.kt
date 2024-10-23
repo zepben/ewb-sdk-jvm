@@ -15,106 +15,92 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhasePaths
 import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhasePaths.Companion.isAfter
 import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhasePaths.Companion.isBefore
-import com.zepben.evolve.services.network.tracing.feeder.DirectionSelector
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
-import org.slf4j.LoggerFactory
 
-class PhaseInferrer {
+class PhaseInferrer(
+    val stateOperators: NetworkStateOperators
+) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
-    private var tracking = mutableMapOf<ConductingEquipment, Boolean>()
-
-    fun run(network: NetworkService) {
-        tracking = mutableMapOf()
-
-        inferMissingPhases(network, PhaseSelector.NORMAL_PHASES, DirectionSelector.NORMAL_DIRECTION)
-        inferMissingPhases(network, PhaseSelector.CURRENT_PHASES, DirectionSelector.CURRENT_DIRECTION)
-
-        tracking.forEach { (conductingEquipment, hasSuspectInferred) ->
-            if (hasSuspectInferred) {
-                logger.warn(
-                    "*** Action Required *** Inferred missing phases for '{}' [{}] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.",
-                    conductingEquipment.name,
-                    conductingEquipment.mRID
-                )
-            } else {
-                logger.warn(
-                    "*** Action Required *** Inferred missing phase for '{}' [{}] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system.",
-                    conductingEquipment.name,
-                    conductingEquipment.mRID
-                )
-            }
+    data class InferredPhase(val conductingEquipment: ConductingEquipment, val suspect: Boolean) {
+        fun description(): String = if (suspect) {
+            "Inferred missing phases for '${conductingEquipment.name}' [${conductingEquipment.mRID}] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
+        } else {
+            "*** Action Required *** Inferred missing phase for '${conductingEquipment.name}' [${conductingEquipment.mRID}] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
         }
     }
 
-    private fun inferMissingPhases(network: NetworkService, phaseSelector: PhaseSelector, directionSelector: DirectionSelector) {
+    fun run(network: NetworkService): Collection<InferredPhase> {
+        val tracking = mutableMapOf<ConductingEquipment, Boolean>()
+
+        inferMissingPhases(network, tracking)
+
+        return tracking.map { InferredPhase(it.key, it.value) }
+    }
+
+    private fun inferMissingPhases(network: NetworkService, tracking: MutableMap<ConductingEquipment, Boolean>) {
         do {
-            val terminalsMissingPhases = network.listOf<Terminal> { ((it.connectivityNode?.terminals?.size ?: 0) > 1) && hasNonePhase(it, phaseSelector) }
+            val terminalsMissingPhases = network.listOf<Terminal> { ((it.connectivityNode?.terminals?.size ?: 0) > 1) && hasNonePhase(it) }
             val terminalsMissingXyPhases = terminalsMissingPhases.filter { t -> hasXYPhases(t) }
         } while (
-            terminalsMissingPhases.process(phaseSelector, directionSelector) { setMissingToNominal(it, phaseSelector) } or
-            terminalsMissingXyPhases.process(phaseSelector, directionSelector) { inferXyPhases(it, phaseSelector, 1) } or
-            terminalsMissingXyPhases.process(phaseSelector, directionSelector) { inferXyPhases(it, phaseSelector, 4) }
+            terminalsMissingPhases.process { setMissingToNominal(it, tracking) } or
+            terminalsMissingXyPhases.process { inferXyPhases(it, 1, tracking) } or
+            terminalsMissingXyPhases.process { inferXyPhases(it, 4, tracking) }
         )
     }
 
-    private fun hasNonePhase(terminal: Terminal, phaseSelector: PhaseSelector): Boolean =
-        phaseSelector.phases(terminal).let { phases ->
+    private fun hasNonePhase(terminal: Terminal): Boolean =
+        stateOperators.phaseStatus(terminal).let { phases ->
             terminal.phases.singlePhases.any { phases[it] == SinglePhaseKind.NONE }
         }
 
     private fun hasXYPhases(terminal: Terminal): Boolean =
         terminal.phases.singlePhases.contains(SinglePhaseKind.Y) || terminal.phases.singlePhases.contains(SinglePhaseKind.X)
 
-    private fun findTerminalAtStartOfMissingPhases(
-        terminals: List<Terminal>,
-        phaseSelector: PhaseSelector,
-        directionSelector: DirectionSelector
-    ): List<Terminal> =
-        terminals.missingFromDownToUp(phaseSelector, directionSelector).takeUnless { it.isEmpty() }
-            ?: terminals.missingFromDownToAny(phaseSelector, directionSelector).takeUnless { it.isEmpty() }
-            ?: terminals.missingFromAny(phaseSelector)
+    private fun findTerminalAtStartOfMissingPhases(terminals: List<Terminal>): List<Terminal> =
+        terminals.missingFromDownToUp().takeUnless { it.isEmpty() }
+            ?: terminals.missingFromDownToAny().takeUnless { it.isEmpty() }
+            ?: terminals.missingFromAny()
 
-    private fun List<Terminal>.missingFromDownToUp(phaseSelector: PhaseSelector, directionSelector: DirectionSelector): List<Terminal> =
+    private fun List<Terminal>.missingFromDownToUp(): List<Terminal> =
         filter { terminal ->
-            hasNonePhase(terminal, phaseSelector) &&
-                FeederDirection.UPSTREAM in directionSelector.select(terminal).value &&
+            hasNonePhase(terminal) &&
+                FeederDirection.UPSTREAM in stateOperators.getDirection(terminal) &&
                 terminal.connectivityNode!!.terminals
                     .asSequence()
                     .filter { it != terminal }
-                    .filter { FeederDirection.DOWNSTREAM in directionSelector.select(it).value }
-                    .any { !hasNonePhase(it, phaseSelector) }
+                    .filter { FeederDirection.DOWNSTREAM in stateOperators.getDirection(it) }
+                    .any { !hasNonePhase(it) }
         }
 
-    private fun List<Terminal>.missingFromDownToAny(phaseSelector: PhaseSelector, directionSelector: DirectionSelector): List<Terminal> =
+    private fun List<Terminal>.missingFromDownToAny(): List<Terminal> =
         filter { terminal ->
-            hasNonePhase(terminal, phaseSelector) &&
+            hasNonePhase(terminal) &&
                 terminal.connectivityNode!!.terminals
                     .asSequence()
                     .filter { it != terminal }
-                    .filter { FeederDirection.DOWNSTREAM in directionSelector.select(it).value }
-                    .any { !hasNonePhase(it, phaseSelector) }
+                    .filter { FeederDirection.DOWNSTREAM in stateOperators.getDirection(it) }
+                    .any { !hasNonePhase(it) }
         }
 
-    private fun List<Terminal>.missingFromAny(phaseSelector: PhaseSelector): List<Terminal> =
+    private fun List<Terminal>.missingFromAny(): List<Terminal> =
         filter { terminal ->
-            hasNonePhase(terminal, phaseSelector) &&
+            hasNonePhase(terminal) &&
                 terminal.connectivityNode!!.terminals
                     .asSequence()
                     .filter { it != terminal }
-                    .any { !hasNonePhase(it, phaseSelector) }
+                    .any { !hasNonePhase(it) }
         }
 
-    private fun List<Terminal>.process(phaseSelector: PhaseSelector, directionSelector: DirectionSelector, processor: (Terminal) -> Boolean): Boolean {
-        var terminalsToProcess = findTerminalAtStartOfMissingPhases(this, phaseSelector, directionSelector)
+    private fun List<Terminal>.process(processor: (Terminal) -> Boolean): Boolean {
+        var terminalsToProcess = findTerminalAtStartOfMissingPhases(this)
 
         var hasProcessed = false
         do {
             var continueProcessing = false
 
             terminalsToProcess.forEach { continueProcessing = processor(it) || continueProcessing }
-            terminalsToProcess = findTerminalAtStartOfMissingPhases(this, phaseSelector, directionSelector)
+            terminalsToProcess = findTerminalAtStartOfMissingPhases(this)
 
             hasProcessed = hasProcessed || continueProcessing
         } while (continueProcessing)
@@ -122,8 +108,8 @@ class PhaseInferrer {
         return hasProcessed
     }
 
-    private fun setMissingToNominal(terminal: Terminal, phaseSelector: PhaseSelector): Boolean {
-        val phases = phaseSelector.phases(terminal)
+    private fun setMissingToNominal(terminal: Terminal, tracking: MutableMap<ConductingEquipment, Boolean>): Boolean {
+        val phases = stateOperators.phaseStatus(terminal)
 
         val phasesToProcess = terminal.phases.singlePhases
             .asSequence()
@@ -135,20 +121,20 @@ class PhaseInferrer {
             return false
 
         phasesToProcess.forEach { phases[it] = it }
-        continuePhases(terminal, phaseSelector)
+        continuePhases(terminal)
 
         terminal.conductingEquipment?.also { tracking[it] = false }
 
         return true
     }
 
-    private fun inferXyPhases(terminal: Terminal, phaseSelector: PhaseSelector, maxMissingPhases: Int): Boolean {
+    private fun inferXyPhases(terminal: Terminal, maxMissingPhases: Int, tracking: MutableMap<ConductingEquipment, Boolean>): Boolean {
         val none = mutableListOf<SinglePhaseKind>()
         val usedPhases = mutableSetOf<SinglePhaseKind>()
 
         val conductingEquipment = terminal.conductingEquipment ?: return false
 
-        val phases = phaseSelector.phases(terminal)
+        val phases = stateOperators.phaseStatus(terminal)
         terminal.phases.singlePhases.forEach { nominalPhase ->
             phases[nominalPhase].also {
                 if (it === SinglePhaseKind.NONE)
@@ -177,19 +163,12 @@ class PhaseInferrer {
             }
         }
 
-        continuePhases(terminal, phaseSelector)
+        continuePhases(terminal)
         return hadChanges
     }
 
-    private fun continuePhases(terminal: Terminal, phaseSelector: PhaseSelector) {
-        // TODO [Review]: Fix this when porting to network trace
-        val operators = when (phaseSelector) {
-            PhaseSelector.NORMAL_PHASES -> NetworkStateOperators.NORMAL
-            PhaseSelector.CURRENT_PHASES -> NetworkStateOperators.CURRENT
-            else -> throw UnsupportedOperationException()
-        }
-
-        val setPhasesTrace = SetPhases(operators)
+    private fun continuePhases(terminal: Terminal) {
+        val setPhasesTrace = SetPhases(stateOperators)
         terminal.otherTerminals().forEach { other ->
             setPhasesTrace.run(terminal, other, terminal.phases.singlePhases)
         }

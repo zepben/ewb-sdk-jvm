@@ -11,6 +11,7 @@ package com.zepben.evolve.services.network.tracing.networktrace
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.traversalV2.RecursiveTracker
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext

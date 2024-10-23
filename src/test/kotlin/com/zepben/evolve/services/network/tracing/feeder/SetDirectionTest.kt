@@ -16,7 +16,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.evolve.services.network.tracing.feeder.DirectionValidator.validateDirections
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection.*
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat

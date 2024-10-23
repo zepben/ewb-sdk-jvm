@@ -4,7 +4,8 @@
 * None.
 
 ### New Features
-* None.
+* Network sate services for updating and querying network state events via gRPC.
+* Client functionaliy for updating network states via gRPC service stub. 
 
 ### Enhancements
 * None.

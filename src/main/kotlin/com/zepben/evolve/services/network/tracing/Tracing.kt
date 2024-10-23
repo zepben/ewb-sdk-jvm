@@ -262,8 +262,8 @@ object Tracing {
      *
      * @return A new traversal instance.
      */
-    @JvmStatic
-    fun removePhases(): RemovePhases = RemovePhases()
+//    @JvmStatic
+//    fun removePhases(): RemovePhases = RemovePhases()
 
     /**
      * Returns an instance of [RemoveDirection] convenience class for removing feeder directions from a network.

@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.streaming.data
 
+import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.services.common.translator.toTimestamp
 import java.time.LocalDateTime
 import com.zepben.protobuf.ns.data.BatchSuccessful as PBBatchSuccessful
@@ -27,7 +28,12 @@ sealed interface SetCurrentStatesStatus
 /**
  * A response indicating all items in the batch were applied successfully.
  */
-class BatchSuccessful : SetCurrentStatesStatus{
+class BatchSuccessful : SetCurrentStatesStatus {
+    companion object {
+        internal fun fromPb(pb: PBBatchSuccessful): SetCurrentStatesStatus =
+            BatchSuccessful()
+    }
+
     internal fun toPb(): PBBatchSuccessful =
         PBBatchSuccessful.newBuilder().build()
 }
@@ -38,7 +44,12 @@ class BatchSuccessful : SetCurrentStatesStatus{
  *
  * @property since The timestamp when the processing was paused.
  */
-class ProcessingPaused(val since: LocalDateTime) : SetCurrentStatesStatus{
+class ProcessingPaused(val since: LocalDateTime?) : SetCurrentStatesStatus {
+    companion object {
+        internal fun fromPb(pb: PBProcessingPaused): SetCurrentStatesStatus =
+            ProcessingPaused(pb.since.toLocalDateTime())
+    }
+
     internal fun toPb(): PBProcessingPaused =
         PBProcessingPaused.newBuilder().also { it.since = since.toTimestamp() }.build()
 }
@@ -49,7 +60,12 @@ class ProcessingPaused(val since: LocalDateTime) : SetCurrentStatesStatus{
  * @property partialFailure Indicates if only come of the batch failed (true), or all entries in the batch failed (false).
  * @property failures The status of each item processed in the batch that failed.
  */
-class BatchFailure(val partialFailure: Boolean, val failures: List<StateEventFailure>) : SetCurrentStatesStatus{
+class BatchFailure(val partialFailure: Boolean, val failures: List<StateEventFailure>) : SetCurrentStatesStatus {
+    companion object {
+        internal fun fromPb(pb: PBBatchFailure): SetCurrentStatesStatus =
+            BatchFailure(pb.partialFailure, pb.failedList.mapNotNull { StateEventFailure.fromPb(it) })
+    }
+
     internal fun toPb(): PBBatchFailure =
         PBBatchFailure.newBuilder().also {
             it.partialFailure = partialFailure
@@ -62,7 +78,18 @@ class BatchFailure(val partialFailure: Boolean, val failures: List<StateEventFai
  *
  * @property eventId The eventId of the state event that failed.
  */
-sealed class StateEventFailure(val eventId: String){
+sealed class StateEventFailure(val eventId: String) {
+    companion object {
+        internal fun fromPb(pb: PBStateEventFailure): StateEventFailure? =
+            when (pb.reasonCase) {
+                PBStateEventFailure.ReasonCase.UNKNOWNMRID -> StateEventUnknownMrid.fromPb(pb.eventId)
+                PBStateEventFailure.ReasonCase.INVALIDMRID -> StateEventInvalidMrid.fromPb(pb.eventId)
+                PBStateEventFailure.ReasonCase.DUPLICATEMRID -> StateEventDuplicateMrid.fromPb(pb.eventId)
+                PBStateEventFailure.ReasonCase.UNSUPPORTEDPHASING -> StateEventUnsupportedPhasing.fromPb(pb.eventId)
+                else -> null
+            }
+    }
+
     internal abstract fun toPb(): PBStateEventFailure
 
     /**
@@ -75,7 +102,12 @@ sealed class StateEventFailure(val eventId: String){
 /**
  * The requested mRID was not found in the network.
  */
-class StateEventUnknownMrid(eventId: String) : StateEventFailure(eventId){
+class StateEventUnknownMrid(eventId: String) : StateEventFailure(eventId) {
+    companion object {
+        internal fun fromPb(eventId: String): StateEventFailure =
+            StateEventUnknownMrid(eventId)
+    }
+
     override fun toPb(): PBStateEventFailure =
         toPbBuilder().apply {
             unknownMrid = PBStateEventUnknownMrid.newBuilder().build()
@@ -85,7 +117,12 @@ class StateEventUnknownMrid(eventId: String) : StateEventFailure(eventId){
 /**
  * The requested mRID already existed in the network and can't be used.
  */
-class StateEventDuplicateMrid(eventId: String) : StateEventFailure(eventId){
+class StateEventDuplicateMrid(eventId: String) : StateEventFailure(eventId) {
+    companion object {
+        internal fun fromPb(eventId: String): StateEventFailure =
+            StateEventDuplicateMrid(eventId)
+    }
+
     override fun toPb(): PBStateEventFailure =
         toPbBuilder().apply {
             duplicateMrid = PBStateEventDuplicateMrid.newBuilder().build()
@@ -95,7 +132,12 @@ class StateEventDuplicateMrid(eventId: String) : StateEventFailure(eventId){
 /**
  * The requested mRID was found in the network model, but was of an invalid type.
  */
-class StateEventInvalidMrid(eventId: String) : StateEventFailure(eventId){
+class StateEventInvalidMrid(eventId: String) : StateEventFailure(eventId) {
+    companion object {
+        internal fun fromPb(eventId: String): StateEventFailure =
+            StateEventInvalidMrid(eventId)
+    }
+
     override fun toPb(): PBStateEventFailure =
         toPbBuilder().apply {
             invalidMrid = PBStateEventInvalidMrid.newBuilder().build()
@@ -106,7 +148,12 @@ class StateEventInvalidMrid(eventId: String) : StateEventFailure(eventId){
  * The requested phasing was not available for the given operation. e.g. An open state request was made with
  * unsupported phases.
  */
-class StateEventUnsupportedPhasing(eventId: String) : StateEventFailure(eventId){
+class StateEventUnsupportedPhasing(eventId: String) : StateEventFailure(eventId) {
+    companion object {
+        internal fun fromPb(eventId: String): StateEventFailure =
+            StateEventUnsupportedPhasing(eventId)
+    }
+
     override fun toPb(): PBStateEventFailure =
         toPbBuilder().apply {
             unsupportedPhasing = PBStateEventUnsupportedPhasing.newBuilder().build()

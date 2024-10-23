@@ -25,13 +25,13 @@ import com.zepben.protobuf.ns.data.CurrentStateEvent.EventCase
  * duplicates when requesting events via dates vs those streamed via live updates.
  * @property timestamp The timestamp when the event occurred.
  */
-sealed class CurrentStateEvent(val eventId: String, val timestamp: LocalDateTime?){
+sealed class CurrentStateEvent(val eventId: String, val timestamp: LocalDateTime?) {
     companion object {
         /**
          * Creates a [CurrentStateEvent] object from protobuf [PBCurrentStateEvent]
          */
         internal fun fromPb(event: PBCurrentStateEvent): CurrentStateEvent =
-            when (event.eventCase){
+            when (event.eventCase) {
                 EventCase.SWITCH -> SwitchStateEvent.fromPb(event)
                 else -> throw UnsupportedOperationException("'${event.eventCase}' is currently unsupported.")
             }
@@ -54,12 +54,18 @@ sealed class CurrentStateEvent(val eventId: String, val timestamp: LocalDateTime
  *
  * @property eventId An identifier of this event. This must be unique across requests to allow detection of
  * duplicates when requesting events via dates vs those streamed via live updates.
- * @property timestamp The timestamp when the event occurred.
+ * @property timestamp The timestamp when the event occurred. This is always handled as UTC (Coordinated Universal Time).
  * @property mRID The mRID of the switch affected by this event.
  * @property action The action to take on the switch for the specified phases.
- * @property phases The phases affected by this event. If not specified, all phases will be affected.
+ * @property phases The phases affected by this event. Defaults to NONE.
  */
-class SwitchStateEvent(eventId: String, timestamp: LocalDateTime?, val mRID: String, val action: SwitchAction, val phases: PhaseCode) : CurrentStateEvent(eventId, timestamp){
+class SwitchStateEvent @JvmOverloads constructor(
+    eventId: String,
+    timestamp: LocalDateTime?,
+    val mRID: String,
+    val action: SwitchAction,
+    val phases: PhaseCode = PhaseCode.NONE
+) : CurrentStateEvent(eventId, timestamp) {
     companion object {
         /**
          * Creates a [SwitchStateEvent] object from protobuf [PBCurrentStateEvent]
@@ -95,10 +101,12 @@ enum class SwitchAction {
      * The specified action was unknown, or was not set.
      */
     UNKNOWN,
+
     /**
      * A request to open a switch.
      */
     OPEN,
+
     /**
      * A request to close a switch.
      */

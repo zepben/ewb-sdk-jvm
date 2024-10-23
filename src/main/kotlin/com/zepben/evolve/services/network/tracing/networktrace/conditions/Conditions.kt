@@ -6,17 +6,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network.tracing.networktrace
+package com.zepben.evolve.services.network.tracing.networktrace.conditions
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.DirectionCondition
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.EquipmentStepLimitCondition
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.EquipmentTypeStepLimitCondition
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.OpenCondition
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.operators.FeederDirectionStateOperations
+import com.zepben.evolve.services.network.tracing.networktrace.operators.OpenStateOperators
 import com.zepben.evolve.services.network.tracing.traversalV2.QueueCondition
 import com.zepben.evolve.services.network.tracing.traversalV2.TraversalCondition
 import kotlin.reflect.KClass

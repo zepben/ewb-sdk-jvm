@@ -16,7 +16,7 @@ import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhaseP
 import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhasePaths.Companion.isAfter
 import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhasePaths.Companion.isBefore
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 
 class PhaseInferrer(
     val stateOperators: NetworkStateOperators

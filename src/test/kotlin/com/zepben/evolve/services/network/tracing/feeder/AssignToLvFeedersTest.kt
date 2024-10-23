@@ -22,7 +22,7 @@ import com.zepben.evolve.services.network.testdata.DownstreamFeederStartPointNet
 import com.zepben.evolve.services.network.testdata.DroppedPhasesNetwork
 import com.zepben.evolve.services.network.testdata.FeederStartPointBetweenConductorsNetwork
 import com.zepben.evolve.services.network.testdata.FeederStartPointToOpenPointNetwork
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat

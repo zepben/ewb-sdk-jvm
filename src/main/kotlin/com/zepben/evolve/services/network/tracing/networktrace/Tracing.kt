@@ -8,12 +8,12 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
-import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
+import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
+import com.zepben.evolve.services.network.tracing.phases.RemovePhases
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
 import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
@@ -129,53 +129,22 @@ object Tracing {
     fun normalSetDirection(): SetDirection = SetDirection(NetworkStateOperators.NORMAL)
     fun currentSetDirection(): SetDirection = SetDirection(NetworkStateOperators.CURRENT)
 
-    /**
-     * Apply feeder directions from all feeder head terminals in the network.
-     *
-     * @param network The network in which to apply feeder directions.
-     */
-    fun setFeederDirections(network: NetworkService) {
-        val normal = normalSetDirection()
-        val current = currentSetDirection()
-
-        network.sequenceOf<Feeder>()
-            .mapNotNull { it.normalHeadTerminal }
-            .forEach {
-                val feederHead = requireNotNull(it.conductingEquipment) { "head terminals require conducting equipment to apply feeder directions" }
-
-                if (!normal.networkStateOperators.isOpen(feederHead, null))
-                    normal.run(it)
-
-                if (!current.networkStateOperators.isOpen(feederHead, null))
-                    current.run(it)
-            }
-    }
-
     fun normalRemoveDirection(): RemoveDirection = RemoveDirection(NetworkStateOperators.NORMAL)
     fun currentRemoveDirection(): RemoveDirection = RemoveDirection(NetworkStateOperators.CURRENT)
 
     fun normalAssignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders(NetworkStateOperators.NORMAL)
     fun currentAssignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders(NetworkStateOperators.CURRENT)
 
-    fun assignEquipmentToFeeders(network: NetworkService) {
-        normalAssignEquipmentToFeeders().run(network)
-        currentAssignEquipmentToFeeders().run(network)
-    }
-
     fun normalAssignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders(NetworkStateOperators.NORMAL)
     fun currentAssignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders(NetworkStateOperators.CURRENT)
-
-    fun assignEquipmentToLvFeeders(network: NetworkService) {
-        normalAssignEquipmentToLvFeeders().run(network)
-        currentAssignEquipmentToLvFeeders().run(network)
-    }
 
     fun normalSetPhases(): SetPhases = SetPhases(NetworkStateOperators.NORMAL)
     fun currentSetPhases(): SetPhases = SetPhases(NetworkStateOperators.CURRENT)
 
-    fun setPhases(network: NetworkService) {
-        normalSetPhases().run(network)
-        currentSetPhases().run(network)
-    }
+    fun normalPhaseInferrer(): PhaseInferrer = PhaseInferrer(NetworkStateOperators.NORMAL)
+    fun currentPhaseInferrer(): PhaseInferrer = PhaseInferrer(NetworkStateOperators.CURRENT)
+
+    fun normalRemovePhases(): RemovePhases = RemovePhases(NetworkStateOperators.NORMAL)
+    fun currentRemovePhases(): RemovePhases = RemovePhases(NetworkStateOperators.CURRENT)
 
 }

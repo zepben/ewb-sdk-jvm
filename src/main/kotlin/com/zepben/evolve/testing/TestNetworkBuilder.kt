@@ -502,8 +502,10 @@ open class TestNetworkBuilder {
      * @return The [NetworkService] created by this [TestNetworkBuilder]
      */
     fun build(applyDirectionsFromSources: Boolean = true): NetworkService {
-        Tracing.setFeederDirections(network)
-        Tracing.setPhases(network)
+        Tracing.normalSetDirection().run(network)
+        Tracing.currentSetDirection().run(network)
+        Tracing.normalSetPhases().run(network)
+        Tracing.currentSetPhases().run(network)
 
         if (applyDirectionsFromSources)
             network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach {
@@ -511,8 +513,10 @@ open class TestNetworkBuilder {
                 Tracing.currentSetDirection().run(it)
             }
 
-        Tracing.assignEquipmentToFeeders(network)
-        Tracing.assignEquipmentToLvFeeders(network)
+        Tracing.normalAssignEquipmentToFeeders().run(network)
+        Tracing.currentAssignEquipmentToFeeders().run(network)
+        Tracing.normalAssignEquipmentToLvFeeders().run(network)
+        Tracing.currentAssignEquipmentToLvFeeders().run(network)
 
         return network
     }

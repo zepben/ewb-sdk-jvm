@@ -46,9 +46,8 @@ import com.zepben.evolve.services.common.testdata.SchemaServices
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
-import com.zepben.evolve.services.network.testdata.fillFields
+import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.testdata.stupid.StupidlyLargeNetwork
-import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
@@ -159,7 +158,10 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         /************ IEC61970 BASE CORE ************/
         validateSchema(SchemaServices.networkServicesOf(::BaseVoltage, BaseVoltage::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::ConnectivityNode, ConnectivityNode::fillFields))
-        validateSchema(SchemaServices.networkServicesOf(::Feeder, Feeder::fillFields).also { Tracing.setFeederDirections(it) })
+        validateSchema(SchemaServices.networkServicesOf(::Feeder, Feeder::fillFields).also {
+            it.assignEquipmentToFeeders()
+            it.setFeederDirections()
+        })
         validateSchema(SchemaServices.networkServicesOf(::GeographicalRegion, GeographicalRegion::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Site, Site::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::SubGeographicalRegion, SubGeographicalRegion::fillFields))
@@ -200,7 +202,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         validateSchema(SchemaServices.networkServicesOf(::Disconnector, Disconnector::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::EnergyConsumer, EnergyConsumer::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::EnergyConsumerPhase, EnergyConsumerPhase::fillFields))
-        validateSchema(SchemaServices.networkServicesOf(::EnergySource, EnergySource::fillFields).also { Tracing.setPhases(it) })
+        validateSchema(SchemaServices.networkServicesOf(::EnergySource, EnergySource::fillFields).also { it.setPhases() })
         validateSchema(SchemaServices.networkServicesOf(::EnergySourcePhase, EnergySourcePhase::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Fuse, Fuse::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Ground, Ground::fillFields))
@@ -228,7 +230,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         /************ IEC61970 InfIEC61970 Feeder ************/
         validateSchema(SchemaServices.networkServicesOf(::Circuit, Circuit::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Loop, Loop::fillFields))
-        validateSchema(SchemaServices.networkServicesOf(::LvFeeder, LvFeeder::fillFields))
+        validateSchema(SchemaServices.networkServicesOf(::LvFeeder, LvFeeder::fillFields).also { it.assignEquipmentToLvFeeders() })
     }
 
     @Test

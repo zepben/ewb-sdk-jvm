@@ -9,7 +9,6 @@
 package com.zepben.evolve.services.network.testdata
 
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 
 object SingleTransformerNetwork {
 
@@ -25,7 +24,7 @@ object SingleTransformerNetwork {
 
         networkService.connect(source.getTerminal(sequenceNumber)!!, transformer.getTerminal(sequenceNumber)!!)
 
-        Tracing.setPhases(networkService)
+        networkService.setPhases()
         source.addFeederDirections(sequenceNumber)
     }
 

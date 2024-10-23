@@ -13,6 +13,8 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
+import com.zepben.evolve.services.network.testdata.setFeederDirections
+import com.zepben.evolve.services.network.testdata.setPhases
 import com.zepben.evolve.services.network.tracing.feeder.DirectionLogger
 import com.zepben.evolve.services.network.tracing.phases.PhaseLogger
 import com.zepben.evolve.services.network.tracing.phases.PhaseStep
@@ -192,8 +194,8 @@ internal class CoreTraceTest {
     }
 
     private fun getNetwork() = PhaseSwapLoopNetwork.create().also {
-        com.zepben.evolve.services.network.tracing.networktrace.Tracing.setPhases(it)
-        com.zepben.evolve.services.network.tracing.networktrace.Tracing.setFeederDirections(it)
+        it.setPhases()
+        it.setFeederDirections()
     }
 
     private fun currentNonDirectionalTrace(start: ConductingEquipment, vararg phases: SinglePhaseKind): Set<PhaseStep> {

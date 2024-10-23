@@ -9,13 +9,12 @@
 package com.zepben.evolve.streaming.mutations
 
 import com.zepben.evolve.conn.grpc.GrpcException
-import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.streaming.data.*
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
+import io.grpc.Status
 import io.grpc.stub.StreamObserver
-import com.zepben.protobuf.ns.data.CurrentStateEvent.EventCase
 
 /**
  * A service class that provides a simplified interface for updating network state events
@@ -46,42 +45,29 @@ class UpdateNetworkStateService(
      * @return An observer that listens for incoming [SetCurrentStatesRequest] messages. The incoming requests are processed
      * by invoking the callback function passed via the constructor. Once the state events are applied, a response is sent
      * back through the [responseObserver].
-     *
-     * @throws IllegalArgumentException if the request contains invalid data
-     * @throws NotImplementedError if an unsupported or unrecognized [CurrentStateEvent] is encountered in the request.
      */
     override fun setCurrentStates(responseObserver: StreamObserver<SetCurrentStatesResponse>): StreamObserver<SetCurrentStatesRequest> =
         object : StreamObserver<SetCurrentStatesRequest> {
             override fun onNext(request: SetCurrentStatesRequest) {
-                require(!request.eventList.isNotEmpty()) { "'SetCurrentStatesRequest.eventList' cannot be empty" }
-                val responseBuilder = SetCurrentStatesResponse.newBuilder()
-                responseBuilder.setMessageId(request.messageId)
-                onSetCurrentStates(request.eventList.map {
-                    val timeStamp = it.timestamp.toLocalDateTime()
-                    require(timeStamp != null) { "SetCurrentStatesRequest.timestamp is not valid" }
-                    when (it.eventCase) {
-                        EventCase.SWITCH -> SwitchStateEvent.fromPb(it)
-                        else -> throw NotImplementedError("There is currently no implementation of ${it.eventCase}.")
-                    }
-                }).also {
-                    when (it) {
-                        is BatchSuccessful -> responseBuilder.success = it.toPb()
-                        is ProcessingPaused -> responseBuilder.paused = it.toPb()
-                        is BatchFailure -> responseBuilder.failure = it.toPb()
-                        else -> throw NotImplementedError("There is currently no implementation to handle the response ${it::class.simpleName}.")
-                    }
-                    responseObserver.onNext(responseBuilder.build())
+                try {
+                    onSetCurrentStates(request.eventList.map { CurrentStateEvent.fromPb(it) })
+                        .also {
+                            val responseBuilder = SetCurrentStatesResponse.newBuilder()
+                            responseBuilder.setMessageId(request.messageId)
+                            when (it) {
+                                is BatchSuccessful -> responseBuilder.success = it.toPb()
+                                is ProcessingPaused -> responseBuilder.paused = it.toPb()
+                                is BatchFailure -> responseBuilder.failure = it.toPb()
+                            }
+                            responseObserver.onNext(responseBuilder.build())
+                        }
+                } catch (e: Throwable) {
+                    responseObserver.onError(Status.INTERNAL.withDescription(e.localizedMessage).asRuntimeException())
                 }
             }
 
             override fun onError(e: Throwable) {
-                throw GrpcException(
-                    when (e) {
-                        is NoSuchMethodError -> "Failed to serialise - are you using the correct version of evolve-grpc? Error was: NoSuchMethodError: ${e.localizedMessage}"
-                        else -> "Failed to serialise Error was: ${e.javaClass.name} ${e.localizedMessage}. See server logs for more details."
-                    },
-                    e
-                )
+                throw GrpcException("Serialization failed due to: ${e.localizedMessage}", e)
             }
 
             override fun onCompleted() {

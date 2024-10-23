@@ -16,6 +16,7 @@ import com.zepben.protobuf.ns.data.CurrentStateEvent as PBCurrentStateEvent
 import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
 import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
+import com.zepben.protobuf.ns.data.CurrentStateEvent.EventCase
 
 /**
  * An event to apply to the current state of the network.
@@ -24,7 +25,18 @@ import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
  * duplicates when requesting events via dates vs those streamed via live updates.
  * @property timestamp The timestamp when the event occurred.
  */
-abstract class CurrentStateEvent(val eventId: String, val timestamp: LocalDateTime){
+sealed class CurrentStateEvent(val eventId: String, val timestamp: LocalDateTime?){
+    companion object {
+        /**
+         * Creates a [CurrentStateEvent] object from protobuf [PBCurrentStateEvent]
+         */
+        internal fun fromPb(event: PBCurrentStateEvent): CurrentStateEvent =
+            when (event.eventCase){
+                EventCase.SWITCH -> SwitchStateEvent.fromPb(event)
+                else -> throw UnsupportedOperationException("'${event.eventCase}' is currently unsupported.")
+            }
+    }
+
     internal abstract fun toPb(): PBCurrentStateEvent
 
     /**
@@ -47,25 +59,19 @@ abstract class CurrentStateEvent(val eventId: String, val timestamp: LocalDateTi
  * @property action The action to take on the switch for the specified phases.
  * @property phases The phases affected by this event. If not specified, all phases will be affected.
  */
-class SwitchStateEvent(eventId: String, timestamp: LocalDateTime, val mRID: String, val action: SwitchAction, val phases: PhaseCode) : CurrentStateEvent(eventId, timestamp){
+class SwitchStateEvent(eventId: String, timestamp: LocalDateTime?, val mRID: String, val action: SwitchAction, val phases: PhaseCode) : CurrentStateEvent(eventId, timestamp){
     companion object {
         /**
          * Creates a [SwitchStateEvent] object from protobuf [PBCurrentStateEvent]
          */
-        internal fun fromPb(event: PBCurrentStateEvent): SwitchStateEvent{
-            require(event.eventId.isNotEmpty()) { "eventId is required" }
-            val timestamp = event.timestamp?.toLocalDateTime()
-            require(timestamp != null) { "timestamp is invalid" }
-            require(event.switch.mrid.isNotEmpty()) { "mrid is required" }
-
-            return SwitchStateEvent(
+        internal fun fromPb(event: PBCurrentStateEvent): CurrentStateEvent =
+            SwitchStateEvent(
                 event.eventId,
-                timestamp,
+                event.timestamp.toLocalDateTime(),
                 event.switch.mrid,
                 SwitchAction.valueOf(event.switch.action.name),
                 PhaseCode.valueOf(event.switch.phases.name)
             )
-        }
     }
 
     /**

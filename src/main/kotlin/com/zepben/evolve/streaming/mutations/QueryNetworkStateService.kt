@@ -10,8 +10,8 @@ package com.zepben.evolve.streaming.mutations
 
 import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.streaming.data.CurrentStateEvent
-import com.zepben.evolve.streaming.data.SwitchStateEvent
 import com.zepben.protobuf.ns.*
+import io.grpc.Status
 import io.grpc.stub.StreamObserver
 import java.time.LocalDateTime
 import java.util.stream.Stream
@@ -28,7 +28,7 @@ import kotlin.streams.asSequence
  * [CurrentStateEvent] objects within the specified time range.
  */
 class QueryNetworkStateService(
-    private val onGetCurrentStates: (from: LocalDateTime, to: LocalDateTime) -> Sequence<List<CurrentStateEvent>>
+    private val onGetCurrentStates: (from: LocalDateTime?, to: LocalDateTime?) -> Sequence<List<CurrentStateEvent>>
 ) : QueryNetworkStateServiceGrpc.QueryNetworkStateServiceImplBase() {
 
     /**
@@ -68,37 +68,24 @@ class QueryNetworkStateService(
      * state events, including the time range for the query. This parameter must not be null.
      * @param responseObserver The observer used to send the response back to the
      * client. This parameter must not be null.
-     *
-     * @throws IllegalArgumentException if the request contains invalid parameters,
-     * such as when provided time is 0 or an end time that is before the start time.
-     * @throws NotImplementedError if the callback function returns an implementation of [CurrentStateEvent] that is not supported.
      */
     override fun getCurrentStates(request: GetCurrentStatesRequest, responseObserver: StreamObserver<GetCurrentStatesResponse>) {
-        val from = request.from.toLocalDateTime()
-        val to = request.to.toLocalDateTime()
+        try {
+            val from = request.from.toLocalDateTime()
+            val to = request.to.toLocalDateTime()
 
-        require(from != null) { "'GetCurrentStatesRequest.from' is not valid" }
-        require(to != null) { "'GetCurrentStatesRequest.to' is not valid" }
-        require(to >= from) { "End time 'GetCurrentStatesRequest.to' must not be before start time 'GetCurrentStatesRequest.from'" }
+            onGetCurrentStates(from, to).forEach { sendResponse(it, request.messageId, responseObserver) }
 
-        onGetCurrentStates(from, to).forEach { sendResponse(it, request.messageId, responseObserver) }
-
-        responseObserver.onCompleted()
+            responseObserver.onCompleted()
+        } catch (e: Throwable) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.localizedMessage).asRuntimeException())
+        }
     }
 
     private fun sendResponse(currentStateEvents: List<CurrentStateEvent>, messageId: Long, responseObserver: StreamObserver<GetCurrentStatesResponse>) {
         val responseBuilder = GetCurrentStatesResponse.newBuilder()
         responseBuilder.setMessageId(messageId)
-
-        currentStateEvents.forEach {
-            responseBuilder.addEvent(
-                when (it) {
-                    is SwitchStateEvent -> it.toPb()
-                    else -> throw NotImplementedError("There is currently no implementation of ${it::class.simpleName}.")
-                }
-            )
-        }
-
+        responseBuilder.addAllEvent(currentStateEvents.map { it.toPb() })
         responseObserver.onNext(responseBuilder.build())
     }
 
@@ -124,7 +111,7 @@ class QueryNetworkStateService(
          * represent the current states within the specified time range.
          * If no events are found, an empty stream is returned.
          */
-        fun get(from: LocalDateTime, to: LocalDateTime): Stream<List<CurrentStateEvent>>
+        fun get(from: LocalDateTime?, to: LocalDateTime?): Stream<List<CurrentStateEvent>>
     }
 
 }

@@ -22,7 +22,7 @@ import com.zepben.protobuf.ns.data.StateEventUnsupportedPhasing as PBStateEventU
 /**
  * The outcome of processing this batch of updates.
  */
-interface SetCurrentStatesStatus
+sealed interface SetCurrentStatesStatus
 
 /**
  * A response indicating all items in the batch were applied successfully.
@@ -62,7 +62,7 @@ class BatchFailure(val partialFailure: Boolean, val failures: List<StateEventFai
  *
  * @property eventId The eventId of the state event that failed.
  */
-abstract class StateEventFailure(val eventId: String){
+sealed class StateEventFailure(val eventId: String){
     internal abstract fun toPb(): PBStateEventFailure
 
     /**

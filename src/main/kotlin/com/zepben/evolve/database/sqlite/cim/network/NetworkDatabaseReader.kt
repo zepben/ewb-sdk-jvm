@@ -20,9 +20,12 @@ import com.zepben.evolve.services.common.extensions.nameAndMRID
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
+import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
+import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
+import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import java.sql.Connection
 import java.util.*
 
@@ -46,31 +49,39 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     serviceReader: NetworkServiceReader = NetworkServiceReader(service, tables, connection),
     tableVersion: TableVersion = tableCimVersion,
     // TODO [Review]: This should probably have a normal and a current versions for all these things, not just the PhaseInferrer
-    private val setFeederDirection: (NetworkService) -> Unit = Tracing::setFeederDirections,
-    private val setPhases: (NetworkService) -> Unit = Tracing::setPhases,
-    private val normalPhaseInferrer: PhaseInferrer = PhaseInferrer(NetworkStateOperators.NORMAL),
-    private val currentPhaseInferrer: PhaseInferrer = PhaseInferrer(NetworkStateOperators.CURRENT),
-    private val assignToFeeders: (NetworkService) -> Unit = Tracing::assignEquipmentToFeeders,
-    private val assignToLvFeeders: (NetworkService) -> Unit = Tracing::assignEquipmentToLvFeeders,
+    private val normalSetFeederDirection: SetDirection = Tracing.normalSetDirection(),
+    private val currentSetFeederDirection: SetDirection = Tracing.currentSetDirection(),
+    private val normalSetPhases: SetPhases = Tracing.normalSetPhases(),
+    private val currentSetPhases: SetPhases = Tracing.currentSetPhases(),
+    private val normalPhaseInferrer: PhaseInferrer = Tracing.normalPhaseInferrer(),
+    private val currentPhaseInferrer: PhaseInferrer = Tracing.currentPhaseInferrer(),
+    private val normalAssignToFeeders: AssignToFeeders = Tracing.normalAssignEquipmentToFeeders(),
+    private val currentAssignToFeeders: AssignToFeeders = Tracing.currentAssignEquipmentToFeeders(),
+    private val normalAssignToLvFeeders: AssignToLvFeeders = Tracing.normalAssignEquipmentToLvFeeders(),
+    private val currentAssignToLvFeeders: AssignToLvFeeders = Tracing.currentAssignEquipmentToLvFeeders(),
 ) : CimDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion) {
 
     override fun postLoad(): Boolean =
         super.postLoad().also {
             logger.info("Applying feeder direction to network...")
-            setFeederDirection(service)
+            normalSetFeederDirection.run(service)
+            currentSetFeederDirection.run(service)
             logger.info("Feeder direction applied to network.")
 
             logger.info("Applying phases to network...")
-            setPhases(service)
+            normalSetPhases.run(service)
+            currentSetPhases.run(service)
             logInferredPhases(normalPhaseInferrer.run(service), currentPhaseInferrer.run(service))
             logger.info("Phasing applied to network.")
 
             logger.info("Assigning equipment to feeders...")
-            assignToFeeders(service)
+            normalAssignToFeeders.run(service)
+            currentAssignToFeeders.run(service)
             logger.info("Equipment assigned to feeders.")
 
             logger.info("Assigning equipment to LV feeders...")
-            assignToLvFeeders(service)
+            normalAssignToLvFeeders.run(service)
+            currentAssignToLvFeeders.run(service)
             logger.info("Equipment assigned to LV feeders.")
 
             logger.info("Validating that each equipment is assigned to a container...")

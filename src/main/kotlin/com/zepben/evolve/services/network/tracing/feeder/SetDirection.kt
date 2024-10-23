@@ -57,6 +57,22 @@ class SetDirection(
         }
 
     /**
+     * Apply feeder directions from all closed feeder head terminals in the network.
+     *
+     * @param network The network in which to apply feeder directions.
+     */
+    fun run(network: NetworkService) {
+        network.sequenceOf<Feeder>()
+            .mapNotNull { it.normalHeadTerminal }
+            .forEach {
+                val feederHead = requireNotNull(it.conductingEquipment) { "head terminals require conducting equipment to apply feeder directions" }
+
+                if (!networkStateOperators.isOpen(feederHead, null))
+                    run(it)
+            }
+    }
+
+    /**
      * Apply [FeederDirection.DOWNSTREAM] from the [terminal].
      *
      * @param terminal The terminal to start applying direction from.

@@ -17,6 +17,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityInternal
 import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue

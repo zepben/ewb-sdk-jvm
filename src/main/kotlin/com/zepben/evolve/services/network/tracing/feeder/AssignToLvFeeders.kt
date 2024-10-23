@@ -14,8 +14,12 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.networktrace.*
-import com.zepben.evolve.services.network.tracing.networktrace.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
+import com.zepben.evolve.services.network.tracing.networktrace.StepPath
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.networktrace.run
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 

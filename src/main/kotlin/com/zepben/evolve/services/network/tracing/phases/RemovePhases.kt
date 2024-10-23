@@ -8,50 +8,22 @@
 
 package com.zepben.evolve.services.network.tracing.phases
 
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
-import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
-import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
-import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue.Companion.branchQueue
-import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue.Companion.processQueue
+import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
+import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue.Companion.branchQueue
+import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue.Companion.processQueue
 
 /**
  * Convenience class that provides methods for removing phases on a [NetworkService]
- * This class is backed by a [BranchRecursiveTraversal].
+ * This class is backed by a [NetworkTrace].
  */
-class RemovePhases {
-
-    /**
-     * The [BranchRecursiveTraversal] used when tracing the normal state of the network.
-     *
-     * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    val normalTraversal: BranchRecursiveTraversal<EbbPhases> = BranchRecursiveTraversal(
-        { current, traversal -> ebbAndQueue(traversal, current, PhaseSelector.NORMAL_PHASES) },
-        { processQueue { it.nominalPhases.size } },
-        { BasicTracker() },
-        { branchQueue { it.nominalPhases.size } }
-    )
-
-    /**
-     * The [BranchRecursiveTraversal] used when tracing the current state of the network.
-     *
-     * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    private val currentTraversal = BranchRecursiveTraversal(
-        { current, traversal -> ebbAndQueue(traversal, current, PhaseSelector.CURRENT_PHASES) },
-        { processQueue { it.nominalPhases.size } },
-        { BasicTracker() },
-        { branchQueue { it.nominalPhases.size } }
-    )
-
-    private val traversals = listOf(normalTraversal, currentTraversal)
+class RemovePhases(
+    val stateOperators: NetworkStateOperators
+) {
 
     /**
      * Remove all traced phases from the specified network.
@@ -83,19 +55,30 @@ class RemovePhases {
      * @param nominalPhasesToEbb The nominal phases to remove traced phasing from.
      */
     fun run(terminal: Terminal, nominalPhasesToEbb: Set<SinglePhaseKind>) {
-        traversals.forEach { it.reset().run(EbbPhases(terminal, nominalPhasesToEbb)) }
+        createTrace().run(terminal, EbbPhases(nominalPhasesToEbb), terminal.phases)
     }
 
-    private fun ebbAndQueue(traversal: BranchRecursiveTraversal<EbbPhases>, ebbPhases: EbbPhases, phaseSelector: PhaseSelector) {
-        val ebbedPhases = ebb(ebbPhases.terminal, ebbPhases.nominalPhases, phaseSelector)
+    private fun createTrace(): NetworkTrace<EbbPhases> =
+        Tracing.connectedTerminalTrace(
+            networkStateOperators = stateOperators,
+            queueFactory = { processQueue { it.data.phasesToEbb.size } },
+            branchQueueFactory = { branchQueue { it.data.phasesToEbb.size } },
+            computeNextT = ::computeNextEbbPhases
+        )
+            .addStepAction { (path, ebbPhases), _ ->
+                ebbPhases.ebbedPhases = ebb(path.toTerminal, ebbPhases.phasesToEbb)
+            }
+            .addQueueCondition { nextStep, _ ->
+                nextStep.data.phasesToEbb.isNotEmpty()
+            }
 
-        NetworkService.connectedTerminals(ebbPhases.terminal, ebbPhases.nominalPhases).forEach { cr ->
-            queueThroughEquipment(traversal, cr.to, cr.toTerminal, ebbFromConnectedTerminal(ebbedPhases, cr, phaseSelector))
-        }
+    private fun computeNextEbbPhases(step: NetworkTraceStep<EbbPhases>, context: StepContext, nextPath: StepPath): EbbPhases {
+        val phasesToEbb = nextPath.nominalPhasePaths.asSequence().map { it.to }.filter { it in step.data.phasesToEbb }.toSet()
+        return EbbPhases(phasesToEbb)
     }
 
-    private fun ebb(terminal: Terminal, phasesToEbb: Set<SinglePhaseKind>, phaseSelector: PhaseSelector): Set<SinglePhaseKind> {
-        val phases = phaseSelector.phases(terminal)
+    private fun ebb(terminal: Terminal, phasesToEbb: Set<SinglePhaseKind>): Set<SinglePhaseKind> {
+        val phases = stateOperators.phaseStatus(terminal)
         return phasesToEbb
             .asSequence()
             .filter { phases[it] != SinglePhaseKind.NONE }
@@ -103,29 +86,6 @@ class RemovePhases {
             .onEach { phases[it] = SinglePhaseKind.NONE }
     }
 
-    private fun ebbFromConnectedTerminal(phasesToEbb: Set<SinglePhaseKind>, cr: ConnectivityResult, phaseSelector: PhaseSelector): Set<SinglePhaseKind> {
-        val connectedPhases = phasesToEbb
-            .asSequence()
-            .mapNotNull { phase -> cr.nominalPhasePaths.firstOrNull { it.from == phase }?.to }
-            .toSet()
-
-        return ebb(cr.toTerminal, connectedPhases, phaseSelector)
-    }
-
-    private fun queueThroughEquipment(
-        traversal: BranchRecursiveTraversal<EbbPhases>,
-        conductingEquipment: ConductingEquipment?,
-        terminal: Terminal,
-        phasesToEbb: Set<SinglePhaseKind>
-    ) {
-        conductingEquipment?.apply {
-            terminals
-                .asSequence()
-                .filter { it != terminal }
-                .forEach { traversal.queue.add(EbbPhases(it, phasesToEbb)) }
-        }
-    }
-
-    class EbbPhases(val terminal: Terminal, val nominalPhases: Set<SinglePhaseKind>)
+    private class EbbPhases(val phasesToEbb: Set<SinglePhaseKind>, var ebbedPhases: Set<SinglePhaseKind> = emptySet())
 
 }

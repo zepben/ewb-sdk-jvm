@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.phases.PhaseValidator.validatePhases
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
@@ -61,7 +62,8 @@ internal class RemovePhasesTest {
 
     @Test
     internal fun removesAllCoreByDefault() {
-        RemovePhases().run(n.getT("c1", 2))
+        RemovePhases(NetworkStateOperators.NORMAL).run(n.getT("c1", 2))
+        RemovePhases(NetworkStateOperators.CURRENT).run(n.getT("c1", 2))
 
         validatePhases(n, "s0", PhaseCode.ABCN)
         validatePhases(n, "c1", PhaseCode.ABCN, PhaseCode.NONE)
@@ -73,7 +75,8 @@ internal class RemovePhasesTest {
 
     @Test
     internal fun canRemoveSpecificPhases() {
-        RemovePhases().run(n.getT("s0", 1), PhaseCode.AB)
+        RemovePhases(NetworkStateOperators.NORMAL).run(n.getT("s0", 1), PhaseCode.AB)
+        RemovePhases(NetworkStateOperators.CURRENT).run(n.getT("s0", 1), PhaseCode.AB)
 
         validatePhases(n, "s0", listOf(SPK.NONE, SPK.NONE, SPK.C, SPK.N))
         validatePhases(n, "c1", listOf(SPK.NONE, SPK.NONE, SPK.C, SPK.N), listOf(SPK.NONE, SPK.NONE, SPK.C, SPK.N))
@@ -85,7 +88,8 @@ internal class RemovePhasesTest {
 
     @Test
     internal fun canRemoveFromEntireNetwork() {
-        RemovePhases().run(n)
+        RemovePhases(NetworkStateOperators.NORMAL).run(n)
+        RemovePhases(NetworkStateOperators.CURRENT).run(n)
 
         validatePhases(n, "s0", PhaseCode.NONE)
         validatePhases(n, "c1", PhaseCode.NONE, PhaseCode.NONE)

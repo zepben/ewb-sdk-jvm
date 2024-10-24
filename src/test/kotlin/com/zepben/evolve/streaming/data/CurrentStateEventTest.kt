@@ -55,7 +55,7 @@ class CurrentStateEventTest {
     }
 
     @Test
-    fun `SwitchStateEvent from protobuf`(){
+    fun `SwitchStateEvent from protobuf and then back to protobuf`(){
         val time = Timestamp.newBuilder().apply { nanos = 1 }.build()
         val event = PBCurrentStateEvent.newBuilder().apply {
             eventId = "event id"
@@ -67,12 +67,21 @@ class CurrentStateEventTest {
             }.build()
         }.build()
 
-        (CurrentStateEvent.fromPb(event) as SwitchStateEvent).let {
-            assertThat(it.eventId, equalTo("event id"))
-            assertThat(it.timestamp, equalTo(time.toLocalDateTime()))
-            assertThat(it.mRID, equalTo("MRID"))
+        val currentStateEvent = CurrentStateEvent.fromPb(event)
+        (currentStateEvent as SwitchStateEvent).let {
+            assertThat(it.eventId, equalTo(event.eventId))
+            assertThat(it.timestamp, equalTo(event.timestamp.toLocalDateTime()))
+            assertThat(it.mRID, equalTo(event.switch.mrid))
             assertThat(it.action, equalTo(SwitchAction.OPEN))
             assertThat(it.phases, equalTo(PhaseCode.N))
+        }
+
+        currentStateEvent.toPb().let {
+            assertThat(it.eventId, equalTo(event.eventId))
+            assertThat(it.timestamp, equalTo(event.timestamp))
+            assertThat(it.switch.mrid, equalTo(event.switch.mrid))
+            assertThat(it.switch.action, equalTo(event.switch.action))
+            assertThat(it.switch.phases, equalTo(event.switch.phases))
         }
     }
 

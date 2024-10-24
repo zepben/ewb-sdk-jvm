@@ -136,7 +136,7 @@ class UpdateNetworkStateClientTest {
         }
     }
 
-    private fun List<StateEventFailure>.assertFailure(index: Int, clazz: Class<*>){
+    private fun List<StateEventFailure>.assertFailure(index: Int, clazz: Class<out StateEventFailure>){
         this[index].let {
             assertThat(it.eventId, equalTo("event${index + 1}"))
             assertThat(it, instanceOf(clazz))

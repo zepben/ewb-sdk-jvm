@@ -56,7 +56,9 @@ class UpdateNetworkStateClientTest {
     )
     private val timestampOf1Second = Timestamp.newBuilder().apply { seconds = 1 }.build()
     private val switchStateEvents = currentStateEvents.filterIsInstance<SwitchStateEvent>()
-    private val batches = currentStateEvents.map { listOf(it) }.asSequence()
+    private val batches = currentStateEvents.mapIndexed { index, item ->
+        UpdateNetworkStateClient.SetCurrentStatesRequest(index.toLong(), listOf(item))
+    }.asSequence()
 
     init {
         grpcCleanup.register(InProcessServerBuilder.forName(serverName).directExecutor().addService(service).build().start())
@@ -64,26 +66,27 @@ class UpdateNetworkStateClientTest {
 
     @Test
     fun `setCurrentStates in batches using Kotlin Sequence`(){
-        testSetCurrentStates { assertBatchedCurrentStatesStatus(client.setCurrentStates(batches).toList()) }
+        testSetCurrentStates { assertBatchedCurrentStatesResponse(client.setCurrentStates(batches).toList()) }
     }
 
     @Test
     fun `setCurrentStates in batches using Java Stream`(){
-        testSetCurrentStates { assertBatchedCurrentStatesStatus(client.setCurrentStates(batches.asStream()).toList()) }
+        testSetCurrentStates { assertBatchedCurrentStatesResponse(client.setCurrentStates(batches.asStream()).toList()) }
     }
 
     @Test
     fun `setCurrentStates in single batch`(){
         testSetCurrentStates {
-            val status = client.setCurrentStates(batches.first())
-            assertThat(status, instanceOf(BatchSuccessful::class.java))
+            batches.first().apply {
+                listOf(client.setCurrentStates(batchId, events)).assert<BatchSuccessful>(0)
+            }
         }
     }
 
     private fun testSetCurrentStates(act: () -> Unit){
         val responses = ArrayDeque(listOf(
-            SetCurrentStatesResponse.newBuilder().apply { success = PBBatchSuccessful.newBuilder().build() }.build(),
-            SetCurrentStatesResponse.newBuilder().apply { paused = PBProcessingPaused.newBuilder().apply { since = timestampOf1Second }.build() }.build(),
+            SetCurrentStatesResponse.newBuilder().apply { success = PBBatchSuccessful.newBuilder().build() },
+            SetCurrentStatesResponse.newBuilder().apply { paused = PBProcessingPaused.newBuilder().apply { since = timestampOf1Second }.build() },
             SetCurrentStatesResponse.newBuilder().apply { failure = PBBatchFailure.newBuilder().apply {
                 partialFailure = true
                 addAllFailed(listOf(
@@ -103,43 +106,51 @@ class UpdateNetworkStateClientTest {
                         eventId = "event4"
                         unsupportedPhasing = PBStateEventUnsupportedPhasing.newBuilder().build()
                     }.build()))
-            }.build() }.build(),
+            }.build() },
             null
         ))
         service.onSetCurrentStates = spy { request, response ->
-            request.eventList.let {
-                assertThat(it.map { it.eventId }, anyOf(switchStateEvents.map { hasItem(it.eventId) }))
-                assertThat(it.map { it.timestamp }, anyOf(switchStateEvents.map { hasItem(it.timestamp.toTimestamp()) }))
-                assertThat(it.map { it.switch.mrid }, anyOf(switchStateEvents.map { hasItem(it.mRID) }))
-                assertThat(it.map { it.switch.action.name }, anyOf(switchStateEvents.map { hasItem(it.action.name) }))
-                assertThat(it.map { it.switch.phases.name }, anyOf(switchStateEvents.map { hasItem(it.phases.name) }))
+            request.eventList.also { event ->
+                assertThat(event.map { it.eventId }, anyOf(switchStateEvents.map { hasItem(it.eventId) }))
+                assertThat(event.map { it.timestamp }, anyOf(switchStateEvents.map { hasItem(it.timestamp.toTimestamp()) }))
+                assertThat(event.map { it.switch.mrid }, anyOf(switchStateEvents.map { hasItem(it.mRID) }))
+                assertThat(event.map { it.switch.action.name }, anyOf(switchStateEvents.map { hasItem(it.action.name) }))
+                assertThat(event.map { it.switch.phases.name }, anyOf(switchStateEvents.map { hasItem(it.phases.name) }))
             }
-            response.onNext(responses.removeFirst())
+            response.onNext(responses.removeFirst()?.apply { messageId = request.messageId }?.build())
         }
 
         act()
     }
 
-    private fun assertBatchedCurrentStatesStatus(currentStatesStatus: List<SetCurrentStatesStatus>){
+    private fun assertBatchedCurrentStatesResponse(currentStatesStatus: List<UpdateNetworkStateClient.SetCurrentStatesResponse>){
         assertThat(currentStatesStatus.size, equalTo(3))
-        assertThat(currentStatesStatus[0], instanceOf(BatchSuccessful::class.java))
-        (currentStatesStatus[1] as ProcessingPaused).let {
+        currentStatesStatus.assert<BatchSuccessful>(0)
+        currentStatesStatus.assert<ProcessingPaused>(1){
             assertThat(it.since, equalTo(timestampOf1Second.toLocalDateTime()))
         }
-        (currentStatesStatus[2] as BatchFailure).let {
+        currentStatesStatus.assert<BatchFailure>(2){
             assertThat(it.partialFailure, equalTo(true))
-            assertThat(it.failures.size, equalTo(4))
-            it.failures.assertFailure(0, StateEventUnknownMrid::class.java)
-            it.failures.assertFailure(1, StateEventDuplicateMrid::class.java)
-            it.failures.assertFailure(2, StateEventInvalidMrid::class.java)
-            it.failures.assertFailure(3, StateEventUnsupportedPhasing::class.java)
+            assertThat(
+                it.failures.map { f -> f::class },
+                contains(
+                    StateEventUnknownMrid::class,
+                    StateEventDuplicateMrid::class,
+                    StateEventInvalidMrid::class,
+                    StateEventUnsupportedPhasing::class
+                )
+            )
+            it.failures.forEachIndexed { index, f ->
+                assertThat(f.eventId, equalTo("event${index + 1}"))
+            }
         }
     }
 
-    private fun List<StateEventFailure>.assertFailure(index: Int, clazz: Class<out StateEventFailure>){
-        this[index].let {
-            assertThat(it.eventId, equalTo("event${index + 1}"))
-            assertThat(it, instanceOf(clazz))
+    private inline fun <reified T>  List<UpdateNetworkStateClient.SetCurrentStatesResponse>.assert(index: Int, additionalAssertions: (T) -> Unit = {}){
+        this[index].also {
+            assertThat(it.batchId, equalTo(index.toLong()))
+            assertThat(it.status, instanceOf(T::class.java))
+            additionalAssertions(it.status as T)
         }
     }
 }

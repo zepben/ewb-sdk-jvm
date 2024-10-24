@@ -11,8 +11,8 @@ package com.zepben.evolve.streaming.get
 import com.zepben.evolve.streaming.data.*
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcClient
-import com.zepben.protobuf.ns.SetCurrentStatesRequest
-import com.zepben.protobuf.ns.SetCurrentStatesResponse
+import com.zepben.protobuf.ns.SetCurrentStatesRequest as PBSetCurrentStatesRequest
+import com.zepben.protobuf.ns.SetCurrentStatesResponse as PBSetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import io.grpc.CallCredentials
 import io.grpc.Channel
@@ -65,14 +65,15 @@ class UpdateNetworkStateClient(
      * This method allows for sending a single batch of current state events to the
      * `UpdateNetworkStateServiceGrpc` service using the gRPC stub provided in the constructor.
      *
+     * @param batchId A unique identifier for the batch of events being processed.
      * @param batch A list of [CurrentStateEvent] objects representing a single batch of events
      * to be processed by the gRPC service.
      *
-     * @return A [SetCurrentStatesStatus] object representing the status of the batch after
+     * @return A [SetCurrentStatesResponse] object representing the status of the batch after
      * being processed by the service.
      */
-    fun setCurrentStates(batch: List<CurrentStateEvent>): SetCurrentStatesStatus =
-        setCurrentStates(sequenceOf(batch)).first()
+    fun setCurrentStates(batchId: Long, batch: List<CurrentStateEvent>): SetCurrentStatesResponse =
+        setCurrentStates(sequenceOf(SetCurrentStatesRequest(batchId, batch))).first()
 
     /**
      * Sends batches of current state events to the gRPC service for processing.
@@ -80,32 +81,33 @@ class UpdateNetworkStateClient(
      * This method is responsible for streaming a sequence of current state event batches to the
      * `UpdateNetworkStateServiceGrpc` service using the gRPC stub provided in the constructor.
      *
-     * @param batches A sequence of lists, where each list contains multiple [CurrentStateEvent] objects
-     * representing a batch of events to be processed by the gRPC service.
+     * @param batches A sequence of [SetCurrentStatesRequest] objects, where each request contains a
+     * collection of [CurrentStateEvent] objects to be processed by the gRPC service.
      *
-     * @return A sequence of [SetCurrentStatesStatus] objects representing the status of each batch
+     * @return A sequence of [SetCurrentStatesResponse] objects representing the status of each batch
      * after being processed by the service.
      */
-    fun setCurrentStates(batches: Sequence<List<CurrentStateEvent>>): Sequence<SetCurrentStatesStatus> {
-        val results = mutableListOf<SetCurrentStatesStatus>()
-        val responseObserver = AwaitableStreamObserver<SetCurrentStatesResponse> { response ->
+    fun setCurrentStates(batches: Sequence<SetCurrentStatesRequest>): Sequence<SetCurrentStatesResponse> {
+        val results = mutableListOf<SetCurrentStatesResponse>()
+        val responseObserver = AwaitableStreamObserver<PBSetCurrentStatesResponse> { response ->
             val status = when (response.statusCase) {
-                SetCurrentStatesResponse.StatusCase.SUCCESS -> BatchSuccessful.fromPb(response.success)
-                SetCurrentStatesResponse.StatusCase.PAUSED -> ProcessingPaused.fromPb(response.paused)
-                SetCurrentStatesResponse.StatusCase.FAILURE -> BatchFailure.fromPb(response.failure)
+                PBSetCurrentStatesResponse.StatusCase.SUCCESS -> BatchSuccessful.fromPb(response.success)
+                PBSetCurrentStatesResponse.StatusCase.PAUSED -> ProcessingPaused.fromPb(response.paused)
+                PBSetCurrentStatesResponse.StatusCase.FAILURE -> BatchFailure.fromPb(response.failure)
                 else -> null
             }
 
             if (status != null)
-                results.add(status)
+                results.add(SetCurrentStatesResponse(response.messageId, status))
         }
 
         val request = stub.setCurrentStates(responseObserver)
-        val requestBuilder = SetCurrentStatesRequest.newBuilder()
         batches.forEach { batch ->
-            requestBuilder.addAllEvent(batch.map { it.toPb() })
-            request.onNext(requestBuilder.build())
-            requestBuilder.clearEvent()
+            PBSetCurrentStatesRequest.newBuilder().apply {
+                messageId = batch.batchId
+                addAllEvent(batch.events.map { it.toPb() })
+                request.onNext(build())
+            }
         }
 
         request.onCompleted()
@@ -120,13 +122,41 @@ class UpdateNetworkStateClient(
      * This method streams batches of current state events to the `UpdateNetworkStateServiceGrpc` service
      * using the gRPC stub provided in the constructor.
      *
-     * @param batches A Java [Stream] of lists, where each list contains multiple [CurrentStateEvent] objects
-     * representing a batch of events to be processed by the gRPC service.
+     * @param batches A Java [Stream] of [SetCurrentStatesRequest] objects, where each request contains a
+     * collection of [CurrentStateEvent] objects to be processed by the gRPC service.
      *
-     * @return A Java [Stream] of [SetCurrentStatesStatus] objects representing the status of each batch
+     * @return A Java [Stream] of [SetCurrentStatesResponse] objects representing the status of each batch
      * after being processed by the service.
      */
-    fun setCurrentStates(batches: Stream<List<CurrentStateEvent>>): Stream<SetCurrentStatesStatus> =
+    fun setCurrentStates(batches: Stream<SetCurrentStatesRequest>): Stream<SetCurrentStatesResponse> =
         setCurrentStates(batches.asSequence()).asStream()
+
+    /**
+     * A request object for submitting a batch of current state events for processing.
+     *
+     * @property batchId A unique identifier for the batch of events being processed.
+     * This allows to track or group multiple events under a single batch.
+     *
+     * @property events A list of [CurrentStateEvent] objects representing the state changes or
+     * events that are being submitted in the current batch.
+     */
+    data class SetCurrentStatesRequest(
+        val batchId: Long,
+        val events: List<CurrentStateEvent>
+    )
+
+    /**
+     * A response object representing the result of processing a batch of current state events.
+     *
+     * @property batchId The unique identifier of the batch that was processed. This matches the
+     * batch ID from the original request to allow correlation between request and response.
+     *
+     * @property status The result of the batch processing, represented by a [SetCurrentStatesStatus]
+     * object.
+     */
+    data class SetCurrentStatesResponse(
+        val batchId: Long,
+        val status: SetCurrentStatesStatus
+    )
 
 }

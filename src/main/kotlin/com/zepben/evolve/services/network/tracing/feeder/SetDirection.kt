@@ -49,7 +49,7 @@ class SetDirection(
         .addStopCondition { (path), _ ->
             isFeederHeadTerminal(path.toTerminal) || reachedSubstationTransformer(path.toTerminal)
         }
-        .addQueueCondition { (_, directionToApply), _ ->
+        .addQueueCondition { (_, directionToApply), _, _, _ ->
             directionToApply != FeederDirection.NONE
         }
         .addStepAction { (path, directionToApply), _ ->

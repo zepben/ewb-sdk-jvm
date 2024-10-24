@@ -14,7 +14,7 @@ interface ContextValueComputer<T> {
 
     fun computeInitialValue(nextItem: T): Any?
 
-    fun computeNextValue(nextItem: T, currentValue: Any?): Any?
+    fun computeNextValue(nextItem: T, currentItem: T, currentValue: Any?): Any?
 }
 
 /**
@@ -24,9 +24,9 @@ interface TypedContextValueComputer<T, U> : ContextValueComputer<T> {
     override fun computeInitialValue(nextItem: T): U
 
     @Suppress("UNCHECKED_CAST")
-    override fun computeNextValue(nextItem: T, currentValue: Any?): Any? {
-        return computeNextValueTyped(nextItem, currentValue as U)
+    override fun computeNextValue(nextItem: T, currentItem: T, currentValue: Any?): Any? {
+        return computeNextValueTyped(nextItem, currentItem, currentValue as U)
     }
 
-    fun computeNextValueTyped(nextItem: T, currentValue: U): U
+    fun computeNextValueTyped(nextItem: T, currentItem: T, currentValue: U): U
 }

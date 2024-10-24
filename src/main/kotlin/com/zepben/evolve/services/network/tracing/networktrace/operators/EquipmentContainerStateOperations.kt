@@ -12,6 +12,8 @@ import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.EquipmentContainer
 
 interface EquipmentContainerStateOperations {
+    fun getEquipment(container: EquipmentContainer): Collection<Equipment>
+    fun getContainers(equipment: Equipment): Collection<EquipmentContainer>
     fun addEquipmentToContainer(equipment: Equipment, container: EquipmentContainer)
     fun addContainerToEquipment(container: EquipmentContainer, equipment: Equipment)
     fun associateEquipmentAndContainer(equipment: Equipment, container: EquipmentContainer) {
@@ -21,6 +23,10 @@ interface EquipmentContainerStateOperations {
 
     companion object {
         val NORMAL = object : EquipmentContainerStateOperations {
+            override fun getEquipment(container: EquipmentContainer): Collection<Equipment> = container.equipment
+
+            override fun getContainers(equipment: Equipment): Collection<EquipmentContainer> = equipment.containers
+
             override fun addEquipmentToContainer(equipment: Equipment, container: EquipmentContainer) {
                 equipment.addContainer(container)
             }
@@ -31,6 +37,10 @@ interface EquipmentContainerStateOperations {
         }
 
         val CURRENT = object : EquipmentContainerStateOperations {
+            override fun getEquipment(container: EquipmentContainer): Collection<Equipment> = container.currentEquipment
+
+            override fun getContainers(equipment: Equipment): Collection<EquipmentContainer> = equipment.currentContainers
+
             override fun addEquipmentToContainer(equipment: Equipment, container: EquipmentContainer) {
                 equipment.addCurrentContainer(container)
             }

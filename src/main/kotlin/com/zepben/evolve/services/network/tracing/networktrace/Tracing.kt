@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.services.network.tracing.FindSwerEquipment
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
@@ -147,5 +148,8 @@ object Tracing {
 
     fun normalRemovePhases(): RemovePhases = RemovePhases(NetworkStateOperators.NORMAL)
     fun currentRemovePhases(): RemovePhases = RemovePhases(NetworkStateOperators.CURRENT)
+
+    fun normalFindSwerEquipment(): FindSwerEquipment = FindSwerEquipment(NetworkStateOperators.NORMAL)
+    fun currentFindSwerEquipment(): FindSwerEquipment = FindSwerEquipment(NetworkStateOperators.CURRENT)
 
 }

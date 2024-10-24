@@ -10,18 +10,23 @@ package com.zepben.evolve.services.network.tracing
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.connectivity.ConductingEquipmentStep
-import com.zepben.evolve.services.network.tracing.connectivity.ConnectedEquipmentTraversal
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.networktrace.run
 
 /**
  * A class which can be used for finding the SWER equipment in a [NetworkService] or [Feeder].
  */
 class FindSwerEquipment(
-    private val createTrace: () -> ConnectedEquipmentTraversal = { Tracing.normalConnectedEquipmentTrace() }
+    val stateOperators: NetworkStateOperators,
 ) {
+
+    private val createTrace = { Tracing.connectedEquipmentTrace(stateOperators).addNetworkCondition { stopAtOpen() } }
 
     /**
      * Find the [ConductingEquipment] on any [Feeder] in a [NetworkService] which is SWER. This will include any equipment on the LV network that is energised
@@ -48,7 +53,7 @@ class FindSwerEquipment(
 
         // We will add all the SWER transformers to the swerEquipment list before starting any traces to prevent tracing though them by accident. In
         // order to do this, we collect the sequence to a list to change the iteration order.
-        feeder.equipment
+        stateOperators.getEquipment(feeder)
             .asSequence()
             .filterIsInstance<PowerTransformer>()
             .filter { it.hasSwerTerminal }
@@ -70,21 +75,24 @@ class FindSwerEquipment(
 
     private fun traceSwerFrom(transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
         val trace = createTrace().apply {
-            addStopCondition { it.conductingEquipment in swerEquipment }
-            addStopCondition { !it.hasSwerTerminal }
-            addStepAction { (conductingEquipment, _), isStopping ->
-                // To make sure we include any open points on a SWER network (unlikely) we include stop equipment if it is a [Switch].
-                if (!isStopping || (conductingEquipment is Switch))
-                    swerEquipment.add(conductingEquipment)
+            // Because queue conditions are called for all terminals, even if we only step on equipment we always want to continue on an internal trace
+            addQueueCondition { step, _ ->
+                when {
+                    // TODO [Review]: Because this is a NetworkTrace with onlyActionEquipment = true, step actions only happen once for each equipment.
+                    //                However queue conditions run for every queued terminal step and now we need a special check for tracedInternally which feels
+                    //                a bit clunky. Need to have a think about this...
+                    step.path.tracedInternally -> true
+                    step.path.toTerminal.isSwerTerminal || step.path.toEquipment is Switch -> step.path.toEquipment !in swerEquipment
+                    else -> false
+                }
             }
+
+            addStepAction { step, _ -> swerEquipment.add(step.path.toEquipment) }
         }
 
-        // We start from the connected equipment to prevent tracing in the wrong direction, as we are using the connected equipment trace.
         transformer.terminals
             .asSequence()
-            .filter { it.phases.numPhases() == 1 }
-            .flatMap { it.connectedTerminals() }
-            .mapNotNull { it.conductingEquipment }
+            .filter { it.isSwerTerminal }
             .forEach {
                 trace.reset()
                 trace.run(it)
@@ -92,27 +100,29 @@ class FindSwerEquipment(
     }
 
     private fun traceLvFrom(transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
-        val trace = createTrace().apply {
-            addStopCondition { it.conductingEquipment in swerEquipment }
-            addStepAction { swerEquipment.add(it.conductingEquipment) }
-        }
+        val trace = createTrace()
+            .addQueueCondition { step, _ ->
+                when {
+                    step.path.tracedInternally -> true
+                    step.path.toEquipment.baseVoltageValue in 1..1000 -> step.path.toEquipment !in swerEquipment
+                    else -> false
+                }
+            }
+            .addStepAction { step, _ -> swerEquipment.add(step.path.toEquipment) }
 
-        // We start from the connected equipment to prevent tracing in the wrong direction, as we are using the connected equipment trace.
+
         transformer.terminals
             .asSequence()
-            .filter { it.phases.numPhases() > 1 }
-            .flatMap { it.connectedTerminals() }
-            .mapNotNull { it.conductingEquipment }
-            .filter { it.baseVoltageValue in 1..1000 }
+            .filter { it.isNonSwerTerminal }
             .forEach {
                 trace.reset()
                 trace.run(it)
             }
     }
 
-    private val ConductingEquipmentStep.hasSwerTerminal: Boolean get() = conductingEquipment.hasSwerTerminal
-
-    private val ConductingEquipment.hasSwerTerminal: Boolean get() = terminals.any { it.phases.numPhases() == 1 }
-    private val ConductingEquipment.hasNonSwerTerminal: Boolean get() = terminals.any { it.phases.numPhases() > 1 }
+    private val Terminal.isSwerTerminal: Boolean get() = phases.numPhases() == 1
+    private val Terminal.isNonSwerTerminal: Boolean get() = phases.numPhases() > 1
+    private val ConductingEquipment.hasSwerTerminal: Boolean get() = terminals.any { it.isSwerTerminal }
+    private val ConductingEquipment.hasNonSwerTerminal: Boolean get() = terminals.any { it.isNonSwerTerminal }
 
 }

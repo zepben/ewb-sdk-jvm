@@ -1,7 +1,7 @@
 # Zepben EWB SDK changelog
 ## [0.25.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Tracing downstream/upstream using a NetworkTrace will not step on a start item if there is no downstream/upstream terminal on the item.
 
 ### New Features
 * None.

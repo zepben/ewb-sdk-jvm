@@ -40,6 +40,9 @@
 
 ## [0.23.0] - 2024-10-18
 ### Breaking Changes
+* Tracing downstream/upstream using a NetworkTrace will not step on a start item if there is no downstream/upstream terminal on the item.
+
+
 * Updated to latest evolve-grpc major version.
 * Removed unused AuthType enum.
 * Removed unused kotlinx-serialization-json dependency.

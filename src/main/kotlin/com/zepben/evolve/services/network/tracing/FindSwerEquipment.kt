@@ -76,13 +76,13 @@ class FindSwerEquipment(
     private fun traceSwerFrom(transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
         val trace = createTrace().apply {
             // Because queue conditions are called for all terminals, even if we only step on equipment we always want to continue on an internal trace
-            addQueueCondition { step, _ ->
+            addQueueCondition { nextStep, _, _, _ ->
                 when {
                     // TODO [Review]: Because this is a NetworkTrace with onlyActionEquipment = true, step actions only happen once for each equipment.
                     //                However queue conditions run for every queued terminal step and now we need a special check for tracedInternally which feels
                     //                a bit clunky. Need to have a think about this...
-                    step.path.tracedInternally -> true
-                    step.path.toTerminal.isSwerTerminal || step.path.toEquipment is Switch -> step.path.toEquipment !in swerEquipment
+                    nextStep.path.tracedInternally -> true
+                    nextStep.path.toTerminal.isSwerTerminal || nextStep.path.toEquipment is Switch -> nextStep.path.toEquipment !in swerEquipment
                     else -> false
                 }
             }
@@ -101,10 +101,10 @@ class FindSwerEquipment(
 
     private fun traceLvFrom(transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
         val trace = createTrace()
-            .addQueueCondition { step, _ ->
+            .addQueueCondition { nextStep, _, _, _ ->
                 when {
-                    step.path.tracedInternally -> true
-                    step.path.toEquipment.baseVoltageValue in 1..1000 -> step.path.toEquipment !in swerEquipment
+                    nextStep.path.tracedInternally -> true
+                    nextStep.path.toEquipment.baseVoltageValue in 1..1000 -> nextStep.path.toEquipment !in swerEquipment
                     else -> false
                 }
             }

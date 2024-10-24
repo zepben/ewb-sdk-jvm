@@ -116,12 +116,6 @@ class QueryNetworkStateServiceTest {
         assertThat(fromSlot.captured, equalTo(request.from.toLocalDateTime()))
         assertThat(toSlot.captured, equalTo(request.to.toLocalDateTime()))
 
-        verifySequence {
-            responseObserver.onNext(responseSlot[0])
-            responseObserver.onNext(responseSlot[1])
-            responseObserver.onCompleted()
-        }
-
         assertThat(responseSlot.map { it.messageId }, contains(1, 1))
         responseSlot.flatMap { it.eventList }.let {
             assertThat(it.map { it.eventId }, contains(*currentStateEvents.map { it.eventId }.toTypedArray()))
@@ -129,6 +123,12 @@ class QueryNetworkStateServiceTest {
             assertThat(it.map { it.switch.mrid }, contains(*switchStateEvents.map { it.mRID }.toTypedArray()))
             assertThat(it.map { it.switch.action.name }, contains(*switchStateEvents.map { it.action.name }.toTypedArray()))
             assertThat(it.map { it.switch.phases.name }, contains(*switchStateEvents.map { it.phases.name }.toTypedArray()))
+        }
+
+        verifySequence {
+            responseObserver.onNext(responseSlot[0])
+            responseObserver.onNext(responseSlot[1])
+            responseObserver.onCompleted()
         }
     }
 

@@ -25,7 +25,11 @@ import com.zepben.protobuf.ns.data.CurrentStateEvent.EventCase
  * duplicates when requesting events via dates vs those streamed via live updates.
  * @property timestamp The timestamp when the event occurred.
  */
-sealed class CurrentStateEvent(val eventId: String, val timestamp: LocalDateTime?) {
+sealed class CurrentStateEvent(
+    val eventId: String,
+    val timestamp: LocalDateTime?
+) {
+
     companion object {
         /**
          * Creates a [CurrentStateEvent] object from protobuf [PBCurrentStateEvent]
@@ -43,10 +47,12 @@ sealed class CurrentStateEvent(val eventId: String, val timestamp: LocalDateTime
      * Creates a [PBCurrentStateEvent.Builder] builder with [eventId] and [timestamp] assigned.
      */
     protected fun toPbBuilder(): PBCurrentStateEvent.Builder =
-        PBCurrentStateEvent.newBuilder().also {
-            it.eventId = eventId
-            it.timestamp = timestamp.toTimestamp()
+        PBCurrentStateEvent.newBuilder().also { pb ->
+            pb.eventId = eventId
+            timestamp.toTimestamp()?.let { pb.timestamp = it} ?: pb.clearTimestamp()
+            pb.timestamp = timestamp.toTimestamp()
         }
+
 }
 
 /**
@@ -66,6 +72,7 @@ class SwitchStateEvent @JvmOverloads constructor(
     val action: SwitchAction,
     val phases: PhaseCode = PhaseCode.NONE
 ) : CurrentStateEvent(eventId, timestamp) {
+
     companion object {
         /**
          * Creates a [SwitchStateEvent] object from protobuf [PBCurrentStateEvent]
@@ -83,15 +90,15 @@ class SwitchStateEvent @JvmOverloads constructor(
     /**
      * Creates a protobuf [PBCurrentStateEvent] object with switch from [SwitchStateEvent]
      */
-    override fun toPb(): PBCurrentStateEvent = toPbBuilder().also {
-        it.switch = PBSwitchStateEvent.newBuilder().also {
+    override fun toPb(): PBCurrentStateEvent = toPbBuilder().also { event ->
+        event.switch = PBSwitchStateEvent.newBuilder().also {
             it.mrid = mRID
             it.action = PBSwitchAction.valueOf(action.name)
             it.phases = PBPhaseCode.valueOf(phases.name)
         }.build()
     }.build()
-}
 
+}
 
 /**
  * Enum representing possible actions for a switch.

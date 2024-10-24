@@ -32,11 +32,4 @@ fun Instant?.toTimestamp(): Timestamp? {
 }
 
 internal fun Timestamp.toLocalDateTime(): LocalDateTime? = toInstant()?.let{ LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
-internal fun LocalDateTime?.toTimestamp(): Timestamp? {
-    return this?.toInstant(ZoneOffset.UTC)?.let {
-        Timestamp.newBuilder().apply {
-            seconds = it.epochSecond
-            nanos = it.nano
-        }.build()
-    }
-}
+internal fun LocalDateTime?.toTimestamp(): Timestamp? = this?.toInstant(ZoneOffset.UTC)?.toTimestamp()

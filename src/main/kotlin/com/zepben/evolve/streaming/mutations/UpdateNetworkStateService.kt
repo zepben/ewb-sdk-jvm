@@ -51,12 +51,13 @@ class UpdateNetworkStateService(
                 try {
                     onSetCurrentStates(request.eventList.map { CurrentStateEvent.fromPb(it) })
                         .also {
-                            val responseBuilder = SetCurrentStatesResponse.newBuilder()
-                            responseBuilder.setMessageId(request.messageId)
-                            when (it) {
-                                is BatchSuccessful -> responseBuilder.success = it.toPb()
-                                is ProcessingPaused -> responseBuilder.paused = it.toPb()
-                                is BatchFailure -> responseBuilder.failure = it.toPb()
+                            val responseBuilder = SetCurrentStatesResponse.newBuilder().apply {
+                                setMessageId(request.messageId)
+                                when (it) {
+                                    is BatchSuccessful -> success = it.toPb()
+                                    is ProcessingPaused -> paused = it.toPb()
+                                    is BatchFailure -> failure = it.toPb()
+                                }
                             }
                             responseObserver.onNext(responseBuilder.build())
                         }
@@ -73,4 +74,5 @@ class UpdateNetworkStateService(
                 responseObserver.onCompleted()
             }
         }
+
 }

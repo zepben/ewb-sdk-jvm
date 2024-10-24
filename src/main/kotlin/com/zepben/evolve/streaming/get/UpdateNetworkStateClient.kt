@@ -102,8 +102,8 @@ class UpdateNetworkStateClient(
 
         val request = stub.setCurrentStates(responseObserver)
         val requestBuilder = SetCurrentStatesRequest.newBuilder()
-        batches.forEach {
-            requestBuilder.addAllEvent(it.map { it.toPb() })
+        batches.forEach { batch ->
+            requestBuilder.addAllEvent(batch.map { it.toPb() })
             request.onNext(requestBuilder.build())
             requestBuilder.clearEvent()
         }
@@ -128,4 +128,5 @@ class UpdateNetworkStateClient(
      */
     fun setCurrentStates(batches: Stream<List<CurrentStateEvent>>): Stream<SetCurrentStatesStatus> =
         setCurrentStates(batches.asSequence()).asStream()
+
 }

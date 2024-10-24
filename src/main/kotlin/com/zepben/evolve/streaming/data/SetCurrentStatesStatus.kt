@@ -29,6 +29,7 @@ sealed interface SetCurrentStatesStatus
  * A response indicating all items in the batch were applied successfully.
  */
 class BatchSuccessful : SetCurrentStatesStatus {
+
     companion object {
         internal fun fromPb(pb: PBBatchSuccessful): SetCurrentStatesStatus =
             BatchSuccessful()
@@ -36,6 +37,7 @@ class BatchSuccessful : SetCurrentStatesStatus {
 
     internal fun toPb(): PBBatchSuccessful =
         PBBatchSuccessful.newBuilder().build()
+
 }
 
 /**
@@ -45,6 +47,7 @@ class BatchSuccessful : SetCurrentStatesStatus {
  * @property since The timestamp when the processing was paused.
  */
 class ProcessingPaused(val since: LocalDateTime?) : SetCurrentStatesStatus {
+
     companion object {
         internal fun fromPb(pb: PBProcessingPaused): SetCurrentStatesStatus =
             ProcessingPaused(pb.since.toLocalDateTime())
@@ -52,6 +55,7 @@ class ProcessingPaused(val since: LocalDateTime?) : SetCurrentStatesStatus {
 
     internal fun toPb(): PBProcessingPaused =
         PBProcessingPaused.newBuilder().also { it.since = since.toTimestamp() }.build()
+
 }
 
 /**
@@ -61,6 +65,7 @@ class ProcessingPaused(val since: LocalDateTime?) : SetCurrentStatesStatus {
  * @property failures The status of each item processed in the batch that failed.
  */
 class BatchFailure(val partialFailure: Boolean, val failures: List<StateEventFailure>) : SetCurrentStatesStatus {
+
     companion object {
         internal fun fromPb(pb: PBBatchFailure): SetCurrentStatesStatus =
             BatchFailure(pb.partialFailure, pb.failedList.mapNotNull { StateEventFailure.fromPb(it) })
@@ -71,6 +76,7 @@ class BatchFailure(val partialFailure: Boolean, val failures: List<StateEventFai
             it.partialFailure = partialFailure
             it.addAllFailed(failures.map { it.toPb() })
         }.build()
+
 }
 
 /**
@@ -79,13 +85,14 @@ class BatchFailure(val partialFailure: Boolean, val failures: List<StateEventFai
  * @property eventId The eventId of the state event that failed.
  */
 sealed class StateEventFailure(val eventId: String) {
+
     companion object {
         internal fun fromPb(pb: PBStateEventFailure): StateEventFailure? =
             when (pb.reasonCase) {
-                PBStateEventFailure.ReasonCase.UNKNOWNMRID -> StateEventUnknownMrid.fromPb(pb.eventId)
-                PBStateEventFailure.ReasonCase.INVALIDMRID -> StateEventInvalidMrid.fromPb(pb.eventId)
-                PBStateEventFailure.ReasonCase.DUPLICATEMRID -> StateEventDuplicateMrid.fromPb(pb.eventId)
-                PBStateEventFailure.ReasonCase.UNSUPPORTEDPHASING -> StateEventUnsupportedPhasing.fromPb(pb.eventId)
+                PBStateEventFailure.ReasonCase.UNKNOWNMRID -> StateEventUnknownMrid.fromPb(pb.eventId, pb.unknownMrid)
+                PBStateEventFailure.ReasonCase.INVALIDMRID -> StateEventInvalidMrid.fromPb(pb.eventId, pb.invalidMrid)
+                PBStateEventFailure.ReasonCase.DUPLICATEMRID -> StateEventDuplicateMrid.fromPb(pb.eventId, pb.duplicateMrid)
+                PBStateEventFailure.ReasonCase.UNSUPPORTEDPHASING -> StateEventUnsupportedPhasing.fromPb(pb.eventId, pb.unsupportedPhasing)
                 else -> null
             }
     }
@@ -97,14 +104,16 @@ sealed class StateEventFailure(val eventId: String) {
      */
     protected fun toPbBuilder(): PBStateEventFailure.Builder =
         PBStateEventFailure.newBuilder().also { it.eventId = eventId }
+
 }
 
 /**
  * The requested mRID was not found in the network.
  */
 class StateEventUnknownMrid(eventId: String) : StateEventFailure(eventId) {
+
     companion object {
-        internal fun fromPb(eventId: String): StateEventFailure =
+        internal fun fromPb(eventId: String, pb: PBStateEventUnknownMrid): StateEventFailure =
             StateEventUnknownMrid(eventId)
     }
 
@@ -112,14 +121,16 @@ class StateEventUnknownMrid(eventId: String) : StateEventFailure(eventId) {
         toPbBuilder().apply {
             unknownMrid = PBStateEventUnknownMrid.newBuilder().build()
         }.build()
+
 }
 
 /**
  * The requested mRID already existed in the network and can't be used.
  */
 class StateEventDuplicateMrid(eventId: String) : StateEventFailure(eventId) {
+
     companion object {
-        internal fun fromPb(eventId: String): StateEventFailure =
+        internal fun fromPb(eventId: String, pb: PBStateEventDuplicateMrid): StateEventFailure =
             StateEventDuplicateMrid(eventId)
     }
 
@@ -127,14 +138,16 @@ class StateEventDuplicateMrid(eventId: String) : StateEventFailure(eventId) {
         toPbBuilder().apply {
             duplicateMrid = PBStateEventDuplicateMrid.newBuilder().build()
         }.build()
+
 }
 
 /**
  * The requested mRID was found in the network model, but was of an invalid type.
  */
 class StateEventInvalidMrid(eventId: String) : StateEventFailure(eventId) {
+
     companion object {
-        internal fun fromPb(eventId: String): StateEventFailure =
+        internal fun fromPb(eventId: String, pb: PBStateEventInvalidMrid): StateEventFailure =
             StateEventInvalidMrid(eventId)
     }
 
@@ -142,6 +155,7 @@ class StateEventInvalidMrid(eventId: String) : StateEventFailure(eventId) {
         toPbBuilder().apply {
             invalidMrid = PBStateEventInvalidMrid.newBuilder().build()
         }.build()
+
 }
 
 /**
@@ -149,8 +163,9 @@ class StateEventInvalidMrid(eventId: String) : StateEventFailure(eventId) {
  * unsupported phases.
  */
 class StateEventUnsupportedPhasing(eventId: String) : StateEventFailure(eventId) {
+
     companion object {
-        internal fun fromPb(eventId: String): StateEventFailure =
+        internal fun fromPb(eventId: String, pb: PBStateEventUnsupportedPhasing): StateEventFailure =
             StateEventUnsupportedPhasing(eventId)
     }
 
@@ -158,4 +173,5 @@ class StateEventUnsupportedPhasing(eventId: String) : StateEventFailure(eventId)
         toPbBuilder().apply {
             unsupportedPhasing = PBStateEventUnsupportedPhasing.newBuilder().build()
         }.build()
+
 }

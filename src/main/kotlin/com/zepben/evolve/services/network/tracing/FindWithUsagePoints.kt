@@ -11,38 +11,33 @@ package com.zepben.evolve.services.network.tracing
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
-import com.zepben.evolve.services.common.extensions.asUnmodifiable
-import com.zepben.evolve.services.network.tracing.phases.PhaseStep
+import com.zepben.evolve.services.network.tracing.networktrace.StepPath
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.networktrace.run
 import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 import java.util.*
-import java.util.function.Supplier
 
 /**
- * Convenience class that provides methods for finding conducting equipment with attached usage points.
+ * Convenience class that provides methods for finding downstream conducting equipment with attached usage points.
  * This class is backed by a [BasicTraversal].
  *
  * @property virtualUsagePointCondition Indicates how the search will handle virtual [UsagePoint] instances.
  */
+// TODO [Review]: Move this out of the SDK and into the network routes as it is quite use case specific?
 class FindWithUsagePoints(
+    val stateOperators: NetworkStateOperators,
     private val virtualUsagePointCondition: VirtualUsagePointCondition = VirtualUsagePointCondition.LV_AGGREGATION_ONLY,
     private val lvThreshold: Int = 1000
 ) {
 
-    fun runNormal(from: ConductingEquipment, to: ConductingEquipment?): Result = runNormal(listOf(from), listOf(to))[0]
-    fun runNormal(froms: List<ConductingEquipment>, tos: List<ConductingEquipment?>): List<Result> = run(froms, tos) { Tracing.normalDownstreamTrace() }
+    fun run(from: ConductingEquipment, to: ConductingEquipment?): Result = run(listOf(from to to)).first()
 
-    fun runCurrent(from: ConductingEquipment, to: ConductingEquipment?): Result = runCurrent(listOf(from), listOf(to))[0]
-    fun runCurrent(froms: List<ConductingEquipment>, tos: List<ConductingEquipment?>): List<Result> = run(froms, tos) { Tracing.currentDownstreamTrace() }
-
-    private fun run(froms: List<ConductingEquipment>, tos: List<ConductingEquipment?>, traversalSupplier: Supplier<BasicTraversal<PhaseStep>>): List<Result> {
-        if (froms.size != tos.size)
-            return Collections.nCopies(froms.size.coerceAtLeast(tos.size), Result(status = Result.Status.MISMATCHED_FROM_TO))
-
-        return froms.mapIndexed { index, from ->
-            val to = tos[index]
-
+    fun run(extents: List<Pair<ConductingEquipment, ConductingEquipment?>>): List<Result> {
+        return extents.map { (from, to) ->
             if (from.mRID != to?.mRID)
-                runTrace(from, to, traversalSupplier)
+                runTrace(from, to)
             else if (hasValidUsagePoints(from))
                 Result(conductingEquipment = mapOf(from.mRID to from))
             else
@@ -50,7 +45,7 @@ class FindWithUsagePoints(
         }
     }
 
-    private fun runTrace(from: ConductingEquipment, to: ConductingEquipment?, traversalSupplier: Supplier<BasicTraversal<PhaseStep>>): Result {
+    private fun runTrace(from: ConductingEquipment, to: ConductingEquipment?): Result {
         if (to?.numTerminals() == 0)
             return Result(status = Result.Status.NO_PATH)
 
@@ -66,24 +61,29 @@ class FindWithUsagePoints(
         var pathFound = to == null
         val withUsagePoints = mutableMapOf<String, ConductingEquipment>()
 
-        val traversal = traversalSupplier.get()
-        traversal.addStopCondition { extentIds.contains(it.conductingEquipment.mRID) }
-        if ((virtualUsagePointCondition == VirtualUsagePointCondition.LV_AGGREGATION_ONLY) || (virtualUsagePointCondition == VirtualUsagePointCondition.ALL))
-            traversal.addStopCondition { shouldExcludeLv(it) }
-
-        traversal.addStepAction { ps, isStopping ->
-            if (isStopping)
-                pathFound = pathFound || extentIds.contains(ps.conductingEquipment.mRID)
-
-            if (hasValidUsagePoints(ps.conductingEquipment))
-                withUsagePoints[ps.conductingEquipment.mRID] = ps.conductingEquipment
+        val traversal = Tracing.connectedEquipmentTrace(stateOperators).addNetworkCondition { downstream() }
+        traversal.addStopCondition { (path), _ -> extentIds.contains(path.toEquipment.mRID) }
+        if ((virtualUsagePointCondition == VirtualUsagePointCondition.LV_AGGREGATION_ONLY) || (virtualUsagePointCondition == VirtualUsagePointCondition.ALL)) {
+            traversal.addStopCondition { (path), _ -> shouldExcludeLv(path) }
         }
 
-        traversal.reset().run(PhaseStep.startAt(from, from.terminals.first().phases), false)
+        traversal.addStepAction { (path), ctx ->
+            if (ctx.isStopping)
+                pathFound = pathFound || extentIds.contains(path.toEquipment.mRID)
+
+            if (hasValidUsagePoints(path.toEquipment))
+                withUsagePoints[path.toEquipment.mRID] = path.toEquipment
+        }
+
+        from.terminals.forEach {
+            traversal.reset().run(it, it.phases, canStopOnStartItem = false)
+        }
 
         if ((to != null) && !pathFound) {
             withUsagePoints.clear()
-            traversal.reset().run(PhaseStep.startAt(to, to.terminals.first().phases), false)
+            to.terminals.forEach {
+                traversal.reset().run(it, it.phases, canStopOnStartItem = false)
+            }
         }
 
         return when {
@@ -92,9 +92,9 @@ class FindWithUsagePoints(
         }
     }
 
-    private fun shouldExcludeLv(phaseStep: PhaseStep) =
-        ((phaseStep.conductingEquipment.baseVoltageValue <= lvThreshold) || (phaseStep.conductingEquipment is EquivalentBranch))
-            && phaseStep.previous?.usagePoints?.any { it.connectionCategory == "LV_AGGREGATION" } ?: false
+    private fun shouldExcludeLv(stepPath: StepPath) =
+        ((stepPath.toEquipment.baseVoltageValue <= lvThreshold) || (stepPath.toEquipment is EquivalentBranch))
+            && stepPath.fromEquipment.usagePoints.any { it.connectionCategory == "LV_AGGREGATION" }
 
     private fun hasValidUsagePoints(conductingEquipment: ConductingEquipment): Boolean =
         conductingEquipment.usagePoints.any {
@@ -110,9 +110,7 @@ class FindWithUsagePoints(
     /**
      * Controls how virtual [UsagePoint] instances are handled by the search.
      */
-    enum
-
-    class VirtualUsagePointCondition {
+    enum class VirtualUsagePointCondition {
 
         /**
          * Only include virtual [UsagePoint] instances if they are also marked as LV aggregation. If an LV aggregation is found, any attached LV equipment
@@ -140,14 +138,11 @@ class FindWithUsagePoints(
 
     class Result(
         val status: Status = Status.NO_ERROR,
-        conductingEquipment: Map<String, ConductingEquipment> = emptyMap()
+        val conductingEquipment: Map<String, ConductingEquipment> = emptyMap()
     ) {
-        val conductingEquipment: Map<String, ConductingEquipment> = conductingEquipment.asUnmodifiable()
-
         enum class Status {
-            NO_ERROR, NO_PATH, MISMATCHED_FROM_TO
+            NO_ERROR, NO_PATH
         }
-
     }
 
 }

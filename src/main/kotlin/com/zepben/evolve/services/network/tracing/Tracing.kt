@@ -313,7 +313,7 @@ object Tracing {
      *
      * @return A new traversal instance.
      */
-    @JvmStatic
-    fun findWithUsagePoints(): FindWithUsagePoints = FindWithUsagePoints()
+//    @JvmStatic
+//    fun findWithUsagePoints(): FindWithUsagePoints = FindWithUsagePoints()
 
 }

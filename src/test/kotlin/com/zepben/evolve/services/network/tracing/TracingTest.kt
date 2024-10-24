@@ -62,7 +62,7 @@ internal class TracingTest {
 //        validate({ Tracing.assignEquipmentToFeeders() }, AssignToFeeders::class.java)
 //        validate({ Tracing.normalDownstreamTree() }, DownstreamTree::class.java)
 //        validate({ Tracing.currentDownstreamTree() }, DownstreamTree::class.java)
-        validate({ Tracing.findWithUsagePoints() }, FindWithUsagePoints::class.java)
+//        validate({ Tracing.findWithUsagePoints() }, FindWithUsagePoints::class.java)
     }
 
     @Test

@@ -14,6 +14,7 @@ import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 
 class NetworkTraceStep<T>(
     val path: StepPath,
+    // TODO [Review]: Do we like the name data?
     val data: T
 ) {
     operator fun component1(): StepPath = path

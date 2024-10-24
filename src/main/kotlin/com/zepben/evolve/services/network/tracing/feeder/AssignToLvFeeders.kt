@@ -68,7 +68,7 @@ class AssignToLvFeeders(
         return Tracing.connectedTerminalTrace(networkStateOperators)
             .addNetworkCondition { stopAtOpen() }
             .addStopCondition { (path), _ -> lvFeederStartPoints.contains(path.toEquipment) }
-            .addQueueCondition { (path), _ -> !reachedHv(path.toEquipment) }
+            .addQueueCondition { (path), _, _, _ -> !reachedHv(path.toEquipment) }
             .addStepAction { (path), context -> process(path, context, terminalToAuxEquipment, lvFeederStartPoints, lvFeedersToAssign) }
     }
 

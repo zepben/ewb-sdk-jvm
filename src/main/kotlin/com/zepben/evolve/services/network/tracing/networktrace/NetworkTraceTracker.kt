@@ -24,7 +24,18 @@ internal class NetworkTraceTracker<T>(
     }
 
     companion object {
-        fun <T> terminalTracker(): NetworkTraceTracker<T> = NetworkTraceTracker { it.path.toTerminal }
-        fun <T> equipmentTracker(): NetworkTraceTracker<T> = NetworkTraceTracker { it.path.toEquipment }
+        fun <T> terminalTracker(): NetworkTraceTracker<T> = NetworkTraceTracker { (path) ->
+            if (path.nominalPhasePaths.isEmpty())
+                path.toTerminal
+            else
+                path.toTerminal to path.nominalPhasePaths.mapTo(mutableSetOf()) { it.to }
+        }
+
+        fun <T> equipmentTracker(): NetworkTraceTracker<T> = NetworkTraceTracker { (path) ->
+            if (path.nominalPhasePaths.isEmpty())
+                path.toEquipment
+            else
+                path.toEquipment to path.nominalPhasePaths.mapTo(mutableSetOf()) { it.to }
+        }
     }
 }

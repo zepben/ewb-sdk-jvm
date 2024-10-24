@@ -119,7 +119,9 @@ class SetPhases(
         branchQueueFactory = { WeightedPriorityQueueV2.branchQueue { it.path.toTerminal.phases.numPhases() } },
         computeNextT = ::computeNextPhasesToFlow
     )
-        .addQueueCondition { nextStep, _ -> nextStep.data.nominalPhasePaths.isNotEmpty() }
+        .addQueueCondition { nextStep, _, _, _ ->
+            nextStep.data.nominalPhasePaths.isNotEmpty()
+        }
         .addStepAction { (path, phasesToFlow), ctx ->
             // We always assume the first step terminal already has the phases applied, so we don't do anything on the first step
             phasesToFlow.stepFlowedPhases = if (!ctx.isStartItem) {

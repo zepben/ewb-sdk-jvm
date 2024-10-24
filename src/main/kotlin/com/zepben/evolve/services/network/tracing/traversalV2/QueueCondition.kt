@@ -9,10 +9,11 @@
 package com.zepben.evolve.services.network.tracing.traversalV2
 
 fun interface QueueCondition<T> : TraversalCondition<T> {
-    // TODO [Review]: Should this have the current step too?
-    //  Use case would be when queuing item you may have stored state in the current T that impacts if you should queue the next item or not.
-    //  Currently working around this by using the context map
-    fun shouldQueue(nextItem: T, currentContext: StepContext): Boolean
+    // TODO [Review]: Does this need the current step and context?
+    //  Use case would be when queuing item you may have stored state in the current T or context that impacts if you should queue the next item or not.
+    fun shouldQueue(nextItem: T, nextContext: StepContext, currentItem: T, currentContext: StepContext): Boolean
+
+    fun shouldQueueStartItem(item: T): Boolean = true
 }
 
 interface QueueConditionWithContextValue<T, U> : QueueCondition<T>, TypedContextValueComputer<T, U>

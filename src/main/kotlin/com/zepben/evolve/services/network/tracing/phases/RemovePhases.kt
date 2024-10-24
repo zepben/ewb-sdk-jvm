@@ -72,7 +72,7 @@ class RemovePhases(
             .addStepAction { (path, ebbPhases), _ ->
                 ebbPhases.ebbedPhases = ebb(path.toTerminal, ebbPhases.phasesToEbb)
             }
-            .addQueueCondition { nextStep, _ ->
+            .addQueueCondition { nextStep, _, _, _ ->
                 nextStep.data.phasesToEbb.isNotEmpty()
             }
 

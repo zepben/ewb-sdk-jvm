@@ -61,8 +61,8 @@ class AssignToFeeders(
         return Tracing.connectedTerminalTrace(networkStateOperators)
             .addNetworkCondition { stopAtOpen() }
             .addStopCondition { (path), _ -> feederStartPoints.contains(path.toEquipment) }
-            .addQueueCondition { (path), _ -> !reachedSubstationTransformer(path.toEquipment) }
-            .addQueueCondition { (path), _ -> !reachedLv(path.toEquipment) }
+            .addQueueCondition { (path), _, _, _ -> !reachedSubstationTransformer(path.toEquipment) }
+            .addQueueCondition { (path), _, _, _ -> !reachedLv(path.toEquipment) }
             .addStepAction { (path), context -> process(path, context, terminalToAuxEquipment, feedersToAssign) }
     }
 

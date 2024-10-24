@@ -22,15 +22,20 @@ internal class EquipmentTypeStepLimitCondition<T>(
         return (context.getValue<Int>(key) ?: 0) >= limit
     }
 
-    override fun computeInitialValue(nextItem: NetworkTraceStep<T>): Int = 0
+    // TODO [Review]: Should this be 1 if the first item matches the equipmentType?
+    override fun computeInitialValue(nextItem: NetworkTraceStep<T>): Int =
+        if (matchesEquipmentType(nextItem.path.toEquipment)) 1 else 0
 
     override val key: String = "sdk:${equipmentType.simpleName}Count"
 
-    override fun computeNextValueTyped(nextItem: NetworkTraceStep<T>, currentValue: Int): Int {
+    override fun computeNextValueTyped(nextItem: NetworkTraceStep<T>, currentItem: NetworkTraceStep<T>, currentValue: Int): Int {
         return when {
             nextItem.path.tracedInternally -> currentValue
-            nextItem.path.toEquipment::class.java.isAssignableFrom(equipmentType.java) -> (currentValue) + 1
+            matchesEquipmentType(nextItem.path.toEquipment) -> currentValue + 1
             else -> currentValue
         }
     }
+
+    private fun matchesEquipmentType(conductingEquipment: ConductingEquipment): Boolean =
+        conductingEquipment::class.java.isAssignableFrom(equipmentType.java)
 }

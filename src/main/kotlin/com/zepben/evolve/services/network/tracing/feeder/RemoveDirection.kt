@@ -20,8 +20,6 @@ import com.zepben.evolve.services.network.tracing.networktrace.operators.Network
 import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
 import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
 
-private typealias DirectionToRemove = FeederDirection
-
 /**
  * Convenience class that provides methods for removing feeder direction on a [NetworkService]
  */
@@ -29,7 +27,8 @@ class RemoveDirection(
     networkStateOperators: NetworkStateOperators
 ) {
 
-    private val directionRemovedKey = RemoveDirection::class.simpleName + "::REMOVED"
+    private class DirectionToRemove(val direction: FeederDirection, var removedDirection: Boolean = false)
+
     private val directionOperators: FeederDirectionStateOperations = networkStateOperators
 
     private val traversal: NetworkTrace<DirectionToRemove> = Tracing.connectedTerminalTrace(
@@ -39,11 +38,10 @@ class RemoveDirection(
     )
         .addNetworkCondition { stopAtOpen() }
         .addStepAction { item, context ->
-            val wasRemoved = directionOperators.removeDirection(item.path.toTerminal, item.data)
-            context.setValue(directionRemovedKey, wasRemoved)
+            item.data.removedDirection = directionOperators.removeDirection(item.path.toTerminal, item.data.direction)
         }
-        .addQueueCondition { (_, directionToRemove), context ->
-            directionToRemove != FeederDirection.NONE && context.getValue<Boolean>(directionRemovedKey) == true
+        .addQueueCondition { (_, directionToRemove), _, _, _ ->
+            directionToRemove.direction != FeederDirection.NONE
         }
 
     /**
@@ -56,7 +54,7 @@ class RemoveDirection(
     @JvmOverloads
     fun run(terminal: Terminal, direction: FeederDirection = FeederDirection.NONE) {
         val directionToRemove = direction.takeUnless { it == FeederDirection.NONE } ?: directionOperators.getDirection(terminal)
-        traversal.reset().run(terminal, directionToRemove, canStopOnStartItem = false)
+        traversal.reset().run(terminal, DirectionToRemove(directionToRemove), canStopOnStartItem = false)
     }
 
     private fun computeNextDirectionToRemove(
@@ -64,12 +62,15 @@ class RemoveDirection(
         context: StepContext,
         nextPath: StepPath,
         nextPaths: List<StepPath>
-    ): FeederDirection {
-        return when (currentStep.data) {
+    ): DirectionToRemove {
+        if (!currentStep.data.removedDirection) {
+            return DirectionToRemove(FeederDirection.NONE)
+        }
+
+        val directionToRemove = when (val directionRemoved = currentStep.data.direction) {
             FeederDirection.NONE -> FeederDirection.NONE
             FeederDirection.BOTH -> FeederDirection.BOTH
             else -> {
-                val directionRemoved = currentStep.data
                 if (nextPaths.size == 1) {
                     // If there is only one connected terminal, always remove the opposite direction
                     directionRemoved.findOpposite()
@@ -92,6 +93,8 @@ class RemoveDirection(
                 }
             }
         }
+
+        return DirectionToRemove(directionToRemove)
     }
 
     private fun FeederDirection.findOpposite(): FeederDirection =

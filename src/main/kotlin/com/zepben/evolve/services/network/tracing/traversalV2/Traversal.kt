@@ -28,7 +28,7 @@ import kotlin.collections.ArrayDeque
 
 abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     internal val queueType: QueueType<T, D>,
-    protected val trackerFactory: () -> Tracker<T>,
+    trackerFactory: () -> Tracker<T>,
     protected val parent: D? = null
 ) {
 
@@ -179,9 +179,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         return getDerivedThis()
     }
 
-    private fun matchesAllQueueConditions(item: T, context: StepContext): Boolean = queueConditions.all { it.shouldQueue(item, context) }
-
-
     /**
      * Add a callback which is called for every item in the traversal (including the starting item).
      *
@@ -239,12 +236,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         return getDerivedThis()
     }
 
-    /**
-     * Calls all the step actions with the passed in item.
-     *
-     * @param item       The item to pass to the step actions.
-     * @param isStopping Indicates if the trace will stop on this step.
-     */
     private fun applyStepActions(item: T, context: StepContext): D {
         stepActions.forEach { it.apply(item, context) }
         return getDerivedThis()
@@ -265,6 +256,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         return getDerivedThis()
     }
 
+    // TODO [Review]: Is removing this and adding to the StepContext if it is a branch better?
     fun addBranchStartAction(onBranchStart: StepAction<T>): D {
         branchStartActions.add(onBranchStart)
         return getDerivedThis()
@@ -297,12 +289,12 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     }
 
 
-    private fun computeNextContext(context: StepContext, nextStep: T): StepContext {
+    private fun computeNextContext(currentItem: T, context: StepContext, nextStep: T): StepContext {
         var newContextData: MutableMap<String, Any?>? = null
 
         for ((key, computer) in computeNextContextFuns) {
             newContextData = newContextData ?: mutableMapOf()
-            newContextData[key] = computer.computeNextValue(nextStep, context.getValue(key))
+            newContextData[key] = computer.computeNextValue(nextStep, currentItem, context.getValue(key))
         }
 
         return StepContext(false, context.stepNumber + 1, newContextData)
@@ -331,8 +323,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     }
 
     /**
-     * Starts the traversal. [setStart] should of been called to set the starting item or use the
-     * overloaded run method that takes an item to start at.
+     * Starts the traversal processing items added via [addStartItem] or [addStartItems].
      *
      * @param canStopOnStartItem Indicates if the traversal will check the start item for stop conditions.
      */
@@ -373,23 +364,31 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     private fun branchStartItems() {
         while (startItems.isNotEmpty()) {
             val startItem = startItems.removeFirst()
-            val branch = createNewBranch().also {
-                it.addStartItem(startItem)
+            if (canQueueStartItem(startItem)) {
+                val branch = createNewBranch(startItem, computeInitialContext(startItem))
+                branchQueue?.add(branch) ?: throw IllegalStateException("INTERNAL ERROR: branchQueue should never be null here")
             }
-
-            branchQueue?.add(branch) ?: throw IllegalStateException("INTERNAL ERROR: branchQueue should never be null here")
         }
     }
 
     private fun traverse(canStopOnStartItem: Boolean) {
         while (startItems.isNotEmpty()) {
             val startItem = startItems.removeFirst()
-            queue.add(startItem)
+
+            // If the traversal is not a branch we need to compute an initial context and check if it
+            // should even be queued to trace. If the traversal is a branch, the branch creators should
+            // have only created the branch if the item was eligible to be queued and added the item
+            // context as part of the branch creation.
+            if (parent == null) {
+                if (canQueueStartItem(startItem)) {
+                    contexts[startItem] = computeInitialContext(startItem)
+                    queue.add(startItem)
+                }
+            } else {
+                queue.add(startItem)
+            }
+
             var canStop = canStopOnStartItem
-
-            // This is a getOrPut because if this is a branch traversal it will already have a context
-            contexts.getOrPut(startItem) { computeInitialContext(startItem) }
-
             while (queue.hasNext()) {
                 queue.next()?.let { current ->
                     if (tracker.visit(current)) {
@@ -419,44 +418,45 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         }
     }
 
-    private fun createNewBranch(): D {
+    private fun createNewBranch(startItem: T, context: StepContext): D {
         return createNewThis().also {
             it.copyQueueConditions(this)
             it.copyStepActions(this)
             it.copyStopConditions(this)
             it.copyContextValueComputers(this)
             it.copyBranchStartActions(this)
+
+            it.contexts[startItem] = context
+            it.addStartItem(startItem)
         }
     }
 
-    private fun itemQueuer(context: StepContext): (T) -> Boolean = { nextItem ->
-        if (canQueueItem(nextItem, context) && queue.add(nextItem)) {
-            contexts[nextItem] = computeNextContext(context, nextItem)
+    private fun itemQueuer(currentItem: T, currentContext: StepContext): (T) -> Boolean = { nextItem ->
+        val nextContext = computeNextContext(currentItem, currentContext, nextItem)
+        if (canQueueItem(nextItem, nextContext, currentItem, currentContext) && queue.add(nextItem)) {
+            contexts[nextItem] = nextContext
             true
         } else {
             false
         }
     }
 
-    private fun queueNextNonBranching(current: T, context: StepContext, queueNext: QueueNext<T>) {
-        queueNext.accept(current, context, itemQueuer(context))
+    private fun queueNextNonBranching(current: T, currentContext: StepContext, queueNext: QueueNext<T>) {
+        queueNext.accept(current, currentContext, itemQueuer(current, currentContext))
     }
 
-    private fun queueNextBranching(current: T, context: StepContext, queueNext: BranchingQueueNext<T>) {
+    private fun queueNextBranching(current: T, currentContext: StepContext, queueNext: BranchingQueueNext<T>) {
         val queueBranch = { nextItem: T ->
-            if (canQueueItem(nextItem, context)) {
-                val branch = createNewBranch().also {
-                    it.contexts[nextItem] = computeNextContext(context, nextItem)
-                    it.addStartItem(nextItem)
-                }
-
+            val nextContext = computeNextContext(current, currentContext, nextItem)
+            if (canQueueItem(nextItem, nextContext, current, currentContext)) {
+                val branch = createNewBranch(nextItem, nextContext)
                 branchQueue?.add(branch) ?: throw IllegalStateException("INTERNAL ERROR: branchQueue should never be null here")
             } else {
                 false
             }
         }
 
-        queueNext.accept(current, context, itemQueuer(context), queueBranch)
+        queueNext.accept(current, currentContext, itemQueuer(current, currentContext), queueBranch)
     }
 
     private fun traverseBranches(canStopOnStartItem: Boolean) {
@@ -466,8 +466,12 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         }
     }
 
-    private fun canQueueItem(nextItem: T, currentContext: StepContext): Boolean {
-        return matchesAllQueueConditions(nextItem, currentContext)
+    private fun canQueueItem(nextItem: T, nextContext: StepContext, currentItem: T, currentContext: StepContext): Boolean {
+        return queueConditions.all { it.shouldQueue(nextItem, nextContext, currentItem, currentContext) }
+    }
+
+    private fun canQueueStartItem(startItem: T): Boolean {
+        return queueConditions.all { it.shouldQueueStartItem(startItem) }
     }
 
     private fun ContextValueComputer<*>.isStandaloneComputer() =

@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.streaming.mutations
 
-import com.zepben.evolve.conn.grpc.GrpcException
 import com.zepben.evolve.streaming.data.*
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
@@ -67,7 +66,7 @@ class UpdateNetworkStateService(
             }
 
             override fun onError(e: Throwable) {
-                throw GrpcException("Serialization failed due to: ${e.localizedMessage}", e)
+                throw e
             }
 
             override fun onCompleted() {

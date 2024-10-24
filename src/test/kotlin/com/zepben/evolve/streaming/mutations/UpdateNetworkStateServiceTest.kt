@@ -10,21 +10,25 @@ package com.zepben.evolve.streaming.mutations
 
 import com.google.protobuf.Timestamp
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.conn.grpc.GrpcException
 import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.evolve.streaming.data.*
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
+import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
+import io.grpc.inprocess.InProcessChannelBuilder
+import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.stub.StreamObserver
+import io.grpc.testing.GrpcCleanupRule
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
+import org.junit.Rule
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
+import java.util.concurrent.Executors
 import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
@@ -32,6 +36,10 @@ import com.zepben.protobuf.ns.data.CurrentStateEvent as PBCurrentStateEvent
 import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
 
 class UpdateNetworkStateServiceTest {
+    @JvmField
+    @Rule
+    val grpcCleanup: GrpcCleanupRule = GrpcCleanupRule()
+
     private val eventsSlot = slot<List<CurrentStateEvent>>()
     private val setCurrentStatesReturns = listOf(
         BatchSuccessful(),
@@ -46,6 +54,12 @@ class UpdateNetworkStateServiceTest {
     private val onSetCurrentStates = mockk<(events: List<CurrentStateEvent>) -> SetCurrentStatesStatus>().also {
         every { it(capture(eventsSlot)) } returnsMany setCurrentStatesReturns
     }
+
+    private val serverName = InProcessServerBuilder.generateName()
+    private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
+    private val stub = UpdateNetworkStateServiceGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor())
+    private val service = UpdateNetworkStateService(onSetCurrentStates)
+
     private val responseSlot = slot<SetCurrentStatesResponse>()
     private val responseErrorSlot = slot<Throwable>()
     private val responseObserver = mockk<StreamObserver<SetCurrentStatesResponse>>().also {
@@ -53,8 +67,6 @@ class UpdateNetworkStateServiceTest {
         justRun { it.onCompleted() }
         justRun { it.onError(capture(responseErrorSlot)) }
     }
-    private val service = UpdateNetworkStateService(onSetCurrentStates)
-    private val requestObserver = service.setCurrentStates(responseObserver)
     private val timeStamp = Timestamp.newBuilder().apply { seconds = 1 }.build()
     private val request = SetCurrentStatesRequest.newBuilder().apply {
         messageId = 1
@@ -68,6 +80,10 @@ class UpdateNetworkStateServiceTest {
             }.build()
         }.build())
     }.build()
+
+    init {
+        grpcCleanup.register(InProcessServerBuilder.forName(serverName).directExecutor().addService(service).build().start())
+    }
 
     @Test
     fun setCurrentStates(){
@@ -92,39 +108,35 @@ class UpdateNetworkStateServiceTest {
     fun `setCurrentStates onNext handles error`(){
         every { onSetCurrentStates(any()) } throws Error("TEST ERROR!")
 
-        requestObserver.onNext(request)
+        sendGrpcRequest(request)
+
+        verify { responseObserver.onError(responseErrorSlot.captured) }
 
         assertThat(responseErrorSlot.captured, instanceOf(StatusRuntimeException::class.java))
         (responseErrorSlot.captured as StatusRuntimeException).status.let {
             assertThat(it.code, equalTo(Status.INTERNAL.code))
             assertThat(it.description, equalTo("TEST ERROR!"))
         }
-
-        verify {
-            responseObserver.onError(responseErrorSlot.captured)
-        }
     }
 
     @Test
-    fun `setCurrentStates onError throws GrpcException`(){
+    fun `setCurrentStates onError`(){
         val throwable = Status.INTERNAL.withDescription("TEST ERROR!").asRuntimeException()
-        val exception = assertThrows<GrpcException> { requestObserver.onError(throwable) }
+        val requestObserver = stub.setCurrentStates(responseObserver)
+        requestObserver.onError(throwable)
 
-        assertThat(exception.cause, equalTo(throwable))
-        assertThat(exception.message, equalTo("Serialization failed due to: ${throwable.localizedMessage}"))
-    }
-
-    @Test
-    fun `setCurrentStates onCompleted`(){
-        requestObserver.onCompleted()
-
-        verify {
-            responseObserver.onCompleted()
-        }
+        verify { responseObserver.onError(responseErrorSlot.captured) }
+        assertThat((responseErrorSlot.captured as StatusRuntimeException).status.code, equalTo(Status.CANCELLED.code))
     }
 
     private fun setCurrentStatesTest(statusCase: SetCurrentStatesResponse.StatusCase, onResponseAssertion: ((SetCurrentStatesResponse) -> Unit)? = null){
-        requestObserver.onNext(request)
+        sendGrpcRequest(request)
+
+        verify {
+            onSetCurrentStates(eventsSlot.captured)
+            responseObserver.onNext(responseSlot.captured)
+            responseObserver.onCompleted()
+        }
 
         eventsSlot.captured.let{
             assertThat(it.size, equalTo(1))
@@ -143,10 +155,12 @@ class UpdateNetworkStateServiceTest {
             assertThat(it.statusCase, equalTo(statusCase))
             onResponseAssertion?.let { fn -> fn(it) }
         }
+    }
 
-        verify {
-            onSetCurrentStates(eventsSlot.captured)
-            responseObserver.onNext(responseSlot.captured)
-        }
+    private fun sendGrpcRequest(request: SetCurrentStatesRequest){
+        // Having this requestObserver in the class property didn't work, so we just create it before sending the request.
+        val requestObserver = stub.setCurrentStates(responseObserver)
+        requestObserver.onNext(request)
+        requestObserver.onCompleted()
     }
 }

@@ -17,16 +17,26 @@ import com.zepben.evolve.streaming.data.SwitchAction
 import com.zepben.evolve.streaming.data.SwitchStateEvent
 import com.zepben.protobuf.ns.GetCurrentStatesRequest
 import com.zepben.protobuf.ns.GetCurrentStatesResponse
+import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
+import io.grpc.inprocess.InProcessChannelBuilder
+import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.stub.StreamObserver
+import io.grpc.testing.GrpcCleanupRule
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
+import org.junit.Rule
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
+import java.util.concurrent.Executors
 
 class QueryNetworkStateServiceTest {
+    @JvmField
+    @Rule
+    val grpcCleanup: GrpcCleanupRule = GrpcCleanupRule()
+
     private val currentStateEvents = listOf<CurrentStateEvent>(
         SwitchStateEvent("event1", LocalDateTime.now(), "mrid1", SwitchAction.OPEN, PhaseCode.ABC),
         SwitchStateEvent("event2", LocalDateTime.now(), "mrid1", SwitchAction.CLOSE, PhaseCode.ABN),
@@ -42,6 +52,11 @@ class QueryNetworkStateServiceTest {
     private val onGetCurrentStatesStream = mockk<QueryNetworkStateService.GetCurrentStates>().also {
         every { it.get(capture(fromSlot), capture(toSlot)) } returns responseCurrentStateEvents.stream()
     }
+
+    private val serverName = InProcessServerBuilder.generateName()
+    private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
+    private val stub = QueryNetworkStateServiceGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor())
+
     private val responseSlot = mutableListOf<GetCurrentStatesResponse>()
     private val responseErrorSlot = slot<Throwable>()
     private val responseObserver = mockk<StreamObserver<GetCurrentStatesResponse>>().also {
@@ -59,15 +74,19 @@ class QueryNetworkStateServiceTest {
 
     @Test
     fun getCurrentStates() {
-        serviceSequence.getCurrentStates(request, responseObserver)
+        startGrpcServerWith(serviceSequence)
+
+        stub.getCurrentStates(request, responseObserver)
         assertGetCurrentStates {
             verify { onGetCurrentStatesSequence(fromSlot.captured, toSlot.captured) }
         }
+    }
 
-        clearMocks(responseObserver, onGetCurrentStatesSequence, onGetCurrentStatesStream, answers = false)
-        responseSlot.clear()
+    @Test
+    fun `getCurrentStates using Java Streams`() {
+        startGrpcServerWith(serviceStream)
 
-        serviceStream.getCurrentStates(request, responseObserver)
+        stub.getCurrentStates(request, responseObserver)
         assertGetCurrentStates {
             verify { onGetCurrentStatesStream.get(fromSlot.captured, toSlot.captured) }
         }
@@ -75,22 +94,25 @@ class QueryNetworkStateServiceTest {
 
     @Test
     fun `getCurrentStates handles error`(){
+        startGrpcServerWith(serviceSequence)
+
         every { onGetCurrentStatesSequence(any(), any()) } throws Error("TEST ERROR!")
 
         serviceSequence.getCurrentStates(request, responseObserver)
 
+        verify { responseObserver.onError(responseErrorSlot.captured) }
         assertThat(responseErrorSlot.captured, instanceOf(StatusRuntimeException::class.java))
         (responseErrorSlot.captured as StatusRuntimeException).status.let {
             assertThat(it.code, equalTo(Status.INTERNAL.code))
             assertThat(it.description, equalTo("TEST ERROR!"))
         }
 
-        verify {
-            responseObserver.onError(responseErrorSlot.captured)
-        }
+
     }
 
     private fun assertGetCurrentStates(onAdditionalVerification: (() -> Unit)? = null) {
+        onAdditionalVerification?.let { it() }
+
         assertThat(fromSlot.captured, equalTo(request.from.toLocalDateTime()))
         assertThat(toSlot.captured, equalTo(request.to.toLocalDateTime()))
 
@@ -103,12 +125,16 @@ class QueryNetworkStateServiceTest {
             assertThat(it.map { it.switch.phases.name }, contains(*switchStateEvents.map { it.phases.name }.toTypedArray()))
         }
 
-        onAdditionalVerification?.let { it() }
-
         verifySequence {
             responseObserver.onNext(responseSlot[0])
             responseObserver.onNext(responseSlot[1])
             responseObserver.onCompleted()
         }
+    }
+
+    private fun startGrpcServerWith(service: QueryNetworkStateService){
+        grpcCleanup.register(InProcessServerBuilder.forName(serverName).directExecutor()
+            .addService(service)
+            .build().start())
     }
 }

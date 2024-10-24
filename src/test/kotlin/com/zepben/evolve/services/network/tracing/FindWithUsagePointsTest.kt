@@ -17,14 +17,15 @@ import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.services.network.testdata.SingleTransformerNetwork
 import com.zepben.evolve.services.network.testdata.WithUsagePointsNetwork
-import com.zepben.evolve.services.network.tracing.FindWithUsagePoints.Result.Status.*
+import com.zepben.evolve.services.network.tracing.FindWithUsagePoints.Result.Status.NO_ERROR
+import com.zepben.evolve.services.network.tracing.FindWithUsagePoints.Result.Status.NO_PATH
 import com.zepben.evolve.services.network.tracing.FindWithUsagePoints.VirtualUsagePointCondition.*
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.util.function.Consumer
 
 
 internal class FindWithUsagePointsTest {
@@ -33,7 +34,7 @@ internal class FindWithUsagePointsTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val findWithUsagePoints = FindWithUsagePoints()
+    private val findWithUsagePoints = FindWithUsagePoints(NetworkStateOperators.NORMAL)
 
     //
     //      c0   c1   c2             c3   c4   c5
@@ -64,53 +65,28 @@ internal class FindWithUsagePointsTest {
     private val tx6 = ce("tx6")
 
     @Test
-    internal fun normalStateSingleTrace() {
-        validate(findWithUsagePoints.runNormal(es, null), NO_ERROR, listOf("tx1", "tx2", "tx3", "tx4", "tx5", "iso"))
-        validate(findWithUsagePoints.runNormal(c3, c5), NO_ERROR, listOf("tx4", "tx5"))
-        validate(findWithUsagePoints.runNormal(c5, c3), NO_ERROR, listOf("tx4", "tx5"))
-        validate(findWithUsagePoints.runNormal(es, c11), NO_PATH, emptyList())
+    internal fun singleTrace() {
+        validate(findWithUsagePoints.run(es, null), NO_ERROR, listOf("tx1", "tx2", "tx3", "tx4", "tx5", "iso"))
+        validate(findWithUsagePoints.run(c3, c5), NO_ERROR, listOf("tx4", "tx5"))
+        validate(findWithUsagePoints.run(c5, c3), NO_ERROR, listOf("tx4", "tx5"))
+        validate(findWithUsagePoints.run(es, c11), NO_PATH, emptyList())
     }
 
     @Test
-    internal fun normalStateMultiTrace() {
-        val results = findWithUsagePoints.runNormal(listOf(es, c3, c5, es), listOf(null, c5, c3, c11))
+    internal fun multiTrace() {
+        val results = findWithUsagePoints.run(listOf(es to null, c3 to c5, c5 to c3, es to c11))
 
         assertThat(results, hasSize(4))
         validate(results[0], NO_ERROR, listOf("tx1", "tx2", "tx3", "tx4", "tx5", "iso"))
         validate(results[1], NO_ERROR, listOf("tx4", "tx5"))
         validate(results[2], NO_ERROR, listOf("tx4", "tx5"))
         validate(results[3], NO_PATH, emptyList())
-
-        validateMismatch(findWithUsagePoints.runNormal(listOf(es, es), listOf(null)), 2)
-        validateMismatch(findWithUsagePoints.runNormal(listOf(es, es), listOf(c1, c11, c3)), 3)
-    }
-
-    @Test
-    internal fun currentStateSingleTrace() {
-        validate(findWithUsagePoints.runCurrent(es, null), NO_ERROR, listOf("tx2", "tx3", "tx6", "tx7", "tx8"))
-        validate(findWithUsagePoints.runCurrent(c1, c12), NO_ERROR, listOf("tx3", "tx7"))
-        validate(findWithUsagePoints.runCurrent(c12, c1), NO_ERROR, listOf("tx3", "tx7"))
-        validate(findWithUsagePoints.runCurrent(es, c5), NO_PATH, emptyList())
-    }
-
-    @Test
-    internal fun currentStateMultiTrace() {
-        val results = findWithUsagePoints.runCurrent(listOf(es, c1, c12, es), listOf(null, c12, c1, c5))
-
-        assertThat(results, hasSize(4))
-        validate(results[0], NO_ERROR, listOf("tx2", "tx3", "tx6", "tx7", "tx8"))
-        validate(results[1], NO_ERROR, listOf("tx3", "tx7"))
-        validate(results[2], NO_ERROR, listOf("tx3", "tx7"))
-        validate(results[3], NO_PATH, emptyList())
-
-        validateMismatch(findWithUsagePoints.runCurrent(listOf(es, es), listOf(null)), 2)
-        validateMismatch(findWithUsagePoints.runCurrent(listOf(es, es), listOf(c1, c11, c3)), 3)
     }
 
     @Test
     internal fun sameFromAndTo() {
-        validate(findWithUsagePoints.runNormal(c3, c3), NO_ERROR, emptyList())
-        validate(findWithUsagePoints.runNormal(tx6, tx6), NO_ERROR, listOf("tx6"))
+        validate(findWithUsagePoints.run(c3, c3), NO_ERROR, emptyList())
+        validate(findWithUsagePoints.run(tx6, tx6), NO_ERROR, listOf("tx6"))
     }
 
     @Test
@@ -122,10 +98,10 @@ internal class FindWithUsagePointsTest {
         usagePoint.addEquipment(tx1)
         tx1.addUsagePoint(usagePoint)
 
-        validate(findWithUsagePoints.runNormal(tx1, null), NO_ERROR, listOf(tx1.mRID))
-        validate(findWithUsagePoints.runNormal(tx1, tx1), NO_ERROR, listOf(tx1.mRID))
-        validate(findWithUsagePoints.runNormal(tx2, null), NO_ERROR, emptyList())
-        validate(findWithUsagePoints.runNormal(tx2, tx2), NO_ERROR, emptyList())
+        validate(findWithUsagePoints.run(tx1, null), NO_ERROR, listOf(tx1.mRID))
+        validate(findWithUsagePoints.run(tx1, tx1), NO_ERROR, listOf(tx1.mRID))
+        validate(findWithUsagePoints.run(tx2, null), NO_ERROR, emptyList())
+        validate(findWithUsagePoints.run(tx2, tx2), NO_ERROR, emptyList())
     }
 
     @Test
@@ -137,8 +113,8 @@ internal class FindWithUsagePointsTest {
             val tx: PowerTransformer = networkService1["tx"]!!
 
             // Validate both `from` and `to` terminals.
-            validate(findWithUsagePoints.runNormal(tx, null), NO_ERROR, listOf(tx.mRID))
-            validate(findWithUsagePoints.runNormal(tx, s), NO_ERROR, listOf(tx.mRID))
+            validate(findWithUsagePoints.run(tx, null), NO_ERROR, listOf(tx.mRID))
+            validate(findWithUsagePoints.run(tx, s), NO_ERROR, listOf(tx.mRID))
         }
 
         validateSingleTransformerNetwork(1)
@@ -147,8 +123,8 @@ internal class FindWithUsagePointsTest {
 
     @Test
     internal fun noPathWithMissingTerminals() {
-        validate(findWithUsagePoints.runNormal(AcLineSegment(), AcLineSegment().apply { addTerminal(Terminal()) }), NO_PATH, emptyList())
-        validate(findWithUsagePoints.runNormal(AcLineSegment().apply { addTerminal(Terminal()) }, AcLineSegment()), NO_PATH, emptyList())
+        validate(findWithUsagePoints.run(AcLineSegment(), AcLineSegment().apply { addTerminal(Terminal()) }), NO_PATH, emptyList())
+        validate(findWithUsagePoints.run(AcLineSegment().apply { addTerminal(Terminal()) }, AcLineSegment()), NO_PATH, emptyList())
     }
 
     @Test
@@ -162,13 +138,13 @@ internal class FindWithUsagePointsTest {
     @Test
     internal fun includesTransformerAndDownstream() {
         val ns = WithUsagePointsNetwork.createTxWithRealAndLv()
-        validate(FindWithUsagePoints().runNormal(ns["es"]!!, null), NO_ERROR, listOf("tx", "ec"))
+        validate(findWithUsagePoints.run(ns["es"]!!, null), NO_ERROR, listOf("tx", "ec"))
     }
 
     @Test
     internal fun lvAggregationExcludeLvNetwork() {
         val ns = WithUsagePointsNetwork.createTxWithRealAndLv("LV_AGGREGATION")
-        validate(FindWithUsagePoints().runNormal(ns["es"]!!, null), NO_ERROR, listOf("tx"))
+        validate(findWithUsagePoints.run(ns["es"]!!, null), NO_ERROR, listOf("tx"))
     }
 
     private fun ce(mRID: String): ConductingEquipment {
@@ -178,15 +154,6 @@ internal class FindWithUsagePointsTest {
     private fun validate(result: FindWithUsagePoints.Result, expectedStatus: FindWithUsagePoints.Result.Status, expectedMRIDs: List<String>) {
         assertThat(result.status, equalTo(expectedStatus))
         assertThat(result.conductingEquipment.keys, containsInAnyOrder(*expectedMRIDs.toTypedArray()))
-    }
-
-    private fun validateMismatch(results: List<FindWithUsagePoints.Result>, expectedResults: Int) {
-        assertThat(results, hasSize(expectedResults))
-
-        results.forEach(Consumer { result: FindWithUsagePoints.Result ->
-            assertThat(result.status, equalTo(MISMATCHED_FROM_TO))
-            assertThat(result.conductingEquipment.keys, empty())
-        })
     }
 
     private fun validateVirtualUsagePoints(
@@ -206,7 +173,7 @@ internal class FindWithUsagePointsTest {
         expectedMrids: List<String>
     ) {
         val ns = WithUsagePointsNetwork.createTxWithVirtual<T>(virtualConnectionCategory)
-        validate(FindWithUsagePoints(virtualUsagePointCondition).runNormal(ns["es"]!!, null), NO_ERROR, expectedMrids)
+        validate(FindWithUsagePoints(NetworkStateOperators.NORMAL, virtualUsagePointCondition).run(ns["es"]!!, null), NO_ERROR, expectedMrids)
     }
 
 }

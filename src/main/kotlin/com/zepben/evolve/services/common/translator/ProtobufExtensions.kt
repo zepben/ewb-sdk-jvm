@@ -13,6 +13,8 @@ import com.zepben.protobuf.cim.iec61968.common.Document
 import com.zepben.protobuf.cim.iec61968.common.Organisation
 import com.zepben.protobuf.cim.iec61968.common.OrganisationRole
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 
 fun OrganisationRole.mRID(): String = io.mrid
@@ -28,3 +30,6 @@ fun Instant?.toTimestamp(): Timestamp? {
         }.build()
     }
 }
+
+internal fun Timestamp.toLocalDateTime(): LocalDateTime? = toInstant()?.let{ LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
+internal fun LocalDateTime?.toTimestamp(): Timestamp? = this?.toInstant(ZoneOffset.UTC)?.toTimestamp()

@@ -9,13 +9,18 @@
 module.exports = {
   someSidebar: [
     "sdk-overview",
-    "sdk-data-model", 
+    "sdk-data-model",
     "sdk-services", 
     "sdk-phases",
     "sdk-tracing",
     "sdk-persistence",
     "sdk-consumer",
     "sdk-protection",
-    "sdk-metrics"
+    "sdk-metrics",
+    {
+        type: "category",
+        label: "Network State",
+        items: ["query-network-state-service", "set-network-state-client"]
+    },
   ]
 };

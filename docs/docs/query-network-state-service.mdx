@@ -1,0 +1,380 @@
+---
+id: query-network-state-service
+title: Query Network State Service
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+An implementation of the `QueryNetworkStateService` will provide an object-oriented wrapper for the gRPC library, with the ability to retrieve information about
+the state of the network. This is done with the following 3 steps:
+
+1. Create callbacks which will be called when gRPC messages are received from a client.
+2. Register the callbacks with an instance of the `QueryNetworkStateService`.
+3. Add your `QueryNetworkStateService` instance as a gRPC service.
+
+:::info
+The below examples make use of a helper library provided by Zepben, which is included as a transitive dependency of the SDK, or can be [added directly from Maven Central](https://central.sonatype.com/artifact/com.zepben.evolve/evolve-conn).
+
+You do _**NOT**_ have to do this, you can register the services directly with a Netty gRPC (or other) server instead.
+:::
+
+The classes you need for performing these actions can be imported from the SDK:
+
+<Tabs
+    groupId="import-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.conn.grpc.GrpcServer;
+import com.zepben.evolve.streaming.data.CurrentStateEvent;
+import com.zepben.evolve.streaming.get.QueryNetworkStateService;
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.conn.grpc.GrpcServer
+import com.zepben.evolve.streaming.data.CurrentStateEvent
+import com.zepben.evolve.streaming.get.QueryNetworkStateService
+```
+
+</TabItem>
+</Tabs>
+
+## Creating callbacks
+
+Each supported message in `QueryNetworkStateService` requires a callback, which will be triggered when any client messages are received. Implementation of these
+callbacks can be done as either lambdas, or full method/function implementations that can be passed as method references.
+
+### onGetCurrentStates
+
+The `onGetCurrentStates` callback is triggered for each request for the current states between two date/times, and should return a list of the current state
+events that occurred between those date/times (inclusive)
+
+<Tabs
+    groupId="callback-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// Using a lambda expression
+QueryNetworkStateService.GetCurrentStates getCurrentStatesLambda = (from, to) ->
+    Stream.of(
+        // Put the batches you wish to return here, e.g. List.of(item1, item2), List.of(item3).
+    );
+
+// Using a method
+class QueryNetworkStateServiceImpl {
+
+    Stream<List<CurrentStateEvent>> getCurrentStates(LocalDateTime from, LocalDateTime to){
+        var batches = ... // Some logic to build the batches of events.
+        return batches.stream();
+    }
+
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+// Using a lambda expression
+var getCurrentStatesLambda = { from: LocalDateTime?, to: LocalDateTime? ->
+    sequenceOf<List<CurrentStateEvent>>(
+        // Put the batches you wish to return here, e.g. List.of(item1, item2), List.of(item3).
+    )
+}
+
+// Using a method
+class QueryNetworkStateServiceImpl {
+
+    fun getCurrentStates(from: LocalDateTime?, to: LocalDateTime?): Sequence<List<CurrentStateEvent>> {
+        val batches = ... // Some logic to build the batches of events.
+        return batches.asSequence()
+    }
+
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Registering callbacks
+
+Registering the callbacks with the service is as simple as passing them into the `QueryNetworkStateService` constructor.
+
+<Tabs
+    groupId="register-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// Using lambda expressions
+QueryNetworkStateService service = new QueryNetworkStateService(getCurrentStatesLambda);
+
+// Using method references
+class QueryNetworkStateServiceImpl {
+
+    QueryNetworkStateService service = new QueryNetworkStateService(this::getCurrentStates);
+
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+// Using lambda expressions
+val service = QueryNetworkStateService(getCurrentStatesLambda)
+
+// Using method references
+class QueryNetworkStateServiceImpl {
+
+    val service = QueryNetworkStateService(::getCurrentStates);
+
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Registering the service
+
+For the above code to have any effect, you need to register the service with a gRPC server. Once this has been done, you should start to receive callbacks for
+each request sent from a gRPC client.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+class Main {
+
+    public static void main(String[] args) {
+        var grpcServer = new GrpcServerImpl(9001, service);
+        grpcServer.start();
+    }
+
+    class GrpcServerImpl extends GrpcServer {
+
+        GrpcServerImpl(int port, QueryNetworkStateService service) {
+            super(port, 0, null, List.of());
+            getServerBuilder().addService(service);
+        }
+
+    }
+
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+fun main() {
+    val grpcServer = object : GrpcServer(grpcPortNumber) {
+        init {
+            serverBuilder.addService(service)
+        }
+    }
+    grpcServer.start()
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Putting it all together
+
+Putting each of the steps above together, you can build the scaffold of a working application
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java-lambda"
+    values={[
+        { label: "Java Lambdas", value: "java-lambda", },
+        { label: "Java Methods", value: "java-method", },
+        { label: "Kotlin Lambdas", value: "kotlin-lambda", },
+        { label: "Kotlin Methods", value: "kotlin-method", },
+    ]
+}>
+<TabItem value="java-lambda">
+
+`Main.java`:
+```java
+import com.zepben.evolve.streaming.get.QueryNetworkStateService;
+import com.zepben.evolve.streaming.data.CurrentStateEvent;
+
+import java.util.stream.Stream;
+
+class Main {
+
+    public static void main(String[] args) {
+        QueryNetworkStateService service = new QueryNetworkStateService(
+            (QueryNetworkStateService.GetCurrentStates) (from, to) -> Stream.of(
+                // Put the batches you wish to return here, e.g. List.of(item1, item2), List.of(item3).
+            )
+        );
+
+        var grpcServer = new GrpcServerImpl(9001, service);
+        grpcServer.start();
+    }
+
+}
+```
+
+`GrpcServerImpl.java`:
+```java
+import com.zepben.evolve.conn.grpc.GrpcServer;
+import com.zepben.evolve.streaming.get.QueryNetworkStateService;
+
+import java.util.List;
+
+class GrpcServerImpl extends GrpcServer {
+
+    GrpcServerImpl(int port, QueryNetworkStateService service) {
+        super(port, 0, null, List.of());
+        getServerBuilder().addService(service);
+    }
+
+}
+```
+
+</TabItem>
+<TabItem value="java-method">
+
+`Main.java`:
+```java
+class Main {
+
+    public static void main(String[] args) {
+        var service = new QueryNetworkStateServiceImpl();
+        var grpcServer = new GrpcServerImpl(9001, service.service);
+        grpcServer.start();
+    }
+
+}
+```
+
+`GrpcServerImpl.java`:
+```java
+import com.zepben.evolve.conn.grpc.GrpcServer;
+import com.zepben.evolve.streaming.get.QueryNetworkStateService;
+
+import java.util.List;
+
+class GrpcServerImpl extends GrpcServer {
+
+    GrpcServerImpl(int port, QueryNetworkStateService service) {
+        super(port, 0, null, List.of());
+        getServerBuilder().addService(service);
+    }
+
+}
+```
+
+`QueryNetworkStateServiceImpl.java`:
+```java
+import com.zepben.evolve.streaming.data.CurrentStateEvent;
+import com.zepben.evolve.streaming.get.QueryNetworkStateService;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Stream;
+
+class QueryNetworkStateServiceImpl {
+
+    QueryNetworkStateService service = new QueryNetworkStateService(this::getCurrentStates);
+
+    Stream<List<CurrentStateEvent>> getCurrentStates(LocalDateTime from, LocalDateTime to){
+        var batches = ... // Some logic to build the batches of events.
+        return batches.stream();
+    }
+
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin-lambda">
+
+```kotlin
+import com.zepben.evolve.conn.grpc.GrpcServer
+import com.zepben.evolve.streaming.data.CurrentStateEvent
+import com.zepben.evolve.streaming.get.QueryNetworkStateService
+
+fun main() {
+    val service = QueryNetworkStateService(
+        onGetCurrentStates = { from, to ->
+            sequenceOf(
+                // Put the batches you wish to return here, e.g. List.of(item1, item2), List.of(item3).
+            )
+        }
+    )
+
+    val grpcServer = object : GrpcServer(grpcPortNumber) {
+        init {
+            serverBuilder.addService(service)
+        }
+    }
+    grpcServer.start()
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin-method">
+
+```kotlin
+import com.zepben.evolve.conn.grpc.GrpcServer
+import com.zepben.evolve.streaming.data.CurrentStateEvent
+import com.zepben.evolve.streaming.get.QueryNetworkStateService
+
+import java.time.LocalDateTime
+
+class QueryNetworkStateServiceImpl {
+
+    val service = QueryNetworkStateService(::getCurrentStates);
+
+    fun getCurrentStates(from: LocalDateTime?, to: LocalDateTime?): Sequence<List<CurrentStateEvent>> {
+        val batches = ... // Some logic to build the batches of events.
+        return batches.asSequence()
+    }
+
+}
+
+fun main() {
+    val service = QueryNetworkStateServiceImpl().service
+    val grpcServer = object : GrpcServer(grpcPortNumber) {
+        init {
+            serverBuilder.addService(service)
+        }
+    }
+    grpcServer.start()
+}
+```
+
+</TabItem>
+</Tabs>

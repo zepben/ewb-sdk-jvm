@@ -6,13 +6,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.streaming.get
+package com.zepben.evolve.streaming.mutations
 
 import com.zepben.evolve.streaming.data.*
+import com.zepben.evolve.streaming.get.AwaitableStreamObserver
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcClient
-import com.zepben.protobuf.ns.SetCurrentStatesRequest as PBSetCurrentStatesRequest
-import com.zepben.protobuf.ns.SetCurrentStatesResponse as PBSetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import io.grpc.CallCredentials
 import io.grpc.Channel
@@ -21,6 +20,8 @@ import java.util.concurrent.Executors
 import java.util.stream.Stream
 import kotlin.streams.asSequence
 import kotlin.streams.asStream
+import com.zepben.protobuf.ns.SetCurrentStatesRequest as PBSetCurrentStatesRequest
+import com.zepben.protobuf.ns.SetCurrentStatesResponse as PBSetCurrentStatesResponse
 
 /**
  * A client class that provides functionality to interact with the gRPC service for updating network states.

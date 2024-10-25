@@ -6,11 +6,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.streaming.mutations
+package com.zepben.evolve.streaming.get
 
 import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.streaming.data.CurrentStateEvent
-import com.zepben.protobuf.ns.*
+import com.zepben.protobuf.ns.GetCurrentStatesRequest
+import com.zepben.protobuf.ns.GetCurrentStatesResponse
+import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
 import java.time.LocalDateTime
@@ -115,4 +117,3 @@ class QueryNetworkStateService(
     }
 
 }
-

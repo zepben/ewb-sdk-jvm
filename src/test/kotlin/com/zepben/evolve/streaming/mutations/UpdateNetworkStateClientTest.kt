@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.streaming.get
+package com.zepben.evolve.streaming.mutations
 
 import com.google.protobuf.Timestamp
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
@@ -16,14 +16,6 @@ import com.zepben.evolve.streaming.data.*
 import com.zepben.evolve.streaming.get.testservices.TestUpdateNetworkStateService
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
-import com.zepben.protobuf.ns.data.BatchSuccessful as PBBatchSuccessful
-import com.zepben.protobuf.ns.data.ProcessingPaused as PBProcessingPaused
-import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
-import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
-import com.zepben.protobuf.ns.data.StateEventUnknownMrid as PBStateEventUnknownMrid
-import com.zepben.protobuf.ns.data.StateEventDuplicateMrid as PBStateEventDuplicateMrid
-import com.zepben.protobuf.ns.data.StateEventInvalidMrid as PBStateEventInvalidMrid
-import com.zepben.protobuf.ns.data.StateEventUnsupportedPhasing as PBStateEventUnsupportedPhasing
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
@@ -36,6 +28,14 @@ import java.time.LocalDateTime
 import java.util.concurrent.Executors
 import kotlin.streams.asStream
 import kotlin.streams.toList
+import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
+import com.zepben.protobuf.ns.data.BatchSuccessful as PBBatchSuccessful
+import com.zepben.protobuf.ns.data.ProcessingPaused as PBProcessingPaused
+import com.zepben.protobuf.ns.data.StateEventDuplicateMrid as PBStateEventDuplicateMrid
+import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
+import com.zepben.protobuf.ns.data.StateEventInvalidMrid as PBStateEventInvalidMrid
+import com.zepben.protobuf.ns.data.StateEventUnknownMrid as PBStateEventUnknownMrid
+import com.zepben.protobuf.ns.data.StateEventUnsupportedPhasing as PBStateEventUnsupportedPhasing
 
 class UpdateNetworkStateClientTest {
     @JvmField

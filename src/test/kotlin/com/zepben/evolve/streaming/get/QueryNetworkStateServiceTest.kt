@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.streaming.mutations
+package com.zepben.evolve.streaming.get
 
 import com.google.protobuf.Timestamp
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode

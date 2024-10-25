@@ -11,13 +11,13 @@ package com.zepben.evolve.streaming.data
 import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.services.common.translator.toTimestamp
 import java.time.LocalDateTime
+import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
 import com.zepben.protobuf.ns.data.BatchSuccessful as PBBatchSuccessful
 import com.zepben.protobuf.ns.data.ProcessingPaused as PBProcessingPaused
-import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
-import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
-import com.zepben.protobuf.ns.data.StateEventUnknownMrid as PBStateEventUnknownMrid
 import com.zepben.protobuf.ns.data.StateEventDuplicateMrid as PBStateEventDuplicateMrid
+import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
 import com.zepben.protobuf.ns.data.StateEventInvalidMrid as PBStateEventInvalidMrid
+import com.zepben.protobuf.ns.data.StateEventUnknownMrid as PBStateEventUnknownMrid
 import com.zepben.protobuf.ns.data.StateEventUnsupportedPhasing as PBStateEventUnsupportedPhasing
 
 /**
@@ -31,6 +31,7 @@ sealed interface SetCurrentStatesStatus
 class BatchSuccessful : SetCurrentStatesStatus {
 
     companion object {
+        @Suppress("UNUSED_PARAMETER")
         internal fun fromPb(pb: PBBatchSuccessful): SetCurrentStatesStatus =
             BatchSuccessful()
     }
@@ -72,9 +73,9 @@ class BatchFailure(val partialFailure: Boolean, val failures: List<StateEventFai
     }
 
     internal fun toPb(): PBBatchFailure =
-        PBBatchFailure.newBuilder().also {
-            it.partialFailure = partialFailure
-            it.addAllFailed(failures.map { it.toPb() })
+        PBBatchFailure.newBuilder().also { batchFailure ->
+            batchFailure.partialFailure = partialFailure
+            batchFailure.addAllFailed(failures.map { it.toPb() })
         }.build()
 
 }
@@ -89,10 +90,10 @@ sealed class StateEventFailure(val eventId: String) {
     companion object {
         internal fun fromPb(pb: PBStateEventFailure): StateEventFailure? =
             when (pb.reasonCase) {
-                PBStateEventFailure.ReasonCase.UNKNOWNMRID -> StateEventUnknownMrid.fromPb(pb.eventId, pb.unknownMrid)
-                PBStateEventFailure.ReasonCase.INVALIDMRID -> StateEventInvalidMrid.fromPb(pb.eventId, pb.invalidMrid)
-                PBStateEventFailure.ReasonCase.DUPLICATEMRID -> StateEventDuplicateMrid.fromPb(pb.eventId, pb.duplicateMrid)
-                PBStateEventFailure.ReasonCase.UNSUPPORTEDPHASING -> StateEventUnsupportedPhasing.fromPb(pb.eventId, pb.unsupportedPhasing)
+                PBStateEventFailure.ReasonCase.UNKNOWNMRID -> StateEventUnknownMrid.fromPb(pb)
+                PBStateEventFailure.ReasonCase.DUPLICATEMRID -> StateEventDuplicateMrid.fromPb(pb)
+                PBStateEventFailure.ReasonCase.INVALIDMRID -> StateEventInvalidMrid.fromPb(pb)
+                PBStateEventFailure.ReasonCase.UNSUPPORTEDPHASING -> StateEventUnsupportedPhasing.fromPb(pb)
                 else -> null
             }
     }
@@ -100,10 +101,10 @@ sealed class StateEventFailure(val eventId: String) {
     internal abstract fun toPb(): PBStateEventFailure
 
     /**
-     * Creates a [PBStateEventFailure.Builder] builder with [eventId] assigned.
+     * Creates a [PBStateEventFailure] with [eventId] assigned along with the specified [block].
      */
-    protected fun toPbBuilder(): PBStateEventFailure.Builder =
-        PBStateEventFailure.newBuilder().also { it.eventId = eventId }
+    protected fun toPb(block: PBStateEventFailure.Builder.() -> Unit): PBStateEventFailure =
+        PBStateEventFailure.newBuilder().also { it.eventId = eventId }.apply(block).build()
 
 }
 
@@ -113,14 +114,13 @@ sealed class StateEventFailure(val eventId: String) {
 class StateEventUnknownMrid(eventId: String) : StateEventFailure(eventId) {
 
     companion object {
-        internal fun fromPb(eventId: String, pb: PBStateEventUnknownMrid): StateEventFailure =
-            StateEventUnknownMrid(eventId)
+        internal fun fromPb(pb: PBStateEventFailure): StateEventFailure =
+            StateEventUnknownMrid(pb.eventId)
     }
 
-    override fun toPb(): PBStateEventFailure =
-        toPbBuilder().apply {
-            unknownMrid = PBStateEventUnknownMrid.newBuilder().build()
-        }.build()
+    override fun toPb(): PBStateEventFailure = toPb {
+        unknownMrid = PBStateEventUnknownMrid.newBuilder().build()
+    }
 
 }
 
@@ -130,14 +130,13 @@ class StateEventUnknownMrid(eventId: String) : StateEventFailure(eventId) {
 class StateEventDuplicateMrid(eventId: String) : StateEventFailure(eventId) {
 
     companion object {
-        internal fun fromPb(eventId: String, pb: PBStateEventDuplicateMrid): StateEventFailure =
-            StateEventDuplicateMrid(eventId)
+        internal fun fromPb(pb: PBStateEventFailure): StateEventFailure =
+            StateEventDuplicateMrid(pb.eventId)
     }
 
-    override fun toPb(): PBStateEventFailure =
-        toPbBuilder().apply {
-            duplicateMrid = PBStateEventDuplicateMrid.newBuilder().build()
-        }.build()
+    override fun toPb(): PBStateEventFailure = toPb {
+        duplicateMrid = PBStateEventDuplicateMrid.newBuilder().build()
+    }
 
 }
 
@@ -147,14 +146,13 @@ class StateEventDuplicateMrid(eventId: String) : StateEventFailure(eventId) {
 class StateEventInvalidMrid(eventId: String) : StateEventFailure(eventId) {
 
     companion object {
-        internal fun fromPb(eventId: String, pb: PBStateEventInvalidMrid): StateEventFailure =
-            StateEventInvalidMrid(eventId)
+        internal fun fromPb(pb: PBStateEventFailure): StateEventFailure =
+            StateEventInvalidMrid(pb.eventId)
     }
 
-    override fun toPb(): PBStateEventFailure =
-        toPbBuilder().apply {
-            invalidMrid = PBStateEventInvalidMrid.newBuilder().build()
-        }.build()
+    override fun toPb(): PBStateEventFailure = toPb {
+        invalidMrid = PBStateEventInvalidMrid.newBuilder().build()
+    }
 
 }
 
@@ -165,13 +163,12 @@ class StateEventInvalidMrid(eventId: String) : StateEventFailure(eventId) {
 class StateEventUnsupportedPhasing(eventId: String) : StateEventFailure(eventId) {
 
     companion object {
-        internal fun fromPb(eventId: String, pb: PBStateEventUnsupportedPhasing): StateEventFailure =
-            StateEventUnsupportedPhasing(eventId)
+        internal fun fromPb(pb: PBStateEventFailure): StateEventFailure =
+            StateEventUnsupportedPhasing(pb.eventId)
     }
 
-    override fun toPb(): PBStateEventFailure =
-        toPbBuilder().apply {
-            unsupportedPhasing = PBStateEventUnsupportedPhasing.newBuilder().build()
-        }.build()
+    override fun toPb(): PBStateEventFailure = toPb {
+        unsupportedPhasing = PBStateEventUnsupportedPhasing.newBuilder().build()
+    }
 
 }

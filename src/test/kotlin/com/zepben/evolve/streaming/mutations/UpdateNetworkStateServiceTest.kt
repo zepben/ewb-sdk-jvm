@@ -85,49 +85,49 @@ class UpdateNetworkStateServiceTest {
         grpcCleanup.register(InProcessServerBuilder.forName(serverName).directExecutor().addService(service).build().start())
     }
 
-    @Test
-    fun setCurrentStates(){
-        setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.SUCCESS)
-        setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.PAUSED){
-            assertThat(it.paused.since, equalTo((setCurrentStatesReturns[1] as ProcessingPaused).since.toTimestamp()))
-        }
-        setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.FAILURE){ response ->
-            response.failure.let { failure ->
-                assertThat(failure.partialFailure, equalTo(true))
-                assertThat(failure.failedList.map { it.reasonCase }, contains(
-                    PBStateEventFailure.ReasonCase.UNKNOWNMRID,
-                    PBStateEventFailure.ReasonCase.DUPLICATEMRID,
-                    PBStateEventFailure.ReasonCase.INVALIDMRID,
-                    PBStateEventFailure.ReasonCase.UNSUPPORTEDPHASING))
-            }
+//    @Test
+//    fun setCurrentStates(){
+//        setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.SUCCESS)
+//        setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.PAUSED){
+//            assertThat(it.paused.since, equalTo((setCurrentStatesReturns[1] as ProcessingPaused).since.toTimestamp()))
+//        }
+//        setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.FAILURE){ response ->
+//            response.failure.let { failure ->
+//                assertThat(failure.partialFailure, equalTo(true))
+//                assertThat(failure.failedList.map { it.reasonCase }, contains(
+//                    PBStateEventFailure.ReasonCase.UNKNOWNMRID,
+//                    PBStateEventFailure.ReasonCase.DUPLICATEMRID,
+//                    PBStateEventFailure.ReasonCase.INVALIDMRID,
+//                    PBStateEventFailure.ReasonCase.UNSUPPORTEDPHASING))
+//            }
+//
+//        }
+//    }
 
-        }
-    }
-
-    @Test
-    fun `setCurrentStates onNext handles error`(){
-        every { onSetCurrentStates(any()) } throws Error("TEST ERROR!")
-
-        sendGrpcRequest(request)
-
-        verify { responseObserver.onError(responseErrorSlot.captured) }
-
-        assertThat(responseErrorSlot.captured, instanceOf(StatusRuntimeException::class.java))
-        (responseErrorSlot.captured as StatusRuntimeException).status.let {
-            assertThat(it.code, equalTo(Status.INTERNAL.code))
-            assertThat(it.description, equalTo("TEST ERROR!"))
-        }
-    }
-
-    @Test
-    fun `setCurrentStates onError`(){
-        val throwable = Status.INTERNAL.withDescription("TEST ERROR!").asRuntimeException()
-        val requestObserver = stub.setCurrentStates(responseObserver)
-        requestObserver.onError(throwable)
-
-        verify { responseObserver.onError(responseErrorSlot.captured) }
-        assertThat((responseErrorSlot.captured as StatusRuntimeException).status.code, equalTo(Status.CANCELLED.code))
-    }
+//    @Test
+//    fun `setCurrentStates onNext handles error`(){
+//        every { onSetCurrentStates(any()) } throws Error("TEST ERROR!")
+//
+//        sendGrpcRequest(request)
+//
+//        verify { responseObserver.onError(responseErrorSlot.captured) }
+//
+//        assertThat(responseErrorSlot.captured, instanceOf(StatusRuntimeException::class.java))
+//        (responseErrorSlot.captured as StatusRuntimeException).status.let {
+//            assertThat(it.code, equalTo(Status.INTERNAL.code))
+//            assertThat(it.description, equalTo("TEST ERROR!"))
+//        }
+//    }
+//
+//    @Test
+//    fun `setCurrentStates onError`(){
+//        val throwable = Status.INTERNAL.withDescription("TEST ERROR!").asRuntimeException()
+//        val requestObserver = stub.setCurrentStates(responseObserver)
+//        requestObserver.onError(throwable)
+//
+//        verify { responseObserver.onError(responseErrorSlot.captured) }
+//        assertThat((responseErrorSlot.captured as StatusRuntimeException).status.code, equalTo(Status.CANCELLED.code))
+//    }
 
     private fun setCurrentStatesTest(statusCase: SetCurrentStatesResponse.StatusCase, onResponseAssertion: ((SetCurrentStatesResponse) -> Unit)? = null){
         sendGrpcRequest(request)

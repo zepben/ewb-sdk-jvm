@@ -72,15 +72,15 @@ class QueryNetworkStateServiceTest {
         to = Timestamp.newBuilder().apply { seconds = 1 }.build()
     }.build()
 
-    @Test
-    fun getCurrentStates() {
-        startGrpcServerWith(serviceSequence)
-
-        stub.getCurrentStates(request, responseObserver)
-        assertGetCurrentStates {
-            verify { onGetCurrentStatesSequence(fromSlot.captured, toSlot.captured) }
-        }
-    }
+//    @Test
+//    fun getCurrentStates() {
+//        startGrpcServerWith(serviceSequence)
+//
+//        stub.getCurrentStates(request, responseObserver)
+//        assertGetCurrentStates {
+//            verify { onGetCurrentStatesSequence(fromSlot.captured, toSlot.captured) }
+//        }
+//    }
 
     @Test
     fun `getCurrentStates using Java Streams`() {

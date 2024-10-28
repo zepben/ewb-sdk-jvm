@@ -92,9 +92,9 @@ class UpdateNetworkStateServiceTest {
             assertThat(it.paused.since, equalTo((setCurrentStatesReturns[1] as ProcessingPaused).since.toTimestamp()))
         }
         setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.FAILURE){ response ->
-            response.failure.let { failure ->
-                assertThat(failure.partialFailure, equalTo(true))
-                assertThat(failure.failedList.map { it.reasonCase }, contains(
+            response.failure.apply {
+                assertThat(partialFailure, equalTo(true))
+                assertThat(failedList.map { it.reasonCase }, contains(
                     PBStateEventFailure.ReasonCase.UNKNOWNMRID,
                     PBStateEventFailure.ReasonCase.DUPLICATEMRID,
                     PBStateEventFailure.ReasonCase.INVALIDMRID,
@@ -113,9 +113,9 @@ class UpdateNetworkStateServiceTest {
         verify { responseObserver.onError(responseErrorSlot.captured) }
 
         assertThat(responseErrorSlot.captured, instanceOf(StatusRuntimeException::class.java))
-        (responseErrorSlot.captured as StatusRuntimeException).status.let {
-            assertThat(it.code, equalTo(Status.INTERNAL.code))
-            assertThat(it.description, equalTo("TEST ERROR!"))
+        (responseErrorSlot.captured as StatusRuntimeException).status.apply {
+            assertThat(code, equalTo(Status.INTERNAL.code))
+            assertThat(description, equalTo("TEST ERROR!"))
         }
     }
 
@@ -138,22 +138,22 @@ class UpdateNetworkStateServiceTest {
             responseObserver.onCompleted()
         }
 
-        eventsSlot.captured.let{
+        eventsSlot.captured.also{
             assertThat(it.size, equalTo(1))
             assertThat(it[0], instanceOf(SwitchStateEvent::class.java))
-            (it[0] as SwitchStateEvent).let {
-                assertThat(it.eventId, equalTo("event id"))
-                assertThat(it.timestamp, equalTo(timeStamp.toLocalDateTime()))
-                assertThat(it.mRID, equalTo("mr id"))
-                assertThat(it.action, equalTo(SwitchAction.OPEN))
-                assertThat(it.phases, equalTo(PhaseCode.ABCN))
+            (it[0] as SwitchStateEvent).apply {
+                assertThat(eventId, equalTo("event id"))
+                assertThat(timestamp, equalTo(timeStamp.toLocalDateTime()))
+                assertThat(mRID, equalTo("mr id"))
+                assertThat(action, equalTo(SwitchAction.OPEN))
+                assertThat(phases, equalTo(PhaseCode.ABCN))
             }
 
         }
-        responseSlot.captured.let {
-            assertThat(it.messageId, equalTo(1))
-            assertThat(it.statusCase, equalTo(statusCase))
-            onResponseAssertion?.let { fn -> fn(it) }
+        responseSlot.captured.apply {
+            assertThat(messageId, equalTo(1))
+            assertThat(statusCase, equalTo(statusCase))
+            onResponseAssertion?.also { it(this) }
         }
     }
 

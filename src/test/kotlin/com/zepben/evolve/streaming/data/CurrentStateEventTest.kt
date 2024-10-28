@@ -37,25 +37,17 @@ class CurrentStateEventTest {
 
     @Test
     fun `CurrentStateEvent from protobuf throws UnsupportedException for classes other than switch`() {
-        notSupportedState(PBCurrentStateEvent.newBuilder().apply {
-            addCut = PBAddCutEvent.newBuilder().build()
-        }.build())
+        notSupportedState { addCut = PBAddCutEvent.newBuilder().build() }
 
-        notSupportedState(PBCurrentStateEvent.newBuilder().apply {
-            removeCut = PBRemoveCutEvent.newBuilder().build()
-        }.build())
+        notSupportedState { removeCut = PBRemoveCutEvent.newBuilder().build() }
 
-        notSupportedState(PBCurrentStateEvent.newBuilder().apply {
-            addJumper = PBAddJumperEvent.newBuilder().build()
-        }.build())
+        notSupportedState { addJumper = PBAddJumperEvent.newBuilder().build() }
 
-        notSupportedState(PBCurrentStateEvent.newBuilder().apply {
-            removeJumper = PBRemoveJumperEvent.newBuilder().build()
-        }.build())
+        notSupportedState { removeJumper = PBRemoveJumperEvent.newBuilder().build() }
     }
 
     @Test
-    fun `SwitchStateEvent from protobuf and then back to protobuf`(){
+    fun `SwitchStateEvent from protobuf and then back to protobuf`() {
         val time = Timestamp.newBuilder().apply { nanos = 1 }.build()
         val event = PBCurrentStateEvent.newBuilder().apply {
             eventId = "event id"
@@ -68,26 +60,26 @@ class CurrentStateEventTest {
         }.build()
 
         val currentStateEvent = CurrentStateEvent.fromPb(event)
-        (currentStateEvent as SwitchStateEvent).let {
-            assertThat(it.eventId, equalTo(event.eventId))
-            assertThat(it.timestamp, equalTo(event.timestamp.toLocalDateTime()))
-            assertThat(it.mRID, equalTo(event.switch.mrid))
-            assertThat(it.action, equalTo(SwitchAction.OPEN))
-            assertThat(it.phases, equalTo(PhaseCode.N))
+        (currentStateEvent as SwitchStateEvent).apply {
+            assertThat(eventId, equalTo(event.eventId))
+            assertThat(timestamp, equalTo(event.timestamp.toLocalDateTime()))
+            assertThat(mRID, equalTo(event.switch.mrid))
+            assertThat(action, equalTo(SwitchAction.OPEN))
+            assertThat(phases, equalTo(PhaseCode.N))
         }
 
-        currentStateEvent.toPb().let {
-            assertThat(it.eventId, equalTo(event.eventId))
-            assertThat(it.timestamp, equalTo(event.timestamp))
-            assertThat(it.switch.mrid, equalTo(event.switch.mrid))
-            assertThat(it.switch.action, equalTo(event.switch.action))
-            assertThat(it.switch.phases, equalTo(event.switch.phases))
+        currentStateEvent.toPb().apply {
+            assertThat(eventId, equalTo(event.eventId))
+            assertThat(timestamp, equalTo(event.timestamp))
+            assertThat(switch.mrid, equalTo(event.switch.mrid))
+            assertThat(switch.action, equalTo(event.switch.action))
+            assertThat(switch.phases, equalTo(event.switch.phases))
         }
     }
 
-    private fun notSupportedState(event: PBCurrentStateEvent){
+    private fun notSupportedState(block: PBCurrentStateEvent.Builder.() -> Unit) {
         assertThrows<UnsupportedOperationException> {
-            CurrentStateEvent.fromPb(event)
+            CurrentStateEvent.fromPb(PBCurrentStateEvent.newBuilder().apply(block).build())
         }
     }
 }

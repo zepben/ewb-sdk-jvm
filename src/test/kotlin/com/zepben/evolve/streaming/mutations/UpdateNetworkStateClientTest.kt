@@ -14,16 +14,18 @@ import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.evolve.streaming.data.*
 import com.zepben.evolve.streaming.get.testservices.TestUpdateNetworkStateService
+import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
+import org.mockito.kotlin.any as mockitoAny
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.spy
+import org.mockito.kotlin.*
 import java.time.LocalDateTime
 import java.util.concurrent.Executors
 import kotlin.streams.asStream
@@ -65,17 +67,30 @@ class UpdateNetworkStateClientTest {
     }
 
     @Test
-    fun `setCurrentStates in batches using Kotlin Sequence`(){
-        testSetCurrentStates { assertBatchedCurrentStatesResponse(client.setCurrentStates(batches).toList()) }
+    fun `setCurrentStates in batches using Kotlin Sequence`() {
+        testSetCurrentStates {
+            assertBatchedCurrentStatesResponse(client.setCurrentStates(batches).toList())
+
+            //verify request arguments
+            val requests = argumentCaptor<SetCurrentStatesRequest>()
+            verify(service.onSetCurrentStates, atLeastOnce()).invoke(requests.capture(), mockitoAny())
+
+            requests.allValues.flatMap { it.eventList }.apply {
+                assertThat(map { it.eventId }, contains(*switchStateEvents.map { it.eventId }.toTypedArray()))
+                assertThat(map { it.timestamp }, contains(*switchStateEvents.map { it.timestamp.toTimestamp() }.toTypedArray()))
+                assertThat(map { it.switch.action.name }, contains(*switchStateEvents.map { it.action.name }.toTypedArray()))
+                assertThat(map { it.switch.phases.name }, contains(*switchStateEvents.map { it.phases.name }.toTypedArray()))
+            }
+        }
     }
 
     @Test
-    fun `setCurrentStates in batches using Java Stream`(){
+    fun `setCurrentStates in batches using Java Stream`() {
         testSetCurrentStates { assertBatchedCurrentStatesResponse(client.setCurrentStates(batches.asStream()).toList()) }
     }
 
     @Test
-    fun `setCurrentStates in single batch`(){
+    fun `setCurrentStates in single batch`() {
         testSetCurrentStates {
             batches.first().apply {
                 listOf(client.setCurrentStates(batchId, events)).assert<BatchSuccessful>(0)
@@ -83,53 +98,52 @@ class UpdateNetworkStateClientTest {
         }
     }
 
-    private fun testSetCurrentStates(act: () -> Unit){
-        val responses = ArrayDeque(listOf(
-            SetCurrentStatesResponse.newBuilder().apply { success = PBBatchSuccessful.newBuilder().build() },
-            SetCurrentStatesResponse.newBuilder().apply { paused = PBProcessingPaused.newBuilder().apply { since = timestampOf1Second }.build() },
-            SetCurrentStatesResponse.newBuilder().apply { failure = PBBatchFailure.newBuilder().apply {
-                partialFailure = true
-                addAllFailed(listOf(
-                    PBStateEventFailure.newBuilder().apply {
-                        eventId = "event1"
-                        unknownMrid = PBStateEventUnknownMrid.newBuilder().build()
-                    }.build(),
-                    PBStateEventFailure.newBuilder().apply {
-                        eventId = "event2"
-                        duplicateMrid = PBStateEventDuplicateMrid.newBuilder().build()
-                    }.build(),
-                    PBStateEventFailure.newBuilder().apply {
-                        eventId = "event3"
-                        invalidMrid = PBStateEventInvalidMrid.newBuilder().build()
-                    }.build(),
-                    PBStateEventFailure.newBuilder().apply {
-                        eventId = "event4"
-                        unsupportedPhasing = PBStateEventUnsupportedPhasing.newBuilder().build()
-                    }.build()))
-            }.build() },
-            null
-        ))
+    private fun testSetCurrentStates(act: () -> Unit) {
+        val responses = ArrayDeque(
+            listOf(
+                SetCurrentStatesResponse.newBuilder().apply { success = PBBatchSuccessful.newBuilder().build() },
+                SetCurrentStatesResponse.newBuilder().apply { paused = PBProcessingPaused.newBuilder().apply { since = timestampOf1Second }.build() },
+                SetCurrentStatesResponse.newBuilder().apply {
+                    failure = PBBatchFailure.newBuilder().apply {
+                        partialFailure = true
+                        addAllFailed(listOf(
+                            PBStateEventFailure.newBuilder().apply {
+                                eventId = "event1"
+                                unknownMrid = PBStateEventUnknownMrid.newBuilder().build()
+                            }.build(),
+                            PBStateEventFailure.newBuilder().apply {
+                                eventId = "event2"
+                                duplicateMrid = PBStateEventDuplicateMrid.newBuilder().build()
+                            }.build(),
+                            PBStateEventFailure.newBuilder().apply {
+                                eventId = "event3"
+                                invalidMrid = PBStateEventInvalidMrid.newBuilder().build()
+                            }.build(),
+                            PBStateEventFailure.newBuilder().apply {
+                                eventId = "event4"
+                                unsupportedPhasing = PBStateEventUnsupportedPhasing.newBuilder().build()
+                            }.build()
+                        )
+                        )
+                    }.build()
+                },
+                null
+            )
+        )
         service.onSetCurrentStates = spy { request, response ->
-            request.eventList.also { event ->
-                assertThat(event.map { it.eventId }, anyOf(switchStateEvents.map { hasItem(it.eventId) }))
-                assertThat(event.map { it.timestamp }, anyOf(switchStateEvents.map { hasItem(it.timestamp.toTimestamp()) }))
-                assertThat(event.map { it.switch.mrid }, anyOf(switchStateEvents.map { hasItem(it.mRID) }))
-                assertThat(event.map { it.switch.action.name }, anyOf(switchStateEvents.map { hasItem(it.action.name) }))
-                assertThat(event.map { it.switch.phases.name }, anyOf(switchStateEvents.map { hasItem(it.phases.name) }))
-            }
             response.onNext(responses.removeFirst()?.apply { messageId = request.messageId }?.build())
         }
 
         act()
     }
 
-    private fun assertBatchedCurrentStatesResponse(currentStatesStatus: List<UpdateNetworkStateClient.SetCurrentStatesResponse>){
+    private fun assertBatchedCurrentStatesResponse(currentStatesStatus: List<UpdateNetworkStateClient.SetCurrentStatesResponse>) {
         assertThat(currentStatesStatus.size, equalTo(3))
         currentStatesStatus.assert<BatchSuccessful>(0)
-        currentStatesStatus.assert<ProcessingPaused>(1){
+        currentStatesStatus.assert<ProcessingPaused>(1) {
             assertThat(it.since, equalTo(timestampOf1Second.toLocalDateTime()))
         }
-        currentStatesStatus.assert<BatchFailure>(2){
+        currentStatesStatus.assert<BatchFailure>(2) {
             assertThat(it.partialFailure, equalTo(true))
             assertThat(
                 it.failures.map { f -> f::class },
@@ -146,7 +160,7 @@ class UpdateNetworkStateClientTest {
         }
     }
 
-    private inline fun <reified T>  List<UpdateNetworkStateClient.SetCurrentStatesResponse>.assert(index: Int, additionalAssertions: (T) -> Unit = {}){
+    private inline fun <reified T> List<UpdateNetworkStateClient.SetCurrentStatesResponse>.assert(index: Int, additionalAssertions: (T) -> Unit = {}) {
         this[index].also {
             assertThat(it.batchId, equalTo(index.toLong()))
             assertThat(it.status, instanceOf(T::class.java))

@@ -30,7 +30,6 @@ import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.concurrent.Executors
 
 class QueryNetworkStateServiceTest {
     @JvmField
@@ -55,7 +54,7 @@ class QueryNetworkStateServiceTest {
 
     private val serverName = InProcessServerBuilder.generateName()
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
-    private val stub = QueryNetworkStateServiceGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor())
+    private val stub = QueryNetworkStateServiceGrpc.newStub(channel)
 
     private val responseSlot = mutableListOf<GetCurrentStatesResponse>()
     private val responseErrorSlot = slot<Throwable>()

@@ -28,7 +28,6 @@ import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.concurrent.Executors
 import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
@@ -57,7 +56,7 @@ class UpdateNetworkStateServiceTest {
 
     private val serverName = InProcessServerBuilder.generateName()
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
-    private val stub = UpdateNetworkStateServiceGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor())
+    private val stub = UpdateNetworkStateServiceGrpc.newStub(channel)
     private val service = UpdateNetworkStateService(onSetCurrentStates)
 
     private val responseSlot = slot<SetCurrentStatesResponse>()

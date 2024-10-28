@@ -58,8 +58,8 @@ callbacks can be done as either lambdas, or full method/function implementations
 
 ### onSetCurrentStates
 
-The `onSetCurrentStates` callback is triggered for each request passing in a batch of current state events, and should return a `SetCurrentStatesStatus` to
-reflect the success or failure of the update process.
+The `onSetCurrentStates` callback is triggered for each request passing in a batch of current state events, and should return a
+[batch result response](set-network-state-client.mdx#batch-result-responses) to reflect the success or failure of the update process.
 
 <Tabs
     groupId="callback-example"
@@ -74,14 +74,14 @@ reflect the success or failure of the update process.
 ```java
 // Using a lambda expression
 Function<List<CurrentStateEvent>, SetCurrentStatesStatus> updateCurrentStatesLambda  = (events) -> {
-    // process updating of events here and return a `SetCurrentStatesStatus`
+    // process updating of events here and return a batch result response
 };
 
 // Using a method
 class UpdateNetworkStateServiceImpl {
 
     SetCurrentStatesStatus updateCurrentStates(List<? extends CurrentStateEvent> events) {
-        // process updating of events here and return a `SetCurrentStatesStatus`
+        // process updating of events here and return a batch result response
     }
 
 }
@@ -93,14 +93,14 @@ class UpdateNetworkStateServiceImpl {
 ```kotlin
 // Using a lambda expression
 var updateCurrentStatesLambda = { events: List<CurrentStateEvent> ->
-    // process updating of events here and return a `SetCurrentStatesStatus`
+    // process updating of events here and return a batch result response
 }
 
 // Using a method
 class UpdateNetworkStateServiceImpl {
 
     fun updateCurrentStates(events: List<CurrentStateEvent>): SetCurrentStatesStatus {
-        // process updating of events here and return a `SetCurrentStatesStatus`
+        // process updating of events here and return a batch result response
     }
 
 }
@@ -230,7 +230,7 @@ class Main {
     public static void main(String[] args) {
         UpdateNetworkStateService service = new UpdateNetworkStateService(
             (events) -> {
-                // process updating of events here and return a `SetCurrentStatesStatus`
+                // process updating of events here and return a batch result response
             });
 
         var grpcServer = new GrpcServerImpl(9001, service);
@@ -302,7 +302,7 @@ class UpdateNetworkStateServiceImpl {
     UpdateNetworkStateService service = new UpdateNetworkStateService(this::updateCurrentStates);
 
     SetCurrentStatesStatus updateCurrentStates(List<? extends CurrentStateEvent> events) {
-        // process updating of events here and return a `SetCurrentStatesStatus`
+        // process updating of events here and return a batch result response
     }
 
 }
@@ -318,7 +318,7 @@ import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService
 
 fun main() {
     val service = UpdateNetworkStateService(onSetCurrentStates = { events: List<CurrentStateEvent> ->
-        // process updating of events here and return a `SetCurrentStatesStatus`
+        // process updating of events here and return a batch result response
     })
 
     val grpcServer = object : GrpcServer(9001) {
@@ -344,7 +344,7 @@ class UpdateNetworkStateServiceImpl {
     val service = UpdateNetworkStateService(::updateCurrentStates);
 
     fun updateCurrentStates(events: List<CurrentStateEvent>): SetCurrentStatesStatus {
-        // process updating of events here and return a `SetCurrentStatesStatus`
+        // process updating of events here and return a batch result response
     }
 
 }

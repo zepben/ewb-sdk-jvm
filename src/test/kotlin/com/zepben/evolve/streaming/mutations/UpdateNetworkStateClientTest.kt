@@ -13,6 +13,9 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.evolve.streaming.data.*
+import com.zepben.evolve.streaming.get.QueryNetworkStateClient
+import com.zepben.evolve.streaming.grpc.GrpcChannel
+import com.zepben.evolve.streaming.grpc.TokenCallCredentials
 import com.zepben.evolve.streaming.mutations.testservices.TestUpdateNetworkStateService
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
@@ -97,6 +100,21 @@ class UpdateNetworkStateClientTest {
         }
     }
 
+    @Test
+    fun `constructor coverage`() {
+        testSetCurrentStates {
+            assertBatchedCurrentStatesResponse(
+                UpdateNetworkStateClient(GrpcChannel(channel), TokenCallCredentials({ "auth-token" })).setCurrentStates(batches).toList()
+            )
+        }
+
+        testSetCurrentStates {
+            assertBatchedCurrentStatesResponse(
+                UpdateNetworkStateClient(channel, TokenCallCredentials({ "auth-token" })).setCurrentStates(batches).toList()
+            )
+        }
+    }
+
     private fun testSetCurrentStates(act: () -> Unit) {
         val responses = ArrayDeque(
             listOf(
@@ -105,24 +123,25 @@ class UpdateNetworkStateClientTest {
                 SetCurrentStatesResponse.newBuilder().apply {
                     failure = PBBatchFailure.newBuilder().apply {
                         partialFailure = true
-                        addAllFailed(listOf(
-                            PBStateEventFailure.newBuilder().apply {
-                                eventId = "event1"
-                                unknownMrid = PBStateEventUnknownMrid.newBuilder().build()
-                            }.build(),
-                            PBStateEventFailure.newBuilder().apply {
-                                eventId = "event2"
-                                duplicateMrid = PBStateEventDuplicateMrid.newBuilder().build()
-                            }.build(),
-                            PBStateEventFailure.newBuilder().apply {
-                                eventId = "event3"
-                                invalidMrid = PBStateEventInvalidMrid.newBuilder().build()
-                            }.build(),
-                            PBStateEventFailure.newBuilder().apply {
-                                eventId = "event4"
-                                unsupportedPhasing = PBStateEventUnsupportedPhasing.newBuilder().build()
-                            }.build()
-                        )
+                        addAllFailed(
+                            listOf(
+                                PBStateEventFailure.newBuilder().apply {
+                                    eventId = "event1"
+                                    unknownMrid = PBStateEventUnknownMrid.newBuilder().build()
+                                }.build(),
+                                PBStateEventFailure.newBuilder().apply {
+                                    eventId = "event2"
+                                    duplicateMrid = PBStateEventDuplicateMrid.newBuilder().build()
+                                }.build(),
+                                PBStateEventFailure.newBuilder().apply {
+                                    eventId = "event3"
+                                    invalidMrid = PBStateEventInvalidMrid.newBuilder().build()
+                                }.build(),
+                                PBStateEventFailure.newBuilder().apply {
+                                    eventId = "event4"
+                                    unsupportedPhasing = PBStateEventUnsupportedPhasing.newBuilder().build()
+                                }.build()
+                            )
                         )
                     }.build()
                 },

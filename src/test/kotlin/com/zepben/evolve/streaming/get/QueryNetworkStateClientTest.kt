@@ -12,6 +12,8 @@ import com.zepben.evolve.streaming.data.CurrentStateEvent
 import com.zepben.evolve.streaming.data.SwitchAction
 import com.zepben.evolve.streaming.data.SwitchStateEvent
 import com.zepben.evolve.streaming.get.testservices.TestQueryNetworkStateService
+import com.zepben.evolve.streaming.grpc.GrpcChannel
+import com.zepben.evolve.streaming.grpc.TokenCallCredentials
 import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
@@ -47,6 +49,17 @@ class QueryNetworkStateClientTest {
     @Test
     fun getCurrentStatesStream() {
         testGetCurrentStates { from, to -> client.getCurrentStatesStream(1, from, to).toList() }
+    }
+
+    @Test
+    fun `constructor coverage`(){
+        testGetCurrentStates { from, to ->
+            QueryNetworkStateClient(GrpcChannel(channel), TokenCallCredentials({ "auth-token" })).getCurrentStatesStream(1, from, to).toList()
+        }
+
+        testGetCurrentStates { from, to ->
+            QueryNetworkStateClient(channel, TokenCallCredentials({ "auth-token" })).getCurrentStatesStream(1, from, to).toList()
+        }
     }
 
     private fun testGetCurrentStates(act: (LocalDateTime, LocalDateTime) -> List<List<CurrentStateEvent>>) {

@@ -61,7 +61,7 @@ class QueryNetworkStateClientTest {
 
         service.onGetCurrentStates = spy { _, _ -> batches.asSequence() }
 
-        val result = client.getCurrentStates(1, from, to).toList()
+        val result = act(from, to)
 
         assertThat(result, equalTo(batches))
     }

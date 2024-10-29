@@ -36,17 +36,15 @@ import java.util.*
  *   remove the split database logic - Check [UpgradeRunner] to see if this is still required.
  *
  * @param connection The connection to the database.
- * @param metadata The [MetadataCollection] to populate with metadata from the database.
  * @param service The [NetworkService] to populate with CIM objects from the database.
  * @param databaseDescription The description of the database for logging (e.g. filename).
  */
 class NetworkDatabaseReader @JvmOverloads constructor(
     connection: Connection,
-    metadata: MetadataCollection,
     override val service: NetworkService,
     databaseDescription: String,
     tables: NetworkDatabaseTables = NetworkDatabaseTables(),
-    metadataReader: MetadataCollectionReader = MetadataCollectionReader(metadata, tables, connection),
+    metadataReader: MetadataCollectionReader = MetadataCollectionReader(service, tables, connection),
     serviceReader: NetworkServiceReader = NetworkServiceReader(service, tables, connection),
     tableVersion: TableVersion = tableCimVersion,
     private val setDirection: SetDirection = SetDirection(),

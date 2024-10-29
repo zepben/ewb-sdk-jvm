@@ -28,10 +28,7 @@ import com.zepben.evolve.cim.iec61970.base.meas.Discrete
 import com.zepben.evolve.cim.iec61970.base.meas.Measurement
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
-import com.zepben.evolve.services.common.meta.MetadataCollection
-import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
-import com.zepben.evolve.services.measurement.MeasurementService
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.createTerminal
 import org.hamcrest.MatcherAssert.assertThat
@@ -39,15 +36,6 @@ import java.time.Instant
 
 @Suppress("SameParameterValue", "MemberVisibilityCanBePrivate")
 class StupidlyLargeNetworkUtils {
-
-    // Only used by the stupidly large network, so remove it if we ever fix that beast.
-    data class Services @JvmOverloads constructor(
-        val metadata: MetadataCollection = MetadataCollection(),
-        val networkService: NetworkService = NetworkService(),
-        val diagramService: DiagramService = DiagramService(),
-        val customerService: CustomerService = CustomerService(),
-        val measurementService: MeasurementService = MeasurementService()
-    )
 
     companion object {
         private val baseVoltagesByNominalVoltage = mutableMapOf<Int, BaseVoltage>()

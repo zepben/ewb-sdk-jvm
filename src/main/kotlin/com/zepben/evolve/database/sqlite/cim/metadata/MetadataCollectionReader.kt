@@ -8,24 +8,25 @@
 
 package com.zepben.evolve.database.sqlite.cim.metadata
 
+import com.zepben.evolve.database.sqlite.cim.tables.TableMetadataDataSources
 import com.zepben.evolve.database.sqlite.common.BaseCollectionReader
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseTables
-import com.zepben.evolve.database.sqlite.cim.tables.TableMetadataDataSources
+import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import java.sql.Connection
 
 /**
  * Class for reading the [MetadataCollection] from the database.
  *
- * @param metadata The [MetadataCollection] to populate from the database.
+ * @param service The [BaseService] containing the [MetadataCollection] to populate from the database.
  * @param databaseTables The tables available in the database.
  * @param connection The [Connection] to the database.
  */
 class MetadataCollectionReader @JvmOverloads constructor(
-    metadata: MetadataCollection,
+    service: BaseService,
     databaseTables: BaseDatabaseTables,
     connection: Connection,
-    private val reader: MetadataEntryReader = MetadataEntryReader(metadata),
+    private val reader: MetadataEntryReader = MetadataEntryReader(service),
 ) : BaseCollectionReader(databaseTables, connection) {
 
     override fun load(): Boolean =

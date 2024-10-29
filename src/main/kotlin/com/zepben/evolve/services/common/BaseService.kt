@@ -14,6 +14,7 @@ import com.zepben.evolve.services.common.exceptions.UnsupportedIdentifiedObjectE
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.nameAndMRID
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
+import com.zepben.evolve.services.common.meta.MetadataCollection
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Stream
@@ -32,11 +33,17 @@ import kotlin.streams.asStream
  *
  * This class provides a common set of functionality that all services will need.
  *
- * @property [name] a short description of the service
+ * @property name a short description of the service
+ * @property metadata The [MetadataCollection] associated with this service.
  */
 abstract class BaseService(
-    val name: String
+    val name: String,
+    val metadata: MetadataCollection
 ) {
+
+    /**
+     * A collection of objects store by this service, indexed by its class type and mRID.
+     */
     protected val objectsByType: MutableMap<KClass<*>, MutableMap<String, IdentifiedObject>> = mutableMapOf()
 
     /**
@@ -44,6 +51,7 @@ abstract class BaseService(
      * The key is the toMrid of the [UnresolvedReference]s, and the value is a list of [UnresolvedReference]s for that specific object.
      * For example, if an AcLineSegment with mRID 'acls1' is present in the service, but the service is missing its 'location' with mRID 'location-l1'
      * and 'perLengthSequenceImpedance' with mRID 'plsi-1', the following key value pairs would be present:
+     * ```kotlin
      * {
      *   "plsi-1": [
      *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='plsi-1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=PerLengthSequenceImpedance, resolve=...), ...)
@@ -52,6 +60,7 @@ abstract class BaseService(
      *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='location-l1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=Location, resolve=...), ...)
      *   ]
      * }
+     * ```
      *
      * [resolve] in [ReferenceResolver] will be the function used to populate the relationship between the [IdentifiedObject]s either when
      * [resolveOrDeferReference] is called if the other side of the reference exists in the service, or otherwise when the second object is added to the service.
@@ -60,19 +69,28 @@ abstract class BaseService(
 
     /**
      * An index of the unresolved references by their [UnresolvedReference.from] mRID. For the above example this will be a dictionary of the form:
+     * ```kotlin
      * {
      *   "acls1": [
      *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='location-l1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=Location, resolve=...), ...)
      *     UnresolvedReference(from=AcLineSegment('acls1'), toMrid='plsi-1', resolver=ReferenceResolver(fromClass=AcLineSegment, toClass=PerLengthSequenceImpedance, resolve=...), ...)
      *   ]
      * }
+     * ```
      */
     private val unresolvedReferencesFrom = mutableMapOf<String, MutableSet<UnresolvedReference<IdentifiedObject, IdentifiedObject>>>()
 
     private val addFunctions: Map<KClass<out IdentifiedObject>, KFunction<*>> = findFunctionsForDispatch("add")
     private val removeFunctions: Map<KClass<out IdentifiedObject>, KFunction<*>> = findFunctionsForDispatch("remove")
 
+    /**
+     * A list of Java classes supported by this service.
+     */
     val supportedClasses: Set<Class<out IdentifiedObject>> = Collections.unmodifiableSet(addFunctions.keys.map { it.java }.toSet())
+
+    /**
+     * A list of Kotlin classes supported by this service.
+     */
     val supportedKClasses: Set<KClass<out IdentifiedObject>> get() = addFunctions.keys
 
     private var _nameTypes: MutableMap<String, NameType> = mutableMapOf()
@@ -93,9 +111,7 @@ abstract class BaseService(
      *
      * @return The object identified by [mRID] as [T] if it was found, otherwise null.
      */
-    inline operator fun <reified T : IdentifiedObject> get(mRID: String?): T? {
-        return get(T::class, mRID)
-    }
+    inline operator fun <reified T : IdentifiedObject> get(mRID: String?): T? = get(T::class, mRID)
 
     /**
      * A Java interop version of [get]. Get an object associated with this service.
@@ -106,9 +122,7 @@ abstract class BaseService(
      *
      * @return The object identified by [mRID] as [T] if it was found, otherwise null.
      */
-    fun <T : IdentifiedObject> get(clazz: Class<T>, mRID: String?): T? {
-        return get(clazz.kotlin, mRID)
-    }
+    fun <T : IdentifiedObject> get(clazz: Class<T>, mRID: String?): T? = get(clazz.kotlin, mRID)
 
     /**
      * The name types associated with this service. The returned collection is read only.
@@ -178,9 +192,7 @@ abstract class BaseService(
      *
      * @return The number of objects of the specified type.
      */
-    inline fun <reified T : IdentifiedObject> num(): Int {
-        return num(T::class)
-    }
+    inline fun <reified T : IdentifiedObject> num(): Int = num(T::class)
 
     /**
      * A Java interop version of [num]. Get the number of objects associated with this service.
@@ -190,9 +202,7 @@ abstract class BaseService(
      *
      * @return The number of objects of the specified type.
      */
-    fun <T : IdentifiedObject> num(clazz: Class<T>): Int {
-        return num(clazz.kotlin)
-    }
+    fun <T : IdentifiedObject> num(clazz: Class<T>): Int = num(clazz.kotlin)
 
     /**
      * Get the number of objects associated with this service.
@@ -202,9 +212,7 @@ abstract class BaseService(
      *
      * @return The number of objects of the specified type.
      */
-    fun <T : IdentifiedObject> num(clazz: KClass<T>): Int {
-        return sequenceOf(clazz).count()
-    }
+    fun <T : IdentifiedObject> num(clazz: KClass<T>): Int = sequenceOf(clazz).count()
 
     /**
      * Attempts to add the [identifiedObject] to the service, if this service instance supports the type of [IdentifiedObject]
@@ -378,7 +386,8 @@ abstract class BaseService(
      *
      * @return true if at least one reference exists.
      */
-    fun hasUnresolvedReferences(mRID: String? = null): Boolean = if (mRID != null) unresolvedReferencesTo.containsKey(mRID) else unresolvedReferencesTo.isNotEmpty()
+    fun hasUnresolvedReferences(mRID: String? = null): Boolean =
+        if (mRID != null) unresolvedReferencesTo.containsKey(mRID) else unresolvedReferencesTo.isNotEmpty()
 
     /**
      * Get the number of [UnresolvedReference]s in this service.
@@ -447,9 +456,7 @@ abstract class BaseService(
      *
      * @return a [Sequence] containing all instances of type [T].
      */
-    inline fun <reified T : IdentifiedObject> sequenceOf(): Sequence<T> {
-        return sequenceOf(T::class)
-    }
+    inline fun <reified T : IdentifiedObject> sequenceOf(): Sequence<T> = sequenceOf(T::class)
 
     /**
      * Create a sequence of all instances of the specified type.
@@ -460,14 +467,13 @@ abstract class BaseService(
      * @return a [Sequence] containing all instances of type [T].
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T : IdentifiedObject> sequenceOf(clazz: KClass<T>): Sequence<T> {
-        return objectsByType[clazz]?.values?.asSequence()?.map { it as T }
+    fun <T : IdentifiedObject> sequenceOf(clazz: KClass<T>): Sequence<T> =
+        objectsByType[clazz]?.values?.asSequence()?.map { it as T }
             ?: objectsByType
                 .asSequence()
                 .filter { (c, _) -> clazz.isSuperclassOf(c) }
                 .flatMap { (_, map) -> map.values.asSequence() }
                 .map { it as T }
-    }
 
     /**
      * A Java interop version of [sequenceOf]. Create a sequence of all instances of the specified type.
@@ -477,9 +483,7 @@ abstract class BaseService(
      *
      * @return a [Stream] containing all instances of type [T].
      */
-    fun <T : IdentifiedObject> streamOf(clazz: Class<T>): Stream<T> {
-        return sequenceOf(clazz.kotlin).asStream()
-    }
+    fun <T : IdentifiedObject> streamOf(clazz: Class<T>): Stream<T> = sequenceOf(clazz.kotlin).asStream()
 
     /**
      * Collect all instances of the specified type that match a [filter] into a [List].
@@ -489,9 +493,7 @@ abstract class BaseService(
      *
      * @return a [List] containing all instances of type [T] that match [filter] stored in this service.
      */
-    inline fun <reified T : IdentifiedObject> listOf(noinline filter: ((T) -> Boolean)? = null): List<T> {
-        return listOf(T::class, filter)
-    }
+    inline fun <reified T : IdentifiedObject> listOf(noinline filter: ((T) -> Boolean)? = null): List<T> = listOf(T::class, filter)
 
     /**
      * A Java interop version of [listOf]. Collect all instances of the specified type that match a [filter] into a [List].
@@ -503,9 +505,7 @@ abstract class BaseService(
      * @return a [List] containing all instances of type [T] that match [filter] stored in this service.
      */
     @JvmOverloads
-    fun <T : IdentifiedObject> listOf(clazz: Class<T>, filter: Predicate<T>? = null): List<T> {
-        return listOf(clazz.kotlin, filter?.let { it::test })
-    }
+    fun <T : IdentifiedObject> listOf(clazz: Class<T>, filter: Predicate<T>? = null): List<T> = listOf(clazz.kotlin, filter?.let { it::test })
 
     /**
      * Collect all instances of the specified type that match a [filter] into a [List].
@@ -532,9 +532,7 @@ abstract class BaseService(
      *
      * @return a [Set] containing all instances of type [T] that match [filter] stored in this service.
      */
-    inline fun <reified T : IdentifiedObject> setOf(noinline filter: ((T) -> Boolean)? = null): Set<T> {
-        return setOf(T::class, filter)
-    }
+    inline fun <reified T : IdentifiedObject> setOf(noinline filter: ((T) -> Boolean)? = null): Set<T> = setOf(T::class, filter)
 
     /**
      * A Java interop version of [setOf]. Collect all instances of the specified type that match a [filter] into a [Set].
@@ -546,9 +544,7 @@ abstract class BaseService(
      * @return a [Set] containing all instances of type [T] that match [filter] stored in this service.
      */
     @JvmOverloads
-    fun <T : IdentifiedObject> setOf(clazz: Class<T>, filter: Predicate<T>? = null): Set<T> {
-        return setOf(clazz.kotlin, filter?.let { it::test })
-    }
+    fun <T : IdentifiedObject> setOf(clazz: Class<T>, filter: Predicate<T>? = null): Set<T> = setOf(clazz.kotlin, filter?.let { it::test })
 
     /**
      * Collect all instances of the specified type that match a [filter] into a [Set].
@@ -575,9 +571,7 @@ abstract class BaseService(
      *
      * @return a [Map] containing all instances of type [T] that match [filter] stored in this service.
      */
-    inline fun <reified T : IdentifiedObject> mapOf(noinline filter: ((T) -> Boolean)? = null): Map<String, T> {
-        return mapOf(T::class, filter)
-    }
+    inline fun <reified T : IdentifiedObject> mapOf(noinline filter: ((T) -> Boolean)? = null): Map<String, T> = mapOf(T::class, filter)
 
     /**
      * A Java interop version of [mapOf]. Collect all instances of the specified type that match a [filter] into a [Map], indexed by [IdentifiedObject.mRID]..
@@ -589,9 +583,7 @@ abstract class BaseService(
      * @return a [Map] containing all instances of type [T] that match [filter] stored in this service.
      */
     @JvmOverloads
-    fun <T : IdentifiedObject> mapOf(clazz: Class<T>, filter: Predicate<T>? = null): Map<String, T> {
-        return mapOf(clazz.kotlin, filter?.let { it::test })
-    }
+    fun <T : IdentifiedObject> mapOf(clazz: Class<T>, filter: Predicate<T>? = null): Map<String, T> = mapOf(clazz.kotlin, filter?.let { it::test })
 
     /**
      * Collect all instances of the specified type that match a [filter] into a [Map], indexed by [IdentifiedObject.mRID]..

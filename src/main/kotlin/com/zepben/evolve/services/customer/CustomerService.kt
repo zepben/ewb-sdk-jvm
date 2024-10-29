@@ -14,11 +14,12 @@ import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61968.customers.PricingStructure
 import com.zepben.evolve.cim.iec61968.customers.Tariff
 import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.services.common.meta.MetadataCollection
 
 /**
  * Maintains an in-memory model of customers and their organisations.
  */
-class CustomerService : BaseService("customer") {
+class CustomerService(metadata: MetadataCollection = MetadataCollection()) : BaseService("customer", metadata) {
 
     // ###################
     // # IEC61968 COMMON #

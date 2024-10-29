@@ -20,17 +20,15 @@ import java.sql.Connection
  * A class for reading the [DiagramService] objects and [MetadataCollection] from our diagram database.
  *
  * @param connection The connection to the database.
- * @param metadata The [MetadataCollection] to populate with metadata from the database.
  * @param service The [DiagramService] to populate with CIM objects from the database.
  * @param databaseDescription The description of the database for logging (e.g. filename).
  */
 class DiagramDatabaseReader @JvmOverloads constructor(
     connection: Connection,
-    metadata: MetadataCollection,
     override val service: DiagramService,
     databaseDescription: String,
     tables: DiagramDatabaseTables = DiagramDatabaseTables(),
-    metadataReader: MetadataCollectionReader = MetadataCollectionReader(metadata, tables, connection),
+    metadataReader: MetadataCollectionReader = MetadataCollectionReader(service, tables, connection),
     serviceReader: DiagramServiceReader = DiagramServiceReader(service, tables, connection),
     tableVersion: TableVersion = tableCimVersion
 ) : CimDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion)

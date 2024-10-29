@@ -19,15 +19,13 @@ import java.sql.DriverManager
  * A class for writing the [CustomerService] objects and [MetadataCollection] to our customer database.
  *
  * @param databaseFile the filename of the database to write.
- * @param metadata The [MetadataCollection] to save to the database.
  * @param service The [CustomerService] to save to the database.
  */
 class CustomerDatabaseWriter @JvmOverloads constructor(
     databaseFile: String,
-    metadata: MetadataCollection,
     service: CustomerService,
     databaseTables: CustomerDatabaseTables = CustomerDatabaseTables(),
-    metadataWriter: MetadataCollectionWriter = MetadataCollectionWriter(metadata, databaseTables),
+    metadataWriter: MetadataCollectionWriter = MetadataCollectionWriter(service, databaseTables),
     serviceWriter: CustomerServiceWriter = CustomerServiceWriter(service, databaseTables),
     getConnection: (String) -> Connection = DriverManager::getConnection
 ) : CimDatabaseWriter(

@@ -29,7 +29,6 @@ abstract class BaseServiceReader(
 ) : BaseCollectionReader(databaseTables, connection) {
 
     final override fun load(): Boolean =
-        //todo try reorder to name types after doLoad
         doLoad()
             .andLoadEach<TableNameTypes>(reader::load)
             .andLoadEach<TableNames>(reader::load)

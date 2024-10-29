@@ -23,10 +23,9 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.SubGeographicalRegion
 import com.zepben.evolve.cim.iec61970.base.core.Substation
 import com.zepben.evolve.cim.iec61970.base.wires.*
-import com.zepben.evolve.services.common.meta.MetadataCollection
+import com.zepben.evolve.services.Services
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.diagram.DiagramService
-import com.zepben.evolve.services.measurement.MeasurementService
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.createAssetOwner
 import com.zepben.evolve.services.network.testdata.createTerminal
@@ -58,11 +57,10 @@ import org.hamcrest.Matchers.equalTo
 @Suppress("SameParameterValue", "BooleanLiteralArgument")
 object StupidlyLargeNetwork {
 
-    fun create(): StupidlyLargeNetworkUtils.Services {
+    fun create(): Services {
         val networkService = NetworkService()
         val diagramService = DiagramService()
         val customerService = CustomerService()
-        val measurementService = MeasurementService()
 
         addSampleNetwork(networkService, diagramService, customerService)
 
@@ -297,7 +295,7 @@ object StupidlyLargeNetwork {
         createAccumulator(networkService, transformer.getTerminal(1)?.mRID, isoTransformer1)
         createDiscrete(networkService, transformer.getTerminal(1)?.mRID, isoTransformer1)
 
-        return StupidlyLargeNetworkUtils.Services(MetadataCollection(), networkService, diagramService, customerService, measurementService)
+        return Services(networkService, diagramService, customerService)
     }
 
     private fun addSampleNetwork(networkService: NetworkService, diagramService: DiagramService, customerService: CustomerService) {

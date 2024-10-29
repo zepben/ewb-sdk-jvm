@@ -98,6 +98,21 @@ class SwitchStateEvent @JvmOverloads constructor(
         }.build()
     }.build()
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SwitchStateEvent
+
+        if (eventId != other.eventId) return false
+        if (timestamp != other.timestamp) return false
+        if (mRID != other.mRID) return false
+        if (action != other.action) return false
+        if (phases != other.phases) return false
+
+        return true
+    }
+
 }
 
 /**

@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.evolve.streaming.data.*
-import com.zepben.evolve.streaming.get.testservices.TestUpdateNetworkStateService
+import com.zepben.evolve.streaming.mutations.testservices.TestUpdateNetworkStateService
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
@@ -27,7 +27,6 @@ import org.junit.Rule
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import java.time.LocalDateTime
-import java.util.concurrent.Executors
 import kotlin.streams.asStream
 import kotlin.streams.toList
 import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
@@ -46,7 +45,7 @@ class UpdateNetworkStateClientTest {
 
     private val serverName = InProcessServerBuilder.generateName()
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
-    private val stub = spy(UpdateNetworkStateServiceGrpc.newStub(channel).withExecutor(Executors.newSingleThreadExecutor()))
+    private val stub = spy(UpdateNetworkStateServiceGrpc.newStub(channel))
     private val client = UpdateNetworkStateClient(stub, null)
     private val service = TestUpdateNetworkStateService()
 

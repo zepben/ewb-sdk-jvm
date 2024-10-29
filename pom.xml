@@ -11,6 +11,7 @@
     <groupId>com.zepben</groupId>
     <artifactId>evolve-sdk</artifactId>
     <version>0.24.0-SNAPSHOT2</version>
+    <version>0.24.0-SNAPSHOT1</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>SDK for interaction with the evolve platform</description>

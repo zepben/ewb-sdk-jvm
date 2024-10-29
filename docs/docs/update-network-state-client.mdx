@@ -1,0 +1,255 @@
+---
+id: update-network-state-client
+title: Update Network State Client
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+The `UpdateNetworkStateClient` will allow you to interact with a server running the `UpdateNetworkStateService` (e.g. EWB). It provides an object-oriented
+wrapper for the gRPC library, with the ability to update information about the state of the network. This is done with the following 3 steps:
+
+1. Create a gRPC connection to the server.
+1. Create an instance of the `UpdateNetworkStateClient` using your gRPC connection.
+2. Use your `UpdateNetworkStateClient` to update the state of the network.
+
+## Creating a gRPC channel
+
+The channel gRPC channel can be directly from the gPRC libray, or the channel wrapped in our `GrpcChannel` helper, which implements the `AutoClosable` interface
+and performs shutdown operations for you. At its most basic, this can be achieved with:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.grpc.GrpcChannel;
+import io.grpc.ManagedChannelBuilder;
+
+var channel = new GrpcChannel(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build());
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.streaming.grpc.GrpcChannel
+import io.grpc.ManagedChannelBuilder
+
+val channel = GrpcChannel(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build())
+```
+
+</TabItem>
+</Tabs>
+
+For more in depth options for using a gRPC channel, see the [gRPC documentation](https://grpc.io/docs/languages/), or look up a tutorial.
+
+## Using a gRPC channel with your client
+
+Using your gRPC channel with the `UpdateNetworkStateClient` is as simple as passing it to the constructor.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+
+var client = new UpdateNetworkStateClient(channel);
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+
+val client = UpdateNetworkStateClient(channel)
+```
+
+</TabItem>
+</Tabs>
+
+## Using your client to update the network state
+
+Now that you have a client, you can use it to update the state of the network on the connected server.
+
+### Updating current network state
+
+The current state of the network can be updated using the `setCurrentStates` function on the `UpdateNetworkStateClient`. All events passed in the same list will
+be executed as a batch.
+
+:::note
+The current implementation only supports updating the current state of switches. In the future we will add more functionality such as cuts and jumpers.
+:::
+
+#### Updating current switch state
+
+The current state of switches can be updating by passing a `SwitchStateEvent` to the `setCurrentStates` function.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.data.SwitchStateEvent;
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+var event1 = new SwitchStateEvent("event1", LocalDateTime.now(), "switch_id_1", SwitchAction.OPEN);
+var event2 = new SwitchStateEvent("event2", LocalDateTime.now(), "switch_id_2", SwitchAction.CLOSE);
+var response = client.setCurrentStates(1, List.of(event1));
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.streaming.data.SwitchStateEvent
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+
+val event1 = SwitchStateEvent("event1", LocalDateTime.now(), "switch_id_1", SwitchAction.OPEN)
+val event2 = SwitchStateEvent("event2", LocalDateTime.now(), "switch_id_2", SwitchAction.CLOSE)
+val response = client.setCurrentStates(1, listOf(event1))
+```
+
+</TabItem>
+</Tabs>
+
+If you have multiple batches to send, you can pass a stream/sequence of them rather than calling `setCurrentStates` multiple times
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.data.SwitchStateEvent;
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Stream;
+
+var event1 = new SwitchStateEvent("event1", LocalDateTime.now(), "switch_id_1", SwitchAction.OPEN);
+var event2 = new SwitchStateEvent("event2", LocalDateTime.now(), "switch_id_2", SwitchAction.CLOSE);
+var batches = Stream.of(
+    new UpdateNetworkStateClient.SetCurrentStatesRequest(1, List.of(event1)),
+    new UpdateNetworkStateClient.SetCurrentStatesRequest(2, List.of(event2))
+);
+
+client.setCurrentStates(batches).forEach(response ->
+    // Process your responses here. You will get a response per batch.
+);
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.streaming.data.SwitchStateEvent
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+
+import java.time.LocalDateTime
+
+val event1 = SwitchStateEvent("event1", LocalDateTime.now(), "switch_id_1", SwitchAction.OPEN)
+val event2 = SwitchStateEvent("event2", LocalDateTime.now(), "switch_id_2", SwitchAction.CLOSE)
+val batches = sequenceOf(
+    UpdateNetworkStateClient.SetCurrentStatesRequest(1, listOf(event1)),
+    UpdateNetworkStateClient.SetCurrentStatesRequest(2, listOf(event2))
+)
+
+client.setCurrentStates(batches).forEach { response ->
+    // Process your responses here. You will get a response per batch.
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Batch result responses
+
+Each batch will receive its own response, which will be one of the following:
+* `BatchSuccessful` - Indicates that all events in the batch were processed successfully. Events that are ignored because they set the state to one that is
+  already present, or are skipped due to a later event applying the opposite action, will be marked as successful.
+* `ProcessingPaused` - Indicates the entire batch was ignore as current state processing in teh server is currently paused. The response will include the time
+  the server was paused.
+* `BatchFailure` - Indicates at least one event in the batch could not be applied. Each event that failed will indicate why it failed, some of which will have
+  more impact than others.
+  * `StateEventUnknownMrid` - The `mRID` of the event could not be found in the network hosted by this server.
+  * `StateEventDuplicateMrid` - The `mRID` of an item being added to the network is already in use.
+  * `StateEventInvalidMrid` - The `mRID` of the item being addressed in the event is of a different type than expected. e.g. You can't remove a `Jumper` with an
+    `mRID` that belongs to a `Cut`.
+  * `StateEventUnsupportedPhasing` - You tried to specify phases that do not make sense to the item being updated. When using the default phasing of `NONE` you
+    will never receive this error. Until un-ganged switching is supported, this error will be returned for all events that specify phases.
+
+You can check the type of response or failure by check against the types from `com.zepben.evolve.streaming.data.*`
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.data.BatchFailure;
+import com.zepben.evolve.streaming.data.StateEventUnknownMrid;
+
+var status = response.getStatus();
+if (status instanceof BatchFailure) {
+    var batchFailure = (BatchFailure) status;
+    batchFailure.getPartialFailure(); // Will be true if all event failed, otherwise false.
+    batchFailure.getFailures().forEach((failure) -> {
+        if (failure instanceof StateEventUnknownMrid) {
+            // Process failure
+        }
+    });
+}
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+when (val status = response.status) {
+    is BatchFailure -> {
+        status.partialFailure // Will be true if all event failed, otherwise false.
+        status.failures.forEach { failure ->
+            when (failure) {
+                is StateEventUnknownMrid -> // Process failure
+            }
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>

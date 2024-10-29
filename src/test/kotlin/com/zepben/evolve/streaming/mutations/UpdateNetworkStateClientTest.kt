@@ -13,7 +13,6 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.evolve.streaming.data.*
-import com.zepben.evolve.streaming.get.QueryNetworkStateClient
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.TokenCallCredentials
 import com.zepben.evolve.streaming.mutations.testservices.TestUpdateNetworkStateService

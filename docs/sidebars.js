@@ -20,7 +20,7 @@ module.exports = {
     {
         type: "category",
         label: "Network State",
-        items: ["query-network-state-client", "query-network-state-service", "set-network-state-client", "set-network-state-service"]
+        items: ["query-network-state-client", "query-network-state-service", "update-network-state-client", "update-network-state-service"]
     },
   ]
 };

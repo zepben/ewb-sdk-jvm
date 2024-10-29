@@ -124,7 +124,7 @@ response.forEach(events -> {
 ```kotlin
 import java.time.LocalDateTime
 
-val response = client.getCurrentStatesStream(1, LocalDateTime.now().plusDays(-1), LocalDateTime.now())
+val response = client.getCurrentStatesS(1, LocalDateTime.now().plusDays(-1), LocalDateTime.now())
 
 response.forEach { events ->
     // process the list of events here.

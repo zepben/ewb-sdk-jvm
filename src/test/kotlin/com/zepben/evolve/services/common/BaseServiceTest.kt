@@ -19,6 +19,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.services.common.exceptions.UnsupportedIdentifiedObjectException
+import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.translator.addFromPb
 import com.zepben.evolve.services.network.translator.toPb
@@ -36,7 +37,7 @@ internal class BaseServiceTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    internal class TestBaseService : BaseService("test") {
+    internal class TestBaseService : BaseService("test", MetadataCollection()) {
         fun add(obj: Junction) = super.add(obj)
         fun remove(obj: Junction) = super.remove(obj)
         fun add(obj: Breaker) = super.add(obj)
@@ -308,7 +309,7 @@ internal class BaseServiceTest {
         override fun hashCode(): Int = 0
     }
 
-    private class MyService : BaseService("") {
+    private class MyService : BaseService("", MetadataCollection()) {
         fun add(cableInfo: MyIdentifiedObject): Boolean = super.add(cableInfo)
 
         // required, since BaseService checks that each add method has a matching remove method

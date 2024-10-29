@@ -38,6 +38,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
 import kotlin.reflect.KClass
@@ -45,7 +46,8 @@ import kotlin.reflect.KClass
 /**
  * Maintains an in-memory model of the network.
  */
-class NetworkService : BaseService("network") {
+class NetworkService(metadata: MetadataCollection = MetadataCollection()) : BaseService("network", metadata) {
+
     private enum class ProcessStatus {
         PROCESSED, SKIPPED, INVALID
     }

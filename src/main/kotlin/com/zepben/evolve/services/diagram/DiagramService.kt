@@ -12,11 +12,12 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.services.common.meta.MetadataCollection
 
 /**
  * Maintains an in-memory model of diagrams.
  */
-class DiagramService : BaseService("diagram") {
+class DiagramService(metadata: MetadataCollection = MetadataCollection()) : BaseService("diagram", metadata) {
 
     private val diagramObjectsByDiagramMRID: MutableMap<String, MutableMap<String, DiagramObject>> = mutableMapOf()
     private val diagramObjectsByIdentifiedObjectMRID: MutableMap<String, MutableMap<String, DiagramObject>> = mutableMapOf()

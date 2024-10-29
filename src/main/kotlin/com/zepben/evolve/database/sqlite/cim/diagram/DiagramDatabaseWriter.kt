@@ -19,15 +19,13 @@ import java.sql.DriverManager
  * A class for writing the [DiagramService] objects and [MetadataCollection] to our diagram database.
  *
  * @param databaseFile the filename of the database to write.
- * @param metadata The [MetadataCollection] to save to the database.
  * @param service The [DiagramService] to save to the database.
  */
 class DiagramDatabaseWriter @JvmOverloads constructor(
     databaseFile: String,
-    metadata: MetadataCollection,
     service: DiagramService,
     databaseTables: DiagramDatabaseTables = DiagramDatabaseTables(),
-    metadataWriter: MetadataCollectionWriter = MetadataCollectionWriter(metadata, databaseTables),
+    metadataWriter: MetadataCollectionWriter = MetadataCollectionWriter(service, databaseTables),
     serviceWriter: DiagramServiceWriter = DiagramServiceWriter(service, databaseTables),
     getConnection: (String) -> Connection = DriverManager::getConnection
 ) : CimDatabaseWriter(

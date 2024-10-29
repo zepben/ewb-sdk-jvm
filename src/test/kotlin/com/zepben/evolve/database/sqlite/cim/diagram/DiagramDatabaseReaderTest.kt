@@ -44,7 +44,6 @@ internal class DiagramDatabaseReaderTest {
 
     private val reader = DiagramDatabaseReader(
         connection,
-        mockk(), // The metadata is unused if we provide a metadataReader.
         service,
         databaseFile,
         mockk(), // tables should not be used if we provide the rest of the parameters, so provide a mockk that will throw if used.

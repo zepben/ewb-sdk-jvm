@@ -8,8 +8,9 @@
 
 package com.zepben.evolve.database.sqlite.cim.metadata
 
-import com.zepben.evolve.database.sqlite.extensions.getInstant
 import com.zepben.evolve.database.sqlite.cim.tables.TableMetadataDataSources
+import com.zepben.evolve.database.sqlite.extensions.getInstant
+import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.meta.DataSource
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import java.sql.ResultSet
@@ -18,10 +19,10 @@ import java.time.Instant
 /**
  * A class for reading the [MetadataCollection] entries from the database.
  *
- * @param metadata The [MetadataCollection] to populate from the database.
+ * @param service The [BaseService] containing the [MetadataCollection] to populate from the database.
  */
 class MetadataEntryReader(
-    private val metadata: MetadataCollection
+    private val service: BaseService
 ) {
 
     /**
@@ -41,7 +42,7 @@ class MetadataEntryReader(
             resultSet.getInstant(table.TIMESTAMP.queryIndex) ?: Instant.EPOCH
         )
 
-        return metadata.add(dataSource)
+        return service.metadata.add(dataSource)
     }
 
 }

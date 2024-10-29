@@ -16,7 +16,6 @@ import com.zepben.evolve.cim.iec61968.customers.Tariff
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseSchemaTest
 import com.zepben.evolve.services.common.Resolvers
-import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.common.testdata.SchemaServices
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.customer.CustomerService
@@ -35,16 +34,11 @@ class CustomerDatabaseSchemaTest : CimDatabaseSchemaTest<CustomerService, Custom
 
     override fun createService(): CustomerService = CustomerService()
 
-    override fun createWriter(filename: String, metadata: MetadataCollection, service: CustomerService): CustomerDatabaseWriter =
-        CustomerDatabaseWriter(filename, metadata, service)
+    override fun createWriter(filename: String, service: CustomerService): CustomerDatabaseWriter =
+        CustomerDatabaseWriter(filename, service)
 
-    override fun createReader(
-        connection: Connection,
-        metadata: MetadataCollection,
-        service: CustomerService,
-        databaseDescription: String
-    ): CustomerDatabaseReader =
-        CustomerDatabaseReader(connection, metadata, service, databaseDescription)
+    override fun createReader(connection: Connection, service: CustomerService, databaseDescription: String): CustomerDatabaseReader =
+        CustomerDatabaseReader(connection, service, databaseDescription)
 
     override fun createComparator(): CustomerServiceComparator = CustomerServiceComparator()
 
@@ -60,11 +54,10 @@ class CustomerDatabaseSchemaTest : CimDatabaseSchemaTest<CustomerService, Custom
 
         assertThat("database must exist", Files.exists(Paths.get(databaseFile)))
 
-        val metadata = MetadataCollection()
         val customerService = CustomerService()
 
         DriverManager.getConnection("jdbc:sqlite:$databaseFile").use { connection ->
-            assertThat("Database should have loaded", CustomerDatabaseReader(connection, metadata, customerService, databaseFile).load())
+            assertThat("Database should have loaded", CustomerDatabaseReader(connection, customerService, databaseFile).load())
         }
 
         logger.info("Sleeping...")

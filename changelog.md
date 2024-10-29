@@ -1,11 +1,12 @@
 # Zepben EWB SDK changelog
 ## [0.24.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Database readers and writes for each `BaseService` no longer accept a `MetadataCollection`, and will instead use the collection of the provided service.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
 * Client functionality for updating and querying network states via gRPC service stub. 
+* `BaseService` now contains a `MetadataCollection` to tightly couple the metadata to the associated service.
 
 ### Enhancements
 * None.
@@ -35,8 +36,8 @@
 * Removed `PowerTransformer.forEachRating` which looped over the collection with an index that made no sense. Please loop over `PowerTransformer.sRatings`
   instead.
 * `Equipment` to `EquipmentContainer` links for LV feeders are no longer written to the database, they should never have been.
-*  Refactored `EwbDataFilePaths`: 
-  * The `EwbDataFilePaths` class has been refactored into an interface to enhance flexibility and abstraction. 
+* Refactored `EwbDataFilePaths`:
+  * The `EwbDataFilePaths` class has been refactored into an interface to enhance flexibility and abstraction.
   * A new class, `LocalEwbDataFilePaths`, has been introduced to specifically handle the resolution of database paths for the local file system.
 * `Switch.ratedCurrent` has been converted to a `double` (used to be an `integer`). Type safe languages will need to be updated to support floating point
   arithmatic/syntax.

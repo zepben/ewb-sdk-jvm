@@ -41,7 +41,6 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseSchemaTest
 import com.zepben.evolve.services.common.Resolvers
-import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.common.testdata.SchemaServices
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.network.NetworkService
@@ -64,16 +63,11 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
 
     override fun createService(): NetworkService = NetworkService()
 
-    override fun createWriter(filename: String, metadata: MetadataCollection, service: NetworkService): NetworkDatabaseWriter =
-        NetworkDatabaseWriter(filename, metadata, service)
+    override fun createWriter(filename: String, service: NetworkService): NetworkDatabaseWriter =
+        NetworkDatabaseWriter(filename, service)
 
-    override fun createReader(
-        connection: Connection,
-        metadata: MetadataCollection,
-        service: NetworkService,
-        databaseDescription: String
-    ): NetworkDatabaseReader =
-        NetworkDatabaseReader(connection, metadata, service, databaseDescription)
+    override fun createReader(connection: Connection, service: NetworkService, databaseDescription: String): NetworkDatabaseReader =
+        NetworkDatabaseReader(connection, service, databaseDescription)
 
     override fun createComparator(): NetworkServiceComparator = NetworkServiceComparator()
 
@@ -89,11 +83,10 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
 
         assertThat("database must exist", Files.exists(Paths.get(databaseFile)))
 
-        val metadata = MetadataCollection()
         val networkService = NetworkService()
 
         DriverManager.getConnection("jdbc:sqlite:$databaseFile").use { connection ->
-            assertThat("Database should have loaded", NetworkDatabaseReader(connection, metadata, networkService, databaseFile).load())
+            assertThat("Database should have loaded", NetworkDatabaseReader(connection, networkService, databaseFile).load())
         }
 
         logger.info("Sleeping...")
@@ -250,7 +243,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
             add(Location(mRID = "loc1").apply { mainAddress = StreetAddress(townDetail = TownDetail(), streetDetail = StreetDetail()) })
         }
 
-        validateWriteRead(writeService) { readService, _ ->
+        validateWriteRead(writeService) { readService ->
             assertThat(
                 "Expected a default street address as blank parts should have been removed during teh database read",
                 readService.get<Location>("loc1")!!.mainAddress,

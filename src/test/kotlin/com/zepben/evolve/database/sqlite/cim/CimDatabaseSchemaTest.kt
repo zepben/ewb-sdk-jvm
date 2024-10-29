@@ -42,8 +42,8 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
     private val schemaTestFile = "src/test/data/schemaTest.sqlite"
 
     abstract fun createService(): TService
-    abstract fun createWriter(filename: String, metadata: MetadataCollection, service: TService): TWriter
-    abstract fun createReader(connection: Connection, metadata: MetadataCollection, service: TService, databaseDescription: String): TReader
+    abstract fun createWriter(filename: String, service: TService): TWriter
+    abstract fun createReader(connection: Connection, service: TService, databaseDescription: String): TReader
     abstract fun createComparator(): TComparator
     abstract fun createIdentifiedObject(): IdentifiedObject
 
@@ -59,7 +59,12 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
 
     @Test
     internal fun `test metadata data source schema`() {
-        validateSchema(expectedMetadata = SchemaServices.createDataSourceTestServices())
+        // Put a copy of the metadata into an appropriate service for comparison.
+        val service = createService().apply {
+            SchemaServices.createDataSourceTestServices().dataSources.forEach { metadata.add(it) }
+        }
+
+        validateSchema(service)
     }
 
     @Test
@@ -79,33 +84,31 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
         )
     }
 
-    protected fun validateSchema(expectedService: TService = createService(), expectedMetadata: MetadataCollection = MetadataCollection()) {
-        validateWriteRead(expectedService, expectedMetadata) { readService, readMetadata ->
-            validateMetadata(readMetadata, expectedMetadata)
+    protected fun validateSchema(expectedService: TService) {
+        validateWriteRead(expectedService) { readService ->
+            validateMetadata(readService.metadata, expectedService.metadata)
             validateService(readService, expectedService, createComparator())
         }
     }
 
     protected fun validateWriteRead(
         writeService: TService = createService(),
-        writeMetadata: MetadataCollection = MetadataCollection(),
         readService: TService = createService(),
-        readMetadata: MetadataCollection = MetadataCollection(),
-        validateRead: ((TService, MetadataCollection) -> Unit)? = null
+        validateRead: ((TService) -> Unit)? = null
     ) {
-        assertThat("Database should have been saved", createWriter(schemaTestFile, writeMetadata, writeService).save())
+        assertThat("Database should have been saved", createWriter(schemaTestFile, writeService).save())
 
         assertThat(systemErr.log, containsString("Creating database schema v${tableCimVersion.supportedVersion}"))
         assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
 
         systemErr.clearCapturedLog()
         val status = DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
-            createReader(connection, readMetadata, readService, schemaTestFile).load()
+            createReader(connection, readService, schemaTestFile).load()
         }
 
         if (validateRead != null) {
             assertThat("Database read should have succeeded", status)
-            validateRead(readService, readMetadata)
+            validateRead(readService)
         } else
             assertThat("database read should have failed", !status)
     }

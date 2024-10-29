@@ -19,15 +19,13 @@ import java.sql.DriverManager
  * A class for writing the [NetworkService] objects and [MetadataCollection] to our network database.
  *
  * @param databaseFile the filename of the database to write.
- * @param metadata The [MetadataCollection] to save to the database.
  * @param service The [NetworkService] to save to the database.
  */
 class NetworkDatabaseWriter @JvmOverloads constructor(
     databaseFile: String,
-    metadata: MetadataCollection,
     service: NetworkService,
     databaseTables: NetworkDatabaseTables = NetworkDatabaseTables(),
-    metadataWriter: MetadataCollectionWriter = MetadataCollectionWriter(metadata, databaseTables),
+    metadataWriter: MetadataCollectionWriter = MetadataCollectionWriter(service, databaseTables),
     serviceWriter: NetworkServiceWriter = NetworkServiceWriter(service, databaseTables),
     getConnection: (String) -> Connection = DriverManager::getConnection
 ) : CimDatabaseWriter(

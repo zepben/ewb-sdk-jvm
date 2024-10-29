@@ -13,7 +13,6 @@ import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseSchemaTest
 import com.zepben.evolve.services.common.Resolvers
-import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.common.testdata.SchemaServices
 import com.zepben.evolve.services.diagram.DiagramService
 import com.zepben.evolve.services.diagram.DiagramServiceComparator
@@ -31,16 +30,11 @@ class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<DiagramService, DiagramD
 
     override fun createService(): DiagramService = DiagramService()
 
-    override fun createWriter(filename: String, metadata: MetadataCollection, service: DiagramService): DiagramDatabaseWriter =
-        DiagramDatabaseWriter(filename, metadata, service)
+    override fun createWriter(filename: String, service: DiagramService): DiagramDatabaseWriter =
+        DiagramDatabaseWriter(filename, service)
 
-    override fun createReader(
-        connection: Connection,
-        metadata: MetadataCollection,
-        service: DiagramService,
-        databaseDescription: String
-    ): DiagramDatabaseReader =
-        DiagramDatabaseReader(connection, metadata, service, databaseDescription)
+    override fun createReader(connection: Connection, service: DiagramService, databaseDescription: String): DiagramDatabaseReader =
+        DiagramDatabaseReader(connection, service, databaseDescription)
 
     override fun createComparator(): DiagramServiceComparator = DiagramServiceComparator()
 
@@ -56,11 +50,10 @@ class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<DiagramService, DiagramD
 
         assertThat("database must exist", Files.exists(Paths.get(databaseFile)))
 
-        val metadata = MetadataCollection()
         val diagramService = DiagramService()
 
         DriverManager.getConnection("jdbc:sqlite:$databaseFile").use { connection ->
-            assertThat("Database should have loaded", DiagramDatabaseReader(connection, metadata, diagramService, databaseFile).load())
+            assertThat("Database should have loaded", DiagramDatabaseReader(connection, diagramService, databaseFile).load())
         }
 
         logger.info("Sleeping...")

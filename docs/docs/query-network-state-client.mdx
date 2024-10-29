@@ -1,0 +1,135 @@
+---
+id: query-network-state-client
+title: Query Network State Client
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+The `QueryNetworkStateClient` will allow you to interact with a server running the `QueryNetworkStateService` (e.g. EWB). It provides an object-oriented
+wrapper for the gRPC library, with the ability to update information about the state of the network. This is done with the following 3 steps:
+
+1. Create a gRPC connection to the server.
+1. Create an instance of the `QueryNetworkStateClient` using your gRPC connection.
+2. Use your `QueryNetworkStateClient` to update the state of the network.
+
+## Creating a gRPC channel
+
+The channel gRPC channel can be directly from the gPRC libray, or the channel wrapped in our `GrpcChannel` helper, which implements the `AutoClosable` interface
+and performs shutdown operations for you. At its most basic, this can be achieved with:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.grpc.GrpcChannel;
+import io.grpc.ManagedChannelBuilder;
+
+var channel = new GrpcChannel(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build());
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.streaming.grpc.GrpcChannel
+import io.grpc.ManagedChannelBuilder
+
+val channel = GrpcChannel(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build())
+```
+
+</TabItem>
+</Tabs>
+
+For more in depth options for using a gRPC channel, see the [gRPC documentation](https://grpc.io/docs/languages/), or look up a tutorial.
+
+## Using a gRPC channel with your client
+
+Using your gRPC channel with the `QueryNetworkStateClient` is as simple as passing it to the constructor.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.get.QueryNetworkStateClient;
+
+var client = new QueryNetworkStateClient(channel);
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.streaming.get.QueryNetworkStateClient
+
+val client = QueryNetworkStateClient(channel)
+```
+
+</TabItem>
+</Tabs>
+
+## Using your client to query the network state
+
+Now that you have a client, you can use it to query the state of the network on the connected server.
+
+### Querying current network state
+
+The current state of the network between two date/times can be retrieved using the `getCurrentStates` or the `getCurrentStatesStream` function on the `QueryNetworkStateClient`.
+
+:::note
+For Java interoperability, prefer using the `getCurrentStatesStream` function, as it returns a Stream compatible with Java's standard library.
+:::
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.data.CurrentStateEvent;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Stream;
+
+Stream<List<CurrentStateEvent>> response = client.getCurrentStatesStream(1, LocalDateTime.now().plusDays(-1), LocalDateTime.now());
+
+response.forEach(events -> {
+    // process the list of events here.
+});
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import java.time.LocalDateTime
+
+val response = client.getCurrentStatesStream(1, LocalDateTime.now().plusDays(-1), LocalDateTime.now())
+
+response.forEach { events ->
+    // process the list of events here.
+}
+```
+
+</TabItem>
+</Tabs>

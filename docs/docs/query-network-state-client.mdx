@@ -6,12 +6,12 @@ title: Query Network State Client
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-The `QueryNetworkStateClient` will allow you to interact with a server running the `QueryNetworkStateService` (e.g. EWB). It provides an object-oriented
-wrapper for the gRPC library, with the ability to update information about the state of the network. This is done with the following 3 steps:
+The `QueryNetworkStateClient` will allow you to interact with a server running the `QueryNetworkStateService`. It provides an object-oriented
+wrapper for the gRPC library, with the ability to retrieve information about the state of the network. This is done with the following 3 steps:
 
 1. Create a gRPC connection to the server.
 1. Create an instance of the `QueryNetworkStateClient` using your gRPC connection.
-2. Use your `QueryNetworkStateClient` to update the state of the network.
+2. Use your `QueryNetworkStateClient` to retrieve the state of the network.
 
 ## Creating a gRPC channel
 

@@ -113,14 +113,7 @@ class SwitchStateEvent @JvmOverloads constructor(
         return true
     }
 
-    override fun hashCode(): Int {
-        var result = eventId.hashCode()
-        result = 31 * result + timestamp.hashCode()
-        result = 31 * result + mRID.hashCode()
-        result = 31 * result + action.hashCode()
-        result = 31 * result + phases.hashCode()
-        return result
-    }
+    override fun hashCode(): Int = listOf(eventId, timestamp, mRID, action, phases).hashCode()
 
 }
 

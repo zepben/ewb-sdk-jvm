@@ -27,6 +27,7 @@ import java.time.LocalDateTime
 import kotlin.streams.toList
 
 class QueryNetworkStateClientTest {
+
     @JvmField
     @Rule
     val grpcCleanup: GrpcCleanupRule = GrpcCleanupRule()
@@ -78,4 +79,5 @@ class QueryNetworkStateClientTest {
 
         assertThat(result, equalTo(batches))
     }
+
 }

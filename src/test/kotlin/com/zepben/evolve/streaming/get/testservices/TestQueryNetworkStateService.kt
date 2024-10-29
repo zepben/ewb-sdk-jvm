@@ -10,11 +10,14 @@ package com.zepben.evolve.streaming.get.testservices
 
 import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.streaming.data.CurrentStateEvent
-import com.zepben.protobuf.ns.*
+import com.zepben.protobuf.ns.GetCurrentStatesRequest
+import com.zepben.protobuf.ns.GetCurrentStatesResponse
+import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
 import io.grpc.stub.StreamObserver
 import java.time.LocalDateTime
 
 class TestQueryNetworkStateService: QueryNetworkStateServiceGrpc.QueryNetworkStateServiceImplBase() {
+
     lateinit var onGetCurrentStates: (from: LocalDateTime?, to: LocalDateTime?) -> Sequence<List<CurrentStateEvent>>
 
     override fun getCurrentStates(request: GetCurrentStatesRequest, responseObserver: StreamObserver<GetCurrentStatesResponse>) {
@@ -27,4 +30,5 @@ class TestQueryNetworkStateService: QueryNetworkStateServiceGrpc.QueryNetworkSta
 
         responseObserver.onCompleted()
     }
+
 }

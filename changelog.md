@@ -7,6 +7,7 @@
 * Network state services for updating and querying network state events via gRPC.
 * Client functionality for updating and querying network states via gRPC service stub. 
 * `BaseService` now contains a `MetadataCollection` to tightly couple the metadata to the associated service.
+* Added `Services`, a new class which contains a copy of each `BaseService` supported by the SDK.
 
 ### Enhancements
 * None.

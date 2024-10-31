@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class QueryNetworkStateServiceTest {
+
     @JvmField
     @Rule
     val grpcCleanup: GrpcCleanupRule = GrpcCleanupRule()
@@ -67,8 +68,8 @@ class QueryNetworkStateServiceTest {
     private val serviceStream = QueryNetworkStateService(onGetCurrentStatesStream)
     private val request = GetCurrentStatesRequest.newBuilder().apply {
         messageId = 1
-        from = Timestamp.newBuilder().apply { nanos = 1 }.build()
-        to = Timestamp.newBuilder().apply { seconds = 1 }.build()
+        fromTimestamp = Timestamp.newBuilder().apply { nanos = 1 }.build()
+        toTimestamp = Timestamp.newBuilder().apply { seconds = 1 }.build()
     }.build()
 
     @Test
@@ -112,16 +113,16 @@ class QueryNetworkStateServiceTest {
     private fun assertGetCurrentStates(onAdditionalVerification: (() -> Unit)? = null) {
         onAdditionalVerification?.let { it() }
 
-        assertThat(fromSlot.captured, equalTo(request.from.toLocalDateTime()))
-        assertThat(toSlot.captured, equalTo(request.to.toLocalDateTime()))
+        assertThat(fromSlot.captured, equalTo(request.fromTimestamp.toLocalDateTime()))
+        assertThat(toSlot.captured, equalTo(request.toTimestamp.toLocalDateTime()))
 
         assertThat(responseSlot.map { it.messageId }, contains(1, 1))
-        responseSlot.flatMap { it.eventList }.let {
-            assertThat(it.map { it.eventId }, contains(*currentStateEvents.map { it.eventId }.toTypedArray()))
-            assertThat(it.map { it.timestamp }, contains(*currentStateEvents.map { it.timestamp.toTimestamp() }.toTypedArray()))
-            assertThat(it.map { it.switch.mrid }, contains(*switchStateEvents.map { it.mRID }.toTypedArray()))
-            assertThat(it.map { it.switch.action.name }, contains(*switchStateEvents.map { it.action.name }.toTypedArray()))
-            assertThat(it.map { it.switch.phases.name }, contains(*switchStateEvents.map { it.phases.name }.toTypedArray()))
+        responseSlot.flatMap { it.eventList }.also { events ->
+            assertThat(events.map { it.eventId }, contains(*currentStateEvents.map { it.eventId }.toTypedArray()))
+            assertThat(events.map { it.timestamp }, contains(*currentStateEvents.map { it.timestamp.toTimestamp() }.toTypedArray()))
+            assertThat(events.map { it.switch.mrid }, contains(*switchStateEvents.map { it.mRID }.toTypedArray()))
+            assertThat(events.map { it.switch.action.name }, contains(*switchStateEvents.map { it.action.name }.toTypedArray()))
+            assertThat(events.map { it.switch.phases.name }, contains(*switchStateEvents.map { it.phases.name }.toTypedArray()))
         }
 
         verifySequence {
@@ -136,4 +137,5 @@ class QueryNetworkStateServiceTest {
             .addService(service)
             .build().start())
     }
+
 }

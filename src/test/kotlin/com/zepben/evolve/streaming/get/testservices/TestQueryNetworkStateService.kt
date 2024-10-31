@@ -21,7 +21,7 @@ class TestQueryNetworkStateService: QueryNetworkStateServiceGrpc.QueryNetworkSta
     lateinit var onGetCurrentStates: (from: LocalDateTime?, to: LocalDateTime?) -> Sequence<List<CurrentStateEvent>>
 
     override fun getCurrentStates(request: GetCurrentStatesRequest, responseObserver: StreamObserver<GetCurrentStatesResponse>) {
-        onGetCurrentStates(request.from.toLocalDateTime(), request.to.toLocalDateTime()).forEach { batch ->
+        onGetCurrentStates(request.fromTimestamp.toLocalDateTime(), request.toTimestamp.toLocalDateTime()).forEach { batch ->
             responseObserver.onNext(GetCurrentStatesResponse.newBuilder().apply {
                 messageId = request.messageId
                 addAllEvent(batch.map { it.toPb() })

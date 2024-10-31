@@ -73,8 +73,8 @@ class QueryNetworkStateService(
      */
     override fun getCurrentStates(request: GetCurrentStatesRequest, responseObserver: StreamObserver<GetCurrentStatesResponse>) {
         try {
-            val from = request.from.toLocalDateTime()
-            val to = request.to.toLocalDateTime()
+            val from = request.fromTimestamp.toLocalDateTime()
+            val to = request.toTimestamp.toLocalDateTime()
 
             onGetCurrentStates(from, to).forEach { sendResponse(it, request.messageId, responseObserver) }
 

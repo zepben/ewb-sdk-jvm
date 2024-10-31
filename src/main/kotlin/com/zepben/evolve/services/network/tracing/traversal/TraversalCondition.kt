@@ -6,6 +6,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network.tracing.traversalV2
+package com.zepben.evolve.services.network.tracing.traversal
 
 sealed interface TraversalCondition<T>

@@ -11,13 +11,12 @@ package com.zepben.evolve.services.network.tracing.networktrace.conditions
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.operators.FeederDirectionStateOperations
 import com.zepben.evolve.services.network.tracing.networktrace.operators.OpenStateOperators
-import com.zepben.evolve.services.network.tracing.traversalV2.QueueCondition
-import com.zepben.evolve.services.network.tracing.traversalV2.TraversalCondition
+import com.zepben.evolve.services.network.tracing.traversal.QueueCondition
+import com.zepben.evolve.services.network.tracing.traversal.TraversalCondition
 import kotlin.reflect.KClass
 
 private typealias NetworkTraceCondition<T> = TraversalCondition<NetworkTraceStep<T>>
@@ -37,7 +36,7 @@ object Conditions {
     fun <T> FeederDirectionStateOperations.downstream(): NetworkTraceCondition<T> =
         downstream(this::getDirection)
 
-    fun <T> stopAtOpen(openTest: OpenTest, phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =
+    fun <T> stopAtOpen(openTest: (ConductingEquipment, SinglePhaseKind?) -> Boolean, phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =
         OpenCondition(openTest, phase)
 
     fun <T> OpenStateOperators.stopAtOpen(phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =

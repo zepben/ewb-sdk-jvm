@@ -6,9 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network.tracing.traversalV2
-
-import com.zepben.evolve.services.network.tracing.traversals.Tracker
+package com.zepben.evolve.services.network.tracing.traversal
 
 internal class RecursiveTracker<T>(val parent: RecursiveTracker<T>?, val delegate: Tracker<T>) : Tracker<T> {
     override fun hasVisited(item: T): Boolean {

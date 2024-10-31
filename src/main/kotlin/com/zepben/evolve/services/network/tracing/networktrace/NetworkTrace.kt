@@ -11,13 +11,9 @@ package com.zepben.evolve.services.network.tracing.networktrace
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
-import com.zepben.evolve.services.network.tracing.traversalV2.RecursiveTracker
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
-import com.zepben.evolve.services.network.tracing.traversalV2.TraversalCondition
-import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
+import com.zepben.evolve.services.network.tracing.traversal.*
 
 class NetworkTrace<T> private constructor(
     val networkStateOperators: NetworkStateOperators,
@@ -109,7 +105,7 @@ class NetworkTrace<T> private constructor(
         return this
     }
 
-    fun addStepAction(action: (NetworkTraceStep<T>, StepContext, NetworkStateOperators) -> Unit): NetworkTrace<T> {
+    fun addNetworkStepAction(action: (NetworkTraceStep<T>, StepContext, NetworkStateOperators) -> Unit): NetworkTrace<T> {
         addStepAction { item, ctx -> action(item, ctx, networkStateOperators) }
         return this
     }

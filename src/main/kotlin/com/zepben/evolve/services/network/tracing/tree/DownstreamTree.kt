@@ -15,7 +15,7 @@ import com.zepben.evolve.services.network.tracing.networktrace.StepPath
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue
+import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
 
 
 class DownstreamTree(

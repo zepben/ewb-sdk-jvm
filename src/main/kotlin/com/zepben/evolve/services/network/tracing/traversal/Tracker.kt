@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network.tracing.traversals
+package com.zepben.evolve.services.network.tracing.traversal
 
 /**
  * An interface used by Traversals to 'track' items that have been visited.

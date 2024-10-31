@@ -40,6 +40,7 @@ object Tracing {
         return NetworkTrace(networkStateOperators, queue, true, computeNextT)
     }
 
+    @JvmStatic
     fun connectedEquipmentTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         queue: TraversalQueue<NetworkTraceStep<Unit>> = TraversalQueue.depthFirst(),

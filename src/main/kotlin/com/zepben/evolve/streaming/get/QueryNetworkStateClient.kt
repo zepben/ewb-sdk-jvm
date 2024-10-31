@@ -78,8 +78,8 @@ class QueryNetworkStateClient(
         }
         val request = GetCurrentStatesRequest.newBuilder().also {
             it.messageId = queryId
-            it.from = from.toTimestamp()
-            it.to = to.toTimestamp()
+            it.fromTimestamp = from.toTimestamp()
+            it.toTimestamp = to.toTimestamp()
         }.build()
 
         stub.getCurrentStates(request, responseObserver)

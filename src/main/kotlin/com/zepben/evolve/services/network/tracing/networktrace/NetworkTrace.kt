@@ -85,28 +85,48 @@ class NetworkTrace<T> private constructor(
         onlyActionEquipment
     )
 
-    fun run(start: Terminal, context: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+    fun addStartItem(start: Terminal, context: T, phases: PhaseCode? = null) {
         val startPath = StepPath(start, start, 0, 0, startNominalPhasePath(phases))
-        run(NetworkTraceStep(startPath, context), canStopOnStartItem)
+        addStartItem(NetworkTraceStep(startPath, context))
     }
 
-    fun run(start: ConductingEquipment, context: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
-        start.terminals.forEach { terminal ->
-            val startPath = StepPath(terminal, terminal, 0, 0, startNominalPhasePath(phases))
-            addStartItem(NetworkTraceStep(startPath, context))
-        }
+    fun addStartItem(start: ConductingEquipment, context: T, phases: PhaseCode? = null) {
+        start.terminals.forEach { addStartItem(it, context, phases) }
+    }
 
+    fun run(start: Terminal, context: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+        addStartItem(start, context, phases)
         run(canStopOnStartItem)
     }
 
-    // TODO [Review]: Should this just be addCondition?
+    fun run(start: ConductingEquipment, context: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+        addStartItem(start, context, phases)
+        run(canStopOnStartItem)
+    }
+
+    // TODO [Review]: Should these just be called addCondition / addStepAction still because they don't conflict with the base ones?
+
     fun addNetworkCondition(block: NetworkStateOperators.() -> TraversalCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
         addCondition(networkStateOperators.block())
         return this
     }
 
-    fun addNetworkStepAction(action: (NetworkTraceStep<T>, StepContext, NetworkStateOperators) -> Unit): NetworkTrace<T> {
-        addStepAction { item, ctx -> action(item, ctx, networkStateOperators) }
+    fun addNetworkQueueCondition(condition: NetworkTraceQueueCondition<T>): NetworkTrace<T> {
+        addQueueCondition { next, nextContext, current, currentContext ->
+            condition.shouldQueue(next, nextContext, current, currentContext, networkStateOperators)
+        }
+        return this
+    }
+
+    fun addNetworkStopCondition(condition: NetworkTraceStopCondition<T>): NetworkTrace<T> {
+        addStopCondition { item, context ->
+            condition.shouldStop(item, context, networkStateOperators)
+        }
+        return this
+    }
+
+    fun addNetworkStepAction(action: NetworkTraceStepAction<T>): NetworkTrace<T> {
+        addStepAction { item, ctx -> action.apply(item, ctx, networkStateOperators) }
         return this
     }
 
@@ -124,6 +144,14 @@ class NetworkTrace<T> private constructor(
     private fun startNominalPhasePath(phases: PhaseCode?): List<NominalPhasePath> =
         phases?.singlePhases?.map { NominalPhasePath(it, it) } ?: emptyList()
 
+}
+
+fun NetworkTrace<Unit>.addStartItem(start: Terminal, phases: PhaseCode? = null) {
+    addStartItem(start, Unit, phases)
+}
+
+fun NetworkTrace<Unit>.addStartItem(start: ConductingEquipment, phases: PhaseCode? = null) {
+    start.terminals.forEach { addStartItem(it, Unit, phases) }
 }
 
 fun NetworkTrace<Unit>.run(start: Terminal, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {

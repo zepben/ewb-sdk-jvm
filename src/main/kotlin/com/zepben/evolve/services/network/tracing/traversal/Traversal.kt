@@ -266,18 +266,8 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         return StepContext(false, isBranchStart, context.stepNumber + 1, branchDepth, newContextData)
     }
 
-    fun addStartItem(item: T): D {
+    protected fun addStartItem(item: T): D {
         startItems.add(item)
-        return getDerivedThis()
-    }
-
-    fun addStartItems(vararg items: T): D {
-        startItems.addAll(items)
-        return getDerivedThis()
-    }
-
-    fun addStartItems(items: Iterable<T>): D {
-        startItems.addAll(items)
         return getDerivedThis()
     }
 

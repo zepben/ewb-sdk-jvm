@@ -15,7 +15,7 @@ class TracingTest {
 
     @Test
     fun playground() {
-        Tracing.connectedEquipmentTrace()
+        Tracing.equipmentNetworkTrace()
             .run(Terminal(), canStopOnStartItem = false)
     }
 
@@ -27,17 +27,17 @@ class TracingTest {
          */
 
         // fun connectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newConnectedEquipmentTrace()
-        Tracing.connectedEquipmentTrace()
+        Tracing.equipmentNetworkTrace()
 
 //        fun connectedEquipmentBreadthTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newConnectedEquipmentBreadthTrace()
-        Tracing.connectedEquipmentTrace(queue = TraversalQueue.breadthFirst())
+        Tracing.equipmentNetworkTrace(queue = TraversalQueue.breadthFirst())
 
 //        fun normalConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newNormalConnectedEquipmentTrace()
-        Tracing.connectedEquipmentTrace()
+        Tracing.equipmentNetworkTrace()
             .addNetworkCondition { stopAtOpen() }
 
 //        fun currentConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newCurrentConnectedEquipmentTrace()
-        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
             .addNetworkCondition { stopAtOpen() }
 
         /*
@@ -45,34 +45,34 @@ class TracingTest {
                but I'm hoping we can do something like what I've done here
          */
 //        fun normalLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace = ConnectedEquipmentTrace.newNormalLimitedConnectedEquipmentTrace()
-        Tracing.connectedEquipmentTrace()
+        Tracing.equipmentNetworkTrace()
             .addNetworkCondition { stopAtOpen() }
             .addCondition(limitEquipmentSteps(10))
 
 
 //        fun currentLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace = ConnectedEquipmentTrace.newCurrentLimitedConnectedEquipmentTrace()
-        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
             .addNetworkCondition { stopAtOpen() }
             .addCondition(limitEquipmentSteps(10, Switch::class)) // If you want to limit to 10 switches
 
 //        fun normalDownstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = TraversalQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
 //            ConnectedEquipmentTrace.newNormalDownstreamEquipmentTrace(queue)
-        Tracing.connectedEquipmentTrace()
+        Tracing.equipmentNetworkTrace()
             .addNetworkCondition { downstream() }
 
 //        fun currentDownstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = TraversalQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
 //            ConnectedEquipmentTrace.newCurrentDownstreamEquipmentTrace(queue)
-        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
             .addNetworkCondition { downstream() }
 
 //        fun normalUpstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = TraversalQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
 //            ConnectedEquipmentTrace.newNormalUpstreamEquipmentTrace(queue)
-        Tracing.connectedEquipmentTrace()
+        Tracing.equipmentNetworkTrace()
             .addNetworkCondition { upstream() }
 
 //        fun currentUpstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = TraversalQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
 //            ConnectedEquipmentTrace.newCurrentUpstreamEquipmentTrace(queue)
-        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
             .addNetworkCondition { upstream() }
 
         // NOTE: The new phase tracing doesn't map 1 to 1 to what was previously there. When we reviewed the
@@ -82,7 +82,7 @@ class TracingTest {
 
 //        fun connectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newConnectivityTrace()
 //        fun phaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newTrace()
-        Tracing.connectedEquipmentTrace()
+        Tracing.equipmentNetworkTrace()
 //            .addCondition(withPhases(PhaseCode.ABCN))
             .addStepAction { step, _ ->
                 val phasePaths = step.path.nominalPhasePaths
@@ -90,38 +90,38 @@ class TracingTest {
             .run(Terminal(), PhaseCode.ABC)
 
 //        fun connectivityBreadthTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newConnectivityBreadthTrace()
-        Tracing.connectedEquipmentTrace(queue = TraversalQueue.breadthFirst())
+        Tracing.equipmentNetworkTrace(queue = TraversalQueue.breadthFirst())
             .run(Terminal(), PhaseCode.ABC)
 
 //        fun normalConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newNormalConnectivityTrace()
 //        fun normalPhaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalTrace()
-        Tracing.connectedEquipmentTrace()
+        Tracing.equipmentNetworkTrace()
             .addNetworkCondition { stopAtOpen() }
             .run(Terminal(), PhaseCode.ABC)
 
 //        fun currentConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newCurrentConnectivityTrace()
 //        fun currentPhaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentTrace()
-        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
             .addNetworkCondition { stopAtOpen() }
             .run(Terminal(), PhaseCode.ABC)
 
 //        fun normalDownstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalDownstreamTrace()
-        Tracing.connectedEquipmentTrace()
+        Tracing.equipmentNetworkTrace()
             .addNetworkCondition { downstream() }
             .run(Terminal(), PhaseCode.ABC)
 
 //        fun currentDownstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentDownstreamTrace()
-        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
             .addNetworkCondition { downstream() }
             .run(Terminal(), PhaseCode.ABC)
 
 //        fun normalUpstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalUpstreamTrace()
-        Tracing.connectedEquipmentTrace()
+        Tracing.equipmentNetworkTrace()
             .addNetworkCondition { upstream() }
             .run(Terminal(), PhaseCode.ABC)
 
 //        fun currentUpstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentUpstreamTrace()
-        Tracing.connectedEquipmentTrace(networkStateOperators = NetworkStateOperators.CURRENT)
+        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
             .addNetworkCondition { upstream() }
             .run(Terminal(), PhaseCode.ABC)
 

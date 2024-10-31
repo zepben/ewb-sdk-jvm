@@ -112,7 +112,7 @@ class SetPhases(
 
     private fun List<NominalPhasePath>.toPhases(): Sequence<SinglePhaseKind> = this.asSequence().map { it.to }
 
-    private fun createNetworkTrace(): NetworkTrace<PhasesToFlow> = Tracing.connectedTerminalTrace(
+    private fun createNetworkTrace(): NetworkTrace<PhasesToFlow> = Tracing.terminalNetworkTrace(
         networkStateOperators = networkStateOperators,
         queueFactory = { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
         branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },

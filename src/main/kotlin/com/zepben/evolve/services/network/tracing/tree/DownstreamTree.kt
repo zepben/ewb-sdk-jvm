@@ -22,7 +22,7 @@ class DownstreamTree(
     networkStateOperators: NetworkStateOperators
 ) {
 
-    private val traversal: NetworkTrace<TreeNode> = Tracing.connectedEquipmentTrace(
+    private val traversal: NetworkTrace<TreeNode> = Tracing.equipmentNetworkTrace(
         networkStateOperators = networkStateOperators,
         queueFactory = { WeightedPriorityQueue.processQueue { it.data.sortWeight } },
         branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.data.sortWeight } },

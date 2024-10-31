@@ -39,6 +39,10 @@ class SetDirection(
                 else -> FeederDirection.NONE
             }
 
+            // NOTE: Stopping / short circuiting by checking that the next direction is already present in the toTerminal,
+            //       causes stop certain looping network configurations not to be reprocessed. This means that some parts of
+            //       loops do not end up with BOTH directions. This is done to stop massive computational blowout on
+            //       on large networks with weird looping connectivity that rarely happens in reality.
             if (nextDirection == FeederDirection.NONE || nextDirection in networkStateOperators.getDirection(nextPath.toTerminal))
                 FeederDirection.NONE
             else

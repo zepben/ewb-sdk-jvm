@@ -13,7 +13,6 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.services.network.tracing.connectivity.PhasePaths.straightPhaseConnectivity
 import com.zepben.evolve.services.network.tracing.connectivity.PhasePaths.viableInferredPhaseConnectivity
-import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 object TerminalConnectivityConnected {

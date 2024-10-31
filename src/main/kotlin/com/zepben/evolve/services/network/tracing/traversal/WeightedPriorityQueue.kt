@@ -1,15 +1,13 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network.tracing.traversalV2
+package com.zepben.evolve.services.network.tracing.traversal
 
-import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
-import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 import java.util.*
 
 /**
@@ -73,13 +71,13 @@ class WeightedPriorityQueue<T>(
          * Special priority queue that queues items with the largest weight as the highest priority.
          */
         @JvmStatic
-        fun <T> processQueue(getWeight: (T) -> Int): TraversalQueue<T> = WeightedPriorityQueue({ BasicQueue.depthFirst() }, getWeight)
+        fun <T> processQueue(getWeight: (T) -> Int): TraversalQueue<T> = WeightedPriorityQueue({ TraversalQueue.depthFirst() }, getWeight)
 
         /**
          * Special priority queue that queues branch items with the largest weight on the starting item as the highest priority.
          */
         fun <T, U : Traversal<T, *>> branchQueue(getWeight: (T) -> Int): TraversalQueue<U> = WeightedPriorityQueue(
-            { BasicQueue.breadthFirst() },
+            { TraversalQueue.breadthFirst() },
             { traversal -> traversal.startItems().firstOrNull()?.let { getWeight(it) } ?: -1 }
         )
 

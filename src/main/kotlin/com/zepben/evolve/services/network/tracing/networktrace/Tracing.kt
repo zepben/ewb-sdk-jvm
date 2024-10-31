@@ -17,8 +17,7 @@ import com.zepben.evolve.services.network.tracing.networktrace.operators.Network
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.RemovePhases
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
-import com.zepben.evolve.services.network.tracing.traversals.BasicQueue
-import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
+import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
 import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
 
 object Tracing {
@@ -27,7 +26,7 @@ object Tracing {
     @JvmOverloads
     fun <T> connectedEquipmentTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
+        queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
         computeNextT: ComputeNextT<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(networkStateOperators, queue, true, computeNextT)
@@ -35,7 +34,7 @@ object Tracing {
 
     fun <T> connectedEquipmentTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
+        queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
         computeNextT: ComputeNextTWithPaths<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(networkStateOperators, queue, true, computeNextT)
@@ -43,15 +42,15 @@ object Tracing {
 
     fun connectedEquipmentTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queue: TraversalQueue<NetworkTraceStep<Unit>> = BasicQueue.depthFirst(),
+        queue: TraversalQueue<NetworkTraceStep<Unit>> = TraversalQueue.depthFirst(),
     ): NetworkTrace<Unit> {
         return connectedEquipmentTrace(networkStateOperators, queue) { _, _, _ -> }
     }
 
     fun <T> connectedEquipmentTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { BasicQueue.depthFirst() },
-        branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { BasicQueue.breadthFirst() },
+        queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
+        branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
         computeNextT: ComputeNextT<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, true, null, computeNextT)
@@ -59,8 +58,8 @@ object Tracing {
 
     fun <T> connectedEquipmentTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { BasicQueue.depthFirst() },
-        branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { BasicQueue.breadthFirst() },
+        queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
+        branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
         computeNextT: ComputeNextTWithPaths<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, true, null, computeNextT)
@@ -68,8 +67,8 @@ object Tracing {
 
     fun connectedEquipmentTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queueFactory: () -> TraversalQueue<NetworkTraceStep<Unit>> = { BasicQueue.depthFirst() },
-        branchQueueFactory: () -> TraversalQueue<NetworkTrace<Unit>> = { BasicQueue.breadthFirst() },
+        queueFactory: () -> TraversalQueue<NetworkTraceStep<Unit>> = { TraversalQueue.depthFirst() },
+        branchQueueFactory: () -> TraversalQueue<NetworkTrace<Unit>> = { TraversalQueue.breadthFirst() },
     ): NetworkTrace<Unit> {
         return connectedEquipmentTrace(networkStateOperators, queueFactory, branchQueueFactory) { _, _, _, _ -> }
     }
@@ -77,7 +76,7 @@ object Tracing {
     // TODO [Review]: Remove "TerminalTrace" and "connectedEquipmentTrace" and just have "networkTrace" which takes the onlyActionEquipment flag
     fun <T> connectedTerminalTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
+        queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
         computeNextT: ComputeNextT<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(networkStateOperators, queue, false, computeNextT)
@@ -85,7 +84,7 @@ object Tracing {
 
     fun <T> connectedTerminalTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queue: TraversalQueue<NetworkTraceStep<T>> = BasicQueue.depthFirst(),
+        queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
         computeNextT: ComputeNextTWithPaths<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(networkStateOperators, queue, false, computeNextT)
@@ -93,15 +92,15 @@ object Tracing {
 
     fun connectedTerminalTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queue: TraversalQueue<NetworkTraceStep<Unit>> = BasicQueue.depthFirst(),
+        queue: TraversalQueue<NetworkTraceStep<Unit>> = TraversalQueue.depthFirst(),
     ): NetworkTrace<Unit> {
         return connectedTerminalTrace(networkStateOperators, queue) { _, _, _ -> }
     }
 
     fun <T> connectedTerminalTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { BasicQueue.depthFirst() },
-        branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { BasicQueue.breadthFirst() },
+        queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
+        branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
         computeNextT: ComputeNextT<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, false, null, computeNextT)
@@ -109,8 +108,8 @@ object Tracing {
 
     fun <T> connectedTerminalTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { BasicQueue.depthFirst() },
-        branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { BasicQueue.breadthFirst() },
+        queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
+        branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
         computeNextT: ComputeNextTWithPaths<T>,
     ): NetworkTrace<T> {
         return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, false, null, computeNextT)
@@ -118,8 +117,8 @@ object Tracing {
 
     fun connectedTerminalTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queueFactory: () -> TraversalQueue<NetworkTraceStep<Unit>> = { BasicQueue.depthFirst() },
-        branchQueueFactory: () -> TraversalQueue<NetworkTrace<Unit>> = { BasicQueue.breadthFirst() },
+        queueFactory: () -> TraversalQueue<NetworkTraceStep<Unit>> = { TraversalQueue.depthFirst() },
+        branchQueueFactory: () -> TraversalQueue<NetworkTrace<Unit>> = { TraversalQueue.breadthFirst() },
     ): NetworkTrace<Unit> {
         return connectedTerminalTrace(networkStateOperators, queueFactory, branchQueueFactory) { _, _, _, _ -> }
     }

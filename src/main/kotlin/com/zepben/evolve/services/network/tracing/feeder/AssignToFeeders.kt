@@ -21,7 +21,7 @@ import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.networktrace.run
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 /**
  * Convenience class that provides methods for assigning HV/MV feeders on a [NetworkService].

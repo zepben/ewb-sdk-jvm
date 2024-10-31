@@ -1,25 +1,22 @@
 /*
- * Copyright 2023 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-package com.zepben.evolve.services.network.tracing.traversalV2
+package com.zepben.evolve.services.network.tracing.traversal
 
-import com.zepben.evolve.services.network.tracing.traversals.Tracker
-import com.zepben.evolve.services.network.tracing.traversals.TraversalQueue
 import java.util.*
 import kotlin.collections.ArrayDeque
 
 /**
  *
- * Base class that provides some common functionality for traversals. This includes things like registering callbacks
- * to be called at every step in the traversal as well as registering stop conditions that traversals can check for when
- * to stop following a path.
- *
- * This base class does not actually provide any way to traverse the items. It needs to be implemented in
- * subclasses. See [BasicTraversal] for an example.
+ * Base class for a Traversal. This provides most of the public interface and implementations for a traversal.
+
+ * This cannot be a concrete class because it requires a final type for branching type traversals. It also
+ * leaves how to add start items up to the derived class implementer as this can often be cleaner, or a
+ * simpler interface if the [T] is a complex object. See [NetworkTrace] for an example.
  *
  * Note this class is not thread safe!
  *
@@ -86,16 +83,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     protected open fun canActionItem(item: T, context: StepContext): Boolean = true
     protected abstract fun getDerivedThis(): D
     protected abstract fun createNewThis(): D
-
-    fun addConditions(vararg conditions: TraversalCondition<T>): D {
-        conditions.forEach { addCondition(it) }
-        return getDerivedThis()
-    }
-
-    fun addConditions(conditions: Collection<TraversalCondition<T>>): D {
-        conditions.forEach { addCondition(it) }
-        return getDerivedThis()
-    }
 
     fun addCondition(condition: TraversalCondition<T>): D {
         when (condition) {

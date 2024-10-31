@@ -12,8 +12,8 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversalV2.Traversal
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.Traversal
 
 private typealias CheckInService = (ConductingEquipment) -> Boolean
 

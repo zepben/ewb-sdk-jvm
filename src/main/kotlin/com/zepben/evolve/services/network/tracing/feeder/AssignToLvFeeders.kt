@@ -68,7 +68,7 @@ class AssignToLvFeeders(
         lvFeederStartPoints: Set<ConductingEquipment>,
         lvFeedersToAssign: List<LvFeeder>,
     ): NetworkTrace<Unit> {
-        return Tracing.connectedTerminalTrace(networkStateOperators)
+        return Tracing.terminalNetworkTrace(networkStateOperators)
             .addNetworkCondition { stopAtOpen() }
             .addStopCondition { (path), _ -> lvFeederStartPoints.contains(path.toEquipment) }
             .addQueueCondition { (path), _, _, _ -> !reachedHv(path.toEquipment) }

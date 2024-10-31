@@ -17,8 +17,8 @@ import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.FeederDirectionStateOperations
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
 
 /**
  * Convenience class that provides methods for removing feeder direction on a [NetworkService]
@@ -37,7 +37,7 @@ class RemoveDirection(
         computeNextT = ::computeNextDirectionToRemove
     )
         .addNetworkCondition { stopAtOpen() }
-        .addStepAction { item, context ->
+        .addStepAction { item, _ ->
             item.data.removedDirection = directionOperators.removeDirection(item.path.toTerminal, item.data.direction)
         }
         .addQueueCondition { (_, directionToRemove), _, _, _ ->
@@ -57,6 +57,7 @@ class RemoveDirection(
         traversal.reset().run(terminal, DirectionToRemove(directionToRemove), canStopOnStartItem = false)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun computeNextDirectionToRemove(
         currentStep: NetworkTraceStep<DirectionToRemove>,
         context: StepContext,

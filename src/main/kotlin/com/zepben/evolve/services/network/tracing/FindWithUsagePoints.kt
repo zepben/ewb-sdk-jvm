@@ -11,17 +11,17 @@ package com.zepben.evolve.services.network.tracing
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
 import com.zepben.evolve.services.network.tracing.networktrace.StepPath
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.networktrace.run
-import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
 import java.util.*
 
 /**
  * Convenience class that provides methods for finding downstream conducting equipment with attached usage points.
- * This class is backed by a [BasicTraversal].
+ * This class is backed by a [NetworkTrace].
  *
  * @property virtualUsagePointCondition Indicates how the search will handle virtual [UsagePoint] instances.
  */

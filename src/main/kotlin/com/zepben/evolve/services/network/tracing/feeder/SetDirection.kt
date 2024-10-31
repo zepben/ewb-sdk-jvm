@@ -17,7 +17,7 @@ import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue
+import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
 
 /**
  * Convenience class that provides methods for setting feeder direction on a [NetworkService]

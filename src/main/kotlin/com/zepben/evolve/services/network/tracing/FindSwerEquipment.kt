@@ -26,7 +26,7 @@ class FindSwerEquipment(
     val stateOperators: NetworkStateOperators,
 ) {
 
-    private val createTrace = { Tracing.connectedEquipmentTrace(stateOperators).addNetworkCondition { stopAtOpen() } }
+    private val createTrace = { Tracing.equipmentNetworkTrace(stateOperators).addNetworkCondition { stopAtOpen() } }
 
     /**
      * Find the [ConductingEquipment] on any [Feeder] in a [NetworkService] which is SWER. This will include any equipment on the LV network that is energised

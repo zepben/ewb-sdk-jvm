@@ -61,7 +61,7 @@ class FindWithUsagePoints(
         var pathFound = to == null
         val withUsagePoints = mutableMapOf<String, ConductingEquipment>()
 
-        val traversal = Tracing.connectedEquipmentTrace(stateOperators).addNetworkCondition { downstream() }
+        val traversal = Tracing.equipmentNetworkTrace(stateOperators).addNetworkCondition { downstream() }
         traversal.addStopCondition { (path), _ -> extentIds.contains(path.toEquipment.mRID) }
         if ((virtualUsagePointCondition == VirtualUsagePointCondition.LV_AGGREGATION_ONLY) || (virtualUsagePointCondition == VirtualUsagePointCondition.ALL)) {
             traversal.addStopCondition { (path), _ -> shouldExcludeLv(path) }

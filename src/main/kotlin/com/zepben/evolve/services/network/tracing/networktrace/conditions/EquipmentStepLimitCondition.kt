@@ -9,8 +9,8 @@
 package com.zepben.evolve.services.network.tracing.networktrace.conditions
 
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversalV2.StopCondition
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.StopCondition
 
 class EquipmentStepLimitCondition<T>(
     private val limit: Int

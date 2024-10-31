@@ -24,7 +24,7 @@ import com.zepben.evolve.services.network.testdata.SplitIndividualPhasesFromJunc
 import com.zepben.evolve.services.network.testdata.SplitSinglePhasesFromJunctionNetwork
 import com.zepben.evolve.services.network.testdata.createJunctionForConnecting
 import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
-import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
+import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*

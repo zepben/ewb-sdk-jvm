@@ -17,9 +17,9 @@ import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.StepPath
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue.Companion.branchQueue
-import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue.Companion.processQueue
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue.Companion.branchQueue
+import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue.Companion.processQueue
 
 /**
  * Convenience class that provides methods for removing phases on a [NetworkService]
@@ -76,6 +76,7 @@ class RemovePhases(
                 nextStep.data.phasesToEbb.isNotEmpty()
             }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun computeNextEbbPhases(step: NetworkTraceStep<EbbPhases>, context: StepContext, nextPath: StepPath): EbbPhases {
         val phasesToEbb = nextPath.nominalPhasePaths.asSequence().map { it.to }.filter { it in step.data.phasesToEbb }.toSet()
         return EbbPhases(phasesToEbb)

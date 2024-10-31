@@ -11,7 +11,6 @@ package com.zepben.evolve.services.network.tracing.connectivity
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 
 /**
  * Stores the connectivity between two terminals, including the mapping between the nominal phases.

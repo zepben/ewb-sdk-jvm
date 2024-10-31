@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
-import com.zepben.evolve.services.network.tracing.traversals.Tracker
+import com.zepben.evolve.services.network.tracing.traversal.Tracker
 
 internal class NetworkTraceTracker<T>(
     private val keySelector: (NetworkTraceStep<T>) -> Any?,

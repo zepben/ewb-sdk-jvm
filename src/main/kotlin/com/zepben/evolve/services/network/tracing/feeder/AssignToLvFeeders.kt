@@ -20,13 +20,12 @@ import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.networktrace.run
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 /**
  * Convenience class that provides methods for assigning LV feeders on a [NetworkService].
  * Requires that a Feeder have a normalHeadTerminal with associated ConductingEquipment.
- * This class is backed by a [BasicTraversal].
+ * This class is backed by a [NetworkTrace].
  */
 class AssignToLvFeeders(
     private val networkStateOperators: NetworkStateOperators

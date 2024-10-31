@@ -10,8 +10,8 @@ package com.zepben.evolve.services.network.tracing.networktrace.conditions
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversalV2.StopConditionWithContextValue
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.StopConditionWithContextValue
 import kotlin.reflect.KClass
 
 internal class EquipmentTypeStepLimitCondition<T>(

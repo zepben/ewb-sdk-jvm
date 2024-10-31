@@ -14,18 +14,17 @@ import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityInternal
 import com.zepben.evolve.services.network.tracing.networktrace.*
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
-import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
-import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
-import com.zepben.evolve.services.network.tracing.traversalV2.WeightedPriorityQueue as WeightedPriorityQueueV2
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
 
 /**
  * Convenience class that provides methods for setting phases on a [NetworkService]
- * This class is backed by a [BranchRecursiveTraversal].
+ * This class is backed by a [NetworkTrace].
  */
 class SetPhases(
     val networkStateOperators: NetworkStateOperators
@@ -116,7 +115,7 @@ class SetPhases(
     private fun createNetworkTrace(): NetworkTrace<PhasesToFlow> = Tracing.connectedTerminalTrace(
         networkStateOperators = networkStateOperators,
         queueFactory = { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
-        branchQueueFactory = { WeightedPriorityQueueV2.branchQueue { it.path.toTerminal.phases.numPhases() } },
+        branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
         computeNextT = ::computeNextPhasesToFlow
     )
         .addQueueCondition { nextStep, _, _, _ ->
@@ -131,6 +130,7 @@ class SetPhases(
             }
         }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun computeNextPhasesToFlow(step: NetworkTraceStep<PhasesToFlow>, ctx: StepContext, nextPath: StepPath): PhasesToFlow {
         // If the current step didn't flow any phases, we don't attempt to flow any further.
         if (!step.data.stepFlowedPhases)

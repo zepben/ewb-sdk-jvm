@@ -10,7 +10,9 @@ package com.zepben.evolve.services.network.tracing.traversalV2
 
 class StepContext(
     val isStartItem: Boolean,
+    val isBranchStartItem: Boolean,
     val stepNumber: Int = 0,
+    val branchDepth: Int,
     private var values: MutableMap<String, Any?>? = null
 ) {
     var isStopping: Boolean = false

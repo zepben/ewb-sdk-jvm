@@ -12,7 +12,6 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.phases.PhaseValidator.validatePhases
 import com.zepben.evolve.testing.TestNetworkBuilder
@@ -142,7 +141,6 @@ internal class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoXYNtoXYtoBC() {
-        Tracing.normalPhaseTrace()
         val network = TestNetworkBuilder()
             .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.XYN)
@@ -176,7 +174,6 @@ internal class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoXYtoXYNtoBC() {
-        Tracing.normalPhaseTrace()
         val network = TestNetworkBuilder()
             .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.XY)

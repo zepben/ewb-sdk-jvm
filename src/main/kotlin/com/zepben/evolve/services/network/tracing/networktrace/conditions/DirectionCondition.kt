@@ -12,8 +12,8 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection.*
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
-import com.zepben.evolve.services.network.tracing.traversalV2.QueueCondition
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.QueueCondition
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 internal class DirectionCondition<T>(
     private val direction: FeederDirection,

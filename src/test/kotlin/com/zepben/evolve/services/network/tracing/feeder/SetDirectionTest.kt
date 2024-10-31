@@ -429,12 +429,12 @@ internal class SetDirectionTest {
         get<ConductingEquipment>(id)!!.getTerminal(terminalId)!!
 
     private fun checkExpectedDirection(t: Terminal, normalDirection: FeederDirection, currentDirection: FeederDirection = normalDirection) {
-        checkExpectedDirection(t, normalDirection, DirectionSelector.NORMAL_DIRECTION)
-        checkExpectedDirection(t, currentDirection, DirectionSelector.CURRENT_DIRECTION)
+        checkExpectedDirection(t, normalDirection, NetworkStateOperators.NORMAL::getDirection)
+        checkExpectedDirection(t, currentDirection, NetworkStateOperators.CURRENT::getDirection)
     }
 
-    private fun checkExpectedDirection(t: Terminal, direction: FeederDirection, directionSelector: DirectionSelector) {
-        assertThat(directionSelector.select(t).value, equalTo(direction))
+    private fun checkExpectedDirection(t: Terminal, direction: FeederDirection, directionSelector: (Terminal) -> FeederDirection) {
+        assertThat(directionSelector(t), equalTo(direction))
     }
 
 }

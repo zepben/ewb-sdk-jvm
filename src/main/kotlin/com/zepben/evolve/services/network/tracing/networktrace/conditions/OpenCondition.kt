@@ -8,19 +8,19 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace.conditions
 
+import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.tracing.OpenTest
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
-import com.zepben.evolve.services.network.tracing.traversalV2.QueueCondition
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.QueueCondition
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 internal class OpenCondition<T>(
-    private val openTest: OpenTest,
+    private val isOpen: (ConductingEquipment, SinglePhaseKind?) -> Boolean,
     private val phase: SinglePhaseKind? = null
 ) : QueueCondition<NetworkTraceStep<T>> {
     override fun shouldQueue(nextItem: NetworkTraceStep<T>, nextContext: StepContext, currentItem: NetworkTraceStep<T>, currentContext: StepContext): Boolean =
         if (nextItem.path.tracedInternally) {
-            !openTest.isOpen(nextItem.path.toEquipment, phase)
+            !isOpen(nextItem.path.toEquipment, phase)
         } else {
             true
         }

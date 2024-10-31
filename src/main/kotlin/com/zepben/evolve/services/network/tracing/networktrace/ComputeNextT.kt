@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
-import com.zepben.evolve.services.network.tracing.traversalV2.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 fun interface ComputeNextT<T> {
     fun compute(currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath): T

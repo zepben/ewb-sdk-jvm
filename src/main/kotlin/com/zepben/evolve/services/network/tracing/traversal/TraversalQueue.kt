@@ -6,7 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network.tracing.traversals
+package com.zepben.evolve.services.network.tracing.traversal
+
+import java.util.*
 
 /**
  * A simple queue interface used for traversals.
@@ -66,4 +68,29 @@ interface TraversalQueue<T> {
      */
     fun clear()
 
+    companion object {
+
+        /**
+         * Creates a new instance backed by a breadth first (FIFO) queue.
+         *
+         * @param T Type to be held by the queue.
+         * @return The new instance.
+         */
+        @JvmStatic
+        fun <T> breadthFirst(): TraversalQueue<T> {
+            return BasicQueue(ArrayDeque())
+        }
+
+        /**
+         * Creates a new instance backed by a depth first (LIFO) queue.
+         *
+         * @param T Type to be held by the queue.
+         * @return The new instance.
+         */
+        @JvmStatic
+        fun <T> depthFirst(): TraversalQueue<T> {
+            return BasicQueue(Collections.asLifoQueue(ArrayDeque()))
+        }
+
+    }
 }

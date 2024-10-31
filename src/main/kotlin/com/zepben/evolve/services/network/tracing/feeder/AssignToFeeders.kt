@@ -58,7 +58,7 @@ class AssignToFeeders(
         feederStartPoints: Set<ConductingEquipment>,
         feedersToAssign: List<Feeder>,
     ): NetworkTrace<Unit> {
-        return Tracing.connectedTerminalTrace(networkStateOperators)
+        return Tracing.terminalNetworkTrace(networkStateOperators)
             .addNetworkCondition { stopAtOpen() }
             .addStopCondition { (path), _ -> feederStartPoints.contains(path.toEquipment) }
             .addQueueCondition { (path), _, _, _ -> !reachedSubstationTransformer(path.toEquipment) }

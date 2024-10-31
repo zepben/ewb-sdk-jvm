@@ -79,7 +79,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     private val stopConditions = mutableListOf<StopCondition<T>>()
     private val queueConditions = mutableListOf<QueueCondition<T>>()
     private val stepActions = mutableListOf<StepAction<T>>()
-    private val branchStartActions = mutableListOf<StepAction<T>>()
 
     private val computeNextContextFuns: MutableMap<String, ContextValueComputer<T>> = mutableMapOf()
     private val contexts: IdentityHashMap<T, StepContext> = IdentityHashMap()
@@ -256,27 +255,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         return getDerivedThis()
     }
 
-    // TODO [Review]: Is removing this and adding to the StepContext if it is a branch better?
-    fun addBranchStartAction(onBranchStart: StepAction<T>): D {
-        branchStartActions.add(onBranchStart)
-        return getDerivedThis()
-    }
-
-    fun clearBranchStartActions(): D {
-        branchStartActions.clear()
-        return getDerivedThis()
-    }
-
-    fun copyBranchStartActions(other: Traversal<T, D>): D {
-        branchStartActions.addAll(other.branchStartActions)
-        return getDerivedThis()
-    }
-
-    private fun applyBranchStartActions(item: T, context: StepContext): D {
-        branchStartActions.forEach { it.apply(item, context) }
-        return getDerivedThis()
-    }
-
     private fun computeInitialContext(nextStep: T): StepContext {
         var newContextData: MutableMap<String, Any?>? = null
 
@@ -285,11 +263,11 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
             newContextData[key] = computer.computeInitialValue(nextStep)
         }
 
-        return StepContext(true, 0, newContextData)
+        return StepContext(true, false, 0, 0, newContextData)
     }
 
 
-    private fun computeNextContext(currentItem: T, context: StepContext, nextStep: T): StepContext {
+    private fun computeNextContext(currentItem: T, context: StepContext, nextStep: T, isBranchStart: Boolean): StepContext {
         var newContextData: MutableMap<String, Any?>? = null
 
         for ((key, computer) in computeNextContextFuns) {
@@ -297,7 +275,8 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
             newContextData[key] = computer.computeNextValue(nextStep, currentItem, context.getValue(key))
         }
 
-        return StepContext(false, context.stepNumber + 1, newContextData)
+        val branchDepth = if (isBranchStart) context.branchDepth + 1 else context.branchDepth
+        return StepContext(false, isBranchStart, context.stepNumber + 1, branchDepth, newContextData)
     }
 
     fun addStartItem(item: T): D {
@@ -335,7 +314,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         running = true
         hasRun = true
 
-        if (queueType is BranchingQueueType && startItems.size > 1) {
+        if (parent == null && queueType is BranchingQueueType && startItems.size > 1) {
             branchStartItems()
         } else {
             traverse(canStopOnStartItem)
@@ -392,15 +371,11 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
             while (queue.hasNext()) {
                 queue.next()?.let { current ->
                     if (tracker.visit(current)) {
-                        val context = contexts[current] ?: error { "INTERNAL ERROR: Traversal item should always have a context" }
+                        val context = getStepContext(current)
                         val canAction = canActionItem(current, context)
 
                         if (canAction) {
                             context.isStopping = canStop && matchesAnyStopCondition(current, context)
-                        }
-
-                        if (parent != null && current === startItem) {
-                            applyBranchStartActions(current, context)
                         }
 
                         if (canAction) {
@@ -418,13 +393,14 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         }
     }
 
+    private fun getStepContext(item: T): StepContext = contexts[item] ?: error { "INTERNAL ERROR: Traversal item should always have a context" }
+
     private fun createNewBranch(startItem: T, context: StepContext): D {
         return createNewThis().also {
             it.copyQueueConditions(this)
             it.copyStepActions(this)
             it.copyStopConditions(this)
             it.copyContextValueComputers(this)
-            it.copyBranchStartActions(this)
 
             it.contexts[startItem] = context
             it.addStartItem(startItem)
@@ -432,7 +408,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     }
 
     private fun itemQueuer(currentItem: T, currentContext: StepContext): (T) -> Boolean = { nextItem ->
-        val nextContext = computeNextContext(currentItem, currentContext, nextItem)
+        val nextContext = computeNextContext(currentItem, currentContext, nextItem, false)
         if (canQueueItem(nextItem, nextContext, currentItem, currentContext) && queue.add(nextItem)) {
             contexts[nextItem] = nextContext
             true
@@ -447,7 +423,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
 
     private fun queueNextBranching(current: T, currentContext: StepContext, queueNext: BranchingQueueNext<T>) {
         val queueBranch = { nextItem: T ->
-            val nextContext = computeNextContext(current, currentContext, nextItem)
+            val nextContext = computeNextContext(current, currentContext, nextItem, true)
             if (canQueueItem(nextItem, nextContext, current, currentContext)) {
                 val branch = createNewBranch(nextItem, nextContext)
                 branchQueue?.add(branch) ?: throw IllegalStateException("INTERNAL ERROR: branchQueue should never be null here")

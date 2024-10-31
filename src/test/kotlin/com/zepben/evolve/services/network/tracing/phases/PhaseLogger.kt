@@ -65,7 +65,7 @@ internal class PhaseLogger private constructor(asset: ConductingEquipment) : Ste
             assets.forEach { asset ->
                 val pl = PhaseLogger(asset!!)
 
-                Tracing.connectedEquipmentTrace()
+                Tracing.equipmentNetworkTrace()
                     .addStepAction(pl)
                     .run(asset)
 

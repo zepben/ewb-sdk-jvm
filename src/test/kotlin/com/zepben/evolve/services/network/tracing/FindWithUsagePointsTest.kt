@@ -117,10 +117,6 @@ internal class FindWithUsagePointsTest {
             validate(findWithUsagePoints.run(tx, s), NO_ERROR, listOf(tx.mRID))
         }
 
-        // TODO [Review]: This fails now because there is no downstream terminal in this case. With the change that a start terminal is not stepped on
-        //                if it doesn't match the direction condition on the network trace, the trace now steps on nothing. What to do?
-        //                Manually check from and add it if it matches the usage point conditions?
-        //                Change the direction condition to pass a flag to say if it can start on a non matching direction?
         validateSingleTransformerNetwork(1)
         validateSingleTransformerNetwork(2)
     }

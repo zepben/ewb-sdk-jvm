@@ -75,7 +75,7 @@ object Tracing {
         queueFactory: () -> TraversalQueue<NetworkTraceStep<Unit>> = { TraversalQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<Unit>> = { TraversalQueue.breadthFirst() },
     ): NetworkTrace<Unit> {
-        return equipmentNetworkTrace(networkStateOperators, queueFactory, branchQueueFactory) { _, _, _, _ -> }
+        return equipmentNetworkTrace(networkStateOperators, queueFactory, branchQueueFactory) { _, _, _ -> }
     }
 
     @JvmStatic

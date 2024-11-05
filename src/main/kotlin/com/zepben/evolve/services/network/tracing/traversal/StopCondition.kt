@@ -8,8 +8,26 @@
 
 package com.zepben.evolve.services.network.tracing.traversal
 
+/**
+ * Functional interface representing a condition that determines whether the traversal should stop at a given item.
+ *
+ * @param T The type of items being traversed.
+ */
 fun interface StopCondition<T> : TraversalCondition<T> {
+    /**
+     * Determines whether the traversal should stop at the specified item.
+     *
+     * @param item The current item being processed in the traversal.
+     * @param context The context associated with the current traversal step.
+     * @return `true` if the traversal should stop at this item; `false` otherwise.
+     */
     fun shouldStop(item: T, context: StepContext): Boolean
 }
 
-abstract class StopConditionWithContextValue<T, U> : StopCondition<T>, TypedContextValueComputer<T, U>
+/**
+ * Interface representing a stop condition that requires a value stored in the [StepContext] to determine if an item should be queued.
+ *
+ * @param T The type of items being traversed.
+ * @param U The type of the context value computed and used in the condition.
+ */
+interface StopConditionWithContextValue<T, U> : StopCondition<T>, TypedContextValueComputer<T, U>

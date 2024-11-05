@@ -1,170 +1,117 @@
 package com.zepben.evolve.services.network.tracing.networktrace
 
-import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.Switch
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.limitEquipmentSteps
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
-import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.upstream
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.sameInstance
 import org.junit.jupiter.api.Test
 
 class TracingTest {
 
     @Test
-    fun playground() {
-        Tracing.equipmentNetworkTrace()
-            .run(Terminal(), canStopOnStartItem = false)
+    fun normalDownstreamTree() {
+        val trace = Tracing.normalDownstreamTree()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
     }
 
     @Test
-    fun `tracing replacements`() {
-        /**
-         * Here are the functions from the original Tracing.kt to create tracing functions.
-         * I am trying to prove if we can replace most of these with just the `NetworkTrace` class
-         */
+    fun currentDownstreamTree() {
+        val trace = Tracing.currentDownstreamTree()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    }
 
-        // fun connectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newConnectedEquipmentTrace()
-        Tracing.equipmentNetworkTrace()
+    @Test
+    fun normalSetDirection() {
+        val trace = Tracing.normalSetDirection()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+    }
 
-//        fun connectedEquipmentBreadthTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newConnectedEquipmentBreadthTrace()
-        Tracing.equipmentNetworkTrace(queue = TraversalQueue.breadthFirst())
+    @Test
+    fun currentSetDirection() {
+        val trace = Tracing.currentSetDirection()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    }
 
-//        fun normalConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newNormalConnectedEquipmentTrace()
-        Tracing.equipmentNetworkTrace()
-            .addNetworkCondition { stopAtOpen() }
+    @Test
+    fun normalRemoveDirection() {
+        val trace = Tracing.normalRemoveDirection()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+    }
 
-//        fun currentConnectedEquipmentTrace(): ConnectedEquipmentTraversal = ConnectedEquipmentTrace.newCurrentConnectedEquipmentTrace()
-        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
-            .addNetworkCondition { stopAtOpen() }
+    @Test
+    fun currentRemoveDirection() {
+        val trace = Tracing.currentRemoveDirection()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    }
 
-        /*
-         TODO: Investigate more how the limited trace work. I don't think what I've done matches what is there,
-               but I'm hoping we can do something like what I've done here
-         */
-//        fun normalLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace = ConnectedEquipmentTrace.newNormalLimitedConnectedEquipmentTrace()
-        Tracing.equipmentNetworkTrace()
-            .addNetworkCondition { stopAtOpen() }
-            .addCondition(limitEquipmentSteps(10))
+    @Test
+    fun normalAssignEquipmentToFeeders() {
+        val trace = Tracing.normalAssignEquipmentToFeeders()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+    }
 
+    @Test
+    fun currentAssignEquipmentToFeeders() {
+        val trace = Tracing.currentAssignEquipmentToFeeders()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    }
 
-//        fun currentLimitedConnectedEquipmentTrace(): LimitedConnectedEquipmentTrace = ConnectedEquipmentTrace.newCurrentLimitedConnectedEquipmentTrace()
-        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
-            .addNetworkCondition { stopAtOpen() }
-            .addCondition(limitEquipmentSteps(10, Switch::class)) // If you want to limit to 10 switches
+    @Test
+    fun normalAssignEquipmentToLvFeeders() {
+        val trace = Tracing.normalAssignEquipmentToLvFeeders()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+    }
 
-//        fun normalDownstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = TraversalQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
-//            ConnectedEquipmentTrace.newNormalDownstreamEquipmentTrace(queue)
-        Tracing.equipmentNetworkTrace()
-            .addNetworkCondition { downstream() }
+    @Test
+    fun currentAssignEquipmentToLvFeeders() {
+        val trace = Tracing.currentAssignEquipmentToLvFeeders()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    }
 
-//        fun currentDownstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = TraversalQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
-//            ConnectedEquipmentTrace.newCurrentDownstreamEquipmentTrace(queue)
-        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
-            .addNetworkCondition { downstream() }
+    @Test
+    fun normalSetPhases() {
+        val trace = Tracing.normalSetPhases()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+    }
 
-//        fun normalUpstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = TraversalQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
-//            ConnectedEquipmentTrace.newNormalUpstreamEquipmentTrace(queue)
-        Tracing.equipmentNetworkTrace()
-            .addNetworkCondition { upstream() }
+    @Test
+    fun currentSetPhases() {
+        val trace = Tracing.currentSetPhases()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    }
 
-//        fun currentUpstreamEquipmentTrace(queue: TraversalQueue<ConductingEquipment> = TraversalQueue.depthFirst()): BasicTraversal<ConductingEquipment> =
-//            ConnectedEquipmentTrace.newCurrentUpstreamEquipmentTrace(queue)
-        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
-            .addNetworkCondition { upstream() }
+    @Test
+    fun normalPhaseInferrer() {
+        val trace = Tracing.normalPhaseInferrer()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+    }
 
-        // NOTE: The new phase tracing doesn't map 1 to 1 to what was previously there. When we reviewed the
-        //       difference between 'connectivity trace' and 'phase trace' and their use cases we felt they
-        //       were not needed and just made things confusing.
-        //       We are hoping the new phase tracing covers existing use cases as it is easier to understand.
+    @Test
+    fun currentPhaseInferrer() {
+        val trace = Tracing.currentPhaseInferrer()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    }
 
-//        fun connectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newConnectivityTrace()
-//        fun phaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newTrace()
-        Tracing.equipmentNetworkTrace()
-//            .addCondition(withPhases(PhaseCode.ABCN))
-            .addStepAction { step, _ ->
-                val phasePaths = step.path.nominalPhasePaths
-            }
-            .run(Terminal(), PhaseCode.ABC)
+    @Test
+    fun normalRemovePhases() {
+        val trace = Tracing.normalRemovePhases()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+    }
 
-//        fun connectivityBreadthTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newConnectivityBreadthTrace()
-        Tracing.equipmentNetworkTrace(queue = TraversalQueue.breadthFirst())
-            .run(Terminal(), PhaseCode.ABC)
+    @Test
+    fun currentRemovePhases() {
+        val trace = Tracing.currentRemovePhases()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    }
 
-//        fun normalConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newNormalConnectivityTrace()
-//        fun normalPhaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalTrace()
-        Tracing.equipmentNetworkTrace()
-            .addNetworkCondition { stopAtOpen() }
-            .run(Terminal(), PhaseCode.ABC)
+    @Test
+    fun normalFindSwerEquipment() {
+        val trace = Tracing.normalFindSwerEquipment()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+    }
 
-//        fun currentConnectivityTrace(): BasicTraversal<ConnectivityResult> = ConnectivityTrace.newCurrentConnectivityTrace()
-//        fun currentPhaseTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentTrace()
-        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
-            .addNetworkCondition { stopAtOpen() }
-            .run(Terminal(), PhaseCode.ABC)
-
-//        fun normalDownstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalDownstreamTrace()
-        Tracing.equipmentNetworkTrace()
-            .addNetworkCondition { downstream() }
-            .run(Terminal(), PhaseCode.ABC)
-
-//        fun currentDownstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentDownstreamTrace()
-        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
-            .addNetworkCondition { downstream() }
-            .run(Terminal(), PhaseCode.ABC)
-
-//        fun normalUpstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newNormalUpstreamTrace()
-        Tracing.equipmentNetworkTrace()
-            .addNetworkCondition { upstream() }
-            .run(Terminal(), PhaseCode.ABC)
-
-//        fun currentUpstreamTrace(): BasicTraversal<PhaseStep> = PhaseTrace.newCurrentUpstreamTrace()
-        Tracing.equipmentNetworkTrace(networkStateOperators = NetworkStateOperators.CURRENT)
-            .addNetworkCondition { upstream() }
-            .run(Terminal(), PhaseCode.ABC)
-
-//        fun setDirection(): SetDirection = SetDirection()
-        Tracing.normalSetDirection()
-        Tracing.currentSetDirection()
-
-        // fun normalDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION)
-        Tracing.normalDownstreamTree()
-
-        // fun currentDownstreamTree(): DownstreamTree = DownstreamTree(OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION)
-        Tracing.currentDownstreamTree()
-
-//        fun removeDirection(): RemoveDirection = RemoveDirection()
-        Tracing.normalRemoveDirection()
-        Tracing.currentRemoveDirection()
-
-//        fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
-        Tracing.normalAssignEquipmentToFeeders()
-        Tracing.currentAssignEquipmentToFeeders()
-
-//        fun assignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
-        Tracing.normalAssignEquipmentToLvFeeders()
-        Tracing.currentAssignEquipmentToLvFeeders()
-
-//        fun setPhases(): SetPhases = SetPhases()
-        Tracing.normalSetPhases()
-        Tracing.currentSetPhases()
-
-//        fun phaseInferrer(): PhaseInferrer = PhaseInferrer()
-        Tracing.normalPhaseInferrer()
-        Tracing.currentPhaseInferrer()
-
-//        fun removePhases(): RemovePhases = RemovePhases()
-        Tracing.normalRemovePhases()
-        Tracing.currentRemovePhases()
-
-        /**
-         * TODO: Where do we want to define these now?
-         * Need to look at the rest of these.
-         */
-
-//        fun findWithUsagePoints(): FindWithUsagePoints = FindWithUsagePoints()
-
+    @Test
+    fun currentFindSwerEquipment() {
+        val trace = Tracing.currentFindSwerEquipment()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
     }
 }

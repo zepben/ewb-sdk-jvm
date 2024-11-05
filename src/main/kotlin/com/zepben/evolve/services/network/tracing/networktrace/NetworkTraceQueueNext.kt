@@ -102,7 +102,6 @@ internal object NetworkTraceQueueNext {
             // If we just visited a busbar, we step to the other terminals that share the same connectivity node.
             // Otherwise, we internally step to the other terminals on the equipment
             if (path.toEquipment is BusbarSection) {
-                // TODO [Review]: Is it safe to assume a single terminal as this is how it is supposed to be modelled?
                 // We don't need to step to terminals that are busbars as they would have been queued at the same time this busbar step was.
                 path.toTerminal.connectedTerminals().filter { it.conductingEquipment !is BusbarSection }
             } else {

@@ -8,8 +8,26 @@
 
 package com.zepben.evolve.services.network.tracing.traversal
 
+/**
+ * Functional interface representing an action to be performed at each step of a traversal.
+ * This allows for custom operations to be executed on each item during traversal.
+ *
+ * @param T The type of items being traversed.
+ */
 fun interface StepAction<T> {
+    /**
+     * Applies the action to the specified [item].
+     *
+     * @param item The current item in the traversal.
+     * @param context The context associated with the current traversal step.
+     */
     fun apply(item: T, context: StepContext)
 }
 
-abstract class StepActionWithContextValue<T, U> : StepAction<T>, TypedContextValueComputer<T, U>
+/**
+ * Interface representing a step action that utilises a value stored in the [StepContext].
+ *
+ * @param T The type of items being traversed.
+ * @param U The type of the context value computed and used in the action.
+ */
+interface StepActionWithContextValue<T, U> : StepAction<T>, TypedContextValueComputer<T, U>

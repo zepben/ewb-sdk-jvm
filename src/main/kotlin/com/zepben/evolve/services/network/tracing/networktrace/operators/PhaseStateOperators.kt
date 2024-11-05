@@ -11,16 +11,35 @@ package com.zepben.evolve.services.network.tracing.networktrace.operators
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.tracing.phases.PhaseStatus
 
+/**
+ * Interface for accessing the phase status of a terminal.
+ */
 interface PhaseStateOperators {
+    /**
+     * Retrieves the phase status of the specified terminal.
+     *
+     * @param terminal The terminal for which to retrieve the phase status.
+     * @return The phase status associated with the specified terminal.
+     */
     fun phaseStatus(terminal: Terminal): PhaseStatus
 
     companion object {
-        val NORMAL = object : PhaseStateOperators {
-            override fun phaseStatus(terminal: Terminal): PhaseStatus = terminal.normalPhases
-        }
+        /**
+         * Instance for accessing the normal phase status of terminals.
+         */
+        val NORMAL: PhaseStateOperators = NormalPhaseStateOperators()
 
-        val CURRENT = object : PhaseStateOperators {
-            override fun phaseStatus(terminal: Terminal): PhaseStatus = terminal.currentPhases
-        }
+        /**
+         * Instance for accessing the current phase status of terminals.
+         */
+        val CURRENT: PhaseStateOperators = CurrentPhaseStateOperators()
     }
+}
+
+private class NormalPhaseStateOperators : PhaseStateOperators {
+    override fun phaseStatus(terminal: Terminal): PhaseStatus = terminal.normalPhases
+}
+
+private class CurrentPhaseStateOperators : PhaseStateOperators {
+    override fun phaseStatus(terminal: Terminal): PhaseStatus = terminal.currentPhases
 }

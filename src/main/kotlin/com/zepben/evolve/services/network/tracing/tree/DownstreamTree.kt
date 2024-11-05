@@ -19,11 +19,11 @@ import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueu
 
 
 class DownstreamTree(
-    networkStateOperators: NetworkStateOperators
+    internal val stateOperators: NetworkStateOperators
 ) {
 
     private val traversal: NetworkTrace<TreeNode> = Tracing.equipmentNetworkTrace(
-        networkStateOperators = networkStateOperators,
+        networkStateOperators = stateOperators,
         queueFactory = { WeightedPriorityQueue.processQueue { it.data.sortWeight } },
         branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.data.sortWeight } },
         computeNextT = { currentItem: NetworkTraceStep<TreeNode>, _, nextPath: StepPath ->

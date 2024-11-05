@@ -29,7 +29,7 @@ import com.zepben.evolve.services.network.tracing.traversal.StepContext
  * This class is backed by a [NetworkTrace].
  */
 class AssignToFeeders(
-    private val networkStateOperators: NetworkStateOperators
+    internal val stateOperators: NetworkStateOperators
 ) {
     fun run(network: NetworkService) {
         val terminalToAuxEquipment = network.sequenceOf<AuxiliaryEquipment>()
@@ -58,7 +58,7 @@ class AssignToFeeders(
         feederStartPoints: Set<ConductingEquipment>,
         feedersToAssign: List<Feeder>,
     ): NetworkTrace<Unit> {
-        return Tracing.terminalNetworkTrace(networkStateOperators)
+        return Tracing.terminalNetworkTrace(stateOperators)
             .addNetworkCondition { stopAtOpen() }
             .addStopCondition { (path), _ -> feederStartPoints.contains(path.toEquipment) }
             .addQueueCondition { (path), _, _, _ -> !reachedSubstationTransformer(path.toEquipment) }
@@ -84,15 +84,15 @@ class AssignToFeeders(
             return
 
         terminalToAuxEquipment[stepPath.toTerminal]?.forEach { auxEq ->
-            feedersToAssign.forEach { feeder -> networkStateOperators.associateEquipmentAndContainer(auxEq, feeder) }
+            feedersToAssign.forEach { feeder -> stateOperators.associateEquipmentAndContainer(auxEq, feeder) }
         }
 
-        feedersToAssign.forEach { feeder -> networkStateOperators.associateEquipmentAndContainer(stepPath.toEquipment, feeder) }
+        feedersToAssign.forEach { feeder -> stateOperators.associateEquipmentAndContainer(stepPath.toEquipment, feeder) }
         when (stepPath.toEquipment) {
             is ProtectedSwitch ->
                 stepPath.toEquipment.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
                     feedersToAssign.forEach {
-                        networkStateOperators.associateEquipmentAndContainer(system, it)
+                        stateOperators.associateEquipmentAndContainer(system, it)
                     }
                 }
         }

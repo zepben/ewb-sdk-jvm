@@ -27,7 +27,7 @@ import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueu
  * This class is backed by a [NetworkTrace].
  */
 class SetPhases(
-    val networkStateOperators: NetworkStateOperators
+    val stateOperators: NetworkStateOperators
 ) {
 
     private class PhasesToFlow(val nominalPhasePaths: List<NominalPhasePath>, var stepFlowedPhases: Boolean = false)
@@ -104,7 +104,7 @@ class SetPhases(
     }
 
     private fun runTerminal(terminal: Terminal, trace: NetworkTrace<PhasesToFlow> = createNetworkTrace()) {
-        val phaseStatus = networkStateOperators.phaseStatus(terminal)
+        val phaseStatus = stateOperators.phaseStatus(terminal)
         val nominalPhasePaths = terminal.phases.map { NominalPhasePath(SinglePhaseKind.NONE, phaseStatus[it]) }
         trace.run(terminal, PhasesToFlow(nominalPhasePaths), canStopOnStartItem = false)
         trace.reset()
@@ -113,7 +113,7 @@ class SetPhases(
     private fun List<NominalPhasePath>.toPhases(): Sequence<SinglePhaseKind> = this.asSequence().map { it.to }
 
     private fun createNetworkTrace(): NetworkTrace<PhasesToFlow> = Tracing.terminalNetworkTrace(
-        networkStateOperators = networkStateOperators,
+        networkStateOperators = stateOperators,
         queueFactory = { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
         branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
         computeNextT = ::computeNextPhasesToFlow
@@ -141,7 +141,7 @@ class SetPhases(
     }
 
     private fun applyPhases(terminal: Terminal, phases: List<SinglePhaseKind>) {
-        val tracedPhases = networkStateOperators.phaseStatus(terminal)
+        val tracedPhases = stateOperators.phaseStatus(terminal)
         terminal.phases.singlePhases.forEachIndexed { index, nominalPhase ->
             tracedPhases[nominalPhase] = phases[index].takeUnless { it in PhaseCode.XY } ?: SinglePhaseKind.NONE
         }
@@ -160,7 +160,7 @@ class SetPhases(
 
     private fun getPhasesToFlow(terminal: Terminal, phases: Sequence<SinglePhaseKind>, internalFlow: Boolean): Set<SinglePhaseKind> =
         if (internalFlow) {
-            terminal.conductingEquipment?.let { ce -> phases.filter { !networkStateOperators.isOpen(ce, it) }.toSet() } ?: emptySet()
+            terminal.conductingEquipment?.let { ce -> phases.filter { !stateOperators.isOpen(ce, it) }.toSet() } ?: emptySet()
         } else {
             phases.toSet()
         }
@@ -170,8 +170,8 @@ class SetPhases(
         toTerminal: Terminal,
         nominalPhasePaths: List<NominalPhasePath>,
     ): Boolean {
-        val fromPhases = networkStateOperators.phaseStatus(fromTerminal)
-        val toPhases = networkStateOperators.phaseStatus(toTerminal)
+        val fromPhases = stateOperators.phaseStatus(fromTerminal)
+        val toPhases = stateOperators.phaseStatus(toTerminal)
 
         var changedPhases = false
         for ((from, to) in nominalPhasePaths) {

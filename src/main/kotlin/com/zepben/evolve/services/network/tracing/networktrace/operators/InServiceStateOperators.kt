@@ -8,27 +8,53 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace.operators
 
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.Equipment
 
+/**
+ * Interface for managing the in-service status of equipment.
+ */
 interface InServiceStateOperators {
-    fun isInService(conductingEquipment: ConductingEquipment): Boolean
-    fun setInService(conductingEquipment: ConductingEquipment, inService: Boolean)
+    /**
+     * Checks if the specified equipment is in service.
+     *
+     * @param equipment The equipment to check.
+     * @return `true` if the equipment is in service; `false` otherwise.
+     */
+    fun isInService(equipment: Equipment): Boolean
+
+    /**
+     * Sets the in-service status of the specified equipment.
+     *
+     * @param equipment The equipment for which to set the in-service status.
+     * @param inService The desired in-service status (`true` for in service, `false` for out of service).
+     */
+    fun setInService(equipment: Equipment, inService: Boolean)
 
     companion object {
-        val NORMAL: InServiceStateOperators = object : InServiceStateOperators {
-            override fun isInService(conductingEquipment: ConductingEquipment): Boolean = conductingEquipment.normallyInService
+        /**
+         * Instance for managing the normal in-service state of equipment.
+         */
+        val NORMAL: InServiceStateOperators = NormalInServiceStateOperators()
 
-            override fun setInService(conductingEquipment: ConductingEquipment, inService: Boolean) {
-                conductingEquipment.normallyInService = inService
-            }
-        }
+        /**
+         * Instance for managing the current in-service state of equipment.
+         */
+        val CURRENT: InServiceStateOperators = CurrentInServiceStateOperators()
+    }
+}
 
-        val CURRENT: InServiceStateOperators = object : InServiceStateOperators {
-            override fun isInService(conductingEquipment: ConductingEquipment): Boolean = conductingEquipment.inService
+private class NormalInServiceStateOperators : InServiceStateOperators {
+    override fun isInService(equipment: Equipment): Boolean = equipment.normallyInService
 
-            override fun setInService(conductingEquipment: ConductingEquipment, inService: Boolean) {
-                conductingEquipment.inService = inService
-            }
-        }
+    override fun setInService(equipment: Equipment, inService: Boolean) {
+        equipment.normallyInService = inService
+    }
+}
+
+private class CurrentInServiceStateOperators : InServiceStateOperators {
+    override fun isInService(equipment: Equipment): Boolean = equipment.inService
+
+    override fun setInService(equipment: Equipment, inService: Boolean) {
+        equipment.inService = inService
     }
 }

@@ -17,14 +17,14 @@ import kotlin.reflect.KClass
 internal class EquipmentTypeStepLimitCondition<T>(
     private val limit: Int,
     private val equipmentType: KClass<out ConductingEquipment>
-) : StopConditionWithContextValue<NetworkTraceStep<T>, Int>() {
+) : StopConditionWithContextValue<NetworkTraceStep<T>, Int> {
     override fun shouldStop(item: NetworkTraceStep<T>, context: StepContext): Boolean {
-        return (context.getValue<Int>(key) ?: 0) >= limit
+        return (context.value) >= limit
     }
 
-    // TODO [Review]: Should this be 1 if the first item matches the equipmentType?
-    override fun computeInitialValue(nextItem: NetworkTraceStep<T>): Int =
-        if (matchesEquipmentType(nextItem.path.toEquipment)) 1 else 0
+    // TODO [Review]: Should this be 1 if the first item matches the equipmentType or always start at 0?
+    override fun computeInitialValue(item: NetworkTraceStep<T>): Int =
+        if (matchesEquipmentType(item.path.toEquipment)) 1 else 0
 
     override val key: String = "sdk:${equipmentType.simpleName}Count"
 

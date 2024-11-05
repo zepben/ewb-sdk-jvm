@@ -28,7 +28,7 @@ import com.zepben.evolve.services.network.tracing.traversal.StepContext
  * This class is backed by a [NetworkTrace].
  */
 class AssignToLvFeeders(
-    private val networkStateOperators: NetworkStateOperators
+    internal val stateOperators: NetworkStateOperators
 ) {
     fun run(network: NetworkService) {
         val terminalToAuxEquipment = network.sequenceOf<AuxiliaryEquipment>()
@@ -68,7 +68,7 @@ class AssignToLvFeeders(
         lvFeederStartPoints: Set<ConductingEquipment>,
         lvFeedersToAssign: List<LvFeeder>,
     ): NetworkTrace<Unit> {
-        return Tracing.terminalNetworkTrace(networkStateOperators)
+        return Tracing.terminalNetworkTrace(stateOperators)
             .addNetworkCondition { stopAtOpen() }
             .addStopCondition { (path), _ -> lvFeederStartPoints.contains(path.toEquipment) }
             .addQueueCondition { (path), _, _, _ -> !reachedHv(path.toEquipment) }
@@ -99,15 +99,15 @@ class AssignToLvFeeders(
         }
 
         terminalToAuxEquipment[stepPath.toTerminal]?.forEach { auxEq ->
-            lvFeedersToAssign.forEach { feeder -> networkStateOperators.associateEquipmentAndContainer(auxEq, feeder) }
+            lvFeedersToAssign.forEach { feeder -> stateOperators.associateEquipmentAndContainer(auxEq, feeder) }
         }
 
-        lvFeedersToAssign.forEach { feeder -> networkStateOperators.associateEquipmentAndContainer(stepPath.toEquipment, feeder) }
+        lvFeedersToAssign.forEach { feeder -> stateOperators.associateEquipmentAndContainer(stepPath.toEquipment, feeder) }
 
         if (stepPath.toEquipment is ProtectedSwitch) {
             stepPath.toEquipment.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
                 lvFeedersToAssign.forEach {
-                    networkStateOperators.associateEquipmentAndContainer(system, it)
+                    stateOperators.associateEquipmentAndContainer(system, it)
                 }
             }
         }

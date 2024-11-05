@@ -23,11 +23,11 @@ import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueu
  * Convenience class that provides methods for setting feeder direction on a [NetworkService]
  */
 class SetDirection(
-    internal val networkStateOperators: NetworkStateOperators,
+    internal val stateOperators: NetworkStateOperators,
 ) {
 
     private val traversal: NetworkTrace<FeederDirection> = Tracing.terminalNetworkTrace(
-        networkStateOperators = networkStateOperators,
+        networkStateOperators = stateOperators,
         { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
         { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
         computeNextT = { step: NetworkTraceStep<FeederDirection>, _, nextPath ->
@@ -43,13 +43,13 @@ class SetDirection(
             //       causes stop certain looping network configurations not to be reprocessed. This means that some parts of
             //       loops do not end up with BOTH directions. This is done to stop massive computational blowout on
             //       on large networks with weird looping connectivity that rarely happens in reality.
-            if (nextDirection == FeederDirection.NONE || nextDirection in networkStateOperators.getDirection(nextPath.toTerminal))
+            if (nextDirection == FeederDirection.NONE || nextDirection in stateOperators.getDirection(nextPath.toTerminal))
                 FeederDirection.NONE
             else
                 nextDirection
         }
     )
-        .addCondition(stopAtOpen(networkStateOperators::isOpen))
+        .addNetworkCondition { stopAtOpen() }
         .addStopCondition { (path), _ ->
             isFeederHeadTerminal(path.toTerminal) || reachedSubstationTransformer(path.toTerminal)
         }
@@ -57,7 +57,7 @@ class SetDirection(
             directionToApply != FeederDirection.NONE
         }
         .addStepAction { (path, directionToApply), _ ->
-            networkStateOperators.addDirection(path.toTerminal, directionToApply)
+            stateOperators.addDirection(path.toTerminal, directionToApply)
         }
 
     /**
@@ -71,7 +71,7 @@ class SetDirection(
             .forEach {
                 val feederHead = requireNotNull(it.conductingEquipment) { "head terminals require conducting equipment to apply feeder directions" }
 
-                if (!networkStateOperators.isOpen(feederHead, null))
+                if (!stateOperators.isOpen(feederHead, null))
                     run(it)
             }
     }
@@ -85,8 +85,8 @@ class SetDirection(
         traversal.reset().run(terminal, FeederDirection.DOWNSTREAM, canStopOnStartItem = false)
     }
 
-    private fun isFeederHeadTerminal(terminal: Terminal?): Boolean =
-        terminal?.conductingEquipment?.run {
+    private fun isFeederHeadTerminal(terminal: Terminal): Boolean =
+        terminal.conductingEquipment?.run {
             containers
                 .asSequence()
                 .filterIsInstance<Feeder>()

@@ -24,15 +24,15 @@ import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueu
  * Convenience class that provides methods for removing feeder direction on a [NetworkService]
  */
 class RemoveDirection(
-    networkStateOperators: NetworkStateOperators
+    internal val stateOperators: NetworkStateOperators
 ) {
 
     private class DirectionToRemove(val direction: FeederDirection, var removedDirection: Boolean = false)
 
-    private val directionOperators: FeederDirectionStateOperations = networkStateOperators
+    private val directionOperators: FeederDirectionStateOperations = stateOperators
 
     private val traversal: NetworkTrace<DirectionToRemove> = Tracing.terminalNetworkTrace(
-        networkStateOperators = networkStateOperators,
+        networkStateOperators = stateOperators,
         queue = WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() },
         computeNextT = ::computeNextDirectionToRemove
     )
@@ -40,8 +40,8 @@ class RemoveDirection(
         .addStepAction { item, _ ->
             item.data.removedDirection = directionOperators.removeDirection(item.path.toTerminal, item.data.direction)
         }
-        .addQueueCondition { (_, directionToRemove), _, _, _ ->
-            directionToRemove.direction != FeederDirection.NONE
+        .addQueueCondition { (_, nextDirectionToRemove), _, (_, currentDirectionToRemove), _ ->
+            nextDirectionToRemove.direction != FeederDirection.NONE && currentDirectionToRemove.removedDirection
         }
 
     /**

@@ -12,35 +12,55 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
 
+/**
+ * Interface for managing the open state of conducting equipment, typically switches.
+ */
 interface OpenStateOperators {
+    /**
+     * Checks if the specified conducting equipment is open. Optionally checking the state of a specific phase.
+     *
+     * @param conductingEquipment The conducting equipment to check open state.
+     * @param phase The specific phase to check, or `null` to check if any phase is open.
+     * @return `true` if open; `false` otherwise.
+     */
     fun isOpen(conductingEquipment: ConductingEquipment, phase: SinglePhaseKind? = null): Boolean
-    fun setOpen(conductingEquipment: ConductingEquipment, isOpen: Boolean, phase: SinglePhaseKind? = null)
+
+    /**
+     * Sets the open state of the specified switch. Optionally applies the state to a specific phase.
+     *
+     * @param switch The switch for which to set the open state.
+     * @param isOpen The desired open state (`true` for open, `false` for closed).
+     * @param phase The specific phase to set, or `null` to apply to all phases.
+     */
+    fun setOpen(switch: Switch, isOpen: Boolean, phase: SinglePhaseKind? = null)
 
     companion object {
-        val NORMAL: OpenStateOperators = object : OpenStateOperators {
-            override fun isOpen(conductingEquipment: ConductingEquipment, phase: SinglePhaseKind?): Boolean =
-                !conductingEquipment.normallyInService || (conductingEquipment is Switch && conductingEquipment.isNormallyOpen(phase))
+        /**
+         * Instance for managing the normal open state of conducting equipment.
+         */
+        val NORMAL: OpenStateOperators = NormalOpenStateOperators()
 
-            override fun setOpen(conductingEquipment: ConductingEquipment, isOpen: Boolean, phase: SinglePhaseKind?) {
-                when (conductingEquipment) {
-                    is Switch -> conductingEquipment.setNormallyOpen(isOpen, phase)
-                    // TODO [Review]: Do we want to do this?
-                    else -> conductingEquipment.normallyInService = false
-                }
-            }
-        }
+        /**
+         * Instance for managing the current open state of conducting equipment.
+         */
+        val CURRENT: OpenStateOperators = CurrentOpenStateOperators()
+    }
+}
 
-        val CURRENT: OpenStateOperators = object : OpenStateOperators {
-            override fun isOpen(conductingEquipment: ConductingEquipment, phase: SinglePhaseKind?): Boolean =
-                !conductingEquipment.inService || (conductingEquipment is Switch && conductingEquipment.isOpen(phase))
+private class NormalOpenStateOperators : OpenStateOperators {
+    override fun isOpen(conductingEquipment: ConductingEquipment, phase: SinglePhaseKind?): Boolean =
+        !conductingEquipment.normallyInService || (conductingEquipment is Switch && conductingEquipment.isNormallyOpen(phase))
 
-            override fun setOpen(conductingEquipment: ConductingEquipment, isOpen: Boolean, phase: SinglePhaseKind?) {
-                when (conductingEquipment) {
-                    is Switch -> conductingEquipment.setOpen(isOpen, phase)
-                    // TODO [Review]: Do we want to do this?
-                    else -> conductingEquipment.inService = false
-                }
-            }
-        }
+    override fun setOpen(switch: Switch, isOpen: Boolean, phase: SinglePhaseKind?) {
+        switch.setNormallyOpen(isOpen, phase)
+    }
+}
+
+private class CurrentOpenStateOperators : OpenStateOperators {
+    override fun isOpen(conductingEquipment: ConductingEquipment, phase: SinglePhaseKind?): Boolean =
+        !conductingEquipment.inService || (conductingEquipment is Switch && conductingEquipment.isOpen(phase))
+
+    override fun setOpen(switch: Switch, isOpen: Boolean, phase: SinglePhaseKind?) {
+        switch.setOpen(isOpen, phase)
     }
 }

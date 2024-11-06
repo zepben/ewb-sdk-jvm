@@ -30,14 +30,14 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     /**
      * Functional interface for queuing items in a non-branching traversal.
      */
-    fun interface QueueNext<T> {
+    internal fun interface QueueNext<T> {
         fun accept(item: T, context: StepContext, queueItem: (T) -> Boolean)
     }
 
     /**
      * Functional interface for queuing items in a branching traversal.
      */
-    fun interface BranchingQueueNext<T> {
+    internal fun interface BranchingQueueNext<T> {
         fun accept(item: T, context: StepContext, queueItem: (T) -> Boolean, queueBranch: (T) -> Boolean)
     }
 

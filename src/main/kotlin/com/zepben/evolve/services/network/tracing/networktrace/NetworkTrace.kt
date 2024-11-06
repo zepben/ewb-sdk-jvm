@@ -11,10 +11,41 @@ package com.zepben.evolve.services.network.tracing.networktrace
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.*
 
+
+/**
+ * A [Traversal] implementation specifically designed to trace connected [Terminal]s of [ConductingEquipment] in a network.
+ *
+ * This trace manages the complexity of network connectivity, especially in cases where connectivity is not straightforward,
+ * such as with [BusbarSection]s and [Clamp]s. It checks the in service flag of equipment and only steps to equipment that is marked as in service.
+ * It also provides the optional ability to trace only specific phases.
+ *
+ * Steps are represented by a [NetworkTraceStep], which contains a [StepPath] and allows associating arbitrary data with each step.
+ * The arbitrary data for each step is computed via a [ComputeNextT] or [ComputeNextTWithPaths] function provided at construction.
+ * The trace invokes these functions when queueing each item and stores the result with the next step.
+ *
+ * When traversing, this trace will step on every connected terminal, as long as they match all the traversal conditions.
+ * Each step is classified as either an external step or an internal step:
+ *
+ * - **External Step**: Moves from one terminal to another with different [Terminal.conductingEquipment].
+ * - **Internal Step**: Moves between terminals within the same [Terminal.conductingEquipment].
+ *
+ * Often, you may want to act upon a [ConductingEquipment] only once, rather than multiple times for each internal and external terminal step.
+ * To achieve this, set the `onlyActionEquipment` flag to `true`. With this flag enabled, the trace will only call step actions and stop conditions once
+ * for each [ConductingEquipment], regardless of how many terminals it has. However, queue conditions are always called for each terminal step regardless
+ * of the flag, since the trace is terminal connectivity-based, and not calling queue conditions for every step can disrupt the traversal.
+ *
+ * The network trace is state-aware by requiring an instance of [NetworkStateOperators].
+ * This allows traversal conditions and step actions to query and act upon state-based properties and functions of equipment in the network when required.
+ *
+ * @param T the type of [NetworkTraceStep.data]
+ */
 class NetworkTrace<T> private constructor(
     val networkStateOperators: NetworkStateOperators,
     queueType: QueueType<NetworkTraceStep<T>, NetworkTrace<T>>,
@@ -22,6 +53,9 @@ class NetworkTrace<T> private constructor(
     private val onlyActionEquipment: Boolean,
 ) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, { NetworkTraceTracker.terminalTracker() }, parent) {
 
+    // TODO [Review]: Do we want to change this so `onlyActionEquipment` is `onlyActionExternalSteps`? This would mean equipment could be stepped on
+    //                multiple times if there is a loop, but it would be a lot more efficient than storing and tracking the equipment in a separate
+    //                tracker (where we are already storing terminals in a tracker).
     private val equipmentTracker: RecursiveTracker<NetworkTraceStep<T>>? =
         if (onlyActionEquipment) RecursiveTracker(parent?.equipmentTracker, NetworkTraceTracker.equipmentTracker()) else null
 
@@ -85,32 +119,84 @@ class NetworkTrace<T> private constructor(
         onlyActionEquipment
     )
 
-    fun addStartItem(start: Terminal, context: T, phases: PhaseCode? = null) {
+    /**
+     * Adds a starting [Terminal] to the trace with the associated step data. Tracing will be only external from this terminal and not trace internally back
+     * through its conducting equipment.
+     *
+     * @param start The starting terminal for the trace.
+     * @param data The data associated with the start step.
+     * @param phases Phases to trace; `null` to ignore phases.
+     */
+    fun addStartItem(start: Terminal, data: T, phases: PhaseCode? = null) {
         val startPath = StepPath(start, start, 0, 0, startNominalPhasePath(phases))
-        addStartItem(NetworkTraceStep(startPath, context))
+        addStartItem(NetworkTraceStep(startPath, data))
     }
 
-    fun addStartItem(start: ConductingEquipment, context: T, phases: PhaseCode? = null) {
-        start.terminals.forEach { addStartItem(it, context, phases) }
+    /**
+     * Adds all terminals of the given [ConductingEquipment] as starting points in the trace, with the associated data.
+     * Tracing will be only external from each terminal and not trace internally back through the conducting equipment.
+     *
+     * @param start The starting equipment whose terminals will be added to the trace.
+     * @param data The data associated with each terminal start step.
+     * @param phases Phases to trace; `null` to ignore phases.
+     */
+    fun addStartItem(start: ConductingEquipment, data: T, phases: PhaseCode? = null) {
+        start.terminals.forEach { addStartItem(it, data, phases) }
     }
 
-    fun run(start: Terminal, context: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
-        addStartItem(start, context, phases)
+    /**
+     * Runs the network trace starting adding the given [Terminal] to the start items.
+     *
+     * @param start The starting terminal for the trace.
+     * @param data The data associated with the start step.
+     * @param phases Phases to trace; `null` to ignore phases.
+     * @param canStopOnStartItem Indicates whether the trace should check stop conditions on start items.
+     */
+    fun run(start: Terminal, data: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+        addStartItem(start, data, phases)
         run(canStopOnStartItem)
     }
 
-    fun run(start: ConductingEquipment, context: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
-        addStartItem(start, context, phases)
+    /**
+     * Runs the network trace starting adding all terminals [Terminal]s of the start equipment to the start items.
+     *
+     * @param start The starting equipment whose terminals will be used as start items for the trace.
+     * @param data The data associated with the start step.
+     * @param phases Phases to trace; `null` to ignore phases.
+     * @param canStopOnStartItem Indicates whether the trace should check stop conditions on start items.
+     */
+    fun run(start: ConductingEquipment, data: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+        addStartItem(start, data, phases)
         run(canStopOnStartItem)
     }
 
-    // TODO [Review]: Should these just be called addCondition / addStepAction still because they don't conflict with the base ones?
+    // TODO [Review]: Should these just be called addCondition / addStepAction still because they don't conflict with the base ones? Or maybe addStateCondition would be better?
 
-    fun addNetworkCondition(block: NetworkStateOperators.() -> TraversalCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
-        addCondition(networkStateOperators.block())
+    /**
+     * Adds a traversal condition to the trace using the trace's [NetworkStateOperators] as the receiver.
+     *
+     * This overload primarily exists to enable a DSL-like syntax for adding predefined traversal conditions to the trace.
+     * For example, to configure the trace to stop at open points using the [Conditions.stopAtOpen] factory, you can use:
+     *
+     * ```kotlin
+     * trace.addNetworkCondition { stopAtOpen() }
+     * ```
+     *
+     * @param condition A lambda function that returns a traversal condition.
+     * @return This [NetworkTrace] instance.
+     */
+    fun addNetworkCondition(condition: NetworkStateOperators.() -> TraversalCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
+        addCondition(networkStateOperators.condition())
         return this
     }
 
+    /**
+     * Adds a queue condition to the trace, as per [Traversal.addQueueCondition], however, the [NetworkTraceQueueCondition] variant also has the
+     * [NetworkStateOperators] passed into it when requiring access to network state to fulfill the condition.
+     *
+     * @param condition The condition to determine whether to queue the next item.
+     * @return This [NetworkTrace] instance.
+     */
     fun addNetworkQueueCondition(condition: NetworkTraceQueueCondition<T>): NetworkTrace<T> {
         addQueueCondition { next, nextContext, current, currentContext ->
             condition.shouldQueue(next, nextContext, current, currentContext, networkStateOperators)
@@ -118,6 +204,13 @@ class NetworkTrace<T> private constructor(
         return this
     }
 
+    /**
+     * Adds a stop condition to the trace, as per [Traversal.addStopCondition], however, the [NetworkTraceStopCondition] variant also has the
+     * [NetworkStateOperators] passed into it when requiring access to network state to fulfill the condition.
+     *
+     * @param condition The condition to determine whether to queue the next item.
+     * @return This [NetworkTrace] instance.
+     */
     fun addNetworkStopCondition(condition: NetworkTraceStopCondition<T>): NetworkTrace<T> {
         addStopCondition { item, context ->
             condition.shouldStop(item, context, networkStateOperators)
@@ -125,6 +218,13 @@ class NetworkTrace<T> private constructor(
         return this
     }
 
+    /**
+     * Adds a step condition to the trace, as per [Traversal.addStepAction], however, the [NetworkTraceStopCondition] variant also has the
+     * [NetworkStateOperators] passed into it when requiring access to network state within the action.
+     *
+     * @param action The condition to determine whether to queue the next item.
+     * @return This [NetworkTrace] instance.
+     */
     fun addNetworkStepAction(action: NetworkTraceStepAction<T>): NetworkTrace<T> {
         addStepAction { item, ctx -> action.apply(item, ctx, networkStateOperators) }
         return this
@@ -146,18 +246,42 @@ class NetworkTrace<T> private constructor(
 
 }
 
+/**
+ * Convenience extension function for [NetworkTrace.addStartItem] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
+ *
+ * @param start The starting terminal for the trace.
+ * @param phases Phases to trace; `null` to ignore phases.
+ */
 fun NetworkTrace<Unit>.addStartItem(start: Terminal, phases: PhaseCode? = null) {
     addStartItem(start, Unit, phases)
 }
 
+/**
+ * Convenience extension function for [NetworkTrace.addStartItem] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
+ *
+ * @param start The starting equipment to add each terminal of to the start equipment of the trace.
+ * @param phases Phases to trace; `null` to ignore phases.
+ */
 fun NetworkTrace<Unit>.addStartItem(start: ConductingEquipment, phases: PhaseCode? = null) {
     start.terminals.forEach { addStartItem(it, Unit, phases) }
 }
 
+/**
+ * Convenience extension function for [NetworkTrace.run] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
+ *
+ * @param start The starting terminal for the trace.
+ * @param phases Phases to trace; `null` to ignore phases.
+ */
 fun NetworkTrace<Unit>.run(start: Terminal, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
     this.run(start, Unit, phases, canStopOnStartItem)
 }
 
+/**
+ * Convenience extension function for [NetworkTrace.run] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
+ *
+ * @param start The starting equipment to add each terminal of to the start equipment of the trace.
+ * @param phases Phases to trace; `null` to ignore phases.
+ */
 fun NetworkTrace<Unit>.run(start: ConductingEquipment, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
     this.run(start, Unit, phases, canStopOnStartItem)
 }

@@ -15,8 +15,8 @@ import com.zepben.evolve.services.network.tracing.traversal.StopConditionWithCon
 import kotlin.reflect.KClass
 
 internal class EquipmentTypeStepLimitCondition<T>(
-    private val limit: Int,
-    private val equipmentType: KClass<out ConductingEquipment>
+    val limit: Int,
+    val equipmentType: KClass<out ConductingEquipment>
 ) : StopConditionWithContextValue<NetworkTraceStep<T>, Int> {
     override fun shouldStop(item: NetworkTraceStep<T>, context: StepContext): Boolean {
         return (context.value) >= limit

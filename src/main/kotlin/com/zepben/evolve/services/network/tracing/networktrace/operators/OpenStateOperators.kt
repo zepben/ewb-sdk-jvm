@@ -17,13 +17,23 @@ import com.zepben.evolve.cim.iec61970.base.wires.Switch
  */
 interface OpenStateOperators {
     /**
-     * Checks if the specified conducting equipment is open. Optionally checking the state of a specific phase.
+     * Checks if the specified switch is open. Optionally checking the state of a specific phase.
      *
-     * @param conductingEquipment The conducting equipment to check open state.
+     * @param switch The switch to check open state.
      * @param phase The specific phase to check, or `null` to check if any phase is open.
      * @return `true` if open; `false` otherwise.
      */
-    fun isOpen(conductingEquipment: ConductingEquipment, phase: SinglePhaseKind? = null): Boolean
+    fun isOpen(switch: Switch, phase: SinglePhaseKind? = null): Boolean
+
+    /**
+     * Convince overload that checks if the [conductingEquipment] is a [Switch] before checking if it is open
+     *
+     * @param conductingEquipment The conducting equipment to check open state.
+     * @param phase The specific phase to check, or `null` to check if any phase is open.
+     * @return `true` if the conducting equipment is a [Switch] and it is open; `false` otherwise.
+     */
+    fun isOpen(conductingEquipment: ConductingEquipment, phase: SinglePhaseKind? = null): Boolean =
+        conductingEquipment is Switch && isOpen(conductingEquipment, phase)
 
     /**
      * Sets the open state of the specified switch. Optionally applies the state to a specific phase.
@@ -48,8 +58,7 @@ interface OpenStateOperators {
 }
 
 private class NormalOpenStateOperators : OpenStateOperators {
-    override fun isOpen(conductingEquipment: ConductingEquipment, phase: SinglePhaseKind?): Boolean =
-        !conductingEquipment.normallyInService || (conductingEquipment is Switch && conductingEquipment.isNormallyOpen(phase))
+    override fun isOpen(switch: Switch, phase: SinglePhaseKind?): Boolean = switch.isNormallyOpen(phase)
 
     override fun setOpen(switch: Switch, isOpen: Boolean, phase: SinglePhaseKind?) {
         switch.setNormallyOpen(isOpen, phase)
@@ -57,8 +66,7 @@ private class NormalOpenStateOperators : OpenStateOperators {
 }
 
 private class CurrentOpenStateOperators : OpenStateOperators {
-    override fun isOpen(conductingEquipment: ConductingEquipment, phase: SinglePhaseKind?): Boolean =
-        !conductingEquipment.inService || (conductingEquipment is Switch && conductingEquipment.isOpen(phase))
+    override fun isOpen(switch: Switch, phase: SinglePhaseKind?): Boolean = switch.isOpen(phase)
 
     override fun setOpen(switch: Switch, isOpen: Boolean, phase: SinglePhaseKind?) {
         switch.setOpen(isOpen, phase)

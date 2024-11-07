@@ -16,8 +16,8 @@ import com.zepben.evolve.services.network.tracing.traversal.QueueCondition
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 internal class DirectionCondition<T>(
-    private val direction: FeederDirection,
-    private val getDirection: (Terminal) -> FeederDirection
+    val direction: FeederDirection,
+    val getDirection: (Terminal) -> FeederDirection
 ) : QueueCondition<NetworkTraceStep<T>> {
 
     override fun shouldQueue(nextItem: NetworkTraceStep<T>, nextContext: StepContext, currentItem: NetworkTraceStep<T>, currentContext: StepContext): Boolean {

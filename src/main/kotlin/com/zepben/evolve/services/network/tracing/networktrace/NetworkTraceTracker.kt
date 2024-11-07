@@ -13,7 +13,10 @@ import com.zepben.evolve.services.network.tracing.traversal.Tracker
 internal class NetworkTraceTracker<T>(
     private val keySelector: (NetworkTraceStep<T>) -> Any?,
 ) : Tracker<NetworkTraceStep<T>> {
-    private val visited = mutableSetOf<Any?>()
+
+    // Setting initial capacity greater than default of 16 as we suspect a majority of network traces will step on more than 12 terminals (load factor is 0.75).
+    // Not sure what a sensible initial capacity actually is, but 16 just felt too small.
+    private val visited = HashSet<Any?>(256)
 
     override fun hasVisited(item: NetworkTraceStep<T>): Boolean = visited.contains(keySelector(item))
 

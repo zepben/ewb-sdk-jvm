@@ -46,6 +46,10 @@ import com.zepben.evolve.services.network.tracing.traversal.*
  *
  * @param T the type of [NetworkTraceStep.data]
  */
+// TODO [Review]: Rename to NetworkTraversal and make abstract with no run or addStartItem functions. Create new NetworkTrace class that has those functions.
+//                This allows us to create descendant classes such as DownstreamTree that can inherit NetworkTraversal which allows you to configure the
+//                trace with additional step actions and conditions which could be very handy while still maintaining all the Traversal interface functions.
+//                Caveat: We need to remove the ability to clear conditions and step actions.
 class NetworkTrace<T> private constructor(
     val networkStateOperators: NetworkStateOperators,
     queueType: QueueType<NetworkTraceStep<T>, NetworkTrace<T>>,
@@ -53,9 +57,9 @@ class NetworkTrace<T> private constructor(
     private val onlyActionEquipment: Boolean,
 ) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, { NetworkTraceTracker.terminalTracker() }, parent) {
 
-    // TODO [Review]: Do we want to change this so `onlyActionEquipment` is `onlyActionExternalSteps`? This would mean equipment could be stepped on
-    //                multiple times if there is a loop, but it would be a lot more efficient than storing and tracking the equipment in a separate
-    //                tracker (where we are already storing terminals in a tracker).
+    // TODO [Review]: Can possibly remove this tracker and get better efficiency out of checking the existing terminal tracker for each terminal on the
+    //                `toEquipment` of each step in the canAction function.
+    //                See my shelf - this ended up feeling a bit hacky because the tracker takes a NetworkTraceStep so you have to build a fake one...
     private val equipmentTracker: RecursiveTracker<NetworkTraceStep<T>>? =
         if (onlyActionEquipment) RecursiveTracker(parent?.equipmentTracker, NetworkTraceTracker.equipmentTracker()) else null
 

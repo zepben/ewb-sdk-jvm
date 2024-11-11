@@ -22,7 +22,10 @@ import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
 
 object Tracing {
 
+
     // TODO [Review]: Remove "equipmentNetworkTrace" and "terminalNetworkTrace" and just have "networkTrace" which takes the onlyActionEquipment flag?
+    //                Use enum for action step type instead? Options could be `ALL_STEPS`, `EQUIPMENT_FIRST_VISIT`, `EXTERNAL_ONLY`
+    //                Allow passing in a custom `canActionEquipment` implementation and we have prebuilt implementations representing the above enums?
     @JvmStatic
     fun <T> equipmentNetworkTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
@@ -133,6 +136,7 @@ object Tracing {
         return terminalNetworkTrace(networkStateOperators, queueFactory, branchQueueFactory) { _, _, _, _ -> }
     }
 
+    // TODO [Review]: Replace normal/downstream variants and have a single variant that takes NetworkStateOperators, defaulting to NORMAL
     // TODO Create some sort of network state test/selector/whatever grouping object that points to the appropriate network state tests/selectors/whateverers (NetworkStateOperators?)
     fun normalDownstreamTree(): DownstreamTree = DownstreamTree(NetworkStateOperators.NORMAL)
     fun currentDownstreamTree(): DownstreamTree = DownstreamTree(NetworkStateOperators.CURRENT)

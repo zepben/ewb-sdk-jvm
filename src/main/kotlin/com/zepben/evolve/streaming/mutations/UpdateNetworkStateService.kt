@@ -26,7 +26,7 @@ import io.grpc.stub.StreamObserver
  * and returns a [SetCurrentStatesStatus], which reflects the success or failure of the update process.
  */
 class UpdateNetworkStateService(
-    private val onSetCurrentStates: (events: List<CurrentStateEvent>) -> SetCurrentStatesStatus
+    private val onSetCurrentStates: (batchId: Long, events: List<CurrentStateEvent>) -> SetCurrentStatesStatus
 ) : UpdateNetworkStateServiceGrpc.UpdateNetworkStateServiceImplBase() {
 
     /**
@@ -49,18 +49,8 @@ class UpdateNetworkStateService(
         object : StreamObserver<SetCurrentStatesRequest> {
             override fun onNext(request: SetCurrentStatesRequest) {
                 try {
-                    onSetCurrentStates(request.eventList.map { CurrentStateEvent.fromPb(it) })
-                        .also {
-                            val responseBuilder = SetCurrentStatesResponse.newBuilder().apply {
-                                setMessageId(request.messageId)
-                                when (it) {
-                                    is BatchSuccessful -> success = it.toPb()
-                                    is ProcessingPaused -> paused = it.toPb()
-                                    is BatchFailure -> failure = it.toPb()
-                                }
-                            }
-                            responseObserver.onNext(responseBuilder.build())
-                        }
+                    onSetCurrentStates(request.messageId, request.eventList.map { CurrentStateEvent.fromPb(it) })
+                        .also { responseObserver.onNext(it.toPb()) }
                 } catch (e: Throwable) {
                     responseObserver.onError(Status.INTERNAL.withDescription(e.localizedMessage).asRuntimeException())
                 }

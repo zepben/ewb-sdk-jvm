@@ -19,25 +19,47 @@ import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
 import com.zepben.protobuf.ns.data.StateEventInvalidMrid as PBStateEventInvalidMrid
 import com.zepben.protobuf.ns.data.StateEventUnknownMrid as PBStateEventUnknownMrid
 import com.zepben.protobuf.ns.data.StateEventUnsupportedPhasing as PBStateEventUnsupportedPhasing
+import com.zepben.protobuf.ns.SetCurrentStatesResponse as PBSetCurrentStatesResponse
 
 /**
  * The outcome of processing this batch of updates.
+ *
+ * @property batchId The unique identifier of the batch that was processed. This matches the batch ID from the original request to allow correlation between
+ * request and response.
  */
-sealed interface SetCurrentStatesStatus
+sealed class SetCurrentStatesStatus(val batchId: Long) {
+
+    companion object {
+        internal fun fromPb(pb: PBSetCurrentStatesResponse): SetCurrentStatesStatus? =
+            when (pb.statusCase) {
+                PBSetCurrentStatesResponse.StatusCase.SUCCESS -> BatchSuccessful.fromPb(pb)
+                PBSetCurrentStatesResponse.StatusCase.PAUSED -> ProcessingPaused.fromPb(pb)
+                PBSetCurrentStatesResponse.StatusCase.FAILURE -> BatchFailure.fromPb(pb)
+                else -> null
+            }
+    }
+
+    internal abstract fun toPb(): PBSetCurrentStatesResponse
+
+    /**
+     * Creates a [PBSetCurrentStatesResponse] with messageId assigned along with the specified [block].
+     */
+    protected fun toPb(block: PBSetCurrentStatesResponse.Builder.() -> Unit): PBSetCurrentStatesResponse =
+        PBSetCurrentStatesResponse.newBuilder().also { it.messageId = batchId }.apply(block).build()
+}
 
 /**
  * A response indicating all items in the batch were applied successfully.
  */
-class BatchSuccessful : SetCurrentStatesStatus {
+class BatchSuccessful(batchId: Long) : SetCurrentStatesStatus(batchId) {
 
     companion object {
-        @Suppress("UNUSED_PARAMETER")
-        internal fun fromPb(pb: PBBatchSuccessful): SetCurrentStatesStatus =
-            BatchSuccessful()
+        internal fun fromPb(pb: PBSetCurrentStatesResponse): SetCurrentStatesStatus =
+            BatchSuccessful(pb.messageId)
     }
 
-    internal fun toPb(): PBBatchSuccessful =
-        PBBatchSuccessful.newBuilder().build()
+    override fun toPb(): PBSetCurrentStatesResponse =
+        toPb { success = PBBatchSuccessful.newBuilder().build() }
 
 }
 
@@ -47,15 +69,15 @@ class BatchSuccessful : SetCurrentStatesStatus {
  *
  * @property since The timestamp when the processing was paused.
  */
-class ProcessingPaused(val since: LocalDateTime?) : SetCurrentStatesStatus {
+class ProcessingPaused(batchId: Long, val since: LocalDateTime?) : SetCurrentStatesStatus(batchId) {
 
     companion object {
-        internal fun fromPb(pb: PBProcessingPaused): SetCurrentStatesStatus =
-            ProcessingPaused(pb.since.toLocalDateTime())
+        internal fun fromPb(pb: PBSetCurrentStatesResponse): SetCurrentStatesStatus =
+            ProcessingPaused(pb.messageId, pb.paused.since.toLocalDateTime())
     }
 
-    internal fun toPb(): PBProcessingPaused =
-        PBProcessingPaused.newBuilder().also { it.since = since.toTimestamp() }.build()
+    override fun toPb(): PBSetCurrentStatesResponse =
+        toPb { paused = PBProcessingPaused.newBuilder().also { it.since = since.toTimestamp() }.build() }
 
 }
 
@@ -65,18 +87,20 @@ class ProcessingPaused(val since: LocalDateTime?) : SetCurrentStatesStatus {
  * @property partialFailure Indicates if only come of the batch failed (true), or all entries in the batch failed (false).
  * @property failures The status of each item processed in the batch that failed.
  */
-class BatchFailure(val partialFailure: Boolean, val failures: List<StateEventFailure>) : SetCurrentStatesStatus {
+class BatchFailure(batchId: Long, val partialFailure: Boolean, val failures: List<StateEventFailure>) : SetCurrentStatesStatus(batchId) {
 
     companion object {
-        internal fun fromPb(pb: PBBatchFailure): SetCurrentStatesStatus =
-            BatchFailure(pb.partialFailure, pb.failedList.mapNotNull { StateEventFailure.fromPb(it) })
+        internal fun fromPb(pb: PBSetCurrentStatesResponse): SetCurrentStatesStatus =
+            BatchFailure(pb.messageId, pb.failure.partialFailure, pb.failure.failedList.mapNotNull { StateEventFailure.fromPb(it) })
     }
 
-    internal fun toPb(): PBBatchFailure =
-        PBBatchFailure.newBuilder().also { batchFailure ->
-            batchFailure.partialFailure = partialFailure
-            batchFailure.addAllFailed(failures.map { it.toPb() })
-        }.build()
+    override fun toPb(): PBSetCurrentStatesResponse =
+        toPb {
+            failure = PBBatchFailure.newBuilder().also { batchFailure ->
+                batchFailure.partialFailure = partialFailure
+                batchFailure.addAllFailed(failures.map { it.toPb() })
+            }.build()
+        }
 
 }
 

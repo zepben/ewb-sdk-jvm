@@ -39,19 +39,20 @@ class UpdateNetworkStateServiceTest {
     @Rule
     val grpcCleanup: GrpcCleanupRule = GrpcCleanupRule()
 
+    private val batchIdSlot = slot<Long>()
     private val eventsSlot = slot<List<CurrentStateEvent>>()
     private val setCurrentStatesReturns = listOf(
-        BatchSuccessful(),
-        ProcessingPaused(LocalDateTime.now()),
-        BatchFailure(true, listOf(
+        BatchSuccessful(1),
+        ProcessingPaused(1, LocalDateTime.now()),
+        BatchFailure(1, true, listOf(
             StateEventUnknownMrid("event id"),
             StateEventDuplicateMrid("event id"),
             StateEventInvalidMrid("event id"),
             StateEventUnsupportedPhasing("event id")
         ))
     )
-    private val onSetCurrentStates = mockk<(events: List<CurrentStateEvent>) -> SetCurrentStatesStatus>().also {
-        every { it(capture(eventsSlot)) } returnsMany setCurrentStatesReturns
+    private val onSetCurrentStates = mockk<(batchId: Long, events: List<CurrentStateEvent>) -> SetCurrentStatesStatus>().also {
+        every { it(capture(batchIdSlot), capture(eventsSlot)) } returnsMany setCurrentStatesReturns
     }
 
     private val serverName = InProcessServerBuilder.generateName()
@@ -105,7 +106,7 @@ class UpdateNetworkStateServiceTest {
 
     @Test
     fun `setCurrentStates onNext handles error`(){
-        every { onSetCurrentStates(any()) } throws Error("TEST ERROR!")
+        every { onSetCurrentStates(any(), any()) } throws Error("TEST ERROR!")
 
         sendGrpcRequest(request)
 
@@ -132,11 +133,12 @@ class UpdateNetworkStateServiceTest {
         sendGrpcRequest(request)
 
         verify {
-            onSetCurrentStates(eventsSlot.captured)
+            onSetCurrentStates(batchIdSlot.captured, eventsSlot.captured)
             responseObserver.onNext(responseSlot.captured)
             responseObserver.onCompleted()
         }
 
+        assertThat(batchIdSlot.captured, equalTo(1))
         eventsSlot.captured.also{
             assertThat(it.size, equalTo(1))
             assertThat(it[0], instanceOf(SwitchStateEvent::class.java))

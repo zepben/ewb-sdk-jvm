@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.services.network.tracing.traversal
 
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import java.util.*
 import kotlin.collections.ArrayDeque
 
@@ -23,7 +24,6 @@ import kotlin.collections.ArrayDeque
  */
 abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     internal val queueType: QueueType<T, D>,
-    trackerFactory: () -> Tracker<T>,
     protected val parent: D? = null
 ) {
 
@@ -85,7 +85,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
 
     private val queue: TraversalQueue<T> = queueType.queue
     private val branchQueue: TraversalQueue<D>? = queueType.branchQueue
-    private val tracker: RecursiveTracker<T> = RecursiveTracker(parent?.tracker, trackerFactory())
     private val startItems: ArrayDeque<T> = ArrayDeque()
 
     @Volatile
@@ -108,6 +107,8 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return `true` if the item can be acted upon; `false` otherwise.
      */
     protected open fun canActionItem(item: T, context: StepContext): Boolean = true
+
+    protected abstract fun canVisitItem(item: T, context: StepContext): Boolean
 
     /**
      * Retrieves the derived instance of this traversal class.
@@ -404,7 +405,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
 
         queue.clear()
         branchQueue?.clear()
-        tracker.clear()
 
         onReset()
 
@@ -446,15 +446,18 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
             var canStop = canStopOnStartItem
             while (queue.hasNext()) {
                 queue.next()?.let { current ->
-                    if (tracker.visit(current)) {
-                        val context = getStepContext(current)
-                        val canAction = canActionItem(current, context)
+                    val context = getStepContext(current)
+                    current as NetworkTraceStep<*>
 
-                        if (canAction) {
-                            context.isStopping = canStop && matchesAnyStopCondition(current, context)
+                    if (canVisitItem(current, context)) {
+                        if (current.path.toEquipment.mRID == "acLineSegment1") {
+                            var i = 0
+                            i++
                         }
+                        context.isActionableItem = canActionItem(current, context)
 
-                        if (canAction) {
+                        if (context.isActionableItem) {
+                            context.isStopping = canStop && matchesAnyStopCondition(current, context)
                             applyStepActions(current, context)
                         }
 
@@ -469,7 +472,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         }
     }
 
-    private fun getStepContext(item: T): StepContext = contexts[item] ?: error { "INTERNAL ERROR: Traversal item should always have a context" }
+    private fun getStepContext(item: T): StepContext = contexts.remove(item) ?: error { "INTERNAL ERROR: Traversal item should always have a context" }
 
     private fun createNewBranch(startItem: T, context: StepContext): D {
         return createNewThis().also {

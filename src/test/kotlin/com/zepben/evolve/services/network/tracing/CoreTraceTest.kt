@@ -208,19 +208,19 @@ internal class CoreTraceTest {
     }
 
     private fun currentNonDirectionalTrace(start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {
-        return runTrace(Tracing.equipmentNetworkTrace(NetworkStateOperators.CURRENT).addNetworkCondition { stopAtOpen() }, start, phases)
+        return runTrace(Tracing.networkTrace(NetworkStateOperators.CURRENT).addNetworkCondition { stopAtOpen() }, start, phases)
     }
 
     private fun normalDownstreamTrace(start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {
-        return runTrace(Tracing.equipmentNetworkTrace(NetworkStateOperators.NORMAL).addNetworkCondition { downstream() }, start, phases)
+        return runTrace(Tracing.networkTrace(NetworkStateOperators.NORMAL).addNetworkCondition { downstream() }, start, phases)
     }
 
     private fun currentDownstreamTrace(start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {
-        return runTrace(Tracing.equipmentNetworkTrace(NetworkStateOperators.CURRENT).addNetworkCondition { downstream() }, start, phases)
+        return runTrace(Tracing.networkTrace(NetworkStateOperators.CURRENT).addNetworkCondition { downstream() }, start, phases)
     }
 
     private fun normalUpstreamTrace(start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {
-        return runTrace(Tracing.equipmentNetworkTrace(NetworkStateOperators.NORMAL).addNetworkCondition { upstream() }, start, phases)
+        return runTrace(Tracing.networkTrace(NetworkStateOperators.NORMAL).addNetworkCondition { upstream() }, start, phases)
     }
 
     private fun runTrace(trace: NetworkTrace<Unit>, start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {

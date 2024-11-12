@@ -12,10 +12,7 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
-import com.zepben.evolve.services.network.tracing.networktrace.StepPath
-import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.*
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue.Companion.branchQueue
@@ -63,8 +60,9 @@ class RemovePhases(
     }
 
     private fun createTrace(): NetworkTrace<EbbPhases> =
-        Tracing.terminalNetworkTrace(
+        Tracing.networkTrace(
             networkStateOperators = stateOperators,
+            actionStepType = NetworkTraceActionType.ALL_STEPS,
             queueFactory = { processQueue { it.data.phasesToEbb.size } },
             branchQueueFactory = { branchQueue { it.data.phasesToEbb.size } },
             computeNextT = ::computeNextEbbPhases

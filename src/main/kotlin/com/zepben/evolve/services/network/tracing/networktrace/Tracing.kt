@@ -13,6 +13,7 @@ import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.RemovePhases
@@ -22,118 +23,65 @@ import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
 
 object Tracing {
 
-
-    // TODO [Review]: Remove "equipmentNetworkTrace" and "terminalNetworkTrace" and just have "networkTrace" which takes the onlyActionEquipment flag?
-    //                Use enum for action step type instead? Options could be `ALL_STEPS`, `EQUIPMENT_FIRST_VISIT`, `EXTERNAL_ONLY`
-    //                Allow passing in a custom `canActionEquipment` implementation and we have prebuilt implementations representing the above enums?
     @JvmStatic
-    fun <T> equipmentNetworkTrace(
+    fun <T> networkTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
+        actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
         computeNextT: ComputeNextT<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queue, true, computeNextT)
+        return NetworkTrace(networkStateOperators, queue, actionStepType, computeNextT)
     }
 
     @JvmStatic
-    fun <T> equipmentNetworkTrace(
+    fun <T> networkTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
+        actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
         computeNextT: ComputeNextTWithPaths<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queue, true, computeNextT)
+        return NetworkTrace(networkStateOperators, queue, actionStepType, computeNextT)
     }
 
     @JvmStatic
-    fun equipmentNetworkTrace(
+    fun networkTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
+        actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queue: TraversalQueue<NetworkTraceStep<Unit>> = TraversalQueue.depthFirst(),
     ): NetworkTrace<Unit> {
-        return equipmentNetworkTrace(networkStateOperators, queue) { _, _, _ -> }
+        return networkTrace(networkStateOperators, actionStepType, queue) { _, _, _ -> }
     }
 
     @JvmStatic
-    fun <T> equipmentNetworkTrace(
+    fun <T> networkTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
+        actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
         computeNextT: ComputeNextT<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, true, null, computeNextT)
+        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, actionStepType, null, computeNextT)
     }
 
     @JvmStatic
-    fun <T> equipmentNetworkTrace(
+    fun <T> networkTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
+        actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
         computeNextT: ComputeNextTWithPaths<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, true, null, computeNextT)
+        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, actionStepType, null, computeNextT)
     }
 
     @JvmStatic
-    fun equipmentNetworkTrace(
+    fun networkTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
+        actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<Unit>> = { TraversalQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<Unit>> = { TraversalQueue.breadthFirst() },
     ): NetworkTrace<Unit> {
-        return equipmentNetworkTrace(networkStateOperators, queueFactory, branchQueueFactory) { _, _, _ -> }
-    }
-
-    @JvmStatic
-    fun <T> terminalNetworkTrace(
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
-        computeNextT: ComputeNextT<T>,
-    ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queue, false, computeNextT)
-    }
-
-    @JvmStatic
-    fun <T> terminalNetworkTrace(
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
-        computeNextT: ComputeNextTWithPaths<T>,
-    ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queue, false, computeNextT)
-    }
-
-    @JvmStatic
-    fun terminalNetworkTrace(
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queue: TraversalQueue<NetworkTraceStep<Unit>> = TraversalQueue.depthFirst(),
-    ): NetworkTrace<Unit> {
-        return terminalNetworkTrace(networkStateOperators, queue) { _, _, _ -> }
-    }
-
-    @JvmStatic
-    fun <T> terminalNetworkTrace(
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
-        branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
-        computeNextT: ComputeNextT<T>,
-    ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, false, null, computeNextT)
-    }
-
-    @JvmStatic
-    fun <T> terminalNetworkTrace(
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
-        branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
-        computeNextT: ComputeNextTWithPaths<T>,
-    ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, false, null, computeNextT)
-    }
-
-    @JvmStatic
-    fun terminalNetworkTrace(
-        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
-        queueFactory: () -> TraversalQueue<NetworkTraceStep<Unit>> = { TraversalQueue.depthFirst() },
-        branchQueueFactory: () -> TraversalQueue<NetworkTrace<Unit>> = { TraversalQueue.breadthFirst() },
-    ): NetworkTrace<Unit> {
-        return terminalNetworkTrace(networkStateOperators, queueFactory, branchQueueFactory) { _, _, _, _ -> }
+        return networkTrace(networkStateOperators, actionStepType, queueFactory, branchQueueFactory) { _, _, _ -> }
     }
 
     // TODO [Review]: Replace normal/downstream variants and have a single variant that takes NetworkStateOperators, defaulting to NORMAL

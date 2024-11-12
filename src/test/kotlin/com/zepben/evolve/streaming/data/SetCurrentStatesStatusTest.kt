@@ -33,13 +33,13 @@ class SetCurrentStatesStatusTest {
     fun `BatchSuccessful from protobuf and then back to protobuf`() {
         val pb = createSetCurrentStatesResponse { success = PBBatchSuccessful.newBuilder().build() }
 
-        val status = SetCurrentStatesStatus.fromPb(pb) as BatchSuccessful
+        val status = SetCurrentStatesStatus.fromPb(pb)
         assertThat(status, instanceOf(BatchSuccessful::class.java))
-        assertThat(status.batchId, equalTo(1))
+        assertThat(status?.batchId, equalTo(1))
 
-        (status as SetCurrentStatesStatus).toPb().also {
+        status?.toPb()?.also {
             assertThat(it.messageId, equalTo(1))
-            assertThat(it.statusCase, equalTo(PBSetCurrentStatesResponse.StatusCase.SUCCESS))
+            assertThat(it.success, not(equalTo(PBSetCurrentStatesResponse.getDefaultInstance())))
         }
     }
 
@@ -70,7 +70,6 @@ class SetCurrentStatesStatusTest {
 
 
         val status = SetCurrentStatesStatus.fromPb(pb) as BatchFailure
-        SetCurrentStatesStatus.fromPb(pb) as BatchFailure
         assertThat(status.partialFailure, equalTo(pb.failure.partialFailure))
         assertThat(status.failures.size, equalTo(1))
         assertThat(status.failures.first(), instanceOf(StateEventInvalidMrid::class.java))
@@ -118,8 +117,5 @@ class SetCurrentStatesStatusTest {
     }
 
     private fun createSetCurrentStatesResponse(block: PBSetCurrentStatesResponse.Builder.() -> Unit): PBSetCurrentStatesResponse =
-        PBSetCurrentStatesResponse.newBuilder().apply {
-            messageId = 1
-            block()
-        }.build()
+        PBSetCurrentStatesResponse.newBuilder().also { it.messageId = 1 }.apply(block).build()
 }

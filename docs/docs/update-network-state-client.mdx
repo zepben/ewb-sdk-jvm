@@ -223,9 +223,8 @@ You can check the type of response or failure by check against the types from `c
 import com.zepben.evolve.streaming.data.BatchFailure;
 import com.zepben.evolve.streaming.data.StateEventUnknownMrid;
 
-var status = response.getStatus();
-if (status instanceof BatchFailure) {
-    var batchFailure = (BatchFailure) status;
+if (response instanceof BatchFailure) {
+    var batchFailure = (BatchFailure) response;
     batchFailure.getPartialFailure(); // Will be true if all event failed, otherwise false.
     batchFailure.getFailures().forEach((failure) -> {
         if (failure instanceof StateEventUnknownMrid) {
@@ -239,15 +238,17 @@ if (status instanceof BatchFailure) {
 <TabItem  value="kotlin">
 
 ```kotlin
-when (val status = response.status) {
+when (response) {
     is BatchFailure -> {
-        status.partialFailure // Will be true if all event failed, otherwise false.
-        status.failures.forEach { failure ->
+        response.partialFailure // Will be true if all event failed, otherwise false.
+        response.failures.forEach { failure ->
             when (failure) {
                 is StateEventUnknownMrid -> // Process failure
+                // process other failure types
             }
         }
     }
+    // process other response types
 }
 ```
 

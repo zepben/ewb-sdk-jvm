@@ -32,6 +32,10 @@ class StepContext(
         // It's a chicken and egg problem...
         internal set
 
+    var isActionableItem: Boolean = false
+        // Once it's a chicken and egg problem as this because it needs to be set after calling canActionItem, however it takes a context.
+        internal set
+
     /**
      * Sets a context value associated with the specified key.
      *

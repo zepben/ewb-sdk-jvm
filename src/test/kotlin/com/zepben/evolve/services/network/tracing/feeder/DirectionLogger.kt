@@ -63,7 +63,7 @@ internal class DirectionLogger private constructor(asset: ConductingEquipment) :
             assets.forEach { asset ->
                 val pl = DirectionLogger(asset!!)
 
-                Tracing.equipmentNetworkTrace()
+                Tracing.networkTrace()
                     .addStepAction(pl)
                     .run(asset)
 

@@ -122,4 +122,8 @@ class GrpcChannelBuilder {
         _callCredentials = TokenCallCredentials(tokenFetcher::fetchToken)
     }
 
+    fun withTokenString(tokenString: String): GrpcChannelBuilder = apply {
+        _callCredentials = TokenCallCredentials { tokenString }
+    }
+
 }

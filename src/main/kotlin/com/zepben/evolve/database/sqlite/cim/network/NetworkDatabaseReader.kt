@@ -24,6 +24,7 @@ import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import java.sql.Connection
@@ -49,16 +50,16 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     metadataReader: MetadataCollectionReader = MetadataCollectionReader(service, tables, connection),
     serviceReader: NetworkServiceReader = NetworkServiceReader(service, tables, connection),
     tableVersion: TableVersion = tableCimVersion,
-    private val normalSetFeederDirection: SetDirection = Tracing.normalSetDirection(),
-    private val currentSetFeederDirection: SetDirection = Tracing.currentSetDirection(),
-    private val normalSetPhases: SetPhases = Tracing.normalSetPhases(),
-    private val currentSetPhases: SetPhases = Tracing.currentSetPhases(),
-    private val normalPhaseInferrer: PhaseInferrer = Tracing.normalPhaseInferrer(),
-    private val currentPhaseInferrer: PhaseInferrer = Tracing.currentPhaseInferrer(),
-    private val normalAssignToFeeders: AssignToFeeders = Tracing.normalAssignEquipmentToFeeders(),
-    private val currentAssignToFeeders: AssignToFeeders = Tracing.currentAssignEquipmentToFeeders(),
-    private val normalAssignToLvFeeders: AssignToLvFeeders = Tracing.normalAssignEquipmentToLvFeeders(),
-    private val currentAssignToLvFeeders: AssignToLvFeeders = Tracing.currentAssignEquipmentToLvFeeders(),
+    private val normalSetFeederDirection: SetDirection = Tracing.setDirection(NetworkStateOperators.NORMAL),
+    private val currentSetFeederDirection: SetDirection = Tracing.setDirection(NetworkStateOperators.CURRENT),
+    private val normalSetPhases: SetPhases = Tracing.setPhases(NetworkStateOperators.NORMAL),
+    private val currentSetPhases: SetPhases = Tracing.setPhases(NetworkStateOperators.CURRENT),
+    private val normalPhaseInferrer: PhaseInferrer = Tracing.phaseInferrer(NetworkStateOperators.NORMAL),
+    private val currentPhaseInferrer: PhaseInferrer = Tracing.phaseInferrer(NetworkStateOperators.CURRENT),
+    private val normalAssignToFeeders: AssignToFeeders = Tracing.assignEquipmentToFeeders(NetworkStateOperators.NORMAL),
+    private val currentAssignToFeeders: AssignToFeeders = Tracing.assignEquipmentToFeeders(NetworkStateOperators.CURRENT),
+    private val normalAssignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.NORMAL),
+    private val currentAssignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.CURRENT),
 ) : CimDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion) {
 
     override fun postLoad(): Boolean =

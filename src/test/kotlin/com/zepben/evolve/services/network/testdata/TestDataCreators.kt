@@ -19,6 +19,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import org.hamcrest.MatcherAssert.assertThat
 
 fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode = PhaseCode.A): EnergySource =
@@ -218,27 +219,27 @@ fun createOperationalRestriction(networkService: NetworkService, mRID: String, n
     }
 
 inline fun <reified T : ConductingEquipment> T.addFeederDirections(terminal: Int = 1): T {
-    getTerminal(terminal)?.also { Tracing.normalSetDirection().run(it) }
-    getTerminal(terminal)?.also { Tracing.currentSetDirection().run(it) }
+    getTerminal(terminal)?.also { Tracing.setDirection(NetworkStateOperators.NORMAL).run(it) }
+    getTerminal(terminal)?.also { Tracing.setDirection(NetworkStateOperators.CURRENT).run(it) }
     return this
 }
 
 fun NetworkService.setPhases() {
-    Tracing.normalSetPhases().run(this)
-    Tracing.currentSetPhases().run(this)
+    Tracing.setPhases(NetworkStateOperators.NORMAL).run(this)
+    Tracing.setPhases(NetworkStateOperators.CURRENT).run(this)
 }
 
 fun NetworkService.setFeederDirections() {
-    Tracing.normalSetDirection().run(this)
-    Tracing.currentSetDirection().run(this)
+    Tracing.setDirection(NetworkStateOperators.NORMAL).run(this)
+    Tracing.setDirection(NetworkStateOperators.CURRENT).run(this)
 }
 
 fun NetworkService.assignEquipmentToFeeders() {
-    Tracing.normalAssignEquipmentToFeeders().run(this)
-    Tracing.currentAssignEquipmentToFeeders().run(this)
+    Tracing.assignEquipmentToFeeders(NetworkStateOperators.NORMAL).run(this)
+    Tracing.assignEquipmentToFeeders(NetworkStateOperators.CURRENT).run(this)
 }
 
 fun NetworkService.assignEquipmentToLvFeeders() {
-    Tracing.normalAssignEquipmentToLvFeeders().run(this)
-    Tracing.currentAssignEquipmentToLvFeeders().run(this)
+    Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.NORMAL).run(this)
+    Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.CURRENT).run(this)
 }

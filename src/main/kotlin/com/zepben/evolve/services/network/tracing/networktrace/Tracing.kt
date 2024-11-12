@@ -86,31 +86,22 @@ object Tracing {
 
     // TODO [Review]: Replace normal/downstream variants and have a single variant that takes NetworkStateOperators, defaulting to NORMAL
     // TODO Create some sort of network state test/selector/whatever grouping object that points to the appropriate network state tests/selectors/whateverers (NetworkStateOperators?)
-    fun normalDownstreamTree(): DownstreamTree = DownstreamTree(NetworkStateOperators.NORMAL)
-    fun currentDownstreamTree(): DownstreamTree = DownstreamTree(NetworkStateOperators.CURRENT)
+    fun downstreamTree(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): DownstreamTree = DownstreamTree(stateOperators)
 
-    fun normalSetDirection(): SetDirection = SetDirection(NetworkStateOperators.NORMAL)
-    fun currentSetDirection(): SetDirection = SetDirection(NetworkStateOperators.CURRENT)
+    fun setDirection(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): SetDirection = SetDirection(stateOperators)
 
-    fun normalRemoveDirection(): RemoveDirection = RemoveDirection(NetworkStateOperators.NORMAL)
-    fun currentRemoveDirection(): RemoveDirection = RemoveDirection(NetworkStateOperators.CURRENT)
+    fun removeDirection(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): RemoveDirection = RemoveDirection(stateOperators)
 
-    fun normalAssignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders(NetworkStateOperators.NORMAL)
-    fun currentAssignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders(NetworkStateOperators.CURRENT)
+    fun assignEquipmentToFeeders(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): AssignToFeeders = AssignToFeeders(stateOperators)
 
-    fun normalAssignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders(NetworkStateOperators.NORMAL)
-    fun currentAssignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders(NetworkStateOperators.CURRENT)
+    fun assignEquipmentToLvFeeders(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): AssignToLvFeeders = AssignToLvFeeders(stateOperators)
 
-    fun normalSetPhases(): SetPhases = SetPhases(NetworkStateOperators.NORMAL)
-    fun currentSetPhases(): SetPhases = SetPhases(NetworkStateOperators.CURRENT)
+    fun setPhases(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): SetPhases = SetPhases(stateOperators)
 
-    fun normalPhaseInferrer(): PhaseInferrer = PhaseInferrer(NetworkStateOperators.NORMAL)
-    fun currentPhaseInferrer(): PhaseInferrer = PhaseInferrer(NetworkStateOperators.CURRENT)
+    fun phaseInferrer(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): PhaseInferrer = PhaseInferrer(stateOperators)
 
-    fun normalRemovePhases(): RemovePhases = RemovePhases(NetworkStateOperators.NORMAL)
-    fun currentRemovePhases(): RemovePhases = RemovePhases(NetworkStateOperators.CURRENT)
+    fun removePhases(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): RemovePhases = RemovePhases(stateOperators)
 
-    fun normalFindSwerEquipment(): FindSwerEquipment = FindSwerEquipment(NetworkStateOperators.NORMAL)
-    fun currentFindSwerEquipment(): FindSwerEquipment = FindSwerEquipment(NetworkStateOperators.CURRENT)
+    fun findSwerEquipment(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): FindSwerEquipment = FindSwerEquipment(stateOperators)
 
 }

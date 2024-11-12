@@ -59,7 +59,9 @@ internal object NetworkTraceQueueNext {
         currentContext: StepContext,
         computeNextT: ComputeNextT<T>,
     ): Sequence<NetworkTraceStep<T>> {
-        return nextStepPaths(isInService, currentStep.path).map { NetworkTraceStep(it, computeNextT.compute(currentStep, currentContext, it)) }
+        return nextStepPaths(isInService, currentStep.path).map {
+            NetworkTraceStep(it, computeNextT.compute(currentStep, currentContext, it))
+        }
     }
 
     private fun <T> nextTraceSteps(
@@ -69,7 +71,9 @@ internal object NetworkTraceQueueNext {
         computeNextT: ComputeNextTWithPaths<T>,
     ): List<NetworkTraceStep<T>> {
         val nextPaths = nextStepPaths(isInService, currentStep.path).toList()
-        return nextPaths.map { NetworkTraceStep(it, computeNextT.compute(currentStep, currentContext, it, nextPaths)) }
+        return nextPaths.map {
+            NetworkTraceStep(it, computeNextT.compute(currentStep, currentContext, it, nextPaths))
+        }
     }
 
     private fun nextStepPaths(isInService: CheckInService, path: StepPath): Sequence<StepPath> {

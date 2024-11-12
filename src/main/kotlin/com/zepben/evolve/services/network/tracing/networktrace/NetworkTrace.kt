@@ -16,8 +16,11 @@ import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.networktrace.trackers.NetworkTraceTracker
+import com.zepben.evolve.services.network.tracing.networktrace.trackers.RecursiveNetworkTraceTracker
+import com.zepben.evolve.services.network.tracing.networktrace.trackers.TerminalNetworkTraceTracker
+import com.zepben.evolve.services.network.tracing.networktrace.trackers.toPhasesSet
 import com.zepben.evolve.services.network.tracing.traversal.*
-
 
 /**
  * A [Traversal] implementation specifically designed to trace connected [Terminal]s of [ConductingEquipment] in a network.
@@ -54,73 +57,72 @@ class NetworkTrace<T> private constructor(
     val networkStateOperators: NetworkStateOperators,
     queueType: QueueType<NetworkTraceStep<T>, NetworkTrace<T>>,
     parent: NetworkTrace<T>? = null,
-    private val onlyActionEquipment: Boolean,
-) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, { NetworkTraceTracker.terminalTracker() }, parent) {
+    private val actionType: NetworkTraceActionType,
+) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, parent) {
 
-    // TODO [Review]: Can possibly remove this tracker and get better efficiency out of checking the existing terminal tracker for each terminal on the
-    //                `toEquipment` of each step in the canAction function.
-    //                See my shelf - this ended up feeling a bit hacky because the tracker takes a NetworkTraceStep so you have to build a fake one...
-    private val equipmentTracker: RecursiveTracker<NetworkTraceStep<T>>? =
-        if (onlyActionEquipment) RecursiveTracker(parent?.equipmentTracker, NetworkTraceTracker.equipmentTracker()) else null
+    private val tracker: NetworkTraceTracker = if (queueType !is BranchingQueueType)
+        TerminalNetworkTraceTracker()
+    else
+        RecursiveNetworkTraceTracker(parent?.tracker as? RecursiveNetworkTraceTracker, TerminalNetworkTraceTracker())
 
     internal constructor(
         networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
-        onlyActionEquipment: Boolean,
+        actionType: NetworkTraceActionType,
         computeNextT: ComputeNextT<T>,
     ) : this(
         networkStateOperators,
-        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT.wrapped(onlyActionEquipment)), queue),
+        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT), queue),
         null,
-        onlyActionEquipment
+        actionType,
     )
 
     internal constructor(
         networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
-        onlyActionEquipment: Boolean,
+        actionType: NetworkTraceActionType,
         computeNextT: ComputeNextTWithPaths<T>,
     ) : this(
         networkStateOperators,
-        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT.wrapped(onlyActionEquipment)), queue),
+        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT), queue),
         null,
-        onlyActionEquipment
+        actionType,
     )
 
     internal constructor(
         networkStateOperators: NetworkStateOperators,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
-        onlyActionEquipment: Boolean,
+        actionType: NetworkTraceActionType,
         parent: NetworkTrace<T>?,
         computeNextT: ComputeNextT<T>,
     ) : this(
         networkStateOperators,
         BranchingQueueType(
-            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT.wrapped(onlyActionEquipment)),
+            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT),
             queueFactory,
             branchQueueFactory
         ),
         parent,
-        onlyActionEquipment
+        actionType,
     )
 
     internal constructor(
         networkStateOperators: NetworkStateOperators,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
-        onlyActionEquipment: Boolean,
+        actionType: NetworkTraceActionType,
         parent: NetworkTrace<T>?,
         computeNextT: ComputeNextTWithPaths<T>,
     ) : this(
         networkStateOperators,
         BranchingQueueType(
-            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT.wrapped(onlyActionEquipment)),
+            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT),
             queueFactory,
             branchQueueFactory
         ),
         parent,
-        onlyActionEquipment
+        actionType,
     )
 
     /**
@@ -235,15 +237,19 @@ class NetworkTrace<T> private constructor(
     }
 
     override fun canActionItem(item: NetworkTraceStep<T>, context: StepContext): Boolean {
-        return context.isStartItem or (equipmentTracker?.visit(item) ?: super.canActionItem(item, context))
+        return actionType.canActionItem(item, context, tracker::hasVisited)
     }
 
     override fun onReset() {
-        equipmentTracker?.clear()
+        tracker.clear()
+    }
+
+    override fun canVisitItem(item: NetworkTraceStep<T>, context: StepContext): Boolean {
+        return tracker.visit(item.path.toTerminal, item.path.nominalPhasePaths.toPhasesSet())
     }
 
     override fun getDerivedThis(): NetworkTrace<T> = this
-    override fun createNewThis(): NetworkTrace<T> = NetworkTrace(networkStateOperators, queueType, this, onlyActionEquipment)
+    override fun createNewThis(): NetworkTrace<T> = NetworkTrace(networkStateOperators, queueType, this, actionType)
 
     private fun startNominalPhasePath(phases: PhaseCode?): List<NominalPhasePath> =
         phases?.singlePhases?.map { NominalPhasePath(it, it) } ?: emptyList()
@@ -288,26 +294,4 @@ fun NetworkTrace<Unit>.run(start: Terminal, phases: PhaseCode? = null, canStopOn
  */
 fun NetworkTrace<Unit>.run(start: ConductingEquipment, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
     this.run(start, Unit, phases, canStopOnStartItem)
-}
-
-private fun <T> ComputeNextT<T>.wrapped(onlyActionEquipment: Boolean): ComputeNextT<T> = if (onlyActionEquipment) {
-    ComputeNextT { currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath ->
-        if (nextPath.tracedInternally)
-            currentStep.data
-        else
-            this.compute(currentStep, currentContext, nextPath)
-    }
-} else {
-    this
-}
-
-private fun <T> ComputeNextTWithPaths<T>.wrapped(onlyActionEquipment: Boolean): ComputeNextTWithPaths<T> = if (onlyActionEquipment) {
-    ComputeNextTWithPaths { currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: StepPath, nextPaths: List<StepPath> ->
-        if (nextPath.tracedInternally)
-            currentStep.data
-        else
-            this.compute(currentStep, currentContext, nextPath, nextPaths)
-    }
-} else {
-    this
 }

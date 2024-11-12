@@ -14,12 +14,9 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
-import com.zepben.evolve.services.network.tracing.networktrace.StepPath
-import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.*
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.networktrace.run
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 /**
@@ -64,7 +61,7 @@ class AssignToLvFeeders(
         lvFeederStartPoints: Set<ConductingEquipment>,
         lvFeedersToAssign: List<LvFeeder>,
     ): NetworkTrace<Unit> {
-        return Tracing.terminalNetworkTrace(stateOperators)
+        return Tracing.networkTrace(stateOperators, NetworkTraceActionType.ALL_STEPS)
             .addNetworkCondition { stopAtOpen() }
             .addStopCondition { (path), _ -> lvFeederStartPoints.contains(path.toEquipment) }
             .addQueueCondition { (path), _, _, _ -> !reachedHv(path.toEquipment) }

@@ -13,6 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceActionType
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
@@ -26,8 +27,9 @@ class SetDirection(
     internal val stateOperators: NetworkStateOperators,
 ) {
 
-    private val traversal: NetworkTrace<FeederDirection> = Tracing.terminalNetworkTrace(
+    private val traversal: NetworkTrace<FeederDirection> = Tracing.networkTrace(
         networkStateOperators = stateOperators,
+        actionStepType = NetworkTraceActionType.ALL_STEPS,
         { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
         { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
         computeNextT = { step: NetworkTraceStep<FeederDirection>, _, nextPath ->

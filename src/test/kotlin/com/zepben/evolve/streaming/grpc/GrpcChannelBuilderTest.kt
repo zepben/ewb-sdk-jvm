@@ -319,6 +319,18 @@ internal class GrpcChannelBuilderTest {
         assertThat(grpcChannel.channel, equalTo(authenticatedChannel))
     }
 
+    @Test
+    internal fun withTokenString() {
+        val authenticatedChannel = mockk<ManagedChannel>()
+
+        mockkStatic(NettyChannelBuilder::class)
+        every { NettyChannelBuilder.forAddress("hostname", 1234, any()).maxInboundMessageSize(any()).intercept(any<CallCredentialApplier>()).build() } returns authenticatedChannel
+
+        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure().withTokenString("token")
+            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 1))
+        assertThat(grpcChannel.channel, equalTo(authenticatedChannel))
+    }
+
     private fun ExceptionMatcher<StatusRuntimeException>.withStatusCode(expected: Status): ExceptionMatcher<StatusRuntimeException> {
         val status = exception.status ?: throw ExpectExceptionError(expected.toString(), "")
         if (expected == status) return this

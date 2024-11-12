@@ -26,10 +26,12 @@ internal class ConnectTest {
 
     private val gcbWithAddress = mockk<GrpcChannelBuilder>()
     private val gcbWithTls = mockk<GrpcChannelBuilder>()
+    private val gcbWithToken = mockk<GrpcChannelBuilder>()
     private val gcbWithAuth = mockk<GrpcChannelBuilder>()
 
     private val grpcChannel = mockk<GrpcChannel>()
     private val grpcChannelWithTls = mockk<GrpcChannel>()
+    private val grpcChannelWithToken = mockk<GrpcChannel>()
     private val grpcChannelWithAuth = mockk<GrpcChannel>()
 
     private val tokenFetcher = mockk<ZepbenTokenFetcher>()
@@ -41,9 +43,11 @@ internal class ConnectTest {
 
         every { gcbWithAddress.makeSecure("caFilename") } returns gcbWithTls
         every { gcbWithTls.withTokenFetcher(tokenFetcher) } returns gcbWithAuth
+        every { gcbWithTls.withTokenString("accessToken") } returns gcbWithToken
 
         every { gcbWithAddress.build() } returns grpcChannel
         every { gcbWithTls.build() } returns grpcChannelWithTls
+        every { gcbWithToken.build() } returns grpcChannelWithToken
         every { gcbWithAuth.build() } returns grpcChannelWithAuth
 
         every { tokenFetcher.tokenRequestData } returns tokenRequestData
@@ -60,6 +64,11 @@ internal class ConnectTest {
     @Test
     internal fun connectInsecure() {
         assertThat(Connect.connectInsecure("hostname", 1234), equalTo(grpcChannel))
+    }
+
+    @Test
+    internal fun connectWithAccessToken() {
+        assertThat(Connect.connectWithAccessToken("hostname", 1234, "accessToken", "caFilename"), equalTo(grpcChannelWithToken))
     }
 
     @Test

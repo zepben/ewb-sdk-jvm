@@ -22,12 +22,16 @@ class DownstreamTree(
     internal val stateOperators: NetworkStateOperators
 ) {
 
-    private val traversal: NetworkTrace<TreeNode> = Tracing.equipmentNetworkTrace(
+    private val traversal: NetworkTrace<TreeNode> = Tracing.networkTrace(
         networkStateOperators = stateOperators,
         queueFactory = { WeightedPriorityQueue.processQueue { it.data.sortWeight } },
         branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.data.sortWeight } },
         computeNextT = { currentItem: NetworkTraceStep<TreeNode>, _, nextPath: StepPath ->
-            TreeNode(nextPath.toEquipment, currentItem.data)
+            // TODO [Review]: computeNextT is called for every step regardless on actionStepType because queueing / queue conditions are always
+            //                run for every step regardless of actionStepType. Is this a bit yuck? Not sure what to do about it?
+            // We just pass the data along on internal steps. As the downstream tree only actions equipment
+            // we only want to create a new tree node when we step onto the next equipment
+            if (nextPath.tracedInternally) currentItem.data else TreeNode(nextPath.toEquipment, currentItem.data)
         }
     )
         .addNetworkCondition { downstream() }

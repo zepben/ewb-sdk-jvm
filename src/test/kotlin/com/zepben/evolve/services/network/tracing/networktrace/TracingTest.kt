@@ -1,6 +1,7 @@
 package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.sameInstance
 import org.junit.jupiter.api.Test
@@ -8,110 +9,119 @@ import org.junit.jupiter.api.Test
 class TracingTest {
 
     @Test
-    fun normalDownstreamTree() {
-        val trace = Tracing.normalDownstreamTree()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+    fun downstreamTree() {
+        val operators = mockk<NetworkStateOperators>()
+        val trace = Tracing.downstreamTree(operators)
+        assertThat(trace.stateOperators, sameInstance(operators))
     }
 
     @Test
-    fun currentDownstreamTree() {
-        val trace = Tracing.currentDownstreamTree()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    fun downstreamTreeDefaultsToNormal() {
+        val trace = Tracing.downstreamTree()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
     }
 
     @Test
     fun normalSetDirection() {
-        val trace = Tracing.normalSetDirection()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+        val operators = mockk<NetworkStateOperators>()
+        val trace = Tracing.setDirection(operators)
+        assertThat(trace.stateOperators, sameInstance(operators))
     }
 
     @Test
-    fun currentSetDirection() {
-        val trace = Tracing.currentSetDirection()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    fun setDirectionDefaultsToNormal() {
+        val trace = Tracing.setDirection()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
     }
 
     @Test
     fun normalRemoveDirection() {
-        val trace = Tracing.normalRemoveDirection()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+        val operators = mockk<NetworkStateOperators>()
+        val trace = Tracing.removeDirection(operators)
+        assertThat(trace.stateOperators, sameInstance(operators))
     }
 
     @Test
-    fun currentRemoveDirection() {
-        val trace = Tracing.currentRemoveDirection()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    fun removeDirectionDefaultsToNormal() {
+        val trace = Tracing.removeDirection()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
     }
 
     @Test
     fun normalAssignEquipmentToFeeders() {
-        val trace = Tracing.normalAssignEquipmentToFeeders()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+        val operators = mockk<NetworkStateOperators>()
+        val trace = Tracing.assignEquipmentToFeeders(operators)
+        assertThat(trace.stateOperators, sameInstance(operators))
     }
 
     @Test
-    fun currentAssignEquipmentToFeeders() {
-        val trace = Tracing.currentAssignEquipmentToFeeders()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    fun assignEquipmentToFeedersDefaultsToNormal() {
+        val trace = Tracing.assignEquipmentToFeeders()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
     }
 
     @Test
     fun normalAssignEquipmentToLvFeeders() {
-        val trace = Tracing.normalAssignEquipmentToLvFeeders()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+        val operators = mockk<NetworkStateOperators>()
+        val trace = Tracing.assignEquipmentToLvFeeders(operators)
+        assertThat(trace.stateOperators, sameInstance(operators))
     }
 
     @Test
-    fun currentAssignEquipmentToLvFeeders() {
-        val trace = Tracing.currentAssignEquipmentToLvFeeders()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    fun assignEquipmentToLvFeedersDefaultsToNormal() {
+        val trace = Tracing.assignEquipmentToLvFeeders()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
     }
 
     @Test
     fun normalSetPhases() {
-        val trace = Tracing.normalSetPhases()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+        val operators = mockk<NetworkStateOperators>()
+        val trace = Tracing.setPhases(operators)
+        assertThat(trace.stateOperators, sameInstance(operators))
     }
 
     @Test
-    fun currentSetPhases() {
-        val trace = Tracing.currentSetPhases()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    fun setPhasesDefaultsToNormal() {
+        val trace = Tracing.setPhases()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
     }
 
     @Test
     fun normalPhaseInferrer() {
-        val trace = Tracing.normalPhaseInferrer()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+        val operators = mockk<NetworkStateOperators>()
+        val trace = Tracing.phaseInferrer(operators)
+        assertThat(trace.stateOperators, sameInstance(operators))
     }
 
     @Test
-    fun currentPhaseInferrer() {
-        val trace = Tracing.currentPhaseInferrer()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    fun phaseInferrerDefaultsToNormal() {
+        val trace = Tracing.phaseInferrer()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
     }
 
     @Test
     fun normalRemovePhases() {
-        val trace = Tracing.normalRemovePhases()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+        val operators = mockk<NetworkStateOperators>()
+        val trace = Tracing.removePhases(operators)
+        assertThat(trace.stateOperators, sameInstance(operators))
     }
 
     @Test
-    fun currentRemovePhases() {
-        val trace = Tracing.currentRemovePhases()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    fun removePhasesDefaultsToNormal() {
+        val trace = Tracing.removePhases()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
     }
 
     @Test
     fun normalFindSwerEquipment() {
-        val trace = Tracing.normalFindSwerEquipment()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
+        val operators = mockk<NetworkStateOperators>()
+        val trace = Tracing.findSwerEquipment(operators)
+        assertThat(trace.stateOperators, sameInstance(operators))
     }
 
     @Test
-    fun currentFindSwerEquipment() {
-        val trace = Tracing.currentFindSwerEquipment()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.CURRENT))
+    fun findSwerEquipmentDefaultsToNormal() {
+        val trace = Tracing.findSwerEquipment()
+        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
     }
 }

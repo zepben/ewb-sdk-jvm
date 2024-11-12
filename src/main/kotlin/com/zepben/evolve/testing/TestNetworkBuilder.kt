@@ -16,6 +16,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import kotlin.reflect.full.primaryConstructor
 
 /**
@@ -502,21 +503,21 @@ open class TestNetworkBuilder {
      * @return The [NetworkService] created by this [TestNetworkBuilder]
      */
     fun build(applyDirectionsFromSources: Boolean = true): NetworkService {
-        Tracing.normalSetDirection().run(network)
-        Tracing.currentSetDirection().run(network)
-        Tracing.normalSetPhases().run(network)
-        Tracing.currentSetPhases().run(network)
+        Tracing.setDirection(NetworkStateOperators.NORMAL).run(network)
+        Tracing.setDirection(NetworkStateOperators.CURRENT).run(network)
+        Tracing.setPhases(NetworkStateOperators.NORMAL).run(network)
+        Tracing.setPhases(NetworkStateOperators.CURRENT).run(network)
 
         if (applyDirectionsFromSources)
             network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach {
-                Tracing.normalSetDirection().run(it)
-                Tracing.currentSetDirection().run(it)
+                Tracing.setDirection(NetworkStateOperators.NORMAL).run(it)
+                Tracing.setDirection(NetworkStateOperators.CURRENT).run(it)
             }
 
-        Tracing.normalAssignEquipmentToFeeders().run(network)
-        Tracing.currentAssignEquipmentToFeeders().run(network)
-        Tracing.normalAssignEquipmentToLvFeeders().run(network)
-        Tracing.currentAssignEquipmentToLvFeeders().run(network)
+        Tracing.assignEquipmentToFeeders(NetworkStateOperators.NORMAL).run(network)
+        Tracing.assignEquipmentToFeeders(NetworkStateOperators.CURRENT).run(network)
+        Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.CURRENT).run(network)
 
         return network
     }

@@ -10,10 +10,7 @@ package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
-import com.zepben.evolve.services.network.tracing.networktrace.StepPath
-import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.*
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.FeederDirectionStateOperations
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
@@ -31,8 +28,9 @@ class RemoveDirection(
 
     private val directionOperators: FeederDirectionStateOperations = stateOperators
 
-    private val traversal: NetworkTrace<DirectionToRemove> = Tracing.terminalNetworkTrace(
+    private val traversal: NetworkTrace<DirectionToRemove> = Tracing.networkTrace(
         networkStateOperators = stateOperators,
+        actionStepType = NetworkTraceActionType.ALL_STEPS,
         queue = WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() },
         computeNextT = ::computeNextDirectionToRemove
     )

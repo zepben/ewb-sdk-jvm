@@ -13,7 +13,7 @@ package com.zepben.evolve.services.network.tracing.traversal
  *
  * @param T The type of items being traversed.
  */
-fun interface StopCondition<T> : TraversalCondition<T> {
+fun interface StopCondition<in T> : TraversalCondition<T> {
     /**
      * Determines whether the traversal should stop at the specified item.
      *
@@ -30,4 +30,4 @@ fun interface StopCondition<T> : TraversalCondition<T> {
  * @param T The type of items being traversed.
  * @param U The type of the context value computed and used in the condition.
  */
-interface StopConditionWithContextValue<T, U> : StopCondition<T>, TypedContextValueComputer<T, U>
+interface StopConditionWithContextValue<in T, U> : StopCondition<T>, TypedContextValueComputer<T, U>

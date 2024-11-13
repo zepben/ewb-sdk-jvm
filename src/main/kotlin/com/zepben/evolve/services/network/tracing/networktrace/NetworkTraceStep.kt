@@ -19,7 +19,8 @@ import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
  * @property path The path representing the transition from one terminal to another.
  * @property data Additional data associated with this step in the trace.
  */
-class NetworkTraceStep<T>(
+// TODO [Review]: Is there a benefit to `out T` here?
+class NetworkTraceStep<out T>(
     val path: StepPath,
     // TODO [Review]: Do we like the name data?
     val data: T

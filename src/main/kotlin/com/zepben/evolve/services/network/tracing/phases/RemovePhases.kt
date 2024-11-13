@@ -60,7 +60,7 @@ class RemovePhases(
     }
 
     private fun createTrace(): NetworkTrace<EbbPhases> =
-        Tracing.networkTrace(
+        Tracing.networkTraceBranching(
             networkStateOperators = stateOperators,
             actionStepType = NetworkTraceActionType.ALL_STEPS,
             queueFactory = { processQueue { it.data.phasesToEbb.size } },

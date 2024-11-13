@@ -53,7 +53,7 @@ object Tracing {
     }
 
     @JvmStatic
-    fun <T> networkTrace(
+    fun <T> networkTraceBranching(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
@@ -64,7 +64,7 @@ object Tracing {
     }
 
     @JvmStatic
-    fun <T> networkTrace(
+    fun <T> networkTraceBranching(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
@@ -75,13 +75,13 @@ object Tracing {
     }
 
     @JvmStatic
-    fun networkTrace(
+    fun networkTraceBranching(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<Unit>> = { TraversalQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<Unit>> = { TraversalQueue.breadthFirst() },
     ): NetworkTrace<Unit> {
-        return networkTrace(networkStateOperators, actionStepType, queueFactory, branchQueueFactory) { _, _, _ -> }
+        return networkTraceBranching(networkStateOperators, actionStepType, queueFactory, branchQueueFactory) { _, _, _ -> }
     }
 
     // TODO [Review]: Replace normal/downstream variants and have a single variant that takes NetworkStateOperators, defaulting to NORMAL

@@ -171,8 +171,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return The current traversal instance.
      */
     fun copyStopConditions(other: Traversal<T, D>): D {
-        stopConditions.addAll(other.stopConditions)
-        computeNextContextFuns.putAll(other.computeNextContextFuns.filter { it.value is StopCondition<*> })
+        other.stopConditions.forEach { addStopCondition(it) }
         return getDerivedThis()
     }
 
@@ -213,8 +212,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return The current traversal instance.
      */
     fun copyQueueConditions(other: Traversal<T, D>): D {
-        queueConditions.addAll(other.queueConditions)
-        computeNextContextFuns.putAll(other.computeNextContextFuns.filter { it is QueueCondition<*> })
+        other.queueConditions.forEach { addQueueCondition(it) }
         return getDerivedThis()
     }
 
@@ -272,8 +270,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return The current traversal instance.
      */
     fun copyStepActions(other: Traversal<T, D>): D {
-        stepActions.addAll(other.stepActions)
-        computeNextContextFuns.putAll(other.computeNextContextFuns.filter { it is StepAction<*> })
+        other.stepActions.forEach { addStepAction(it) }
         return getDerivedThis()
     }
 
@@ -313,7 +310,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return The current traversal instance.
      */
     fun copyContextValueComputers(other: Traversal<T, D>): D {
-        computeNextContextFuns.putAll(other.computeNextContextFuns.filter { it.value.isStandaloneComputer() })
+        other.computeNextContextFuns.values.filter { it.isStandaloneComputer() }.forEach { addContextValueComputer(it) }
         return getDerivedThis()
     }
 

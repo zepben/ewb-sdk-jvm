@@ -13,7 +13,7 @@ package com.zepben.evolve.services.network.tracing.traversal
  *
  * @param T The type of items being traversed.
  */
-fun interface QueueCondition<T> : TraversalCondition<T> {
+fun interface QueueCondition<in T> : TraversalCondition<T> {
     /**
      * Determines whether the [nextItem] should be queued for traversal.
      *
@@ -40,4 +40,4 @@ fun interface QueueCondition<T> : TraversalCondition<T> {
  * @param T The type of items being traversed.
  * @param U The type of the context value computed and used in the condition.
  */
-interface QueueConditionWithContextValue<T, U> : QueueCondition<T>, TypedContextValueComputer<T, U>
+interface QueueConditionWithContextValue<in T, U> : QueueCondition<T>, TypedContextValueComputer<T, U>

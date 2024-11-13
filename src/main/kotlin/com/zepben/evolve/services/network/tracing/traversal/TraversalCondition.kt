@@ -15,4 +15,4 @@ package com.zepben.evolve.services.network.tracing.traversal
  *
  * @param T The type of items being traversed.
  */
-sealed interface TraversalCondition<T>
+sealed interface TraversalCondition<in T>

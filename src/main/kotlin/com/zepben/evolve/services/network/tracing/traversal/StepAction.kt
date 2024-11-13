@@ -14,7 +14,7 @@ package com.zepben.evolve.services.network.tracing.traversal
  *
  * @param T The type of items being traversed.
  */
-fun interface StepAction<T> {
+fun interface StepAction<in T> {
     /**
      * Applies the action to the specified [item].
      *

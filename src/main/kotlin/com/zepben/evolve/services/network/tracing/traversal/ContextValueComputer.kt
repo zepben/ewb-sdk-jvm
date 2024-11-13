@@ -15,7 +15,7 @@ package com.zepben.evolve.services.network.tracing.traversal
  *
  * @param T The type of items being traversed.
  */
-interface ContextValueComputer<T> {
+interface ContextValueComputer<in T> {
     /**
      * A unique key identifying the context value computed by this computer.
      */
@@ -47,7 +47,7 @@ interface ContextValueComputer<T> {
  * @param T The type of items being traversed.
  * @param U The type of the context value computed and stored.
  */
-interface TypedContextValueComputer<T, U> : ContextValueComputer<T> {
+interface TypedContextValueComputer<in T, U> : ContextValueComputer<T> {
     /**
      * Computes the initial context value of type [U] for the given starting item.
      *

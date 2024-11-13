@@ -10,6 +10,7 @@ package com.zepben.evolve.streaming.data
 
 import com.google.protobuf.Timestamp
 import com.zepben.evolve.services.common.translator.toLocalDateTime
+import com.zepben.protobuf.ns.SetCurrentStatesResponse as PBSetCurrentStatesResponse
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
@@ -29,35 +30,52 @@ class SetCurrentStatesStatusTest {
     }.build()
 
     @Test
-    fun `BatchSuccessful from protobuf and then back to protobuf`(){
-        val pb = PBBatchSuccessful.newBuilder().build()
-        val status = BatchSuccessful.fromPb(pb) as BatchSuccessful
+    fun `BatchSuccessful from protobuf and then back to protobuf`() {
+        val pb = createSetCurrentStatesResponse { success = PBBatchSuccessful.newBuilder().build() }
+
+        val status = SetCurrentStatesStatus.fromPb(pb)
         assertThat(status, instanceOf(BatchSuccessful::class.java))
-        assertThat(status.toPb(), instanceOf(PBBatchSuccessful::class.java))
+        assertThat(status?.batchId, equalTo(1))
+
+        status?.toPb()?.also {
+            assertThat(it.messageId, equalTo(1))
+            assertThat(it.success, not(equalTo(PBSetCurrentStatesResponse.getDefaultInstance())))
+        }
     }
 
     @Test
-    fun `ProcessingPaused from protobuf and then back to protobuf`(){
-        val pb = PBProcessingPaused.newBuilder().apply { since = Timestamp.newBuilder().apply { seconds = 1 }.build() }.build()
-        val status = ProcessingPaused.fromPb(pb) as ProcessingPaused
-        assertThat(status.since, equalTo(pb.since.toLocalDateTime()))
-        assertThat(status.toPb().since, equalTo(pb.since))
+    fun `ProcessingPaused from protobuf and then back to protobuf`() {
+        val pb = createSetCurrentStatesResponse {
+            paused = PBProcessingPaused.newBuilder().apply { since = Timestamp.newBuilder().apply { seconds = 1 }.build() }.build()
+        }
+
+        val status = SetCurrentStatesStatus.fromPb(pb) as ProcessingPaused
+        assertThat(status.since, equalTo(pb.paused.since.toLocalDateTime()))
+        assertThat(status.batchId, equalTo(1))
+
+        (status as SetCurrentStatesStatus).toPb().also {
+            assertThat(it.messageId, equalTo(1))
+            assertThat(it.paused.since, equalTo(pb.paused.since))
+        }
     }
 
     @Test
-    fun `BatchFailure from protobuf and then back to protobuf`(){
-        val pb = PBBatchFailure.newBuilder().apply {
-            partialFailure = true
-            addAllFailed(listOf(invalidMridPb))
-        }.build()
+    fun `BatchFailure from protobuf and then back to protobuf`() {
+        val pb = createSetCurrentStatesResponse {
+            failure = PBBatchFailure.newBuilder().apply {
+                partialFailure = true
+                addAllFailed(listOf(invalidMridPb))
+            }.build()
+        }
 
-        val status = BatchFailure.fromPb(pb) as BatchFailure
-        assertThat(status.partialFailure, equalTo(pb.partialFailure))
+
+        val status = SetCurrentStatesStatus.fromPb(pb) as BatchFailure
+        assertThat(status.partialFailure, equalTo(pb.failure.partialFailure))
         assertThat(status.failures.size, equalTo(1))
         assertThat(status.failures.first(), instanceOf(StateEventInvalidMrid::class.java))
 
-        status.toPb().let {
-            assertThat(it.partialFailure, equalTo(pb.partialFailure))
+        (status as SetCurrentStatesStatus).toPb().failure.also {
+            assertThat(it.partialFailure, equalTo(pb.failure.partialFailure))
             assertThat(it.failedList.size, equalTo(1))
             assertThat(it.failedList.first().reasonCase, equalTo(PBStateEventFailure.ReasonCase.INVALIDMRID))
         }
@@ -87,7 +105,7 @@ class SetCurrentStatesStatusTest {
         assertThat(StateEventFailure.fromPb(PBStateEventFailure.newBuilder().build()), nullValue())
     }
 
-    private fun testStateEventFailure(pb: PBStateEventFailure, clazz: Class<out StateEventFailure>){
+    private fun testStateEventFailure(pb: PBStateEventFailure, clazz: Class<out StateEventFailure>) {
         val state = StateEventFailure.fromPb(pb)
         assertThat(state?.eventId, equalTo(pb.eventId))
         assertThat(state, instanceOf(clazz))
@@ -97,4 +115,7 @@ class SetCurrentStatesStatusTest {
             assertThat(it.reasonCase, equalTo(pb.reasonCase))
         }
     }
+
+    private fun createSetCurrentStatesResponse(block: PBSetCurrentStatesResponse.Builder.() -> Unit): PBSetCurrentStatesResponse =
+        PBSetCurrentStatesResponse.newBuilder().also { it.messageId = 1 }.apply(block).build()
 }

@@ -154,7 +154,7 @@ class UpdateNetworkStateClientTest {
         act()
     }
 
-    private fun assertBatchedCurrentStatesResponse(currentStatesStatus: List<UpdateNetworkStateClient.SetCurrentStatesResponse>) {
+    private fun assertBatchedCurrentStatesResponse(currentStatesStatus: List<SetCurrentStatesStatus>) {
         assertThat(currentStatesStatus.size, equalTo(3))
         currentStatesStatus.assert<BatchSuccessful>(0)
         currentStatesStatus.assert<ProcessingPaused>(1) {
@@ -177,11 +177,11 @@ class UpdateNetworkStateClientTest {
         }
     }
 
-    private inline fun <reified T> List<UpdateNetworkStateClient.SetCurrentStatesResponse>.assert(index: Int, additionalAssertions: (T) -> Unit = {}) {
+    private inline fun <reified T> List<SetCurrentStatesStatus>.assert(index: Int, additionalAssertions: (T) -> Unit = {}) {
         this[index].also {
             assertThat(it.batchId, equalTo(index.toLong()))
-            assertThat(it.status, instanceOf(T::class.java))
-            additionalAssertions(it.status as T)
+            assertThat(it, instanceOf(T::class.java))
+            additionalAssertions(it as T)
         }
     }
 }

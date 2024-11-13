@@ -70,10 +70,10 @@ class UpdateNetworkStateClient(
      * @param batch A list of [CurrentStateEvent] objects representing a single batch of events
      * to be processed by the gRPC service.
      *
-     * @return A [SetCurrentStatesResponse] object representing the status of the batch after
+     * @return A [SetCurrentStatesStatus] object representing the status of the batch after
      * being processed by the service.
      */
-    fun setCurrentStates(batchId: Long, batch: List<CurrentStateEvent>): SetCurrentStatesResponse =
+    fun setCurrentStates(batchId: Long, batch: List<CurrentStateEvent>): SetCurrentStatesStatus =
         setCurrentStates(sequenceOf(SetCurrentStatesRequest(batchId, batch))).first()
 
     /**
@@ -85,21 +85,13 @@ class UpdateNetworkStateClient(
      * @param batches A sequence of [SetCurrentStatesRequest] objects, where each request contains a
      * collection of [CurrentStateEvent] objects to be processed by the gRPC service.
      *
-     * @return A sequence of [SetCurrentStatesResponse] objects representing the status of each batch
+     * @return A sequence of [SetCurrentStatesStatus] objects representing the status of each batch
      * after being processed by the service.
      */
-    fun setCurrentStates(batches: Sequence<SetCurrentStatesRequest>): Sequence<SetCurrentStatesResponse> {
-        val results = mutableListOf<SetCurrentStatesResponse>()
+    fun setCurrentStates(batches: Sequence<SetCurrentStatesRequest>): Sequence<SetCurrentStatesStatus> {
+        val results = mutableListOf<SetCurrentStatesStatus>()
         val responseObserver = AwaitableStreamObserver<PBSetCurrentStatesResponse> { response ->
-            val status = when (response.statusCase) {
-                PBSetCurrentStatesResponse.StatusCase.SUCCESS -> BatchSuccessful.fromPb(response.success)
-                PBSetCurrentStatesResponse.StatusCase.PAUSED -> ProcessingPaused.fromPb(response.paused)
-                PBSetCurrentStatesResponse.StatusCase.FAILURE -> BatchFailure.fromPb(response.failure)
-                else -> null
-            }
-
-            if (status != null)
-                results.add(SetCurrentStatesResponse(response.messageId, status))
+            SetCurrentStatesStatus.fromPb(response)?.also { results.add(it) }
         }
 
         val request = stub.setCurrentStates(responseObserver)
@@ -126,10 +118,10 @@ class UpdateNetworkStateClient(
      * @param batches A Java [Stream] of [SetCurrentStatesRequest] objects, where each request contains a
      * collection of [CurrentStateEvent] objects to be processed by the gRPC service.
      *
-     * @return A Java [Stream] of [SetCurrentStatesResponse] objects representing the status of each batch
+     * @return A Java [Stream] of [SetCurrentStatesStatus] objects representing the status of each batch
      * after being processed by the service.
      */
-    fun setCurrentStates(batches: Stream<SetCurrentStatesRequest>): Stream<SetCurrentStatesResponse> =
+    fun setCurrentStates(batches: Stream<SetCurrentStatesRequest>): Stream<SetCurrentStatesStatus> =
         setCurrentStates(batches.asSequence()).asStream()
 
     /**
@@ -144,20 +136,6 @@ class UpdateNetworkStateClient(
     data class SetCurrentStatesRequest(
         val batchId: Long,
         val events: List<CurrentStateEvent>
-    )
-
-    /**
-     * A response object representing the result of processing a batch of current state events.
-     *
-     * @property batchId The unique identifier of the batch that was processed. This matches the
-     * batch ID from the original request to allow correlation between request and response.
-     *
-     * @property status The result of the batch processing, represented by a [SetCurrentStatesStatus]
-     * object.
-     */
-    data class SetCurrentStatesResponse(
-        val batchId: Long,
-        val status: SetCurrentStatesStatus
     )
 
 }

@@ -369,13 +369,17 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
 
     /**
      * Starts the traversal processing items added via [addStartItem].
+     * This wil call [reset] if the traversal has previously been run.
      *
      * @param canStopOnStartItem Indicates if the traversal should check stop conditions on the starting item.
      */
     @JvmOverloads
     fun run(canStopOnStartItem: Boolean = true) {
         check(!running) { "Traversal is already running." }
-        check(!hasRun) { "Traversal must be reset before reuse." }
+
+        if (hasRun) {
+            reset()
+        }
 
         running = true
         hasRun = true
@@ -447,10 +451,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
                     current as NetworkTraceStep<*>
 
                     if (canVisitItem(current, context)) {
-                        if (current.path.toEquipment.mRID == "acLineSegment1") {
-                            var i = 0
-                            i++
-                        }
                         context.isActionableItem = canActionItem(current, context)
 
                         if (context.isActionableItem) {

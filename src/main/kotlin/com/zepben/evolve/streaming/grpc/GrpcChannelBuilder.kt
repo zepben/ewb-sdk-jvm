@@ -118,11 +118,17 @@ class GrpcChannelBuilder {
         privateKey: String
     ): GrpcChannelBuilder = makeSecure(rootCertificates?.let { File(it) }, File(certificateChain), File(privateKey))
 
+    fun makeInsecure( ): GrpcChannelBuilder = apply {
+        _channelCredentials = InsecureChannelCredentials.create()
+    }
+
     fun withTokenFetcher(tokenFetcher: ZepbenTokenFetcher): GrpcChannelBuilder = apply {
         _callCredentials = TokenCallCredentials(tokenFetcher::fetchToken)
     }
 
     fun withTokenString(tokenString: String): GrpcChannelBuilder = apply {
+        if (_callCredentials != null)
+            throw IllegalStateException("You cannot call makeSecure() or withTokenFetcher() for this connection method.")
         _callCredentials = TokenCallCredentials { tokenString }
     }
 

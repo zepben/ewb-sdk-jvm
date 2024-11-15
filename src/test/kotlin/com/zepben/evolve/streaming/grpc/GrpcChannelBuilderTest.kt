@@ -326,9 +326,19 @@ internal class GrpcChannelBuilderTest {
         mockkStatic(NettyChannelBuilder::class)
         every { NettyChannelBuilder.forAddress("hostname", 1234, any()).maxInboundMessageSize(any()).intercept(any<CallCredentialApplier>()).build() } returns authenticatedChannel
 
-        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure().withTokenString("token")
+        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeInsecure().withTokenString("token")
             .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 1))
         assertThat(grpcChannel.channel, equalTo(authenticatedChannel))
+    }
+
+    @Test
+    internal fun willThrowExceptionIfWithTokenFetcherAndWithTokenStringAreBothCalled() {
+        val tokenFetcher = ZepbenTokenFetcher("audience", "domain", AuthMethod.AUTH0)
+        val grpcChannelBuilder = GrpcChannelBuilder().forAddress("hostname", 1234).makeInsecure().withTokenFetcher(tokenFetcher)
+
+        expect {
+            grpcChannelBuilder.withTokenString("token")
+        }.toThrow<IllegalStateException>().withMessage("You cannot call makeSecure() or withTokenFetcher() for this connection method.")
     }
 
     private fun ExceptionMatcher<StatusRuntimeException>.withStatusCode(expected: Status): ExceptionMatcher<StatusRuntimeException> {

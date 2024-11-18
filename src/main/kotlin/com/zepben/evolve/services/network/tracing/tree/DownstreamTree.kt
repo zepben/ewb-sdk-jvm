@@ -13,20 +13,21 @@ import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.StepPath
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.actions.TreeNode
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
 
-
+// TODO [Review]: Move this into NetworkRoutes and push usage of generating trees via `EquipmentTreeBuilder`
 class DownstreamTree(
     internal val stateOperators: NetworkStateOperators
 ) {
 
-    private val traversal: NetworkTrace<TreeNode> = Tracing.networkTraceBranching(
+    private val traversal: NetworkTrace<TreeNode<ConductingEquipment>> = Tracing.networkTraceBranching(
         networkStateOperators = stateOperators,
-        queueFactory = { WeightedPriorityQueue.processQueue { it.data.sortWeight } },
-        branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.data.sortWeight } },
-        computeNextT = { currentItem: NetworkTraceStep<TreeNode>, _, nextPath: StepPath ->
+        queueFactory = { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
+        branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
+        computeNextT = { currentItem: NetworkTraceStep<TreeNode<ConductingEquipment>>, _, nextPath: StepPath ->
             // TODO [Review]: computeNextT is called for every step regardless on actionStepType because queueing / queue conditions are always
             //                run for every step regardless of actionStepType. Is this a bit yuck? Not sure what to do about it?
             // We just pass the data along on internal steps. As the downstream tree only actions equipment
@@ -40,9 +41,9 @@ class DownstreamTree(
             treeNode.parent?.addChild(treeNode)
         }
 
-    fun run(start: ConductingEquipment): TreeNode {
+    fun run(start: ConductingEquipment): TreeNode<ConductingEquipment> {
         val root = TreeNode(start, null)
-        traversal.run(root.conductingEquipment, root, canStopOnStartItem = false)
+        traversal.run(root.identifiedObject, root, canStopOnStartItem = false)
         return root
     }
 

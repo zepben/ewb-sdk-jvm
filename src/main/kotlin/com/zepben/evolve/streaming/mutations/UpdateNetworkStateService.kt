@@ -16,8 +16,7 @@ import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import io.grpc.stub.StreamObserver
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -33,7 +32,8 @@ import java.util.concurrent.atomic.AtomicInteger
  * @property onProcessingError A function that takes a [Throwable] object. Called when onSetCurrentStates
  * throws an exception or the [CompletableFuture] is completed with exception.
  * @property timeout Duration (in seconds) for the future to complete. It ensures that the future will complete and
- * avoid blocking the gRPC request. Note that this overrides the timeout (if set) of the future returned by onSetCurrentStates.
+ * avoid blocking the gRPC connection thread. Note that this overrides the timeout (if set) of the future returned
+ * by onSetCurrentStates.
  */
 class UpdateNetworkStateService(
     private val onSetCurrentStates: (batchId: Long, events: List<CurrentStateEvent>) -> CompletableFuture<SetCurrentStatesStatus>,
@@ -94,7 +94,7 @@ class UpdateNetworkStateService(
             }
 
             override fun onCompleted() = runBlocking {
-                // Block response observer onCompleted until all outstanding processes are completed.
+                // Block response observer from completing until all outstanding processes are completed.
                 onCompletedLock.lock()
                 responseObserver.onCompleted()
             }

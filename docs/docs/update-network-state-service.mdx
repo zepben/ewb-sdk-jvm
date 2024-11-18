@@ -21,35 +21,12 @@ You do _**NOT**_ have to do this, you can register the services directly with a 
 
 The classes you need for performing these actions can be imported from the SDK:
 
-<Tabs
-    groupId="import-example"
-    defaultValue="java"
-    values={[
-        { label: "Java", value: "java", },
-        { label: "Kotlin", value: "kotlin", },
-    ]
-}>
-<TabItem value="java">
-
-```java
-import com.zepben.evolve.conn.grpc.GrpcServer;
-import com.zepben.evolve.streaming.data.CurrentStateEvent;
-import com.zepben.evolve.streaming.data.SetCurrentStatesStatus;
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService;
-```
-
-</TabItem>
-<TabItem  value="kotlin">
-
 ```kotlin
 import com.zepben.evolve.conn.grpc.GrpcServer
 import com.zepben.evolve.streaming.data.CurrentStateEvent
 import com.zepben.evolve.streaming.data.SetCurrentStatesStatus
 import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService
 ```
-
-</TabItem>
-</Tabs>
 
 ## Creating callbacks
 
@@ -59,84 +36,27 @@ callbacks can be done as either lambdas, or full method/function implementations
 ### onSetCurrentStates
 
 The `onSetCurrentStates` callback is triggered for each request passing in a batch of current state events, and should return a
-[batch result response](update-network-state-client.mdx#batch-result-responses) to reflect the success or failure of the update process.
-
-<Tabs
-    groupId="callback-example"
-    defaultValue="java"
-    values={[
-        { label: "Java", value: "java", },
-        { label: "Kotlin", value: "kotlin", },
-    ]
-}>
-<TabItem value="java">
-
-```java
-// Using a lambda expression
-Function<List<CurrentStateEvent>, SetCurrentStatesStatus> updateCurrentStatesLambda  = (events) -> {
-    // process updating of events here and return a batch result response
-};
-
-// Using a method
-class UpdateNetworkStateServiceImpl {
-
-    SetCurrentStatesStatus updateCurrentStates(List<? extends CurrentStateEvent> events) {
-        // process updating of events here and return a batch result response
-    }
-
-}
-```
-
-</TabItem>
-<TabItem  value="kotlin">
+`CompletableFuture` of [batch result response](update-network-state-client.mdx#batch-result-responses) to reflect the success or failure of the update process.
 
 ```kotlin
 // Using a lambda expression
-var updateCurrentStatesLambda = { events: List<CurrentStateEvent> ->
-    // process updating of events here and return a batch result response
+var updateCurrentStatesLambda = { batchId: Long, events: List<CurrentStateEvent> ->
+    // process updating of events here and return a CompletableFuture of batch result response
 }
 
 // Using a method
 class UpdateNetworkStateServiceImpl {
 
-    fun updateCurrentStates(events: List<CurrentStateEvent>): SetCurrentStatesStatus {
-        // process updating of events here and return a batch result response
+    fun updateCurrentStates(batchId: Long, events: List<CurrentStateEvent>): CompletableFuture<SetCurrentStatesStatus> {
+        // process updating of events here and return a CompletableFuture of batch result response
     }
 
 }
 ```
-
-</TabItem>
-</Tabs>
 
 ## Registering callbacks
 
 Registering the callbacks with the service is as simple as passing them into the `UpdateNetworkStateService` constructor.
-
-<Tabs
-    groupId="register-example"
-    defaultValue="java"
-    values={[
-        { label: "Java", value: "java", },
-        { label: "Kotlin", value: "kotlin", },
-    ]
-}>
-<TabItem value="java">
-
-```java
-// Using lambda expressions
-UpdateNetworkStateService service = new UpdateNetworkStateService(updateCurrentStatesLambda);
-
-// Using method references
-class UpdateNetworkStateServiceImpl {
-
-    UpdateNetworkStateService service = new UpdateNetworkStateService(this::updateCurrentStates);
-
-}
-```
-
-</TabItem>
-<TabItem  value="kotlin">
 
 ```kotlin
 // Using lambda expressions
@@ -150,46 +70,10 @@ class UpdateNetworkStateServiceImpl {
 }
 ```
 
-</TabItem>
-</Tabs>
-
 ## Registering the service
 
 For the above code to have any effect, you need to register the service with a gRPC server. Once this has been done, you should start to receive callbacks for
 each request sent from a gRPC client.
-
-<Tabs
-    groupId="code-example"
-    defaultValue="java"
-    values={[
-        { label: "Java", value: "java", },
-        { label: "Kotlin", value: "kotlin", },
-    ]
-}>
-<TabItem value="java">
-
-```java
-class Main {
-
-    public static void main(String[] args) {
-        var grpcServer = new GrpcServerImpl(9001, service);
-        grpcServer.start();
-    }
-
-    class GrpcServerImpl extends GrpcServer {
-
-        GrpcServerImpl(int port, UpdateNetworkStateService service) {
-            super(port, 0, null, List.of());
-            getServerBuilder().addService(service);
-        }
-
-    }
-
-}
-```
-
-</TabItem>
-<TabItem  value="kotlin">
 
 ```kotlin
 fun main() {
@@ -202,113 +86,19 @@ fun main() {
 }
 ```
 
-</TabItem>
-</Tabs>
-
 ## Putting it all together
 
 Putting each of the steps above together, you can build the scaffold of a working application
 
 <Tabs
     groupId="code-example"
-    defaultValue="java-lambda"
+    defaultValue="kotlin-lambda"
     values={[
-        { label: "Java Lambdas", value: "java-lambda", },
-        { label: "Java Methods", value: "java-method", },
         { label: "Kotlin Lambdas", value: "kotlin-lambda", },
         { label: "Kotlin Methods", value: "kotlin-method", },
     ]
 }>
-<TabItem value="java-lambda">
 
-`Main.java`:
-```java
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService;
-
-class Main {
-
-    public static void main(String[] args) {
-        UpdateNetworkStateService service = new UpdateNetworkStateService(
-            (events) -> {
-                // process updating of events here and return a batch result response
-            });
-
-        var grpcServer = new GrpcServerImpl(9001, service);
-        grpcServer.start();
-    }
-
-}
-```
-
-`GrpcServerImpl.java`:
-```java
-import com.zepben.evolve.conn.grpc.GrpcServer;
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService;
-
-import java.util.List;
-
-class GrpcServerImpl extends GrpcServer {
-
-    GrpcServerImpl(int port, UpdateNetworkStateService service) {
-        super(port, 0, null, List.of());
-        getServerBuilder().addService(service);
-    }
-
-}
-```
-
-</TabItem>
-<TabItem value="java-method">
-
-`Main.java`:
-```java
-class Main {
-
-    public static void main(String[] args) {
-        var service = new UpdateNetworkStateServiceImpl();
-        var grpcServer = new GrpcServerImpl(9001, service.service);
-        grpcServer.start();
-    }
-
-}
-```
-
-`GrpcServerImpl.java`:
-```java
-import com.zepben.evolve.conn.grpc.GrpcServer;
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService;
-
-import java.util.List;
-
-class GrpcServerImpl extends GrpcServer {
-
-    GrpcServerImpl(int port, UpdateNetworkStateService service) {
-        super(port, 0, null, List.of());
-        getServerBuilder().addService(service);
-    }
-
-}
-```
-
-`UpdateNetworkStateServiceImpl.java`:
-```java
-import com.zepben.evolve.streaming.data.CurrentStateEvent;
-import com.zepben.evolve.streaming.data.SetCurrentStatesStatus;
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService;
-
-import java.util.List;
-
-class UpdateNetworkStateServiceImpl {
-    UpdateNetworkStateService service = new UpdateNetworkStateService(this::updateCurrentStates);
-
-    SetCurrentStatesStatus updateCurrentStates(List<? extends CurrentStateEvent> events) {
-        // process updating of events here and return a batch result response
-    }
-
-}
-```
-
-</TabItem>
 <TabItem  value="kotlin-lambda">
 
 ```kotlin
@@ -317,8 +107,8 @@ import com.zepben.evolve.streaming.data.CurrentStateEvent
 import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService
 
 fun main() {
-    val service = UpdateNetworkStateService(onSetCurrentStates = { events: List<CurrentStateEvent> ->
-        // process updating of events here and return a batch result response
+    val service = UpdateNetworkStateService(onSetCurrentStates = { batchId: Long, events: List<CurrentStateEvent> ->
+       // process updating of events here and return a CompletableFuture of batch result response
     })
 
     val grpcServer = object : GrpcServer(9001) {
@@ -341,10 +131,10 @@ import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService
 
 class UpdateNetworkStateServiceImpl {
 
-    val service = UpdateNetworkStateService(::updateCurrentStates);
+    val service = UpdateNetworkStateService(::updateCurrentStates)
 
-    fun updateCurrentStates(events: List<CurrentStateEvent>): SetCurrentStatesStatus {
-        // process updating of events here and return a batch result response
+    fun updateCurrentStates(batchId: Long, events: List<CurrentStateEvent>): CompletableFuture<SetCurrentStatesStatus> {
+        // process updating of events here and return a CompletableFuture of batch result response
     }
 
 }

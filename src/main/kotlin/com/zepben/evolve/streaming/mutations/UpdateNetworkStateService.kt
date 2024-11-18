@@ -8,12 +8,16 @@
 
 package com.zepben.evolve.streaming.mutations
 
+import com.zepben.evolve.conn.grpc.GrpcException
 import com.zepben.evolve.streaming.data.*
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
-import io.grpc.Status
 import io.grpc.stub.StreamObserver
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import java.util.concurrent.*
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * A service class that provides a simplified interface for updating network state events
@@ -23,11 +27,23 @@ import io.grpc.stub.StreamObserver
  * allowing users to update the network state using a more convenient function type.
  *
  * @property onSetCurrentStates A function that takes a list of [CurrentStateEvent] objects
- * and returns a [SetCurrentStatesStatus], which reflects the success or failure of the update process.
+ * and returns a [CompletableFuture] of [SetCurrentStatesStatus], which reflects the success or failure of
+ * the update process.
+ * @property onProcessingError A function that takes a [Throwable] object. Called when onSetCurrentStates
+ * throws an exception or the [CompletableFuture] is completed with exception.
+ * @property timeout Duration (in seconds) for the future to complete. It ensures that the future will complete and
+ * avoid blocking the gRPC connection thread. Note that this overrides the timeout (if set) of the future returned
+ * by onSetCurrentStates.
  */
 class UpdateNetworkStateService(
-    private val onSetCurrentStates: (batchId: Long, events: List<CurrentStateEvent>) -> SetCurrentStatesStatus
+    private val onSetCurrentStates: (batchId: Long, events: List<CurrentStateEvent>) -> CompletableFuture<SetCurrentStatesStatus>,
+    private val onProcessingError: (Throwable) -> Unit = {},
+    private val timeout: Long = 60
 ) : UpdateNetworkStateServiceGrpc.UpdateNetworkStateServiceImplBase() {
+
+    init {
+        require(timeout > 0) { "Property timeout must be an integer value greater than 0" }
+    }
 
     /**
      * Handles streaming requests for setting current state events and responds with the result of the operation.
@@ -47,12 +63,29 @@ class UpdateNetworkStateService(
      */
     override fun setCurrentStates(responseObserver: StreamObserver<SetCurrentStatesResponse>): StreamObserver<SetCurrentStatesRequest> =
         object : StreamObserver<SetCurrentStatesRequest> {
+            private val outstandingProcesses = AtomicInteger()
+            private val onCompletedLock = Mutex()
             override fun onNext(request: SetCurrentStatesRequest) {
                 try {
                     onSetCurrentStates(request.messageId, request.eventList.map { CurrentStateEvent.fromPb(it) })
-                        .also { responseObserver.onNext(it.toPb()) }
+                        .orTimeout(timeout, TimeUnit.SECONDS)
+                        .also { completable ->
+                            if (outstandingProcesses.incrementAndGet() == 1)
+                                onCompletedLock.tryLock()
+
+                            completable.whenComplete { result, e ->
+                                if (result != null)
+                                    responseObserver.onNext(result.toPb())
+                                else if (e != null)
+                                    handleError(request, "Error raised by the state updater", e)
+
+                                if (outstandingProcesses.decrementAndGet() == 0)
+                                    onCompletedLock.unlock()
+                            }
+                        }
+
                 } catch (e: Throwable) {
-                    responseObserver.onError(Status.INTERNAL.withDescription(e.localizedMessage).asRuntimeException())
+                    handleError(request, "onSetCurrentStates has error", e)
                 }
             }
 
@@ -60,8 +93,15 @@ class UpdateNetworkStateService(
                 throw e
             }
 
-            override fun onCompleted() {
+            override fun onCompleted() = runBlocking {
+                // Block response observer from completing until all outstanding processes are completed.
+                onCompletedLock.lock()
                 responseObserver.onCompleted()
+            }
+
+            private fun handleError(request: SetCurrentStatesRequest, message: String, e: Throwable) {
+                onProcessingError(GrpcException("$message for batch `${request.messageId}`: ${e.localizedMessage}", e))
+                responseObserver.onNext(BatchFailure(request.messageId, false, listOf()).toPb())
             }
         }
 

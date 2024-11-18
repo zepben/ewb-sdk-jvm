@@ -84,8 +84,6 @@ object Tracing {
         return networkTraceBranching(networkStateOperators, actionStepType, queueFactory, branchQueueFactory) { _, _, _ -> }
     }
 
-    // TODO [Review]: Replace normal/downstream variants and have a single variant that takes NetworkStateOperators, defaulting to NORMAL
-    // TODO Create some sort of network state test/selector/whatever grouping object that points to the appropriate network state tests/selectors/whateverers (NetworkStateOperators?)
     fun downstreamTree(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): DownstreamTree = DownstreamTree(stateOperators)
 
     fun setDirection(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): SetDirection = SetDirection(stateOperators)

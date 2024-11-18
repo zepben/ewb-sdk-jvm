@@ -148,7 +148,7 @@ class UpdateNetworkStateServiceTest {
     }
 
     @Test
-    fun `setCurrentStates should setup timeout on the future returned by onSetCurrentStates callback to avoid blocking the grpc request`() {
+    fun `setCurrentStates should setup timeout on the future returned by onSetCurrentStates callback to avoid blocking the grpc connection`() {
         startGrpcServer(false)
         every { onSetCurrentStates(capture(batchIdSlot), capture(eventsSlot)) } answers {
             CompletableFuture<SetCurrentStatesStatus>().orTimeout(60, TimeUnit.SECONDS)

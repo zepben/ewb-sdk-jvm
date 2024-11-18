@@ -29,8 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger
  *
  * @property onSetCurrentStates A function that takes a list of [CurrentStateEvent] objects
  * and returns a [CompletableFuture] of [SetCurrentStatesStatus], which reflects the success or failure of
- * the update process. Care must be taken to ensure the [CompletableFuture] is configured with a timeout to
- * avoid blocking the gRPC call.
+ * the update process.
  * @property onProcessingError A function that takes a [Throwable] object. Called when onSetCurrentStates
  * throws an exception or the [CompletableFuture] is completed with exception.
  * @property timeout Duration (in seconds) for the future to complete. It ensures that the future will complete and
@@ -64,24 +63,22 @@ class UpdateNetworkStateService(
      */
     override fun setCurrentStates(responseObserver: StreamObserver<SetCurrentStatesResponse>): StreamObserver<SetCurrentStatesRequest> =
         object : StreamObserver<SetCurrentStatesRequest> {
-            val outstandingProcesses = AtomicInteger()
-            val onCompletedLock = Mutex()
+            private val outstandingProcesses = AtomicInteger()
+            private val onCompletedLock = Mutex()
             override fun onNext(request: SetCurrentStatesRequest) {
                 try {
                     onSetCurrentStates(request.messageId, request.eventList.map { CurrentStateEvent.fromPb(it) })
                         .orTimeout(timeout, TimeUnit.SECONDS)
                         .also { completable ->
-                            // prevent onCompleted from happening when any request is being processed
                             if (outstandingProcesses.incrementAndGet() == 1)
                                 onCompletedLock.tryLock()
 
                             completable.whenComplete { result, e ->
                                 if (result != null)
                                     responseObserver.onNext(result.toPb())
-                                else if(e != null)
+                                else if (e != null)
                                     handleError(request, "Error raised by the state updater", e)
 
-                                // Allow onCompleted from happening when there are no outstanding request processing
                                 if (outstandingProcesses.decrementAndGet() == 0)
                                     onCompletedLock.unlock()
                             }
@@ -97,11 +94,12 @@ class UpdateNetworkStateService(
             }
 
             override fun onCompleted() = runBlocking {
+                // Block response observer onCompleted until all outstanding processes are completed.
                 onCompletedLock.lock()
                 responseObserver.onCompleted()
             }
 
-            private fun handleError(request: SetCurrentStatesRequest, message: String, e: Throwable){
+            private fun handleError(request: SetCurrentStatesRequest, message: String, e: Throwable) {
                 onProcessingError(GrpcException("$message for batch `${request.messageId}`: ${e.localizedMessage}", e))
                 responseObserver.onNext(BatchFailure(request.messageId, false, listOf()).toPb())
             }

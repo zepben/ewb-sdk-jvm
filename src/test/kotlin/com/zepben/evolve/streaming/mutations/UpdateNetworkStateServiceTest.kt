@@ -31,10 +31,7 @@ import org.junit.Rule
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
@@ -145,15 +142,17 @@ class UpdateNetworkStateServiceTest {
     }
 
     @Test
-    fun `constructor parameter timeout must be greater than 0`(){
+    fun `constructor parameter timeout must be greater than 0`() {
         assertThrows<IllegalArgumentException> { UpdateNetworkStateService(onSetCurrentStates, timeout = 0) }
         assertThrows<IllegalArgumentException> { UpdateNetworkStateService(onSetCurrentStates, timeout = -1) }
     }
 
     @Test
-    fun `setCurrentStates should setup timeout on the future returned by onSetCurrentStates callback to avoid blocking the grpc request`(){
+    fun `setCurrentStates should setup timeout on the future returned by onSetCurrentStates callback to avoid blocking the grpc request`() {
         startGrpcServer(false)
-        every { onSetCurrentStates(capture(batchIdSlot), capture(eventsSlot)) } answers { CompletableFuture<SetCurrentStatesStatus>().orTimeout(60, TimeUnit.SECONDS) }
+        every { onSetCurrentStates(capture(batchIdSlot), capture(eventsSlot)) } answers {
+            CompletableFuture<SetCurrentStatesStatus>().orTimeout(60, TimeUnit.SECONDS)
+        }
         val responseObserverOnCompletedLatch = CountDownLatch(1)
         every { responseObserver.onCompleted() } answers { responseObserverOnCompletedLatch.countDown() }
 
@@ -167,7 +166,7 @@ class UpdateNetworkStateServiceTest {
             assertThat(it.messageId, equalTo(request.messageId))
             assertThat(it.statusCase, equalTo(SetCurrentStatesResponse.StatusCase.FAILURE))
         }
-        verify (exactly = 2){
+        verify(exactly = 2) {
             onSetCurrentStates.invoke(batchIdSlot.captured, eventsSlot.captured)
             onProcessingError.invoke(any())
             responseObserver.onNext(responseSlot.captured)
@@ -176,10 +175,10 @@ class UpdateNetworkStateServiceTest {
     }
 
     @Test
-    fun `setCurrentStates responseObserver onCompleted should only be called when all processing has finished`() = runBlocking {
+    fun `setCurrentStates should only close response stream when all processing has finished`() = runBlocking {
         startGrpcServer(false)
         val completableFutures: List<CompletableFuture<SetCurrentStatesStatus>> = List(3) { CompletableFuture() }
-        // Configure mock with latches to synchronize the test thread with the server thread
+        // Configure mock with latches to synchronize the test thread with the gRPC server thread
         val onSetCurrentStatesLatch = CountDownLatch(3)
         every { onSetCurrentStates(capture(batchIdSlot), capture(eventsSlot)) } answers {
             onSetCurrentStatesLatch.countDown()

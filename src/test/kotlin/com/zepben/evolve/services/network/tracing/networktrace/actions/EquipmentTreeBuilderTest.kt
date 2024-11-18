@@ -1,42 +1,109 @@
-/*
- * Copyright 2021 Zeppelin Bend Pty Ltd
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-
-package com.zepben.evolve.services.network.tracing.tree
+package com.zepben.evolve.services.network.tracing.networktrace.actions
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.network.testdata.LoopingNetwork
 import com.zepben.evolve.services.network.testdata.addFeederDirections
-import com.zepben.evolve.services.network.tracing.networktrace.actions.TreeNode
-import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.feeder.DirectionLogger
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.StepPath
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
+import com.zepben.evolve.services.network.tracing.networktrace.run
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
 import com.zepben.testutils.junit.SystemLogExtension
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.util.*
 
-internal class DownstreamTreeTest {
-
+internal class EquipmentTreeBuilderTest {
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
-    internal fun downstreamTreeTest() {
+    fun `computes initial value`() {
+        val builder = EquipmentTreeBuilder()
+        val path = mockk<StepPath>()
+        val ce = mockk<ConductingEquipment>()
+        every { path.toEquipment } returns ce
+        val initialValue = builder.computeInitialValue(NetworkTraceStep(path, Unit))
+        assertThat(initialValue.parent, nullValue())
+        assertThat(initialValue.identifiedObject, sameInstance(ce))
+        assertThat(initialValue.children, empty())
+
+        // Make sure that if a step with the same equipment is computed initially it returns the same tree node, not a new node
+        val initialValue2 = builder.computeInitialValue(NetworkTraceStep(path, Unit))
+        assertThat(initialValue2, sameInstance(initialValue))
+    }
+
+    @Test
+    fun `compute next value returns existing value on internal step`() {
+        val nextPath = mockk<StepPath>()
+        every { nextPath.tracedInternally } returns true
+        val nextItem = mockk<NetworkTraceStep<*>>()
+        val treeNode = mockk<TreeNode<ConductingEquipment>>()
+
+        val builder = EquipmentTreeBuilder()
+        val nextNode = builder.computeNextValue(NetworkTraceStep(nextPath, Unit), nextItem, treeNode)
+        assertThat(nextNode, sameInstance(treeNode))
+    }
+
+    @Test
+    fun `compute next value returns new tree node on external step`() {
+        val ce = mockk<ConductingEquipment>()
+        val nextPath = mockk<StepPath>()
+        every { nextPath.tracedInternally } returns false
+        every { nextPath.toEquipment } returns ce
+        val nextItem = mockk<NetworkTraceStep<*>>()
+        val currentNode = mockk<TreeNode<ConductingEquipment>>()
+
+        val builder = EquipmentTreeBuilder()
+        val nextNode = builder.computeNextValueTyped(NetworkTraceStep(nextPath, Unit), nextItem, currentNode)
+        assertThat(nextNode.parent, sameInstance(currentNode))
+        assertThat(nextNode.identifiedObject, sameInstance(ce))
+        assertThat(nextNode.children, empty())
+    }
+
+    @Test
+    fun `add child to parent on applying step`() {
+        val builder = EquipmentTreeBuilder()
+        val item = mockk<NetworkTraceStep<*>>()
+        val ce = mockk<ConductingEquipment>()
+        val node = mockk<TreeNode<ConductingEquipment>>()
+        val parent = mockk<TreeNode<ConductingEquipment>>()
+        every { node.parent } returns parent
+        justRun { parent.addChild(node) }
+        val context = mockk<StepContext>()
+        every { context.getValue<TreeNode<ConductingEquipment>>(builder.key) } returns node
+        builder.apply(item, context)
+
+        verify(exactly = 1) { parent.addChild(node) }
+    }
+
+    @Test
+    fun `full tree integration test`() {
         val n = LoopingNetwork.create()
 
-        n.get<ConductingEquipment>("j0")!!.addFeederDirections()//.also { DirectionLogger.trace(it) }
+        n.get<ConductingEquipment>("j0")!!.addFeederDirections().also { DirectionLogger.trace(it) }
 
         val start: ConductingEquipment = n["j1"]!!
-        assertThat(start, notNullValue())
-        val root = DownstreamTree(NetworkStateOperators.NORMAL).run(start)
+        assertThat(start, Matchers.notNullValue())
+        val treeBuilder = EquipmentTreeBuilder()
+        Tracing.networkTraceBranching()
+            .addNetworkCondition { downstream() }
+            .addStepAction(treeBuilder)
+            .run(start)
 
-        assertThat(root, notNullValue())
+        val root = treeBuilder.roots.first()
+
+        assertThat(root, Matchers.notNullValue())
         assertTreeAsset(root, n["j1"], null, arrayOf(n["acLineSegment1"], n["acLineSegment3"]))
 
         var testNode = root.children[0]
@@ -146,10 +213,10 @@ internal class DownstreamTreeTest {
 
         if (parent != null) {
             val treeParent = treeNode.parent
-            assertThat(treeParent, notNullValue())
+            assertThat(treeParent, Matchers.notNullValue())
             assertThat(treeParent!!.identifiedObject, equalTo(parent))
         } else
-            assertThat(treeNode.parent, nullValue())
+            assertThat(treeNode.parent, Matchers.nullValue())
 
         assertThat(treeNode.children, hasSize(children.size))
         for (i in children.indices) {
@@ -192,5 +259,4 @@ internal class DownstreamTreeTest {
 
         return depth
     }
-
 }

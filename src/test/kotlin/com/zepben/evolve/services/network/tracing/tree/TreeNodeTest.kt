@@ -8,9 +8,8 @@
 
 package com.zepben.evolve.services.network.tracing.tree
 
-import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
+import com.zepben.evolve.services.network.tracing.networktrace.actions.TreeNode
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
@@ -30,7 +29,7 @@ internal class TreeNodeTest {
         val treeNode8 = TreeNode(Junction("j8"), treeNode7)
         val treeNode9 = TreeNode(Junction("j9"), treeNode8)
 
-        assertThat(treeNode0.conductingEquipment.mRID, equalTo("j0"))
+        assertThat(treeNode0.identifiedObject.mRID, equalTo("j0"))
         assertThat(treeNode0.parent, nullValue())
 
         treeNode0.addChild(treeNode1)
@@ -50,24 +49,12 @@ internal class TreeNodeTest {
         assertParents(treeNodes, intArrayOf(-1, 0, 0, 0, 3, 3, 5, 6, 7, 8))
     }
 
-    @Test
-    internal fun sortWeight() {
-        val treeNode0 = TreeNode(Junction("j0"), null)
-        val treeNode1 = TreeNode(
-            Junction("j1").apply { addTerminal(Terminal().apply { phases = PhaseCode.AB }) },
-            null
-        )
-
-        assertThat(treeNode0.sortWeight, equalTo(1))
-        assertThat(treeNode1.sortWeight, equalTo(2))
-    }
-
-    private fun assertChildren(treeNodes: List<TreeNode>, childCounts: IntArray) {
+    private fun assertChildren(treeNodes: List<TreeNode<*>>, childCounts: IntArray) {
         for (i in treeNodes.indices)
             assertThat(treeNodes[i].children, hasSize(childCounts[i]))
     }
 
-    private fun assertParents(treeNodes: List<TreeNode>, parents: IntArray) {
+    private fun assertParents(treeNodes: List<TreeNode<*>>, parents: IntArray) {
         for (i in treeNodes.indices) {
             if (parents[i] < 0)
                 assertThat(treeNodes[i].parent, nullValue())

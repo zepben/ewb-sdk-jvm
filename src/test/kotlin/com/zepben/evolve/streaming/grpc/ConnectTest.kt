@@ -28,6 +28,7 @@ internal class ConnectTest {
     private val gcbWithTls = mockk<GrpcChannelBuilder>()
     private val gcbWithOutTls = mockk<GrpcChannelBuilder>()
     private val gcbWithToken = mockk<GrpcChannelBuilder>()
+    private val gcbWithTlsWithToken = mockk<GrpcChannelBuilder>()
     private val gcbWithAuth = mockk<GrpcChannelBuilder>()
 
     private val grpcChannel = mockk<GrpcChannel>()
@@ -43,12 +44,15 @@ internal class ConnectTest {
         tokenRequestData.clear()
 
         every { gcbWithAddress.makeSecure("caFilename") } returns gcbWithTls
-        every { gcbWithAddress.makeInsecure() } returns gcbWithOutTls
         every { gcbWithTls.withTokenFetcher(tokenFetcher) } returns gcbWithAuth
+        every { gcbWithTls.withTokenString("accessToken") } returns gcbWithTlsWithToken
+
+        every { gcbWithAddress.makeInsecure() } returns gcbWithOutTls
         every { gcbWithOutTls.withTokenString("accessToken") } returns gcbWithToken
 
         every { gcbWithAddress.build() } returns grpcChannel
         every { gcbWithTls.build() } returns grpcChannelWithTls
+        every { gcbWithTlsWithToken.build() } returns grpcChannelWithToken
         every { gcbWithToken.build() } returns grpcChannelWithToken
         every { gcbWithAuth.build() } returns grpcChannelWithAuth
 
@@ -71,6 +75,11 @@ internal class ConnectTest {
     @Test
     internal fun connectWithAccessTokenInsecure() {
         assertThat(Connect.connectWithAccessTokenInsecure("hostname", 1234, "accessToken"), equalTo(grpcChannelWithToken))
+    }
+
+    @Test
+    internal fun connectWithAccessToken() {
+        assertThat(Connect.connectWithAccessToken("hostname", 1234, "accessToken", "caFilename"), equalTo(grpcChannelWithToken))
     }
 
     @Test

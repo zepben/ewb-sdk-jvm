@@ -129,7 +129,11 @@ class GrpcChannelBuilder {
     fun withTokenString(tokenString: String): GrpcChannelBuilder = apply {
         if (_callCredentials != null)
             throw IllegalStateException("You cannot call makeSecure() or withTokenFetcher() for this connection method.")
-        _callCredentials = TokenCallCredentials { tokenString }
+        _callCredentials = TokenCallCredentials { withToken(tokenString) }
+    }
+
+    private fun withToken(token: String, prefix: String = "Bearer"): String {
+        return "$prefix $token"
     }
 
 }

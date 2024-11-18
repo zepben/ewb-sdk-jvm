@@ -29,10 +29,12 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
@@ -70,7 +72,7 @@ class UpdateNetworkStateServiceTest {
     private val serverName = InProcessServerBuilder.generateName()
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
     private val stub = UpdateNetworkStateServiceGrpc.newStub(channel)
-    private val service = UpdateNetworkStateService(onSetCurrentStates, onProcessingError)
+    private val service = UpdateNetworkStateService(onSetCurrentStates, onProcessingError, 1)
 
     private val responseSlot = slot<SetCurrentStatesResponse>()
     private val responseErrorSlot = slot<Throwable>()
@@ -140,6 +142,37 @@ class UpdateNetworkStateServiceTest {
 
         verify { responseObserver.onError(responseErrorSlot.captured) }
         assertThat((responseErrorSlot.captured as StatusRuntimeException).status.code, equalTo(Status.CANCELLED.code))
+    }
+
+    @Test
+    fun `constructor parameter timeout must be greater than 0`(){
+        assertThrows<IllegalArgumentException> { UpdateNetworkStateService(onSetCurrentStates, timeout = 0) }
+        assertThrows<IllegalArgumentException> { UpdateNetworkStateService(onSetCurrentStates, timeout = -1) }
+    }
+
+    @Test
+    fun `setCurrentStates should setup timeout on the future returned by onSetCurrentStates callback to avoid blocking the grpc request`(){
+        startGrpcServer(false)
+        every { onSetCurrentStates(capture(batchIdSlot), capture(eventsSlot)) } answers { CompletableFuture<SetCurrentStatesStatus>().orTimeout(60, TimeUnit.SECONDS) }
+        val responseObserverOnCompletedLatch = CountDownLatch(1)
+        every { responseObserver.onCompleted() } answers { responseObserverOnCompletedLatch.countDown() }
+
+        val requestObserver = stub.setCurrentStates(responseObserver)
+        requestObserver.onNext(request)
+        requestObserver.onNext(request)
+        requestObserver.onCompleted()
+
+        responseObserverOnCompletedLatch.await()
+        responseSlot.captured.also {
+            assertThat(it.messageId, equalTo(request.messageId))
+            assertThat(it.statusCase, equalTo(SetCurrentStatesResponse.StatusCase.FAILURE))
+        }
+        verify (exactly = 2){
+            onSetCurrentStates.invoke(batchIdSlot.captured, eventsSlot.captured)
+            onProcessingError.invoke(any())
+            responseObserver.onNext(responseSlot.captured)
+        }
+        verify { responseObserver.onCompleted() }
     }
 
     @Test

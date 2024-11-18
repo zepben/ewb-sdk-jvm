@@ -17,6 +17,7 @@ import io.grpc.stub.StreamObserver
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -32,11 +33,18 @@ import java.util.concurrent.atomic.AtomicInteger
  * avoid blocking the gRPC call.
  * @property onProcessingError A function that takes a [Throwable] object. Called when onSetCurrentStates
  * throws an exception or the [CompletableFuture] is completed with exception.
+ * @property timeout Duration (in seconds) for the future to complete. It ensures that the future will complete and
+ * avoid blocking the gRPC request. Note that this overrides the timeout (if set) of the future returned by onSetCurrentStates.
  */
 class UpdateNetworkStateService(
     private val onSetCurrentStates: (batchId: Long, events: List<CurrentStateEvent>) -> CompletableFuture<SetCurrentStatesStatus>,
-    private val onProcessingError: (Throwable) -> Unit = {}
+    private val onProcessingError: (Throwable) -> Unit = {},
+    private val timeout: Long = 60
 ) : UpdateNetworkStateServiceGrpc.UpdateNetworkStateServiceImplBase() {
+
+    init {
+        require(timeout > 0) { "Property timeout must be an integer value greater than 0" }
+    }
 
     /**
      * Handles streaming requests for setting current state events and responds with the result of the operation.
@@ -61,6 +69,7 @@ class UpdateNetworkStateService(
             override fun onNext(request: SetCurrentStatesRequest) {
                 try {
                     onSetCurrentStates(request.messageId, request.eventList.map { CurrentStateEvent.fromPb(it) })
+                        .orTimeout(timeout, TimeUnit.SECONDS)
                         .also { completable ->
                             // prevent onCompleted from happening when any request is being processed
                             if (outstandingProcesses.incrementAndGet() == 1)

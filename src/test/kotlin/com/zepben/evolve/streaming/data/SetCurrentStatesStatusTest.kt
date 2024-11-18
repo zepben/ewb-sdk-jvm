@@ -39,7 +39,7 @@ class SetCurrentStatesStatusTest {
 
         status?.toPb()?.also {
             assertThat(it.messageId, equalTo(1))
-            assertThat(it.success, not(equalTo(PBSetCurrentStatesResponse.getDefaultInstance())))
+            assertThat(it.statusCase, equalTo(PBSetCurrentStatesResponse.StatusCase.SUCCESS))
         }
     }
 

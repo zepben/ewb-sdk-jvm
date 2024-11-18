@@ -40,9 +40,9 @@ import com.zepben.evolve.services.network.tracing.traversal.*
  * - **Internal Step**: Moves between terminals within the same [Terminal.conductingEquipment].
  *
  * Often, you may want to act upon a [ConductingEquipment] only once, rather than multiple times for each internal and external terminal step.
- * To achieve this, set the `onlyActionEquipment` flag to `true`. With this flag enabled, the trace will only call step actions and stop conditions once
- * for each [ConductingEquipment], regardless of how many terminals it has. However, queue conditions are always called for each terminal step regardless
- * of the flag, since the trace is terminal connectivity-based, and not calling queue conditions for every step can disrupt the traversal.
+ * To achieve this, [actionType] to [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT]. With this type enabled, the trace will only call step actions and
+ * stop conditions once for each [ConductingEquipment], regardless of how many terminals it has. However, queue conditions are always called for each terminal
+ * step regardless of the flag, since the trace is terminal connectivity-based, and not calling queue conditions for every step can disrupt the traversal.
  *
  * The network trace is state-aware by requiring an instance of [NetworkStateOperators].
  * This allows traversal conditions and step actions to query and act upon state-based properties and functions of equipment in the network when required.
@@ -72,7 +72,7 @@ class NetworkTrace<T> private constructor(
         computeNextT: ComputeNextT<T>,
     ) : this(
         networkStateOperators,
-        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT), queue),
+        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT.withType(actionType)), queue),
         null,
         actionType,
     )
@@ -84,7 +84,7 @@ class NetworkTrace<T> private constructor(
         computeNextT: ComputeNextTWithPaths<T>,
     ) : this(
         networkStateOperators,
-        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT), queue),
+        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT.withType(actionType)), queue),
         null,
         actionType,
     )
@@ -99,7 +99,7 @@ class NetworkTrace<T> private constructor(
     ) : this(
         networkStateOperators,
         BranchingQueueType(
-            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT),
+            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT.withType(actionType)),
             queueFactory,
             branchQueueFactory
         ),
@@ -117,7 +117,7 @@ class NetworkTrace<T> private constructor(
     ) : this(
         networkStateOperators,
         BranchingQueueType(
-            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT),
+            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT.withType(actionType)),
             queueFactory,
             branchQueueFactory
         ),
@@ -256,42 +256,23 @@ class NetworkTrace<T> private constructor(
 
 }
 
-/**
- * Convenience extension function for [NetworkTrace.addStartItem] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
- *
- * @param start The starting terminal for the trace.
- * @param phases Phases to trace; `null` to ignore phases.
- */
-fun NetworkTrace<Unit>.addStartItem(start: Terminal, phases: PhaseCode? = null) {
-    addStartItem(start, Unit, phases)
-}
+// TODO [Review]: Should computeNextT still be called for every step regardless on actionStepType because queueing / queue conditions are always
+//                run for every step regardless of actionStepType?
+private fun <T> ComputeNextT<T>.withType(actionType: NetworkTraceActionType): ComputeNextT<T> =
+    when (actionType) {
+        NetworkTraceActionType.ALL_STEPS -> this
+        NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT -> ComputeNextT { currentStep, currentContext, nextPath ->
+            // We just pass the data along on internal steps as a first step on equipment will always happen on an external step.
+            if (nextPath.tracedInternally) currentStep.data
+            else compute(currentStep, currentContext, nextPath)
+        }
+    }
 
-/**
- * Convenience extension function for [NetworkTrace.addStartItem] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
- *
- * @param start The starting equipment to add each terminal of to the start equipment of the trace.
- * @param phases Phases to trace; `null` to ignore phases.
- */
-fun NetworkTrace<Unit>.addStartItem(start: ConductingEquipment, phases: PhaseCode? = null) {
-    start.terminals.forEach { addStartItem(it, Unit, phases) }
-}
-
-/**
- * Convenience extension function for [NetworkTrace.run] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
- *
- * @param start The starting terminal for the trace.
- * @param phases Phases to trace; `null` to ignore phases.
- */
-fun NetworkTrace<Unit>.run(start: Terminal, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
-    this.run(start, Unit, phases, canStopOnStartItem)
-}
-
-/**
- * Convenience extension function for [NetworkTrace.run] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
- *
- * @param start The starting equipment to add each terminal of to the start equipment of the trace.
- * @param phases Phases to trace; `null` to ignore phases.
- */
-fun NetworkTrace<Unit>.run(start: ConductingEquipment, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
-    this.run(start, Unit, phases, canStopOnStartItem)
-}
+private fun <T> ComputeNextTWithPaths<T>.withType(actionType: NetworkTraceActionType): ComputeNextTWithPaths<T> =
+    when (actionType) {
+        NetworkTraceActionType.ALL_STEPS -> this
+        NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT -> ComputeNextTWithPaths { currentStep, currentContext, nextPath, nextPaths ->
+            if (nextPath.tracedInternally) currentStep.data
+            else compute(currentStep, currentContext, nextPath, nextPaths)
+        }
+    }

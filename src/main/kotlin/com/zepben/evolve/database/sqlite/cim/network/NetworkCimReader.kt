@@ -2627,6 +2627,35 @@ class NetworkCimReader(
     }
 
     /**
+     * [ZBEX]
+     * Create a [BatteryUnit] to [BatteryControl] association from [TableBatteryUnitsBatteryControls].
+     *
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
+     *
+     * @return true if the association was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @ZBEX
+    @Throws(SQLException::class)
+    fun load(table: TableBatteryUnitsBatteryControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val batteryUnitMRID = resultSet.getString(table.BATTERY_UNIT_MRID.queryIndex)
+        setIdentifier("${batteryUnitMRID}-to-UNKNOWN")
+
+        val batteryControlMRID = resultSet.getString(table.BATTERY_CONTROL_MRID.queryIndex)
+        val id = setIdentifier("${batteryUnitMRID}-to-${batteryControlMRID}")
+
+        val typeNameAndMRID = "BatteryUnit to BatteryControl association $id"
+        val batteryUnit = service.getOrThrow<BatteryUnit>(batteryUnitMRID, typeNameAndMRID)
+        val batteryControl = service.getOrThrow<BatteryControl>(batteryControlMRID, typeNameAndMRID)
+
+        batteryUnit.addControl(batteryControl)
+
+        return true
+    }
+
+    /**
      * Create a [Circuit] to [Substation] association from [TableCircuitsSubstations].
      *
      * @param table The database table to read the association from.
@@ -2677,6 +2706,33 @@ class NetworkCimReader(
         val terminal = service.getOrThrow<Terminal>(terminalMRID, typeNameAndMRID)
 
         circuit.addEndTerminal(terminal)
+
+        return true
+    }
+
+    /**
+     * Create a [EndDevice] to [EndDeviceFunction] association from [TableEndDevicesEndDeviceFunctions].
+     *
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
+     *
+     * @return true if the association was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableEndDevicesEndDeviceFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val endDeviceMRID = resultSet.getString(table.END_DEVICE_MRID.queryIndex)
+        setIdentifier("${endDeviceMRID}-to-UNKNOWN")
+
+        val endDeviceFunctionMRID = resultSet.getString(table.END_DEVICE_FUNCTION_MRID.queryIndex)
+        val id = setIdentifier("${endDeviceMRID}-to-${endDeviceFunctionMRID}")
+
+        val typeNameAndMRID = "EndDevice to EndDeviceFunction association $id"
+        val endDevice = service.getOrThrow<EndDevice>(endDeviceMRID, typeNameAndMRID)
+        val endDeviceFunction = service.getOrThrow<EndDeviceFunction>(endDeviceFunctionMRID, typeNameAndMRID)
+
+        endDevice.addFunction(endDeviceFunction)
 
         return true
     }

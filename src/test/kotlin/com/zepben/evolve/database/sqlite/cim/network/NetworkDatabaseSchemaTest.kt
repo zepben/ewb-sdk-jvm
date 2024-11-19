@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.cim.network
 
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
@@ -111,6 +113,12 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
 
     @Test
     internal fun `test schema for each supported type`() {
+        /************ [ZBEX] EXTENSIONS IEC61968 METERING ************/
+        validateSchema(SchemaServices.networkServicesOf(::BatteryControl, BatteryControl::fillFields))
+
+        /************ [ZBEX] EXTENSIONS IEC61970 BASE WIRES ************/
+        validateSchema(SchemaServices.networkServicesOf(::PanDemandResponseFunction, PanDemandResponseFunction::fillFields))
+
         /************ IEC61968 ASSET INFO ************/
         validateSchema(SchemaServices.networkServicesOf(::CableInfo, CableInfo::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::NoLoadTest, NoLoadTest::fillFields))
@@ -211,6 +219,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         validateSchema(SchemaServices.networkServicesOf(::ReactiveCapabilityCurve, ReactiveCapabilityCurve::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Recloser, Recloser::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::SeriesCompensator, SeriesCompensator::fillFields))
+        validateSchema(SchemaServices.networkServicesOf(::StaticVarCompensator, StaticVarCompensator::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::SynchronousMachine, SynchronousMachine::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::TapChangerControl, TapChangerControl::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::TransformerStarImpedance, TransformerStarImpedance::fillFields))

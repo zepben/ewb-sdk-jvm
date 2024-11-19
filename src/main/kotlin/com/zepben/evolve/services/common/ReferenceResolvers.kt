@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.services.common
 
+import com.zepben.evolve.cim.extensions.ZBEX
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.Asset
 import com.zepben.evolve.cim.iec61968.assets.AssetOrganisationRole
@@ -24,6 +26,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransforme
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
+import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunction
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
@@ -41,6 +44,7 @@ import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
@@ -466,6 +470,24 @@ internal object ProtectionRelayFunctionToRelayInfoResolver : ReferenceResolver<P
 
 internal object SynchronousMachineToReactiveCapabilityCurveResolver : ReferenceResolver<SynchronousMachine, ReactiveCapabilityCurve> by KReferenceResolver(
     SynchronousMachine::class, ReactiveCapabilityCurve::class, SynchronousMachine::addCurve
+)
+
+@ZBEX
+internal object BatteryControlToBatteryUnitResolver : ReferenceResolver<BatteryControl, BatteryUnit> by KReferenceResolver(
+    BatteryControl::class, BatteryUnit::class, BatteryControl::batteryUnit.setter
+)
+
+@ZBEX
+internal object BatteryUnitToBatteryControlResolver : ReferenceResolver<BatteryUnit, BatteryControl> by KReferenceResolver(
+    BatteryUnit::class, BatteryControl::class, BatteryUnit::addControl
+)
+
+internal object EndDeviceToEndDeviceFunctionResolver : ReferenceResolver<EndDevice, EndDeviceFunction> by KReferenceResolver(
+    EndDevice::class, EndDeviceFunction::class, EndDevice::addFunction
+)
+
+internal object EndDeviceFunctionToEndDeviceResolver : ReferenceResolver<EndDeviceFunction, EndDevice> by KReferenceResolver(
+    EndDeviceFunction::class, EndDevice::class, EndDeviceFunction::endDevice.setter
 )
 
 //-------------------------------------------//

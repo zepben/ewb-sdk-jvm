@@ -34,6 +34,8 @@ internal class RegulatingControlTest {
     internal fun accessorCoverage() {
         val regulatingControl = object : RegulatingControl() {}
 
+        assertThat(regulatingControl.ctPrimary, nullValue())
+        assertThat(regulatingControl.minTargetDeadband, nullValue())
         assertThat(regulatingControl.discrete, nullValue())
         assertThat(regulatingControl.enabled, nullValue())
         assertThat(regulatingControl.mode, equalTo(RegulatingControlModeKind.UNKNOWN_CONTROL_MODE))
@@ -48,6 +50,8 @@ internal class RegulatingControlTest {
 
         regulatingControl.fillFields(NetworkService())
 
+        assertThat(regulatingControl.ctPrimary, equalTo(1.0))
+        assertThat(regulatingControl.minTargetDeadband, equalTo(2.0))
         assertThat(regulatingControl.discrete, equalTo(false))
         assertThat(regulatingControl.mode, equalTo(RegulatingControlModeKind.voltage))
         assertThat(regulatingControl.monitoredPhase, equalTo(PhaseCode.ABC))

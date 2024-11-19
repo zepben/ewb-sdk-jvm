@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.services.network.translator
 
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOrganisationRole
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
@@ -19,6 +21,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransforme
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
+import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunction
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -65,6 +68,12 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
     private val nsToPb = NetworkCimToProto()
 
     override val validationInfo = listOf(
+        /************ EXTENSIONS IEC61968 METERING ************/
+        ValidationInfo(PanDemandResponseFunction(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+
+        /************ EXTENSIONS IEC61970 BASE WIRES ************/
+        ValidationInfo(BatteryControl(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+
         /************ IEC61968 ASSET INFO ************/
         ValidationInfo(CableInfo(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(NoLoadTest(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
@@ -165,6 +174,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         ValidationInfo(ReactiveCapabilityCurve(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(Recloser(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(SeriesCompensator(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(StaticVarCompensator(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(SynchronousMachine(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(TransformerStarImpedance(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(TapChangerControl(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
@@ -184,6 +194,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         Curve::class.java to { ReactiveCapabilityCurve(it) },
         EarthFaultCompensator::class.java to { GroundingImpedance(it) },
         EndDevice::class.java to { Meter(it) },
+        EndDeviceFunction::class.java to { PanDemandResponseFunction(it) },
         Equipment::class.java to { Junction(it) },
         EquipmentContainer::class.java to { Site(it) },
         Measurement::class.java to { Discrete(it) },
@@ -201,8 +212,10 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         super.excludedTables + setOf(
             // Excluded associations
             TableAssetOrganisationRolesAssets::class,
+            TableBatteryUnitsBatteryControls::class,
             TableCircuitsSubstations::class,
             TableCircuitsTerminals::class,
+            TableEndDevicesEndDeviceFunctions::class,
             TableEquipmentEquipmentContainers::class,
             TableEquipmentOperationalRestrictions::class,
             TableEquipmentUsagePoints::class,

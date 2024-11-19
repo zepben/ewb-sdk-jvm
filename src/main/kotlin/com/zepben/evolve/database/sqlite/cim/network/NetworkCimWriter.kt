@@ -659,6 +659,7 @@ class NetworkCimWriter(
 
         var status = true
         endDevice.usagePoints.forEach { status = status and saveAssociation(it, endDevice) }
+        endDevice.functions.forEach { status = status and saveAssociation(it, endDevice) }
 
         return status and saveAssetContainer(table, insert, endDevice, description)
     }
@@ -1419,6 +1420,9 @@ class NetworkCimWriter(
         insert.setString(table.BATTERY_STATE.queryIndex, batteryUnit.batteryState.name)
         insert.setNullableLong(table.RATED_E.queryIndex, batteryUnit.ratedE)
         insert.setNullableLong(table.STORED_E.queryIndex, batteryUnit.storedE)
+
+        var status = true
+        batteryUnit.controls.forEach { status = status and saveAssociation(batteryUnit, it) }
 
         return savePowerElectronicsUnit(table, insert, batteryUnit, "battery unit")
     }
@@ -2422,6 +2426,18 @@ class NetworkCimWriter(
         return insert.tryExecuteSingleUpdate("asset organisation role to asset association")
     }
 
+    @ZBEX
+    @Throws(SQLException::class)
+    private fun saveAssociation(batteryUnit: BatteryUnit, batteryControl: BatteryControl): Boolean {
+        val table = databaseTables.getTable<TableBatteryUnitsBatteryControls>()
+        val insert = databaseTables.getInsert<TableBatteryUnitsBatteryControls>()
+
+        insert.setString(table.BATTERY_UNIT_MRID.queryIndex, batteryUnit.mRID)
+        insert.setString(table.BATTERY_CONTROL_MRID.queryIndex, batteryControl.mRID)
+
+        return insert.tryExecuteSingleUpdate("battery control to battery unit association")
+    }
+
     @Throws(SQLException::class)
     private fun saveAssociation(circuit: Circuit, substation: Substation): Boolean {
         val table = databaseTables.getTable<TableCircuitsSubstations>()
@@ -2442,6 +2458,17 @@ class NetworkCimWriter(
         insert.setString(table.TERMINAL_MRID.queryIndex, terminal.mRID)
 
         return insert.tryExecuteSingleUpdate("circuit to terminal association")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveAssociation(endDeviceFunction: EndDeviceFunction, endDevice: EndDevice): Boolean {
+        val table = databaseTables.getTable<TableEndDevicesEndDeviceFunctions>()
+        val insert = databaseTables.getInsert<TableEndDevicesEndDeviceFunctions>()
+
+        insert.setString(table.END_DEVICE_FUNCTION_MRID.queryIndex, endDeviceFunction.mRID)
+        insert.setString(table.END_DEVICE_MRID.queryIndex, endDevice.mRID)
+
+        return insert.tryExecuteSingleUpdate("end device function to end device association")
     }
 
     @Throws(SQLException::class)

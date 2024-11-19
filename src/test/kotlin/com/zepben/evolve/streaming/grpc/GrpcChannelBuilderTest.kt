@@ -320,25 +320,25 @@ internal class GrpcChannelBuilderTest {
     }
 
     @Test
-    internal fun withTokenString() {
+    internal fun withAccessToken() {
         val authenticatedChannel = mockk<ManagedChannel>()
 
         mockkStatic(NettyChannelBuilder::class)
         every { NettyChannelBuilder.forAddress("hostname", 1234, any()).maxInboundMessageSize(any()).intercept(any<CallCredentialApplier>()).build() } returns authenticatedChannel
 
-        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeInsecure().withTokenString("token")
+        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeInsecure().withAccessToken("token")
             .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 1))
         assertThat(grpcChannel.channel, equalTo(authenticatedChannel))
     }
 
     @Test
-    internal fun willThrowExceptionIfWithTokenFetcherAndWithTokenStringAreBothCalled() {
+    internal fun `will throw exception if withTokenFetcher is called before withAccessToken`() {
         val tokenFetcher = ZepbenTokenFetcher("audience", "domain", AuthMethod.AUTH0)
         val grpcChannelBuilder = GrpcChannelBuilder().forAddress("hostname", 1234).makeInsecure().withTokenFetcher(tokenFetcher)
 
         expect {
-            grpcChannelBuilder.withTokenString("token")
-        }.toThrow<IllegalStateException>().withMessage("You cannot call makeSecure() or withTokenFetcher() for this connection method.")
+            grpcChannelBuilder.withAccessToken("token")
+        }.toThrow<IllegalArgumentException>().withMessage("Call credential already set in connection builder.")
     }
 
     private fun ExceptionMatcher<StatusRuntimeException>.withStatusCode(expected: Status): ExceptionMatcher<StatusRuntimeException> {

@@ -8,7 +8,8 @@
 * Client functionality for updating and querying network states via gRPC service stub. 
 * `BaseService` now contains a `MetadataCollection` to tightly couple the metadata to the associated service.
 * Added `Services`, a new class which contains a copy of each `BaseService` supported by the SDK.
-* Added `connectWithAccessTokenInsecure()` for connecting to a gRPC service using an access token without SSL/TLS.
+* Added `connectWithAccessTokenInsecure()` for connecting to a gRPC service using an access token without SSL/TLS for testing.
+* Added `connectWithAccessToken()` for connecting to a gRPC service using an access token with SSL/TLS.
 
 ### Enhancements
 * None.

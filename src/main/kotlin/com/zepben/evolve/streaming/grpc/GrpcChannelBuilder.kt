@@ -123,12 +123,14 @@ class GrpcChannelBuilder {
     }
 
     fun withTokenFetcher(tokenFetcher: ZepbenTokenFetcher): GrpcChannelBuilder = apply {
+        if (_callCredentials != null)
+            throw IllegalArgumentException("Call credential already set in connection builder.")
         _callCredentials = TokenCallCredentials(tokenFetcher::fetchToken)
     }
 
-    fun withTokenString(tokenString: String): GrpcChannelBuilder = apply {
+    fun withAccessToken(tokenString: String): GrpcChannelBuilder = apply {
         if (_callCredentials != null)
-            throw IllegalStateException("You cannot call makeSecure() or withTokenFetcher() for this connection method.")
+            throw IllegalArgumentException("Call credential already set in connection builder.")
         _callCredentials = TokenCallCredentials { withToken(tokenString) }
     }
 

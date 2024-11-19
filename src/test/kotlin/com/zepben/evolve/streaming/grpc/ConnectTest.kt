@@ -45,10 +45,10 @@ internal class ConnectTest {
 
         every { gcbWithAddress.makeSecure("caFilename") } returns gcbWithTls
         every { gcbWithTls.withTokenFetcher(tokenFetcher) } returns gcbWithAuth
-        every { gcbWithTls.withTokenString("accessToken") } returns gcbWithTlsWithToken
+        every { gcbWithTls.withAccessToken("accessToken") } returns gcbWithTlsWithToken
 
         every { gcbWithAddress.makeInsecure() } returns gcbWithOutTls
-        every { gcbWithOutTls.withTokenString("accessToken") } returns gcbWithToken
+        every { gcbWithOutTls.withAccessToken("accessToken") } returns gcbWithToken
 
         every { gcbWithAddress.build() } returns grpcChannel
         every { gcbWithTls.build() } returns grpcChannelWithTls

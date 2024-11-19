@@ -72,7 +72,7 @@ object Connect {
         personalAccessToken: String,
         caFilename: String? = null
     ): GrpcChannel {
-        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenString(personalAccessToken).build()
+        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withAccessToken(personalAccessToken).build()
     }
 
     /**
@@ -90,7 +90,7 @@ object Connect {
         rpcPort: Int = 50051,
         personalAccessToken: String
     ): GrpcChannel {
-        return GrpcChannelBuilder().forAddress(host, rpcPort).makeInsecure().withTokenString(personalAccessToken).build()
+        return GrpcChannelBuilder().forAddress(host, rpcPort).makeInsecure().withAccessToken(personalAccessToken).build()
     }
 
     /**

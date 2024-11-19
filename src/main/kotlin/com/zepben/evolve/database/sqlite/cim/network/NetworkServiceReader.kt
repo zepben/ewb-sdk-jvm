@@ -11,6 +11,8 @@ package com.zepben.evolve.database.sqlite.cim.network
 import com.zepben.evolve.database.sqlite.cim.BaseServiceReader
 import com.zepben.evolve.database.sqlite.cim.CimReader
 import com.zepben.evolve.database.sqlite.cim.tables.associations.*
+import com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions
+import com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61970.base.wires.TableBatteryControls
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableAssetOwners
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TablePoles
@@ -85,7 +87,9 @@ class NetworkServiceReader @JvmOverloads constructor(
             .andLoadEach<TableAssetOwners>(reader::load)
             .andLoadEach<TablePoles>(reader::load)
             .andLoadEach<TableStreetlights>(reader::load)
+            .andLoadEach<TablePanDemandResponseFunctions>(reader::load)
             .andLoadEach<TableMeters>(reader::load)
+            .andLoadEach<TableEndDevicesEndDeviceFunctions>(reader::load)
             .andLoadEach<TableUsagePoints>(reader::load)
             .andLoadEach<TableOperationalRestrictions>(reader::load)
             .andLoadEach<TableBaseVoltages>(reader::load)
@@ -118,6 +122,7 @@ class NetworkServiceReader @JvmOverloads constructor(
             .andLoadEach<TableGrounds>(reader::load)
             .andLoadEach<TableGroundDisconnectors>(reader::load)
             .andLoadEach<TableSeriesCompensators>(reader::load)
+            .andLoadEach<TableStaticVarCompensators>(reader::load)
             .andLoadEach<TableLinearShuntCompensators>(reader::load)
             .andLoadEach<TablePowerTransformers>(reader::load)
             .andLoadEach<TableReclosers>(reader::load)
@@ -130,7 +135,9 @@ class NetworkServiceReader @JvmOverloads constructor(
             .andLoadEach<TableTerminals>(reader::load)
             .andLoadEach<TableTapChangerControls>(reader::load)
             .andLoadEach<TablePowerElectronicsConnectionPhases>(reader::load)
+            .andLoadEach<TableBatteryControls>(reader::load)
             .andLoadEach<TableBatteryUnits>(reader::load)
+            .andLoadEach<TableBatteryUnitsBatteryControls>(reader::load)
             .andLoadEach<TablePhotoVoltaicUnits>(reader::load)
             .andLoadEach<TablePowerElectronicsWindUnits>(reader::load)
             .andLoadEach<TableEvChargingUnits>(reader::load)

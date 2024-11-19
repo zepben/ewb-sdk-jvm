@@ -9,6 +9,9 @@
 package com.zepben.evolve.services.network.translator
 
 import com.google.protobuf.NullValue
+import com.zepben.evolve.cim.extensions.ZBEX
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
@@ -17,6 +20,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransfor
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
+import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunction
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -42,11 +46,14 @@ import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.common.translator.BaseCimToProto
 import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.evolve.services.common.translator.toTimestamp
+import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControlMode
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerFunctionKind
+import com.zepben.protobuf.cim.iec61968.metering.EndDeviceFunctionKind
 import com.zepben.protobuf.cim.iec61970.base.auxiliaryequipment.PotentialTransformerKind
 import com.zepben.protobuf.cim.iec61970.base.wires.PhaseShuntConnectionKind
+import com.zepben.protobuf.cim.iec61970.base.wires.SVCControlMode
 import com.zepben.protobuf.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.protobuf.cim.iec61970.base.wires.SynchronousMachineKind
 import com.zepben.protobuf.cim.iec61970.base.wires.TransformerCoolingType
@@ -55,6 +62,8 @@ import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind
 import com.zepben.protobuf.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.protobuf.network.model.FeederDirection
+import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
+import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControl as PBBatteryControl
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.NoLoadTest as PBNoLoadTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.OpenCircuitTest as PBOpenCircuitTest
@@ -69,6 +78,7 @@ import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTest as PBTransform
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireInfo as PBWireInfo
 import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
 import com.zepben.protobuf.cim.iec61968.assets.AssetContainer as PBAssetContainer
+import com.zepben.protobuf.cim.iec61968.assets.AssetFunction as PBAssetFunction
 import com.zepben.protobuf.cim.iec61968.assets.AssetInfo as PBAssetInfo
 import com.zepben.protobuf.cim.iec61968.assets.AssetOrganisationRole as PBAssetOrganisationRole
 import com.zepben.protobuf.cim.iec61968.assets.AssetOwner as PBAssetOwner
@@ -86,6 +96,7 @@ import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransf
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infcommon.Ratio as PBRatio
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
+import com.zepben.protobuf.cim.iec61968.metering.EndDeviceFunction as PBEndDeviceFunction
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint as PBUsagePoint
 import com.zepben.protobuf.cim.iec61968.operations.OperationalRestriction as PBOperationalRestriction
@@ -169,6 +180,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingControlModeKind as 
 import com.zepben.protobuf.cim.iec61970.base.wires.RotatingMachine as PBRotatingMachine
 import com.zepben.protobuf.cim.iec61970.base.wires.SeriesCompensator as PBSeriesCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCompensator
+import com.zepben.protobuf.cim.iec61970.base.wires.StaticVarCompensator as PBStaticVarCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.SynchronousMachine as PBSynchronousMachine
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
@@ -185,6 +197,59 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
 import com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind as PBProtectionKind
 import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit as PBEvChargingUnit
+
+// #######################################
+// # [ZBEX] EXTENSIONS IEC61968 METERING #
+// #######################################
+
+/**
+ * Convert the [PanDemandResponseFunction] into its protobuf counterpart.
+ *
+ * @param cim The [PanDemandResponseFunction] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+@ZBEX
+fun toPb(cim: PanDemandResponseFunction, pb: PBPanDemandResponseFunction.Builder): PBPanDemandResponseFunction.Builder =
+    pb.apply {
+        kind = EndDeviceFunctionKind.valueOf(cim.kind.name)
+        appliance = cim.appliance?.toInt() ?: UNKNOWN_INT
+        toPb(cim, edfBuilder)
+    }
+
+/**
+ * An extension for converting any PanDemandResponseFunction into its protobuf counterpart.
+ */
+@ZBEX
+fun PanDemandResponseFunction.toPb(): PBPanDemandResponseFunction = toPb(this, PBPanDemandResponseFunction.newBuilder()).build()
+
+// #########################################
+// # [ZBEX] EXTENSIONS IEC61970 BASE WRIES #
+// #########################################
+
+/**
+ * Convert the [BatteryControl] into its protobuf counterpart.
+ *
+ * @param cim The [BatteryControl] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+@ZBEX
+fun toPb(cim: BatteryControl, pb: PBBatteryControl.Builder): PBBatteryControl.Builder =
+    pb.apply {
+        cim.batteryUnit?.let { batteryUnitMRID = it.mRID } ?: clearBatteryUnitMRID()
+        chargingRate = cim.chargingRate ?: UNKNOWN_DOUBLE
+        dischargingRate = cim.dischargingRate ?: UNKNOWN_DOUBLE
+        reservePercent = cim.reservePercent ?: UNKNOWN_DOUBLE
+        controlMode = BatteryControlMode.valueOf(cim.controlMode.name)
+        toPb(cim, rcBuilder)
+    }
+
+/**
+ * An extension for converting any BatteryControl into its protobuf counterpart.
+ */
+@ZBEX
+fun BatteryControl.toPb(): PBBatteryControl = toPb(this, PBBatteryControl.newBuilder()).build()
 
 // #######################
 // # IEC61968 ASSET INFO #
@@ -461,6 +526,16 @@ fun toPb(cim: Asset, pb: PBAsset.Builder): PBAsset.Builder =
  */
 fun toPb(cim: AssetContainer, pb: PBAssetContainer.Builder): PBAssetContainer.Builder =
     pb.apply { toPb(cim, atBuilder) }
+
+/**
+ * Convert the [AssetFunction] into its protobuf counterpart.
+ *
+ * @param cim The [AssetFunction] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: AssetFunction, pb: PBAssetFunction.Builder): PBAssetFunction.Builder =
+    pb.apply { toPb(cim, ioBuilder) }
 
 /**
  * Convert the [AssetInfo] into its protobuf counterpart.
@@ -740,7 +815,22 @@ fun toPb(cim: EndDevice, pb: PBEndDevice.Builder): PBEndDevice.Builder =
         cim.usagePoints.forEach { addUsagePointMRIDs(it.mRID) }
         cim.customerMRID?.let { customerMRID = it } ?: clearCustomerMRID()
         cim.serviceLocation?.let { serviceLocationMRID = it.mRID } ?: clearServiceLocationMRID()
+        cim.functions.forEach { addEndDeviceFunctionMRIDs(it.mRID) }
         toPb(cim, acBuilder)
+    }
+
+/**
+ * Convert the [EndDeviceFunction] into its protobuf counterpart.
+ *
+ * @param cim The [EndDeviceFunction] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: EndDeviceFunction, pb: PBEndDeviceFunction.Builder): PBEndDeviceFunction.Builder =
+    pb.apply {
+        enabled = cim.enabled
+        cim.endDevice?.let { endDeviceMRID = it.mRID }
+        toPb(cim, afBuilder)
     }
 
 /**
@@ -1524,6 +1614,7 @@ fun toPb(cim: BatteryUnit, pb: PBBatteryUnit.Builder): PBBatteryUnit.Builder =
         batteryState = BatteryStateKind.valueOf(cim.batteryState.name)
         ratedE = cim.ratedE ?: UNKNOWN_LONG
         storedE = cim.storedE ?: UNKNOWN_LONG
+        cim.controls.forEach { addBatteryControlMRIDs(it.mRID) }
         toPb(cim, peuBuilder)
     }
 
@@ -2161,6 +2252,23 @@ fun toPb(cim: SeriesCompensator, pb: PBSeriesCompensator.Builder): PBSeriesCompe
     }
 
 /**
+ * Convert the [StaticVarCompensator] into its protobuf counterpart.
+ *
+ * @param cim The [StaticVarCompensator] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: StaticVarCompensator, pb: PBStaticVarCompensator.Builder): PBStaticVarCompensator.Builder =
+    pb.apply {
+        capacitiveRating = cim.capacitiveRating ?: UNKNOWN_DOUBLE
+        inductiveRating = cim.inductiveRating ?: UNKNOWN_DOUBLE
+        q = cim.q ?: UNKNOWN_DOUBLE
+        svcControlMode = SVCControlMode.Enum.valueOf(cim.svcControlMode.name)
+        voltageSetPoint = cim.voltageSetPoint ?: UNKNOWN_INT
+        toPb(cim, rceBuilder)
+    }
+
+/**
  * Convert the [ShuntCompensator] into its protobuf counterpart.
  *
  * @param cim The [ShuntCompensator] to convert.
@@ -2456,6 +2564,11 @@ fun Recloser.toPb(): PBRecloser = toPb(this, PBRecloser.newBuilder()).build()
 fun SeriesCompensator.toPb(): PBSeriesCompensator = toPb(this, PBSeriesCompensator.newBuilder()).build()
 
 /**
+ * An extension for converting any StaticVarCompensator into its protobuf counterpart.
+ */
+fun StaticVarCompensator.toPb(): PBStaticVarCompensator = toPb(this, PBStaticVarCompensator.newBuilder()).build()
+
+/**
  * An extension for converting any SynchronousMachine into its protobuf counterpart.
  */
 fun SynchronousMachine.toPb(): PBSynchronousMachine = toPb(this, PBSynchronousMachine.newBuilder()).build()
@@ -2576,6 +2689,32 @@ fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBui
  * A helper class for Java friendly convertion from CIM objects to their protobuf counterparts.
  */
 class NetworkCimToProto : BaseCimToProto() {
+
+    // #######################################
+    // # [ZBEX] EXTENSIONS IEC61968 METERING #
+    // #######################################
+
+    /**
+     * Convert the [PanDemandResponseFunction] into its protobuf counterpart.
+     *
+     * @param cim The [PanDemandResponseFunction] to convert.
+     * @return The protobuf form of [cim].
+     */
+    @ZBEX
+    fun toPb(cim: PanDemandResponseFunction): PBPanDemandResponseFunction = cim.toPb()
+
+    // #########################################
+    // # [ZBEX] EXTENSIONS IEC61970 BASE WIRES #
+    // #########################################
+
+    /**
+     * Convert the [BatteryControl] into its protobuf counterpart.
+     *
+     * @param cim The [BatteryControl] to convert.
+     * @return The protobuf form of [cim].
+     */
+    @ZBEX
+    fun toPb(cim: BatteryControl): PBBatteryControl = cim.toPb()
 
     // #######################
     // # IEC61968 ASSET INFO #
@@ -3216,6 +3355,15 @@ class NetworkCimToProto : BaseCimToProto() {
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: SeriesCompensator): PBSeriesCompensator = cim.toPb()
+
+    /**
+     * Convert the [StaticVarCompensator] into its protobuf counterpart.
+     *
+     * @param cim The [StaticVarCompensator] to convert.
+     * @return The protobuf form of [cim].
+     */
+    @ZBEX
+    fun toPb(cim: StaticVarCompensator): PBStaticVarCompensator = cim.toPb()
 
     /**
      * Convert the [SynchronousMachine] into its protobuf counterpart.

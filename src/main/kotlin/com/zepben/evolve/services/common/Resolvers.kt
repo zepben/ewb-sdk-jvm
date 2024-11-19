@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.common
 
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.Asset
 import com.zepben.evolve.cim.iec61968.assets.AssetOrganisationRole
@@ -24,6 +25,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransforme
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
+import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunction
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
@@ -41,6 +43,7 @@ import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
@@ -510,4 +513,20 @@ object Resolvers {
     @JvmStatic
     fun reactiveCapabilityCurve(synchronousMachine: SynchronousMachine): BoundReferenceResolver<SynchronousMachine, ReactiveCapabilityCurve> =
         BoundReferenceResolver(synchronousMachine, SynchronousMachineToReactiveCapabilityCurveResolver, null)
+
+    @JvmStatic
+    fun batteryUnits(batteryControl: BatteryControl): BoundReferenceResolver<BatteryControl, BatteryUnit> =
+        BoundReferenceResolver(batteryControl, BatteryControlToBatteryUnitResolver, BatteryUnitToBatteryControlResolver)
+
+    @JvmStatic
+    fun batteryControls(batteryUnit: BatteryUnit): BoundReferenceResolver<BatteryUnit, BatteryControl> =
+        BoundReferenceResolver(batteryUnit, BatteryUnitToBatteryControlResolver, BatteryControlToBatteryUnitResolver)
+
+    @JvmStatic
+    fun endDeviceFunctions(endDevice: EndDevice): BoundReferenceResolver<EndDevice, EndDeviceFunction> =
+        BoundReferenceResolver(endDevice, EndDeviceToEndDeviceFunctionResolver, EndDeviceFunctionToEndDeviceResolver)
+
+    @JvmStatic
+    fun endDevice(endDeviceFunction: EndDeviceFunction): BoundReferenceResolver<EndDeviceFunction, EndDevice> =
+        BoundReferenceResolver(endDeviceFunction, EndDeviceFunctionToEndDeviceResolver, EndDeviceToEndDeviceFunctionResolver)
 }

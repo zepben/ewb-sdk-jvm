@@ -8,14 +8,16 @@
 
 package com.zepben.evolve.services.network.testdata
 
+import com.zepben.evolve.cim.extensions.ZBEX
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControlMode
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
-import com.zepben.evolve.cim.iec61968.metering.EndDevice
-import com.zepben.evolve.cim.iec61968.metering.Meter
-import com.zepben.evolve.cim.iec61968.metering.UsagePoint
+import com.zepben.evolve.cim.iec61968.metering.*
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
@@ -40,6 +42,49 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import java.time.Instant
 import java.util.*
+
+/************ [ZBEX] EXTENSION IEC61968 METERING ************/
+
+@ZBEX
+fun PanDemandResponseFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): PanDemandResponseFunction {
+    (this as EndDeviceFunction).fillFields(service, includeRuntime)
+
+    kind = EndDeviceFunctionKind.autonomousDst
+    assignAppliance(
+        isElectricVehicle = true,
+        isExteriorLighting = false,
+        isGenerationSystem = true,
+        isHvacCompressorOrFurnace = false,
+        isInteriorLighting = true,
+        isIrrigationPump = false,
+        isManagedCommercialIndustrialLoad = true,
+        isPoolPumpSpaJacuzzi = false,
+        isSimpleMiscLoad = true,
+        isSmartAppliance = false,
+        isStripAndBaseboardHeater = true,
+        isWaterHeater = false
+    )
+
+    return this
+}
+
+/************ [ZBEX] EXTENSION IEC61970 BASE WIRES ************/
+
+@ZBEX
+fun BatteryControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): BatteryControl {
+    (this as RegulatingControl).fillFields(service, includeRuntime)
+
+    batteryUnit = BatteryUnit().also {
+        it.addControl(this)
+        service.add(it)
+    }
+    chargingRate = 1.0
+    dischargingRate = 2.0
+    reservePercent = 3.0
+    controlMode = BatteryControlMode.time
+
+    return this
+}
 
 /************ IEC61968 ASSET INFO ************/
 
@@ -214,6 +259,11 @@ fun AssetContainer.fillFields(service: NetworkService, includeRuntime: Boolean =
     return this
 }
 
+fun AssetFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): AssetFunction {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+    return this
+}
+
 fun AssetOrganisationRole.fillFields(service: NetworkService, includeRuntime: Boolean = true): AssetOrganisationRole {
     (this as OrganisationRole).fillFieldsCommon(service, includeRuntime)
     return this
@@ -325,6 +375,20 @@ fun EndDevice.fillFields(service: NetworkService, includeRuntime: Boolean = true
 
     customerMRID = UUID.randomUUID().toString()
     serviceLocation = Location().also { service.add(it) }
+
+    addFunction(PanDemandResponseFunction().also { service.add(it) })
+
+    return this
+}
+
+fun EndDeviceFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): EndDeviceFunction {
+    (this as AssetFunction).fillFields(service, includeRuntime)
+
+    endDevice = Meter().also {
+        it.addFunction(this)
+        service.add(it)
+    }
+    enabled = false
 
     return this
 }
@@ -856,6 +920,8 @@ fun BatteryUnit.fillFields(service: NetworkService, includeRuntime: Boolean = tr
     ratedE = 1L
     storedE = 2L
 
+    addControl(BatteryControl().also { service.add(it) })
+
     return this
 }
 
@@ -1270,6 +1336,8 @@ fun RegulatingCondEq.fillFields(service: NetworkService, includeRuntime: Boolean
 fun RegulatingControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): RegulatingControl {
     (this as PowerSystemResource).fillFields(service, includeRuntime)
 
+    ctPrimary = 1.0
+    minTargetDeadband = 2.0
     discrete = false
     mode = RegulatingControlModeKind.voltage
     monitoredPhase = PhaseCode.ABC
@@ -1319,6 +1387,18 @@ fun ShuntCompensator.fillFields(service: NetworkService, includeRuntime: Boolean
     nomU = 1
     phaseConnection = PhaseShuntConnectionKind.I
     sections = 2.2
+
+    return this
+}
+
+fun StaticVarCompensator.fillFields(service: NetworkService, includeRuntime: Boolean = true): StaticVarCompensator {
+    (this as RegulatingCondEq).fillFields(service, includeRuntime)
+
+    capacitiveRating = 1.0
+    inductiveRating = 2.0
+    q = 3.0
+    svcControlMode = SVCControlMode.reactivePower
+    voltageSetPoint = 4
 
     return this
 }

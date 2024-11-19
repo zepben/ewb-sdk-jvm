@@ -10,9 +10,19 @@
 * Added `Services`, a new class which contains a copy of each `BaseService` supported by the SDK.
 * Added `connectWithAccessTokenInsecure()` for connecting to a gRPC service using an access token without SSL/TLS.
 * Added `connectWithAccessToken()` for connecting to a gRPC service using an access token with SSL/TLS.
+* Added `PanDemandResponseFunction`, a new class which contains `EndDeviceFunctionKind` and the identity of the `ControlledAppliance` of this function.
+* Added `BatteryControl`, a new class which describes behaviour specific to controlling  a `BatteryUnit`.
+* Added `StaticVarCompensator` a new class representing a facility for providing variable and controllable shunt reactive power.
+* Added `ControlledAppliance` a new class representing the identity of the appliance controlled by a specific `EndDeviceFunction`.
+* Added new enums:
+  * `BatteryControlMode`
+  * `EndDeviceFunctionKind`
+  * `SVCControlMode`
 
 ### Enhancements
-* None.
+* Added `ctPrimary` and `minTargetDeadband` to `RegulatingContrl`.
+* Added collection of `BatteryControl` to `BatteryUnit`
+* Added collection of `EndDeviceFunctionKind` to `EndDevice`
 
 ### Fixes
 * None.

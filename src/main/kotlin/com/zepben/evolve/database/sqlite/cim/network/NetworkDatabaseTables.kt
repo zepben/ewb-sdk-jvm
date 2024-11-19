@@ -11,6 +11,8 @@ package com.zepben.evolve.database.sqlite.cim.network
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 import com.zepben.evolve.database.sqlite.cim.tables.associations.*
+import com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions
+import com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61970.base.wires.TableBatteryControls
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableAssetOwners
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TablePoles
@@ -60,7 +62,9 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableAssetOrganisationRolesAssets(),
             TableAssetOwners(),
             TableBaseVoltages(),
+            TableBatteryControls(),
             TableBatteryUnits(),
+            TableBatteryUnitsBatteryControls(),
             TableBreakers(),
             TableBusbarSections(),
             TableCableInfo(),
@@ -76,6 +80,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableDisconnectors(),
             TableDiscretes(),
             TableDistanceRelays(),
+            TableEndDevicesEndDeviceFunctions(),
             TableEnergyConsumerPhases(),
             TableEnergyConsumers(),
             TableEnergySourcePhases(),
@@ -107,6 +112,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableOperationalRestrictions(),
             TableOrganisations(),
             TableOverheadWireInfo(),
+            TablePanDemandResponseFunctions(),
             TablePerLengthSequenceImpedances(),
             TablePetersenCoils(),
             TablePhotoVoltaicUnits(),
@@ -142,6 +148,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableStreetlights(),
             TableSubGeographicalRegions(),
             TableSubstations(),
+            TableStaticVarCompensators(),
             TableSwitchInfo(),
             TableSynchronousMachines(),
             TableSynchronousMachinesReactiveCapabilityCurves(),

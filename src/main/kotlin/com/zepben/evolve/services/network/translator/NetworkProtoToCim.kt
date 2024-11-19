@@ -8,14 +8,16 @@
 
 package com.zepben.evolve.services.network.translator
 
+import com.zepben.evolve.cim.extensions.ZBEX
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControlMode
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
-import com.zepben.evolve.cim.iec61968.metering.EndDevice
-import com.zepben.evolve.cim.iec61968.metering.Meter
-import com.zepben.evolve.cim.iec61968.metering.UsagePoint
+import com.zepben.evolve.cim.iec61968.metering.*
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
@@ -42,6 +44,8 @@ import com.zepben.evolve.services.common.translator.toCim
 import com.zepben.evolve.services.common.translator.toInstant
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
+import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
+import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControl as PBBatteryControl
 import com.zepben.protobuf.cim.iec61968.assetinfo.CableInfo as PBCableInfo
 import com.zepben.protobuf.cim.iec61968.assetinfo.NoLoadTest as PBNoLoadTest
 import com.zepben.protobuf.cim.iec61968.assetinfo.OpenCircuitTest as PBOpenCircuitTest
@@ -56,6 +60,7 @@ import com.zepben.protobuf.cim.iec61968.assetinfo.TransformerTest as PBTransform
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireInfo as PBWireInfo
 import com.zepben.protobuf.cim.iec61968.assets.Asset as PBAsset
 import com.zepben.protobuf.cim.iec61968.assets.AssetContainer as PBAssetContainer
+import com.zepben.protobuf.cim.iec61968.assets.AssetFunction as PBAssetFunction
 import com.zepben.protobuf.cim.iec61968.assets.AssetInfo as PBAssetInfo
 import com.zepben.protobuf.cim.iec61968.assets.AssetOrganisationRole as PBAssetOrganisationRole
 import com.zepben.protobuf.cim.iec61968.assets.AssetOwner as PBAssetOwner
@@ -73,6 +78,7 @@ import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransf
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo as PBRelayInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infcommon.Ratio as PBRatio
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice as PBEndDevice
+import com.zepben.protobuf.cim.iec61968.metering.EndDeviceFunction as PBEndDeviceFunction
 import com.zepben.protobuf.cim.iec61968.metering.Meter as PBMeter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint as PBUsagePoint
 import com.zepben.protobuf.cim.iec61968.operations.OperationalRestriction as PBOperationalRestriction
@@ -154,6 +160,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.RegulatingControl as PBRegula
 import com.zepben.protobuf.cim.iec61970.base.wires.RotatingMachine as PBRotatingMachine
 import com.zepben.protobuf.cim.iec61970.base.wires.SeriesCompensator as PBSeriesCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.ShuntCompensator as PBShuntCompensator
+import com.zepben.protobuf.cim.iec61970.base.wires.StaticVarCompensator as PBStaticVarCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.Switch as PBSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.SynchronousMachine as PBSynchronousMachine
 import com.zepben.protobuf.cim.iec61970.base.wires.TapChanger as PBTapChanger
@@ -169,6 +176,60 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Circuit as PBCircuit
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
 import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit as PBEvChargingUnit
+
+// #######################################
+// # [ZBEX] EXTENSIONS IEC61968 METERING #
+// #######################################
+
+@ZBEX
+    /**
+     * Convert the protobuf [PBPanDemandResponseFunction] into its CIM counterpart.
+     *
+     * @param pb The protobuf [PBPanDemandResponseFunction] to convert.
+     * @param networkService The [NetworkService] the converted CIM object will be added too.
+     * @return The converted [pb] as a CIM [PanDemandResponseFunction].
+     */
+fun toCim(pb: PBPanDemandResponseFunction, networkService: NetworkService): PanDemandResponseFunction =
+    PanDemandResponseFunction(pb.mRID()).apply {
+        pb.appliance.takeUnless { it == UNKNOWN_INT }?.also { ap -> assignAppliance(ap) }
+        kind = pb.kind?.let { k -> EndDeviceFunctionKind.valueOf(k.name) } ?: EndDeviceFunctionKind.UNKNOWN
+        toCim(pb.edf, this, networkService)
+    }
+
+@ZBEX
+    /**
+     * An extension to add a converted copy of the protobuf [PBPanDemandResponseFunction] to the [NetworkService].
+     */
+fun NetworkService.addFromPb(pb: PBPanDemandResponseFunction): PanDemandResponseFunction? = tryAddOrNull(toCim(pb, this))
+
+@ZBEX
+// ##################################
+// # EXTENSIONS IEC61970 BASE WIRES #
+// ##################################
+
+    /**
+     * Convert the protobuf [PBBatteryControl] into its CIM counterpart.
+     *
+     * @param pb The protobuf [PBBatteryControl] to convert.
+     * @param networkService The [NetworkService] the converted CIM object will be added too.
+     * @return The converted [pb] as a CIM [BatteryControl].
+     */
+fun toCim(pb: PBBatteryControl, networkService: NetworkService): BatteryControl =
+    BatteryControl(pb.mRID()).apply {
+        chargingRate = pb.chargingRate.takeUnless { it == UNKNOWN_DOUBLE }
+        dischargingRate = pb.dischargingRate.takeUnless { it == UNKNOWN_DOUBLE }
+        reservePercent = pb.reservePercent.takeUnless { it == UNKNOWN_DOUBLE }
+        pb.controlMode?.let { controlMode = BatteryControlMode.valueOf(it.name) }
+        pb.batteryUnitMRID.also { batteryUnitMRID ->
+            networkService.resolveOrDeferReference(Resolvers.batteryUnits(this), batteryUnitMRID)
+        }
+        toCim(pb.rc, this, networkService)
+    }
+
+/**
+ * An extension to add a converted copy of the protobuf [PBBatteryControl] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBBatteryControl): BatteryControl? = tryAddOrNull(toCim(pb, this))
 
 // #######################
 // # IEC61968 ASSET INFO #
@@ -459,6 +520,18 @@ fun toCim(pb: PBAssetContainer, cim: AssetContainer, networkService: NetworkServ
     cim.apply { toCim(pb.at, this, networkService) }
 
 /**
+ * Convert the protobuf [PBAssetFunction] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBAssetFunction] to convert.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [AssetFunction].
+ */
+fun toCim(pb: PBAssetFunction, cim: AssetFunction, networkService: NetworkService): AssetFunction =
+    cim.apply {
+        toCim(pb.io, this, networkService)
+    }
+
+/**
  * Convert the protobuf [PBAssetInfo] into its CIM counterpart.
  *
  * @param pb The protobuf [PBAssetInfo] to convert.
@@ -734,9 +807,27 @@ fun toCim(pb: PBEndDevice, cim: EndDevice, networkService: NetworkService): EndD
         pb.usagePointMRIDsList.forEach { usagePointMRID ->
             networkService.resolveOrDeferReference(Resolvers.usagePoints(this), usagePointMRID)
         }
+        pb.endDeviceFunctionMRIDsList.forEach { endDeviceFunctionMRID ->
+            networkService.resolveOrDeferReference(Resolvers.endDeviceFunctions(this), endDeviceFunctionMRID)
+        }
         customerMRID = pb.customerMRID.takeIf { !it.isNullOrBlank() }
         networkService.resolveOrDeferReference(Resolvers.serviceLocation(this), pb.serviceLocationMRID)
         toCim(pb.ac, this, networkService)
+    }
+
+/**
+ * Convert the protobuf [PBEndDeviceFunction] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBEndDeviceFunction] to convert.
+ * @param cim The CIM [EndDeviceFunction] to populate.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [EndDeviceFunction].
+ */
+fun toCim(pb: PBEndDeviceFunction, cim: EndDeviceFunction, networkService: NetworkService): EndDeviceFunction =
+    cim.apply {
+        enabled = pb.enabled
+        pb.endDeviceMRID?.also { networkService.resolveOrDeferReference(Resolvers.endDevice(this), it) }
+        toCim(pb.af, this, networkService)
     }
 
 /**
@@ -1600,6 +1691,9 @@ fun toCim(pb: PBBatteryUnit, networkService: NetworkService): BatteryUnit =
         batteryState = BatteryStateKind.valueOf(pb.batteryState.name)
         ratedE = pb.ratedE.takeUnless { it == UNKNOWN_LONG }
         storedE = pb.storedE.takeUnless { it == UNKNOWN_LONG }
+        pb.batteryControlMRIDsList.forEach {
+            networkService.resolveOrDeferReference(Resolvers.batteryControls(this), it)
+        }
         toCim(pb.peu, this, networkService)
     }
 
@@ -2279,6 +2373,23 @@ fun toCim(pb: PBShuntCompensator, cim: ShuntCompensator, networkService: Network
     }
 
 /**
+ * Convert the protobuf [PBStaticVarCompensator] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBStaticVarCompensator] to convert.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [StaticVarCompensator].
+ */
+fun toCim(pb: PBStaticVarCompensator, networkService: NetworkService): StaticVarCompensator =
+    StaticVarCompensator(pb.mRID()).apply {
+        capacitiveRating = pb.capacitiveRating.takeUnless { it == UNKNOWN_DOUBLE }
+        inductiveRating = pb.inductiveRating.takeUnless { it == UNKNOWN_DOUBLE }
+        q = pb.q.takeUnless { it == UNKNOWN_DOUBLE }
+        pb.svcControlMode?.also { svcControlMode = SVCControlMode.valueOf(it.toString()) }
+        voltageSetPoint = pb.voltageSetPoint.takeUnless { it == UNKNOWN_INT }
+        toCim(pb.rce, this, networkService)
+    }
+
+/**
  * Convert the protobuf [PBSwitch] into its CIM counterpart.
  *
  * @param pb The protobuf [PBSwitch] to convert.
@@ -2559,6 +2670,11 @@ fun NetworkService.addFromPb(pb: PBRecloser): Recloser? = tryAddOrNull(toCim(pb,
 fun NetworkService.addFromPb(pb: PBSeriesCompensator): SeriesCompensator? = tryAddOrNull(toCim(pb, this))
 
 /**
+ * An extension to add a converted copy of the protobuf [PBStaticVarCompensator] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBStaticVarCompensator): StaticVarCompensator? = tryAddOrNull(toCim(pb, this))
+
+/**
  * An extension to add a converted copy of the protobuf [PBSynchronousMachine] to the [NetworkService].
  */
 fun NetworkService.addFromPb(pb: PBSynchronousMachine): SynchronousMachine? = tryAddOrNull(toCim(pb, this))
@@ -2681,6 +2797,46 @@ fun NetworkService.addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = tryAddOrNu
  * @property networkService The [NetworkService] all converted objects should be added to.
  */
 class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
+
+
+    // #######################################
+    // # [ZBEX] EXTENSIONS IEC61968 METERING #
+    // #######################################
+
+
+    /**
+     * Add a converted copy of the protobuf [PBPanDemandResponseFunction] to the [NetworkService].
+     *
+     * @param pb The [PBPanDemandResponseFunction] to convert.
+     * @return The converted [PanDemandResponseFunction]
+     */
+    @ZBEX
+    fun addFromPb(pb: PBPanDemandResponseFunction): PanDemandResponseFunction? = networkService.addFromPb(pb)
+
+    /**
+     * An extension to add a converted copy of the protobuf [PBPanDemandResponseFunction] to the [NetworkService].
+     */
+    @ZBEX
+    fun NetworkService.addFromPb(pb: PBPanDemandResponseFunction): PanDemandResponseFunction? = tryAddOrNull(toCim(pb, this))
+
+    // #########################################
+    // # [ZBEX] EXTENSIONS IEC61970 BASE WIRES #
+    // #########################################
+
+    /**
+     * Add a converted copy of the protobuf [PBBatteryControl] to the [NetworkService].
+     *
+     * @param pb The [PBBatteryControl] to convert.
+     * @return The converted [BatteryControl]
+     */
+    @ZBEX
+    fun addFromPb(pb: PBBatteryControl): BatteryControl? = networkService.addFromPb(pb)
+
+    /**
+     * An extension to add a converted copy of the protobuf [PBBatteryControl] to the [NetworkService].
+     */
+    @ZBEX
+    fun NetworkService.addFromPb(pb: PBBatteryControl): BatteryControl? = tryAddOrNull(toCim(pb, this))
 
     // #######################
     // # IEC61968 ASSET INFO #
@@ -3329,6 +3485,14 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
      * @return The converted [SeriesCompensator]
      */
     fun addFromPb(pb: PBSeriesCompensator): SeriesCompensator? = networkService.addFromPb(pb)
+
+    /**
+     * Add a converted copy of the protobuf [PBStaticVarCompensator] to the [NetworkService].
+     *
+     * @param pb The [PBStaticVarCompensator] to convert.
+     * @return The converted [StaticVarCompensator]
+     */
+    fun addFromPb(pb: PBStaticVarCompensator): StaticVarCompensator? = networkService.addFromPb(pb)
 
     /**
      * Add a converted copy of the protobuf [PBSynchronousMachine] to the [NetworkService].

@@ -33,6 +33,7 @@ internal class ConnectTest {
 
     private val grpcChannel = mockk<GrpcChannel>()
     private val grpcChannelWithTls = mockk<GrpcChannel>()
+    private val grpcChannelWithTlsWithToken = mockk<GrpcChannel>()
     private val grpcChannelWithToken = mockk<GrpcChannel>()
     private val grpcChannelWithAuth = mockk<GrpcChannel>()
 
@@ -52,7 +53,7 @@ internal class ConnectTest {
 
         every { gcbWithAddress.build() } returns grpcChannel
         every { gcbWithTls.build() } returns grpcChannelWithTls
-        every { gcbWithTlsWithToken.build() } returns grpcChannelWithToken
+        every { gcbWithTlsWithToken.build() } returns grpcChannelWithTlsWithToken
         every { gcbWithToken.build() } returns grpcChannelWithToken
         every { gcbWithAuth.build() } returns grpcChannelWithAuth
 
@@ -79,7 +80,7 @@ internal class ConnectTest {
 
     @Test
     internal fun connectWithAccessToken() {
-        assertThat(Connect.connectWithAccessToken("hostname", 1234, "accessToken", "caFilename"), equalTo(grpcChannelWithToken))
+        assertThat(Connect.connectWithAccessToken("hostname", 1234, "accessToken", "caFilename"), equalTo(grpcChannelWithTlsWithToken))
     }
 
     @Test

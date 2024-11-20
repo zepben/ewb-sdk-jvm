@@ -332,12 +332,15 @@ internal class GrpcChannelBuilderTest {
     }
 
     @Test
-    internal fun `will throw exception if withTokenFetcher is called before withAccessToken`() {
+    internal fun `will throw exception if attempting to override already set call credentials`() {
         val tokenFetcher = ZepbenTokenFetcher("audience", "domain", AuthMethod.AUTH0)
         val grpcChannelBuilder = GrpcChannelBuilder().forAddress("hostname", 1234).makeInsecure().withTokenFetcher(tokenFetcher)
 
         expect {
             grpcChannelBuilder.withAccessToken("token")
+        }.toThrow<IllegalArgumentException>().withMessage("Call credential already set in connection builder.")
+        expect {
+            grpcChannelBuilder.withTokenFetcher(tokenFetcher)
         }.toThrow<IllegalArgumentException>().withMessage("Call credential already set in connection builder.")
     }
 

@@ -128,14 +128,10 @@ class GrpcChannelBuilder {
         _callCredentials = TokenCallCredentials(tokenFetcher::fetchToken)
     }
 
-    fun withAccessToken(tokenString: String): GrpcChannelBuilder = apply {
+    fun withAccessToken(token: String, prefix: String = "Bearer"): GrpcChannelBuilder = apply {
         if (_callCredentials != null)
             throw IllegalArgumentException("Call credential already set in connection builder.")
-        _callCredentials = TokenCallCredentials { withToken(tokenString) }
-    }
-
-    private fun withToken(token: String, prefix: String = "Bearer"): String {
-        return "$prefix $token"
+        _callCredentials = TokenCallCredentials { "$prefix $token" }
     }
 
 }

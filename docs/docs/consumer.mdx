@@ -32,8 +32,8 @@ This will typically be one of the following:
 1. `connectWithPassword()`, for authenticating with a username, password, and client ID.
 1. `connectWithSecret()`, for authenticating with a client ID and secret, typically used for machine-to-machine services.1
 1. `connectWithIdentity()`, for authenticating with an Azure managed identity.
-1. `connectWithAccessToken()` for authenticating an access token with SSL/TLS.
-1. `connectWithAccessTokenInsecure()` for authenticating using an access token without SSL/TLS for testing.
+1. `connectWithAccessToken()` for authenticating with a Personal Access Token.
+1. `connectWithAccessTokenInsecure()` for authenticating using a Personal Access Token over a non-SSL/TLS connection. Cannot be used against a secured (HTTPS) EWB.
 
 
 <Tabs
@@ -91,12 +91,12 @@ try (GrpcChannel channel = Connect.connectWithIdentity(
     NetworkService ns = client.getService();
 }
 
-// With an personal access token and SSL
+// With a personal access token and SSL
 try (GrpcChannel channel = Connect.connectWithAccessToken(
     "example.zepben.com", // rpc hostname
     443,                  // rpc port
-    "your_access_token",  // personal access token generated from EAS
-    "path/to/ca.cert"     // Do not pass if you intend to use system CAs for server cert verification
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9.",  // personal access token generated from EAS
+    "path/to/ca.cert"     // set to null to use system CAs for server cert verification
     )
 ) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
@@ -104,11 +104,11 @@ try (GrpcChannel channel = Connect.connectWithAccessToken(
     NetworkService ns = client.getService();
 }
 
-// With an personal access token without SSL
+// With a personal access token without SSL
 try (GrpcChannel channel = Connect.connectWithAccessTokenInsecure(
     "example.zepben.com", // rpc hostname
     443,                  // rpc port
-    "your_access_token",  // personal access token generated from EAS
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9."  // personal access token generated from EAS
     )
 ) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
@@ -194,9 +194,8 @@ Connect.connectWithIdentity(
 Connect.connectWithAccessToken(
     "example.zepben.com", // rpc hostname
     443,                  // rpc port
-    "your_access_token",  // personal access token generated from EAS
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9.",  // personal access token generated from EAS
     "path/to/ca.cert"     // Do not pass if you intend to use system CAs for server cert verification
-    )
 ).use { channel ->
      val client = NetworkConsumerClient(channel)
      val result = client.getEquipmentContainer("container_mrid").throwOnError()
@@ -207,7 +206,7 @@ Connect.connectWithAccessToken(
 Connect.connectWithAccessTokenInsecure(
     "example.zepben.com", // rpc hostname
     443,                  // rpc port
-    "your_access_token",  // personal access token generated from EAS
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9." // personal access token generated from EAS
     )
 ).use { channel ->
      val client = NetworkConsumerClient(channel)

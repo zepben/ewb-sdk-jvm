@@ -16,6 +16,7 @@ import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.upstream
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.withDirection
 import com.zepben.evolve.services.network.tracing.networktrace.operators.FeederDirectionStateOperations
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.networktrace.operators.OpenStateOperators
@@ -25,6 +26,26 @@ import org.hamcrest.Matchers.instanceOf
 import org.junit.jupiter.api.Test
 
 class ConditionsTest {
+
+    @Test
+    fun withDirection() {
+        val getDirection = Terminal::normalFeederDirection
+        val condition = Conditions.withDirection<Unit>(FeederDirection.BOTH, getDirection)
+        assertThat(condition, instanceOf(DirectionCondition::class.java))
+        condition as DirectionCondition
+        assertThat(condition.getDirection, equalTo(getDirection))
+        assertThat(condition.direction, equalTo(FeederDirection.BOTH))
+    }
+
+    @Test
+    fun feederDirectionStateOperatorsWithDirection() {
+        val feederDirectionOperators: FeederDirectionStateOperations = NetworkStateOperators.NORMAL
+        val condition = feederDirectionOperators.withDirection<Unit>(FeederDirection.BOTH)
+        assertThat(condition, instanceOf(DirectionCondition::class.java))
+        condition as DirectionCondition
+        assertThat(condition.getDirection, equalTo(feederDirectionOperators::getDirection))
+        assertThat(condition.direction, equalTo(FeederDirection.BOTH))
+    }
 
     @Test
     fun upstream() {
@@ -57,7 +78,7 @@ class ConditionsTest {
     }
 
     @Test
-    fun testDownstream() {
+    fun feederDirectionStateOperatorsDownstream() {
         val feederDirectionOperators: FeederDirectionStateOperations = NetworkStateOperators.NORMAL
         val condition = feederDirectionOperators.downstream<Unit>()
         assertThat(condition, instanceOf(DirectionCondition::class.java))

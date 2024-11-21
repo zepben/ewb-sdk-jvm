@@ -19,8 +19,9 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
  * @param start The starting terminal for the trace.
  * @param phases Phases to trace; `null` to ignore phases.
  */
-fun NetworkTrace<Unit>.addStartItem(start: Terminal, phases: PhaseCode? = null) {
+fun NetworkTrace<Unit>.addStartItem(start: Terminal, phases: PhaseCode? = null): NetworkTrace<Unit> {
     addStartItem(start, Unit, phases)
+    return this
 }
 
 /**
@@ -29,8 +30,9 @@ fun NetworkTrace<Unit>.addStartItem(start: Terminal, phases: PhaseCode? = null) 
  * @param start The starting equipment to add each terminal of to the start equipment of the trace.
  * @param phases Phases to trace; `null` to ignore phases.
  */
-fun NetworkTrace<Unit>.addStartItem(start: ConductingEquipment, phases: PhaseCode? = null) {
+fun NetworkTrace<Unit>.addStartItem(start: ConductingEquipment, phases: PhaseCode? = null): NetworkTrace<Unit> {
     start.terminals.forEach { addStartItem(it, Unit, phases) }
+    return this
 }
 
 /**
@@ -39,8 +41,9 @@ fun NetworkTrace<Unit>.addStartItem(start: ConductingEquipment, phases: PhaseCod
  * @param start The starting terminal for the trace.
  * @param phases Phases to trace; `null` to ignore phases.
  */
-fun NetworkTrace<Unit>.run(start: Terminal, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+fun NetworkTrace<Unit>.run(start: Terminal, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true): NetworkTrace<Unit> {
     this.run(start, Unit, phases, canStopOnStartItem)
+    return this
 }
 
 /**
@@ -49,6 +52,7 @@ fun NetworkTrace<Unit>.run(start: Terminal, phases: PhaseCode? = null, canStopOn
  * @param start The starting equipment to add each terminal of to the start equipment of the trace.
  * @param phases Phases to trace; `null` to ignore phases.
  */
-fun NetworkTrace<Unit>.run(start: ConductingEquipment, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+fun NetworkTrace<Unit>.run(start: ConductingEquipment, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true): NetworkTrace<Unit> {
     this.run(start, Unit, phases, canStopOnStartItem)
+    return this
 }

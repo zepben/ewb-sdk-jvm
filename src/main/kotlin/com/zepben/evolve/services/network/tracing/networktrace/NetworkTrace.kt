@@ -133,9 +133,10 @@ class NetworkTrace<T> private constructor(
      * @param data The data associated with the start step.
      * @param phases Phases to trace; `null` to ignore phases.
      */
-    fun addStartItem(start: Terminal, data: T, phases: PhaseCode? = null) {
+    fun addStartItem(start: Terminal, data: T, phases: PhaseCode? = null): NetworkTrace<T> {
         val startPath = StepPath(start, start, 0, 0, startNominalPhasePath(phases))
         addStartItem(NetworkTraceStep(startPath, data))
+        return this
     }
 
     /**
@@ -146,8 +147,9 @@ class NetworkTrace<T> private constructor(
      * @param data The data associated with each terminal start step.
      * @param phases Phases to trace; `null` to ignore phases.
      */
-    fun addStartItem(start: ConductingEquipment, data: T, phases: PhaseCode? = null) {
+    fun addStartItem(start: ConductingEquipment, data: T, phases: PhaseCode? = null): NetworkTrace<T> {
         start.terminals.forEach { addStartItem(it, data, phases) }
+        return this
     }
 
     /**
@@ -158,9 +160,10 @@ class NetworkTrace<T> private constructor(
      * @param phases Phases to trace; `null` to ignore phases.
      * @param canStopOnStartItem Indicates whether the trace should check stop conditions on start items.
      */
-    fun run(start: Terminal, data: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+    fun run(start: Terminal, data: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true): NetworkTrace<T> {
         addStartItem(start, data, phases)
         run(canStopOnStartItem)
+        return this
     }
 
     /**
@@ -171,9 +174,10 @@ class NetworkTrace<T> private constructor(
      * @param phases Phases to trace; `null` to ignore phases.
      * @param canStopOnStartItem Indicates whether the trace should check stop conditions on start items.
      */
-    fun run(start: ConductingEquipment, data: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true) {
+    fun run(start: ConductingEquipment, data: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true): NetworkTrace<T> {
         addStartItem(start, data, phases)
         run(canStopOnStartItem)
+        return this
     }
 
     // TODO [Review]: Should these just be called addCondition / addStepAction still because they don't conflict with the base ones? Or maybe addStateCondition would be better?

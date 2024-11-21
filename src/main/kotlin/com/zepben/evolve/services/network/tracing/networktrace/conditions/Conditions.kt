@@ -35,8 +35,9 @@ object Conditions {
      * @param getDirection A function that retrieves the [FeederDirection] of a given [Terminal].
      * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
      */
+    @JvmStatic
     fun <T> upstream(getDirection: (Terminal) -> FeederDirection): NetworkTraceQueueCondition<T> =
-        DirectionCondition(FeederDirection.UPSTREAM, getDirection)
+        withDirection(FeederDirection.UPSTREAM, getDirection)
 
     /**
      * Creates a [NetworkTrace] condition that will cause tracing a feeder upstream (towards the head terminal).
@@ -49,6 +50,7 @@ object Conditions {
      *
      * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
      */
+    @JvmStatic
     fun <T> FeederDirectionStateOperations.upstream(): NetworkTraceQueueCondition<T> =
         upstream(this::getDirection)
 
@@ -58,8 +60,34 @@ object Conditions {
      * @param getDirection A function that retrieves the [FeederDirection] of a given [Terminal].
      * @return A [NetworkTraceQueueCondition] that results in downstream tracing.
      */
+    @JvmStatic
     fun <T> downstream(getDirection: (Terminal) -> FeederDirection): NetworkTraceQueueCondition<T> =
-        DirectionCondition(FeederDirection.DOWNSTREAM, getDirection)
+        withDirection(FeederDirection.DOWNSTREAM, getDirection)
+
+    /**
+     * Creates a [NetworkTrace] condition that will cause tracing only terminals with directions that match [direction].
+     *
+     * @param getDirection A function that retrieves the [FeederDirection] of a given [Terminal].
+     * @return A [NetworkTraceQueueCondition] that results in tracing terminals with the matching direction.
+     */
+    @JvmStatic
+    fun <T> withDirection(direction: FeederDirection, getDirection: (Terminal) -> FeederDirection): NetworkTraceQueueCondition<T> =
+        DirectionCondition(direction, getDirection)
+
+    /**
+     * Creates a [NetworkTrace] condition that will cause tracing only terminals with directions that match [direction].
+     * This uses [FeederDirectionStateOperations.getDirection] receiver instance method within the condition.
+     *
+     * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
+     * ```
+     * trace.addNetworkCondition { withDirection(FeederDirection.BOTH) }
+     * ```
+     *
+     * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
+     */
+    @JvmStatic
+    fun <T> FeederDirectionStateOperations.withDirection(direction: FeederDirection): NetworkTraceQueueCondition<T> =
+        withDirection(direction, this::getDirection)
 
     /**
      * Creates a [NetworkTrace] condition that will cause tracing a feeder downstream (away from the head terminal).
@@ -72,6 +100,7 @@ object Conditions {
      *
      * @return A [NetworkTraceQueueCondition] that results in downstream tracing.
      */
+    @JvmStatic
     fun <T> FeederDirectionStateOperations.downstream(): NetworkTraceQueueCondition<T> =
         downstream(this::getDirection)
 
@@ -82,6 +111,7 @@ object Conditions {
      * @param phase The phase to test the open status; `null` to ignore phases and check if it is open on any phase.
      * @return A [NetworkTraceQueueCondition] that results in not tracing through open equipment.
      */
+    @JvmStatic
     fun <T> stopAtOpen(openTest: (Switch, SinglePhaseKind?) -> Boolean, phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =
         OpenCondition(openTest, phase)
 
@@ -97,6 +127,7 @@ object Conditions {
      * @param phase The phase to test the open status; `null` to ignore phases and check if it is open on any phase.
      * @return A [NetworkTraceQueueCondition] that results in not queueing through open equipment.
      */
+    @JvmStatic
     fun <T> OpenStateOperators.stopAtOpen(phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =
         stopAtOpen(this::isOpen, phase)
 
@@ -106,6 +137,7 @@ object Conditions {
      * @param limit The maximum number of equipment steps allowed before stopping.
      * @return A [NetworkTraceStopCondition] that stops tracing the path once the step limit is reached.
      */
+    @JvmStatic
     fun <T> limitEquipmentSteps(limit: Int): NetworkTraceStopCondition<T> =
         EquipmentStepLimitCondition(limit)
 
@@ -117,6 +149,7 @@ object Conditions {
      * @param equipmentType The class of the equipment type to track against the limit.
      * @return A [NetworkTraceStopCondition] that stops the trace when the step limit is reached for the specified equipment type.
      */
+    @JvmStatic
     fun <T> limitEquipmentSteps(limit: Int, equipmentType: KClass<out ConductingEquipment>): NetworkTraceStopCondition<T> =
         EquipmentTypeStepLimitCondition(limit, equipmentType)
 
@@ -127,6 +160,7 @@ object Conditions {
      * @param equipmentType The class of the equipment type to track against the limit.
      * @return A [NetworkTraceStopCondition] that stops the trace when the step limit is reached for the specified equipment type.
      */
+    @JvmStatic
     fun <T> limitEquipmentSteps(limit: Int, equipmentType: Class<out ConductingEquipment>): NetworkTraceStopCondition<T> =
         limitEquipmentSteps(limit, equipmentType.kotlin)
 

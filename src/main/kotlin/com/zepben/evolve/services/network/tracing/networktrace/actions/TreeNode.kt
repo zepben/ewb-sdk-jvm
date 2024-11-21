@@ -8,11 +8,11 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace.actions
 
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import java.lang.ref.WeakReference
 
-class TreeNode<T : ConductingEquipment>(
+class TreeNode<T : IdentifiedObject>(
     val identifiedObject: T,
     parent: TreeNode<T>?
 ) {

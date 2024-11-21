@@ -34,11 +34,13 @@ interface NetworkStateOperators :
         /**
          * Instance that operates on the normal state of network objects.
          */
+        @JvmField
         val NORMAL: NetworkStateOperators = NormalNetworkStateOperators()
 
         /**
          * Instance that operates on the current state of network objects.
          */
+        @JvmField
         val CURRENT: NetworkStateOperators = CurrentNetworkStateOperators()
     }
 }

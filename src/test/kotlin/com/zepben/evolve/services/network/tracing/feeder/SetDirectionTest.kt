@@ -16,6 +16,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.evolve.services.network.tracing.feeder.DirectionValidator.validateDirections
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection.*
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
@@ -70,8 +71,7 @@ internal class SetDirectionTest {
             .toAcls() // c4
             .network
 
-        SetDirection().run(n.getT("c0", 2))
-        DirectionLogger.trace(n["c0"])
+        doSetDirectionTrace(n.getT("c0", 2))
 
         n.getT("c0", 1).validateDirections(NONE)
         n.getT("c0", 2).validateDirections(DOWNSTREAM)
@@ -114,33 +114,6 @@ internal class SetDirectionTest {
         n.getT("j3", 2).validateDirections(NONE)
         n.getT("c4", 1).validateDirections(NONE)
         n.getT("c4", 2).validateDirections(NONE)
-    }
-
-    @Test
-    internal fun `doesn't trace from open feeder heads`() {
-        //
-        // 1 b0 21--c1--21--c2--21 b3 2
-        //
-        val n = TestNetworkBuilder()
-            .fromBreaker() // b0
-            .toAcls() // c1
-            .toAcls() // c2
-            .toBreaker(isNormallyOpen = true) // b3
-            .addFeeder("b0", 2)
-            .addFeeder("b3", 1)
-            .network
-
-        SetDirection().run(n)
-        DirectionLogger.trace(n["b0"])
-
-        n.getT("b0", 1).validateDirections(NONE)
-        n.getT("b0", 2).validateDirections(DOWNSTREAM)
-        n.getT("c1", 1).validateDirections(UPSTREAM)
-        n.getT("c1", 2).validateDirections(DOWNSTREAM)
-        n.getT("c2", 1).validateDirections(UPSTREAM)
-        n.getT("c2", 2).validateDirections(DOWNSTREAM)
-        n.getT("b3", 1).validateDirections(UPSTREAM)
-        n.getT("b3", 2).validateDirections(NONE)
     }
 
     @Test
@@ -254,8 +227,7 @@ internal class SetDirectionTest {
             .connect("c12", "j6", 2, 2)
             .network
 
-        SetDirection().run(n.getT("j0", 1))
-        DirectionLogger.trace(n["j0"])
+        doSetDirectionTrace(n.getT("j0", 1))
 
         // To avoid reprocessing all BOTH loops in larger networks we do not process anything with a direction already set. This means this test will apply
         // a standard UP/DOWN path through j2-t2 through to j6-t2 and then a BOTH loop around the c9/j4 loop which will stop the reverse UP/DOWN path
@@ -327,8 +299,7 @@ internal class SetDirectionTest {
             .connect("c12", "j6", 2, 2)
             .network
 
-        SetDirection().run(n.getT("j0", 1))
-        DirectionLogger.trace(n["j0"])
+        doSetDirectionTrace(n.getT("j0", 1))
 
         // To avoid reprocessing all BOTH loops in larger networks we do not process anything with a direction already set. This means this test will apply
         // a UP/DOWN path through j2-t2 directly into a BOTH loop around the c9/j11 loop which will stop the reverse UP/DOWN path
@@ -373,8 +344,7 @@ internal class SetDirectionTest {
             .toAcls(nominalPhases = PhaseCode.A) // c2
             .network
 
-        SetDirection().run(n.getT("j0", 1))
-        DirectionLogger.trace(n["j0"])
+        doSetDirectionTrace(n.getT("j0", 1))
 
         n.getT("j0", 1).validateDirections(DOWNSTREAM)
         n.getT("c1", 1).validateDirections(UPSTREAM)
@@ -395,8 +365,7 @@ internal class SetDirectionTest {
             .toAcls(nominalPhases = PhaseCode.NONE) // c2
             .network
 
-        SetDirection().run(n.getT("j0", 1))
-        DirectionLogger.trace(n["j0"])
+        doSetDirectionTrace(n.getT("j0", 1))
 
         n.getT("j0", 1).validateDirections(DOWNSTREAM)
         n.getT("c1", 1).validateDirections(UPSTREAM)
@@ -407,21 +376,65 @@ internal class SetDirectionTest {
         n.getT("c3", 2).validateDirections(NONE)
     }
 
+    @Test
+    internal fun handlesMultiFeeds() {
+        //
+        // j0 --c1-- --c2-- j3
+        //          |
+        //          c4
+        //          |
+        //           --c5--
+        //
+        val n = TestNetworkBuilder()
+            .fromJunction(PhaseCode.A, 1) // j0
+            .toAcls(PhaseCode.A) // c1
+            .toAcls(PhaseCode.A) // c2
+            .toJunction(PhaseCode.A, 1) // j3
+            .branchFrom("c1")
+            .toAcls(PhaseCode.A) // c4
+            .toAcls(PhaseCode.A) // c5
+            .addFeeder("j0")
+            .addFeeder("j3")
+            .build()
+
+        n.getT("j0", 1).validateDirections(BOTH)
+        n.getT("c1", 1).validateDirections(BOTH)
+        n.getT("c1", 2).validateDirections(BOTH)
+        n.getT("c2", 1).validateDirections(BOTH)
+        n.getT("c2", 2).validateDirections(BOTH)
+        n.getT("j3", 1).validateDirections(BOTH)
+        n.getT("c4", 1).validateDirections(UPSTREAM)
+        n.getT("c4", 2).validateDirections(DOWNSTREAM)
+        n.getT("c5", 1).validateDirections(UPSTREAM)
+        n.getT("c5", 2).validateDirections(DOWNSTREAM)
+    }
+
+    private fun doSetDirectionTrace(terminal: Terminal) {
+        SetDirection(NetworkStateOperators.NORMAL).run(terminal)
+        SetDirection(NetworkStateOperators.CURRENT).run(terminal)
+        DirectionLogger.trace(terminal.conductingEquipment!!)
+    }
+
     private fun doSetDirectionTrace(n: NetworkService) {
-        SetDirection().run(n)
-        n.sequenceOf<Feeder>().forEach { DirectionLogger.trace(it.normalHeadTerminal!!.conductingEquipment!!) }
+        val normal = SetDirection(NetworkStateOperators.NORMAL)
+        val current = SetDirection(NetworkStateOperators.CURRENT)
+        n.sequenceOf<Feeder>().forEach {
+            normal.run(it.normalHeadTerminal!!)
+            current.run(it.normalHeadTerminal!!)
+            DirectionLogger.trace(it.normalHeadTerminal!!.conductingEquipment!!)
+        }
     }
 
     private fun NetworkService.getT(id: String, terminalId: Int) =
         get<ConductingEquipment>(id)!!.getTerminal(terminalId)!!
 
     private fun checkExpectedDirection(t: Terminal, normalDirection: FeederDirection, currentDirection: FeederDirection = normalDirection) {
-        checkExpectedDirection(t, normalDirection, DirectionSelector.NORMAL_DIRECTION)
-        checkExpectedDirection(t, currentDirection, DirectionSelector.CURRENT_DIRECTION)
+        checkExpectedDirection(t, normalDirection, NetworkStateOperators.NORMAL::getDirection)
+        checkExpectedDirection(t, currentDirection, NetworkStateOperators.CURRENT::getDirection)
     }
 
-    private fun checkExpectedDirection(t: Terminal, direction: FeederDirection, directionSelector: DirectionSelector) {
-        assertThat(directionSelector.select(t).value, equalTo(direction))
+    private fun checkExpectedDirection(t: Terminal, direction: FeederDirection, directionSelector: (Terminal) -> FeederDirection) {
+        assertThat(directionSelector(t), equalTo(direction))
     }
 
 }

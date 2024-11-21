@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Zeppelin Bend Pty Ltd
+ * Copyright 2024 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,93 +8,83 @@
 
 package com.zepben.evolve.services.network.tracing.feeder
 
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.OpenTest
-import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
-import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
-import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceActionType
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
 
 /**
  * Convenience class that provides methods for setting feeder direction on a [NetworkService]
- * This class is backed by a [BranchRecursiveTraversal].
  */
-class SetDirection {
+class SetDirection(
+    internal val stateOperators: NetworkStateOperators,
+) {
 
-    /**
-     * The [BranchRecursiveTraversal] used when tracing the normal state of the network.
-     *
-     * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    val normalTraversal: BranchRecursiveTraversal<Terminal> = BranchRecursiveTraversal(
-        { terminal, traversal -> setDownstreamAndQueueNext(traversal, terminal, OpenTest.NORMALLY_OPEN, DirectionSelector.NORMAL_DIRECTION) },
-        { WeightedPriorityQueue.processQueue { it.phases.numPhases() } },
-        { BasicTracker() },
-        { WeightedPriorityQueue.branchQueue { it.phases.numPhases() } }
+    private val traversal: NetworkTrace<FeederDirection> = Tracing.networkTraceBranching(
+        networkStateOperators = stateOperators,
+        actionStepType = NetworkTraceActionType.ALL_STEPS,
+        { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
+        { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
+        computeNextT = { step: NetworkTraceStep<FeederDirection>, _, nextPath ->
+            val directionApplied = step.data
+            val nextDirection = when (directionApplied) {
+                FeederDirection.UPSTREAM -> FeederDirection.DOWNSTREAM
+                FeederDirection.DOWNSTREAM -> FeederDirection.UPSTREAM
+                FeederDirection.BOTH -> FeederDirection.BOTH
+                else -> FeederDirection.NONE
+            }
+
+            // NOTE: Stopping / short circuiting by checking that the next direction is already present in the toTerminal,
+            //       causes stop certain looping network configurations not to be reprocessed. This means that some parts of
+            //       loops do not end up with BOTH directions. This is done to stop massive computational blowout on
+            //       on large networks with weird looping connectivity that rarely happens in reality.
+            if (nextDirection == FeederDirection.NONE || nextDirection in stateOperators.getDirection(nextPath.toTerminal))
+                FeederDirection.NONE
+            else
+                nextDirection
+        }
     )
+        .addNetworkCondition { stopAtOpen() }
+        .addStopCondition { (path), _ ->
+            isFeederHeadTerminal(path.toTerminal) || reachedSubstationTransformer(path.toTerminal)
+        }
+        .addQueueCondition { (_, directionToApply), _, _, _ ->
+            directionToApply != FeederDirection.NONE
+        }
+        .addStepAction { (path, directionToApply), _ ->
+            stateOperators.addDirection(path.toTerminal, directionToApply)
+        }
 
     /**
-     * The [BranchRecursiveTraversal] used when tracing the current state of the network.
-     *
-     * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    val currentTraversal: BranchRecursiveTraversal<Terminal> = BranchRecursiveTraversal(
-        { terminal, traversal -> setDownstreamAndQueueNext(traversal, terminal, OpenTest.CURRENTLY_OPEN, DirectionSelector.CURRENT_DIRECTION) },
-        { WeightedPriorityQueue.processQueue { it.phases.numPhases() } },
-        { BasicTracker() },
-        { WeightedPriorityQueue.branchQueue { it.phases.numPhases() } }
-    )
-
-    /**
-     * Apply feeder directions from all feeder head terminals in the network.
+     * Apply feeder directions from all closed feeder head terminals in the network.
      *
      * @param network The network in which to apply feeder directions.
      */
     fun run(network: NetworkService) {
-        run(network.sequenceOf<Feeder>().mapNotNull { it.normalHeadTerminal }.filter { !it.conductingEquipment.isNormallyOpenSwitch() }.toList())
+        network.sequenceOf<Feeder>()
+            .mapNotNull { it.normalHeadTerminal }
+            .forEach {
+                val feederHead = requireNotNull(it.conductingEquipment) { "head terminals require conducting equipment to apply feeder directions" }
+
+                if (!stateOperators.isOpen(feederHead, null))
+                    run(it)
+            }
     }
 
     /**
      * Apply [FeederDirection.DOWNSTREAM] from the [terminal].
      *
-     * @param terminal The terminal to start applying feeder direction from.
+     * @param terminal The terminal to start applying direction from.
      */
     fun run(terminal: Terminal) {
-        run(listOf(terminal))
-    }
-
-    private fun run(startTerminals: List<Terminal>) {
-        normalTraversal.tracker.clear()
-        currentTraversal.tracker.clear()
-
-        startTerminals.forEach {
-            normalTraversal.reset().run(it)
-            currentTraversal.reset().run(it)
-        }
-    }
-
-    private fun setDownstreamAndQueueNext(
-        traversal: BranchRecursiveTraversal<Terminal>,
-        terminal: Terminal,
-        openTest: OpenTest,
-        directionSelector: DirectionSelector
-    ) {
-        val direction = directionSelector.select(terminal)
-        if (!direction.add(FeederDirection.DOWNSTREAM))
-            return
-
-        val connected = terminal.connectivityNode?.let { cn -> cn.terminals.filter { it != terminal } } ?: emptyList()
-        val processor = ::flowUpstreamAndQueueNextStraight.takeIf { connected.size == 1 } ?: ::flowUpstreamAndQueueNextBranch
-
-        connected.forEach {
-            processor(traversal, it, openTest, directionSelector)
-        }
+        traversal.reset().run(terminal, FeederDirection.DOWNSTREAM, canStopOnStartItem = false)
     }
 
     private fun isFeederHeadTerminal(terminal: Terminal): Boolean =
@@ -105,66 +95,7 @@ class SetDirection {
                 .any { it.normalHeadTerminal == terminal }
         } ?: false
 
-    private fun reachedSubstationTransformer(terminal: Terminal): Boolean =
-        terminal.conductingEquipment.let { ce -> (ce is PowerTransformer) && ce.substations.isNotEmpty() }
-
-    private fun flowUpstreamAndQueueNextStraight(
-        traversal: BranchRecursiveTraversal<Terminal>,
-        terminal: Terminal,
-        openTest: OpenTest,
-        directionSelector: DirectionSelector
-    ) {
-        if (!traversal.tracker.visit(terminal))
-            return
-
-        if (terminal.conductingEquipment?.numTerminals() == 2)
-            flowUpstreamAndQueueNext(terminal, openTest, directionSelector, traversal.queue::add)
-        else
-            flowUpstreamAndQueueNext(terminal, openTest, directionSelector) { traversal.startNewBranch(it) }
-    }
-
-    private fun flowUpstreamAndQueueNextBranch(
-        traversal: BranchRecursiveTraversal<Terminal>,
-        terminal: Terminal,
-        openTest: OpenTest,
-        directionSelector: DirectionSelector
-    ) {
-        // We don't want to visit the upstream terminal if we have branched as it prevents the downstream path of a loop processing correctly, but we
-        // still need to make sure we don't re-visit the upstream terminal.
-        if (traversal.hasVisited(terminal))
-            return
-
-        flowUpstreamAndQueueNext(terminal, openTest, directionSelector) { traversal.startNewBranch(it) }
-    }
-
-    private fun flowUpstreamAndQueueNext(
-        terminal: Terminal,
-        openTest: OpenTest,
-        directionSelector: DirectionSelector,
-        queue: (Terminal) -> Unit
-    ) {
-        val direction = directionSelector.select(terminal)
-        if (!direction.add(FeederDirection.UPSTREAM))
-            return
-
-        if (isFeederHeadTerminal(terminal) || reachedSubstationTransformer(terminal))
-            return
-
-        val ce = terminal.conductingEquipment ?: return
-        if (openTest.isOpen(ce, null))
-            return
-
-        ce.terminals
-            .asSequence()
-            .filter { it != terminal }
-            .forEach { queue(it) }
-    }
-
-    private fun ConductingEquipment?.isNormallyOpenSwitch(): Boolean =
-        (this is Switch) && isNormallyOpen()
-
-    private fun BranchRecursiveTraversal<Terminal>.startNewBranch(terminal: Terminal) {
-        branchQueue.add(branchSupplier().setStart(terminal))
-    }
+    private fun reachedSubstationTransformer(terminal: Terminal?): Boolean =
+        terminal?.conductingEquipment.let { ce -> (ce is PowerTransformer) && ce.substations.isNotEmpty() }
 
 }

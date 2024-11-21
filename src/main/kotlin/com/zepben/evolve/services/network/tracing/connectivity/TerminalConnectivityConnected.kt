@@ -13,12 +13,11 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.services.network.tracing.connectivity.PhasePaths.straightPhaseConnectivity
 import com.zepben.evolve.services.network.tracing.connectivity.PhasePaths.viableInferredPhaseConnectivity
-import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
-class TerminalConnectivityConnected @JvmOverloads constructor(
+object TerminalConnectivityConnected {
+
     private val createCandidatePhases: () -> XyCandidatePhasePaths = { XyCandidatePhasePaths() }
-) {
 
     @JvmOverloads
     fun connectedTerminals(terminal: Terminal, phaseCode: PhaseCode = terminal.phases): List<ConnectivityResult> =
@@ -39,7 +38,7 @@ class TerminalConnectivityConnected @JvmOverloads constructor(
         return results
     }
 
-    private fun terminalConnectivity(
+    fun terminalConnectivity(
         terminal: Terminal,
         connectedTerminal: Terminal,
         includePhases: Set<SPK>

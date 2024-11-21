@@ -10,7 +10,9 @@ package com.zepben.evolve.database.sqlite.cim.network
 
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionReader
 import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.services.network.NetworkService
@@ -51,11 +53,16 @@ internal class NetworkDatabaseReaderTest {
         every { this@mockk.supportedVersion } returns 1
     }
 
-    private val setDirection = mockk<SetDirection> { justRun { run(service) } }
-    private val setPhases = mockk<SetPhases> { justRun { run(service) } }
-    private val phaseInferrer = mockk<PhaseInferrer> { justRun { run(service) } }
-    private val assignToFeeders = mockk<AssignToFeeders> { justRun { run(service) } }
-    private val assignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
+    private val normalSetFeederDirections = mockk<SetDirection> { justRun { run(service) } }
+    private val currentSetFeederDirections = mockk<SetDirection> { justRun { run(service) } }
+    private val normalSetPhases = mockk<SetPhases> { justRun { run(service) } }
+    private val currentSetPhases = mockk<SetPhases> { justRun { run(service) } }
+    private val normalPhaseInferrer = mockk<PhaseInferrer>()
+    private val currentPhaseInferrer = mockk<PhaseInferrer>()
+    private val normalAssignToFeeders = mockk<AssignToFeeders> { justRun { run(service) } }
+    private val currentAssignToFeeders = mockk<AssignToFeeders> { justRun { run(service) } }
+    private val normalAssignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
+    private val currentAssignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
 
     private val reader = NetworkDatabaseReader(
         connection,
@@ -65,11 +72,16 @@ internal class NetworkDatabaseReaderTest {
         metadataReader,
         networkServiceReader,
         tableVersion,
-        setDirection,
-        setPhases,
-        phaseInferrer,
-        assignToFeeders,
-        assignToLvFeeders
+        normalSetFeederDirections,
+        currentSetFeederDirections,
+        normalSetPhases,
+        currentSetPhases,
+        normalPhaseInferrer,
+        currentPhaseInferrer,
+        normalAssignToFeeders,
+        currentAssignToFeeders,
+        normalAssignToLvFeeders,
+        currentAssignToLvFeeders,
     )
 
     //
@@ -78,6 +90,9 @@ internal class NetworkDatabaseReaderTest {
 
     @Test
     internal fun `calls expected processors, including post processes`() {
+        every { normalPhaseInferrer.run(service) } returns emptyList()
+        every { currentPhaseInferrer.run(service) } returns emptyList()
+
         assertThat("Should have loaded", reader.load())
 
         assertThat(systemErr.log, containsString("Applying feeder direction to network..."))
@@ -106,11 +121,20 @@ internal class NetworkDatabaseReaderTest {
             networkServiceReader.load()
             service.unresolvedReferences()
 
-            setDirection.run(service)
-            setPhases.run(service)
-            phaseInferrer.run(service)
-            assignToFeeders.run(service)
-            assignToLvFeeders.run(service)
+            normalSetFeederDirections.run(service)
+            currentSetFeederDirections.run(service)
+
+            normalSetPhases.run(service)
+            currentSetPhases.run(service)
+
+            normalPhaseInferrer.run(service)
+            currentPhaseInferrer.run(service)
+
+            normalAssignToFeeders.run(service)
+            currentAssignToFeeders.run(service)
+
+            normalAssignToLvFeeders.run(service)
+            currentAssignToLvFeeders.run(service)
 
             // calls for _validate_equipment_containers()
             service.listOf<Equipment>(any<(Equipment) -> Boolean>())
@@ -119,6 +143,27 @@ internal class NetworkDatabaseReaderTest {
             service.sequenceOf<Feeder>()
             service.sequenceOf<EnergySource>()
         }
+    }
+
+    @Test
+    internal fun `logs inferred phases`() {
+        val j1 = Junction("j1").apply { name = "j1 name" }
+        val j2 = Junction("j1").apply { name = "j1 name" }
+        val j3 = Junction("j1").apply { name = "j1 name" }
+        every { normalPhaseInferrer.run(service) } returns listOf(PhaseInferrer.InferredPhase(j1, false), PhaseInferrer.InferredPhase(j1, true))
+        every { currentPhaseInferrer.run(service) } returns listOf(PhaseInferrer.InferredPhase(j2, false), PhaseInferrer.InferredPhase(j3, true))
+
+        reader.load()
+
+        fun correctMessage(idObj: IdentifiedObject) =
+            "*** Action Required *** Inferred missing phase for '${idObj.name}' [${idObj.mRID}] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
+
+        fun suspectMessage(idObj: IdentifiedObject) =
+            "*** Action Required *** Inferred missing phases for '${idObj.name}' [${idObj.mRID}] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
+
+        assertThat(systemErr.log, containsString(correctMessage(j1)))
+        assertThat(systemErr.log, containsString(suspectMessage(j2)))
+        assertThat(systemErr.log, containsString(suspectMessage(j3)))
     }
 
 }

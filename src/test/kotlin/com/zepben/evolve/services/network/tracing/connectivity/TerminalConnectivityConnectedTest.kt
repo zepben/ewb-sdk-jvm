@@ -13,7 +13,6 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -28,7 +27,7 @@ internal class TerminalConnectivityConnectedTest {
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
     val networkService = NetworkService()
-    val connectivity = TerminalConnectivityConnected()
+    val connectivity = TerminalConnectivityConnected
 
     @Test
     internal fun straightConnections() {

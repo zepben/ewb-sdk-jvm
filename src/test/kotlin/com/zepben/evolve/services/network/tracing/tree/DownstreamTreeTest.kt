@@ -11,8 +11,8 @@ package com.zepben.evolve.services.network.tracing.tree
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.network.testdata.LoopingNetwork
 import com.zepben.evolve.services.network.testdata.addFeederDirections
-import com.zepben.evolve.services.network.tracing.Tracing
-import com.zepben.evolve.services.network.tracing.feeder.DirectionLogger
+import com.zepben.evolve.services.network.tracing.networktrace.actions.TreeNode
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -30,12 +30,11 @@ internal class DownstreamTreeTest {
     internal fun downstreamTreeTest() {
         val n = LoopingNetwork.create()
 
-        Tracing.setPhases().run(n)
-        n.get<ConductingEquipment>("j0")!!.addFeederDirections().also { DirectionLogger.trace(it) }
+        n.get<ConductingEquipment>("j0")!!.addFeederDirections()//.also { DirectionLogger.trace(it) }
 
         val start: ConductingEquipment = n["j1"]!!
         assertThat(start, notNullValue())
-        val root = Tracing.normalDownstreamTree().run(start)
+        val root = DownstreamTree(NetworkStateOperators.NORMAL).run(start)
 
         assertThat(root, notNullValue())
         assertTreeAsset(root, n["j1"], null, arrayOf(n["acLineSegment1"], n["acLineSegment3"]))
@@ -86,14 +85,20 @@ internal class DownstreamTreeTest {
         assertThat(findNodes(root, "acLineSegment9"), hasSize(1))
         assertThat(findNodes(root, "j10"), hasSize(1))
         assertThat(findNodes(root, "acLineSegment10"), hasSize(1))
+
+        // NOTE: We short circuit reprocessing loops to avoid reprocessing on unlikely weird looping connectivity
+        //       which can cause massive computation blowout on large networks. This being the case, because j10-t2
+        //       gets run first, j12-t1 only ends up with an UPSTREAM because when j10-t3 goes to be run, it already
+        //       has BOTH and thus does not try to continue. The issue with this is that j12-t1 is never visited
+        //       in the opposing direction and thus not flowing both the other way around the loop back to j10-t2.
         assertThat(findNodes(root, "j11"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
         assertThat(findNodes(root, "acLineSegment11"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
-        assertThat(findNodes(root, "j12"), hasSize(3))
+        assertThat(findNodes(root, "j12"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
         assertThat(findNodes(root, "acLineSegment12"), hasSize(4))
-        assertThat(findNodes(root, "j13"), hasSize(3))
+        assertThat(findNodes(root, "j13"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
         assertThat(findNodes(root, "acLineSegment13"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
         assertThat(findNodes(root, "j14"), hasSize(4))
-        assertThat(findNodes(root, "acLineSegment14"), hasSize(3))
+        assertThat(findNodes(root, "acLineSegment14"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
         assertThat(findNodes(root, "acLineSegment15"), hasSize(4))
         assertThat(findNodes(root, "acLineSegment16"), hasSize(4))
 
@@ -121,45 +126,45 @@ internal class DownstreamTreeTest {
         assertThat(findNodeDepths(root, "acLineSegment10"), equalTo(listOf(5)))
         assertThat(findNodeDepths(root, "j11"), equalTo(listOf(8))) // Would have been 8, 10, 12 if the intermediate loop was reprocessed.
         assertThat(findNodeDepths(root, "acLineSegment11"), equalTo(listOf(7))) // Would have been 7, 11, 13 if the intermediate loop was reprocessed.
-        assertThat(findNodeDepths(root, "j12"), equalTo(listOf(8, 10, 10)))
+        assertThat(findNodeDepths(root, "j12"), equalTo(listOf(10))) // Would have been 8, 10, 10 if the intermediate loop was reprocessed.
         assertThat(findNodeDepths(root, "acLineSegment12"), equalTo(listOf(7, 10, 11, 14)))
-        assertThat(findNodeDepths(root, "j13"), equalTo(listOf(10, 12, 12)))
+        assertThat(findNodeDepths(root, "j13"), equalTo(listOf(12))) // Would have been 10, 12, 12 if the intermediate loop was reprocessed.
         assertThat(findNodeDepths(root, "acLineSegment13"), equalTo(listOf(9))) // Would have been 9, 9, 11 if the intermediate loop was reprocessed.
         assertThat(findNodeDepths(root, "j14"), equalTo(listOf(8, 9, 12, 13)))
-        assertThat(findNodeDepths(root, "acLineSegment14"), equalTo(listOf(9, 11, 11)))
+        assertThat(findNodeDepths(root, "acLineSegment14"), equalTo(listOf(11))) // Would have been 9, 11, 11 if the intermediate loop was reprocessed.
         assertThat(findNodeDepths(root, "acLineSegment15"), equalTo(listOf(7, 10, 12, 13)))
         assertThat(findNodeDepths(root, "acLineSegment16"), equalTo(listOf(8, 9, 11, 14)))
     }
 
     private fun assertTreeAsset(
-        treeNode: TreeNode,
+        treeNode: TreeNode<ConductingEquipment>,
         asset: ConductingEquipment?,
         parent: ConductingEquipment?,
         children: Array<ConductingEquipment?>
     ) {
-        assertThat(treeNode.conductingEquipment, equalTo(asset))
+        assertThat(treeNode.identifiedObject, equalTo(asset))
 
         if (parent != null) {
             val treeParent = treeNode.parent
             assertThat(treeParent, notNullValue())
-            assertThat(treeParent!!.conductingEquipment, equalTo(parent))
+            assertThat(treeParent!!.identifiedObject, equalTo(parent))
         } else
             assertThat(treeNode.parent, nullValue())
 
         assertThat(treeNode.children, hasSize(children.size))
         for (i in children.indices) {
-            assertThat(treeNode.children[i].conductingEquipment, equalTo(children[i]))
+            assertThat(treeNode.children[i].identifiedObject, equalTo(children[i]))
         }
     }
 
-    private fun findNodes(root: TreeNode, assetId: String): List<TreeNode> {
-        val matches = mutableListOf<TreeNode>()
-        val processNodes = ArrayDeque<TreeNode>()
+    private fun findNodes(root: TreeNode<ConductingEquipment>, assetId: String): List<TreeNode<ConductingEquipment>> {
+        val matches = mutableListOf<TreeNode<ConductingEquipment>>()
+        val processNodes = ArrayDeque<TreeNode<ConductingEquipment>>()
         processNodes.addLast(root)
 
         while (processNodes.size > 0) {
             val node = Objects.requireNonNull(processNodes.pollFirst())
-            if (node.conductingEquipment.mRID == assetId)
+            if (node.identifiedObject.mRID == assetId)
                 matches.add(node)
 
             node.children.forEach(processNodes::addLast)
@@ -168,7 +173,7 @@ internal class DownstreamTreeTest {
         return matches
     }
 
-    private fun findNodeDepths(root: TreeNode, assetId: String): List<Int> {
+    private fun findNodeDepths(root: TreeNode<ConductingEquipment>, assetId: String): List<Int> {
         val nodes = findNodes(root, assetId)
         val depths = mutableListOf<Int>()
 
@@ -177,9 +182,9 @@ internal class DownstreamTreeTest {
         return depths
     }
 
-    private fun depthInTree(treeNode: TreeNode): Int {
+    private fun depthInTree(treeNode: TreeNode<ConductingEquipment>): Int {
         var depth = -1
-        var node: TreeNode? = treeNode
+        var node: TreeNode<ConductingEquipment>? = treeNode
         while (node != null) {
             node = node.parent
             ++depth

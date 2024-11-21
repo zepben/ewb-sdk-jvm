@@ -10,12 +10,15 @@ package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
-import com.zepben.evolve.services.network.tracing.Tracing
-import com.zepben.evolve.services.network.tracing.connectivity.ConductingEquipmentStep
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.run
+import com.zepben.evolve.services.network.tracing.traversal.StepAction
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
 import org.slf4j.LoggerFactory
 
 // Logs all the phases of assets, terminals and nominal phases. Useful for debugging.
-internal class PhaseLogger private constructor(asset: ConductingEquipment) : (ConductingEquipmentStep, Boolean?) -> Unit {
+internal class PhaseLogger private constructor(asset: ConductingEquipment) : StepAction<NetworkTraceStep<Unit>> {
 
     private val b: StringBuilder = StringBuilder()
         .append("\n###############################")
@@ -23,9 +26,9 @@ internal class PhaseLogger private constructor(asset: ConductingEquipment) : (Co
         .append("\n")
         .append("\n")
 
-    override fun invoke(a: ConductingEquipmentStep, isStopping: Boolean?) {
-        a.conductingEquipment.terminals.forEach { t ->
-            b.append("${a.conductingEquipment.mRID}-T${t.sequenceNumber}: ")
+    override fun apply(item: NetworkTraceStep<Unit>, context: StepContext) {
+        item.path.toEquipment.terminals.forEach { t ->
+            b.append("${item.path.toEquipment.mRID}-T${t.sequenceNumber}: ")
 
             t.phases.singlePhases.forEach { phase ->
                 val nps = t.normalPhases[phase]
@@ -62,7 +65,8 @@ internal class PhaseLogger private constructor(asset: ConductingEquipment) : (Co
             assets.forEach { asset ->
                 val pl = PhaseLogger(asset!!)
 
-                Tracing.connectedEquipmentTrace().apply { addStepAction(pl) }
+                Tracing.networkTrace()
+                    .addStepAction(pl)
                     .run(asset)
 
                 pl.log()

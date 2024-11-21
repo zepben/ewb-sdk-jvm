@@ -10,53 +10,37 @@ package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
-import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
-import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue.Companion.branchQueue
-import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue.Companion.processQueue
+import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.networktrace.operators.FeederDirectionStateOperations
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
 
 /**
  * Convenience class that provides methods for removing feeder direction on a [NetworkService]
- * This class is backed by a [BranchRecursiveTraversal].
  */
-@Suppress("MemberVisibilityCanBePrivate")
-class RemoveDirection {
+class RemoveDirection(
+    internal val stateOperators: NetworkStateOperators
+) {
 
-    /**
-     * The [BranchRecursiveTraversal] used when tracing the normal state of the network.
-     *
-     * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
-     */
-    val normalTraversal: BranchRecursiveTraversal<TerminalDirection> = BranchRecursiveTraversal(
-        { current, traversal -> ebbAndQueue(traversal, current, DirectionSelector.NORMAL_DIRECTION) },
-        { processQueue { it.weight } },
-        { BasicTracker() },
-        { branchQueue { it.weight } }
+    private class DirectionToRemove(val direction: FeederDirection, var removedDirection: Boolean = false)
+
+    private val directionOperators: FeederDirectionStateOperations = stateOperators
+
+    private val traversal: NetworkTrace<DirectionToRemove> = Tracing.networkTrace(
+        networkStateOperators = stateOperators,
+        actionStepType = NetworkTraceActionType.ALL_STEPS,
+        queue = WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() },
+        computeNextT = ::computeNextDirectionToRemove
     )
-
-    /**
-     * The [BranchRecursiveTraversal] used when tracing the current state of the network.
-     *
-     * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
-     */
-    val currentTraversal: BranchRecursiveTraversal<TerminalDirection> = BranchRecursiveTraversal(
-        { current, traversal -> ebbAndQueue(traversal, current, DirectionSelector.CURRENT_DIRECTION) },
-        { processQueue { it.weight } },
-        { BasicTracker() },
-        { branchQueue { it.weight } }
-    )
-
-    /**
-     * Remove all feeder directions from the specified network.
-     *
-     * @param networkService The network service to remove feeder directions from.
-     */
-    fun run(networkService: NetworkService) {
-        networkService.sequenceOf<Terminal>().forEach {
-            it.normalFeederDirection = FeederDirection.NONE
-            it.currentFeederDirection = FeederDirection.NONE
+        .addNetworkCondition { stopAtOpen() }
+        .addStepAction { item, _ ->
+            item.data.removedDirection = directionOperators.removeDirection(item.path.toTerminal, item.data.direction)
         }
-    }
+        .addQueueCondition { (_, nextDirectionToRemove), _, (_, currentDirectionToRemove), _ ->
+            nextDirectionToRemove.direction != FeederDirection.NONE && currentDirectionToRemove.removedDirection
+        }
 
     /**
      * Allows the removal of feeder direction from a terminal and the connected equipment chain.
@@ -67,84 +51,50 @@ class RemoveDirection {
      */
     @JvmOverloads
     fun run(terminal: Terminal, direction: FeederDirection = FeederDirection.NONE) {
-        runFromTerminal(normalTraversal, TerminalDirection(terminal, direction.orElse(terminal.normalFeederDirection)))
-        runFromTerminal(currentTraversal, TerminalDirection(terminal, direction.orElse(terminal.currentFeederDirection)))
+        val directionToRemove = direction.takeUnless { it == FeederDirection.NONE } ?: directionOperators.getDirection(terminal)
+        traversal.reset().run(terminal, DirectionToRemove(directionToRemove), canStopOnStartItem = false)
     }
 
-    private fun runFromTerminal(traversal: BranchRecursiveTraversal<TerminalDirection>, start: TerminalDirection) {
-        traversal.reset()
-            .run(start)
-    }
+    @Suppress("UNUSED_PARAMETER")
+    private fun computeNextDirectionToRemove(
+        currentStep: NetworkTraceStep<DirectionToRemove>,
+        context: StepContext,
+        nextPath: StepPath,
+        nextPaths: List<StepPath>
+    ): DirectionToRemove {
+        if (!currentStep.data.removedDirection) {
+            return DirectionToRemove(FeederDirection.NONE)
+        }
 
-    private fun ebbAndQueue(traversal: BranchRecursiveTraversal<TerminalDirection>, current: TerminalDirection, directionSelector: DirectionSelector) {
-        if (!directionSelector.select(current.terminal).remove(current.directionToEbb))
-            return
+        val directionToRemove = when (val directionRemoved = currentStep.data.direction) {
+            FeederDirection.NONE -> FeederDirection.NONE
+            FeederDirection.BOTH -> FeederDirection.BOTH
+            else -> {
+                if (nextPaths.size == 1) {
+                    // If there is only one connected terminal, always remove the opposite direction
+                    directionRemoved.findOpposite()
+                } else {
+                    //
+                    // Check the number of other terminals with same direction:
+                    //    0:  remove opposite direction from all other terminals.
+                    //    1:  remove opposite direction from only the matched terminal.
+                    //    2+: do not queue or remove anything else as everything is still valid.
+                    //
+                    val matchingTerminals = nextPaths.count {
+                        it.toTerminal != currentStep.path.toTerminal && directionRemoved in directionOperators.getDirection(it.toTerminal)
+                    }
 
-        val otherTerminals = current.terminal.connectivityNode?.let { cn -> cn.terminals.filter { it != current.terminal } } ?: emptyList()
-
-        if (current.directionToEbb == FeederDirection.BOTH) {
-            otherTerminals
-                .asSequence()
-                .filter { directionSelector.select(it).remove(FeederDirection.BOTH) }
-                .forEach { queueIfRequired(traversal, it, FeederDirection.BOTH, directionSelector) }
-        } else {
-            //
-            // Check the number of other terminals with same direction:
-            //    0:  remove opposite direction from all other terminals.
-            //    1:  remove opposite direction from only the matched terminal.
-            //    2+: do not queue or remove anything else as everything is still valid.
-            //
-            val oppositeDirection = current.directionToEbb.findOpposite()
-            val matchingTerminals = otherTerminals.filter { current.directionToEbb in directionSelector.select(it).value }
-            when (matchingTerminals.size) {
-                0 -> {
-                    otherTerminals
-                        .asSequence()
-                        .filter { directionSelector.select(it).remove(oppositeDirection) }
-                        .forEach { queueIfRequired(traversal, it, oppositeDirection, directionSelector) }
-
-                    otherTerminals.forEach { traversal.queue.add(TerminalDirection(it, oppositeDirection)) }
-                }
-
-                1 -> {
-                    matchingTerminals.first().also {
-                        if (directionSelector.select(it).remove(oppositeDirection))
-                            queueIfRequired(traversal, it, oppositeDirection, directionSelector)
+                    when {
+                        matchingTerminals == 0 -> directionRemoved.findOpposite()
+                        matchingTerminals == 1 && directionRemoved in directionOperators.getDirection(nextPath.toTerminal) -> directionRemoved.findOpposite()
+                        else -> FeederDirection.NONE
                     }
                 }
             }
         }
+
+        return DirectionToRemove(directionToRemove)
     }
-
-    private fun queueIfRequired(
-        traversal: BranchRecursiveTraversal<TerminalDirection>,
-        terminal: Terminal,
-        directionEbbed: FeederDirection,
-        directionSelector: DirectionSelector
-    ) {
-        val ce = terminal.conductingEquipment ?: return
-        val otherTerminals = ce.terminals.filter { it != terminal }
-
-        if (directionEbbed == FeederDirection.BOTH)
-            otherTerminals.forEach { traversal.queue.add(TerminalDirection(it, directionEbbed)) }
-        else {
-            //
-            // Check the number of other terminals with same direction:
-            //    0:  remove opposite direction from all other terminals.
-            //    1:  remove opposite direction from only the matched terminal.
-            //    2+: do not queue or remove anything else as everything is still valid.
-            //
-            val oppositeDirection = directionEbbed.findOpposite()
-            val matchingTerminals = otherTerminals.filter { directionEbbed in directionSelector.select(it).value }
-            when (matchingTerminals.size) {
-                0 -> otherTerminals.forEach { traversal.queue.add(TerminalDirection(it, oppositeDirection)) }
-                1 -> traversal.queue.add(TerminalDirection(matchingTerminals.first(), oppositeDirection))
-            }
-        }
-    }
-
-    private fun FeederDirection.orElse(default: FeederDirection): FeederDirection =
-        takeUnless { it == FeederDirection.NONE } ?: default
 
     private fun FeederDirection.findOpposite(): FeederDirection =
         // This will never be called for NONE or BOTH.
@@ -152,11 +102,5 @@ class RemoveDirection {
             FeederDirection.UPSTREAM -> FeederDirection.DOWNSTREAM
             else -> FeederDirection.UPSTREAM
         }
-
-    class TerminalDirection(val terminal: Terminal, val directionToEbb: FeederDirection) {
-
-        val weight: Int = terminal.phases.numPhases()
-
-    }
 
 }

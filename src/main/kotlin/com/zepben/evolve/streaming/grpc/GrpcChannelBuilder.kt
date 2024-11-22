@@ -118,8 +118,20 @@ class GrpcChannelBuilder {
         privateKey: String
     ): GrpcChannelBuilder = makeSecure(rootCertificates?.let { File(it) }, File(certificateChain), File(privateKey))
 
+    fun makeInsecure( ): GrpcChannelBuilder = apply {
+        _channelCredentials = InsecureChannelCredentials.create()
+    }
+
     fun withTokenFetcher(tokenFetcher: ZepbenTokenFetcher): GrpcChannelBuilder = apply {
+        if (_callCredentials != null)
+            throw IllegalArgumentException("Call credential already set in connection builder.")
         _callCredentials = TokenCallCredentials(tokenFetcher::fetchToken)
+    }
+
+    fun withAccessToken(token: String, prefix: String = "Bearer"): GrpcChannelBuilder = apply {
+        if (_callCredentials != null)
+            throw IllegalArgumentException("Call credential already set in connection builder.")
+        _callCredentials = TokenCallCredentials { "$prefix $token" }
     }
 
 }

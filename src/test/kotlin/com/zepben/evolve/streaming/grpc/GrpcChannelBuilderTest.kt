@@ -319,6 +319,31 @@ internal class GrpcChannelBuilderTest {
         assertThat(grpcChannel.channel, equalTo(authenticatedChannel))
     }
 
+    @Test
+    internal fun withAccessToken() {
+        val authenticatedChannel = mockk<ManagedChannel>()
+
+        mockkStatic(NettyChannelBuilder::class)
+        every { NettyChannelBuilder.forAddress("hostname", 1234, any()).maxInboundMessageSize(any()).intercept(any<CallCredentialApplier>()).build() } returns authenticatedChannel
+
+        val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeInsecure().withAccessToken("token")
+            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 1))
+        assertThat(grpcChannel.channel, equalTo(authenticatedChannel))
+    }
+
+    @Test
+    internal fun `will throw exception if attempting to override already set call credentials`() {
+        val tokenFetcher = ZepbenTokenFetcher("audience", "domain", AuthMethod.AUTH0)
+        val grpcChannelBuilder = GrpcChannelBuilder().forAddress("hostname", 1234).makeInsecure().withTokenFetcher(tokenFetcher)
+
+        expect {
+            grpcChannelBuilder.withAccessToken("token")
+        }.toThrow<IllegalArgumentException>().withMessage("Call credential already set in connection builder.")
+        expect {
+            grpcChannelBuilder.withTokenFetcher(tokenFetcher)
+        }.toThrow<IllegalArgumentException>().withMessage("Call credential already set in connection builder.")
+    }
+
     private fun ExceptionMatcher<StatusRuntimeException>.withStatusCode(expected: Status): ExceptionMatcher<StatusRuntimeException> {
         val status = exception.status ?: throw ExpectExceptionError(expected.toString(), "")
         if (expected == status) return this

@@ -6,23 +6,21 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.services.network.tracing.networktrace.trackers
+package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 
-internal class TerminalNetworkTraceTracker : NetworkTraceTracker {
+internal class NetworkTraceTracker(initialCapacity: Int) {
 
-    // Setting initial capacity greater than default of 16 as we suspect a majority of network traces will step on more than 12 terminals (load factor is 0.75).
-    // Not sure what a sensible initial capacity actually is, but 16 just felt too small.
-    private val visited = HashSet<Any?>(256)
+    private val visited = HashSet<Any?>(initialCapacity)
 
-    override fun hasVisited(terminal: Terminal, phases: Set<SinglePhaseKind>): Boolean = visited.contains(getKey(terminal, phases))
+    fun hasVisited(terminal: Terminal, phases: Set<SinglePhaseKind>): Boolean = visited.contains(getKey(terminal, phases))
 
-    override fun visit(terminal: Terminal, phases: Set<SinglePhaseKind>): Boolean = visited.add(getKey(terminal, phases))
+    fun visit(terminal: Terminal, phases: Set<SinglePhaseKind>): Boolean = visited.add(getKey(terminal, phases))
 
-    override fun clear() {
+    fun clear() {
         visited.clear()
     }
 

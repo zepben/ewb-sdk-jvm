@@ -10,7 +10,6 @@ package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
-import com.zepben.evolve.services.network.tracing.networktrace.trackers.toPhasesSet
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 // TODO [Review]: Just call this ActionType maybe?

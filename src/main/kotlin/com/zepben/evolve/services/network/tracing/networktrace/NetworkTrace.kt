@@ -12,15 +12,15 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
+import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.networktrace.trackers.NetworkTraceTracker
-import com.zepben.evolve.services.network.tracing.networktrace.trackers.RecursiveNetworkTraceTracker
-import com.zepben.evolve.services.network.tracing.networktrace.trackers.TerminalNetworkTraceTracker
-import com.zepben.evolve.services.network.tracing.networktrace.trackers.toPhasesSet
-import com.zepben.evolve.services.network.tracing.traversal.*
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
+import com.zepben.evolve.services.network.tracing.traversal.Traversal
+import com.zepben.evolve.services.network.tracing.traversal.TraversalCondition
+import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
 
 /**
  * A [Traversal] implementation specifically designed to trace connected [Terminal]s of [ConductingEquipment] in a network.
@@ -60,10 +60,14 @@ class NetworkTrace<T> private constructor(
     private val actionType: NetworkTraceActionType,
 ) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, parent) {
 
-    private val tracker: NetworkTraceTracker = if (queueType !is BranchingQueueType)
-        TerminalNetworkTraceTracker()
-    else
-        RecursiveNetworkTraceTracker(parent?.tracker as? RecursiveNetworkTraceTracker, TerminalNetworkTraceTracker())
+    // Setting initial capacity greater than default of 16 for non-branching traces as we suspect a majority of network traces will step on more than 12
+    // terminals (load factor is 0.75). Not sure what a sensible initial capacity actually is, but 16 just felt too small.
+    private val tracker: NetworkTraceTracker = NetworkTraceTracker(
+        when (queueType) {
+            is BasicQueueType<*, *> -> 256
+            is BranchingQueueType<*, *> -> 16
+        }
+    )
 
     internal constructor(
         networkStateOperators: NetworkStateOperators,
@@ -241,7 +245,7 @@ class NetworkTrace<T> private constructor(
     }
 
     override fun canActionItem(item: NetworkTraceStep<T>, context: StepContext): Boolean {
-        return actionType.canActionItem(item, context, tracker::hasVisited)
+        return actionType.canActionItem(item, context, ::hasVisited)
     }
 
     override fun onReset() {
@@ -249,7 +253,7 @@ class NetworkTrace<T> private constructor(
     }
 
     override fun canVisitItem(item: NetworkTraceStep<T>, context: StepContext): Boolean {
-        return tracker.visit(item.path.toTerminal, item.path.nominalPhasePaths.toPhasesSet())
+        return visit(item.path.toTerminal, item.path.nominalPhasePaths.toPhasesSet())
     }
 
     override fun getDerivedThis(): NetworkTrace<T> = this
@@ -257,6 +261,39 @@ class NetworkTrace<T> private constructor(
 
     private fun startNominalPhasePath(phases: PhaseCode?): List<NominalPhasePath> =
         phases?.singlePhases?.map { NominalPhasePath(it, it) } ?: emptyList()
+
+    private fun hasVisited(terminal: Terminal, phases: Set<SinglePhaseKind>): Boolean {
+        // We could do this with the following code:
+        //    parent?.hasVisited(terminal, phases) == true || tracker.hasVisited(terminal, phases)
+        //
+        // Although this reads nicer, it risks causing stack overflows.
+
+        var parent = parent
+        while (parent != null) {
+            // NOTE: Make sure you call the parents tracker, not the parent directly to avoid exponential blowouts with long chain traces.
+            if (parent.tracker.hasVisited(terminal, phases))
+                return true
+            parent = parent.parent
+        }
+
+        return tracker.hasVisited(terminal, phases)
+    }
+
+    private fun visit(terminal: Terminal, phases: Set<SinglePhaseKind>): Boolean {
+        // We could do this with the following code:
+        //    (parent?.hasVisited(terminal, phases) != true) && tracker.visit(terminal, phases)
+        //
+        // Although this reads nicer, it risks causing stack overflows.
+        var parent = parent
+        while (parent != null) {
+            // NOTE: Make sure you call the parents tracker, not the parent directly to avoid exponential blowouts with long chain traces.
+            if (parent.tracker.hasVisited(terminal, phases))
+                return false
+            parent = parent.parent
+        }
+
+        return tracker.visit(terminal, phases)
+    }
 
 }
 

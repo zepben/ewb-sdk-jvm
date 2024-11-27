@@ -17,8 +17,8 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
  * [ZBEX]
  * A class representing the association between EndDevices and EndDeviceFunctions.
  *
- * @property END_DEVICE_MRID A column storing the mRID of BatteryUnits.
- * @property END_DEVICE_FUNCTION_MRID A column storing the mRID of BatteryControls.
+ * @property END_DEVICE_MRID A column storing the mRID of EndDevices.
+ * @property END_DEVICE_FUNCTION_MRID A column storing the mRID of EndDeviceFunctions.
  */
 @ZBEX
 @Suppress("PropertyName")

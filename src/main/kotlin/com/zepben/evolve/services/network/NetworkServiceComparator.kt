@@ -1016,7 +1016,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 RegulatingControl::enabled,
                 RegulatingControl::maxAllowedTargetValue,
                 RegulatingControl::minAllowedTargetValue,
-                RegulatingControl::ratedCurrent
+                RegulatingControl::ratedCurrent,
+                RegulatingControl::ctPrimary,
+                RegulatingControl::minTargetDeadband
             )
             compareIdReferences(RegulatingControl::terminal)
             compareIdReferenceCollections(RegulatingControl::regulatingCondEqs)

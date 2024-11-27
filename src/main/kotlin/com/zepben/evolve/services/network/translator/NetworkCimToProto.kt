@@ -2212,6 +2212,8 @@ fun toPb(cim: RegulatingControl, pb: PBRegulatingControl.Builder): PBRegulatingC
         cim.terminal?.also { terminalMRID = it.mRID } ?: clearTerminalMRID()
         clearRegulatingCondEqMRIDs()
         cim.regulatingCondEqs.forEach { addRegulatingCondEqMRIDs(it.mRID) }
+        ctPrimary = cim.ctPrimary ?: UNKNOWN_DOUBLE
+        minTargetDeadband = cim.minTargetDeadband ?: UNKNOWN_DOUBLE
 
         toPb(cim, psrBuilder)
     }

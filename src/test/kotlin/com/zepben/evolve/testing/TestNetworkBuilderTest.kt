@@ -366,6 +366,26 @@ internal class TestNetworkBuilderTest {
         validateConnectivityNodeOverride { mRID, cnMrid -> toOther<Fuse>(mRID = mRID, connectivityNodeMrid = cnMrid) }
     }
 
+    @Test
+    internal fun `can add sites`() {
+        //
+        // 1--c0--21 b1 21--c2--21 b2 21--c3--1
+        //
+        TestNetworkBuilder()
+            .fromAcls() // c0
+            .toBreaker() // b1
+            .toAcls() // c2
+            .toBreaker() // b3
+            .toAcls() // c4
+            .addSite("b1", "c2", "b3") // site5
+            .addSite("c0", "b1", mRID = "customSiteId")
+            .network
+            .apply {
+                validateSite("site5", equipment = listOf("b1", "c2", "b3"))
+                validateSite("customSiteId", equipment = listOf("c0", "b1"))
+            }
+    }
+
     private fun NetworkService.validateConnections(mRID: String, vararg expectedTerms: List<String>) {
         assertThat(get<ConductingEquipment>(mRID)!!.numTerminals(), equalTo(expectedTerms.size))
         expectedTerms.forEachIndexed { index, expected ->
@@ -430,6 +450,12 @@ internal class TestNetworkBuilderTest {
         )
         // Make sure our overridden connectivity node was not created.
         assertThat(ns.get<ConnectivityNode>("different-cn"), nullValue())
+    }
+
+    private fun NetworkService.validateSite(mRID: String, equipment: List<String>) {
+        val site = get<Site>(mRID)!!
+        assertThat(site.equipment.map { it.mRID }, containsInAnyOrder(*equipment.toTypedArray()))
+        equipment.map { get<Equipment>(it)!! }.forEach { ce -> assertThat(ce.sites, hasItem(site)) }
     }
 
 }

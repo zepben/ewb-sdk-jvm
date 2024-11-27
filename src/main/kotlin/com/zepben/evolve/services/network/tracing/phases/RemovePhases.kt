@@ -16,9 +16,9 @@ import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceActionType
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
-import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue.Companion.branchQueue
 import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue.Companion.processQueue
 
 /**
@@ -75,21 +75,21 @@ class RemovePhases {
     }
 
     private fun createTrace(stateOperators: NetworkStateOperators): NetworkTrace<EbbPhases> =
-        Tracing.networkTraceBranching(
+        Tracing.networkTrace(
             networkStateOperators = stateOperators,
             actionStepType = NetworkTraceActionType.ALL_STEPS,
-            queueFactory = { processQueue { it.data.phasesToEbb.size } },
-            branchQueueFactory = { branchQueue { it.data.phasesToEbb.size } },
+            processQueue { it.data.phasesToEbb.size },
             computeData = ::computeNextEbbPhases
         )
+            .addCondition { stopAtOpen() }
             .addStepAction { (path, ebbPhases), _ ->
                 ebbPhases.ebbedPhases = ebb(stateOperators, path.toTerminal, ebbPhases.phasesToEbb)
             }
-            .addQueueCondition { nextStep, _, _, _ ->
-                nextStep.data.phasesToEbb.isNotEmpty()
+            .addQueueCondition { nextStep, _, currentStep, _ ->
+                nextStep.data.phasesToEbb.isNotEmpty() && currentStep.data.ebbedPhases.isNotEmpty()
             }
 
-    @Suppress("UNUSED_PARAMETER")
+    @Suppress("UNUSED_PARAMETER", "unused")
     private fun computeNextEbbPhases(step: NetworkTraceStep<EbbPhases>, context: StepContext, nextPath: NetworkTraceStep.Path): EbbPhases {
         val phasesToEbb = nextPath.nominalPhasePaths.asSequence().map { it.to }.filter { it in step.data.phasesToEbb }.toSet()
         return EbbPhases(phasesToEbb)

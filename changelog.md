@@ -8,10 +8,12 @@
 * Tracing downstream/upstream using a NetworkTrace will not step on a start item if there is no downstream/upstream terminal on the item.
 * `SetDirection` now correctly applies te `BOTH` direction on all parts of the loop again, so if you were relying on the broken intermediate state, you will
   need to update your code.
+* `RemovePhases` now stops at open points like the `SetPhases` counterpart. If you were relying on the bug to remove phases through open points you will now
+  need to start additional traces from the other side of the open points to maintain this behaviour.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
-* Client functionality for updating and querying network states via gRPC service stub. 
+* Client functionality for updating and querying network states via gRPC service stub.
 * `BaseService` now contains a `MetadataCollection` to tightly couple the metadata to the associated service.
 * Added `Services`, a new class which contains a copy of each `BaseService` supported by the SDK.
 * Added `connectWithAccessTokenInsecure()` for connecting to a gRPC service using an access token without SSL/TLS.
@@ -34,9 +36,14 @@
 * Added an unordered collection comparator.
 * Added the energized relationship for the current state of network between `Feeder` and `LvFeeder`.
 * Updated `NetworkConsumer.getEquipmentForContainers` to allow requesting normal, current or all equipments.
+* You can now add sites to the `TestNetworkBuilder` via `addSite`.
+* You can now start the `AssignToFeeder` trace from a specified `Terminal` rather than all feeder heads.
+* When processing feeder assignments, all LV feeders belonging to a dist substation site will now be considered energized when the site is energized by a
+  feeder.
+* Major speed improvements have been made for `RemovePhases` when dealing with large networks with many nested loops.
 
 ### Fixes
-* None.
+* `RemovePhases` now stops at open points like the `SetPhases` counterpart.
 
 ### Notes
 * None.

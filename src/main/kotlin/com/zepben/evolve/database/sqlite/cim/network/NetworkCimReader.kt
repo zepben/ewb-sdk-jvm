@@ -2287,6 +2287,8 @@ class NetworkCimReader(
             minAllowedTargetValue = resultSet.getNullableDouble(table.MIN_ALLOWED_TARGET_VALUE.queryIndex)
             ratedCurrent = resultSet.getNullableDouble(table.RATED_CURRENT.queryIndex)
             terminal = service.ensureGet(resultSet.getNullableString(table.TERMINAL_MRID.queryIndex), typeNameAndMRID())
+            ctPrimary = resultSet.getNullableDouble(table.CT_PRIMARY.queryIndex)
+            minTargetDeadband = resultSet.getNullableDouble(table.MIN_TARGET_DEADBAND.queryIndex)
         }
 
         return loadPowerSystemResource(regulatingControl, table, resultSet)

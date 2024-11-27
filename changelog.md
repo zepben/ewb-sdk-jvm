@@ -10,7 +10,7 @@
 * Added `Services`, a new class which contains a copy of each `BaseService` supported by the SDK.
 
 ### Enhancements
-* None.
+* You can now start the `AssignToFeeder` trace from a specified `Terminal` rather than all feeder heads.
 
 ### Fixes
 * None.

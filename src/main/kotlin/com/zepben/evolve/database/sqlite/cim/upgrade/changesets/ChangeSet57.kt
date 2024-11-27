@@ -17,6 +17,7 @@ internal fun changeSet57() = ChangeSet(
     57,
     listOf(
         // Network Change
+        `Add ct_primary and min_target_deadband columns for tap_changer_controls`,
         `Create table battery_controls`,
         `Create table pan_demand_response_functions`,
         `Create table static_var_compensators`,
@@ -28,6 +29,16 @@ internal fun changeSet57() = ChangeSet(
 // ###################
 // # Network Changes #
 // ###################
+
+@ZBEX
+@Suppress("ObjectPropertyName")
+private val `Add ct_primary and min_target_deadband columns for tap_changer_controls` = Change(
+    listOf(
+        "ALTER TABLE tap_changer_controls ADD COLUMN ct_primary NUMBER NOT NULL DEFAULT 'NONE';",
+        "ALTER TABLE tap_changer_controls ADD COLUMN min_target_deadband NUMBER NOT NULL DEFAULT 'NONE';"
+    ),
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+)
 
 @ZBEX
 @Suppress("ObjectPropertyName")
@@ -50,6 +61,8 @@ private val `Create table battery_controls` = Change(
             min_allowed_target_value NUMBER NULL,
             rated_current NUMBER NULL,
             terminal_mrid TEXT NULL,
+            ct_primary NUMBER NULL,
+            min_target_deadband NUMBER NULL,
             battery_unit_mrid TEXT NULL,
             charging_Rate NUMBER NULL,
             discharging_rate NUMBER NULL,

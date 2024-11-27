@@ -2314,6 +2314,8 @@ fun toCim(pb: PBRegulatingControl, cim: RegulatingControl, networkService: Netwo
         pb.regulatingCondEqMRIDsList.forEach {
             networkService.resolveOrDeferReference(Resolvers.regulatingCondEq(this), it)
         }
+        ctPrimary = pb.ctPrimary.takeUnless { it == UNKNOWN_DOUBLE }
+        minTargetDeadband = pb.minTargetDeadband.takeUnless { it == UNKNOWN_DOUBLE }
 
         toCim(pb.psr, this, networkService)
     }
@@ -2831,12 +2833,6 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
      */
     @ZBEX
     fun addFromPb(pb: PBBatteryControl): BatteryControl? = networkService.addFromPb(pb)
-
-    /**
-     * An extension to add a converted copy of the protobuf [PBBatteryControl] to the [NetworkService].
-     */
-    @ZBEX
-    fun NetworkService.addFromPb(pb: PBBatteryControl): BatteryControl? = tryAddOrNull(toCim(pb, this))
 
     // #######################
     // # IEC61968 ASSET INFO #

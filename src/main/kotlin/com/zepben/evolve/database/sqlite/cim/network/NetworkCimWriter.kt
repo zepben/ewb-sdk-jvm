@@ -2115,6 +2115,8 @@ class NetworkCimWriter(
         insert.setNullableDouble(table.MIN_ALLOWED_TARGET_VALUE.queryIndex, regulatingControl.minAllowedTargetValue)
         insert.setNullableDouble(table.RATED_CURRENT.queryIndex, regulatingControl.ratedCurrent)
         insert.setNullableString(table.TERMINAL_MRID.queryIndex, regulatingControl.terminal?.mRID)
+        insert.setNullableDouble(table.CT_PRIMARY.queryIndex, regulatingControl.ctPrimary)
+        insert.setNullableDouble(table.MIN_TARGET_DEADBAND.queryIndex, regulatingControl.minTargetDeadband)
 
         return savePowerSystemResource(table, insert, regulatingControl, description)
     }

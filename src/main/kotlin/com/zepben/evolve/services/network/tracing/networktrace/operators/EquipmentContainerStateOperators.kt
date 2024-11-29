@@ -10,6 +10,8 @@ package com.zepben.evolve.services.network.tracing.networktrace.operators
 
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.EquipmentContainer
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 
 /**
  * Defines operations for managing relationships between [Equipment] and [EquipmentContainer].
@@ -31,6 +33,22 @@ interface EquipmentContainerStateOperators {
      * @return A collection of containers that contain the specified equipment.
      */
     fun getContainers(equipment: Equipment): Collection<EquipmentContainer>
+
+    /**
+     * Retrieves a collection of feeders that energize the given LV feeder.
+     *
+     * @param lvFeeder The LV feeder for which to get the energizing feeders.
+     * @return A collection of feeders that energize the given LV feeder.
+     */
+    fun getEnergizingFeeders(lvFeeder: LvFeeder): Collection<Feeder>
+
+    /**
+     * Retrieves a collection of LV feeders energized by the given feeder.
+     *
+     * @param feeder The feeder for which to get the energized LV feeders.
+     * @return A collection of LV feeders energized by the given feeder.
+     */
+    fun getEnergizedLvFeeders(feeder: Feeder): Collection<LvFeeder>
 
     /**
      * Adds the specified equipment to the given container.
@@ -59,6 +77,33 @@ interface EquipmentContainerStateOperators {
         addContainerToEquipment(container, equipment)
     }
 
+    /**
+     * Adds the specified energizing feeder to the given lvFeeder.
+     *
+     * @param feeder The energizing feeder to add to the lvFeeder.
+     * @param lvFeeder The lvFeeder to which the feeder will be added.
+     */
+    fun addEnergizingFeederToLvFeeder(feeder: Feeder, lvFeeder: LvFeeder)
+
+    /**
+     * Adds the specified energized lvFeeder to the given feeder.
+     *
+     * @param lvFeeder The energized lvFeeder to add to the feeder.
+     * @param feeder The feeder to which the lvFeeder will be added.
+     */
+    fun addEnergizedLvFeederToFeeder(lvFeeder: LvFeeder, feeder: Feeder)
+
+    /**
+     * Establishes a bidirectional association between the specified feeder and LV feeder.
+     *
+     * @param feeder The feeder energizing the lv feeder.
+     * @param lvFeeder The lv feeder energized by the feeder.
+     */
+    fun associateEnergizingFeeder(feeder: Feeder, lvFeeder: LvFeeder) {
+        addEnergizingFeederToLvFeeder(feeder, lvFeeder)
+        addEnergizedLvFeederToFeeder(lvFeeder, feeder)
+    }
+
     companion object {
 
         /**
@@ -81,12 +126,24 @@ private class NormalEquipmentContainerStateOperators : EquipmentContainerStateOp
 
     override fun getContainers(equipment: Equipment): Collection<EquipmentContainer> = equipment.containers
 
+    override fun getEnergizingFeeders(lvFeeder: LvFeeder): Collection<Feeder> = lvFeeder.normalEnergizingFeeders
+
+    override fun getEnergizedLvFeeders(feeder: Feeder): Collection<LvFeeder> = feeder.normalEnergizedLvFeeders
+
     override fun addEquipmentToContainer(equipment: Equipment, container: EquipmentContainer) {
         container.addEquipment(equipment)
     }
 
     override fun addContainerToEquipment(container: EquipmentContainer, equipment: Equipment) {
         equipment.addContainer(container)
+    }
+
+    override fun addEnergizingFeederToLvFeeder(feeder: Feeder, lvFeeder: LvFeeder) {
+        lvFeeder.addNormalEnergizingFeeder(feeder)
+    }
+
+    override fun addEnergizedLvFeederToFeeder(lvFeeder: LvFeeder, feeder: Feeder) {
+        feeder.addNormalEnergizedLvFeeder(lvFeeder)
     }
 }
 
@@ -95,6 +152,12 @@ private class CurrentEquipmentContainerStateOperators : EquipmentContainerStateO
 
     override fun getContainers(equipment: Equipment): Collection<EquipmentContainer> = equipment.currentContainers
 
+    //todo update to use current variant once added. Using normal is what happens at the moment, which is wrong.
+    override fun getEnergizingFeeders(lvFeeder: LvFeeder): Collection<Feeder> = lvFeeder.normalEnergizingFeeders
+
+    //todo update to use current variant once added. Using normal is what happens at the moment, which is wrong.
+    override fun getEnergizedLvFeeders(feeder: Feeder): Collection<LvFeeder> = feeder.normalEnergizedLvFeeders
+
     override fun addEquipmentToContainer(equipment: Equipment, container: EquipmentContainer) {
         container.addCurrentEquipment(equipment)
     }
@@ -102,4 +165,28 @@ private class CurrentEquipmentContainerStateOperators : EquipmentContainerStateO
     override fun addContainerToEquipment(container: EquipmentContainer, equipment: Equipment) {
         equipment.addCurrentContainer(container)
     }
+
+    override fun addEnergizingFeederToLvFeeder(feeder: Feeder, lvFeeder: LvFeeder) {
+        //todo update to use current variant once added. Adding as normal is what happens at the moment, which is wrong.
+        lvFeeder.addNormalEnergizingFeeder(feeder)
+    }
+
+    override fun addEnergizedLvFeederToFeeder(lvFeeder: LvFeeder, feeder: Feeder) {
+        //todo update to use current variant once added. Adding as normal is what happens at the moment, which is wrong.
+        feeder.addNormalEnergizedLvFeeder(lvFeeder)
+    }
+}
+
+/**
+ * Retrieves a collection of containers associated with the given equipment.
+ *
+ * @receiver The equipment for which to get the associated containers.
+ * @param T The type of containers to find.
+ * @param operators The [NetworkStateOperators] used to select the containers.
+ * @return A collection of containers of the specified type that contain the specified equipment.
+ */
+// TODO [Review]: Where should these be located?
+inline fun <reified T : EquipmentContainer> Equipment?.getFilteredContainers(operators: NetworkStateOperators): Collection<T> = when (this) {
+    null -> emptyList()
+    else -> operators.getContainers(this).filterIsInstance<T>()
 }

@@ -10,6 +10,7 @@
 * Added `Services`, a new class which contains a copy of each `BaseService` supported by the SDK.
 
 ### Enhancements
+* You can now add sites to the `TestNetworkBuilder` via `addSite`.
 * You can now start the `AssignToFeeder` trace from a specified `Terminal` rather than all feeder heads.
 
 ### Fixes

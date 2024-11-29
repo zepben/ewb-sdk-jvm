@@ -8,10 +8,7 @@
 
 package com.zepben.evolve.testing
 
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
@@ -493,6 +490,19 @@ open class TestNetworkBuilder {
     }
 
     /**
+     * Create a new [Site] containing the specified equipment.
+     *
+     * @param equipmentMrids The mRID's of the equipment to add to the site.
+     * @param mRID Option mRID for the new [Site].
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    fun addSite(vararg equipmentMrids: String, mRID: String? = null): TestNetworkBuilder {
+        network.createSite(mRID, equipmentMrids)
+        return this
+    }
+
+    /**
      * Get the [NetworkService] after apply traced phasing, feeder directions, and HV/LV feeder assignment.
      *
      * Does not infer phasing.
@@ -641,6 +651,18 @@ open class TestNetworkBuilder {
             }.also {
                 headEquipment.addContainer(it)
                 add(it)
+            }
+        }
+
+    private fun NetworkService.createSite(mRID: String?, equipmentMrids: Array<out String>) =
+        mRID.orNextId("site").let { id ->
+            Site(id).also { site ->
+                equipmentMrids.map { network.get<Equipment>(it)!! }.forEach {
+                    site.addEquipment(it)
+                    it.addContainer(site)
+                }
+
+                add(site)
             }
         }
 

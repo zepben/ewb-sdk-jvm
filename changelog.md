@@ -12,6 +12,7 @@
 * Added `connectWithAccessToken()` for connecting to a gRPC service using an access token with SSL/TLS.
 
 ### Enhancements
+* You can now add sites to the `TestNetworkBuilder` via `addSite`.
 * You can now start the `AssignToFeeder` trace from a specified `Terminal` rather than all feeder heads.
 
 ### Fixes

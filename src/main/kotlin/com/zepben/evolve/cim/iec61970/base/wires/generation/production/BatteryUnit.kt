@@ -82,6 +82,10 @@ class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronic
         return ret
     }
 
+    /**
+     * Clear [controls].
+     * @return This [BatteryUnit] for fluent use.
+     */
     fun clearControls(): BatteryUnit {
         _batteryControls = null
         return this

@@ -87,4 +87,24 @@ internal class ControlledApplianceTest {
         assertThat(controlledAppliance.isStripAndBaseboardHeater, equalTo(true))
         assertThat(controlledAppliance.isWaterHeater, equalTo(false))
     }
+
+    @Test
+    internal fun controlledApplianceToInt() {
+        val controlledAppliance = ControlledAppliance(
+            isElectricVehicle = true,
+            isExteriorLighting = false,
+            isGenerationSystem = true,
+            isHvacCompressorOrFurnace = false,
+            isInteriorLighting = true,
+            isIrrigationPump = false,
+            isManagedCommercialIndustrialLoad = true,
+            isPoolPumpSpaJacuzzi = false,
+            isSimpleMiscLoad = true,
+            isSmartAppliance = false,
+            isStripAndBaseboardHeater = true,
+            isWaterHeater = false
+        )
+
+        assertThat(controlledAppliance.toInt(), equalTo(1365))
+    }
 }

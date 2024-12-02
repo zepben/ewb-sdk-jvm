@@ -77,6 +77,10 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
         return ret
     }
 
+    /**
+     * Clear [usagePoints].
+     * @return This [EndDevice] for fluent use.
+     */
     fun clearUsagePoints(): EndDevice {
         _usagePoints = null
         return this
@@ -126,6 +130,10 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
         return ret
     }
 
+    /**
+     * Clear [functions].
+     * @return This [EndDevice] for fluent use.
+     */
     fun clearFunctions(): EndDevice {
         _endDeviceFunctions = null
         return this

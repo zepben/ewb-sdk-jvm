@@ -104,21 +104,10 @@ class NetworkCimWriter(
         val table = databaseTables.getTable<TablePanDemandResponseFunctions>()
         val insert = databaseTables.getInsert<TablePanDemandResponseFunctions>()
 
-        return savePanDemandResponseFunction(table, insert, panDemandResponseFunction, "pan demand response function")
-    }
-
-    @ZBEX
-    @Throws(SQLException::class)
-    private fun savePanDemandResponseFunction(
-        table: TablePanDemandResponseFunctions,
-        insert: PreparedStatement,
-        panDemandResponseFunction: PanDemandResponseFunction,
-        description: String
-    ): Boolean {
         insert.setNullableString(table.KIND.queryIndex, panDemandResponseFunction.kind.name)
         insert.setNullableInt(table.APPLIANCE.queryIndex, panDemandResponseFunction.appliance?.toInt())
 
-        return saveEndDeviceFunction(table, insert, panDemandResponseFunction, description)
+        return saveEndDeviceFunction(table, insert, panDemandResponseFunction, "pan demand response function")
     }
 
     // #########################################

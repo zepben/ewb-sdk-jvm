@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires
 
+import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
@@ -26,7 +27,9 @@ abstract class TableRegulatingControls : TablePowerSystemResources() {
     val MIN_ALLOWED_TARGET_VALUE: Column = Column(++columnIndex, "min_allowed_target_value", "NUMBER", NULL)
     val RATED_CURRENT: Column = Column(++columnIndex, "rated_current", "NUMBER", NULL)
     val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
+    @ZBEX
     val CT_PRIMARY: Column = Column(++columnIndex, "ct_primary", "NUMBER", NULL)
+    @ZBEX
     val MIN_TARGET_DEADBAND: Column = Column(++columnIndex, "min_target_deadband", "NUMBER", NULL)
 
 }

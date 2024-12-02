@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61968.meterin
 
 import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.database.sqlite.cim.tables.Column
+import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableEndDeviceFunctions
 
@@ -17,7 +18,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableEndDe
 @Suppress("PropertyName")
 class TablePanDemandResponseFunctions : TableEndDeviceFunctions() {
 
-    val KIND: Column = Column(++columnIndex, "kind", "TEXT", NULL)
+    val KIND: Column = Column(++columnIndex, "kind", "TEXT", NOT_NULL)
     val APPLIANCE: Column = Column(++columnIndex, "appliance", "INTEGER", NULL)
 
     override val name: String = "pan_demand_response_functions"

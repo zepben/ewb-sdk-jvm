@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.services.network
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
@@ -64,22 +63,18 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
 
     private val _measurements: MutableMap<String, MutableList<Measurement>> = mutableMapOf()
 
-    // #######################################
-    // # [ZBEX] EXTENSIONS IEC61968 METERING #
-    // #######################################
+    // ################################
+    // # EXTENSIONS IEC61968 METERING #
+    // ################################
 
-    @ZBEX
     fun add(panDemandResponseFunction: PanDemandResponseFunction): Boolean = super.add(panDemandResponseFunction)
-    @ZBEX
     fun remove(panDemandResponseFunction: PanDemandResponseFunction): Boolean = super.remove(panDemandResponseFunction)
 
-    // #########################################
-    // # [ZBEX] EXTENSIONS IEC61970 BASE WIRES #
-    // #########################################
+    // ##################################
+    // # EXTENSIONS IEC61970 BASE WIRES #
+    // ##################################
 
-    @ZBEX
     fun add(batteryControl: BatteryControl): Boolean = super.add(batteryControl)
-    @ZBEX
     fun remove(batteryControl: BatteryControl): Boolean = super.remove(batteryControl)
 
     // #######################

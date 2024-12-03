@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.database.sqlite.cim.upgrade.changesets
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.upgrade.Change
 import com.zepben.evolve.database.sqlite.cim.upgrade.ChangeSet
@@ -28,7 +27,6 @@ internal fun changeSet57() = ChangeSet(
 // # Network Changes #
 // ###################
 
-@ZBEX
 @Suppress("ObjectPropertyName")
 private val `Add ct_primary and min_target_deadband columns for tap_changer_controls` = Change(
     listOf(
@@ -38,7 +36,6 @@ private val `Add ct_primary and min_target_deadband columns for tap_changer_cont
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
 
-@ZBEX
 @Suppress("ObjectPropertyName")
 private val `Create table battery_controls` = Change(
     listOf(

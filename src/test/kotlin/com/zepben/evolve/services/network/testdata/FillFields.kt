@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.services.network.testdata
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControlMode
@@ -43,9 +42,8 @@ import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import java.time.Instant
 import java.util.*
 
-/************ [ZBEX] EXTENSION IEC61968 METERING ************/
+/************ EXTENSION IEC61968 METERING ************/
 
-@ZBEX
 fun PanDemandResponseFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): PanDemandResponseFunction {
     (this as EndDeviceFunction).fillFields(service, includeRuntime)
 
@@ -68,9 +66,8 @@ fun PanDemandResponseFunction.fillFields(service: NetworkService, includeRuntime
     return this
 }
 
-/************ [ZBEX] EXTENSION IEC61970 BASE WIRES ************/
+/************ EXTENSION IEC61970 BASE WIRES ************/
 
-@ZBEX
 fun BatteryControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): BatteryControl {
     (this as RegulatingControl).fillFields(service, includeRuntime)
 

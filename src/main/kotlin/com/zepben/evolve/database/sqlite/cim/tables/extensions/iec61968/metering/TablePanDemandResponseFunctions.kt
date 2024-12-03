@@ -8,13 +8,11 @@
 
 package com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61968.metering
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableEndDeviceFunctions
 
-@ZBEX
 @Suppress("PropertyName")
 class TablePanDemandResponseFunctions : TableEndDeviceFunctions() {
 

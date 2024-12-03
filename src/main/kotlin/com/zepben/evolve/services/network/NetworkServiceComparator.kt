@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.services.network
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
@@ -58,7 +57,6 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()
 ) : BaseServiceComparator() {
 
-    @ZBEX
     /************ EXTENSION IEC61968 METERING ************/
 
     private fun comparePanDemandResponseFunction(
@@ -71,7 +69,6 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareValues(PanDemandResponseFunction::kind, PanDemandResponseFunction::appliance)
         }
 
-    @ZBEX
     /************ EXTENSION IEC61970 BASE WIRES ************/
 
     private fun compareBatteryControl(source: BatteryControl, target: BatteryControl): ObjectDifference<BatteryControl> =

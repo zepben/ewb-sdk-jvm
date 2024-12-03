@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.services.common
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.Asset
@@ -472,12 +471,10 @@ internal object SynchronousMachineToReactiveCapabilityCurveResolver : ReferenceR
     SynchronousMachine::class, ReactiveCapabilityCurve::class, SynchronousMachine::addCurve
 )
 
-@ZBEX
 internal object BatteryControlToBatteryUnitResolver : ReferenceResolver<BatteryControl, BatteryUnit> by KReferenceResolver(
     BatteryControl::class, BatteryUnit::class, BatteryControl::batteryUnit.setter
 )
 
-@ZBEX
 internal object BatteryUnitToBatteryControlResolver : ReferenceResolver<BatteryUnit, BatteryControl> by KReferenceResolver(
     BatteryUnit::class, BatteryControl::class, BatteryUnit::addControl
 )

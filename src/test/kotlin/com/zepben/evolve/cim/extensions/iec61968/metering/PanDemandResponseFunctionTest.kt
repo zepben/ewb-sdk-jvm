@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.cim.extensions.iec61968.metering
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.iec61968.metering.ControlledAppliance
 import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunctionKind
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
@@ -23,7 +22,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class PanDemandResponseFunctionTest {
 
-    @ZBEX
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()

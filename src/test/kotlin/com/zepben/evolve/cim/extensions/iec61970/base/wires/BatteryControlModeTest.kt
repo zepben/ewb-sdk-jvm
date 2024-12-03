@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.cim.extensions.iec61970.base.wires
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.validateEnum
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
@@ -17,7 +16,6 @@ import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControlMode
 
 internal class BatteryControlModeTest {
 
-    @ZBEX
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()

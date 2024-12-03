@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.services.network.translator
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControlMode
@@ -177,9 +176,9 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
 import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit as PBEvChargingUnit
 
-// #######################################
-// # [ZBEX] EXTENSIONS IEC61968 METERING #
-// #######################################
+// ################################
+// # EXTENSIONS IEC61968 METERING #
+// ################################
 
 /**
  * Convert the protobuf [PBPanDemandResponseFunction] into its CIM counterpart.
@@ -188,7 +187,6 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.
  * @param networkService The [NetworkService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [PanDemandResponseFunction].
  */
-@ZBEX
 fun toCim(pb: PBPanDemandResponseFunction, networkService: NetworkService): PanDemandResponseFunction =
     PanDemandResponseFunction(pb.mRID()).apply {
         pb.appliance.takeUnless { it == UNKNOWN_INT }?.also { ap -> assignAppliance(ap) }
@@ -200,7 +198,6 @@ fun toCim(pb: PBPanDemandResponseFunction, networkService: NetworkService): PanD
 /**
  * An extension to add a converted copy of the protobuf [PBPanDemandResponseFunction] to the [NetworkService].
  */
-@ZBEX
 fun NetworkService.addFromPb(pb: PBPanDemandResponseFunction): PanDemandResponseFunction? = tryAddOrNull(toCim(pb, this))
 
 // ##################################
@@ -214,7 +211,6 @@ fun NetworkService.addFromPb(pb: PBPanDemandResponseFunction): PanDemandResponse
  * @param networkService The [NetworkService] the converted CIM object will be added too.
  * @return The converted [pb] as a CIM [BatteryControl].
  */
-@ZBEX
 fun toCim(pb: PBBatteryControl, networkService: NetworkService): BatteryControl =
     BatteryControl(pb.mRID()).apply {
         chargingRate = pb.chargingRate.takeUnless { it == UNKNOWN_DOUBLE }
@@ -230,7 +226,6 @@ fun toCim(pb: PBBatteryControl, networkService: NetworkService): BatteryControl 
 /**
  * An extension to add a converted copy of the protobuf [PBBatteryControl] to the [NetworkService].
  */
-@ZBEX
 fun NetworkService.addFromPb(pb: PBBatteryControl): BatteryControl? = tryAddOrNull(toCim(pb, this))
 
 // #######################
@@ -2803,9 +2798,9 @@ fun NetworkService.addFromPb(pb: PBEvChargingUnit): EvChargingUnit? = tryAddOrNu
 class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
 
 
-    // #######################################
-    // # [ZBEX] EXTENSIONS IEC61968 METERING #
-    // #######################################
+    // ################################
+    // # EXTENSIONS IEC61968 METERING #
+    // ################################
 
 
     /**
@@ -2814,11 +2809,10 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
      * @param pb The [PBPanDemandResponseFunction] to convert.
      * @return The converted [PanDemandResponseFunction]
      */
-    @ZBEX
     fun addFromPb(pb: PBPanDemandResponseFunction): PanDemandResponseFunction? = networkService.addFromPb(pb)
 
     // #########################################
-    // # [ZBEX] EXTENSIONS IEC61970 BASE WIRES #
+    // # EXTENSIONS IEC61970 BASE WIRES #
     // #########################################
 
     /**
@@ -2827,7 +2821,6 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
      * @param pb The [PBBatteryControl] to convert.
      * @return The converted [BatteryControl]
      */
-    @ZBEX
     fun addFromPb(pb: PBBatteryControl): BatteryControl? = networkService.addFromPb(pb)
 
     // #######################

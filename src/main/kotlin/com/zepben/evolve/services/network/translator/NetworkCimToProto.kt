@@ -9,7 +9,6 @@
 package com.zepben.evolve.services.network.translator
 
 import com.google.protobuf.NullValue
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
@@ -198,9 +197,9 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeede
 import com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind as PBProtectionKind
 import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit as PBEvChargingUnit
 
-// #######################################
-// # [ZBEX] EXTENSIONS IEC61968 METERING #
-// #######################################
+// ################################
+// # EXTENSIONS IEC61968 METERING #
+// ################################
 
 /**
  * Convert the [PanDemandResponseFunction] into its protobuf counterpart.
@@ -209,7 +208,6 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.
  * @param pb The protobuf builder to populate.
  * @return [pb] for fluent use.
  */
-@ZBEX
 fun toPb(cim: PanDemandResponseFunction, pb: PBPanDemandResponseFunction.Builder): PBPanDemandResponseFunction.Builder =
     pb.apply {
         kind = EndDeviceFunctionKind.valueOf(cim.kind.name)
@@ -220,12 +218,11 @@ fun toPb(cim: PanDemandResponseFunction, pb: PBPanDemandResponseFunction.Builder
 /**
  * An extension for converting any PanDemandResponseFunction into its protobuf counterpart.
  */
-@ZBEX
 fun PanDemandResponseFunction.toPb(): PBPanDemandResponseFunction = toPb(this, PBPanDemandResponseFunction.newBuilder()).build()
 
-// #########################################
-// # [ZBEX] EXTENSIONS IEC61970 BASE WRIES #
-// #########################################
+// ##################################
+// # EXTENSIONS IEC61970 BASE WRIES #
+// ##################################
 
 /**
  * Convert the [BatteryControl] into its protobuf counterpart.
@@ -234,7 +231,6 @@ fun PanDemandResponseFunction.toPb(): PBPanDemandResponseFunction = toPb(this, P
  * @param pb The protobuf builder to populate.
  * @return [pb] for fluent use.
  */
-@ZBEX
 fun toPb(cim: BatteryControl, pb: PBBatteryControl.Builder): PBBatteryControl.Builder =
     pb.apply {
         cim.batteryUnit?.let { batteryUnitMRID = it.mRID } ?: clearBatteryUnitMRID()
@@ -248,7 +244,6 @@ fun toPb(cim: BatteryControl, pb: PBBatteryControl.Builder): PBBatteryControl.Bu
 /**
  * An extension for converting any BatteryControl into its protobuf counterpart.
  */
-@ZBEX
 fun BatteryControl.toPb(): PBBatteryControl = toPb(this, PBBatteryControl.newBuilder()).build()
 
 // #######################
@@ -2693,7 +2688,7 @@ fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBui
 class NetworkCimToProto : BaseCimToProto() {
 
     // #######################################
-    // # [ZBEX] EXTENSIONS IEC61968 METERING #
+    // # EXTENSIONS IEC61968 METERING #
     // #######################################
 
     /**
@@ -2702,12 +2697,11 @@ class NetworkCimToProto : BaseCimToProto() {
      * @param cim The [PanDemandResponseFunction] to convert.
      * @return The protobuf form of [cim].
      */
-    @ZBEX
     fun toPb(cim: PanDemandResponseFunction): PBPanDemandResponseFunction = cim.toPb()
 
-    // #########################################
-    // # [ZBEX] EXTENSIONS IEC61970 BASE WIRES #
-    // #########################################
+    // ##################################
+    // # EXTENSIONS IEC61970 BASE WIRES #
+    // ##################################
 
     /**
      * Convert the [BatteryControl] into its protobuf counterpart.
@@ -2715,7 +2709,6 @@ class NetworkCimToProto : BaseCimToProto() {
      * @param cim The [BatteryControl] to convert.
      * @return The protobuf form of [cim].
      */
-    @ZBEX
     fun toPb(cim: BatteryControl): PBBatteryControl = cim.toPb()
 
     // #######################
@@ -3364,7 +3357,6 @@ class NetworkCimToProto : BaseCimToProto() {
      * @param cim The [StaticVarCompensator] to convert.
      * @return The protobuf form of [cim].
      */
-    @ZBEX
     fun toPb(cim: StaticVarCompensator): PBStaticVarCompensator = cim.toPb()
 
     /**

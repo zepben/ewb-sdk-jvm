@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.services.network.translator
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.services.common.translator.mRID
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControl
@@ -45,14 +44,12 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 
 
-/************ [ZBEX] EXTENSION IEC61968 METERING ************/
+/************ EXTENSION IEC61968 METERING ************/
 
-@ZBEX
 fun PanDemandResponseFunction.mRID(): String = edf.mRID()
 
-/************ [ZBEX] EXTENSION IEC61970 BASE WIRES ************/
+/************ EXTENSION IEC61970 BASE WIRES ************/
 
-@ZBEX
 fun BatteryControl.mRID(): String = rc.mRID()
 
 /************ IEC61968 ASSET INFO ************/

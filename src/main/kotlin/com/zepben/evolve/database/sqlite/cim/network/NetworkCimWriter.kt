@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.database.sqlite.cim.network
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
@@ -86,9 +85,9 @@ class NetworkCimWriter(
     override val databaseTables: NetworkDatabaseTables
 ) : CimWriter(databaseTables) {
 
-    // #######################################
-    // # [ZBEX] EXTENSIONS IEC61968 METERING #
-    // #######################################
+    // ################################
+    // # EXTENSIONS IEC61968 METERING #
+    // ################################
 
     /**
      * Save the [PanDemandResponseFunction] fields to [TablePanDemandResponseFunctions].
@@ -98,7 +97,6 @@ class NetworkCimWriter(
      * @return true if the [PanDemandResponseFunction] was successfully written to the database, otherwise false.
      * @throws SQLException For any errors encountered writing to the database.
      */
-    @ZBEX
     @Throws(SQLException::class)
     fun save(panDemandResponseFunction: PanDemandResponseFunction): Boolean {
         val table = databaseTables.getTable<TablePanDemandResponseFunctions>()
@@ -110,9 +108,9 @@ class NetworkCimWriter(
         return saveEndDeviceFunction(table, insert, panDemandResponseFunction, "pan demand response function")
     }
 
-    // #########################################
-    // # [ZBEX] EXTENSIONS IEC61970 BASE WIRES #
-    // #########################################
+    // ##################################
+    // # EXTENSIONS IEC61970 BASE WIRES #
+    // ##################################
 
     /**
      * Save the [BatteryControl] fields to [TableBatteryControls].
@@ -122,7 +120,6 @@ class NetworkCimWriter(
      * @return true if the [BatteryControl] was successfully written to the database, otherwise false.
      * @throws SQLException For any errors encountered writing to the database.
      */
-    @ZBEX
     @Throws(SQLException::class)
     fun save(batteryControl: BatteryControl): Boolean {
         val table = databaseTables.getTable<TableBatteryControls>()
@@ -2164,7 +2161,6 @@ class NetworkCimWriter(
      * @return true if the [StaticVarCompensator] was successfully written to the database, otherwise false.
      * @throws SQLException For any errors encountered writing to the database.
      */
-    @ZBEX
     @Throws(SQLException::class)
     fun save(staticVarCompensator: StaticVarCompensator): Boolean {
         val table = databaseTables.getTable<TableStaticVarCompensators>()

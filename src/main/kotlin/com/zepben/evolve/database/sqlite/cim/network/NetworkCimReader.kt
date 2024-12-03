@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.database.sqlite.cim.network
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControlMode
@@ -83,12 +82,11 @@ class NetworkCimReader(
     override val service: NetworkService
 ) : CimReader(service) {
 
-    // #######################################
-    // # [ZBEX] EXTENSIONS IEC61968 Metering #
-    // #######################################
+    // ################################
+    // # EXTENSIONS IEC61968 Metering #
+    // ################################
 
     /**
-     * [ZBEX]
      * Create a [PanDemandResponseFunction] and populate its fields from [TablePanDemandResponseFunctions].
      *
      * @param table The database table to read the [PanDemandResponseFunction] fields from.
@@ -98,7 +96,6 @@ class NetworkCimReader(
      * @return true if the [PanDemandResponseFunction] was successfully read from the database and added to the service.
      * @throws SQLException For any errors encountered reading from the database.
      */
-    @ZBEX
     @Throws(SQLException::class)
     fun load(table: TablePanDemandResponseFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val panDemandResponseFunction = PanDemandResponseFunction(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
@@ -110,12 +107,11 @@ class NetworkCimReader(
         return loadEndDeviceFunction(panDemandResponseFunction, table, resultSet) && service.addOrThrow(panDemandResponseFunction)
     }
 
-    // ##########################################
-    // # [ZBEX] EXTENSIONS IEC61970 Base Wiring #
-    // ##########################################
+    // ###################################
+    // # EXTENSIONS IEC61970 Base Wiring #
+    // ###################################
 
     /**
-     * [ZBEX]
      * Create a [BatteryControl] and populate its fields from [TableBatteryControls].
      *
      * @param table The database table to read the [BatteryControl] fields from.
@@ -125,7 +121,6 @@ class NetworkCimReader(
      * @return true if the [BatteryControl] was successfully read from the database and added to the service.
      * @throws SQLException For any errors encountered reading from the database.
      */
-    @ZBEX
     @Throws(SQLException::class)
     fun load(table: TableBatteryControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val batteryControl = BatteryControl(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {

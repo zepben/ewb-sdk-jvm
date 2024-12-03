@@ -2,10 +2,12 @@
 ## [0.24.0] - UNRELEASED
 ### Breaking Changes
 * Database readers and writes for each `BaseService` no longer accept a `MetadataCollection`, and will instead use the collection of the provided service.
+* `RemovePhases` now stops at open points like the `SetPhases` counterpart. If you were relying on the bug to remove phases through open points you will now
+  need to start additional traces from the other side of the open points to maintain this behaviour.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
-* Client functionality for updating and querying network states via gRPC service stub. 
+* Client functionality for updating and querying network states via gRPC service stub.
 * `BaseService` now contains a `MetadataCollection` to tightly couple the metadata to the associated service.
 * Added `Services`, a new class which contains a copy of each `BaseService` supported by the SDK.
 * Added `connectWithAccessTokenInsecure()` for connecting to a gRPC service using an access token without SSL/TLS.
@@ -16,9 +18,10 @@
 * You can now start the `AssignToFeeder` trace from a specified `Terminal` rather than all feeder heads.
 * When processing feeder assignments, all LV feeders belonging to a dist substation site will now be considered energized when the site is energized by a
   feeder.
+* Major speed improvements have been made for `RemovePhases` when dealing with large networks with many nested loops.
 
 ### Fixes
-* None.
+* `RemovePhases` now stops at open points like the `SetPhases` counterpart.
 
 ### Notes
 * None.

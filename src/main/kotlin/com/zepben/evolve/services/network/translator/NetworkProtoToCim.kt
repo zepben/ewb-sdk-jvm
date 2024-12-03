@@ -827,7 +827,7 @@ fun toCim(pb: PBEndDevice, cim: EndDevice, networkService: NetworkService): EndD
  */
 fun toCim(pb: PBEndDeviceFunction, cim: EndDeviceFunction, networkService: NetworkService): EndDeviceFunction =
     cim.apply {
-        enabled = pb.enabled
+        enabled = pb.enabledSet.takeUnless { pb.hasEnabledNull() }
         pb.endDeviceMRID?.also { networkService.resolveOrDeferReference(Resolvers.endDevice(this), it) }
         toCim(pb.af, this, networkService)
     }

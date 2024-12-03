@@ -32,7 +32,7 @@ internal class EndDeviceFunctionTest {
         val eD = object : EndDevice() {}
 
         assertThat(endDeviceFunction.endDevice, nullValue())
-        assertThat(endDeviceFunction.enabled, equalTo(true))
+        assertThat(endDeviceFunction.enabled, nullValue())
 
         endDeviceFunction.apply {
             endDevice = eD

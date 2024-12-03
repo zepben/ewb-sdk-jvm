@@ -704,7 +704,7 @@ class NetworkCimReader(
     @Throws(SQLException::class)
     private fun loadEndDeviceFunction(endDeviceFunction: EndDeviceFunction, table: TableEndDeviceFunctions, resultSet: ResultSet): Boolean {
         endDeviceFunction.apply {
-            enabled = resultSet.getBoolean(table.ENABLED.queryIndex)
+            enabled = resultSet.getNullableBoolean(table.ENABLED.queryIndex)
             service.resolveOrDeferReference(Resolvers.endDevice(this), resultSet.getNullableString(table.END_DEVICE_MRID.queryIndex))
         }
 

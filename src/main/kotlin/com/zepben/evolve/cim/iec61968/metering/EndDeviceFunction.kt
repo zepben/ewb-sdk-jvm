@@ -19,6 +19,6 @@ import com.zepben.evolve.cim.iec61968.assets.AssetFunction
 abstract class EndDeviceFunction(mRID: String = "") : AssetFunction(mRID) {
 
     var endDevice: EndDevice? = null
-    var enabled: Boolean? = true
+    var enabled: Boolean? = null
 
 }

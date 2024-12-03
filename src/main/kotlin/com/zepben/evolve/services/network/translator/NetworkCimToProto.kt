@@ -828,7 +828,7 @@ fun toPb(cim: EndDevice, pb: PBEndDevice.Builder): PBEndDevice.Builder =
  */
 fun toPb(cim: EndDeviceFunction, pb: PBEndDeviceFunction.Builder): PBEndDeviceFunction.Builder =
     pb.apply {
-        enabled = cim.enabled
+        cim.enabled?.let { enabledSet = it } ?: run { enabledNull = NullValue.NULL_VALUE }
         cim.endDevice?.let { endDeviceMRID = it.mRID }
         toPb(cim, afBuilder)
     }

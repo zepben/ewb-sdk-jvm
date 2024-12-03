@@ -9,7 +9,6 @@
 package com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering
 
 import com.zepben.evolve.database.sqlite.cim.tables.Column
-import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableAssetFunctions
 
@@ -17,6 +16,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableAssetFu
 abstract class TableEndDeviceFunctions : TableAssetFunctions() {
 
     val END_DEVICE_MRID: Column = Column(++columnIndex, "end_device_mrid", "TEXT", NULL)
-    val ENABLED: Column = Column(++columnIndex, "enabled", "BOOLEAN", NOT_NULL)
+    val ENABLED: Column = Column(++columnIndex, "enabled", "BOOLEAN", NULL)
 
 }

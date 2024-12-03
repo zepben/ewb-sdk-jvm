@@ -81,7 +81,7 @@ private val `Create table pan_demand_response_functions` = Change(
             description TEXT NOT NULL,
             num_diagram_objects INTEGER NOT NULL,
             end_device_mrid TEXT NULL,
-            enabled BOOLEAN NOT NULL,
+            enabled BOOLEAN NULL,
             kind TEXT NULL,
             appliance INTEGER NULL
         );""".trimIndent(),

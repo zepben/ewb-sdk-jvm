@@ -10,7 +10,10 @@ package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceActionType
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.FeederDirectionStateOperations
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
@@ -32,9 +35,9 @@ class RemoveDirection(
         networkStateOperators = stateOperators,
         actionStepType = NetworkTraceActionType.ALL_STEPS,
         queue = WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() },
-        computeNextT = ::computeNextDirectionToRemove
+        computeData = ::computeNextDirectionToRemove
     )
-        .addNetworkCondition { stopAtOpen() }
+        .addCondition { stopAtOpen() }
         .addStepAction { item, _ ->
             item.data.removedDirection = directionOperators.removeDirection(item.path.toTerminal, item.data.direction)
         }
@@ -59,8 +62,8 @@ class RemoveDirection(
     private fun computeNextDirectionToRemove(
         currentStep: NetworkTraceStep<DirectionToRemove>,
         context: StepContext,
-        nextPath: StepPath,
-        nextPaths: List<StepPath>
+        nextPath: NetworkTraceStep.Path,
+        nextPaths: List<NetworkTraceStep.Path>
     ): DirectionToRemove {
         if (!currentStep.data.removedDirection) {
             return DirectionToRemove(FeederDirection.NONE)

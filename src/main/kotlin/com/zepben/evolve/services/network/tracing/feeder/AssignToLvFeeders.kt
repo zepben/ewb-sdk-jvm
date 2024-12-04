@@ -62,7 +62,7 @@ class AssignToLvFeeders(
         lvFeedersToAssign: List<LvFeeder>,
     ): NetworkTrace<Unit> {
         return Tracing.networkTrace(stateOperators, NetworkTraceActionType.ALL_STEPS)
-            .addNetworkCondition { stopAtOpen() }
+            .addCondition { stopAtOpen() }
             .addStopCondition { (path), _ -> lvFeederStartPoints.contains(path.toEquipment) }
             .addQueueCondition { (path), _, _, _ -> !reachedHv(path.toEquipment) }
             .addStepAction { (path), context -> process(path, context, terminalToAuxEquipment, lvFeederStartPoints, lvFeedersToAssign) }
@@ -73,7 +73,7 @@ class AssignToLvFeeders(
     }
 
     private fun process(
-        stepPath: StepPath,
+        stepPath: NetworkTraceStep.Path,
         stepContext: StepContext,
         terminalToAuxEquipment: Map<Terminal, Collection<AuxiliaryEquipment>>,
         lvFeederStartPoints: Set<ConductingEquipment>,

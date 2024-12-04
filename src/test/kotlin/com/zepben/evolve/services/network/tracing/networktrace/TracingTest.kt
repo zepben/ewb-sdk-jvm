@@ -17,19 +17,6 @@ import org.junit.jupiter.api.Test
 class TracingTest {
 
     @Test
-    fun downstreamTree() {
-        val operators = mockk<NetworkStateOperators>()
-        val trace = Tracing.downstreamTree(operators)
-        assertThat(trace.stateOperators, sameInstance(operators))
-    }
-
-    @Test
-    fun downstreamTreeDefaultsToNormal() {
-        val trace = Tracing.downstreamTree()
-        assertThat(trace.stateOperators, sameInstance(NetworkStateOperators.NORMAL))
-    }
-
-    @Test
     fun normalSetDirection() {
         val operators = mockk<NetworkStateOperators>()
         val trace = Tracing.setDirection(operators)

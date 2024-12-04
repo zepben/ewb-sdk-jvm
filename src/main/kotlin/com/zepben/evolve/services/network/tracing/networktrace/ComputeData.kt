@@ -8,9 +8,12 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
-import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
-fun interface NetworkTraceStopCondition<T> {
-    fun shouldStop(item: NetworkTraceStep<T>, context: StepContext, networkStateOperators: NetworkStateOperators): Boolean
+fun interface ComputeData<T> {
+    fun computeNext(currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: NetworkTraceStep.Path): T
+}
+
+fun interface ComputeDataWithPaths<T> {
+    fun computeNext(currentStep: NetworkTraceStep<T>, currentContext: StepContext, nextPath: NetworkTraceStep.Path, nextPaths: List<NetworkTraceStep.Path>): T
 }

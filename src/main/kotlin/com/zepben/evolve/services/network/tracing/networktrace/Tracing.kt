@@ -19,7 +19,6 @@ import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.RemovePhases
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
-import com.zepben.evolve.services.network.tracing.tree.DownstreamTree
 
 object Tracing {
 
@@ -29,9 +28,9 @@ object Tracing {
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
-        computeNextT: ComputeNextT<T>,
+        computeData: ComputeData<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queue, actionStepType, computeNextT)
+        return NetworkTrace(networkStateOperators, queue, actionStepType, computeData)
     }
 
     @JvmStatic
@@ -40,9 +39,9 @@ object Tracing {
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
-        computeNextT: ComputeNextTWithPaths<T>,
+        computeData: ComputeDataWithPaths<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queue, actionStepType, computeNextT)
+        return NetworkTrace(networkStateOperators, queue, actionStepType, computeData)
     }
 
     @JvmStatic
@@ -62,9 +61,9 @@ object Tracing {
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
-        computeNextT: ComputeNextT<T>,
+        computeData: ComputeData<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, actionStepType, null, computeNextT)
+        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, actionStepType, null, computeData)
     }
 
     @JvmStatic
@@ -74,9 +73,9 @@ object Tracing {
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
-        computeNextT: ComputeNextTWithPaths<T>,
+        computeData: ComputeDataWithPaths<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, actionStepType, null, computeNextT)
+        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, actionStepType, null, computeData)
     }
 
     @JvmStatic
@@ -89,9 +88,6 @@ object Tracing {
     ): NetworkTrace<Unit> {
         return networkTraceBranching(networkStateOperators, actionStepType, queueFactory, branchQueueFactory) { _, _, _ -> }
     }
-
-    @JvmStatic
-    fun downstreamTree(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): DownstreamTree = DownstreamTree(stateOperators)
 
     @JvmStatic
     fun setDirection(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): SetDirection = SetDirection(stateOperators)

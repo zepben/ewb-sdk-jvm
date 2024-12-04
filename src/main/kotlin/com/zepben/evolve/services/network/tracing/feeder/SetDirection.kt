@@ -32,7 +32,7 @@ class SetDirection(
         actionStepType = NetworkTraceActionType.ALL_STEPS,
         { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
         { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
-        computeNextT = { step: NetworkTraceStep<FeederDirection>, _, nextPath ->
+        computeData = { step: NetworkTraceStep<FeederDirection>, _, nextPath ->
             val directionApplied = step.data
             val nextDirection = when (directionApplied) {
                 FeederDirection.UPSTREAM -> FeederDirection.DOWNSTREAM
@@ -51,7 +51,7 @@ class SetDirection(
                 nextDirection
         }
     )
-        .addNetworkCondition { stopAtOpen() }
+        .addCondition { stopAtOpen() }
         .addStopCondition { (path), _ ->
             isFeederHeadTerminal(path.toTerminal) || reachedSubstationTransformer(path.toTerminal)
         }

@@ -45,7 +45,7 @@ object Conditions {
      *
      * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
      * ```
-     * trace.addNetworkCondition { upstream() }
+     * trace.addCondition { upstream() }
      * ```
      *
      * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
@@ -80,7 +80,7 @@ object Conditions {
      *
      * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
      * ```
-     * trace.addNetworkCondition { withDirection(FeederDirection.BOTH) }
+     * trace.addCondition { withDirection(FeederDirection.BOTH) }
      * ```
      *
      * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
@@ -95,7 +95,7 @@ object Conditions {
      *
      * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
      * ```
-     * trace.addNetworkCondition { downstream() }
+     * trace.addCondition { downstream() }
      * ```
      *
      * @return A [NetworkTraceQueueCondition] that results in downstream tracing.
@@ -121,7 +121,7 @@ object Conditions {
      *
      * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
      * ```
-     * trace.addNetworkCondition { stopAtOpen() }
+     * trace.addNCondition { stopAtOpen() }
      * ```
      *
      * @param phase The phase to test the open status; `null` to ignore phases and check if it is open on any phase.

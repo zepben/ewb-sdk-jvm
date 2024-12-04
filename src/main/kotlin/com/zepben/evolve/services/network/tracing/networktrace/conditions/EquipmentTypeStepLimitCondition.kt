@@ -22,9 +22,7 @@ internal class EquipmentTypeStepLimitCondition<T>(
         return (context.value) >= limit
     }
 
-    // TODO [Review]: Should this be 1 if the first item matches the equipmentType or always start at 0?
-    override fun computeInitialValue(item: NetworkTraceStep<T>): Int =
-        if (matchesEquipmentType(item.path.toEquipment)) 1 else 0
+    override fun computeInitialValue(item: NetworkTraceStep<T>): Int = 0
 
     override val key: String = "sdk:${equipmentType.simpleName}Count"
 

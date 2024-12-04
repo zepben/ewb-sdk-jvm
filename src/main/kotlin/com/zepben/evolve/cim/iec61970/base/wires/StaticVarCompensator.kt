@@ -21,7 +21,7 @@ package com.zepben.evolve.cim.iec61970.base.wires
  * @property voltageSetPoint The reactive power output of the SVC is proportional to the difference between the voltage at the regulated bus and the voltage set-point.
  *                           When the regulated bus voltage is equal to the voltage set-point, the reactive power output is zero. Must be in volts.
  */
-class StaticVarCompensator(mRID: String = "") : RegulatingCondEq(mRID) {
+class StaticVarCompensator @JvmOverloads constructor(mRID: String = "") : RegulatingCondEq(mRID) {
 
     var capacitiveRating: Double? = null
     var inductiveRating: Double? = null

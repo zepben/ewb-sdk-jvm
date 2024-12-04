@@ -14,6 +14,7 @@ import com.zepben.evolve.cim.extensions.ZBEX
  * Mode of operation for the dispatch (charging/discharging) function of BatteryControl.
  */
 @ZBEX
+@Suppress("EnumEntryName")
 enum class BatteryControlMode {
     /**
      * Unknown control mode.

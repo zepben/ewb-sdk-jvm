@@ -26,7 +26,7 @@ import kotlin.reflect.full.declaredMemberProperties
  * @property isStripAndBaseboardHeater True if the appliance is a strip or baseboard heater.
  * @property isWaterHeater True if the appliance is a water heater.
  */
-data class ControlledAppliance(
+data class ControlledAppliance @JvmOverloads constructor(
     val isElectricVehicle: Boolean = false,
     val isExteriorLighting: Boolean = false,
     val isGenerationSystem: Boolean = false,

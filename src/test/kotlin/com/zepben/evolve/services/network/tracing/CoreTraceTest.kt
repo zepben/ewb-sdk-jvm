@@ -139,7 +139,6 @@ internal class CoreTraceTest {
                 TrackedPhases(n["j4"]!!, SinglePhaseKind.Y),
                 TrackedPhases(n["j5"]!!, SinglePhaseKind.Y),
                 TrackedPhases(n["j6"]!!, SinglePhaseKind.X, SinglePhaseKind.Y),
-                // TODO [Review]: I had to add this line as it traces the B through the Y on ac7. Why did it work before?
                 TrackedPhases(n["j6"]!!, SinglePhaseKind.Y),
                 TrackedPhases(n["j7"]!!, SinglePhaseKind.B, SinglePhaseKind.C),
                 TrackedPhases(n["j9"]!!, SinglePhaseKind.Y),
@@ -208,19 +207,19 @@ internal class CoreTraceTest {
     }
 
     private fun currentNonDirectionalTrace(start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {
-        return runTrace(Tracing.networkTrace(NetworkStateOperators.CURRENT).addNetworkCondition { stopAtOpen() }, start, phases)
+        return runTrace(Tracing.networkTrace(NetworkStateOperators.CURRENT).addCondition { stopAtOpen() }, start, phases)
     }
 
     private fun normalDownstreamTrace(start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {
-        return runTrace(Tracing.networkTrace(NetworkStateOperators.NORMAL).addNetworkCondition { downstream() }, start, phases)
+        return runTrace(Tracing.networkTrace(NetworkStateOperators.NORMAL).addCondition { downstream() }, start, phases)
     }
 
     private fun currentDownstreamTrace(start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {
-        return runTrace(Tracing.networkTrace(NetworkStateOperators.CURRENT).addNetworkCondition { downstream() }, start, phases)
+        return runTrace(Tracing.networkTrace(NetworkStateOperators.CURRENT).addCondition { downstream() }, start, phases)
     }
 
     private fun normalUpstreamTrace(start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {
-        return runTrace(Tracing.networkTrace(NetworkStateOperators.NORMAL).addNetworkCondition { upstream() }, start, phases)
+        return runTrace(Tracing.networkTrace(NetworkStateOperators.NORMAL).addCondition { upstream() }, start, phases)
     }
 
     private fun runTrace(trace: NetworkTrace<Unit>, start: ConductingEquipment, phases: PhaseCode): List<TrackedPhases> {

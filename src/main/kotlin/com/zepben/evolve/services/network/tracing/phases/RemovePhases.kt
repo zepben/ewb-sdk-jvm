@@ -12,7 +12,10 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceActionType
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue.Companion.branchQueue
@@ -65,7 +68,7 @@ class RemovePhases(
             actionStepType = NetworkTraceActionType.ALL_STEPS,
             queueFactory = { processQueue { it.data.phasesToEbb.size } },
             branchQueueFactory = { branchQueue { it.data.phasesToEbb.size } },
-            computeNextT = ::computeNextEbbPhases
+            computeData = ::computeNextEbbPhases
         )
             .addStepAction { (path, ebbPhases), _ ->
                 ebbPhases.ebbedPhases = ebb(path.toTerminal, ebbPhases.phasesToEbb)
@@ -75,7 +78,7 @@ class RemovePhases(
             }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun computeNextEbbPhases(step: NetworkTraceStep<EbbPhases>, context: StepContext, nextPath: StepPath): EbbPhases {
+    private fun computeNextEbbPhases(step: NetworkTraceStep<EbbPhases>, context: StepContext, nextPath: NetworkTraceStep.Path): EbbPhases {
         val phasesToEbb = nextPath.nominalPhasePaths.asSequence().map { it.to }.filter { it in step.data.phasesToEbb }.toSet()
         return EbbPhases(phasesToEbb)
     }

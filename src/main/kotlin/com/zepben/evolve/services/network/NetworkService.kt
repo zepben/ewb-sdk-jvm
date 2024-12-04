@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.services.network
 
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
@@ -60,6 +62,20 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     } as MutableMap<String, ConnectivityNode>
 
     private val _measurements: MutableMap<String, MutableList<Measurement>> = mutableMapOf()
+
+    // ################################
+    // # EXTENSIONS IEC61968 METERING #
+    // ################################
+
+    fun add(panDemandResponseFunction: PanDemandResponseFunction): Boolean = super.add(panDemandResponseFunction)
+    fun remove(panDemandResponseFunction: PanDemandResponseFunction): Boolean = super.remove(panDemandResponseFunction)
+
+    // ##################################
+    // # EXTENSIONS IEC61970 BASE WIRES #
+    // ##################################
+
+    fun add(batteryControl: BatteryControl): Boolean = super.add(batteryControl)
+    fun remove(batteryControl: BatteryControl): Boolean = super.remove(batteryControl)
 
     // #######################
     // # IEC61968 ASSET INFO #
@@ -344,6 +360,9 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
 
     fun add(seriesCompensator: SeriesCompensator): Boolean = super.add(seriesCompensator)
     fun remove(seriesCompensator: SeriesCompensator): Boolean = super.remove(seriesCompensator)
+
+    fun add(staticVarCompensator: StaticVarCompensator): Boolean = super.add(staticVarCompensator)
+    fun remove(staticVarCompensator: StaticVarCompensator): Boolean = super.remove(staticVarCompensator)
 
     fun add(synchronousMachine: SynchronousMachine): Boolean = super.add(synchronousMachine)
     fun remove(synchronousMachine: SynchronousMachine): Boolean = super.remove(synchronousMachine)

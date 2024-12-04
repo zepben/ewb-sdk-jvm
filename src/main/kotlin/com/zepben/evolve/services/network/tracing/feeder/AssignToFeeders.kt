@@ -56,7 +56,7 @@ class AssignToFeeders(
         feedersToAssign: List<Feeder>,
     ): NetworkTrace<Unit> {
         return Tracing.networkTrace(stateOperators, NetworkTraceActionType.ALL_STEPS)
-            .addNetworkCondition { stopAtOpen() }
+            .addCondition { stopAtOpen() }
             .addStopCondition { (path), _ -> feederStartPoints.contains(path.toEquipment) }
             .addQueueCondition { (path), _, _, _ -> !reachedSubstationTransformer(path.toEquipment) }
             .addQueueCondition { (path), _, _, _ -> !reachedLv(path.toEquipment) }
@@ -72,7 +72,7 @@ class AssignToFeeders(
     }
 
     private fun process(
-        stepPath: StepPath,
+        stepPath: NetworkTraceStep.Path,
         stepContext: StepContext,
         terminalToAuxEquipment: Map<Terminal, Collection<AuxiliaryEquipment>>,
         feedersToAssign: List<Feeder>

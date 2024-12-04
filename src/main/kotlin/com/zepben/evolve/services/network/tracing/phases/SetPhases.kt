@@ -117,7 +117,7 @@ class SetPhases(
         actionStepType = NetworkTraceActionType.ALL_STEPS,
         queueFactory = { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
         branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
-        computeNextT = ::computeNextPhasesToFlow
+        computeData = ::computeNextPhasesToFlow
     )
         .addQueueCondition { nextStep, _, _, _ ->
             nextStep.data.nominalPhasePaths.isNotEmpty()
@@ -132,7 +132,7 @@ class SetPhases(
         }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun computeNextPhasesToFlow(step: NetworkTraceStep<PhasesToFlow>, ctx: StepContext, nextPath: StepPath): PhasesToFlow {
+    private fun computeNextPhasesToFlow(step: NetworkTraceStep<PhasesToFlow>, ctx: StepContext, nextPath: NetworkTraceStep.Path): PhasesToFlow {
         // If the current step didn't flow any phases, we don't attempt to flow any further.
         if (!step.data.stepFlowedPhases)
             return PhasesToFlow(emptyList())

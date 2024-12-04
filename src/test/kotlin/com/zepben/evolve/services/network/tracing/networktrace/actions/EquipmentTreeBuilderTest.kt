@@ -13,7 +13,6 @@ import com.zepben.evolve.services.network.testdata.LoopingNetwork
 import com.zepben.evolve.services.network.testdata.addFeederDirections
 import com.zepben.evolve.services.network.tracing.feeder.DirectionLogger
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
-import com.zepben.evolve.services.network.tracing.networktrace.StepPath
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
 import com.zepben.evolve.services.network.tracing.networktrace.run
@@ -38,7 +37,7 @@ internal class EquipmentTreeBuilderTest {
     @Test
     fun `computes initial value`() {
         val builder = EquipmentTreeBuilder()
-        val path = mockk<StepPath>()
+        val path = mockk<NetworkTraceStep.Path>()
         val ce = mockk<ConductingEquipment>()
         every { path.toEquipment } returns ce
         val initialValue = builder.computeInitialValue(NetworkTraceStep(path, Unit))
@@ -53,7 +52,7 @@ internal class EquipmentTreeBuilderTest {
 
     @Test
     fun `compute next value returns existing value on internal step`() {
-        val nextPath = mockk<StepPath>()
+        val nextPath = mockk<NetworkTraceStep.Path>()
         every { nextPath.tracedInternally } returns true
         val nextItem = mockk<NetworkTraceStep<*>>()
         val treeNode = mockk<TreeNode<ConductingEquipment>>()
@@ -66,7 +65,7 @@ internal class EquipmentTreeBuilderTest {
     @Test
     fun `compute next value returns new tree node on external step`() {
         val ce = mockk<ConductingEquipment>()
-        val nextPath = mockk<StepPath>()
+        val nextPath = mockk<NetworkTraceStep.Path>()
         every { nextPath.tracedInternally } returns false
         every { nextPath.toEquipment } returns ce
         val nextItem = mockk<NetworkTraceStep<*>>()
@@ -95,6 +94,9 @@ internal class EquipmentTreeBuilderTest {
         verify(exactly = 1) { parent.addChild(node) }
     }
 
+    // This test uses quite a complex looping network to do a bit of an integration test of the NetworkTrace and some of its functions.
+    // This exists because the old API DownstreamTree trace used it as a comprehensive test, and having some more black box / integration
+    // style tests for complex pieces of network is really useful for detecting regressions in edge cases.
     @Test
     fun `full tree integration test`() {
         val n = LoopingNetwork.create()
@@ -102,16 +104,16 @@ internal class EquipmentTreeBuilderTest {
         n.get<ConductingEquipment>("j0")!!.addFeederDirections().also { DirectionLogger.trace(it) }
 
         val start: ConductingEquipment = n["j1"]!!
-        assertThat(start, Matchers.notNullValue())
+        assertThat(start, notNullValue())
         val treeBuilder = EquipmentTreeBuilder()
         Tracing.networkTraceBranching()
-            .addNetworkCondition { downstream() }
+            .addCondition { downstream() }
             .addStepAction(treeBuilder)
             .run(start)
 
         val root = treeBuilder.roots.first()
 
-        assertThat(root, Matchers.notNullValue())
+        assertThat(root, notNullValue())
         assertTreeAsset(root, n["j1"], null, arrayOf(n["acLineSegment1"], n["acLineSegment3"]))
 
         var testNode = root.children[0]
@@ -221,7 +223,7 @@ internal class EquipmentTreeBuilderTest {
 
         if (parent != null) {
             val treeParent = treeNode.parent
-            assertThat(treeParent, Matchers.notNullValue())
+            assertThat(treeParent, notNullValue())
             assertThat(treeParent!!.identifiedObject, equalTo(parent))
         } else
             assertThat(treeNode.parent, Matchers.nullValue())

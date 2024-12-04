@@ -41,8 +41,8 @@ import java.util.*
  * @param service The [NetworkService] to populate with CIM objects from the database.
  * @param databaseDescription The description of the database for logging (e.g. filename).
  */
-// TODO [Review]: Are most of these things constructor injectable just for testing? Should this be an internal constructor and have a public one with just what we want people to pass in?
-class NetworkDatabaseReader @JvmOverloads constructor(
+// TODO [Review]: Are most of these things constructor injectable just for testing? Should this be an internal constructor and have a public one with just what we want people to pass in? - Yes, but can be another task for everything else, just do it here for the moment - reference this in the task as an example
+class NetworkDatabaseReader internal constructor(
     connection: Connection,
     override val service: NetworkService,
     databaseDescription: String,
@@ -61,6 +61,12 @@ class NetworkDatabaseReader @JvmOverloads constructor(
     private val normalAssignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.NORMAL),
     private val currentAssignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.CURRENT),
 ) : CimDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion) {
+
+    constructor(
+        connection: Connection,
+        service: NetworkService,
+        databaseDescription: String,
+    ) : this(connection, service, databaseDescription, NetworkDatabaseTables())
 
     override fun postLoad(): Boolean =
         super.postLoad().also {

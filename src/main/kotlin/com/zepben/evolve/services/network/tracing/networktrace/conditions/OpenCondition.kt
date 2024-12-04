@@ -10,8 +10,8 @@ package com.zepben.evolve.services.network.tracing.networktrace.conditions
 
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceQueueCondition
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
-import com.zepben.evolve.services.network.tracing.traversal.QueueCondition
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 // NOTE: This is a queue condition and not a stop condition because once cuts and jumpers are added to the network model we need the 'next' terminal
@@ -19,15 +19,18 @@ import com.zepben.evolve.services.network.tracing.traversal.StepContext
 internal class OpenCondition<T>(
     val isOpen: (Switch, SinglePhaseKind?) -> Boolean,
     val phase: SinglePhaseKind? = null
-) : QueueCondition<NetworkTraceStep<T>> {
-    override fun shouldQueue(nextItem: NetworkTraceStep<T>, nextContext: StepContext, currentItem: NetworkTraceStep<T>, currentContext: StepContext): Boolean =
-        if (nextItem.path.tracedInternally && nextItem.path.toEquipment is Switch) {
-            !isOpen(nextItem.path.toEquipment, phase)
-        } else {
-            true
+) : NetworkTraceQueueCondition<T>(NetworkTraceStep.Type.INTERNAL) {
+
+    override fun shouldQueueMatchedStep(
+        nextItem: NetworkTraceStep<T>,
+        nextContext: StepContext,
+        currentItem: NetworkTraceStep<T>,
+        currentContext: StepContext,
+    ): Boolean =
+        when (nextItem.path.toEquipment) {
+            is Switch -> !isOpen(nextItem.path.toEquipment, phase)
+            else -> true
         }
 
-    override fun shouldQueueStartItem(item: NetworkTraceStep<T>): Boolean {
-        return true
-    }
+    override fun shouldQueueStartItem(item: NetworkTraceStep<T>): Boolean = true
 }

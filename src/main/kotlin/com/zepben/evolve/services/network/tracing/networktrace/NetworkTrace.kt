@@ -17,10 +17,7 @@ import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.traversal.StepContext
-import com.zepben.evolve.services.network.tracing.traversal.Traversal
-import com.zepben.evolve.services.network.tracing.traversal.TraversalCondition
-import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
+import com.zepben.evolve.services.network.tracing.traversal.*
 
 /**
  * A [Traversal] implementation specifically designed to trace connected [Terminal]s of [ConductingEquipment] in a network.
@@ -29,8 +26,8 @@ import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
  * such as with [BusbarSection]s and [Clamp]s. It checks the in service flag of equipment and only steps to equipment that is marked as in service.
  * It also provides the optional ability to trace only specific phases.
  *
- * Steps are represented by a [NetworkTraceStep], which contains a [StepPath] and allows associating arbitrary data with each step.
- * The arbitrary data for each step is computed via a [ComputeNextT] or [ComputeNextTWithPaths] function provided at construction.
+ * Steps are represented by a [NetworkTraceStep], which contains a [NetworkTraceStep.Path] and allows associating arbitrary data with each step.
+ * The arbitrary data for each step is computed via a [ComputeData] or [ComputeDataWithPaths] function provided at construction.
  * The trace invokes these functions when queueing each item and stores the result with the next step.
  *
  * When traversing, this trace will step on every connected terminal, as long as they match all the traversal conditions.
@@ -40,19 +37,18 @@ import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
  * - **Internal Step**: Moves between terminals within the same [Terminal.conductingEquipment].
  *
  * Often, you may want to act upon a [ConductingEquipment] only once, rather than multiple times for each internal and external terminal step.
- * To achieve this, [actionType] to [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT]. With this type enabled, the trace will only call step actions and
- * stop conditions once for each [ConductingEquipment], regardless of how many terminals it has. However, queue conditions are always called for each terminal
- * step regardless of the flag, since the trace is terminal connectivity-based, and not calling queue conditions for every step can disrupt the traversal.
+ * To achieve this, set [actionType] to [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT]. With this type, the trace will only call step actions and
+ * conditions once for each [ConductingEquipment], regardless of how many terminals it has. However, queue conditions can be configured to be called
+ * differently for each condition as continuing the trace can rely on different conditions based on an external or internal step. For example, not
+ * queuing past open switches should happen on an internal step, thus if the trace is configured with FIRST_STEP_ON_EQUIPMENT, it will by default only
+ * action the first external step to each equipment, and thus the provided [Conditions.stopAtOpen] condition overrides the default behaviour such that
+ * it is called on all internal steps.
  *
  * The network trace is state-aware by requiring an instance of [NetworkStateOperators].
  * This allows traversal conditions and step actions to query and act upon state-based properties and functions of equipment in the network when required.
  *
  * @param T the type of [NetworkTraceStep.data]
  */
-// TODO [Review]: Rename to NetworkTraversal and make abstract with no run or addStartItem functions. Create new NetworkTrace class that has those functions.
-//                This allows us to create descendant classes such as DownstreamTree that can inherit NetworkTraversal which allows you to configure the
-//                trace with additional step actions and conditions which could be very handy while still maintaining all the Traversal interface functions.
-//                Caveat: We need to remove the ability to clear conditions and step actions.
 class NetworkTrace<T> private constructor(
     val networkStateOperators: NetworkStateOperators,
     queueType: QueueType<NetworkTraceStep<T>, NetworkTrace<T>>,
@@ -73,10 +69,10 @@ class NetworkTrace<T> private constructor(
         networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
         actionType: NetworkTraceActionType,
-        computeNextT: ComputeNextT<T>,
+        computeData: ComputeData<T>,
     ) : this(
         networkStateOperators,
-        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT.withType(actionType)), queue),
+        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeData.withActionType(actionType)), queue),
         null,
         actionType,
     )
@@ -85,10 +81,10 @@ class NetworkTrace<T> private constructor(
         networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
         actionType: NetworkTraceActionType,
-        computeNextT: ComputeNextTWithPaths<T>,
+        computeNextT: ComputeDataWithPaths<T>,
     ) : this(
         networkStateOperators,
-        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT.withType(actionType)), queue),
+        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT.withActionType(actionType)), queue),
         null,
         actionType,
     )
@@ -99,11 +95,11 @@ class NetworkTrace<T> private constructor(
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
         actionType: NetworkTraceActionType,
         parent: NetworkTrace<T>?,
-        computeNextT: ComputeNextT<T>,
+        computeData: ComputeData<T>,
     ) : this(
         networkStateOperators,
         BranchingQueueType(
-            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT.withType(actionType)),
+            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeData.withActionType(actionType)),
             queueFactory,
             branchQueueFactory
         ),
@@ -117,11 +113,11 @@ class NetworkTrace<T> private constructor(
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
         actionType: NetworkTraceActionType,
         parent: NetworkTrace<T>?,
-        computeNextT: ComputeNextTWithPaths<T>,
+        computeNextT: ComputeDataWithPaths<T>,
     ) : this(
         networkStateOperators,
         BranchingQueueType(
-            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT.withType(actionType)),
+            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT.withActionType(actionType)),
             queueFactory,
             branchQueueFactory
         ),
@@ -138,7 +134,7 @@ class NetworkTrace<T> private constructor(
      * @param phases Phases to trace; `null` to ignore phases.
      */
     fun addStartItem(start: Terminal, data: T, phases: PhaseCode? = null): NetworkTrace<T> {
-        val startPath = StepPath(start, start, 0, 0, startNominalPhasePath(phases))
+        val startPath = NetworkTraceStep.Path(start, start, 0, 0, startNominalPhasePath(phases))
         addStartItem(NetworkTraceStep(startPath, data))
         return this
     }
@@ -184,8 +180,6 @@ class NetworkTrace<T> private constructor(
         return this
     }
 
-    // TODO [Review]: Should these just be called addCondition / addStepAction still because they don't conflict with the base ones? Or maybe addStateCondition would be better?
-
     /**
      * Adds a traversal condition to the trace using the trace's [NetworkStateOperators] as the receiver.
      *
@@ -193,55 +187,47 @@ class NetworkTrace<T> private constructor(
      * For example, to configure the trace to stop at open points using the [Conditions.stopAtOpen] factory, you can use:
      *
      * ```kotlin
-     * trace.addNetworkCondition { stopAtOpen() }
+     * trace.addCondition { stopAtOpen() }
      * ```
      *
      * @param condition A lambda function that returns a traversal condition.
      * @return This [NetworkTrace] instance.
      */
-    fun addNetworkCondition(condition: NetworkStateOperators.() -> TraversalCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
+    fun addCondition(condition: NetworkStateOperators.() -> TraversalCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
         addCondition(networkStateOperators.condition())
         return this
     }
 
+    // NOTE: This override feels a little dirty - it's the only condition / step adder that needs it.
+    //       But... I couldn't come up with a cleaner design with the time I had... - GMC
     /**
-     * Adds a queue condition to the trace, as per [Traversal.addQueueCondition], however, the [NetworkTraceQueueCondition] variant also has the
-     * [NetworkStateOperators] passed into it when requiring access to network state to fulfill the condition.
+     * Adds a [QueueCondition] to the traversal. However, before registering it with the traversal, it will make sure that the queue condition
+     * is only checked on step types relevant to the [NetworkTraceActionType] assigned to this instance. That is when:
      *
-     * @param condition The condition to determine whether to queue the next item.
-     * @return This [NetworkTrace] instance.
+     * - [actionType] is [NetworkTraceActionType.ALL_STEPS] the condition will be checked on all steps.
+     * - [actionType] is [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT] the condition will be checked on external steps.
+     *
+     * However, if the [condition] is an instance of [NetworkTraceQueueCondition] the [NetworkTraceQueueCondition.stepType] will be honoured.
+     *
+     * @param condition The queue condition to add.
+     * @return The current traversal instance.
      */
-    fun addNetworkQueueCondition(condition: NetworkTraceQueueCondition<T>): NetworkTrace<T> {
-        addQueueCondition { next, nextContext, current, currentContext ->
-            condition.shouldQueue(next, nextContext, current, currentContext, networkStateOperators)
-        }
-        return this
+    override fun addQueueCondition(condition: QueueCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
+        return super.addQueueCondition(condition.toNetworkTraceQueueCondition(actionType.defaultQueueConditionStepType(), false))
     }
 
     /**
-     * Adds a stop condition to the trace, as per [Traversal.addStopCondition], however, the [NetworkTraceStopCondition] variant also has the
-     * [NetworkStateOperators] passed into it when requiring access to network state to fulfill the condition.
+     * Adds a [QueueCondition] to the traversal that will only check steps that match the given [stepType].
      *
-     * @param condition The condition to determine whether to queue the next item.
-     * @return This [NetworkTrace] instance.
-     */
-    fun addNetworkStopCondition(condition: NetworkTraceStopCondition<T>): NetworkTrace<T> {
-        addStopCondition { item, context ->
-            condition.shouldStop(item, context, networkStateOperators)
-        }
-        return this
-    }
-
-    /**
-     * Adds a step condition to the trace, as per [Traversal.addStepAction], however, the [NetworkTraceStopCondition] variant also has the
-     * [NetworkStateOperators] passed into it when requiring access to network state within the action.
+     * If the [condition] is a [NetworkTraceQueueCondition] the [NetworkTraceQueueCondition.stepType] will be ignored and the type passed into
+     * this function will be used instead.
      *
-     * @param action The condition to determine whether to queue the next item.
-     * @return This [NetworkTrace] instance.
+     * @param condition The queue condition to add.
+     * @param stepType The step type where the queue condition is checked.
+     * @return The current traversal instance.
      */
-    fun addNetworkStepAction(action: NetworkTraceStepAction<T>): NetworkTrace<T> {
-        addStepAction { item, ctx -> action.apply(item, ctx, networkStateOperators) }
-        return this
+    fun addQueueCondition(stepType: NetworkTraceStep.Type, condition: QueueCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
+        return addQueueCondition(condition.toNetworkTraceQueueCondition(stepType, true))
     }
 
     override fun canActionItem(item: NetworkTraceStep<T>, context: StepContext): Boolean {
@@ -295,25 +281,35 @@ class NetworkTrace<T> private constructor(
         return tracker.visit(terminal, phases)
     }
 
+    private fun QueueCondition<NetworkTraceStep<T>>.toNetworkTraceQueueCondition(stepType: NetworkTraceStep.Type, overrideStepType: Boolean) =
+        when {
+            this is NetworkTraceQueueCondition<T> && !overrideStepType -> this
+            else -> NetworkTraceQueueCondition.delegateTo(stepType, this@toNetworkTraceQueueCondition)
+        }
+
+    private fun NetworkTraceActionType.defaultQueueConditionStepType() = when (this) {
+        NetworkTraceActionType.ALL_STEPS -> NetworkTraceStep.Type.ALL
+        NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT -> NetworkTraceStep.Type.EXTERNAL
+    }
+
 }
 
-// TODO [Review]: Should computeNextT still be called for every step regardless on actionStepType because queueing / queue conditions are always
-//                run for every step regardless of actionStepType?
-private fun <T> ComputeNextT<T>.withType(actionType: NetworkTraceActionType): ComputeNextT<T> =
+private fun <T> ComputeData<T>.withActionType(actionType: NetworkTraceActionType): ComputeData<T> =
     when (actionType) {
         NetworkTraceActionType.ALL_STEPS -> this
-        NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT -> ComputeNextT { currentStep, currentContext, nextPath ->
+        NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT -> ComputeData { currentStep, currentContext, nextPath ->
             // We just pass the data along on internal steps as a first step on equipment will always happen on an external step.
             if (nextPath.tracedInternally) currentStep.data
-            else compute(currentStep, currentContext, nextPath)
+            else computeNext(currentStep, currentContext, nextPath)
         }
     }
 
-private fun <T> ComputeNextTWithPaths<T>.withType(actionType: NetworkTraceActionType): ComputeNextTWithPaths<T> =
+private fun <T> ComputeDataWithPaths<T>.withActionType(actionType: NetworkTraceActionType): ComputeDataWithPaths<T> =
     when (actionType) {
         NetworkTraceActionType.ALL_STEPS -> this
-        NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT -> ComputeNextTWithPaths { currentStep, currentContext, nextPath, nextPaths ->
+        NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT -> ComputeDataWithPaths { currentStep, currentContext, nextPath, nextPaths ->
+            // We just pass the data along on internal steps as a first step on equipment will always happen on an external step.
             if (nextPath.tracedInternally) currentStep.data
-            else compute(currentStep, currentContext, nextPath, nextPaths)
+            else computeNext(currentStep, currentContext, nextPath, nextPaths)
         }
     }

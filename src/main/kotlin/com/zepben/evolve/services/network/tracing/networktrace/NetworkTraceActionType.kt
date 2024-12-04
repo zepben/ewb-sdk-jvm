@@ -12,7 +12,6 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
-// TODO [Review]: Just call this ActionType maybe?
 enum class NetworkTraceActionType {
     ALL_STEPS {
         override fun canActionItem(item: NetworkTraceStep<*>, context: StepContext, hasTracked: (Terminal, Set<SinglePhaseKind>) -> Boolean): Boolean {

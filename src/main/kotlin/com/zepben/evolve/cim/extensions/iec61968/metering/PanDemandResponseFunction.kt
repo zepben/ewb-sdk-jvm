@@ -166,6 +166,10 @@ class PanDemandResponseFunction @JvmOverloads constructor(mRID: String = "") : E
         return true
     }
 
+    /**
+     * Clear [ControlledAppliance] configuration.
+     * @return This [PanDemandResponseFunction] for fluent use.
+     */
     fun clearAppliance(): PanDemandResponseFunction {
         _appliance = null
         return this

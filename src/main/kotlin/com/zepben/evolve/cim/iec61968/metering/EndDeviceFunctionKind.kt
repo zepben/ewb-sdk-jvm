@@ -11,6 +11,7 @@ package com.zepben.evolve.cim.iec61968.metering
 /**
  * Kind of end device function.
  */
+@Suppress("EnumEntryName")
 enum class EndDeviceFunctionKind {
     /**
      * Unknown function kind.

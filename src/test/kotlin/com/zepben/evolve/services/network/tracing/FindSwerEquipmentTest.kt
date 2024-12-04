@@ -24,7 +24,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 
-// TODO [Review]: These tests need to be properly reviewed as they have been completely rewritten
 internal class FindSwerEquipmentTest {
 
     @JvmField
@@ -61,7 +60,7 @@ internal class FindSwerEquipmentTest {
             .toPowerTransformer(listOf(PhaseCode.AB, PhaseCode.A)) // tx3
             .toAcls(PhaseCode.A) // c4
             .toAcls(PhaseCode.A) // c5
-            .toPowerTransformer(listOf(PhaseCode.A, PhaseCode.AN)) // tx6
+            .toPowerTransformer(listOf(PhaseCode.A, PhaseCode.AN, PhaseCode.AN)) // tx6
             .toAcls(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // c7
             .toBreaker(PhaseCode.AN) { baseVoltage = BaseVoltage().apply { nominalVoltage = 415 } } // b8
             .branchFrom("tx6", 2)

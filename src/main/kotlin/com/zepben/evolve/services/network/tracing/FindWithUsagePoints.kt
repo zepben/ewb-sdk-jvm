@@ -12,7 +12,7 @@ import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.equivalents.EquivalentBranch
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
-import com.zepben.evolve.services.network.tracing.networktrace.StepPath
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep.Path
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.downstream
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
@@ -61,7 +61,7 @@ class FindWithUsagePoints(
         var pathFound = to == null
         val withUsagePoints = mutableMapOf<String, ConductingEquipment>()
 
-        val traversal = Tracing.networkTrace(stateOperators).addNetworkCondition { downstream() }
+        val traversal = Tracing.networkTrace(stateOperators).addCondition { downstream() }
         traversal.addStopCondition { (path), _ -> extentIds.contains(path.toEquipment.mRID) }
         if ((virtualUsagePointCondition == VirtualUsagePointCondition.LV_AGGREGATION_ONLY) || (virtualUsagePointCondition == VirtualUsagePointCondition.ALL)) {
             traversal.addStopCondition { (path), _ -> shouldExcludeLv(path) }
@@ -92,7 +92,7 @@ class FindWithUsagePoints(
         }
     }
 
-    private fun shouldExcludeLv(stepPath: StepPath) =
+    private fun shouldExcludeLv(stepPath: Path) =
         ((stepPath.toEquipment.baseVoltageValue <= lvThreshold) || (stepPath.toEquipment is EquivalentBranch))
             && stepPath.fromEquipment.usagePoints.any { it.connectionCategory == "LV_AGGREGATION" }
 

@@ -186,7 +186,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @param condition The queue condition to add.
      * @return The current traversal instance.
      */
-    fun addQueueCondition(condition: QueueCondition<T>): D {
+    open fun addQueueCondition(condition: QueueCondition<T>): D {
         queueConditions.add(condition)
         if (condition is QueueConditionWithContextValue<T, *>) {
             computeNextContextFuns[condition.key] = condition

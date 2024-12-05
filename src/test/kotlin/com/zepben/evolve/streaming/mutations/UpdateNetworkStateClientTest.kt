@@ -22,12 +22,14 @@ import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
-import org.mockito.kotlin.any as mockitoAny
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
 import java.time.LocalDateTime
 import kotlin.streams.asStream
 import kotlin.streams.toList
@@ -39,8 +41,10 @@ import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
 import com.zepben.protobuf.ns.data.StateEventInvalidMrid as PBStateEventInvalidMrid
 import com.zepben.protobuf.ns.data.StateEventUnknownMrid as PBStateEventUnknownMrid
 import com.zepben.protobuf.ns.data.StateEventUnsupportedPhasing as PBStateEventUnsupportedPhasing
+import org.mockito.kotlin.any as mockitoAny
 
-class UpdateNetworkStateClientTest {
+internal class UpdateNetworkStateClientTest {
+
     @JvmField
     @Rule
     val grpcCleanup: GrpcCleanupRule = GrpcCleanupRule()
@@ -60,7 +64,7 @@ class UpdateNetworkStateClientTest {
     private val timestampOf1Second = Timestamp.newBuilder().apply { seconds = 1 }.build()
     private val switchStateEvents = currentStateEvents.filterIsInstance<SwitchStateEvent>()
     private val batches = currentStateEvents.mapIndexed { index, item ->
-        UpdateNetworkStateClient.SetCurrentStatesRequest(index.toLong(), listOf(item))
+        CurrentStateEventBatch(index.toLong(), listOf(item))
     }.asSequence()
 
     init {
@@ -68,7 +72,13 @@ class UpdateNetworkStateClientTest {
     }
 
     @Test
-    fun `setCurrentStates in batches using Kotlin Sequence`() {
+    internal fun `constructor coverage`() {
+        UpdateNetworkStateClient(GrpcChannel(channel), TokenCallCredentials { "auth-token" })
+        UpdateNetworkStateClient(channel, TokenCallCredentials { "auth-token" })
+    }
+
+    @Test
+    internal fun `setCurrentStates in batches using Kotlin Sequence`() {
         testSetCurrentStates {
             assertBatchedCurrentStatesResponse(client.setCurrentStates(batches).toList())
 
@@ -86,31 +96,16 @@ class UpdateNetworkStateClientTest {
     }
 
     @Test
-    fun `setCurrentStates in batches using Java Stream`() {
+    internal fun `setCurrentStates in batches using Java Stream`() {
         testSetCurrentStates { assertBatchedCurrentStatesResponse(client.setCurrentStates(batches.asStream()).toList()) }
     }
 
     @Test
-    fun `setCurrentStates in single batch`() {
+    internal fun `setCurrentStates in single batch`() {
         testSetCurrentStates {
             batches.first().apply {
                 listOf(client.setCurrentStates(batchId, events)).assert<BatchSuccessful>(0)
             }
-        }
-    }
-
-    @Test
-    fun `constructor coverage`() {
-        testSetCurrentStates {
-            assertBatchedCurrentStatesResponse(
-                UpdateNetworkStateClient(GrpcChannel(channel), TokenCallCredentials({ "auth-token" })).setCurrentStates(batches).toList()
-            )
-        }
-
-        testSetCurrentStates {
-            assertBatchedCurrentStatesResponse(
-                UpdateNetworkStateClient(channel, TokenCallCredentials({ "auth-token" })).setCurrentStates(batches).toList()
-            )
         }
     }
 
@@ -184,4 +179,5 @@ class UpdateNetworkStateClientTest {
             additionalAssertions(it as T)
         }
     }
+
 }

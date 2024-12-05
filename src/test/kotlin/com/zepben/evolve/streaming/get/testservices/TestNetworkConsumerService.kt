@@ -19,7 +19,6 @@ internal class TestNetworkConsumerService : NetworkConsumerGrpc.NetworkConsumerI
     lateinit var onGetIdentifiedObjects: (request: GetIdentifiedObjectsRequest, response: StreamObserver<GetIdentifiedObjectsResponse>) -> Unit
     lateinit var onGetNetworkHierarchy: (request: GetNetworkHierarchyRequest, response: StreamObserver<GetNetworkHierarchyResponse>) -> Unit
     lateinit var onGetEquipmentForContainers: (request: GetEquipmentForContainersRequest, response: StreamObserver<GetEquipmentForContainersResponse>) -> Unit
-    lateinit var onGetCurrentEquipmentForFeeder: (request: GetCurrentEquipmentForFeederRequest, response: StreamObserver<GetCurrentEquipmentForFeederResponse>) -> Unit
     lateinit var onGetEquipmentForRestriction: (request: GetEquipmentForRestrictionRequest, response: StreamObserver<GetEquipmentForRestrictionResponse>) -> Unit
     lateinit var onGetTerminalsForNode: (request: GetTerminalsForNodeRequest, response: StreamObserver<GetTerminalsForNodeResponse>) -> Unit
     lateinit var onGetMetadataRequest: (request: GetMetadataRequest, response: StreamObserver<GetMetadataResponse>) -> Unit
@@ -37,10 +36,6 @@ internal class TestNetworkConsumerService : NetworkConsumerGrpc.NetworkConsumerI
 
     override fun getEquipmentForContainers(response: StreamObserver<GetEquipmentForContainersResponse>): StreamObserver<GetEquipmentForContainersRequest> =
         TestStreamObserver(response, onGetEquipmentForContainers)
-
-    override fun getCurrentEquipmentForFeeder(request: GetCurrentEquipmentForFeederRequest, response: StreamObserver<GetCurrentEquipmentForFeederResponse>) {
-        runGrpc(request, response, onGetCurrentEquipmentForFeeder)
-    }
 
     override fun getEquipmentForRestriction(request: GetEquipmentForRestrictionRequest, response: StreamObserver<GetEquipmentForRestrictionResponse>) {
         runGrpc(request, response, onGetEquipmentForRestriction)

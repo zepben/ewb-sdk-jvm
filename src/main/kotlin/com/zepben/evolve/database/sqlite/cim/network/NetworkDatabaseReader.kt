@@ -41,14 +41,13 @@ import java.util.*
  * @param service The [NetworkService] to populate with CIM objects from the database.
  * @param databaseDescription The description of the database for logging (e.g. filename).
  */
-// TODO [Review]: Are most of these things constructor injectable just for testing? Should this be an internal constructor and have a public one with just what we want people to pass in? - Yes, but can be another task for everything else, just do it here for the moment - reference this in the task as an example
 class NetworkDatabaseReader internal constructor(
     connection: Connection,
     override val service: NetworkService,
     databaseDescription: String,
-    tables: NetworkDatabaseTables = NetworkDatabaseTables(),
-    metadataReader: MetadataCollectionReader = MetadataCollectionReader(service, tables, connection),
-    serviceReader: NetworkServiceReader = NetworkServiceReader(service, tables, connection),
+    private val inferPhases: Boolean,
+    metadataReader: MetadataCollectionReader,
+    serviceReader: NetworkServiceReader,
     tableVersion: TableVersion = tableCimVersion,
     private val normalSetFeederDirection: SetDirection = Tracing.setDirection(NetworkStateOperators.NORMAL),
     private val currentSetFeederDirection: SetDirection = Tracing.setDirection(NetworkStateOperators.CURRENT),
@@ -62,11 +61,20 @@ class NetworkDatabaseReader internal constructor(
     private val currentAssignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.CURRENT),
 ) : CimDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion) {
 
+    @JvmOverloads
     constructor(
         connection: Connection,
         service: NetworkService,
         databaseDescription: String,
-    ) : this(connection, service, databaseDescription, NetworkDatabaseTables())
+        inferPhases: Boolean = true
+    ) : this(
+        connection,
+        service,
+        databaseDescription,
+        inferPhases,
+        MetadataCollectionReader(service, NetworkDatabaseTables(), connection),
+        NetworkServiceReader(service, NetworkDatabaseTables(), connection),
+    )
 
     override fun postLoad(): Boolean =
         super.postLoad().also {
@@ -78,6 +86,7 @@ class NetworkDatabaseReader internal constructor(
             logger.info("Applying phases to network...")
             normalSetPhases.run(service)
             currentSetPhases.run(service)
+            if (inferPhases)
             logInferredPhases(normalPhaseInferrer.run(service), currentPhaseInferrer.run(service))
             logger.info("Phasing applied to network.")
 

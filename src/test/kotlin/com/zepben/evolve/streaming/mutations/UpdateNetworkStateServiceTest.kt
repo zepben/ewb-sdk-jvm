@@ -31,14 +31,18 @@ import org.junit.Rule
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
-import java.util.concurrent.*
-import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
-import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
 import com.zepben.protobuf.ns.data.CurrentStateEvent as PBCurrentStateEvent
 import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
+import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
+import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
 
-class UpdateNetworkStateServiceTest {
+internal class UpdateNetworkStateServiceTest {
+
     @JvmField
     @Rule
     val grpcCleanup: GrpcCleanupRule = GrpcCleanupRule()
@@ -50,10 +54,11 @@ class UpdateNetworkStateServiceTest {
         ProcessingPaused(1, LocalDateTime.now()),
         BatchFailure(
             1, true, listOf(
-                StateEventUnknownMrid("event id"),
-                StateEventDuplicateMrid("event id"),
-                StateEventInvalidMrid("event id"),
-                StateEventUnsupportedPhasing("event id")
+                StateEventUnknownMrid("event id", "we couldn't find it"),
+                StateEventDuplicateMrid("event id", "you have already used it"),
+                StateEventInvalidMrid("event id", "it is for the wrong type"),
+                StateEventUnsupportedPhasing("event id", "we don't support un-ganged yet"),
+                StateEventUnsupportedMrid("event id", "you found the right type of thing, but we still can't help you")
             )
         )
     )
@@ -93,7 +98,7 @@ class UpdateNetworkStateServiceTest {
     }.build()
 
     @Test
-    fun setCurrentStates() {
+    internal fun setCurrentStates() {
         startGrpcServer()
         setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.SUCCESS)
         setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.PAUSED) {
@@ -107,16 +112,17 @@ class UpdateNetworkStateServiceTest {
                         PBStateEventFailure.ReasonCase.UNKNOWNMRID,
                         PBStateEventFailure.ReasonCase.DUPLICATEMRID,
                         PBStateEventFailure.ReasonCase.INVALIDMRID,
-                        PBStateEventFailure.ReasonCase.UNSUPPORTEDPHASING
+                        PBStateEventFailure.ReasonCase.UNSUPPORTEDPHASING,
+                        PBStateEventFailure.ReasonCase.UNSUPPORTEDMRID
                     )
                 )
             }
-
         }
+        setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.NOTPROCESSED)
     }
 
     @Test
-    fun `setCurrentStates onNext handles error`() {
+    internal fun `setCurrentStates onNext handles error`() {
         startGrpcServer()
         every { onSetCurrentStates(any(), any()) } throws error
 
@@ -131,7 +137,7 @@ class UpdateNetworkStateServiceTest {
     }
 
     @Test
-    fun `setCurrentStates onError`() {
+    internal fun `setCurrentStates onError`() {
         startGrpcServer()
         val throwable = Status.INTERNAL.withDescription("TEST ERROR!").asRuntimeException()
         val requestObserver = stub.setCurrentStates(responseObserver)
@@ -142,13 +148,13 @@ class UpdateNetworkStateServiceTest {
     }
 
     @Test
-    fun `constructor parameter timeout must be greater than 0`() {
+    internal fun `constructor parameter timeout must be greater than 0`() {
         assertThrows<IllegalArgumentException> { UpdateNetworkStateService(onSetCurrentStates, timeout = 0) }
         assertThrows<IllegalArgumentException> { UpdateNetworkStateService(onSetCurrentStates, timeout = -1) }
     }
 
     @Test
-    fun `setCurrentStates should setup timeout on the future returned by onSetCurrentStates callback to avoid blocking the grpc connection`() {
+    internal fun `setCurrentStates should setup timeout on the future returned by onSetCurrentStates callback to avoid blocking the grpc connection`() {
         startGrpcServer(false)
         every { onSetCurrentStates(capture(batchIdSlot), capture(eventsSlot)) } answers {
             CompletableFuture<SetCurrentStatesStatus>().orTimeout(60, TimeUnit.SECONDS)
@@ -175,7 +181,7 @@ class UpdateNetworkStateServiceTest {
     }
 
     @Test
-    fun `setCurrentStates should only close response stream when all processing has finished`() = runBlocking {
+    internal fun `setCurrentStates should only close response stream when all processing has finished`() = runBlocking {
         startGrpcServer(false)
         val completableFutures: List<CompletableFuture<SetCurrentStatesStatus>> = List(3) { CompletableFuture() }
         // Configure mock with latches to synchronize the test thread with the gRPC server thread
@@ -272,4 +278,5 @@ class UpdateNetworkStateServiceTest {
             assertThat(it.failure.failedList, empty())
         }
     }
+
 }

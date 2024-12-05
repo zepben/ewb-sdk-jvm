@@ -8,7 +8,9 @@
 
 package com.zepben.evolve.streaming.mutations
 
-import com.zepben.evolve.streaming.data.*
+import com.zepben.evolve.streaming.data.CurrentStateEvent
+import com.zepben.evolve.streaming.data.CurrentStateEventBatch
+import com.zepben.evolve.streaming.data.SetCurrentStatesStatus
 import com.zepben.evolve.streaming.get.AwaitableStreamObserver
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcClient
@@ -74,7 +76,7 @@ class UpdateNetworkStateClient(
      * being processed by the service.
      */
     fun setCurrentStates(batchId: Long, batch: List<CurrentStateEvent>): SetCurrentStatesStatus =
-        setCurrentStates(sequenceOf(SetCurrentStatesRequest(batchId, batch))).first()
+        setCurrentStates(sequenceOf(CurrentStateEventBatch(batchId, batch))).first()
 
     /**
      * Sends batches of current state events to the gRPC service for processing.
@@ -82,13 +84,13 @@ class UpdateNetworkStateClient(
      * This method is responsible for streaming a sequence of current state event batches to the
      * `UpdateNetworkStateServiceGrpc` service using the gRPC stub provided in the constructor.
      *
-     * @param batches A sequence of [SetCurrentStatesRequest] objects, where each request contains a
+     * @param batches A sequence of [CurrentStateEventBatch] objects, where each request contains a
      * collection of [CurrentStateEvent] objects to be processed by the gRPC service.
      *
      * @return A sequence of [SetCurrentStatesStatus] objects representing the status of each batch
      * after being processed by the service.
      */
-    fun setCurrentStates(batches: Sequence<SetCurrentStatesRequest>): Sequence<SetCurrentStatesStatus> {
+    fun setCurrentStates(batches: Sequence<CurrentStateEventBatch>): Sequence<SetCurrentStatesStatus> {
         val results = mutableListOf<SetCurrentStatesStatus>()
         val responseObserver = AwaitableStreamObserver<PBSetCurrentStatesResponse> { response ->
             SetCurrentStatesStatus.fromPb(response)?.also { results.add(it) }
@@ -115,27 +117,13 @@ class UpdateNetworkStateClient(
      * This method streams batches of current state events to the `UpdateNetworkStateServiceGrpc` service
      * using the gRPC stub provided in the constructor.
      *
-     * @param batches A Java [Stream] of [SetCurrentStatesRequest] objects, where each request contains a
+     * @param batches A Java [Stream] of [CurrentStateEventBatch] objects, where each request contains a
      * collection of [CurrentStateEvent] objects to be processed by the gRPC service.
      *
      * @return A Java [Stream] of [SetCurrentStatesStatus] objects representing the status of each batch
      * after being processed by the service.
      */
-    fun setCurrentStates(batches: Stream<SetCurrentStatesRequest>): Stream<SetCurrentStatesStatus> =
+    fun setCurrentStates(batches: Stream<CurrentStateEventBatch>): Stream<SetCurrentStatesStatus> =
         setCurrentStates(batches.asSequence()).asStream()
-
-    /**
-     * A request object for submitting a batch of current state events for processing.
-     *
-     * @property batchId A unique identifier for the batch of events being processed.
-     * This allows to track or group multiple events under a single batch.
-     *
-     * @property events A list of [CurrentStateEvent] objects representing the state changes or
-     * events that are being submitted in the current batch.
-     */
-    data class SetCurrentStatesRequest(
-        val batchId: Long,
-        val events: List<CurrentStateEvent>
-    )
 
 }

@@ -9,23 +9,25 @@
 package com.zepben.evolve.streaming.get.testservices
 
 import com.zepben.evolve.services.common.translator.toLocalDateTime
-import com.zepben.evolve.streaming.data.CurrentStateEvent
+import com.zepben.evolve.streaming.data.CurrentStateEventBatch
 import com.zepben.protobuf.ns.GetCurrentStatesRequest
 import com.zepben.protobuf.ns.GetCurrentStatesResponse
 import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
 import io.grpc.stub.StreamObserver
 import java.time.LocalDateTime
 
-class TestQueryNetworkStateService: QueryNetworkStateServiceGrpc.QueryNetworkStateServiceImplBase() {
+internal class TestQueryNetworkStateService : QueryNetworkStateServiceGrpc.QueryNetworkStateServiceImplBase() {
 
-    lateinit var onGetCurrentStates: (from: LocalDateTime?, to: LocalDateTime?) -> Sequence<List<CurrentStateEvent>>
+    lateinit var onGetCurrentStates: (from: LocalDateTime?, to: LocalDateTime?) -> Sequence<CurrentStateEventBatch>
 
     override fun getCurrentStates(request: GetCurrentStatesRequest, responseObserver: StreamObserver<GetCurrentStatesResponse>) {
         onGetCurrentStates(request.fromTimestamp.toLocalDateTime(), request.toTimestamp.toLocalDateTime()).forEach { batch ->
-            responseObserver.onNext(GetCurrentStatesResponse.newBuilder().apply {
-                messageId = request.messageId
-                addAllEvent(batch.map { it.toPb() })
-            }.build())
+            responseObserver.onNext(
+                GetCurrentStatesResponse.newBuilder()
+                    .setMessageId(batch.batchId)
+                    .addAllEvent(batch.events.map { it.toPb() })
+                    .build()
+            )
         }
 
         responseObserver.onCompleted()

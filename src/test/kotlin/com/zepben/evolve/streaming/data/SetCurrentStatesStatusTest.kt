@@ -10,27 +10,28 @@ package com.zepben.evolve.streaming.data
 
 import com.google.protobuf.Timestamp
 import com.zepben.evolve.services.common.translator.toLocalDateTime
-import com.zepben.protobuf.ns.SetCurrentStatesResponse as PBSetCurrentStatesResponse
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
+import com.zepben.protobuf.ns.SetCurrentStatesResponse as PBSetCurrentStatesResponse
+import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
 import com.zepben.protobuf.ns.data.BatchSuccessful as PBBatchSuccessful
 import com.zepben.protobuf.ns.data.ProcessingPaused as PBProcessingPaused
-import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
-import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
-import com.zepben.protobuf.ns.data.StateEventUnknownMrid as PBStateEventUnknownMrid
 import com.zepben.protobuf.ns.data.StateEventDuplicateMrid as PBStateEventDuplicateMrid
+import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
 import com.zepben.protobuf.ns.data.StateEventInvalidMrid as PBStateEventInvalidMrid
+import com.zepben.protobuf.ns.data.StateEventUnknownMrid as PBStateEventUnknownMrid
 import com.zepben.protobuf.ns.data.StateEventUnsupportedPhasing as PBStateEventUnsupportedPhasing
 
-class SetCurrentStatesStatusTest {
+internal class SetCurrentStatesStatusTest {
+
     private val invalidMridPb = PBStateEventFailure.newBuilder().apply {
         eventId = "event2"
         invalidMrid = PBStateEventInvalidMrid.newBuilder().build()
     }.build()
 
     @Test
-    fun `BatchSuccessful from protobuf and then back to protobuf`() {
+    internal fun `BatchSuccessful from protobuf and then back to protobuf`() {
         val pb = createSetCurrentStatesResponse { success = PBBatchSuccessful.newBuilder().build() }
 
         val status = SetCurrentStatesStatus.fromPb(pb)
@@ -44,7 +45,7 @@ class SetCurrentStatesStatusTest {
     }
 
     @Test
-    fun `ProcessingPaused from protobuf and then back to protobuf`() {
+    internal fun `ProcessingPaused from protobuf and then back to protobuf`() {
         val pb = createSetCurrentStatesResponse {
             paused = PBProcessingPaused.newBuilder().apply { since = Timestamp.newBuilder().apply { seconds = 1 }.build() }.build()
         }
@@ -60,7 +61,7 @@ class SetCurrentStatesStatusTest {
     }
 
     @Test
-    fun `BatchFailure from protobuf and then back to protobuf`() {
+    internal fun `BatchFailure from protobuf and then back to protobuf`() {
         val pb = createSetCurrentStatesResponse {
             failure = PBBatchFailure.newBuilder().apply {
                 partialFailure = true
@@ -82,7 +83,7 @@ class SetCurrentStatesStatusTest {
     }
 
     @Test
-    fun `StateEventFailure from protobuf and then back to protobuf`() {
+    internal fun `StateEventFailure from protobuf and then back to protobuf`() {
         val unknowMridPb = PBStateEventFailure.newBuilder().apply {
             eventId = "event1"
             unknownMrid = PBStateEventUnknownMrid.newBuilder().build()
@@ -118,4 +119,5 @@ class SetCurrentStatesStatusTest {
 
     private fun createSetCurrentStatesResponse(block: PBSetCurrentStatesResponse.Builder.() -> Unit): PBSetCurrentStatesResponse =
         PBSetCurrentStatesResponse.newBuilder().also { it.messageId = 1 }.apply(block).build()
+
 }

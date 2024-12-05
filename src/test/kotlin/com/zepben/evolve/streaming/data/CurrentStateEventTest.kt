@@ -16,18 +16,19 @@ import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import com.zepben.protobuf.ns.data.CurrentStateEvent as PBCurrentStateEvent
-import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
+import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
 import com.zepben.protobuf.ns.data.AddCutEvent as PBAddCutEvent
-import com.zepben.protobuf.ns.data.RemoveCutEvent as PBRemoveCutEvent
 import com.zepben.protobuf.ns.data.AddJumperEvent as PBAddJumperEvent
+import com.zepben.protobuf.ns.data.CurrentStateEvent as PBCurrentStateEvent
+import com.zepben.protobuf.ns.data.RemoveCutEvent as PBRemoveCutEvent
 import com.zepben.protobuf.ns.data.RemoveJumperEvent as PBRemoveJumperEvent
 import com.zepben.protobuf.ns.data.SwitchAction as PBSwitchAction
-import com.zepben.protobuf.cim.iec61970.base.core.PhaseCode as PBPhaseCode
+import com.zepben.protobuf.ns.data.SwitchStateEvent as PBSwitchStateEvent
 
-class CurrentStateEventTest {
+internal class CurrentStateEventTest {
+
     @Test
-    fun `CurrentStateEvent from protobuf`() {
+    internal fun `CurrentStateEvent from protobuf`() {
         val stateEvent = CurrentStateEvent.fromPb(PBCurrentStateEvent.newBuilder().apply {
             switch = PBSwitchStateEvent.newBuilder().build()
         }.build())
@@ -36,7 +37,7 @@ class CurrentStateEventTest {
     }
 
     @Test
-    fun `CurrentStateEvent from protobuf throws UnsupportedException for classes other than switch`() {
+    internal fun `CurrentStateEvent from protobuf throws UnsupportedException for classes other than switch`() {
         notSupportedState { addCut = PBAddCutEvent.newBuilder().build() }
 
         notSupportedState { removeCut = PBRemoveCutEvent.newBuilder().build() }
@@ -47,7 +48,7 @@ class CurrentStateEventTest {
     }
 
     @Test
-    fun `SwitchStateEvent from protobuf and then back to protobuf`() {
+    internal fun `SwitchStateEvent from protobuf and then back to protobuf`() {
         val time = Timestamp.newBuilder().apply { nanos = 1 }.build()
         val event = PBCurrentStateEvent.newBuilder().apply {
             eventId = "event id"
@@ -82,4 +83,5 @@ class CurrentStateEventTest {
             CurrentStateEvent.fromPb(PBCurrentStateEvent.newBuilder().apply(block).build())
         }
     }
+
 }

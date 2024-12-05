@@ -10,6 +10,7 @@ package com.zepben.evolve.streaming.get
 
 import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.evolve.streaming.data.CurrentStateEvent
+import com.zepben.evolve.streaming.data.CurrentStateEventBatch
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcClient
 import com.zepben.protobuf.ns.GetCurrentStatesRequest
@@ -71,10 +72,10 @@ class QueryNetworkStateClient(
      * @return A [Sequence] of [List]s of [CurrentStateEvent] objects, where each list represents a
      * collection of network state events in the specified time range.
      */
-    fun getCurrentStates(queryId: Long, from: LocalDateTime, to: LocalDateTime): Sequence<List<CurrentStateEvent>>{
-        val results = mutableListOf<List<CurrentStateEvent>>()
+    fun getCurrentStates(queryId: Long, from: LocalDateTime, to: LocalDateTime): Sequence<CurrentStateEventBatch> {
+        val results = mutableListOf<CurrentStateEventBatch>()
         val responseObserver = AwaitableStreamObserver<GetCurrentStatesResponse>{ response ->
-            results.add(response.eventList.map { CurrentStateEvent.fromPb(it) })
+            results.add(CurrentStateEventBatch(response.messageId, response.eventList.map { CurrentStateEvent.fromPb(it) }))
         }
         val request = GetCurrentStatesRequest.newBuilder().also {
             it.messageId = queryId
@@ -100,7 +101,7 @@ class QueryNetworkStateClient(
      * @return A [Stream] of [List]s of [CurrentStateEvent] objects, where each list represents a collection
      * of network state events in the specified time range.
      */
-    fun getCurrentStatesStream(queryId: Long, from: LocalDateTime, to: LocalDateTime): Stream<List<CurrentStateEvent>> =
+    fun getCurrentStatesStream(queryId: Long, from: LocalDateTime, to: LocalDateTime): Stream<CurrentStateEventBatch> =
         getCurrentStates(queryId, from, to).asStream()
 
 }

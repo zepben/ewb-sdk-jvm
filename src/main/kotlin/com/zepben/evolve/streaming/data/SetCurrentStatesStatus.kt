@@ -8,14 +8,10 @@
 
 package com.zepben.evolve.streaming.data
 
-import com.zepben.evolve.services.common.translator.toLocalDateTime
-import com.zepben.evolve.services.common.translator.toTimestamp
-import java.time.LocalDateTime
 import com.zepben.protobuf.ns.SetCurrentStatesResponse as PBSetCurrentStatesResponse
 import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
 import com.zepben.protobuf.ns.data.BatchNotProcessed as PBBatchNotProcessed
 import com.zepben.protobuf.ns.data.BatchSuccessful as PBBatchSuccessful
-import com.zepben.protobuf.ns.data.ProcessingPaused as PBProcessingPaused
 import com.zepben.protobuf.ns.data.StateEventDuplicateMrid as PBStateEventDuplicateMrid
 import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
 import com.zepben.protobuf.ns.data.StateEventInvalidMrid as PBStateEventInvalidMrid
@@ -35,7 +31,6 @@ sealed class SetCurrentStatesStatus(val batchId: Long) {
         internal fun fromPb(pb: PBSetCurrentStatesResponse): SetCurrentStatesStatus? =
             when (pb.statusCase) {
                 PBSetCurrentStatesResponse.StatusCase.SUCCESS -> BatchSuccessful.fromPb(pb)
-                PBSetCurrentStatesResponse.StatusCase.PAUSED -> ProcessingPaused.fromPb(pb)
                 PBSetCurrentStatesResponse.StatusCase.FAILURE -> BatchFailure.fromPb(pb)
                 PBSetCurrentStatesResponse.StatusCase.NOTPROCESSED -> BatchNotProcessed.fromPb(pb)
                 else -> null
@@ -64,24 +59,6 @@ class BatchSuccessful(batchId: Long) : SetCurrentStatesStatus(batchId) {
 
     override fun toPb(): PBSetCurrentStatesResponse =
         toPb { success = PBBatchSuccessful.newBuilder().build() }
-
-}
-
-/**
- * A response indicating that current state events are not currently being processed. There is no need to retry these,
- * the missed events will be requested when processing resumes.
- *
- * @property since The timestamp when the processing was paused.
- */
-class ProcessingPaused(batchId: Long, val since: LocalDateTime?) : SetCurrentStatesStatus(batchId) {
-
-    companion object {
-        internal fun fromPb(pb: PBSetCurrentStatesResponse): ProcessingPaused =
-            ProcessingPaused(pb.messageId, pb.paused.since.toLocalDateTime())
-    }
-
-    override fun toPb(): PBSetCurrentStatesResponse =
-        toPb { paused = PBProcessingPaused.newBuilder().also { it.since = since.toTimestamp() }.build() }
 
 }
 

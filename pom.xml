@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.zepben.protobuf</groupId>
             <artifactId>evolve-grpc</artifactId>
-            <version>0.33.0-SNAPSHOT1</version>
+            <version>0.33.0-SNAPSHOT2</version>
         </dependency>
 
         <dependency>

@@ -8,9 +8,7 @@
 
 package com.zepben.evolve.streaming.mutations
 
-import com.google.protobuf.Timestamp
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
-import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.evolve.streaming.data.*
 import com.zepben.evolve.streaming.grpc.GrpcChannel
@@ -31,11 +29,10 @@ import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import java.time.LocalDateTime
-import kotlin.streams.asStream
 import kotlin.streams.toList
 import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
+import com.zepben.protobuf.ns.data.BatchNotProcessed as PBBatchNotProcessed
 import com.zepben.protobuf.ns.data.BatchSuccessful as PBBatchSuccessful
-import com.zepben.protobuf.ns.data.ProcessingPaused as PBProcessingPaused
 import com.zepben.protobuf.ns.data.StateEventDuplicateMrid as PBStateEventDuplicateMrid
 import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
 import com.zepben.protobuf.ns.data.StateEventInvalidMrid as PBStateEventInvalidMrid
@@ -61,11 +58,10 @@ internal class UpdateNetworkStateClientTest {
         SwitchStateEvent("event3", LocalDateTime.now(), "mrid2", SwitchAction.CLOSE),
         SwitchStateEvent("event4", LocalDateTime.now(), "mrid2", SwitchAction.OPEN),
     )
-    private val timestampOf1Second = Timestamp.newBuilder().apply { seconds = 1 }.build()
     private val switchStateEvents = currentStateEvents.filterIsInstance<SwitchStateEvent>()
     private val batches = currentStateEvents.mapIndexed { index, item ->
         CurrentStateEventBatch(index.toLong(), listOf(item))
-    }.asSequence()
+    }
 
     init {
         grpcCleanup.register(InProcessServerBuilder.forName(serverName).directExecutor().addService(service).build().start())
@@ -80,7 +76,7 @@ internal class UpdateNetworkStateClientTest {
     @Test
     internal fun `setCurrentStates in batches using Kotlin Sequence`() {
         testSetCurrentStates {
-            assertBatchedCurrentStatesResponse(client.setCurrentStates(batches).toList())
+            assertBatchedCurrentStatesResponse(client.setCurrentStates(batches.asSequence()).toList())
 
             //verify request arguments
             val requests = argumentCaptor<SetCurrentStatesRequest>()
@@ -97,7 +93,7 @@ internal class UpdateNetworkStateClientTest {
 
     @Test
     internal fun `setCurrentStates in batches using Java Stream`() {
-        testSetCurrentStates { assertBatchedCurrentStatesResponse(client.setCurrentStates(batches.asStream()).toList()) }
+        testSetCurrentStates { assertBatchedCurrentStatesResponse(client.setCurrentStates(batches.stream()).toList()) }
     }
 
     @Test
@@ -113,7 +109,6 @@ internal class UpdateNetworkStateClientTest {
         val responses = ArrayDeque(
             listOf(
                 SetCurrentStatesResponse.newBuilder().apply { success = PBBatchSuccessful.newBuilder().build() },
-                SetCurrentStatesResponse.newBuilder().apply { paused = PBProcessingPaused.newBuilder().apply { since = timestampOf1Second }.build() },
                 SetCurrentStatesResponse.newBuilder().apply {
                     failure = PBBatchFailure.newBuilder().apply {
                         partialFailure = true
@@ -139,9 +134,15 @@ internal class UpdateNetworkStateClientTest {
                         )
                     }.build()
                 },
-                null
+                SetCurrentStatesResponse.newBuilder().apply { notProcessed = PBBatchNotProcessed.newBuilder().build() },
+                // Test for unknown message types. Could also be `null`, but the intentions are not as clear.
+                SetCurrentStatesResponse.newBuilder()
             )
         )
+
+        // We must have the same number of responses as batches to prevent errors about ArrayDeque having no elements.
+        assertThat(responses, hasSize(batches.size))
+
         service.onSetCurrentStates = spy { request, response ->
             response.onNext(responses.removeFirst()?.apply { messageId = request.messageId }?.build())
         }
@@ -150,13 +151,12 @@ internal class UpdateNetworkStateClientTest {
     }
 
     private fun assertBatchedCurrentStatesResponse(currentStatesStatus: List<SetCurrentStatesStatus>) {
-        assertThat(currentStatesStatus.size, equalTo(3))
+        // The unknown message type shouldn't have been included in the results.
+        assertThat(currentStatesStatus, hasSize(batches.size - 1))
+
         currentStatesStatus.assert<BatchSuccessful>(0)
-        currentStatesStatus.assert<ProcessingPaused>(1) {
-            assertThat(it.since, equalTo(timestampOf1Second.toLocalDateTime()))
-        }
-        currentStatesStatus.assert<BatchFailure>(2) {
-            assertThat(it.partialFailure, equalTo(true))
+        currentStatesStatus.assert<BatchFailure>(1) {
+            assertThat("Should have been a partial failure", it.partialFailure)
             assertThat(
                 it.failures.map { f -> f::class },
                 contains(
@@ -170,6 +170,7 @@ internal class UpdateNetworkStateClientTest {
                 assertThat(f.eventId, equalTo("event${index + 1}"))
             }
         }
+        currentStatesStatus.assert<BatchNotProcessed>(2)
     }
 
     private inline fun <reified T> List<SetCurrentStatesStatus>.assert(index: Int, additionalAssertions: (T) -> Unit = {}) {

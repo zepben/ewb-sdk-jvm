@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
 import com.zepben.protobuf.ns.SetCurrentStatesResponse as PBSetCurrentStatesResponse
 import com.zepben.protobuf.ns.data.BatchFailure as PBBatchFailure
 import com.zepben.protobuf.ns.data.BatchSuccessful as PBBatchSuccessful
-import com.zepben.protobuf.ns.data.ProcessingPaused as PBProcessingPaused
 import com.zepben.protobuf.ns.data.StateEventDuplicateMrid as PBStateEventDuplicateMrid
 import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
 import com.zepben.protobuf.ns.data.StateEventInvalidMrid as PBStateEventInvalidMrid
@@ -41,22 +40,6 @@ internal class SetCurrentStatesStatusTest {
         status?.toPb()?.also {
             assertThat(it.messageId, equalTo(1))
             assertThat(it.statusCase, equalTo(PBSetCurrentStatesResponse.StatusCase.SUCCESS))
-        }
-    }
-
-    @Test
-    internal fun `ProcessingPaused from protobuf and then back to protobuf`() {
-        val pb = createSetCurrentStatesResponse {
-            paused = PBProcessingPaused.newBuilder().apply { since = Timestamp.newBuilder().apply { seconds = 1 }.build() }.build()
-        }
-
-        val status = SetCurrentStatesStatus.fromPb(pb) as ProcessingPaused
-        assertThat(status.since, equalTo(pb.paused.since.toLocalDateTime()))
-        assertThat(status.batchId, equalTo(1))
-
-        (status as SetCurrentStatesStatus).toPb().also {
-            assertThat(it.messageId, equalTo(1))
-            assertThat(it.paused.since, equalTo(pb.paused.since))
         }
     }
 

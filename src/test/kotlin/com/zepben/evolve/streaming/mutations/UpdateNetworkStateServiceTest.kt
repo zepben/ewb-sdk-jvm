@@ -12,7 +12,6 @@ import com.google.protobuf.Timestamp
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.conn.grpc.GrpcException
 import com.zepben.evolve.services.common.translator.toLocalDateTime
-import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.evolve.streaming.data.*
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
@@ -30,7 +29,6 @@ import org.hamcrest.Matchers.*
 import org.junit.Rule
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -51,7 +49,6 @@ internal class UpdateNetworkStateServiceTest {
     private val eventsSlot = slot<List<CurrentStateEvent>>()
     private val setCurrentStatesReturns = listOf(
         BatchSuccessful(1),
-        ProcessingPaused(1, LocalDateTime.now()),
         BatchFailure(
             1, true, listOf(
                 StateEventUnknownMrid("event id", "we couldn't find it"),
@@ -101,9 +98,6 @@ internal class UpdateNetworkStateServiceTest {
     internal fun setCurrentStates() {
         startGrpcServer()
         setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.SUCCESS)
-        setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.PAUSED) {
-            assertThat(it.paused.since, equalTo((setCurrentStatesReturns[1] as ProcessingPaused).since.toTimestamp()))
-        }
         setCurrentStatesTest(SetCurrentStatesResponse.StatusCase.FAILURE) { response ->
             response.failure.apply {
                 assertThat(partialFailure, equalTo(true))

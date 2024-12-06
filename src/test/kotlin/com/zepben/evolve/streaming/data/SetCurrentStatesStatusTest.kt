@@ -84,7 +84,7 @@ internal class SetCurrentStatesStatusTest {
 
     @Test
     internal fun `StateEventFailure from protobuf and then back to protobuf`() {
-        val unknowMridPb = PBStateEventFailure.newBuilder().apply {
+        val unknownMridPb = PBStateEventFailure.newBuilder().apply {
             eventId = "event1"
             unknownMrid = PBStateEventUnknownMrid.newBuilder().build()
         }.build()
@@ -99,7 +99,7 @@ internal class SetCurrentStatesStatusTest {
             unsupportedPhasing = PBStateEventUnsupportedPhasing.newBuilder().build()
         }.build()
 
-        testStateEventFailure(unknowMridPb, StateEventUnknownMrid::class.java)
+        testStateEventFailure(unknownMridPb, StateEventUnknownMrid::class.java)
         testStateEventFailure(duplicateMridPb, StateEventDuplicateMrid::class.java)
         testStateEventFailure(unsupportedPhasingPb, StateEventUnsupportedPhasing::class.java)
         testStateEventFailure(invalidMridPb, StateEventInvalidMrid::class.java)

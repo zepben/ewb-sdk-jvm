@@ -197,8 +197,6 @@ client.setCurrentStates(batches).forEach { response ->
 Each batch will receive its own response, which will be one of the following:
 * `BatchSuccessful` - Indicates that all events in the batch were processed successfully. Events that are ignored because they set the state to one that is
   already present, or are skipped due to a later event applying the opposite action, will be marked as successful.
-* `ProcessingPaused` - Indicates the entire batch was ignore as current state processing in teh server is currently paused. The response will include the time
-  the server was paused.
 * `BatchFailure` - Indicates at least one event in the batch could not be applied. Each event that failed will indicate why it failed, some of which will have
   more impact than others.
   * `StateEventUnknownMrid` - The `mRID` of the event could not be found in the network hosted by this server.
@@ -207,6 +205,10 @@ Each batch will receive its own response, which will be one of the following:
     `mRID` that belongs to a `Cut`.
   * `StateEventUnsupportedPhasing` - You tried to specify phases that do not make sense to the item being updated. When using the default phasing of `NONE` you
     will never receive this error. Until un-ganged switching is supported, this error will be returned for all events that specify phases.
+  * `StateEventUnsupportedMrid` - The `mRID` provided can't be used to perform the given action even though it is of the correct type. e.g. Trying to open/close
+   a switch in a voltage level that hasn't been implemented in the server.
+
+* `BatchNotProcessed` - Indicates the entire batch was ignored because the message ID of the batch was prior to the last processed batch.
 
 You can check the type of response or failure by check against the types from `com.zepben.evolve.streaming.data.*`
 <Tabs

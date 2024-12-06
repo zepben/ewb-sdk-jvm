@@ -141,22 +141,22 @@ internal class QueryNetworkStateServiceTest {
 
     @Test
     internal fun `calls process error handler with exception in status handler`() {
+        val expectedError = Exception("Some test error")
+        every { onCurrentStatesStatus(any()) } throws expectedError
+
         val responseObserver = mockk<StreamObserver<Empty>> { justRun { onCompleted() } }
         val requestObserver = service.reportBatchStatus(responseObserver)
 
-        // Not sure if/how we can set this to something not supported like you would get from a future version, so just leave it blank.
-        requestObserver.onNext(SetCurrentStatesResponse.newBuilder().setMessageId(1).build())
-        requestObserver.onCompleted()
+        requestObserver.onNext(BatchSuccessful(2L).toPb())
 
         val error = slot<GrpcException>()
         verifySequence {
             onProcessingError(capture(error))
-            responseObserver.onCompleted()
         }
 
         assertThat(
             error.captured.message,
-            equalTo("Failed to decode status response for batch `1`: Unsupported type STATUS_NOT_SET")
+            equalTo("Exception thrown in status response handler for batch `2`: ${expectedError.localizedMessage}")
         )
     }
 

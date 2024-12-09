@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.streaming.get
 
-import com.zepben.evolve.streaming.data.CurrentStateEvent
+import com.zepben.evolve.streaming.data.CurrentStateEventBatch
 import com.zepben.evolve.streaming.data.SwitchAction
 import com.zepben.evolve.streaming.data.SwitchStateEvent
 import com.zepben.evolve.streaming.get.testservices.TestQueryNetworkStateService
@@ -26,7 +26,7 @@ import org.mockito.kotlin.spy
 import java.time.LocalDateTime
 import kotlin.streams.toList
 
-class QueryNetworkStateClientTest {
+internal class QueryNetworkStateClientTest {
 
     @JvmField
     @Rule
@@ -43,34 +43,29 @@ class QueryNetworkStateClientTest {
     }
 
     @Test
-    fun getCurrentStates() {
+    internal fun `constructor coverage`() {
+        QueryNetworkStateClient(GrpcChannel(channel), TokenCallCredentials { "auth-token" })
+        QueryNetworkStateClient(channel, TokenCallCredentials { "auth-token" })
+    }
+
+    @Test
+    internal fun getCurrentStates() {
         testGetCurrentStates { from, to -> client.getCurrentStates(1, from, to).toList() }
     }
 
     @Test
-    fun getCurrentStatesStream() {
+    internal fun getCurrentStatesStream() {
         testGetCurrentStates { from, to -> client.getCurrentStatesStream(1, from, to).toList() }
     }
 
-    @Test
-    fun `constructor coverage`(){
-        testGetCurrentStates { from, to ->
-            QueryNetworkStateClient(GrpcChannel(channel), TokenCallCredentials({ "auth-token" })).getCurrentStatesStream(1, from, to).toList()
-        }
-
-        testGetCurrentStates { from, to ->
-            QueryNetworkStateClient(channel, TokenCallCredentials({ "auth-token" })).getCurrentStatesStream(1, from, to).toList()
-        }
-    }
-
-    private fun testGetCurrentStates(act: (LocalDateTime, LocalDateTime) -> List<List<CurrentStateEvent>>) {
+    private fun testGetCurrentStates(act: (LocalDateTime, LocalDateTime) -> List<CurrentStateEventBatch>) {
         val from = LocalDateTime.now().plusDays(-1)
         val to = LocalDateTime.now()
         val batches = listOf(
-            listOf(SwitchStateEvent("event1", from, "switch-1", SwitchAction.OPEN)),
-            listOf(SwitchStateEvent("event2", from, "switch-2", SwitchAction.OPEN)),
-            listOf(SwitchStateEvent("event3", from.plusHours(1), "switch-1", SwitchAction.CLOSE)),
-            listOf(SwitchStateEvent("event4", from.plusHours(1), "switch-2", SwitchAction.CLOSE))
+            CurrentStateEventBatch(1, listOf(SwitchStateEvent("event1", from, "switch-1", SwitchAction.OPEN))),
+            CurrentStateEventBatch(2, listOf(SwitchStateEvent("event2", from, "switch-2", SwitchAction.OPEN))),
+            CurrentStateEventBatch(3, listOf(SwitchStateEvent("event3", from.plusHours(1), "switch-1", SwitchAction.CLOSE))),
+            CurrentStateEventBatch(4, listOf(SwitchStateEvent("event4", from.plusHours(1), "switch-2", SwitchAction.CLOSE)))
         )
 
         service.onGetCurrentStates = spy { _, _ -> batches.asSequence() }

@@ -10,7 +10,6 @@ package com.zepben.evolve.cim.iec61970.base.core
 
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.phases.PhaseStatus
-import com.zepben.evolve.services.network.tracing.phases.TracedPhases
 import java.lang.ref.WeakReference
 
 /**
@@ -25,8 +24,6 @@ import java.lang.ref.WeakReference
  *                          The first terminal is the "starting point" for a two terminal branch.
  * @property normalFeederDirection Stores the direction of the feeder head relative to this [Terminal] in the normal state of the network.
  * @property currentFeederDirection Stores the direction of the feeder head relative to this [Terminal] in the current state of the network.
- * @property tracedPhases The phase object representing the traced phases in both the normal and current network. If
- *                        properly configured you would expect the normal state phases to match those in {@code phases}
  */
 class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID) {
 
@@ -41,12 +38,6 @@ class Terminal @JvmOverloads constructor(mRID: String = "") : AcDcTerminal(mRID)
 
     var normalFeederDirection: FeederDirection = FeederDirection.NONE
     var currentFeederDirection: FeederDirection = FeederDirection.NONE
-
-    @Deprecated(
-        message = "Replaced by direct use of `normalPhases` and `currentPhases`.",
-        replaceWith = ReplaceWith("/* See [TracedPhases.normal] and [TracedPhases.current] for direct replacement suggestions */"),
-    )
-    val tracedPhases: TracedPhases get() = TracedPhases(terminal = this)
 
     // The reference to the connectivity node is weak so if a Network object goes out of scope, holding a single conducting equipment
     // reference does not cause everything connected to it in the network to stay in memory.

@@ -9,7 +9,6 @@
 package com.zepben.evolve.services.network.testdata
 
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.Tracing
 
 object SingleTransformerNetwork {
 
@@ -18,14 +17,13 @@ object SingleTransformerNetwork {
     //
     fun create(sequenceNumber: Int): NetworkService = NetworkService().also { networkService ->
         val source = createSourceForConnecting(networkService, "s", 1)
-        val transformer = createPowerTransformerForConnecting(networkService, "tx", 1, 1, 0)
+        val transformer = createPowerTransformerForConnecting(networkService, "tx", 2, 1, 0)
 
         source.terminals[0].sequenceNumber = sequenceNumber
-        transformer.terminals[0].sequenceNumber = sequenceNumber
 
         networkService.connect(source.getTerminal(sequenceNumber)!!, transformer.getTerminal(sequenceNumber)!!)
 
-        Tracing.setPhases().run(networkService)
+        networkService.setPhases()
         source.addFeederDirections(sequenceNumber)
     }
 

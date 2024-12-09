@@ -10,13 +10,12 @@ package com.zepben.evolve.services.network.tracing.connectivity
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 /**
  * Helper class for finding the paths through equipment.
  */
-class TerminalConnectivityInternal {
+object TerminalConnectivityInternal {
 
     /**
      * Find the connectivity between the two terminals. The function assumes they are on the same conducting equipment.

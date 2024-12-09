@@ -16,9 +16,9 @@ import com.zepben.protobuf.ns.data.StateEventFailure as PBStateEventFailure
 internal class SetCurrentStatesStatusTest {
 
     //
-    // NOTE: We don;t bother to check that the correct thing was put into the protobuf variants directly because it is
+    // NOTE: We don't bother to check that the correct thing was put into the protobuf variants directly because it is
     //       assumed that if the resulting object coming out the other side is correct then the intermediate one must
-    //       have been correct (good enough fo us anyway).
+    //       have been correct (good enough for us anyway).
     //
 
     @Test

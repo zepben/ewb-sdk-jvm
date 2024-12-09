@@ -128,7 +128,10 @@ sealed class StateEventFailure(val eventId: String, val message: String) {
      * Creates a [PBStateEventFailure] with [eventId] assigned along with the specified [block].
      */
     protected fun toPb(block: PBStateEventFailure.Builder.() -> Unit): PBStateEventFailure =
-        PBStateEventFailure.newBuilder().also { it.eventId = eventId }.apply(block).build()
+        PBStateEventFailure.newBuilder().also {
+            it.eventId = eventId
+            it.message = message
+        }.apply(block).build()
 
 }
 

@@ -78,6 +78,20 @@ internal class FeederTest {
     }
 
     @Test
+    internal fun currentEnergizedLvFeeders() {
+        PrivateCollectionValidator.validateUnordered(
+            ::Feeder,
+            ::LvFeeder,
+            Feeder::currentEnergizedLvFeeders,
+            Feeder::numCurrentEnergizedLvFeeders,
+            Feeder::getCurrentEnergizedLvFeeder,
+            Feeder::addCurrentEnergizedLvFeeder,
+            Feeder::removeCurrentEnergizedLvFeeder,
+            Feeder::clearCurrentEnergizedLvFeeders
+        )
+    }
+
+    @Test
     internal fun `can set feeder head terminal on feeder without equipment`() {
         val terminal = Terminal()
         val terminal2 = Terminal()

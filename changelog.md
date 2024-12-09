@@ -2,6 +2,7 @@
 ## [0.24.0] - UNRELEASED
 ### Breaking Changes
 * Database readers and writes for each `BaseService` no longer accept a `MetadataCollection`, and will instead use the collection of the provided service.
+* Removed `getCurrentEquipmentForFeeder` implementation for `NetworkConsumer` as its functionality is now incorporated in `getEquipmentForContainers`.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
@@ -12,7 +13,8 @@
 * Added `connectWithAccessToken()` for connecting to a gRPC service using an access token with SSL/TLS.
 
 ### Enhancements
-* None.
+* Added the energized relationship for the current state of network between `Feeder` and `LvFeeder`.
+* Updated `NetworkConsumer.getEquipmentForContainers` to allow requesting normal, current or all equipments.
 
 ### Fixes
 * None.

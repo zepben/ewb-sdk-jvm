@@ -161,17 +161,19 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
-    internal fun `server receives linked container options`() {
+    internal fun `server receives container options for getEquipmentForContainers`() {
         consumerService.onGetEquipmentForContainers = spy { request, _ ->
             assertThat(request.mridsList, containsInAnyOrder("id"))
             assertThat(request.includeEnergizingContainers, equalTo(IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS))
             assertThat(request.includeEnergizedContainers, equalTo(IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS))
+            assertThat(request.networkState, equalTo(NetworkState.CURRENT_NETWORK_STATE))
         }
 
         consumerClient.getEquipmentForContainer(
             "id",
             includeEnergizingContainers = IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
-            includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+            includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS,
+            networkState = NetworkState.CURRENT_NETWORK_STATE
         )
 
         verify(consumerService.onGetEquipmentForContainers).invoke(any(), any())

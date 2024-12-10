@@ -19,7 +19,9 @@ internal fun changeSet57() = ChangeSet(
         `Add ct_primary and min_target_deadband columns for tap_changer_controls`,
         `Create table battery_controls`,
         `Create table pan_demand_response_functions`,
-        `Create table static_var_compensators`
+        `Create table static_var_compensators`,
+        `Create table battery_units_battery_controls`,
+        `Create table end_devices_end_device_functions`
     )
 )
 
@@ -110,6 +112,39 @@ private val `Create table static_var_compensators` = Change(
             voltage_set_point INTEGER NULL
         );""".trimIndent(),
         "CREATE UNIQUE INDEX static_var_compensators_mrid ON static_var_compensators (mrid);"
+    ),
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+)
+
+// #######################
+// # Association Changes #
+// #######################
+
+@ZBEX
+@Suppress("ObjectPropertyName")
+private val `Create table battery_units_battery_controls` = Change(
+    listOf(
+        """CREATE TABLE battery_units_battery_controls (
+            battery_unit_mrid TEXT NOT_NULL,
+            battery_control_mrid TEXT NOT_NULL
+        );""".trimIndent(),
+        "CREATE UNIQUE INDEX battery_units_mrid_battery_controls_mrid ON battery_units_battery_controls (battery_unit_mrid, battery_control_mrid);",
+        "CREATE INDEX battery_units_battery_controls_battery_unit_mrid ON battery_units_battery_controls (battery_unit_mrid);",
+        "CREATE INDEX battery_units_battery_controls_battery_control_mrid ON battery_units_battery_controls (battery_control_mrid);"
+    ),
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+)
+
+@Suppress("ObjectPropertyName")
+private val `Create table end_devices_end_device_functions` = Change(
+    listOf(
+        """CREATE TABLE end_devices_end_device_functions (
+            end_device_mrid TEXT NOT_NULL,
+            end_device_function_mrid TEXT NOT_NULL
+        );""".trimIndent(),
+        "CREATE UNIQUE INDEX end_device_mrid_end_device_function_mrid ON end_devices_end_device_functions (end_device_mrid, end_device_function_mrid);",
+        "CREATE INDEX end_devices_end_device_functions_end_device_mrid ON end_devices_end_device_functions (end_device_mrid);",
+        "CREATE INDEX end_devices_end_device_functions_end_device_function_mrid ON end_devices_end_device_functions (end_device_function_mrid);"
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )

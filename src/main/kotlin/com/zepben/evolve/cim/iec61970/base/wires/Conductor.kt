@@ -19,8 +19,8 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
  * between points in the power system.
  *
  * @property length Segment length for calculating line section capabilities.
- * @property designTemperature [ZBEX] The temperature in degrees Celsius for the network design of this conductor.
- * @property designRating [ZBEX] The current rating in Amperes at the specified design temperature that can be used without the conductor breaching physical network
+ * @property designTemperature The temperature in degrees Celsius for the network design of this conductor.
+ * @property designRating The current rating in Amperes at the specified design temperature that can be used without the conductor breaching physical network
  *   design limits.
  */
 abstract class Conductor(mRID: String = "") : ConductingEquipment(mRID) {

@@ -8,6 +8,9 @@
 
 package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControlMode
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -29,6 +32,7 @@ internal class BatteryUnitTest {
     @Test
     internal fun accessorCoverage() {
         val batteryUnit = BatteryUnit()
+        val batteryControl = BatteryControl()
 
         assertThat(batteryUnit.batteryState, equalTo(BatteryStateKind.UNKNOWN))
         assertThat(batteryUnit.ratedE, nullValue())
@@ -39,9 +43,34 @@ internal class BatteryUnitTest {
             ratedE = 1L
             storedE = 2L
         }
+        batteryUnit.addControl(batteryControl)
 
         assertThat(batteryUnit.batteryState, equalTo(BatteryStateKind.charging))
         assertThat(batteryUnit.ratedE, equalTo(1L))
         assertThat(batteryUnit.storedE, equalTo(2L))
+    }
+
+    @Test
+    internal fun batteryControls() {
+        PrivateCollectionValidator.validateUnordered(
+            ::BatteryUnit,
+            ::BatteryControl,
+            BatteryUnit::controls,
+            BatteryUnit::numBatteryControls,
+            BatteryUnit::getControl,
+            BatteryUnit::addControl,
+            BatteryUnit::removeControl,
+            BatteryUnit::clearControls
+        )
+    }
+
+    @Test
+    internal fun getBatteryControlWithMode() {
+        val batteryUnit = BatteryUnit()
+        val batteryControl = BatteryControl()
+
+        batteryUnit.addControl(batteryControl)
+
+        assertThat(batteryUnit.getControl(BatteryControlMode.UNKNOWN), equalTo(batteryControl))
     }
 }

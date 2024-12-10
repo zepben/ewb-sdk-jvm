@@ -212,8 +212,10 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         super.excludedTables + setOf(
             // Excluded associations
             TableAssetOrganisationRolesAssets::class,
+            TableBatteryUnitsBatteryControls::class,
             TableCircuitsSubstations::class,
             TableCircuitsTerminals::class,
+            TableEndDevicesEndDeviceFunctions::class,
             TableEquipmentEquipmentContainers::class,
             TableEquipmentOperationalRestrictions::class,
             TableEquipmentUsagePoints::class,

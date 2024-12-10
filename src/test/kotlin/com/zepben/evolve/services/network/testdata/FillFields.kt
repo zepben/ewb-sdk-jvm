@@ -480,17 +480,22 @@ fun Feeder.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
     }
 
     if (includeRuntime) {
-        for (i in 0..1)
+        for (i in 0..1) {
             addNormalEnergizedLvFeeder(LvFeeder().also {
                 it.addNormalEnergizingFeeder(this)
                 service.add(it)
             })
 
-        for (i in 0..1)
+            addCurrentEnergizedLvFeeder(LvFeeder().also {
+                it.addCurrentEnergizingFeeder(this)
+                service.add(it)
+            })
+
             addCurrentEquipment(Junction().also {
                 it.addCurrentContainer(this)
                 service.add(it)
             })
+        }
     } else {
         equipment.forEach { it.removeContainer(this) }
         clearEquipment()
@@ -1484,17 +1489,22 @@ fun LvFeeder.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     normalHeadTerminal = Terminal().also { service.add(it) }
 
     if (includeRuntime) {
-        for (i in 0..1)
+        for (i in 0..1) {
             addNormalEnergizingFeeder(Feeder().also {
                 it.addNormalEnergizedLvFeeder(this)
                 service.add(it)
             })
 
-        for (i in 0..1)
+            addCurrentEnergizingFeeder(Feeder().also {
+                it.addCurrentEnergizedLvFeeder(this)
+                service.add(it)
+            })
+
             addCurrentEquipment(Junction().also {
                 it.addCurrentContainer(this)
                 service.add(it)
             })
+        }
     } else {
         equipment.forEach { it.removeContainer(this) }
         clearEquipment()

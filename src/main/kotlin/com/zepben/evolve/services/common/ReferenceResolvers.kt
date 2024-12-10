@@ -200,6 +200,10 @@ internal object FeederToNormalEnergizedLvFeedersResolver : ReferenceResolver<Fee
     Feeder::class, LvFeeder::class, Feeder::addNormalEnergizedLvFeeder
 )
 
+internal object FeederToCurrentEnergizedLvFeedersResolver : ReferenceResolver<Feeder, LvFeeder> by KReferenceResolver(
+    Feeder::class, LvFeeder::class, Feeder::addCurrentEnergizedLvFeeder
+)
+
 internal object GeographicalRegionToSubGeographicalRegionResolver : ReferenceResolver<GeographicalRegion, SubGeographicalRegion> by KReferenceResolver(
     GeographicalRegion::class, SubGeographicalRegion::class, GeographicalRegion::addSubGeographicalRegion
 )
@@ -350,6 +354,10 @@ internal object LvFeederToNormalHeadTerminalResolver : ReferenceResolver<LvFeede
 
 internal object LvFeederToNormalEnergizingFeedersResolver : ReferenceResolver<LvFeeder, Feeder> by KReferenceResolver(
     LvFeeder::class, Feeder::class, LvFeeder::addNormalEnergizingFeeder
+)
+
+internal object LvFeederToCurrentEnergizingFeedersResolver : ReferenceResolver<LvFeeder, Feeder> by KReferenceResolver(
+    LvFeeder::class, Feeder::class, LvFeeder::addCurrentEnergizingFeeder
 )
 
 internal object PowerElectronicsConnectionToPowerElectronicsConnectionPhaseResolver :

@@ -62,6 +62,20 @@ internal class LvFeederTest {
     }
 
     @Test
+    internal fun currentEnergizingFeeders() {
+        PrivateCollectionValidator.validateUnordered(
+            ::LvFeeder,
+            ::Feeder,
+            LvFeeder::currentEnergizingFeeders,
+            LvFeeder::numCurrentEnergizingFeeders,
+            LvFeeder::getCurrentEnergizingFeeder,
+            LvFeeder::addCurrentEnergizingFeeder,
+            LvFeeder::removeCurrentEnergizingFeeder,
+            LvFeeder::clearCurrentEnergizingFeeders
+        )
+    }
+
+    @Test
     internal fun currentEquipment() {
         PrivateCollectionValidator.validateUnordered(
             ::LvFeeder,

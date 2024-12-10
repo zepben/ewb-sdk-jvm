@@ -31,6 +31,7 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
     var normalEnergizingSubstation: Substation? = null
     private var _currentEquipmentById: MutableMap<String?, Equipment>? = null
     private var _normalEnergizedLvFeedersById: MutableMap<String?, LvFeeder>? = null
+    private var _currentEnergizedLvFeedersById: MutableMap<String?, LvFeeder>? = null
 
     /**
      * Contained equipment using the current state of the network. The returned collection is read only.
@@ -120,8 +121,63 @@ class Feeder @JvmOverloads constructor(mRID: String = "") : EquipmentContainer(m
         return ret != null
     }
 
+    /**
+     * Clear all [LvFeeder]'s associated with this [Feeder] in the normal state of the network.
+     *
+     * @return This [LvFeeder] for fluent use.
+     */
     fun clearNormalEnergizedLvFeeders(): Feeder {
         _normalEnergizedLvFeedersById = null
+        return this
+    }
+
+    /**
+     * The LV feeders that are currently energized by the feeder. The returned collection is read only.
+     */
+    val currentEnergizedLvFeeders: Collection<LvFeeder> get() = _currentEnergizedLvFeedersById?.values.asUnmodifiable()
+
+    /**
+     * Get the number of entries in the current [LvFeeder] collection.
+     */
+    fun numCurrentEnergizedLvFeeders(): Int = _currentEnergizedLvFeedersById?.size ?: 0
+
+    /**
+     * Energized LV feeder using the current state of the network.
+     *
+     * @param mRID the mRID of the required current [LvFeeder]
+     * @return The [LvFeeder] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getCurrentEnergizedLvFeeder(mRID: String): LvFeeder? = _currentEnergizedLvFeedersById?.get(mRID)
+
+    /**
+     * @param lvFeeder the LV feeder to associate with this feeder in the current state of the network.
+     */
+    fun addCurrentEnergizedLvFeeder(lvFeeder: LvFeeder): Feeder {
+        if (validateReference(lvFeeder, ::getCurrentEnergizedLvFeeder, "An LvFeeder"))
+            return this
+
+        _currentEnergizedLvFeedersById = _currentEnergizedLvFeedersById ?: mutableMapOf()
+        _currentEnergizedLvFeedersById!!.putIfAbsent(lvFeeder.mRID, lvFeeder)
+
+        return this
+    }
+
+    /**
+     * @param lvFeeder the LV feeder to disassociate from this HV/MV feeder in the current state of the network.
+     */
+    fun removeCurrentEnergizedLvFeeder(lvFeeder: LvFeeder): Boolean {
+        val ret = _currentEnergizedLvFeedersById?.remove(lvFeeder.mRID)
+        if (_currentEnergizedLvFeedersById.isNullOrEmpty()) _currentEnergizedLvFeedersById = null
+        return ret != null
+    }
+
+    /**
+     * Clear all [LvFeeder]'s associated with this [Feeder] in the current state of the network.
+     *
+     * @return This [LvFeeder] for fluent use.
+     */
+    fun clearCurrentEnergizedLvFeeders(): Feeder {
+        _currentEnergizedLvFeedersById = null
         return this
     }
 }

@@ -85,6 +85,7 @@ class NetworkConsumerClient(
      * @param equipmentContainer The [EquipmentContainer] to fetch equipment for.
      * @param includeEnergizingContainers The level of energizing containers to include equipment from.
      * @param includeEnergizedContainers The level of energized containers to include equipment from.
+     * @param networkState The network state of the equipment.
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
@@ -96,9 +97,10 @@ class NetworkConsumerClient(
     fun getEquipmentForContainer(
         equipmentContainer: EquipmentContainer,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
-        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS,
+        networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE
     ): GrpcResult<MultiObjectResult> =
-        getEquipmentForContainer(equipmentContainer.mRID, includeEnergizingContainers, includeEnergizedContainers)
+        getEquipmentForContainer(equipmentContainer.mRID, includeEnergizingContainers, includeEnergizedContainers, networkState)
 
     /**
      * Retrieve the [Equipment] for the [EquipmentContainer] represented by [mRID]
@@ -108,6 +110,7 @@ class NetworkConsumerClient(
      * @param mRID The mRID of the [EquipmentContainer] to fetch equipment for.
      * @param includeEnergizingContainers The level of energizing containers to include equipment from.
      * @param includeEnergizedContainers The level of energized containers to include equipment from.
+     * @param networkState The network state of the equipment.
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
@@ -119,9 +122,10 @@ class NetworkConsumerClient(
     fun getEquipmentForContainer(
         mRID: String,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
-        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS,
+        networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE
     ): GrpcResult<MultiObjectResult> =
-        getEquipmentForContainers(sequenceOf(mRID), includeEnergizingContainers, includeEnergizedContainers)
+        getEquipmentForContainers(sequenceOf(mRID), includeEnergizingContainers, includeEnergizedContainers, networkState)
 
     /**
      * Retrieve the [Equipment] for all [EquipmentContainer]s represented by [mRIDs]
@@ -131,6 +135,7 @@ class NetworkConsumerClient(
      * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch equipment for.
      * @param includeEnergizingContainers The level of energizing containers to include equipment from.
      * @param includeEnergizedContainers The level of energized containers to include equipment from.
+     * @param networkState The network state of the equipment.
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
@@ -142,9 +147,10 @@ class NetworkConsumerClient(
     fun getEquipmentForContainers(
         mRIDs: Iterable<String>,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
-        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS,
+        networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE
     ): GrpcResult<MultiObjectResult> =
-        getEquipmentForContainers(mRIDs.asSequence(), includeEnergizingContainers, includeEnergizedContainers)
+        getEquipmentForContainers(mRIDs.asSequence(), includeEnergizingContainers, includeEnergizedContainers, networkState)
 
     /**
      * Retrieve the [Equipment] for all [EquipmentContainer]s represented by [mRIDs]
@@ -154,6 +160,7 @@ class NetworkConsumerClient(
      * @param mRIDs The mRIDs of the [EquipmentContainer]s to fetch equipment for.
      * @param includeEnergizingContainers The level of energizing containers to include equipment from.
      * @param includeEnergizedContainers The level of energized containers to include equipment from.
+     * @param networkState The network state of the equipment.
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
@@ -165,9 +172,10 @@ class NetworkConsumerClient(
     fun getEquipmentForContainers(
         mRIDs: Sequence<String>,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
-        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS,
+        networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE
     ): GrpcResult<MultiObjectResult> =
-        handleMultiObjectRPC { processEquipmentForContainers(mRIDs, includeEnergizingContainers, includeEnergizedContainers) }
+        handleMultiObjectRPC { processEquipmentForContainers(mRIDs, includeEnergizingContainers, includeEnergizedContainers, networkState) }
 
     /**
      * Retrieve the [Equipment] for [operationalRestriction].
@@ -198,38 +206,6 @@ class NetworkConsumerClient(
      */
     fun getEquipmentForRestriction(mRID: String): GrpcResult<MultiObjectResult> =
         handleMultiObjectRPC { processRestriction(mRID) }
-
-    /**
-     * Retrieve the current [Equipment] for [feeder]. The current equipment is the equipment connected to the Feeder based on
-     * the current phasing and switching of the network.
-     *
-     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
-     *
-     * @param feeder The [Feeder] to fetch current equipment for.
-     * @return A [GrpcResult] with a result of one of the following:
-     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
-     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
-     * Note the [NetworkConsumerClient] warning in this case.
-     */
-    fun getCurrentEquipmentForFeeder(feeder: Feeder): GrpcResult<MultiObjectResult> =
-        getCurrentEquipmentForFeeder(feeder.mRID)
-
-    /**
-     * Retrieve the current [Equipment] for the [Feeder] represented by [mRID]. The current equipment is the equipment connected to the Feeder based on
-     * the current phasing and switching of the network.
-     *
-     * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
-     *
-     * @param mRID The mRID of the [Feeder] to fetch current equipment for.
-     * @return A [GrpcResult] with a result of one of the following:
-     * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
-     * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed] (see [BaseService.add]).
-     * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
-     * Note the [NetworkConsumerClient] warning in this case.
-     */
-    fun getCurrentEquipmentForFeeder(mRID: String): GrpcResult<MultiObjectResult> =
-        handleMultiObjectRPC { processFeeder(mRID) }
 
     /**
      * Retrieve the [Terminal]s for [connectivityNode].
@@ -488,7 +464,8 @@ class NetworkConsumerClient(
     private fun processEquipmentForContainers(
         mRIDs: Sequence<String>,
         includeEnergizingContainers: IncludedEnergizingContainers,
-        includeEnergizedContainers: IncludedEnergizedContainers
+        includeEnergizedContainers: IncludedEnergizedContainers,
+        networkState: NetworkState
     ): Sequence<ExtractResult> {
         val extractResults = mutableListOf<ExtractResult>()
         val streamObserver = AwaitableStreamObserver<GetEquipmentForContainersResponse> { response ->
@@ -502,6 +479,7 @@ class NetworkConsumerClient(
 
         builder.includeEnergizingContainers = includeEnergizingContainers
         builder.includeEnergizedContainers = includeEnergizedContainers
+        builder.networkState = networkState
 
         batchSend(mRIDs, builder::addMrids) {
             if (builder.mridsList.isNotEmpty())
@@ -510,20 +488,6 @@ class NetworkConsumerClient(
         }
 
         request.onCompleted()
-        streamObserver.await()
-
-        return extractResults.asSequence()
-    }
-
-    private fun processFeeder(mRID: String): Sequence<ExtractResult> {
-        val extractResults = mutableListOf<ExtractResult>()
-        val streamObserver = AwaitableStreamObserver<GetCurrentEquipmentForFeederResponse> { response ->
-            response.identifiedObjectsList.forEach {
-                extractResults.add(extractIdentifiedObject(it))
-            }
-        }
-
-        stub.getCurrentEquipmentForFeeder(GetCurrentEquipmentForFeederRequest.newBuilder().setMrid(mRID).build(), streamObserver)
         streamObserver.await()
 
         return extractResults.asSequence()

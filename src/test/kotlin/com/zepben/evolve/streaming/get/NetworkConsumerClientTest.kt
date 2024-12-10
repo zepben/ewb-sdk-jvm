@@ -161,17 +161,19 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
-    internal fun `server receives linked container options`() {
+    internal fun `server receives container options for getEquipmentForContainers`() {
         consumerService.onGetEquipmentForContainers = spy { request, _ ->
             assertThat(request.mridsList, containsInAnyOrder("id"))
             assertThat(request.includeEnergizingContainers, equalTo(IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS))
             assertThat(request.includeEnergizedContainers, equalTo(IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS))
+            assertThat(request.networkState, equalTo(NetworkState.CURRENT_NETWORK_STATE))
         }
 
         consumerClient.getEquipmentForContainer(
             "id",
             includeEnergizingContainers = IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
-            includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+            includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS,
+            networkState = NetworkState.CURRENT_NETWORK_STATE
         )
 
         verify(consumerService.onGetEquipmentForContainers).invoke(any(), any())
@@ -527,18 +529,6 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
-    internal fun `getCurrentEquipmentForFeeder returns equipment for a given Feeder`() {
-        val expectedService = FeederNetworkWithCurrent.create()
-        configureFeederResponses(expectedService)
-
-        val result = consumerClient.getCurrentEquipmentForFeeder("f001")
-
-        assertThat(result.value.objects, aMapWithSize(service.num<Equipment>()))
-        assertThat(service.num<Equipment>(), equalTo(5))
-        assertThat(service.listOf<IdentifiedObject>().map { it.mRID }, containsInAnyOrder("fsp", "c2", "tx", "c3", "sw"))
-    }
-
-    @Test
     internal fun `getEquipmentForRestriction returns equipment for a given OperationalRestriction`() {
         val expectedService = OperationalRestrictionTestNetworks.create()
         configureResponses(expectedService)
@@ -572,16 +562,14 @@ internal class NetworkConsumerClientTest {
         val operationalRestriction = OperationalRestriction()
         val connectivityNode = ConnectivityNode()
 
-        doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(feeder.mRID), any(), any())
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(feeder.mRID), any(), any(), any())
         doReturn(expectedResult).`when`(consumerClient).getEquipmentContainer(eq(feeder.mRID), any(), any(), any())
         doReturn(expectedResult).`when`(consumerClient).getEquipmentForRestriction(eq(operationalRestriction.mRID))
-        doReturn(expectedResult).`when`(consumerClient).getCurrentEquipmentForFeeder(eq(feeder.mRID))
         doReturn(expectedResult).`when`(consumerClient).getTerminalsForConnectivityNode(eq(connectivityNode.mRID))
 
         assertThat(consumerClient.getEquipmentForContainer(feeder), equalTo(expectedResult))
         assertThat(consumerClient.getEquipmentContainer(feeder.mRID), equalTo(expectedResult))
         assertThat(consumerClient.getEquipmentForRestriction(operationalRestriction), equalTo(expectedResult))
-        assertThat(consumerClient.getCurrentEquipmentForFeeder(feeder), equalTo(expectedResult))
         assertThat(consumerClient.getTerminalsForConnectivityNode(connectivityNode), equalTo(expectedResult))
     }
 
@@ -591,13 +579,13 @@ internal class NetworkConsumerClientTest {
         val result2 = mock<GrpcResult<MultiObjectResult>>()
 
         doReturn(result1).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
-        doReturn(result2).`when`(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any())
+        doReturn(result2).`when`(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any(), any())
 
         assertThat(consumerClient.getEquipmentContainers(listOf("id")), equalTo(result1))
         assertThat(consumerClient.getEquipmentForContainers(listOf("id")), equalTo(result2))
 
         verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
-        verify(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any())
+        verify(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any(), any())
     }
 
     @Test
@@ -816,17 +804,6 @@ internal class NetworkConsumerClientTest {
                 .forEach { response.onNext(it) }
         }
 
-        consumerService.onGetCurrentEquipmentForFeeder = spy { request, response ->
-            val objects = mutableListOf<IdentifiedObject>()
-            val feeder = expectedService.get<Feeder>(request.mrid)!!
-
-            if (invalidObject == Equipment::class.java)
-                throw expectedException!!
-
-            feeder.currentEquipment.forEach { equip -> objects.add(equip) }
-            currentEquipmentResponseOf(objects).forEach { response.onNext(it) }
-        }
-
         return expectedException
     }
 
@@ -906,14 +883,6 @@ internal class NetworkConsumerClientTest {
         val responses = mutableListOf<GetEquipmentForContainersResponse>()
         objects.forEach {
             responses.add(GetEquipmentForContainersResponse.newBuilder().apply { buildNIO(it, addIdentifiedObjectsBuilder()) }.build())
-        }
-        return responses.iterator()
-    }
-
-    private fun currentEquipmentResponseOf(objects: List<IdentifiedObject>): MutableIterator<GetCurrentEquipmentForFeederResponse> {
-        val responses = mutableListOf<GetCurrentEquipmentForFeederResponse>()
-        objects.forEach {
-            responses.add(GetCurrentEquipmentForFeederResponse.newBuilder().apply { buildNIO(it, addIdentifiedObjectsBuilder()) }.build())
         }
         return responses.iterator()
     }

@@ -128,7 +128,6 @@ class NetworkCimReader(
             dischargingRate = resultSet.getNullableDouble(table.DISCHARGING_RATE.queryIndex)
             reservePercent = resultSet.getNullableDouble(table.RESERVE_PERCENT.queryIndex)
             controlMode = BatteryControlMode.valueOf(resultSet.getString(table.CONTROL_MODE.queryIndex))
-            service.resolveOrDeferReference(Resolvers.batteryUnits(this), resultSet.getNullableString(table.BATTERY_UNIT_MRID.queryIndex))
         }
 
         return loadRegulatingControl(batteryControl, table, resultSet) && service.addOrThrow(batteryControl)
@@ -705,7 +704,6 @@ class NetworkCimReader(
     private fun loadEndDeviceFunction(endDeviceFunction: EndDeviceFunction, table: TableEndDeviceFunctions, resultSet: ResultSet): Boolean {
         endDeviceFunction.apply {
             enabled = resultSet.getNullableBoolean(table.ENABLED.queryIndex)
-            service.resolveOrDeferReference(Resolvers.endDevice(this), resultSet.getNullableString(table.END_DEVICE_MRID.queryIndex))
         }
 
         return loadAssetFunction(endDeviceFunction, table, resultSet)

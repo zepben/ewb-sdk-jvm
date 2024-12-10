@@ -92,15 +92,6 @@ class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronic
     }
 
     private fun validateControl(control: BatteryControl): Boolean {
-        if (validateReference(control, ::getControl, "A BatteryControl"))
-            return true
-
-        if (control.batteryUnit == null)
-            control.batteryUnit = this
-
-        require(control.batteryUnit === this) {
-            "${control.typeNameAndMRID()} `batteryUnit` property references ${control.batteryUnit!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-        return false
+        return validateReference(control, ::getControl, "A BatteryControl")
     }
 }

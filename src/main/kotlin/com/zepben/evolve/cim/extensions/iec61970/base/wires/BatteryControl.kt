@@ -10,12 +10,10 @@ package com.zepben.evolve.cim.extensions.iec61970.base.wires
 
 import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.iec61970.base.wires.RegulatingControl
-import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
 
 /**
  * Describes behaviour specific to controlling batteries.
  *
- * @property batteryUnit BatteryUnit controlled by this BatteryControl.
  * @property chargingRate Charging rate (input power) in percentage of maxP. (Unit: PerCent)
  * @property dischargingRate Discharge rate (output power) in percentage of maxP. (Unit: PerCent)
  * @property reservePercent Percentage of the rated storage capacity that should be reserved during normal operations. This reserve acts as a safeguard, preventing the energy level
@@ -23,8 +21,6 @@ import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUn
  */
 @ZBEX
 class BatteryControl @JvmOverloads constructor(mRID: String = "") : RegulatingControl(mRID) {
-
-    var batteryUnit: BatteryUnit? = null
 
     var chargingRate: Double? = null
     var dischargingRate: Double? = null

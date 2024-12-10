@@ -233,7 +233,6 @@ fun PanDemandResponseFunction.toPb(): PBPanDemandResponseFunction = toPb(this, P
  */
 fun toPb(cim: BatteryControl, pb: PBBatteryControl.Builder): PBBatteryControl.Builder =
     pb.apply {
-        cim.batteryUnit?.let { batteryUnitMRID = it.mRID } ?: clearBatteryUnitMRID()
         chargingRate = cim.chargingRate ?: UNKNOWN_DOUBLE
         dischargingRate = cim.dischargingRate ?: UNKNOWN_DOUBLE
         reservePercent = cim.reservePercent ?: UNKNOWN_DOUBLE
@@ -824,7 +823,6 @@ fun toPb(cim: EndDevice, pb: PBEndDevice.Builder): PBEndDevice.Builder =
 fun toPb(cim: EndDeviceFunction, pb: PBEndDeviceFunction.Builder): PBEndDeviceFunction.Builder =
     pb.apply {
         cim.enabled?.let { enabledSet = it } ?: run { enabledNull = NullValue.NULL_VALUE }
-        cim.endDevice?.let { endDeviceMRID = it.mRID }
         toPb(cim, afBuilder)
     }
 

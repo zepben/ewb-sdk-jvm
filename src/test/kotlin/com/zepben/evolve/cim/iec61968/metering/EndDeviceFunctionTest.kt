@@ -29,17 +29,11 @@ internal class EndDeviceFunctionTest {
     @Test
     internal fun accessorCoverage() {
         val endDeviceFunction = object : EndDeviceFunction() {}
-        val eD = object : EndDevice() {}
 
-        assertThat(endDeviceFunction.endDevice, nullValue())
         assertThat(endDeviceFunction.enabled, nullValue())
 
-        endDeviceFunction.apply {
-            endDevice = eD
-            enabled = false
-        }
+        endDeviceFunction.apply { enabled = false }
 
-        assertThat(endDeviceFunction.endDevice, equalTo(eD))
         assertThat(endDeviceFunction.enabled, equalTo(false))
     }
 

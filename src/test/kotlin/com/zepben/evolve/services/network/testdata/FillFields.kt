@@ -71,10 +71,6 @@ fun PanDemandResponseFunction.fillFields(service: NetworkService, includeRuntime
 fun BatteryControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): BatteryControl {
     (this as RegulatingControl).fillFields(service, includeRuntime)
 
-    batteryUnit = BatteryUnit().also {
-        it.addControl(this)
-        service.add(it)
-    }
     chargingRate = 1.0
     dischargingRate = 2.0
     reservePercent = 3.0
@@ -381,10 +377,6 @@ fun EndDevice.fillFields(service: NetworkService, includeRuntime: Boolean = true
 fun EndDeviceFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): EndDeviceFunction {
     (this as AssetFunction).fillFields(service, includeRuntime)
 
-    endDevice = Meter().also {
-        it.addFunction(this)
-        service.add(it)
-    }
     enabled = false
 
     return this

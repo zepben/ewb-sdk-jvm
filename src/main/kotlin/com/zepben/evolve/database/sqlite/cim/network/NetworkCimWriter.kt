@@ -125,7 +125,6 @@ class NetworkCimWriter(
         val table = databaseTables.getTable<TableBatteryControls>()
         val insert = databaseTables.getInsert<TableBatteryControls>()
 
-        insert.setNullableString(table.BATTERY_UNIT_MRID.queryIndex, batteryControl.batteryUnit?.mRID)
         insert.setNullableDouble(table.CHARGING_RATE.queryIndex, batteryControl.chargingRate)
         insert.setNullableDouble(table.DISCHARGING_RATE.queryIndex, batteryControl.dischargingRate)
         insert.setNullableDouble(table.RESERVE_PERCENT.queryIndex, batteryControl.reservePercent)
@@ -656,7 +655,6 @@ class NetworkCimWriter(
         endDeviceFunction: EndDeviceFunction,
         description: String
     ): Boolean {
-        insert.setNullableString(table.END_DEVICE_MRID.queryIndex, endDeviceFunction.endDevice?.mRID)
         insert.setNullableBoolean(table.ENABLED.queryIndex, endDeviceFunction.enabled)
 
         return saveAssetFunction(table, insert, endDeviceFunction, description)

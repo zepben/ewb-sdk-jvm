@@ -471,20 +471,12 @@ internal object SynchronousMachineToReactiveCapabilityCurveResolver : ReferenceR
     SynchronousMachine::class, ReactiveCapabilityCurve::class, SynchronousMachine::addCurve
 )
 
-internal object BatteryControlToBatteryUnitResolver : ReferenceResolver<BatteryControl, BatteryUnit> by KReferenceResolver(
-    BatteryControl::class, BatteryUnit::class, BatteryControl::batteryUnit.setter
-)
-
 internal object BatteryUnitToBatteryControlResolver : ReferenceResolver<BatteryUnit, BatteryControl> by KReferenceResolver(
     BatteryUnit::class, BatteryControl::class, BatteryUnit::addControl
 )
 
 internal object EndDeviceToEndDeviceFunctionResolver : ReferenceResolver<EndDevice, EndDeviceFunction> by KReferenceResolver(
     EndDevice::class, EndDeviceFunction::class, EndDevice::addFunction
-)
-
-internal object EndDeviceFunctionToEndDeviceResolver : ReferenceResolver<EndDeviceFunction, EndDevice> by KReferenceResolver(
-    EndDeviceFunction::class, EndDevice::class, EndDeviceFunction::endDevice.setter
 )
 
 //-------------------------------------------//

@@ -32,7 +32,6 @@ internal class BatteryControlTest {
     internal fun accessorCoverage() {
         val batteryControl = BatteryControl()
 
-        assertThat(batteryControl.batteryUnit, nullValue())
         assertThat(batteryControl.chargingRate, nullValue())
         assertThat(batteryControl.dischargingRate, nullValue())
         assertThat(batteryControl.reservePercent, nullValue())
@@ -40,7 +39,6 @@ internal class BatteryControlTest {
 
         batteryControl.fillFields(NetworkService())
 
-        assertThat(batteryControl.batteryUnit, notNullValue())
         assertThat(batteryControl.chargingRate, equalTo(1.0))
         assertThat(batteryControl.dischargingRate, equalTo(2.0))
         assertThat(batteryControl.reservePercent, equalTo(3.0))

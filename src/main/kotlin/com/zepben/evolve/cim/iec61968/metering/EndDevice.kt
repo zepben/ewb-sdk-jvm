@@ -140,15 +140,6 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
     }
 
     private fun validateFunction(function: EndDeviceFunction): Boolean {
-        if (validateReference(function, ::getFunction, "A EndDeviceFunction"))
-            return true
-
-        if (function.endDevice == null)
-            function.endDevice = this
-
-        require(function.endDevice === this) {
-            "${function.typeNameAndMRID()} endDevice` property references ${function.endDevice!!.typeNameAndMRID()}, expected ${typeNameAndMRID()}."
-        }
-        return false
+        return validateReference(function, ::getFunction, "A EndDeviceFunction")
     }
 }

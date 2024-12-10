@@ -515,18 +515,11 @@ object Resolvers {
         BoundReferenceResolver(synchronousMachine, SynchronousMachineToReactiveCapabilityCurveResolver, null)
 
     @JvmStatic
-    fun batteryUnits(batteryControl: BatteryControl): BoundReferenceResolver<BatteryControl, BatteryUnit> =
-        BoundReferenceResolver(batteryControl, BatteryControlToBatteryUnitResolver, BatteryUnitToBatteryControlResolver)
-
-    @JvmStatic
     fun batteryControls(batteryUnit: BatteryUnit): BoundReferenceResolver<BatteryUnit, BatteryControl> =
-        BoundReferenceResolver(batteryUnit, BatteryUnitToBatteryControlResolver, BatteryControlToBatteryUnitResolver)
+        BoundReferenceResolver(batteryUnit, BatteryUnitToBatteryControlResolver, null)
 
     @JvmStatic
     fun endDeviceFunctions(endDevice: EndDevice): BoundReferenceResolver<EndDevice, EndDeviceFunction> =
-        BoundReferenceResolver(endDevice, EndDeviceToEndDeviceFunctionResolver, EndDeviceFunctionToEndDeviceResolver)
+        BoundReferenceResolver(endDevice, EndDeviceToEndDeviceFunctionResolver, null)
 
-    @JvmStatic
-    fun endDevice(endDeviceFunction: EndDeviceFunction): BoundReferenceResolver<EndDeviceFunction, EndDevice> =
-        BoundReferenceResolver(endDeviceFunction, EndDeviceFunctionToEndDeviceResolver, EndDeviceToEndDeviceFunctionResolver)
 }

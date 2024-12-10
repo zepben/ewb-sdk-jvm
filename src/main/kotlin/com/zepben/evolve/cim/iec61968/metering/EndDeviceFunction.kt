@@ -13,12 +13,10 @@ import com.zepben.evolve.cim.iec61968.assets.AssetFunction
 /**
  * Function performed by an end device such as a meter, communication equipment, controllers, etc.
  *
- *  @property endDevice The EndDevice to which this EndDeviceFunction take place.
  *  @property enabled True if the function is enabled.
  */
 abstract class EndDeviceFunction(mRID: String = "") : AssetFunction(mRID) {
 
-    var endDevice: EndDevice? = null
     var enabled: Boolean? = null
 
 }

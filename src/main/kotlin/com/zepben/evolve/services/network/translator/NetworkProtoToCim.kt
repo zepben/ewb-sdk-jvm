@@ -217,9 +217,6 @@ fun toCim(pb: PBBatteryControl, networkService: NetworkService): BatteryControl 
         dischargingRate = pb.dischargingRate.takeUnless { it == UNKNOWN_DOUBLE }
         reservePercent = pb.reservePercent.takeUnless { it == UNKNOWN_DOUBLE }
         pb.controlMode?.let { controlMode = BatteryControlMode.valueOf(it.name) }
-        pb.batteryUnitMRID.also { batteryUnitMRID ->
-            networkService.resolveOrDeferReference(Resolvers.batteryUnits(this), batteryUnitMRID)
-        }
         toCim(pb.rc, this, networkService)
     }
 
@@ -823,7 +820,6 @@ fun toCim(pb: PBEndDevice, cim: EndDevice, networkService: NetworkService): EndD
 fun toCim(pb: PBEndDeviceFunction, cim: EndDeviceFunction, networkService: NetworkService): EndDeviceFunction =
     cim.apply {
         enabled = pb.enabledSet.takeUnless { pb.hasEnabledNull() }
-        pb.endDeviceMRID?.also { networkService.resolveOrDeferReference(Resolvers.endDevice(this), it) }
         toCim(pb.af, this, networkService)
     }
 

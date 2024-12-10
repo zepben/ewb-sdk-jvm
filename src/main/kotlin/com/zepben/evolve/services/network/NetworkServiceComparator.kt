@@ -81,7 +81,6 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 BatteryControl::reservePercent,
                 BatteryControl::controlMode
             )
-            compareIdReferences(BatteryControl::batteryUnit)
         }
 
     /************ IEC61968 ASSET INFO ************/
@@ -321,7 +320,6 @@ class NetworkServiceComparator @JvmOverloads constructor(
         apply {
             compareAssetFunction()
 
-            compareIdReferences(EndDeviceFunction::endDevice)
             compareValues(EndDeviceFunction::enabled)
         }
 

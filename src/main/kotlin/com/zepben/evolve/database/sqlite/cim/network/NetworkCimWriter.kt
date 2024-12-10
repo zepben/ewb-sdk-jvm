@@ -2409,7 +2409,6 @@ class NetworkCimWriter(
         return insert.tryExecuteSingleUpdate("asset organisation role to asset association")
     }
 
-    @ZBEX
     @Throws(SQLException::class)
     private fun saveAssociation(batteryUnit: BatteryUnit, batteryControl: BatteryControl): Boolean {
         val table = databaseTables.getTable<TableBatteryUnitsBatteryControls>()

@@ -120,7 +120,6 @@ private val `Create table static_var_compensators` = Change(
 // # Association Changes #
 // #######################
 
-@ZBEX
 @Suppress("ObjectPropertyName")
 private val `Create table battery_units_battery_controls` = Change(
     listOf(

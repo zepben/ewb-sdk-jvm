@@ -2620,7 +2620,6 @@ class NetworkCimReader(
     }
 
     /**
-     * [ZBEX]
      * Create a [BatteryUnit] to [BatteryControl] association from [TableBatteryUnitsBatteryControls].
      *
      * @param table The database table to read the association from.
@@ -2630,7 +2629,6 @@ class NetworkCimReader(
      * @return true if the association was successfully read from the database and added to the service.
      * @throws SQLException For any errors encountered reading from the database.
      */
-    @ZBEX
     @Throws(SQLException::class)
     fun load(table: TableBatteryUnitsBatteryControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val batteryUnitMRID = resultSet.getString(table.BATTERY_UNIT_MRID.queryIndex)

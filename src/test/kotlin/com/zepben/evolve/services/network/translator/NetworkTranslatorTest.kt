@@ -51,6 +51,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infasse
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableCurveData
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.protection.TableProtectionRelayFunctionThresholds
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.protection.TableProtectionRelayFunctionTimeLimits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.TablePhaseImpedanceData
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.TablePowerTransformerEndRatings
 import com.zepben.evolve.services.common.testdata.fillFieldsCommon
 import com.zepben.evolve.services.common.translator.TranslatorTestBase
@@ -166,6 +167,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         ValidationInfo(Junction(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(LinearShuntCompensator(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(LoadBreakSwitch(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(PerLengthPhaseImpedance(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(PerLengthSequenceImpedance(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(PetersenCoil(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(PowerTransformer(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
@@ -198,6 +200,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         Equipment::class.java to { Junction(it) },
         EquipmentContainer::class.java to { Site(it) },
         Measurement::class.java to { Discrete(it) },
+        PerLengthImpedance::class.java to { PerLengthSequenceImpedance(it) },
         ProtectionRelayFunction::class.java to { CurrentRelay(it) },
         ProtectedSwitch::class.java to { Breaker(it) },
         RegulatingControl::class.java to { TapChangerControl(it) },
@@ -234,6 +237,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
             TableProtectionRelayFunctionTimeLimits::class,
             TableProtectionRelayFunctionsSensors::class,
             TableRecloseDelays::class,
+            TablePhaseImpedanceData::class,
         )
 
 }

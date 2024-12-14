@@ -144,7 +144,9 @@ import com.zepben.protobuf.cim.iec61970.base.wires.LinearShuntCompensator as PBL
 import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBreakSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthImpedance as PBPerLengthImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthLineParameter as PBPerLengthLineParameter
+import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthPhaseImpedance as PBPerLengthPhaseImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthSequenceImpedance as PBPerLengthSequenceImpedance
+import com.zepben.protobuf.cim.iec61970.base.wires.PhaseImpedanceData as PBPhaseImpedanceData
 import com.zepben.protobuf.cim.iec61970.base.wires.PetersenCoil as PBPetersenCoil
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnection as PBPowerElectronicsConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnectionPhase as PBPowerElectronicsConnectionPhase
@@ -1742,7 +1744,7 @@ fun NetworkService.addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWi
  */
 fun toCim(pb: PBAcLineSegment, networkService: NetworkService): AcLineSegment =
     AcLineSegment(pb.mRID()).apply {
-        networkService.resolveOrDeferReference(Resolvers.perLengthSequenceImpedance(this), pb.perLengthSequenceImpedanceMRID)
+        networkService.resolveOrDeferReference(Resolvers.perLengthImpedance(this), pb.perLengthImpedanceMRID)
         toCim(pb.cd, this, networkService)
     }
 
@@ -2067,6 +2069,35 @@ fun toCim(pb: PBPerLengthLineParameter, cim: PerLengthLineParameter, networkServ
  */
 fun toCim(pb: PBPerLengthImpedance, cim: PerLengthImpedance, networkService: NetworkService): PerLengthImpedance =
     cim.apply { toCim(pb.lp, cim, networkService) }
+
+/**
+ * Convert the protobuf [PBPerLengthPhaseImpedance] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBPerLengthPhaseImpedance] to convert.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [PerLengthPhaseImpedance].
+ */
+fun toCim(pb: PBPerLengthPhaseImpedance, networkService: NetworkService): PerLengthPhaseImpedance =
+    PerLengthPhaseImpedance(pb.mRID()).apply {
+        pb.phaseImpedanceDataList.forEach { addPhaseImpedanceData(toCim(it)) }
+        toCim(pb.pli, this, networkService)
+    }
+
+/**
+ * Convert the protobuf [PBPhaseImpedanceData] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBPhaseImpedanceData] to convert.
+ * @return The converted [pb] as a CIM [PhaseImpedanceData].
+ */
+fun toCim(pb: PBPhaseImpedanceData): PhaseImpedanceData =
+    PhaseImpedanceData(
+        SinglePhaseKind.valueOf(pb.fromPhase.name),
+        SinglePhaseKind.valueOf(pb.toPhase.name),
+        pb.b.takeUnless { it == UNKNOWN_DOUBLE },
+        pb.g.takeUnless { it == UNKNOWN_DOUBLE },
+        pb.r.takeUnless { it == UNKNOWN_DOUBLE },
+        pb.x.takeUnless { it == UNKNOWN_DOUBLE },
+    )
 
 /**
  * Convert the protobuf [PBPerLengthSequenceImpedance] into its CIM counterpart.
@@ -2613,6 +2644,11 @@ fun NetworkService.addFromPb(pb: PBLinearShuntCompensator): LinearShuntCompensat
  * An extension to add a converted copy of the protobuf [PBLoadBreakSwitch] to the [NetworkService].
  */
 fun NetworkService.addFromPb(pb: PBLoadBreakSwitch): LoadBreakSwitch? = tryAddOrNull(toCim(pb, this))
+
+/**
+ * An extension to add a converted copy of the protobuf [PBPerLengthPhaseImpedance] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBPerLengthPhaseImpedance): PerLengthPhaseImpedance? = tryAddOrNull(toCim(pb, this))
 
 /**
  * An extension to add a converted copy of the protobuf [PBPerLengthSequenceImpedance] to the [NetworkService].
@@ -3386,6 +3422,14 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
      * @return The converted [LoadBreakSwitch]
      */
     fun addFromPb(pb: PBLoadBreakSwitch): LoadBreakSwitch? = networkService.addFromPb(pb)
+
+    /**
+     * Add a converted copy of the protobuf [PBPerLengthPhaseImpedance] to the [NetworkService].
+     *
+     * @param pb The [PBPerLengthPhaseImpedance] to convert.
+     * @return The converted [PerLengthPhaseImpedance]
+     */
+    fun addFromPb(pb: PBPerLengthPhaseImpedance): PerLengthPhaseImpedance? = networkService.addFromPb(pb)
 
     /**
      * Add a converted copy of the protobuf [PBPerLengthSequenceImpedance] to the [NetworkService].

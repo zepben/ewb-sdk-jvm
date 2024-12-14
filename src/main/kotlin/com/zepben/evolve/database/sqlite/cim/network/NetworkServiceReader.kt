@@ -98,6 +98,8 @@ class NetworkServiceReader @JvmOverloads constructor(
             .andLoadEach<TableSubGeographicalRegions>(reader::load)
             .andLoadEach<TableSubstations>(reader::load)
             .andLoadEach<TableSites>(reader::load)
+            .andLoadEach<TablePerLengthPhaseImpedances>(reader::load)
+            .andLoadEach<TablePhaseImpedanceData>(reader::load)
             .andLoadEach<TablePerLengthSequenceImpedances>(reader::load)
             .andLoadEach<TableEquivalentBranches>(reader::load)
             .andLoadEach<TableAcLineSegments>(reader::load)

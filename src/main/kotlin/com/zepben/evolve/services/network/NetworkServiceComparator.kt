@@ -855,6 +855,16 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private fun ObjectDifference<out PerLengthLineParameter>.comparePerLengthLineParameter(): ObjectDifference<out PerLengthLineParameter> =
         apply { compareIdentifiedObject() }
 
+    private fun comparePerLengthPhaseImpedance(
+        source: PerLengthPhaseImpedance,
+        target: PerLengthPhaseImpedance
+    ): ObjectDifference<PerLengthPhaseImpedance> =
+        ObjectDifference(source, target).apply {
+            comparePerLengthImpedance()
+
+            compareIndexedValueCollections(PerLengthPhaseImpedance::phaseImpedanceData)
+        }
+
     private fun comparePerLengthSequenceImpedance(
         source: PerLengthSequenceImpedance,
         target: PerLengthSequenceImpedance

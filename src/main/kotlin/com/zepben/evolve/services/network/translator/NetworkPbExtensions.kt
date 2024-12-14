@@ -191,6 +191,7 @@ fun Line.mRID(): String = ec.mRID()
 fun LinearShuntCompensator.mRID(): String = sc.mRID()
 fun PerLengthImpedance.mRID(): String = lp.mRID()
 fun PerLengthLineParameter.mRID(): String = io.mrid
+fun PerLengthPhaseImpedance.mRID(): String = pli.mRID()
 fun PerLengthSequenceImpedance.mRID(): String = pli.mRID()
 fun PetersenCoil.mRID(): String = efc.mRID()
 fun PowerElectronicsConnection.mRID(): String = rce.mRID()

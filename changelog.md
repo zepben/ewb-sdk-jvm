@@ -2,6 +2,8 @@
 ## [0.24.0] - UNRELEASED
 ### Breaking Changes
 * Database readers and writes for each `BaseService` no longer accept a `MetadataCollection`, and will instead use the collection of the provided service.
+* `AcLineSegment.perLengthSequenceImpedance` has been corrected to `perLengthImpedance`. This has been done in a non-breaking way, however the public resolver
+  `Resolvers.perLengthSequenceImpedance` is now `Resolvers.perLengthImpedance`, correctly reflecting the CIM relationship.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
@@ -14,6 +16,8 @@
 * Added `BatteryControl`, a new class which describes behaviour specific to controlling  a `BatteryUnit`.
 * Added `StaticVarCompensator` a new class representing a facility for providing variable and controllable shunt reactive power.
 * Added `ControlledAppliance` a new class representing the identity of the appliance controlled by a specific `EndDeviceFunction`.
+* Added `PerLengthPhaseImpedance` a new class used for representing the impedance of individual wires on an AcLineSegment.
+* Added `PhaseImpedanceData` a data class with a link to `PerLengthPhaseImpedance`, for capturing the phase impedance data of an individual wire.
 * Added new enums:
   * `BatteryControlMode`
   * `EndDeviceFunctionKind`
@@ -25,7 +29,6 @@
 * Added collection of `EndDeviceFunctionKind` to `EndDevice`
 
 ### Fixes
-* None.
 
 ### Notes
 * None.

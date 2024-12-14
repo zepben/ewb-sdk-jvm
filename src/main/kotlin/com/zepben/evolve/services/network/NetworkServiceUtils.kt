@@ -180,6 +180,7 @@ inline fun <R> whenNetworkServiceObject(
     isOperationalRestriction: (OperationalRestriction) -> R,
     isOrganisation: (Organisation) -> R,
     isOverheadWireInfo: (OverheadWireInfo) -> R,
+    isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> R,
     isPerLengthSequenceImpedance: (PerLengthSequenceImpedance) -> R,
     isPole: (Pole) -> R,
     isPowerElectronicsConnection: (PowerElectronicsConnection) -> R,
@@ -267,6 +268,7 @@ inline fun <R> whenNetworkServiceObject(
     is OperationalRestriction -> isOperationalRestriction(identifiedObject)
     is Organisation -> isOrganisation(identifiedObject)
     is OverheadWireInfo -> isOverheadWireInfo(identifiedObject)
+    is PerLengthPhaseImpedance -> isPerLengthPhaseImpedance(identifiedObject)
     is PerLengthSequenceImpedance -> isPerLengthSequenceImpedance(identifiedObject)
     is Pole -> isPole(identifiedObject)
     is PowerElectronicsConnection -> isPowerElectronicsConnection(identifiedObject)

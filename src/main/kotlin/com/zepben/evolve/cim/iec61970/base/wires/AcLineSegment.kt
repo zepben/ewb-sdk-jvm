@@ -18,9 +18,23 @@ package com.zepben.evolve.cim.iec61970.base.wires
  * The BaseVoltage at the two ends of ACLineSegments in a Line shall have the same BaseVoltage.nominalVoltage. However, boundary lines  may have
  * slightly different BaseVoltage.nominalVoltages and  variation is allowed. Larger voltage difference in general requires use of an equivalent branch.
  *
- * @property perLengthSequenceImpedance Per-length impedance of this line segment.
+ * @property perLengthImpedance Per-length impedance of this line segment.
+ * @property perLengthPhaseImpedance Per-length phase impedance of this line segment.
+ * @property perLengthSequenceImpedance Per-length sequence impedance of this line segment.
  */
 class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRID) {
 
-    var perLengthSequenceImpedance: PerLengthSequenceImpedance? = null
+    var perLengthImpedance: PerLengthImpedance? = null
+
+    var perLengthSequenceImpedance: PerLengthSequenceImpedance?
+        get() = perLengthImpedance.takeIf { it is PerLengthSequenceImpedance } as? PerLengthSequenceImpedance
+        set(it) {
+            perLengthImpedance = it
+        }
+
+    var perLengthPhaseImpedance: PerLengthPhaseImpedance?
+        get() = perLengthImpedance.takeIf { it is PerLengthPhaseImpedance } as? PerLengthPhaseImpedance
+        set(it) {
+            perLengthImpedance = it
+        }
 }

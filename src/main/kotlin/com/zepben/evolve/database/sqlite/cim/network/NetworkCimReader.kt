@@ -1584,11 +1584,7 @@ class NetworkCimReader(
     @Throws(SQLException::class)
     fun load(table: TableAcLineSegments, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val acLineSegment = AcLineSegment(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
-            perLengthSequenceImpedance =
-                service.ensureGet(
-                    resultSet.getNullableString(table.PER_LENGTH_SEQUENCE_IMPEDANCE_MRID.queryIndex),
-                    typeNameAndMRID()
-                )
+            perLengthImpedance = service.ensureGet(resultSet.getNullableString(table.PER_LENGTH_IMPEDANCE_MRID.queryIndex), typeNameAndMRID())
         }
 
         return loadConductor(acLineSegment, table, resultSet) && service.addOrThrow(acLineSegment)
@@ -1968,6 +1964,55 @@ class NetworkCimReader(
     @Throws(SQLException::class)
     private fun loadPerLengthLineParameter(perLengthLineParameter: PerLengthLineParameter, table: TablePerLengthLineParameters, resultSet: ResultSet): Boolean =
         loadIdentifiedObject(perLengthLineParameter, table, resultSet)
+
+    /**
+     * Create a [PerLengthPhaseImpedance] and populate its fields from [TablePerLengthPhaseImpedances].
+     *
+     * @param table The database table to read the [PerLengthPhaseImpedance] fields from.
+     * @param resultSet The record in the database table containing the fields for this [PerLengthPhaseImpedance].
+     * @param setIdentifier A callback to register the mRID of this [PerLengthPhaseImpedance] for logging purposes.
+     *
+     * @return true if the [PerLengthPhaseImpedance] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TablePerLengthPhaseImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val perLengthPhaseImpedance = PerLengthPhaseImpedance(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadPerLengthImpedance(perLengthPhaseImpedance, table, resultSet) && service.addOrThrow(perLengthPhaseImpedance)
+    }
+
+    /**
+     * Create a [PhaseImpedanceData] and populate its fields from [TablePhaseImpedanceData] then add it to associated [PerLengthPhaseImpedance].
+     *
+     * @param table The database table to read the [PhaseImpedanceData] fields from.
+     * @param resultSet The record in the database table containing the fields for this [PhaseImpedanceData].
+     * @param setIdentifier A callback to register the mRID of this [PhaseImpedanceData] and its associated [PerLengthPhaseImpedance] for logging purposes.
+     *
+     * @return true if the [PhaseImpedanceData] was successfully read from the database and added to associated [PerLengthPhaseImpedance].
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TablePhaseImpedanceData, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val perLengthPhaseImpedanceMRID = setIdentifier(resultSet.getString(table.PER_LENGTH_PHASE_IMPEDANCE_MRID.queryIndex))
+        val id = setIdentifier(perLengthPhaseImpedanceMRID)
+
+        val perLengthPhaseImpedance =
+            service.getOrThrow<PerLengthPhaseImpedance>(perLengthPhaseImpedanceMRID, "PerLengthPhaseImpedance to PhaseImpedanceData association $id")
+
+        perLengthPhaseImpedance.addPhaseImpedanceData(
+            PhaseImpedanceData(
+                SinglePhaseKind.valueOf(resultSet.getString(table.FROM_PHASE.queryIndex)),
+                SinglePhaseKind.valueOf(resultSet.getString(table.TO_PHASE.queryIndex)),
+                resultSet.getNullableDouble(table.B.queryIndex),
+                resultSet.getNullableDouble(table.G.queryIndex),
+                resultSet.getNullableDouble(table.R.queryIndex),
+                resultSet.getNullableDouble(table.X.queryIndex),
+            )
+        )
+
+        return true
+    }
 
     /**
      * Create a [PerLengthSequenceImpedance] and populate its fields from [TablePerLengthSequenceImpedances].

@@ -1211,6 +1211,15 @@ fun PerLengthLineParameter.fillFields(service: NetworkService, includeRuntime: B
     return this
 }
 
+fun PerLengthPhaseImpedance.fillFields(service: NetworkService, includeRuntime: Boolean = true): PerLengthPhaseImpedance {
+    (this as PerLengthImpedance).fillFields(service, includeRuntime)
+
+    for (i in 0..1)
+        addPhaseImpedanceData(PhaseImpedanceData(SinglePhaseKind.get(i), SinglePhaseKind.get(i), i.toDouble(), i.toDouble(), i.toDouble(), i.toDouble()))
+
+    return this
+}
+
 fun PerLengthSequenceImpedance.fillFields(service: NetworkService, includeRuntime: Boolean = true): PerLengthSequenceImpedance {
     (this as PerLengthImpedance).fillFields(service, includeRuntime)
 

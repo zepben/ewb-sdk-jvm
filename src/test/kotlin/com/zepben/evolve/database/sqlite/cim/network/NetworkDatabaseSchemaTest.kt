@@ -211,6 +211,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         validateSchema(SchemaServices.networkServicesOf(::Junction, Junction::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::LinearShuntCompensator, LinearShuntCompensator::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::LoadBreakSwitch, LoadBreakSwitch::fillFields))
+        validateSchema(SchemaServices.networkServicesOf(::PerLengthPhaseImpedance, PerLengthPhaseImpedance::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::PerLengthSequenceImpedance, PerLengthSequenceImpedance::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::PetersenCoil, PetersenCoil::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::PowerTransformer, PowerTransformer::fillFields))

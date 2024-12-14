@@ -163,7 +163,9 @@ import com.zepben.protobuf.cim.iec61970.base.wires.LinearShuntCompensator as PBL
 import com.zepben.protobuf.cim.iec61970.base.wires.LoadBreakSwitch as PBLoadBreakSwitch
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthImpedance as PBPerLengthImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthLineParameter as PBPerLengthLineParameter
+import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthPhaseImpedance as PBPerLengthPhaseImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthSequenceImpedance as PBPerLengthSequenceImpedance
+import com.zepben.protobuf.cim.iec61970.base.wires.PhaseImpedanceData as PBPhaseImpedanceData
 import com.zepben.protobuf.cim.iec61970.base.wires.PetersenCoil as PBPetersenCoil
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnection as PBPowerElectronicsConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnectionPhase as PBPowerElectronicsConnectionPhase
@@ -1678,7 +1680,7 @@ fun PowerElectronicsWindUnit.toPb(): PBPowerElectronicsWindUnit = toPb(this, PBP
  */
 fun toPb(cim: AcLineSegment, pb: PBAcLineSegment.Builder): PBAcLineSegment.Builder =
     pb.apply {
-        cim.perLengthSequenceImpedance?.let { perLengthSequenceImpedanceMRID = it.mRID } ?: clearPerLengthSequenceImpedanceMRID()
+        cim.perLengthImpedance?.let { perLengthImpedanceMRID = it.mRID } ?: clearPerLengthImpedanceMRID()
         toPb(cim, cdBuilder)
     }
 
@@ -1978,6 +1980,36 @@ fun toPb(cim: PerLengthImpedance, pb: PBPerLengthImpedance.Builder): PBPerLength
  */
 fun toPb(cim: PerLengthLineParameter, pb: PBPerLengthLineParameter.Builder): PBPerLengthLineParameter.Builder =
     pb.apply { toPb(cim, ioBuilder) }
+
+/**
+ * Convert the [PerLengthPhaseImpedance] into its protobuf counterpart.
+ *
+ * @param cim The [PerLengthPhaseImpedance] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: PerLengthPhaseImpedance, pb: PBPerLengthPhaseImpedance.Builder): PBPerLengthPhaseImpedance.Builder =
+    pb.apply {
+        cim.phaseImpedanceData.forEachIndexed { i, data -> addPhaseImpedanceDataBuilder(i).apply { toPb(data, this) } }
+        toPb(cim, pliBuilder)
+    }
+
+/**
+ * Convert the [PhaseImpedanceData] into its protobuf counterpart.
+ *
+ * @param cim The [PhaseImpedanceData] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: PhaseImpedanceData, pb: PBPhaseImpedanceData.Builder): PBPhaseImpedanceData.Builder =
+    pb.apply {
+        fromPhase = SinglePhaseKind.valueOf(cim.fromPhase.name)
+        toPhase = SinglePhaseKind.valueOf(cim.toPhase.name)
+        b = cim.b ?: UNKNOWN_DOUBLE
+        g = cim.g ?: UNKNOWN_DOUBLE
+        r = cim.r ?: UNKNOWN_DOUBLE
+        x = cim.x ?: UNKNOWN_DOUBLE
+    }
 
 /**
  * Convert the [PerLengthSequenceImpedance] into its protobuf counterpart.
@@ -2509,9 +2541,19 @@ fun LinearShuntCompensator.toPb(): PBLinearShuntCompensator = toPb(this, PBLinea
 fun LoadBreakSwitch.toPb(): PBLoadBreakSwitch = toPb(this, PBLoadBreakSwitch.newBuilder()).build()
 
 /**
+ * An extension for converting any PerLengthPhaseImpedance into its protobuf counterpart.
+ */
+fun PerLengthPhaseImpedance.toPb(): PBPerLengthPhaseImpedance = toPb(this, PBPerLengthPhaseImpedance.newBuilder()).build()
+
+/**
  * An extension for converting any PerLengthSequenceImpedance into its protobuf counterpart.
  */
 fun PerLengthSequenceImpedance.toPb(): PBPerLengthSequenceImpedance = toPb(this, PBPerLengthSequenceImpedance.newBuilder()).build()
+
+/**
+ * An extension for converting any PhaseImpedanceData into its protobuf counterpart.
+ */
+fun PhaseImpedanceData.toPb(): PBPhaseImpedanceData = toPb(this, PBPhaseImpedanceData.newBuilder()).build()
 
 /**
  * An extension for converting any PetersenCoil into its protobuf counterpart.
@@ -3270,12 +3312,28 @@ class NetworkCimToProto : BaseCimToProto() {
     fun toPb(cim: LoadBreakSwitch): PBLoadBreakSwitch = cim.toPb()
 
     /**
+     * Convert the [PerLengthPhaseImpedance] into its protobuf counterpart.
+     *
+     * @param cim The [PerLengthPhaseImpedance] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: PerLengthPhaseImpedance): PBPerLengthPhaseImpedance = cim.toPb()
+
+    /**
      * Convert the [PerLengthSequenceImpedance] into its protobuf counterpart.
      *
      * @param cim The [PerLengthSequenceImpedance] to convert.
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: PerLengthSequenceImpedance): PBPerLengthSequenceImpedance = cim.toPb()
+
+    /**
+     * Convert the [PhaseImpedanceData] into its protobuf counterpart.
+     *
+     * @param cim The [PhaseImpedanceData] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: PhaseImpedanceData): PBPhaseImpedanceData = cim.toPb()
 
     /**
      * Convert the [PetersenCoil] into its protobuf counterpart.

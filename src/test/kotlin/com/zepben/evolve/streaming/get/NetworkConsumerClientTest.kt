@@ -979,6 +979,7 @@ internal class NetworkConsumerClientTest {
                 isJumper = { jumper = it.toPb() },
                 isJunction = { junction = it.toPb() },
                 isLinearShuntCompensator = { linearShuntCompensator = it.toPb() },
+                isPerLengthPhaseImpedance = { perLengthPhaseImpedance = it.toPb() },
                 isPerLengthSequenceImpedance = { perLengthSequenceImpedance = it.toPb() },
                 isPowerElectronicsConnection = { powerElectronicsConnection = it.toPb() },
                 isPowerElectronicsConnectionPhase = { powerElectronicsConnectionPhase = it.toPb() },

@@ -65,7 +65,10 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRem
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.*
-import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.*
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TableBatteryUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePowerElectronicsUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnits
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLvFeeders
@@ -74,6 +77,7 @@ import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.PreparedStatement
 import java.sql.SQLException
+import kotlin.Throws
 
 /**
  * A class for writing the [NetworkService] tables to the database.
@@ -1474,10 +1478,7 @@ class NetworkCimWriter(
         val table = databaseTables.getTable<TableAcLineSegments>()
         val insert = databaseTables.getInsert<TableAcLineSegments>()
 
-        insert.setNullableString(
-            table.PER_LENGTH_SEQUENCE_IMPEDANCE_MRID.queryIndex,
-            acLineSegment.perLengthSequenceImpedance?.mRID
-        )
+        insert.setNullableString(table.PER_LENGTH_IMPEDANCE_MRID.queryIndex, acLineSegment.perLengthImpedance?.mRID)
 
         return saveConductor(table, insert, acLineSegment, "AC line segment")
     }
@@ -1837,6 +1838,43 @@ class NetworkCimWriter(
         description: String
     ): Boolean {
         return saveIdentifiedObject(table, insert, perLengthLineParameter, description)
+    }
+
+    /**
+     * Save the [PerLengthPhaseImpedance] fields to [TablePerLengthPhaseImpedances].
+     *
+     * @param perLengthPhaseImpedance The [PerLengthPhaseImpedance] instance to write to the database.
+     *
+     * @return true if the [PerLengthPhaseImpedance] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(perLengthPhaseImpedance: PerLengthPhaseImpedance): Boolean {
+        val table = databaseTables.getTable<TablePerLengthPhaseImpedances>()
+        val insert = databaseTables.getInsert<TablePerLengthPhaseImpedances>()
+
+        var status = true
+        perLengthPhaseImpedance.data.forEach { phaseImpedanceData ->
+            status = status and savePhaseImpedanceData(perLengthPhaseImpedance, phaseImpedanceData)
+        }
+
+        return status and savePerLengthImpedance(table, insert, perLengthPhaseImpedance, "per length phase impedance")
+    }
+
+    @Throws(SQLException::class)
+    private fun savePhaseImpedanceData(perLengthPhaseImpedance: PerLengthPhaseImpedance, phaseImpedanceData: PhaseImpedanceData): Boolean {
+        val table = databaseTables.getTable<TablePhaseImpedanceData>()
+        val insert = databaseTables.getInsert<TablePhaseImpedanceData>()
+
+        insert.setNullableString(table.PER_LENGTH_PHASE_IMPEDANCE_MRID.queryIndex, perLengthPhaseImpedance.mRID)
+        insert.setString(table.FROM_PHASE.queryIndex, phaseImpedanceData.fromPhase.name)
+        insert.setString(table.TO_PHASE.queryIndex, phaseImpedanceData.toPhase.name)
+        insert.setNullableDouble(table.B.queryIndex, phaseImpedanceData.b)
+        insert.setNullableDouble(table.G.queryIndex, phaseImpedanceData.g)
+        insert.setNullableDouble(table.R.queryIndex, phaseImpedanceData.r)
+        insert.setNullableDouble(table.X.queryIndex, phaseImpedanceData.x)
+
+        return insert.tryExecuteSingleUpdate("phase impedance data")
     }
 
     /**

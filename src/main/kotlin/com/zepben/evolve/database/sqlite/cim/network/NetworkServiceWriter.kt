@@ -102,6 +102,7 @@ class NetworkServiceWriter @JvmOverloads constructor(
             .andSaveEach<Jumper>(writer::save)
             .andSaveEach<Junction>(writer::save)
             .andSaveEach<LinearShuntCompensator>(writer::save)
+            .andSaveEach<PerLengthPhaseImpedance>(writer::save)
             .andSaveEach<PerLengthSequenceImpedance>(writer::save)
             .andSaveEach<PowerElectronicsConnection>(writer::save)
             .andSaveEach<PowerElectronicsConnectionPhase>(writer::save)

@@ -331,6 +331,9 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     fun add(loadBreakSwitch: LoadBreakSwitch): Boolean = super.add(loadBreakSwitch)
     fun remove(loadBreakSwitch: LoadBreakSwitch): Boolean = super.remove(loadBreakSwitch)
 
+    fun add(perLengthPhaseImpedance: PerLengthPhaseImpedance): Boolean = super.add(perLengthPhaseImpedance)
+    fun remove(perLengthPhaseImpedance: PerLengthPhaseImpedance): Boolean = super.remove(perLengthPhaseImpedance)
+
     fun add(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.add(perLengthSequenceImpedance)
     fun remove(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.remove(perLengthSequenceImpedance)
 

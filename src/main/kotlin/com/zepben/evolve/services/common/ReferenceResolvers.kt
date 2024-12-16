@@ -51,8 +51,8 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import kotlin.reflect.KClass
 
 
-internal object AcLineSegmentToPerLengthSequenceImpedanceResolver : ReferenceResolver<AcLineSegment, PerLengthSequenceImpedance> by KReferenceResolver(
-    AcLineSegment::class, PerLengthSequenceImpedance::class, AcLineSegment::perLengthSequenceImpedance.setter
+internal object AcLineSegmentToPerLengthImpedanceResolver : ReferenceResolver<AcLineSegment, PerLengthImpedance> by KReferenceResolver(
+    AcLineSegment::class, PerLengthImpedance::class, AcLineSegment::perLengthImpedance.setter
 )
 
 internal object AssetToAssetOrganisationRoleResolver : ReferenceResolver<Asset, AssetOrganisationRole> by KReferenceResolver(

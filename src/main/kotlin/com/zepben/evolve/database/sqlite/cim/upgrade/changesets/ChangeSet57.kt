@@ -21,7 +21,10 @@ internal fun changeSet57() = ChangeSet(
         `Create table pan_demand_response_functions`,
         `Create table static_var_compensators`,
         `Create table battery_units_battery_controls`,
-        `Create table end_devices_end_device_functions`
+        `Create table end_devices_end_device_functions`,
+        `Create table phase_impedance_data`,
+        `Create table per_length_phase_impedances`,
+        `Rename acls impedance column`
     )
 )
 
@@ -144,6 +147,46 @@ private val `Create table end_devices_end_device_functions` = Change(
         "CREATE UNIQUE INDEX end_device_mrid_end_device_function_mrid ON end_devices_end_device_functions (end_device_mrid, end_device_function_mrid);",
         "CREATE INDEX end_devices_end_device_functions_end_device_mrid ON end_devices_end_device_functions (end_device_mrid);",
         "CREATE INDEX end_devices_end_device_functions_end_device_function_mrid ON end_devices_end_device_functions (end_device_function_mrid);"
+    ),
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+)
+
+@Suppress("ObjectPropertyName")
+private val `Create table phase_impedance_data` = Change(
+    listOf(
+        """CREATE TABLE phase_impedance_data (
+            per_length_phase_impedance_mrid TEXT NOT NULL,
+            from_phase TEXT NOT NULL,
+            to_phase TEXT NOT NULL,
+            b NUMBER NULL,
+            g NUMBER NULL,
+            r NUMBER NULL,
+            x NUMBER NULL
+        );""".trimIndent(),
+        "CREATE UNIQUE INDEX phase_impedance_data_from_phase_to_phase_per_length_phase_impedance_mrid ON phase_impedance_data (per_length_phase_impedance_mrid, from_phase, to_phase);",
+        "CREATE INDEX phase_impedance_data_per_length_phase_impedance_mrid ON phase_impedance_data (per_length_phase_impedance_mrid);"
+    ),
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+)
+
+@Suppress("ObjectPropertyName")
+private val `Create table per_length_phase_impedances` = Change(
+    listOf(
+        """CREATE TABLE per_length_phase_impedances (
+            mrid TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            num_diagram_objects INTEGER NOT NULL
+        );""".trimIndent(),
+        "CREATE UNIQUE INDEX per_length_phase_impedances_mrid ON per_length_phase_impedances (mrid);"
+    ),
+    targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
+)
+
+@Suppress("ObjectPropertyName")
+private val `Rename acls impedance column` = Change(
+    listOf(
+        "ALTER TABLE ac_line_segments RENAME COLUMN per_length_sequence_impedance_mrid TO per_length_impedance_mrid;",
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )

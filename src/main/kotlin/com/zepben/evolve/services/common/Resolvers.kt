@@ -59,8 +59,8 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 object Resolvers {
 
     @JvmStatic
-    fun perLengthSequenceImpedance(acLineSegment: AcLineSegment): BoundReferenceResolver<AcLineSegment, PerLengthSequenceImpedance> =
-        BoundReferenceResolver(acLineSegment, AcLineSegmentToPerLengthSequenceImpedanceResolver, null)
+    fun perLengthImpedance(acLineSegment: AcLineSegment): BoundReferenceResolver<AcLineSegment, PerLengthImpedance> =
+        BoundReferenceResolver(acLineSegment, AcLineSegmentToPerLengthImpedanceResolver, null)
 
     @JvmStatic
     fun organisationRoles(asset: Asset): BoundReferenceResolver<Asset, AssetOrganisationRole> =

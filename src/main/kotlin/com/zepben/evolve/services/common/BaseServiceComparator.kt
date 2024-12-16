@@ -42,8 +42,8 @@ abstract class BaseServiceComparator {
                 AccessController.doPrivileged(PrivilegedExceptionAction {
                     it.isAccessible = true
                     true
-                } as PrivilegedExceptionAction<Boolean>)
-            } catch (e: PrivilegedActionException) {
+                })
+            } catch (_: PrivilegedActionException) {
                 false
             }
         }
@@ -211,6 +211,14 @@ abstract class BaseServiceComparator {
         vararg properties: KProperty1<in T, List<*>>
     ): ObjectDifference<T> {
         properties.forEach { addIfDifferent(it.name, it.compareIndexedValueCollection(source, target)) }
+        return this
+    }
+
+    fun <T, R, K : Comparable<K>> ObjectDifference<T>.compareUnorderedValueCollection(
+        property: KProperty1<in T, List<R>>,
+        keySelector: (R) -> K
+    ): ObjectDifference<T> {
+        addIfDifferent(property.name, property.compareUnorderedValueCollection(source, target, keySelector))
         return this
     }
 

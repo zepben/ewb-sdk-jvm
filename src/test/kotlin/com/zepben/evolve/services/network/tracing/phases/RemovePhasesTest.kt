@@ -88,15 +88,18 @@ internal class RemovePhasesTest {
 
     @Test
     internal fun canRemoveFromEntireNetwork() {
-        RemovePhases(NetworkStateOperators.NORMAL).run(n)
         RemovePhases(NetworkStateOperators.CURRENT).run(n)
 
-        validatePhases(n, "s0", PhaseCode.NONE)
-        validatePhases(n, "c1", PhaseCode.NONE, PhaseCode.NONE)
-        validatePhases(n, "c2", PhaseCode.NONE, PhaseCode.NONE)
-        validatePhases(n, "c3", PhaseCode.NONE, PhaseCode.NONE)
-        validatePhases(n, "s4", PhaseCode.NONE)
-        validatePhases(n, "c5", PhaseCode.NONE, PhaseCode.NONE)
+        validatePhases(n.getT("s0", 1), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c1", 1), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c1", 2), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c2", 1), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c2", 2), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c3", 1), PhaseCode.AB, PhaseCode.NONE)
+        validatePhases(n.getT("c3", 2), PhaseCode.AB, PhaseCode.NONE)
+        validatePhases(n.getT("s4", 1), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c5", 1), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c5", 2), PhaseCode.ABCN, PhaseCode.NONE)
     }
 
     private fun NetworkService.getT(ce: String, t: Int): Terminal =

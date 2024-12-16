@@ -103,6 +103,19 @@ class SetPhases(
         runTerminal(terminal)
     }
 
+    /**
+     * Apply phases from the [fromTerminal] to the [toTerminal].
+     *
+     * @param fromTerminal The terminal to from which to spread phases.
+     * @param toTerminal The terminal to spread phases to.
+     * @param phases The nominal phases on which to spread phases.
+     */
+    @JvmOverloads
+    fun spreadPhases(fromTerminal: Terminal, toTerminal: Terminal, phases: List<SinglePhaseKind> = fromTerminal.phases.singlePhases) {
+        val paths = getNominalPhasePaths(fromTerminal, toTerminal, phases.asSequence())
+        flowPhases(fromTerminal, toTerminal, paths)
+    }
+
     private fun runTerminal(terminal: Terminal, trace: NetworkTrace<PhasesToFlow> = createNetworkTrace()) {
         val phaseStatus = stateOperators.phaseStatus(terminal)
         val nominalPhasePaths = terminal.phases.map { NominalPhasePath(SinglePhaseKind.NONE, phaseStatus[it]) }

@@ -27,6 +27,7 @@
 * Added `ctPrimary` and `minTargetDeadband` to `RegulatingContrl`.
 * Added collection of `BatteryControl` to `BatteryUnit`
 * Added collection of `EndDeviceFunctionKind` to `EndDevice`
+* Added an unordered collection comparator.
 
 ### Fixes
 

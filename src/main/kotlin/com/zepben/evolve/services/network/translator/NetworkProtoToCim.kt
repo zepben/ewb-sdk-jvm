@@ -146,8 +146,8 @@ import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthImpedance as PBPerLe
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthLineParameter as PBPerLengthLineParameter
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthPhaseImpedance as PBPerLengthPhaseImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthSequenceImpedance as PBPerLengthSequenceImpedance
-import com.zepben.protobuf.cim.iec61970.base.wires.PhaseImpedanceData as PBPhaseImpedanceData
 import com.zepben.protobuf.cim.iec61970.base.wires.PetersenCoil as PBPetersenCoil
+import com.zepben.protobuf.cim.iec61970.base.wires.PhaseImpedanceData as PBPhaseImpedanceData
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnection as PBPowerElectronicsConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnectionPhase as PBPowerElectronicsConnectionPhase
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
@@ -2079,7 +2079,7 @@ fun toCim(pb: PBPerLengthImpedance, cim: PerLengthImpedance, networkService: Net
  */
 fun toCim(pb: PBPerLengthPhaseImpedance, networkService: NetworkService): PerLengthPhaseImpedance =
     PerLengthPhaseImpedance(pb.mRID()).apply {
-        pb.phaseImpedanceDataList.forEach { addPhaseImpedanceData(toCim(it)) }
+        pb.phaseImpedanceDataList.forEach { addData(toCim(it)) }
         toCim(pb.pli, this, networkService)
     }
 

@@ -61,7 +61,10 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRem
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.*
-import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.*
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TableBatteryUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePowerElectronicsUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnits
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLvFeeders
@@ -72,6 +75,7 @@ import com.zepben.evolve.services.common.extensions.*
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.ResultSet
 import java.sql.SQLException
+import kotlin.Throws
 
 /**
  * A class for reading the [NetworkService] tables from the database.
@@ -2000,7 +2004,7 @@ class NetworkCimReader(
         val perLengthPhaseImpedance =
             service.getOrThrow<PerLengthPhaseImpedance>(perLengthPhaseImpedanceMRID, "PerLengthPhaseImpedance to PhaseImpedanceData association $id")
 
-        perLengthPhaseImpedance.addPhaseImpedanceData(
+        perLengthPhaseImpedance.addData(
             PhaseImpedanceData(
                 SinglePhaseKind.valueOf(resultSet.getString(table.FROM_PHASE.queryIndex)),
                 SinglePhaseKind.valueOf(resultSet.getString(table.TO_PHASE.queryIndex)),

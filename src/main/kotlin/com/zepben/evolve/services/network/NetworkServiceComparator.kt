@@ -862,7 +862,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
         ObjectDifference(source, target).apply {
             comparePerLengthImpedance()
 
-            compareIndexedValueCollections(PerLengthPhaseImpedance::phaseImpedanceData)
+            compareIndexedValueCollections(PerLengthPhaseImpedance::data)
         }
 
     private fun comparePerLengthSequenceImpedance(

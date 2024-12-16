@@ -32,7 +32,54 @@ import com.zepben.evolve.cim.iec61970.base.protection.*
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
-import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.evolve.cim.iec61970.base.wires.Breaker
+import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
+import com.zepben.evolve.cim.iec61970.base.wires.Conductor
+import com.zepben.evolve.cim.iec61970.base.wires.Connector
+import com.zepben.evolve.cim.iec61970.base.wires.Disconnector
+import com.zepben.evolve.cim.iec61970.base.wires.EarthFaultCompensator
+import com.zepben.evolve.cim.iec61970.base.wires.EnergyConnection
+import com.zepben.evolve.cim.iec61970.base.wires.EnergyConsumer
+import com.zepben.evolve.cim.iec61970.base.wires.EnergyConsumerPhase
+import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
+import com.zepben.evolve.cim.iec61970.base.wires.EnergySourcePhase
+import com.zepben.evolve.cim.iec61970.base.wires.Fuse
+import com.zepben.evolve.cim.iec61970.base.wires.Ground
+import com.zepben.evolve.cim.iec61970.base.wires.GroundDisconnector
+import com.zepben.evolve.cim.iec61970.base.wires.GroundingImpedance
+import com.zepben.evolve.cim.iec61970.base.wires.Jumper
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
+import com.zepben.evolve.cim.iec61970.base.wires.Line
+import com.zepben.evolve.cim.iec61970.base.wires.LinearShuntCompensator
+import com.zepben.evolve.cim.iec61970.base.wires.LoadBreakSwitch
+import com.zepben.evolve.cim.iec61970.base.wires.PerLengthImpedance
+import com.zepben.evolve.cim.iec61970.base.wires.PerLengthLineParameter
+import com.zepben.evolve.cim.iec61970.base.wires.PerLengthPhaseImpedance
+import com.zepben.evolve.cim.iec61970.base.wires.PerLengthSequenceImpedance
+import com.zepben.evolve.cim.iec61970.base.wires.PetersenCoil
+import com.zepben.evolve.cim.iec61970.base.wires.PhaseImpedanceData
+import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnection
+import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnectionPhase
+import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
+import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformerEnd
+import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.evolve.cim.iec61970.base.wires.RatioTapChanger
+import com.zepben.evolve.cim.iec61970.base.wires.ReactiveCapabilityCurve
+import com.zepben.evolve.cim.iec61970.base.wires.Recloser
+import com.zepben.evolve.cim.iec61970.base.wires.RegulatingCondEq
+import com.zepben.evolve.cim.iec61970.base.wires.RegulatingControl
+import com.zepben.evolve.cim.iec61970.base.wires.RotatingMachine
+import com.zepben.evolve.cim.iec61970.base.wires.SeriesCompensator
+import com.zepben.evolve.cim.iec61970.base.wires.ShuntCompensator
+import com.zepben.evolve.cim.iec61970.base.wires.StaticVarCompensator
+import com.zepben.evolve.cim.iec61970.base.wires.Switch
+import com.zepben.evolve.cim.iec61970.base.wires.SynchronousMachine
+import com.zepben.evolve.cim.iec61970.base.wires.TapChanger
+import com.zepben.evolve.cim.iec61970.base.wires.TapChangerControl
+import com.zepben.evolve.cim.iec61970.base.wires.TransformerEnd
+import com.zepben.evolve.cim.iec61970.base.wires.TransformerEndRatedS
+import com.zepben.evolve.cim.iec61970.base.wires.TransformerStarImpedance
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
@@ -165,8 +212,8 @@ import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthImpedance as PBPerLe
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthLineParameter as PBPerLengthLineParameter
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthPhaseImpedance as PBPerLengthPhaseImpedance
 import com.zepben.protobuf.cim.iec61970.base.wires.PerLengthSequenceImpedance as PBPerLengthSequenceImpedance
-import com.zepben.protobuf.cim.iec61970.base.wires.PhaseImpedanceData as PBPhaseImpedanceData
 import com.zepben.protobuf.cim.iec61970.base.wires.PetersenCoil as PBPetersenCoil
+import com.zepben.protobuf.cim.iec61970.base.wires.PhaseImpedanceData as PBPhaseImpedanceData
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnection as PBPowerElectronicsConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerElectronicsConnectionPhase as PBPowerElectronicsConnectionPhase
 import com.zepben.protobuf.cim.iec61970.base.wires.PowerTransformer as PBPowerTransformer
@@ -1990,7 +2037,7 @@ fun toPb(cim: PerLengthLineParameter, pb: PBPerLengthLineParameter.Builder): PBP
  */
 fun toPb(cim: PerLengthPhaseImpedance, pb: PBPerLengthPhaseImpedance.Builder): PBPerLengthPhaseImpedance.Builder =
     pb.apply {
-        cim.phaseImpedanceData.forEachIndexed { i, data -> addPhaseImpedanceDataBuilder(i).apply { toPb(data, this) } }
+        cim.data.forEachIndexed { i, data -> addPhaseImpedanceDataBuilder(i).apply { toPb(data, this) } }
         toPb(cim, pliBuilder)
     }
 

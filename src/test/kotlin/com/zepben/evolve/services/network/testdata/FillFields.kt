@@ -1215,7 +1215,7 @@ fun PerLengthPhaseImpedance.fillFields(service: NetworkService, includeRuntime: 
     (this as PerLengthImpedance).fillFields(service, includeRuntime)
 
     for (i in 0..1)
-        addPhaseImpedanceData(PhaseImpedanceData(SinglePhaseKind.get(i), SinglePhaseKind.get(i), i.toDouble(), i.toDouble(), i.toDouble(), i.toDouble()))
+        addData(PhaseImpedanceData(SinglePhaseKind.get(i), SinglePhaseKind.get(i), i.toDouble(), i.toDouble(), i.toDouble(), i.toDouble()))
 
     return this
 }

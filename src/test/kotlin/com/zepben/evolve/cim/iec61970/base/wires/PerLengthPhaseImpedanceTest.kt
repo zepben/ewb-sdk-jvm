@@ -32,12 +32,12 @@ internal class PerLengthPhaseImpedanceTest {
         PrivateCollectionValidator.validateUnordered(
             ::PerLengthPhaseImpedance,
             { it: Int -> PhaseImpedanceData(SinglePhaseKind.get(it), SinglePhaseKind.get(it), it.toDouble(), it.toDouble(), it.toDouble(), it.toDouble()) },
-            PerLengthPhaseImpedance::phaseImpedanceData,
-            PerLengthPhaseImpedance::numPhaseImpedanceData,
+            PerLengthPhaseImpedance::data,
+            PerLengthPhaseImpedance::numData,
             { i: PerLengthPhaseImpedance, t: SinglePhaseKind -> i.getData(t, t) },
-            PerLengthPhaseImpedance::addPhaseImpedanceData,
-            PerLengthPhaseImpedance::removePhaseImpedanceData,
-            PerLengthPhaseImpedance::clearPhaseImpedanceData,
+            PerLengthPhaseImpedance::addData,
+            PerLengthPhaseImpedance::removeData,
+            PerLengthPhaseImpedance::clearData,
             { it.fromPhase }
         )
     }
@@ -53,12 +53,12 @@ internal class PerLengthPhaseImpedanceTest {
         val pid3 = PhaseImpedanceData(SinglePhaseKind.C, SinglePhaseKind.C)
 
         PerLengthPhaseImpedance().apply {
-            addPhaseImpedanceData(pi1)
-            addPhaseImpedanceData(pi2)
-            addPhaseImpedanceData(pi3)
-            addPhaseImpedanceData(pid1)
-            addPhaseImpedanceData(pid2)
-            addPhaseImpedanceData(pid3)
+            addData(pi1)
+            addData(pi2)
+            addData(pi3)
+            addData(pid1)
+            addData(pid2)
+            addData(pid3)
 
             assertThat(diagonal(), containsInAnyOrder(pid1, pid2, pid3))
             assertThat(diagonal(), not(containsInAnyOrder(pi1, pi2, pi3)))

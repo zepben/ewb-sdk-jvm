@@ -36,8 +36,7 @@ class RemovePhases(
      */
     fun run(networkService: NetworkService) {
         networkService.sequenceOf<Terminal>().forEach {
-            it.normalPhases.phaseStatusInternal = 0u
-            it.currentPhases.phaseStatusInternal = 0u
+            stateOperators.phaseStatus(it).phaseStatusInternal = 0u
         }
     }
 

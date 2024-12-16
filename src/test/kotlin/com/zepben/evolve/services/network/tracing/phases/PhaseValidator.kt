@@ -52,6 +52,10 @@ object PhaseValidator {
         validatePhases(terminal, expectedPhases, expectedPhases)
     }
 
+    fun validatePhases(terminal: Terminal?, expectedPhasesNormal: PhaseCode, expectedPhasesCurrent: PhaseCode) {
+        validatePhases(terminal, expectedPhasesNormal.singlePhases, expectedPhasesCurrent.singlePhases)
+    }
+
     fun validatePhases(terminal: Terminal?, expectedPhasesNormal: List<SinglePhaseKind>, expectedPhasesCurrent: List<SinglePhaseKind>) {
         if (terminal == null)
             return

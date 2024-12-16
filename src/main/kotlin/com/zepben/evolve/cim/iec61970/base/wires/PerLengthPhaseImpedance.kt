@@ -10,7 +10,6 @@ package com.zepben.evolve.cim.iec61970.base.wires
 
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
-import java.util.function.BiConsumer
 
 /**
  * Impedance and admittance parameters per unit length for n-wire unbalanced lines, in matrix form.
@@ -38,15 +37,6 @@ class PerLengthPhaseImpedance @JvmOverloads constructor(mRID: String = "") : Per
      */
     fun getData(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): PhaseImpedanceData? =
         _data?.find { it.fromPhase == fromPhase && it.toPhase == toPhase }
-
-    /**
-     * Java interop forEachIndexed. Perform the specified action against each [PhaseImpedanceData].
-     *
-     * @param action The action to perform on each [PhaseImpedanceData]
-     */
-    fun forEachData(action: BiConsumer<Int, PhaseImpedanceData>) {
-        _data?.forEachIndexed(action::accept)
-    }
 
     /**
      * Add a [PhaseImpedanceData] to this [PerLengthPhaseImpedance]
@@ -85,4 +75,5 @@ class PerLengthPhaseImpedance @JvmOverloads constructor(mRID: String = "") : Per
         _data = null
         return this
     }
+
 }

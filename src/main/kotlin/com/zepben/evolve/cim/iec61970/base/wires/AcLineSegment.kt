@@ -27,14 +27,15 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
     var perLengthImpedance: PerLengthImpedance? = null
 
     var perLengthSequenceImpedance: PerLengthSequenceImpedance?
-        get() = perLengthImpedance.takeIf { it is PerLengthSequenceImpedance } as? PerLengthSequenceImpedance
+        get() = perLengthImpedance as? PerLengthSequenceImpedance
         set(it) {
             perLengthImpedance = it
         }
 
     var perLengthPhaseImpedance: PerLengthPhaseImpedance?
-        get() = perLengthImpedance.takeIf { it is PerLengthPhaseImpedance } as? PerLengthPhaseImpedance
+        get() = perLengthImpedance as? PerLengthPhaseImpedance
         set(it) {
             perLengthImpedance = it
         }
+
 }

@@ -28,6 +28,8 @@ internal class RemovePhasesTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
+    private val removePhases = RemovePhases()
+
     //
     // s0 --c1-- --c2--
     //           \-c3--
@@ -62,8 +64,8 @@ internal class RemovePhasesTest {
 
     @Test
     internal fun removesAllCoreByDefault() {
-        RemovePhases(NetworkStateOperators.NORMAL).run(n.getT("c1", 2))
-        RemovePhases(NetworkStateOperators.CURRENT).run(n.getT("c1", 2))
+        removePhases.run(n.getT("c1", 2), NetworkStateOperators.NORMAL)
+        removePhases.run(n.getT("c1", 2), NetworkStateOperators.CURRENT)
 
         validatePhases(n, "s0", PhaseCode.ABCN)
         validatePhases(n, "c1", PhaseCode.ABCN, PhaseCode.NONE)
@@ -75,8 +77,8 @@ internal class RemovePhasesTest {
 
     @Test
     internal fun canRemoveSpecificPhases() {
-        RemovePhases(NetworkStateOperators.NORMAL).run(n.getT("s0", 1), PhaseCode.AB)
-        RemovePhases(NetworkStateOperators.CURRENT).run(n.getT("s0", 1), PhaseCode.AB)
+        removePhases.run(n.getT("s0", 1), PhaseCode.AB, NetworkStateOperators.NORMAL)
+        removePhases.run(n.getT("s0", 1), PhaseCode.AB, NetworkStateOperators.CURRENT)
 
         validatePhases(n, "s0", listOf(SPK.NONE, SPK.NONE, SPK.C, SPK.N))
         validatePhases(n, "c1", listOf(SPK.NONE, SPK.NONE, SPK.C, SPK.N), listOf(SPK.NONE, SPK.NONE, SPK.C, SPK.N))
@@ -88,7 +90,7 @@ internal class RemovePhasesTest {
 
     @Test
     internal fun canRemoveFromEntireNetwork() {
-        RemovePhases(NetworkStateOperators.CURRENT).run(n)
+        removePhases.run(n, NetworkStateOperators.CURRENT)
 
         validatePhases(n.getT("s0", 1), PhaseCode.ABCN, PhaseCode.NONE)
         validatePhases(n.getT("c1", 1), PhaseCode.ABCN, PhaseCode.NONE)

@@ -19,6 +19,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.testutils.junit.SystemLogExtension
@@ -50,16 +51,23 @@ internal class NetworkDatabaseReaderTest {
         every { this@mockk.supportedVersion } returns 1
     }
 
-    private val normalSetFeederDirections = mockk<SetDirection> { justRun { run(service) } }
-    private val currentSetFeederDirections = mockk<SetDirection> { justRun { run(service) } }
-    private val normalSetPhases = mockk<SetPhases> { justRun { run(service) } }
-    private val currentSetPhases = mockk<SetPhases> { justRun { run(service) } }
-    private val normalPhaseInferrer = mockk<PhaseInferrer>()
-    private val currentPhaseInferrer = mockk<PhaseInferrer>()
-    private val normalAssignToFeeders = mockk<AssignToFeeders> { justRun { run(service) } }
-    private val currentAssignToFeeders = mockk<AssignToFeeders> { justRun { run(service) } }
-    private val normalAssignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
-    private val currentAssignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
+    private val setFeederDirections = mockk<SetDirection> {
+        justRun { run(service, NetworkStateOperators.NORMAL) }
+        justRun { run(service, NetworkStateOperators.CURRENT) }
+    }
+    private val setPhases = mockk<SetPhases> {
+        justRun { run(service, NetworkStateOperators.NORMAL) }
+        justRun { run(service, NetworkStateOperators.CURRENT) }
+    }
+    private val phaseInferrer = mockk<PhaseInferrer>()
+    private val assignToFeeders = mockk<AssignToFeeders> {
+        justRun { run(service, NetworkStateOperators.NORMAL) }
+        justRun { run(service, NetworkStateOperators.CURRENT) }
+    }
+    private val assignToLvFeeders = mockk<AssignToLvFeeders> {
+        justRun { run(service, NetworkStateOperators.NORMAL) }
+        justRun { run(service, NetworkStateOperators.CURRENT) }
+    }
 
     private fun reader(inferPhases: Boolean) = NetworkDatabaseReader(
         connection,
@@ -69,16 +77,11 @@ internal class NetworkDatabaseReaderTest {
         metadataReader,
         networkServiceReader,
         tableVersion,
-        normalSetFeederDirections,
-        currentSetFeederDirections,
-        normalSetPhases,
-        currentSetPhases,
-        normalPhaseInferrer,
-        currentPhaseInferrer,
-        normalAssignToFeeders,
-        currentAssignToFeeders,
-        normalAssignToLvFeeders,
-        currentAssignToLvFeeders,
+        setFeederDirections,
+        setPhases,
+        phaseInferrer,
+        assignToFeeders,
+        assignToLvFeeders,
     )
 
     //
@@ -87,8 +90,8 @@ internal class NetworkDatabaseReaderTest {
 
     @Test
     internal fun `calls expected processors, including post processes`() {
-        every { normalPhaseInferrer.run(service) } returns emptyList()
-        every { currentPhaseInferrer.run(service) } returns emptyList()
+        every { phaseInferrer.run(service, NetworkStateOperators.NORMAL) } returns emptyList()
+        every { phaseInferrer.run(service, NetworkStateOperators.CURRENT) } returns emptyList()
 
         assertThat("Should have loaded", reader(true).load())
 
@@ -118,20 +121,20 @@ internal class NetworkDatabaseReaderTest {
             networkServiceReader.load()
             service.unresolvedReferences()
 
-            normalSetFeederDirections.run(service)
-            currentSetFeederDirections.run(service)
+            setFeederDirections.run(service, NetworkStateOperators.NORMAL)
+            setFeederDirections.run(service, NetworkStateOperators.CURRENT)
 
-            normalSetPhases.run(service)
-            currentSetPhases.run(service)
+            setPhases.run(service, NetworkStateOperators.NORMAL)
+            setPhases.run(service, NetworkStateOperators.CURRENT)
 
-            normalPhaseInferrer.run(service)
-            currentPhaseInferrer.run(service)
+            phaseInferrer.run(service, NetworkStateOperators.NORMAL)
+            phaseInferrer.run(service, NetworkStateOperators.CURRENT)
 
-            normalAssignToFeeders.run(service)
-            currentAssignToFeeders.run(service)
+            assignToFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToFeeders.run(service, NetworkStateOperators.CURRENT)
 
-            normalAssignToLvFeeders.run(service)
-            currentAssignToLvFeeders.run(service)
+            assignToLvFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToLvFeeders.run(service, NetworkStateOperators.CURRENT)
 
             // calls for _validate_equipment_containers()
             service.listOf<Equipment>(any<(Equipment) -> Boolean>())
@@ -147,8 +150,14 @@ internal class NetworkDatabaseReaderTest {
         val j1 = Junction("j1").apply { name = "j1 name" }
         val j2 = Junction("j1").apply { name = "j1 name" }
         val j3 = Junction("j1").apply { name = "j1 name" }
-        every { normalPhaseInferrer.run(service) } returns listOf(PhaseInferrer.InferredPhase(j1, false), PhaseInferrer.InferredPhase(j1, true))
-        every { currentPhaseInferrer.run(service) } returns listOf(PhaseInferrer.InferredPhase(j2, false), PhaseInferrer.InferredPhase(j3, true))
+        every { phaseInferrer.run(service, NetworkStateOperators.NORMAL) } returns listOf(
+            PhaseInferrer.InferredPhase(j1, false),
+            PhaseInferrer.InferredPhase(j1, true)
+        )
+        every { phaseInferrer.run(service, NetworkStateOperators.CURRENT) } returns listOf(
+            PhaseInferrer.InferredPhase(j2, false),
+            PhaseInferrer.InferredPhase(j3, true)
+        )
 
         reader(true).load()
 
@@ -167,7 +176,7 @@ internal class NetworkDatabaseReaderTest {
     fun `does not infer phases when inferPhases is false`() {
         reader(false).load()
 
-        verify { normalPhaseInferrer wasNot called }
-        verify { currentPhaseInferrer wasNot called }
+        verify { phaseInferrer wasNot called }
+        verify { phaseInferrer wasNot called }
     }
 }

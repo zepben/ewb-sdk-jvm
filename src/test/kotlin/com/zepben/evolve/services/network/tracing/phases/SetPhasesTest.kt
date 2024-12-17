@@ -33,12 +33,14 @@ internal class SetPhasesTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
+    private val setPhases = SetPhases()
+
     @Test
     internal fun setPhasesTest() {
         val n = PhaseSwapLoopNetwork.create()
 
-        SetPhases(NetworkStateOperators.NORMAL).run(n)
-        SetPhases(NetworkStateOperators.CURRENT).run(n)
+        setPhases.run(n, NetworkStateOperators.NORMAL)
+        setPhases.run(n, NetworkStateOperators.CURRENT)
         PhaseLogger.trace(n.listOf<EnergySource>())
 
         // Check various points to make sure phases have been applied during the trace.
@@ -147,8 +149,8 @@ internal class SetPhasesTest {
             .buildAndLog()
 
         n.getT("c1", 2).also {
-            SetPhases(NetworkStateOperators.NORMAL).run(it, it.phases)
-            SetPhases(NetworkStateOperators.CURRENT).run(it, it.phases)
+            setPhases.run(it, it.phases, NetworkStateOperators.NORMAL)
+            setPhases.run(it, it.phases, NetworkStateOperators.CURRENT)
         }
 
         PhaseValidator.validatePhases(n, "c0", PhaseCode.NONE, PhaseCode.NONE)
@@ -167,8 +169,8 @@ internal class SetPhasesTest {
             .buildAndLog()
 
         expect {
-            SetPhases(NetworkStateOperators.NORMAL).run(n.getT("c0", 2), PhaseCode.AB)
-            SetPhases(NetworkStateOperators.CURRENT).run(n.getT("c0", 2), PhaseCode.AB)
+            setPhases.run(n.getT("c0", 2), PhaseCode.AB, NetworkStateOperators.NORMAL)
+            setPhases.run(n.getT("c0", 2), PhaseCode.AB, NetworkStateOperators.CURRENT)
         }.toThrow<IllegalArgumentException>()
             .withMessage(
                 "Attempted to apply phases [A, B] to Terminal{id='c0-t2'} with nominal phases A. Number of phases to apply must match the number of " +
@@ -189,8 +191,8 @@ internal class SetPhasesTest {
         val c1: AcLineSegment = n["c1"]!!
 
         expect {
-            SetPhases(NetworkStateOperators.NORMAL).run(n.getT("c0", 2))
-            SetPhases(NetworkStateOperators.CURRENT).run(n.getT("c0", 2))
+            setPhases.run(n.getT("c0", 2), NetworkStateOperators.NORMAL)
+            setPhases.run(n.getT("c0", 2), NetworkStateOperators.CURRENT)
         }.toThrow<IllegalStateException>()
             .withMessage(
                 "Attempted to flow conflicting phase A onto B on nominal phase A. This occurred while flowing from " +
@@ -214,8 +216,8 @@ internal class SetPhasesTest {
         val c2: AcLineSegment = n["c2"]!!
 
         expect {
-            SetPhases(NetworkStateOperators.NORMAL).run(n.getT("c0", 2))
-            SetPhases(NetworkStateOperators.CURRENT).run(n.getT("c0", 2))
+            setPhases.run(n.getT("c0", 2), NetworkStateOperators.NORMAL)
+            setPhases.run(n.getT("c0", 2), NetworkStateOperators.CURRENT)
         }.toThrow<IllegalStateException>()
             .withMessage(
                 "Attempted to flow conflicting phase A onto B on nominal phase A. This occurred while flowing between " +
@@ -399,8 +401,8 @@ internal class SetPhasesTest {
         val t = n.getT("c0", 2)
         t.normalPhases[SPK.X] = SPK.A
         t.currentPhases[SPK.X] = SPK.A
-        SetPhases(NetworkStateOperators.NORMAL).run(t)
-        SetPhases(NetworkStateOperators.CURRENT).run(t)
+        setPhases.run(t, NetworkStateOperators.NORMAL)
+        setPhases.run(t, NetworkStateOperators.CURRENT)
 
         PhaseValidator.validatePhases(n, "c0", PhaseCode.NONE, PhaseCode.A)
         PhaseValidator.validatePhases(n, "c1", listOf(SPK.A, SPK.NONE, SPK.NONE), listOf(SPK.A, SPK.NONE, SPK.NONE))

@@ -432,22 +432,23 @@ internal class SetDirectionTest {
             Duration.ofMillis(100),
             message = "If this test times out, you have managed to break things as described in the test note. Go fix it."
         ) {
-            Tracing.setDirection(NetworkStateOperators.NORMAL).run(builder.network)
+            Tracing.setDirection().run(builder.network, NetworkStateOperators.NORMAL)
         }
     }
 
     private fun doSetDirectionTrace(terminal: Terminal) {
-        SetDirection(NetworkStateOperators.NORMAL).run(terminal)
-        SetDirection(NetworkStateOperators.CURRENT).run(terminal)
+        SetDirection().apply {
+            run(terminal, NetworkStateOperators.NORMAL)
+            run(terminal, NetworkStateOperators.CURRENT)
+        }
         DirectionLogger.trace(terminal.conductingEquipment!!)
     }
 
     private fun doSetDirectionTrace(n: NetworkService) {
-        val normal = SetDirection(NetworkStateOperators.NORMAL)
-        val current = SetDirection(NetworkStateOperators.CURRENT)
+        val setDirection = SetDirection()
         n.sequenceOf<Feeder>().forEach {
-            normal.run(it.normalHeadTerminal!!)
-            current.run(it.normalHeadTerminal!!)
+            setDirection.run(it.normalHeadTerminal!!, NetworkStateOperators.NORMAL)
+            setDirection.run(it.normalHeadTerminal!!, NetworkStateOperators.CURRENT)
             DirectionLogger.trace(it.normalHeadTerminal!!.conductingEquipment!!)
         }
     }

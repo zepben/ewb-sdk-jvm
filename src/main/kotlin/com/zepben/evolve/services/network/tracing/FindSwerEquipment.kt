@@ -22,59 +22,60 @@ import com.zepben.evolve.services.network.tracing.networktrace.run
 /**
  * A class which can be used for finding the SWER equipment in a [NetworkService] or [Feeder].
  */
-class FindSwerEquipment(
-    val stateOperators: NetworkStateOperators,
-) {
+class FindSwerEquipment {
 
-    private val createTrace = { Tracing.networkTrace(stateOperators).addCondition { stopAtOpen() } }
+    private fun createTrace(stateOperators: NetworkStateOperators) = Tracing.networkTrace(stateOperators).addCondition { stopAtOpen() }
 
     /**
      * Find the [ConductingEquipment] on any [Feeder] in a [NetworkService] which is SWER. This will include any equipment on the LV network that is energised
      * via SWER.
      *
      * @param networkService The [NetworkService] to process.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when finding SWER equipment.
      *
      * @return A [Set] of [ConductingEquipment] on any [Feeder] in [networkService] that is SWER, or energised via SWER.
      */
-    fun find(networkService: NetworkService): Set<ConductingEquipment> =
+    @JvmOverloads
+    fun find(networkService: NetworkService, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): Set<ConductingEquipment> =
         networkService.sequenceOf<Feeder>()
-            .flatMap { find(it) }
+            .flatMap { find(it, networkStateOperators) }
             .toSet()
 
     /**
      * Find the [ConductingEquipment] on a [Feeder] which is SWER. This will include any equipment on the LV network that is energised via SWER.
      *
      * @param feeder The [Feeder] to process.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when finding SWER equipment.
      *
      * @return A [Set] of [ConductingEquipment] on [feeder] that is SWER, or energised via SWER.
      */
-    fun find(feeder: Feeder): Set<ConductingEquipment> {
+    fun find(feeder: Feeder, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): Set<ConductingEquipment> {
         val swerEquipment = mutableSetOf<ConductingEquipment>()
 
         // We will add all the SWER transformers to the swerEquipment list before starting any traces to prevent tracing though them by accident. In
         // order to do this, we collect the sequence to a list to change the iteration order.
-        stateOperators.getEquipment(feeder)
+        networkStateOperators.getEquipment(feeder)
             .asSequence()
             .filterIsInstance<PowerTransformer>()
             .filter { it.hasSwerTerminal }
             .filter { it.hasNonSwerTerminal }
             .toList()
             .onEach { swerEquipment.add(it) }
-            .forEach { traceFrom(it, swerEquipment) }
+            .forEach { traceFrom(networkStateOperators, it, swerEquipment) }
 
         return swerEquipment.toSet()
     }
 
-    private fun traceFrom(transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
+    private fun traceFrom(stateOperators: NetworkStateOperators, transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
         // Trace from any SWER terminals.
-        traceSwerFrom(transformer, swerEquipment)
+        traceSwerFrom(stateOperators, transformer, swerEquipment)
 
         // Trace from any LV terminals.
-        traceLvFrom(transformer, swerEquipment)
+        traceLvFrom(stateOperators, transformer, swerEquipment)
     }
 
-    private fun traceSwerFrom(transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
-        val trace = createTrace().apply {
+    private fun traceSwerFrom(stateOperators: NetworkStateOperators, transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
+        val trace = createTrace(stateOperators).apply {
             addQueueCondition { nextStep, _, _, _ ->
                 when {
                     nextStep.path.toTerminal.isSwerTerminal || nextStep.path.toEquipment is Switch -> nextStep.path.toEquipment !in swerEquipment
@@ -94,8 +95,8 @@ class FindSwerEquipment(
             }
     }
 
-    private fun traceLvFrom(transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
-        val trace = createTrace()
+    private fun traceLvFrom(stateOperators: NetworkStateOperators, transformer: PowerTransformer, swerEquipment: MutableSet<ConductingEquipment>) {
+        val trace = createTrace(stateOperators)
             .addQueueCondition { nextStep, _, _, _ ->
                 when {
                     nextStep.path.toEquipment.baseVoltageValue in 1..1000 -> nextStep.path.toEquipment !in swerEquipment

@@ -25,19 +25,30 @@ import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueu
  * Convenience class that provides methods for removing phases on a [NetworkService]
  * This class is backed by a [NetworkTrace].
  */
-class RemovePhases(
-    val stateOperators: NetworkStateOperators
-) {
+class RemovePhases {
 
     /**
      * Remove all traced phases from the specified network.
      *
      * @param networkService The network service to remove traced phasing from.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when removing phases.
      */
-    fun run(networkService: NetworkService) {
+    @JvmOverloads
+    fun run(networkService: NetworkService, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) {
         networkService.sequenceOf<Terminal>().forEach {
-            stateOperators.phaseStatus(it).phaseStatusInternal = 0u
+            networkStateOperators.phaseStatus(it).phaseStatusInternal = 0u
         }
+    }
+
+    /**
+     * Removes all nominal phases a terminal traced phases and the connected equipment chain.
+     *
+     * @param terminal The terminal from which to start the phase removal.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when removing phases.
+     */
+    @JvmOverloads
+    fun run(terminal: Terminal, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) {
+        run(terminal, terminal.phases, networkStateOperators)
     }
 
     /**
@@ -45,10 +56,11 @@ class RemovePhases(
      *
      * @param terminal The terminal from which to start the phase removal.
      * @param nominalPhasesToEbb The nominal phases to remove traced phasing from. Defaults to all phases.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when removing phases.
      */
     @JvmOverloads
-    fun run(terminal: Terminal, nominalPhasesToEbb: PhaseCode = terminal.phases) {
-        run(terminal, nominalPhasesToEbb.singlePhases.toSet())
+    fun run(terminal: Terminal, nominalPhasesToEbb: PhaseCode, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) {
+        run(terminal, nominalPhasesToEbb.singlePhases.toSet(), networkStateOperators)
     }
 
     /**
@@ -56,12 +68,13 @@ class RemovePhases(
      *
      * @param terminal The terminal from which to start the phase removal.
      * @param nominalPhasesToEbb The nominal phases to remove traced phasing from.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when removing phases.
      */
-    fun run(terminal: Terminal, nominalPhasesToEbb: Set<SinglePhaseKind>) {
-        createTrace().run(terminal, EbbPhases(nominalPhasesToEbb), terminal.phases)
+    fun run(terminal: Terminal, nominalPhasesToEbb: Set<SinglePhaseKind>, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) {
+        createTrace(networkStateOperators).run(terminal, EbbPhases(nominalPhasesToEbb), terminal.phases)
     }
 
-    private fun createTrace(): NetworkTrace<EbbPhases> =
+    private fun createTrace(stateOperators: NetworkStateOperators): NetworkTrace<EbbPhases> =
         Tracing.networkTraceBranching(
             networkStateOperators = stateOperators,
             actionStepType = NetworkTraceActionType.ALL_STEPS,
@@ -70,7 +83,7 @@ class RemovePhases(
             computeData = ::computeNextEbbPhases
         )
             .addStepAction { (path, ebbPhases), _ ->
-                ebbPhases.ebbedPhases = ebb(path.toTerminal, ebbPhases.phasesToEbb)
+                ebbPhases.ebbedPhases = ebb(stateOperators, path.toTerminal, ebbPhases.phasesToEbb)
             }
             .addQueueCondition { nextStep, _, _, _ ->
                 nextStep.data.phasesToEbb.isNotEmpty()
@@ -82,7 +95,7 @@ class RemovePhases(
         return EbbPhases(phasesToEbb)
     }
 
-    private fun ebb(terminal: Terminal, phasesToEbb: Set<SinglePhaseKind>): Set<SinglePhaseKind> {
+    private fun ebb(stateOperators: NetworkStateOperators, terminal: Terminal, phasesToEbb: Set<SinglePhaseKind>): Set<SinglePhaseKind> {
         val phases = stateOperators.phaseStatus(terminal)
         return phasesToEbb
             .asSequence()

@@ -31,7 +31,7 @@ internal class FindSwerEquipmentTest {
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
     private val stateOperators = spy(NetworkStateOperators.NORMAL)
-    private val findSwerEquipment = FindSwerEquipment(stateOperators)
+    private val findSwerEquipment = FindSwerEquipment()
 
     @Test
     internal fun `processes all feeders in a network`() {
@@ -43,11 +43,11 @@ internal class FindSwerEquipmentTest {
             .build()
 
         val findSwerEquipmentSpy = spy(findSwerEquipment)
-        findSwerEquipmentSpy.find(ns)
+        findSwerEquipmentSpy.find(ns, stateOperators)
 
-        verify(findSwerEquipmentSpy).find(ns["fdr2"]!!)
+        verify(findSwerEquipmentSpy).find(ns["fdr2"]!!, stateOperators)
         verify(stateOperators).getEquipment(ns["fdr2"]!!)
-        verify(findSwerEquipmentSpy).find(ns["fdr3"]!!)
+        verify(findSwerEquipmentSpy).find(ns["fdr3"]!!, stateOperators)
         verify(stateOperators).getEquipment(ns["fdr3"]!!)
     }
 
@@ -68,7 +68,7 @@ internal class FindSwerEquipmentTest {
             .addFeeder("b0") // fdr10
             .build()
 
-        assertThat(findSwerEquipment.find(ns["fdr10"]!!), ns.createContainsInAnyOrder("tx3", "c4", "c5", "tx6", "c7", "b8"))
+        assertThat(findSwerEquipment.find(ns["fdr10"]!!, stateOperators), ns.createContainsInAnyOrder("tx3", "c4", "c5", "tx6", "c7", "b8"))
     }
 
     @Test
@@ -80,7 +80,7 @@ internal class FindSwerEquipmentTest {
             .addFeeder("b0") // fdr3
             .build()
 
-        assertThat(findSwerEquipment.find(ns["fdr3"]!!), empty())
+        assertThat(findSwerEquipment.find(ns["fdr3"]!!, stateOperators), empty())
     }
 
     @Test
@@ -96,7 +96,7 @@ internal class FindSwerEquipmentTest {
             .addFeeder("c0") // fdr7
             .build()
 
-        assertThat(findSwerEquipment.find(ns), ns.createContainsInAnyOrder("tx1", "c2", "tx3", "c4", "tx5"))
+        assertThat(findSwerEquipment.find(ns, stateOperators), ns.createContainsInAnyOrder("tx1", "c2", "tx3", "c4", "tx5"))
     }
 
     @Test
@@ -108,7 +108,7 @@ internal class FindSwerEquipmentTest {
             .addFeeder("tx0") // fdr3
             .build()
 
-        assertThat(findSwerEquipment.find(ns["fdr3"]!!), ns.createContainsInAnyOrder("tx0", "b1"))
+        assertThat(findSwerEquipment.find(ns["fdr3"]!!, stateOperators), ns.createContainsInAnyOrder("tx0", "b1"))
         verify(stateOperators).isOpen(ns["b1"]!!)
     }
 
@@ -122,7 +122,7 @@ internal class FindSwerEquipmentTest {
             .addFeeder("tx0") // fdr4
             .build()
 
-        assertThat(findSwerEquipment.find(ns["fdr4"]!!), ns.createContainsInAnyOrder("tx0", "c1", "b2"))
+        assertThat(findSwerEquipment.find(ns["fdr4"]!!, stateOperators), ns.createContainsInAnyOrder("tx0", "c1", "b2"))
         verify(stateOperators).isOpen(ns["b2"]!!)
     }
 
@@ -140,7 +140,7 @@ internal class FindSwerEquipmentTest {
             .addFeeder("tx0") // fdr5
             .build()
 
-        assertThat(findSwerEquipment.find(ns["fdr5"]!!), ns.createContainsInAnyOrder("tx0", "c1", "c2", "c3", "c4"))
+        assertThat(findSwerEquipment.find(ns["fdr5"]!!, stateOperators), ns.createContainsInAnyOrder("tx0", "c1", "c2", "c3", "c4"))
     }
 
     @Test
@@ -158,7 +158,7 @@ internal class FindSwerEquipmentTest {
             .build()
 
         // We need to run the actual trace rather than a mock to make sure it does not loop back through the LV.
-        assertThat(findSwerEquipment.find(ns), ns.createContainsInAnyOrder("c2", "tx3", "c4", "tx5", "c6"))
+        assertThat(findSwerEquipment.find(ns, stateOperators), ns.createContainsInAnyOrder("c2", "tx3", "c4", "tx5", "c6"))
     }
 
     private fun NetworkService.createContainsInAnyOrder(vararg mRIDs: String): Matcher<Iterable<ConductingEquipment>?>? =

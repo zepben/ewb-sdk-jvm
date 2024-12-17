@@ -49,16 +49,11 @@ class NetworkDatabaseReader internal constructor(
     metadataReader: MetadataCollectionReader,
     serviceReader: NetworkServiceReader,
     tableVersion: TableVersion = tableCimVersion,
-    private val normalSetFeederDirection: SetDirection = Tracing.setDirection(NetworkStateOperators.NORMAL),
-    private val currentSetFeederDirection: SetDirection = Tracing.setDirection(NetworkStateOperators.CURRENT),
-    private val normalSetPhases: SetPhases = Tracing.setPhases(NetworkStateOperators.NORMAL),
-    private val currentSetPhases: SetPhases = Tracing.setPhases(NetworkStateOperators.CURRENT),
-    private val normalPhaseInferrer: PhaseInferrer = Tracing.phaseInferrer(NetworkStateOperators.NORMAL),
-    private val currentPhaseInferrer: PhaseInferrer = Tracing.phaseInferrer(NetworkStateOperators.CURRENT),
-    private val normalAssignToFeeders: AssignToFeeders = Tracing.assignEquipmentToFeeders(NetworkStateOperators.NORMAL),
-    private val currentAssignToFeeders: AssignToFeeders = Tracing.assignEquipmentToFeeders(NetworkStateOperators.CURRENT),
-    private val normalAssignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.NORMAL),
-    private val currentAssignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.CURRENT),
+    private val setFeederDirection: SetDirection = Tracing.setDirection(),
+    private val setPhases: SetPhases = Tracing.setPhases(),
+    private val phaseInferrer: PhaseInferrer = Tracing.phaseInferrer(),
+    private val assignToFeeders: AssignToFeeders = Tracing.assignEquipmentToFeeders(),
+    private val assignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders(),
 ) : CimDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion) {
 
     @JvmOverloads
@@ -79,25 +74,29 @@ class NetworkDatabaseReader internal constructor(
     override fun postLoad(): Boolean =
         super.postLoad().also {
             logger.info("Applying feeder direction to network...")
-            normalSetFeederDirection.run(service)
-            currentSetFeederDirection.run(service)
+            setFeederDirection.run(service, NetworkStateOperators.NORMAL)
+            setFeederDirection.run(service, NetworkStateOperators.CURRENT)
             logger.info("Feeder direction applied to network.")
 
             logger.info("Applying phases to network...")
-            normalSetPhases.run(service)
-            currentSetPhases.run(service)
-            if (inferPhases)
-            logInferredPhases(normalPhaseInferrer.run(service), currentPhaseInferrer.run(service))
+            setPhases.run(service, NetworkStateOperators.NORMAL)
+            setPhases.run(service, NetworkStateOperators.CURRENT)
+            if (inferPhases) {
+                logInferredPhases(
+                    phaseInferrer.run(service, NetworkStateOperators.NORMAL),
+                    phaseInferrer.run(service, NetworkStateOperators.CURRENT)
+                )
+            }
             logger.info("Phasing applied to network.")
 
             logger.info("Assigning equipment to feeders...")
-            normalAssignToFeeders.run(service)
-            currentAssignToFeeders.run(service)
+            assignToFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToFeeders.run(service, NetworkStateOperators.CURRENT)
             logger.info("Equipment assigned to feeders.")
 
             logger.info("Assigning equipment to LV feeders...")
-            normalAssignToLvFeeders.run(service)
-            currentAssignToLvFeeders.run(service)
+            assignToLvFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToLvFeeders.run(service, NetworkStateOperators.CURRENT)
             logger.info("Equipment assigned to LV feeders.")
 
             logger.info("Validating that each equipment is assigned to a container...")

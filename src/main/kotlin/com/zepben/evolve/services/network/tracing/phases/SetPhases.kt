@@ -117,8 +117,7 @@ class SetPhases(
     }
 
     private fun runTerminal(terminal: Terminal, trace: NetworkTrace<PhasesToFlow> = createNetworkTrace()) {
-        val phaseStatus = stateOperators.phaseStatus(terminal)
-        val nominalPhasePaths = terminal.phases.map { NominalPhasePath(SinglePhaseKind.NONE, phaseStatus[it]) }
+        val nominalPhasePaths = terminal.phases.map { NominalPhasePath(SinglePhaseKind.NONE, it) }
         trace.run(terminal, PhasesToFlow(nominalPhasePaths), canStopOnStartItem = false)
         trace.reset()
     }

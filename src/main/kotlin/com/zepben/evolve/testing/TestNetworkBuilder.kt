@@ -503,21 +503,21 @@ open class TestNetworkBuilder {
      * @return The [NetworkService] created by this [TestNetworkBuilder]
      */
     fun build(applyDirectionsFromSources: Boolean = true): NetworkService {
-        Tracing.setDirection(NetworkStateOperators.NORMAL).run(network)
-        Tracing.setDirection(NetworkStateOperators.CURRENT).run(network)
-        Tracing.setPhases(NetworkStateOperators.NORMAL).run(network)
-        Tracing.setPhases(NetworkStateOperators.CURRENT).run(network)
+        Tracing.setDirection().run(network, NetworkStateOperators.NORMAL)
+        Tracing.setDirection().run(network, NetworkStateOperators.CURRENT)
+        Tracing.setPhases().run(network, NetworkStateOperators.NORMAL)
+        Tracing.setPhases().run(network, NetworkStateOperators.CURRENT)
 
         if (applyDirectionsFromSources)
             network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach {
-                Tracing.setDirection(NetworkStateOperators.NORMAL).run(it)
-                Tracing.setDirection(NetworkStateOperators.CURRENT).run(it)
+                Tracing.setDirection().run(it, NetworkStateOperators.NORMAL)
+                Tracing.setDirection().run(it, NetworkStateOperators.CURRENT)
             }
 
-        Tracing.assignEquipmentToFeeders(NetworkStateOperators.NORMAL).run(network)
-        Tracing.assignEquipmentToFeeders(NetworkStateOperators.CURRENT).run(network)
-        Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.NORMAL).run(network)
-        Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.CURRENT).run(network)
+        Tracing.assignEquipmentToFeeders().run(network, NetworkStateOperators.NORMAL)
+        Tracing.assignEquipmentToFeeders().run(network, NetworkStateOperators.CURRENT)
+        Tracing.assignEquipmentToLvFeeders().run(network, NetworkStateOperators.NORMAL)
+        Tracing.assignEquipmentToLvFeeders().run(network, NetworkStateOperators.CURRENT)
 
         return network
     }

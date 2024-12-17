@@ -37,12 +37,14 @@ internal class AssignToLvFeedersTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
+    private val assignToLvFeeders = AssignToLvFeeders()
+
     @Test
     internal fun appliesToEquipmentOnHeadTerminalSide() {
         val network = FeederStartPointBetweenConductorsNetwork.create(makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         validateEquipment(lvFeeder.equipment, "fsp", "c2")
     }
@@ -52,7 +54,7 @@ internal class AssignToLvFeedersTest {
         val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = true, currentlyOpen = false, makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         validateEquipment(lvFeeder.equipment, "fsp", "c1", "op")
         validateEquipment(lvFeeder.currentEquipment)
@@ -63,7 +65,7 @@ internal class AssignToLvFeedersTest {
         val network = FeederStartPointToOpenPointNetwork.create(normallyOpen = false, currentlyOpen = true, makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
-        AssignToLvFeeders(NetworkStateOperators.CURRENT).run(network)
+        assignToLvFeeders.run(network, NetworkStateOperators.CURRENT)
 
         validateEquipment(lvFeeder.equipment)
         validateEquipment(lvFeeder.currentEquipment, "fsp", "c1", "op")
@@ -75,7 +77,7 @@ internal class AssignToLvFeedersTest {
         val lvFeeder1: LvFeeder = network["f1"]!!
         val lvFeeder2: LvFeeder = network["f2"]!!
 
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         validateEquipment(lvFeeder1.equipment, "fsp1", "c2", "fsp2")
         validateEquipment(lvFeeder2.equipment, "fsp1", "c2", "fsp2")
@@ -87,7 +89,7 @@ internal class AssignToLvFeedersTest {
         val lvFeeder1: LvFeeder = network["f1"]!!
         val lvFeeder2: LvFeeder = network["f2"]!!
 
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         validateEquipment(lvFeeder1.equipment, "fsp1", "c2", "fsp2")
         validateEquipment(lvFeeder2.equipment, "fsp2", "c3")
@@ -98,7 +100,7 @@ internal class AssignToLvFeedersTest {
         val network = DroppedPhasesNetwork.create(makeFeederLv = true)
         val lvFeeder: LvFeeder = network["f"]!!
 
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         validateEquipment(lvFeeder.equipment, "fcb", "acls1", "acls2", "acls3", "iso", "acls4", "tx")
     }
@@ -120,7 +122,7 @@ internal class AssignToLvFeedersTest {
             }
 
         val lvFeeder: LvFeeder = network["lvf3"]!!
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
         validateEquipment(lvFeeder.equipment, "b0", "c1")
     }
 
@@ -142,7 +144,7 @@ internal class AssignToLvFeedersTest {
             }
 
         val lvFeeder: LvFeeder = network["lvf4"]!!
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
         validateEquipment(lvFeeder.equipment, "b0", "c1", "tx2")
     }
 
@@ -164,8 +166,8 @@ internal class AssignToLvFeedersTest {
         val feeder: Feeder = network["fdr4"]!!
         val lvFeeder: LvFeeder = network["lvf5"]!!
 
-        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        AssignToFeeders().run(network, NetworkStateOperators.NORMAL)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         assertThat(feeder.normalEnergizedLvFeeders, empty())
         assertThat(lvFeeder.normalEnergizingFeeders, empty())
@@ -184,8 +186,8 @@ internal class AssignToLvFeedersTest {
         val lvFeeder1: LvFeeder = network["lvf2"]!!
         val lvFeeder2: LvFeeder = network["lvf3"]!!
 
-        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        AssignToFeeders().run(network, NetworkStateOperators.NORMAL)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         assertThat(feeder.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder1, lvFeeder2))
         assertThat(lvFeeder1.normalEnergizingFeeders, containsInAnyOrder(feeder))
@@ -205,8 +207,8 @@ internal class AssignToLvFeedersTest {
         val feeder2: Feeder = network["fdr2"]!!
         val lvFeeder: LvFeeder = network["lvf3"]!!
 
-        AssignToFeeders(NetworkStateOperators.NORMAL).run(network)
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        AssignToFeeders().run(network, NetworkStateOperators.NORMAL)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         assertThat(feeder1.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
         assertThat(feeder2.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
@@ -227,7 +229,7 @@ internal class AssignToLvFeedersTest {
 
         val lvFeeder: LvFeeder = network["lvf2"]!!
 
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         validateEquipment(lvFeeder.equipment, "b0", "c1", "a1", "a2")
     }
@@ -257,7 +259,7 @@ internal class AssignToLvFeedersTest {
 
         val lvFeeder: LvFeeder = network["lvf1"]!!
 
-        AssignToLvFeeders(NetworkStateOperators.NORMAL).run(network)
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         validateEquipment(lvFeeder.equipment, "b0", "prsys3")
     }

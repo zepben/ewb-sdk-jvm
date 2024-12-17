@@ -24,10 +24,10 @@ import com.zepben.evolve.services.network.tracing.traversal.StepContext
  * Requires that a Feeder have a normalHeadTerminal with associated ConductingEquipment.
  * This class is backed by a [NetworkTrace].
  */
-class AssignToLvFeeders(
-    internal val stateOperators: NetworkStateOperators
-) {
-    fun run(network: NetworkService) {
+class AssignToLvFeeders {
+
+    @JvmOverloads
+    fun run(network: NetworkService, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) {
         val terminalToAuxEquipment = network.sequenceOf<AuxiliaryEquipment>()
             .filter { it.terminal != null }
             .groupBy { it.terminal!! }
@@ -43,20 +43,22 @@ class AssignToLvFeeders(
             }
             .toSet()
 
-        network.sequenceOf<LvFeeder>().forEach { run(it, lvFeederStartPoints, terminalToAuxEquipment) }
+        network.sequenceOf<LvFeeder>().forEach { run(networkStateOperators, it, lvFeederStartPoints, terminalToAuxEquipment) }
     }
 
     private fun run(
+        stateOperators: NetworkStateOperators,
         lvFeeder: LvFeeder,
         feederStartPoints: Set<ConductingEquipment>,
         terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
     ) {
         val headTerminal = lvFeeder.normalHeadTerminal ?: return
-        val traversal = createTrace(terminalToAuxEquipment, feederStartPoints, listOf(lvFeeder))
+        val traversal = createTrace(stateOperators, terminalToAuxEquipment, feederStartPoints, listOf(lvFeeder))
         traversal.run(headTerminal, canStopOnStartItem = false)
     }
 
     private fun createTrace(
+        stateOperators: NetworkStateOperators,
         terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
         lvFeederStartPoints: Set<ConductingEquipment>,
         lvFeedersToAssign: List<LvFeeder>,
@@ -65,7 +67,9 @@ class AssignToLvFeeders(
             .addCondition { stopAtOpen() }
             .addStopCondition { (path), _ -> lvFeederStartPoints.contains(path.toEquipment) }
             .addQueueCondition { (path), _, _, _ -> !reachedHv(path.toEquipment) }
-            .addStepAction { (path), context -> process(path, context, terminalToAuxEquipment, lvFeederStartPoints, lvFeedersToAssign) }
+            .addStepAction { (path), context ->
+                process(stateOperators, path, context, terminalToAuxEquipment, lvFeederStartPoints, lvFeedersToAssign)
+            }
     }
 
     private val reachedHv: (ConductingEquipment) -> Boolean = { ce ->
@@ -73,6 +77,7 @@ class AssignToLvFeeders(
     }
 
     private fun process(
+        stateOperators: NetworkStateOperators,
         stepPath: NetworkTraceStep.Path,
         stepContext: StepContext,
         terminalToAuxEquipment: Map<Terminal, Collection<AuxiliaryEquipment>>,

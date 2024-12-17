@@ -264,8 +264,10 @@ internal class RemoveDirectionTest {
     }
 
     private fun removeDirections(terminal: Terminal, feederDirection: FeederDirection = NONE) {
-        RemoveDirection(NetworkStateOperators.NORMAL).run(terminal, feederDirection)
-        RemoveDirection(NetworkStateOperators.CURRENT).run(terminal, feederDirection)
+        RemoveDirection().apply {
+            run(terminal, feederDirection, NetworkStateOperators.NORMAL)
+            run(terminal, feederDirection, NetworkStateOperators.CURRENT)
+        }
     }
 
     private fun NetworkService.validateDirections(

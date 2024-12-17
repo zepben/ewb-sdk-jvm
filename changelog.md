@@ -2,6 +2,8 @@
 ## [0.25.0] - UNRELEASED
 ### Breaking Changes
 * Tracing downstream/upstream using a NetworkTrace will not step on a start item if there is no downstream/upstream terminal on the item.
+* `SetDirection` now correctly applies the `BOTH` direction on all parts of the loop again, so if you were relying on the broken intermediate state, you will
+  need to update your code.
 
 ### New Features
 * None.

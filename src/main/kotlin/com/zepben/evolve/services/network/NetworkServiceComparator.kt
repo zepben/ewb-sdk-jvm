@@ -697,7 +697,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
         ObjectDifference(source, target).apply {
             compareConductor()
 
-            compareIdReferences(AcLineSegment::perLengthSequenceImpedance)
+            compareIdReferences(AcLineSegment::perLengthImpedance)
         }
 
     private fun compareBreaker(source: Breaker, target: Breaker): ObjectDifference<Breaker> =

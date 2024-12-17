@@ -5,6 +5,9 @@
 * `AcLineSegment.perLengthSequenceImpedance` has been corrected to `perLengthImpedance`. This has been done in a non-breaking way, however the public resolver
   `Resolvers.perLengthSequenceImpedance` is now `Resolvers.perLengthImpedance`, correctly reflecting the CIM relationship.
 * Removed `getCurrentEquipmentForFeeder` implementation for `NetworkConsumer` as its functionality is now incorporated in `getEquipmentForContainers`.
+* Tracing downstream/upstream using a NetworkTrace will not step on a start item if there is no downstream/upstream terminal on the item.
+* `SetDirection` now correctly applies te `BOTH` direction on all parts of the loop again, so if you were relying on the broken intermediate state, you will
+  need to update your code.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
@@ -41,9 +44,6 @@
 
 ## [0.23.0] - 2024-10-18
 ### Breaking Changes
-* Tracing downstream/upstream using a NetworkTrace will not step on a start item if there is no downstream/upstream terminal on the item.
-
-
 * Updated to latest evolve-grpc major version.
 * Removed unused AuthType enum.
 * Removed unused kotlinx-serialization-json dependency.

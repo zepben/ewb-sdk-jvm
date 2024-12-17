@@ -89,6 +89,7 @@ object Tracing {
         return networkTraceBranching(networkStateOperators, actionStepType, queueFactory, branchQueueFactory) { _, _, _ -> }
     }
 
+    // TODO [Review]: Should these not take the operators at construction but take them when they are run? - Yes change it
     @JvmStatic
     fun setDirection(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): SetDirection = SetDirection(stateOperators)
 

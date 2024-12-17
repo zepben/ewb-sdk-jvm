@@ -60,8 +60,10 @@ internal object NetworkTraceQueueNext {
         currentContext: StepContext,
         computeData: ComputeData<T>,
     ): Sequence<NetworkTraceStep<T>> {
+        val nextNumTerminalSteps = currentStep.nextNumTerminalSteps()
+        val nextNumEquipmentSteps = currentStep.nextNumEquipmentSteps()
         return nextStepPaths(isInService, currentStep.path).map {
-            NetworkTraceStep(it, computeData.computeNext(currentStep, currentContext, it))
+            NetworkTraceStep(it, nextNumTerminalSteps, nextNumEquipmentSteps, computeData.computeNext(currentStep, currentContext, it))
         }
     }
 
@@ -71,25 +73,25 @@ internal object NetworkTraceQueueNext {
         currentContext: StepContext,
         computeNextT: ComputeDataWithPaths<T>,
     ): List<NetworkTraceStep<T>> {
+        val nextNumTerminalSteps = currentStep.nextNumTerminalSteps()
+        val nextNumEquipmentSteps = currentStep.nextNumEquipmentSteps()
         val nextPaths = nextStepPaths(isInService, currentStep.path).toList()
         return nextPaths.map {
-            NetworkTraceStep(it, computeNextT.computeNext(currentStep, currentContext, it, nextPaths))
+            NetworkTraceStep(it, nextNumTerminalSteps, nextNumEquipmentSteps, computeNextT.computeNext(currentStep, currentContext, it, nextPaths))
         }
     }
 
     private fun nextStepPaths(isInService: CheckInService, path: Path): Sequence<Path> {
         val nextTerminals = nextTerminals(isInService, path)
-        val nextNumEquipmentSteps = if (path.tracedInternally) path.numEquipmentSteps + 1 else path.numEquipmentSteps
-        val nextNumTerminalSteps = path.numTerminalSteps + 1
 
         return if (path.nominalPhasePaths.isNotEmpty()) {
             val phasePaths = path.nominalPhasePaths.map { it.to }.toSet()
             nextTerminals
                 .map { nextTerminal -> TerminalConnectivityConnected.terminalConnectivity(path.toTerminal, nextTerminal, phasePaths) }
                 .filter { it.nominalPhasePaths.isNotEmpty() }
-                .map { Path(path.toTerminal, it.toTerminal, nextNumTerminalSteps, nextNumEquipmentSteps, it.nominalPhasePaths) }
+                .map { Path(path.toTerminal, it.toTerminal, it.nominalPhasePaths) }
         } else {
-            nextTerminals.map { Path(path.toTerminal, it, nextNumTerminalSteps, nextNumEquipmentSteps) }
+            nextTerminals.map { Path(path.toTerminal, it) }
         }
     }
 
@@ -119,5 +121,9 @@ internal object NetworkTraceQueueNext {
 
     private fun Terminal.hasConnectedBusbars(): Boolean =
         connectivityNode?.terminals?.any { it !== this && it.conductingEquipment is BusbarSection } ?: false
+
+    private fun NetworkTraceStep<*>.nextNumTerminalSteps() = numTerminalSteps + 1
+    private fun NetworkTraceStep<*>.nextNumEquipmentSteps() = if (path.tracedInternally) numEquipmentSteps + 1 else numEquipmentSteps
+
 
 }

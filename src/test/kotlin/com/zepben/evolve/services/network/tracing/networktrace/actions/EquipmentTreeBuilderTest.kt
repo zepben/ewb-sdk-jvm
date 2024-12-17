@@ -39,13 +39,13 @@ internal class EquipmentTreeBuilderTest {
         val path = mockk<NetworkTraceStep.Path>()
         val ce = mockk<ConductingEquipment>()
         every { path.toEquipment } returns ce
-        val initialValue = builder.computeInitialValue(NetworkTraceStep(path, Unit))
+        val initialValue = builder.computeInitialValue(NetworkTraceStep(path, 0, 0, Unit))
         assertThat(initialValue.parent, nullValue())
         assertThat(initialValue.identifiedObject, sameInstance(ce))
         assertThat(initialValue.children, empty())
 
         // Make sure that if a step with the same equipment is computed initially it returns the same tree node, not a new node
-        val initialValue2 = builder.computeInitialValue(NetworkTraceStep(path, Unit))
+        val initialValue2 = builder.computeInitialValue(NetworkTraceStep(path, 0, 0, Unit))
         assertThat(initialValue2, sameInstance(initialValue))
     }
 
@@ -57,7 +57,7 @@ internal class EquipmentTreeBuilderTest {
         val treeNode = mockk<TreeNode<ConductingEquipment>>()
 
         val builder = EquipmentTreeBuilder()
-        val nextNode = builder.computeNextValue(NetworkTraceStep(nextPath, Unit), nextItem, treeNode)
+        val nextNode = builder.computeNextValue(NetworkTraceStep(nextPath, 1, 1, Unit), nextItem, treeNode)
         assertThat(nextNode, sameInstance(treeNode))
     }
 
@@ -71,7 +71,7 @@ internal class EquipmentTreeBuilderTest {
         val currentNode = mockk<TreeNode<ConductingEquipment>>()
 
         val builder = EquipmentTreeBuilder()
-        val nextNode = builder.computeNextValueTyped(NetworkTraceStep(nextPath, Unit), nextItem, currentNode)
+        val nextNode = builder.computeNextValueTyped(NetworkTraceStep(nextPath, 1, 1, Unit), nextItem, currentNode)
         assertThat(nextNode.parent, sameInstance(currentNode))
         assertThat(nextNode.identifiedObject, sameInstance(ce))
         assertThat(nextNode.children, empty())

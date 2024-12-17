@@ -59,11 +59,13 @@ class NetworkTraceStep<out T>(
         val fromTerminal: Terminal,
         val toTerminal: Terminal,
         val nominalPhasePaths: List<NominalPhasePath> = emptyList(),
-        // TODO [Review]: Add this now?
+
         // This will need to be added when we add clamps to the model. The proposed idea is that if an AcLineSegment has multiple clamps and your current
         // path is one of the clamps, one of the next step paths will be another clamp on the AcLineSegment, essentially jumping over the AcLineSegment for the Path.
         // If there is a cut on the AcLineSegment, you may need to know about it, primarily because the cut could create an open point between the clamps that needs
         // to prevent queuing as part of an "open test".
+        // NOTE: Not sure if we will actually need this in the constructor as you could technically pull it back off the Cut or Clamp from / to equipment.
+        //       There is just a performance hit to compute that vs if you already have it when constructing the object.
         // abstract val viaSegment: AcLineSegment? = null,
     ) {
         val fromEquipment: ConductingEquipment =

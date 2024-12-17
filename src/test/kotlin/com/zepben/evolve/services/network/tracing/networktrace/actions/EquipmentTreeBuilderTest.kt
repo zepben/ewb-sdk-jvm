@@ -23,7 +23,6 @@ import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -82,7 +81,6 @@ internal class EquipmentTreeBuilderTest {
     fun `add child to parent on applying step`() {
         val builder = EquipmentTreeBuilder()
         val item = mockk<NetworkTraceStep<*>>()
-        val ce = mockk<ConductingEquipment>()
         val node = mockk<TreeNode<ConductingEquipment>>()
         val parent = mockk<TreeNode<ConductingEquipment>>()
         every { node.parent } returns parent
@@ -163,19 +161,14 @@ internal class EquipmentTreeBuilderTest {
         assertThat(findNodes(root, "j10"), hasSize(1))
         assertThat(findNodes(root, "acLineSegment10"), hasSize(1))
 
-        // NOTE: We short circuit reprocessing loops to avoid reprocessing on unlikely weird looping connectivity
-        //       which can cause massive computation blowout on large networks. This being the case, because j10-t2
-        //       gets run first, j12-t1 only ends up with an UPSTREAM because when j10-t3 goes to be run, it already
-        //       has BOTH and thus does not try to continue. The issue with this is that j12-t1 is never visited
-        //       in the opposing direction and thus not flowing both the other way around the loop back to j10-t2.
-        assertThat(findNodes(root, "j11"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
-        assertThat(findNodes(root, "acLineSegment11"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
-        assertThat(findNodes(root, "j12"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
+        assertThat(findNodes(root, "j11"), hasSize(3))
+        assertThat(findNodes(root, "acLineSegment11"), hasSize(3))
+        assertThat(findNodes(root, "j12"), hasSize(3))
         assertThat(findNodes(root, "acLineSegment12"), hasSize(4))
-        assertThat(findNodes(root, "j13"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
-        assertThat(findNodes(root, "acLineSegment13"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
+        assertThat(findNodes(root, "j13"), hasSize(3))
+        assertThat(findNodes(root, "acLineSegment13"), hasSize(3))
         assertThat(findNodes(root, "j14"), hasSize(4))
-        assertThat(findNodes(root, "acLineSegment14"), hasSize(1)) // Would have been 3 if the intermediate loop was reprocessed.
+        assertThat(findNodes(root, "acLineSegment14"), hasSize(3))
         assertThat(findNodes(root, "acLineSegment15"), hasSize(4))
         assertThat(findNodes(root, "acLineSegment16"), hasSize(4))
 
@@ -201,14 +194,14 @@ internal class EquipmentTreeBuilderTest {
         assertThat(findNodeDepths(root, "acLineSegment9"), equalTo(listOf(7)))
         assertThat(findNodeDepths(root, "j10"), equalTo(listOf(6)))
         assertThat(findNodeDepths(root, "acLineSegment10"), equalTo(listOf(5)))
-        assertThat(findNodeDepths(root, "j11"), equalTo(listOf(8))) // Would have been 8, 10, 12 if the intermediate loop was reprocessed.
-        assertThat(findNodeDepths(root, "acLineSegment11"), equalTo(listOf(7))) // Would have been 7, 11, 13 if the intermediate loop was reprocessed.
-        assertThat(findNodeDepths(root, "j12"), equalTo(listOf(10))) // Would have been 8, 10, 10 if the intermediate loop was reprocessed.
+        assertThat(findNodeDepths(root, "j11"), equalTo(listOf(8, 10, 12)))
+        assertThat(findNodeDepths(root, "acLineSegment11"), equalTo(listOf(7, 11, 13)))
+        assertThat(findNodeDepths(root, "j12"), equalTo(listOf(8, 10, 10)))
         assertThat(findNodeDepths(root, "acLineSegment12"), equalTo(listOf(7, 10, 11, 14)))
-        assertThat(findNodeDepths(root, "j13"), equalTo(listOf(12))) // Would have been 10, 12, 12 if the intermediate loop was reprocessed.
-        assertThat(findNodeDepths(root, "acLineSegment13"), equalTo(listOf(9))) // Would have been 9, 9, 11 if the intermediate loop was reprocessed.
+        assertThat(findNodeDepths(root, "j13"), equalTo(listOf(10, 12, 12)))
+        assertThat(findNodeDepths(root, "acLineSegment13"), equalTo(listOf(9, 9, 11)))
         assertThat(findNodeDepths(root, "j14"), equalTo(listOf(8, 9, 12, 13)))
-        assertThat(findNodeDepths(root, "acLineSegment14"), equalTo(listOf(11))) // Would have been 9, 11, 11 if the intermediate loop was reprocessed.
+        assertThat(findNodeDepths(root, "acLineSegment14"), equalTo(listOf(9, 11, 11)))
         assertThat(findNodeDepths(root, "acLineSegment15"), equalTo(listOf(7, 10, 12, 13)))
         assertThat(findNodeDepths(root, "acLineSegment16"), equalTo(listOf(8, 9, 11, 14)))
     }
@@ -226,7 +219,7 @@ internal class EquipmentTreeBuilderTest {
             assertThat(treeParent, notNullValue())
             assertThat(treeParent!!.identifiedObject, equalTo(parent))
         } else
-            assertThat(treeNode.parent, Matchers.nullValue())
+            assertThat(treeNode.parent, nullValue())
 
         assertThat(treeNode.children, hasSize(children.size))
         for (i in children.indices) {

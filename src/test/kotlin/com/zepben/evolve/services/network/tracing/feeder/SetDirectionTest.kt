@@ -16,13 +16,16 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.evolve.services.network.tracing.feeder.DirectionValidator.validateDirections
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection.*
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertTimeoutPreemptively
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.time.Duration
 
 internal class SetDirectionTest {
 
@@ -229,15 +232,11 @@ internal class SetDirectionTest {
 
         doSetDirectionTrace(n.getT("j0", 1))
 
-        // To avoid reprocessing all BOTH loops in larger networks we do not process anything with a direction already set. This means this test will apply
-        // a standard UP/DOWN path through j2-t2 through to j6-t2 and then a BOTH loop around the c9/j4 loop which will stop the reverse UP/DOWN path
-        // ever being processed from j6-t2 via j2-t3.
-
         n.getT("j0", 1).validateDirections(DOWNSTREAM)
         n.getT("c1", 1).validateDirections(UPSTREAM)
         n.getT("c1", 2).validateDirections(DOWNSTREAM)
         n.getT("j2", 1).validateDirections(UPSTREAM)
-        n.getT("j2", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("j2", 2).validateDirections(BOTH)
         n.getT("j2", 3).validateDirections(BOTH)
         n.getT("c3", 1).validateDirections(BOTH)
         n.getT("c3", 2).validateDirections(BOTH)
@@ -245,20 +244,20 @@ internal class SetDirectionTest {
         n.getT("j4", 2).validateDirections(BOTH)
         n.getT("c5", 1).validateDirections(BOTH)
         n.getT("c5", 2).validateDirections(BOTH)
-        n.getT("j6", 1).validateDirections(DOWNSTREAM)  // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("j6", 2).validateDirections(UPSTREAM)  // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("j6", 1).validateDirections(BOTH)
+        n.getT("j6", 2).validateDirections(BOTH)
         n.getT("j6", 3).validateDirections(DOWNSTREAM)
         n.getT("c7", 1).validateDirections(UPSTREAM)
         n.getT("c7", 2).validateDirections(DOWNSTREAM)
         n.getT("j8", 1).validateDirections(UPSTREAM)
         n.getT("c9", 1).validateDirections(BOTH)
         n.getT("c9", 2).validateDirections(BOTH)
-        n.getT("c10", 1).validateDirections(UPSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("c10", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("j11", 1).validateDirections(UPSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("j11", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("c12", 1).validateDirections(UPSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("c12", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("c10", 1).validateDirections(BOTH)
+        n.getT("c10", 2).validateDirections(BOTH)
+        n.getT("j11", 1).validateDirections(BOTH)
+        n.getT("j11", 2).validateDirections(BOTH)
+        n.getT("c12", 1).validateDirections(BOTH)
+        n.getT("c12", 2).validateDirections(BOTH)
     }
 
     @Test
@@ -309,7 +308,7 @@ internal class SetDirectionTest {
         n.getT("c1", 1).validateDirections(UPSTREAM)
         n.getT("c1", 2).validateDirections(DOWNSTREAM)
         n.getT("j2", 1).validateDirections(UPSTREAM)
-        n.getT("j2", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("j2", 2).validateDirections(BOTH)
         n.getT("j2", 3).validateDirections(BOTH)
         n.getT("c3", 1).validateDirections(BOTH)
         n.getT("c3", 2).validateDirections(BOTH)
@@ -407,6 +406,34 @@ internal class SetDirectionTest {
         n.getT("c4", 2).validateDirections(DOWNSTREAM)
         n.getT("c5", 1).validateDirections(UPSTREAM)
         n.getT("c5", 2).validateDirections(DOWNSTREAM)
+    }
+
+    @Test
+    internal fun `ensure there are no exponential blowouts in the loop processing`() {
+        //
+        // NOTE: This test was added to ensure the loop processing wasn't blowing out when there are many nested loops. The original
+        //       fix was to prevent reprocessing of the loop, but this caused parts of the loop to be "damaged", so now we allow a
+        //       single re-pass which fixes this, without the exponential complexity increase of the original version.
+        //
+        val builder = TestNetworkBuilder()
+            .fromSource() // s0
+            .toJunction(numTerminals = 3) // j1
+            .addFeeder("s0")
+
+        // A loop of 10 solved quickly, 11 was slower but still acceptable, 20 was unworkable, so if 20 passes in the timeout we are happy.
+        for (i in 3..20) {
+            // Create the most simple loop of all back onto the junction over and over.
+            builder.fromAcls()
+                .connect("j1", "c$i", 2, 1)
+                .connect("j1", "c$i", 3, 2)
+        }
+
+        assertTimeoutPreemptively(
+            Duration.ofMillis(100),
+            message = "If this test times out, you have managed to break things as described in the test note. Go fix it."
+        ) {
+            Tracing.setDirection(NetworkStateOperators.NORMAL).run(builder.network)
+        }
     }
 
     private fun doSetDirectionTrace(terminal: Terminal) {

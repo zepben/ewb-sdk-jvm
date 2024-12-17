@@ -27,6 +27,9 @@ class SetDirection(
     internal val stateOperators: NetworkStateOperators,
 ) {
 
+    // Used to track the loops we have already reprocessed to prevent computation blowouts.
+    private val reprocessedLoopTerminals = mutableSetOf<Terminal>()
+
     private val traversal: NetworkTrace<FeederDirection> = Tracing.networkTraceBranching(
         networkStateOperators = stateOperators,
         actionStepType = NetworkTraceActionType.ALL_STEPS,
@@ -41,14 +44,22 @@ class SetDirection(
                 else -> FeederDirection.NONE
             }
 
-            // NOTE: Stopping / short circuiting by checking that the next direction is already present in the toTerminal,
-            //       causes stop certain looping network configurations not to be reprocessed. This means that some parts of
+            //
+            // NOTE: Stopping / short-circuiting by checking that the next direction is already present in the toTerminal,
+            //       causes certain looping network configurations not to be reprocessed. This means that some parts of
             //       loops do not end up with BOTH directions. This is done to stop massive computational blowout on
-            //       on large networks with weird looping connectivity that rarely happens in reality.
-            if (nextDirection == FeederDirection.NONE || nextDirection in stateOperators.getDirection(nextPath.toTerminal))
-                FeederDirection.NONE
-            else
-                nextDirection
+            //       large networks with weird looping connectivity that rarely happens in reality.
+            //
+            //       To allow these parts of the loop to be correctly processed without the computational blowout, we allow
+            //       a single re-pass over the loop, controlled by the `reprocessedLoopTerminals` set.
+            //
+            val nextTerminalDirection = stateOperators.getDirection(nextPath.toTerminal)
+            when {
+                nextDirection == FeederDirection.NONE -> FeederDirection.NONE
+                nextDirection !in nextTerminalDirection -> nextDirection
+                (nextTerminalDirection == FeederDirection.BOTH) && reprocessedLoopTerminals.add(nextPath.toTerminal) -> nextDirection
+                else -> FeederDirection.NONE
+            }
         }
     )
         .addCondition { stopAtOpen() }
@@ -84,6 +95,7 @@ class SetDirection(
      * @param terminal The terminal to start applying direction from.
      */
     fun run(terminal: Terminal) {
+        reprocessedLoopTerminals.clear()
         traversal.reset().run(terminal, FeederDirection.DOWNSTREAM, canStopOnStartItem = false)
     }
 
@@ -93,7 +105,7 @@ class SetDirection(
                 .asSequence()
                 .filterIsInstance<Feeder>()
                 .any { it.normalHeadTerminal == terminal }
-        } ?: false
+        } == true
 
     private fun reachedSubstationTransformer(terminal: Terminal?): Boolean =
         terminal?.conductingEquipment.let { ce -> (ce is PowerTransformer) && ce.substations.isNotEmpty() }

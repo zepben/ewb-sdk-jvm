@@ -89,29 +89,28 @@ object Tracing {
         return networkTraceBranching(networkStateOperators, actionStepType, queueFactory, branchQueueFactory) { _, _, _ -> }
     }
 
-    // TODO [Review]: Should these not take the operators at construction but take them when they are run? - Yes change it
     @JvmStatic
-    fun setDirection(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): SetDirection = SetDirection(stateOperators)
+    fun setDirection(): SetDirection = SetDirection()
 
     @JvmStatic
-    fun removeDirection(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): RemoveDirection = RemoveDirection(stateOperators)
+    fun removeDirection(): RemoveDirection = RemoveDirection()
 
     @JvmStatic
-    fun assignEquipmentToFeeders(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): AssignToFeeders = AssignToFeeders(stateOperators)
+    fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
 
     @JvmStatic
-    fun assignEquipmentToLvFeeders(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): AssignToLvFeeders = AssignToLvFeeders(stateOperators)
+    fun assignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
 
     @JvmStatic
-    fun setPhases(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): SetPhases = SetPhases(stateOperators)
+    fun setPhases(): SetPhases = SetPhases()
 
     @JvmStatic
-    fun phaseInferrer(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): PhaseInferrer = PhaseInferrer(stateOperators)
+    fun phaseInferrer(): PhaseInferrer = PhaseInferrer()
 
     @JvmStatic
-    fun removePhases(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): RemovePhases = RemovePhases(stateOperators)
+    fun removePhases(): RemovePhases = RemovePhases()
 
     @JvmStatic
-    fun findSwerEquipment(stateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): FindSwerEquipment = FindSwerEquipment(stateOperators)
+    fun findSwerEquipment(): FindSwerEquipment = FindSwerEquipment()
 
 }

@@ -219,27 +219,27 @@ fun createOperationalRestriction(networkService: NetworkService, mRID: String, n
     }
 
 inline fun <reified T : ConductingEquipment> T.addFeederDirections(terminal: Int = 1): T {
-    getTerminal(terminal)?.also { Tracing.setDirection(NetworkStateOperators.NORMAL).run(it) }
-    getTerminal(terminal)?.also { Tracing.setDirection(NetworkStateOperators.CURRENT).run(it) }
+    getTerminal(terminal)?.also { Tracing.setDirection().run(it, NetworkStateOperators.NORMAL) }
+    getTerminal(terminal)?.also { Tracing.setDirection().run(it, NetworkStateOperators.CURRENT) }
     return this
 }
 
 fun NetworkService.setPhases() {
-    Tracing.setPhases(NetworkStateOperators.NORMAL).run(this)
-    Tracing.setPhases(NetworkStateOperators.CURRENT).run(this)
+    Tracing.setPhases().run(this, NetworkStateOperators.NORMAL)
+    Tracing.setPhases().run(this, NetworkStateOperators.CURRENT)
 }
 
 fun NetworkService.setFeederDirections() {
-    Tracing.setDirection(NetworkStateOperators.NORMAL).run(this)
-    Tracing.setDirection(NetworkStateOperators.CURRENT).run(this)
+    Tracing.setDirection().run(this, NetworkStateOperators.NORMAL)
+    Tracing.setDirection().run(this, NetworkStateOperators.CURRENT)
 }
 
 fun NetworkService.assignEquipmentToFeeders() {
-    Tracing.assignEquipmentToFeeders(NetworkStateOperators.NORMAL).run(this)
-    Tracing.assignEquipmentToFeeders(NetworkStateOperators.CURRENT).run(this)
+    Tracing.assignEquipmentToFeeders().run(this, NetworkStateOperators.NORMAL)
+    Tracing.assignEquipmentToFeeders().run(this, NetworkStateOperators.CURRENT)
 }
 
 fun NetworkService.assignEquipmentToLvFeeders() {
-    Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.NORMAL).run(this)
-    Tracing.assignEquipmentToLvFeeders(NetworkStateOperators.CURRENT).run(this)
+    Tracing.assignEquipmentToLvFeeders().run(this, NetworkStateOperators.NORMAL)
+    Tracing.assignEquipmentToLvFeeders().run(this, NetworkStateOperators.CURRENT)
 }

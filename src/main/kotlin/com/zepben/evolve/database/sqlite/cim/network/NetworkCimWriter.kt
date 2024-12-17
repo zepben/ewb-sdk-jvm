@@ -107,7 +107,7 @@ class NetworkCimWriter(
         val insert = databaseTables.getInsert<TablePanDemandResponseFunctions>()
 
         insert.setNullableString(table.KIND.queryIndex, panDemandResponseFunction.kind.name)
-        insert.setNullableInt(table.APPLIANCE.queryIndex, panDemandResponseFunction.appliance?.toInt())
+        insert.setNullableInt(table.APPLIANCE.queryIndex, panDemandResponseFunction.controlledApplianceBitmask)
 
         return saveEndDeviceFunction(table, insert, panDemandResponseFunction, "pan demand response function")
     }

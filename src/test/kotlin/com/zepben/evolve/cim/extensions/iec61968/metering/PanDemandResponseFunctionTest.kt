@@ -9,8 +9,8 @@
 package com.zepben.evolve.cim.extensions.iec61968.metering
 
 import com.zepben.evolve.cim.iec61968.metering.ControlledAppliance
+import com.zepben.evolve.cim.iec61968.metering.ControlledAppliance.Appliance.*
 import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunctionKind
-import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.testutils.exception.ExpectException.Companion.expect
@@ -37,131 +37,143 @@ internal class PanDemandResponseFunctionTest {
         val panDemandResponseFunction = PanDemandResponseFunction()
 
         assertThat(panDemandResponseFunction.kind, equalTo(EndDeviceFunctionKind.UNKNOWN))
-        assertThat(panDemandResponseFunction.appliance, nullValue())
+        assertThat(panDemandResponseFunction.controlledApplianceBitmask, nullValue())
+        assertThat(panDemandResponseFunction.controlledAppliance, nullValue())
 
         panDemandResponseFunction.fillFields(NetworkService())
 
         assertThat(panDemandResponseFunction.kind, equalTo(EndDeviceFunctionKind.autonomousDst))
-        assertThat(panDemandResponseFunction.appliance, equalTo(ControlledAppliance.fromInt(1365)))
+        assertThat(panDemandResponseFunction.controlledApplianceBitmask, equalTo(1365))
+        assertThat(panDemandResponseFunction.controlledAppliance, equalTo(ControlledAppliance(1365)))
     }
 
     @Test
-    internal fun assignApplianceByControlledAppliance() {
+    internal fun `can add and remove appliances`() {
         val panDemandResponseFunction = PanDemandResponseFunction()
-        val ca = ControlledAppliance.fromInt(300)
 
-        panDemandResponseFunction.assignAppliance(ca)
+        // Add an appliance with no previous bitmask.
+        assertThat("Should have added", panDemandResponseFunction.addAppliance(WATER_HEATER))
+        panDemandResponseFunction.controlledAppliance.validate(isWaterHeater = true)
 
-        assertThat(panDemandResponseFunction.appliance, equalTo(ca))
+        // Add an appliance with a previous bitmask.
+        assertThat("Should have added", panDemandResponseFunction.addAppliance(ELECTRIC_VEHICLE))
+        panDemandResponseFunction.controlledAppliance.validate(isWaterHeater = true, isElectricVehicle = true)
+
+        // Add a duplicate appliance.
+        assertThat("Shouldn't have added duplicate", !panDemandResponseFunction.addAppliance(ELECTRIC_VEHICLE))
+        panDemandResponseFunction.controlledAppliance.validate(isWaterHeater = true, isElectricVehicle = true)
+
+        // Remove an appliance with a remaining bitmask.
+        assertThat("Should have removed", panDemandResponseFunction.removeAppliance(WATER_HEATER))
+        panDemandResponseFunction.controlledAppliance.validate(isElectricVehicle = true)
+
+        // Remove an appliance that wasn't included.
+        assertThat("Shouldn't have removed unused", !panDemandResponseFunction.removeAppliance(WATER_HEATER))
+        panDemandResponseFunction.controlledAppliance.validate(isElectricVehicle = true)
+
+        // Remove an appliance with no remaining bitmask.
+        assertThat("Should have removed", panDemandResponseFunction.removeAppliance(ELECTRIC_VEHICLE))
+        panDemandResponseFunction.controlledAppliance.validate()
     }
 
     @Test
-    internal fun assignApplianceByInt() {
+    internal fun `can add and remove multiple appliances`() {
         val panDemandResponseFunction = PanDemandResponseFunction()
-        val ca = ControlledAppliance.fromInt(300)
 
-        panDemandResponseFunction.assignAppliance(300)
+        // Must include appliances to add.
+        expect { panDemandResponseFunction.addAppliances() }.toThrow<IllegalArgumentException>()
 
-        assertThat(panDemandResponseFunction.appliance, equalTo(ca))
-    }
+        // Add appliance with no previous bitmask.
+        assertThat("Should have added", panDemandResponseFunction.addAppliances(SMART_APPLIANCE, IRRIGATION_PUMP))
+        panDemandResponseFunction.controlledAppliance.validate(isSmartAppliance = true, isIrrigationPump = true)
 
-    @Test
-    internal fun assignApplianceBySettingEachValueIndividually() {
-        val panDemandResponseFunction = PanDemandResponseFunction()
-        val ca = ControlledAppliance.fromInt(1365)
-
-        panDemandResponseFunction.assignAppliance(
-            isElectricVehicle = true,
-            isExteriorLighting = false,
-            isGenerationSystem = true,
-            isHvacCompressorOrFurnace = false,
-            isInteriorLighting = true,
-            isIrrigationPump = false,
-            isManagedCommercialIndustrialLoad = true,
-            isPoolPumpSpaJacuzzi = false,
-            isSimpleMiscLoad = true,
-            isSmartAppliance = false,
-            isStripAndBaseboardHeater = true,
-            isWaterHeater = false
+        // Add partial duplicate appliance with a previous bitmask.
+        assertThat("Should have added", panDemandResponseFunction.addAppliances(ELECTRIC_VEHICLE, IRRIGATION_PUMP))
+        panDemandResponseFunction.controlledAppliance.validate(
+            isSmartAppliance = true,
+            isIrrigationPump = true,
+            isElectricVehicle = true
         )
 
-        assertThat(panDemandResponseFunction.appliance, equalTo(ca))
-    }
-
-    @Test
-    internal fun `assigning controlled appliance to panDemandResponseFunction with existing appliance throws`() {
-        val panDemandResponseFunction = PanDemandResponseFunction()
-
-        panDemandResponseFunction.fillFields(NetworkService())
-
-        expect { panDemandResponseFunction.assignAppliance(1234) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("Unable to assign this ControlledAppliance to ${panDemandResponseFunction.typeNameAndMRID()}. A ControlledAppliance is already assigned to this PanDemandResponseFunction, try using the updateAppliance function.")
-
-    }
-
-    @Test
-    internal fun `updating controlled appliance of panDemandResponseFunction without existing appliance throws`() {
-        val panDemandResponseFunction = PanDemandResponseFunction()
-
-        expect { panDemandResponseFunction.updateAppliance(isExteriorLighting = true) }
-            .toThrow<IllegalArgumentException>()
-            .withMessage("Unable to update ControlledAppliance of ${panDemandResponseFunction.typeNameAndMRID()}. A ControlledAppliance must be assigned to this PanDemandResponseFunction first, try using the assignAppliance function.")
-
-    }
-
-    @Test
-    internal fun updateAppliance() {
-        val panDemandResponseFunction = PanDemandResponseFunction()
-
-        panDemandResponseFunction.assignAppliance(
-            isElectricVehicle = true,
-            isExteriorLighting = false,
-            isGenerationSystem = true,
-            isHvacCompressorOrFurnace = false,
-            isInteriorLighting = true,
-            isIrrigationPump = false,
-            isManagedCommercialIndustrialLoad = true,
-            isPoolPumpSpaJacuzzi = false,
-            isSimpleMiscLoad = true,
-            isSmartAppliance = false,
-            isStripAndBaseboardHeater = true,
-            isWaterHeater = false
+        // Add duplicate appliances.
+        assertThat("Shouldn't have added", !panDemandResponseFunction.addAppliances(ELECTRIC_VEHICLE, IRRIGATION_PUMP))
+        panDemandResponseFunction.controlledAppliance.validate(
+            isSmartAppliance = true,
+            isIrrigationPump = true,
+            isElectricVehicle = true
         )
 
-        panDemandResponseFunction.updateAppliance(
-            isStripAndBaseboardHeater = false,
-            isWaterHeater = true
-        )
+        // Must include appliances to remove.
+        expect { panDemandResponseFunction.removeAppliances() }.toThrow<IllegalArgumentException>()
 
-        assertThat(
-            panDemandResponseFunction.appliance, equalTo(
-                ControlledAppliance(
-                    isElectricVehicle = true,
-                    isExteriorLighting = false,
-                    isGenerationSystem = true,
-                    isHvacCompressorOrFurnace = false,
-                    isInteriorLighting = true,
-                    isIrrigationPump = false,
-                    isManagedCommercialIndustrialLoad = true,
-                    isPoolPumpSpaJacuzzi = false,
-                    isSimpleMiscLoad = true,
-                    isSmartAppliance = false,
-                    isStripAndBaseboardHeater = false,
-                    isWaterHeater = true
-                )
-            )
-        )
+        // Remove appliances with a remaining bitmask.
+        assertThat("Should have removed", panDemandResponseFunction.removeAppliances(ELECTRIC_VEHICLE, IRRIGATION_PUMP))
+        panDemandResponseFunction.controlledAppliance.validate(isSmartAppliance = true)
+
+        // Remove appliances that weren't included.
+        assertThat("Shouldn't have removed", !panDemandResponseFunction.removeAppliances(ELECTRIC_VEHICLE, IRRIGATION_PUMP))
+        panDemandResponseFunction.controlledAppliance.validate(isSmartAppliance = true)
+
+        // Remove partial unused appliances with no remaining bitmask.
+        assertThat("Should have removed", panDemandResponseFunction.removeAppliances(SMART_APPLIANCE, IRRIGATION_PUMP))
+        panDemandResponseFunction.controlledAppliance.validate()
     }
 
     @Test
-    internal fun clearAppliance() {
+    internal fun `removing an appliance initialises the bitmask`() {
+        // Removing an appliance with no previous bitmask marks the controlled appliance as used.
         val panDemandResponseFunction = PanDemandResponseFunction()
 
-        panDemandResponseFunction.fillFields(NetworkService())
-        panDemandResponseFunction.clearAppliance()
+        assertThat(panDemandResponseFunction.controlledApplianceBitmask, nullValue())
+        assertThat(panDemandResponseFunction.controlledAppliance, nullValue())
 
-        assertThat(panDemandResponseFunction.appliance, nullValue())
+        assertThat("Shouldn't have removed", panDemandResponseFunction.removeAppliance(ELECTRIC_VEHICLE))
+
+        assertThat(panDemandResponseFunction.controlledApplianceBitmask, equalTo(0))
+        panDemandResponseFunction.controlledAppliance.validate()
+    }
+
+    @Test
+    internal fun `removing appliances initialises the bitmask`() {
+        // Removing appliances with no previous bitmask marks the controlled appliance as used.
+        val panDemandResponseFunction = PanDemandResponseFunction()
+
+        assertThat(panDemandResponseFunction.controlledApplianceBitmask, nullValue())
+        assertThat(panDemandResponseFunction.controlledAppliance, nullValue())
+
+        assertThat("Shouldn't have removed", panDemandResponseFunction.removeAppliances(ELECTRIC_VEHICLE, WATER_HEATER))
+
+        assertThat(panDemandResponseFunction.controlledApplianceBitmask, equalTo(0))
+        panDemandResponseFunction.controlledAppliance.validate()
+    }
+
+    private fun ControlledAppliance?.validate(
+        isElectricVehicle: Boolean = false,
+        isExteriorLighting: Boolean = false,
+        isGenerationSystem: Boolean = false,
+        isHvacCompressorOrFurnace: Boolean = false,
+        isInteriorLighting: Boolean = false,
+        isIrrigationPump: Boolean = false,
+        isManagedCommercialIndustrialLoad: Boolean = false,
+        isPoolPumpSpaJacuzzi: Boolean = false,
+        isSimpleMiscLoad: Boolean = false,
+        isSmartAppliance: Boolean = false,
+        isStripAndBaseboardHeater: Boolean = false,
+        isWaterHeater: Boolean = false
+    ) {
+        assertThat(this, notNullValue())
+        assertThat(this!!.isElectricVehicle, equalTo(isElectricVehicle))
+        assertThat(this.isExteriorLighting, equalTo(isExteriorLighting))
+        assertThat(this.isGenerationSystem, equalTo(isGenerationSystem))
+        assertThat(this.isHvacCompressorOrFurnace, equalTo(isHvacCompressorOrFurnace))
+        assertThat(this.isInteriorLighting, equalTo(isInteriorLighting))
+        assertThat(this.isIrrigationPump, equalTo(isIrrigationPump))
+        assertThat(this.isManagedCommercialIndustrialLoad, equalTo(isManagedCommercialIndustrialLoad))
+        assertThat(this.isPoolPumpSpaJacuzzi, equalTo(isPoolPumpSpaJacuzzi))
+        assertThat(this.isSimpleMiscLoad, equalTo(isSimpleMiscLoad))
+        assertThat(this.isSmartAppliance, equalTo(isSmartAppliance))
+        assertThat(this.isStripAndBaseboardHeater, equalTo(isStripAndBaseboardHeater))
+        assertThat(this.isWaterHeater, equalTo(isWaterHeater))
     }
 
 }

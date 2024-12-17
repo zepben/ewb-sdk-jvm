@@ -8,8 +8,6 @@
 
 package com.zepben.evolve.cim.iec61968.metering
 
-import kotlin.reflect.full.declaredMemberProperties
-
 /**
  * Appliance controlled with a PAN device control.
  *
@@ -26,82 +24,41 @@ import kotlin.reflect.full.declaredMemberProperties
  * @property isStripAndBaseboardHeater True if the appliance is a strip or baseboard heater.
  * @property isWaterHeater True if the appliance is a water heater.
  */
-data class ControlledAppliance @JvmOverloads constructor(
-    val isElectricVehicle: Boolean = false,
-    val isExteriorLighting: Boolean = false,
-    val isGenerationSystem: Boolean = false,
-    val isHvacCompressorOrFurnace: Boolean = false,
-    val isInteriorLighting: Boolean = false,
-    val isIrrigationPump: Boolean = false,
-    val isManagedCommercialIndustrialLoad: Boolean = false,
-    val isPoolPumpSpaJacuzzi: Boolean = false,
-    val isSimpleMiscLoad: Boolean = false,
-    val isSmartAppliance: Boolean = false,
-    val isStripAndBaseboardHeater: Boolean = false,
-    val isWaterHeater: Boolean = false
-) {
-    /**
-     * Return the int representation of this [ControlledAppliance]
-     */
-    fun toInt(): Int {
-        var result = 0
-        ControlledAppliance::class.declaredMemberProperties.forEach { property ->
-            result += bitmask(property.name).times(if (property.get(this) == false) 0 else 1)
-        }
-        return result
+data class ControlledAppliance(internal val bitmask: Int) {
+
+    constructor(appliance: Appliance) : this(appliance.bitmask)
+    constructor(appliance: Appliance, vararg appliances: Appliance) : this(appliances.fold(appliance.bitmask) { bitmask, next -> bitmask or next.bitmask })
+
+    val isElectricVehicle: Boolean get() = Appliance.ELECTRIC_VEHICLE in bitmask
+    val isExteriorLighting: Boolean get() = Appliance.EXTERIOR_LIGHTING in bitmask
+    val isGenerationSystem: Boolean get() = Appliance.GENERATION_SYSTEM in bitmask
+    val isHvacCompressorOrFurnace: Boolean get() = Appliance.HVAC_COMPRESSOR_OR_FURNACE in bitmask
+    val isInteriorLighting: Boolean get() = Appliance.INTERIOR_LIGHTING in bitmask
+    val isIrrigationPump: Boolean get() = Appliance.IRRIGATION_PUMP in bitmask
+    val isManagedCommercialIndustrialLoad: Boolean get() = Appliance.MANAGED_COMMERCIAL_INDUSTRIAL_LOAD in bitmask
+    val isPoolPumpSpaJacuzzi: Boolean get() = Appliance.POOL_PUMP_SPA_JACUZZI in bitmask
+    val isSimpleMiscLoad: Boolean get() = Appliance.SIMPLE_MISC_LOAD in bitmask
+    val isSmartAppliance: Boolean get() = Appliance.SMART_APPLIANCE in bitmask
+    val isStripAndBaseboardHeater: Boolean get() = Appliance.STRIP_AND_BASEBOARD_HEATER in bitmask
+    val isWaterHeater: Boolean get() = Appliance.WATER_HEATER in bitmask
+
+    enum class Appliance(index: Int) {
+        ELECTRIC_VEHICLE(0),
+        EXTERIOR_LIGHTING(1),
+        GENERATION_SYSTEM(2),
+        HVAC_COMPRESSOR_OR_FURNACE(3),
+        INTERIOR_LIGHTING(4),
+        IRRIGATION_PUMP(5),
+        MANAGED_COMMERCIAL_INDUSTRIAL_LOAD(6),
+        POOL_PUMP_SPA_JACUZZI(7),
+        SIMPLE_MISC_LOAD(8),
+        SMART_APPLIANCE(9),
+        STRIP_AND_BASEBOARD_HEATER(10),
+        WATER_HEATER(11);
+
+        val bitmask: Int = 1 shl index
     }
 
-    companion object {
-        /**
-         * Return a [ControlledAppliance]
-         *
-         * @param int the bitmask of the configuration
-         * @return The [ControlledAppliance] with the specified configuration.
-         */
-        fun fromInt(int: Int): ControlledAppliance {
-            return ControlledAppliance::class.declaredMemberProperties.map {
-                decode(it.name, int)
-            }.let { value ->
-                ControlledAppliance(
-                    value[0],
-                    value[1],
-                    value[2],
-                    value[3],
-                    value[4],
-                    value[5],
-                    value[6],
-                    value[7],
-                    value[8],
-                    value[9],
-                    value[10],
-                    value[11]
-                )
-            }
-        }
-
-        // Decode the setting for a variable base on input Int
-        private fun decode(variableName: String, int: Int): Boolean {
-            return int and bitmask(variableName) > 0
-        }
-
-        // Get the bitmask of a property of this class
-        private fun bitmask(variableName: String): Int {
-            return when (variableName) {
-                "isElectricVehicle" -> 1 shl 0
-                "isExteriorLighting" -> 1 shl 1
-                "isGenerationSystem" -> 1 shl 2
-                "isHvacCompressorOrFurnace" -> 1 shl 3
-                "isInteriorLighting" -> 1 shl 4
-                "isIrrigationPump" -> 1 shl 5
-                "isManagedCommercialIndustrialLoad" -> 1 shl 6
-                "isPoolPumpSpaJacuzzi" -> 1 shl 7
-                "isSimpleMiscLoad" -> 1 shl 8
-                "isSmartAppliance" -> 1 shl 9
-                "isStripAndBaseboardHeater" -> 1 shl 10
-                "isWaterHeater" -> 1 shl 11
-                else -> -1
-            }
-        }
-    }
+    private operator fun Int.contains(appliance: Appliance): Boolean = (this and appliance.bitmask) != 0
 
 }

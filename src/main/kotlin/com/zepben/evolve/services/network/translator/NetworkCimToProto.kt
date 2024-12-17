@@ -260,7 +260,7 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.
 fun toPb(cim: PanDemandResponseFunction, pb: PBPanDemandResponseFunction.Builder): PBPanDemandResponseFunction.Builder =
     pb.apply {
         kind = EndDeviceFunctionKind.valueOf(cim.kind.name)
-        appliance = cim.appliance?.toInt() ?: UNKNOWN_INT
+        appliance = cim.controlledApplianceBitmask ?: UNKNOWN_INT
         toPb(cim, edfBuilder)
     }
 

@@ -191,8 +191,8 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.
  */
 fun toCim(pb: PBPanDemandResponseFunction, networkService: NetworkService): PanDemandResponseFunction =
     PanDemandResponseFunction(pb.mRID()).apply {
-        pb.appliance.takeUnless { it == UNKNOWN_INT }?.also { ap -> assignAppliance(ap) }
         kind = pb.kind?.let { k -> EndDeviceFunctionKind.valueOf(k.name) } ?: EndDeviceFunctionKind.UNKNOWN
+        controlledApplianceBitmask = pb.appliance.takeUnless { it == UNKNOWN_INT }
         toCim(pb.edf, this, networkService)
     }
 

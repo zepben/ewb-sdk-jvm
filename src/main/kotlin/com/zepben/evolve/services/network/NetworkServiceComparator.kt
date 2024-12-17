@@ -66,7 +66,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
         ObjectDifference(source, target).apply {
             compareEndDeviceFunction()
 
-            compareValues(PanDemandResponseFunction::kind, PanDemandResponseFunction::appliance)
+            compareValues(PanDemandResponseFunction::kind, PanDemandResponseFunction::controlledApplianceBitmask)
         }
 
     /************ EXTENSION IEC61970 BASE WIRES ************/

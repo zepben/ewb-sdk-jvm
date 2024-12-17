@@ -22,6 +22,7 @@ internal class TracedPhasesTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     @Test
+    @Suppress("DEPRECATION")
     internal fun tracedPhases() {
         val terminal = Terminal()
         assertThat(terminal.tracedPhases.normal, sameInstance(terminal.normalPhases))

@@ -48,19 +48,13 @@ fun PanDemandResponseFunction.fillFields(service: NetworkService, includeRuntime
     (this as EndDeviceFunction).fillFields(service, includeRuntime)
 
     kind = EndDeviceFunctionKind.autonomousDst
-    assignAppliance(
-        isElectricVehicle = true,
-        isExteriorLighting = false,
-        isGenerationSystem = true,
-        isHvacCompressorOrFurnace = false,
-        isInteriorLighting = true,
-        isIrrigationPump = false,
-        isManagedCommercialIndustrialLoad = true,
-        isPoolPumpSpaJacuzzi = false,
-        isSimpleMiscLoad = true,
-        isSmartAppliance = false,
-        isStripAndBaseboardHeater = true,
-        isWaterHeater = false
+    controlledAppliance = ControlledAppliance(
+        ControlledAppliance.Appliance.ELECTRIC_VEHICLE,
+        ControlledAppliance.Appliance.GENERATION_SYSTEM,
+        ControlledAppliance.Appliance.INTERIOR_LIGHTING,
+        ControlledAppliance.Appliance.MANAGED_COMMERCIAL_INDUSTRIAL_LOAD,
+        ControlledAppliance.Appliance.SIMPLE_MISC_LOAD,
+        ControlledAppliance.Appliance.STRIP_AND_BASEBOARD_HEATER,
     )
 
     return this
@@ -123,6 +117,7 @@ fun OverheadWireInfo.fillFields(service: NetworkService, includeRuntime: Boolean
 fun PowerTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerTransformerInfo {
     (this as AssetInfo).fillFields(service, includeRuntime)
 
+    @Suppress("unused")
     for (i in 0..1) {
         addTransformerTankInfo(TransformerTankInfo().also {
             it.powerTransformerInfo = this
@@ -208,6 +203,7 @@ fun TransformerTankInfo.fillFields(service: NetworkService, includeRuntime: Bool
         service.add(it)
     }
 
+    @Suppress("unused")
     for (i in 0..1) {
         addTransformerEndInfo(TransformerEndInfo().also {
             it.transformerTankInfo = this
@@ -359,6 +355,7 @@ fun PotentialTransformerInfo.fillFields(service: NetworkService, includeRuntime:
 fun EndDevice.fillFields(service: NetworkService, includeRuntime: Boolean = true): EndDevice {
     (this as AssetContainer).fillFields(service, includeRuntime)
 
+    @Suppress("unused")
     for (i in 0..1) {
         addUsagePoint(UsagePoint().also {
             it.addEndDevice(this)
@@ -397,6 +394,7 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
     approvedInverterCapacity = 5000
     phaseCode = PhaseCode.AN
 
+    @Suppress("unused")
     for (i in 0..1) {
         addEquipment(Junction().also {
             it.addUsagePoint(this)
@@ -417,6 +415,7 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
 fun OperationalRestriction.fillFields(service: NetworkService, includeRuntime: Boolean = true): OperationalRestriction {
     (this as Document).fillFieldsCommon(service, includeRuntime)
 
+    @Suppress("unused")
     for (i in 0..1) {
         addEquipment(Junction().also {
             it.addOperationalRestriction(this)
@@ -469,6 +468,7 @@ fun PotentialTransformer.fillFields(service: NetworkService, includeRuntime: Boo
 fun Sensor.fillFields(service: NetworkService, includeRuntime: Boolean = true): Sensor {
     (this as AuxiliaryEquipment).fillFields(service, includeRuntime)
 
+    @Suppress("unused")
     for (i in 0..1) {
         addRelayFunction(CurrentRelay().also {
             it.addSensor(this)
@@ -502,6 +502,7 @@ fun ConnectivityNodeContainer.fillFields(service: NetworkService, includeRuntime
 fun ConnectivityNode.fillFields(service: NetworkService, includeRuntime: Boolean = true): ConnectivityNode {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
+    @Suppress("unused")
     for (i in 0..1)
         addTerminal(Terminal().also {
             it.connectivityNode = this
@@ -514,6 +515,7 @@ fun ConnectivityNode.fillFields(service: NetworkService, includeRuntime: Boolean
 fun EquipmentContainer.fillFields(service: NetworkService, includeRuntime: Boolean = true): EquipmentContainer {
     (this as ConnectivityNodeContainer).fillFields(service, includeRuntime)
 
+    @Suppress("unused")
     for (i in 0..1)
         addEquipment(Junction().also {
             it.addContainer(this)
@@ -533,12 +535,14 @@ fun Feeder.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
     }
 
     if (includeRuntime) {
+        @Suppress("unused")
         for (i in 0..1)
             addNormalEnergizedLvFeeder(LvFeeder().also {
                 it.addNormalEnergizingFeeder(this)
                 service.add(it)
             })
 
+        @Suppress("unused")
         for (i in 0..1)
             addCurrentEquipment(Junction().also {
                 it.addCurrentContainer(this)
@@ -555,6 +559,7 @@ fun Feeder.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
 fun GeographicalRegion.fillFields(service: NetworkService, includeRuntime: Boolean = true): GeographicalRegion {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
+    @Suppress("unused")
     for (i in 0..1)
         addSubGeographicalRegion(SubGeographicalRegion().also { service.add(it) })
 
@@ -577,6 +582,7 @@ fun Equipment.fillFields(service: NetworkService, includeRuntime: Boolean = true
     normallyInService = false
     commissionedDate = Instant.MIN
 
+    @Suppress("unused")
     for (i in 0..1) {
         addUsagePoint(UsagePoint().also {
             it.addEquipment(this)
@@ -609,6 +615,7 @@ fun ConductingEquipment.fillFields(service: NetworkService, includeRuntime: Bool
 
     baseVoltage = BaseVoltage().also { service.add(it) }
 
+    @Suppress("unused")
     for (i in 0..1)
         addTerminal(Terminal().also { service.add(it) })
 
@@ -628,6 +635,7 @@ fun SubGeographicalRegion.fillFields(service: NetworkService, includeRuntime: Bo
         service.add(it)
     }
 
+    @Suppress("unused")
     for (i in 0..1)
         addSubstation(Substation().also { service.add(it) })
 
@@ -642,6 +650,7 @@ fun Substation.fillFields(service: NetworkService, includeRuntime: Boolean = tru
         service.add(it)
     }
 
+    @Suppress("unused")
     for (i in 0..1) {
         addFeeder(Feeder().also { service.add(it) })
 
@@ -840,6 +849,7 @@ fun ProtectionRelayScheme.fillFields(service: NetworkService, includeRuntime: Bo
         service.add(it)
     }
 
+    @Suppress("unused")
     for (i in 0..1) {
         addFunction(CurrentRelay().also {
             it.addScheme(this)
@@ -855,6 +865,7 @@ fun ProtectionRelaySystem.fillFields(service: NetworkService, includeRuntime: Bo
 
     protectionKind = ProtectionKind.DISTANCE
 
+    @Suppress("unused")
     for (i in 0..1) {
         addScheme(ProtectionRelayScheme().also {
             it.system = this
@@ -1252,6 +1263,7 @@ fun PowerTransformer.fillFields(service: NetworkService, includeRuntime: Boolean
     function = TransformerFunctionKind.voltageRegulator
     assetInfo = PowerTransformerInfo().also { service.add(it) }
 
+    @Suppress("unused")
     for (i in 0..1) {
         addEnd(PowerTransformerEnd().also {
             it.powerTransformer = this
@@ -1289,6 +1301,7 @@ fun ProtectedSwitch.fillFields(service: NetworkService, includeRuntime: Boolean 
 
     breakingCapacity = 1
 
+    @Suppress("unused")
     for (i in 0..1) {
         addRelayFunction(CurrentRelay().also {
             it.addProtectedSwitch(this)
@@ -1409,7 +1422,7 @@ fun Switch.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
 
     setNormallyOpen(true)
     setOpen(true)
-    // when unganged support is added to protobuf
+    // when un-ganged support is added to protobuf
     //    normalOpen = 2
     //    open = 3
 
@@ -1521,6 +1534,7 @@ fun Circuit.fillFields(service: NetworkService, includeRuntime: Boolean = true):
         service.add(it)
     }
 
+    @Suppress("unused")
     for (i in 0..1) {
         addEndTerminal(Terminal().also { service.add(it) })
         addEndSubstation(Substation().also {
@@ -1536,6 +1550,7 @@ fun Circuit.fillFields(service: NetworkService, includeRuntime: Boolean = true):
 fun Loop.fillFields(service: NetworkService, includeRuntime: Boolean = true): Loop {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
+    @Suppress("unused")
     for (i in 0..1) {
         addCircuit(Circuit().also {
             it.loop = this
@@ -1562,12 +1577,14 @@ fun LvFeeder.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     normalHeadTerminal = Terminal().also { service.add(it) }
 
     if (includeRuntime) {
+        @Suppress("unused")
         for (i in 0..1)
             addNormalEnergizingFeeder(Feeder().also {
                 it.addNormalEnergizedLvFeeder(this)
                 service.add(it)
             })
 
+        @Suppress("unused")
         for (i in 0..1)
             addCurrentEquipment(Junction().also {
                 it.addCurrentContainer(this)

@@ -386,6 +386,27 @@ internal class SetPhasesTest {
         PhaseValidator.validatePhases(n, "tx3", PhaseCode.AN.singlePhases, listOf(SPK.A, SPK.NONE))
     }
 
+    @Test
+    internal fun `can set phases from an unknown nominal phase`() {
+        //
+        // 1--c0--21--c1--2
+        //
+        val n = TestNetworkBuilder()
+            .fromAcls(PhaseCode.X) // c0
+            .toAcls(PhaseCode.ABC) // c1
+            .network
+
+        val t = n.getT("c0", 2)
+        t.normalPhases[SPK.X] = SPK.A
+        t.currentPhases[SPK.X] = SPK.A
+        SetPhases(NetworkStateOperators.NORMAL).run(t)
+        SetPhases(NetworkStateOperators.CURRENT).run(t)
+
+        PhaseValidator.validatePhases(n, "c0", PhaseCode.NONE, PhaseCode.A)
+        PhaseValidator.validatePhases(n, "c1", listOf(SPK.A, SPK.NONE, SPK.NONE), listOf(SPK.A, SPK.NONE, SPK.NONE))
+    }
+
+
     private fun TestNetworkBuilder.buildAndLog() = build().apply {
         PhaseLogger.trace(listOf<EnergySource>())
     }

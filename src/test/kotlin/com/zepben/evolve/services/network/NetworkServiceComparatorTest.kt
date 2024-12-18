@@ -428,7 +428,6 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             createConductingEquipment,
             { Terminal(mRID = "1").apply { conductingEquipment = it } },
             { Terminal(mRID = "2").apply { conductingEquipment = it } },
-            Terminal::conductingEquipment.setter,
             NetworkServiceComparatorOptions.all().copy(compareTerminals = false), optionsStopCompare = true
         )
     }
@@ -1148,8 +1147,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         )
 
         comparatorValidator.validateIndexedCollection(
-            PowerTransformer::ends, PowerTransformer::addEnd, { PowerTransformer(it) },
-            { PowerTransformerEnd(mRID = "pte1") }, { PowerTransformerEnd(mRID = "pte2") }, PowerTransformerEnd::powerTransformer.setter
+            PowerTransformer::ends,
+            PowerTransformer::addEnd,
+            { PowerTransformer(it) },
+            { PowerTransformerEnd(mRID = "pte1").apply { powerTransformer = it } },
+            { PowerTransformerEnd(mRID = "pte2").apply { powerTransformer = it } },
         )
     }
 

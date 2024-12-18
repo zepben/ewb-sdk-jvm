@@ -33,8 +33,8 @@ class PerLengthPhaseImpedance @JvmOverloads constructor(mRID: String = "") : Per
     /**
      * Get the matrix entry for the corresponding to and from phases.
      *
-     * @param fromPhase The from phase to lookup.
-     * @param toPhase The to phase to lookup.
+     * @param fromPhase The "from" phase to lookup.
+     * @param toPhase The "to" phase to lookup.
      * @return The matching [PhaseImpedanceData] or null if none was found.
      */
     fun getData(fromPhase: SinglePhaseKind, toPhase: SinglePhaseKind): PhaseImpedanceData? =
@@ -43,7 +43,7 @@ class PerLengthPhaseImpedance @JvmOverloads constructor(mRID: String = "") : Per
     /**
      * Add a [PhaseImpedanceData] to this [PerLengthPhaseImpedance]
      * @param phaseImpedanceData The [PhaseImpedanceData] to add
-     * @return this [PerLengthPhaseImpedance] for fluent use.
+     * @return This [PerLengthPhaseImpedance] for fluent use.
      */
     fun addData(phaseImpedanceData: PhaseImpedanceData): PerLengthPhaseImpedance {
         require(

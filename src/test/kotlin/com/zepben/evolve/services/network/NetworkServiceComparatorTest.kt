@@ -1035,6 +1035,20 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     }
 
     @Test
+    internal fun comparePerLengthPhaseImpedance() {
+        comparePerLengthImpedance { PerLengthPhaseImpedance(it) }
+
+        comparatorValidator.validateUnorderedCollection(
+            PerLengthPhaseImpedance::data,
+            PerLengthPhaseImpedance::addData,
+            { PerLengthPhaseImpedance(it) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 1.0, 2.0, 3.0, 4.0) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.C, 1.0, 2.0, 3.0, 4.0) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 2.0, 3.0, 4.0, 5.0) },
+        )
+    }
+
+    @Test
     internal fun comparePerLengthSequenceImpedance() {
         comparePerLengthImpedance { PerLengthSequenceImpedance(it) }
 

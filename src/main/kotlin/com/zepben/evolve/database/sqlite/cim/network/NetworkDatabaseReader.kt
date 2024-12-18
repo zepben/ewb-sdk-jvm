@@ -122,11 +122,7 @@ class NetworkDatabaseReader internal constructor(
 
     private fun validateEquipmentContainers(networkService: NetworkService) {
         val missingContainers = networkService.listOf<Equipment> { it.containers.isEmpty() }
-        val countByClass = mutableMapOf<String, Int>()
-        missingContainers.forEach {
-            countByClass.getOrPut(it.javaClass.simpleName) { 0 }
-            countByClass[it.javaClass.simpleName] = countByClass[it.javaClass.simpleName]!! + 1
-        }
+        val countByClass = missingContainers.groupingBy { it.javaClass.simpleName }.eachCount()
         countByClass.forEach { (className, count) ->
             logger.warn("$count ${className}s were missing an equipment container.")
         }

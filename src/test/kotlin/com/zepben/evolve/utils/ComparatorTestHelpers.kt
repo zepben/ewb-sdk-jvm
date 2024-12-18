@@ -335,8 +335,8 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
 
         ObjectDifference(sourceEmpty, inTargetSameOrder).apply {
             differences[property.name] = CollectionDifference().apply {
-                missingFromSource.add(getValueOrReferenceDifference(getItem1(target), null))
-                missingFromSource.add(getValueOrReferenceDifference(getItem2(target), null))
+                missingFromSource.add(getValueOrReferenceDifference(null, getItem1(target)))
+                missingFromSource.add(getValueOrReferenceDifference(null, getItem2(target)))
             }
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
 

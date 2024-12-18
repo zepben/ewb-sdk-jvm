@@ -846,7 +846,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareConductor { AcLineSegment(it) }
 
         comparatorValidator.validateProperty(
-            AcLineSegment::perLengthSequenceImpedance,
+            AcLineSegment::perLengthImpedance,
             { AcLineSegment(it) },
             { PerLengthSequenceImpedance("p1") },
             { PerLengthSequenceImpedance("p2") })

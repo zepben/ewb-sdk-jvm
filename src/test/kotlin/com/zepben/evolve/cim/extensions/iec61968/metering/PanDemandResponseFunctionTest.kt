@@ -37,14 +37,14 @@ internal class PanDemandResponseFunctionTest {
         val panDemandResponseFunction = PanDemandResponseFunction()
 
         assertThat(panDemandResponseFunction.kind, equalTo(EndDeviceFunctionKind.UNKNOWN))
-        assertThat(panDemandResponseFunction.controlledApplianceBitmask, nullValue())
-        assertThat(panDemandResponseFunction.controlledAppliance, nullValue())
+        assertThat(panDemandResponseFunction.applianceBitmask, nullValue())
+        assertThat(panDemandResponseFunction.appliance, nullValue())
 
         panDemandResponseFunction.fillFields(NetworkService())
 
         assertThat(panDemandResponseFunction.kind, equalTo(EndDeviceFunctionKind.autonomousDst))
-        assertThat(panDemandResponseFunction.controlledApplianceBitmask, equalTo(1365))
-        assertThat(panDemandResponseFunction.controlledAppliance, equalTo(ControlledAppliance(1365)))
+        assertThat(panDemandResponseFunction.applianceBitmask, equalTo(1365))
+        assertThat(panDemandResponseFunction.appliance, equalTo(ControlledAppliance(1365)))
     }
 
     @Test
@@ -53,27 +53,27 @@ internal class PanDemandResponseFunctionTest {
 
         // Add an appliance with no previous bitmask.
         assertThat("Should have added", panDemandResponseFunction.addAppliance(WATER_HEATER))
-        panDemandResponseFunction.controlledAppliance.validate(isWaterHeater = true)
+        panDemandResponseFunction.appliance.validate(isWaterHeater = true)
 
         // Add an appliance with a previous bitmask.
         assertThat("Should have added", panDemandResponseFunction.addAppliance(ELECTRIC_VEHICLE))
-        panDemandResponseFunction.controlledAppliance.validate(isWaterHeater = true, isElectricVehicle = true)
+        panDemandResponseFunction.appliance.validate(isWaterHeater = true, isElectricVehicle = true)
 
         // Add a duplicate appliance.
         assertThat("Shouldn't have added duplicate", !panDemandResponseFunction.addAppliance(ELECTRIC_VEHICLE))
-        panDemandResponseFunction.controlledAppliance.validate(isWaterHeater = true, isElectricVehicle = true)
+        panDemandResponseFunction.appliance.validate(isWaterHeater = true, isElectricVehicle = true)
 
         // Remove an appliance with a remaining bitmask.
         assertThat("Should have removed", panDemandResponseFunction.removeAppliance(WATER_HEATER))
-        panDemandResponseFunction.controlledAppliance.validate(isElectricVehicle = true)
+        panDemandResponseFunction.appliance.validate(isElectricVehicle = true)
 
         // Remove an appliance that wasn't included.
         assertThat("Shouldn't have removed unused", !panDemandResponseFunction.removeAppliance(WATER_HEATER))
-        panDemandResponseFunction.controlledAppliance.validate(isElectricVehicle = true)
+        panDemandResponseFunction.appliance.validate(isElectricVehicle = true)
 
         // Remove an appliance with no remaining bitmask.
         assertThat("Should have removed", panDemandResponseFunction.removeAppliance(ELECTRIC_VEHICLE))
-        panDemandResponseFunction.controlledAppliance.validate()
+        panDemandResponseFunction.appliance.validate()
     }
 
     @Test
@@ -85,11 +85,11 @@ internal class PanDemandResponseFunctionTest {
 
         // Add appliance with no previous bitmask.
         assertThat("Should have added", panDemandResponseFunction.addAppliances(SMART_APPLIANCE, IRRIGATION_PUMP))
-        panDemandResponseFunction.controlledAppliance.validate(isSmartAppliance = true, isIrrigationPump = true)
+        panDemandResponseFunction.appliance.validate(isSmartAppliance = true, isIrrigationPump = true)
 
         // Add partial duplicate appliance with a previous bitmask.
         assertThat("Should have added", panDemandResponseFunction.addAppliances(ELECTRIC_VEHICLE, IRRIGATION_PUMP))
-        panDemandResponseFunction.controlledAppliance.validate(
+        panDemandResponseFunction.appliance.validate(
             isSmartAppliance = true,
             isIrrigationPump = true,
             isElectricVehicle = true
@@ -97,7 +97,7 @@ internal class PanDemandResponseFunctionTest {
 
         // Add duplicate appliances.
         assertThat("Shouldn't have added", !panDemandResponseFunction.addAppliances(ELECTRIC_VEHICLE, IRRIGATION_PUMP))
-        panDemandResponseFunction.controlledAppliance.validate(
+        panDemandResponseFunction.appliance.validate(
             isSmartAppliance = true,
             isIrrigationPump = true,
             isElectricVehicle = true
@@ -108,15 +108,15 @@ internal class PanDemandResponseFunctionTest {
 
         // Remove appliances with a remaining bitmask.
         assertThat("Should have removed", panDemandResponseFunction.removeAppliances(ELECTRIC_VEHICLE, IRRIGATION_PUMP))
-        panDemandResponseFunction.controlledAppliance.validate(isSmartAppliance = true)
+        panDemandResponseFunction.appliance.validate(isSmartAppliance = true)
 
         // Remove appliances that weren't included.
         assertThat("Shouldn't have removed", !panDemandResponseFunction.removeAppliances(ELECTRIC_VEHICLE, IRRIGATION_PUMP))
-        panDemandResponseFunction.controlledAppliance.validate(isSmartAppliance = true)
+        panDemandResponseFunction.appliance.validate(isSmartAppliance = true)
 
         // Remove partial unused appliances with no remaining bitmask.
         assertThat("Should have removed", panDemandResponseFunction.removeAppliances(SMART_APPLIANCE, IRRIGATION_PUMP))
-        panDemandResponseFunction.controlledAppliance.validate()
+        panDemandResponseFunction.appliance.validate()
     }
 
     @Test
@@ -124,13 +124,13 @@ internal class PanDemandResponseFunctionTest {
         // Removing an appliance with no previous bitmask marks the controlled appliance as used.
         val panDemandResponseFunction = PanDemandResponseFunction()
 
-        assertThat(panDemandResponseFunction.controlledApplianceBitmask, nullValue())
-        assertThat(panDemandResponseFunction.controlledAppliance, nullValue())
+        assertThat(panDemandResponseFunction.applianceBitmask, nullValue())
+        assertThat(panDemandResponseFunction.appliance, nullValue())
 
         assertThat("Shouldn't have removed", panDemandResponseFunction.removeAppliance(ELECTRIC_VEHICLE))
 
-        assertThat(panDemandResponseFunction.controlledApplianceBitmask, equalTo(0))
-        panDemandResponseFunction.controlledAppliance.validate()
+        assertThat(panDemandResponseFunction.applianceBitmask, equalTo(0))
+        panDemandResponseFunction.appliance.validate()
     }
 
     @Test
@@ -138,13 +138,13 @@ internal class PanDemandResponseFunctionTest {
         // Removing appliances with no previous bitmask marks the controlled appliance as used.
         val panDemandResponseFunction = PanDemandResponseFunction()
 
-        assertThat(panDemandResponseFunction.controlledApplianceBitmask, nullValue())
-        assertThat(panDemandResponseFunction.controlledAppliance, nullValue())
+        assertThat(panDemandResponseFunction.applianceBitmask, nullValue())
+        assertThat(panDemandResponseFunction.appliance, nullValue())
 
         assertThat("Shouldn't have removed", panDemandResponseFunction.removeAppliances(ELECTRIC_VEHICLE, WATER_HEATER))
 
-        assertThat(panDemandResponseFunction.controlledApplianceBitmask, equalTo(0))
-        panDemandResponseFunction.controlledAppliance.validate()
+        assertThat(panDemandResponseFunction.applianceBitmask, equalTo(0))
+        panDemandResponseFunction.appliance.validate()
     }
 
     private fun ControlledAppliance?.validate(

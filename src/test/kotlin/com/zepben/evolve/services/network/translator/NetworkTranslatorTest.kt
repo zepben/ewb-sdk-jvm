@@ -231,13 +231,13 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
             // Excluded array data
             TableCurveData::class,
             TableLocationStreetAddresses::class,
+            TablePhaseImpedanceData::class,
             TablePositionPoints::class,
             TablePowerTransformerEndRatings::class,
             TableProtectionRelayFunctionThresholds::class,
             TableProtectionRelayFunctionTimeLimits::class,
             TableProtectionRelayFunctionsSensors::class,
             TableRecloseDelays::class,
-            TablePhaseImpedanceData::class,
         )
 
 }

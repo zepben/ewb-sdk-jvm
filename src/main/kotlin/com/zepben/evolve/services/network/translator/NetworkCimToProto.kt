@@ -260,7 +260,7 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.
 fun toPb(cim: PanDemandResponseFunction, pb: PBPanDemandResponseFunction.Builder): PBPanDemandResponseFunction.Builder =
     pb.apply {
         kind = EndDeviceFunctionKind.valueOf(cim.kind.name)
-        appliance = cim.controlledApplianceBitmask ?: UNKNOWN_INT
+        appliance = cim.applianceBitmask ?: UNKNOWN_INT
         toPb(cim, edfBuilder)
     }
 
@@ -2042,23 +2042,6 @@ fun toPb(cim: PerLengthPhaseImpedance, pb: PBPerLengthPhaseImpedance.Builder): P
     }
 
 /**
- * Convert the [PhaseImpedanceData] into its protobuf counterpart.
- *
- * @param cim The [PhaseImpedanceData] to convert.
- * @param pb The protobuf builder to populate.
- * @return [pb] for fluent use.
- */
-fun toPb(cim: PhaseImpedanceData, pb: PBPhaseImpedanceData.Builder): PBPhaseImpedanceData.Builder =
-    pb.apply {
-        fromPhase = SinglePhaseKind.valueOf(cim.fromPhase.name)
-        toPhase = SinglePhaseKind.valueOf(cim.toPhase.name)
-        b = cim.b ?: UNKNOWN_DOUBLE
-        g = cim.g ?: UNKNOWN_DOUBLE
-        r = cim.r ?: UNKNOWN_DOUBLE
-        x = cim.x ?: UNKNOWN_DOUBLE
-    }
-
-/**
  * Convert the [PerLengthSequenceImpedance] into its protobuf counterpart.
  *
  * @param cim The [PerLengthSequenceImpedance] to convert.
@@ -2089,6 +2072,23 @@ fun toPb(cim: PetersenCoil, pb: PBPetersenCoil.Builder): PBPetersenCoil.Builder 
     pb.apply {
         xGroundNominal = cim.xGroundNominal ?: UNKNOWN_DOUBLE
         toPb(cim, efcBuilder)
+    }
+
+/**
+ * Convert the [PhaseImpedanceData] into its protobuf counterpart.
+ *
+ * @param cim The [PhaseImpedanceData] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: PhaseImpedanceData, pb: PBPhaseImpedanceData.Builder): PBPhaseImpedanceData.Builder =
+    pb.apply {
+        fromPhase = SinglePhaseKind.valueOf(cim.fromPhase.name)
+        toPhase = SinglePhaseKind.valueOf(cim.toPhase.name)
+        b = cim.b ?: UNKNOWN_DOUBLE
+        g = cim.g ?: UNKNOWN_DOUBLE
+        r = cim.r ?: UNKNOWN_DOUBLE
+        x = cim.x ?: UNKNOWN_DOUBLE
     }
 
 /**
@@ -2326,6 +2326,22 @@ fun toPb(cim: SeriesCompensator, pb: PBSeriesCompensator.Builder): PBSeriesCompe
     }
 
 /**
+ * Convert the [ShuntCompensator] into its protobuf counterpart.
+ *
+ * @param cim The [ShuntCompensator] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: ShuntCompensator, pb: PBShuntCompensator.Builder): PBShuntCompensator.Builder =
+    pb.apply {
+        sections = cim.sections ?: UNKNOWN_DOUBLE
+        grounded = cim.grounded
+        nomU = cim.nomU ?: UNKNOWN_INT
+        phaseConnection = PhaseShuntConnectionKind.Enum.valueOf(cim.phaseConnection.name)
+        toPb(cim, rceBuilder)
+    }
+
+/**
  * Convert the [StaticVarCompensator] into its protobuf counterpart.
  *
  * @param cim The [StaticVarCompensator] to convert.
@@ -2339,22 +2355,6 @@ fun toPb(cim: StaticVarCompensator, pb: PBStaticVarCompensator.Builder): PBStati
         q = cim.q ?: UNKNOWN_DOUBLE
         svcControlMode = SVCControlMode.Enum.valueOf(cim.svcControlMode.name)
         voltageSetPoint = cim.voltageSetPoint ?: UNKNOWN_INT
-        toPb(cim, rceBuilder)
-    }
-
-/**
- * Convert the [ShuntCompensator] into its protobuf counterpart.
- *
- * @param cim The [ShuntCompensator] to convert.
- * @param pb The protobuf builder to populate.
- * @return [pb] for fluent use.
- */
-fun toPb(cim: ShuntCompensator, pb: PBShuntCompensator.Builder): PBShuntCompensator.Builder =
-    pb.apply {
-        sections = cim.sections ?: UNKNOWN_DOUBLE
-        grounded = cim.grounded
-        nomU = cim.nomU ?: UNKNOWN_INT
-        phaseConnection = PhaseShuntConnectionKind.Enum.valueOf(cim.phaseConnection.name)
         toPb(cim, rceBuilder)
     }
 
@@ -2596,11 +2596,6 @@ fun PerLengthPhaseImpedance.toPb(): PBPerLengthPhaseImpedance = toPb(this, PBPer
  * An extension for converting any PerLengthSequenceImpedance into its protobuf counterpart.
  */
 fun PerLengthSequenceImpedance.toPb(): PBPerLengthSequenceImpedance = toPb(this, PBPerLengthSequenceImpedance.newBuilder()).build()
-
-/**
- * An extension for converting any PhaseImpedanceData into its protobuf counterpart.
- */
-fun PhaseImpedanceData.toPb(): PBPhaseImpedanceData = toPb(this, PBPhaseImpedanceData.newBuilder()).build()
 
 /**
  * An extension for converting any PetersenCoil into its protobuf counterpart.
@@ -3373,14 +3368,6 @@ class NetworkCimToProto : BaseCimToProto() {
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: PerLengthSequenceImpedance): PBPerLengthSequenceImpedance = cim.toPb()
-
-    /**
-     * Convert the [PhaseImpedanceData] into its protobuf counterpart.
-     *
-     * @param cim The [PhaseImpedanceData] to convert.
-     * @return The protobuf form of [cim].
-     */
-    fun toPb(cim: PhaseImpedanceData): PBPhaseImpedanceData = cim.toPb()
 
     /**
      * Convert the [PetersenCoil] into its protobuf counterpart.

@@ -590,7 +590,6 @@ class NetworkConsumerClient(
             JUMPER -> extractResult(io.jumper.mRID()) { addFromPb(io.jumper) }
             JUNCTION -> extractResult(io.junction.mRID()) { addFromPb(io.junction) }
             LINEARSHUNTCOMPENSATOR -> extractResult(io.linearShuntCompensator.mRID()) { addFromPb(io.linearShuntCompensator) }
-            PERLENGTHPHASEIMPEDANCE -> extractResult(io.perLengthPhaseImpedance.mRID()) { addFromPb(io.perLengthPhaseImpedance) }
             PERLENGTHSEQUENCEIMPEDANCE -> extractResult(io.perLengthSequenceImpedance.mRID()) { addFromPb(io.perLengthSequenceImpedance) }
             POWERELECTRONICSCONNECTION -> extractResult(io.powerElectronicsConnection.mRID()) { addFromPb(io.powerElectronicsConnection) }
             POWERELECTRONICSCONNECTIONPHASE -> extractResult(io.powerElectronicsConnectionPhase.mRID()) { addFromPb(io.powerElectronicsConnectionPhase) }
@@ -641,6 +640,7 @@ class NetworkConsumerClient(
             PANDEMANDRESPONSEFUNCTION -> extractResult(io.panDemandResponseFunction.mRID()) { addFromPb(io.panDemandResponseFunction) }
             BATTERYCONTROL -> extractResult(io.batteryControl.mRID()) { addFromPb(io.batteryControl) }
             STATICVARCOMPENSATOR -> extractResult(io.staticVarCompensator.mRID()) { addFromPb(io.staticVarCompensator) }
+            PERLENGTHPHASEIMPEDANCE -> extractResult(io.perLengthPhaseImpedance.mRID()) { addFromPb(io.perLengthPhaseImpedance) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )

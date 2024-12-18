@@ -11,7 +11,10 @@ package com.zepben.evolve.cim.iec61970.base.wires.generation.production
 import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControlMode
-import com.zepben.evolve.services.common.extensions.*
+import com.zepben.evolve.services.common.extensions.asUnmodifiable
+import com.zepben.evolve.services.common.extensions.getByMRID
+import com.zepben.evolve.services.common.extensions.safeRemove
+import com.zepben.evolve.services.common.extensions.validateReference
 
 /**
  * An electrochemical energy storage device.
@@ -19,25 +22,25 @@ import com.zepben.evolve.services.common.extensions.*
  * @property batteryState The current state of the battery (charging, full, etc.).
  * @property ratedE Full energy storage capacity of the battery in watt-hours (Wh). The attribute shall be a positive value.
  * @property storedE Amount of energy currently stored in watt-hours (Wh). The attribute shall be a positive value or zero and lower than [BatteryUnit.ratedE].
- * @property controls collection of [BatteryControl] controlling this [BatteryUnit].
+ * @property controls [ZBEX] The collection of [BatteryControl] controlling this [BatteryUnit]. The returned collection is read only.
  */
 class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronicsUnit(mRID) {
-
-    @ZBEX
-    private var _batteryControls: MutableList<BatteryControl>? = null
 
     var batteryState: BatteryStateKind = BatteryStateKind.UNKNOWN
     var ratedE: Long? = null
     var storedE: Long? = null
 
-    /**
-     * The [BatteryControl]s for this [BatteryUnit]. The returned collection is read only.
-     */
+    private var _batteryControls: MutableList<BatteryControl>? = null
+
+    @ZBEX
     val controls: List<BatteryControl> get() = _batteryControls.asUnmodifiable()
 
     /**
      * Get the number of entries in the [BatteryControl] collection.
      */
+    //
+    // NOTE: This is called `numBatteryControls` because `numControls` is already used by `PowerSystemResource`.
+    //
     fun numBatteryControls(): Int = _batteryControls?.size ?: 0
 
     /**
@@ -83,7 +86,7 @@ class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronic
     }
 
     /**
-     * Clear [controls].
+     * Clear all [BatteryControl]'s attached to this [BatteryUnit].
      * @return This [BatteryUnit] for fluent use.
      */
     fun clearControls(): BatteryUnit {
@@ -94,4 +97,5 @@ class BatteryUnit @JvmOverloads constructor(mRID: String = "") : PowerElectronic
     private fun validateControl(control: BatteryControl): Boolean {
         return validateReference(control, ::getControl, "A BatteryControl")
     }
+
 }

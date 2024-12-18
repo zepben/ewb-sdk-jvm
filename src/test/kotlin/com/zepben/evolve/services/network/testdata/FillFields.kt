@@ -48,7 +48,7 @@ fun PanDemandResponseFunction.fillFields(service: NetworkService, includeRuntime
     (this as EndDeviceFunction).fillFields(service, includeRuntime)
 
     kind = EndDeviceFunctionKind.autonomousDst
-    controlledAppliance = ControlledAppliance(
+    appliance = ControlledAppliance(
         ControlledAppliance.Appliance.ELECTRIC_VEHICLE,
         ControlledAppliance.Appliance.GENERATION_SYSTEM,
         ControlledAppliance.Appliance.INTERIOR_LIGHTING,
@@ -1005,7 +1005,7 @@ fun PowerElectronicsWindUnit.fillFields(service: NetworkService, includeRuntime:
 fun AcLineSegment.fillFields(service: NetworkService, includeRuntime: Boolean = true): AcLineSegment {
     (this as Conductor).fillFields(service, includeRuntime)
 
-    perLengthSequenceImpedance = PerLengthSequenceImpedance().also { service.add(it) }
+    perLengthImpedance = PerLengthSequenceImpedance().also { service.add(it) }
 
     return this
 }
@@ -1347,8 +1347,6 @@ fun RegulatingCondEq.fillFields(service: NetworkService, includeRuntime: Boolean
 fun RegulatingControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): RegulatingControl {
     (this as PowerSystemResource).fillFields(service, includeRuntime)
 
-    ctPrimary = 1.0
-    minTargetDeadband = 2.0
     discrete = false
     mode = RegulatingControlModeKind.voltage
     monitoredPhase = PhaseCode.ABC
@@ -1359,6 +1357,8 @@ fun RegulatingControl.fillFields(service: NetworkService, includeRuntime: Boolea
     minAllowedTargetValue = 50.0
     ratedCurrent = 10.0
     terminal = Terminal().also { service.add(it) }
+    ctPrimary = 1.0
+    minTargetDeadband = 2.0
     addRegulatingCondEq(PowerElectronicsConnection().also { it.regulatingControl = this; service.add(it) })
 
     return this

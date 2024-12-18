@@ -13,6 +13,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
+@Suppress("PropertyName")
 class TablePhaseImpedanceData : SqliteTable() {
 
     val PER_LENGTH_PHASE_IMPEDANCE_MRID: Column = Column(++columnIndex, "per_length_phase_impedance_mrid", "TEXT", NOT_NULL)

@@ -104,7 +104,7 @@ class NetworkCimReader(
     fun load(table: TablePanDemandResponseFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val panDemandResponseFunction = PanDemandResponseFunction(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             kind = EndDeviceFunctionKind.valueOf(resultSet.getString(table.KIND.queryIndex))
-            controlledApplianceBitmask = resultSet.getNullableInt(table.APPLIANCE.queryIndex)
+            applianceBitmask = resultSet.getNullableInt(table.APPLIANCE.queryIndex)
         }
 
         return loadEndDeviceFunction(panDemandResponseFunction, table, resultSet) && service.addOrThrow(panDemandResponseFunction)

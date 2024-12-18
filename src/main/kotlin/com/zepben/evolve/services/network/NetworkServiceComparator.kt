@@ -66,7 +66,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
         ObjectDifference(source, target).apply {
             compareEndDeviceFunction()
 
-            compareValues(PanDemandResponseFunction::kind, PanDemandResponseFunction::controlledApplianceBitmask)
+            compareValues(PanDemandResponseFunction::kind, PanDemandResponseFunction::applianceBitmask)
         }
 
     /************ EXTENSION IEC61970 BASE WIRES ************/
@@ -1069,22 +1069,6 @@ class NetworkServiceComparator @JvmOverloads constructor(
             addIfDifferent("isOpen", compareOpenStatus(source, target, Switch::isOpen))
         }
 
-    private fun ObjectDifference<out TapChanger>.compareTapChanger(): ObjectDifference<out TapChanger> =
-        apply {
-            comparePowerSystemResource()
-
-            compareValues(
-                TapChanger::controlEnabled,
-                TapChanger::neutralU,
-                TapChanger::highStep,
-                TapChanger::lowStep,
-                TapChanger::neutralStep,
-                TapChanger::normalStep,
-                TapChanger::step
-            )
-            compareIdReferences(TapChanger::tapChangerControl)
-        }
-
     private fun compareStaticVarCompensator(source: StaticVarCompensator, target: StaticVarCompensator): ObjectDifference<StaticVarCompensator> =
         ObjectDifference(source, target).apply {
             compareRegulatingCondEq()
@@ -1126,6 +1110,22 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 SynchronousMachine::operatingMode
             )
             compareIdReferenceCollections(SynchronousMachine::curves)
+        }
+
+    private fun ObjectDifference<out TapChanger>.compareTapChanger(): ObjectDifference<out TapChanger> =
+        apply {
+            comparePowerSystemResource()
+
+            compareValues(
+                TapChanger::controlEnabled,
+                TapChanger::neutralU,
+                TapChanger::highStep,
+                TapChanger::lowStep,
+                TapChanger::neutralStep,
+                TapChanger::normalStep,
+                TapChanger::step
+            )
+            compareIdReferences(TapChanger::tapChangerControl)
         }
 
     private fun compareTapChangerControl(source: TapChangerControl, target: TapChangerControl): ObjectDifference<TapChangerControl> =

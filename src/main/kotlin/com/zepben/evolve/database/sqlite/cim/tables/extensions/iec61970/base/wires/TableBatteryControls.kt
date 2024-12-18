@@ -16,8 +16,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.TableReg
 @Suppress("PropertyName")
 class TableBatteryControls : TableRegulatingControls() {
 
-    val BATTERY_UNIT_MRID: Column = Column(++columnIndex, "battery_unit_mrid", "TEXT", NULL)
-    val CHARGING_RATE: Column = Column(++columnIndex, "charging_Rate", "NUMBER", NULL)
+    val CHARGING_RATE: Column = Column(++columnIndex, "charging_rate", "NUMBER", NULL)
     val DISCHARGING_RATE: Column = Column(++columnIndex, "discharging_rate", "NUMBER", NULL)
     val RESERVE_PERCENT: Column = Column(++columnIndex, "reserve_percent", "NUMBER", NULL)
     val CONTROL_MODE: Column = Column(++columnIndex, "control_mode", "TEXT", NOT_NULL)

@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.extensions.ZBEX
+
 /**
  * Static VAr Compensator control mode.
  */
@@ -15,8 +17,9 @@ package com.zepben.evolve.cim.iec61970.base.wires
 enum class SVCControlMode {
 
     /**
-     * Unknown control.
+     * [ZBEX] Unknown control.
      */
+    @ZBEX
     UNKNOWN,
 
     /**

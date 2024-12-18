@@ -35,8 +35,8 @@ internal fun changeSet57() = ChangeSet(
 @Suppress("ObjectPropertyName")
 private val `Add ct_primary and min_target_deadband columns for tap_changer_controls` = Change(
     listOf(
-        "ALTER TABLE tap_changer_controls ADD COLUMN ct_primary NUMBER NOT NULL DEFAULT 'NONE';",
-        "ALTER TABLE tap_changer_controls ADD COLUMN min_target_deadband NUMBER NOT NULL DEFAULT 'NONE';"
+        "ALTER TABLE tap_changer_controls ADD COLUMN ct_primary NUMBER NULL DEFAULT null;",
+        "ALTER TABLE tap_changer_controls ADD COLUMN min_target_deadband NUMBER NULL DEFAULT null;"
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)
 )
@@ -63,8 +63,7 @@ private val `Create table battery_controls` = Change(
             terminal_mrid TEXT NULL,
             ct_primary NUMBER NULL,
             min_target_deadband NUMBER NULL,
-            battery_unit_mrid TEXT NULL,
-            charging_Rate NUMBER NULL,
+            charging_rate NUMBER NULL,
             discharging_rate NUMBER NULL,
             reserve_percent NUMBER NULL,
             control_mode TEXT NOT NULL
@@ -82,7 +81,6 @@ private val `Create table pan_demand_response_functions` = Change(
             name TEXT NOT NULL,
             description TEXT NOT NULL,
             num_diagram_objects INTEGER NOT NULL,
-            end_device_mrid TEXT NULL,
             enabled BOOLEAN NULL,
             kind TEXT NULL,
             appliance INTEGER NULL

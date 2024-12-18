@@ -14,17 +14,24 @@ import com.zepben.evolve.cim.iec61970.base.wires.RegulatingControl
 /**
  * Describes behaviour specific to controlling batteries.
  *
- * @property chargingRate Charging rate (input power) in percentage of maxP. (Unit: PerCent)
- * @property dischargingRate Discharge rate (output power) in percentage of maxP. (Unit: PerCent)
- * @property reservePercent Percentage of the rated storage capacity that should be reserved during normal operations. This reserve acts as a safeguard, preventing the energy level
- * @property controlMode Mode of operation for the dispatch (charging/discharging) function of BatteryControl.
+ * @property chargingRate [ZBEX] Charging rate (input power) in percentage of maxP. (Unit: PerCent)
+ * @property dischargingRate [ZBEX] Discharge rate (output power) in percentage of maxP. (Unit: PerCent)
+ * @property reservePercent [ZBEX] Percentage of the rated storage capacity that should be reserved during normal operations. This reserve acts as a safeguard, preventing the energy level
+ * @property controlMode [ZBEX] Mode of operation for the dispatch (charging/discharging) function of BatteryControl.
  */
 @ZBEX
 class BatteryControl @JvmOverloads constructor(mRID: String = "") : RegulatingControl(mRID) {
 
+    @ZBEX
     var chargingRate: Double? = null
+
+    @ZBEX
     var dischargingRate: Double? = null
+
+    @ZBEX
     var reservePercent: Double? = null
+
+    @ZBEX
     var controlMode: BatteryControlMode = BatteryControlMode.UNKNOWN
 
 }

@@ -8,19 +8,16 @@
 
 package com.zepben.evolve.database.sqlite.cim.tables.associations
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
 /**
- * [ZBEX]
  * A class representing the association between EndDevices and EndDeviceFunctions.
  *
  * @property END_DEVICE_MRID A column storing the mRID of EndDevices.
  * @property END_DEVICE_FUNCTION_MRID A column storing the mRID of EndDeviceFunctions.
  */
-@ZBEX
 @Suppress("PropertyName")
 class TableEndDevicesEndDeviceFunctions : SqliteTable() {
 

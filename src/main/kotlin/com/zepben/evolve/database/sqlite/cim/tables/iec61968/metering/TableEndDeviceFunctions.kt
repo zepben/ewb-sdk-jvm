@@ -15,7 +15,6 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableAssetFu
 @Suppress("PropertyName")
 abstract class TableEndDeviceFunctions : TableAssetFunctions() {
 
-    val END_DEVICE_MRID: Column = Column(++columnIndex, "end_device_mrid", "TEXT", NULL)
     val ENABLED: Column = Column(++columnIndex, "enabled", "BOOLEAN", NULL)
 
 }

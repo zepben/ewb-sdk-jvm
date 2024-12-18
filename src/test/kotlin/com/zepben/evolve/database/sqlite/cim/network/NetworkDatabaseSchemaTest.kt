@@ -114,10 +114,10 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
     @Test
     internal fun `test schema for each supported type`() {
         /************ EXTENSIONS IEC61968 METERING ************/
-        validateSchema(SchemaServices.networkServicesOf(::BatteryControl, BatteryControl::fillFields))
+        validateSchema(SchemaServices.networkServicesOf(::PanDemandResponseFunction, PanDemandResponseFunction::fillFields))
 
         /************ EXTENSIONS IEC61970 BASE WIRES ************/
-        validateSchema(SchemaServices.networkServicesOf(::PanDemandResponseFunction, PanDemandResponseFunction::fillFields))
+        validateSchema(SchemaServices.networkServicesOf(::BatteryControl, BatteryControl::fillFields))
 
         /************ IEC61968 ASSET INFO ************/
         validateSchema(SchemaServices.networkServicesOf(::CableInfo, CableInfo::fillFields))

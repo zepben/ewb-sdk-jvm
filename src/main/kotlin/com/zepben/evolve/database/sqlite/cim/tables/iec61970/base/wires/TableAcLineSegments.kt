@@ -14,8 +14,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableAcLineSegments : TableConductors() {
 
-    val PER_LENGTH_IMPEDANCE_MRID: Column =
-        Column(++columnIndex, "per_length_impedance_mrid", "TEXT", NULL)
+    val PER_LENGTH_IMPEDANCE_MRID: Column = Column(++columnIndex, "per_length_impedance_mrid", "TEXT", NULL)
 
     override val name: String = "ac_line_segments"
 

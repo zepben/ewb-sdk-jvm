@@ -192,7 +192,7 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.
 fun toCim(pb: PBPanDemandResponseFunction, networkService: NetworkService): PanDemandResponseFunction =
     PanDemandResponseFunction(pb.mRID()).apply {
         kind = pb.kind?.let { k -> EndDeviceFunctionKind.valueOf(k.name) } ?: EndDeviceFunctionKind.UNKNOWN
-        controlledApplianceBitmask = pb.appliance.takeUnless { it == UNKNOWN_INT }
+        applianceBitmask = pb.appliance.takeUnless { it == UNKNOWN_INT }
         toCim(pb.edf, this, networkService)
     }
 
@@ -2084,22 +2084,6 @@ fun toCim(pb: PBPerLengthPhaseImpedance, networkService: NetworkService): PerLen
     }
 
 /**
- * Convert the protobuf [PBPhaseImpedanceData] into its CIM counterpart.
- *
- * @param pb The protobuf [PBPhaseImpedanceData] to convert.
- * @return The converted [pb] as a CIM [PhaseImpedanceData].
- */
-fun toCim(pb: PBPhaseImpedanceData): PhaseImpedanceData =
-    PhaseImpedanceData(
-        SinglePhaseKind.valueOf(pb.fromPhase.name),
-        SinglePhaseKind.valueOf(pb.toPhase.name),
-        pb.b.takeUnless { it == UNKNOWN_DOUBLE },
-        pb.g.takeUnless { it == UNKNOWN_DOUBLE },
-        pb.r.takeUnless { it == UNKNOWN_DOUBLE },
-        pb.x.takeUnless { it == UNKNOWN_DOUBLE },
-    )
-
-/**
  * Convert the protobuf [PBPerLengthSequenceImpedance] into its CIM counterpart.
  *
  * @param pb The protobuf [PBPerLengthSequenceImpedance] to convert.
@@ -2131,6 +2115,22 @@ fun toCim(pb: PBPetersenCoil, networkService: NetworkService): PetersenCoil =
         xGroundNominal = pb.xGroundNominal.takeUnless { it == UNKNOWN_DOUBLE }
         toCim(pb.efc, this, networkService)
     }
+
+/**
+ * Convert the protobuf [PBPhaseImpedanceData] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBPhaseImpedanceData] to convert.
+ * @return The converted [pb] as a CIM [PhaseImpedanceData].
+ */
+fun toCim(pb: PBPhaseImpedanceData): PhaseImpedanceData =
+    PhaseImpedanceData(
+        SinglePhaseKind.valueOf(pb.fromPhase.name),
+        SinglePhaseKind.valueOf(pb.toPhase.name),
+        pb.b.takeUnless { it == UNKNOWN_DOUBLE },
+        pb.g.takeUnless { it == UNKNOWN_DOUBLE },
+        pb.r.takeUnless { it == UNKNOWN_DOUBLE },
+        pb.x.takeUnless { it == UNKNOWN_DOUBLE },
+    )
 
 /**
  * Convert the protobuf [PBPowerElectronicsConnection] into its CIM counterpart.

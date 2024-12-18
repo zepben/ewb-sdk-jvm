@@ -13,6 +13,7 @@ import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSetValidator
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import java.sql.Statement
 
 object ChangeSet57NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 57) {
@@ -28,8 +29,8 @@ object ChangeSet57NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
 
     override fun populateStatements(): List<String> = listOf(
         "INSERT INTO tap_changer_controls (mrid, name, description, num_diagram_objects, location_mrid, num_controls, discrete, mode, monitored_phase, target_deadband, target_value, enabled, max_allowed_target_value, min_allowed_target_value, rated_current, terminal_mrid, ct_primary, min_target_deadband, limit_voltage, line_drop_compensation, line_drop_r, line_drop_x, reverse_line_drop_r, reverse_line_drop_x, forward_ldc_blocking, time_delay, co_generation_enabled) VALUES ('tap_changer_control_2_mrid', 'name', 'description', 1, 'location_mrid', 2, true, 'mode', 'monitored_phase', 3, 4, true, 5, 6, 7, 'terminal_mrid', 8, 9, 10, true, 11, 12, 13, 14, true, 15, true)",
-        "INSERT INTO battery_controls (mrid, name, description, num_diagram_objects, location_mrid, num_controls, discrete, mode, monitored_phase, target_deadband, target_value, enabled, max_allowed_target_value, min_allowed_target_value, rated_current, terminal_mrid, ct_primary, min_target_deadband, battery_unit_mrid, charging_Rate, discharging_rate, reserve_percent, control_mode) VALUES ('mrid', 'name', 'description', 1, 'location_mrid', 2, true, 'mode', 'monitored_phase', 3.0, 4.0, true, 5.0, 6.0, 7.0, 8.0, 9.0, 'terminal_mrid', 'battery_unit_mrid', 10.0, 11.0, 12.0, 'control_mode');",
-        "INSERT INTO pan_demand_response_functions (mrid, name, description, num_diagram_objects, end_device_mrid, enabled, kind, appliance) VALUES ('mrid', 'name', 'description', 1, 'end_device_mrid', true, 'kind', 2);",
+        "INSERT INTO battery_controls (mrid, name, description, num_diagram_objects, location_mrid, num_controls, discrete, mode, monitored_phase, target_deadband, target_value, enabled, max_allowed_target_value, min_allowed_target_value, rated_current, terminal_mrid, ct_primary, min_target_deadband, charging_rate, discharging_rate, reserve_percent, control_mode) VALUES ('mrid', 'name', 'description', 1, 'location_mrid', 2, true, 'mode', 'monitored_phase', 3.0, 4.0, true, 5.0, 6.0, 7.0, 8.0, 9.0, 'terminal_mrid', 10.0, 11.0, 12.0, 'control_mode');",
+        "INSERT INTO pan_demand_response_functions (mrid, name, description, num_diagram_objects, enabled, kind, appliance) VALUES ('mrid', 'name', 'description', 1, true, 'kind', 2);",
         "INSERT INTO static_var_compensators (mrid, name, description, num_diagram_objects, location_mrid, num_controls, normally_in_service, in_service, commissioned_date, base_voltage_mrid, control_enabled, regulating_control_mrid, capacitive_rating, inductive_rating, q, svc_control_mode, voltage_set_point) VALUES ('mrid', 'name', 'description', 1, 'location_mrid', 2, true, true, 'commissioned_date', 'base_voltage_mrid', true, 'regulating_control_mrid', 3.0, 4.0, 5.0, 'svc_control_mode', 6);",
         "INSERT INTO battery_units_battery_controls (battery_unit_mrid, battery_control_mrid) VALUES ('battery_unit_mrid', 'battery_control_mrid');",
         "INSERT INTO end_devices_end_device_functions (end_device_mrid, end_device_function_mrid) VALUES ('end_device_mrid', 'end_device_function_mrid');",
@@ -40,6 +41,7 @@ object ChangeSet57NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         )
 
     override fun validateChanges(statement: Statement) {
+        ensureModifiedTapChangerControls(statement)
         ensureAddedBatteryControls(statement)
         ensureAddedPanDemandResponseFunctions(statement)
         ensureAddedStaticVarCompensators(statement)
@@ -52,6 +54,7 @@ object ChangeSet57NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
 
     override fun tearDownStatements(): List<String> =
         listOf(
+            "DELETE FROM tap_changer_controls;",
             "DELETE FROM battery_controls;",
             "DELETE FROM pan_demand_response_functions;",
             "DELETE FROM static_var_compensators;",
@@ -61,6 +64,70 @@ object ChangeSet57NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
             "DELETE FROM phase_impedance_data;",
             "DELETE FROM ac_line_segments;"
         )
+
+    private fun ensureModifiedTapChangerControls(statement: Statement) {
+        validateRows(
+            statement, "SELECT * FROM tap_changer_controls",
+            { rs ->
+                assertThat(rs.getString("mrid"), equalTo("tap_changer_control_mrid"))
+                assertThat(rs.getString("name"), equalTo("name"))
+                assertThat(rs.getString("description"), equalTo("description"))
+                assertThat(rs.getInt("num_diagram_objects"), equalTo(1))
+                assertThat(rs.getString("location_mrid"), equalTo("location_mrid"))
+                assertThat(rs.getInt("num_controls"), equalTo(2))
+                assertThat(rs.getBoolean("discrete"), equalTo(true))
+                assertThat(rs.getString("mode"), equalTo("mode"))
+                assertThat(rs.getString("monitored_phase"), equalTo("monitored_phase"))
+                assertThat(rs.getFloat("target_deadband"), equalTo(3.0f))
+                assertThat(rs.getDouble("target_value"), equalTo(4.0))
+                assertThat(rs.getBoolean("enabled"), equalTo(true))
+                assertThat(rs.getDouble("max_allowed_target_value"), equalTo(5.0))
+                assertThat(rs.getDouble("min_allowed_target_value"), equalTo(6.0))
+                assertThat(rs.getDouble("rated_current"), equalTo(7.0))
+                assertThat(rs.getString("terminal_mrid"), equalTo("terminal_mrid"))
+                assertThat(rs.getNullableDouble("ct_primary"), nullValue())
+                assertThat(rs.getNullableDouble("min_target_deadband"), nullValue())
+                assertThat(rs.getInt("limit_voltage"), equalTo(8))
+                assertThat(rs.getBoolean("line_drop_compensation"), equalTo(true))
+                assertThat(rs.getDouble("line_drop_r"), equalTo(9.0))
+                assertThat(rs.getDouble("line_drop_x"), equalTo(10.0))
+                assertThat(rs.getDouble("reverse_line_drop_r"), equalTo(11.0))
+                assertThat(rs.getDouble("reverse_line_drop_x"), equalTo(12.0))
+                assertThat(rs.getBoolean("forward_ldc_blocking"), equalTo(true))
+                assertThat(rs.getDouble("time_delay"), equalTo(13.0))
+                assertThat(rs.getBoolean("co_generation_enabled"), equalTo(true))
+            },
+            { rs ->
+                assertThat(rs.getString("mrid"), equalTo("tap_changer_control_2_mrid"))
+                assertThat(rs.getString("name"), equalTo("name"))
+                assertThat(rs.getString("description"), equalTo("description"))
+                assertThat(rs.getInt("num_diagram_objects"), equalTo(1))
+                assertThat(rs.getString("location_mrid"), equalTo("location_mrid"))
+                assertThat(rs.getInt("num_controls"), equalTo(2))
+                assertThat(rs.getBoolean("discrete"), equalTo(true))
+                assertThat(rs.getString("mode"), equalTo("mode"))
+                assertThat(rs.getString("monitored_phase"), equalTo("monitored_phase"))
+                assertThat(rs.getFloat("target_deadband"), equalTo(3.0f))
+                assertThat(rs.getDouble("target_value"), equalTo(4.0))
+                assertThat(rs.getBoolean("enabled"), equalTo(true))
+                assertThat(rs.getDouble("max_allowed_target_value"), equalTo(5.0))
+                assertThat(rs.getDouble("min_allowed_target_value"), equalTo(6.0))
+                assertThat(rs.getDouble("rated_current"), equalTo(7.0))
+                assertThat(rs.getString("terminal_mrid"), equalTo("terminal_mrid"))
+                assertThat(rs.getDouble("ct_primary"), equalTo(8.0))
+                assertThat(rs.getDouble("min_target_deadband"), equalTo(9.0))
+                assertThat(rs.getInt("limit_voltage"), equalTo(10))
+                assertThat(rs.getBoolean("line_drop_compensation"), equalTo(true))
+                assertThat(rs.getDouble("line_drop_r"), equalTo(11.0))
+                assertThat(rs.getDouble("line_drop_x"), equalTo(12.0))
+                assertThat(rs.getDouble("reverse_line_drop_r"), equalTo(13.0))
+                assertThat(rs.getDouble("reverse_line_drop_x"), equalTo(14.0))
+                assertThat(rs.getBoolean("forward_ldc_blocking"), equalTo(true))
+                assertThat(rs.getDouble("time_delay"), equalTo(15.0))
+                assertThat(rs.getBoolean("co_generation_enabled"), equalTo(true))
+            }
+        )
+    }
 
     private fun ensureAddedBatteryControls(statement: Statement) {
         ensureTables(statement, "battery_controls")
@@ -104,7 +171,11 @@ object ChangeSet57NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
 
     private fun ensureAddedPhaseImpedanceData(statement: Statement) {
         ensureTables(statement, "phase_impedance_data")
-        ensureIndexes(statement, "phase_impedance_data_per_length_phase_impedance_mrid", "phase_impedance_data_from_phase_to_phase_per_length_phase_impedance_mrid")
+        ensureIndexes(
+            statement,
+            "phase_impedance_data_per_length_phase_impedance_mrid",
+            "phase_impedance_data_from_phase_to_phase_per_length_phase_impedance_mrid"
+        )
     }
 
     private fun ensureRenamedPerLengthImpedance(statement: Statement) {

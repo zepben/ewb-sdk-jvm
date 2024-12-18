@@ -29,16 +29,21 @@ internal class PerLengthPhaseImpedanceTest {
 
     @Test
     internal fun phaseImpedanceData() {
+        // We need to change the formatting of the key's string to match what we log.
+        data class Key(val fromPhase: SinglePhaseKind, val toPhase: SinglePhaseKind) {
+            override fun toString(): String = "fromPhase $fromPhase and toPhase $toPhase"
+        }
+
         PrivateCollectionValidator.validateUnordered(
             ::PerLengthPhaseImpedance,
-            { it: Int -> PhaseImpedanceData(SinglePhaseKind.get(it), SinglePhaseKind.get(it), it.toDouble(), it.toDouble(), it.toDouble(), it.toDouble()) },
+            { PhaseImpedanceData(SinglePhaseKind.get(it), SinglePhaseKind.get(it + 1), it.toDouble(), it.toDouble(), it.toDouble(), it.toDouble()) },
             PerLengthPhaseImpedance::data,
             PerLengthPhaseImpedance::numData,
-            { i: PerLengthPhaseImpedance, t: SinglePhaseKind -> i.getData(t, t) },
+            { it, (from, to) -> it.getData(from, to) },
             PerLengthPhaseImpedance::addData,
             PerLengthPhaseImpedance::removeData,
             PerLengthPhaseImpedance::clearData,
-            { it.fromPhase }
+            { Key(it.fromPhase, it.toPhase) }
         )
     }
 

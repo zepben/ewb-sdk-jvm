@@ -9,7 +9,6 @@
 package com.zepben.evolve.services.network.testdata
 
 import com.zepben.evolve.cim.iec61968.assetinfo.OverheadWireInfo
-import com.zepben.evolve.cim.iec61968.assetinfo.WireInfo
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.metering.Meter
@@ -103,10 +102,10 @@ fun createAcLineSegmentForConnecting(
     wireInfoId: String = "wireInfo"
 ): AcLineSegment =
     AcLineSegment(id).apply {
-        perLengthSequenceImpedance = network.get(PerLengthSequenceImpedance::class, perLengthSequenceImpedanceId)
+        perLengthImpedance = network[perLengthSequenceImpedanceId]
             ?: PerLengthSequenceImpedance(perLengthSequenceImpedanceId).also { network.add(it) }
 
-        assetInfo = network.get(WireInfo::class, wireInfoId) ?: OverheadWireInfo(wireInfoId).also { network.add(it) }
+        assetInfo = network[wireInfoId] ?: OverheadWireInfo(wireInfoId).also { network.add(it) }
         name = "$id name"
         this.length = length
 

@@ -95,7 +95,6 @@ internal class NetworkServiceUtilsTest {
         isOperationalRestriction: (OperationalRestriction) -> String,
         isOrganisation: (Organisation) -> String,
         isOverheadWireInfo: (OverheadWireInfo) -> String,
-        isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> String,
         isPerLengthSequenceImpedance: (PerLengthSequenceImpedance) -> String,
         isPole: (Pole) -> String,
         isPowerElectronicsConnection: (PowerElectronicsConnection) -> String,
@@ -148,6 +147,7 @@ internal class NetworkServiceUtilsTest {
         isPanDemandResponseFunction: (PanDemandResponseFunction) -> String,
         isBatteryControl: (BatteryControl) -> String,
         isStaticVarCompensator: (StaticVarCompensator) -> String,
+        isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -182,7 +182,6 @@ internal class NetworkServiceUtilsTest {
         isOperationalRestriction = isOperationalRestriction,
         isOrganisation = isOrganisation,
         isOverheadWireInfo = isOverheadWireInfo,
-        isPerLengthPhaseImpedance = isPerLengthPhaseImpedance,
         isPerLengthSequenceImpedance = isPerLengthSequenceImpedance,
         isPole = isPole,
         isPowerElectronicsConnection = isPowerElectronicsConnection,
@@ -235,6 +234,7 @@ internal class NetworkServiceUtilsTest {
         isPanDemandResponseFunction = isPanDemandResponseFunction,
         isBatteryControl = isBatteryControl,
         isStaticVarCompensator = isStaticVarCompensator,
+        isPerLengthPhaseImpedance = isPerLengthPhaseImpedance,
         isOther = isOther
     )
 
@@ -271,7 +271,6 @@ internal class NetworkServiceUtilsTest {
         isOperationalRestriction: InvokeChecker<OperationalRestriction> = NeverInvokedChecker(),
         isOrganisation: InvokeChecker<Organisation> = NeverInvokedChecker(),
         isOverheadWireInfo: InvokeChecker<OverheadWireInfo> = NeverInvokedChecker(),
-        isPerLengthPhaseImpedance: InvokeChecker<PerLengthPhaseImpedance> = NeverInvokedChecker(),
         isPerLengthSequenceImpedance: InvokeChecker<PerLengthSequenceImpedance> = NeverInvokedChecker(),
         isPole: InvokeChecker<Pole> = NeverInvokedChecker(),
         isPowerElectronicsConnection: InvokeChecker<PowerElectronicsConnection> = NeverInvokedChecker(),
@@ -324,6 +323,7 @@ internal class NetworkServiceUtilsTest {
         isPanDemandResponseFunction: InvokeChecker<PanDemandResponseFunction> = NeverInvokedChecker(),
         isBatteryControl: InvokeChecker<BatteryControl> = NeverInvokedChecker(),
         isStaticVarCompensator: InvokeChecker<StaticVarCompensator> = NeverInvokedChecker(),
+        isPerLengthPhaseImpedance: InvokeChecker<PerLengthPhaseImpedance> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -359,7 +359,6 @@ internal class NetworkServiceUtilsTest {
             isOperationalRestriction = isOperationalRestriction,
             isOrganisation = isOrganisation,
             isOverheadWireInfo = isOverheadWireInfo,
-            isPerLengthPhaseImpedance = isPerLengthPhaseImpedance,
             isPerLengthSequenceImpedance = isPerLengthSequenceImpedance,
             isPole = isPole,
             isPowerElectronicsConnection = isPowerElectronicsConnection,
@@ -412,6 +411,7 @@ internal class NetworkServiceUtilsTest {
             isPanDemandResponseFunction = isPanDemandResponseFunction,
             isBatteryControl = isBatteryControl,
             isStaticVarCompensator = isStaticVarCompensator,
+            isPerLengthPhaseImpedance = isPerLengthPhaseImpedance,
             isOther = isOther
         )
 
@@ -589,6 +589,7 @@ internal class NetworkServiceUtilsTest {
         PanDemandResponseFunction().also { whenNetworkServiceObjectTester(it, isPanDemandResponseFunction = InvokedChecker(it)) }
         BatteryControl().also { whenNetworkServiceObjectTester(it, isBatteryControl = InvokedChecker(it)) }
         StaticVarCompensator().also { whenNetworkServiceObjectTester(it, isStaticVarCompensator = InvokedChecker(it)) }
+        PerLengthPhaseImpedance().also { whenNetworkServiceObjectTester(it, isPerLengthPhaseImpedance = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

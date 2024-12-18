@@ -8,19 +8,16 @@
 
 package com.zepben.evolve.database.sqlite.cim.tables.associations
 
-import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.database.sqlite.cim.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
 /**
- * [ZBEX]
  * A class representing the association between BatteryUnits and BatteryControls
  *
  * @property BATTERY_UNIT_MRID A column storing the mRID of BatteryUnits.
  * @property BATTERY_CONTROL_MRID A column storing the mRID of BatteryControls.
  */
-@ZBEX
 @Suppress("PropertyName")
 class TableBatteryUnitsBatteryControls : SqliteTable() {
 

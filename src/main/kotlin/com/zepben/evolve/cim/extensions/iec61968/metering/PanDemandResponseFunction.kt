@@ -14,25 +14,29 @@ import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunction
 import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunctionKind
 
 /**
+ * [ZBEX]
  * PAN function that an end device supports, distinguished by 'kind'.
  *
- * @property kind Kind of this function.
- * @property controlledAppliance The appliances being controlled.
+ * @property kind [ZBEX] Kind of this function.
+ * @property appliance [ZBEX] The appliances being controlled.
  */
 @ZBEX
 class PanDemandResponseFunction @JvmOverloads constructor(mRID: String = "") : EndDeviceFunction(mRID) {
 
+    @ZBEX
     var kind: EndDeviceFunctionKind = EndDeviceFunctionKind.UNKNOWN
-    var controlledAppliance: ControlledAppliance?
-        get() = controlledApplianceBitmask?.let { ControlledAppliance(it) }
+
+    @ZBEX
+    var appliance: ControlledAppliance?
+        get() = applianceBitmask?.let { ControlledAppliance(it) }
         set(ca) {
-            controlledApplianceBitmask = ca?.bitmask
+            applianceBitmask = ca?.bitmask
         }
 
     /**
      * The bitmask representation of the appliances being controlled.
      */
-    internal var controlledApplianceBitmask: Int? = null
+    internal var applianceBitmask: Int? = null
 
     /**
      * Add an appliance to the appliances being controlled.
@@ -41,11 +45,11 @@ class PanDemandResponseFunction @JvmOverloads constructor(mRID: String = "") : E
      * @return True if the controlled appliances were updated.
      */
     fun addAppliance(appliance: ControlledAppliance.Appliance): Boolean {
-        val previous = controlledApplianceBitmask
+        val previous = applianceBitmask
 
-        controlledApplianceBitmask = (controlledApplianceBitmask ?: 0) or appliance.bitmask
+        applianceBitmask = (applianceBitmask ?: 0) or appliance.bitmask
 
-        return controlledApplianceBitmask != previous
+        return applianceBitmask != previous
     }
 
     /**
@@ -56,11 +60,11 @@ class PanDemandResponseFunction @JvmOverloads constructor(mRID: String = "") : E
      */
     fun addAppliances(vararg appliances: ControlledAppliance.Appliance): Boolean {
         require(appliances.isNotEmpty()) { "You must provide at least one appliance to add" }
-        val previous = controlledApplianceBitmask
+        val previous = applianceBitmask
 
-        controlledApplianceBitmask = appliances.fold(controlledApplianceBitmask ?: 0) { bitmask, next -> bitmask or next.bitmask }
+        applianceBitmask = appliances.fold(applianceBitmask ?: 0) { bitmask, next -> bitmask or next.bitmask }
 
-        return controlledApplianceBitmask != previous
+        return applianceBitmask != previous
     }
 
     /**
@@ -70,11 +74,11 @@ class PanDemandResponseFunction @JvmOverloads constructor(mRID: String = "") : E
      * @return True if the controlled appliances were updated.
      */
     fun removeAppliance(appliance: ControlledAppliance.Appliance): Boolean {
-        val previous = controlledApplianceBitmask
+        val previous = applianceBitmask
 
-        controlledApplianceBitmask = (controlledApplianceBitmask ?: 0) and appliance.bitmask.inv()
+        applianceBitmask = (applianceBitmask ?: 0) and appliance.bitmask.inv()
 
-        return controlledApplianceBitmask != previous
+        return applianceBitmask != previous
     }
 
     /**
@@ -85,11 +89,11 @@ class PanDemandResponseFunction @JvmOverloads constructor(mRID: String = "") : E
      */
     fun removeAppliances(vararg appliances: ControlledAppliance.Appliance): Boolean {
         require(appliances.isNotEmpty()) { "You must provide at least one appliance to remove" }
-        val previous = controlledApplianceBitmask
+        val previous = applianceBitmask
 
-        controlledApplianceBitmask = (controlledApplianceBitmask ?: 0) and appliances.fold(0) { bitmask, next -> bitmask or next.bitmask }.inv()
+        applianceBitmask = (applianceBitmask ?: 0) and appliances.fold(0) { bitmask, next -> bitmask or next.bitmask }.inv()
 
-        return controlledApplianceBitmask != previous
+        return applianceBitmask != previous
     }
 
 }

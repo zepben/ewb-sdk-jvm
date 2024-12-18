@@ -107,7 +107,7 @@ class NetworkCimWriter(
         val insert = databaseTables.getInsert<TablePanDemandResponseFunctions>()
 
         insert.setNullableString(table.KIND.queryIndex, panDemandResponseFunction.kind.name)
-        insert.setNullableInt(table.APPLIANCE.queryIndex, panDemandResponseFunction.controlledApplianceBitmask)
+        insert.setNullableInt(table.APPLIANCE.queryIndex, panDemandResponseFunction.applianceBitmask)
 
         return saveEndDeviceFunction(table, insert, panDemandResponseFunction, "pan demand response function")
     }
@@ -873,9 +873,7 @@ class NetworkCimWriter(
     @Throws(SQLException::class)
     private fun saveCurve(table: TableCurves, insert: PreparedStatement, curve: Curve, description: String): Boolean {
         var status = true
-        curve.data.forEach { curveData ->
-            status = status and saveCurveData(curve, curveData)
-        }
+        curve.data.forEach { status = status and saveCurveData(curve, it) }
 
         return status and saveIdentifiedObject(table, insert, curve, description)
     }
@@ -1412,7 +1410,7 @@ class NetworkCimWriter(
         var status = true
         batteryUnit.controls.forEach { status = status and saveAssociation(batteryUnit, it) }
 
-        return savePowerElectronicsUnit(table, insert, batteryUnit, "battery unit")
+        return status and savePowerElectronicsUnit(table, insert, batteryUnit, "battery unit")
     }
 
     /**
@@ -1854,9 +1852,7 @@ class NetworkCimWriter(
         val insert = databaseTables.getInsert<TablePerLengthPhaseImpedances>()
 
         var status = true
-        perLengthPhaseImpedance.data.forEach { phaseImpedanceData ->
-            status = status and savePhaseImpedanceData(perLengthPhaseImpedance, phaseImpedanceData)
-        }
+        perLengthPhaseImpedance.data.forEach { status = status and savePhaseImpedanceData(perLengthPhaseImpedance, it) }
 
         return status and savePerLengthImpedance(table, insert, perLengthPhaseImpedance, "per length phase impedance")
     }
@@ -2261,9 +2257,7 @@ class NetworkCimWriter(
         insert.setNullableString(table.OPERATING_MODE.queryIndex, synchronousMachine.operatingMode.name)
 
         var status = true
-        synchronousMachine.curves.forEach { rcc ->
-            status = status and saveAssociation(synchronousMachine, rcc)
-        }
+        synchronousMachine.curves.forEach { status = status and saveAssociation(synchronousMachine, it) }
 
         return status and saveRotatingMachine(table, insert, synchronousMachine, "synchronous machine")
     }

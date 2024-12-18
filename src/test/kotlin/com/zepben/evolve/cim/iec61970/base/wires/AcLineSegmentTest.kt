@@ -39,19 +39,20 @@ internal class AcLineSegmentTest {
         acLineSegment.perLengthSequenceImpedance = perLengthSequenceImpedance
 
         assertThat(acLineSegment.perLengthSequenceImpedance, equalTo(perLengthSequenceImpedance))
-        assertThat(acLineSegment.perLengthImpedance, equalTo(perLengthSequenceImpedance))
         assertThat(acLineSegment.perLengthPhaseImpedance, nullValue())
+        assertThat(acLineSegment.perLengthImpedance, equalTo(perLengthSequenceImpedance))
 
         acLineSegment.perLengthPhaseImpedance = perLengthPhaseImpedance
 
+        assertThat(acLineSegment.perLengthSequenceImpedance, nullValue())
         assertThat(acLineSegment.perLengthPhaseImpedance, equalTo(perLengthPhaseImpedance))
         assertThat(acLineSegment.perLengthImpedance, equalTo(perLengthPhaseImpedance))
-        assertThat(acLineSegment.perLengthSequenceImpedance, nullValue())
 
-        acLineSegment.perLengthPhaseImpedance = null
+        acLineSegment.perLengthImpedance = null
 
         assertThat(acLineSegment.perLengthSequenceImpedance, nullValue())
         assertThat(acLineSegment.perLengthPhaseImpedance, nullValue())
         assertThat(acLineSegment.perLengthImpedance, nullValue())
     }
+
 }

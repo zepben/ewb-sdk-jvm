@@ -144,6 +144,7 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isPanDemandResponseFunction Handler when the [identifiedObject] is a [PanDemandResponseFunction]
  * @param isBatteryControl Handler when the [identifiedObject] is a [BatteryControl]
  * @param isStaticVarCompensator Handler when the [identifiedObject] is a [StaticVarCompensator]
+ * @param isPerLengthPhaseImpedance Handler when the [identifiedObject] is a [PerLengthPhaseImpedance]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -180,7 +181,6 @@ inline fun <R> whenNetworkServiceObject(
     isOperationalRestriction: (OperationalRestriction) -> R,
     isOrganisation: (Organisation) -> R,
     isOverheadWireInfo: (OverheadWireInfo) -> R,
-    isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> R,
     isPerLengthSequenceImpedance: (PerLengthSequenceImpedance) -> R,
     isPole: (Pole) -> R,
     isPowerElectronicsConnection: (PowerElectronicsConnection) -> R,
@@ -233,6 +233,7 @@ inline fun <R> whenNetworkServiceObject(
     isPanDemandResponseFunction: (PanDemandResponseFunction) -> R,
     isBatteryControl: (BatteryControl) -> R,
     isStaticVarCompensator: (StaticVarCompensator) -> R,
+    isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -268,7 +269,6 @@ inline fun <R> whenNetworkServiceObject(
     is OperationalRestriction -> isOperationalRestriction(identifiedObject)
     is Organisation -> isOrganisation(identifiedObject)
     is OverheadWireInfo -> isOverheadWireInfo(identifiedObject)
-    is PerLengthPhaseImpedance -> isPerLengthPhaseImpedance(identifiedObject)
     is PerLengthSequenceImpedance -> isPerLengthSequenceImpedance(identifiedObject)
     is Pole -> isPole(identifiedObject)
     is PowerElectronicsConnection -> isPowerElectronicsConnection(identifiedObject)
@@ -321,5 +321,6 @@ inline fun <R> whenNetworkServiceObject(
     is PanDemandResponseFunction -> isPanDemandResponseFunction(identifiedObject)
     is BatteryControl -> isBatteryControl(identifiedObject)
     is StaticVarCompensator -> isStaticVarCompensator(identifiedObject)
+    is PerLengthPhaseImpedance -> isPerLengthPhaseImpedance(identifiedObject)
     else -> isOther(identifiedObject)
 }

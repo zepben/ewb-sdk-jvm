@@ -24,7 +24,7 @@ class PhaseInferrer {
         fun description(): String = if (suspect) {
             "Inferred missing phases for '${conductingEquipment.name}' [${conductingEquipment.mRID}] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
         } else {
-            "*** Action Required *** Inferred missing phase for '${conductingEquipment.name}' [${conductingEquipment.mRID}] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
+            "Inferred missing phase for '${conductingEquipment.name}' [${conductingEquipment.mRID}] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
         }
     }
 
@@ -57,10 +57,10 @@ class PhaseInferrer {
         private fun hasXYPhases(terminal: Terminal): Boolean =
             terminal.phases.singlePhases.contains(SinglePhaseKind.Y) || terminal.phases.singlePhases.contains(SinglePhaseKind.X)
 
-        private fun findTerminalAtStartOfMissingPhases(terminals: List<Terminal>): List<Terminal> =
-            terminals.missingFromDownToUp().takeUnless { it.isEmpty() }
-                ?: terminals.missingFromDownToAny().takeUnless { it.isEmpty() }
-                ?: terminals.missingFromAny()
+        private fun List<Terminal>.findTerminalAtStartOfMissingPhases(): List<Terminal> =
+            missingFromDownToUp().takeUnless { it.isEmpty() }
+                ?: missingFromDownToAny().takeUnless { it.isEmpty() }
+                ?: missingFromAny()
 
         private fun List<Terminal>.missingFromDownToUp(): List<Terminal> =
             filter { terminal ->
@@ -93,14 +93,14 @@ class PhaseInferrer {
             }
 
         private fun List<Terminal>.process(processor: (Terminal) -> Boolean): Boolean {
-            var terminalsToProcess = findTerminalAtStartOfMissingPhases(this)
+            var terminalsToProcess = findTerminalAtStartOfMissingPhases()
 
             var hasProcessed = false
             do {
                 var continueProcessing = false
 
                 terminalsToProcess.forEach { continueProcessing = processor(it) || continueProcessing }
-                terminalsToProcess = findTerminalAtStartOfMissingPhases(this)
+                terminalsToProcess = findTerminalAtStartOfMissingPhases()
 
                 hasProcessed = hasProcessed || continueProcessing
             } while (continueProcessing)

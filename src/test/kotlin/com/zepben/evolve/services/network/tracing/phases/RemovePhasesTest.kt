@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.phases.PhaseValidator.validatePhases
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
@@ -26,6 +27,8 @@ internal class RemovePhasesTest {
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+
+    private val removePhases = RemovePhases()
 
     //
     // s0 --c1-- --c2--
@@ -61,7 +64,8 @@ internal class RemovePhasesTest {
 
     @Test
     internal fun removesAllCoreByDefault() {
-        RemovePhases().run(n.getT("c1", 2))
+        removePhases.run(n.getT("c1", 2), NetworkStateOperators.NORMAL)
+        removePhases.run(n.getT("c1", 2), NetworkStateOperators.CURRENT)
 
         validatePhases(n, "s0", PhaseCode.ABCN)
         validatePhases(n, "c1", PhaseCode.ABCN, PhaseCode.NONE)
@@ -73,7 +77,8 @@ internal class RemovePhasesTest {
 
     @Test
     internal fun canRemoveSpecificPhases() {
-        RemovePhases().run(n.getT("s0", 1), PhaseCode.AB)
+        removePhases.run(n.getT("s0", 1), PhaseCode.AB, NetworkStateOperators.NORMAL)
+        removePhases.run(n.getT("s0", 1), PhaseCode.AB, NetworkStateOperators.CURRENT)
 
         validatePhases(n, "s0", listOf(SPK.NONE, SPK.NONE, SPK.C, SPK.N))
         validatePhases(n, "c1", listOf(SPK.NONE, SPK.NONE, SPK.C, SPK.N), listOf(SPK.NONE, SPK.NONE, SPK.C, SPK.N))
@@ -85,14 +90,18 @@ internal class RemovePhasesTest {
 
     @Test
     internal fun canRemoveFromEntireNetwork() {
-        RemovePhases().run(n)
+        removePhases.run(n, NetworkStateOperators.CURRENT)
 
-        validatePhases(n, "s0", PhaseCode.NONE)
-        validatePhases(n, "c1", PhaseCode.NONE, PhaseCode.NONE)
-        validatePhases(n, "c2", PhaseCode.NONE, PhaseCode.NONE)
-        validatePhases(n, "c3", PhaseCode.NONE, PhaseCode.NONE)
-        validatePhases(n, "s4", PhaseCode.NONE)
-        validatePhases(n, "c5", PhaseCode.NONE, PhaseCode.NONE)
+        validatePhases(n.getT("s0", 1), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c1", 1), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c1", 2), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c2", 1), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c2", 2), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c3", 1), PhaseCode.AB, PhaseCode.NONE)
+        validatePhases(n.getT("c3", 2), PhaseCode.AB, PhaseCode.NONE)
+        validatePhases(n.getT("s4", 1), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c5", 1), PhaseCode.ABCN, PhaseCode.NONE)
+        validatePhases(n.getT("c5", 2), PhaseCode.ABCN, PhaseCode.NONE)
     }
 
     private fun NetworkService.getT(ce: String, t: Int): Terminal =

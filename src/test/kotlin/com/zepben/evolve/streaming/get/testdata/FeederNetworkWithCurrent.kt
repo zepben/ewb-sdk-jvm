@@ -14,7 +14,6 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.*
-import com.zepben.evolve.services.network.tracing.Tracing
 
 object FeederNetworkWithCurrent {
     //                c1       c2      c3       c4
@@ -63,8 +62,8 @@ object FeederNetworkWithCurrent {
         networkService.connect(sw.t2, c4.t1)
         networkService.connect(c4.t2, tx2.t1)
 
-        Tracing.setPhases().run(networkService)
-        Tracing.assignEquipmentToFeeders().run(networkService)
+        networkService.setPhases()
+        networkService.assignEquipmentToFeeders()
 
         return networkService
     }

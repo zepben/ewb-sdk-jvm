@@ -473,7 +473,11 @@ fun EquipmentContainer.fillFields(service: NetworkService, includeRuntime: Boole
 fun Feeder.fillFields(service: NetworkService, includeRuntime: Boolean = true): Feeder {
     (this as EquipmentContainer).fillFields(service, includeRuntime)
 
-    normalHeadTerminal = Terminal().also { service.add(it) }
+    normalHeadTerminal = Terminal().apply {
+        conductingEquipment = equipment.filterIsInstance<ConductingEquipment>().first()
+        conductingEquipment!!.addTerminal(this)
+    }.also { service.add(it) }
+
     normalEnergizingSubstation = Substation().also {
         it.addFeeder(this)
         service.add(it)
@@ -1481,7 +1485,10 @@ fun Loop.fillFields(service: NetworkService, includeRuntime: Boolean = true): Lo
 fun LvFeeder.fillFields(service: NetworkService, includeRuntime: Boolean = true): LvFeeder {
     (this as EquipmentContainer).fillFields(service, includeRuntime)
 
-    normalHeadTerminal = Terminal().also { service.add(it) }
+    normalHeadTerminal = Terminal().apply {
+        conductingEquipment = equipment.filterIsInstance<ConductingEquipment>().first()
+        conductingEquipment!!.addTerminal(this)
+    }.also { service.add(it) }
 
     if (includeRuntime) {
         for (i in 0..1)

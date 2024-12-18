@@ -14,84 +14,62 @@ import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.OpenTest
-import com.zepben.evolve.services.network.tracing.connectivity.ConnectivityResult
+import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
+import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityInternal
-import com.zepben.evolve.services.network.tracing.traversals.BasicTracker
-import com.zepben.evolve.services.network.tracing.traversals.BranchRecursiveTraversal
-import com.zepben.evolve.services.network.tracing.traversals.WeightedPriorityQueue
+import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
 
 /**
  * Convenience class that provides methods for setting phases on a [NetworkService]
- * This class is backed by a [BranchRecursiveTraversal].
+ * This class is backed by a [NetworkTrace].
  */
-class SetPhases(
-    private val terminalConnectivityInternal: TerminalConnectivityInternal = TerminalConnectivityInternal()
-) {
+class SetPhases {
+
+    private class PhasesToFlow(val nominalPhasePaths: List<NominalPhasePath>, var stepFlowedPhases: Boolean = false)
 
     /**
-     * The [BranchRecursiveTraversal] used when tracing the normal state of the network.
-     *
-     * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    val normalTraversal: BranchRecursiveTraversal<Terminal> = BranchRecursiveTraversal(
-        { current, traversal -> setPhasesAndQueueNext(traversal, current, OpenTest.NORMALLY_OPEN, PhaseSelector.NORMAL_PHASES) },
-        { WeightedPriorityQueue.processQueue { it.phases.numPhases() } },
-        { BasicTracker() },
-        { WeightedPriorityQueue.branchQueue { it.phases.numPhases() } }
-    )
-
-    /**
-     * The [BranchRecursiveTraversal] used when tracing the current state of the network.
-     *
-     * NOTE: If you add stop conditions to this traversal it may no longer work correctly, use at your own risk.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    val currentTraversal: BranchRecursiveTraversal<Terminal> = BranchRecursiveTraversal(
-        { current, traversal -> setPhasesAndQueueNext(traversal, current, OpenTest.CURRENTLY_OPEN, PhaseSelector.CURRENT_PHASES) },
-        { WeightedPriorityQueue.processQueue { it.phases.numPhases() } },
-        { BasicTracker() },
-        { WeightedPriorityQueue.branchQueue { it.phases.numPhases() } }
-    )
-
-    /**
-     * Apply phases from all sources in the network.
+     * Apply phases and flow from all energy sources in the network.
+     * This will apply [Terminal.phases] to all terminals on each [EnergySource] and then flow along the connected network.
      *
      * @param network The network in which to apply phases.
-     */
-    fun run(network: NetworkService) {
-        val terminals = network.sequenceOf<EnergySource>()
-            .flatMap { it.terminals.asSequence() }
-            .toList()
-            .onEach {
-                applyPhases(it, PhaseSelector.NORMAL_PHASES, it.phases.singlePhases)
-                applyPhases(it, PhaseSelector.CURRENT_PHASES, it.phases.singlePhases)
-            }
-
-        run(terminals)
-    }
-
-    /**
-     * Apply phases from the [terminal].
-     *
-     * @param terminal The terminal to start applying phases from.
-     * @param phases The phases to apply. Must only contain ABCN.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when setting phases.
      */
     @JvmOverloads
-    @Throws(IllegalArgumentException::class)
-    fun run(terminal: Terminal, phases: PhaseCode = terminal.phases) {
-        run(terminal, phases.singlePhases)
+    fun run(network: NetworkService, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) {
+        val trace = createNetworkTrace(networkStateOperators)
+        network.sequenceOf<EnergySource>()
+            .flatMap { it.terminals.asSequence() }
+            .forEach {
+                applyPhases(networkStateOperators, it, it.phases.singlePhases)
+                runTerminal(it, networkStateOperators, trace)
+            }
     }
 
     /**
-     * Apply phases from the [terminal].
+     * Apply phases to the [terminal] and flow.
      *
      * @param terminal The terminal to start applying phases from.
      * @param phases The phases to apply. Must only contain ABCN.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when setting phases.
      */
     @Throws(IllegalArgumentException::class)
-    fun run(terminal: Terminal, phases: List<SinglePhaseKind>) {
+    @JvmOverloads
+    fun run(terminal: Terminal, phases: PhaseCode, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) {
+        run(terminal, phases.singlePhases, networkStateOperators)
+    }
+
+    /**
+     * Apply phases to the [terminal] and flow.
+     *
+     * @param terminal The terminal to start applying phases from.
+     * @param phases The phases to apply. Must only contain ABCN.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when setting phases.
+     */
+    @Throws(IllegalArgumentException::class)
+    @JvmOverloads
+    fun run(terminal: Terminal, phases: List<SinglePhaseKind>, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) {
         if (phases.size != terminal.phases.singlePhases.size) {
             throw IllegalArgumentException(
                 "Attempted to apply phases $phases to $terminal with nominal phases ${terminal.phases}. " +
@@ -99,29 +77,53 @@ class SetPhases(
             )
         }
 
-        applyPhases(terminal, PhaseSelector.NORMAL_PHASES, phases)
-        applyPhases(terminal, PhaseSelector.CURRENT_PHASES, phases)
-
-        normalTraversal.tracker.clear()
-        currentTraversal.tracker.clear()
-
-        run(listOf(terminal))
+        applyPhases(networkStateOperators, terminal, phases)
+        runTerminal(terminal, networkStateOperators)
     }
 
     /**
-     * Apply phases from the [terminal] on the selected phases. Only spreads existing phases.
+     * Spread phases from the [seedTerminal] to the [startTerminal] and flow. The [seedTerminal] and [startTerminal] must have the same [Terminal.conductingEquipment].
      *
-     * @param terminal The terminal to from which to spread phases.
-     * @param phaseSelector The selector to use to spread the phases. Must be [PhaseSelector.NORMAL_PHASES] or [PhaseSelector.CURRENT_PHASES]
-     *
-     * @return True if any phases were spread, otherwise false.
+     * @param seedTerminal The terminal to from which to spread phases.
+     * @param startTerminal The terminal to spread phases to and start the trace from.
+     * @param phases The nominal phases on which to spread phases from the seed terminal.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when setting phases.
      */
-    fun run(terminal: Terminal, phaseSelector: PhaseSelector) {
-        when (phaseSelector) {
-            PhaseSelector.NORMAL_PHASES -> run(listOf(terminal), normalTraversal, PhaseSelector.NORMAL_PHASES)
-            PhaseSelector.CURRENT_PHASES -> run(listOf(terminal), currentTraversal, PhaseSelector.CURRENT_PHASES)
-            else -> throw IllegalArgumentException("Invalid PhaseSelector specified. Must be PhaseSelector.NORMAL_PHASES or PhaseSelector.CURRENT_PHASES")
+    @JvmOverloads
+    fun run(
+        seedTerminal: Terminal,
+        startTerminal: Terminal,
+        phases: List<SinglePhaseKind>,
+        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
+    ) {
+        val nominalPhasePaths = getNominalPhasePaths(networkStateOperators, seedTerminal, startTerminal, phases.asSequence())
+        if (flowPhases(networkStateOperators, seedTerminal, startTerminal, nominalPhasePaths)) {
+            run(startTerminal, networkStateOperators)
         }
+    }
+
+    /**
+     * Flow phases already set on the given [terminal].
+     */
+    @JvmOverloads
+    fun run(terminal: Terminal, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL) {
+        runTerminal(terminal, networkStateOperators)
+    }
+
+    /**
+     * Apply nominal phases from the [fromTerminal] to the [toTerminal].
+     *
+     * @param fromTerminal The terminal to from which to spread phases.
+     * @param toTerminal The terminal to spread phases to.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when setting phases.
+     */
+    @JvmOverloads
+    fun spreadPhases(
+        fromTerminal: Terminal,
+        toTerminal: Terminal,
+        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
+    ) {
+        spreadPhases(fromTerminal, toTerminal, fromTerminal.phases.singlePhases, networkStateOperators)
     }
 
     /**
@@ -129,113 +131,109 @@ class SetPhases(
      *
      * @param fromTerminal The terminal to from which to spread phases.
      * @param toTerminal The terminal to spread phases to.
-     * @param phasesToFlow The nominal phases on which to spread phases.
-     * @param phaseSelector The selector to use to spread the phases.
-     *
-     * @return A set of [SinglePhaseKind] that were updated. This will be empty if there were no updates.
+     * @param phases The nominal phases on which to spread phases.
+     * @param networkStateOperators The [NetworkStateOperators] to be used when setting phases.
      */
     @JvmOverloads
     fun spreadPhases(
         fromTerminal: Terminal,
         toTerminal: Terminal,
-        phaseSelector: PhaseSelector,
-        phasesToFlow: Set<SinglePhaseKind> = fromTerminal.phases.singlePhases.toSet()
-    ): Set<SinglePhaseKind> {
-        val cr = terminalConnectivityInternal.between(fromTerminal, toTerminal, phasesToFlow)
-        return flowViaPaths(cr, phaseSelector)
+        phases: List<SinglePhaseKind>,
+        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
+    ) {
+        val paths = getNominalPhasePaths(networkStateOperators, fromTerminal, toTerminal, phases.asSequence())
+        flowPhases(networkStateOperators, fromTerminal, toTerminal, paths)
     }
 
-    private fun applyPhases(terminal: Terminal, phaseSelector: PhaseSelector, phases: List<SinglePhaseKind>) {
-        val tracedPhases = phaseSelector.phases(terminal)
+    private fun runTerminal(
+        terminal: Terminal,
+        networkStateOperators: NetworkStateOperators,
+        trace: NetworkTrace<PhasesToFlow> = createNetworkTrace(networkStateOperators)
+    ) {
+        val nominalPhasePaths = terminal.phases.map { NominalPhasePath(SinglePhaseKind.NONE, it) }
+        trace.run(terminal, PhasesToFlow(nominalPhasePaths), canStopOnStartItem = false)
+        trace.reset()
+    }
 
+    private fun List<NominalPhasePath>.toPhases(): Sequence<SinglePhaseKind> = this.asSequence().map { it.to }
+
+    private fun createNetworkTrace(stateOperators: NetworkStateOperators): NetworkTrace<PhasesToFlow> = Tracing.networkTraceBranching(
+        networkStateOperators = stateOperators,
+        actionStepType = NetworkTraceActionType.ALL_STEPS,
+        queueFactory = { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
+        branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
+        computeData = computeNextPhasesToFlow(stateOperators)
+    )
+        .addQueueCondition { nextStep, _, _, _ ->
+            nextStep.data.nominalPhasePaths.isNotEmpty()
+        }
+        .addStepAction { (path, phasesToFlow), ctx ->
+            // We always assume the first step terminal already has the phases applied, so we don't do anything on the first step
+            phasesToFlow.stepFlowedPhases = if (!ctx.isStartItem) {
+                flowPhases(stateOperators, path.fromTerminal, path.toTerminal, phasesToFlow.nominalPhasePaths)
+            } else {
+                true
+            }
+        }
+
+    private fun computeNextPhasesToFlow(stateOperators: NetworkStateOperators): ComputeData<PhasesToFlow> =
+        ComputeData { step, _, nextPath ->
+            // If the current step didn't flow any phases, we don't attempt to flow any further.
+            if (!step.data.stepFlowedPhases) {
+                PhasesToFlow(emptyList())
+            } else {
+                val phasePaths = getNominalPhasePaths(stateOperators, nextPath.fromTerminal, nextPath.toTerminal, step.data.nominalPhasePaths.toPhases())
+                PhasesToFlow(phasePaths)
+            }
+        }
+
+
+    private fun applyPhases(stateOperators: NetworkStateOperators, terminal: Terminal, phases: List<SinglePhaseKind>) {
+        val tracedPhases = stateOperators.phaseStatus(terminal)
         terminal.phases.singlePhases.forEachIndexed { index, nominalPhase ->
             tracedPhases[nominalPhase] = phases[index].takeUnless { it in PhaseCode.XY } ?: SinglePhaseKind.NONE
         }
     }
 
-    private fun run(startTerminals: List<Terminal>) {
-        run(startTerminals, normalTraversal, PhaseSelector.NORMAL_PHASES)
-        run(startTerminals, currentTraversal, PhaseSelector.CURRENT_PHASES)
-    }
-
-    private fun run(
-        startTerminals: List<Terminal>,
-        traversal: BranchRecursiveTraversal<Terminal>,
-        phaseSelector: PhaseSelector
-    ) {
-        for (terminal in startTerminals)
-            runTerminal(terminal, traversal, phaseSelector)
-    }
-
-    private fun runTerminal(start: Terminal, traversal: BranchRecursiveTraversal<Terminal>, phaseSelector: PhaseSelector) {
-        runFromTerminal(traversal, start, phaseSelector, start.phases.singlePhases.toSet())
-    }
-
-    private fun runFromTerminal(
-        traversal: BranchRecursiveTraversal<Terminal>,
-        terminal: Terminal,
-        phaseSelector: PhaseSelector,
-        phasesToFlow: Set<SinglePhaseKind>
-    ) {
-        traversal.reset().tracker.visit(terminal)
-
-        flowToConnectedTerminalsAndQueue(traversal, terminal, phaseSelector, phasesToFlow)
-
-        traversal.run()
-    }
-
-    private fun setPhasesAndQueueNext(traversal: BranchRecursiveTraversal<Terminal>, current: Terminal, openTest: OpenTest, phaseSelector: PhaseSelector) {
-        val phasesToFlow = getPhasesToFlow(current, openTest)
-
-        current.conductingEquipment?.terminals?.forEach {
-            if (it != current) {
-                val phasesFlowed = flowThroughEquipment(traversal, current, it, phaseSelector, phasesToFlow)
-                if (phasesFlowed.isNotEmpty())
-                    flowToConnectedTerminalsAndQueue(traversal, it, phaseSelector, phasesFlowed)
-            }
-        }
-    }
-
-    private fun flowThroughEquipment(
-        traversal: BranchRecursiveTraversal<Terminal>,
+    private fun getNominalPhasePaths(
+        stateOperators: NetworkStateOperators,
         fromTerminal: Terminal,
         toTerminal: Terminal,
-        phaseSelector: PhaseSelector,
-        phasesToFlow: Set<SinglePhaseKind>
-    ): Set<SinglePhaseKind> {
-        traversal.tracker.visit(toTerminal)
-        return spreadPhases(fromTerminal, toTerminal, phaseSelector, phasesToFlow)
-    }
+        phases: Sequence<SinglePhaseKind>
+    ): List<NominalPhasePath> {
+        val tracedInternally = fromTerminal.conductingEquipment == toTerminal.conductingEquipment
+        val phasesToFlow = getPhasesToFlow(stateOperators, fromTerminal, phases, tracedInternally)
 
-    /**
-     * Applies all the [phasesToFlow] from the [fromTerminal] to the connected terminals and queues them.
-     */
-    private fun flowToConnectedTerminalsAndQueue(
-        traversal: BranchRecursiveTraversal<Terminal>,
-        fromTerminal: Terminal,
-        phaseSelector: PhaseSelector,
-        phasesToFlow: Set<SinglePhaseKind>
-    ) {
-        val connectivityResults = NetworkService.connectedTerminals(fromTerminal, phasesToFlow)
-
-        val useBranchQueue = (connectivityResults.size > 1) || ((fromTerminal.conductingEquipment?.numTerminals() ?: 0) > 2)
-
-        connectivityResults.forEach { cr ->
-            if (flowViaPaths(cr, phaseSelector).isNotEmpty()) {
-                if (useBranchQueue)
-                    traversal.branchQueue.add(traversal.branchSupplier().setStart(cr.toTerminal))
-                else
-                    traversal.queue.add(cr.toTerminal)
-            }
+        return if (tracedInternally) {
+            TerminalConnectivityInternal.between(fromTerminal, toTerminal, phasesToFlow).nominalPhasePaths
+        } else {
+            TerminalConnectivityConnected.terminalConnectivity(fromTerminal, toTerminal, phasesToFlow).nominalPhasePaths
         }
     }
 
-    private fun flowViaPaths(cr: ConnectivityResult, phaseSelector: PhaseSelector): Set<SinglePhaseKind> {
-        val fromPhases = phaseSelector.phases(cr.fromTerminal)
-        val toPhases = phaseSelector.phases(cr.toTerminal)
+    private fun getPhasesToFlow(
+        stateOperators: NetworkStateOperators,
+        terminal: Terminal,
+        phases: Sequence<SinglePhaseKind>,
+        internalFlow: Boolean
+    ): Set<SinglePhaseKind> =
+        if (internalFlow) {
+            terminal.conductingEquipment?.let { ce -> phases.filter { !stateOperators.isOpen(ce, it) }.toSet() } ?: emptySet()
+        } else {
+            phases.toSet()
+        }
 
-        val changedPhases = mutableSetOf<SinglePhaseKind>()
-        for ((from, to) in cr.nominalPhasePaths) {
+    private fun flowPhases(
+        stateOperators: NetworkStateOperators,
+        fromTerminal: Terminal,
+        toTerminal: Terminal,
+        nominalPhasePaths: List<NominalPhasePath>,
+    ): Boolean {
+        val fromPhases = stateOperators.phaseStatus(fromTerminal)
+        val toPhases = stateOperators.phaseStatus(toTerminal)
+
+        var changedPhases = false
+        for ((from, to) in nominalPhasePaths) {
             try {
                 // If the path comes from NONE, then we want to apply the `to phase`.
                 val phase = if (from != SinglePhaseKind.NONE)
@@ -246,17 +244,17 @@ class SetPhases(
                     toPhases[to]
 
                 if ((phase != SinglePhaseKind.NONE) && toPhases.set(to, phase))
-                    changedPhases.add(to)
+                    changedPhases = true
             } catch (ex: UnsupportedOperationException) {
                 val phaseDesc = if (from == to)
                     "$from"
                 else
                     "path $from to $to"
 
-                val terminalDesc = if (cr.from == cr.to)
-                    "from ${cr.fromTerminal} to ${cr.toTerminal} through ${cr.from?.typeNameAndMRID()}"
+                val terminalDesc = if (fromTerminal.conductingEquipment == toTerminal.conductingEquipment)
+                    "from $fromTerminal to $toTerminal through ${fromTerminal.conductingEquipment?.typeNameAndMRID()}"
                 else
-                    "between ${cr.fromTerminal} on ${cr.from?.typeNameAndMRID()} and ${cr.toTerminal} on ${cr.to?.typeNameAndMRID()}"
+                    "between $fromTerminal on ${fromTerminal.conductingEquipment?.typeNameAndMRID()} and $toTerminal on ${toTerminal.conductingEquipment?.typeNameAndMRID()}"
 
                 throw IllegalStateException(
                     "Attempted to flow conflicting phase ${fromPhases[from]} onto ${toPhases[to]} on nominal phase $phaseDesc. This occurred while " +
@@ -267,13 +265,4 @@ class SetPhases(
         }
         return changedPhases
     }
-
-    private fun getPhasesToFlow(terminal: Terminal, openTest: OpenTest): MutableSet<SinglePhaseKind> =
-        terminal.conductingEquipment?.let { ce ->
-            terminal.phases.singlePhases
-                .asSequence()
-                .filter { !openTest.isOpen(ce, it) }
-                .toMutableSet()
-        } ?: mutableSetOf()
-
 }

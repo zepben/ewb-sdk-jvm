@@ -4,6 +4,7 @@
 * Database readers and writes for each `BaseService` no longer accept a `MetadataCollection`, and will instead use the collection of the provided service.
 * `AcLineSegment.perLengthSequenceImpedance` has been corrected to `perLengthImpedance`. This has been done in a non-breaking way, however the public resolver
   `Resolvers.perLengthSequenceImpedance` is now `Resolvers.perLengthImpedance`, correctly reflecting the CIM relationship.
+* Removed `getCurrentEquipmentForFeeder` implementation for `NetworkConsumer` as its functionality is now incorporated in `getEquipmentForContainers`.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
@@ -28,8 +29,11 @@
 * Added collection of `BatteryControl` to `BatteryUnit`
 * Added collection of `EndDeviceFunctionKind` to `EndDevice`
 * Added an unordered collection comparator.
+* Added the energized relationship for the current state of network between `Feeder` and `LvFeeder`.
+* Updated `NetworkConsumer.getEquipmentForContainers` to allow requesting normal, current or all equipments.
 
 ### Fixes
+* None.
 
 ### Notes
 * None.

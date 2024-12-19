@@ -45,7 +45,7 @@ internal class GrpcChannelBuilderTest {
         every { NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(any()).build() } returns insecureChannel
 
         var grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234)
-            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 2000))
+            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 2000))
 
         verify {
             NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(2000)
@@ -53,7 +53,7 @@ internal class GrpcChannelBuilderTest {
         assertThat(grpcChannel.channel, equalTo(insecureChannel))
 
         grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234)
-            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = DEFAULT_BUILD_ARGS.maxInboundMessageSize))
+            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = DEFAULT_BUILD_ARGS.maxInboundMessageSize))
 
         verify {
             NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(20971520)
@@ -61,7 +61,7 @@ internal class GrpcChannelBuilderTest {
         assertThat(grpcChannel.channel, equalTo(insecureChannel))
 
         grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234)
-            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 2000))
+            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 2000))
 
         verify {
             NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(2000)
@@ -73,17 +73,20 @@ internal class GrpcChannelBuilderTest {
     internal fun defaultBuildArgs() {
         val insecureChannel = mockk<ManagedChannel>()
 
-        mockkStatic(NettyChannelBuilder::class)
-        every { NettyChannelBuilder.forAddress("localhost", 50051).usePlaintext().maxInboundMessageSize(DEFAULT_BUILD_ARGS.maxInboundMessageSize).build() } returns insecureChannel
+        mockkStatic(NettyChannelBuilder::class) {
+            every {
+                NettyChannelBuilder.forAddress("localhost", 50051).usePlaintext().maxInboundMessageSize(DEFAULT_BUILD_ARGS.maxInboundMessageSize).build()
+            } returns insecureChannel
 
-        val builderSpy = spyk(GrpcChannelBuilder())
-        every { builderSpy.testConnection(any(), any()) } just runs
+            val builderSpy = spyk(GrpcChannelBuilder())
+            every { builderSpy.testConnection(any(), any(), any()) } just runs
 
-        val grpcChannel = builderSpy.build()
+            val grpcChannel = builderSpy.build()
 
-        verifySequence {
-            builderSpy.build(DEFAULT_BUILD_ARGS)
-            builderSpy.testConnection(grpcChannel, false)
+            verifySequence {
+                builderSpy.build(DEFAULT_BUILD_ARGS)
+                builderSpy.testConnection(grpcChannel, true, 5000)
+            }
         }
     }
 
@@ -96,29 +99,29 @@ internal class GrpcChannelBuilderTest {
 
         val builderSpy = spyk(GrpcChannelBuilder())
 
-        val grpcChannel = builderSpy.build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 7))
+        val grpcChannel = builderSpy.build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 7))
 
         verifySequence {
-            builderSpy.build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 7))
+            builderSpy.build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 7))
         }
         assertThat(grpcChannel.channel, equalTo(insecureChannel))
     }
 
     @Test
-    internal fun passDebugFlagToTestConnection() {
+    internal fun passDebugFlagAndTimeoutMsToTestConnection() {
         val insecureChannel = mockk<ManagedChannel>()
 
         mockkStatic(NettyChannelBuilder::class)
         every { NettyChannelBuilder.forAddress("localhost", 50051).usePlaintext().maxInboundMessageSize(12).build() } returns insecureChannel
 
         val builderSpy = spyk(GrpcChannelBuilder())
-        every { builderSpy.testConnection(any(), any()) } just runs
+        every { builderSpy.testConnection(any(), any(), any()) } just runs
 
-        val grpcChannel = builderSpy.build(GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, maxInboundMessageSize = 12))
+        val grpcChannel = builderSpy.build(GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 1234, maxInboundMessageSize = 12))
 
         verifySequence {
-            builderSpy.build(GrpcBuildArgs(skipConnectionTest=false, debugConnectionTest=true, maxInboundMessageSize = 12))
-            builderSpy.testConnection(grpcChannel, true)
+            builderSpy.build(GrpcBuildArgs(skipConnectionTest=false, debugConnectionTest = true, connectionTestTimeoutMs = 1234, maxInboundMessageSize = 12))
+            builderSpy.testConnection(grpcChannel, true, 1234)
         }
     }
 
@@ -134,42 +137,36 @@ internal class GrpcChannelBuilderTest {
     }
 
     @Test
-    internal fun `testConnection rethrows grpc status UNAVAILABLE exceptions`() {
+    internal fun `testConnection continues past grpc status UNAVAILABLE exceptions`() {
         val responses = mapOf(
-            NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
-            CustomerConsumerClient::class to StatusRuntimeException(Status.INVALID_ARGUMENT),
-            DiagramConsumerClient::class to StatusRuntimeException(Status.UNAVAILABLE),
+            NetworkConsumerClient::class to StatusRuntimeException(Status.UNAVAILABLE),
+            CustomerConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
+            DiagramConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
         )
 
-        expect {
-            runTestConnection(responses)
-        }.toThrow<StatusRuntimeException>().withStatusCode(Status.UNAVAILABLE)
+        runTestConnection(responses)
     }
 
     @Test
-    internal fun `testConnection rethrows grpc status UNAUTHENTICATED exceptions`() {
+    internal fun `testConnection continues past grpc status UNAUTHENTICATED exceptions`() {
         val responses = mapOf(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
             CustomerConsumerClient::class to StatusRuntimeException(Status.UNAUTHENTICATED),
-            DiagramConsumerClient::class to StatusRuntimeException(Status.UNAVAILABLE),
+            DiagramConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
         )
 
-        expect {
-            runTestConnection(responses)
-        }.toThrow<StatusRuntimeException>().withStatusCode(Status.UNAUTHENTICATED)
+        runTestConnection(responses)
     }
 
     @Test
-    internal fun `testConnection rethrows grpc status UNKNOWN exceptions`() {
+    internal fun `testConnection continues past grpc status UNKNOWN exceptions`() {
         val responses = mapOf(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
             CustomerConsumerClient::class to StatusRuntimeException(Status.UNKNOWN),
-            DiagramConsumerClient::class to StatusRuntimeException(Status.UNAVAILABLE),
+            DiagramConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
         )
 
-        expect {
-            runTestConnection(responses)
-        }.toThrow<StatusRuntimeException>().withStatusCode(Status.UNKNOWN)
+        runTestConnection(responses) // TODO: This might be the one to fail fast on, UNKNOWN: Connection refused = token expired or etc?
     }
 
     @Test
@@ -196,9 +193,9 @@ internal class GrpcChannelBuilderTest {
         expect {
             runTestConnection(responses, debug = true)
         }.toThrow<GrpcConnectionException>().withMessage("Couldn't establish gRPC connection to any service on localhost:50051.\n" +
-            "[DEBUG] com.zepben.evolve.streaming.get.NetworkConsumerClient: io.grpc.StatusRuntimeException: DATA_LOSS: Data loss message for testing\n" +
-            "[DEBUG] com.zepben.evolve.streaming.get.CustomerConsumerClient: io.grpc.StatusRuntimeException: INVALID_ARGUMENT: Invalid argument message for testing\n" +
-            "[DEBUG] com.zepben.evolve.streaming.get.DiagramConsumerClient: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.dc.DiagramConsumer/getMetadata")
+            "[DEBUG] NetworkConsumerClient: io.grpc.StatusRuntimeException: DATA_LOSS: Data loss message for testing\n" +
+            "[DEBUG] CustomerConsumerClient: io.grpc.StatusRuntimeException: INVALID_ARGUMENT: Invalid argument message for testing\n" +
+            "[DEBUG] DiagramConsumerClient: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.dc.DiagramConsumer/getMetadata")
     }
 
     @Test
@@ -222,7 +219,7 @@ internal class GrpcChannelBuilderTest {
         every { NettyChannelBuilder.forAddress("hostname", 1234).usePlaintext().maxInboundMessageSize(any()).build() } returns insecureChannel
 
         val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234)
-            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 28))
+            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 28))
         assertThat(grpcChannel.channel, equalTo(insecureChannel))
     }
 
@@ -239,7 +236,7 @@ internal class GrpcChannelBuilderTest {
         every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).maxInboundMessageSize(any()).build() } returns secureChannel
 
         val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(caFile).build(
-            GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 34))
+            GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 34))
         assertThat(grpcChannel.channel, equalTo(secureChannel))
     }
 
@@ -255,7 +252,7 @@ internal class GrpcChannelBuilderTest {
         every { NettyChannelBuilder.forAddress("hostname", 1234, channelCredentials).maxInboundMessageSize(any()).build() } returns secureChannel
 
         val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure()
-            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 42))
+            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 42))
         assertThat(grpcChannel.channel, equalTo(secureChannel))
     }
 
@@ -276,11 +273,11 @@ internal class GrpcChannelBuilderTest {
 
         assertThat(
             GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(caFile, certChainFile, pkFile)
-                .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 53)).channel, equalTo(secureChannel)
+                .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 53)).channel, equalTo(secureChannel)
         )
         assertThat(
             GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure(certificateChain = certChainFile, privateKey = pkFile)
-                .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 62)).channel, equalTo(secureChannel)
+                .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 62)).channel, equalTo(secureChannel)
         )
     }
 
@@ -293,16 +290,16 @@ internal class GrpcChannelBuilderTest {
         mockkConstructor(GrpcChannelBuilder::class)
         every {
             constructedWith<GrpcChannelBuilder>().makeSecure(null, "certChainFilename", "pkFilename")
-                .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 1))
+                .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 1))
         } returns secureGrpcChannel
 
         assertThat(
             GrpcChannelBuilder().makeSecure(null, "certChainFilename", "pkFilename")
-                .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 1)), equalTo(secureGrpcChannel)
+                .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 1)), equalTo(secureGrpcChannel)
         )
         assertThat(
             GrpcChannelBuilder().makeSecure(certificateChain = "certChainFilename", privateKey = "pkFilename")
-                .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 1)), equalTo(secureGrpcChannel)
+                .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 1)), equalTo(secureGrpcChannel)
         )
     }
 
@@ -315,7 +312,7 @@ internal class GrpcChannelBuilderTest {
 
         val tokenFetcher = ZepbenTokenFetcher("audience", "domain", AuthMethod.AUTH0)
         val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeSecure().withTokenFetcher(tokenFetcher)
-            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 1))
+            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 1))
         assertThat(grpcChannel.channel, equalTo(authenticatedChannel))
     }
 
@@ -327,7 +324,7 @@ internal class GrpcChannelBuilderTest {
         every { NettyChannelBuilder.forAddress("hostname", 1234, any()).maxInboundMessageSize(any()).intercept(any<CallCredentialApplier>()).build() } returns authenticatedChannel
 
         val grpcChannel = GrpcChannelBuilder().forAddress("hostname", 1234).makeInsecure().withAccessToken("token")
-            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, maxInboundMessageSize = 1))
+            .build(GrpcBuildArgs(skipConnectionTest = true, debugConnectionTest = false, connectionTestTimeoutMs = 5000, maxInboundMessageSize = 1))
         assertThat(grpcChannel.channel, equalTo(authenticatedChannel))
     }
 
@@ -350,7 +347,7 @@ internal class GrpcChannelBuilderTest {
         throw ExpectExceptionError(expected.toString(), status.toString())
     }
 
-    private fun runTestConnection(responses: Map<KClass<out CimConsumerClient<out BaseService, out BaseProtoToCim>>, Exception?>, debug: Boolean = false) {
+    private fun runTestConnection(responses: Map<KClass<out CimConsumerClient<out BaseService, out BaseProtoToCim>>, Exception?>, debug: Boolean = false, timeoutMs: Long = 5000) {
         val builder = GrpcChannelBuilder()
         val channel = mockk<Channel>()
         val grpcChannel = mockk<GrpcChannel>()
@@ -386,6 +383,6 @@ internal class GrpcChannelBuilderTest {
             every { diagramGrpcResult.wasSuccessful } returns false
         } ?: (every { diagramGrpcResult.wasSuccessful } returns true)
 
-        builder.testConnection(grpcChannel, debug)
+        builder.testConnection(grpcChannel, debug, timeoutMs)
     }
 }

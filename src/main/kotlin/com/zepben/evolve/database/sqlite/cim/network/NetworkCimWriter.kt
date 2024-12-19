@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.cim.network
 
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
@@ -15,6 +17,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransforme
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
+import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunction
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -38,6 +41,8 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.cim.CimWriter
 import com.zepben.evolve.database.sqlite.cim.tables.associations.*
+import com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions
+import com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61970.base.wires.TableBatteryControls
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.*
@@ -45,6 +50,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infasse
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TableRelayInfo
+import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableEndDeviceFunctions
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableEndDevices
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableUsagePoints
@@ -59,7 +65,10 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRem
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.*
-import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.*
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TableBatteryUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePowerElectronicsUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnits
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLvFeeders
@@ -68,6 +77,7 @@ import com.zepben.evolve.database.sqlite.extensions.*
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.PreparedStatement
 import java.sql.SQLException
+import kotlin.Throws
 
 /**
  * A class for writing the [NetworkService] tables to the database.
@@ -78,6 +88,54 @@ import java.sql.SQLException
 class NetworkCimWriter(
     override val databaseTables: NetworkDatabaseTables
 ) : CimWriter(databaseTables) {
+
+    // ################################
+    // # EXTENSIONS IEC61968 METERING #
+    // ################################
+
+    /**
+     * Save the [PanDemandResponseFunction] fields to [TablePanDemandResponseFunctions].
+     *
+     * @param panDemandResponseFunction The [PanDemandResponseFunction] instance to write to the database.
+     *
+     * @return true if the [PanDemandResponseFunction] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(panDemandResponseFunction: PanDemandResponseFunction): Boolean {
+        val table = databaseTables.getTable<TablePanDemandResponseFunctions>()
+        val insert = databaseTables.getInsert<TablePanDemandResponseFunctions>()
+
+        insert.setNullableString(table.KIND.queryIndex, panDemandResponseFunction.kind.name)
+        insert.setNullableInt(table.APPLIANCE.queryIndex, panDemandResponseFunction.applianceBitmask)
+
+        return saveEndDeviceFunction(table, insert, panDemandResponseFunction, "pan demand response function")
+    }
+
+    // ##################################
+    // # EXTENSIONS IEC61970 BASE WIRES #
+    // ##################################
+
+    /**
+     * Save the [BatteryControl] fields to [TableBatteryControls].
+     *
+     * @param batteryControl The [BatteryControl] instance to write to the database.
+     *
+     * @return true if the [BatteryControl] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(batteryControl: BatteryControl): Boolean {
+        val table = databaseTables.getTable<TableBatteryControls>()
+        val insert = databaseTables.getInsert<TableBatteryControls>()
+
+        insert.setNullableDouble(table.CHARGING_RATE.queryIndex, batteryControl.chargingRate)
+        insert.setNullableDouble(table.DISCHARGING_RATE.queryIndex, batteryControl.dischargingRate)
+        insert.setNullableDouble(table.RESERVE_PERCENT.queryIndex, batteryControl.reservePercent)
+        insert.setNullableString(table.CONTROL_MODE.queryIndex, batteryControl.controlMode.name)
+
+        return saveRegulatingControl(table, insert, batteryControl, "battery control")
+    }
 
     // #######################
     // # IEC61968 Asset Info #
@@ -329,6 +387,11 @@ class NetworkCimWriter(
     @Throws(SQLException::class)
     private fun saveAssetInfo(table: TableAssetInfo, insert: PreparedStatement, assetInfo: AssetInfo, description: String): Boolean {
         return saveIdentifiedObject(table, insert, assetInfo, description)
+    }
+
+    @Throws(SQLException::class)
+    private fun saveAssetFunction(table: TableAssetFunctions, insert: PreparedStatement, assetFunction: AssetFunction, description: String): Boolean {
+        return saveIdentifiedObject(table, insert, assetFunction, description)
     }
 
     @Throws(SQLException::class)
@@ -585,8 +648,21 @@ class NetworkCimWriter(
 
         var status = true
         endDevice.usagePoints.forEach { status = status and saveAssociation(it, endDevice) }
+        endDevice.functions.forEach { status = status and saveAssociation(it, endDevice) }
 
         return status and saveAssetContainer(table, insert, endDevice, description)
+    }
+
+    @Throws(SQLException::class)
+    private fun saveEndDeviceFunction(
+        table: TableEndDeviceFunctions,
+        insert: PreparedStatement,
+        endDeviceFunction: EndDeviceFunction,
+        description: String
+    ): Boolean {
+        insert.setNullableBoolean(table.ENABLED.queryIndex, endDeviceFunction.enabled)
+
+        return saveAssetFunction(table, insert, endDeviceFunction, description)
     }
 
     /**
@@ -797,9 +873,7 @@ class NetworkCimWriter(
     @Throws(SQLException::class)
     private fun saveCurve(table: TableCurves, insert: PreparedStatement, curve: Curve, description: String): Boolean {
         var status = true
-        curve.data.forEach { curveData ->
-            status = status and saveCurveData(curve, curveData)
-        }
+        curve.data.forEach { status = status and saveCurveData(curve, it) }
 
         return status and saveIdentifiedObject(table, insert, curve, description)
     }
@@ -1333,7 +1407,10 @@ class NetworkCimWriter(
         insert.setNullableLong(table.RATED_E.queryIndex, batteryUnit.ratedE)
         insert.setNullableLong(table.STORED_E.queryIndex, batteryUnit.storedE)
 
-        return savePowerElectronicsUnit(table, insert, batteryUnit, "battery unit")
+        var status = true
+        batteryUnit.controls.forEach { status = status and saveAssociation(batteryUnit, it) }
+
+        return status and savePowerElectronicsUnit(table, insert, batteryUnit, "battery unit")
     }
 
     /**
@@ -1399,10 +1476,7 @@ class NetworkCimWriter(
         val table = databaseTables.getTable<TableAcLineSegments>()
         val insert = databaseTables.getInsert<TableAcLineSegments>()
 
-        insert.setNullableString(
-            table.PER_LENGTH_SEQUENCE_IMPEDANCE_MRID.queryIndex,
-            acLineSegment.perLengthSequenceImpedance?.mRID
-        )
+        insert.setNullableString(table.PER_LENGTH_IMPEDANCE_MRID.queryIndex, acLineSegment.perLengthImpedance?.mRID)
 
         return saveConductor(table, insert, acLineSegment, "AC line segment")
     }
@@ -1765,6 +1839,41 @@ class NetworkCimWriter(
     }
 
     /**
+     * Save the [PerLengthPhaseImpedance] fields to [TablePerLengthPhaseImpedances].
+     *
+     * @param perLengthPhaseImpedance The [PerLengthPhaseImpedance] instance to write to the database.
+     *
+     * @return true if the [PerLengthPhaseImpedance] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(perLengthPhaseImpedance: PerLengthPhaseImpedance): Boolean {
+        val table = databaseTables.getTable<TablePerLengthPhaseImpedances>()
+        val insert = databaseTables.getInsert<TablePerLengthPhaseImpedances>()
+
+        var status = true
+        perLengthPhaseImpedance.data.forEach { status = status and savePhaseImpedanceData(perLengthPhaseImpedance, it) }
+
+        return status and savePerLengthImpedance(table, insert, perLengthPhaseImpedance, "per length phase impedance")
+    }
+
+    @Throws(SQLException::class)
+    private fun savePhaseImpedanceData(perLengthPhaseImpedance: PerLengthPhaseImpedance, phaseImpedanceData: PhaseImpedanceData): Boolean {
+        val table = databaseTables.getTable<TablePhaseImpedanceData>()
+        val insert = databaseTables.getInsert<TablePhaseImpedanceData>()
+
+        insert.setNullableString(table.PER_LENGTH_PHASE_IMPEDANCE_MRID.queryIndex, perLengthPhaseImpedance.mRID)
+        insert.setString(table.FROM_PHASE.queryIndex, phaseImpedanceData.fromPhase.name)
+        insert.setString(table.TO_PHASE.queryIndex, phaseImpedanceData.toPhase.name)
+        insert.setNullableDouble(table.B.queryIndex, phaseImpedanceData.b)
+        insert.setNullableDouble(table.G.queryIndex, phaseImpedanceData.g)
+        insert.setNullableDouble(table.R.queryIndex, phaseImpedanceData.r)
+        insert.setNullableDouble(table.X.queryIndex, phaseImpedanceData.x)
+
+        return insert.tryExecuteSingleUpdate("phase impedance data")
+    }
+
+    /**
      * Save the [PerLengthSequenceImpedance] fields to [TablePerLengthSequenceImpedances].
      *
      * @param perLengthSequenceImpedance The [PerLengthSequenceImpedance] instance to write to the database.
@@ -2024,6 +2133,8 @@ class NetworkCimWriter(
         insert.setNullableDouble(table.MIN_ALLOWED_TARGET_VALUE.queryIndex, regulatingControl.minAllowedTargetValue)
         insert.setNullableDouble(table.RATED_CURRENT.queryIndex, regulatingControl.ratedCurrent)
         insert.setNullableString(table.TERMINAL_MRID.queryIndex, regulatingControl.terminal?.mRID)
+        insert.setNullableDouble(table.CT_PRIMARY.queryIndex, regulatingControl.ctPrimary)
+        insert.setNullableDouble(table.MIN_TARGET_DEADBAND.queryIndex, regulatingControl.minTargetDeadband)
 
         return savePowerSystemResource(table, insert, regulatingControl, description)
     }
@@ -2078,6 +2189,28 @@ class NetworkCimWriter(
         return saveRegulatingCondEq(table, insert, shuntCompensator, description)
     }
 
+    /**
+     * Save the [StaticVarCompensator] fields to [TableStaticVarCompensators].
+     *
+     * @param staticVarCompensator The [StaticVarCompensator] instance to write to the database.
+     *
+     * @return true if the [StaticVarCompensator] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(staticVarCompensator: StaticVarCompensator): Boolean {
+        val table = databaseTables.getTable<TableStaticVarCompensators>()
+        val insert = databaseTables.getInsert<TableStaticVarCompensators>()
+
+        insert.setNullableDouble(table.CAPACITIVE_RATING.queryIndex, staticVarCompensator.capacitiveRating)
+        insert.setNullableDouble(table.INDUCTIVE_RATING.queryIndex, staticVarCompensator.inductiveRating)
+        insert.setNullableDouble(table.Q.queryIndex, staticVarCompensator.q)
+        insert.setNullableString(table.SVC_CONTROL_MODE.queryIndex, staticVarCompensator.svcControlMode.name)
+        insert.setNullableInt(table.VOLTAGE_SET_POINT.queryIndex, staticVarCompensator.voltageSetPoint)
+
+        return saveRegulatingCondEq(table, insert, staticVarCompensator, "static var compensator")
+    }
+
     @Throws(SQLException::class)
     private fun saveSwitch(table: TableSwitches, insert: PreparedStatement, switch: Switch, description: String): Boolean {
         insert.setInt(table.NORMAL_OPEN.queryIndex, switch.normalOpen)
@@ -2124,9 +2257,7 @@ class NetworkCimWriter(
         insert.setNullableString(table.OPERATING_MODE.queryIndex, synchronousMachine.operatingMode.name)
 
         var status = true
-        synchronousMachine.curves.forEach { rcc ->
-            status = status and saveAssociation(synchronousMachine, rcc)
-        }
+        synchronousMachine.curves.forEach { status = status and saveAssociation(synchronousMachine, it) }
 
         return status and saveRotatingMachine(table, insert, synchronousMachine, "synchronous machine")
     }
@@ -2311,6 +2442,17 @@ class NetworkCimWriter(
     }
 
     @Throws(SQLException::class)
+    private fun saveAssociation(batteryUnit: BatteryUnit, batteryControl: BatteryControl): Boolean {
+        val table = databaseTables.getTable<TableBatteryUnitsBatteryControls>()
+        val insert = databaseTables.getInsert<TableBatteryUnitsBatteryControls>()
+
+        insert.setString(table.BATTERY_UNIT_MRID.queryIndex, batteryUnit.mRID)
+        insert.setString(table.BATTERY_CONTROL_MRID.queryIndex, batteryControl.mRID)
+
+        return insert.tryExecuteSingleUpdate("battery control to battery unit association")
+    }
+
+    @Throws(SQLException::class)
     private fun saveAssociation(circuit: Circuit, substation: Substation): Boolean {
         val table = databaseTables.getTable<TableCircuitsSubstations>()
         val insert = databaseTables.getInsert<TableCircuitsSubstations>()
@@ -2330,6 +2472,17 @@ class NetworkCimWriter(
         insert.setString(table.TERMINAL_MRID.queryIndex, terminal.mRID)
 
         return insert.tryExecuteSingleUpdate("circuit to terminal association")
+    }
+
+    @Throws(SQLException::class)
+    private fun saveAssociation(endDeviceFunction: EndDeviceFunction, endDevice: EndDevice): Boolean {
+        val table = databaseTables.getTable<TableEndDevicesEndDeviceFunctions>()
+        val insert = databaseTables.getInsert<TableEndDevicesEndDeviceFunctions>()
+
+        insert.setString(table.END_DEVICE_FUNCTION_MRID.queryIndex, endDeviceFunction.mRID)
+        insert.setString(table.END_DEVICE_MRID.queryIndex, endDevice.mRID)
+
+        return insert.tryExecuteSingleUpdate("end device function to end device association")
     }
 
     @Throws(SQLException::class)
@@ -2429,7 +2582,7 @@ class NetworkCimWriter(
         insert.setString(table.USAGE_POINT_MRID.queryIndex, usagePoint.mRID)
         insert.setString(table.END_DEVICE_MRID.queryIndex, endDevice.mRID)
 
-        return insert.tryExecuteSingleUpdate("usage point to end device association association")
+        return insert.tryExecuteSingleUpdate("usage point to end device association")
     }
 
     private fun EquipmentContainer.shouldExportContainerContents(): Boolean = when (this) {

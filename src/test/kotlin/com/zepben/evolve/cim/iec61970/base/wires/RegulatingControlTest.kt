@@ -45,6 +45,8 @@ internal class RegulatingControlTest {
         assertThat(regulatingControl.minAllowedTargetValue, nullValue())
         assertThat(regulatingControl.ratedCurrent, nullValue())
         assertThat(regulatingControl.terminal, nullValue())
+        assertThat(regulatingControl.ctPrimary, nullValue())
+        assertThat(regulatingControl.minTargetDeadband, nullValue())
 
         regulatingControl.fillFields(NetworkService())
 
@@ -58,6 +60,8 @@ internal class RegulatingControlTest {
         assertThat(regulatingControl.minAllowedTargetValue, equalTo(50.0))
         assertThat(regulatingControl.ratedCurrent, equalTo(10.0))
         assertThat(regulatingControl.terminal, notNullValue())
+        assertThat(regulatingControl.ctPrimary, equalTo(1.0))
+        assertThat(regulatingControl.minTargetDeadband, equalTo(2.0))
     }
 
     @Test

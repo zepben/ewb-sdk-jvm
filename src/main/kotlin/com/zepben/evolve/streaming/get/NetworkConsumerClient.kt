@@ -637,9 +637,14 @@ class NetworkConsumerClient(
             SYNCHRONOUSMACHINE -> extractResult(io.synchronousMachine.mRID()) { addFromPb(io.synchronousMachine) }
             GROUNDINGIMPEDANCE -> extractResult(io.groundingImpedance.mRID()) { addFromPb(io.groundingImpedance) }
             PETERSENCOIL -> extractResult(io.petersenCoil.mRID()) { addFromPb(io.petersenCoil) }
+            PANDEMANDRESPONSEFUNCTION -> extractResult(io.panDemandResponseFunction.mRID()) { addFromPb(io.panDemandResponseFunction) }
+            BATTERYCONTROL -> extractResult(io.batteryControl.mRID()) { addFromPb(io.batteryControl) }
+            STATICVARCOMPENSATOR -> extractResult(io.staticVarCompensator.mRID()) { addFromPb(io.staticVarCompensator) }
+            PERLENGTHPHASEIMPEDANCE -> extractResult(io.perLengthPhaseImpedance.mRID()) { addFromPb(io.perLengthPhaseImpedance) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )
+
         }
 
     private fun <T, U : IdentifiedObject> toMap(objects: Iterable<T>, mapper: (T) -> U?): Map<String, U> =

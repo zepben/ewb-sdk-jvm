@@ -58,4 +58,18 @@ internal class EndDeviceTest {
             EndDevice::clearUsagePoints
         )
     }
+
+    @Test
+    internal fun endDeviceFunctions() {
+        PrivateCollectionValidator.validateUnordered(
+            { object : EndDevice() {} },
+            { id -> object : EndDeviceFunction(id) {} },
+            EndDevice::functions,
+            EndDevice::numFunctions,
+            EndDevice::getFunction,
+            EndDevice::addFunction,
+            EndDevice::removeFunction,
+            EndDevice::clearFunctions
+        )
+    }
 }

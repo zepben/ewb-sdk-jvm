@@ -11,6 +11,8 @@
 
 package com.zepben.evolve.services.network
 
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
@@ -139,6 +141,10 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isPetersenCoil Handler when the [identifiedObject] is a [PetersenCoil]
  * @param isReactiveCapabilityCurve Handler when the [identifiedObject] is a [ReactiveCapabilityCurve]
  * @param isSynchronousMachine Handler when the [identifiedObject] is a [SynchronousMachine]
+ * @param isPanDemandResponseFunction Handler when the [identifiedObject] is a [PanDemandResponseFunction]
+ * @param isBatteryControl Handler when the [identifiedObject] is a [BatteryControl]
+ * @param isStaticVarCompensator Handler when the [identifiedObject] is a [StaticVarCompensator]
+ * @param isPerLengthPhaseImpedance Handler when the [identifiedObject] is a [PerLengthPhaseImpedance]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -224,6 +230,10 @@ inline fun <R> whenNetworkServiceObject(
     isPetersenCoil: (PetersenCoil) -> R,
     isReactiveCapabilityCurve: (ReactiveCapabilityCurve) -> R,
     isSynchronousMachine: (SynchronousMachine) -> R,
+    isPanDemandResponseFunction: (PanDemandResponseFunction) -> R,
+    isBatteryControl: (BatteryControl) -> R,
+    isStaticVarCompensator: (StaticVarCompensator) -> R,
+    isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -308,5 +318,9 @@ inline fun <R> whenNetworkServiceObject(
     is PetersenCoil -> isPetersenCoil(identifiedObject)
     is ReactiveCapabilityCurve -> isReactiveCapabilityCurve(identifiedObject)
     is SynchronousMachine -> isSynchronousMachine(identifiedObject)
+    is PanDemandResponseFunction -> isPanDemandResponseFunction(identifiedObject)
+    is BatteryControl -> isBatteryControl(identifiedObject)
+    is StaticVarCompensator -> isStaticVarCompensator(identifiedObject)
+    is PerLengthPhaseImpedance -> isPerLengthPhaseImpedance(identifiedObject)
     else -> isOther(identifiedObject)
 }

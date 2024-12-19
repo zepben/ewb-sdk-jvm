@@ -11,6 +11,8 @@ package com.zepben.evolve.cim.iec61968.metering
 import com.zepben.evolve.cim.iec61968.assets.AssetContainer
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
+import com.zepben.evolve.services.common.extensions.getByMRID
+import com.zepben.evolve.services.common.extensions.safeRemove
 import com.zepben.evolve.services.common.extensions.validateReference
 
 /**
@@ -26,16 +28,17 @@ import com.zepben.evolve.services.common.extensions.validateReference
  *
  * @property customerMRID Customer owning this end device.
  * @property serviceLocation Service location whose service delivery is measured by this end device.
+ * @property usagePoints The collection of [UsagePoint] belonging to this [EndDevice]. The returned collection is read only.
+ * @property functions The collection of [EndDeviceFunctionKind] present on this [EndDevice]. The returned collection is read only.
  */
 abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
 
-    private var _usagePoints: MutableList<UsagePoint>? = null
     var customerMRID: String? = null
     var serviceLocation: Location? = null
 
-    /**
-     * The usage points belonging to this end device. The returned collection is read only.
-     */
+    private var _usagePoints: MutableList<UsagePoint>? = null
+    private var _functions: MutableList<EndDeviceFunction>? = null
+
     val usagePoints: Collection<UsagePoint> get() = _usagePoints.asUnmodifiable()
 
     /**
@@ -75,8 +78,67 @@ abstract class EndDevice(mRID: String = "") : AssetContainer(mRID) {
         return ret
     }
 
+    /**
+     * Clear all [UsagePoint]'s attached to this [EndDevice].
+     * @return This [EndDevice] for fluent use.
+     */
     fun clearUsagePoints(): EndDevice {
         _usagePoints = null
         return this
     }
+
+    val functions: List<EndDeviceFunction> get() = _functions.asUnmodifiable()
+
+    /**
+     * Get the number of entries in the [EndDeviceFunction] collection.
+     */
+    fun numFunctions(): Int = _functions?.size ?: 0
+
+    /**
+     * Get a [EndDeviceFunction] of this [EndDevice] by its [EndDeviceFunction.mRID]
+     *
+     * @param mRID the mRID of the required [EndDeviceFunction]
+     * @return The [EndDeviceFunction] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getFunction(mRID: String): EndDeviceFunction? = _functions.getByMRID(mRID)
+
+    /**
+     * Add a [EndDeviceFunction] for this [EndDevice]
+     *
+     * @throws IllegalStateException if the [EndDeviceFunction] references another [EndDevice]
+     * @param function the [EndDeviceFunction] to be added to this [EndDevice]
+     *
+     * @return This [EndDevice] for fluent use
+     */
+    fun addFunction(function: EndDeviceFunction): EndDevice {
+        if (validateFunction(function)) return this
+
+        _functions = _functions.or(::mutableListOf) { add(function) }
+
+        return this
+    }
+
+    /**
+     * @param function the [EndDeviceFunction] to disassociate with this end device.
+     * @return true if the [EndDeviceFunction] is disassociated.
+     */
+    fun removeFunction(function: EndDeviceFunction): Boolean {
+        val ret = _functions.safeRemove(function)
+        if (_functions.isNullOrEmpty()) _functions = null
+        return ret
+    }
+
+    /**
+     * Clear all [EndDeviceFunction]'s attached to this [EndDevice].
+     * @return This [EndDevice] for fluent use.
+     */
+    fun clearFunctions(): EndDevice {
+        _functions = null
+        return this
+    }
+
+    private fun validateFunction(function: EndDeviceFunction): Boolean {
+        return validateReference(function, ::getFunction, "A EndDeviceFunction")
+    }
+
 }

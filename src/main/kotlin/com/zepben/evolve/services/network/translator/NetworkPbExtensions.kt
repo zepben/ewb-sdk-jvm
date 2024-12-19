@@ -9,6 +9,8 @@
 package com.zepben.evolve.services.network.translator
 
 import com.zepben.evolve.services.common.translator.mRID
+import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.protobuf.cim.iec61968.assetinfo.*
 import com.zepben.protobuf.cim.iec61968.assets.*
 import com.zepben.protobuf.cim.iec61968.common.Location
@@ -16,6 +18,7 @@ import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.CurrentTransfor
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.protobuf.cim.iec61968.metering.EndDevice
+import com.zepben.protobuf.cim.iec61968.metering.EndDeviceFunction
 import com.zepben.protobuf.cim.iec61968.metering.Meter
 import com.zepben.protobuf.cim.iec61968.metering.UsagePoint
 import com.zepben.protobuf.cim.iec61968.operations.OperationalRestriction
@@ -40,6 +43,15 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 
+
+/************ EXTENSION IEC61968 METERING ************/
+
+fun PanDemandResponseFunction.mRID(): String = edf.mRID()
+
+/************ EXTENSION IEC61970 BASE WIRES ************/
+
+fun BatteryControl.mRID(): String = rc.mRID()
+
 /************ IEC61968 ASSET INFO ************/
 
 fun CableInfo.mRID(): String = wi.mRID()
@@ -59,6 +71,7 @@ fun WireInfo.mRID(): String = ai.mRID()
 
 fun Asset.mRID(): String = io.mrid
 fun AssetContainer.mRID(): String = at.mRID()
+fun AssetFunction.mRID(): String = io.mrid
 fun AssetInfo.mRID(): String = io.mrid
 fun AssetOrganisationRole.mRID(): String = or.mRID()
 fun AssetOwner.mRID(): String = aor.mRID()
@@ -79,6 +92,7 @@ fun PotentialTransformerInfo.mRID(): String = ai.mRID()
 /************ IEC61968 METERING ************/
 
 fun EndDevice.mRID(): String = ac.mRID()
+fun EndDeviceFunction.mRID(): String = af.mRID()
 fun Meter.mRID(): String = ed.mRID()
 fun UsagePoint.mRID(): String = io.mrid
 
@@ -177,6 +191,7 @@ fun Line.mRID(): String = ec.mRID()
 fun LinearShuntCompensator.mRID(): String = sc.mRID()
 fun PerLengthImpedance.mRID(): String = lp.mRID()
 fun PerLengthLineParameter.mRID(): String = io.mrid
+fun PerLengthPhaseImpedance.mRID(): String = pli.mRID()
 fun PerLengthSequenceImpedance.mRID(): String = pli.mRID()
 fun PetersenCoil.mRID(): String = efc.mRID()
 fun PowerElectronicsConnection.mRID(): String = rce.mRID()
@@ -192,6 +207,7 @@ fun RegulatingControl.mRID(): String = psr.mRID()
 fun RotatingMachine.mRID(): String = rce.mRID()
 fun SeriesCompensator.mRID(): String = ce.mRID()
 fun ShuntCompensator.mRID(): String = rce.mRID()
+fun StaticVarCompensator.mRID(): String = rce.mRID()
 fun Switch.mRID(): String = ce.mRID()
 fun SynchronousMachine.mRID(): String = rm.mRID()
 fun TapChanger.mRID(): String = psr.mRID()

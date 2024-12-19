@@ -26,5 +26,7 @@ abstract class TableRegulatingControls : TablePowerSystemResources() {
     val MIN_ALLOWED_TARGET_VALUE: Column = Column(++columnIndex, "min_allowed_target_value", "NUMBER", NULL)
     val RATED_CURRENT: Column = Column(++columnIndex, "rated_current", "NUMBER", NULL)
     val TERMINAL_MRID: Column = Column(++columnIndex, "terminal_mrid", "TEXT", NULL)
+    val CT_PRIMARY: Column = Column(++columnIndex, "ct_primary", "NUMBER", NULL)
+    val MIN_TARGET_DEADBAND: Column = Column(++columnIndex, "min_target_deadband", "NUMBER", NULL)
 
 }

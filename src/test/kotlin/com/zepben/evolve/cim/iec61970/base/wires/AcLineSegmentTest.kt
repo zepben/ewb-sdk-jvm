@@ -30,11 +30,29 @@ internal class AcLineSegmentTest {
     internal fun accessorCoverage() {
         val acLineSegment = AcLineSegment()
         val perLengthSequenceImpedance = PerLengthSequenceImpedance()
+        val perLengthPhaseImpedance = PerLengthPhaseImpedance()
 
         assertThat(acLineSegment.perLengthSequenceImpedance, nullValue())
+        assertThat(acLineSegment.perLengthPhaseImpedance, nullValue())
+        assertThat(acLineSegment.perLengthImpedance, nullValue())
 
         acLineSegment.perLengthSequenceImpedance = perLengthSequenceImpedance
 
         assertThat(acLineSegment.perLengthSequenceImpedance, equalTo(perLengthSequenceImpedance))
+        assertThat(acLineSegment.perLengthPhaseImpedance, nullValue())
+        assertThat(acLineSegment.perLengthImpedance, equalTo(perLengthSequenceImpedance))
+
+        acLineSegment.perLengthPhaseImpedance = perLengthPhaseImpedance
+
+        assertThat(acLineSegment.perLengthSequenceImpedance, nullValue())
+        assertThat(acLineSegment.perLengthPhaseImpedance, equalTo(perLengthPhaseImpedance))
+        assertThat(acLineSegment.perLengthImpedance, equalTo(perLengthPhaseImpedance))
+
+        acLineSegment.perLengthImpedance = null
+
+        assertThat(acLineSegment.perLengthSequenceImpedance, nullValue())
+        assertThat(acLineSegment.perLengthPhaseImpedance, nullValue())
+        assertThat(acLineSegment.perLengthImpedance, nullValue())
     }
+
 }

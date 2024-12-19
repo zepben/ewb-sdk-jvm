@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.cim.network
 
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
@@ -100,6 +102,7 @@ class NetworkServiceWriter @JvmOverloads constructor(
             .andSaveEach<Jumper>(writer::save)
             .andSaveEach<Junction>(writer::save)
             .andSaveEach<LinearShuntCompensator>(writer::save)
+            .andSaveEach<PerLengthPhaseImpedance>(writer::save)
             .andSaveEach<PerLengthSequenceImpedance>(writer::save)
             .andSaveEach<PowerElectronicsConnection>(writer::save)
             .andSaveEach<PowerElectronicsConnectionPhase>(writer::save)
@@ -136,5 +139,8 @@ class NetworkServiceWriter @JvmOverloads constructor(
             .andSaveEach<PetersenCoil>(writer::save)
             .andSaveEach<GroundingImpedance>(writer::save)
             .andSaveEach<ReactiveCapabilityCurve>(writer::save)
+            .andSaveEach<PanDemandResponseFunction>(writer::save)
+            .andSaveEach<BatteryControl>(writer::save)
+            .andSaveEach<StaticVarCompensator>(writer::save)
 
 }

@@ -1026,6 +1026,10 @@ internal class NetworkConsumerClientTest {
                 isSynchronousMachine = { synchronousMachine = it.toPb() },
                 isGroundingImpedance = { groundingImpedance = it.toPb() },
                 isPetersenCoil = { petersenCoil = it.toPb() },
+                isPanDemandResponseFunction = { panDemandResponseFunction = it.toPb() },
+                isBatteryControl = { batteryControl = it.toPb() },
+                isStaticVarCompensator = { staticVarCompensator = it.toPb() },
+                isPerLengthPhaseImpedance = { perLengthPhaseImpedance = it.toPb() },
             )
         }
 

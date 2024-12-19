@@ -150,6 +150,48 @@ fun <T, R> KProperty1<in T, List<R>>.compareIndexedValueCollection(
     return differences.nullIfEmpty()
 }
 
+fun <T, R, K : Comparable<K>> KProperty1<in T, List<R>>.compareUnorderedValueCollection(
+    source: T,
+    target: T,
+    keySelector: (R) -> K
+): CollectionDifference? {
+    val differences = CollectionDifference()
+    val sourceList = this.get(source).sortedBy { keySelector(it) }
+    val targetList = this.get(target).sortedBy { keySelector(it) }
+
+    var sourceIndex = 0
+    var targetIndex = 0
+
+    while ((sourceIndex < sourceList.size) && (targetIndex < targetList.size)) {
+        val sourceItem = sourceList[sourceIndex]
+        val targetItem = targetList[targetIndex]
+
+        val sourceCheck = keySelector(sourceItem)
+        val targetCheck = keySelector(targetItem)
+
+        if (sourceCheck == targetCheck) {
+            if (sourceItem != targetItem)
+                differences.modifications.add(ValueDifference(sourceItem, targetItem))
+            ++sourceIndex
+            ++targetIndex
+        } else if (sourceCheck < targetCheck) {
+            differences.missingFromTarget.add(ValueDifference(sourceItem, null))
+            ++sourceIndex
+        } else { // if (targetCheck < sourceCheck)
+            differences.missingFromSource.add(ValueDifference(null, targetItem))
+            ++targetIndex
+        }
+    }
+
+    while (targetIndex < targetList.size)
+        differences.missingFromSource.add(ValueDifference(null, targetList[targetIndex++]))
+
+    while (sourceIndex < sourceList.size)
+        differences.missingFromTarget.add(ValueDifference(sourceList[sourceIndex++], null))
+
+    return differences.nullIfEmpty()
+}
+
 internal fun CollectionDifference.nullIfEmpty() =
     if (missingFromSource.isEmpty() && missingFromTarget.isEmpty() && modifications.isEmpty()) {
         null

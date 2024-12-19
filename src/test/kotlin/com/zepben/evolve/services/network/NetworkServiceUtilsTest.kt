@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.services.network
 
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.AssetOwner
 import com.zepben.evolve.cim.iec61968.assets.Pole
@@ -142,6 +144,10 @@ internal class NetworkServiceUtilsTest {
         isPetersenCoil: (PetersenCoil) -> String,
         isReactiveCapabilityCurve: (ReactiveCapabilityCurve) -> String,
         isSynchronousMachine: (SynchronousMachine) -> String,
+        isPanDemandResponseFunction: (PanDemandResponseFunction) -> String,
+        isBatteryControl: (BatteryControl) -> String,
+        isStaticVarCompensator: (StaticVarCompensator) -> String,
+        isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -225,6 +231,10 @@ internal class NetworkServiceUtilsTest {
         isPetersenCoil = isPetersenCoil,
         isReactiveCapabilityCurve = isReactiveCapabilityCurve,
         isSynchronousMachine = isSynchronousMachine,
+        isPanDemandResponseFunction = isPanDemandResponseFunction,
+        isBatteryControl = isBatteryControl,
+        isStaticVarCompensator = isStaticVarCompensator,
+        isPerLengthPhaseImpedance = isPerLengthPhaseImpedance,
         isOther = isOther
     )
 
@@ -310,6 +320,10 @@ internal class NetworkServiceUtilsTest {
         isPetersenCoil: InvokeChecker<PetersenCoil> = NeverInvokedChecker(),
         isReactiveCapabilityCurve: InvokeChecker<ReactiveCapabilityCurve> = NeverInvokedChecker(),
         isSynchronousMachine: InvokeChecker<SynchronousMachine> = NeverInvokedChecker(),
+        isPanDemandResponseFunction: InvokeChecker<PanDemandResponseFunction> = NeverInvokedChecker(),
+        isBatteryControl: InvokeChecker<BatteryControl> = NeverInvokedChecker(),
+        isStaticVarCompensator: InvokeChecker<StaticVarCompensator> = NeverInvokedChecker(),
+        isPerLengthPhaseImpedance: InvokeChecker<PerLengthPhaseImpedance> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -394,6 +408,10 @@ internal class NetworkServiceUtilsTest {
             isPetersenCoil = isPetersenCoil,
             isReactiveCapabilityCurve = isReactiveCapabilityCurve,
             isSynchronousMachine = isSynchronousMachine,
+            isPanDemandResponseFunction = isPanDemandResponseFunction,
+            isBatteryControl = isBatteryControl,
+            isStaticVarCompensator = isStaticVarCompensator,
+            isPerLengthPhaseImpedance = isPerLengthPhaseImpedance,
             isOther = isOther
         )
 
@@ -568,6 +586,10 @@ internal class NetworkServiceUtilsTest {
         PetersenCoil().also { whenNetworkServiceObjectTester(it, isPetersenCoil = InvokedChecker(it)) }
         ReactiveCapabilityCurve().also { whenNetworkServiceObjectTester(it, isReactiveCapabilityCurve = InvokedChecker(it)) }
         SynchronousMachine().also { whenNetworkServiceObjectTester(it, isSynchronousMachine = InvokedChecker(it)) }
+        PanDemandResponseFunction().also { whenNetworkServiceObjectTester(it, isPanDemandResponseFunction = InvokedChecker(it)) }
+        BatteryControl().also { whenNetworkServiceObjectTester(it, isBatteryControl = InvokedChecker(it)) }
+        StaticVarCompensator().also { whenNetworkServiceObjectTester(it, isStaticVarCompensator = InvokedChecker(it)) }
+        PerLengthPhaseImpedance().also { whenNetworkServiceObjectTester(it, isPerLengthPhaseImpedance = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

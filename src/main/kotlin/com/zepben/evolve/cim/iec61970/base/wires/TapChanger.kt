@@ -15,8 +15,9 @@ import com.zepben.evolve.cim.iec61970.base.core.PowerSystemResource
  *
  * @property controlEnabled Specifies the regulation status of the equipment.  True is regulating, false is not regulating.
  * @property tapChangerControl The regulating control scheme in which this tap changer participates.
- * @property highStep Highest possible tap step position, advance from neutral. The attribute shall be greater than lowStep.
- * @property lowStep Lowest possible tap step position, retard from neutral.
+ * @property highStep Highest possible tap step position, advance from neutral. The attribute shall be greater than lowStep. This tap position results in the
+ *                    maximum voltage boost on secondary winding(s).
+ * @property lowStep Lowest possible tap step position, retard from neutral. This tap position results in the maximum voltage buck on secondary winding(s).
  * @property neutralStep The neutral tap step position for this winding.
  *                       The attribute shall be equal or greater than lowStep and equal or less than highStep.
  * @property neutralU Voltage at which the winding operates at the neutral tap setting.

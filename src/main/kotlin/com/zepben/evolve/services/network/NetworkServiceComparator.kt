@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.services.network
 
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
@@ -15,6 +17,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransforme
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
+import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunction
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
@@ -53,6 +56,32 @@ import com.zepben.evolve.services.common.compareValues
 class NetworkServiceComparator @JvmOverloads constructor(
     private var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()
 ) : BaseServiceComparator() {
+
+    /************ EXTENSION IEC61968 METERING ************/
+
+    private fun comparePanDemandResponseFunction(
+        source: PanDemandResponseFunction,
+        target: PanDemandResponseFunction
+    ): ObjectDifference<PanDemandResponseFunction> =
+        ObjectDifference(source, target).apply {
+            compareEndDeviceFunction()
+
+            compareValues(PanDemandResponseFunction::kind, PanDemandResponseFunction::applianceBitmask)
+        }
+
+    /************ EXTENSION IEC61970 BASE WIRES ************/
+
+    private fun compareBatteryControl(source: BatteryControl, target: BatteryControl): ObjectDifference<BatteryControl> =
+        ObjectDifference(source, target).apply {
+            compareRegulatingControl()
+
+            compareValues(
+                BatteryControl::chargingRate,
+                BatteryControl::dischargingRate,
+                BatteryControl::reservePercent,
+                BatteryControl::controlMode
+            )
+        }
 
     /************ IEC61968 ASSET INFO ************/
 
@@ -185,6 +214,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private fun ObjectDifference<out AssetContainer>.compareAssetContainer(): ObjectDifference<out AssetContainer> =
         apply { compareAsset() }
 
+    private fun ObjectDifference<out AssetFunction>.compareAssetFunction(): ObjectDifference<out AssetFunction> =
+        apply { compareIdentifiedObject() }
+
     private fun ObjectDifference<out AssetInfo>.compareAssetInfo(): ObjectDifference<out AssetInfo> =
         apply { compareIdentifiedObject() }
 
@@ -281,6 +313,14 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
             compareValues(EndDevice::customerMRID)
             compareIdReferences(EndDevice::serviceLocation)
+            compareIdReferenceCollections(EndDevice::functions)
+        }
+
+    private fun ObjectDifference<out EndDeviceFunction>.compareEndDeviceFunction(): ObjectDifference<out EndDeviceFunction> =
+        apply {
+            compareAssetFunction()
+
+            compareValues(EndDeviceFunction::enabled)
         }
 
     private fun compareMeter(source: Meter, target: Meter): ObjectDifference<Meter> =
@@ -627,6 +667,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
             comparePowerElectronicsUnit()
 
             compareValues(BatteryUnit::batteryState, BatteryUnit::ratedE, BatteryUnit::storedE)
+            compareIdReferenceCollections(BatteryUnit::controls)
         }
 
     private fun comparePhotoVoltaicUnit(source: PhotoVoltaicUnit, target: PhotoVoltaicUnit): ObjectDifference<PhotoVoltaicUnit> =
@@ -656,7 +697,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
         ObjectDifference(source, target).apply {
             compareConductor()
 
-            compareIdReferences(AcLineSegment::perLengthSequenceImpedance)
+            compareIdReferences(AcLineSegment::perLengthImpedance)
         }
 
     private fun compareBreaker(source: Breaker, target: Breaker): ObjectDifference<Breaker> =
@@ -814,6 +855,16 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private fun ObjectDifference<out PerLengthLineParameter>.comparePerLengthLineParameter(): ObjectDifference<out PerLengthLineParameter> =
         apply { compareIdentifiedObject() }
 
+    private fun comparePerLengthPhaseImpedance(
+        source: PerLengthPhaseImpedance,
+        target: PerLengthPhaseImpedance
+    ): ObjectDifference<PerLengthPhaseImpedance> =
+        ObjectDifference(source, target).apply {
+            comparePerLengthImpedance()
+
+            compareUnorderedValueCollection(PerLengthPhaseImpedance::data) { "${it.fromPhase}-${it.toPhase}" }
+        }
+
     private fun comparePerLengthSequenceImpedance(
         source: PerLengthSequenceImpedance,
         target: PerLengthSequenceImpedance
@@ -970,7 +1021,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 RegulatingControl::enabled,
                 RegulatingControl::maxAllowedTargetValue,
                 RegulatingControl::minAllowedTargetValue,
-                RegulatingControl::ratedCurrent
+                RegulatingControl::ratedCurrent,
+                RegulatingControl::ctPrimary,
+                RegulatingControl::minTargetDeadband
             )
             compareIdReferences(RegulatingControl::terminal)
             compareIdReferenceCollections(RegulatingControl::regulatingCondEqs)
@@ -1016,20 +1069,17 @@ class NetworkServiceComparator @JvmOverloads constructor(
             addIfDifferent("isOpen", compareOpenStatus(source, target, Switch::isOpen))
         }
 
-    private fun ObjectDifference<out TapChanger>.compareTapChanger(): ObjectDifference<out TapChanger> =
-        apply {
-            comparePowerSystemResource()
+    private fun compareStaticVarCompensator(source: StaticVarCompensator, target: StaticVarCompensator): ObjectDifference<StaticVarCompensator> =
+        ObjectDifference(source, target).apply {
+            compareRegulatingCondEq()
 
             compareValues(
-                TapChanger::controlEnabled,
-                TapChanger::neutralU,
-                TapChanger::highStep,
-                TapChanger::lowStep,
-                TapChanger::neutralStep,
-                TapChanger::normalStep,
-                TapChanger::step
+                StaticVarCompensator::capacitiveRating,
+                StaticVarCompensator::inductiveRating,
+                StaticVarCompensator::q,
+                StaticVarCompensator::svcControlMode,
+                StaticVarCompensator::voltageSetPoint
             )
-            compareIdReferences(TapChanger::tapChangerControl)
         }
 
     private fun compareSynchronousMachine(source: SynchronousMachine, target: SynchronousMachine): ObjectDifference<SynchronousMachine> =
@@ -1060,6 +1110,22 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 SynchronousMachine::operatingMode
             )
             compareIdReferenceCollections(SynchronousMachine::curves)
+        }
+
+    private fun ObjectDifference<out TapChanger>.compareTapChanger(): ObjectDifference<out TapChanger> =
+        apply {
+            comparePowerSystemResource()
+
+            compareValues(
+                TapChanger::controlEnabled,
+                TapChanger::neutralU,
+                TapChanger::highStep,
+                TapChanger::lowStep,
+                TapChanger::neutralStep,
+                TapChanger::normalStep,
+                TapChanger::step
+            )
+            compareIdReferences(TapChanger::tapChangerControl)
         }
 
     private fun compareTapChangerControl(source: TapChangerControl, target: TapChangerControl): ObjectDifference<TapChangerControl> =

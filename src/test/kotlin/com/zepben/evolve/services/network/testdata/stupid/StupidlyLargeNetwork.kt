@@ -120,7 +120,7 @@ object StupidlyLargeNetwork {
             name = "AC Lne Segment 101"
             baseVoltage = singleVoltage
             length = 5.0
-            this.perLengthSequenceImpedance = perLengthSequenceImpedance
+            this.perLengthImpedance = perLengthSequenceImpedance
             this.assetInfo = oh1
         }
         val aSwitch = Breaker("switch").apply {
@@ -130,7 +130,7 @@ object StupidlyLargeNetwork {
         }
         val acLineSegment202 = AcLineSegment("acLineSegment202").apply {
             name = "AC Lne Segment 202"
-            this.perLengthSequenceImpedance = perLengthSequenceImpedance2
+            this.perLengthImpedance = perLengthSequenceImpedance2
             this.assetInfo = oh1
         }
 

@@ -8,13 +8,14 @@
 
 package com.zepben.evolve.database.sqlite.cim.network
 
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControlMode
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.*
-import com.zepben.evolve.cim.iec61968.metering.EndDevice
-import com.zepben.evolve.cim.iec61968.metering.Meter
-import com.zepben.evolve.cim.iec61968.metering.UsagePoint
+import com.zepben.evolve.cim.iec61968.metering.*
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
@@ -36,6 +37,8 @@ import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.database.sqlite.cim.CimReader
 import com.zepben.evolve.database.sqlite.cim.tables.associations.*
+import com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions
+import com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61970.base.wires.TableBatteryControls
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.*
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.*
@@ -43,6 +46,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infasse
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TablePotentialTransformerInfo
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TableRecloseDelays
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.infiec61968.infassetinfo.TableRelayInfo
+import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableEndDeviceFunctions
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableEndDevices
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableMeters
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering.TableUsagePoints
@@ -57,7 +61,10 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRem
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRemotePoints
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.scada.TableRemoteSources
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.*
-import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.*
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TableBatteryUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePhotoVoltaicUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePowerElectronicsUnits
+import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.generation.production.TablePowerElectronicsWindUnits
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableCircuits
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLoops
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.feeder.TableLvFeeders
@@ -68,6 +75,7 @@ import com.zepben.evolve.services.common.extensions.*
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.ResultSet
 import java.sql.SQLException
+import kotlin.Throws
 
 /**
  * A class for reading the [NetworkService] tables from the database.
@@ -77,6 +85,56 @@ import java.sql.SQLException
 class NetworkCimReader(
     override val service: NetworkService
 ) : CimReader(service) {
+
+    // ################################
+    // # EXTENSIONS IEC61968 Metering #
+    // ################################
+
+    /**
+     * Create a [PanDemandResponseFunction] and populate its fields from [TablePanDemandResponseFunctions].
+     *
+     * @param table The database table to read the [PanDemandResponseFunction] fields from.
+     * @param resultSet The record in the database table containing the fields for this [PanDemandResponseFunction].
+     * @param setIdentifier A callback to register the mRID of this [PanDemandResponseFunction] for logging purposes.
+     *
+     * @return true if the [PanDemandResponseFunction] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TablePanDemandResponseFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val panDemandResponseFunction = PanDemandResponseFunction(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            kind = EndDeviceFunctionKind.valueOf(resultSet.getString(table.KIND.queryIndex))
+            applianceBitmask = resultSet.getNullableInt(table.APPLIANCE.queryIndex)
+        }
+
+        return loadEndDeviceFunction(panDemandResponseFunction, table, resultSet) && service.addOrThrow(panDemandResponseFunction)
+    }
+
+    // ###################################
+    // # EXTENSIONS IEC61970 Base Wiring #
+    // ###################################
+
+    /**
+     * Create a [BatteryControl] and populate its fields from [TableBatteryControls].
+     *
+     * @param table The database table to read the [BatteryControl] fields from.
+     * @param resultSet The record in the database table containing the fields for this [BatteryControl].
+     * @param setIdentifier A callback to register the mRID of this [BatteryControl] for logging purposes.
+     *
+     * @return true if the [BatteryControl] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableBatteryControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val batteryControl = BatteryControl(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            chargingRate = resultSet.getNullableDouble(table.CHARGING_RATE.queryIndex)
+            dischargingRate = resultSet.getNullableDouble(table.DISCHARGING_RATE.queryIndex)
+            reservePercent = resultSet.getNullableDouble(table.RESERVE_PERCENT.queryIndex)
+            controlMode = BatteryControlMode.valueOf(resultSet.getString(table.CONTROL_MODE.queryIndex))
+        }
+
+        return loadRegulatingControl(batteryControl, table, resultSet) && service.addOrThrow(batteryControl)
+    }
 
     // #######################
     // # IEC61968 Asset Info #
@@ -341,6 +399,10 @@ class NetworkCimReader(
     @Throws(SQLException::class)
     private fun loadAssetContainer(assetContainer: AssetContainer, table: TableAssetContainers, resultSet: ResultSet): Boolean =
         loadAsset(assetContainer, table, resultSet)
+
+    @Throws(SQLException::class)
+    private fun loadAssetFunction(assetFunction: AssetFunction, table: TableAssetFunctions, resultSet: ResultSet): Boolean =
+        loadIdentifiedObject(assetFunction, table, resultSet)
 
     @Throws(SQLException::class)
     private fun loadAssetInfo(assetInfo: AssetInfo, table: TableAssetInfo, resultSet: ResultSet): Boolean =
@@ -639,6 +701,15 @@ class NetworkCimReader(
         }
 
         return loadAssetContainer(endDevice, table, resultSet)
+    }
+
+    @Throws(SQLException::class)
+    private fun loadEndDeviceFunction(endDeviceFunction: EndDeviceFunction, table: TableEndDeviceFunctions, resultSet: ResultSet): Boolean {
+        endDeviceFunction.apply {
+            enabled = resultSet.getNullableBoolean(table.ENABLED.queryIndex)
+        }
+
+        return loadAssetFunction(endDeviceFunction, table, resultSet)
     }
 
     /**
@@ -1516,11 +1587,7 @@ class NetworkCimReader(
     @Throws(SQLException::class)
     fun load(table: TableAcLineSegments, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val acLineSegment = AcLineSegment(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
-            perLengthSequenceImpedance =
-                service.ensureGet(
-                    resultSet.getNullableString(table.PER_LENGTH_SEQUENCE_IMPEDANCE_MRID.queryIndex),
-                    typeNameAndMRID()
-                )
+            perLengthImpedance = service.ensureGet(resultSet.getNullableString(table.PER_LENGTH_IMPEDANCE_MRID.queryIndex), typeNameAndMRID())
         }
 
         return loadConductor(acLineSegment, table, resultSet) && service.addOrThrow(acLineSegment)
@@ -1902,6 +1969,55 @@ class NetworkCimReader(
         loadIdentifiedObject(perLengthLineParameter, table, resultSet)
 
     /**
+     * Create a [PerLengthPhaseImpedance] and populate its fields from [TablePerLengthPhaseImpedances].
+     *
+     * @param table The database table to read the [PerLengthPhaseImpedance] fields from.
+     * @param resultSet The record in the database table containing the fields for this [PerLengthPhaseImpedance].
+     * @param setIdentifier A callback to register the mRID of this [PerLengthPhaseImpedance] for logging purposes.
+     *
+     * @return true if the [PerLengthPhaseImpedance] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TablePerLengthPhaseImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val perLengthPhaseImpedance = PerLengthPhaseImpedance(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
+
+        return loadPerLengthImpedance(perLengthPhaseImpedance, table, resultSet) && service.addOrThrow(perLengthPhaseImpedance)
+    }
+
+    /**
+     * Create a [PhaseImpedanceData] and populate its fields from [TablePhaseImpedanceData] then add it to associated [PerLengthPhaseImpedance].
+     *
+     * @param table The database table to read the [PhaseImpedanceData] fields from.
+     * @param resultSet The record in the database table containing the fields for this [PhaseImpedanceData].
+     * @param setIdentifier A callback to register the mRID of this [PhaseImpedanceData] and its associated [PerLengthPhaseImpedance] for logging purposes.
+     *
+     * @return true if the [PhaseImpedanceData] was successfully read from the database and added to associated [PerLengthPhaseImpedance].
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TablePhaseImpedanceData, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val perLengthPhaseImpedanceMRID = setIdentifier(resultSet.getString(table.PER_LENGTH_PHASE_IMPEDANCE_MRID.queryIndex))
+        val id = setIdentifier(perLengthPhaseImpedanceMRID)
+
+        val perLengthPhaseImpedance =
+            service.getOrThrow<PerLengthPhaseImpedance>(perLengthPhaseImpedanceMRID, "PerLengthPhaseImpedance to PhaseImpedanceData association $id")
+
+        perLengthPhaseImpedance.addData(
+            PhaseImpedanceData(
+                SinglePhaseKind.valueOf(resultSet.getString(table.FROM_PHASE.queryIndex)),
+                SinglePhaseKind.valueOf(resultSet.getString(table.TO_PHASE.queryIndex)),
+                resultSet.getNullableDouble(table.B.queryIndex),
+                resultSet.getNullableDouble(table.G.queryIndex),
+                resultSet.getNullableDouble(table.R.queryIndex),
+                resultSet.getNullableDouble(table.X.queryIndex),
+            )
+        )
+
+        return true
+    }
+
+    /**
      * Create a [PerLengthSequenceImpedance] and populate its fields from [TablePerLengthSequenceImpedances].
      *
      * @param table The database table to read the [PerLengthSequenceImpedance] fields from.
@@ -2212,6 +2328,8 @@ class NetworkCimReader(
             minAllowedTargetValue = resultSet.getNullableDouble(table.MIN_ALLOWED_TARGET_VALUE.queryIndex)
             ratedCurrent = resultSet.getNullableDouble(table.RATED_CURRENT.queryIndex)
             terminal = service.ensureGet(resultSet.getNullableString(table.TERMINAL_MRID.queryIndex), typeNameAndMRID())
+            ctPrimary = resultSet.getNullableDouble(table.CT_PRIMARY.queryIndex)
+            minTargetDeadband = resultSet.getNullableDouble(table.MIN_TARGET_DEADBAND.queryIndex)
         }
 
         return loadPowerSystemResource(regulatingControl, table, resultSet)
@@ -2276,6 +2394,29 @@ class NetworkCimReader(
         }
 
         return loadRegulatingCondEq(shuntCompensator, table, resultSet)
+    }
+
+    /**
+     * Create a [StaticVarCompensator] and populate its fields from [TableStaticVarCompensators].
+     *
+     * @param table The database table to read the [StaticVarCompensator] fields from.
+     * @param resultSet The record in the database table containing the fields for this [StaticVarCompensator].
+     * @param setIdentifier A callback to register the mRID of this [StaticVarCompensator] for logging purposes.
+     *
+     * @return true if the [StaticVarCompensator] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableStaticVarCompensators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val staticVarCompensator = StaticVarCompensator(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            capacitiveRating = resultSet.getNullableDouble(table.CAPACITIVE_RATING.queryIndex)
+            inductiveRating = resultSet.getNullableDouble(table.INDUCTIVE_RATING.queryIndex)
+            q = resultSet.getNullableDouble(table.Q.queryIndex)
+            svcControlMode = SVCControlMode.valueOf(resultSet.getString(table.SVC_CONTROL_MODE.queryIndex))
+            voltageSetPoint = resultSet.getNullableInt(table.VOLTAGE_SET_POINT.queryIndex)
+        }
+
+        return loadRegulatingCondEq(staticVarCompensator, table, resultSet) && service.addOrThrow(staticVarCompensator)
     }
 
     @Throws(SQLException::class)
@@ -2527,6 +2668,33 @@ class NetworkCimReader(
     }
 
     /**
+     * Create a [BatteryUnit] to [BatteryControl] association from [TableBatteryUnitsBatteryControls].
+     *
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
+     *
+     * @return true if the association was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableBatteryUnitsBatteryControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val batteryUnitMRID = resultSet.getString(table.BATTERY_UNIT_MRID.queryIndex)
+        setIdentifier("${batteryUnitMRID}-to-UNKNOWN")
+
+        val batteryControlMRID = resultSet.getString(table.BATTERY_CONTROL_MRID.queryIndex)
+        val id = setIdentifier("${batteryUnitMRID}-to-${batteryControlMRID}")
+
+        val typeNameAndMRID = "BatteryUnit to BatteryControl association $id"
+        val batteryUnit = service.getOrThrow<BatteryUnit>(batteryUnitMRID, typeNameAndMRID)
+        val batteryControl = service.getOrThrow<BatteryControl>(batteryControlMRID, typeNameAndMRID)
+
+        batteryUnit.addControl(batteryControl)
+
+        return true
+    }
+
+    /**
      * Create a [Circuit] to [Substation] association from [TableCircuitsSubstations].
      *
      * @param table The database table to read the association from.
@@ -2577,6 +2745,33 @@ class NetworkCimReader(
         val terminal = service.getOrThrow<Terminal>(terminalMRID, typeNameAndMRID)
 
         circuit.addEndTerminal(terminal)
+
+        return true
+    }
+
+    /**
+     * Create a [EndDevice] to [EndDeviceFunction] association from [TableEndDevicesEndDeviceFunctions].
+     *
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
+     *
+     * @return true if the association was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableEndDevicesEndDeviceFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val endDeviceMRID = resultSet.getString(table.END_DEVICE_MRID.queryIndex)
+        setIdentifier("${endDeviceMRID}-to-UNKNOWN")
+
+        val endDeviceFunctionMRID = resultSet.getString(table.END_DEVICE_FUNCTION_MRID.queryIndex)
+        val id = setIdentifier("${endDeviceMRID}-to-${endDeviceFunctionMRID}")
+
+        val typeNameAndMRID = "EndDevice to EndDeviceFunction association $id"
+        val endDevice = service.getOrThrow<EndDevice>(endDeviceMRID, typeNameAndMRID)
+        val endDeviceFunction = service.getOrThrow<EndDeviceFunction>(endDeviceFunctionMRID, typeNameAndMRID)
+
+        endDevice.addFunction(endDeviceFunction)
 
         return true
     }

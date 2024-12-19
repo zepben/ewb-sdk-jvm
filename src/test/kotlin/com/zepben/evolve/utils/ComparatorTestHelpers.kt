@@ -231,7 +231,6 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
         createIdObj: (String) -> T,
         createItem: (T) -> R,
         createOtherItem: (T) -> R,
-        setItemIdObj: (R, T) -> Unit = { _, _ -> },
         options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
         optionsStopCompare: Boolean = false,
         expectedDifferences: Set<String> = emptySet()
@@ -242,12 +241,10 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
 
         val inSource = createIdObj("mRID").apply {
             val item = createItem(this)
-            setItemIdObj(item, this)
             addToCollection(this, item)
         }
         val inTarget = createIdObj("mRID").apply {
             val item = createItem(this)
-            setItemIdObj(item, this)
             addToCollection(this, item)
         }
         validateCompare(inSource, inTarget, options = options, optionsStopCompare = optionsStopCompare)
@@ -266,12 +263,94 @@ class ServiceComparatorValidator<T : BaseService, C : BaseServiceComparator>(
 
         val targetDifferent = createIdObj("mRID").apply {
             val item = createOtherItem(this)
-            setItemIdObj(item, this)
             addToCollection(this, item)
         }
         ObjectDifference(inSource, targetDifferent).apply {
             val valOrRefDiff = getValueOrReferenceDifference(getItem(source), getItem(target))
             differences[property.name] = CollectionDifference().apply { modifications.add(IndexedDifference(0, valOrRefDiff)) }
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
+    }
+
+    /**
+     * @param property The property we are checking.
+     * @param addToCollection The function used to add the items to the object.
+     * @param createIdObj Create the [IdentifiedObject] under test.
+     * @param createItem1 Create the first item to add to the collection.
+     * @param createItem2 Create the second item to add to the collection.
+     * @param createDiffItem1 Create an item with the same key as the first item, but with different data.
+     * @param options Optional comparator options. Defaults to `all`.
+     * @param optionsStopCompare Indicates if the provided options result in the comparison detecting no differences.
+     * @param expectedDifferences A set of differences expected between two items that should otherwise be equal. Only use if there are
+     * expected runtime differences due to things outside your control. e.g. auto generated ID's etc.
+     */
+    fun <T : IdentifiedObject, R> validateUnorderedCollection(
+        property: KProperty1<in T, Collection<R>>,
+        addToCollection: (T, R) -> Unit,
+        createIdObj: (String) -> T,
+        createItem1: (T) -> R,
+        createItem2: (T) -> R,
+        createDiffItem1: (T) -> R,
+        options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all(),
+        optionsStopCompare: Boolean = false,
+        expectedDifferences: Set<String> = emptySet()
+    ) {
+        val sourceEmpty = createIdObj("mRID")
+        val targetEmpty = createIdObj("mRID")
+        validateCompare(sourceEmpty, targetEmpty, options = options, optionsStopCompare = optionsStopCompare)
+
+        val inSource = createIdObj("mRID").apply {
+            val item1 = createItem1(this)
+            addToCollection(this, item1)
+
+            val item2 = createItem2(this)
+            addToCollection(this, item2)
+        }
+        val inTargetSameOrder = createIdObj("mRID").apply {
+            val item1 = createItem1(this)
+            addToCollection(this, item1)
+
+            val item2 = createItem2(this)
+            addToCollection(this, item2)
+        }
+        validateCompare(inSource, inTargetSameOrder, options = options, optionsStopCompare = optionsStopCompare)
+
+        val inTargetDiffOrder = createIdObj("mRID").apply {
+            val item2 = createItem2(this)
+            addToCollection(this, item2)
+
+            val item1 = createItem1(this)
+            addToCollection(this, item1)
+        }
+        validateCompare(inSource, inTargetDiffOrder, options = options, optionsStopCompare = optionsStopCompare)
+
+        val getItem1 = { obj: T -> property.get(obj).firstOrNull() }
+        val getItem2 = { obj: T -> property.get(obj).lastOrNull() }
+
+        ObjectDifference(inSource, targetEmpty).apply {
+            differences[property.name] = CollectionDifference().apply {
+                missingFromTarget.add(getValueOrReferenceDifference(getItem1(source), null))
+                missingFromTarget.add(getValueOrReferenceDifference(getItem2(source), null))
+            }
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
+
+        ObjectDifference(sourceEmpty, inTargetSameOrder).apply {
+            differences[property.name] = CollectionDifference().apply {
+                missingFromSource.add(getValueOrReferenceDifference(null, getItem1(target)))
+                missingFromSource.add(getValueOrReferenceDifference(null, getItem2(target)))
+            }
+        }.validateExpected(options, optionsStopCompare, expectedDifferences)
+
+        val targetDifferent = createIdObj("mRID").apply {
+            val item1 = createDiffItem1(this)
+            addToCollection(this, item1)
+
+            val item2 = createItem2(this)
+            addToCollection(this, item2)
+        }
+        ObjectDifference(inSource, targetDifferent).apply {
+            differences[property.name] = CollectionDifference().apply {
+                modifications.add(getValueOrReferenceDifference(getItem1(source), getItem1(target)))
+            }
         }.validateExpected(options, optionsStopCompare, expectedDifferences)
     }
 

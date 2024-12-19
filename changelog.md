@@ -2,6 +2,8 @@
 ## [0.24.0] - UNRELEASED
 ### Breaking Changes
 * Database readers and writes for each `BaseService` no longer accept a `MetadataCollection`, and will instead use the collection of the provided service.
+* `AcLineSegment.perLengthSequenceImpedance` has been corrected to `perLengthImpedance`. This has been done in a non-breaking way, however the public resolver
+  `Resolvers.perLengthSequenceImpedance` is now `Resolvers.perLengthImpedance`, correctly reflecting the CIM relationship.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
@@ -10,12 +12,24 @@
 * Added `Services`, a new class which contains a copy of each `BaseService` supported by the SDK.
 * Added `connectWithAccessTokenInsecure()` for connecting to a gRPC service using an access token without SSL/TLS.
 * Added `connectWithAccessToken()` for connecting to a gRPC service using an access token with SSL/TLS.
+* Added `PanDemandResponseFunction`, a new class which contains `EndDeviceFunctionKind` and the identity of the `ControlledAppliance` of this function.
+* Added `BatteryControl`, a new class which describes behaviour specific to controlling  a `BatteryUnit`.
+* Added `StaticVarCompensator` a new class representing a facility for providing variable and controllable shunt reactive power.
+* Added `ControlledAppliance` a new class representing the identity of the appliance controlled by a specific `EndDeviceFunction`.
+* Added `PerLengthPhaseImpedance` a new class used for representing the impedance of individual wires on an AcLineSegment.
+* Added `PhaseImpedanceData` a data class with a link to `PerLengthPhaseImpedance`, for capturing the phase impedance data of an individual wire.
+* Added new enums:
+  * `BatteryControlMode`
+  * `EndDeviceFunctionKind`
+  * `SVCControlMode`
 
 ### Enhancements
-* None.
+* Added `ctPrimary` and `minTargetDeadband` to `RegulatingContrl`.
+* Added collection of `BatteryControl` to `BatteryUnit`
+* Added collection of `EndDeviceFunctionKind` to `EndDevice`
+* Added an unordered collection comparator.
 
 ### Fixes
-* None.
 
 ### Notes
 * None.

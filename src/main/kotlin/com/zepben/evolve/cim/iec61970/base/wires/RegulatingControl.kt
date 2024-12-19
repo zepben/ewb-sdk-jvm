@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.cim.iec61970.base.wires
 
+import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
@@ -55,6 +56,12 @@ import com.zepben.evolve.services.common.extensions.validateReference
  * from ohms to voltage.
  * @property terminal The terminal associated with this regulating control. The terminal is associated instead of a node, since the terminal could connect into
  * either a topological node or a connectivity node. Sometimes it is useful to model regulation at a terminal of a bus bar object.
+ * @property ctPrimary [ZBEX] Current rating of the CT, expressed in terms of the current (in Amperes) that flows in the Primary where the 'Primary' is the conductor
+ * being monitored. It ensures proper operation of the regulating equipment by providing the necessary current references for control actions. An important side
+ * effect of this current value is that it also defines the current value at which the full LDC R and X voltages are applied by the controller, where enabled.
+ * @property minTargetDeadband [ZBEX] This is the minimum allowable range for discrete control in regulating devices, used to prevent frequent control actions and
+ * promote operational stability. This attribute sets a baseline range within which no adjustments are made, applicable across various devices like voltage
+ * regulators, shunt compensators, or battery units.
  * @property regulatingCondEqs The [RegulatingCondEq] that are controlled by this regulating control scheme.
  */
 abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) {
@@ -69,6 +76,12 @@ abstract class RegulatingControl(mRID: String = "") : PowerSystemResource(mRID) 
     var minAllowedTargetValue: Double? = null
     var ratedCurrent: Double? = null
     var terminal: Terminal? = null
+
+    @ZBEX
+    var ctPrimary: Double? = null
+
+    @ZBEX
+    var minTargetDeadband: Double? = null
 
     private var _regulatingCondEqs: MutableList<RegulatingCondEq>? = null
 

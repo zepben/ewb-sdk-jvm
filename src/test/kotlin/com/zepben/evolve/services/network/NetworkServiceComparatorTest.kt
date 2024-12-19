@@ -8,6 +8,9 @@
 
 package com.zepben.evolve.services.network
 
+import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
+import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControlMode
 import com.zepben.evolve.cim.iec61968.assetinfo.*
 import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
@@ -16,9 +19,7 @@ import com.zepben.evolve.cim.iec61968.common.StreetAddress
 import com.zepben.evolve.cim.iec61968.common.TownDetail
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.*
 import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
-import com.zepben.evolve.cim.iec61968.metering.EndDevice
-import com.zepben.evolve.cim.iec61968.metering.Meter
-import com.zepben.evolve.cim.iec61968.metering.UsagePoint
+import com.zepben.evolve.cim.iec61968.metering.*
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
@@ -52,6 +53,37 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         { NetworkService() },
         { options -> NetworkServiceComparator(options) }
     )
+
+    /************ EXTENSIONS IEC61968 METERING ************/
+
+    @Test
+    internal fun comparePanDemandResponseFunction() {
+        compareEndDeviceFunction { PanDemandResponseFunction(it) }
+
+        comparatorValidator.validateProperty(
+            PanDemandResponseFunction::kind,
+            { PanDemandResponseFunction(it) },
+            { EndDeviceFunctionKind.demandResponse },
+            { EndDeviceFunctionKind.onRequestRead }
+        )
+        comparatorValidator.validateProperty(PanDemandResponseFunction::applianceBitmask, { PanDemandResponseFunction(it) }, { 1 }, { 2 })
+    }
+
+    /************ EXTENSIONS IEC61970 BASE WIRES ************/
+    @Test
+    internal fun compareBatteryControl() {
+        compareRegulatingControl { BatteryControl(it) }
+
+        comparatorValidator.validateProperty(BatteryControl::chargingRate, { BatteryControl(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(BatteryControl::dischargingRate, { BatteryControl(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(BatteryControl::reservePercent, { BatteryControl(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(
+            BatteryControl::controlMode,
+            { BatteryControl(it) },
+            { BatteryControlMode.peakShaveCharge },
+            { BatteryControlMode.peakShaveDischarge }
+        )
+    }
 
     /************ IEC61968 ASSET INFO ************/
 
@@ -96,7 +128,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             PowerTransformerInfo::addTransformerTankInfo,
             { PowerTransformerInfo(it) },
             { TransformerTankInfo("tti1") },
-            { TransformerTankInfo("tti2") })
+            { TransformerTankInfo("tti2") }
+        )
     }
 
     @Test
@@ -146,7 +179,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             TransformerTankInfo::addTransformerEndInfo,
             { TransformerTankInfo(it) },
             { TransformerEndInfo("tei1") },
-            { TransformerEndInfo("tei2") })
+            { TransformerEndInfo("tei2") }
+        )
     }
 
     private fun compareTransformerTest(createTransformerTest: (String) -> TransformerTest) {
@@ -174,6 +208,10 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
     private fun compareAssetContainer(createAssetContainer: (String) -> AssetContainer) {
         compareAsset(createAssetContainer)
+    }
+
+    private fun compareAssetFunction(createAssetFunction: (String) -> AssetFunction) {
+        compareIdentifiedObject(createAssetFunction)
     }
 
     private fun compareAssetInfo(createAssetInfo: (String) -> AssetInfo) {
@@ -204,7 +242,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             Streetlight::lampKind,
             { Streetlight(it) },
             { StreetlightLampKind.HIGH_PRESSURE_SODIUM },
-            { StreetlightLampKind.MERCURY_VAPOR })
+            { StreetlightLampKind.MERCURY_VAPOR }
+        )
         comparatorValidator.validateProperty(Streetlight::lightRating, { Streetlight(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(Streetlight::pole, { Streetlight(it) }, { Pole("x") }, { Pole("y") })
     }
@@ -223,13 +262,15 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             Location::mainAddress,
             { Location(it) },
             { StreetAddress(townDetail = TownDetail("town", "state")) },
-            { StreetAddress(townDetail = TownDetail("other", "state")) })
+            { StreetAddress(townDetail = TownDetail("other", "state")) }
+        )
         comparatorValidator.validateIndexedCollection(
             Location::points,
             Location::addPoint,
             { Location(it) },
             { PositionPoint(1.0, 2.0) },
-            { PositionPoint(3.0, 4.0) })
+            { PositionPoint(3.0, 4.0) }
+        )
     }
 
     /************ IEC61968 infIEC61968 InfAssetInfo ************/
@@ -297,6 +338,12 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         )
     }
 
+    private fun compareEndDeviceFunction(createEndDeviceFunction: (String) -> EndDeviceFunction) {
+        compareAssetFunction(createEndDeviceFunction)
+
+        comparatorValidator.validateProperty(EndDeviceFunction::enabled, createEndDeviceFunction, { true }, { false })
+    }
+
     @Test
     internal fun compareMeter() {
         compareEndDevice { Meter(mRID = it) }
@@ -344,7 +391,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             OperationalRestriction::addEquipment,
             { OperationalRestriction(it) },
             { Junction("j1") },
-            { Junction("j2") })
+            { Junction("j2") }
+        )
     }
 
     /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
@@ -428,7 +476,6 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             createConductingEquipment,
             { Terminal(mRID = "1").apply { conductingEquipment = it } },
             { Terminal(mRID = "2").apply { conductingEquipment = it } },
-            Terminal::conductingEquipment.setter,
             NetworkServiceComparatorOptions.all().copy(compareTerminals = false), optionsStopCompare = true
         )
     }
@@ -442,7 +489,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             ConnectivityNode::addTerminal,
             { ConnectivityNode(it) },
             { Terminal("1") },
-            { Terminal("2") })
+            { Terminal("2") }
+        )
     }
 
     private fun compareConnectivityNodeContainer(createConnectivityNodeContainer: (String) -> ConnectivityNodeContainer) {
@@ -457,7 +505,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             Curve::addData,
             createCurve,
             { CurveData(1f, 2f) },
-            { CurveData(3f, 4f) })
+            { CurveData(3f, 4f) }
+        )
     }
 
     private fun compareEquipment(createEquipment: (String) -> Equipment) {
@@ -475,14 +524,16 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             Equipment::addOperationalRestriction,
             createEquipment,
             { OperationalRestriction("o1") },
-            { OperationalRestriction("o2") })
+            { OperationalRestriction("o2") }
+        )
 
         comparatorValidator.validateCollection(
             Equipment::currentContainers,
             Equipment::addCurrentContainer,
             createEquipment,
             { Feeder("f1") },
-            { Feeder("f2") })
+            { Feeder("f2") }
+        )
     }
 
     private fun compareEquipmentContainer(createEquipmentContainer: (String) -> EquipmentContainer) {
@@ -493,7 +544,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             EquipmentContainer::addEquipment,
             createEquipmentContainer,
             { Junction("j1") },
-            { Junction("j2") })
+            { Junction("j2") }
+        )
     }
 
     @Test
@@ -514,7 +566,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             GeographicalRegion::addSubGeographicalRegion,
             { GeographicalRegion(it) },
             { SubGeographicalRegion("sg1") },
-            { SubGeographicalRegion("sg2") })
+            { SubGeographicalRegion("sg2") }
+        )
     }
 
     private fun comparePowerSystemResource(createPowerSystemResource: (String) -> PowerSystemResource) {
@@ -537,14 +590,16 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             SubGeographicalRegion::geographicalRegion,
             { SubGeographicalRegion(it) },
             { GeographicalRegion("g1") },
-            { GeographicalRegion("g2") })
+            { GeographicalRegion("g2") }
+        )
 
         comparatorValidator.validateCollection(
             SubGeographicalRegion::substations,
             SubGeographicalRegion::addSubstation,
             { SubGeographicalRegion(it) },
             { Substation("s1") },
-            { Substation("s2") })
+            { Substation("s2") }
+        )
     }
 
     @Test
@@ -555,7 +610,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             Substation::subGeographicalRegion,
             { Substation(it) },
             { SubGeographicalRegion("sg1") },
-            { SubGeographicalRegion("sg2") })
+            { SubGeographicalRegion("sg2") }
+        )
 
         comparatorValidator.validateCollection(Substation::feeders, Substation::addFeeder, { Substation(it) }, { Feeder("f1") }, { Feeder("f2") })
     }
@@ -804,7 +860,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             RemoteSource::measurement,
             { RemoteSource(it) },
             { object : Measurement("m1") {} },
-            { object : Measurement("m2") {} })
+            { object : Measurement("m2") {} }
+        )
     }
 
     /************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
@@ -847,10 +904,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareConductor { AcLineSegment(it) }
 
         comparatorValidator.validateProperty(
-            AcLineSegment::perLengthSequenceImpedance,
+            AcLineSegment::perLengthImpedance,
             { AcLineSegment(it) },
             { PerLengthSequenceImpedance("p1") },
-            { PerLengthSequenceImpedance("p2") })
+            { PerLengthSequenceImpedance("p2") }
+        )
     }
 
     @Test
@@ -905,7 +963,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             EnergyConsumer::phaseConnection,
             { EnergyConsumer(it) },
             { PhaseShuntConnectionKind.I },
-            { PhaseShuntConnectionKind.D })
+            { PhaseShuntConnectionKind.D }
+        )
         comparatorValidator.validateProperty(EnergyConsumer::q, { EnergyConsumer(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(EnergyConsumer::qFixed, { EnergyConsumer(it) }, { 1.0 }, { 2.0 })
         comparatorValidator.validateCollection(
@@ -913,7 +972,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             EnergyConsumer::addPhase,
             { EnergyConsumer(it) },
             { EnergyConsumerPhase("ecp1") },
-            { EnergyConsumerPhase("ecp2") })
+            { EnergyConsumerPhase("ecp2") }
+        )
     }
 
     @Test
@@ -924,7 +984,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             EnergyConsumerPhase::energyConsumer,
             { EnergyConsumerPhase(it) },
             { EnergyConsumer("ec1") },
-            { EnergyConsumer("ec2") })
+            { EnergyConsumer("ec2") }
+        )
 
         comparatorValidator.validateProperty(EnergyConsumerPhase::phase, { EnergyConsumerPhase(it) }, { SinglePhaseKind.A }, { SinglePhaseKind.B })
         comparatorValidator.validateProperty(EnergyConsumerPhase::p, { EnergyConsumerPhase(it) }, { 1.0 }, { 2.0 })
@@ -968,7 +1029,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             EnergySource::addPhase,
             { EnergySource(it) },
             { EnergySourcePhase("ecp1") },
-            { EnergySourcePhase("ecp2") })
+            { EnergySourcePhase("ecp2") }
+        )
     }
 
     @Test
@@ -1036,6 +1098,20 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
     }
 
     @Test
+    internal fun comparePerLengthPhaseImpedance() {
+        comparePerLengthImpedance { PerLengthPhaseImpedance(it) }
+
+        comparatorValidator.validateUnorderedCollection(
+            PerLengthPhaseImpedance::data,
+            PerLengthPhaseImpedance::addData,
+            { PerLengthPhaseImpedance(it) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 1.0, 2.0, 3.0, 4.0) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.C, 1.0, 2.0, 3.0, 4.0) },
+            { PhaseImpedanceData(SinglePhaseKind.A, SinglePhaseKind.B, 2.0, 3.0, 4.0, 5.0) },
+        )
+    }
+
+    @Test
     internal fun comparePerLengthSequenceImpedance() {
         comparePerLengthImpedance { PerLengthSequenceImpedance(it) }
 
@@ -1065,13 +1141,15 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             PowerElectronicsConnection::addPhase,
             { PowerElectronicsConnection(it) },
             { PowerElectronicsConnectionPhase("pecp1") },
-            { PowerElectronicsConnectionPhase("pecp2") })
+            { PowerElectronicsConnectionPhase("pecp2") }
+        )
         comparatorValidator.validateCollection(
             PowerElectronicsConnection::units,
             PowerElectronicsConnection::addUnit,
             { PowerElectronicsConnection(it) },
             { object : PowerElectronicsUnit("peu1") {} },
-            { object : PowerElectronicsUnit("peu2") {} })
+            { object : PowerElectronicsUnit("peu2") {} }
+        )
 
         comparatorValidator.validateProperty(PowerElectronicsConnection::maxIFault, { PowerElectronicsConnection(it) }, { 1 }, { 2 })
         comparatorValidator.validateProperty(PowerElectronicsConnection::maxQ, { PowerElectronicsConnection(it) }, { 1.0 }, { 2.0 })
@@ -1114,12 +1192,14 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             PowerElectronicsConnectionPhase::phase,
             { PowerElectronicsConnectionPhase(it) },
             { SinglePhaseKind.A },
-            { SinglePhaseKind.B })
+            { SinglePhaseKind.B }
+        )
         comparatorValidator.validateProperty(
             PowerElectronicsConnectionPhase::powerElectronicsConnection,
             { PowerElectronicsConnectionPhase(it) },
             { PowerElectronicsConnection("pec1") },
-            { PowerElectronicsConnection("pec2") })
+            { PowerElectronicsConnection("pec2") }
+        )
     }
 
     @Test
@@ -1148,8 +1228,11 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         )
 
         comparatorValidator.validateIndexedCollection(
-            PowerTransformer::ends, PowerTransformer::addEnd, { PowerTransformer(it) },
-            { PowerTransformerEnd(mRID = "pte1") }, { PowerTransformerEnd(mRID = "pte2") }, PowerTransformerEnd::powerTransformer.setter
+            PowerTransformer::ends,
+            PowerTransformer::addEnd,
+            { PowerTransformer(it) },
+            { PowerTransformerEnd(mRID = "pte1").apply { powerTransformer = it } },
+            { PowerTransformerEnd(mRID = "pte2").apply { powerTransformer = it } },
         )
     }
 
@@ -1213,7 +1296,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             RatioTapChanger::transformerEnd,
             { RatioTapChanger(it) },
             { PowerTransformerEnd("pte1") },
-            { PowerTransformerEnd("pte2") })
+            { PowerTransformerEnd("pte2") }
+        )
 
         comparatorValidator.validateProperty(RatioTapChanger::stepVoltageIncrement, { RatioTapChanger(it) }, { 1.0 }, { 2.0 })
     }
@@ -1236,7 +1320,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             RegulatingCondEq::regulatingControl,
             createRegulatingCondEq,
             { TapChangerControl("tcc1") },
-            { TapChangerControl("tcc2") })
+            { TapChangerControl("tcc2") }
+        )
     }
 
     private fun compareRegulatingControl(createRegulatingControl: (String) -> RegulatingControl) {
@@ -1247,7 +1332,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             RegulatingControl::mode,
             createRegulatingControl,
             { RegulatingControlModeKind.voltage },
-            { RegulatingControlModeKind.UNKNOWN_CONTROL_MODE })
+            { RegulatingControlModeKind.UNKNOWN_CONTROL_MODE }
+        )
         comparatorValidator.validateProperty(RegulatingControl::monitoredPhase, createRegulatingControl, { PhaseCode.ABC }, { PhaseCode.A })
         comparatorValidator.validateProperty(RegulatingControl::targetDeadband, createRegulatingControl, { 1.0f }, { 2.0f })
         comparatorValidator.validateProperty(RegulatingControl::targetValue, createRegulatingControl, { 1.0 }, { 2.0 })
@@ -1303,8 +1389,25 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             ShuntCompensator::phaseConnection,
             createShuntCompensator,
             { PhaseShuntConnectionKind.D },
-            { PhaseShuntConnectionKind.G })
+            { PhaseShuntConnectionKind.G }
+        )
         comparatorValidator.validateProperty(ShuntCompensator::sections, createShuntCompensator, { 1.0 }, { 2.0 })
+    }
+
+    @Test
+    internal fun compareStaticVarCompensator() {
+        compareRegulatingCondEq { StaticVarCompensator(it) }
+
+        comparatorValidator.validateProperty(StaticVarCompensator::capacitiveRating, { StaticVarCompensator(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(StaticVarCompensator::inductiveRating, { StaticVarCompensator(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(StaticVarCompensator::q, { StaticVarCompensator(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(
+            StaticVarCompensator::svcControlMode,
+            { StaticVarCompensator(it) },
+            { SVCControlMode.reactivePower },
+            { SVCControlMode.voltage }
+        )
+        comparatorValidator.validateProperty(StaticVarCompensator::voltageSetPoint, { StaticVarCompensator(it) }, { 1 }, { 2 })
     }
 
     private fun compareSwitch(createSwitch: (String) -> Switch) {
@@ -1319,11 +1422,13 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         val difference = ObjectDifference(closedSwitch, openSwitch).apply {
             differences["isNormallyOpen"] = ValueDifference(
                 PhaseCode.ABCN.singlePhases.associateWith { false },
-                PhaseCode.ABCN.singlePhases.associateWith { true })
+                PhaseCode.ABCN.singlePhases.associateWith { true }
+            )
 
             differences["isOpen"] = ValueDifference(
                 PhaseCode.ABCN.singlePhases.associateWith { true },
-                PhaseCode.ABCN.singlePhases.associateWith { false })
+                PhaseCode.ABCN.singlePhases.associateWith { false }
+            )
         }
 
         comparatorValidator.validateCompare(closedSwitch, openSwitch, expectModification = difference)
@@ -1356,19 +1461,22 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             SynchronousMachine::type,
             { SynchronousMachine(it) },
             { SynchronousMachineKind.generator },
-            { SynchronousMachineKind.motor })
+            { SynchronousMachineKind.motor }
+        )
         comparatorValidator.validateProperty(
             SynchronousMachine::operatingMode,
             { SynchronousMachine(it) },
             { SynchronousMachineKind.generator },
-            { SynchronousMachineKind.motor })
+            { SynchronousMachineKind.motor }
+        )
 
         comparatorValidator.validateCollection(
             SynchronousMachine::curves,
             SynchronousMachine::addCurve,
             { SynchronousMachine(it) },
             { ReactiveCapabilityCurve("rcc1") },
-            { ReactiveCapabilityCurve("rcc2") })
+            { ReactiveCapabilityCurve("rcc2") }
+        )
     }
 
     private fun compareTapChanger(createTapChanger: (String) -> TapChanger) {
@@ -1385,7 +1493,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             TapChanger::tapChangerControl,
             { createTapChanger(it).apply { highStep = 10 } },
             { TapChangerControl("tcc1") },
-            { TapChangerControl("tcc2") })
+            { TapChangerControl("tcc2") }
+        )
     }
 
     @Test
@@ -1416,7 +1525,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             TransformerEnd::starImpedance,
             createTransformerEnd,
             { TransformerStarImpedance("tsi1") },
-            { TransformerStarImpedance("tsi2") })
+            { TransformerStarImpedance("tsi2") }
+        )
     }
 
     @Test
@@ -1446,7 +1556,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             Loop::addEnergizingSubstation,
             { Loop(it) },
             { Substation("s1") },
-            { Substation("s2") })
+            { Substation("s2") }
+        )
     }
 
 }

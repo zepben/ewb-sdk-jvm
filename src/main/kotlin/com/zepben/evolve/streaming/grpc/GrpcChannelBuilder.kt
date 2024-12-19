@@ -17,17 +17,21 @@ import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.nc.NetworkConsumerGrpc
 import io.grpc.*
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 private const val TWENTY_MEGABYTES = 1024 * 1024 * 20
 
 data class GrpcBuildArgs(
     val skipConnectionTest: Boolean,
     val debugConnectionTest: Boolean,
+    val connectionTestTimeoutMs: Long,
     val maxInboundMessageSize: Int
 )
 
-val DEFAULT_BUILD_ARGS = GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = false, maxInboundMessageSize = TWENTY_MEGABYTES)
+val DEFAULT_BUILD_ARGS = GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 5000, maxInboundMessageSize = TWENTY_MEGABYTES)
 
 
 /**
@@ -41,6 +45,8 @@ class GrpcChannelBuilder {
     private var _channelCredentials: ChannelCredentials? = null
     private var _callCredentials: CallCredentials? = null
 
+    private val logger: Logger = LoggerFactory.getLogger(javaClass)
+
     fun build(buildArgs: GrpcBuildArgs = DEFAULT_BUILD_ARGS): GrpcChannel = GrpcChannel(
         _channelCredentials?.let { channelCreds ->
             val channelBuilder = NettyChannelBuilder.forAddress(_host, _port, channelCreds).maxInboundMessageSize(buildArgs.maxInboundMessageSize)
@@ -50,28 +56,30 @@ class GrpcChannelBuilder {
         } ?: NettyChannelBuilder.forAddress(_host, _port).usePlaintext().maxInboundMessageSize(buildArgs.maxInboundMessageSize).build()
     ).also {
         if (!buildArgs.skipConnectionTest)
-            testConnection(it, buildArgs.debugConnectionTest)
+            testConnection(it, buildArgs.debugConnectionTest, buildArgs.connectionTestTimeoutMs)
     }
 
-    internal fun testConnection(grpcChannel: GrpcChannel, debug: Boolean) {
-        val clients = listOf(
-            NetworkConsumerClient(NetworkConsumerGrpc.newStub(grpcChannel.channel)),
-            CustomerConsumerClient(CustomerConsumerGrpc.newStub(grpcChannel.channel)),
-            DiagramConsumerClient(DiagramConsumerGrpc.newStub(grpcChannel.channel)),
+    internal fun testConnection(grpcChannel: GrpcChannel, debug: Boolean, timeoutMs: Long) {
+        //withDeadLineAfter() sets the deadline based on now() when it is called not when the request is made, so we hold the clients in these lambda's until we are ready to make the getMetadata() request.
+        val clients = mapOf(
+            "NetworkConsumerClient" to { NetworkConsumerClient(NetworkConsumerGrpc.newStub(grpcChannel.channel).withDeadlineAfter(timeoutMs, TimeUnit.MILLISECONDS)) },
+            "CustomerConsumerClient" to { CustomerConsumerClient(CustomerConsumerGrpc.newStub(grpcChannel.channel).withDeadlineAfter(timeoutMs, TimeUnit.MILLISECONDS)) },
+            "DiagramConsumerClient" to { DiagramConsumerClient(DiagramConsumerGrpc.newStub(grpcChannel.channel).withDeadlineAfter(timeoutMs, TimeUnit.MILLISECONDS)) },
         )
         val debugErrors = mutableMapOf<String, StatusRuntimeException>()
 
         clients.forEach {
-            val result = it.getMetadata()
-            if (result.wasSuccessful)
+            val result = it.value().getMetadata()
+
+            if (result.wasSuccessful) {
+                logger.debug("Initial connection test with ${it.key} succeeded. Returning GrpcChannel to client.")
                 return
+            }
             val t = result.thrown
             if (t is StatusRuntimeException) {
-                if (listOf(Status.Code.UNAUTHENTICATED, Status.Code.UNAVAILABLE, Status.Code.UNKNOWN).contains(t.status.code))
-                    throw t
-                else
-                    if (debug)
-                        debugErrors[it::class.java.name] = t
+                logger.debug("Initial connection test failed for ${it.key} with $t")
+                if (debug)
+                    debugErrors[it.key] = t
             } else
                 throw t
         }

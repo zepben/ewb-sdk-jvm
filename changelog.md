@@ -2,6 +2,7 @@
 ## [0.24.0] - UNRELEASED
 ### Breaking Changes
 * Database readers and writes for each `BaseService` no longer accept a `MetadataCollection`, and will instead use the collection of the provided service.
+* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests. 
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
@@ -15,7 +16,7 @@
 * None.
 
 ### Fixes
-* None.
+* GrpcChannelBuilder's initial connectivity test no longer fails due to a lack of permissions on a subset of services.
 
 ### Notes
 * None.

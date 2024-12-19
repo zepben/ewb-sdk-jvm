@@ -2722,8 +2722,8 @@ fun toPb(cim: LvFeeder, pb: PBLvFeeder.Builder): PBLvFeeder.Builder =
 
         clearNormalEnergizingFeederMRIDs()
         cim.normalEnergizingFeeders.forEach { addNormalEnergizingFeederMRIDs(it.mRID) }
-        clearCurrentlyEnergizingFeedersMRIDs()
-        cim.currentEnergizingFeeders.forEach { addCurrentlyEnergizingFeedersMRIDs(it.mRID) }
+        clearCurrentlyEnergizingFeederMRIDs()
+        cim.currentEnergizingFeeders.forEach { addCurrentlyEnergizingFeederMRIDs(it.mRID) }
 
         toPb(cim, ecBuilder)
     }

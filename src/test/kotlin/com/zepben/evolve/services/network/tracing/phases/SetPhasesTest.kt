@@ -19,6 +19,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
@@ -32,11 +33,14 @@ internal class SetPhasesTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
+    private val setPhases = SetPhases()
+
     @Test
     internal fun setPhasesTest() {
         val n = PhaseSwapLoopNetwork.create()
 
-        SetPhases().run(n)
+        setPhases.run(n, NetworkStateOperators.NORMAL)
+        setPhases.run(n, NetworkStateOperators.CURRENT)
         PhaseLogger.trace(n.listOf<EnergySource>())
 
         // Check various points to make sure phases have been applied during the trace.
@@ -144,7 +148,10 @@ internal class SetPhasesTest {
             .toAcls(PhaseCode.ABCN) // c2
             .buildAndLog()
 
-        SetPhases().run(n.getT("c1", 2))
+        n.getT("c1", 2).also {
+            setPhases.run(it, it.phases, NetworkStateOperators.NORMAL)
+            setPhases.run(it, it.phases, NetworkStateOperators.CURRENT)
+        }
 
         PhaseValidator.validatePhases(n, "c0", PhaseCode.NONE, PhaseCode.NONE)
         PhaseValidator.validatePhases(n, "c1", PhaseCode.NONE, PhaseCode.ABCN)
@@ -162,7 +169,8 @@ internal class SetPhasesTest {
             .buildAndLog()
 
         expect {
-            SetPhases().run(n.getT("c0", 2), PhaseCode.AB)
+            setPhases.run(n.getT("c0", 2), PhaseCode.AB, NetworkStateOperators.NORMAL)
+            setPhases.run(n.getT("c0", 2), PhaseCode.AB, NetworkStateOperators.CURRENT)
         }.toThrow<IllegalArgumentException>()
             .withMessage(
                 "Attempted to apply phases [A, B] to Terminal{id='c0-t2'} with nominal phases A. Number of phases to apply must match the number of " +
@@ -183,7 +191,8 @@ internal class SetPhasesTest {
         val c1: AcLineSegment = n["c1"]!!
 
         expect {
-            SetPhases().run(n.getT("c0", 2))
+            setPhases.run(n.getT("c0", 2), NetworkStateOperators.NORMAL)
+            setPhases.run(n.getT("c0", 2), NetworkStateOperators.CURRENT)
         }.toThrow<IllegalStateException>()
             .withMessage(
                 "Attempted to flow conflicting phase A onto B on nominal phase A. This occurred while flowing from " +
@@ -207,7 +216,8 @@ internal class SetPhasesTest {
         val c2: AcLineSegment = n["c2"]!!
 
         expect {
-            SetPhases().run(n.getT("c0", 2))
+            setPhases.run(n.getT("c0", 2), NetworkStateOperators.NORMAL)
+            setPhases.run(n.getT("c0", 2), NetworkStateOperators.CURRENT)
         }.toThrow<IllegalStateException>()
             .withMessage(
                 "Attempted to flow conflicting phase A onto B on nominal phase A. This occurred while flowing between " +
@@ -377,6 +387,27 @@ internal class SetPhasesTest {
         PhaseValidator.validatePhases(n, "c2", PhaseCode.AN, PhaseCode.AN)
         PhaseValidator.validatePhases(n, "tx3", PhaseCode.AN.singlePhases, listOf(SPK.A, SPK.NONE))
     }
+
+    @Test
+    internal fun `can set phases from an unknown nominal phase`() {
+        //
+        // 1--c0--21--c1--2
+        //
+        val n = TestNetworkBuilder()
+            .fromAcls(PhaseCode.X) // c0
+            .toAcls(PhaseCode.ABC) // c1
+            .network
+
+        val t = n.getT("c0", 2)
+        t.normalPhases[SPK.X] = SPK.A
+        t.currentPhases[SPK.X] = SPK.A
+        setPhases.run(t, NetworkStateOperators.NORMAL)
+        setPhases.run(t, NetworkStateOperators.CURRENT)
+
+        PhaseValidator.validatePhases(n, "c0", PhaseCode.NONE, PhaseCode.A)
+        PhaseValidator.validatePhases(n, "c1", listOf(SPK.A, SPK.NONE, SPK.NONE), listOf(SPK.A, SPK.NONE, SPK.NONE))
+    }
+
 
     private fun TestNetworkBuilder.buildAndLog() = build().apply {
         PhaseLogger.trace(listOf<EnergySource>())

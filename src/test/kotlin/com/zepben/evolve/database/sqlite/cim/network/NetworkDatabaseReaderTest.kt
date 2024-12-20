@@ -10,20 +10,20 @@ package com.zepben.evolve.database.sqlite.cim.network
 
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionReader
 import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.testutils.junit.SystemLogExtension
-import io.mockk.every
-import io.mockk.justRun
-import io.mockk.mockk
-import io.mockk.verifySequence
+import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
@@ -51,25 +51,37 @@ internal class NetworkDatabaseReaderTest {
         every { this@mockk.supportedVersion } returns 1
     }
 
-    private val setDirection = mockk<SetDirection> { justRun { run(service) } }
-    private val setPhases = mockk<SetPhases> { justRun { run(service) } }
-    private val phaseInferrer = mockk<PhaseInferrer> { justRun { run(service) } }
-    private val assignToFeeders = mockk<AssignToFeeders> { justRun { run(service) } }
-    private val assignToLvFeeders = mockk<AssignToLvFeeders> { justRun { run(service) } }
+    private val setFeederDirections = mockk<SetDirection> {
+        justRun { run(service, NetworkStateOperators.NORMAL) }
+        justRun { run(service, NetworkStateOperators.CURRENT) }
+    }
+    private val setPhases = mockk<SetPhases> {
+        justRun { run(service, NetworkStateOperators.NORMAL) }
+        justRun { run(service, NetworkStateOperators.CURRENT) }
+    }
+    private val phaseInferrer = mockk<PhaseInferrer>()
+    private val assignToFeeders = mockk<AssignToFeeders> {
+        justRun { run(service, NetworkStateOperators.NORMAL) }
+        justRun { run(service, NetworkStateOperators.CURRENT) }
+    }
+    private val assignToLvFeeders = mockk<AssignToLvFeeders> {
+        justRun { run(service, NetworkStateOperators.NORMAL) }
+        justRun { run(service, NetworkStateOperators.CURRENT) }
+    }
 
-    private val reader = NetworkDatabaseReader(
+    private fun reader(inferPhases: Boolean) = NetworkDatabaseReader(
         connection,
         service,
         databaseFile,
-        mockk(), // tables should not be used if we provide the rest of the parameters, so provide a mockk that will throw if used.
+        inferPhases,
         metadataReader,
         networkServiceReader,
         tableVersion,
-        setDirection,
+        setFeederDirections,
         setPhases,
         phaseInferrer,
         assignToFeeders,
-        assignToLvFeeders
+        assignToLvFeeders,
     )
 
     //
@@ -78,7 +90,10 @@ internal class NetworkDatabaseReaderTest {
 
     @Test
     internal fun `calls expected processors, including post processes`() {
-        assertThat("Should have loaded", reader.load())
+        every { phaseInferrer.run(service, NetworkStateOperators.NORMAL) } returns emptyList()
+        every { phaseInferrer.run(service, NetworkStateOperators.CURRENT) } returns emptyList()
+
+        assertThat("Should have loaded", reader(true).load())
 
         assertThat(systemErr.log, containsString("Applying feeder direction to network..."))
         assertThat(systemErr.log, containsString("Feeder direction applied to network."))
@@ -106,11 +121,20 @@ internal class NetworkDatabaseReaderTest {
             networkServiceReader.load()
             service.unresolvedReferences()
 
-            setDirection.run(service)
-            setPhases.run(service)
-            phaseInferrer.run(service)
-            assignToFeeders.run(service)
-            assignToLvFeeders.run(service)
+            setFeederDirections.run(service, NetworkStateOperators.NORMAL)
+            setFeederDirections.run(service, NetworkStateOperators.CURRENT)
+
+            setPhases.run(service, NetworkStateOperators.NORMAL)
+            setPhases.run(service, NetworkStateOperators.CURRENT)
+
+            phaseInferrer.run(service, NetworkStateOperators.NORMAL)
+            phaseInferrer.run(service, NetworkStateOperators.CURRENT)
+
+            assignToFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToFeeders.run(service, NetworkStateOperators.CURRENT)
+
+            assignToLvFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToLvFeeders.run(service, NetworkStateOperators.CURRENT)
 
             // calls for _validate_equipment_containers()
             service.listOf<Equipment>(any<(Equipment) -> Boolean>())
@@ -121,4 +145,38 @@ internal class NetworkDatabaseReaderTest {
         }
     }
 
+    @Test
+    internal fun `logs inferred phases`() {
+        val j1 = Junction("j1").apply { name = "j1 name" }
+        val j2 = Junction("j1").apply { name = "j1 name" }
+        val j3 = Junction("j1").apply { name = "j1 name" }
+        every { phaseInferrer.run(service, NetworkStateOperators.NORMAL) } returns listOf(
+            PhaseInferrer.InferredPhase(j1, false),
+            PhaseInferrer.InferredPhase(j1, true)
+        )
+        every { phaseInferrer.run(service, NetworkStateOperators.CURRENT) } returns listOf(
+            PhaseInferrer.InferredPhase(j2, false),
+            PhaseInferrer.InferredPhase(j3, true)
+        )
+
+        reader(true).load()
+
+        fun correctMessage(idObj: IdentifiedObject) =
+            "*** Action Required *** Inferred missing phase for '${idObj.name}' [${idObj.mRID}] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
+
+        fun suspectMessage(idObj: IdentifiedObject) =
+            "*** Action Required *** Inferred missing phases for '${idObj.name}' [${idObj.mRID}] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
+
+        assertThat(systemErr.log, containsString(correctMessage(j1)))
+        assertThat(systemErr.log, containsString(suspectMessage(j2)))
+        assertThat(systemErr.log, containsString(suspectMessage(j3)))
+    }
+
+    @Test
+    fun `does not infer phases when inferPhases is false`() {
+        reader(false).load()
+
+        verify { phaseInferrer wasNot called }
+        verify { phaseInferrer wasNot called }
+    }
 }

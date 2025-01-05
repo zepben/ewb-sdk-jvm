@@ -35,6 +35,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
@@ -555,6 +556,9 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(Feeder::normalHeadTerminal, { Feeder(it) }, { Terminal("t1") }, { Terminal("t2") })
         comparatorValidator.validateProperty(Feeder::normalEnergizingSubstation, { Feeder(it) }, { Substation("s1") }, { Substation("s2") })
         comparatorValidator.validateCollection(Feeder::currentEquipment, Feeder::addCurrentEquipment, { Feeder(it) }, { Junction("j1") }, { Junction("j2") })
+        comparatorValidator.validateCollection(Feeder::normalEnergizedLvFeeders, Feeder::addNormalEnergizedLvFeeder, { Feeder(it) }, { LvFeeder("lvf1") }, { LvFeeder("lvf2") })
+        comparatorValidator.validateCollection(Feeder::currentEnergizedLvFeeders, Feeder::addCurrentEnergizedLvFeeder, { Feeder(it) }, { LvFeeder("lvf1") }, { LvFeeder("lvf2") })
+
     }
 
     @Test
@@ -1342,6 +1346,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(RegulatingControl::minAllowedTargetValue, createRegulatingControl, { 1.0 }, { 2.0 })
         comparatorValidator.validateProperty(RegulatingControl::ratedCurrent, createRegulatingControl, { 1.1 }, { 2.2 })
         comparatorValidator.validateProperty(RegulatingControl::terminal, createRegulatingControl, { Terminal("t1") }, { Terminal("t2") })
+        comparatorValidator.validateProperty(RegulatingControl::ctPrimary, createRegulatingControl, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(RegulatingControl::minTargetDeadband, createRegulatingControl, { 1.0 }, { 2.0 })
 
         comparatorValidator.validateCollection(
             RegulatingControl::regulatingCondEqs,
@@ -1558,6 +1564,17 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { Substation("s1") },
             { Substation("s2") }
         )
+    }
+
+    @Test
+    internal fun compareLvFeeder() {
+        compareEquipmentContainer { LvFeeder(it) }
+
+        comparatorValidator.validateProperty(LvFeeder::normalHeadTerminal, { LvFeeder(it) }, { Terminal("t1") }, { Terminal("t2") })
+        comparatorValidator.validateCollection(LvFeeder::currentEquipment, LvFeeder::addCurrentEquipment, { LvFeeder(it) }, { Junction("j1") }, { Junction("j2") })
+        comparatorValidator.validateCollection(LvFeeder::normalEnergizingFeeders, LvFeeder::addNormalEnergizingFeeder, { LvFeeder(it) }, { Feeder("lvf1") }, { Feeder("lvf2") })
+        comparatorValidator.validateCollection(LvFeeder::currentEnergizingFeeders, LvFeeder::addCurrentEnergizingFeeder, { LvFeeder(it) }, { Feeder("lvf1") }, { Feeder("lvf2") })
+
     }
 
 }

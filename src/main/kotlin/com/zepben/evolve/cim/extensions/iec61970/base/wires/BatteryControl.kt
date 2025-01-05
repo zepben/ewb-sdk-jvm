@@ -16,7 +16,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.RegulatingControl
  *
  * @property chargingRate [ZBEX] Charging rate (input power) in percentage of maxP. (Unit: PerCent)
  * @property dischargingRate [ZBEX] Discharge rate (output power) in percentage of maxP. (Unit: PerCent)
- * @property reservePercent [ZBEX] Percentage of the rated storage capacity that should be reserved during normal operations. This reserve acts as a safeguard, preventing the energy level
+ * @property reservePercent [ZBEX] Percentage of the rated storage capacity that should be reserved during normal operations. This reserve acts as a safeguard, preventing the energy level from
+ * dropping below this threshold under standard conditions. The field must be set to a non-negative value between 0 and 1. (Unit: PerCent)
  * @property controlMode [ZBEX] Mode of operation for the dispatch (charging/discharging) function of BatteryControl.
  */
 @ZBEX

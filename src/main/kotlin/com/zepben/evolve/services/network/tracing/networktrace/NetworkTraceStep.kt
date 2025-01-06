@@ -79,7 +79,24 @@ class NetworkTraceStep<out T>(
         val tracedExternally: Boolean get() = !tracedInternally
     }
 
+    /**
+     * Indicates either the of a NetworkTraceStep, or which [NetworkTraceStep.type] types to match when a type option is required.
+     */
     enum class Type {
-        ALL, INTERNAL, EXTERNAL
+        /**
+         * Indicates that all network trace steps should be matched, regardless of [NetworkTraceStep.type].
+         * Be aware that this means that [NetworkTraceStep.type] will never have this value.
+         */
+        ALL,
+
+        /**
+         * Indicates that a [NetworkTraceStep] is a step where the path traced 'internally' from one terminal to another on the same piece of equipment.
+         */
+        INTERNAL,
+
+        /**
+         * Indicates that a [NetworkTraceStep] is a step where the path traced 'externally' from one terminal to another on different pieces of equipment.
+         */
+        EXTERNAL
     }
 }

@@ -47,6 +47,14 @@ import com.zepben.evolve.services.network.tracing.traversal.*
  * The network trace is state-aware by requiring an instance of [NetworkStateOperators].
  * This allows traversal conditions and step actions to query and act upon state-based properties and functions of equipment in the network when required.
  *
+ * 'Branching' traversals are also supported allowing tracing both ways around loops in the network. When using a branching instance, a new 'branch'
+ * is created for each terminal when a step has two or more terminals it can step to. That is on an internal step, if the equipment has more than 2 terminals
+ * and more than 2 terminals will be queued, a branch will be created for each terminal. On an external step, if 2 or more terminals are to be queued,
+ * a branch will be created for each terminal.
+ * If you do not need to trace loops both ways or have no loops, do not use a branching instance as it is less efficient than the non-branching one.
+ *
+ * To create instances of this class, use the factory methods providing in the [Tracing] object.
+ *
  * @param T the type of [NetworkTraceStep.data]
  */
 class NetworkTrace<T> private constructor(

@@ -12,8 +12,13 @@ import java.util.*
 import kotlin.collections.ArrayDeque
 
 /**
- * Base class for a network traversal, providing the main interface and implementation for traversal logic.
+ * A base traversal class allowing items in a connected graph to be traced.
+ * It provides the main interface and implementation for traversal logic.
  * This class manages conditions, actions, and context values that guide each traversal step.
+ *
+ * This class supports a concept of 'branching', whereby when a new branch is created a new child traversal instance is created. The child
+ * inherits its parents conditions, actions and what it has tracked. However, it knows nothing about what its siblings have tracked. This
+ * allows traversing both ways around loops in the graph.
  *
  * This class is abstract to allow for type-specific implementations for branching traversals and custom start item handling.
  *
@@ -154,17 +159,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     }
 
     /**
-     * Clears all the stop conditions registered on this traversal.
-     *
-     * @return The current traversal instance.
-     */
-    fun clearStopConditions(): D {
-        stopConditions.clear()
-        computeNextContextFuns.entries.removeIf { it.value is StopCondition<*> }
-        return getDerivedThis()
-    }
-
-    /**
      * Copies all the stop conditions from another traversal to this traversal.
      *
      * @param other The other traversal object to copy from.
@@ -191,17 +185,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
         if (condition is QueueConditionWithContextValue<T, *>) {
             computeNextContextFuns[condition.key] = condition
         }
-        return getDerivedThis()
-    }
-
-    /**
-     * Clears all queue conditions registered on this traversal.
-     *
-     * @return The current traversal instance.
-     */
-    fun clearQueueConditions(): D {
-        queueConditions.clear()
-        computeNextContextFuns.entries.removeIf { it is QueueCondition<*> }
         return getDerivedThis()
     }
 
@@ -253,17 +236,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     }
 
     /**
-     * Clears all step actions registered on this traversal.
-     *
-     * @return The current traversal instance.
-     */
-    fun clearStepActions(): D {
-        stepActions.clear()
-        computeNextContextFuns.entries.removeIf { it is StepAction<*> }
-        return getDerivedThis()
-    }
-
-    /**
      * Copies all the step actions from the passed in traversal to this traversal.
      *
      * @param other The other traversal object to copy from.
@@ -288,17 +260,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     fun addContextValueComputer(computer: ContextValueComputer<T>): D {
         require(computer !is TraversalCondition<*>) { "`computer` must not be a TraversalCondition. Use `addCondition` to add conditions that also compute context values" }
         computeNextContextFuns[computer.key] = computer
-        return getDerivedThis()
-    }
-
-    /**
-     * Clears all standalone context value computers registered on this traversal.
-     * That is, it does not remove any [TraversalCondition] registered that also implements [ContextValueComputer]
-     *
-     * @return The current traversal instance.
-     */
-    fun clearContextValueComputers(): D {
-        computeNextContextFuns.entries.removeIf { it.value.isStandaloneComputer() }
         return getDerivedThis()
     }
 

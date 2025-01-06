@@ -6,8 +6,9 @@
   `Resolvers.perLengthSequenceImpedance` is now `Resolvers.perLengthImpedance`, correctly reflecting the CIM relationship.
 * Removed `getCurrentEquipmentForFeeder` implementation for `NetworkConsumer` as its functionality is now incorporated in `getEquipmentForContainers`.
 * Tracing downstream/upstream using a NetworkTrace will not step on a start item if there is no downstream/upstream terminal on the item.
-* `SetDirection` now correctly applies te `BOTH` direction on all parts of the loop again, so if you were relying on the broken intermediate state, you will
+* `SetDirection` now correctly applies the `BOTH` direction on all parts of the loop again, so if you were relying on the broken intermediate state, you will
   need to update your code.
+* FindWithUsagePoints was deemed too use-case specific for the SDK and has been removed.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.

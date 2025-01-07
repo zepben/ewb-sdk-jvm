@@ -7,7 +7,6 @@
  */
 package com.zepben.evolve.services.network.tracing.traversal
 
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import java.util.*
 import kotlin.collections.ArrayDeque
 
@@ -305,7 +304,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @param item The item to add.
      * @return The current traversal instance.
      */
-    protected fun addStartItem(item: T): D {
+    protected open fun addStartItem(item: T): D {
         startItems.add(item)
         return getDerivedThis()
     }
@@ -322,10 +321,12 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      *
      * @param startItem The item from which to start the traversal.
      * @param canStopOnStartItem Indicates if the traversal should check stop conditions on the starting item.
+     * @return The current traversal instance.
      */
-    protected fun run(startItem: T, canStopOnStartItem: Boolean = true) {
+    protected open fun run(startItem: T, canStopOnStartItem: Boolean = true): D {
         startItems.add(startItem)
         run(canStopOnStartItem)
+        return getDerivedThis()
     }
 
     /**
@@ -409,8 +410,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
             while (queue.hasNext()) {
                 queue.next()?.let { current ->
                     val context = getStepContext(current)
-                    current as NetworkTraceStep<*>
-
                     if (canVisitItem(current, context)) {
                         context.isActionableItem = canActionItem(current, context)
 

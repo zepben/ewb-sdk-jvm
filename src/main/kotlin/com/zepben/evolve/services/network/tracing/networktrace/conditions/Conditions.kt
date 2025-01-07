@@ -117,11 +117,11 @@ object Conditions {
 
     /**
      * Creates a [NetworkTrace] condition that will cause a trace to not queue through open equipment.
-     * This uses [OpenStateOperators.stopAtOpen] receiver instance method within the condition.
+     * This uses [OpenStateOperators.isOpen] receiver instance method within the condition.
      *
      * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
      * ```
-     * trace.addNCondition { stopAtOpen() }
+     * trace.addCondition { stopAtOpen() }
      * ```
      *
      * @param phase The phase to test the open status; `null` to ignore phases and check if it is open on any phase.

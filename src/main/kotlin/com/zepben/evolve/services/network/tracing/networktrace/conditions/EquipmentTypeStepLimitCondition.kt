@@ -18,13 +18,12 @@ internal class EquipmentTypeStepLimitCondition<T>(
     val limit: Int,
     val equipmentType: KClass<out ConductingEquipment>
 ) : StopConditionWithContextValue<NetworkTraceStep<T>, Int> {
-    override fun shouldStop(item: NetworkTraceStep<T>, context: StepContext): Boolean {
-        return (context.value) >= limit
-    }
 
-    override fun computeInitialValue(item: NetworkTraceStep<T>): Int = 0
+    override fun shouldStop(item: NetworkTraceStep<T>, context: StepContext): Boolean = context.value >= limit
 
     override val key: String = "sdk:${equipmentType.simpleName}Count"
+
+    override fun computeInitialValue(item: NetworkTraceStep<T>): Int = 0
 
     override fun computeNextValueTyped(nextItem: NetworkTraceStep<T>, currentItem: NetworkTraceStep<T>, currentValue: Int): Int {
         return when {
@@ -35,5 +34,5 @@ internal class EquipmentTypeStepLimitCondition<T>(
     }
 
     private fun matchesEquipmentType(conductingEquipment: ConductingEquipment): Boolean =
-        conductingEquipment::class.java.isAssignableFrom(equipmentType.java)
+        equipmentType.java.isAssignableFrom(conductingEquipment::class.java)
 }

@@ -35,7 +35,7 @@ abstract class NetworkTraceQueueCondition<T>(val stepType: NetworkTraceStep.Type
         currentItem: NetworkTraceStep<T>,
         currentContext: StepContext
     ): Boolean =
-        if (nextItem.path.tracedInternally) shouldQueueMatchedStep(nextItem, nextContext, currentItem, currentContext) else true
+        if (nextItem.type == NetworkTraceStep.Type.INTERNAL) shouldQueueMatchedStep(nextItem, nextContext, currentItem, currentContext) else true
 
     private fun shouldQueueExternalStep(
         nextItem: NetworkTraceStep<T>,
@@ -43,7 +43,7 @@ abstract class NetworkTraceQueueCondition<T>(val stepType: NetworkTraceStep.Type
         currentItem: NetworkTraceStep<T>,
         currentContext: StepContext
     ): Boolean =
-        if (!nextItem.path.tracedInternally) shouldQueueMatchedStep(nextItem, nextContext, currentItem, currentContext) else true
+        if (nextItem.type == NetworkTraceStep.Type.EXTERNAL) shouldQueueMatchedStep(nextItem, nextContext, currentItem, currentContext) else true
 
     companion object {
         @JvmStatic

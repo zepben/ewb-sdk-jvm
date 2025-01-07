@@ -35,5 +35,9 @@ class EquipmentTreeBuilder : StepActionWithContextValue<NetworkTraceStep<*>, Equ
         currentNode.parent?.addChild(currentNode)
     }
 
+    fun clear() {
+        _roots.clear()
+    }
+
     override val key: String = UUID.randomUUID().toString()
 }

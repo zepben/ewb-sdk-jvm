@@ -33,7 +33,7 @@ class StepContext(
         internal set
 
     var isActionableItem: Boolean = false
-        // Once it's a chicken and egg problem as this because it needs to be set after calling canActionItem, however it takes a context.
+        // Once again it's a chicken and egg problem as this because it needs to be set after calling canActionItem, however it takes a context.
         internal set
 
     /**

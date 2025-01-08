@@ -152,11 +152,9 @@ private class CurrentEquipmentContainerStateOperators : EquipmentContainerStateO
 
     override fun getContainers(equipment: Equipment): Collection<EquipmentContainer> = equipment.currentContainers
 
-    //todo update to use current variant once added. Using normal is what happens at the moment, which is wrong.
-    override fun getEnergizingFeeders(lvFeeder: LvFeeder): Collection<Feeder> = lvFeeder.normalEnergizingFeeders
+    override fun getEnergizingFeeders(lvFeeder: LvFeeder): Collection<Feeder> = lvFeeder.currentEnergizingFeeders
 
-    //todo update to use current variant once added. Using normal is what happens at the moment, which is wrong.
-    override fun getEnergizedLvFeeders(feeder: Feeder): Collection<LvFeeder> = feeder.normalEnergizedLvFeeders
+    override fun getEnergizedLvFeeders(feeder: Feeder): Collection<LvFeeder> = feeder.currentEnergizedLvFeeders
 
     override fun addEquipmentToContainer(equipment: Equipment, container: EquipmentContainer) {
         container.addCurrentEquipment(equipment)
@@ -167,13 +165,11 @@ private class CurrentEquipmentContainerStateOperators : EquipmentContainerStateO
     }
 
     override fun addEnergizingFeederToLvFeeder(feeder: Feeder, lvFeeder: LvFeeder) {
-        //todo update to use current variant once added. Adding as normal is what happens at the moment, which is wrong.
-        lvFeeder.addNormalEnergizingFeeder(feeder)
+        lvFeeder.addCurrentEnergizingFeeder(feeder)
     }
 
     override fun addEnergizedLvFeederToFeeder(lvFeeder: LvFeeder, feeder: Feeder) {
-        //todo update to use current variant once added. Adding as normal is what happens at the moment, which is wrong.
-        feeder.addNormalEnergizedLvFeeder(lvFeeder)
+        feeder.addCurrentEnergizedLvFeeder(lvFeeder)
     }
 }
 

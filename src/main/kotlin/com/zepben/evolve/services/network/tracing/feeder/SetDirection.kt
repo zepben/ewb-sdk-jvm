@@ -10,6 +10,7 @@ package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
@@ -18,12 +19,42 @@ import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
 import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
 
 /**
  * Convenience class that provides methods for setting feeder direction on a [NetworkService]
  */
 class SetDirection {
+
+    fun computeData(reprocessedLoopTerminals: MutableSet<Terminal>, stateOperators: NetworkStateOperators, step: NetworkTraceStep<FeederDirection>, nextPath: NetworkTraceStep.Path): FeederDirection {
+        if (nextPath.fromEquipment is BusbarSection)
+            return step.data
+        val directionApplied = step.data
+        val nextDirection =  when (directionApplied) {
+            FeederDirection.UPSTREAM -> FeederDirection.DOWNSTREAM
+            FeederDirection.DOWNSTREAM -> FeederDirection.UPSTREAM
+            FeederDirection.BOTH -> FeederDirection.BOTH
+            else -> FeederDirection.NONE
+        }
+
+        //
+        // NOTE: Stopping / short-circuiting by checking that the next direction is already present in the toTerminal,
+        //       causes certain looping network configurations not to be reprocessed. This means that some parts of
+        //       loops do not end up with BOTH directions. This is done to stop massive computational blowout on
+        //       large networks with weird looping connectivity that rarely happens in reality.
+        //
+        //       To allow these parts of the loop to be correctly processed without the computational blowout, we allow
+        //       a single re-pass over the loop, controlled by the `reprocessedLoopTerminals` set.
+        //
+        val nextTerminalDirection = stateOperators.getDirection(nextPath.toTerminal)
+        return when {
+            nextDirection == FeederDirection.NONE -> FeederDirection.NONE
+            nextDirection !in nextTerminalDirection -> nextDirection
+            (nextTerminalDirection == FeederDirection.BOTH) && reprocessedLoopTerminals.add(nextPath.toTerminal) -> nextDirection
+            else -> FeederDirection.NONE
+        }
+    }
 
     private fun createTraversal(stateOperators: NetworkStateOperators): NetworkTrace<FeederDirection> {
         // Used to track the loops we have already reprocessed to prevent computation blowouts.
@@ -34,32 +65,7 @@ class SetDirection {
             actionStepType = NetworkTraceActionType.ALL_STEPS,
             { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
             { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
-            computeData = { step: NetworkTraceStep<FeederDirection>, _, nextPath ->
-                val directionApplied = step.data
-                val nextDirection = when (directionApplied) {
-                    FeederDirection.UPSTREAM -> FeederDirection.DOWNSTREAM
-                    FeederDirection.DOWNSTREAM -> FeederDirection.UPSTREAM
-                    FeederDirection.BOTH -> FeederDirection.BOTH
-                    else -> FeederDirection.NONE
-                }
-
-                //
-                // NOTE: Stopping / short-circuiting by checking that the next direction is already present in the toTerminal,
-                //       causes certain looping network configurations not to be reprocessed. This means that some parts of
-                //       loops do not end up with BOTH directions. This is done to stop massive computational blowout on
-                //       large networks with weird looping connectivity that rarely happens in reality.
-                //
-                //       To allow these parts of the loop to be correctly processed without the computational blowout, we allow
-                //       a single re-pass over the loop, controlled by the `reprocessedLoopTerminals` set.
-                //
-                val nextTerminalDirection = stateOperators.getDirection(nextPath.toTerminal)
-                when {
-                    nextDirection == FeederDirection.NONE -> FeederDirection.NONE
-                    nextDirection !in nextTerminalDirection -> nextDirection
-                    (nextTerminalDirection == FeederDirection.BOTH) && reprocessedLoopTerminals.add(nextPath.toTerminal) -> nextDirection
-                    else -> FeederDirection.NONE
-                }
-            }
+            computeData = { step: NetworkTraceStep<FeederDirection>, _, nextPath -> computeData(reprocessedLoopTerminals, stateOperators, step, nextPath) }
         )
             .addCondition { stopAtOpen() }
             .addStopCondition { (path), _ ->

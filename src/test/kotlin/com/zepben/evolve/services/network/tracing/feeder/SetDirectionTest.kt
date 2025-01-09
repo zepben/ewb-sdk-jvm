@@ -12,6 +12,7 @@
 package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.evolve.services.network.tracing.feeder.DirectionValidator.validateDirections
@@ -373,6 +374,28 @@ internal class SetDirectionTest {
         n.getT("b2", 2).validateDirections(NONE)
         n.getT("c3", 1).validateDirections(NONE)
         n.getT("c3", 2).validateDirections(NONE)
+    }
+
+    @Test
+    internal fun setsDirectionThroughBusbars() {
+        //
+        // s0 11--c1--2  1  1--c3--2
+        //               o2
+        val n = TestNetworkBuilder()
+            .fromSource() // s0
+            .toAcls() // c1
+            .toOther<BusbarSection>(numTerminals = 1) // o2
+            .toAcls() // c3
+            .network
+
+        doSetDirectionTrace(n.getT("s0", 1))
+
+        n.getT("s0", 1).validateDirections(DOWNSTREAM)
+        n.getT("c1", 1).validateDirections(UPSTREAM)
+        n.getT("c1", 2).validateDirections(DOWNSTREAM)
+        n.getT("o2", 1).validateDirections(UPSTREAM)
+        n.getT("c3", 1).validateDirections(UPSTREAM)
+        n.getT("c3", 2).validateDirections(DOWNSTREAM)
     }
 
     @Test

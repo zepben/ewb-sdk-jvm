@@ -274,6 +274,7 @@ class NetworkConsumerClient(
      * @param expectedClass The expected type of the fetched container.
      * @param includeEnergizingContainers The level of energizing containers to include equipment from.
      * @param includeEnergizedContainers The level of energized containers to include equipment from.
+     * @param networkState The network state of the equipment.
      *
      * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item couldn't be added to
      * [service], its mRID will be present in [MultiObjectResult.failed].
@@ -287,10 +288,11 @@ class NetworkConsumerClient(
         mRID: String,
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
-        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS,
+        networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE
     ): GrpcResult<MultiObjectResult> =
         tryRpc {
-            val result = getEquipmentContainers(sequenceOf(mRID), expectedClass, includeEnergizingContainers, includeEnergizedContainers)
+            val result = getEquipmentContainers(sequenceOf(mRID), expectedClass, includeEnergizingContainers, includeEnergizedContainers, networkState)
             if (result.wasFailure)
                 throw result.thrown
 
@@ -310,6 +312,7 @@ class NetworkConsumerClient(
      * @param expectedClass The expected type of the fetched containers.
      * @param includeEnergizingContainers The level of energizing containers to include equipment from.
      * @param includeEnergizedContainers The level of energized containers to include equipment from.
+     * @param networkState The network state of the equipment.
      *
      * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed]
@@ -322,9 +325,10 @@ class NetworkConsumerClient(
         mRIDs: Iterable<String>,
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
-        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS,
+        networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE
     ): GrpcResult<MultiObjectResult> =
-        getEquipmentContainers(mRIDs.asSequence(), expectedClass, includeEnergizingContainers, includeEnergizedContainers)
+        getEquipmentContainers(mRIDs.asSequence(), expectedClass, includeEnergizingContainers, includeEnergizedContainers, networkState)
 
     /***
      * Retrieve the equipment container networks for the specified [mRID]s and store the results in the [service].
@@ -336,6 +340,7 @@ class NetworkConsumerClient(
      * @param expectedClass The expected type of the fetched containers.
      * @param includeEnergizingContainers The level of energizing containers to include equipment from.
      * @param includeEnergizedContainers The level of energized containers to include equipment from.
+     * @param networkState The network state of the equipment.
      *
      * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item was not found, or
      * couldn't be added to [service], it will be excluded from the map and its mRID will be present in [MultiObjectResult.failed]
@@ -348,10 +353,11 @@ class NetworkConsumerClient(
         mRIDs: Sequence<String>,
         expectedClass: Class<out EquipmentContainer> = EquipmentContainer::class.java,
         includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
-        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+        includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS,
+        networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE
     ): GrpcResult<MultiObjectResult> =
         getWithReferences(mRIDs, expectedClass) { it, (objects, _) ->
-            objects.putAll(getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers)
+            objects.putAll(getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers, networkState)
                 .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
                 .value.objects
             )
@@ -680,10 +686,29 @@ class NetworkConsumerClient(
 
 }
 
+/***
+ * Retrieve the equipment container network for the specified [mRID] and store the results in the [NetworkConsumerClient.service].
+ *
+ * This is a Kotlin's generic convenience method that will fetch the container object and all the equipment contained, along with all subsequent
+ * references. This should entail a complete connectivity model for the container, however not the connectivity between multiple containers.
+ *
+ * @param mRID The mRID of the [EquipmentContainer] to fetch.
+ * @param includeEnergizingContainers The level of energizing containers to include equipment from.
+ * @param includeEnergizedContainers The level of energized containers to include equipment from.
+ * @param networkState The network state of the equipment.
+ *
+ * @return A [GrpcResult] of a [MultiObjectResult]. If successful, containing a map keyed by mRID of all the objects retrieved. If an item couldn't be added to
+ * [NetworkConsumerClient.service], its mRID will be present in [MultiObjectResult.failed].
+ *
+ * In addition to normal gRPC errors, you may also receive an unsuccessful [GrpcResult] with the following errors:
+ * - [NoSuchElementException] if the requested object was not found.
+ * - [ClassCastException] if the requested object was of the wrong type.
+ */
 inline fun <reified T : EquipmentContainer> NetworkConsumerClient.getEquipmentContainer(
     mRID: String,
     includeEnergizingContainers: IncludedEnergizingContainers = IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
-    includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS
+    includeEnergizedContainers: IncludedEnergizedContainers = IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS,
+    networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE
 ): GrpcResult<MultiObjectResult> {
-    return getEquipmentContainer(mRID, T::class.java, includeEnergizingContainers, includeEnergizedContainers)
+    return getEquipmentContainer(mRID, T::class.java, includeEnergizingContainers, includeEnergizedContainers, networkState)
 }

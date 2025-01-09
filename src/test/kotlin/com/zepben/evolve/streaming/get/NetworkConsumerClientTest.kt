@@ -161,22 +161,31 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
-    internal fun `server receives container options for getEquipmentForContainers`() {
+    internal fun `server receives container options for getting equipment containers`() {
+        val mRID = "f001"
+        val includeEnergizingContainers = IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS
+        val includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+        val networkState = NetworkState.CURRENT_NETWORK_STATE
         consumerService.onGetEquipmentForContainers = spy { request, _ ->
-            assertThat(request.mridsList, containsInAnyOrder("id"))
-            assertThat(request.includeEnergizingContainers, equalTo(IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS))
-            assertThat(request.includeEnergizedContainers, equalTo(IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS))
-            assertThat(request.networkState, equalTo(NetworkState.CURRENT_NETWORK_STATE))
+            assertThat(request.mridsList, containsInAnyOrder(mRID))
+            assertThat(request.includeEnergizingContainers, equalTo(includeEnergizingContainers))
+            assertThat(request.includeEnergizedContainers, equalTo(includeEnergizedContainers))
+            assertThat(request.networkState, equalTo(networkState))
         }
 
-        consumerClient.getEquipmentForContainer(
-            "id",
-            includeEnergizingContainers = IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
-            includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS,
-            networkState = NetworkState.CURRENT_NETWORK_STATE
-        )
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService)
 
-        verify(consumerService.onGetEquipmentForContainers).invoke(any(), any())
+        consumerClient.getEquipmentForContainer(mRID, includeEnergizingContainers, includeEnergizedContainers, networkState)
+        consumerClient.getEquipmentForContainer(Feeder(mRID), includeEnergizingContainers, includeEnergizedContainers, networkState)
+        consumerClient.getEquipmentForContainers(listOf(mRID), includeEnergizingContainers, includeEnergizedContainers, networkState)
+        consumerClient.getEquipmentForContainers(sequenceOf(mRID), includeEnergizingContainers, includeEnergizedContainers, networkState)
+        consumerClient.getEquipmentContainer<Feeder>(mRID, includeEnergizingContainers, includeEnergizedContainers, networkState)
+        consumerClient.getEquipmentContainer(mRID, Feeder::class.java, includeEnergizingContainers, includeEnergizedContainers, networkState)
+        consumerClient.getEquipmentContainers(listOf(mRID), Feeder::class.java, includeEnergizingContainers, includeEnergizedContainers, networkState)
+        consumerClient.getEquipmentContainers(sequenceOf(mRID), Feeder::class.java, includeEnergizingContainers, includeEnergizedContainers, networkState)
+
+        verify(consumerService.onGetEquipmentForContainers, times(8)).invoke(any(), any())
     }
 
     @Test
@@ -470,11 +479,11 @@ internal class NetworkConsumerClientTest {
     @Test
     internal fun `get equipment containers sequence variant coverage`() {
         val expectedResult = mock<GrpcResult<MultiObjectResult>>()
-        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any(), any())
 
         assertThat(consumerClient.getEquipmentContainers(sequenceOf("f001")), equalTo(expectedResult))
 
-        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
+        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any(), any())
     }
 
     @Test
@@ -563,7 +572,7 @@ internal class NetworkConsumerClientTest {
         val connectivityNode = ConnectivityNode()
 
         doReturn(expectedResult).`when`(consumerClient).getEquipmentForContainer(eq(feeder.mRID), any(), any(), any())
-        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainer(eq(feeder.mRID), any(), any(), any())
+        doReturn(expectedResult).`when`(consumerClient).getEquipmentContainer(eq(feeder.mRID), any(), any(), any(), any())
         doReturn(expectedResult).`when`(consumerClient).getEquipmentForRestriction(eq(operationalRestriction.mRID))
         doReturn(expectedResult).`when`(consumerClient).getTerminalsForConnectivityNode(eq(connectivityNode.mRID))
 
@@ -578,13 +587,13 @@ internal class NetworkConsumerClientTest {
         val result1 = mock<GrpcResult<MultiObjectResult>>()
         val result2 = mock<GrpcResult<MultiObjectResult>>()
 
-        doReturn(result1).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
+        doReturn(result1).`when`(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any(), any())
         doReturn(result2).`when`(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any(), any())
 
         assertThat(consumerClient.getEquipmentContainers(listOf("id")), equalTo(result1))
         assertThat(consumerClient.getEquipmentForContainers(listOf("id")), equalTo(result2))
 
-        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any())
+        verify(consumerClient).getEquipmentContainers(any<Sequence<String>>(), any(), any(), any(), any())
         verify(consumerClient).getEquipmentForContainers(any<Sequence<String>>(), any(), any(), any())
     }
 
@@ -675,13 +684,14 @@ internal class NetworkConsumerClientTest {
     internal fun `generic get equipment container calls java interop`() {
         val result = mock<GrpcResult<MultiObjectResult>>()
 
-        doReturn(result).`when`(consumerClient).getEquipmentContainer(any(), any(), any(), any())
+        doReturn(result).`when`(consumerClient).getEquipmentContainer(any(), any(), any(), any(), any())
 
         assertThat(
             consumerClient.getEquipmentContainer<Feeder>(
                 "fdr",
                 IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
-                IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+                IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS,
+                NetworkState.ALL_NETWORK_STATE
             ),
             equalTo(result)
         )
@@ -690,7 +700,8 @@ internal class NetworkConsumerClientTest {
             "fdr",
             Feeder::class.java,
             IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS,
-            IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+            IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS,
+            NetworkState.ALL_NETWORK_STATE
         )
     }
 

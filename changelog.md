@@ -30,7 +30,7 @@
 * Added collection of `EndDeviceFunctionKind` to `EndDevice`
 * Added an unordered collection comparator.
 * Added the energized relationship for the current state of network between `Feeder` and `LvFeeder`.
-* Updated `NetworkConsumer.getEquipmentForContainers` to allow requesting normal, current or all equipments.
+* Updated `NetworkConsumer`'s `getEquipmentForContainers` and `getEquipmentContainers` to allow requesting normal, current or all equipments. 
 
 ### Fixes
 * None.

@@ -35,8 +35,10 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
+import com.zepben.evolve.cim.iec61970.base.wires.Clamp
 import com.zepben.evolve.cim.iec61970.base.wires.Conductor
 import com.zepben.evolve.cim.iec61970.base.wires.Connector
+import com.zepben.evolve.cim.iec61970.base.wires.Cut
 import com.zepben.evolve.cim.iec61970.base.wires.Disconnector
 import com.zepben.evolve.cim.iec61970.base.wires.EarthFaultCompensator
 import com.zepben.evolve.cim.iec61970.base.wires.EnergyConnection
@@ -190,8 +192,10 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSourc
 import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment as PBAcLineSegment
 import com.zepben.protobuf.cim.iec61970.base.wires.Breaker as PBBreaker
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
+import com.zepben.protobuf.cim.iec61970.base.wires.Clamp as PBClamp
 import com.zepben.protobuf.cim.iec61970.base.wires.Conductor as PBConductor
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
+import com.zepben.protobuf.cim.iec61970.base.wires.Cut as PBCut
 import com.zepben.protobuf.cim.iec61970.base.wires.Disconnector as PBDisconnector
 import com.zepben.protobuf.cim.iec61970.base.wires.EarthFaultCompensator as PBEarthFaultCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConnection as PBEnergyConnection
@@ -1730,6 +1734,10 @@ fun PowerElectronicsWindUnit.toPb(): PBPowerElectronicsWindUnit = toPb(this, PBP
 fun toPb(cim: AcLineSegment, pb: PBAcLineSegment.Builder): PBAcLineSegment.Builder =
     pb.apply {
         cim.perLengthImpedance?.let { perLengthImpedanceMRID = it.mRID } ?: clearPerLengthImpedanceMRID()
+        clearCutMRIDs()
+        cim.cuts.forEach { addCutMRIDs(it.mRID) }
+        clearClampMRIDs()
+        cim.clamps.forEach { addClampMRIDs(it.mRID) }
         toPb(cim, cdBuilder)
     }
 
@@ -1757,6 +1765,20 @@ fun toPb(cim: BusbarSection, pb: PBBusbarSection.Builder): PBBusbarSection.Build
     pb.apply { toPb(cim, cnBuilder) }
 
 /**
+ * Convert the [Clamp] into its protobuf counterpart.
+ *
+ * @param cim The [Clamp] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: Clamp, pb: PBClamp.Builder): PBClamp.Builder =
+    pb.apply {
+        lengthFromTerminal1 = cim.lengthFromTerminal1 ?: UNKNOWN_DOUBLE
+        cim.acLineSegment?.let { acLineSegmentMRID = it.mRID } ?: clearAcLineSegmentMRID()
+        toPb(cim, ceBuilder)
+    }
+
+/**
  * Convert the [Conductor] into its protobuf counterpart.
  *
  * @param cim The [Conductor] to convert.
@@ -1780,6 +1802,20 @@ fun toPb(cim: Conductor, pb: PBConductor.Builder): PBConductor.Builder =
  */
 fun toPb(cim: Connector, pb: PBConnector.Builder): PBConnector.Builder =
     pb.apply { toPb(cim, ceBuilder) }
+
+/**
+ * Convert the [Cut] into its protobuf counterpart.
+ *
+ * @param cim The [Cut] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: Cut, pb: PBCut.Builder): PBCut.Builder =
+    pb.apply {
+        lengthFromTerminal1 = cim.lengthFromTerminal1 ?: UNKNOWN_DOUBLE
+        cim.acLineSegment?.let { acLineSegmentMRID = it.mRID } ?: clearAcLineSegmentMRID()
+        toPb(cim, swBuilder)
+    }
 
 /**
  * Convert the [Disconnector] into its protobuf counterpart.
@@ -2525,6 +2561,16 @@ fun Breaker.toPb(): PBBreaker = toPb(this, PBBreaker.newBuilder()).build()
 fun BusbarSection.toPb(): PBBusbarSection = toPb(this, PBBusbarSection.newBuilder()).build()
 
 /**
+ * An extension for converting any Clamp into its protobuf counterpart.
+ */
+fun Clamp.toPb(): PBClamp = toPb(this, PBClamp.newBuilder()).build()
+
+/**
+ * An extension for converting any Cut into its protobuf counterpart.
+ */
+fun Cut.toPb(): PBCut = toPb(this, PBCut.newBuilder()).build()
+
+/**
  * An extension for converting any Disconnector into its protobuf counterpart.
  */
 fun Disconnector.toPb(): PBDisconnector = toPb(this, PBDisconnector.newBuilder()).build()
@@ -3252,6 +3298,22 @@ class NetworkCimToProto : BaseCimToProto() {
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: BusbarSection): PBBusbarSection = cim.toPb()
+
+    /**
+     * Convert the [Clamp] into its protobuf counterpart.
+     *
+     * @param cim The [Clamp] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: Clamp): PBClamp = cim.toPb()
+
+    /**
+     * Convert the [Cut] into its protobuf counterpart.
+     *
+     * @param cim The [Cut] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: Cut): PBCut = cim.toPb()
 
     /**
      * Convert the [Disconnector] into its protobuf counterpart.

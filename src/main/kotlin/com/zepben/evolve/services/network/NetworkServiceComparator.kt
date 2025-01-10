@@ -731,6 +731,8 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareConductor()
 
             compareIdReferences(AcLineSegment::perLengthImpedance)
+            compareIdReferenceCollections(AcLineSegment::cuts)
+            compareIdReferenceCollections(AcLineSegment::clamps)
         }
 
     private fun compareBreaker(source: Breaker, target: Breaker): ObjectDifference<Breaker> =
@@ -743,6 +745,14 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private fun compareBusbarSection(source: BusbarSection, target: BusbarSection): ObjectDifference<BusbarSection> =
         ObjectDifference(source, target).apply { compareConnector() }
 
+    private fun compareClamp(source: Clamp, target: Clamp): ObjectDifference<Clamp> =
+        ObjectDifference(source, target).apply {
+            compareConductingEquipment()
+
+            compareValues(Clamp::lengthFromTerminal1)
+            compareIdReferences(Clamp::acLineSegment)
+        }
+
     private fun ObjectDifference<out Conductor>.compareConductor(): ObjectDifference<out Conductor> =
         apply {
             compareConductingEquipment()
@@ -752,6 +762,14 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
     private fun ObjectDifference<out Connector>.compareConnector(): ObjectDifference<out Connector> =
         apply { compareConductingEquipment() }
+
+    private fun compareCut(source: Cut, target: Cut): ObjectDifference<Cut> =
+        ObjectDifference(source, target).apply {
+            compareSwitch()
+
+            compareValues(Cut::lengthFromTerminal1)
+            compareIdReferences(Cut::acLineSegment)
+        }
 
     private fun compareDisconnector(source: Disconnector, target: Disconnector): ObjectDifference<Disconnector> =
         ObjectDifference(source, target).apply { compareSwitch() }

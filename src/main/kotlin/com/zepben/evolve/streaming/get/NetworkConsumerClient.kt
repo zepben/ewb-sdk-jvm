@@ -619,6 +619,8 @@ class NetworkConsumerClient(
             BATTERYCONTROL -> extractResult(io.batteryControl.mRID()) { addFromPb(io.batteryControl) }
             STATICVARCOMPENSATOR -> extractResult(io.staticVarCompensator.mRID()) { addFromPb(io.staticVarCompensator) }
             PERLENGTHPHASEIMPEDANCE -> extractResult(io.perLengthPhaseImpedance.mRID()) { addFromPb(io.perLengthPhaseImpedance) }
+            CUT -> extractResult(io.cut.mRID()) { addFromPb(io.cut) }
+            CLAMP -> extractResult(io.clamp.mRID()) { addFromPb(io.clamp) }
             OTHER, IDENTIFIEDOBJECT_NOT_SET, null -> throw UnsupportedOperationException(
                 "Identified object type ${io.identifiedObjectCase} is not supported by the network service"
             )

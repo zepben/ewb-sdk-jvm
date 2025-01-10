@@ -199,6 +199,8 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         validateSchema(SchemaServices.networkServicesOf(::Breaker, Breaker::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::BusbarSection, BusbarSection::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::Disconnector, Disconnector::fillFields))
+        validateSchema(SchemaServices.networkServicesOf(::Clamp, Clamp::fillFields))
+        validateSchema(SchemaServices.networkServicesOf(::Cut, Cut::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::EnergyConsumer, EnergyConsumer::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::EnergyConsumerPhase, EnergyConsumerPhase::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::EnergySource, EnergySource::fillFields).also { Tracing.setPhases().run(it) })

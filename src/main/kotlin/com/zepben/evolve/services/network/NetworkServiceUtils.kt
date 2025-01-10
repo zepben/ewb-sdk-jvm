@@ -145,6 +145,8 @@ import com.zepben.evolve.services.customer.CustomerService
  * @param isBatteryControl Handler when the [identifiedObject] is a [BatteryControl]
  * @param isStaticVarCompensator Handler when the [identifiedObject] is a [StaticVarCompensator]
  * @param isPerLengthPhaseImpedance Handler when the [identifiedObject] is a [PerLengthPhaseImpedance]
+ * @param isCut Handler when the [identifiedObject] is a [Cut]
+ * @param isClamp Handler when the [identifiedObject] is a [Clamp]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -234,6 +236,8 @@ inline fun <R> whenNetworkServiceObject(
     isBatteryControl: (BatteryControl) -> R,
     isStaticVarCompensator: (StaticVarCompensator) -> R,
     isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> R,
+    isCut: (Cut) -> R,
+    isClamp: (Clamp) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -322,5 +326,7 @@ inline fun <R> whenNetworkServiceObject(
     is BatteryControl -> isBatteryControl(identifiedObject)
     is StaticVarCompensator -> isStaticVarCompensator(identifiedObject)
     is PerLengthPhaseImpedance -> isPerLengthPhaseImpedance(identifiedObject)
+    is Cut -> isCut(identifiedObject)
+    is Clamp -> isClamp(identifiedObject)
     else -> isOther(identifiedObject)
 }

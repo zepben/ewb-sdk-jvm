@@ -148,6 +148,8 @@ internal class NetworkServiceUtilsTest {
         isBatteryControl: (BatteryControl) -> String,
         isStaticVarCompensator: (StaticVarCompensator) -> String,
         isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> String,
+        isCut: (Cut) -> String,
+        isClamp: (Clamp) -> String,
         isOther: (IdentifiedObject) -> String
     ): String = whenNetworkServiceObject(
         identifiedObject,
@@ -235,6 +237,8 @@ internal class NetworkServiceUtilsTest {
         isBatteryControl = isBatteryControl,
         isStaticVarCompensator = isStaticVarCompensator,
         isPerLengthPhaseImpedance = isPerLengthPhaseImpedance,
+        isCut = isCut,
+        isClamp = isClamp,
         isOther = isOther
     )
 
@@ -324,6 +328,8 @@ internal class NetworkServiceUtilsTest {
         isBatteryControl: InvokeChecker<BatteryControl> = NeverInvokedChecker(),
         isStaticVarCompensator: InvokeChecker<StaticVarCompensator> = NeverInvokedChecker(),
         isPerLengthPhaseImpedance: InvokeChecker<PerLengthPhaseImpedance> = NeverInvokedChecker(),
+        isCut: InvokeChecker<Cut> = NeverInvokedChecker(),
+        isClamp: InvokeChecker<Clamp> = NeverInvokedChecker(),
         isOther: InvokeChecker<IdentifiedObject> = NeverInvokedChecker()
     ) {
         val returnValue = whenNetworkServiceObjectProxy(
@@ -412,6 +418,8 @@ internal class NetworkServiceUtilsTest {
             isBatteryControl = isBatteryControl,
             isStaticVarCompensator = isStaticVarCompensator,
             isPerLengthPhaseImpedance = isPerLengthPhaseImpedance,
+            isCut = isCut,
+            isClamp = isClamp,
             isOther = isOther
         )
 
@@ -496,6 +504,12 @@ internal class NetworkServiceUtilsTest {
         isPetersenCoil.verifyInvoke()
         isReactiveCapabilityCurve.verifyInvoke()
         isSynchronousMachine.verifyInvoke()
+        isPanDemandResponseFunction.verifyInvoke()
+        isBatteryControl.verifyInvoke()
+        isStaticVarCompensator.verifyInvoke()
+        isPerLengthPhaseImpedance.verifyInvoke()
+        isCut.verifyInvoke()
+        isClamp.verifyInvoke()
         isOther.verifyInvoke()
     }
 
@@ -590,6 +604,8 @@ internal class NetworkServiceUtilsTest {
         BatteryControl().also { whenNetworkServiceObjectTester(it, isBatteryControl = InvokedChecker(it)) }
         StaticVarCompensator().also { whenNetworkServiceObjectTester(it, isStaticVarCompensator = InvokedChecker(it)) }
         PerLengthPhaseImpedance().also { whenNetworkServiceObjectTester(it, isPerLengthPhaseImpedance = InvokedChecker(it)) }
+        Cut().also { whenNetworkServiceObjectTester(it, isCut = InvokedChecker(it)) }
+        Clamp().also { whenNetworkServiceObjectTester(it, isClamp = InvokedChecker(it)) }
         object : IdentifiedObject() {}.also { whenNetworkServiceObjectTester(it, isOther = InvokedChecker(it)) }
     }
 }

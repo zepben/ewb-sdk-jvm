@@ -998,6 +998,11 @@ fun AcLineSegment.fillFields(service: NetworkService, includeRuntime: Boolean = 
     (this as Conductor).fillFields(service, includeRuntime)
 
     perLengthImpedance = PerLengthSequenceImpedance().also { service.add(it) }
+    @Suppress("unused")
+    for (i in 0..1) {
+        addCut(Cut().also { service.add(it) })
+        addClamp(Clamp().also { service.add(it) })
+    }
 
     return this
 }
@@ -1015,6 +1020,18 @@ fun BusbarSection.fillFields(service: NetworkService, includeRuntime: Boolean = 
     return this
 }
 
+fun Clamp.fillFields(service: NetworkService, includeRuntime: Boolean = true): Clamp {
+    (this as ConductingEquipment).fillFields(service, includeRuntime)
+
+    lengthFromTerminal1 = 1.1
+    acLineSegment = AcLineSegment().also {
+        it.addClamp(this)
+        service.add(it)
+    }
+
+    return this
+}
+
 fun Conductor.fillFields(service: NetworkService, includeRuntime: Boolean = true): Conductor {
     (this as ConductingEquipment).fillFields(service, includeRuntime)
 
@@ -1028,6 +1045,18 @@ fun Conductor.fillFields(service: NetworkService, includeRuntime: Boolean = true
 
 fun Connector.fillFields(service: NetworkService, includeRuntime: Boolean = true): Connector {
     (this as ConductingEquipment).fillFields(service, includeRuntime)
+    return this
+}
+
+fun Cut.fillFields(service: NetworkService, includeRuntime: Boolean = true): Cut {
+    (this as Switch).fillFields(service, includeRuntime)
+
+    lengthFromTerminal1 = 1.1
+    acLineSegment = AcLineSegment().also {
+        it.addCut(this)
+        service.add(it)
+    }
+
     return this
 }
 

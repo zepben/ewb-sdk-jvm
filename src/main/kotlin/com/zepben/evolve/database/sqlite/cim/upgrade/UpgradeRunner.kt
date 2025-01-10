@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.*
 import java.sql.*
+import kotlin.Throws
 
 /**
  * Upgrade the schema in one of our databases to the latest version.
@@ -42,7 +43,8 @@ class UpgradeRunner @JvmOverloads constructor(
         changeSet54(),
         changeSet55(),
         changeSet56(),
-        changeSet57()
+        changeSet57(),
+        changeSet58()
     ),
     private val tableVersion: TableVersion = tableCimVersion
 ) {

@@ -1629,6 +1629,27 @@ class NetworkCimReader(
         return loadConnector(busbarSection, table, resultSet) && service.addOrThrow(busbarSection)
     }
 
+    /**
+     * Create a [Clamp] and populate its fields from [TableClamps].
+     *
+     * @param table The database table to read the [Clamp] fields from.
+     * @param resultSet The record in the database table containing the fields for this [Clamp].
+     * @param setIdentifier A callback to register the mRID of this [Clamp] for logging purposes.
+     *
+     * @return true if the [Clamp] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableClamps, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val clamp = Clamp(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            lengthFromTerminal1 = resultSet.getNullableDouble(table.LENGTH_FROM_TERMINAL_1.queryIndex)
+            acLineSegment = service.ensureGet(resultSet.getString(table.AC_LINE_SEGMENT_MRID.queryIndex), typeNameAndMRID())
+            acLineSegment?.addClamp(this)
+        }
+
+        return loadConductingEquipment(clamp, table, resultSet) && service.addOrThrow(clamp)
+    }
+
     @Throws(SQLException::class)
     private fun loadConductor(conductor: Conductor, table: TableConductors, resultSet: ResultSet): Boolean {
         conductor.apply {
@@ -1647,6 +1668,27 @@ class NetworkCimReader(
     @Throws(SQLException::class)
     private fun loadConnector(connector: Connector, table: TableConnectors, resultSet: ResultSet): Boolean =
         loadConductingEquipment(connector, table, resultSet)
+
+    /**
+     * Create a [Cut] and populate its fields from [TableCuts].
+     *
+     * @param table The database table to read the [Cut] fields from.
+     * @param resultSet The record in the database table containing the fields for this [Cut].
+     * @param setIdentifier A callback to register the mRID of this [Cut] for logging purposes.
+     *
+     * @return true if the [Cut] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun load(table: TableCuts, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val cut = Cut(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            lengthFromTerminal1 = resultSet.getNullableDouble(table.LENGTH_FROM_TERMINAL_1.queryIndex)
+            acLineSegment = service.ensureGet(resultSet.getString(table.AC_LINE_SEGMENT_MRID.queryIndex), typeNameAndMRID())
+            acLineSegment?.addCut(this)
+        }
+
+        return loadSwitch(cut, table, resultSet) && service.addOrThrow(cut)
+    }
 
     /**
      * Create a [Disconnector] and populate its fields from [TableDisconnectors].

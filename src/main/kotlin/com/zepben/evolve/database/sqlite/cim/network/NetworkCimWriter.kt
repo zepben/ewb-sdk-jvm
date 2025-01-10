@@ -1515,6 +1515,25 @@ class NetworkCimWriter(
         return saveConnector(table, insert, busbarSection, "busbar section")
     }
 
+    /**
+     * Save the [Clamp] fields to [TableClamps].
+     *
+     * @param clamp The [Clamp] instance to write to the database.
+     *
+     * @return true if the [Clamp] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(clamp: Clamp): Boolean {
+        val table = databaseTables.getTable<TableClamps>()
+        val insert = databaseTables.getInsert<TableClamps>()
+
+        insert.setNullableDouble(table.LENGTH_FROM_TERMINAL_1.queryIndex, clamp.lengthFromTerminal1)
+        insert.setNullableString(table.AC_LINE_SEGMENT_MRID.queryIndex, clamp.acLineSegment?.mRID)
+
+        return saveConductingEquipment(table, insert, clamp, "clamp")
+    }
+
     @Throws(SQLException::class)
     private fun saveConductor(table: TableConductors, insert: PreparedStatement, conductor: Conductor, description: String): Boolean {
         insert.setNullableDouble(table.LENGTH.queryIndex, conductor.length)
@@ -1528,6 +1547,25 @@ class NetworkCimWriter(
     @Throws(SQLException::class)
     private fun saveConnector(table: TableConnectors, insert: PreparedStatement, connector: Connector, description: String): Boolean {
         return saveConductingEquipment(table, insert, connector, description)
+    }
+
+    /**
+     * Save the [Cut] fields to [TableCuts].
+     *
+     * @param cut The [Cut] instance to write to the database.
+     *
+     * @return true if the [Cut] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun save(cut: Cut): Boolean {
+        val table = databaseTables.getTable<TableCuts>()
+        val insert = databaseTables.getInsert<TableCuts>()
+
+        insert.setNullableDouble(table.LENGTH_FROM_TERMINAL_1.queryIndex, cut.lengthFromTerminal1)
+        insert.setNullableString(table.AC_LINE_SEGMENT_MRID.queryIndex, cut.acLineSegment?.mRID)
+
+        return saveSwitch(table, insert, cut, "cut")
     }
 
     /**

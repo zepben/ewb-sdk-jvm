@@ -1038,6 +1038,8 @@ internal class NetworkConsumerClientTest {
                 isBatteryControl = { batteryControl = it.toPb() },
                 isStaticVarCompensator = { staticVarCompensator = it.toPb() },
                 isPerLengthPhaseImpedance = { perLengthPhaseImpedance = it.toPb() },
+                isCut = { cut = it.toPb() },
+                isClamp = { clamp = it.toPb() },
             )
         }
 

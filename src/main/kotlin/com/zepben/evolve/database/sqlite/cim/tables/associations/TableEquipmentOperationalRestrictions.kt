@@ -22,8 +22,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 class TableEquipmentOperationalRestrictions : SqliteTable() {
 
     val EQUIPMENT_MRID: Column = Column(++columnIndex, "equipment_mrid", "TEXT", NOT_NULL)
-    val OPERATIONAL_RESTRICTION_MRID: Column =
-        Column(++columnIndex, "operational_restriction_mrid", "TEXT", NOT_NULL)
+    val OPERATIONAL_RESTRICTION_MRID: Column = Column(++columnIndex, "operational_restriction_mrid", "TEXT", NOT_NULL)
 
     override val name: String = "equipment_operational_restrictions"
 

@@ -57,7 +57,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private var options: NetworkServiceComparatorOptions = NetworkServiceComparatorOptions.all()
 ) : BaseServiceComparator() {
 
-    /************ EXTENSION IEC61968 METERING ************/
+    // ###############################
+    // # EXTENSION IEC61968 METERING #
+    // ###############################
 
     private fun comparePanDemandResponseFunction(
         source: PanDemandResponseFunction,
@@ -69,7 +71,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareValues(PanDemandResponseFunction::kind, PanDemandResponseFunction::applianceBitmask)
         }
 
-    /************ EXTENSION IEC61970 BASE WIRES ************/
+    // #################################
+    // # EXTENSION IEC61970 BASE WIRES #
+    // #################################
 
     private fun compareBatteryControl(source: BatteryControl, target: BatteryControl): ObjectDifference<BatteryControl> =
         ObjectDifference(source, target).apply {
@@ -83,7 +87,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             )
         }
 
-    /************ IEC61968 ASSET INFO ************/
+    // #######################
+    // # IEC61968 ASSET INFO #
+    // #######################
 
     private fun compareCableInfo(source: CableInfo, target: CableInfo): ObjectDifference<CableInfo> =
         ObjectDifference(source, target).apply { compareWireInfo() }
@@ -201,7 +207,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareValues(WireInfo::ratedCurrent, WireInfo::material)
         }
 
-    /************ IEC61968 ASSETS ************/
+    // ###################
+    // # IEC61968 ASSETS #
+    // ###################
 
     private fun ObjectDifference<out Asset>.compareAsset(): ObjectDifference<out Asset> =
         apply {
@@ -226,9 +234,6 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private fun compareAssetOwner(source: AssetOwner, target: AssetOwner): ObjectDifference<AssetOwner> =
         ObjectDifference(source, target).apply { compareAssetOrganisationRole() }
 
-    private fun ObjectDifference<out Structure>.compareStructure(): ObjectDifference<out Structure> =
-        apply { compareAssetContainer() }
-
     private fun comparePole(source: Pole, target: Pole): ObjectDifference<Pole> =
         ObjectDifference(source, target).apply {
             compareStructure()
@@ -245,7 +250,12 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(Streetlight::pole)
         }
 
-    /************ IEC61968 COMMON ************/
+    private fun ObjectDifference<out Structure>.compareStructure(): ObjectDifference<out Structure> =
+        apply { compareAssetContainer() }
+
+    // ###################
+    // # IEC61968 COMMON #
+    // ###################
 
     private fun compareLocation(source: Location, target: Location): ObjectDifference<Location> =
         ObjectDifference(source, target).apply {
@@ -255,15 +265,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIndexedValueCollections(Location::points)
         }
 
-    /************ IEC61968 infIEC61968 InfAssetInfo ************/
-
-    private fun compareRelayInfo(source: RelayInfo, target: RelayInfo): ObjectDifference<RelayInfo> =
-        ObjectDifference(source, target).apply {
-            compareAssetInfo()
-
-            compareValues(RelayInfo::curveSetting, RelayInfo::recloseFast)
-            compareIndexedValueCollections(RelayInfo::recloseDelays)
-        }
+    // #####################################
+    // # IEC61968 infIEC61968 InfAssetInfo #
+    // #####################################
 
     private fun compareCurrentTransformerInfo(source: CurrentTransformerInfo, target: CurrentTransformerInfo): ObjectDifference<CurrentTransformerInfo> =
         ObjectDifference(source, target).apply {
@@ -302,7 +306,17 @@ class NetworkServiceComparator @JvmOverloads constructor(
             )
         }
 
-    /************ IEC61968 METERING ************/
+    private fun compareRelayInfo(source: RelayInfo, target: RelayInfo): ObjectDifference<RelayInfo> =
+        ObjectDifference(source, target).apply {
+            compareAssetInfo()
+
+            compareValues(RelayInfo::curveSetting, RelayInfo::recloseFast)
+            compareIndexedValueCollections(RelayInfo::recloseDelays)
+        }
+
+    // #####################
+    // # IEC61968 METERING #
+    // #####################
 
     private fun ObjectDifference<out EndDevice>.compareEndDevice(): ObjectDifference<out EndDevice> =
         apply {
@@ -342,7 +356,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 compareIdReferenceCollections(UsagePoint::equipment, UsagePoint::endDevices)
         }
 
-    /************ IEC61968 OPERATIONS ************/
+    // #######################
+    // # IEC61968 OPERATIONS #
+    // #######################
 
     private fun compareOperationalRestriction(source: OperationalRestriction, target: OperationalRestriction): ObjectDifference<OperationalRestriction> =
         ObjectDifference(source, target).apply {
@@ -351,7 +367,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferenceCollections(OperationalRestriction::equipment)
         }
 
-    /************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
+    // #####################################
+    // # IEC61970 BASE AUXILIARY EQUIPMENT #
+    // #####################################
 
     private fun ObjectDifference<out AuxiliaryEquipment>.compareAuxiliaryEquipment(): ObjectDifference<out AuxiliaryEquipment> =
         apply {
@@ -385,7 +403,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferenceCollections(Sensor::relayFunctions)
         }
 
-    /************ IEC61970 BASE CORE ************/
+    // ######################
+    // # IEC61970 BASE CORE #
+    // ######################
 
     private fun ObjectDifference<out AcDcTerminal>.compareAcDcTerminal(): ObjectDifference<out AcDcTerminal> =
         apply { compareIdentifiedObject() }
@@ -508,7 +528,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             addIfDifferent(Terminal::currentPhases.name, Terminal::currentPhases.compareValues(source, target) { it.phaseStatusInternal })
         }
 
-    /************ IEC61970 BASE EQUIVALENTS ************/
+    // #############################
+    // # IEC61970 BASE EQUIVALENTS #
+    // #############################
 
     private fun compareEquivalentBranch(source: EquivalentBranch, target: EquivalentBranch): ObjectDifference<EquivalentBranch> =
         ObjectDifference(source, target).apply {
@@ -537,7 +559,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
     private fun ObjectDifference<out EquivalentEquipment>.compareEquivalentEquipment(): ObjectDifference<out EquivalentEquipment> =
         apply { compareConductingEquipment() }
 
-    /************ IEC61970 BASE MEAS ************/
+    // ######################
+    // # IEC61970 BASE MEAS #
+    // ######################
 
     private fun compareAccumulator(source: Accumulator, target: Accumulator): ObjectDifference<Accumulator> =
         ObjectDifference(source, target).apply {
@@ -575,7 +599,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(Measurement::remoteSource)
         }
 
-    /************ IEC61970 Base Protection ************/
+    // ############################
+    // # IEC61970 Base Protection #
+    // ############################
 
     private fun compareCurrentRelay(source: CurrentRelay, target: CurrentRelay): ObjectDifference<CurrentRelay> =
         ObjectDifference(source, target).apply {
@@ -642,7 +668,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareProtectionRelayFunction()
         }
 
-    /************ IEC61970 BASE SCADA ************/
+    // #######################
+    // # IEC61970 BASE SCADA #
+    // #######################
 
     private fun compareRemoteControl(source: RemoteControl, target: RemoteControl): ObjectDifference<RemoteControl> =
         ObjectDifference(source, target).apply {
@@ -661,7 +689,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(RemoteSource::measurement)
         }
 
-    /************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
+    // #############################################
+    // # IEC61970 BASE WIRES GENERATION PRODUCTION #
+    // #############################################
 
     private fun compareBatteryUnit(source: BatteryUnit, target: BatteryUnit): ObjectDifference<BatteryUnit> =
         ObjectDifference(source, target).apply {
@@ -692,7 +722,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             comparePowerElectronicsUnit()
         }
 
-    /************ IEC61970 BASE WIRES ************/
+    // #######################
+    // # IEC61970 BASE WIRES #
+    // #######################
 
     private fun compareAcLineSegment(source: AcLineSegment, target: AcLineSegment): ObjectDifference<AcLineSegment> =
         ObjectDifference(source, target).apply {
@@ -707,9 +739,6 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
             compareValues(Breaker::inTransitTime)
         }
-
-    private fun compareLoadBreakSwitch(source: LoadBreakSwitch, target: LoadBreakSwitch): ObjectDifference<LoadBreakSwitch> =
-        ObjectDifference(source, target).apply { compareProtectedSwitch() }
 
     private fun compareBusbarSection(source: BusbarSection, target: BusbarSection): ObjectDifference<BusbarSection> =
         ObjectDifference(source, target).apply { compareConnector() }
@@ -849,6 +878,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 LinearShuntCompensator::gPerSection
             )
         }
+
+    private fun compareLoadBreakSwitch(source: LoadBreakSwitch, target: LoadBreakSwitch): ObjectDifference<LoadBreakSwitch> =
+        ObjectDifference(source, target).apply { compareProtectedSwitch() }
 
     private fun ObjectDifference<out PerLengthImpedance>.comparePerLengthImpedance(): ObjectDifference<out PerLengthImpedance> =
         apply { comparePerLengthLineParameter() }
@@ -998,6 +1030,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareValues(RatioTapChanger::stepVoltageIncrement)
         }
 
+    private fun compareReactiveCapabilityCurve(source: ReactiveCapabilityCurve, target: ReactiveCapabilityCurve): ObjectDifference<ReactiveCapabilityCurve> =
+        ObjectDifference(source, target).apply { compareCurve() }
+
     private fun compareRecloser(source: Recloser, target: Recloser): ObjectDifference<Recloser> =
         ObjectDifference(source, target).apply { compareProtectedSwitch() }
 
@@ -1030,9 +1065,6 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferenceCollections(RegulatingControl::regulatingCondEqs)
         }
 
-    private fun compareReactiveCapabilityCurve(source: ReactiveCapabilityCurve, target: ReactiveCapabilityCurve): ObjectDifference<ReactiveCapabilityCurve> =
-        ObjectDifference(source, target).apply { compareCurve() }
-
     private fun ObjectDifference<out RotatingMachine>.compareRotatingMachine(): ObjectDifference<out RotatingMachine> =
         apply {
             compareRegulatingCondEq()
@@ -1061,15 +1093,6 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareValues(ShuntCompensator::grounded, ShuntCompensator::nomU, ShuntCompensator::phaseConnection, ShuntCompensator::sections)
         }
 
-    private fun ObjectDifference<out Switch>.compareSwitch(): ObjectDifference<out Switch> =
-        apply {
-            compareConductingEquipment()
-
-            compareValues(Switch::ratedCurrent)
-            addIfDifferent("isNormallyOpen", compareOpenStatus(source, target, Switch::isNormallyOpen))
-            addIfDifferent("isOpen", compareOpenStatus(source, target, Switch::isOpen))
-        }
-
     private fun compareStaticVarCompensator(source: StaticVarCompensator, target: StaticVarCompensator): ObjectDifference<StaticVarCompensator> =
         ObjectDifference(source, target).apply {
             compareRegulatingCondEq()
@@ -1081,6 +1104,15 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 StaticVarCompensator::svcControlMode,
                 StaticVarCompensator::voltageSetPoint
             )
+        }
+
+    private fun ObjectDifference<out Switch>.compareSwitch(): ObjectDifference<out Switch> =
+        apply {
+            compareConductingEquipment()
+
+            compareValues(Switch::ratedCurrent)
+            addIfDifferent("isNormallyOpen", compareOpenStatus(source, target, Switch::isNormallyOpen))
+            addIfDifferent("isOpen", compareOpenStatus(source, target, Switch::isOpen))
         }
 
     private fun compareSynchronousMachine(source: SynchronousMachine, target: SynchronousMachine): ObjectDifference<SynchronousMachine> =
@@ -1165,7 +1197,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdReferences(TransformerStarImpedance::transformerEndInfo)
         }
 
-    /************ IEC61970 InfIEC61970 Feeder ************/
+    // ###############################
+    // # IEC61970 InfIEC61970 Feeder #
+    // ###############################
 
     private fun compareCircuit(source: Circuit, target: Circuit): ObjectDifference<Circuit> =
         ObjectDifference(source, target).apply {
@@ -1193,7 +1227,9 @@ class NetworkServiceComparator @JvmOverloads constructor(
                 compareIdReferenceCollections(LvFeeder::currentEquipment)
         }
 
-    /************ IEC61970 InfIEC61970 WIRES GENERATION PRODUCTION ************/
+    // ####################################################
+    // # IEC61970 InfIEC61970 WIRES GENERATION PRODUCTION #
+    // ####################################################
 
     private fun compareEvChargingUnit(source: EvChargingUnit, target: EvChargingUnit): ObjectDifference<EvChargingUnit> =
         ObjectDifference(source, target).apply {

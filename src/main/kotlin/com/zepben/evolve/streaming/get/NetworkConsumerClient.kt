@@ -370,6 +370,7 @@ class NetworkConsumerClient(
      * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
      *
      * @param loop The [Loop] to fetch equipment for.
+     * @param networkState The network state of the equipment.
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
@@ -377,8 +378,8 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForLoop(loop: Loop): GrpcResult<MultiObjectResult> =
-        getEquipmentForLoop(loop.mRID)
+    fun getEquipmentForLoop(loop: Loop, networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE): GrpcResult<MultiObjectResult> =
+        getEquipmentForLoop(loop.mRID, networkState)
 
     /**
      * Retrieve the [Equipment] for the [Loop] represented by [mRID]
@@ -386,6 +387,7 @@ class NetworkConsumerClient(
      * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
      *
      * @param mRID The mRID of the [Loop] to fetch equipment for.
+     * @param networkState The network state of the equipment.
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
@@ -393,14 +395,14 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getEquipmentForLoop(mRID: String): GrpcResult<MultiObjectResult> =
+    fun getEquipmentForLoop(mRID: String, networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE): GrpcResult<MultiObjectResult> =
         getWithReferences(mRID, Loop::class.java) { loop, (objects, _) ->
             objects.putAll(loop.circuits.associateBy { it.mRID })
             objects.putAll(loop.substations.associateBy { it.mRID })
             objects.putAll(loop.energizingSubstations.associateBy { it.mRID })
 
             val containers = loop.circuits.asSequence() + loop.substations.asSequence() + loop.energizingSubstations.asSequence()
-            objects.putAll(getEquipmentForContainers(containers.map { it.mRID })
+            objects.putAll(getEquipmentForContainers(containers.map { it.mRID }, networkState = networkState)
                 .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
                 .value.objects)
             null
@@ -411,6 +413,7 @@ class NetworkConsumerClient(
      *
      * Exceptions that occur during retrieval will be caught and passed to all error handlers that have been registered against this client.
      *
+     * @param networkState The network state of the equipment.
      *
      * @return A [GrpcResult] with a result of one of the following:
      * - When [GrpcResult.wasSuccessful], a map containing the retrieved objects keyed by mRID, accessible via [GrpcResult.value]. If an item was not found, or
@@ -418,7 +421,7 @@ class NetworkConsumerClient(
      * - When [GrpcResult.wasFailure], the error that occurred retrieving or processing the object, accessible via [GrpcResult.thrown].
      * Note the [NetworkConsumerClient] warning in this case.
      */
-    fun getAllLoops(): GrpcResult<MultiObjectResult> {
+    fun getAllLoops(networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE): GrpcResult<MultiObjectResult> {
         val response = getNetworkHierarchy()
         val hierarchy = response.onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }.value
 
@@ -434,7 +437,7 @@ class NetworkConsumerClient(
             .asSequence()
             .flatMap { it.circuits.asSequence() + it.substations.asSequence() + it.energizingSubstations.asSequence() }
             .distinct()
-            .map { it.mRID })
+            .map { it.mRID }, networkState = networkState)
             .onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }
             .value.objects
         )

@@ -161,31 +161,59 @@ internal class NetworkConsumerClientTest {
     }
 
     @Test
-    internal fun `server receives container options for getting equipment containers`() {
+    internal fun `onGetEquipmentForContainers receives options for getEquipmentForContainer`() {
         val mRID = "f001"
         val includeEnergizingContainers = IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS
         val includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
         val networkState = NetworkState.CURRENT_NETWORK_STATE
-        consumerService.onGetEquipmentForContainers = spy { request, _ ->
-            assertThat(request.mridsList, containsInAnyOrder(mRID))
-            assertThat(request.includeEnergizingContainers, equalTo(includeEnergizingContainers))
-            assertThat(request.includeEnergizedContainers, equalTo(includeEnergizedContainers))
-            assertThat(request.networkState, equalTo(networkState))
-        }
-
-        val expectedService = FeederNetwork.create()
-        configureFeederResponses(expectedService)
+        configureGetEquipmentForContainersToValidateParameters(mRID, includeEnergizingContainers, includeEnergizedContainers, networkState)
 
         consumerClient.getEquipmentForContainer(mRID, includeEnergizingContainers, includeEnergizedContainers, networkState)
         consumerClient.getEquipmentForContainer(Feeder(mRID), includeEnergizingContainers, includeEnergizedContainers, networkState)
         consumerClient.getEquipmentForContainers(listOf(mRID), includeEnergizingContainers, includeEnergizedContainers, networkState)
         consumerClient.getEquipmentForContainers(sequenceOf(mRID), includeEnergizingContainers, includeEnergizedContainers, networkState)
+
+        verify(consumerService.onGetEquipmentForContainers, times(4)).invoke(any(), any())
+    }
+
+    @Test
+    internal fun `onGetEquipmentForContainers receives options for getEquipmentContainer`() {
+        val mRID = "f001"
+        val includeEnergizingContainers = IncludedEnergizingContainers.INCLUDE_ENERGIZING_SUBSTATIONS
+        val includeEnergizedContainers = IncludedEnergizedContainers.INCLUDE_ENERGIZED_LV_FEEDERS
+        val networkState = NetworkState.CURRENT_NETWORK_STATE
+
+        val expectedService = FeederNetwork.create()
+        configureFeederResponses(expectedService)
+        configureGetEquipmentForContainersToValidateParameters(mRID, includeEnergizingContainers, includeEnergizedContainers, networkState)
+
         consumerClient.getEquipmentContainer<Feeder>(mRID, includeEnergizingContainers, includeEnergizedContainers, networkState)
         consumerClient.getEquipmentContainer(mRID, Feeder::class.java, includeEnergizingContainers, includeEnergizedContainers, networkState)
         consumerClient.getEquipmentContainers(listOf(mRID), Feeder::class.java, includeEnergizingContainers, includeEnergizedContainers, networkState)
         consumerClient.getEquipmentContainers(sequenceOf(mRID), Feeder::class.java, includeEnergizingContainers, includeEnergizedContainers, networkState)
 
-        verify(consumerService.onGetEquipmentForContainers, times(8)).invoke(any(), any())
+        verify(consumerService.onGetEquipmentForContainers, times(4)).invoke(any(), any())
+    }
+
+    @Test
+    internal fun `onGetEquipmentForContainers receives options for getEquipmentForLoop`() {
+        val mRID = "BTS-ZEP-BEN-BTS-CBR"
+        val networkState = NetworkState.CURRENT_NETWORK_STATE
+
+        val expectedService = LoopNetwork.create()
+        configureResponses(expectedService)
+        configureGetEquipmentForContainersToValidateParameters(
+            mRID,
+            IncludedEnergizingContainers.EXCLUDE_ENERGIZING_CONTAINERS,
+            IncludedEnergizedContainers.EXCLUDE_ENERGIZED_CONTAINERS,
+            networkState
+        )
+
+        consumerClient.getEquipmentForLoop(mRID, networkState)
+        consumerClient.getEquipmentForLoop(Loop(mRID), networkState)
+        consumerClient.getAllLoops(networkState)
+
+        verify(consumerService.onGetEquipmentForContainers, times(3)).invoke(any(), any())
     }
 
     @Test
@@ -1025,6 +1053,20 @@ internal class NetworkConsumerClientTest {
         assertThat("missing from source", differences.missingFromSource(), empty())
         assertThat("missing from target", differences.missingFromTarget(), empty())
         assertThat("has differences", differences.modifications().entries, empty())
+    }
+
+    private fun configureGetEquipmentForContainersToValidateParameters(
+        mRID: String,
+        includeEnergizingContainers: IncludedEnergizingContainers,
+        includeEnergizedContainers: IncludedEnergizedContainers,
+        networkState: NetworkState
+    ) {
+        consumerService.onGetEquipmentForContainers = spy { request, _ ->
+            assertThat(request.mridsList, containsInAnyOrder(mRID))
+            assertThat(request.includeEnergizingContainers, equalTo(includeEnergizingContainers))
+            assertThat(request.includeEnergizedContainers, equalTo(includeEnergizedContainers))
+            assertThat(request.networkState, equalTo(networkState))
+        }
     }
 
 }

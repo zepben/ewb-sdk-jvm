@@ -624,7 +624,7 @@ fun ConductingEquipment.fillFields(service: NetworkService, includeRuntime: Bool
     baseVoltage = BaseVoltage().also { service.add(it) }
 
     @Suppress("unused")
-    for (i in 0..1)
+    for (i in 0..(1).coerceAtMost(maxTerminals - 1))
         addTerminal(Terminal().also { service.add(it) })
 
     return this

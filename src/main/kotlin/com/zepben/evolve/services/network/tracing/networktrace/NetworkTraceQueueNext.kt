@@ -110,7 +110,8 @@ internal object NetworkTraceQueueNext {
             // Otherwise, we internally step to the other terminals on the equipment
             if (path.toEquipment is BusbarSection) {
                 // We don't need to step to terminals that are busbars as they would have been queued at the same time this busbar step was.
-                path.toTerminal.connectedTerminals().filter { it.conductingEquipment !is BusbarSection }
+                // We also don't try and go back to the terminal we came from as we already visited it to get to this busbar.
+                path.toTerminal.connectedTerminals().filter { it != path.fromTerminal && it.conductingEquipment !is BusbarSection }
             } else {
                 path.toTerminal.otherTerminals()
             }

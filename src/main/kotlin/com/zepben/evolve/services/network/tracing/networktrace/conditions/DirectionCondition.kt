@@ -34,9 +34,10 @@ internal class DirectionCondition<T>(
 
     private fun FeederDirection.complementaryExternalDirection(): FeederDirection = when (this) {
         NONE -> NONE
-        BOTH -> BOTH
         UPSTREAM -> DOWNSTREAM
         DOWNSTREAM -> UPSTREAM
+        BOTH -> BOTH
+        CONNECTOR -> CONNECTOR
     }
 
 }

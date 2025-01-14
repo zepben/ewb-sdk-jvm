@@ -9,14 +9,14 @@
 package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 
 object DirectionValidator {
 
-    fun Terminal.validateDirections(expectedNormalDirection: FeederDirection, expectedCurrentDirection: FeederDirection = expectedNormalDirection) {
-        assertThat(normalFeederDirection, equalTo(expectedNormalDirection))
-        assertThat(currentFeederDirection, equalTo(expectedCurrentDirection))
+    fun Terminal.validateDirection(feederDirection: FeederDirection, stateOperators: NetworkStateOperators) {
+        assertThat(stateOperators.getDirection(this), equalTo(feederDirection))
     }
 
 }

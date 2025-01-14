@@ -12,12 +12,8 @@ import com.zepben.evolve.cim.iec61970.base.meas.AccumulatorValue
 import com.zepben.evolve.cim.iec61970.base.meas.AnalogValue
 import com.zepben.evolve.cim.iec61970.base.meas.DiscreteValue
 import com.zepben.evolve.cim.iec61970.base.meas.MeasurementValue
-import com.zepben.evolve.services.common.InvokeChecker
-import com.zepben.evolve.services.common.InvokedChecker
-import com.zepben.evolve.services.common.NeverInvokedChecker
+import com.zepben.evolve.services.common.verifyWhenServiceFunctionSupportsAllServiceTypes
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -27,11 +23,16 @@ internal class MeasurementServiceUtilsTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    // Function references to functions with generics are not yet supported.
-    // So, we take a copy of the function that has a concrete type and pass through.
-    // If you get failed tests about missing IdentifiedObject types, first update the proxied function,
-    // then update this one to match and then update the tests.
-    private fun whenMeasurementServiceObjectProxy(
+    @Test
+    internal fun `supports all network service types`() {
+        verifyWhenServiceFunctionSupportsAllServiceTypes(MeasurementService().supportedKClasses, ::whenMeasurementServiceObjectProxy, "measurementValue") {
+            object : MeasurementValue() {}
+        }
+    }
+
+    // Function references to functions with generics are not yet supported, so we take a copy of the function that has a concrete type and pass through.
+    // If you get failed tests about missing IdentifiedObject types, first update the proxied function, then update this one to match.
+    internal fun whenMeasurementServiceObjectProxy(
         measurementValue: MeasurementValue,
         isAnalogValue: (AnalogValue) -> String,
         isAccumulatorValue: (AccumulatorValue) -> String,
@@ -45,33 +46,4 @@ internal class MeasurementServiceUtilsTest {
         isOther = isOther
     )
 
-    private fun whenMeasurementServiceObjectTester(
-        measurementValue: MeasurementValue,
-        isAnalogValue: InvokeChecker<AnalogValue> = NeverInvokedChecker(),
-        isAccumulatorValue: InvokeChecker<AccumulatorValue> = NeverInvokedChecker(),
-        isDiscreteValue: InvokeChecker<DiscreteValue> = NeverInvokedChecker(),
-        isOther: InvokeChecker<MeasurementValue> = NeverInvokedChecker()
-    ) {
-        val returnValue = whenMeasurementServiceObjectProxy(
-            measurementValue,
-            isAnalogValue = isAnalogValue,
-            isAccumulatorValue = isAccumulatorValue,
-            isDiscreteValue = isDiscreteValue,
-            isOther = isOther
-        )
-
-        assertThat(returnValue, equalTo(measurementValue.toString()))
-        isAnalogValue.verifyInvoke()
-        isAccumulatorValue.verifyInvoke()
-        isDiscreteValue.verifyInvoke()
-        isOther.verifyInvoke()
-    }
-
-    @Test
-    internal fun `invokes correct function`() {
-        AnalogValue().also { whenMeasurementServiceObjectTester(it, isAnalogValue = InvokedChecker(it)) }
-        AccumulatorValue().also { whenMeasurementServiceObjectTester(it, isAccumulatorValue = InvokedChecker(it)) }
-        DiscreteValue().also { whenMeasurementServiceObjectTester(it, isDiscreteValue = InvokedChecker(it)) }
-        object : MeasurementValue() {}.also { whenMeasurementServiceObjectTester(it, isOther = InvokedChecker(it)) }
-    }
 }

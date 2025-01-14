@@ -38,6 +38,14 @@ data class GrpcBuildArgs(
 val DEFAULT_BUILD_ARGS = GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 5000, maxInboundMessageSize = TWENTY_MEGABYTES)
 
 
+val grpcClientConnectionTests: Map<String, MethodDescriptor<checkConnection, Empty>> = mapOf(
+    "NetworkConsumerClient" to NetworkConsumerGrpc.getCheckConnectionMethod(),
+    "CustomerConsumerClient" to CustomerConsumerGrpc.getCheckConnectionMethod(),
+    "DiagramConsumerClient" to DiagramConsumerGrpc.getCheckConnectionMethod(),
+    "UpdateNetworkStateClient" to UpdateNetworkStateServiceGrpc.getCheckConnectionMethod(),
+    "QueryNetworkStateClient" to QueryNetworkStateServiceGrpc.getCheckConnectionMethod(),
+)
+
 /**
  * Builder class for GrpcChannel. Allows easy specification of channel credentials via SSL/TLS
  * and call credentials via a ZepbenTokenFetcher.
@@ -60,17 +68,11 @@ class GrpcChannelBuilder {
         } ?: NettyChannelBuilder.forAddress(_host, _port).usePlaintext().maxInboundMessageSize(buildArgs.maxInboundMessageSize).build()
     ).also {
         if (!buildArgs.skipConnectionTest)
-            testConnection(it, buildArgs.debugConnectionTest, buildArgs.connectionTestTimeoutMs)
+            testConnection(it, grpcClientConnectionTests, buildArgs.debugConnectionTest, buildArgs.connectionTestTimeoutMs)
     }
 
-    internal fun testConnection(grpcChannel: GrpcChannel, debug: Boolean, timeoutMs: Long) {
-        val clients: Map<String, MethodDescriptor<checkConnection, Empty>> = mapOf(
-            "NetworkConsumerClient" to NetworkConsumerGrpc.getCheckConnectionMethod(),
-            "CustomerConsumerClient" to CustomerConsumerGrpc.getCheckConnectionMethod(),
-            "DiagramConsumerClient" to DiagramConsumerGrpc.getCheckConnectionMethod(),
-            "UpdateNetworkStateService" to UpdateNetworkStateServiceGrpc.getCheckConnectionMethod(),
-            "QueryNetworkStateService" to QueryNetworkStateServiceGrpc.getCheckConnectionMethod(),
-        )
+    internal fun testConnection(grpcChannel: GrpcChannel, clients: Map<String, MethodDescriptor<checkConnection, Empty>>, debug: Boolean, timeoutMs: Long) {
+
         val debugErrors = mutableMapOf<String, StatusRuntimeException>()
 
         //Grabbing the callOptions from one of our stubs, hoping that they are all the same.

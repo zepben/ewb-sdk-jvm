@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.streaming.grpc
 
+import com.google.common.reflect.ClassPath
 import com.google.protobuf.Empty
 import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.common.AuthMethod
@@ -31,6 +32,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
 
 internal class GrpcChannelBuilderTest {
@@ -82,13 +84,13 @@ internal class GrpcChannelBuilderTest {
             } returns insecureChannel
 
             val builderSpy = spyk(GrpcChannelBuilder())
-            every { builderSpy.testConnection(any(), any(), any()) } just runs
+            every { builderSpy.testConnection(any(), grpcClientConnectionTests, any(), any()) } just runs
 
             val grpcChannel = builderSpy.build()
 
             verifySequence {
                 builderSpy.build(DEFAULT_BUILD_ARGS)
-                builderSpy.testConnection(grpcChannel, true, 5000)
+                builderSpy.testConnection(grpcChannel, grpcClientConnectionTests, true, 5000)
             }
         }
     }
@@ -118,13 +120,13 @@ internal class GrpcChannelBuilderTest {
         every { NettyChannelBuilder.forAddress("localhost", 50051).usePlaintext().maxInboundMessageSize(12).build() } returns insecureChannel
 
         val builderSpy = spyk(GrpcChannelBuilder())
-        every { builderSpy.testConnection(any(), any(), any()) } just runs
+        every { builderSpy.testConnection(any(), grpcClientConnectionTests, any(), any()) } just runs
 
         val grpcChannel = builderSpy.build(GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 1234, maxInboundMessageSize = 12))
 
         verifySequence {
             builderSpy.build(GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 1234, maxInboundMessageSize = 12))
-            builderSpy.testConnection(grpcChannel, true, 1234)
+            builderSpy.testConnection(grpcChannel, grpcClientConnectionTests, true, 1234)
         }
     }
 
@@ -353,12 +355,6 @@ internal class GrpcChannelBuilderTest {
         }.toThrow<IllegalArgumentException>().withMessage("Call credential already set in connection builder.")
     }
 
-    private fun ExceptionMatcher<StatusRuntimeException>.withStatusCode(expected: Status): ExceptionMatcher<StatusRuntimeException> {
-        val status = exception.status ?: throw ExpectExceptionError(expected.toString(), "")
-        if (expected == status) return this
-        throw ExpectExceptionError(expected.toString(), status.toString())
-    }
-
     private fun runTestConnection(responses: Map<KClass<out GrpcClient>, Exception?>, debug: Boolean = false, timeoutMs: Long = 5000) {
         val builder = GrpcChannelBuilder()
         val channel = mockk<Channel>()
@@ -442,8 +438,24 @@ internal class GrpcChannelBuilderTest {
                     )
                 } returns queryNetworkStateServiceResult)
 
-            builder.testConnection(grpcChannel, debug, timeoutMs)
+            builder.testConnection(grpcChannel, grpcClientConnectionTests, debug, timeoutMs)
             }
         }
+    }
+
+    @Test
+    fun testGrpcClientConnectionTests() {
+        //Doesn't actually check that they are covering all the stubs etc. but it's a start.
+        val grpcClients = ClassPath.from(ClassLoader.getSystemClassLoader())
+            .getTopLevelClassesRecursive("com.zepben.evolve")
+            .asSequence()
+            .map { it.load() }
+            .filter { !Modifier.isAbstract(it.modifiers) }
+            .filter { GrpcClient::class.java.isAssignableFrom(it) }
+            .toSet()
+
+        val toIgnore = listOf("ThrowingGrpcClient")
+
+        assertThat(grpcClients.map { it.simpleName }.subtract(toIgnore), equalTo(grpcClientConnectionTests.keys))
     }
 }

@@ -20,9 +20,7 @@ import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.nc.NetworkConsumerGrpc
 import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
-import com.zepben.testutils.exception.ExceptionMatcher
 import com.zepben.testutils.exception.ExpectException.Companion.expect
-import com.zepben.testutils.exception.ExpectExceptionError
 import io.grpc.*
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import io.grpc.stub.ClientCalls
@@ -205,8 +203,8 @@ internal class GrpcChannelBuilderTest {
             "[DEBUG] NetworkConsumerClient: io.grpc.StatusRuntimeException: DATA_LOSS: Data loss message for testing\n" +
             "[DEBUG] CustomerConsumerClient: io.grpc.StatusRuntimeException: INVALID_ARGUMENT: Invalid argument message for testing\n" +
             "[DEBUG] DiagramConsumerClient: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.dc.DiagramConsumer/checkConnection\n" +
-            "[DEBUG] UpdateNetworkStateService: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.ns.UpdateNetworkStateClient/checkConnection\n" +
-            "[DEBUG] QueryNetworkStateService: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.ns.QueryNetworkStateClient/checkConnection"
+            "[DEBUG] UpdateNetworkStateClient: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.ns.UpdateNetworkStateClient/checkConnection\n" +
+            "[DEBUG] QueryNetworkStateClient: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.ns.QueryNetworkStateClient/checkConnection"
         )
     }
 
@@ -363,83 +361,83 @@ internal class GrpcChannelBuilderTest {
         }
 
         mockkStatic(ClientCalls::class) {
-            mockkStatic(
-                NetworkConsumerGrpc::getCheckConnectionMethod,
-                CustomerConsumerGrpc::getCheckConnectionMethod,
-                DiagramConsumerGrpc::getCheckConnectionMethod,
-                UpdateNetworkStateServiceGrpc::getCheckConnectionMethod,
-                QueryNetworkStateServiceGrpc::getCheckConnectionMethod,
-            ) {
 
-                val networkConsumerGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
-                val customerConsumerGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
-                val diagramConsumerGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
-                val updateNetworkStateServiceGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
-                val queryNetworkStateServiceGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
+            val networkConsumerGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
+            val customerConsumerGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
+            val diagramConsumerGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
+            val updateNetworkStateServiceGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
+            val queryNetworkStateServiceGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
 
-                every { NetworkConsumerGrpc.getCheckConnectionMethod() } returns networkConsumerGrpcMethodDesc
-                every { CustomerConsumerGrpc.getCheckConnectionMethod() } returns customerConsumerGrpcMethodDesc
-                every { DiagramConsumerGrpc.getCheckConnectionMethod() } returns diagramConsumerGrpcMethodDesc
-                every { UpdateNetworkStateServiceGrpc.getCheckConnectionMethod() } returns updateNetworkStateServiceGrpcMethodDesc
-                every { QueryNetworkStateServiceGrpc.getCheckConnectionMethod() } returns queryNetworkStateServiceGrpcMethodDesc
+            val mockkedGrpcClientConnectionTests: Map<String, MethodDescriptor<checkConnection, Empty>> = mapOf(
+                "NetworkConsumerClient" to networkConsumerGrpcMethodDesc,
+                "CustomerConsumerClient" to customerConsumerGrpcMethodDesc,
+                "DiagramConsumerClient" to diagramConsumerGrpcMethodDesc,
+                "UpdateNetworkStateClient" to updateNetworkStateServiceGrpcMethodDesc,
+                "QueryNetworkStateClient" to queryNetworkStateServiceGrpcMethodDesc,
+            )
 
-                val networkConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
-                val customerConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
-                val diagramConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
-                val updateNetworkStateServiceClientCall = mockk<ClientCall<checkConnection, Empty>>()
-                val queryNetworkStateServiceClientCall = mockk<ClientCall<checkConnection, Empty>>()
+            every { NetworkConsumerGrpc.getCheckConnectionMethod() } returns networkConsumerGrpcMethodDesc
+            every { CustomerConsumerGrpc.getCheckConnectionMethod() } returns customerConsumerGrpcMethodDesc
+            every { DiagramConsumerGrpc.getCheckConnectionMethod() } returns diagramConsumerGrpcMethodDesc
+            every { UpdateNetworkStateServiceGrpc.getCheckConnectionMethod() } returns updateNetworkStateServiceGrpcMethodDesc
+            every { QueryNetworkStateServiceGrpc.getCheckConnectionMethod() } returns queryNetworkStateServiceGrpcMethodDesc
 
-                every { channel.newCall(networkConsumerGrpcMethodDesc, any()) } returns networkConsumerClientCall
-                every { channel.newCall(customerConsumerGrpcMethodDesc, any()) } returns customerConsumerClientCall
-                every { channel.newCall(diagramConsumerGrpcMethodDesc, any()) } returns diagramConsumerClientCall
-                every { channel.newCall(updateNetworkStateServiceGrpcMethodDesc, any()) } returns updateNetworkStateServiceClientCall
-                every { channel.newCall(queryNetworkStateServiceGrpcMethodDesc, any()) } returns queryNetworkStateServiceClientCall
+            val networkConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
+            val customerConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
+            val diagramConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
+            val updateNetworkStateServiceClientCall = mockk<ClientCall<checkConnection, Empty>>()
+            val queryNetworkStateServiceClientCall = mockk<ClientCall<checkConnection, Empty>>()
 
-                val networkConsumerResult = mockk<Empty>()
-                val customerConsumerResult = mockk<Empty>()
-                val diagramConsumerResult = mockk<Empty>()
-                val updateNetworkStateServiceResult = mockk<Empty>()
-                val queryNetworkStateServiceResult = mockk<Empty>()
+            every { channel.newCall(networkConsumerGrpcMethodDesc, any()) } returns networkConsumerClientCall
+            every { channel.newCall(customerConsumerGrpcMethodDesc, any()) } returns customerConsumerClientCall
+            every { channel.newCall(diagramConsumerGrpcMethodDesc, any()) } returns diagramConsumerClientCall
+            every { channel.newCall(updateNetworkStateServiceGrpcMethodDesc, any()) } returns updateNetworkStateServiceClientCall
+            every { channel.newCall(queryNetworkStateServiceGrpcMethodDesc, any()) } returns queryNetworkStateServiceClientCall
 
-                every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } returns networkConsumerResult
-                every { ClientCalls.blockingUnaryCall(customerConsumerClientCall, any<checkConnection>()) } returns customerConsumerResult
-                every { ClientCalls.blockingUnaryCall(diagramConsumerClientCall, any<checkConnection>()) } returns diagramConsumerResult
-                every { ClientCalls.blockingUnaryCall(updateNetworkStateServiceClientCall, any<checkConnection>()) } returns updateNetworkStateServiceResult
-                every { ClientCalls.blockingUnaryCall(queryNetworkStateServiceClientCall, any<checkConnection>()) } returns queryNetworkStateServiceResult
+            val networkConsumerResult = mockk<Empty>()
+            val customerConsumerResult = mockk<Empty>()
+            val diagramConsumerResult = mockk<Empty>()
+            val updateNetworkStateServiceResult = mockk<Empty>()
+            val queryNetworkStateServiceResult = mockk<Empty>()
+
+            every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } returns networkConsumerResult
+            every { ClientCalls.blockingUnaryCall(customerConsumerClientCall, any<checkConnection>()) } returns customerConsumerResult
+            every { ClientCalls.blockingUnaryCall(diagramConsumerClientCall, any<checkConnection>()) } returns diagramConsumerResult
+            every { ClientCalls.blockingUnaryCall(updateNetworkStateServiceClientCall, any<checkConnection>()) } returns updateNetworkStateServiceResult
+            every { ClientCalls.blockingUnaryCall(queryNetworkStateServiceClientCall, any<checkConnection>()) } returns queryNetworkStateServiceResult
 
 
-                responses[NetworkConsumerClient::class]?.let {
-                    every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } throws it
-                } ?: (every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } returns networkConsumerResult)
+            responses[NetworkConsumerClient::class]?.let {
+                every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } throws it
+            } ?: (every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } returns networkConsumerResult)
 
-                responses[CustomerConsumerClient::class]?.let {
-                    every { ClientCalls.blockingUnaryCall(customerConsumerClientCall, any<checkConnection>()) } throws it
-                } ?: (every { ClientCalls.blockingUnaryCall(customerConsumerClientCall, any<checkConnection>()) } returns customerConsumerResult)
+            responses[CustomerConsumerClient::class]?.let {
+                every { ClientCalls.blockingUnaryCall(customerConsumerClientCall, any<checkConnection>()) } throws it
+            } ?: (every { ClientCalls.blockingUnaryCall(customerConsumerClientCall, any<checkConnection>()) } returns customerConsumerResult)
 
-                responses[DiagramConsumerClient::class]?.let {
-                    every { ClientCalls.blockingUnaryCall(diagramConsumerClientCall, any<checkConnection>()) } throws it
-                } ?: (every { ClientCalls.blockingUnaryCall(diagramConsumerClientCall, any<checkConnection>()) } returns diagramConsumerResult)
+            responses[DiagramConsumerClient::class]?.let {
+                every { ClientCalls.blockingUnaryCall(diagramConsumerClientCall, any<checkConnection>()) } throws it
+            } ?: (every { ClientCalls.blockingUnaryCall(diagramConsumerClientCall, any<checkConnection>()) } returns diagramConsumerResult)
 
-                responses[UpdateNetworkStateClient::class]?.let {
-                    every { ClientCalls.blockingUnaryCall(updateNetworkStateServiceClientCall, any<checkConnection>()) } throws it
-                } ?: (every {
-                    ClientCalls.blockingUnaryCall(
-                        updateNetworkStateServiceClientCall,
-                        any<checkConnection>()
-                    )
-                } returns updateNetworkStateServiceResult)
+            responses[UpdateNetworkStateClient::class]?.let {
+                every { ClientCalls.blockingUnaryCall(updateNetworkStateServiceClientCall, any<checkConnection>()) } throws it
+            } ?: (every {
+                ClientCalls.blockingUnaryCall(
+                    updateNetworkStateServiceClientCall,
+                    any<checkConnection>()
+                )
+            } returns updateNetworkStateServiceResult)
 
-                responses[QueryNetworkStateClient::class]?.let {
-                    every { ClientCalls.blockingUnaryCall(queryNetworkStateServiceClientCall, any<checkConnection>()) } throws it
-                } ?: (every {
-                    ClientCalls.blockingUnaryCall(
-                        queryNetworkStateServiceClientCall,
-                        any<checkConnection>()
-                    )
-                } returns queryNetworkStateServiceResult)
+            responses[QueryNetworkStateClient::class]?.let {
+                every { ClientCalls.blockingUnaryCall(queryNetworkStateServiceClientCall, any<checkConnection>()) } throws it
+            } ?: (every {
+                ClientCalls.blockingUnaryCall(
+                    queryNetworkStateServiceClientCall,
+                    any<checkConnection>()
+                )
+            } returns queryNetworkStateServiceResult)
 
-            builder.testConnection(grpcChannel, grpcClientConnectionTests, debug, timeoutMs)
-            }
+            builder.testConnection(grpcChannel, mockkedGrpcClientConnectionTests, debug, timeoutMs)
         }
     }
 

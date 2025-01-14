@@ -18,6 +18,7 @@
   * `BatteryControl`, a new class which describes behaviour specific to controlling a `BatteryUnit`.
   * `Clamp`: A Clamp is a galvanic connection at a line segment where other equipment is connected. A Clamp does not cut the line segment. A Clamp is
     ConductingEquipment and has one Terminal with an associated ConnectivityNode. Any other ConductingEquipment can be connected to the Clamp ConnectivityNode.
+    __NOT CURRENTLY FULLY SUPPORTED BY TRACING__
   * `ControlledAppliance`, a new class representing the identity of the appliance controlled by a specific `EndDeviceFunction`.
   * `Cut`: A cut separates a line segment into two parts. The cut appears as a switch inserted between these two parts and connects them together. As the cut is
     normally open there is no galvanic connection between the two line segment parts. But it is possible to close the cut to get galvanic connection. The cut
@@ -25,6 +26,7 @@
     to the line segment's terminal with sequence number equal to 1. The cut terminals also act as connection points for jumpers and other equipment, e.g. a
     mobile generator. To enable this, connectivity nodes are placed at the cut terminals. Once the connectivity nodes are in place any conducting equipment can
     be connected at them.
+    __NOT CURRENTLY FULLY SUPPORTED BY TRACING__
   * `EndDeviceFunction`, the function performed by an end device such as a meter, communication equipment, controllers, etc.
   * `PanDemandResponseFunction`, a new class which contains `EndDeviceFunctionKind` and the identity of the `ControlledAppliance` of this function.
   * `PerLengthPhaseImpedance`, a new class used for representing the impedance of individual wires on an AcLineSegment.
@@ -46,7 +48,7 @@
 * None.
 
 ### Notes
-* None.
+* `Cut` and `Clamp` have been added to the model, but no processing for them has been added to the tracing, so results will not be what you expect.
 
 ## [0.23.0] - 2024-10-18
 ### Breaking Changes

@@ -5,10 +5,16 @@
 * `AcLineSegment.perLengthSequenceImpedance` has been corrected to `perLengthImpedance`. This has been done in a non-breaking way, however the public resolver
   `Resolvers.perLengthSequenceImpedance` is now `Resolvers.perLengthImpedance`, correctly reflecting the CIM relationship.
 * Removed `getCurrentEquipmentForFeeder` implementation for `NetworkConsumer` as its functionality is now incorporated in `getEquipmentForContainers`.
-* Tracing downstream/upstream using a NetworkTrace will not step on a start item if there is no downstream/upstream terminal on the item.
+* Traversal / Tracing API has been completely rewritten. `Traversal` has a different public API and `BranchRecursiveTraversal` no longer exists.
+  All traces that used to be used via the `Tracing.*` factory functions should be migrated to use the new `NetworkTrace` class instantiated from the factory
+  functions in `com.zepben.evolve.services.network.tracing.networktrace.Tracing`. The `NetworkTrace` should cover all existing use cases while being easier to
+  use and read. See the documentation for usage details.
 * `SetDirection` now correctly applies the `BOTH` direction on all parts of the loop again, so if you were relying on the broken intermediate state, you will
   need to update your code.
-* FindWithUsagePoints was deemed too use-case specific for the SDK and has been removed.
+* `SetDirection` now correctly sets directions for networks with `BusbarSection`.
+* `RemoveDirection` has been removed. It did not work reliably with dual fed networks with loops. You now need to clear direction using the new
+  `ClearDirection` and reapply directions where appropriate using `SetDirection`.
+* `FindWithUsagePoints` was deemed too use-case specific for the SDK and has been removed.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
@@ -27,6 +33,8 @@
   * `BatteryControlMode`
   * `EndDeviceFunctionKind`
   * `SVCControlMode`
+* Added `ClearDirection` that clears feeder directions.
+* Added new `FeederDirection.CONNECTOR` value for `Connector` equipment that are modelled only with a single terminal.
 
 ### Enhancements
 * Added `ctPrimary` and `minTargetDeadband` to `RegulatingContrl`.
@@ -36,6 +44,7 @@
 * Added the energized relationship for the current state of network between `Feeder` and `LvFeeder`.
 * Updated `NetworkConsumer`'s `getEquipmentForContainers`, `getEquipmentContainers` and `getEquipmentForLoop` to allow requesting normal, current or all 
   equipments. 
+* `SetDirection` now supports networks with `BusbarSection` and will apply the `FeederDirection.CONNECTOR` value to their terminals.
 
 ### Fixes
 * None.

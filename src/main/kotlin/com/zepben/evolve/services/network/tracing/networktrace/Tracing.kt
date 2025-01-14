@@ -15,7 +15,7 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.FindSwerEquipment
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
-import com.zepben.evolve.services.network.tracing.feeder.RemoveDirection
+import com.zepben.evolve.services.network.tracing.feeder.ClearDirection
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
@@ -181,11 +181,11 @@ object Tracing {
     fun setDirection(): SetDirection = SetDirection()
 
     /**
-     * Returns a class that can be used to remove feeder directions from items in a [NetworkService].
-     * @return a new RemoveDirection instance.
+     * Returns a class that can be used to clear feeder directions from items in a [NetworkService].
+     * @return a new ClearDirection instance.
      */
     @JvmStatic
-    fun removeDirection(): RemoveDirection = RemoveDirection()
+    fun clearDirection(): ClearDirection = ClearDirection()
 
     /**
      * Returns a class that can be used to assign [Equipment] to [Feeder]s of items in a [NetworkService].

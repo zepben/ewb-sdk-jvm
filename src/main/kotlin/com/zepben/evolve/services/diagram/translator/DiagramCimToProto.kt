@@ -8,18 +8,32 @@
 
 package com.zepben.evolve.services.diagram.translator
 
+import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObjectPoint
 import com.zepben.evolve.services.common.translator.BaseCimToProto
 import com.zepben.evolve.services.common.translator.toPb
+import com.zepben.evolve.services.diagram.whenDiagramServiceObject
+import com.zepben.protobuf.dc.DiagramIdentifiedObject
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.Diagram as PBDiagram
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObject as PBDiagramObject
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramObjectPoint as PBDiagramObjectPoint
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.DiagramStyle as PBDiagramStyle
 import com.zepben.protobuf.cim.iec61970.base.diagramlayout.OrientationKind as PBOrientationKind
 
-/************ IEC61970 DIAGRAM LAYOUT ************/
+fun diagramIdentifiedObject(identifiedObject: IdentifiedObject): DiagramIdentifiedObject =
+    DiagramIdentifiedObject.newBuilder().apply {
+        whenDiagramServiceObject(
+            identifiedObject,
+            isDiagram = { diagram = it.toPb() },
+            isDiagramObject = { diagramObject = it.toPb() },
+        )
+    }.build()
+
+//############################
+// # IEC61970 DIAGRAM LAYOUT #
+//############################
 
 fun toPb(cim: Diagram, pb: PBDiagram.Builder): PBDiagram.Builder =
     pb.apply {
@@ -50,7 +64,9 @@ fun toPb(cim: DiagramObjectPoint, pb: PBDiagramObjectPoint.Builder): PBDiagramOb
 fun Diagram.toPb(): PBDiagram = toPb(this, PBDiagram.newBuilder()).build()
 fun DiagramObject.toPb(): PBDiagramObject = toPb(this, PBDiagramObject.newBuilder()).build()
 
-/************ Class for Java friendly usage ************/
+//##################################
+// # Class for Java friendly usage #
+//##################################
 
 class DiagramCimToProto : BaseCimToProto() {
 

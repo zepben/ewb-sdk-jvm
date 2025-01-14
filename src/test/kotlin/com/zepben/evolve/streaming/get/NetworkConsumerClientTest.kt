@@ -18,11 +18,10 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.common.Resolvers
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
-import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.NetworkServiceComparator
+import com.zepben.evolve.services.network.translator.networkIdentifiedObject
 import com.zepben.evolve.services.network.translator.toPb
-import com.zepben.evolve.services.network.whenNetworkServiceObject
 import com.zepben.evolve.streaming.get.ConsumerUtils.buildFromBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
@@ -887,7 +886,7 @@ internal class NetworkConsumerClientTest {
     private fun responseOf(objects: List<IdentifiedObject>): MutableIterator<GetIdentifiedObjectsResponse> {
         val responses = mutableListOf<GetIdentifiedObjectsResponse>()
         objects.forEach {
-            responses.add(GetIdentifiedObjectsResponse.newBuilder().apply { buildNIO(it, addIdentifiedObjectsBuilder()) }.build())
+            responses.add(GetIdentifiedObjectsResponse.newBuilder().apply { addIdentifiedObjects(networkIdentifiedObject(it)) }.build())
         }
         return responses.iterator()
     }
@@ -903,7 +902,7 @@ internal class NetworkConsumerClientTest {
                 builder = GetIdentifiedObjectsResponse.newBuilder()
             }
 
-            buildNIO(obj, builder.addIdentifiedObjectsBuilder())
+            builder.addIdentifiedObjects(networkIdentifiedObject(obj))
         }
         responses.add(builder.build())
 
@@ -913,7 +912,7 @@ internal class NetworkConsumerClientTest {
     private fun restrictionEquipmentResponseOf(objects: List<IdentifiedObject>): MutableIterator<GetEquipmentForRestrictionResponse> {
         val responses = mutableListOf<GetEquipmentForRestrictionResponse>()
         objects.forEach {
-            responses.add(GetEquipmentForRestrictionResponse.newBuilder().apply { buildNIO(it, addIdentifiedObjectsBuilder()) }.build())
+            responses.add(GetEquipmentForRestrictionResponse.newBuilder().apply { addIdentifiedObjects(networkIdentifiedObject(it)) }.build())
         }
         return responses.iterator()
     }
@@ -921,7 +920,7 @@ internal class NetworkConsumerClientTest {
     private fun containerEquipmentResponseOf(objects: List<IdentifiedObject>): MutableIterator<GetEquipmentForContainersResponse> {
         val responses = mutableListOf<GetEquipmentForContainersResponse>()
         objects.forEach {
-            responses.add(GetEquipmentForContainersResponse.newBuilder().apply { buildNIO(it, addIdentifiedObjectsBuilder()) }.build())
+            responses.add(GetEquipmentForContainersResponse.newBuilder().apply { addIdentifiedObjects(networkIdentifiedObject(it)) }.build())
         }
         return responses.iterator()
     }
@@ -949,102 +948,6 @@ internal class NetworkConsumerClientTest {
         .addAllCircuits(circuits.map { it.toPb() })
         .addAllLoops(loops.map { it.toPb() })
         .build()
-
-    private fun buildNIO(obj: IdentifiedObject, identifiedObjectBuilder: NIO.Builder): NIO? {
-        identifiedObjectBuilder.apply {
-            whenNetworkServiceObject(
-                obj,
-                isBatteryUnit = { batteryUnit = it.toPb() },
-                isPhotoVoltaicUnit = { photoVoltaicUnit = it.toPb() },
-                isPowerElectronicsWindUnit = { powerElectronicsWindUnit = it.toPb() },
-                isCableInfo = { cableInfo = it.toPb() },
-                isOverheadWireInfo = { overheadWireInfo = it.toPb() },
-                isPowerTransformerInfo = { powerTransformerInfo = it.toPb() },
-                isAssetOwner = { assetOwner = it.toPb() },
-                isOrganisation = { organisation = it.toPb() },
-                isLocation = { location = it.toPb() },
-                isMeter = { meter = it.toPb() },
-                isUsagePoint = { usagePoint = it.toPb() },
-                isOperationalRestriction = { operationalRestriction = it.toPb() },
-                isFaultIndicator = { faultIndicator = it.toPb() },
-                isBaseVoltage = { baseVoltage = it.toPb() },
-                isConnectivityNode = { connectivityNode = it.toPb() },
-                isFeeder = { feeder = it.toPb() },
-                isGeographicalRegion = { geographicalRegion = it.toPb() },
-                isSite = { site = it.toPb() },
-                isSubGeographicalRegion = { subGeographicalRegion = it.toPb() },
-                isSubstation = { substation = it.toPb() },
-                isTerminal = { terminal = it.toPb() },
-                isAcLineSegment = { acLineSegment = it.toPb() },
-                isBreaker = { breaker = it.toPb() },
-                isLoadBreakSwitch = { loadBreakSwitch = it.toPb() },
-                isDisconnector = { disconnector = it.toPb() },
-                isEnergyConsumer = { energyConsumer = it.toPb() },
-                isEnergyConsumerPhase = { energyConsumerPhase = it.toPb() },
-                isEnergySource = { energySource = it.toPb() },
-                isEnergySourcePhase = { energySourcePhase = it.toPb() },
-                isFuse = { fuse = it.toPb() },
-                isJumper = { jumper = it.toPb() },
-                isJunction = { junction = it.toPb() },
-                isLinearShuntCompensator = { linearShuntCompensator = it.toPb() },
-                isPerLengthSequenceImpedance = { perLengthSequenceImpedance = it.toPb() },
-                isPowerElectronicsConnection = { powerElectronicsConnection = it.toPb() },
-                isPowerElectronicsConnectionPhase = { powerElectronicsConnectionPhase = it.toPb() },
-                isPowerTransformer = { powerTransformer = it.toPb() },
-                isPowerTransformerEnd = { powerTransformerEnd = it.toPb() },
-                isRatioTapChanger = { ratioTapChanger = it.toPb() },
-                isRecloser = { recloser = it.toPb() },
-                isBusbarSection = { busbarSection = it.toPb() },
-                isCircuit = { circuit = it.toPb() },
-                isLoop = { loop = it.toPb() },
-                isPole = { pole = it.toPb() },
-                isStreetlight = { streetlight = it.toPb() },
-                isAccumulator = { accumulator = it.toPb() },
-                isAnalog = { analog = it.toPb() },
-                isDiscrete = { discrete = it.toPb() },
-                isControl = { control = it.toPb() },
-                isRemoteControl = { remoteControl = it.toPb() },
-                isRemoteSource = { remoteSource = it.toPb() },
-                isTransformerStarImpedance = { transformerStarImpedance = it.toPb() },
-                isTransformerEndInfo = { transformerEndInfo = it.toPb() },
-                isTransformerTankInfo = { transformerTankInfo = it.toPb() },
-                isNoLoadTest = { noLoadTest = it.toPb() },
-                isOpenCircuitTest = { openCircuitTest = it.toPb() },
-                isShortCircuitTest = { shortCircuitTest = it.toPb() },
-                isEquivalentBranch = { equivalentBranch = it.toPb() },
-                isShuntCompensatorInfo = { shuntCompensatorInfo = it.toPb() },
-                isLvFeeder = { lvFeeder = it.toPb() },
-                isCurrentTransformer = { currentTransformer = it.toPb() },
-                isPotentialTransformer = { potentialTransformer = it.toPb() },
-                isCurrentTransformerInfo = { currentTransformerInfo = it.toPb() },
-                isPotentialTransformerInfo = { potentialTransformerInfo = it.toPb() },
-                isSwitchInfo = { switchInfo = it.toPb() },
-                isRelayInfo = { relayInfo = it.toPb() },
-                isCurrentRelay = { currentRelay = it.toPb() },
-                isEvChargingUnit = { evChargingUnit = it.toPb() },
-                isTapChangerControl = { tapChangerControl = it.toPb() },
-                isSeriesCompensator = { seriesCompensator = it.toPb() },
-                isGround = { ground = it.toPb() },
-                isGroundDisconnector = { groundDisconnector = it.toPb() },
-                isProtectionRelayScheme = { protectionRelayScheme = it.toPb() },
-                isProtectionRelaySystem = { protectionRelaySystem = it.toPb() },
-                isVoltageRelay = { voltageRelay = it.toPb() },
-                isDistanceRelay = { distanceRelay = it.toPb() },
-                isReactiveCapabilityCurve = { reactiveCapabilityCurve = it.toPb() },
-                isSynchronousMachine = { synchronousMachine = it.toPb() },
-                isGroundingImpedance = { groundingImpedance = it.toPb() },
-                isPetersenCoil = { petersenCoil = it.toPb() },
-                isPanDemandResponseFunction = { panDemandResponseFunction = it.toPb() },
-                isBatteryControl = { batteryControl = it.toPb() },
-                isStaticVarCompensator = { staticVarCompensator = it.toPb() },
-                isPerLengthPhaseImpedance = { perLengthPhaseImpedance = it.toPb() },
-                isCut = { cut = it.toPb() },
-                isClamp = { clamp = it.toPb() },
-            )
-        }
-
-        return identifiedObjectBuilder.build()
-    }
 
     private fun validateFeederNetwork(actual: NetworkService?, expectedService: NetworkService) {
         assertThat(actual, notNullValue())

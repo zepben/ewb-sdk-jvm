@@ -94,6 +94,7 @@ import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.common.translator.BaseCimToProto
 import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.evolve.services.common.translator.toTimestamp
+import com.zepben.evolve.services.network.whenNetworkServiceObject
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControlMode
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
@@ -109,6 +110,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind
 import com.zepben.protobuf.cim.iec61970.infiec61970.protection.PowerDirectionKind
+import com.zepben.protobuf.nc.NetworkIdentifiedObject
 import com.zepben.protobuf.network.model.FeederDirection
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControl as PBBatteryControl
@@ -249,6 +251,99 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
 import com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind as PBProtectionKind
 import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit as PBEvChargingUnit
+
+fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifiedObject =
+    NetworkIdentifiedObject.newBuilder().apply {
+        whenNetworkServiceObject(
+            identifiedObject,
+            isAcLineSegment = { acLineSegment = it.toPb() },
+            isAccumulator = { accumulator = it.toPb() },
+            isAnalog = { analog = it.toPb() },
+            isAssetOwner = { assetOwner = it.toPb() },
+            isBreaker = { breaker = it.toPb() },
+            isLoadBreakSwitch = { loadBreakSwitch = it.toPb() },
+            isBaseVoltage = { baseVoltage = it.toPb() },
+            isCableInfo = { cableInfo = it.toPb() },
+            isCircuit = { circuit = it.toPb() },
+            isConnectivityNode = { connectivityNode = it.toPb() },
+            isControl = { control = it.toPb() },
+            isDisconnector = { disconnector = it.toPb() },
+            isDiscrete = { discrete = it.toPb() },
+            isEnergyConsumer = { energyConsumer = it.toPb() },
+            isEnergyConsumerPhase = { energyConsumerPhase = it.toPb() },
+            isEnergySource = { energySource = it.toPb() },
+            isEnergySourcePhase = { energySourcePhase = it.toPb() },
+            isFaultIndicator = { faultIndicator = it.toPb() },
+            isFeeder = { feeder = it.toPb() },
+            isFuse = { fuse = it.toPb() },
+            isGeographicalRegion = { geographicalRegion = it.toPb() },
+            isJumper = { jumper = it.toPb() },
+            isJunction = { junction = it.toPb() },
+            isLinearShuntCompensator = { linearShuntCompensator = it.toPb() },
+            isLocation = { location = it.toPb() },
+            isMeter = { meter = it.toPb() },
+            isOperationalRestriction = { operationalRestriction = it.toPb() },
+            isOrganisation = { organisation = it.toPb() },
+            isOverheadWireInfo = { overheadWireInfo = it.toPb() },
+            isPole = { pole = it.toPb() },
+            isPowerTransformer = { powerTransformer = it.toPb() },
+            isPowerTransformerEnd = { powerTransformerEnd = it.toPb() },
+            isPowerTransformerInfo = { powerTransformerInfo = it.toPb() },
+            isRatioTapChanger = { ratioTapChanger = it.toPb() },
+            isRecloser = { recloser = it.toPb() },
+            isRemoteControl = { remoteControl = it.toPb() },
+            isRemoteSource = { remoteSource = it.toPb() },
+            isSite = { site = it.toPb() },
+            isStreetlight = { streetlight = it.toPb() },
+            isSubGeographicalRegion = { subGeographicalRegion = it.toPb() },
+            isSubstation = { substation = it.toPb() },
+            isTerminal = { terminal = it.toPb() },
+            isUsagePoint = { usagePoint = it.toPb() },
+            isPerLengthSequenceImpedance = { perLengthSequenceImpedance = it.toPb() },
+            isLoop = { loop = it.toPb() },
+            isLvFeeder = { lvFeeder = it.toPb() },
+            isBatteryUnit = { batteryUnit = it.toPb() },
+            isPhotoVoltaicUnit = { photoVoltaicUnit = it.toPb() },
+            isPowerElectronicsWindUnit = { powerElectronicsWindUnit = it.toPb() },
+            isPowerElectronicsConnection = { powerElectronicsConnection = it.toPb() },
+            isPowerElectronicsConnectionPhase = { powerElectronicsConnectionPhase = it.toPb() },
+            isBusbarSection = { busbarSection = it.toPb() },
+            isTransformerEndInfo = { transformerEndInfo = it.toPb() },
+            isTransformerTankInfo = { transformerTankInfo = it.toPb() },
+            isTransformerStarImpedance = { transformerStarImpedance = it.toPb() },
+            isNoLoadTest = { noLoadTest = it.toPb() },
+            isOpenCircuitTest = { openCircuitTest = it.toPb() },
+            isShortCircuitTest = { shortCircuitTest = it.toPb() },
+            isEquivalentBranch = { equivalentBranch = it.toPb() },
+            isShuntCompensatorInfo = { shuntCompensatorInfo = it.toPb() },
+            isCurrentTransformerInfo = { currentTransformerInfo = it.toPb() },
+            isPotentialTransformerInfo = { potentialTransformerInfo = it.toPb() },
+            isCurrentTransformer = { currentTransformer = it.toPb() },
+            isPotentialTransformer = { potentialTransformer = it.toPb() },
+            isSwitchInfo = { switchInfo = it.toPb() },
+            isCurrentRelay = { currentRelay = it.toPb() },
+            isRelayInfo = { relayInfo = it.toPb() },
+            isEvChargingUnit = { evChargingUnit = it.toPb() },
+            isTapChangerControl = { tapChangerControl = it.toPb() },
+            isSeriesCompensator = { seriesCompensator = it.toPb() },
+            isGround = { ground = it.toPb() },
+            isGroundDisconnector = { groundDisconnector = it.toPb() },
+            isProtectionRelayScheme = { protectionRelayScheme = it.toPb() },
+            isProtectionRelaySystem = { protectionRelaySystem = it.toPb() },
+            isVoltageRelay = { voltageRelay = it.toPb() },
+            isDistanceRelay = { distanceRelay = it.toPb() },
+            isSynchronousMachine = { synchronousMachine = it.toPb() },
+            isReactiveCapabilityCurve = { reactiveCapabilityCurve = it.toPb() },
+            isGroundingImpedance = { groundingImpedance = it.toPb() },
+            isPetersenCoil = { petersenCoil = it.toPb() },
+            isPanDemandResponseFunction = { panDemandResponseFunction = it.toPb() },
+            isBatteryControl = { batteryControl = it.toPb() },
+            isStaticVarCompensator = { staticVarCompensator = it.toPb() },
+            isPerLengthPhaseImpedance = { perLengthPhaseImpedance = it.toPb() },
+            isCut = { cut = it.toPb() },
+            isClamp = { clamp = it.toPb() },
+        )
+    }.build()
 
 // ################################
 // # EXTENSIONS IEC61968 METERING #

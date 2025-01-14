@@ -63,7 +63,8 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
     ::NetworkService,
     NetworkServiceComparator(),
     NetworkDatabaseTables(),
-    NetworkService::addFromPb
+    NetworkService::addFromPb,
+    ::networkIdentifiedObject
 ) {
 
     private val nsToPb = NetworkCimToProto()

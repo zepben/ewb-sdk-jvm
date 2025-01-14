@@ -14,6 +14,7 @@
 * Added `connectWithAccessTokenInsecure()` for connecting to a gRPC service using an access token without SSL/TLS.
 * Added `connectWithAccessToken()` for connecting to a gRPC service using an access token with SSL/TLS.
 * Added the following new CIM classes:
+  * `AssetFunction`, the function performed by an asset.
   * `BatteryControl`, a new class which describes behaviour specific to controlling a `BatteryUnit`.
   * `Clamp`: A Clamp is a galvanic connection at a line segment where other equipment is connected. A Clamp does not cut the line segment. A Clamp is
     ConductingEquipment and has one Terminal with an associated ConnectivityNode. Any other ConductingEquipment can be connected to the Clamp ConnectivityNode.
@@ -24,6 +25,7 @@
     to the line segment's terminal with sequence number equal to 1. The cut terminals also act as connection points for jumpers and other equipment, e.g. a
     mobile generator. To enable this, connectivity nodes are placed at the cut terminals. Once the connectivity nodes are in place any conducting equipment can
     be connected at them.
+  * `EndDeviceFunction`, the function performed by an end device such as a meter, communication equipment, controllers, etc.
   * `PanDemandResponseFunction`, a new class which contains `EndDeviceFunctionKind` and the identity of the `ControlledAppliance` of this function.
   * `PerLengthPhaseImpedance`, a new class used for representing the impedance of individual wires on an AcLineSegment.
   * `PhaseImpedanceData`, a data class with a link to `PerLengthPhaseImpedance`, for capturing the phase impedance data of an individual wire.

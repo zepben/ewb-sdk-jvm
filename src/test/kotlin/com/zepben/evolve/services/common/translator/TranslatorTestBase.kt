@@ -32,7 +32,8 @@ internal abstract class TranslatorTestBase<S : BaseService>(
     private val createService: () -> S,
     private val comparator: BaseServiceComparator,
     private val databaseTables: CimDatabaseTables,
-    private val addFromPb: S.(PBNameType) -> NameType
+    private val addFromPb: S.(PBNameType) -> NameType,
+    private val createServiceIdentifiedObject: (IdentifiedObject) -> Any
 ) {
 
     @JvmField
@@ -137,6 +138,8 @@ internal abstract class TranslatorTestBase<S : BaseService>(
 
             val populatedDifferences = comparator.compare(cim, addWithUnresolvedReferences()).differences
             assertThat("Failed to convert populated ${cim::class.simpleName}:${populatedDifferences}", populatedDifferences, anEmptyMap())
+
+            assertThat(createServiceIdentifiedObject(cim), notNullValue())
         }
 
         private fun removeUnsentReferences() {

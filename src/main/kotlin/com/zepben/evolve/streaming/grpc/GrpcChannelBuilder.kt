@@ -8,15 +8,19 @@
 
 package com.zepben.evolve.streaming.grpc
 
+import com.google.protobuf.Empty
 import com.zepben.auth.client.ZepbenTokenFetcher
-import com.zepben.evolve.streaming.get.CustomerConsumerClient
 import com.zepben.evolve.streaming.get.DiagramConsumerClient
-import com.zepben.evolve.streaming.get.NetworkConsumerClient
+
 import com.zepben.protobuf.cc.CustomerConsumerGrpc
+import com.zepben.protobuf.checkConnection.checkConnection
 import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.nc.NetworkConsumerGrpc
+import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
+import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import io.grpc.*
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
+import io.grpc.stub.ClientCalls
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -60,28 +64,36 @@ class GrpcChannelBuilder {
     }
 
     internal fun testConnection(grpcChannel: GrpcChannel, debug: Boolean, timeoutMs: Long) {
-        //withDeadLineAfter() sets the deadline based on now() when it is called not when the request is made, so we hold the clients in these lambda's until we are ready to make the getMetadata() request.
-        val clients = mapOf(
-            "NetworkConsumerClient" to { NetworkConsumerClient(NetworkConsumerGrpc.newStub(grpcChannel.channel).withDeadlineAfter(timeoutMs, TimeUnit.MILLISECONDS)) },
-            "CustomerConsumerClient" to { CustomerConsumerClient(CustomerConsumerGrpc.newStub(grpcChannel.channel).withDeadlineAfter(timeoutMs, TimeUnit.MILLISECONDS)) },
-            "DiagramConsumerClient" to { DiagramConsumerClient(DiagramConsumerGrpc.newStub(grpcChannel.channel).withDeadlineAfter(timeoutMs, TimeUnit.MILLISECONDS)) },
+        val clients: Map<String, MethodDescriptor<checkConnection, Empty>> = mapOf(
+            "NetworkConsumerClient" to NetworkConsumerGrpc.getCheckConnectionMethod(),
+            "CustomerConsumerClient" to CustomerConsumerGrpc.getCheckConnectionMethod(),
+            "DiagramConsumerClient" to DiagramConsumerGrpc.getCheckConnectionMethod(),
+            "UpdateNetworkStateService" to UpdateNetworkStateServiceGrpc.getCheckConnectionMethod(),
+            "QueryNetworkStateService" to QueryNetworkStateServiceGrpc.getCheckConnectionMethod(),
         )
         val debugErrors = mutableMapOf<String, StatusRuntimeException>()
 
-        clients.forEach {
-            val result = it.value().getMetadata()
-
-            if (result.wasSuccessful) {
-                logger.debug("Initial connection test with ${it.key} succeeded. Returning GrpcChannel to client.")
+        //Grabbing the callOptions from one of our stubs, hoping that they are all the same.
+        val callOptions = NetworkConsumerGrpc.newStub(grpcChannel.channel).callOptions
+        val request = checkConnection.newBuilder().build()
+        clients.forEach { (desc, methodDescriptor) ->
+            runCatching {
+                //Doing this by hand so we can set the deadline for each call/turning it into a request timeout
+                //Might want to make this async one day.
+                ClientCalls.blockingUnaryCall(
+                    grpcChannel.channel.newCall(methodDescriptor, callOptions.withDeadlineAfter(timeoutMs, TimeUnit.MILLISECONDS)),
+                    request
+                )
+                logger.debug("Initial connection test with $desc succeeded. Returning GrpcChannel to client.")
                 return
+            }.onFailure { t ->
+                if (t is StatusRuntimeException) {
+                    logger.debug("Initial connection test failed for $desc with $t")
+                    if (debug)
+                        debugErrors[desc] = t
+                } else
+                    throw t
             }
-            val t = result.thrown
-            if (t is StatusRuntimeException) {
-                logger.debug("Initial connection test failed for ${it.key} with $t")
-                if (debug)
-                    debugErrors[it.key] = t
-            } else
-                throw t
         }
         var debugInfo = ""
         debugErrors.forEach{ debugInfo +=  "\n[DEBUG] ${it.key}: ${it.value}" }

@@ -8,20 +8,23 @@
 
 package com.zepben.evolve.streaming.grpc
 
+import com.google.protobuf.Empty
 import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.common.AuthMethod
-import com.zepben.evolve.services.common.BaseService
-import com.zepben.evolve.services.common.meta.ServiceInfo
-import com.zepben.evolve.services.common.translator.BaseProtoToCim
-import com.zepben.evolve.streaming.get.CimConsumerClient
-import com.zepben.evolve.streaming.get.CustomerConsumerClient
-import com.zepben.evolve.streaming.get.DiagramConsumerClient
-import com.zepben.evolve.streaming.get.NetworkConsumerClient
+import com.zepben.evolve.streaming.get.*
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+import com.zepben.protobuf.cc.CustomerConsumerGrpc
+import com.zepben.protobuf.checkConnection.checkConnection
+import com.zepben.protobuf.dc.DiagramConsumerGrpc
+import com.zepben.protobuf.nc.NetworkConsumerGrpc
+import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
+import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import com.zepben.testutils.exception.ExceptionMatcher
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.exception.ExpectExceptionError
 import io.grpc.*
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
+import io.grpc.stub.ClientCalls
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -120,17 +123,19 @@ internal class GrpcChannelBuilderTest {
         val grpcChannel = builderSpy.build(GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 1234, maxInboundMessageSize = 12))
 
         verifySequence {
-            builderSpy.build(GrpcBuildArgs(skipConnectionTest=false, debugConnectionTest = true, connectionTestTimeoutMs = 1234, maxInboundMessageSize = 12))
+            builderSpy.build(GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 1234, maxInboundMessageSize = 12))
             builderSpy.testConnection(grpcChannel, true, 1234)
         }
     }
 
     @Test
     internal fun `testConnection returns on first successful call`() {
-        val responses = mapOf(
+        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
             CustomerConsumerClient::class to StatusRuntimeException(Status.INVALID_ARGUMENT),
-            DiagramConsumerClient::class to null //null returns GrpcResult mockk with wasSuccessful = true
+            DiagramConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
+            UpdateNetworkStateClient::class to null,
+            QueryNetworkStateClient::class to null,
         )
 
         runTestConnection(responses)
@@ -138,7 +143,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection continues past grpc status UNAVAILABLE exceptions`() {
-        val responses = mapOf(
+        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.UNAVAILABLE),
             CustomerConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
             DiagramConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
@@ -149,7 +154,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection continues past grpc status UNAUTHENTICATED exceptions`() {
-        val responses = mapOf(
+        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
             CustomerConsumerClient::class to StatusRuntimeException(Status.UNAUTHENTICATED),
             DiagramConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
@@ -160,7 +165,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection continues past grpc status UNKNOWN exceptions`() {
-        val responses = mapOf(
+        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
             CustomerConsumerClient::class to StatusRuntimeException(Status.UNKNOWN),
             DiagramConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
@@ -171,7 +176,7 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection rethrows unexpected exceptions`() {
-        val responses = mapOf(
+        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS),
             CustomerConsumerClient::class to Exception("Unexpected"),
             DiagramConsumerClient::class to StatusRuntimeException(Status.UNAVAILABLE),
@@ -184,10 +189,12 @@ internal class GrpcChannelBuilderTest {
 
     @Test
     internal fun `testConnection collects other exceptions for debug output`() {
-        val responses = mapOf(
+        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS.withDescription("Data loss message for testing")),
             CustomerConsumerClient::class to StatusRuntimeException(Status.INVALID_ARGUMENT.withDescription("Invalid argument message for testing")),
-            DiagramConsumerClient::class to StatusRuntimeException(Status.UNIMPLEMENTED.withDescription("Method not found: zepben.protobuf.dc.DiagramConsumer/getMetadata")),
+            DiagramConsumerClient::class to StatusRuntimeException(Status.UNIMPLEMENTED.withDescription("Method not found: zepben.protobuf.dc.DiagramConsumer/checkConnection")),
+            UpdateNetworkStateClient::class to StatusRuntimeException(Status.UNIMPLEMENTED.withDescription("Method not found: zepben.protobuf.ns.UpdateNetworkStateClient/checkConnection")),
+            QueryNetworkStateClient::class to StatusRuntimeException(Status.UNIMPLEMENTED.withDescription("Method not found: zepben.protobuf.ns.QueryNetworkStateClient/checkConnection"))
             )
 
         expect {
@@ -195,15 +202,20 @@ internal class GrpcChannelBuilderTest {
         }.toThrow<GrpcConnectionException>().withMessage("Couldn't establish gRPC connection to any service on localhost:50051.\n" +
             "[DEBUG] NetworkConsumerClient: io.grpc.StatusRuntimeException: DATA_LOSS: Data loss message for testing\n" +
             "[DEBUG] CustomerConsumerClient: io.grpc.StatusRuntimeException: INVALID_ARGUMENT: Invalid argument message for testing\n" +
-            "[DEBUG] DiagramConsumerClient: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.dc.DiagramConsumer/getMetadata")
+            "[DEBUG] DiagramConsumerClient: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.dc.DiagramConsumer/checkConnection\n" +
+            "[DEBUG] UpdateNetworkStateService: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.ns.UpdateNetworkStateClient/checkConnection\n" +
+            "[DEBUG] QueryNetworkStateService: io.grpc.StatusRuntimeException: UNIMPLEMENTED: Method not found: zepben.protobuf.ns.QueryNetworkStateClient/checkConnection"
+        )
     }
 
     @Test
     internal fun `testConnection throws GrpcConnectionException if no successful responses received`() {
-        val responses = mapOf(
+        val responses = mapOf<KClass<out GrpcClient>, Exception?>(
             NetworkConsumerClient::class to StatusRuntimeException(Status.DATA_LOSS.withDescription("Data loss message for testing")),
             CustomerConsumerClient::class to StatusRuntimeException(Status.INVALID_ARGUMENT.withDescription("Invalid argument message for testing")),
-            DiagramConsumerClient::class to StatusRuntimeException(Status.UNIMPLEMENTED.withDescription("Method not found: zepben.protobuf.dc.DiagramConsumer/getMetadata")),
+            DiagramConsumerClient::class to StatusRuntimeException(Status.UNIMPLEMENTED.withDescription("Method not found: zepben.protobuf.dc.DiagramConsumer/checkConnection")),
+            UpdateNetworkStateClient::class to StatusRuntimeException(Status.UNIMPLEMENTED.withDescription("Method not found: zepben.protobuf.ns.UpdateNetworkStateClient/checkConnection")),
+            QueryNetworkStateClient::class to StatusRuntimeException(Status.UNIMPLEMENTED.withDescription("Method not found: zepben.protobuf.ns.QueryNetworkStateClient/checkConnection")),
         )
 
         expect {
@@ -347,42 +359,91 @@ internal class GrpcChannelBuilderTest {
         throw ExpectExceptionError(expected.toString(), status.toString())
     }
 
-    private fun runTestConnection(responses: Map<KClass<out CimConsumerClient<out BaseService, out BaseProtoToCim>>, Exception?>, debug: Boolean = false, timeoutMs: Long = 5000) {
+    private fun runTestConnection(responses: Map<KClass<out GrpcClient>, Exception?>, debug: Boolean = false, timeoutMs: Long = 5000) {
         val builder = GrpcChannelBuilder()
         val channel = mockk<Channel>()
-        val grpcChannel = mockk<GrpcChannel>()
+        val grpcChannel = mockk<GrpcChannel> {
+            every { this@mockk.channel } returns channel
+        }
 
-        every { grpcChannel.channel } returns channel
+        mockkStatic(ClientCalls::class) {
+            mockkStatic(
+                NetworkConsumerGrpc::getCheckConnectionMethod,
+                CustomerConsumerGrpc::getCheckConnectionMethod,
+                DiagramConsumerGrpc::getCheckConnectionMethod,
+                UpdateNetworkStateServiceGrpc::getCheckConnectionMethod,
+                QueryNetworkStateServiceGrpc::getCheckConnectionMethod,
+            ) {
 
-        val networkGrpcResult = mockk<GrpcResult<ServiceInfo>>()
-        mockkConstructor(NetworkConsumerClient::class)
-        every { anyConstructed<NetworkConsumerClient>().getMetadata() } returns networkGrpcResult
+                val networkConsumerGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
+                val customerConsumerGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
+                val diagramConsumerGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
+                val updateNetworkStateServiceGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
+                val queryNetworkStateServiceGrpcMethodDesc = mockk<MethodDescriptor<checkConnection, Empty>>()
 
-        responses[NetworkConsumerClient::class]?.let {
-            every { networkGrpcResult.thrown } returns it
-            every { networkGrpcResult.wasSuccessful } returns false
-        } ?: (every { networkGrpcResult.wasSuccessful } returns true)
+                every { NetworkConsumerGrpc.getCheckConnectionMethod() } returns networkConsumerGrpcMethodDesc
+                every { CustomerConsumerGrpc.getCheckConnectionMethod() } returns customerConsumerGrpcMethodDesc
+                every { DiagramConsumerGrpc.getCheckConnectionMethod() } returns diagramConsumerGrpcMethodDesc
+                every { UpdateNetworkStateServiceGrpc.getCheckConnectionMethod() } returns updateNetworkStateServiceGrpcMethodDesc
+                every { QueryNetworkStateServiceGrpc.getCheckConnectionMethod() } returns queryNetworkStateServiceGrpcMethodDesc
+
+                val networkConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
+                val customerConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
+                val diagramConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
+                val updateNetworkStateServiceClientCall = mockk<ClientCall<checkConnection, Empty>>()
+                val queryNetworkStateServiceClientCall = mockk<ClientCall<checkConnection, Empty>>()
+
+                every { channel.newCall(networkConsumerGrpcMethodDesc, any()) } returns networkConsumerClientCall
+                every { channel.newCall(customerConsumerGrpcMethodDesc, any()) } returns customerConsumerClientCall
+                every { channel.newCall(diagramConsumerGrpcMethodDesc, any()) } returns diagramConsumerClientCall
+                every { channel.newCall(updateNetworkStateServiceGrpcMethodDesc, any()) } returns updateNetworkStateServiceClientCall
+                every { channel.newCall(queryNetworkStateServiceGrpcMethodDesc, any()) } returns queryNetworkStateServiceClientCall
+
+                val networkConsumerResult = mockk<Empty>()
+                val customerConsumerResult = mockk<Empty>()
+                val diagramConsumerResult = mockk<Empty>()
+                val updateNetworkStateServiceResult = mockk<Empty>()
+                val queryNetworkStateServiceResult = mockk<Empty>()
+
+                every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } returns networkConsumerResult
+                every { ClientCalls.blockingUnaryCall(customerConsumerClientCall, any<checkConnection>()) } returns customerConsumerResult
+                every { ClientCalls.blockingUnaryCall(diagramConsumerClientCall, any<checkConnection>()) } returns diagramConsumerResult
+                every { ClientCalls.blockingUnaryCall(updateNetworkStateServiceClientCall, any<checkConnection>()) } returns updateNetworkStateServiceResult
+                every { ClientCalls.blockingUnaryCall(queryNetworkStateServiceClientCall, any<checkConnection>()) } returns queryNetworkStateServiceResult
 
 
-        val customerGrpcResult = mockk<GrpcResult<ServiceInfo>>()
-        mockkConstructor(CustomerConsumerClient::class)
-        every { anyConstructed<CustomerConsumerClient>().getMetadata() } returns customerGrpcResult
+                responses[NetworkConsumerClient::class]?.let {
+                    every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } throws it
+                } ?: (every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } returns networkConsumerResult)
 
-        responses[CustomerConsumerClient::class]?.let {
-            every { customerGrpcResult.thrown } returns it
-            every { customerGrpcResult.wasSuccessful } returns false
-        } ?: (every { customerGrpcResult.wasSuccessful } returns true)
+                responses[CustomerConsumerClient::class]?.let {
+                    every { ClientCalls.blockingUnaryCall(customerConsumerClientCall, any<checkConnection>()) } throws it
+                } ?: (every { ClientCalls.blockingUnaryCall(customerConsumerClientCall, any<checkConnection>()) } returns customerConsumerResult)
 
+                responses[DiagramConsumerClient::class]?.let {
+                    every { ClientCalls.blockingUnaryCall(diagramConsumerClientCall, any<checkConnection>()) } throws it
+                } ?: (every { ClientCalls.blockingUnaryCall(diagramConsumerClientCall, any<checkConnection>()) } returns diagramConsumerResult)
 
-        val diagramGrpcResult = mockk<GrpcResult<ServiceInfo>>()
-        mockkConstructor(DiagramConsumerClient::class)
-        every { anyConstructed<DiagramConsumerClient>().getMetadata() } returns diagramGrpcResult
+                responses[UpdateNetworkStateClient::class]?.let {
+                    every { ClientCalls.blockingUnaryCall(updateNetworkStateServiceClientCall, any<checkConnection>()) } throws it
+                } ?: (every {
+                    ClientCalls.blockingUnaryCall(
+                        updateNetworkStateServiceClientCall,
+                        any<checkConnection>()
+                    )
+                } returns updateNetworkStateServiceResult)
 
-        responses[DiagramConsumerClient::class]?.let {
-            every { diagramGrpcResult.thrown } returns it
-            every { diagramGrpcResult.wasSuccessful } returns false
-        } ?: (every { diagramGrpcResult.wasSuccessful } returns true)
+                responses[QueryNetworkStateClient::class]?.let {
+                    every { ClientCalls.blockingUnaryCall(queryNetworkStateServiceClientCall, any<checkConnection>()) } throws it
+                } ?: (every {
+                    ClientCalls.blockingUnaryCall(
+                        queryNetworkStateServiceClientCall,
+                        any<checkConnection>()
+                    )
+                } returns queryNetworkStateServiceResult)
 
-        builder.testConnection(grpcChannel, debug, timeoutMs)
+            builder.testConnection(grpcChannel, debug, timeoutMs)
+            }
+        }
     }
 }

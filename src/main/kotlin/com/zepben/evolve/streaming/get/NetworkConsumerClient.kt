@@ -357,9 +357,10 @@ class NetworkConsumerClient(
         networkState: NetworkState = NetworkState.NORMAL_NETWORK_STATE
     ): GrpcResult<MultiObjectResult> =
         getWithReferences(mRIDs, expectedClass) { it, (objects, _) ->
-            objects.putAll(getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers, networkState)
-                .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
-                .value.objects
+            objects.putAll(
+                getEquipmentForContainers(it.map { eq -> eq.mRID }, includeEnergizingContainers, includeEnergizedContainers, networkState)
+                    .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
+                    .value.objects
             )
             null
         }
@@ -402,9 +403,10 @@ class NetworkConsumerClient(
             objects.putAll(loop.energizingSubstations.associateBy { it.mRID })
 
             val containers = loop.circuits.asSequence() + loop.substations.asSequence() + loop.energizingSubstations.asSequence()
-            objects.putAll(getEquipmentForContainers(containers.map { it.mRID }, networkState = networkState)
-                .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
-                .value.objects)
+            objects.putAll(
+                getEquipmentForContainers(containers.map { it.mRID }, networkState = networkState)
+                    .onError { thrown, wasHandled -> return@getWithReferences GrpcResult.ofError(thrown, wasHandled) }
+                    .value.objects)
             null
         }
 
@@ -433,13 +435,16 @@ class NetworkConsumerClient(
         mor.objects.putAll(hierarchy.circuits)
         mor.objects.putAll(hierarchy.loops)
 
-        mor.objects.putAll(getEquipmentForContainers(hierarchy.loops.values
+        val mrids = hierarchy.loops.values
             .asSequence()
             .flatMap { it.circuits.asSequence() + it.substations.asSequence() + it.energizingSubstations.asSequence() }
             .distinct()
-            .map { it.mRID }, networkState = networkState)
-            .onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }
-            .value.objects
+            .map { it.mRID }
+
+        mor.objects.putAll(
+            getEquipmentForContainers(mrids, networkState = networkState)
+                .onError { thrown, wasHandled -> return GrpcResult.ofError(thrown, wasHandled) }
+                .value.objects
         )
 
         resolveReferences(mor)?.let { return it }

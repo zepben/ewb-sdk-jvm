@@ -10,6 +10,8 @@
   need to update your code.
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart. If you were relying on the bug to remove phases through open points you will now
   need to start additional traces from the other side of the open points to maintain this behaviour.
+* `LvFeeders` can now start at circuit head switches within the transformer site. Any switches that are members of the transformers site will have `LvFeeder`s 
+  created with the `normalHeadTerminal` being the downstream terminal of the `Switch`, and the `LvFeeder` will be energised by the same `Feeder` as the transformer.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
@@ -44,6 +46,7 @@
 
 ### Fixes
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart.
+* `AssignToLvFeeder` will no longer trace out from an open/de-energised `normalHeadTerminal`.
 
 ### Notes
 * None.

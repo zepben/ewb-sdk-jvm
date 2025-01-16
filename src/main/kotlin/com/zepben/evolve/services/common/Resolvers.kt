@@ -63,6 +63,22 @@ object Resolvers {
         BoundReferenceResolver(acLineSegment, AcLineSegmentToPerLengthImpedanceResolver, null)
 
     @JvmStatic
+    fun cuts(acLineSegment: AcLineSegment): BoundReferenceResolver<AcLineSegment, Cut> =
+        BoundReferenceResolver(acLineSegment, AcLineSegmentToCutResolver, CutToAcLineSegmentResolver)
+
+    @JvmStatic
+    fun clamps(acLineSegment: AcLineSegment): BoundReferenceResolver<AcLineSegment, Clamp> =
+        BoundReferenceResolver(acLineSegment, AcLineSegmentToClampResolver, ClampToAcLineSegmentResolver)
+
+    @JvmStatic
+    fun acLineSegment(cut: Cut): BoundReferenceResolver<Cut, AcLineSegment> =
+        BoundReferenceResolver(cut, CutToAcLineSegmentResolver, AcLineSegmentToCutResolver)
+
+    @JvmStatic
+    fun acLineSegment(clamp: Clamp): BoundReferenceResolver<Clamp, AcLineSegment> =
+        BoundReferenceResolver(clamp, ClampToAcLineSegmentResolver, AcLineSegmentToClampResolver)
+
+    @JvmStatic
     fun organisationRoles(asset: Asset): BoundReferenceResolver<Asset, AssetOrganisationRole> =
         BoundReferenceResolver(asset, AssetToAssetOrganisationRoleResolver, null)
 

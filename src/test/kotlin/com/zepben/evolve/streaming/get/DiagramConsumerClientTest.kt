@@ -12,8 +12,7 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
 import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.services.diagram.DiagramService
-import com.zepben.evolve.services.diagram.translator.toPb
-import com.zepben.evolve.services.diagram.whenDiagramServiceObject
+import com.zepben.evolve.services.diagram.translator.diagramIdentifiedObject
 import com.zepben.evolve.streaming.get.ConsumerUtils.buildFromBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
@@ -318,19 +317,10 @@ internal class DiagramConsumerClientTest {
     private fun responseOf(objects: List<DiagramObject>): MutableIterator<GetDiagramObjectsResponse> {
         val responses = mutableListOf<GetDiagramObjectsResponse>()
         objects.forEach {
-            responses.add(GetDiagramObjectsResponse.newBuilder().apply { buildDIO(it, addIdentifiedObjectsBuilder()) }.build())
+            responses.add(GetDiagramObjectsResponse.newBuilder().apply { addIdentifiedObjects(diagramIdentifiedObject(it)) }.build())
         }
         return responses.iterator()
     }
-
-    private fun buildDIO(obj: IdentifiedObject, identifiedObjectBuilder: DIO.Builder): DIO? =
-        identifiedObjectBuilder.apply {
-            whenDiagramServiceObject(
-                obj,
-                isDiagram = { diagram = it.toPb() },
-                isDiagramObject = { diagramObject = it.toPb() },
-            )
-        }.build()
 
     private fun createResponse(
         identifiedObjectBuilder: DIO.Builder,

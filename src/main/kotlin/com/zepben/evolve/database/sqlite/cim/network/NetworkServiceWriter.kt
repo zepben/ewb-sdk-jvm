@@ -93,6 +93,8 @@ class NetworkServiceWriter @JvmOverloads constructor(
             .andSaveEach<Breaker>(writer::save)
             .andSaveEach<LoadBreakSwitch>(writer::save)
             .andSaveEach<BusbarSection>(writer::save)
+            .andSaveEach<Clamp>(writer::save)
+            .andSaveEach<Cut>(writer::save)
             .andSaveEach<Disconnector>(writer::save)
             .andSaveEach<EnergyConsumer>(writer::save)
             .andSaveEach<EnergyConsumerPhase>(writer::save)

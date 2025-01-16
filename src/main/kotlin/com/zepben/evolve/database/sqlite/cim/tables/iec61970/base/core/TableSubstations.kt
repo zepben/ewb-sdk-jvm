@@ -14,8 +14,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
 @Suppress("PropertyName")
 class TableSubstations : TableEquipmentContainers() {
 
-    val SUB_GEOGRAPHICAL_REGION_MRID: Column =
-        Column(++columnIndex, "sub_geographical_region_mrid", "TEXT", NULL)
+    val SUB_GEOGRAPHICAL_REGION_MRID: Column = Column(++columnIndex, "sub_geographical_region_mrid", "TEXT", NULL)
 
     override val name: String = "substations"
 

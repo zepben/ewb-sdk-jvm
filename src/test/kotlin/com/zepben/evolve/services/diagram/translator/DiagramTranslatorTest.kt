@@ -21,7 +21,8 @@ internal class DiagramTranslatorTest : TranslatorTestBase<DiagramService>(
     ::DiagramService,
     DiagramServiceComparator(),
     DiagramDatabaseTables(),
-    DiagramService::addFromPb
+    DiagramService::addFromPb,
+    ::diagramIdentifiedObject
 ) {
 
     private val dsToPb = DiagramCimToProto()

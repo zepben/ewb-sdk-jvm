@@ -14,7 +14,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
 @Suppress("PropertyName")
 class TablePoles : TableStructures() {
 
-    var CLASSIFICATION: Column = Column(++columnIndex, "classification", "TEXT", NOT_NULL)
+    val CLASSIFICATION: Column = Column(++columnIndex, "classification", "TEXT", NOT_NULL)
 
     override val name: String = "poles"
 

@@ -55,6 +55,22 @@ internal object AcLineSegmentToPerLengthImpedanceResolver : ReferenceResolver<Ac
     AcLineSegment::class, PerLengthImpedance::class, AcLineSegment::perLengthImpedance.setter
 )
 
+internal object AcLineSegmentToCutResolver : ReferenceResolver<AcLineSegment, Cut> by KReferenceResolver(
+    AcLineSegment::class, Cut::class, AcLineSegment::addCut
+)
+
+internal object AcLineSegmentToClampResolver : ReferenceResolver<AcLineSegment, Clamp> by KReferenceResolver(
+    AcLineSegment::class, Clamp::class, AcLineSegment::addClamp
+)
+
+internal object CutToAcLineSegmentResolver : ReferenceResolver<Cut, AcLineSegment> by KReferenceResolver(
+    Cut::class, AcLineSegment::class, Cut::acLineSegment.setter
+)
+
+internal object ClampToAcLineSegmentResolver : ReferenceResolver<Clamp, AcLineSegment> by KReferenceResolver(
+    Clamp::class, AcLineSegment::class, Clamp::acLineSegment.setter
+)
+
 internal object AssetToAssetOrganisationRoleResolver : ReferenceResolver<Asset, AssetOrganisationRole> by KReferenceResolver(
     Asset::class, AssetOrganisationRole::class, Asset::addOrganisationRole
 )

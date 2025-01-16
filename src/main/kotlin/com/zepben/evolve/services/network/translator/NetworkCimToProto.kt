@@ -35,8 +35,10 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
+import com.zepben.evolve.cim.iec61970.base.wires.Clamp
 import com.zepben.evolve.cim.iec61970.base.wires.Conductor
 import com.zepben.evolve.cim.iec61970.base.wires.Connector
+import com.zepben.evolve.cim.iec61970.base.wires.Cut
 import com.zepben.evolve.cim.iec61970.base.wires.Disconnector
 import com.zepben.evolve.cim.iec61970.base.wires.EarthFaultCompensator
 import com.zepben.evolve.cim.iec61970.base.wires.EnergyConnection
@@ -92,6 +94,7 @@ import com.zepben.evolve.services.common.*
 import com.zepben.evolve.services.common.translator.BaseCimToProto
 import com.zepben.evolve.services.common.translator.toPb
 import com.zepben.evolve.services.common.translator.toTimestamp
+import com.zepben.evolve.services.network.whenNetworkServiceObject
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControlMode
 import com.zepben.protobuf.cim.iec61968.assetinfo.WireMaterialKind
 import com.zepben.protobuf.cim.iec61968.infiec61968.infassetinfo.TransformerConstructionKind
@@ -107,6 +110,7 @@ import com.zepben.protobuf.cim.iec61970.base.wires.VectorGroup
 import com.zepben.protobuf.cim.iec61970.base.wires.WindingConnection
 import com.zepben.protobuf.cim.iec61970.base.wires.generation.production.BatteryStateKind
 import com.zepben.protobuf.cim.iec61970.infiec61970.protection.PowerDirectionKind
+import com.zepben.protobuf.nc.NetworkIdentifiedObject
 import com.zepben.protobuf.network.model.FeederDirection
 import com.zepben.protobuf.cim.extensions.iec61968.metering.PanDemandResponseFunction as PBPanDemandResponseFunction
 import com.zepben.protobuf.cim.extensions.iec61970.base.wires.BatteryControl as PBBatteryControl
@@ -190,8 +194,10 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSourc
 import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment as PBAcLineSegment
 import com.zepben.protobuf.cim.iec61970.base.wires.Breaker as PBBreaker
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
+import com.zepben.protobuf.cim.iec61970.base.wires.Clamp as PBClamp
 import com.zepben.protobuf.cim.iec61970.base.wires.Conductor as PBConductor
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
+import com.zepben.protobuf.cim.iec61970.base.wires.Cut as PBCut
 import com.zepben.protobuf.cim.iec61970.base.wires.Disconnector as PBDisconnector
 import com.zepben.protobuf.cim.iec61970.base.wires.EarthFaultCompensator as PBEarthFaultCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConnection as PBEnergyConnection
@@ -245,6 +251,99 @@ import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.iec61970.infiec61970.feeder.LvFeeder as PBLvFeeder
 import com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind as PBProtectionKind
 import com.zepben.protobuf.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit as PBEvChargingUnit
+
+fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifiedObject =
+    NetworkIdentifiedObject.newBuilder().apply {
+        whenNetworkServiceObject(
+            identifiedObject,
+            isAcLineSegment = { acLineSegment = it.toPb() },
+            isAccumulator = { accumulator = it.toPb() },
+            isAnalog = { analog = it.toPb() },
+            isAssetOwner = { assetOwner = it.toPb() },
+            isBreaker = { breaker = it.toPb() },
+            isLoadBreakSwitch = { loadBreakSwitch = it.toPb() },
+            isBaseVoltage = { baseVoltage = it.toPb() },
+            isCableInfo = { cableInfo = it.toPb() },
+            isCircuit = { circuit = it.toPb() },
+            isConnectivityNode = { connectivityNode = it.toPb() },
+            isControl = { control = it.toPb() },
+            isDisconnector = { disconnector = it.toPb() },
+            isDiscrete = { discrete = it.toPb() },
+            isEnergyConsumer = { energyConsumer = it.toPb() },
+            isEnergyConsumerPhase = { energyConsumerPhase = it.toPb() },
+            isEnergySource = { energySource = it.toPb() },
+            isEnergySourcePhase = { energySourcePhase = it.toPb() },
+            isFaultIndicator = { faultIndicator = it.toPb() },
+            isFeeder = { feeder = it.toPb() },
+            isFuse = { fuse = it.toPb() },
+            isGeographicalRegion = { geographicalRegion = it.toPb() },
+            isJumper = { jumper = it.toPb() },
+            isJunction = { junction = it.toPb() },
+            isLinearShuntCompensator = { linearShuntCompensator = it.toPb() },
+            isLocation = { location = it.toPb() },
+            isMeter = { meter = it.toPb() },
+            isOperationalRestriction = { operationalRestriction = it.toPb() },
+            isOrganisation = { organisation = it.toPb() },
+            isOverheadWireInfo = { overheadWireInfo = it.toPb() },
+            isPole = { pole = it.toPb() },
+            isPowerTransformer = { powerTransformer = it.toPb() },
+            isPowerTransformerEnd = { powerTransformerEnd = it.toPb() },
+            isPowerTransformerInfo = { powerTransformerInfo = it.toPb() },
+            isRatioTapChanger = { ratioTapChanger = it.toPb() },
+            isRecloser = { recloser = it.toPb() },
+            isRemoteControl = { remoteControl = it.toPb() },
+            isRemoteSource = { remoteSource = it.toPb() },
+            isSite = { site = it.toPb() },
+            isStreetlight = { streetlight = it.toPb() },
+            isSubGeographicalRegion = { subGeographicalRegion = it.toPb() },
+            isSubstation = { substation = it.toPb() },
+            isTerminal = { terminal = it.toPb() },
+            isUsagePoint = { usagePoint = it.toPb() },
+            isPerLengthSequenceImpedance = { perLengthSequenceImpedance = it.toPb() },
+            isLoop = { loop = it.toPb() },
+            isLvFeeder = { lvFeeder = it.toPb() },
+            isBatteryUnit = { batteryUnit = it.toPb() },
+            isPhotoVoltaicUnit = { photoVoltaicUnit = it.toPb() },
+            isPowerElectronicsWindUnit = { powerElectronicsWindUnit = it.toPb() },
+            isPowerElectronicsConnection = { powerElectronicsConnection = it.toPb() },
+            isPowerElectronicsConnectionPhase = { powerElectronicsConnectionPhase = it.toPb() },
+            isBusbarSection = { busbarSection = it.toPb() },
+            isTransformerEndInfo = { transformerEndInfo = it.toPb() },
+            isTransformerTankInfo = { transformerTankInfo = it.toPb() },
+            isTransformerStarImpedance = { transformerStarImpedance = it.toPb() },
+            isNoLoadTest = { noLoadTest = it.toPb() },
+            isOpenCircuitTest = { openCircuitTest = it.toPb() },
+            isShortCircuitTest = { shortCircuitTest = it.toPb() },
+            isEquivalentBranch = { equivalentBranch = it.toPb() },
+            isShuntCompensatorInfo = { shuntCompensatorInfo = it.toPb() },
+            isCurrentTransformerInfo = { currentTransformerInfo = it.toPb() },
+            isPotentialTransformerInfo = { potentialTransformerInfo = it.toPb() },
+            isCurrentTransformer = { currentTransformer = it.toPb() },
+            isPotentialTransformer = { potentialTransformer = it.toPb() },
+            isSwitchInfo = { switchInfo = it.toPb() },
+            isCurrentRelay = { currentRelay = it.toPb() },
+            isRelayInfo = { relayInfo = it.toPb() },
+            isEvChargingUnit = { evChargingUnit = it.toPb() },
+            isTapChangerControl = { tapChangerControl = it.toPb() },
+            isSeriesCompensator = { seriesCompensator = it.toPb() },
+            isGround = { ground = it.toPb() },
+            isGroundDisconnector = { groundDisconnector = it.toPb() },
+            isProtectionRelayScheme = { protectionRelayScheme = it.toPb() },
+            isProtectionRelaySystem = { protectionRelaySystem = it.toPb() },
+            isVoltageRelay = { voltageRelay = it.toPb() },
+            isDistanceRelay = { distanceRelay = it.toPb() },
+            isSynchronousMachine = { synchronousMachine = it.toPb() },
+            isReactiveCapabilityCurve = { reactiveCapabilityCurve = it.toPb() },
+            isGroundingImpedance = { groundingImpedance = it.toPb() },
+            isPetersenCoil = { petersenCoil = it.toPb() },
+            isPanDemandResponseFunction = { panDemandResponseFunction = it.toPb() },
+            isBatteryControl = { batteryControl = it.toPb() },
+            isStaticVarCompensator = { staticVarCompensator = it.toPb() },
+            isPerLengthPhaseImpedance = { perLengthPhaseImpedance = it.toPb() },
+            isCut = { cut = it.toPb() },
+            isClamp = { clamp = it.toPb() },
+        )
+    }.build()
 
 // ################################
 // # EXTENSIONS IEC61968 METERING #
@@ -1730,6 +1829,10 @@ fun PowerElectronicsWindUnit.toPb(): PBPowerElectronicsWindUnit = toPb(this, PBP
 fun toPb(cim: AcLineSegment, pb: PBAcLineSegment.Builder): PBAcLineSegment.Builder =
     pb.apply {
         cim.perLengthImpedance?.let { perLengthImpedanceMRID = it.mRID } ?: clearPerLengthImpedanceMRID()
+        clearCutMRIDs()
+        cim.cuts.forEach { addCutMRIDs(it.mRID) }
+        clearClampMRIDs()
+        cim.clamps.forEach { addClampMRIDs(it.mRID) }
         toPb(cim, cdBuilder)
     }
 
@@ -1757,6 +1860,20 @@ fun toPb(cim: BusbarSection, pb: PBBusbarSection.Builder): PBBusbarSection.Build
     pb.apply { toPb(cim, cnBuilder) }
 
 /**
+ * Convert the [Clamp] into its protobuf counterpart.
+ *
+ * @param cim The [Clamp] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: Clamp, pb: PBClamp.Builder): PBClamp.Builder =
+    pb.apply {
+        lengthFromTerminal1 = cim.lengthFromTerminal1 ?: UNKNOWN_DOUBLE
+        cim.acLineSegment?.let { acLineSegmentMRID = it.mRID } ?: clearAcLineSegmentMRID()
+        toPb(cim, ceBuilder)
+    }
+
+/**
  * Convert the [Conductor] into its protobuf counterpart.
  *
  * @param cim The [Conductor] to convert.
@@ -1780,6 +1897,20 @@ fun toPb(cim: Conductor, pb: PBConductor.Builder): PBConductor.Builder =
  */
 fun toPb(cim: Connector, pb: PBConnector.Builder): PBConnector.Builder =
     pb.apply { toPb(cim, ceBuilder) }
+
+/**
+ * Convert the [Cut] into its protobuf counterpart.
+ *
+ * @param cim The [Cut] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: Cut, pb: PBCut.Builder): PBCut.Builder =
+    pb.apply {
+        lengthFromTerminal1 = cim.lengthFromTerminal1 ?: UNKNOWN_DOUBLE
+        cim.acLineSegment?.let { acLineSegmentMRID = it.mRID } ?: clearAcLineSegmentMRID()
+        toPb(cim, swBuilder)
+    }
 
 /**
  * Convert the [Disconnector] into its protobuf counterpart.
@@ -2525,6 +2656,16 @@ fun Breaker.toPb(): PBBreaker = toPb(this, PBBreaker.newBuilder()).build()
 fun BusbarSection.toPb(): PBBusbarSection = toPb(this, PBBusbarSection.newBuilder()).build()
 
 /**
+ * An extension for converting any Clamp into its protobuf counterpart.
+ */
+fun Clamp.toPb(): PBClamp = toPb(this, PBClamp.newBuilder()).build()
+
+/**
+ * An extension for converting any Cut into its protobuf counterpart.
+ */
+fun Cut.toPb(): PBCut = toPb(this, PBCut.newBuilder()).build()
+
+/**
  * An extension for converting any Disconnector into its protobuf counterpart.
  */
 fun Disconnector.toPb(): PBDisconnector = toPb(this, PBDisconnector.newBuilder()).build()
@@ -3252,6 +3393,22 @@ class NetworkCimToProto : BaseCimToProto() {
      * @return The protobuf form of [cim].
      */
     fun toPb(cim: BusbarSection): PBBusbarSection = cim.toPb()
+
+    /**
+     * Convert the [Clamp] into its protobuf counterpart.
+     *
+     * @param cim The [Clamp] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: Clamp): PBClamp = cim.toPb()
+
+    /**
+     * Convert the [Cut] into its protobuf counterpart.
+     *
+     * @param cim The [Cut] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: Cut): PBCut = cim.toPb()
 
     /**
      * Convert the [Disconnector] into its protobuf counterpart.

@@ -26,7 +26,8 @@ internal class CustomerTranslatorTest : TranslatorTestBase<CustomerService>(
     ::CustomerService,
     CustomerServiceComparator(),
     CustomerDatabaseTables(),
-    CustomerService::addFromPb
+    CustomerService::addFromPb,
+    ::customerIdentifiedObject
 ) {
 
     private val csToPb = CustomerCimToProto()

@@ -42,7 +42,9 @@ import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import java.time.Instant
 import java.util.*
 
-/************ EXTENSION IEC61968 METERING ************/
+// ###############################
+// # EXTENSION IEC61968 METERING #
+// ###############################
 
 fun PanDemandResponseFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): PanDemandResponseFunction {
     (this as EndDeviceFunction).fillFields(service, includeRuntime)
@@ -60,7 +62,9 @@ fun PanDemandResponseFunction.fillFields(service: NetworkService, includeRuntime
     return this
 }
 
-/************ EXTENSION IEC61970 BASE WIRES ************/
+// #################################
+// # EXTENSION IEC61970 BASE WIRES #
+// #################################
 
 fun BatteryControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): BatteryControl {
     (this as RegulatingControl).fillFields(service, includeRuntime)
@@ -73,12 +77,9 @@ fun BatteryControl.fillFields(service: NetworkService, includeRuntime: Boolean =
     return this
 }
 
-/************ IEC61968 ASSET INFO ************/
-
-fun AssetInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): AssetInfo {
-    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
-    return this
-}
+// #######################
+// # IEC61968 ASSET INFO #
+// #######################
 
 fun CableInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CableInfo {
     (this as WireInfo).fillFields(service, includeRuntime)
@@ -232,7 +233,9 @@ fun WireInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     return this
 }
 
-/************ IEC61968 ASSETS ************/
+// ###################
+// # IEC61968 ASSETS #
+// ###################
 
 fun Asset.fillFields(service: NetworkService, includeRuntime: Boolean = true): Asset {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
@@ -249,6 +252,11 @@ fun AssetContainer.fillFields(service: NetworkService, includeRuntime: Boolean =
 }
 
 fun AssetFunction.fillFields(service: NetworkService, includeRuntime: Boolean = true): AssetFunction {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+    return this
+}
+
+fun AssetInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): AssetInfo {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
     return this
 }
@@ -294,7 +302,9 @@ fun Structure.fillFields(service: NetworkService, includeRuntime: Boolean = true
     return this
 }
 
-/************ IEC61968 COMMON ************/
+// ###################
+// # IEC61968 COMMON #
+// ###################
 
 fun Location.fillFields(service: NetworkService, includeRuntime: Boolean = true): Location {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
@@ -306,17 +316,9 @@ fun Location.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     return this
 }
 
-/************ IEC61968 infIEC61968 InfAssetInfo ************/
-
-fun RelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): RelayInfo {
-    (this as AssetInfo).fillFields(service, includeRuntime)
-
-    curveSetting = "curveSetting"
-    recloseFast = true
-    addDelays(1.0, 2.0, 3.0)
-
-    return this
-}
+// #####################################
+// # IEC61968 infIEC61968 InfAssetInfo #
+// #####################################
 
 fun CurrentTransformerInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentTransformerInfo {
     (this as AssetInfo).fillFields(service, includeRuntime)
@@ -350,7 +352,19 @@ fun PotentialTransformerInfo.fillFields(service: NetworkService, includeRuntime:
     return this
 }
 
-/************ IEC61968 METERING ************/
+fun RelayInfo.fillFields(service: NetworkService, includeRuntime: Boolean = true): RelayInfo {
+    (this as AssetInfo).fillFields(service, includeRuntime)
+
+    curveSetting = "curveSetting"
+    recloseFast = true
+    addDelays(1.0, 2.0, 3.0)
+
+    return this
+}
+
+// #####################
+// # IEC61968 METERING #
+// #####################
 
 fun EndDevice.fillFields(service: NetworkService, includeRuntime: Boolean = true): EndDevice {
     (this as AssetContainer).fillFields(service, includeRuntime)
@@ -410,7 +424,9 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
     return this
 }
 
-/************ IEC61968 OPERATIONS ************/
+// #######################
+// # IEC61968 OPERATIONS #
+// #######################
 
 fun OperationalRestriction.fillFields(service: NetworkService, includeRuntime: Boolean = true): OperationalRestriction {
     (this as Document).fillFieldsCommon(service, includeRuntime)
@@ -426,7 +442,9 @@ fun OperationalRestriction.fillFields(service: NetworkService, includeRuntime: B
     return this
 }
 
-/************ IEC61970 BASE AUXILIARY EQUIPMENT ************/
+// #####################################
+// # IEC61970 BASE AUXILIARY EQUIPMENT #
+// #####################################
 
 fun AuxiliaryEquipment.fillFields(service: NetworkService, includeRuntime: Boolean = true): AuxiliaryEquipment {
     (this as Equipment).fillFields(service, includeRuntime)
@@ -479,7 +497,9 @@ fun Sensor.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
     return this
 }
 
-/************ IEC61970 BASE CORE ************/
+// ######################
+// # IEC61970 BASE CORE #
+// ######################
 
 fun AcDcTerminal.fillFields(service: NetworkService, includeRuntime: Boolean = true): AcDcTerminal {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
@@ -494,8 +514,15 @@ fun BaseVoltage.fillFields(service: NetworkService, includeRuntime: Boolean = tr
     return this
 }
 
-fun ConnectivityNodeContainer.fillFields(service: NetworkService, includeRuntime: Boolean = true): ConnectivityNodeContainer {
-    (this as PowerSystemResource).fillFields(service, includeRuntime)
+fun ConductingEquipment.fillFields(service: NetworkService, includeRuntime: Boolean = true): ConductingEquipment {
+    (this as Equipment).fillFields(service, includeRuntime)
+
+    baseVoltage = BaseVoltage().also { service.add(it) }
+
+    @Suppress("unused")
+    for (i in 0..1)
+        addTerminal(Terminal().also { service.add(it) })
+
     return this
 }
 
@@ -508,6 +535,54 @@ fun ConnectivityNode.fillFields(service: NetworkService, includeRuntime: Boolean
             it.connectivityNode = this
             service.add(it)
         })
+
+    return this
+}
+
+fun ConnectivityNodeContainer.fillFields(service: NetworkService, includeRuntime: Boolean = true): ConnectivityNodeContainer {
+    (this as PowerSystemResource).fillFields(service, includeRuntime)
+    return this
+}
+
+fun Curve.fillFields(service: NetworkService, includeRuntime: Boolean = true): Curve {
+    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+
+    addData(1f, 1f)
+
+    return this
+}
+
+fun Equipment.fillFields(service: NetworkService, includeRuntime: Boolean = true): Equipment {
+    (this as PowerSystemResource).fillFields(service, includeRuntime)
+
+    inService = false
+    normallyInService = false
+    commissionedDate = Instant.MIN
+
+    @Suppress("unused")
+    for (i in 0..1) {
+        addUsagePoint(UsagePoint().also {
+            it.addEquipment(this)
+            service.add(it)
+        })
+
+        addOperationalRestriction(OperationalRestriction().also {
+            it.addEquipment(this)
+            service.add(it)
+        })
+
+        addContainer(Circuit().also {
+            it.addEquipment(this)
+            service.add(it)
+        })
+
+        if (includeRuntime) {
+            addCurrentContainer(Feeder().also {
+                it.addEquipment(this)
+                service.add(it)
+            })
+        }
+    }
 
     return this
 }
@@ -575,53 +650,6 @@ fun PowerSystemResource.fillFields(service: NetworkService, includeRuntime: Bool
 
     location = Location().apply { addPoint(PositionPoint(3.3, 4.4)) }.also { service.add(it) }
     numControls = 5
-
-    return this
-}
-
-fun Equipment.fillFields(service: NetworkService, includeRuntime: Boolean = true): Equipment {
-    (this as PowerSystemResource).fillFields(service, includeRuntime)
-
-    inService = false
-    normallyInService = false
-    commissionedDate = Instant.MIN
-
-    @Suppress("unused")
-    for (i in 0..1) {
-        addUsagePoint(UsagePoint().also {
-            it.addEquipment(this)
-            service.add(it)
-        })
-
-        addOperationalRestriction(OperationalRestriction().also {
-            it.addEquipment(this)
-            service.add(it)
-        })
-
-        addContainer(Circuit().also {
-            it.addEquipment(this)
-            service.add(it)
-        })
-
-        if (includeRuntime) {
-            addCurrentContainer(Feeder().also {
-                it.addEquipment(this)
-                service.add(it)
-            })
-        }
-    }
-
-    return this
-}
-
-fun ConductingEquipment.fillFields(service: NetworkService, includeRuntime: Boolean = true): ConductingEquipment {
-    (this as Equipment).fillFields(service, includeRuntime)
-
-    baseVoltage = BaseVoltage().also { service.add(it) }
-
-    @Suppress("unused")
-    for (i in 0..1)
-        addTerminal(Terminal().also { service.add(it) })
 
     return this
 }
@@ -700,7 +728,9 @@ fun Terminal.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     return this
 }
 
-/************ IEC61970 BASE EQUIVALENTS ************/
+// #############################
+// # IEC61970 BASE EQUIVALENTS #
+// #############################
 
 fun EquivalentBranch.fillFields(service: NetworkService, includeRuntime: Boolean = true): EquivalentBranch {
     (this as EquivalentEquipment).fillFields(service, includeRuntime)
@@ -730,18 +760,20 @@ fun EquivalentEquipment.fillFields(service: NetworkService, includeRuntime: Bool
     return this
 }
 
-/************ IEC61970 BASE MEAS ************/
+// ######################
+// # IEC61970 BASE MEAS #
+// ######################
+
+fun Accumulator.fillFields(service: NetworkService, includeRuntime: Boolean = true): Accumulator {
+    (this as Measurement).fillFields(service, includeRuntime)
+    return this
+}
 
 fun Analog.fillFields(service: NetworkService, includeRuntime: Boolean = true): Analog {
     (this as Measurement).fillFields(service, includeRuntime)
 
     positiveFlowIn = true
 
-    return this
-}
-
-fun Accumulator.fillFields(service: NetworkService, includeRuntime: Boolean = true): Accumulator {
-    (this as Measurement).fillFields(service, includeRuntime)
     return this
 }
 
@@ -785,7 +817,9 @@ fun Measurement.fillFields(service: NetworkService, includeRuntime: Boolean = tr
     return this
 }
 
-/************ IEC61970 Base Protection ************/
+// ############################
+// # IEC61970 Base Protection #
+// ############################
 
 fun CurrentRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): CurrentRelay {
     (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
@@ -886,7 +920,9 @@ fun VoltageRelay.fillFields(service: NetworkService, includeRuntime: Boolean = t
 }
 
 
-/************ IEC61970 BASE SCADA ************/
+// #######################
+// # IEC61970 BASE SCADA #
+// #######################
 
 fun RemoteControl.fillFields(service: NetworkService, includeRuntime: Boolean = true): RemoteControl {
     (this as RemotePoint).fillFields(service, includeRuntime)
@@ -915,7 +951,9 @@ fun RemoteSource.fillFields(service: NetworkService, includeRuntime: Boolean = t
     return this
 }
 
-/************ IEC61970 BASE WIRES GENERATION PRODUCTION ************/
+// #############################################
+// # IEC61970 BASE WIRES GENERATION PRODUCTION #
+// #############################################
 
 fun BatteryUnit.fillFields(service: NetworkService, includeRuntime: Boolean = true): BatteryUnit {
     (this as PowerElectronicsUnit).fillFields(service, includeRuntime)
@@ -931,58 +969,6 @@ fun BatteryUnit.fillFields(service: NetworkService, includeRuntime: Boolean = tr
 
 fun PhotoVoltaicUnit.fillFields(service: NetworkService, includeRuntime: Boolean = true): PhotoVoltaicUnit {
     (this as PowerElectronicsUnit).fillFields(service, includeRuntime)
-    return this
-}
-
-fun PowerElectronicsConnection.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerElectronicsConnection {
-    (this as RegulatingCondEq).fillFields(service, includeRuntime)
-
-    maxIFault = 1
-    maxQ = 2.0
-    minQ = 3.0
-    p = 4.0
-    q = 5.0
-    ratedS = 6
-    ratedU = 7
-    inverterStandard = "TEST"
-    sustainOpOvervoltLimit = 8
-    stopAtOverFreq = 10.0f
-    stopAtUnderFreq = 5.0f
-    invVoltWattRespMode = false
-    invWattRespV1 = 200
-    invWattRespV2 = 216
-    invWattRespV3 = 235
-    invWattRespV4 = 244
-    invWattRespPAtV1 = 0.1f
-    invWattRespPAtV2 = 0.2f
-    invWattRespPAtV3 = 0.3f
-    invWattRespPAtV4 = 0.1f
-    invVoltVarRespMode = false
-    invVarRespV1 = 200
-    invVarRespV2 = 200
-    invVarRespV3 = 300
-    invVarRespV4 = 300
-    invVarRespQAtV1 = 0.6f
-    invVarRespQAtV2 = -1.0f
-    invVarRespQAtV3 = 1.0f
-    invVarRespQAtV4 = -0.6f
-    invReactivePowerMode = false
-    invFixReactivePower = -1.0f
-
-    return this
-}
-
-fun PowerElectronicsConnectionPhase.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerElectronicsConnectionPhase {
-    (this as PowerSystemResource).fillFields(service, includeRuntime)
-
-    powerElectronicsConnection = PowerElectronicsConnection().also {
-        it.addPhase(this)
-        service.add(it)
-    }
-    p = 1.0
-    phase = SinglePhaseKind.B
-    q = 2.0
-
     return this
 }
 
@@ -1004,12 +990,19 @@ fun PowerElectronicsWindUnit.fillFields(service: NetworkService, includeRuntime:
     return this
 }
 
-/************ IEC61970 BASE WIRES ************/
+// #######################
+// # IEC61970 BASE WIRES #
+// #######################
 
 fun AcLineSegment.fillFields(service: NetworkService, includeRuntime: Boolean = true): AcLineSegment {
     (this as Conductor).fillFields(service, includeRuntime)
 
     perLengthImpedance = PerLengthSequenceImpedance().also { service.add(it) }
+    @Suppress("unused")
+    for (i in 0..1) {
+        addCut(Cut().also { service.add(it) })
+        addClamp(Clamp().also { service.add(it) })
+    }
 
     return this
 }
@@ -1024,6 +1017,18 @@ fun Breaker.fillFields(service: NetworkService, includeRuntime: Boolean = true):
 
 fun BusbarSection.fillFields(service: NetworkService, includeRuntime: Boolean = true): BusbarSection {
     (this as Connector).fillFields(service, includeRuntime)
+    return this
+}
+
+fun Clamp.fillFields(service: NetworkService, includeRuntime: Boolean = true): Clamp {
+    (this as ConductingEquipment).fillFields(service, includeRuntime)
+
+    lengthFromTerminal1 = 1.1
+    acLineSegment = AcLineSegment().also {
+        it.addClamp(this)
+        service.add(it)
+    }
+
     return this
 }
 
@@ -1043,10 +1048,14 @@ fun Connector.fillFields(service: NetworkService, includeRuntime: Boolean = true
     return this
 }
 
-fun Curve.fillFields(service: NetworkService, includeRuntime: Boolean = true): Curve {
-    (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
+fun Cut.fillFields(service: NetworkService, includeRuntime: Boolean = true): Cut {
+    (this as Switch).fillFields(service, includeRuntime)
 
-    addData(1f, 1f)
+    lengthFromTerminal1 = 1.1
+    acLineSegment = AcLineSegment().also {
+        it.addCut(this)
+        service.add(it)
+    }
 
     return this
 }
@@ -1172,16 +1181,16 @@ fun Ground.fillFields(service: NetworkService, includeRuntime: Boolean = true): 
     return this
 }
 
+fun GroundDisconnector.fillFields(service: NetworkService, includeRuntime: Boolean = true): GroundDisconnector {
+    (this as Switch).fillFields(service, includeRuntime)
+    return this
+}
+
 fun GroundingImpedance.fillFields(service: NetworkService, includeRuntime: Boolean = true): GroundingImpedance {
     (this as EarthFaultCompensator).fillFields(service, includeRuntime)
 
     x = 1.0
 
-    return this
-}
-
-fun GroundDisconnector.fillFields(service: NetworkService, includeRuntime: Boolean = true): GroundDisconnector {
-    (this as Switch).fillFields(service, includeRuntime)
     return this
 }
 
@@ -1254,6 +1263,58 @@ fun PetersenCoil.fillFields(service: NetworkService, includeRuntime: Boolean = t
     (this as EarthFaultCompensator).fillFields(service, includeRuntime)
 
     xGroundNominal = 1.0
+
+    return this
+}
+
+fun PowerElectronicsConnection.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerElectronicsConnection {
+    (this as RegulatingCondEq).fillFields(service, includeRuntime)
+
+    maxIFault = 1
+    maxQ = 2.0
+    minQ = 3.0
+    p = 4.0
+    q = 5.0
+    ratedS = 6
+    ratedU = 7
+    inverterStandard = "TEST"
+    sustainOpOvervoltLimit = 8
+    stopAtOverFreq = 10.0f
+    stopAtUnderFreq = 5.0f
+    invVoltWattRespMode = false
+    invWattRespV1 = 200
+    invWattRespV2 = 216
+    invWattRespV3 = 235
+    invWattRespV4 = 244
+    invWattRespPAtV1 = 0.1f
+    invWattRespPAtV2 = 0.2f
+    invWattRespPAtV3 = 0.3f
+    invWattRespPAtV4 = 0.1f
+    invVoltVarRespMode = false
+    invVarRespV1 = 200
+    invVarRespV2 = 200
+    invVarRespV3 = 300
+    invVarRespV4 = 300
+    invVarRespQAtV1 = 0.6f
+    invVarRespQAtV2 = -1.0f
+    invVarRespQAtV3 = 1.0f
+    invVarRespQAtV4 = -0.6f
+    invReactivePowerMode = false
+    invFixReactivePower = -1.0f
+
+    return this
+}
+
+fun PowerElectronicsConnectionPhase.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerElectronicsConnectionPhase {
+    (this as PowerSystemResource).fillFields(service, includeRuntime)
+
+    powerElectronicsConnection = PowerElectronicsConnection().also {
+        it.addPhase(this)
+        service.add(it)
+    }
+    p = 1.0
+    phase = SinglePhaseKind.B
+    q = 2.0
 
     return this
 }
@@ -1528,7 +1589,9 @@ fun TransformerStarImpedance.fillFields(service: NetworkService, includeRuntime:
     return this
 }
 
-/************ IEC61970 InfIEC61970 Feeder ************/
+// ###############################
+// # IEC61970 InfIEC61970 Feeder #
+// ###############################
 
 fun Circuit.fillFields(service: NetworkService, includeRuntime: Boolean = true): Circuit {
     (this as Line).fillFields(service, includeRuntime)
@@ -1606,7 +1669,9 @@ fun LvFeeder.fillFields(service: NetworkService, includeRuntime: Boolean = true)
     return this
 }
 
-/************ IEC61970 InfIEC61970 WIRES GENERATION PRODUCTION ************/
+// ####################################################
+// # IEC61970 InfIEC61970 WIRES GENERATION PRODUCTION #
+// ####################################################
 
 fun EvChargingUnit.fillFields(service: NetworkService, includeRuntime: Boolean = true): EvChargingUnit {
     (this as PowerElectronicsUnit).fillFields(service, includeRuntime)

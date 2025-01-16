@@ -124,8 +124,10 @@ import com.zepben.protobuf.cim.iec61970.base.scada.RemoteSource as PBRemoteSourc
 import com.zepben.protobuf.cim.iec61970.base.wires.AcLineSegment as PBAcLineSegment
 import com.zepben.protobuf.cim.iec61970.base.wires.Breaker as PBBreaker
 import com.zepben.protobuf.cim.iec61970.base.wires.BusbarSection as PBBusbarSection
+import com.zepben.protobuf.cim.iec61970.base.wires.Clamp as PBClamp
 import com.zepben.protobuf.cim.iec61970.base.wires.Conductor as PBConductor
 import com.zepben.protobuf.cim.iec61970.base.wires.Connector as PBConnector
+import com.zepben.protobuf.cim.iec61970.base.wires.Cut as PBCut
 import com.zepben.protobuf.cim.iec61970.base.wires.Disconnector as PBDisconnector
 import com.zepben.protobuf.cim.iec61970.base.wires.EarthFaultCompensator as PBEarthFaultCompensator
 import com.zepben.protobuf.cim.iec61970.base.wires.EnergyConnection as PBEnergyConnection
@@ -1749,6 +1751,12 @@ fun NetworkService.addFromPb(pb: PBPowerElectronicsWindUnit): PowerElectronicsWi
 fun toCim(pb: PBAcLineSegment, networkService: NetworkService): AcLineSegment =
     AcLineSegment(pb.mRID()).apply {
         networkService.resolveOrDeferReference(Resolvers.perLengthImpedance(this), pb.perLengthImpedanceMRID)
+        pb.cutMRIDsList.forEach { cutMRID ->
+            networkService.resolveOrDeferReference(Resolvers.cuts(this), cutMRID)
+        }
+        pb.clampMRIDsList.forEach { clampMRID ->
+            networkService.resolveOrDeferReference(Resolvers.clamps(this), clampMRID)
+        }
         toCim(pb.cd, this, networkService)
     }
 
@@ -1790,6 +1798,20 @@ fun toCim(pb: PBBusbarSection, networkService: NetworkService): BusbarSection =
     }
 
 /**
+ * Convert the protobuf [PBClamp] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBClamp] to convert.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [Clamp].
+ */
+fun toCim(pb: PBClamp, networkService: NetworkService): Clamp =
+    Clamp(pb.mRID()).apply {
+        lengthFromTerminal1 = pb.lengthFromTerminal1.takeUnless { it == UNKNOWN_DOUBLE }
+        networkService.resolveOrDeferReference(Resolvers.acLineSegment(this), pb.acLineSegmentMRID)
+        toCim(pb.ce, this, networkService)
+    }
+
+/**
  * Convert the protobuf [PBConductor] into its CIM counterpart.
  *
  * @param pb The protobuf [PBConductor] to convert.
@@ -1816,6 +1838,20 @@ fun toCim(pb: PBConductor, cim: Conductor, networkService: NetworkService): Cond
  */
 fun toCim(pb: PBConnector, cim: Connector, networkService: NetworkService): Connector =
     cim.apply { toCim(pb.ce, this, networkService) }
+
+/**
+ * Convert the protobuf [PBCut] into its CIM counterpart.
+ *
+ * @param pb The protobuf [PBCut] to convert.
+ * @param networkService The [NetworkService] the converted CIM object will be added too.
+ * @return The converted [pb] as a CIM [Cut].
+ */
+fun toCim(pb: PBCut, networkService: NetworkService): Cut =
+    Cut(pb.mRID()).apply {
+        lengthFromTerminal1 = pb.lengthFromTerminal1.takeUnless { it == UNKNOWN_DOUBLE }
+        networkService.resolveOrDeferReference(Resolvers.acLineSegment(this), pb.acLineSegmentMRID)
+        toCim(pb.sw, this, networkService)
+    }
 
 /**
  * Convert the protobuf [PBDisconnector] into its CIM counterpart.
@@ -2585,6 +2621,16 @@ fun NetworkService.addFromPb(pb: PBBreaker): Breaker? = tryAddOrNull(toCim(pb, t
 fun NetworkService.addFromPb(pb: PBBusbarSection): BusbarSection? = tryAddOrNull(toCim(pb, this))
 
 /**
+ * An extension to add a converted copy of the protobuf [PBClamp] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBClamp): Clamp? = tryAddOrNull(toCim(pb, this))
+
+/**
+ * An extension to add a converted copy of the protobuf [PBCut] to the [NetworkService].
+ */
+fun NetworkService.addFromPb(pb: PBCut): Cut? = tryAddOrNull(toCim(pb, this))
+
+/**
  * An extension to add a converted copy of the protobuf [PBDisconnector] to the [NetworkService].
  */
 fun NetworkService.addFromPb(pb: PBDisconnector): Disconnector? = tryAddOrNull(toCim(pb, this))
@@ -3326,6 +3372,22 @@ class NetworkProtoToCim(val networkService: NetworkService) : BaseProtoToCim() {
      * @return The converted [BusbarSection]
      */
     fun addFromPb(pb: PBBusbarSection): BusbarSection? = networkService.addFromPb(pb)
+
+    /**
+     * Add a converted copy of the protobuf [PBClamp] to the [NetworkService].
+     *
+     * @param pb The [PBClamp] to convert.
+     * @return The converted [Clamp]
+     */
+    fun addFromPb(pb: PBClamp): Clamp? = networkService.addFromPb(pb)
+
+    /**
+     * Add a converted copy of the protobuf [PBCut] to the [NetworkService].
+     *
+     * @param pb The [PBCut] to convert.
+     * @return The converted [Cut]
+     */
+    fun addFromPb(pb: PBCut): Cut? = networkService.addFromPb(pb)
 
     /**
      * Add a converted copy of the protobuf [PBDisconnector] to the [NetworkService].

@@ -12,8 +12,7 @@ import com.zepben.evolve.cim.iec61968.customers.Customer
 import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.services.customer.CustomerService
-import com.zepben.evolve.services.customer.translator.toPb
-import com.zepben.evolve.services.customer.whenCustomerServiceObject
+import com.zepben.evolve.services.customer.translator.customerIdentifiedObject
 import com.zepben.evolve.streaming.get.ConsumerUtils.buildFromBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.forEachBuilder
 import com.zepben.evolve.streaming.get.ConsumerUtils.validateFailure
@@ -322,23 +321,10 @@ internal class CustomerConsumerClientTest {
     private fun responseOf(objects: List<Customer>): MutableIterator<GetCustomersForContainerResponse> {
         val responses = mutableListOf<GetCustomersForContainerResponse>()
         objects.forEach {
-            responses.add(GetCustomersForContainerResponse.newBuilder().apply { buildCIO(it, addIdentifiedObjectsBuilder()) }.build())
+            responses.add(GetCustomersForContainerResponse.newBuilder().apply { addIdentifiedObjects(customerIdentifiedObject(it)) }.build())
         }
         return responses.iterator()
     }
-
-    private fun buildCIO(obj: IdentifiedObject, identifiedObjectBuilder: CIO.Builder): CIO? =
-        identifiedObjectBuilder.apply {
-            whenCustomerServiceObject(
-                obj,
-                isCustomer = { customer = it.toPb() },
-                isCustomerAgreement = {},
-                isOrganisation = {},
-                isTariff = {},
-                isPricingStructure = {},
-                isOther = {},
-            )
-        }.build()
 
     private fun createResponse(
         identifiedObjectBuilder: CIO.Builder,

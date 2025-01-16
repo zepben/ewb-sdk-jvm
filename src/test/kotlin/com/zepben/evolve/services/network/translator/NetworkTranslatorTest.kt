@@ -63,7 +63,8 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
     ::NetworkService,
     NetworkServiceComparator(),
     NetworkDatabaseTables(),
-    NetworkService::addFromPb
+    NetworkService::addFromPb,
+    ::networkIdentifiedObject
 ) {
 
     private val nsToPb = NetworkCimToProto()
@@ -154,6 +155,8 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         ValidationInfo(AcLineSegment(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(Breaker(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(BusbarSection(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(Clamp(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
+        ValidationInfo(Cut(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(Disconnector(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(EnergyConsumer(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(EnergyConsumerPhase(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),

@@ -295,6 +295,12 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     fun add(disconnector: Disconnector): Boolean = super.add(disconnector)
     fun remove(disconnector: Disconnector): Boolean = super.remove(disconnector)
 
+    fun add(clamp: Clamp): Boolean = super.add(clamp)
+    fun remove(clamp: Clamp): Boolean = super.remove(clamp)
+
+    fun add(cut: Cut): Boolean = super.add(cut)
+    fun remove(cut: Cut): Boolean = super.remove(cut)
+
     fun add(energyConsumer: EnergyConsumer): Boolean = super.add(energyConsumer)
     fun remove(energyConsumer: EnergyConsumer): Boolean = super.remove(energyConsumer)
 

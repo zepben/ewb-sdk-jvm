@@ -556,8 +556,18 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         comparatorValidator.validateProperty(Feeder::normalHeadTerminal, { Feeder(it) }, { Terminal("t1") }, { Terminal("t2") })
         comparatorValidator.validateProperty(Feeder::normalEnergizingSubstation, { Feeder(it) }, { Substation("s1") }, { Substation("s2") })
         comparatorValidator.validateCollection(Feeder::currentEquipment, Feeder::addCurrentEquipment, { Feeder(it) }, { Junction("j1") }, { Junction("j2") })
-        comparatorValidator.validateCollection(Feeder::normalEnergizedLvFeeders, Feeder::addNormalEnergizedLvFeeder, { Feeder(it) }, { LvFeeder("lvf1") }, { LvFeeder("lvf2") })
-        comparatorValidator.validateCollection(Feeder::currentEnergizedLvFeeders, Feeder::addCurrentEnergizedLvFeeder, { Feeder(it) }, { LvFeeder("lvf1") }, { LvFeeder("lvf2") })
+        comparatorValidator.validateCollection(
+            Feeder::normalEnergizedLvFeeders,
+            Feeder::addNormalEnergizedLvFeeder,
+            { Feeder(it) },
+            { LvFeeder("lvf1") },
+            { LvFeeder("lvf2") })
+        comparatorValidator.validateCollection(
+            Feeder::currentEnergizedLvFeeders,
+            Feeder::addCurrentEnergizedLvFeeder,
+            { Feeder(it) },
+            { LvFeeder("lvf1") },
+            { LvFeeder("lvf2") })
 
     }
 
@@ -913,6 +923,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
             { PerLengthSequenceImpedance("p1") },
             { PerLengthSequenceImpedance("p2") }
         )
+        comparatorValidator.validateCollection(AcLineSegment::cuts, AcLineSegment::addCut, { AcLineSegment(it) }, { Cut("c1") }, { Cut("c2") })
+        comparatorValidator.validateCollection(AcLineSegment::clamps, AcLineSegment::addClamp, { AcLineSegment(it) }, { Clamp("c1") }, { Clamp("c2") })
     }
 
     @Test
@@ -927,6 +939,14 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareConnector { BusbarSection(it) }
     }
 
+    @Test
+    internal fun compareClamp() {
+        compareConductingEquipment { Clamp(it) }
+
+        comparatorValidator.validateProperty(Clamp::lengthFromTerminal1, { Clamp(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(Clamp::acLineSegment, { Clamp(it) }, { AcLineSegment("c1") }, { AcLineSegment("c2") })
+    }
+
     private fun compareConductor(createConductor: (String) -> Conductor) {
         compareConductingEquipment(createConductor)
 
@@ -938,6 +958,14 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
     private fun compareConnector(createConnector: (String) -> Connector) {
         compareConductingEquipment(createConnector)
+    }
+
+    @Test
+    internal fun compareCut() {
+        compareSwitch { Cut(it) }
+
+        comparatorValidator.validateProperty(Cut::lengthFromTerminal1, { Cut(it) }, { 1.0 }, { 2.0 })
+        comparatorValidator.validateProperty(Cut::acLineSegment, { Cut(it) }, { AcLineSegment("c1") }, { AcLineSegment("c2") })
     }
 
     @Test
@@ -1571,9 +1599,24 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareEquipmentContainer { LvFeeder(it) }
 
         comparatorValidator.validateProperty(LvFeeder::normalHeadTerminal, { LvFeeder(it) }, { Terminal("t1") }, { Terminal("t2") })
-        comparatorValidator.validateCollection(LvFeeder::currentEquipment, LvFeeder::addCurrentEquipment, { LvFeeder(it) }, { Junction("j1") }, { Junction("j2") })
-        comparatorValidator.validateCollection(LvFeeder::normalEnergizingFeeders, LvFeeder::addNormalEnergizingFeeder, { LvFeeder(it) }, { Feeder("lvf1") }, { Feeder("lvf2") })
-        comparatorValidator.validateCollection(LvFeeder::currentEnergizingFeeders, LvFeeder::addCurrentEnergizingFeeder, { LvFeeder(it) }, { Feeder("lvf1") }, { Feeder("lvf2") })
+        comparatorValidator.validateCollection(
+            LvFeeder::currentEquipment,
+            LvFeeder::addCurrentEquipment,
+            { LvFeeder(it) },
+            { Junction("j1") },
+            { Junction("j2") })
+        comparatorValidator.validateCollection(
+            LvFeeder::normalEnergizingFeeders,
+            LvFeeder::addNormalEnergizingFeeder,
+            { LvFeeder(it) },
+            { Feeder("lvf1") },
+            { Feeder("lvf2") })
+        comparatorValidator.validateCollection(
+            LvFeeder::currentEnergizingFeeders,
+            LvFeeder::addCurrentEnergizingFeeder,
+            { LvFeeder(it) },
+            { Feeder("lvf1") },
+            { Feeder("lvf2") })
 
     }
 

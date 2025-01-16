@@ -24,12 +24,16 @@ Our main style requirements are:
 
 ## Checklist for model change ##
 
+Make sure you double (or triple) check the ones listed in the "most important" list below.
+
 1. Update `pom.xml` to import the correct version of `evolve-grpc`.
-2. Model updated and tested.
-3. Add/remove methods added to *Service class if new class was added.
-4. Descriptions copied from CIM and added as doc comments to new changes (on class, property etc)
-5. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required.
-6. Database:
+2. Model updated and tested. Pay attention to:
+   1. Ensure descriptions are copied from CIM and added as doc comments.
+   2. All extension classes/enums are under the `com.zepben.evolve.cim.extensions` package in their appropriate sub-package.
+   3. Mark all extensions (classes, enums and properties) with `@ZBEX` and documented with `[ZBEX]`
+3. Add/remove methods added to *Service class if any new classes were added.
+4. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required.
+5. Database:
    1. Table class(es) updated. - `com.zepben.evolve.database.sqlite.cim.tables`
    2. New tables added to appropriate database table collections:
       * `com.zepben.evolve.database.sqlite.cim.customer.CustomerDatabaseTables`
@@ -61,18 +65,27 @@ Our main style requirements are:
       * `com.zepben.evolve.database.sqlite.cim.customer.CustomerDatabaseSchemaTest`
       * `com.zepben.evolve.database.sqlite.cim.diagram.DiagramDatabaseSchemaTest`
       * `com.zepben.evolve.database.sqlite.cim.network.NetworkDatabaseSchemaTest`
-7. Reference resolver(s) added (if new associations).
-8. Protobuf/gRPC
+6. Reference resolver(s) added (if new associations).
+7. Protobuf/gRPC
    1. *CimToProto(s) updated (including java wrapper).
    2. *ProtoToCim(s) updated (including java wrapper).
    3. *TranslatorTest(s) updated.
+8. *ServiceComparator(s) updated.
+9. *ServiceComparatorTest(s) added for each new class and property.
+10. Exhaustive when functions in *ServiceUtils updated if a new class is added. Update *ServiceUtilsTest to match.
+11. Release notes updated.
 
 NOTE: Do not update the StupidlyLargeNetwork file, this will be phased out.
 
-1. *ServiceComparator(s) updated.
-2. *ServiceComparatorTest(s) added for each new class and property.
-3. Exhaustive when functions in *ServiceUtils updated if a new class is added. Update *ServiceUtilsTest to match.
-4. Release notes updated.
+### Most Important ###
+
+These are the most important changes to pay attention to:
+1. `Model updated with descriptions copied from CIM` - commonly done incorrectly.
+2. `FillFields` - fills in the data that many other tests rely on to detect differences in default vs filled classes.
+3. `*ServiceComparator(s) and *ServiceComparatorTest(s)` - used by many tests to validate things, many which can pass with false positive results if not done.
+4. `*TranslatorTest(s)` - ensure the classes will work correctly in user code
+5. `*DatabaseSchemaTest(s)` - ensure migrators will produce databases that load correctly.
+6. `ChangeSetValidator` - must test upgrading existing database tables with populated data to ensure old databases will work.
 
 ## Adding support for new services ##
 

@@ -106,6 +106,8 @@ class NetworkServiceReader @JvmOverloads constructor(
             .andLoadEach<TableBreakers>(reader::load)
             .andLoadEach<TableLoadBreakSwitches>(reader::load)
             .andLoadEach<TableBusbarSections>(reader::load)
+            .andLoadEach<TableClamps>(reader::load)
+            .andLoadEach<TableCuts>(reader::load)
             .andLoadEach<TableCurrentRelays>(reader::load)
             .andLoadEach<TableDistanceRelays>(reader::load)
             .andLoadEach<TableVoltageRelays>(reader::load)

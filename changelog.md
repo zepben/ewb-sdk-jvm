@@ -8,17 +8,30 @@
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
-* Client functionality for updating and querying network states via gRPC service stub. 
+* Client functionality for updating and querying network states via gRPC service stub.
 * `BaseService` now contains a `MetadataCollection` to tightly couple the metadata to the associated service.
 * Added `Services`, a new class which contains a copy of each `BaseService` supported by the SDK.
 * Added `connectWithAccessTokenInsecure()` for connecting to a gRPC service using an access token without SSL/TLS.
 * Added `connectWithAccessToken()` for connecting to a gRPC service using an access token with SSL/TLS.
-* Added `PanDemandResponseFunction`, a new class which contains `EndDeviceFunctionKind` and the identity of the `ControlledAppliance` of this function.
-* Added `BatteryControl`, a new class which describes behaviour specific to controlling  a `BatteryUnit`.
-* Added `StaticVarCompensator` a new class representing a facility for providing variable and controllable shunt reactive power.
-* Added `ControlledAppliance` a new class representing the identity of the appliance controlled by a specific `EndDeviceFunction`.
-* Added `PerLengthPhaseImpedance` a new class used for representing the impedance of individual wires on an AcLineSegment.
-* Added `PhaseImpedanceData` a data class with a link to `PerLengthPhaseImpedance`, for capturing the phase impedance data of an individual wire.
+* Added the following new CIM classes:
+  * `AssetFunction`, the function performed by an asset.
+  * `BatteryControl`, a new class which describes behaviour specific to controlling a `BatteryUnit`.
+  * `Clamp`: A Clamp is a galvanic connection at a line segment where other equipment is connected. A Clamp does not cut the line segment. A Clamp is
+    ConductingEquipment and has one Terminal with an associated ConnectivityNode. Any other ConductingEquipment can be connected to the Clamp ConnectivityNode.
+    __NOT CURRENTLY FULLY SUPPORTED BY TRACING__
+  * `ControlledAppliance`, a new class representing the identity of the appliance controlled by a specific `EndDeviceFunction`.
+  * `Cut`: A cut separates a line segment into two parts. The cut appears as a switch inserted between these two parts and connects them together. As the cut is
+    normally open there is no galvanic connection between the two line segment parts. But it is possible to close the cut to get galvanic connection. The cut
+    terminals are oriented towards the line segment terminals with the same sequence number. Hence the cut terminal with sequence number equal to 1 is oriented
+    to the line segment's terminal with sequence number equal to 1. The cut terminals also act as connection points for jumpers and other equipment, e.g. a
+    mobile generator. To enable this, connectivity nodes are placed at the cut terminals. Once the connectivity nodes are in place any conducting equipment can
+    be connected at them.
+    __NOT CURRENTLY FULLY SUPPORTED BY TRACING__
+  * `EndDeviceFunction`, the function performed by an end device such as a meter, communication equipment, controllers, etc.
+  * `PanDemandResponseFunction`, a new class which contains `EndDeviceFunctionKind` and the identity of the `ControlledAppliance` of this function.
+  * `PerLengthPhaseImpedance`, a new class used for representing the impedance of individual wires on an AcLineSegment.
+  * `PhaseImpedanceData`, a data class with a link to `PerLengthPhaseImpedance`, for capturing the phase impedance data of an individual wire.
+  * `StaticVarCompensator`, a new class representing a facility for providing variable and controllable shunt reactive power.
 * Added new enums:
   * `BatteryControlMode`
   * `EndDeviceFunctionKind`
@@ -26,8 +39,6 @@
 
 ### Enhancements
 * Added `ctPrimary` and `minTargetDeadband` to `RegulatingContrl`.
-* Added collection of `BatteryControl` to `BatteryUnit`
-* Added collection of `EndDeviceFunctionKind` to `EndDevice`
 * Added an unordered collection comparator.
 * Added the energized relationship for the current state of network between `Feeder` and `LvFeeder`.
 * Updated `NetworkConsumer`'s `getEquipmentForContainers`, `getEquipmentContainers` and `getEquipmentForLoop` to allow requesting normal, current or all 
@@ -37,7 +48,7 @@
 * None.
 
 ### Notes
-* None.
+* `Cut` and `Clamp` have been added to the model, but no processing for them has been added to the tracing, so results will not be what you expect.
 
 ## [0.23.0] - 2024-10-18
 ### Breaking Changes

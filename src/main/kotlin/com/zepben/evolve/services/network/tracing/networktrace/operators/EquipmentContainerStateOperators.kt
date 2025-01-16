@@ -172,17 +172,3 @@ private class CurrentEquipmentContainerStateOperators : EquipmentContainerStateO
         feeder.addCurrentEnergizedLvFeeder(lvFeeder)
     }
 }
-
-/**
- * Retrieves a collection of containers associated with the given equipment.
- *
- * @receiver The equipment for which to get the associated containers.
- * @param T The type of containers to find.
- * @param operators The [NetworkStateOperators] used to select the containers.
- * @return A collection of containers of the specified type that contain the specified equipment.
- */
-// TODO [Review]: Where should these be located?
-inline fun <reified T : EquipmentContainer> Equipment?.getFilteredContainers(operators: NetworkStateOperators): Collection<T> = when (this) {
-    null -> emptyList()
-    else -> operators.getContainers(this).filterIsInstance<T>()
-}

@@ -25,6 +25,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
@@ -324,3 +325,29 @@ inline fun <R> whenNetworkServiceObject(
     is PerLengthPhaseImpedance -> isPerLengthPhaseImpedance(identifiedObject)
     else -> isOther(identifiedObject)
 }
+
+// TODO: Do we want to make the following public API?
+
+/**
+ * A map of all [AuxiliaryEquipment] in the [NetworkService] indexed by their terminals.
+ */
+internal val NetworkService.auxEquipmentByTerminal: Map<Terminal, List<AuxiliaryEquipment>>
+    get() = sequenceOf<AuxiliaryEquipment>()
+        .filter { it.terminal != null }
+        .groupBy { it.terminal!! }
+
+/**
+ * A set of all [ConductingEquipment] in the [NetworkService] that are at the top of a feeder.
+ */
+internal val NetworkService.feederStartPoints: Set<ConductingEquipment>
+    get() = sequenceOf<Feeder>()
+        .mapNotNull { it.normalHeadTerminal?.conductingEquipment }
+        .toSet()
+
+/**
+ * A set of all [ConductingEquipment] in the [NetworkService] that are at the top of an LV feeder.
+ */
+internal val NetworkService.lvFeederStartPoints: Set<ConductingEquipment>
+    get() = sequenceOf<LvFeeder>()
+        .mapNotNull { it.normalHeadTerminal?.conductingEquipment }
+        .toSet()

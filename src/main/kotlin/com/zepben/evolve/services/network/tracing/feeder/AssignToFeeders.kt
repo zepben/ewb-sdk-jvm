@@ -14,10 +14,12 @@ import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.auxEquipmentByTerminal
+import com.zepben.evolve.services.network.feederStartPoints
+import com.zepben.evolve.services.network.lvFeederStartPoints
 import com.zepben.evolve.services.network.tracing.networktrace.*
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
-import com.zepben.evolve.services.network.tracing.networktrace.operators.getFilteredContainers
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 /**
@@ -165,41 +167,3 @@ class AssignToFeeders {
     }
 
 }
-
-/**
- * A map of all [AuxiliaryEquipment] in the [NetworkService] indexed by their terminals.
- */
-// TODO [Review]: Where should this be located?
-val NetworkService.auxEquipmentByTerminal: Map<Terminal, List<AuxiliaryEquipment>>
-    get() = sequenceOf<AuxiliaryEquipment>()
-        .filter { it.terminal != null }
-        .groupBy { it.terminal!! }
-
-/**
- * A set of all [ConductingEquipment] in the [NetworkService] that are at the top of a feeder.
- */
-// TODO [Review]: Where should this be located?
-val NetworkService.feederStartPoints: Set<ConductingEquipment>
-    get() = sequenceOf<Feeder>()
-        .mapNotNull { it.normalHeadTerminal?.conductingEquipment }
-        .toSet()
-
-/**
- * A set of all [ConductingEquipment] in the [NetworkService] that are at the top of an LV feeder.
- */
-// TODO [Review]: Where should this be located?
-val NetworkService.lvFeederStartPoints: Set<ConductingEquipment>
-    get() = sequenceOf<LvFeeder>()
-        .mapNotNull { it.normalHeadTerminal?.conductingEquipment }
-        .toSet()
-
-/**
- * Find all LV feeders containing any [Equipment] in the [Site].
- */
-// TODO [Review]: Where should this be located?
-fun Collection<Site>.findLvFeeders(lvFeederStartPoints: Set<ConductingEquipment>, stateOperators: NetworkStateOperators): Iterable<LvFeeder> =
-    asSequence()
-        .flatMap { it.equipment }
-        .filter { it in lvFeederStartPoints }
-        .flatMap { equipment -> equipment.getFilteredContainers<LvFeeder>(stateOperators) }
-        .asIterable()

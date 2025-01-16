@@ -32,7 +32,8 @@ class ClearDirection {
     /**
      * Clears the feeder direction from a terminal and the connected equipment chain.
      * This clears directions even if equipment is dual fed. A set of feeder head terminals encountered while running will be returned and directions
-     * can be reapplied if required using [SetDirection].
+     * can be reapplied if required using [SetDirection]. Note that if you start on a feeder head terminal, this will be returned in the encountered
+     * feeder heads set.
      *
      * @param terminal The terminal from which to start the direction removal.
      * @param networkStateOperators The [NetworkStateOperators] to be used when removing directions.

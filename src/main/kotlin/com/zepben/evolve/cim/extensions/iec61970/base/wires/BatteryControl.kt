@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.extensions.ZBEX
 import com.zepben.evolve.cim.iec61970.base.wires.RegulatingControl
 
 /**
+ * [ZBEX]
  * Describes behaviour specific to controlling batteries.
  *
  * @property chargingRate [ZBEX] Charging rate (input power) in percentage of maxP. (Unit: PerCent)

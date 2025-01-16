@@ -16,6 +16,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
@@ -31,6 +32,9 @@ internal class AssignToFeedersTest {
     @JvmField
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
+
+    val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
+    val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
     private val assignToFeeders = AssignToFeeders()
 
@@ -112,9 +116,6 @@ internal class AssignToFeedersTest {
 
     @Test
     internal fun stopsAtLvEquipment() {
-        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
-        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
-
         val network = TestNetworkBuilder()
             .fromBreaker { baseVoltage = hvBaseVoltage } // b0
             .toAcls { baseVoltage = hvBaseVoltage } // c1
@@ -135,9 +136,6 @@ internal class AssignToFeedersTest {
 
     @Test
     internal fun includesTransformers() {
-        val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
-        val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
-
         val network = TestNetworkBuilder()
             .fromBreaker { baseVoltage = hvBaseVoltage } // b0
             .toAcls { baseVoltage = hvBaseVoltage } // c1
@@ -204,6 +202,78 @@ internal class AssignToFeedersTest {
         assignToFeeders.run(network, NetworkStateOperators.NORMAL)
 
         validateEquipment(feeder.equipment, "b0", "prsys3")
+    }
+
+    @Test
+    internal fun `can be run from a single terminal`() {
+        //
+        // 1 b0 21--c1--2 j2 31--c3--21--c4--2
+        //                2
+        //                1
+        //                |
+        //                c5
+        //                |
+        //                21--c6--2
+        //
+        val network = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .toAcls() // c1
+            .toJunction(numTerminals = 3) // j2
+            .toAcls() // c3
+            .toAcls() // c4
+            .fromAcls() // c5
+            .toAcls() // c6
+            .connect("j2", "c5", 2, 1)
+            .addFeeder("b0") // fdr7
+            .network
+
+        val feeder = network.get<Feeder>("fdr7")!!
+        val junction = network.get<Junction>("j2")!!.also {
+            feeder.addEquipment(it)
+            it.addContainer(feeder)
+        }
+
+        assignToFeeders.run(network, NetworkStateOperators.NORMAL, startTerminal = junction.terminals.last())
+
+        // b0 is included from the network builder.
+        // j2 was added to allow us to test the terminal based assignment.
+        // c3 and c4 should have been added via the trace.
+        // c1, c5 and c6 shouldn't have been added if the assignment only went out t3 of j2.
+        validateEquipment(feeder.equipment, "b0", "j2", "c3", "c4")
+    }
+
+    @Test
+    internal fun `energizes all LV feeders for a dist TX site that is energized`() {
+        //
+        //                              1--c4--21 b5 2
+        // 1 b0 21--c1--21 tx2 21--c3--2
+        //                              1--c6--21 b7 2
+        //
+        val network = TestNetworkBuilder()
+            .fromBreaker { baseVoltage = hvBaseVoltage } // b0
+            .toAcls { baseVoltage = hvBaseVoltage } // c1
+            .toPowerTransformer(endActions = listOf({ ratedU = hvBaseVoltage.nominalVoltage }, { ratedU = lvBaseVoltage.nominalVoltage })) // tx2
+            .toAcls { baseVoltage = lvBaseVoltage } // c3
+            .toAcls { baseVoltage = lvBaseVoltage } // c4
+            .toBreaker { baseVoltage = lvBaseVoltage } // b5
+            .fromAcls { baseVoltage = lvBaseVoltage } // c6
+            .toBreaker { baseVoltage = lvBaseVoltage } // b7
+            .connect("c3", "c6", 2, 1)
+            .addFeeder("b0") // fdr8
+            .addLvFeeder("tx2") // lvf9
+            .addLvFeeder("b5") // lvf10
+            .addLvFeeder("b7") // lvf11
+            .addSite("tx2", "c3", "c4", "b5", "c6", "b7") // site12
+            .network
+
+        val feeder = network.get<Feeder>("fdr8")!!
+
+        assignToFeeders.run(network, NetworkStateOperators.NORMAL)
+
+        // We ensure the HV trace stopped at the transformer, but the additional LV feeders from b5 and b7 are still
+        // marked as energized through the dist substation site.
+        validateEquipment(feeder.equipment, "b0", "c1", "tx2")
+        assertThat(feeder.normalEnergizedLvFeeders.map { it.mRID }, containsInAnyOrder("lvf9", "lvf10", "lvf11"))
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

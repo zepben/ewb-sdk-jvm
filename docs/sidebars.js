@@ -10,10 +10,9 @@ module.exports = {
   someSidebar: [
     "sdk-overview",
     "sdk-data-model",
-    "sdk-services", 
+    "sdk-services",
     "sdk-phases",
     "sdk-tracing",
-    "sdk-persistence",
     "sdk-consumer",
     "sdk-protection",
     "sdk-metrics",

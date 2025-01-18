@@ -16,6 +16,7 @@ import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
+import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.testdata.DownstreamFeederStartPointNetwork
@@ -260,6 +261,30 @@ internal class AssignToLvFeedersTest {
         Tracing.assignEquipmentToLvFeeders().run(network)
 
         validateEquipment(lvFeeder.equipment, "b0", "prsys3")
+    }
+
+    @Test
+    internal fun `assigns normal and current energising feeders based on state`() {
+        val network = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .addLvFeeder("b0") // lvf1
+            .network
+
+        val normalFeeder = Feeder()
+        val currentFeeder = Feeder()
+        val breaker: Breaker = network["b0"]!!
+        val lvFeeder: LvFeeder = network["lvf1"]!!
+
+        breaker.addContainer(normalFeeder)
+        breaker.addCurrentContainer(currentFeeder)
+
+        Tracing.assignEquipmentToLvFeeders().run(network)
+
+        assertThat(normalFeeder.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
+        assertThat(lvFeeder.normalEnergizingFeeders, containsInAnyOrder(normalFeeder))
+
+        assertThat(currentFeeder.currentEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
+        assertThat(lvFeeder.currentEnergizingFeeders, containsInAnyOrder(currentFeeder))
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

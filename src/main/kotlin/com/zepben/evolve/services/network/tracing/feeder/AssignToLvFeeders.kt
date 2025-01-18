@@ -40,6 +40,10 @@ class AssignToLvFeeders {
                         feeder.addNormalEnergizedLvFeeder(lvFeeder)
                         lvFeeder.addNormalEnergizingFeeder(feeder)
                     }
+                    headEquipment.currentFeeders.forEach { feeder ->
+                        feeder.addCurrentEnergizedLvFeeder(lvFeeder)
+                        lvFeeder.addCurrentEnergizingFeeder(feeder)
+                    }
                 }
             }
             .toSet()

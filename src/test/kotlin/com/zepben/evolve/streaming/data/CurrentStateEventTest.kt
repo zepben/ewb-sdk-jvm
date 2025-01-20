@@ -29,22 +29,18 @@ internal class CurrentStateEventTest {
 
     @Test
     internal fun `CurrentStateEvent from protobuf`() {
-        val stateEvent = CurrentStateEvent.fromPb(PBCurrentStateEvent.newBuilder().apply {
-            switch = PBSwitchStateEvent.newBuilder().build()
-        }.build())
-
-        assertThat(stateEvent, instanceOf(SwitchStateEvent::class.java))
+        convertsToExpectedClass<SwitchStateEvent> { switch = PBSwitchStateEvent.newBuilder().build() }
+        convertsToExpectedClass<AddCutEvent> { addCut = PBAddCutEvent.newBuilder().build() }
+        convertsToExpectedClass<RemoveCutEvent> { removeCut = PBRemoveCutEvent.newBuilder().build() }
+        convertsToExpectedClass<AddJumperEvent> { addJumper = PBAddJumperEvent.newBuilder().build() }
+        convertsToExpectedClass<RemoveJumperEvent> { removeJumper = PBRemoveJumperEvent.newBuilder().build() }
     }
 
     @Test
     internal fun `CurrentStateEvent from protobuf throws UnsupportedException for classes other than switch`() {
-        notSupportedState { addCut = PBAddCutEvent.newBuilder().build() }
-
-        notSupportedState { removeCut = PBRemoveCutEvent.newBuilder().build() }
-
-        notSupportedState { addJumper = PBAddJumperEvent.newBuilder().build() }
-
-        notSupportedState { removeJumper = PBRemoveJumperEvent.newBuilder().build() }
+        assertThrows<UnsupportedOperationException> {
+            CurrentStateEvent.fromPb(PBCurrentStateEvent.newBuilder().build())
+        }
     }
 
     @Test
@@ -78,10 +74,11 @@ internal class CurrentStateEventTest {
         }
     }
 
-    private fun notSupportedState(block: PBCurrentStateEvent.Builder.() -> Unit) {
-        assertThrows<UnsupportedOperationException> {
-            CurrentStateEvent.fromPb(PBCurrentStateEvent.newBuilder().apply(block).build())
-        }
+    private inline fun <reified T : Any> convertsToExpectedClass(block: PBCurrentStateEvent.Builder.() -> Unit) {
+        val stateEvent = CurrentStateEvent.fromPb(PBCurrentStateEvent.newBuilder().apply(block).build())
+
+        assertThat(stateEvent, instanceOf(T::class.java))
+
     }
 
 }

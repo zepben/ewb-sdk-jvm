@@ -41,8 +41,9 @@
 * Added `ctPrimary` and `minTargetDeadband` to `RegulatingContrl`.
 * Added an unordered collection comparator.
 * Added the energized relationship for the current state of network between `Feeder` and `LvFeeder`.
-* Updated `NetworkConsumer`'s `getEquipmentForContainers`, `getEquipmentContainers` and `getEquipmentForLoop` to allow requesting normal, current or all 
-  equipments. 
+* Updated `NetworkConsumer`'s `getEquipmentForContainers`, `getEquipmentContainers` and `getEquipmentForLoop` to allow requesting normal, current or all
+  equipments.
+* gRPC now supports `FeederDirection.CONNECTOR`.
 
 ### Fixes
 * None.

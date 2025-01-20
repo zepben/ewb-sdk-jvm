@@ -117,7 +117,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 var event1 = new SwitchStateEvent("event1", LocalDateTime.now(), "switch_id_1", SwitchAction.OPEN);
-var event2 = new SwitchStateEvent("event2", LocalDateTime.now(), "switch_id_2", SwitchAction.CLOSE);
 var response = client.setCurrentStates(1, List.of(event1));
 ```
 
@@ -129,7 +128,6 @@ import com.zepben.evolve.streaming.data.SwitchStateEvent
 import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
 
 val event1 = SwitchStateEvent("event1", LocalDateTime.now(), "switch_id_1", SwitchAction.OPEN)
-val event2 = SwitchStateEvent("event2", LocalDateTime.now(), "switch_id_2", SwitchAction.CLOSE)
 val response = client.setCurrentStates(1, listOf(event1))
 ```
 
@@ -187,6 +185,167 @@ val batches = sequenceOf(
 client.setCurrentStates(batches).forEach { response ->
     // Process your responses here. You will get a response per batch.
 }
+```
+
+</TabItem>
+</Tabs>
+
+#### Adding cuts
+
+You can add a cut to an AC line segment by passing an `AddCutEvent` to the `setCurrentStates` function. This can be done with both individual events, and
+batches of events as shown above.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.data.AddCutEvent;
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+var event1 = new AddCutEvent("event1", LocalDateTime.now(), "cut_id_1", "acls_id_1");
+var response = client.setCurrentStates(1, List.of(event1));
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.streaming.data.AddCutEvent
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+
+val event1 = AddCutEvent("event1", LocalDateTime.now(), "cut_id_1", "acls_id_1")
+val response = client.setCurrentStates(1, listOf(event1))
+```
+
+</TabItem>
+</Tabs>
+
+#### Removing cuts
+
+You can remove previously added cuts by passing a `RemoveCutEvent` to the `setCurrentStates` function. This can be done with both individual events, and batches
+of events as shown above.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.data.RemoveCutEvent;
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+var event1 = new RemoveCutEvent("event1", LocalDateTime.now(), "cut_id_1");
+var response = client.setCurrentStates(1, List.of(event1));
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.streaming.data.RemoveCutEvent
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+
+val event1 = RemoveCutEvent("event1", LocalDateTime.now(), "cut_id_1")
+val response = client.setCurrentStates(1, listOf(event1))
+```
+
+</TabItem>
+</Tabs>
+
+#### Adding jumpers
+
+You can add a jumper between two pieces of equipment by passing an `AddJumperEvent` to the `setCurrentStates` function. This can be done with both individual
+events, and batches of events as shown above.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.data.AddJumperEvent;
+import com.zepben.evolve.streaming.data.JumperConnection;
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+var event1 = new AddJumperEvent("event1", LocalDateTime.now(), "jumper_id_1", new JumperConnection("acls_id_1"), new JumperConnection("acls_id_2"));
+var response = client.setCurrentStates(1, List.of(event1));
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.streaming.data.AddJumperEvent
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+
+val event1 = AddJumperEvent("event1", LocalDateTime.now(), "jumper_id_1", JumperConnection("acls_id_1"), JumperConnection("acls_id_2"))
+val response = client.setCurrentStates(1, listOf(event1))
+```
+
+</TabItem>
+</Tabs>
+
+#### Removing jumpers
+
+You can remove previously added jumpers by passing a `RemoveJumperEvent` to the `setCurrentStates` function. This can be done with both individual events, and
+batches of events as shown above.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.data.RemoveJumperEvent;
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+var event1 = new RemoveJumperEvent("event1", LocalDateTime.now(), "jumper_id_1");
+var response = client.setCurrentStates(1, List.of(event1));
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import com.zepben.evolve.streaming.data.RemoveJumperEvent
+import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+
+val event1 = RemoveJumperEvent("event1", LocalDateTime.now(), "jumper_id_1")
+val response = client.setCurrentStates(1, listOf(event1))
 ```
 
 </TabItem>

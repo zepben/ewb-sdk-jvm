@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -25,14 +25,14 @@ internal class EquipmentContainerStateOperatorsTest {
 
     @Test
     fun getEquipment() {
-        fun test(operations: EquipmentContainerStateOperators, equipmentProp: KProperty1<EquipmentContainer, Collection<Equipment>>) {
+        fun test(operators: EquipmentContainerStateOperators, equipmentProp: KProperty1<EquipmentContainer, Collection<Equipment>>) {
             val equipment1 = mockk<Equipment>()
             val equipment2 = mockk<Equipment>()
             val equipment = listOf(equipment1, equipment2)
             val container = mockk<EquipmentContainer>()
             every { equipmentProp.get(container) } returns equipment
 
-            val result = operations.getEquipment(container)
+            val result = operators.getEquipment(container)
 
             assertThat(result, equalTo(equipment))
             verify { equipmentProp.get(container) }
@@ -44,14 +44,14 @@ internal class EquipmentContainerStateOperatorsTest {
 
     @Test
     fun getContainers() {
-        fun test(operations: EquipmentContainerStateOperators, containersProp: KProperty1<Equipment, Collection<EquipmentContainer>>) {
+        fun test(operators: EquipmentContainerStateOperators, containersProp: KProperty1<Equipment, Collection<EquipmentContainer>>) {
             val container1 = mockk<EquipmentContainer>()
             val container2 = mockk<EquipmentContainer>()
             val containers = listOf(container1, container2)
             val equipment = mockk<Equipment>()
             every { containersProp.get(equipment) } returns containers
 
-            val result = operations.getContainers(equipment)
+            val result = operators.getContainers(equipment)
 
             assertThat(result, equalTo(containers))
             verify { containersProp.get(equipment) }
@@ -63,12 +63,12 @@ internal class EquipmentContainerStateOperatorsTest {
 
     @Test
     fun addEquipmentToContainer() {
-        fun test(operations: EquipmentContainerStateOperators, addEquipment: (EquipmentContainer, Equipment) -> EquipmentContainer) {
+        fun test(operators: EquipmentContainerStateOperators, addEquipment: EquipmentContainer.(Equipment) -> EquipmentContainer) {
             val container = mockk<EquipmentContainer>()
             val equipment = mockk<Equipment>()
             every { addEquipment(container, equipment) } returns container
 
-            operations.addEquipmentToContainer(equipment, container)
+            operators.addEquipmentToContainer(equipment, container)
 
             verify { addEquipment(container, equipment) }
         }
@@ -79,12 +79,12 @@ internal class EquipmentContainerStateOperatorsTest {
 
     @Test
     fun addContainerToEquipment() {
-        fun test(operations: EquipmentContainerStateOperators, addContainer: (Equipment, EquipmentContainer) -> Equipment) {
+        fun test(operators: EquipmentContainerStateOperators, addContainer: Equipment.(EquipmentContainer) -> Equipment) {
             val container = mockk<EquipmentContainer>()
             val equipment = mockk<Equipment>()
             every { addContainer(equipment, container) } returns equipment
 
-            operations.addContainerToEquipment(container, equipment)
+            operators.addContainerToEquipment(container, equipment)
 
             verify { addContainer(equipment, container) }
         }
@@ -96,16 +96,16 @@ internal class EquipmentContainerStateOperatorsTest {
     @Test
     fun associateEquipmentAndContainer() {
         fun test(
-            operations: EquipmentContainerStateOperators,
-            addEquipment: (EquipmentContainer, Equipment) -> EquipmentContainer,
-            addContainer: (Equipment, EquipmentContainer) -> Equipment
+            operators: EquipmentContainerStateOperators,
+            addEquipment: EquipmentContainer.(Equipment) -> EquipmentContainer,
+            addContainer: Equipment.(EquipmentContainer) -> Equipment
         ) {
             val container = mockk<EquipmentContainer>()
             val equipment = mockk<Equipment>()
             every { addEquipment(container, equipment) } returns container
             every { addContainer(equipment, container) } returns equipment
 
-            operations.associateEquipmentAndContainer(equipment, container)
+            operators.associateEquipmentAndContainer(equipment, container)
 
             verify { addEquipment(container, equipment) }
             verify { addContainer(equipment, container) }
@@ -114,4 +114,59 @@ internal class EquipmentContainerStateOperatorsTest {
         test(normal, EquipmentContainer::addEquipment, Equipment::addContainer)
         test(current, EquipmentContainer::addCurrentEquipment, Equipment::addCurrentContainer)
     }
+
+    @Test
+    fun removeEquipmentFromContainer() {
+        fun test(operators: EquipmentContainerStateOperators, removeEquipment: EquipmentContainer.(Equipment) -> Boolean) {
+            val container = mockk<EquipmentContainer>()
+            val equipment = mockk<Equipment>()
+            every { removeEquipment(container, equipment) } returns true
+
+            operators.removeEquipmentFromContainer(equipment, container)
+
+            verify { removeEquipment(container, equipment) }
+        }
+
+        test(normal, EquipmentContainer::removeEquipment)
+        test(current, EquipmentContainer::removeCurrentEquipment)
+    }
+
+    @Test
+    fun removeContainerFromEquipment() {
+        fun test(operators: EquipmentContainerStateOperators, removeContainer: Equipment.(EquipmentContainer) -> Boolean) {
+            val container = mockk<EquipmentContainer>()
+            val equipment = mockk<Equipment>()
+            every { removeContainer(equipment, container) } returns true
+
+            operators.removeContainerFromEquipment(container, equipment)
+
+            verify { removeContainer(equipment, container) }
+        }
+
+        test(normal, Equipment::removeContainer)
+        test(current, Equipment::removeCurrentContainer)
+    }
+
+    @Test
+    fun disassociateEquipmentAndContainer() {
+        fun test(
+            operators: EquipmentContainerStateOperators,
+            removeEquipment: EquipmentContainer.(Equipment) -> Boolean,
+            removeContainer: Equipment.(EquipmentContainer) -> Boolean
+        ) {
+            val container = mockk<EquipmentContainer>()
+            val equipment = mockk<Equipment>()
+            every { removeEquipment(container, equipment) } returns true
+            every { removeContainer(equipment, container) } returns true
+
+            operators.disassociateEquipmentAndContainer(equipment, container)
+
+            verify { removeEquipment(container, equipment) }
+            verify { removeContainer(equipment, container) }
+        }
+
+        test(normal, EquipmentContainer::removeEquipment, Equipment::removeContainer)
+        test(current, EquipmentContainer::removeCurrentEquipment, Equipment::removeCurrentContainer)
+    }
+
 }

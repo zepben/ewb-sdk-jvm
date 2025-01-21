@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -78,6 +78,33 @@ interface EquipmentContainerStateOperators {
     }
 
     /**
+     * Removes the specified equipment from the given container.
+     *
+     * @param equipment The equipment to remove from the container.
+     * @param container The container from which the equipment will be removed.
+     */
+    fun removeEquipmentFromContainer(equipment: Equipment, container: EquipmentContainer)
+
+    /**
+     * Removes the specified container from the given equipment.
+     *
+     * @param container The container to remove from the equipment.
+     * @param equipment The equipment from which the container will be removed.
+     */
+    fun removeContainerFromEquipment(container: EquipmentContainer, equipment: Equipment)
+
+    /**
+     * Remove a bidirectional association between the specified equipment and container.
+     *
+     * @param equipment The equipment to disassociate with the container.
+     * @param container The container to disassociate with the equipment.
+     */
+    fun disassociateEquipmentAndContainer(equipment: Equipment, container: EquipmentContainer) {
+        removeEquipmentFromContainer(equipment, container)
+        removeContainerFromEquipment(container, equipment)
+    }
+
+    /**
      * Adds the specified energizing feeder to the given lvFeeder.
      *
      * @param feeder The energizing feeder to add to the lvFeeder.
@@ -138,6 +165,14 @@ private class NormalEquipmentContainerStateOperators : EquipmentContainerStateOp
         equipment.addContainer(container)
     }
 
+    override fun removeEquipmentFromContainer(equipment: Equipment, container: EquipmentContainer) {
+        container.removeEquipment(equipment)
+    }
+
+    override fun removeContainerFromEquipment(container: EquipmentContainer, equipment: Equipment) {
+        equipment.removeContainer(container)
+    }
+
     override fun addEnergizingFeederToLvFeeder(feeder: Feeder, lvFeeder: LvFeeder) {
         lvFeeder.addNormalEnergizingFeeder(feeder)
     }
@@ -162,6 +197,14 @@ private class CurrentEquipmentContainerStateOperators : EquipmentContainerStateO
 
     override fun addContainerToEquipment(container: EquipmentContainer, equipment: Equipment) {
         equipment.addCurrentContainer(container)
+    }
+
+    override fun removeEquipmentFromContainer(equipment: Equipment, container: EquipmentContainer) {
+        container.removeCurrentEquipment(equipment)
+    }
+
+    override fun removeContainerFromEquipment(container: EquipmentContainer, equipment: Equipment) {
+        equipment.removeCurrentContainer(container)
     }
 
     override fun addEnergizingFeederToLvFeeder(feeder: Feeder, lvFeeder: LvFeeder) {

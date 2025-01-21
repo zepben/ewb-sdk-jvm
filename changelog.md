@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [0.24.0] - UNRELEASED
+## [0.24.0] - 2025-01-21
 ### Breaking Changes
 * Database readers and writes for each `BaseService` no longer accept a `MetadataCollection`, and will instead use the collection of the provided service.
 * `AcLineSegment.perLengthSequenceImpedance` has been corrected to `perLengthImpedance`. This has been done in a non-breaking way, however the public resolver

@@ -11,6 +11,7 @@ package com.zepben.evolve.services.network.tracing.feeder
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.auxEquipmentByTerminal
@@ -99,8 +100,16 @@ class AssignToLvFeeders {
             if ((terminal == null) || (lvFeedersToAssign.isEmpty()))
                 return
 
-            val traversal = createTrace(terminalToAuxEquipment, lvFeederStartPoints, lvFeedersToAssign)
-            traversal.run(terminal, false, canStopOnStartItem = false)
+            val startCe = terminal.conductingEquipment
+            when {
+                // If the starting equipment is open, we don't want to trace from it, we just assign it to the given containers.
+                startCe is Switch && stateOperators.isOpen(startCe) -> lvFeedersToAssign.associateEquipment(startCe)
+                else -> {
+                    val traversal = createTrace(terminalToAuxEquipment, lvFeederStartPoints, lvFeedersToAssign)
+                    // We don't want the data to be true here because we don't want the trace to stop if this is the head equipment.
+                    traversal.run(terminal, false)
+                }
+            }
         }
 
         private fun createTrace(

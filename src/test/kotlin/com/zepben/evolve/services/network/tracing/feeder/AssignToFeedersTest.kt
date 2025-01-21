@@ -18,6 +18,7 @@ import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.evolve.services.network.getT
 import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
@@ -274,6 +275,23 @@ internal class AssignToFeedersTest {
         // marked as energized through the dist substation site.
         validateEquipment(feeder.equipment, "b0", "c1", "tx2")
         assertThat(feeder.normalEnergizedLvFeeders.map { it.mRID }, containsInAnyOrder("lvf9", "lvf10", "lvf11"))
+    }
+
+    @Test
+    internal fun `does not trace out from terminal belonging to open switch`() {
+        //
+        // 1 b0 21--c1--2
+        //
+        val network = TestNetworkBuilder()
+            .fromBreaker(isNormallyOpen = true) // b0
+            .toAcls() // c1
+            .addFeeder("b0") // fdr2
+            .network
+
+        assignToFeeders.run(network, NetworkStateOperators.NORMAL, network.getT("b0", 2))
+
+        val feeder = network.get<Feeder>("fdr2")!!
+        validateEquipment(feeder.equipment, "b0")
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

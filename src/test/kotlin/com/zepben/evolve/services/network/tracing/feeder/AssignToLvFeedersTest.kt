@@ -19,6 +19,7 @@ import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.services.network.getT
 import com.zepben.evolve.services.network.lvFeederStartPoints
 import com.zepben.evolve.services.network.testdata.DownstreamFeederStartPointNetwork
 import com.zepben.evolve.services.network.testdata.DroppedPhasesNetwork
@@ -376,6 +377,23 @@ internal class AssignToLvFeedersTest {
 
         assertThat(currentFeeder.currentEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
         assertThat(lvFeeder.currentEnergizingFeeders, containsInAnyOrder(currentFeeder))
+    }
+
+    @Test
+    internal fun `does not trace out from terminal belonging to open switch`() {
+        //
+        // 1 b0 21--c1--2
+        //
+        val network = TestNetworkBuilder()
+            .fromBreaker(isNormallyOpen = true) // b0
+            .toAcls() // c1
+            .addLvFeeder("b0") // lvf2
+            .network
+
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL, network.getT("b0", 2))
+
+        val feeder = network.get<LvFeeder>("lvf2")!!
+        validateEquipment(feeder.equipment, "b0")
     }
 
     private fun validateEquipment(equipment: Collection<Equipment>, vararg expectedMRIDs: String) {

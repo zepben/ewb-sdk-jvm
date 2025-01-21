@@ -28,6 +28,7 @@
 
 ### Fixes
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart.
+* `AssignToFeeder` and `AssignToLvFeeder` will no longer trace from start terminals that belong to open switches.
 
 ### Notes
 * None.

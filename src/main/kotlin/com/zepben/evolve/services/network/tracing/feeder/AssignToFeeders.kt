@@ -12,6 +12,7 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.auxEquipmentByTerminal
@@ -91,8 +92,14 @@ class AssignToFeeders {
             if ((terminal == null) || (feedersToAssign.isEmpty()))
                 return
 
-            val traversal = createTrace(terminalToAuxEquipment, feederStartPoints, lvFeederStartPoints, feedersToAssign)
-            traversal.run(terminal, canStopOnStartItem = false)
+            val startCe = terminal.conductingEquipment
+            when {
+                startCe is Switch && stateOperators.isOpen(startCe) -> feedersToAssign.associateEquipment(startCe)
+                else -> {
+                    val traversal = createTrace(terminalToAuxEquipment, feederStartPoints, lvFeederStartPoints, feedersToAssign)
+                    traversal.run(terminal, canStopOnStartItem = false)
+                }
+            }
         }
 
         private fun createTrace(

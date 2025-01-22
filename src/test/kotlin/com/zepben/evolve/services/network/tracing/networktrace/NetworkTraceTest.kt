@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,8 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.getT
 import com.zepben.evolve.testing.TestNetworkBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertTimeoutPreemptively
@@ -43,8 +42,5 @@ class NetworkTraceTest {
             Tracing.networkTraceBranching().run(network.getT("j0", 1))
         }
     }
-
-    private fun NetworkService.getT(id: String, terminalId: Int) =
-        get<ConductingEquipment>(id)!!.getTerminal(terminalId)!!
 
 }

@@ -13,6 +13,7 @@
 * `RemoveDirection` has been removed. It did not work reliably with dual fed networks with loops. You now need to clear direction using the new
   `ClearDirection` and reapply directions where appropriate using `SetDirection`.
 * `FindWithUsagePoints` was deemed too use-case specific for the SDK and has been removed.
+* Removal of deprecated `Terminal.tracedPhases` property. Use `Terminal.normalPhases` and `Terminal.currentPhases` instead.
 
 ### New Features
 * Added `ClearDirection` that clears feeder directions.

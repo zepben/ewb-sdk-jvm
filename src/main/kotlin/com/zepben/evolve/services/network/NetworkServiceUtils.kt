@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -331,8 +331,6 @@ inline fun <R> whenNetworkServiceObject(
     is Clamp -> isClamp(identifiedObject)
     else -> isOther(identifiedObject)
 }
-
-// TODO: Do we want to make the following public API?
 
 /**
  * A map of all [AuxiliaryEquipment] in the [NetworkService] indexed by their terminals.

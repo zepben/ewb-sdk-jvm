@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,6 +13,7 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
+import com.zepben.evolve.cim.iec61970.base.wires.Clamp
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions
@@ -54,10 +55,11 @@ import com.zepben.evolve.services.network.tracing.traversal.*
  * a branch will be created for each terminal.
  * If you do not need to trace loops both ways or have no loops, do not use a branching instance as it is less efficient than the non-branching one.
  *
- * To create instances of this class, use the factory methods providing in the [Tracing] object.
+ * To create instances of this class, use the factory methods provided in the [Tracing] object.
  *
  * @param T the type of [NetworkTraceStep.data]
  */
+// Constructor is private as the other constructors deal with creating different instances for different use cases.
 class NetworkTrace<T> private constructor(
     val networkStateOperators: NetworkStateOperators,
     queueType: QueueType<NetworkTraceStep<T>, NetworkTrace<T>>,
@@ -74,6 +76,7 @@ class NetworkTrace<T> private constructor(
         }
     )
 
+    // Non-branching instance that takes a normal compute data
     internal constructor(
         networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
@@ -86,6 +89,7 @@ class NetworkTrace<T> private constructor(
         actionType,
     )
 
+    // Non-branching instance that takes a compute data requiring all next step paths.
     @ZepbenExperimental
     internal constructor(
         networkStateOperators: NetworkStateOperators,
@@ -99,6 +103,7 @@ class NetworkTrace<T> private constructor(
         actionType,
     )
 
+    // Branching instance that takes a regular compute data.
     internal constructor(
         networkStateOperators: NetworkStateOperators,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
@@ -117,6 +122,7 @@ class NetworkTrace<T> private constructor(
         actionType,
     )
 
+    // Branching instance that takes a compute data requiring all next step paths.
     @ZepbenExperimental
     internal constructor(
         networkStateOperators: NetworkStateOperators,

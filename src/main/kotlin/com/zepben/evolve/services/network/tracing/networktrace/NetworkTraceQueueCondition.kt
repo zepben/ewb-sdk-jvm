@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,6 +11,17 @@ package com.zepben.evolve.services.network.tracing.networktrace
 import com.zepben.evolve.services.network.tracing.traversal.QueueCondition
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
+/**
+ * A special queue condition implementation that allows only checking `shouldQueue` when a [NetworkTraceStep] matches a given
+ * [NetworkTraceStep.Type]. When [stepType] is:
+ * *[NetworkTraceStep.Type.ALL]: [shouldQueue] will be called for every step.
+ * *[NetworkTraceStep.Type.INTERNAL]: [shouldQueue] will be called only when [NetworkTraceStep.type] is [NetworkTraceStep.Type.INTERNAL].
+ * *[NetworkTraceStep.Type.EXTERNAL]: [shouldQueue] will be called only when [NetworkTraceStep.type] is [NetworkTraceStep.Type.EXTERNAL].
+ *
+ * If the step does not match the given step type, `true` will always be returned.
+ *
+ * @property stepType The step type to match to check `shouldQueue`.
+ */
 abstract class NetworkTraceQueueCondition<T>(val stepType: NetworkTraceStep.Type) : QueueCondition<NetworkTraceStep<T>> {
 
     private val shouldQueueFunc = when (stepType) {
@@ -22,6 +33,9 @@ abstract class NetworkTraceQueueCondition<T>(val stepType: NetworkTraceStep.Type
     override fun shouldQueue(nextItem: NetworkTraceStep<T>, nextContext: StepContext, currentItem: NetworkTraceStep<T>, currentContext: StepContext): Boolean =
         shouldQueueFunc(nextItem, nextContext, currentItem, currentContext)
 
+    /**
+     * The logic you would normally put in [shouldQueue]. However, this will only be called when a step matches the [stepType].
+     */
     abstract fun shouldQueueMatchedStep(
         nextItem: NetworkTraceStep<T>,
         nextContext: StepContext,
@@ -46,13 +60,21 @@ abstract class NetworkTraceQueueCondition<T>(val stepType: NetworkTraceStep.Type
         if (nextItem.type == NetworkTraceStep.Type.EXTERNAL) shouldQueueMatchedStep(nextItem, nextContext, currentItem, currentContext) else true
 
     companion object {
+        /**
+         * Creates A [NetworkTraceQueueCondition] that delegates to the given [condition] when matching the given [stepType].
+         * The [condition] is already a [NetworkTraceQueueCondition] this will override the [stepType] of that instance.
+         *
+         * @param stepType The step type to match to check the queue condition.
+         * @param condition The queue conditions to delegate to when matching the step type.
+         * @return A new queue condition that only checks the condition when matching the given step type.
+         */
         @JvmStatic
         fun <T> delegateTo(stepType: NetworkTraceStep.Type, condition: QueueCondition<NetworkTraceStep<T>>): NetworkTraceQueueCondition<T> =
             DelegatedNetworkTraceQueueCondition(stepType, condition)
     }
 }
 
-internal class DelegatedNetworkTraceQueueCondition<T>(
+private class DelegatedNetworkTraceQueueCondition<T>(
     stepType: NetworkTraceStep.Type,
     val delegate: QueueCondition<NetworkTraceStep<T>>
 ) : NetworkTraceQueueCondition<T>(stepType) {

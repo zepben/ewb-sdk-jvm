@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,16 +9,25 @@
 package com.zepben.evolve.services.network.tracing.networktrace.actions
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.traversal.StepAction
 import com.zepben.evolve.services.network.tracing.traversal.StepActionWithContextValue
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 import java.util.*
 
 private typealias EquipmentTreeNode = TreeNode<ConductingEquipment>
 
+/**
+ * A [StepAction] that can be added to a [NetworkTrace] to build a tree structure representing the paths taken during a trace.
+ * The [roots] are the start items of the trace and the children of a tree node represent the next step paths from a given step in the trace.
+ */
 class EquipmentTreeBuilder : StepActionWithContextValue<NetworkTraceStep<*>, EquipmentTreeNode> {
     private val _roots: MutableMap<ConductingEquipment, EquipmentTreeNode> = mutableMapOf()
 
+    /**
+     * The root nodes in the tree. These represent the start items in the trace.
+     */
     val roots: Collection<EquipmentTreeNode> get() = _roots.values
 
     override fun computeInitialValue(item: NetworkTraceStep<*>): EquipmentTreeNode {

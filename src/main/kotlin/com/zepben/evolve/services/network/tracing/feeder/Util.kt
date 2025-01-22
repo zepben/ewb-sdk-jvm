@@ -13,13 +13,10 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 
 
-internal fun Terminal.isFeederHeadTerminal(): Boolean =
-    conductingEquipment?.let { ce ->
-        ce.containers
-            .asSequence()
-            .filterIsInstance<Feeder>()
-            .any { it.normalHeadTerminal == this }
-    } == true
+internal fun Terminal.isFeederHeadTerminal(): Boolean = when (val ce = conductingEquipment) {
+    null -> false
+    else -> ce.containers.asSequence().filterIsInstance<Feeder>().any { it.normalHeadTerminal == this }
+}
 
 /**
  * Find all LV feeders containing any [Equipment] in the [Site].

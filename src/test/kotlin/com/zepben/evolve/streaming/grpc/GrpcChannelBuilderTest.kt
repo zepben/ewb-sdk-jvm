@@ -14,12 +14,7 @@ import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.common.AuthMethod
 import com.zepben.evolve.streaming.get.*
 import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
-import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.checkConnection.checkConnection
-import com.zepben.protobuf.dc.DiagramConsumerGrpc
-import com.zepben.protobuf.nc.NetworkConsumerGrpc
-import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
-import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import io.grpc.*
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
@@ -376,12 +371,6 @@ internal class GrpcChannelBuilderTest {
                 "QueryNetworkStateClient" to queryNetworkStateServiceGrpcMethodDesc,
             )
 
-            every { NetworkConsumerGrpc.getCheckConnectionMethod() } returns networkConsumerGrpcMethodDesc
-            every { CustomerConsumerGrpc.getCheckConnectionMethod() } returns customerConsumerGrpcMethodDesc
-            every { DiagramConsumerGrpc.getCheckConnectionMethod() } returns diagramConsumerGrpcMethodDesc
-            every { UpdateNetworkStateServiceGrpc.getCheckConnectionMethod() } returns updateNetworkStateServiceGrpcMethodDesc
-            every { QueryNetworkStateServiceGrpc.getCheckConnectionMethod() } returns queryNetworkStateServiceGrpcMethodDesc
-
             val networkConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
             val customerConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
             val diagramConsumerClientCall = mockk<ClientCall<checkConnection, Empty>>()
@@ -406,7 +395,6 @@ internal class GrpcChannelBuilderTest {
             every { ClientCalls.blockingUnaryCall(updateNetworkStateServiceClientCall, any<checkConnection>()) } returns updateNetworkStateServiceResult
             every { ClientCalls.blockingUnaryCall(queryNetworkStateServiceClientCall, any<checkConnection>()) } returns queryNetworkStateServiceResult
 
-
             responses[NetworkConsumerClient::class]?.let {
                 every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } throws it
             } ?: (every { ClientCalls.blockingUnaryCall(networkConsumerClientCall, any<checkConnection>()) } returns networkConsumerResult)
@@ -421,21 +409,11 @@ internal class GrpcChannelBuilderTest {
 
             responses[UpdateNetworkStateClient::class]?.let {
                 every { ClientCalls.blockingUnaryCall(updateNetworkStateServiceClientCall, any<checkConnection>()) } throws it
-            } ?: (every {
-                ClientCalls.blockingUnaryCall(
-                    updateNetworkStateServiceClientCall,
-                    any<checkConnection>()
-                )
-            } returns updateNetworkStateServiceResult)
+            } ?: (every { ClientCalls.blockingUnaryCall(updateNetworkStateServiceClientCall, any<checkConnection>()) } returns updateNetworkStateServiceResult)
 
             responses[QueryNetworkStateClient::class]?.let {
                 every { ClientCalls.blockingUnaryCall(queryNetworkStateServiceClientCall, any<checkConnection>()) } throws it
-            } ?: (every {
-                ClientCalls.blockingUnaryCall(
-                    queryNetworkStateServiceClientCall,
-                    any<checkConnection>()
-                )
-            } returns queryNetworkStateServiceResult)
+            } ?: (every { ClientCalls.blockingUnaryCall(queryNetworkStateServiceClientCall, any<checkConnection>()) } returns queryNetworkStateServiceResult)
 
             builder.testConnection(grpcChannel, mockkedGrpcClientConnectionTests, debug, timeoutMs)
         }

@@ -10,7 +10,6 @@ package com.zepben.evolve.streaming.grpc
 
 import com.google.protobuf.Empty
 import com.zepben.auth.client.ZepbenTokenFetcher
-import com.zepben.evolve.streaming.get.DiagramConsumerClient
 
 import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.checkConnection.checkConnection

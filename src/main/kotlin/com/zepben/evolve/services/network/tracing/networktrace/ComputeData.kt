@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.annotations.ZepbenExperimental
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 /**
@@ -30,6 +31,7 @@ fun interface ComputeData<T> {
  * Functional interface used to compute contextual data stored on a [NetworkTraceStep]. This can be used when the contextual data can only be computed
  * by knowing all the next paths that can be stepped to from a given step.
  */
+@ZepbenExperimental
 fun interface ComputeDataWithPaths<T> {
     /**
      * Called for each new [NetworkTraceStep] in a [NetworkTrace]. The value returned from this function will be stored against the next step within [NetworkTraceStep.data].

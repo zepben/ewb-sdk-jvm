@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.annotations.ZepbenExperimental
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
@@ -85,6 +86,7 @@ class NetworkTrace<T> private constructor(
         actionType,
     )
 
+    @ZepbenExperimental
     internal constructor(
         networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
@@ -115,6 +117,7 @@ class NetworkTrace<T> private constructor(
         actionType,
     )
 
+    @ZepbenExperimental
     internal constructor(
         networkStateOperators: NetworkStateOperators,
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
@@ -312,6 +315,7 @@ private fun <T> ComputeData<T>.withActionType(actionType: NetworkTraceActionType
         }
     }
 
+@ZepbenExperimental
 private fun <T> ComputeDataWithPaths<T>.withActionType(actionType: NetworkTraceActionType): ComputeDataWithPaths<T> =
     when (actionType) {
         NetworkTraceActionType.ALL_STEPS -> this

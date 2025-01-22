@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.annotations.ZepbenExperimental
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
@@ -25,6 +26,7 @@ internal object NetworkTraceQueueNext {
         }
     }
 
+    @ZepbenExperimental
     fun <T> basic(isInService: CheckInService, computeNextT: ComputeDataWithPaths<T>): Traversal.QueueNext<NetworkTraceStep<T>> {
         return Traversal.QueueNext { item, context, queueItem ->
             nextTraceSteps(isInService, item, context, computeNextT).forEach { queueItem(it) }
@@ -37,6 +39,7 @@ internal object NetworkTraceQueueNext {
         }
     }
 
+    @ZepbenExperimental
     fun <T> branching(isInService: CheckInService, computeNextT: ComputeDataWithPaths<T>): Traversal.BranchingQueueNext<NetworkTraceStep<T>> {
         return Traversal.BranchingQueueNext { item, context, queueItem, queueBranch ->
             queueNextStepsBranching(nextTraceSteps(isInService, item, context, computeNextT), queueItem, queueBranch)
@@ -67,6 +70,7 @@ internal object NetworkTraceQueueNext {
         }
     }
 
+    @ZepbenExperimental
     private fun <T> nextTraceSteps(
         isInService: CheckInService,
         currentStep: NetworkTraceStep<T>,

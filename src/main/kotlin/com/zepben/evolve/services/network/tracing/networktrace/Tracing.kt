@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.annotations.ZepbenExperimental
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
@@ -64,6 +65,7 @@ object Tracing {
      *
      * @return a new NetworkTrace
      */
+    @ZepbenExperimental
     @JvmStatic
     @JvmOverloads
     fun <T> networkTrace(
@@ -139,6 +141,7 @@ object Tracing {
      */
     @JvmStatic
     @JvmOverloads
+    @ZepbenExperimental
     fun <T> networkTraceBranching(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,

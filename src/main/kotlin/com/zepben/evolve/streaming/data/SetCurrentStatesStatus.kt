@@ -135,6 +135,15 @@ sealed class StateEventFailure(val eventId: String, val message: String) {
 
 }
 
+class StateEventUnknownError(eventId: String, message: String) : StateEventFailure(eventId, message) {
+    companion object {
+        internal fun fromPb(pb: PBStateEventFailure): StateEventFailure =
+            StateEventUnknownMrid(pb.eventId, pb.message)
+    }
+
+    override fun toPb(): PBStateEventFailure = toPb { }
+
+}
 /**
  * The requested mRID was not found in the network.
  */

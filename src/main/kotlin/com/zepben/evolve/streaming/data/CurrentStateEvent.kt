@@ -205,7 +205,7 @@ class RemoveCutEvent(
             RemoveCutEvent(
                 event.eventId,
                 event.timestamp.toLocalDateTime(),
-                event.addCut.mrid
+                event.removeCut.mrid
             )
     }
 
@@ -262,8 +262,8 @@ class AddJumperEvent(
                 event.eventId,
                 event.timestamp.toLocalDateTime(),
                 event.addJumper.mrid,
-                JumperConnection.fromPb(event.addJumper.from),
-                JumperConnection.fromPb(event.addJumper.to)
+                JumperConnection.fromPb(event.addJumper.fromConnection),
+                JumperConnection.fromPb(event.addJumper.toConnection)
             )
     }
 
@@ -273,8 +273,8 @@ class AddJumperEvent(
     override fun toPb(): PBCurrentStateEvent = toPbBuilder().also { event ->
         event.addJumper = PBAddJumperEvent.newBuilder().also {
             it.mrid = mRID
-            it.from = from.toPb()
-            it.to = to.toPb()
+            it.fromConnection = from.toPb()
+            it.toConnection = to.toPb()
         }.build()
     }.build()
 
@@ -319,7 +319,7 @@ class RemoveJumperEvent(
             RemoveJumperEvent(
                 event.eventId,
                 event.timestamp.toLocalDateTime(),
-                event.addCut.mrid
+                event.removeJumper.mrid
             )
     }
 

@@ -9,168 +9,168 @@
 package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
-import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.Equipment
-import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.evolve.cim.iec61970.base.wires.Switch
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.traversals.BasicTraversal
+import com.zepben.evolve.services.network.auxEquipmentByTerminal
+import com.zepben.evolve.services.network.feederStartPoints
+import com.zepben.evolve.services.network.lvFeederStartPoints
+import com.zepben.evolve.services.network.tracing.networktrace.*
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import com.zepben.evolve.services.network.tracing.traversal.StepContext
 
 /**
  * Convenience class that provides methods for assigning HV/MV feeders on a [NetworkService].
  * Requires that a Feeder have a normalHeadTerminal with associated ConductingEquipment.
- * This class is backed by a [BasicTraversal].
+ * This class is backed by a [NetworkTrace].
  */
 class AssignToFeeders {
 
-    private val normalTraversal = AssociatedTerminalTrace.newNormalTrace()
-    private val currentTraversal = AssociatedTerminalTrace.newCurrentTrace()
-    private lateinit var activeFeeder: Feeder
+    /**
+     * Assign equipment to feeders in the specified network, given an optional start terminal.
+     *
+     * @param network The [NetworkService] to process.
+     * @param startTerminal An optional [Terminal] to start from:
+     * * When a start terminal is provided, the trace will assign all feeders associated with the terminals equipment to all connected equipment.
+     * * If no start terminal is provided, all feeder head terminals in the network will be used instead, assigning their associated feeder.
+     */
+    @JvmOverloads
+    fun run(
+        network: NetworkService,
+        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
+        startTerminal: Terminal? = null
+    ): Unit = AssignToFeedersInternal(networkStateOperators).run(network, startTerminal)
 
-    fun run(network: NetworkService) {
-        val terminalToAuxEquipment = network.sequenceOf<AuxiliaryEquipment>()
-            .filter { it.terminal != null }
-            .groupBy { it.terminal!!.mRID }
+    /**
+     * Assign equipment to feeders tracing out from the supplied terminal.
+     *
+     * @param terminal The [Terminal] to trace from.
+     * @param feederStartPoints A set of all [ConductingEquipment] containing a feeder head terminal. Must contain a list of all feeder
+     * head equipment that may be traced to from [terminal] to prevent excess tracing onto the sub-transmission network.
+     * @param lvFeederStartPoints A set of all [ConductingEquipment] containing an LV feeder head terminal. Must contain a list of all LV
+     * feeder head equipment that may be traced to from [terminal].
+     * @param terminalToAuxEquipment A map of all [AuxiliaryEquipment] by their attached [Terminal] that can be traced from [terminal].
+     * @param feedersToAssign The list of feeders to assign to all traced equipment.
+     */
+    @JvmOverloads
+    fun run(
+        terminal: Terminal?,
+        feederStartPoints: Set<ConductingEquipment>,
+        lvFeederStartPoints: Set<ConductingEquipment>,
+        terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
+        feedersToAssign: List<Feeder>,
+        networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
+    ): Unit = AssignToFeedersInternal(networkStateOperators).run(terminal, feederStartPoints, lvFeederStartPoints, terminalToAuxEquipment, feedersToAssign)
 
-        val feederStartPoints = network.sequenceOf<Feeder>()
-            .mapNotNull { it.normalHeadTerminal }
-            .mapNotNull { it.conductingEquipment }
-            .toSet()
+    private class AssignToFeedersInternal(val stateOperators: NetworkStateOperators) {
 
-        configureStepActions(normalTraversal, terminalToAuxEquipment)
-        configureStepActions(currentTraversal, terminalToAuxEquipment)
+        fun run(network: NetworkService, startTerminal: Terminal?) {
+            val feederStartPoints = network.feederStartPoints
+            val lvFeederStartPoints = network.lvFeederStartPoints
+            val terminalToAuxEquipment = network.auxEquipmentByTerminal
 
-        configureStopConditions(normalTraversal, feederStartPoints)
-        configureStopConditions(currentTraversal, feederStartPoints)
-
-        network.sequenceOf<Feeder>().forEach(::run)
-    }
-
-    private fun run(feeder: Feeder) {
-        activeFeeder = feeder
-
-        val headTerminal = feeder.normalHeadTerminal ?: return
-
-        run(normalTraversal, headTerminal)
-        run(currentTraversal, headTerminal)
-    }
-
-    private fun run(traversal: BasicTraversal<Terminal>, headTerminal: Terminal) {
-        traversal.reset()
-
-        traversal.tracker.visit(headTerminal)
-        traversal.applyStepActions(headTerminal, false)
-        AssociatedTerminalTrace.queueAssociated(traversal, headTerminal)
-
-        traversal.run()
-    }
-
-    private fun configureStepActions(traversal: BasicTraversal<Terminal>, terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>) {
-        traversal.clearStepActions()
-        normalTraversal.addStepAction(processNormal(terminalToAuxEquipment))
-        currentTraversal.addStepAction(processCurrent(terminalToAuxEquipment))
-    }
-
-    private fun configureStopConditions(traversal: BasicTraversal<Terminal>, feederStartPoints: Set<ConductingEquipment>) {
-        traversal.clearStopConditions()
-        traversal.addStopCondition(reachedEquipment(feederStartPoints))
-        traversal.addStopCondition(reachedSubstationTransformer)
-        traversal.addStopCondition(reachedLv)
-    }
-
-    private val reachedEquipment: (Set<ConductingEquipment>) -> (Terminal) -> Boolean = { { terminal: Terminal -> it.contains(terminal.conductingEquipment) } }
-
-    private val reachedSubstationTransformer: (Terminal) -> Boolean = { ps: Terminal ->
-        val ce = ps.conductingEquipment
-        ce is PowerTransformer && ce.substations.isNotEmpty()
-    }
-
-    private val reachedLv: (Terminal) -> Boolean = { terminal ->
-        terminal.conductingEquipment?.baseVoltage?.let { it.nominalVoltage < 1000 } ?: false
-    }
-
-    private fun processNormal(
-        terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
-    ): (Terminal, Boolean) -> Unit =
-        { terminal, isStopping ->
-            process(
-                terminal,
-                { eq, feeder ->
-                    eq.addContainer(feeder)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                system.addContainer(feeder)
-                            }
-                    }
-                },
-                { feeder, eq ->
-                    feeder.addEquipment(eq)
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                feeder.addEquipment(system)
-                            }
-                    }
-                },
-                isStopping,
-                terminalToAuxEquipment
-            )
+            if (startTerminal == null) {
+                network.sequenceOf<Feeder>().forEach {
+                    run(it.normalHeadTerminal, feederStartPoints, lvFeederStartPoints, terminalToAuxEquipment, listOf(it))
+                }
+            } else
+                run(startTerminal, feederStartPoints, lvFeederStartPoints, terminalToAuxEquipment, startTerminal.feeders)
         }
 
-    private fun processCurrent(
-        terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
-    ): (Terminal, Boolean) -> Unit =
-        { terminal, isStopping ->
-            process(
-                terminal,
-                { eq, feeder ->
-                    eq.addCurrentContainer(feeder)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                system.addCurrentContainer(feeder)
-                            }
-                    }
-                },
-                { feeder, eq ->
-                    feeder.addCurrentEquipment(eq)
-                    // Handle classes extending Equipment
-                    when (eq) {
-                        is ProtectedSwitch ->
-                            eq.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system }.forEach { system ->
-                                feeder.addCurrentEquipment(system)
-                            }
-                    }
-                },
-                isStopping,
-                terminalToAuxEquipment
-            )
+        fun run(
+            terminal: Terminal?,
+            feederStartPoints: Set<ConductingEquipment>,
+            lvFeederStartPoints: Set<ConductingEquipment>,
+            terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
+            feedersToAssign: List<Feeder>
+        ) {
+            // If there is no terminal, or there are no feeders to assign, then we have nothing to do.
+            if ((terminal == null) || (feedersToAssign.isEmpty()))
+                return
+
+            val startCe = terminal.conductingEquipment
+            when {
+                startCe is Switch && stateOperators.isOpen(startCe) -> feedersToAssign.associateEquipment(startCe)
+                else -> {
+                    val traversal = createTrace(terminalToAuxEquipment, feederStartPoints, lvFeederStartPoints, feedersToAssign)
+                    traversal.run(terminal, canStopOnStartItem = false)
+                }
+            }
         }
 
-    private fun process(
-        terminal: Terminal,
-        assignFeederToEquipment: (Equipment, Feeder) -> Unit,
-        assignEquipmentToFeeder: (Feeder, Equipment) -> Unit,
-        isStopping: Boolean,
-        terminalToAuxEquipment: Map<String, Collection<AuxiliaryEquipment>>
-    ) {
-        if (isStopping && (reachedLv(terminal) || reachedSubstationTransformer(terminal)))
-            return
+        private fun createTrace(
+            terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
+            feederStartPoints: Set<ConductingEquipment>,
+            lvFeederStartPoints: Set<ConductingEquipment>,
+            feedersToAssign: List<Feeder>,
+        ): NetworkTrace<Unit> {
+            fun reachedSubstationTransformer(ce: ConductingEquipment) = ce is PowerTransformer && ce.substations.isNotEmpty()
+            fun reachedLv(ce: ConductingEquipment) = ce.baseVoltage?.let { it.nominalVoltage < 1000 } == true
 
-        terminalToAuxEquipment[terminal.mRID]?.forEach {
-            assignFeederToEquipment(it, activeFeeder)
-            assignEquipmentToFeeder(activeFeeder, it)
+            return Tracing.networkTrace(stateOperators, NetworkTraceActionType.ALL_STEPS)
+                .addCondition { stopAtOpen() }
+                .addStopCondition { (path), _ -> feederStartPoints.contains(path.toEquipment) }
+                .addQueueCondition { (path), _, _, _ -> !reachedSubstationTransformer(path.toEquipment) }
+                .addQueueCondition { (path), _, _, _ -> !reachedLv(path.toEquipment) }
+                .addStepAction { (path), context -> process(path, context, terminalToAuxEquipment, lvFeederStartPoints, feedersToAssign) }
         }
 
-        terminal.conductingEquipment?.let {
-            assignFeederToEquipment(it, activeFeeder)
-            assignEquipmentToFeeder(activeFeeder, it)
+        private fun process(
+            stepPath: NetworkTraceStep.Path,
+            stepContext: StepContext,
+            terminalToAuxEquipment: Map<Terminal, Collection<AuxiliaryEquipment>>,
+            lvFeederStartPoints: Set<ConductingEquipment>,
+            feedersToAssign: List<Feeder>
+        ) {
+            if (stepPath.tracedInternally && !stepContext.isStartItem)
+                return
+
+            feedersToAssign.associateEquipment(terminalToAuxEquipment[stepPath.toTerminal].orEmpty())
+            feedersToAssign.associateEquipment(stepPath.toEquipment)
+
+            when (stepPath.toEquipment) {
+                is PowerTransformer -> feedersToAssign.tryEnergizeLvFeeders(stepPath.toEquipment, lvFeederStartPoints)
+                is ProtectedSwitch -> feedersToAssign.associateRelaySystems(stepPath.toEquipment)
+            }
         }
+
+        private val Terminal.feeders: List<Feeder>
+            get() = conductingEquipment.getFilteredContainers<Feeder>(stateOperators).toList()
+
+        private fun Iterable<EquipmentContainer>.associateEquipment(equipment: Iterable<Equipment>) = forEach { feeder ->
+            equipment.forEach { stateOperators.associateEquipmentAndContainer(it, feeder) }
+        }
+
+        private fun Iterable<EquipmentContainer>.associateEquipment(equipment: Equipment) = forEach { feeder ->
+            stateOperators.associateEquipmentAndContainer(equipment, feeder)
+        }
+
+        private fun Iterable<EquipmentContainer>.associateRelaySystems(toEquipment: ProtectedSwitch) {
+            associateEquipment(toEquipment.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system })
+        }
+
+        private fun Iterable<Feeder>.tryEnergizeLvFeeders(toEquipment: PowerTransformer, lvFeederStartPoints: Set<ConductingEquipment>) {
+            //
+            // NOTE: This will need to change if we stop assigning site internals to the HV feeder as it will stop before it gets here.
+            //
+
+            // Check to see if the change to LV is part of a dist transformer site. If so, we want to energize all LV feeders on any equipment
+            // in the site, not just the one on the first LV terminal; otherwise, just energize the LV feeders on this equipment.
+            val sites = toEquipment.getFilteredContainers<Site>(stateOperators)
+            if (sites.isNotEmpty())
+                energizes(sites.findLvFeeders(lvFeederStartPoints, stateOperators))
+            else
+                energizes(toEquipment.getFilteredContainers<LvFeeder>(stateOperators))
+        }
+
+        private fun Iterable<Feeder>.energizes(lvFeeders: Iterable<LvFeeder>) = forEach { feeder ->
+            lvFeeders.forEach { stateOperators.associateEnergizingFeeder(feeder, it) }
+        }
+
     }
 
 }

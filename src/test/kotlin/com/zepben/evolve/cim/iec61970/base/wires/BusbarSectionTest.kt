@@ -27,4 +27,8 @@ internal class BusbarSectionTest {
         assertThat(BusbarSection("id").mRID, equalTo("id"))
     }
 
+    @Test
+    fun `can only have a single terminal`() {
+        assertThat(BusbarSection().maxTerminals, equalTo(1))
+    }
 }

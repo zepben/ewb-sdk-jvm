@@ -9,6 +9,7 @@
 package com.zepben.evolve.services.network.tracing.phases
 
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
+import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*

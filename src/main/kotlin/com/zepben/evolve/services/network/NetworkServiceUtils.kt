@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -25,6 +25,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.Meter
 import com.zepben.evolve.cim.iec61968.metering.UsagePoint
 import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.FaultIndicator
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
@@ -330,3 +331,27 @@ inline fun <R> whenNetworkServiceObject(
     is Clamp -> isClamp(identifiedObject)
     else -> isOther(identifiedObject)
 }
+
+/**
+ * A map of all [AuxiliaryEquipment] in the [NetworkService] indexed by their terminals.
+ */
+internal val NetworkService.auxEquipmentByTerminal: Map<Terminal, List<AuxiliaryEquipment>>
+    get() = sequenceOf<AuxiliaryEquipment>()
+        .filter { it.terminal != null }
+        .groupBy { it.terminal!! }
+
+/**
+ * A set of all [ConductingEquipment] in the [NetworkService] that are at the top of a feeder.
+ */
+internal val NetworkService.feederStartPoints: Set<ConductingEquipment>
+    get() = sequenceOf<Feeder>()
+        .mapNotNull { it.normalHeadTerminal?.conductingEquipment }
+        .toSet()
+
+/**
+ * A set of all [ConductingEquipment] in the [NetworkService] that are at the top of an LV feeder.
+ */
+internal val NetworkService.lvFeederStartPoints: Set<ConductingEquipment>
+    get() = sequenceOf<LvFeeder>()
+        .mapNotNull { it.normalHeadTerminal?.conductingEquipment }
+        .toSet()

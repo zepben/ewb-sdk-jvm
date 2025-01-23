@@ -16,13 +16,19 @@ package com.zepben.evolve.services.network.tracing.feeder
  * @property DOWNSTREAM The terminal can be used to trace downstream away from the feeder head.
  * @property BOTH The terminal is part of a loop on the feeder and tracing in either direction will allow you
  *                to trace upstream towards the feeder head, or downstream away from the feeder head.
+ * @property CONNECTOR The terminal belongs to a Connector that is modelled with only a single terminal.
+ *                     CONNECTOR will match direction UPSTREAM, DOWNSTREAM, and BOTH, however it exists to
+ *                     differentiate it from BOTH which is used to indicate loops on the feeder. This however
+ *                     means you can't tell if a terminal with CONNECTOR is part of a loop directly, you need
+ *                     to check its connected terminals and check for BOTH to determine if it is in a loop.
  */
 enum class FeederDirection(private val value: Int) {
 
     NONE(0),
     UPSTREAM(1),
     DOWNSTREAM(2),
-    BOTH(3);
+    BOTH(3),
+    CONNECTOR(4);
 
     companion object {
         private val directionsByValues: Array<FeederDirection> = enumValues<FeederDirection>().sortedBy { it.value }.toTypedArray()
@@ -33,9 +39,9 @@ enum class FeederDirection(private val value: Int) {
 
     fun value(): Int = value
 
-    operator fun contains(other: FeederDirection): Boolean = if (this == BOTH) other != NONE else this == other
+    operator fun contains(other: FeederDirection): Boolean = if (this == BOTH || this == CONNECTOR) other != NONE else this == other
 
-    operator fun plus(rhs: FeederDirection): FeederDirection = directionsByValues[value or rhs.value]
+    operator fun plus(rhs: FeederDirection): FeederDirection = if (this == CONNECTOR || rhs == CONNECTOR) CONNECTOR else directionsByValues[value or rhs.value]
 
     operator fun minus(rhs: FeederDirection): FeederDirection = directionsByValues[value - (value and rhs.value)]
 
@@ -43,7 +49,7 @@ enum class FeederDirection(private val value: Int) {
         when (this) {
             UPSTREAM -> DOWNSTREAM
             DOWNSTREAM -> UPSTREAM
-            BOTH -> NONE
+            BOTH, CONNECTOR -> NONE
             NONE -> BOTH
         }
 

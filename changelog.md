@@ -1,16 +1,35 @@
 # Zepben EWB SDK changelog
 ## [0.25.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* Traversal / Tracing API has been completely rewritten. `Traversal` has a different public API and `BranchRecursiveTraversal` no longer exists.
+  All traces that used to be used via the `Tracing.*` factory functions should be migrated to use the new `NetworkTrace` class instantiated from the factory
+  functions in `com.zepben.evolve.services.network.tracing.networktrace.Tracing`. The `NetworkTrace` should cover all existing use cases while being easier to
+  use and read. See the documentation for usage details.
+* `SetDirection` now correctly applies the `BOTH` direction on all parts of the loop again, so if you were relying on the broken intermediate state, you will
+  need to update your code.
+* `RemovePhases` now stops at open points like the `SetPhases` counterpart. If you were relying on the bug to remove phases through open points you will now
+  need to start additional traces from the other side of the open points to maintain this behaviour.
+* `SetDirection` now correctly sets directions for networks with `BusbarSection`.
+* `RemoveDirection` has been removed. It did not work reliably with dual fed networks with loops. You now need to clear direction using the new
+  `ClearDirection` and reapply directions where appropriate using `SetDirection`.
+* `FindWithUsagePoints` was deemed too use-case specific for the SDK and has been removed.
+* Removal of deprecated `Terminal.tracedPhases` property. Use `Terminal.normalPhases` and `Terminal.currentPhases` instead.
 
 ### New Features
-* None.
+* Added `ClearDirection` that clears feeder directions.
+* Added new `FeederDirection.CONNECTOR` value for `Connector` equipment that are modelled only with a single terminal.
 
 ### Enhancements
-* None.
+* You can now add sites to the `TestNetworkBuilder` via `addSite`.
+* You can now start the `AssignToFeeder` trace from a specified `Terminal` rather than all feeder heads.
+* When processing feeder assignments, all LV feeders belonging to a dist substation site will now be considered energized when the site is energized by a
+  feeder.
+* Major speed improvements have been made for `RemovePhases` when dealing with large networks with many nested loops.
+* `SetDirection` now supports networks with `BusbarSection` and will apply the `FeederDirection.CONNECTOR` value to their terminals.
 
 ### Fixes
-* None.
+* `RemovePhases` now stops at open points like the `SetPhases` counterpart.
+* `AssignToFeeder` and `AssignToLvFeeder` will no longer trace from start terminals that belong to open switches.
 
 ### Notes
 * None.

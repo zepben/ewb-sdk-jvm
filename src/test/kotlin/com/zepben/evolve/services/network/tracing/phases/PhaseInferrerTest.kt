@@ -8,15 +8,16 @@
 
 package com.zepben.evolve.services.network.tracing.phases
 
+import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.phases.PhaseValidator.validatePhases
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.doReturn
@@ -54,13 +55,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c2", listOf(SPK.B, SPK.NONE))
         validatePhases(network, "c3", listOf(SPK.NONE, SPK.B, SPK.NONE))
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, correct = listOf("c1", "c3"))
+        validateReturnedPhases(currentInferred, network, correct = listOf("c1", "c3"))
 
         validatePhases(network, "c1", PhaseCode.BC)
         validatePhases(network, "c2", PhaseCode.BC)
         validatePhases(network, "c3", PhaseCode.ABC)
-
-        validateLog(correct = listOf("c1", "c3"))
     }
 
     //
@@ -85,13 +88,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c2", listOf(SPK.B, SPK.NONE, SPK.N))
         validatePhases(network, "c3", listOf(SPK.NONE, SPK.B, SPK.NONE, SPK.N))
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, correct = listOf("c1", "c3"))
+        validateReturnedPhases(currentInferred, network, correct = listOf("c1", "c3"))
 
         validatePhases(network, "c1", PhaseCode.BCN)
         validatePhases(network, "c2", PhaseCode.BCN)
         validatePhases(network, "c3", PhaseCode.ABCN)
-
-        validateLog(correct = listOf("c1", "c3"))
     }
 
     //
@@ -116,13 +121,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c2", listOf(SPK.NONE, SPK.C))
         validatePhases(network, "c3", listOf(SPK.NONE, SPK.NONE, SPK.C))
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, correct = listOf("c1", "c3"))
+        validateReturnedPhases(currentInferred, network, correct = listOf("c1", "c3"))
 
         validatePhases(network, "c1", PhaseCode.AC)
         validatePhases(network, "c2", PhaseCode.AC)
         validatePhases(network, "c3", PhaseCode.ABC)
-
-        validateLog(correct = listOf("c1", "c3"))
     }
 
     //
@@ -136,7 +143,6 @@ internal class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoXYNtoXYtoBC() {
-        Tracing.normalPhaseTrace()
         val network = TestNetworkBuilder()
             .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.XYN)
@@ -148,13 +154,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c2", PhaseCode.BC)
         validatePhases(network, "c3", PhaseCode.BC)
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, correct = listOf("c1"))
+        validateReturnedPhases(currentInferred, network, correct = listOf("c1"))
 
         validatePhases(network, "c1", PhaseCode.BCN)
         validatePhases(network, "c2", PhaseCode.BC)
         validatePhases(network, "c3", PhaseCode.BC)
-
-        validateLog(correct = listOf("c1"))
     }
 
     //
@@ -168,7 +176,6 @@ internal class PhaseInferrerTest {
     //
     @Test
     internal fun testABCtoXYtoXYNtoBC() {
-        Tracing.normalPhaseTrace()
         val network = TestNetworkBuilder()
             .fromSource(PhaseCode.ABC)
             .toAcls(PhaseCode.XY)
@@ -180,13 +187,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c2", listOf(SPK.B, SPK.C, SPK.NONE))
         validatePhases(network, "c3", PhaseCode.BC)
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, correct = listOf("c2"))
+        validateReturnedPhases(currentInferred, network, correct = listOf("c2"))
 
         validatePhases(network, "c1", PhaseCode.BC)
         validatePhases(network, "c2", PhaseCode.BCN)
         validatePhases(network, "c3", PhaseCode.BC)
-
-        validateLog(correct = listOf("c2"))
     }
 
     //
@@ -211,13 +220,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c2", PhaseCode.NONE)
         validatePhases(network, "c3", PhaseCode.NONE)
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, correct = listOf("c2", "c3"))
+        validateReturnedPhases(currentInferred, network, correct = listOf("c2", "c3"))
 
         validatePhases(network, "c1", PhaseCode.ABC)
         validatePhases(network, "c2", PhaseCode.N)
         validatePhases(network, "c3", PhaseCode.ABCN)
-
-        validateLog(correct = listOf("c2", "c3"))
     }
 
     //
@@ -244,13 +255,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c2", PhaseCode.B)
         validatePhases(network, "c3", listOf(SPK.B, SPK.NONE, SPK.NONE))
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, suspect = listOf("c3"))
+        validateReturnedPhases(currentInferred, network, suspect = listOf("c3"))
 
         validatePhases(network, "c1", PhaseCode.ABC)
         validatePhases(network, "c2", PhaseCode.B)
         validatePhases(network, "c3", PhaseCode.BCN)
-
-        validateLog(suspect = listOf("c3"))
     }
 
     //
@@ -277,13 +290,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c2", PhaseCode.C)
         validatePhases(network, "c3", listOf(SPK.C, SPK.NONE, SPK.NONE))
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, suspect = listOf("c3"))
+        validateReturnedPhases(currentInferred, network, suspect = listOf("c3"))
 
         validatePhases(network, "c1", PhaseCode.ABC)
         validatePhases(network, "c2", PhaseCode.C)
         validatePhases(network, "c3", listOf(SPK.C, SPK.NONE, SPK.N))
-
-        validateLog(suspect = listOf("c3"))
     }
 
     //
@@ -308,13 +323,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c2", PhaseCode.A)
         validatePhases(network, "c3", listOf(SPK.A, SPK.NONE))
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, correct = listOf("c3"))
+        validateReturnedPhases(currentInferred, network, correct = listOf("c3"))
 
         validatePhases(network, "c1", PhaseCode.ABC)
         validatePhases(network, "c2", PhaseCode.A)
         validatePhases(network, "c3", PhaseCode.AN)
-
-        validateLog(correct = listOf("c3"))
     }
 
     //
@@ -338,13 +355,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c1", listOf(SPK.A, SPK.NONE, SPK.NONE, SPK.N))
         validatePhases(network, "s2", PhaseCode.AN)
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, correct = listOf("c1"))
+        validateReturnedPhases(currentInferred, network, correct = listOf("c1"))
 
         validatePhases(network, "s0", PhaseCode.AN)
         validatePhases(network, "c1", PhaseCode.ABCN)
         validatePhases(network, "s2", PhaseCode.AN)
-
-        validateLog(correct = listOf("c1"))
     }
 
     //
@@ -371,14 +390,16 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c3", PhaseCode.NONE)
         validatePhases(network, "c4", PhaseCode.NONE)
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network, correct = listOf("c3"))
+        validateReturnedPhases(currentInferred, network, correct = listOf("c3"))
 
         validatePhases(network, "c1", PhaseCode.ABCN)
         validatePhases(network, "c2", PhaseCode.N)
         validatePhases(network, "c3", PhaseCode.AB)
         validatePhases(network, "c4", PhaseCode.AB)
-
-        validateLog(correct = listOf("c3"))
     }
 
     //
@@ -403,13 +424,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "b2", PhaseCode.ABC, PhaseCode.NONE)
         validatePhases(network, "c3", PhaseCode.NONE)
 
-        phaseInferrer.run(network)
+        val normalInferred = phaseInferrer.run(network, NetworkStateOperators.NORMAL)
+        val currentInferred = phaseInferrer.run(network, NetworkStateOperators.CURRENT)
+
+        validateReturnedPhases(normalInferred, network)
+        validateReturnedPhases(currentInferred, network)
 
         validatePhases(network, "c1", PhaseCode.ABC)
         validatePhases(network, "b2", PhaseCode.ABC, PhaseCode.NONE)
         validatePhases(network, "c3", PhaseCode.NONE)
-
-        validateLog()
     }
 
     //
@@ -442,11 +465,13 @@ internal class PhaseInferrerTest {
             .build()
 
         // We need to make sure "c6-t2" is returned first to replicate the production data bug that this test is designed to replicate.
-        phaseInferrer.run(spy(network).also { ns ->
+        val networkSpy = spy(network).also { ns ->
             doReturn(listOf(network["c6-t2"]!!, *network.listOf<Terminal> { it.mRID != "c6-t2" }.toTypedArray()))
                 .`when`(ns)
                 .listOf(Terminal::class.java)
-        })
+        }
+        phaseInferrer.run(networkSpy, NetworkStateOperators.NORMAL)
+        phaseInferrer.run(networkSpy, NetworkStateOperators.CURRENT)
 
         validatePhases(network, "c2", PhaseCode.AC, PhaseCode.AC)
         validatePhases(network, "c3", PhaseCode.ABC, PhaseCode.ABC)
@@ -458,22 +483,15 @@ internal class PhaseInferrerTest {
         validatePhases(network, "c9", PhaseCode.ABC, PhaseCode.ABC)
     }
 
-    private fun validateLog(correct: List<String> = emptyList(), suspect: List<String> = emptyList()) {
-        assertThat(
-            listOf(*systemErr.logLines),
-            containsInAnyOrder(
-                *(correct.map { correctMessage(it) } +
-                    suspect.map { suspectMessage(it) })
-                    .map { containsString(it) }
-                    .toTypedArray()
-            )
-        )
+    private fun validateReturnedPhases(
+        inferredPhases: Collection<PhaseInferrer.InferredPhase>,
+        network: NetworkService,
+        correct: List<String> = emptyList(),
+        suspect: List<String> = emptyList()
+    ) {
+        val expectedInferred = correct.map { PhaseInferrer.InferredPhase(network.get<ConductingEquipment>(it)!!, false) } +
+            suspect.map { PhaseInferrer.InferredPhase(network.get<ConductingEquipment>(it)!!, true) }
+
+        assertThat(inferredPhases, containsInAnyOrder(*expectedInferred.toTypedArray()))
     }
-
-    private fun correctMessage(id: String) =
-        "*** Action Required *** Inferred missing phase for '' [$id] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
-
-    private fun suspectMessage(id: String) =
-        "*** Action Required *** Inferred missing phases for '' [$id] which may not be correct. The phases were inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
-
 }

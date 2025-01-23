@@ -16,32 +16,27 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.NetworkService
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
 
 object PhaseValidator {
 
-    fun validatePhases(network: NetworkService, id: String, phaseCode: PhaseCode) {
-        validatePhases(network, id, phaseCode.singlePhases)
+    fun validatePhases(network: NetworkService, id: String, expectedPhases: PhaseCode, vararg otherExpectedPhases: PhaseCode) {
+        validatePhases(network, id, expectedPhases.singlePhases, *otherExpectedPhases.map { it.singlePhases }.toTypedArray())
     }
 
-    fun validatePhases(network: NetworkService, id: String, expectedPhases: List<SinglePhaseKind>) {
-        validatePhases(network, id, expectedPhases.toList(), expectedPhases.toList())
-    }
-
-    fun validatePhases(network: NetworkService, id: String, expectedPhases1: PhaseCode, expectedPhases2: PhaseCode) {
-        validatePhases(network, id, expectedPhases1.singlePhases, expectedPhases2.singlePhases)
-    }
-
-    fun validatePhases(network: NetworkService, id: String, expectedPhases1: List<SinglePhaseKind>, expectedPhases2: List<SinglePhaseKind>?) {
+    fun validatePhases(network: NetworkService, id: String, expectedPhases: List<SinglePhaseKind>, vararg otherExpectedPhases: List<SinglePhaseKind>) {
         when (val io: IdentifiedObject = network[id]!!) {
-            is Terminal -> validatePhases(io, expectedPhases1, expectedPhases2 ?: expectedPhases1)
+            is Terminal -> validatePhases(io, expectedPhases, otherExpectedPhases.firstOrNull() ?: expectedPhases)
             is ConductingEquipment -> {
-                validatePhases(io.getTerminal(1), expectedPhases1)
+                val checkPhases = if (io.numTerminals() > 1 && otherExpectedPhases.isEmpty()) {
+                    listOf(expectedPhases, expectedPhases)
+                } else
+                    listOf(expectedPhases, *otherExpectedPhases)
 
-                if (expectedPhases2 != null)
-                    validatePhases(io.getTerminal(2), expectedPhases2)
-                else
-                    assertThat(io.getTerminal(2), nullValue())
+                assertThat(io.numTerminals(), equalTo(checkPhases.size))
+
+                checkPhases.forEachIndexed { index, phases ->
+                    validatePhases(io.getTerminal(index + 1), phases)
+                }
             }
 
             else -> throw IllegalArgumentException()
@@ -50,6 +45,10 @@ object PhaseValidator {
 
     fun validatePhases(terminal: Terminal?, expectedPhases: List<SinglePhaseKind>) {
         validatePhases(terminal, expectedPhases, expectedPhases)
+    }
+
+    fun validatePhases(terminal: Terminal?, expectedPhasesNormal: PhaseCode, expectedPhasesCurrent: PhaseCode) {
+        validatePhases(terminal, expectedPhasesNormal.singlePhases, expectedPhasesCurrent.singlePhases)
     }
 
     fun validatePhases(terminal: Terminal?, expectedPhasesNormal: List<SinglePhaseKind>, expectedPhasesCurrent: List<SinglePhaseKind>) {

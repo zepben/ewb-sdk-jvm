@@ -11,17 +11,24 @@
 
 package com.zepben.evolve.services.network.tracing.feeder
 
-import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.core.Feeder
+import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
+import com.zepben.evolve.cim.iec61970.base.core.Substation
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.services.network.NetworkService
+import com.zepben.evolve.services.network.getT
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
-import com.zepben.evolve.services.network.tracing.feeder.DirectionValidator.validateDirections
+import com.zepben.evolve.services.network.tracing.feeder.DirectionValidator.validateDirection
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection.*
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.testing.TestNetworkBuilder
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertTimeoutPreemptively
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.time.Duration
 
 internal class SetDirectionTest {
 
@@ -35,24 +42,24 @@ internal class SetDirectionTest {
 
         doSetDirectionTrace(n)
 
-        checkExpectedDirection(n.getT("acLineSegment0", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("acLineSegment0", 2), DOWNSTREAM)
-        checkExpectedDirection(n.getT("acLineSegment1", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("acLineSegment4", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("j4", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("j4", 2), DOWNSTREAM)
-        checkExpectedDirection(n.getT("j4", 3), DOWNSTREAM)
-        checkExpectedDirection(n.getT("j8", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("j5", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("j5", 2), DOWNSTREAM)
-        checkExpectedDirection(n.getT("j5", 3), DOWNSTREAM)
-        checkExpectedDirection(n.getT("j9", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("j6", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("j6", 2), UPSTREAM)
-        checkExpectedDirection(n.getT("acLineSegment2", 2), DOWNSTREAM)
-        checkExpectedDirection(n.getT("acLineSegment3", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("acLineSegment9", 2), UPSTREAM)
-        checkExpectedDirection(n.getT("j2", 1), UPSTREAM)
+        n.getT("acLineSegment0", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("acLineSegment0", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("acLineSegment1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("acLineSegment4", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j4", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j4", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j4", 3).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j8", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j5", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j5", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j5", 3).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j9", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j6", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j6", 2).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("acLineSegment2", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("acLineSegment3", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("acLineSegment9", 2).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
     }
 
     @Test
@@ -70,19 +77,24 @@ internal class SetDirectionTest {
             .toAcls() // c4
             .network
 
-        SetDirection().run(n.getT("c0", 2))
-        DirectionLogger.trace(n["c0"])
+        doSetDirectionTrace(n.getT("c0", 2))
 
-        n.getT("c0", 1).validateDirections(NONE)
-        n.getT("c0", 2).validateDirections(DOWNSTREAM)
-        n.getT("b1", 1).validateDirections(UPSTREAM)
-        n.getT("b1", 2).validateDirections(NONE, DOWNSTREAM)
-        n.getT("c2", 1).validateDirections(NONE, UPSTREAM)
-        n.getT("c2", 2).validateDirections(NONE, DOWNSTREAM)
-        n.getT("b3", 1).validateDirections(UPSTREAM)
-        n.getT("b3", 2).validateDirections(DOWNSTREAM, NONE)
-        n.getT("c4", 1).validateDirections(UPSTREAM, NONE)
-        n.getT("c4", 2).validateDirections(DOWNSTREAM, NONE)
+        n.getT("c0", 1).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c0", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b1", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("b1", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.CURRENT)
+        n.getT("c2", 1).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c2", 1).validateDirection(UPSTREAM, NetworkStateOperators.CURRENT)
+        n.getT("c2", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c2", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.CURRENT)
+        n.getT("b3", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b3", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b3", 2).validateDirection(NONE, NetworkStateOperators.CURRENT)
+        n.getT("c4", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 1).validateDirection(NONE, NetworkStateOperators.CURRENT)
+        n.getT("c4", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 2).validateDirection(NONE, NetworkStateOperators.CURRENT)
     }
 
     @Test
@@ -104,43 +116,16 @@ internal class SetDirectionTest {
 
         DirectionLogger.trace(n["c0"])
 
-        n.getT("c0", 1).validateDirections(NONE)
-        n.getT("c0", 2).validateDirections(NONE)
-        n.getT("j1", 1).validateDirections(NONE)
-        n.getT("j1", 2).validateDirections(BOTH)
-        n.getT("c2", 1).validateDirections(BOTH)
-        n.getT("c2", 2).validateDirections(BOTH)
-        n.getT("j3", 1).validateDirections(BOTH)
-        n.getT("j3", 2).validateDirections(NONE)
-        n.getT("c4", 1).validateDirections(NONE)
-        n.getT("c4", 2).validateDirections(NONE)
-    }
-
-    @Test
-    internal fun `doesn't trace from open feeder heads`() {
-        //
-        // 1 b0 21--c1--21--c2--21 b3 2
-        //
-        val n = TestNetworkBuilder()
-            .fromBreaker() // b0
-            .toAcls() // c1
-            .toAcls() // c2
-            .toBreaker(isNormallyOpen = true) // b3
-            .addFeeder("b0", 2)
-            .addFeeder("b3", 1)
-            .network
-
-        SetDirection().run(n)
-        DirectionLogger.trace(n["b0"])
-
-        n.getT("b0", 1).validateDirections(NONE)
-        n.getT("b0", 2).validateDirections(DOWNSTREAM)
-        n.getT("c1", 1).validateDirections(UPSTREAM)
-        n.getT("c1", 2).validateDirections(DOWNSTREAM)
-        n.getT("c2", 1).validateDirections(UPSTREAM)
-        n.getT("c2", 2).validateDirections(DOWNSTREAM)
-        n.getT("b3", 1).validateDirections(UPSTREAM)
-        n.getT("b3", 2).validateDirections(NONE)
+        n.getT("c0", 1).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c0", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("j1", 1).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("j1", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c2", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c2", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j3", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j3", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c4", 1).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c4", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
     }
 
     @Test
@@ -160,14 +145,14 @@ internal class SetDirectionTest {
 
         DirectionLogger.trace(n["b0"])
 
-        n.getT("b0", 1).validateDirections(NONE)
-        n.getT("b0", 2).validateDirections(DOWNSTREAM)
-        n.getT("c1", 1).validateDirections(UPSTREAM)
-        n.getT("c1", 2).validateDirections(DOWNSTREAM)
-        n.getT("tx2", 1).validateDirections(UPSTREAM)
-        n.getT("tx2", 2).validateDirections(NONE)
-        n.getT("c3", 1).validateDirections(NONE)
-        n.getT("c3", 2).validateDirections(NONE)
+        n.getT("b0", 1).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("b0", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("tx2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("tx2", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
     }
 
     @Test
@@ -196,24 +181,24 @@ internal class SetDirectionTest {
 
         doSetDirectionTrace(n)
 
-        checkExpectedDirection(n.getT("s0", 1), DOWNSTREAM)
-        checkExpectedDirection(n.getT("c1", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("c1", 2), DOWNSTREAM)
-        checkExpectedDirection(n.getT("j2", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("j2", 2), DOWNSTREAM)
-        checkExpectedDirection(n.getT("c3", 1), BOTH)
-        checkExpectedDirection(n.getT("c3", 2), BOTH)
-        checkExpectedDirection(n.getT("j4", 1), BOTH)
-        checkExpectedDirection(n.getT("j4", 2), BOTH)
-        checkExpectedDirection(n.getT("c5", 1), BOTH)
-        checkExpectedDirection(n.getT("c5", 2), BOTH)
-        checkExpectedDirection(n.getT("j6", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("j6", 2), DOWNSTREAM)
-        checkExpectedDirection(n.getT("c7", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("c7", 2), DOWNSTREAM)
-        checkExpectedDirection(n.getT("j8", 1), UPSTREAM)
-        checkExpectedDirection(n.getT("c9", 1), BOTH)
-        checkExpectedDirection(n.getT("c9", 2), BOTH)
+        n.getT("s0", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j2", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j4", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j4", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j6", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j6", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j8", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c9", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c9", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
     }
 
     @Test
@@ -254,39 +239,34 @@ internal class SetDirectionTest {
             .connect("c12", "j6", 2, 2)
             .network
 
-        SetDirection().run(n.getT("j0", 1))
-        DirectionLogger.trace(n["j0"])
+        doSetDirectionTrace(n.getT("j0", 1))
 
-        // To avoid reprocessing all BOTH loops in larger networks we do not process anything with a direction already set. This means this test will apply
-        // a standard UP/DOWN path through j2-t2 through to j6-t2 and then a BOTH loop around the c9/j4 loop which will stop the reverse UP/DOWN path
-        // ever being processed from j6-t2 via j2-t3.
-
-        n.getT("j0", 1).validateDirections(DOWNSTREAM)
-        n.getT("c1", 1).validateDirections(UPSTREAM)
-        n.getT("c1", 2).validateDirections(DOWNSTREAM)
-        n.getT("j2", 1).validateDirections(UPSTREAM)
-        n.getT("j2", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("j2", 3).validateDirections(BOTH)
-        n.getT("c3", 1).validateDirections(BOTH)
-        n.getT("c3", 2).validateDirections(BOTH)
-        n.getT("j4", 1).validateDirections(BOTH)
-        n.getT("j4", 2).validateDirections(BOTH)
-        n.getT("c5", 1).validateDirections(BOTH)
-        n.getT("c5", 2).validateDirections(BOTH)
-        n.getT("j6", 1).validateDirections(DOWNSTREAM)  // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("j6", 2).validateDirections(UPSTREAM)  // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("j6", 3).validateDirections(DOWNSTREAM)
-        n.getT("c7", 1).validateDirections(UPSTREAM)
-        n.getT("c7", 2).validateDirections(DOWNSTREAM)
-        n.getT("j8", 1).validateDirections(UPSTREAM)
-        n.getT("c9", 1).validateDirections(BOTH)
-        n.getT("c9", 2).validateDirections(BOTH)
-        n.getT("c10", 1).validateDirections(UPSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("c10", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("j11", 1).validateDirections(UPSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("j11", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("c12", 1).validateDirections(UPSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("c12", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
+        n.getT("j0", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j2", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j2", 3).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j4", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j4", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j6", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j6", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j6", 3).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j8", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c9", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c9", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c10", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c10", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j11", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j11", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c12", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c12", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
     }
 
     @Test
@@ -327,39 +307,38 @@ internal class SetDirectionTest {
             .connect("c12", "j6", 2, 2)
             .network
 
-        SetDirection().run(n.getT("j0", 1))
-        DirectionLogger.trace(n["j0"])
+        doSetDirectionTrace(n.getT("j0", 1))
 
         // To avoid reprocessing all BOTH loops in larger networks we do not process anything with a direction already set. This means this test will apply
         // a UP/DOWN path through j2-t2 directly into a BOTH loop around the c9/j11 loop which will stop the reverse UP/DOWN path
         // ever being processed from j6-t2 via j2-t3.
 
-        n.getT("j0", 1).validateDirections(DOWNSTREAM)
-        n.getT("c1", 1).validateDirections(UPSTREAM)
-        n.getT("c1", 2).validateDirections(DOWNSTREAM)
-        n.getT("j2", 1).validateDirections(UPSTREAM)
-        n.getT("j2", 2).validateDirections(DOWNSTREAM) // Would have been BOTH if the intermediate loop was reprocessed.
-        n.getT("j2", 3).validateDirections(BOTH)
-        n.getT("c3", 1).validateDirections(BOTH)
-        n.getT("c3", 2).validateDirections(BOTH)
-        n.getT("j4", 1).validateDirections(BOTH)
-        n.getT("j4", 2).validateDirections(BOTH)
-        n.getT("c5", 1).validateDirections(BOTH)
-        n.getT("c5", 2).validateDirections(BOTH)
-        n.getT("j6", 1).validateDirections(BOTH)
-        n.getT("j6", 2).validateDirections(BOTH)
-        n.getT("j6", 3).validateDirections(DOWNSTREAM)
-        n.getT("c7", 1).validateDirections(UPSTREAM)
-        n.getT("c7", 2).validateDirections(DOWNSTREAM)
-        n.getT("j8", 1).validateDirections(UPSTREAM)
-        n.getT("c9", 1).validateDirections(BOTH)
-        n.getT("c9", 2).validateDirections(BOTH)
-        n.getT("c10", 1).validateDirections(BOTH)
-        n.getT("c10", 2).validateDirections(BOTH)
-        n.getT("j11", 1).validateDirections(BOTH)
-        n.getT("j11", 2).validateDirections(BOTH)
-        n.getT("c12", 1).validateDirections(BOTH)
-        n.getT("c12", 2).validateDirections(BOTH)
+        n.getT("j0", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j2", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j2", 3).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j4", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j4", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j6", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j6", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j6", 3).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("j8", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c9", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c9", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c10", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c10", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j11", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j11", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c12", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c12", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
     }
 
     @Test
@@ -373,14 +352,13 @@ internal class SetDirectionTest {
             .toAcls(nominalPhases = PhaseCode.A) // c2
             .network
 
-        SetDirection().run(n.getT("j0", 1))
-        DirectionLogger.trace(n["j0"])
+        doSetDirectionTrace(n.getT("j0", 1))
 
-        n.getT("j0", 1).validateDirections(DOWNSTREAM)
-        n.getT("c1", 1).validateDirections(UPSTREAM)
-        n.getT("c1", 2).validateDirections(DOWNSTREAM)
-        n.getT("c2", 1).validateDirections(UPSTREAM)
-        n.getT("c2", 2).validateDirections(DOWNSTREAM)
+        n.getT("j0", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c2", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
     }
 
     @Test
@@ -395,33 +373,170 @@ internal class SetDirectionTest {
             .toAcls(nominalPhases = PhaseCode.NONE) // c2
             .network
 
-        SetDirection().run(n.getT("j0", 1))
-        DirectionLogger.trace(n["j0"])
+        doSetDirectionTrace(n.getT("j0", 1))
 
-        n.getT("j0", 1).validateDirections(DOWNSTREAM)
-        n.getT("c1", 1).validateDirections(UPSTREAM)
-        n.getT("c1", 2).validateDirections(DOWNSTREAM)
-        n.getT("b2", 1).validateDirections(UPSTREAM)
-        n.getT("b2", 2).validateDirections(NONE)
-        n.getT("c3", 1).validateDirections(NONE)
-        n.getT("c3", 2).validateDirections(NONE)
+        n.getT("j0", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b2", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+    }
+
+    @Test
+    internal fun handlesMultiFeeds() {
+        //
+        // j0 --c1-- --c2-- j3
+        //          |
+        //          c4
+        //          |
+        //           --c5--
+        //
+        val n = TestNetworkBuilder()
+            .fromJunction(PhaseCode.A, 1) // j0
+            .toAcls(PhaseCode.A) // c1
+            .toAcls(PhaseCode.A) // c2
+            .toJunction(PhaseCode.A, 1) // j3
+            .branchFrom("c1")
+            .toAcls(PhaseCode.A) // c4
+            .toAcls(PhaseCode.A) // c5
+            .addFeeder("j0")
+            .addFeeder("j3")
+            .build()
+
+        n.getT("j0", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c1", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c2", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c2", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("j3", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c4", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c5", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+    }
+
+    @Test
+    internal fun `ensure there are no exponential blowouts in the loop processing`() {
+        //
+        // NOTE: This test was added to ensure the loop processing wasn't blowing out when there are many nested loops. The original
+        //       fix was to prevent reprocessing of the loop, but this caused parts of the loop to be "damaged", so now we allow a
+        //       single re-pass which fixes this, without the exponential complexity increase of the original version.
+        //
+        val builder = TestNetworkBuilder()
+            .fromSource() // s0
+            .toJunction(numTerminals = 3) // j1
+            .addFeeder("s0")
+
+        // A loop of 10 solved quickly, 11 was slower but still acceptable, 20 was unworkable, so if 20 passes in the timeout we are happy.
+        for (i in 3..20) {
+            // Create the most simple loop of all back onto the junction over and over.
+            builder.fromAcls()
+                .connect("j1", "c$i", 2, 1)
+                .connect("j1", "c$i", 3, 2)
+        }
+
+        assertTimeoutPreemptively(
+            Duration.ofMillis(100),
+            message = "If this test times out, you have managed to break things as described in the test note. Go fix it."
+        ) {
+            Tracing.setDirection().run(builder.network, NetworkStateOperators.NORMAL)
+        }
+    }
+
+    @Test
+    internal fun setsDirectionThroughBusbars() {
+        //
+        // s0 11--c1--2  1  1--c3--2
+        //               o2
+        val n = TestNetworkBuilder()
+            .fromSource() // s0
+            .toAcls() // c1
+            .toOther<BusbarSection>(numTerminals = 1) // o2
+            .toAcls() // c3
+            .network
+
+        doSetDirectionTrace(n.getT("s0", 1))
+
+        n.getT("s0", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("o2", 1).validateDirection(CONNECTOR, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+    }
+
+    @Test
+    internal fun setsDirectionThroughBusbarsDualSource() {
+        //
+        // s0 11--c1--2  1  1--c3--21 s4
+        //               o2
+        val n = TestNetworkBuilder()
+            .fromSource() // s0
+            .toAcls() // c1
+            .toOther<BusbarSection>(numTerminals = 1) // o2
+            .toAcls() // c3
+            .toSource() // s4
+            .network
+
+        doSetDirectionTrace(n.getT("s0", 1))
+        doSetDirectionTrace(n.getT("s4", 1))
+
+        n.getT("s0", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c1", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("o2", 1).validateDirection(CONNECTOR, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("s4", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+    }
+
+    @Test
+    internal fun setsDirectionThroughBusbarsWithLoops() {
+        //
+        //               1----c3---21
+        // s0 11--c1--2  1 o2       b4
+        //               2----c5---12
+        val n = TestNetworkBuilder()
+            .fromSource() // s0
+            .toAcls() // c1
+            .toOther<BusbarSection>(numTerminals = 1) // o2
+            .toAcls() // c3
+            .toBreaker() // b4
+            .toAcls() // c5
+            .connect("c5", "o2", 2, 1)
+            .network
+
+        doSetDirectionTrace(n.getT("s0", 1))
+
+        n.getT("s0", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("o2", 1).validateDirection(CONNECTOR, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("b4", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("b4", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+    }
+
+    private fun doSetDirectionTrace(terminal: Terminal) {
+        SetDirection().apply {
+            run(terminal, NetworkStateOperators.NORMAL)
+            run(terminal, NetworkStateOperators.CURRENT)
+        }
+        DirectionLogger.trace(terminal.conductingEquipment!!)
     }
 
     private fun doSetDirectionTrace(n: NetworkService) {
-        SetDirection().run(n)
-        n.sequenceOf<Feeder>().forEach { DirectionLogger.trace(it.normalHeadTerminal!!.conductingEquipment!!) }
-    }
-
-    private fun NetworkService.getT(id: String, terminalId: Int) =
-        get<ConductingEquipment>(id)!!.getTerminal(terminalId)!!
-
-    private fun checkExpectedDirection(t: Terminal, normalDirection: FeederDirection, currentDirection: FeederDirection = normalDirection) {
-        checkExpectedDirection(t, normalDirection, DirectionSelector.NORMAL_DIRECTION)
-        checkExpectedDirection(t, currentDirection, DirectionSelector.CURRENT_DIRECTION)
-    }
-
-    private fun checkExpectedDirection(t: Terminal, direction: FeederDirection, directionSelector: DirectionSelector) {
-        assertThat(directionSelector.select(t).value, equalTo(direction))
+        val setDirection = SetDirection()
+        n.sequenceOf<Feeder>().forEach {
+            setDirection.run(it.normalHeadTerminal!!, NetworkStateOperators.NORMAL)
+            setDirection.run(it.normalHeadTerminal!!, NetworkStateOperators.CURRENT)
+            DirectionLogger.trace(it.normalHeadTerminal!!.conductingEquipment!!)
+        }
     }
 
 }

@@ -18,7 +18,8 @@ import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.services.customer.CustomerService
 import com.zepben.evolve.services.network.NetworkService
-import com.zepben.evolve.services.network.tracing.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import org.hamcrest.MatcherAssert.assertThat
 
 fun createSourceForConnecting(network: NetworkService, id: String, numTerminals: Int, phaseCode: PhaseCode = PhaseCode.A): EnergySource =
@@ -218,6 +219,27 @@ fun createOperationalRestriction(networkService: NetworkService, mRID: String, n
     }
 
 inline fun <reified T : ConductingEquipment> T.addFeederDirections(terminal: Int = 1): T {
-    getTerminal(terminal)?.also { Tracing.setDirection().run(it) }
+    getTerminal(terminal)?.also { Tracing.setDirection().run(it, NetworkStateOperators.NORMAL) }
+    getTerminal(terminal)?.also { Tracing.setDirection().run(it, NetworkStateOperators.CURRENT) }
     return this
+}
+
+fun NetworkService.setPhases() {
+    Tracing.setPhases().run(this, NetworkStateOperators.NORMAL)
+    Tracing.setPhases().run(this, NetworkStateOperators.CURRENT)
+}
+
+fun NetworkService.setFeederDirections() {
+    Tracing.setDirection().run(this, NetworkStateOperators.NORMAL)
+    Tracing.setDirection().run(this, NetworkStateOperators.CURRENT)
+}
+
+fun NetworkService.assignEquipmentToFeeders() {
+    Tracing.assignEquipmentToFeeders().run(this, NetworkStateOperators.NORMAL)
+    Tracing.assignEquipmentToFeeders().run(this, NetworkStateOperators.CURRENT)
+}
+
+fun NetworkService.assignEquipmentToLvFeeders() {
+    Tracing.assignEquipmentToLvFeeders().run(this, NetworkStateOperators.NORMAL)
+    Tracing.assignEquipmentToLvFeeders().run(this, NetworkStateOperators.CURRENT)
 }

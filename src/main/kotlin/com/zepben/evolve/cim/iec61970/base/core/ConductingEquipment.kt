@@ -67,12 +67,17 @@ abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
      * Add a [Terminal] to this [ConductingEquipment]
      *
      * If [Terminal.sequenceNumber] is 0 [terminal] will receive a sequenceNumber of [numTerminals] + 1 when added.
-     * @throws IllegalStateException if the [Terminal] references another [ConductingEquipment] or if a [Terminal] with
+     * @throws IllegalArgumentException if the [Terminal] references another [ConductingEquipment] or if a [Terminal] with
      *         the same sequenceNumber already exists.
+     * @throws IllegalStateException if [maxTerminals] has already been reached.
      * @return This [ConductingEquipment] for fluent use
      */
     fun addTerminal(terminal: Terminal): ConductingEquipment {
         if (validateTerminal(terminal)) return this
+
+        check(numTerminals() < maxTerminals) {
+            "Unable to add ${terminal.typeNameAndMRID()} to ${typeNameAndMRID()}. This conducting equipment already has the maximum number of terminals ($maxTerminals)."
+        }
 
         if (terminal.sequenceNumber == 0)
             terminal.sequenceNumber = numTerminals() + 1
@@ -83,6 +88,11 @@ abstract class ConductingEquipment(mRID: String = "") : Equipment(mRID) {
 
         return this
     }
+
+    /**
+     * The maximum number of terminals that this conducting equipment can have.
+     */
+    open val maxTerminals: Int get() = Int.MAX_VALUE
 
     fun removeTerminal(terminal: Terminal): Boolean = _terminals.remove(terminal)
 

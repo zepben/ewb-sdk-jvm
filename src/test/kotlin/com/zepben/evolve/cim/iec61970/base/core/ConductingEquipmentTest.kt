@@ -15,6 +15,7 @@ import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
 internal class ConductingEquipmentTest {
@@ -123,4 +124,30 @@ internal class ConductingEquipmentTest {
         assertThat(ce.t3, equalTo(t3))
     }
 
+    @Test
+    fun `default maxTerminals is max int`() {
+        val ce = object : ConductingEquipment() {}
+        assertThat(ce.maxTerminals, equalTo(Int.MAX_VALUE))
+    }
+
+    @Test
+    fun `maxTerminals throws when exceeded`() {
+        val ce = object : ConductingEquipment() {
+            override val maxTerminals: Int get() = 1
+        }
+
+        ce.addTerminal(Terminal())
+        assertThrows<IllegalStateException> { ce.addTerminal(Terminal()) }
+    }
+
+    @Test
+    fun `can re-add existing terminal without maxTerminals causing a throw`() {
+        val ce = object : ConductingEquipment() {
+            override val maxTerminals: Int get() = 1
+        }
+
+        val t = Terminal()
+        ce.addTerminal(t)
+        ce.addTerminal(t)
+    }
 }

@@ -23,6 +23,8 @@ import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
 import com.zepben.evolve.services.network.tracing.feeder.SetDirection
+import com.zepben.evolve.services.network.tracing.networktrace.Tracing
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import java.sql.Connection
@@ -39,38 +41,62 @@ import java.util.*
  * @param service The [NetworkService] to populate with CIM objects from the database.
  * @param databaseDescription The description of the database for logging (e.g. filename).
  */
-class NetworkDatabaseReader @JvmOverloads constructor(
+class NetworkDatabaseReader internal constructor(
     connection: Connection,
     override val service: NetworkService,
     databaseDescription: String,
-    tables: NetworkDatabaseTables = NetworkDatabaseTables(),
-    metadataReader: MetadataCollectionReader = MetadataCollectionReader(service, tables, connection),
-    serviceReader: NetworkServiceReader = NetworkServiceReader(service, tables, connection),
+    private val inferPhases: Boolean,
+    metadataReader: MetadataCollectionReader,
+    serviceReader: NetworkServiceReader,
     tableVersion: TableVersion = tableCimVersion,
-    private val setDirection: SetDirection = SetDirection(),
-    private val setPhases: SetPhases = SetPhases(),
-    private val phaseInferrer: PhaseInferrer = PhaseInferrer(),
-    private val assignToFeeders: AssignToFeeders = AssignToFeeders(),
-    private val assignToLvFeeders: AssignToLvFeeders = AssignToLvFeeders()
+    private val setFeederDirection: SetDirection = Tracing.setDirection(),
+    private val setPhases: SetPhases = Tracing.setPhases(),
+    private val phaseInferrer: PhaseInferrer = Tracing.phaseInferrer(),
+    private val assignToFeeders: AssignToFeeders = Tracing.assignEquipmentToFeeders(),
+    private val assignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders(),
 ) : CimDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion) {
+
+    @JvmOverloads
+    constructor(
+        connection: Connection,
+        service: NetworkService,
+        databaseDescription: String,
+        inferPhases: Boolean = true
+    ) : this(
+        connection,
+        service,
+        databaseDescription,
+        inferPhases,
+        MetadataCollectionReader(service, NetworkDatabaseTables(), connection),
+        NetworkServiceReader(service, NetworkDatabaseTables(), connection),
+    )
 
     override fun postLoad(): Boolean =
         super.postLoad().also {
             logger.info("Applying feeder direction to network...")
-            setDirection.run(service)
+            setFeederDirection.run(service, NetworkStateOperators.NORMAL)
+            setFeederDirection.run(service, NetworkStateOperators.CURRENT)
             logger.info("Feeder direction applied to network.")
 
             logger.info("Applying phases to network...")
-            setPhases.run(service)
-            phaseInferrer.run(service)
+            setPhases.run(service, NetworkStateOperators.NORMAL)
+            setPhases.run(service, NetworkStateOperators.CURRENT)
+            if (inferPhases) {
+                logInferredPhases(
+                    phaseInferrer.run(service, NetworkStateOperators.NORMAL),
+                    phaseInferrer.run(service, NetworkStateOperators.CURRENT)
+                )
+            }
             logger.info("Phasing applied to network.")
 
             logger.info("Assigning equipment to feeders...")
-            assignToFeeders.run(service)
+            assignToFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToFeeders.run(service, NetworkStateOperators.CURRENT)
             logger.info("Equipment assigned to feeders.")
 
             logger.info("Assigning equipment to LV feeders...")
-            assignToLvFeeders.run(service)
+            assignToLvFeeders.run(service, NetworkStateOperators.NORMAL)
+            assignToLvFeeders.run(service, NetworkStateOperators.CURRENT)
             logger.info("Equipment assigned to LV feeders.")
 
             logger.info("Validating that each equipment is assigned to a container...")
@@ -82,13 +108,21 @@ class NetworkDatabaseReader @JvmOverloads constructor(
             logger.info("Sources vs feeders validated.")
         }
 
+    private fun logInferredPhases(
+        normalInferredPhases: Collection<PhaseInferrer.InferredPhase>,
+        currentInferredPhases: Collection<PhaseInferrer.InferredPhase>
+    ) {
+        val inferredPhases = normalInferredPhases.associateBy { it.conductingEquipment }.toMutableMap()
+        currentInferredPhases.forEach {
+            inferredPhases.merge(it.conductingEquipment, it) { left, right -> left.takeIf { left.suspect } ?: right }
+        }
+
+        inferredPhases.values.forEach { logger.warn("*** Action Required *** ${it.description()}") }
+    }
+
     private fun validateEquipmentContainers(networkService: NetworkService) {
         val missingContainers = networkService.listOf<Equipment> { it.containers.isEmpty() }
-        val countByClass = mutableMapOf<String, Int>()
-        missingContainers.forEach {
-            countByClass.getOrPut(it.javaClass.simpleName) { 0 }
-            countByClass[it.javaClass.simpleName] = countByClass[it.javaClass.simpleName]!! + 1
-        }
+        val countByClass = missingContainers.groupingBy { it.javaClass.simpleName }.eachCount()
         countByClass.forEach { (className, count) ->
             logger.warn("$count ${className}s were missing an equipment container.")
         }

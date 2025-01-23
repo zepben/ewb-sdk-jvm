@@ -10,7 +10,6 @@ package com.zepben.evolve.services.network.tracing.connectivity
 
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
-import com.zepben.evolve.services.network.tracing.phases.NominalPhasePath
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind as SPK
 
 object TransformerPhasePaths {

@@ -39,7 +39,7 @@
 * AddJumperEvent now uses correct protobuf classes when converting
 * RemoveJumperEvent now uses correct protobuf classes when converting
 
-## [0.24.1] - UNRELEASED
+## [0.24.1] - 2025-01-23
 ### Breaking Changes
 * None.
 

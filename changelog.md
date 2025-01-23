@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [0.24.1] - UNRELEASED
+## [0.24.1] - 2025-01-23
 ### Breaking Changes
 * Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests.
 * Updated to ewb-grpc 0.34.1:

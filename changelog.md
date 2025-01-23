@@ -7,6 +7,10 @@
 
 ### Fixes
 * GrpcChannelBuilder's initial connectivity test no longer fails due to a lack of permissions on a subset of services.
+* Updated to latest SDK:
+  - AddJumperEvent from and to changed to fromConnection and toConnection
+* AddJumperEvent now uses correct protobuf classes when converting
+* RemoveJumperEvent now uses correct protobuf classes when converting
 
 ## [0.24.0] - 2025-01-21
 ### Breaking Changes

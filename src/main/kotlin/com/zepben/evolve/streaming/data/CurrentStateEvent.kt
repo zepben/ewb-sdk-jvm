@@ -205,7 +205,7 @@ class RemoveCutEvent(
             RemoveCutEvent(
                 event.eventId,
                 event.timestamp.toLocalDateTime(),
-                event.addCut.mrid
+                event.removeCut.mrid
             )
     }
 
@@ -319,7 +319,7 @@ class RemoveJumperEvent(
             RemoveJumperEvent(
                 event.eventId,
                 event.timestamp.toLocalDateTime(),
-                event.addCut.mrid
+                event.removeJumper.mrid
             )
     }
 

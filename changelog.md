@@ -1,8 +1,12 @@
 # Zepben EWB SDK changelog
 ## [0.24.1] - UNRELEASED
 ### Breaking Changes
+* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests.
+* Updated to ewb-grpc 0.34.1:
+  * Changed AddJumperEvent to not use reserved words.
 
 ### Fixes
+* GrpcChannelBuilder's initial connectivity test no longer fails due to a lack of permissions on a subset of services.
 
 ## [0.24.0] - 2025-01-21
 ### Breaking Changes
@@ -10,7 +14,6 @@
 * `AcLineSegment.perLengthSequenceImpedance` has been corrected to `perLengthImpedance`. This has been done in a non-breaking way, however the public resolver
   `Resolvers.perLengthSequenceImpedance` is now `Resolvers.perLengthImpedance`, correctly reflecting the CIM relationship.
 * Removed `getCurrentEquipmentForFeeder` implementation for `NetworkConsumer` as its functionality is now incorporated in `getEquipmentForContainers`.
-* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests.
 
 ### New Features
 * Network state services for updating and querying network state events via gRPC.
@@ -52,7 +55,6 @@
 * gRPC now supports `FeederDirection.CONNECTOR`.
 
 ### Fixes
-* GrpcChannelBuilder's initial connectivity test no longer fails due to a lack of permissions on a subset of services.
 
 ### Notes
 * `Cut` and `Clamp` have been added to the model, but no processing for them has been added to the tracing, so results will not be what you expect.

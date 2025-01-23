@@ -39,6 +39,25 @@
 * AddJumperEvent now uses correct protobuf classes when converting
 * RemoveJumperEvent now uses correct protobuf classes when converting
 
+## [0.24.1] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests.
+* Updated to ewb-grpc 0.34.1:
+  * Changed AddJumperEvent to not use reserved words.
+
+### Fixes
+* GrpcChannelBuilder's initial connectivity test no longer fails due to a lack of permissions on a subset of services.
+* Updated to latest SDK:
+  - AddJumperEvent from and to changed to fromConnection and toConnection
+* AddJumperEvent now uses correct protobuf classes when converting
+* RemoveJumperEvent now uses correct protobuf classes when converting
+
 ### Notes
 * None.
 

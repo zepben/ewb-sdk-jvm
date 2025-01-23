@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.24.1](#v0241)| `23 January 2025` |
 |[0.24.0](#v0240)| `21 January 2025` |
 |[0.23.0](#v0230)| `18 October 2024` |
 |[0.22.0](#v0220)| `30 May 2024` |
@@ -32,6 +33,22 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.24.1]
+
+### Breaking Changes
+* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests.
+* Updated to ewb-grpc 0.34.1:
+  * Changed AddJumperEvent to not use reserved words.
+
+### Fixes
+* GrpcChannelBuilder's initial connectivity test no longer fails due to a lack of permissions on a subset of services.
+* Updated to latest SDK:
+  - AddJumperEvent from and to changed to fromConnection and toConnection
+* AddJumperEvent now uses correct protobuf classes when converting
+* RemoveJumperEvent now uses correct protobuf classes when converting
 
 ---
 

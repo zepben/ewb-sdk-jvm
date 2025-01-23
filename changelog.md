@@ -26,10 +26,18 @@
   feeder.
 * Major speed improvements have been made for `RemovePhases` when dealing with large networks with many nested loops.
 * `SetDirection` now supports networks with `BusbarSection` and will apply the `FeederDirection.CONNECTOR` value to their terminals.
+* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests.
+* Updated to ewb-grpc 0.34.1:
+  * Changed AddJumperEvent to not use reserved words.
 
 ### Fixes
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart.
 * `AssignToFeeder` and `AssignToLvFeeder` will no longer trace from start terminals that belong to open switches.
+* GrpcChannelBuilder's initial connectivity test no longer fails due to a lack of permissions on a subset of services.
+* Updated to latest SDK:
+  - AddJumperEvent from and to changed to fromConnection and toConnection
+* AddJumperEvent now uses correct protobuf classes when converting
+* RemoveJumperEvent now uses correct protobuf classes when converting
 
 ### Notes
 * None.
@@ -81,7 +89,6 @@
 * gRPC now supports `FeederDirection.CONNECTOR`.
 
 ### Fixes
-* None.
 
 ### Notes
 * `Cut` and `Clamp` have been added to the model, but no processing for them has been added to the tracing, so results will not be what you expect.

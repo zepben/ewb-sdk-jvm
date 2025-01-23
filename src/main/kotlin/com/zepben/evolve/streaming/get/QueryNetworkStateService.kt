@@ -14,6 +14,7 @@ import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.streaming.data.CurrentStateEvent
 import com.zepben.evolve.streaming.data.CurrentStateEventBatch
 import com.zepben.evolve.streaming.data.SetCurrentStatesStatus
+import com.zepben.protobuf.connection.CheckConnectionRequest
 import com.zepben.protobuf.ns.GetCurrentStatesRequest
 import com.zepben.protobuf.ns.GetCurrentStatesResponse
 import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
@@ -221,4 +222,8 @@ class QueryNetworkStateService(
         fun handle(error: GrpcException)
     }
 
+    override fun checkConnection(request: CheckConnectionRequest?, responseObserver: StreamObserver<Empty>) {
+        responseObserver.onNext(Empty.getDefaultInstance())
+        responseObserver.onCompleted()
+    }
 }

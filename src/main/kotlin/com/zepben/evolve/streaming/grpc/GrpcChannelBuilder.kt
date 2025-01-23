@@ -12,7 +12,7 @@ import com.google.protobuf.Empty
 import com.zepben.auth.client.ZepbenTokenFetcher
 
 import com.zepben.protobuf.cc.CustomerConsumerGrpc
-import com.zepben.protobuf.checkConnection.CheckConnectionRequest
+import com.zepben.protobuf.connection.CheckConnectionRequest
 import com.zepben.protobuf.dc.DiagramConsumerGrpc
 import com.zepben.protobuf.nc.NetworkConsumerGrpc
 import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
@@ -37,7 +37,8 @@ data class GrpcBuildArgs(
 val DEFAULT_BUILD_ARGS = GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 5000, maxInboundMessageSize = TWENTY_MEGABYTES)
 
 
-val grpcClientConnectionTests: Map<String, MethodDescriptor<CheckConnectionRequest, Empty>> = mapOf(
+// This needs to be updated for every new client that gets added to the SDK.
+internal val GRPC_CLIENT_CONNECTION_TESTS: Map<String, MethodDescriptor<CheckConnectionRequest, Empty>> = mapOf(
     "NetworkConsumerClient" to NetworkConsumerGrpc.getCheckConnectionMethod(),
     "CustomerConsumerClient" to CustomerConsumerGrpc.getCheckConnectionMethod(),
     "DiagramConsumerClient" to DiagramConsumerGrpc.getCheckConnectionMethod(),
@@ -67,22 +68,22 @@ class GrpcChannelBuilder {
         } ?: NettyChannelBuilder.forAddress(_host, _port).usePlaintext().maxInboundMessageSize(buildArgs.maxInboundMessageSize).build()
     ).also {
         if (!buildArgs.skipConnectionTest)
-            testConnection(it, grpcClientConnectionTests, buildArgs.debugConnectionTest, buildArgs.connectionTestTimeoutMs)
+            testConnection(it, GRPC_CLIENT_CONNECTION_TESTS, buildArgs.debugConnectionTest, buildArgs.connectionTestTimeoutMs)
     }
 
     internal fun testConnection(grpcChannel: GrpcChannel, clients: Map<String, MethodDescriptor<CheckConnectionRequest, Empty>>, debug: Boolean, timeoutMs: Long) {
 
         val debugErrors = mutableMapOf<String, StatusRuntimeException>()
 
-        //Grabbing the callOptions from one of our stubs, hoping that they are all the same.
+        // Grabbing the callOptions from one of our stubs, hoping that they are all the same.
         val callOptions = NetworkConsumerGrpc.newStub(grpcChannel.channel).callOptions
         val request = CheckConnectionRequest.newBuilder().build()
         clients.forEach { (desc, methodDescriptor) ->
             runCatching {
-                //Doing this by hand so we can set the deadline for each call/turning it into a request timeout
-                //Might want to make this async one day.
-                // TODO: Wrap in timeout block since deadline doesn't timeout inflight/stuck requests
-                // TODO: Is there any reason to not revert this at that point and just use client stubs?
+                // Doing this by hand so we can set the deadline for each call/turning it into a request timeout
+                // Future improvement might be to make this async one day, but it's only an improvement if
+                // we are in a scenario where a user only has permissions for one service and it's not the first one that is checked.
+                // TODO: this could probably just use client stubs because deadlines don't really work
                 ClientCalls.blockingUnaryCall(
                     grpcChannel.channel.newCall(methodDescriptor, callOptions.withDeadlineAfter(timeoutMs, TimeUnit.MILLISECONDS)),
                     request

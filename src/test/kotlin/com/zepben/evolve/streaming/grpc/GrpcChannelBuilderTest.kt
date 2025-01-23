@@ -14,7 +14,7 @@ import com.zepben.auth.client.ZepbenTokenFetcher
 import com.zepben.auth.common.AuthMethod
 import com.zepben.evolve.streaming.get.*
 import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
-import com.zepben.protobuf.checkConnection.CheckConnectionRequest
+import com.zepben.protobuf.connection.CheckConnectionRequest
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import io.grpc.*
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
@@ -77,13 +77,13 @@ internal class GrpcChannelBuilderTest {
             } returns insecureChannel
 
             val builderSpy = spyk(GrpcChannelBuilder())
-            every { builderSpy.testConnection(any(), grpcClientConnectionTests, any(), any()) } just runs
+            every { builderSpy.testConnection(any(), GRPC_CLIENT_CONNECTION_TESTS, any(), any()) } just runs
 
             val grpcChannel = builderSpy.build()
 
             verifySequence {
                 builderSpy.build(DEFAULT_BUILD_ARGS)
-                builderSpy.testConnection(grpcChannel, grpcClientConnectionTests, true, 5000)
+                builderSpy.testConnection(grpcChannel, GRPC_CLIENT_CONNECTION_TESTS, true, 5000)
             }
         }
     }
@@ -113,13 +113,13 @@ internal class GrpcChannelBuilderTest {
         every { NettyChannelBuilder.forAddress("localhost", 50051).usePlaintext().maxInboundMessageSize(12).build() } returns insecureChannel
 
         val builderSpy = spyk(GrpcChannelBuilder())
-        every { builderSpy.testConnection(any(), grpcClientConnectionTests, any(), any()) } just runs
+        every { builderSpy.testConnection(any(), GRPC_CLIENT_CONNECTION_TESTS, any(), any()) } just runs
 
         val grpcChannel = builderSpy.build(GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 1234, maxInboundMessageSize = 12))
 
         verifySequence {
             builderSpy.build(GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 1234, maxInboundMessageSize = 12))
-            builderSpy.testConnection(grpcChannel, grpcClientConnectionTests, true, 1234)
+            builderSpy.testConnection(grpcChannel, GRPC_CLIENT_CONNECTION_TESTS, true, 1234)
         }
     }
 
@@ -166,7 +166,7 @@ internal class GrpcChannelBuilderTest {
             DiagramConsumerClient::class to null, //null returns GrpcResult mockk with wasSuccessful = true
         )
 
-        runTestConnection(responses) // TODO: This might be the one to fail fast on, UNKNOWN: Connection refused = token expired or etc?
+        runTestConnection(responses)
     }
 
     @Test
@@ -432,6 +432,6 @@ internal class GrpcChannelBuilderTest {
 
         val toIgnore = listOf("ThrowingGrpcClient")
 
-        assertThat(grpcClients.map { it.simpleName }.subtract(toIgnore), equalTo(grpcClientConnectionTests.keys))
+        assertThat(grpcClients.map { it.simpleName }.subtract(toIgnore), equalTo(GRPC_CLIENT_CONNECTION_TESTS.keys))
     }
 }

@@ -11,7 +11,7 @@ package com.zepben.evolve.streaming.mutations
 import com.google.protobuf.Empty
 import com.zepben.evolve.conn.grpc.GrpcException
 import com.zepben.evolve.streaming.data.*
-import com.zepben.protobuf.checkConnection.CheckConnectionRequest
+import com.zepben.protobuf.connection.CheckConnectionRequest
 import com.zepben.protobuf.ns.SetCurrentStatesRequest
 import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc

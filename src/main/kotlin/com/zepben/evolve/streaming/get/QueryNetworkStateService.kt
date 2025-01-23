@@ -14,7 +14,7 @@ import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.streaming.data.CurrentStateEvent
 import com.zepben.evolve.streaming.data.CurrentStateEventBatch
 import com.zepben.evolve.streaming.data.SetCurrentStatesStatus
-import com.zepben.protobuf.checkConnection.CheckConnectionRequest
+import com.zepben.protobuf.connection.CheckConnectionRequest
 import com.zepben.protobuf.ns.GetCurrentStatesRequest
 import com.zepben.protobuf.ns.GetCurrentStatesResponse
 import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc

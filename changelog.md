@@ -38,6 +38,7 @@
   - AddJumperEvent from and to changed to fromConnection and toConnection
 * AddJumperEvent now uses correct protobuf classes when converting
 * RemoveJumperEvent now uses correct protobuf classes when converting
+* When finding `LvFeeders` in the `Site` we will now exclude `LvFeeders` that start with an open `Switch`
 
 ## [0.24.1] - 2025-01-23
 ### Breaking Changes

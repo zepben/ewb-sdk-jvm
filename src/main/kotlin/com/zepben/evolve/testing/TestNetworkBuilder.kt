@@ -636,8 +636,10 @@ open class TestNetworkBuilder {
                 normalHeadTerminal = headEquipment.getTerminal(sequenceNumber ?: headEquipment.numTerminals())!!
 
                 addEquipment(headEquipment)
+                addCurrentEquipment(headEquipment)
             }.also {
                 headEquipment.addContainer(it)
+                headEquipment.addCurrentContainer(it)
                 add(it)
             }
         }
@@ -648,8 +650,10 @@ open class TestNetworkBuilder {
                 normalHeadTerminal = headEquipment.getTerminal(sequenceNumber ?: headEquipment.numTerminals())!!
 
                 addEquipment(headEquipment)
+                addCurrentEquipment(headEquipment)
             }.also {
                 headEquipment.addContainer(it)
+                headEquipment.addCurrentContainer(it)
                 add(it)
             }
         }

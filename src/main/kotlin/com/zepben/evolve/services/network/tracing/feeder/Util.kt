@@ -13,7 +13,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 
 
-internal fun Terminal.isFeederHeadTerminal(): Boolean = when (val ce = conductingEquipment) {
+fun Terminal.isFeederHeadTerminal(): Boolean = when (val ce = conductingEquipment) {
     null -> false
     else -> ce.containers.asSequence().filterIsInstance<Feeder>().any { it.normalHeadTerminal == this }
 }
@@ -21,10 +21,12 @@ internal fun Terminal.isFeederHeadTerminal(): Boolean = when (val ce = conductin
 /**
  * Find all LV feeders containing any [Equipment] in the [Site].
  */
-internal fun Collection<Site>.findLvFeeders(lvFeederStartPoints: Set<ConductingEquipment>, stateOperators: NetworkStateOperators): Iterable<LvFeeder> =
+fun Collection<Site>.findLvFeeders(lvFeederStartPoints: Set<ConductingEquipment>, stateOperators: NetworkStateOperators): Iterable<LvFeeder> =
     asSequence()
-        .flatMap { it.equipment }
+        .flatMap { stateOperators.getEquipment(it) }
+        .filterIsInstance<ConductingEquipment>()
         .filter { it in lvFeederStartPoints }
+        .filter { !stateOperators.isOpen(it) }      // Exclude any open switch that might be energised by a different feeder on the other side.
         .flatMap { equipment -> equipment.getFilteredContainers<LvFeeder>(stateOperators) }
         .asIterable()
 
@@ -36,7 +38,7 @@ internal fun Collection<Site>.findLvFeeders(lvFeederStartPoints: Set<ConductingE
  * @param operators The [NetworkStateOperators] used to select the containers.
  * @return A collection of containers of the specified type that contain the specified equipment.
  */
-internal inline fun <reified T : EquipmentContainer> Equipment?.getFilteredContainers(operators: NetworkStateOperators): Collection<T> = when (this) {
+inline fun <reified T : EquipmentContainer> Equipment?.getFilteredContainers(operators: NetworkStateOperators): Collection<T> = when (this) {
     null -> emptyList()
     else -> operators.getContainers(this).filterIsInstance<T>()
 }

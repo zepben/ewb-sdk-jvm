@@ -24,7 +24,7 @@ import java.sql.DriverManager
 import java.time.Instant
 import java.util.*
 
-abstract class MetricsSchemaTest {
+internal abstract class MetricsSchemaTest {
 
     @JvmField
     @RegisterExtension

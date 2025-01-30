@@ -18,6 +18,7 @@
 ### New Features
 * Added `ClearDirection` that clears feeder directions.
 * Added new `FeederDirection.CONNECTOR` value for `Connector` equipment that are modelled only with a single terminal.
+* Added `MetricsDataSourceWriter`, which can be used to write metrics to a Postgres database.
 
 ### Enhancements
 * You can now add sites to the `TestNetworkBuilder` via `addSite`.

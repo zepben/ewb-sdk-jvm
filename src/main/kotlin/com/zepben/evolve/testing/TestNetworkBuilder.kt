@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -331,6 +331,50 @@ open class TestNetworkBuilder {
     }
 
     /**
+     * Start a new network island from a [BusbarSection], updating the network pointer to the new [BusbarSection].
+     *
+     * @param nominalPhases The nominal phases for the new [BusbarSection].
+     * @param mRID Optional mRID for the new [BusbarSection].
+     * @param action An action that accepts the new [BusbarSection] to allow for additional initialisation.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun fromBusbarSection(
+        nominalPhases: PhaseCode = PhaseCode.ABC,
+        mRID: String? = null,
+        action: BusbarSection.() -> Unit = {}
+    ): TestNetworkBuilder {
+        current = network.createBusbarSection(mRID, nominalPhases).also(action)
+        return this
+    }
+
+    /**
+     * Add a new [BusbarSection] to the network and connect it to the current network pointer, updating the network pointer to the new [BusbarSection].
+     *
+     * @param nominalPhases The nominal phases for the new [BusbarSection].
+     * @param mRID Optional mRID for the new [BusbarSection].
+     * @param connectivityNodeMrid Optional id of the connectivity node used to connect this [BusbarSection] to the previous item. Will only be used if the previous
+     * item is not already connected.
+     * @param action An action that accepts the new [BusbarSection] to allow for additional initialisation.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    @JvmOverloads
+    fun toBusbarSection(
+        nominalPhases: PhaseCode = PhaseCode.ABC,
+        mRID: String? = null,
+        connectivityNodeMrid: String? = null,
+        action: BusbarSection.() -> Unit = {}
+    ): TestNetworkBuilder {
+        current = network.createBusbarSection(mRID, nominalPhases).also {
+            connect(current!!, it, connectivityNodeMrid)
+            action(it)
+        }
+        return this
+    }
+
+    /**
      * Start a new network island from a [ConductingEquipment], updating the network pointer to the new [ConductingEquipment].
      *
      * @param creator Creator of the new [ConductingEquipment].
@@ -386,13 +430,13 @@ open class TestNetworkBuilder {
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
     @JvmOverloads
-    fun toOther(
-        creator: (String) -> ConductingEquipment,
+    fun <T : ConductingEquipment> toOther(
+        creator: (String) -> T,
         nominalPhases: PhaseCode = PhaseCode.ABC,
         numTerminals: Int? = null,
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
-        action: ConductingEquipment.() -> Unit = {}
+        action: T.() -> Unit = {}
     ): TestNetworkBuilder {
         current = network.createOther(mRID, creator, nominalPhases, numTerminals).also {
             connect(current!!, it, connectivityNodeMrid)
@@ -419,7 +463,7 @@ open class TestNetworkBuilder {
         numTerminals: Int? = null,
         mRID: String? = null,
         connectivityNodeMrid: String? = null,
-        noinline action: ConductingEquipment.() -> Unit = {}
+        noinline action: T.() -> Unit = {}
     ): TestNetworkBuilder =
         toOther({ T::class.primaryConstructor!!.call(it) }, nominalPhases, numTerminals, mRID, connectivityNodeMrid, action)
 
@@ -590,6 +634,13 @@ open class TestNetworkBuilder {
             }.also { add(it) }
         }
 
+    private fun NetworkService.createBusbarSection(mRID: String?, phaseCode: PhaseCode = PhaseCode.ABC) =
+        mRID.orNextId("bbs").let { id ->
+            BusbarSection(id).apply {
+                addTerminal(Terminal("$id-t1").apply { phases = phaseCode }.also { add(it) })
+            }.also { add(it) }
+        }
+
     private fun NetworkService.createPowerElectronicsConnection(mRID: String?, phaseCode: PhaseCode = PhaseCode.ABC, numTerminals: Int?) =
         mRID.orNextId("pec").let { id ->
             PowerElectronicsConnection(id).apply {
@@ -617,12 +668,12 @@ open class TestNetworkBuilder {
             }.also { add(it) }
         }
 
-    private fun NetworkService.createOther(
+    private fun <T : ConductingEquipment> NetworkService.createOther(
         mRID: String?,
-        creator: (String) -> ConductingEquipment,
+        creator: (String) -> T,
         phaseCode: PhaseCode = PhaseCode.ABC,
         numTerminals: Int?
-    ) =
+    ): T =
         mRID.orNextId("o").let { id ->
             creator(id).apply {
                 for (i in 1..(numTerminals ?: 2))

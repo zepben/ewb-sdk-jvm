@@ -20,7 +20,7 @@ import javax.sql.DataSource
 /**
  * Class for writing metrics to an arbitrary datasource.
  */
-class MetricsDataSourceWriter(
+class MetricsDataSourceWriter @JvmOverloads constructor(
     private val dataSource: DataSource,
     private val databaseTables: MetricsDatabaseTables = MetricsDatabaseTables()
 ) {

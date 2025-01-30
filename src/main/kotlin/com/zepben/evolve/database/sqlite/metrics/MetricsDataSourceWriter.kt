@@ -8,21 +8,25 @@
 
 package com.zepben.evolve.database.sqlite.metrics
 
+import com.zepben.evolve.database.sqlite.common.SchemaUtils
 import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import com.zepben.evolve.metrics.IngestionJob
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection
-import java.sql.SQLException
 import javax.sql.DataSource
 
+/**
+ * Class for writing metrics to an arbitrary datasource.
+ */
 class MetricsDataSourceWriter(
     private val dataSource: DataSource,
     private val databaseTables: MetricsDatabaseTables = MetricsDatabaseTables()
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
+    private val schemaUtils = SchemaUtils(databaseTables, logger)
     private val versionTable = databaseTables.getTable<TableVersion>()
 
     @Throws(IncompatibleVersionException::class)
@@ -30,58 +34,13 @@ class MetricsDataSourceWriter(
         return dataSource.connection.use { connection ->
             connection.configureBatch()
             val localVersion = versionTable.supportedVersion
-            when (val remoteVersion = getVersion(connection)) {
-                null -> createSchema(connection) && populateTables(connection, job) && postSave(connection)
+            when (val remoteVersion = schemaUtils.getVersion(connection)) {
+                null -> schemaUtils.createSchema(connection) && populateTables(connection, job) && postSave(connection)
                 localVersion -> populateTables(connection, job) && postSave(connection)
                 else -> throw IncompatibleVersionException(localVersion, remoteVersion)
             }
         }
     }
-
-    private fun createSchema(connection: Connection): Boolean =
-        try {
-            logger.info("No version table found. Creating database schema v${versionTable.supportedVersion}...")
-
-            connection.createStatement().use { statement ->
-                statement.queryTimeout = 2
-
-                databaseTables.forEachTable { table ->
-                    statement.executeUpdate(table.createTableSql)
-                    table.createIndexesSql.forEach { sql ->
-                        statement.executeUpdate(sql)
-                    }
-                }
-
-                // Add the version number to the database.
-                connection.prepareStatement(versionTable.preparedInsertSql).use { insert ->
-                    insert.setInt(versionTable.VERSION.queryIndex, versionTable.supportedVersion)
-                    insert.executeUpdate()
-                }
-
-                connection.commit()
-                logger.info("Schema created.")
-            }
-            true
-        } catch (e: SQLException) {
-            logger.error("Failed to create database schema: " + e.message)
-            false
-        }
-
-    private fun getVersion(connection: Connection): Int? =
-        connection.createStatement().use { statement ->
-            val tableVersion = databaseTables.getTable<TableVersion>()
-            try {
-                statement.executeQuery(tableVersion.selectSql).use { rs ->
-                    if (rs.next()) {
-                        rs.getInt(tableVersion.VERSION.queryIndex)
-                    } else {
-                        throw MissingVersionException
-                    }
-                }
-            } catch (e: SQLException) {
-                null
-            }
-        }
 
     internal fun populateTables(connection: Connection, job: IngestionJob): Boolean {
         databaseTables.prepareInsertStatements(connection)

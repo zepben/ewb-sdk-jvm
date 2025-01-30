@@ -37,6 +37,7 @@ abstract class BaseDatabaseWriter(
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
+    private val schemaUtils = SchemaUtils(databaseTables, logger)
 
     private val databaseDescriptor: String = "jdbc:sqlite:$databaseFile"
     private lateinit var saveConnection: Connection
@@ -85,7 +86,7 @@ abstract class BaseDatabaseWriter(
         } else {
             removeExisting()
                 && connect()
-                && create()
+                && schemaUtils.createSchema(saveConnection)
                 && prepareInsertStatements()
         }
 
@@ -118,48 +119,17 @@ abstract class BaseDatabaseWriter(
             false
         }
 
-    private fun create(): Boolean =
-        try {
-            val versionTable = databaseTables.getTable<TableVersion>()
-            logger.info("Creating database schema v${versionTable.supportedVersion}...")
-
-            saveConnection.createStatement().use { statement ->
-                statement.queryTimeout = 2
-
-                databaseTables.forEachTable {
-                    statement.executeUpdate(it.createTableSql)
-                }
-
-                // Add the version number to the database.
-                saveConnection.prepareStatement(versionTable.preparedInsertSql).use { insert ->
-                    insert.setInt(versionTable.VERSION.queryIndex, versionTable.supportedVersion)
-                    insert.executeUpdate()
-                }
-
-                saveConnection.commit()
-                logger.info("Schema created.")
-            }
-            true
-        } catch (e: SQLException) {
-            logger.error("Failed to create database schema: " + e.message)
-            false
-        }
-
     private fun versionMatches(): Boolean {
-        saveConnection.createStatement().use { statement ->
-            val tableVersion = databaseTables.getTable<TableVersion>()
-            statement.executeQuery(tableVersion.selectSql).use { rs ->
-                if (rs.next()) {
-                    val version = rs.getInt(tableVersion.VERSION.queryIndex)
-                    return if (version == tableVersion.supportedVersion) true
-                    else {
-                        logger.error("Unsupported version in database file (got $version, expected ${tableVersion.supportedVersion}).")
-                        false
-                    }
-                } else {
-                    logger.error("Missing version table in database file, cannot check compatibility")
-                    return false
-                }
+        val tableVersion = databaseTables.getTable<TableVersion>()
+        return when (val version = schemaUtils.getVersion(saveConnection)) {
+            null -> {
+                logger.error("Missing version table in database file, cannot check compatibility")
+                false
+            }
+            tableVersion.supportedVersion -> true
+            else -> {
+                logger.error("Unsupported version in database file (got $version, expected ${tableVersion.supportedVersion}).")
+                false
             }
         }
     }

@@ -52,7 +52,7 @@ internal class MetricsDatabaseWriterTest : MetricsSchemaTest() {
             IngestionJob(uuid),
             modelPath = modelPath,
             metricsWriter = writer
-        ).saveSchema()
+        ).populateTables()
 
         assertThat("Job ID file should exist", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").exists())
 
@@ -73,7 +73,7 @@ internal class MetricsDatabaseWriterTest : MetricsSchemaTest() {
             IngestionJob(uuid3),
             modelPath = modelPath,
             metricsWriter = writer
-        ).saveSchema()
+        ).populateTables()
 
         assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid1.$JOB_ID_FILE_EXTENSION").notExists())
         assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid2.$JOB_ID_FILE_EXTENSION").notExists())

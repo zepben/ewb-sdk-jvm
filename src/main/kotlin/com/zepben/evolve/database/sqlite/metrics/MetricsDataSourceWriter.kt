@@ -69,4 +69,4 @@ class IncompatibleVersionException(
 /**
  * Thrown if the version table in the remote metrics database has no entry.
  */
-object MissingVersionException : Exception("Version table present in remote metrics database, but it missing an entry.")
+class MissingVersionException : Exception("Version table present in remote metrics database, but it missing an entry.")

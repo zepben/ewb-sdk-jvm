@@ -53,7 +53,7 @@ internal class SchemaUtils(
                     if (rs.next()) {
                         rs.getInt(tableVersion.VERSION.queryIndex)
                     } else {
-                        throw MissingVersionException
+                        throw MissingVersionException()
                     }
                 }
             } catch (e: SQLException) {

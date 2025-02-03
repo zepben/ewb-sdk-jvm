@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -27,6 +27,20 @@ import com.zepben.evolve.services.common.extensions.*
  * @property clamps The clamps connected to the line segment.
  */
 class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRID) {
+
+    @Deprecated("Mid-span terminals are deprecated. Use Clamps instead.")
+    var midSpanTerminalsEnabled: Boolean = false
+        set(value) {
+            if (value) {
+                check(cuts.isEmpty() && clamps.isEmpty()) { "Cannot enable mid-span terminals when cuts or clamps are present"}
+            } else {
+                check(terminals.size == 2) { "Cannot disable mid-span terminals on segments with more than 2 terminals"}
+            }
+            field = value
+        }
+
+    override val maxTerminals: Int
+        get() = if (midSpanTerminalsEnabled) super.maxTerminals else 2
 
     var perLengthImpedance: PerLengthImpedance? = null
     private var _cuts: MutableList<Cut>? = null

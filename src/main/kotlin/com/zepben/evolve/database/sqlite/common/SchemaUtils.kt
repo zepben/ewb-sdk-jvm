@@ -17,7 +17,7 @@ internal class SchemaUtils(
     private val databaseTables: BaseDatabaseTables,
 ) {
 
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     fun createSchema(connection: Connection): Boolean =
         try {

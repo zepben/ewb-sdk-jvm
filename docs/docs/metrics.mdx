@@ -43,10 +43,8 @@ The following is an example of creating, populating, and saving an `IngestionJob
 <TabItem value="java">
 
 ```java
-import com.zaxxer.hikari.HikariDataSource;
 import com.zepben.evolve.cim.iec61970.base.core.Feeder;
-import com.zepben.evolve.database.sqlite.metrics.IncompatibleVersionException;
-import com.zepben.evolve.database.sqlite.metrics.MetricsDataSourceWriter;
+import com.zepben.evolve.database.online.MetricsOnlineDatabaseWriter;
 import com.zepben.evolve.database.sqlite.metrics.MetricsDatabaseWriter;
 import com.zepben.evolve.metrics.IngestionJob;
 import com.zepben.evolve.metrics.IngestionMetadata;
@@ -55,13 +53,15 @@ import com.zepben.evolve.metrics.TotalNetworkContainer;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.UUID;
 
 import static com.zepben.evolve.metrics.NetworkContainerKt.networkContainer;
 
 public class IngestionJobExample {
-    public static void main(String[] args) throws NoSuchAlgorithmException, IncompatibleVersionException {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
         // This would normally be inside a NetworkService, but it is created here for this example.
@@ -96,29 +96,30 @@ public class IngestionJobExample {
             System.out.println("Ingestion job could not be saved successfully");
         }
 
-        // Alternatively, write to an online database using MetricsDataSourceWriter
-        HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setJdbcUrl("jdbc:postgres://localhost:5432/metrics");
-        dataSource.setUsername("admin");
-        dataSource.setPassword("password");
-
-        MetricsDataSourceWriter metricsDataSourceWriter = new MetricsDataSourceWriter(dataSource);
-        if (metricsDataSourceWriter.save(ingestionJob)) {
+        // Alternatively, write to an online database using MetricsOnlineDatabaseWriter
+        MetricsOnlineDatabaseWriter metricsOnlineDatabaseWriter = new MetricsOnlineDatabaseWriter(() -> {
+            try {
+                return DriverManager.getConnection("jdbc:postgres://localhost:5432/metrics", "admin", "password");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        if (metricsOnlineDatabaseWriter.save(ingestionJob)) {
             System.out.println("Ingestion job saved to postgres db successfully");
         } else {
             System.out.println("Ingestion job could not be saved to postgres db successfully");
         }
     }
 }
+
 ```
 
 </TabItem>
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zaxxer.hikari.HikariDataSource
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.database.sqlite.metrics.MetricsDataSourceWriter
+import com.zepben.evolve.database.online.MetricsOnlineDatabaseWriter
 import com.zepben.evolve.database.sqlite.metrics.MetricsDatabaseWriter
 import com.zepben.evolve.metrics.IngestionJob
 import com.zepben.evolve.metrics.IngestionMetadata
@@ -126,6 +127,7 @@ import com.zepben.evolve.metrics.TotalNetworkContainer
 import com.zepben.evolve.metrics.toNetworkContainer
 import java.nio.file.Path
 import java.security.MessageDigest
+import java.sql.DriverManager
 import java.time.Instant
 import java.util.*
 
@@ -160,14 +162,11 @@ fun main() {
         println("Ingestion job could not be saved successfully")
     }
 
-    // Alternatively, write to an online database using MetricsDataSourceWriter
-    val dataSource = HikariDataSource().apply {
-        jdbcUrl = "jdbc:postgres://localhost:5432/metrics"
-        username = "admin"
-        password = "password"
+    // Alternatively, write to an online database using MetricsOnlineDatabaseWriter
+    val metricsOnlineDatabaseWriter = MetricsOnlineDatabaseWriter {
+        DriverManager.getConnection("jdbc:postgres://localhost:5432/metrics", "admin", "password")
     }
-    val metricsDataSourceWriter = MetricsDataSourceWriter(dataSource)
-    if (metricsDataSourceWriter.save(ingestionJob)) {
+    if (metricsOnlineDatabaseWriter.save(ingestionJob)) {
         println("Ingestion job saved to postgres db successfully")
     } else {
         println("Ingestion job could not be saved to postgres db successfully")

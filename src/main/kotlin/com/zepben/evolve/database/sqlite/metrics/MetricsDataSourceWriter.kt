@@ -22,7 +22,7 @@ import javax.sql.DataSource
  */
 class MetricsDataSourceWriter @JvmOverloads constructor(
     private val dataSource: DataSource,
-    private val databaseTables: MetricsDatabaseTables = MetricsDatabaseTables()
+    private val databaseTables: MetricsDatabaseTables = MetricsDatabaseTables(),
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)

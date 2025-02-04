@@ -76,7 +76,7 @@ abstract class BaseDatabaseWriter(
      *
      * @return true if the model was saved successfully.
      */
-    internal abstract fun populateTables(): Boolean
+    protected abstract fun populateTables(): Boolean
 
     private fun preSave(): Boolean =
         if (persistFile && Files.exists(Paths.get(databaseFile))) {

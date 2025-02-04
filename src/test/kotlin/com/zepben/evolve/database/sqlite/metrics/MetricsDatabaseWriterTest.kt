@@ -36,7 +36,7 @@ internal class MetricsDatabaseWriterTest : MetricsSchemaTest() {
             "databaseFile",
             mockk(), // ingestion job isn't actually used to create the MetricsWriter
             metricsWriter = writer
-        ).populateTables()
+        ).save()
 
         assertThat("Should have saved successfully", result)
 
@@ -52,7 +52,7 @@ internal class MetricsDatabaseWriterTest : MetricsSchemaTest() {
             IngestionJob(uuid),
             modelPath = modelPath,
             metricsWriter = writer
-        ).populateTables()
+        ).save()
 
         assertThat("Job ID file should exist", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").exists())
 
@@ -73,7 +73,7 @@ internal class MetricsDatabaseWriterTest : MetricsSchemaTest() {
             IngestionJob(uuid3),
             modelPath = modelPath,
             metricsWriter = writer
-        ).populateTables()
+        ).save()
 
         assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid1.$JOB_ID_FILE_EXTENSION").notExists())
         assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid2.$JOB_ID_FILE_EXTENSION").notExists())

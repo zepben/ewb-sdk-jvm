@@ -8,7 +8,6 @@
 
 package com.zepben.evolve.database.sqlite.common
 
-import com.zepben.evolve.database.sqlite.metrics.MissingVersionException
 import org.slf4j.Logger
 import java.sql.Connection
 import java.sql.SQLException
@@ -52,9 +51,7 @@ internal class SchemaUtils(
                 statement.executeQuery(tableVersion.selectSql).use { rs ->
                     if (rs.next()) {
                         rs.getInt(tableVersion.VERSION.queryIndex)
-                    } else {
-                        throw MissingVersionException()
-                    }
+                    } else null
                 }
             } catch (e: SQLException) {
                 null

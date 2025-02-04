@@ -29,17 +29,20 @@ class MetricsDataSourceWriter @JvmOverloads constructor(
     private val schemaUtils = SchemaUtils(databaseTables, logger)
     private val versionTable = databaseTables.getTable<TableVersion>()
 
-    @Throws(IncompatibleVersionException::class)
-    fun save(job: IngestionJob): Boolean {
-        return dataSource.connection.use { connection ->
-            connection.configureBatch()
-            val localVersion = versionTable.supportedVersion
-            when (val remoteVersion = schemaUtils.getVersion(connection)) {
-                null -> schemaUtils.createSchema(connection) && populateTables(connection, job) && postSave(connection)
-                localVersion -> populateTables(connection, job) && postSave(connection)
-                else -> throw IncompatibleVersionException(localVersion, remoteVersion)
+    fun save(job: IngestionJob): Boolean = dataSource.connection.use { connection ->
+        connection.configureBatch()
+        val localVersion = versionTable.supportedVersion
+        val status = when (val remoteVersion = schemaUtils.getVersion(connection)) {
+            null -> schemaUtils.createSchema(connection)
+            localVersion -> true
+            else -> {
+                logger.error("Incompatible version in remote metrics database: expected v$localVersion, found v$remoteVersion. " +
+                    "Please ${if (localVersion > remoteVersion) "upgrade the remote database" else "use a newer version of the SDK"}.")
+                false
             }
         }
+
+        return status && populateTables(connection, job) && postSave(connection)
     }
 
     internal fun populateTables(connection: Connection, job: IngestionJob): Boolean {
@@ -53,20 +56,3 @@ class MetricsDataSourceWriter @JvmOverloads constructor(
     }
 
 }
-
-/**
- * Indicates a difference between the local and remote version of the metrics database.
- *
- * @property localVersion The locally-supported version of the metrics database in the SDK.
- * @property remoteVersion The version of the remote metrics database.
- */
-class IncompatibleVersionException(
-    val localVersion: Int,
-    val remoteVersion: Int
-) : Exception("Incompatible version in remote metrics database: expected v$localVersion, found v$remoteVersion. " +
-    "Please ${if (localVersion > remoteVersion) "upgrade the remote database" else "use a newer version of the SDK"}.")
-
-/**
- * Thrown if the version table in the remote metrics database has no entry.
- */
-class MissingVersionException : Exception("Version table present in remote metrics database, but it missing an entry.")

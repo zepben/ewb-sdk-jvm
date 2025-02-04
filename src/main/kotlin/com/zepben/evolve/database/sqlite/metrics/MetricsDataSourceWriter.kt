@@ -20,13 +20,16 @@ import javax.sql.DataSource
 /**
  * Class for writing metrics to an arbitrary datasource.
  */
-class MetricsDataSourceWriter @JvmOverloads constructor(
+class MetricsDataSourceWriter internal constructor(
     private val dataSource: DataSource,
-    private val databaseTables: MetricsDatabaseTables = MetricsDatabaseTables(),
+    private val databaseTables: MetricsDatabaseTables,
+    private val schemaUtils: SchemaUtils = SchemaUtils(databaseTables),
+    private val createMetricsWriter: (IngestionJob, MetricsDatabaseTables) -> MetricsWriter = { job, tables -> MetricsWriter(job, tables) }
 ) {
 
+    constructor(dataSource: DataSource) : this(dataSource, MetricsDatabaseTables())
+
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val schemaUtils = SchemaUtils(databaseTables, logger)
     private val versionTable = databaseTables.getTable<TableVersion>()
 
     fun save(job: IngestionJob): Boolean = dataSource.connection.use { connection ->
@@ -45,9 +48,9 @@ class MetricsDataSourceWriter @JvmOverloads constructor(
         return status && populateTables(connection, job) && postSave(connection)
     }
 
-    internal fun populateTables(connection: Connection, job: IngestionJob): Boolean {
+    private fun populateTables(connection: Connection, job: IngestionJob): Boolean {
         databaseTables.prepareInsertStatements(connection)
-        return MetricsWriter(job, databaseTables).save()
+        return createMetricsWriter(job, databaseTables).save()
     }
 
     private fun postSave(connection: Connection): Boolean {

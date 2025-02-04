@@ -9,13 +9,15 @@
 package com.zepben.evolve.database.sqlite.common
 
 import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.sql.SQLException
 
 internal class SchemaUtils(
     private val databaseTables: BaseDatabaseTables,
-    private val logger: Logger
 ) {
+
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun createSchema(connection: Connection): Boolean =
         try {

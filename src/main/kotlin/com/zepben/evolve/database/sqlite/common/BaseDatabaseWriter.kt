@@ -37,7 +37,7 @@ abstract class BaseDatabaseWriter(
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val schemaUtils = SchemaUtils(databaseTables, logger)
+    private val schemaUtils = SchemaUtils(databaseTables)
 
     private val databaseDescriptor: String = "jdbc:sqlite:$databaseFile"
     private lateinit var saveConnection: Connection

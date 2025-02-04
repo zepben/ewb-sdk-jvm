@@ -10,92 +10,46 @@ package com.zepben.evolve.database.sqlite.metrics
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import com.zepben.evolve.database.sqlite.common.SchemaUtils
 import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
-import com.zepben.evolve.database.sqlite.metrics.tables.tableMetricsVersion
 import com.zepben.evolve.metrics.IngestionJob
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.slf4j.Logger
 import java.sql.Connection
 import java.util.*
 import javax.sql.DataSource
 
 internal class MetricsDataSourceWriterTest : MetricsSchemaTest() {
 
-    @AfterEach
-    internal fun unmockAll() {
-        clearAllMocks()
+    private val conn = mockk<Connection> {
+        every { close() } just Runs
+        every { commit() } just Runs
     }
+    private val dataSource = mockk<DataSource> { every { connection } returns conn }
+    private val databaseTables = mockk<MetricsDatabaseTables> {
+        every { prepareInsertStatements(conn) } just Runs
+    }
+    private val ingestionJob = IngestionJob(UUID.randomUUID())
 
     @Test
-    internal fun callsWriter() {
-        val dataSource = mockk<DataSource>()
-        val connection = mockk<Connection>()
-        val databaseTables = mockk<MetricsDatabaseTables> {
-            every { prepareInsertStatements(connection) } just Runs
-            every { tables } returns mapOf(TableVersion::class to tableMetricsVersion)
-        }
-        val ingestionJob = IngestionJob(UUID.randomUUID())
-        mockkConstructor(MetricsWriter::class) {
-            every { constructedWith<MetricsWriter>(EqMatcher(ingestionJob), EqMatcher(databaseTables), AllAnyMatcher<MetricsEntryWriter>()).save() } returns true
-            val result = MetricsDataSourceWriter(dataSource, databaseTables).populateTables(connection, ingestionJob)
-
-            assertThat("Should have saved successfully", result)
-
-            verifySequence {
-                databaseTables.tables
-                databaseTables.prepareInsertStatements(connection)
-                MetricsWriter(ingestionJob, databaseTables).save()
-            }
+    internal fun callsWriter() = validateSaveWithVersions(1, 1) { result ->
+        assertThat("Should have saved successfully", result)
+        verifySequence {
+            databaseTables.tables
+            databaseTables.prepareInsertStatements(conn)
+            MetricsWriter(ingestionJob, databaseTables).save()
         }
     }
 
     @Test
-    internal fun throwsIfLocalVersionIsTooOld() {
-        mockkStatic(Connection::configureBatch)
-        val conn = mockk<Connection> {
-            every { close() } just Runs
-            every { configureBatch() } returns this
-        }
-        val dataSource = mockk<DataSource> { every { connection } returns conn }
-        val databaseTables = mockk<MetricsDatabaseTables> {
-            every { prepareInsertStatements(conn) } just Runs
-            every { tables } returns mapOf(TableVersion::class to TableVersion(1))
-        }
-        val ingestionJob = IngestionJob(UUID.randomUUID())
-        mockkConstructor(SchemaUtils::class) {
-            every { constructedWith<SchemaUtils>(EqMatcher(databaseTables), AllAnyMatcher<Logger>()).getVersion(conn) } returns 2
-
-            val result = MetricsDataSourceWriter(dataSource, databaseTables).save(ingestionJob)
-
-            assertThat("Save should not be successful if local version is too old", !result)
-        }
+    internal fun throwsIfLocalVersionIsTooOld() = validateSaveWithVersions(1, 2) { result ->
+        assertThat("Save should not be successful if local version is too old", !result)
     }
 
     @Test
-    internal fun throwsIfOnlineVersionIsTooOld() {
-        mockkStatic(Connection::configureBatch)
-        val conn = mockk<Connection> {
-            every { close() } just Runs
-            every { configureBatch() } returns this
-        }
-        val dataSource = mockk<DataSource> { every { connection } returns conn }
-        val databaseTables = mockk<MetricsDatabaseTables> {
-            every { prepareInsertStatements(conn) } just Runs
-            every { tables } returns mapOf(TableVersion::class to TableVersion(2))
-        }
-        val ingestionJob = IngestionJob(UUID.randomUUID())
-        mockkConstructor(SchemaUtils::class) {
-            every { constructedWith<SchemaUtils>(EqMatcher(databaseTables), AllAnyMatcher<Logger>()).getVersion(conn) } returns 1
-
-            val result = MetricsDataSourceWriter(dataSource, databaseTables).save(ingestionJob)
-
-            assertThat("Save should not be successful if online version is too old", !result)
-        }
+    internal fun throwsIfOnlineVersionIsTooOld() = validateSaveWithVersions(2, 1) { result ->
+        assertThat("Save should not be successful if online version is too old", !result)
     }
 
     override fun save(file: String, job: IngestionJob): Boolean {
@@ -105,6 +59,21 @@ internal class MetricsDataSourceWriterTest : MetricsSchemaTest() {
         return HikariDataSource(hikariConfig).use { dataSource ->
             MetricsDataSourceWriter(dataSource).save(job)
         }
+    }
+
+    private fun validateSaveWithVersions(localVersion: Int, remoteVersion: Int, resultAction: (Boolean) -> Unit) = mockkStatic(Connection::configureBatch) {
+        every { conn.configureBatch() } returns conn
+        every { databaseTables.tables } returns mapOf(TableVersion::class to TableVersion(localVersion))
+
+        val result = MetricsDataSourceWriter(
+            dataSource,
+            databaseTables,
+            schemaUtils = mockk { every { getVersion(conn) } returns remoteVersion },
+        ) { _, _ ->
+            mockk { every { save() } returns true }
+        }.save(ingestionJob)
+
+        resultAction(result)
     }
 
 }

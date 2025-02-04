@@ -14,6 +14,7 @@
   `ClearDirection` and reapply directions where appropriate using `SetDirection`.
 * `FindWithUsagePoints` was deemed too use-case specific for the SDK and has been removed.
 * Removal of deprecated `Terminal.tracedPhases` property. Use `Terminal.normalPhases` and `Terminal.currentPhases` instead.
+* Renamed `BaseDatabaseWriter::saveSchema` to `BaseDatabaseWriter::populateTables`.
 
 ### New Features
 * Added `ClearDirection` that clears feeder directions.

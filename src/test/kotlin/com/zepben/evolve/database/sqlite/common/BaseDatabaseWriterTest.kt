@@ -12,12 +12,10 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.nio.file.Files
-import java.nio.file.Paths
+import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Path
 import java.sql.DriverManager
 
 internal class BaseDatabaseWriterTest {
@@ -26,17 +24,8 @@ internal class BaseDatabaseWriterTest {
     @RegisterExtension
     val systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val dbTestFile = "src/test/data/dbTest.sqlite"
-
-    @BeforeEach
-    internal fun beforeEach() {
-        Files.deleteIfExists(Paths.get(dbTestFile))
-    }
-
-    @AfterEach
-    internal fun afterEach() {
-        Files.deleteIfExists(Paths.get(dbTestFile))
-    }
+    @TempDir
+    internal lateinit var testDir: Path
 
     @Test
     internal fun persistFileMatchingVersion() {
@@ -52,7 +41,7 @@ internal class BaseDatabaseWriterTest {
     }
 
     private fun persistentWriter(version: Int) : BaseDatabaseWriter = object : BaseDatabaseWriter(
-        dbTestFile,
+        testDir.resolve("db.sqlite").toString(),
         object : BaseDatabaseTables() {
             override val includedTables: Sequence<SqliteTable> = sequenceOf(TableVersion(version))
         },

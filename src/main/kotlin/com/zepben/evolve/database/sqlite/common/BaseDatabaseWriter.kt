@@ -143,26 +143,11 @@ abstract class BaseDatabaseWriter(
         }
     }
 
-    private fun postSave(): Boolean =
-        try {
-            if (!writingToExistingFile) {
-                logger.info("Adding indexes...")
+    private fun postSave(): Boolean {
+        val status = if (!writingToExistingFile) schemaUtils.createIndexes(saveConnection) else true
 
-                saveConnection.createStatement().use { statement ->
-                    databaseTables.forEachTable { table ->
-                        table.createIndexesSql.forEach { sql ->
-                            statement.execute(sql)
-                        }
-                    }
-                }
-
-                logger.info("Indexes added.")
-            }
-            logger.info("Committing...")
-
+        return status && try {
             saveConnection.commit()
-
-            logger.info("Done.")
             true
         } catch (e: SQLException) {
             logger.error("Failed to finalise the database: " + e.message)
@@ -170,5 +155,6 @@ abstract class BaseDatabaseWriter(
         } finally {
             closeConnection()
         }
+    }
 
 }

@@ -46,6 +46,25 @@ internal class SchemaUtils(
             false
         }
 
+    fun createIndexes(connection: Connection): Boolean =
+        try {
+            logger.info("Adding indexes...")
+
+            connection.createStatement().use { statement ->
+                databaseTables.forEachTable { table ->
+                    table.createIndexesSql.forEach { sql ->
+                        statement.execute(sql)
+                    }
+                }
+            }
+
+            logger.info("Indexes added.")
+            true
+        } catch (e: SQLException) {
+            logger.error("Failed to create database indexes: " + e.message)
+            false
+        }
+
     fun getVersion(connection: Connection): Int? =
         connection.createStatement().use { statement ->
             val tableVersion = databaseTables.getTable<TableVersion>()

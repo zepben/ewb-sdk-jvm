@@ -17,6 +17,7 @@ import com.zepben.evolve.metrics.IngestionJob
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection
+import java.sql.SQLException
 
 /**
  * Class for writing metrics to an online SQL database.
@@ -40,7 +41,7 @@ class MetricsOnlineDatabaseWriter internal constructor(
         connection.configureBatch()
         val localVersion = versionTable.supportedVersion
         val status = when (val remoteVersion = schemaUtils.getVersion(connection)) {
-            null -> schemaUtils.createSchema(connection)
+            null -> schemaUtils.createSchema(connection) && schemaUtils.createIndexes(connection)
             localVersion -> true
             else -> {
                 logger.error("Incompatible version in remote metrics database: expected v$localVersion, found v$remoteVersion. " +
@@ -57,9 +58,12 @@ class MetricsOnlineDatabaseWriter internal constructor(
         return createMetricsWriter(job, databaseTables).save()
     }
 
-    private fun postSave(connection: Connection): Boolean {
+    private fun postSave(connection: Connection): Boolean = try {
         connection.commit()
-        return true
+        true
+    } catch (e: SQLException) {
+        logger.error("Failed to commit changes to the online metrics database: {}", e.message)
+        false
     }
 
 }

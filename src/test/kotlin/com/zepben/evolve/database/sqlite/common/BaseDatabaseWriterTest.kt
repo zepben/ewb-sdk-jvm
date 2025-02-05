@@ -40,18 +40,18 @@ internal class BaseDatabaseWriterTest {
 
     @Test
     internal fun persistFileMatchingVersion() {
-        assertThat("Persistant writer should be able to write new file", persistantWriter(1).save())
-        assertThat("Persistant writer should be able to write to db file with matching version", persistantWriter(1).save())
+        assertThat("Persistent writer should be able to write new file", persistentWriter(1).save())
+        assertThat("Persistent writer should be able to write to db file with matching version", persistentWriter(1).save())
     }
 
     @Test
     internal fun persistFileDifferentVersion() {
-        assertThat("Persistant writer should be able to write new file", persistantWriter(1).save())
-        assertThat("Persistant writer shouldn't write to db file with mismatched version", !persistantWriter(2).save())
+        assertThat("Persistent writer should be able to write new file", persistentWriter(1).save())
+        assertThat("Persistent writer shouldn't write to db file with mismatched version", !persistentWriter(2).save())
         assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 2)"))
     }
 
-    private fun persistantWriter(version: Int) : BaseDatabaseWriter = object : BaseDatabaseWriter(
+    private fun persistentWriter(version: Int) : BaseDatabaseWriter = object : BaseDatabaseWriter(
         dbTestFile,
         object : BaseDatabaseTables() {
             override val includedTables: Sequence<SqliteTable> = sequenceOf(TableVersion(version))

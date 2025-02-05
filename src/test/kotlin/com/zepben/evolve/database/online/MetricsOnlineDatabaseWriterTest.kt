@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.database.online
 
+import com.zepben.evolve.database.sqlite.common.SchemaUtils
 import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import com.zepben.evolve.database.sqlite.metrics.MetricsDatabaseTables
@@ -30,6 +31,10 @@ internal class MetricsOnlineDatabaseWriterTest : MetricsSchemaTest() {
     private val databaseTables = mockk<MetricsDatabaseTables> {
         every { prepareInsertStatements(conn) } just Runs
     }
+    private val schemaUtils = mockk<SchemaUtils> {
+        every { createSchema(conn) } returns true
+        every { createIndexes(conn) } returns true
+    }
     private val ingestionJob = IngestionJob(UUID.randomUUID())
 
     @Test
@@ -37,6 +42,20 @@ internal class MetricsOnlineDatabaseWriterTest : MetricsSchemaTest() {
         MatcherAssert.assertThat("Should have saved successfully", result)
         verifySequence {
             databaseTables.tables
+            schemaUtils.getVersion(conn)
+            databaseTables.prepareInsertStatements(conn)
+            MetricsWriter(ingestionJob, databaseTables).save()
+        }
+    }
+
+    @Test
+    internal fun createsSchemaAndIndexes() = validateSaveWithVersions(1, null) { result ->
+        MatcherAssert.assertThat("Should have saved successfully", result)
+        verifySequence {
+            databaseTables.tables
+            schemaUtils.getVersion(conn)
+            schemaUtils.createSchema(conn)
+            schemaUtils.createIndexes(conn)
             databaseTables.prepareInsertStatements(conn)
             MetricsWriter(ingestionJob, databaseTables).save()
         }
@@ -55,14 +74,15 @@ internal class MetricsOnlineDatabaseWriterTest : MetricsSchemaTest() {
     override fun save(file: String, job: IngestionJob): Boolean =
         MetricsOnlineDatabaseWriter { DriverManager.getConnection("jdbc:sqlite:$file") }.save(job)
 
-    private fun validateSaveWithVersions(localVersion: Int, remoteVersion: Int, resultAction: (Boolean) -> Unit) = mockkStatic(Connection::configureBatch) {
+    private fun validateSaveWithVersions(localVersion: Int, remoteVersion: Int?, resultAction: (Boolean) -> Unit) = mockkStatic(Connection::configureBatch) {
         every { conn.configureBatch() } returns conn
         every { databaseTables.tables } returns mapOf(TableVersion::class to TableVersion(localVersion))
+        every { schemaUtils.getVersion(conn) } returns remoteVersion
 
         val result = MetricsOnlineDatabaseWriter(
             { conn },
             databaseTables,
-            schemaUtils = mockk { every { getVersion(conn) } returns remoteVersion },
+            schemaUtils = schemaUtils,
         ) { _, _ ->
             mockk { every { save() } returns true }
         }.save(ingestionJob)

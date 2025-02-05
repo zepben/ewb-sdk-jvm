@@ -16,9 +16,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.Clamp
 import com.zepben.evolve.cim.iec61970.base.wires.Cut
 import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectivityConnected
 import com.zepben.evolve.services.network.tracing.networktrace.operators.InServiceStateOperators
-import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 
-internal class NetworkTraceStepPathProvider(val stateOperators: NetworkStateOperators) {
+internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOperators) {
 
     fun nextPaths(path: NetworkTraceStep.Path): Sequence<NetworkTraceStep.Path> {
         val nextTerminals = nextTerminals(path)
@@ -51,7 +50,7 @@ internal class NetworkTraceStepPathProvider(val stateOperators: NetworkStateOper
     }
 
     private fun nextTerminalsFromAcLineSegment(segment: AcLineSegment, path: NetworkTraceStep.Path): Sequence<Terminal> {
-        // If the path traversed the segment, we need to step externally from the segment terminal.
+        // If the current path traversed the segment, we need to step externally from the segment terminal.
         // Otherwise, we traverse the segment
         return if (path.tracedInternally || path.traversedAcLineSegment) {
             nextExternalTerminals(path)
@@ -63,52 +62,50 @@ internal class NetworkTraceStepPathProvider(val stateOperators: NetworkStateOper
         }
     }
 
-    // We don't need to step to terminals that are busbars as they would have been queued at the same time this busbar step was.
-    // We also don't try and go back to the terminal we came from as we already visited it to get to this busbar.
-    private fun nextTerminalsFromBusbar(path: NetworkTraceStep.Path): Sequence<Terminal> =
-        path.toTerminal.connectedTerminals().filter { it != path.fromTerminal && it.conductingEquipment !is BusbarSection }
+    private fun nextTerminalsFromBusbar(path: NetworkTraceStep.Path): Sequence<Terminal> {
+        return path.toTerminal.connectedTerminals()
+            // We don't go back to the terminal we came from as we already visited it to get to this busbar.
+            .filter { it != path.fromTerminal }
+            // We don't step to terminals that are busbars as they would have been returned at the same time this busbar step was.
+            .filter { it.conductingEquipment !is BusbarSection }
+    }
 
     private fun nextTerminalsFromClamp(clamp: Clamp, path: NetworkTraceStep.Path): Sequence<Terminal> {
-        // If the path was from traversing an AcLineSegment, we need to step externally to other equipment.
-        // Else if we stepped here externally not from a segment, we need to traverse the segment both ways.
+        // If the current path was from traversing an AcLineSegment, we need to step externally to other equipment.
+        // Otherwise, we need to traverse the segment both ways.
         return if (path.traversedAcLineSegment) {
             nextExternalTerminals(path)
         } else {
-            when (val segment = clamp.acLineSegment) {
-                null -> emptySequence()
-                else -> segment.traverseFromTerminalBothWays(path.toTerminal, clamp.lengthFromT1Or0)
-            }
+            clamp.acLineSegment?.traverseFromTerminalBothWays(path.toTerminal, clamp.lengthFromT1Or0).orEmpty()
         }
     }
 
     private fun nextTerminalsFromCut(cut: Cut, path: NetworkTraceStep.Path): Sequence<Terminal> {
-        // If the path was from traversing an AcLineSegment, we need to step externally to other equipment, and internally on the cut.
-        // Else if we stepped here externally not from a segment, we need to traverse the segment plus step internally on the cut.
+        // If the current path was from traversing an AcLineSegment, we need to step externally to other equipment.
+        // Else we need to traverse the segment.
         val nextTerminals = if (path.traversedAcLineSegment) {
             nextExternalTerminals(path)
         } else {
-            when (val segment = cut.acLineSegment) {
-                null -> emptySequence()
-                else -> {
-                    val towardsT2: Boolean = path.toTerminal.sequenceNumber != 1
-                    segment.traverseFromTerminal(path.toTerminal, cut.lengthFromT1Or0, towardsT2)
-                }
-            }
+            val towardsT2: Boolean = path.toTerminal.sequenceNumber != 1
+            cut.acLineSegment?.traverseFromTerminal(path.toTerminal, cut.lengthFromT1Or0, towardsT2).orEmpty()
         }
 
+        // If the current path traced internally, we need to also return the external terminals
+        // Else we need to step internally to the Cut's other terminal.
         return if (path.tracedInternally) {
+            // traversedAcLineSegment and tracedInternally should never both be true, so we should never get external terminals twice
             nextTerminals + nextExternalTerminals(path)
         } else {
             val cutOtherTerminal = cut.getTerminal(if (path.toTerminal.sequenceNumber == 1) 2 else 1)
-            nextTerminals + cutOtherTerminal.asSequenceOrEmpty()
+            nextTerminals + cutOtherTerminal.asSequence()
         }
     }
 
     private fun nextExternalTerminals(path: NetworkTraceStep.Path): Sequence<Terminal> {
-        // When we step externally to other terminals we need to consider:
         // Busbars are only modelled with a single terminal. So if we find any we need to step to them before the
         // other (non busbar) equipment connected to the same connectivity node. Once the busbar has been
         // visited we then step to the other non busbar terminals connected to the same connectivity node.
+        // If there are no busbars we can just step to all other connected terminals.
         return when {
             path.toEquipment is BusbarSection -> nextTerminalsFromBusbar(path)
             path.toTerminal.hasConnectedBusbars() -> path.toTerminal.connectedTerminals().filter { it.conductingEquipment is BusbarSection }
@@ -125,6 +122,23 @@ internal class NetworkTraceStepPathProvider(val stateOperators: NetworkStateOper
     private fun AcLineSegment.traverseFromTerminalBothWays(fromTerminal: Terminal, lengthFromT1: Double): Sequence<Terminal> =
         traverseFromTerminalTowardsT1(fromTerminal, lengthFromT1) + traverseFromTerminalTowardsT2(fromTerminal, lengthFromT1)
 
+    /**
+     * This returns terminals found traversing along an AcLineSegment from any terminal "on" the segment. Terminals considered on the segment are any clamp
+     * or cut terminals that belong to the segment as well as the segment's own terminals. When traversing the segment, the traversal stops
+     * at and returns the next cut terminal found along the segment plus any clamp terminals it found between the fromTerminal and the cut terminal.
+     * If there are no cuts on the segment the terminal, the other end of the segment is returned along with all clamp terminals.
+     * To determine order of terminals on the segment, `lengthFromTerminal1` is used for cuts and clamps. When this property is null a default value of 0.0 is
+     * assumed, effectively placing it at the start of the segment. Terminal 1 on the segment is deemed at 0.0 and Terminal 2 is deemed at Double.MAX_VALUE.
+     *
+     * This algorithm assumes AcLineSegments have exactly 2 terminals, cuts have exactly 2 terminals and clamps have exactly 1 terminal.
+     * However, if you are using the legacy model where there were multiple terminals on a segment, this function will still return all the
+     * terminals on the segment as long as there are no clamps or cuts on the segment. Basically, segments with cuts and clamps are mutually exclusive
+     * to segments with multiple terminals (the data model should enforce this anyway).
+     *
+     * @param fromTerminal The terminal on the segment to traverse from. This could either be a segment terminal, or a terminal from any cut or clamp on the segment.
+     * @param lengthFromT1 The length from terminal 1 the fromTerminal is.
+     * @param towardsSegmentT2 Use `true` if the segment should be traversed towards terminal 2, otherwise `false` to traverse towards terminal 1.
+     */
     private fun AcLineSegment.traverseFromTerminal(fromTerminal: Terminal, lengthFromT1: Double, towardsSegmentT2: Boolean): Sequence<Terminal> {
         // We need to ignore cuts that are not "in service" because that means they do not exist!
         // We also make sure we filter out the cut or the clamp we are starting at, so we don't compare it in our checks
@@ -155,39 +169,17 @@ internal class NetworkTraceStepPathProvider(val stateOperators: NetworkStateOper
             else -> nextCut.getTerminal(if (towardsSegmentT2) 1 else 2)
         }
 
-        return clampsBeforeNextTerminal.mapNotNull { it.getTerminal(1) } + nextTerminal.asSequenceOrEmpty()
+        return clampsBeforeNextTerminal.mapNotNull { it.getTerminal(1) } + nextTerminal.asSequence()
     }
 
     private fun Terminal.hasConnectedBusbars(): Boolean =
         connectivityNode?.terminals?.any { it !== this && it.conductingEquipment is BusbarSection } ?: false
 
 
-    // todo: We know if we traversed when we compute the next terminal. Should we store this on the step so we don't need to compute it?
-    private val NetworkTraceStep.Path.traversedAcLineSegment: Boolean get() =
-        when {
-            tracedInternally -> false
-            fromEquipment is AcLineSegment -> when (toEquipment) {
-                is Clamp -> toEquipment.acLineSegment === fromEquipment
-                is Cut -> toEquipment.acLineSegment === fromEquipment
-                else -> false
-            }
-            fromEquipment is Cut -> when (toEquipment) {
-                is AcLineSegment -> fromEquipment.acLineSegment === toEquipment
-                is Clamp -> fromEquipment.acLineSegment === toEquipment.acLineSegment
-                else -> false
-            }
-            fromEquipment is Clamp -> when (toEquipment) {
-                is AcLineSegment -> fromEquipment.acLineSegment === toEquipment
-                is Cut -> fromEquipment.acLineSegment === toEquipment.acLineSegment
-                else -> false
-            }
-            else -> false
-        }
-
     private val Cut.lengthFromT1Or0: Double get() = lengthFromTerminal1 ?: 0.0
     private val Clamp.lengthFromT1Or0: Double get() = lengthFromTerminal1 ?: 0.0
 
-    private fun Terminal?.asSequenceOrEmpty(): Sequence<Terminal> = if (this != null) sequenceOf(this) else emptySequence()
+    private fun Terminal?.asSequence(): Sequence<Terminal> = if (this != null) sequenceOf(this) else emptySequence()
 
-    private fun InServiceStateOperators.isInService(equipment: Equipment?): Boolean = equipment?.let { isInService(it) } ?: false
+    private fun InServiceStateOperators.isInService(equipment: Equipment?): Boolean = if (equipment != null) isInService(equipment) else false
 }

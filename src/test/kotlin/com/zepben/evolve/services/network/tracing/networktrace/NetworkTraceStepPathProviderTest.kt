@@ -349,6 +349,25 @@ class NetworkTraceStepPathProviderTest {
         assertThat(nextPaths, containsInAnyOrder(cut2.t1..clamp2.t1, cut2.t1..clamp3.t1, cut2.t1..cut1.t2, cut2.t1..c8.t1))
     }
 
+    @Suppress("DEPRECATION")
+    @Test
+    fun `supports legacy AcLineSegment with multiple terminals`() {
+        val network = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .toAcls() // c1
+            .network
+
+        val b0: Breaker = network["b0"]!!
+        val c1: AcLineSegment = network["c1"]!!
+        c1.midSpanTerminalsEnabled = true
+        c1.addTerminal(Terminal())
+
+        val currentPath = b0.t2..c1.t1
+        val nextPaths = pathProvider.nextPaths(currentPath).toList()
+
+        assertThat(nextPaths, containsInAnyOrder(c1.t1..c1.t2, c1.t1..c1.t3))
+    }
+
     private fun busbarNetwork(): NetworkService {
         //         1
         //         b0

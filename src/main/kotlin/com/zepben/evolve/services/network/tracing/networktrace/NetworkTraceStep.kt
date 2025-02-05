@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,6 +10,9 @@ package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.evolve.cim.iec61970.base.wires.Clamp
+import com.zepben.evolve.cim.iec61970.base.wires.Cut
 import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep.Type
 
@@ -77,6 +80,34 @@ class NetworkTraceStep<out T>(
         val tracedInternally: Boolean get() = fromEquipment == toEquipment
 
         val tracedExternally: Boolean get() = !tracedInternally
+
+        // TODO: We know if we traversed a segment when we compute the next terminal in NetworkTraceStepPathProvider. Should we store this on the step, so we don't need to compute it?
+        //       There would be some overhead in passing around a flag in a pair with the terminal until we build the step. Is that more than computing it once each step?
+        // TODO: Any reason not have have this as public API?
+        val traversedAcLineSegment: Boolean
+            get() =
+                when {
+                    tracedInternally -> false
+                    fromEquipment is AcLineSegment -> when (toEquipment) {
+                        is Clamp -> toEquipment.acLineSegment === fromEquipment
+                        is Cut -> toEquipment.acLineSegment === fromEquipment
+                        else -> false
+                    }
+
+                    fromEquipment is Cut -> when (toEquipment) {
+                        is AcLineSegment -> fromEquipment.acLineSegment === toEquipment
+                        is Clamp -> fromEquipment.acLineSegment === toEquipment.acLineSegment
+                        else -> false
+                    }
+
+                    fromEquipment is Clamp -> when (toEquipment) {
+                        is AcLineSegment -> fromEquipment.acLineSegment === toEquipment
+                        is Cut -> fromEquipment.acLineSegment === toEquipment.acLineSegment
+                        else -> false
+                    }
+
+                    else -> false
+                }
     }
 
     /**

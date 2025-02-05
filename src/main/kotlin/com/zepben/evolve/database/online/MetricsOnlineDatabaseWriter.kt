@@ -44,9 +44,11 @@ class MetricsOnlineDatabaseWriter internal constructor(
      * @return true if the [IngestionJob] was successfully written to the database, otherwise false.
      */
     fun save(job: IngestionJob): Boolean = getConnection().use { connection ->
-        connection.configureBatch()
         val localVersion = versionTable.supportedVersion
-        val status = when (val remoteVersion = schemaUtils.getVersion(connection)) {
+        val remoteVersion = schemaUtils.getVersion(connection)
+        connection.configureBatch()
+        val status = when (remoteVersion) {
+            // TODO work out compatibility issues e.g. "blob" is not a postgres type
             null -> schemaUtils.createSchema(connection) && schemaUtils.createIndexes(connection)
             localVersion -> true
             else -> {

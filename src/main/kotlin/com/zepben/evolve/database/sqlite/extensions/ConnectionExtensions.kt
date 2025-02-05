@@ -11,6 +11,7 @@ package com.zepben.evolve.database.sqlite.extensions
 import java.sql.Connection
 
 fun Connection.configureBatch(): Connection {
+    // TODO figure out how to make this SQL dialect-agnostic or restructure the code so this only runs for the SQLite stuff
     createStatement().use { statement ->
         statement.executeUpdate("PRAGMA journal_mode = OFF")
         statement.executeUpdate("PRAGMA synchronous = OFF")

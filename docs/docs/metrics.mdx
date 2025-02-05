@@ -98,7 +98,7 @@ public class IngestionJobExample {
         // Alternatively, write to an online database using MetricsOnlineDatabaseWriter
         MetricsOnlineDatabaseWriter metricsOnlineDatabaseWriter = new MetricsOnlineDatabaseWriter(() -> {
             try {
-                return DriverManager.getConnection("jdbc:postgres://localhost:5432/metrics", "admin", "password");
+                return DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics", "admin", "password");
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -163,7 +163,7 @@ fun main() {
 
     // Alternatively, write to an online database using MetricsOnlineDatabaseWriter
     val metricsOnlineDatabaseWriter = MetricsOnlineDatabaseWriter {
-        DriverManager.getConnection("jdbc:postgres://localhost:5432/metrics", "admin", "password")
+        DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics", "admin", "password")
     }
     if (metricsOnlineDatabaseWriter.save(ingestionJob)) {
         println("Ingestion job saved to postgres db successfully")

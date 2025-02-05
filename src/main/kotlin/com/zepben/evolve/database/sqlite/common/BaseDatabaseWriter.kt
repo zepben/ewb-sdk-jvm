@@ -144,7 +144,7 @@ abstract class BaseDatabaseWriter(
     }
 
     private fun postSave(): Boolean {
-        val status = if (!writingToExistingFile) schemaUtils.createIndexes(saveConnection) else true
+        val status = writingToExistingFile || schemaUtils.createIndexes(saveConnection)
 
         return status && try {
             saveConnection.commit()

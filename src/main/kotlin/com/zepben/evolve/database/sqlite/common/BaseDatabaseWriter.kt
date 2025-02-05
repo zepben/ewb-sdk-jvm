@@ -144,6 +144,7 @@ abstract class BaseDatabaseWriter(
     }
 
     private fun postSave(): Boolean {
+        // Indexing after inserting data is much more performant than the reverse order.
         val status = writingToExistingFile || schemaUtils.createIndexes(saveConnection)
 
         return status && try {

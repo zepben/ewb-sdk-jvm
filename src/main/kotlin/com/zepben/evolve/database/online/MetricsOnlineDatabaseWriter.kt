@@ -37,6 +37,12 @@ class MetricsOnlineDatabaseWriter internal constructor(
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val versionTable = databaseTables.getTable<TableVersion>()
 
+    /**
+     * Save an ingestion job to the specified database.
+     *
+     * @param job The ingestion job to save to the database.
+     * @return true if the [IngestionJob] was successfully written to the database, otherwise false.
+     */
     fun save(job: IngestionJob): Boolean = getConnection().use { connection ->
         connection.configureBatch()
         val localVersion = versionTable.supportedVersion

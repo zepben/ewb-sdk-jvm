@@ -91,7 +91,7 @@
 * RemoveJumperEvent now uses correct protobuf classes when converting
 
 ### Notes
-* None.
+* Tracing models with `Cut` and `Clamp` are now supported via the new tracing API.
 
 ## [0.24.0] - 2025-01-21
 ### Breaking Changes

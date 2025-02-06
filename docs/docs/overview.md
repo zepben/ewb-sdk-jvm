@@ -1,6 +1,7 @@
 ---
 id: sdk-overview
 title: Overview
+slug: /
 ---
 
 # EWB SDK

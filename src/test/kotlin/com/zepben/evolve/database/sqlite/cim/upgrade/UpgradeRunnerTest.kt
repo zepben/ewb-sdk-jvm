@@ -9,7 +9,7 @@
 package com.zepben.evolve.database.sqlite.cim.upgrade
 
 import com.zepben.evolve.database.paths.DatabaseType
-import com.zepben.evolve.database.sqlite.cim.tables.Column
+import com.zepben.evolve.database.sql.Column
 import com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion
 import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.database.sqlite.extensions.configureBatch

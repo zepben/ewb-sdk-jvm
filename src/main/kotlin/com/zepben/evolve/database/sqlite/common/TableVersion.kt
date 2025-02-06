@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.common
 
-import com.zepben.evolve.database.sqlite.cim.tables.Column
-import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sql.Column
+import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import java.sql.Connection

@@ -8,9 +8,9 @@
 
 package com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires
 
-import com.zepben.evolve.database.sqlite.cim.tables.Column
-import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NOT_NULL
-import com.zepben.evolve.database.sqlite.cim.tables.Column.Nullable.NULL
+import com.zepben.evolve.database.sql.Column
+import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sql.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 abstract class TableShuntCompensators : TableRegulatingCondEq() {

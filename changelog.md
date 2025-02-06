@@ -14,10 +14,18 @@
   `ClearDirection` and reapply directions where appropriate using `SetDirection`.
 * `FindWithUsagePoints` was deemed too use-case specific for the SDK and has been removed.
 * Removal of deprecated `Terminal.tracedPhases` property. Use `Terminal.normalPhases` and `Terminal.currentPhases` instead.
+* The following change have been made to `SqliteTable`:
+  * It will only find columns defined in Kotlin classes, Java is no longer supported.
+  * Its constructor is now internal.
+  * It now inherits from the new `SqlTable`.
+* The following change have been made to `Column`:
+  * Its package has changed from `com.zepben.evolve.database.sqlite.cim.tables` to `com.zepben.evolve.database.sql`.
+  * Its constructor is now internal.
 
 ### New Features
 * Added `ClearDirection` that clears feeder directions.
 * Added new `FeederDirection.CONNECTOR` value for `Connector` equipment that are modelled only with a single terminal.
+* Created a new `SqlTable` that doesn't support creating schema creation statements by default.
 
 ### Enhancements
 * You can now add sites to the `TestNetworkBuilder` via `addSite`.

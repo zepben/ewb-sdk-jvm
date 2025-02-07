@@ -75,16 +75,11 @@ import com.zepben.evolve.services.common.extensions.*
 import com.zepben.evolve.services.network.NetworkService
 import java.sql.ResultSet
 import java.sql.SQLException
-import kotlin.Throws
 
 /**
  * A class for reading the [NetworkService] tables from the database.
- *
- * @property service The [NetworkService] to populate from the database.
  */
-class NetworkCimReader(
-    override val service: NetworkService
-) : CimReader(service) {
+internal class NetworkCimReader : CimReader<NetworkService>() {
 
     // ################################
     // # EXTENSIONS IEC61968 Metering #
@@ -93,6 +88,7 @@ class NetworkCimReader(
     /**
      * Create a [PanDemandResponseFunction] and populate its fields from [TablePanDemandResponseFunctions].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PanDemandResponseFunction] fields from.
      * @param resultSet The record in the database table containing the fields for this [PanDemandResponseFunction].
      * @param setIdentifier A callback to register the mRID of this [PanDemandResponseFunction] for logging purposes.
@@ -101,13 +97,13 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePanDemandResponseFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePanDemandResponseFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val panDemandResponseFunction = PanDemandResponseFunction(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             kind = EndDeviceFunctionKind.valueOf(resultSet.getString(table.KIND.queryIndex))
             applianceBitmask = resultSet.getNullableInt(table.APPLIANCE.queryIndex)
         }
 
-        return loadEndDeviceFunction(panDemandResponseFunction, table, resultSet) && service.addOrThrow(panDemandResponseFunction)
+        return readEndDeviceFunction(panDemandResponseFunction, table, resultSet) && service.addOrThrow(panDemandResponseFunction)
     }
 
     // ###################################
@@ -117,6 +113,7 @@ class NetworkCimReader(
     /**
      * Create a [BatteryControl] and populate its fields from [TableBatteryControls].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [BatteryControl] fields from.
      * @param resultSet The record in the database table containing the fields for this [BatteryControl].
      * @param setIdentifier A callback to register the mRID of this [BatteryControl] for logging purposes.
@@ -125,7 +122,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableBatteryControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableBatteryControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val batteryControl = BatteryControl(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             chargingRate = resultSet.getNullableDouble(table.CHARGING_RATE.queryIndex)
             dischargingRate = resultSet.getNullableDouble(table.DISCHARGING_RATE.queryIndex)
@@ -133,7 +130,7 @@ class NetworkCimReader(
             controlMode = BatteryControlMode.valueOf(resultSet.getString(table.CONTROL_MODE.queryIndex))
         }
 
-        return loadRegulatingControl(batteryControl, table, resultSet) && service.addOrThrow(batteryControl)
+        return readRegulatingControl(service, batteryControl, table, resultSet) && service.addOrThrow(batteryControl)
     }
 
     // #######################
@@ -143,6 +140,7 @@ class NetworkCimReader(
     /**
      * Create a [CableInfo] and populate its fields from [TableCableInfo].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [CableInfo] fields from.
      * @param resultSet The record in the database table containing the fields for this [CableInfo].
      * @param setIdentifier A callback to register the mRID of this [CableInfo] for logging purposes.
@@ -151,15 +149,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCableInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableCableInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val cableInfo = CableInfo(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadWireInfo(cableInfo, table, resultSet) && service.addOrThrow(cableInfo)
+        return readWireInfo(cableInfo, table, resultSet) && service.addOrThrow(cableInfo)
     }
 
     /**
      * Create a [NoLoadTest] and populate its fields from [TableNoLoadTests].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [NoLoadTest] fields from.
      * @param resultSet The record in the database table containing the fields for this [NoLoadTest].
      * @param setIdentifier A callback to register the mRID of this [NoLoadTest] for logging purposes.
@@ -168,7 +167,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableNoLoadTests, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableNoLoadTests, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val noLoadTest = NoLoadTest(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             energisedEndVoltage = resultSet.getNullableInt(table.ENERGISED_END_VOLTAGE.queryIndex)
             excitingCurrent = resultSet.getNullableDouble(table.EXCITING_CURRENT.queryIndex)
@@ -177,12 +176,13 @@ class NetworkCimReader(
             lossZero = resultSet.getNullableInt(table.LOSS_ZERO.queryIndex)
         }
 
-        return loadTransformerTest(noLoadTest, table, resultSet) && service.addOrThrow(noLoadTest)
+        return readTransformerTest(noLoadTest, table, resultSet) && service.addOrThrow(noLoadTest)
     }
 
     /**
      * Create an [OpenCircuitTest] and populate its fields from [TableOpenCircuitTests].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [OpenCircuitTest] fields from.
      * @param resultSet The record in the database table containing the fields for this [OpenCircuitTest].
      * @param setIdentifier A callback to register the mRID of this [OpenCircuitTest] for logging purposes.
@@ -191,7 +191,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableOpenCircuitTests, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableOpenCircuitTests, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val openCircuitTest = OpenCircuitTest(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             energisedEndStep = resultSet.getNullableInt(table.ENERGISED_END_STEP.queryIndex)
             energisedEndVoltage = resultSet.getNullableInt(table.ENERGISED_END_VOLTAGE.queryIndex)
@@ -200,12 +200,13 @@ class NetworkCimReader(
             phaseShift = resultSet.getNullableDouble(table.PHASE_SHIFT.queryIndex)
         }
 
-        return loadTransformerTest(openCircuitTest, table, resultSet) && service.addOrThrow(openCircuitTest)
+        return readTransformerTest(openCircuitTest, table, resultSet) && service.addOrThrow(openCircuitTest)
     }
 
     /**
      * Create an [OverheadWireInfo] and populate its fields from [TableOverheadWireInfo].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [OverheadWireInfo] fields from.
      * @param resultSet The record in the database table containing the fields for this [OverheadWireInfo].
      * @param setIdentifier A callback to register the mRID of this [OverheadWireInfo] for logging purposes.
@@ -214,15 +215,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableOverheadWireInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableOverheadWireInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val overheadWireInfo = OverheadWireInfo(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadWireInfo(overheadWireInfo, table, resultSet) && service.addOrThrow(overheadWireInfo)
+        return readWireInfo(overheadWireInfo, table, resultSet) && service.addOrThrow(overheadWireInfo)
     }
 
     /**
      * Create a [PowerTransformerInfo] and populate its fields from [TablePowerTransformerInfo].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PowerTransformerInfo] fields from.
      * @param resultSet The record in the database table containing the fields for this [PowerTransformerInfo].
      * @param setIdentifier A callback to register the mRID of this [PowerTransformerInfo] for logging purposes.
@@ -231,15 +233,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePowerTransformerInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePowerTransformerInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val powerTransformerInfo = PowerTransformerInfo(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadAssetInfo(powerTransformerInfo, table, resultSet) && service.addOrThrow(powerTransformerInfo)
+        return readAssetInfo(powerTransformerInfo, table, resultSet) && service.addOrThrow(powerTransformerInfo)
     }
 
     /**
      * Create a [ShortCircuitTest] and populate its fields from [TableShortCircuitTests].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [ShortCircuitTest] fields from.
      * @param resultSet The record in the database table containing the fields for this [ShortCircuitTest].
      * @param setIdentifier A callback to register the mRID of this [ShortCircuitTest] for logging purposes.
@@ -248,7 +251,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableShortCircuitTests, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableShortCircuitTests, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val shortCircuitTest = ShortCircuitTest(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             current = resultSet.getNullableDouble(table.CURRENT.queryIndex)
             energisedEndStep = resultSet.getNullableInt(table.ENERGISED_END_STEP.queryIndex)
@@ -262,12 +265,13 @@ class NetworkCimReader(
             voltageOhmicPart = resultSet.getNullableDouble(table.VOLTAGE_OHMIC_PART.queryIndex)
         }
 
-        return loadTransformerTest(shortCircuitTest, table, resultSet) && service.addOrThrow(shortCircuitTest)
+        return readTransformerTest(shortCircuitTest, table, resultSet) && service.addOrThrow(shortCircuitTest)
     }
 
     /**
      * Create a [ShuntCompensatorInfo] and populate its fields from [TableShuntCompensatorInfo].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [ShuntCompensatorInfo] fields from.
      * @param resultSet The record in the database table containing the fields for this [ShuntCompensatorInfo].
      * @param setIdentifier A callback to register the mRID of this [ShuntCompensatorInfo] for logging purposes.
@@ -276,7 +280,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableShuntCompensatorInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableShuntCompensatorInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val shuntCompensatorInfo = ShuntCompensatorInfo(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             maxPowerLoss = resultSet.getNullableInt(table.MAX_POWER_LOSS.queryIndex)
             ratedCurrent = resultSet.getNullableInt(table.RATED_CURRENT.queryIndex)
@@ -284,12 +288,13 @@ class NetworkCimReader(
             ratedVoltage = resultSet.getNullableInt(table.RATED_VOLTAGE.queryIndex)
         }
 
-        return loadAssetInfo(shuntCompensatorInfo, table, resultSet) && service.addOrThrow(shuntCompensatorInfo)
+        return readAssetInfo(shuntCompensatorInfo, table, resultSet) && service.addOrThrow(shuntCompensatorInfo)
     }
 
     /**
      * Create a [SwitchInfo] and populate its fields from [TableSwitchInfo].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [SwitchInfo] fields from.
      * @param resultSet The record in the database table containing the fields for this [SwitchInfo].
      * @param setIdentifier A callback to register the mRID of this [SwitchInfo] for logging purposes.
@@ -298,17 +303,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableSwitchInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableSwitchInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val switchInfo = SwitchInfo(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             ratedInterruptingTime = resultSet.getNullableDouble(table.RATED_INTERRUPTING_TIME.queryIndex)
         }
 
-        return loadAssetInfo(switchInfo, table, resultSet) && service.addOrThrow(switchInfo)
+        return readAssetInfo(switchInfo, table, resultSet) && service.addOrThrow(switchInfo)
     }
 
     /**
      * Create a [TransformerEndInfo] and populate its fields from [TableTransformerEndInfo].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [TransformerEndInfo] fields from.
      * @param resultSet The record in the database table containing the fields for this [TransformerEndInfo].
      * @param setIdentifier A callback to register the mRID of this [TransformerEndInfo] for logging purposes.
@@ -317,7 +323,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableTransformerEndInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableTransformerEndInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val transformerEndInfo = TransformerEndInfo(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             connectionKind = WindingConnection.valueOf(resultSet.getString(table.CONNECTION_KIND.queryIndex))
             emergencyS = resultSet.getNullableInt(table.EMERGENCY_S.queryIndex)
@@ -339,12 +345,13 @@ class NetworkCimReader(
             transformerTankInfo?.addTransformerEndInfo(this)
         }
 
-        return loadAssetInfo(transformerEndInfo, table, resultSet) && service.addOrThrow(transformerEndInfo)
+        return readAssetInfo(transformerEndInfo, table, resultSet) && service.addOrThrow(transformerEndInfo)
     }
 
     /**
      * Create a [TransformerTankInfo] and populate its fields from [TableTransformerTankInfo].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [TransformerTankInfo] fields from.
      * @param resultSet The record in the database table containing the fields for this [TransformerTankInfo].
      * @param setIdentifier A callback to register the mRID of this [TransformerTankInfo] for logging purposes.
@@ -353,34 +360,34 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableTransformerTankInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableTransformerTankInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val transformerTankInfo = TransformerTankInfo(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             powerTransformerInfo =
                 service.ensureGet<PowerTransformerInfo>(resultSet.getString(table.POWER_TRANSFORMER_INFO_MRID.queryIndex), typeNameAndMRID())
                     ?.addTransformerTankInfo(this)
         }
 
-        return loadAssetInfo(transformerTankInfo, table, resultSet) && service.addOrThrow(transformerTankInfo)
+        return readAssetInfo(transformerTankInfo, table, resultSet) && service.addOrThrow(transformerTankInfo)
     }
 
     @Throws(SQLException::class)
-    private fun loadTransformerTest(transformerTest: TransformerTest, table: TableTransformerTest, resultSet: ResultSet): Boolean {
+    private fun readTransformerTest(transformerTest: TransformerTest, table: TableTransformerTest, resultSet: ResultSet): Boolean {
         transformerTest.apply {
             basePower = resultSet.getNullableInt(table.BASE_POWER.queryIndex)
             temperature = resultSet.getNullableDouble(table.TEMPERATURE.queryIndex)
         }
 
-        return loadIdentifiedObject(transformerTest, table, resultSet)
+        return readIdentifiedObject(transformerTest, table, resultSet)
     }
 
     @Throws(SQLException::class)
-    private fun loadWireInfo(wireInfo: WireInfo, table: TableWireInfo, resultSet: ResultSet): Boolean {
+    private fun readWireInfo(wireInfo: WireInfo, table: TableWireInfo, resultSet: ResultSet): Boolean {
         wireInfo.apply {
             ratedCurrent = resultSet.getNullableInt(table.RATED_CURRENT.queryIndex)
             material = WireMaterialKind.valueOf(resultSet.getString(table.MATERIAL.queryIndex))
         }
 
-        return loadAssetInfo(wireInfo, table, resultSet)
+        return readAssetInfo(wireInfo, table, resultSet)
     }
 
     // ###################
@@ -388,45 +395,48 @@ class NetworkCimReader(
     // ###################
 
     @Throws(SQLException::class)
-    private fun loadAsset(asset: Asset, table: TableAssets, resultSet: ResultSet): Boolean {
+    private fun readAsset(service: NetworkService, asset: Asset, table: TableAssets, resultSet: ResultSet): Boolean {
         asset.apply {
             location =
                 service.ensureGet(resultSet.getNullableString(table.LOCATION_MRID.queryIndex), typeNameAndMRID())
         }
-        return loadIdentifiedObject(asset, table, resultSet)
+        return readIdentifiedObject(asset, table, resultSet)
     }
 
     @Throws(SQLException::class)
-    private fun loadAssetContainer(assetContainer: AssetContainer, table: TableAssetContainers, resultSet: ResultSet): Boolean =
-        loadAsset(assetContainer, table, resultSet)
+    private fun readAssetContainer(service: NetworkService, assetContainer: AssetContainer, table: TableAssetContainers, resultSet: ResultSet): Boolean =
+        readAsset(service, assetContainer, table, resultSet)
 
     @Throws(SQLException::class)
-    private fun loadAssetFunction(assetFunction: AssetFunction, table: TableAssetFunctions, resultSet: ResultSet): Boolean =
-        loadIdentifiedObject(assetFunction, table, resultSet)
+    private fun readAssetFunction(assetFunction: AssetFunction, table: TableAssetFunctions, resultSet: ResultSet): Boolean =
+        readIdentifiedObject(assetFunction, table, resultSet)
 
     @Throws(SQLException::class)
-    private fun loadAssetInfo(assetInfo: AssetInfo, table: TableAssetInfo, resultSet: ResultSet): Boolean =
-        loadIdentifiedObject(assetInfo, table, resultSet)
+    private fun readAssetInfo(assetInfo: AssetInfo, table: TableAssetInfo, resultSet: ResultSet): Boolean =
+        readIdentifiedObject(assetInfo, table, resultSet)
 
     @Throws(SQLException::class)
-    private fun loadAssetOrganisationRole(
+    private fun readAssetOrganisationRole(
+        service: NetworkService,
         assetOrganisationRole: AssetOrganisationRole,
         table: TableAssetOrganisationRoles,
         resultSet: ResultSet
     ): Boolean =
-        loadOrganisationRole(assetOrganisationRole, table, resultSet)
+        readOrganisationRole(service, assetOrganisationRole, table, resultSet)
 
     @Throws(SQLException::class)
-    private fun loadStructure(
+    private fun readStructure(
+        service: NetworkService,
         structure: Structure,
         table: TableStructures,
         resultSet: ResultSet
     ): Boolean =
-        loadAssetContainer(structure, table, resultSet)
+        readAssetContainer(service, structure, table, resultSet)
 
     /**
      * Create an [AssetOwner] and populate its fields from [TableAssetOwners].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [AssetOwner] fields from.
      * @param resultSet The record in the database table containing the fields for this [AssetOwner].
      * @param setIdentifier A callback to register the mRID of this [AssetOwner] for logging purposes.
@@ -435,15 +445,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableAssetOwners, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableAssetOwners, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val assetOwner = AssetOwner(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadAssetOrganisationRole(assetOwner, table, resultSet) && service.addOrThrow(assetOwner)
+        return readAssetOrganisationRole(service, assetOwner, table, resultSet) && service.addOrThrow(assetOwner)
     }
 
     /**
      * Create a [Pole] and populate its fields from [TablePoles].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Pole] fields from.
      * @param resultSet The record in the database table containing the fields for this [Pole].
      * @param setIdentifier A callback to register the mRID of this [Pole] for logging purposes.
@@ -452,17 +463,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePoles, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePoles, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val pole = Pole(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
         pole.classification = resultSet.getString(table.CLASSIFICATION.queryIndex).emptyIfNull().internEmpty()
 
-        return loadStructure(pole, table, resultSet) && service.addOrThrow(pole)
+        return readStructure(service, pole, table, resultSet) && service.addOrThrow(pole)
     }
 
     /**
      * Create a [Streetlight] and populate its fields from [TableStreetlights].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Streetlight] fields from.
      * @param resultSet The record in the database table containing the fields for this [Streetlight].
      * @param setIdentifier A callback to register the mRID of this [Streetlight] for logging purposes.
@@ -471,7 +483,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableStreetlights, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableStreetlights, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val streetlight = Streetlight(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             lampKind = StreetlightLampKind.valueOf(resultSet.getString(table.LAMP_KIND.queryIndex))
             lightRating = resultSet.getNullableInt(table.LIGHT_RATING.queryIndex)
@@ -479,7 +491,7 @@ class NetworkCimReader(
             pole?.addStreetlight(this)
         }
 
-        return loadAsset(streetlight, table, resultSet) && service.addOrThrow(streetlight)
+        return readAsset(service, streetlight, table, resultSet) && service.addOrThrow(streetlight)
     }
 
     // ###################
@@ -489,6 +501,7 @@ class NetworkCimReader(
     /**
      * Create a [Location] and populate its fields from [TableLocations].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Location] fields from.
      * @param resultSet The record in the database table containing the fields for this [Location].
      * @param setIdentifier A callback to register the mRID of this [Location] for logging purposes.
@@ -497,15 +510,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableLocations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableLocations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val location = Location(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadIdentifiedObject(location, table, resultSet) && service.addOrThrow(location)
+        return readIdentifiedObject(location, table, resultSet) && service.addOrThrow(location)
     }
 
     /**
      * Create a [setIdentifier] and populate its fields from [TableLocationStreetAddresses].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [setIdentifier] fields from.
      * @param resultSet The record in the database table containing the fields for this [setIdentifier].
      * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
@@ -514,7 +528,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableLocationStreetAddresses, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableLocationStreetAddresses, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val locationMRID = setIdentifier(resultSet.getString(table.LOCATION_MRID.queryIndex))
         val field = TableLocationStreetAddressField.valueOf(resultSet.getString(table.ADDRESS_FIELD.queryIndex))
 
@@ -522,7 +536,7 @@ class NetworkCimReader(
         val location = service.getOrThrow<Location>(locationMRID, "Location to StreetAddress association $id")
 
         when (field) {
-            TableLocationStreetAddressField.mainAddress -> location.mainAddress = loadStreetAddress(table, resultSet)
+            TableLocationStreetAddressField.mainAddress -> location.mainAddress = readStreetAddress(table, resultSet)
         }
 
         return true
@@ -531,6 +545,7 @@ class NetworkCimReader(
     /**
      * Create a [setIdentifier] and populate its fields from [TablePositionPoints].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [setIdentifier] fields from.
      * @param resultSet The record in the database table containing the fields for this [setIdentifier].
      * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
@@ -539,7 +554,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePositionPoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePositionPoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val locationMRID = setIdentifier(resultSet.getString(table.LOCATION_MRID.queryIndex))
         val sequenceNumber = resultSet.getInt(table.SEQUENCE_NUMBER.queryIndex)
 
@@ -558,16 +573,16 @@ class NetworkCimReader(
     }
 
     @Throws(SQLException::class)
-    private fun loadStreetAddress(table: TableStreetAddresses, resultSet: ResultSet): StreetAddress =
+    private fun readStreetAddress(table: TableStreetAddresses, resultSet: ResultSet): StreetAddress =
         StreetAddress(
             resultSet.getString(table.POSTAL_CODE.queryIndex).emptyIfNull().internEmpty(),
-            loadTownDetail(table, resultSet),
+            readTownDetail(table, resultSet),
             resultSet.getString(table.PO_BOX.queryIndex).emptyIfNull().internEmpty(),
-            loadStreetDetail(table, resultSet)
+            readStreetDetail(table, resultSet)
         )
 
     @Throws(SQLException::class)
-    private fun loadStreetDetail(table: TableStreetAddresses, resultSet: ResultSet): StreetDetail? =
+    private fun readStreetDetail(table: TableStreetAddresses, resultSet: ResultSet): StreetDetail? =
         StreetDetail(
             resultSet.getString(table.BUILDING_NAME.queryIndex).emptyIfNull().internEmpty(),
             resultSet.getString(table.FLOOR_IDENTIFICATION.queryIndex).emptyIfNull().internEmpty(),
@@ -579,7 +594,7 @@ class NetworkCimReader(
         ).takeUnless { it.allFieldsEmpty() }
 
     @Throws(SQLException::class)
-    private fun loadTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? =
+    private fun readTownDetail(table: TableTownDetails, resultSet: ResultSet): TownDetail? =
         TownDetail(
             resultSet.getString(table.TOWN_NAME.queryIndex)?.internEmpty(),
             resultSet.getString(table.STATE_OR_PROVINCE.queryIndex)?.internEmpty()
@@ -592,6 +607,7 @@ class NetworkCimReader(
     /**
      * Create a [RelayInfo] and populate its fields from [TableRelayInfo].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [RelayInfo] fields from.
      * @param resultSet The record in the database table containing the fields for this [RelayInfo].
      * @param setIdentifier A callback to register the mRID of this [RelayInfo] for logging purposes.
@@ -600,18 +616,19 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableRelayInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableRelayInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val relayInfo = RelayInfo(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             curveSetting = resultSet.getNullableString(table.CURVE_SETTING.queryIndex)
             recloseFast = resultSet.getNullableBoolean(table.RECLOSE_FAST.queryIndex)
         }
 
-        return loadAssetInfo(relayInfo, table, resultSet) && service.addOrThrow(relayInfo)
+        return readAssetInfo(relayInfo, table, resultSet) && service.addOrThrow(relayInfo)
     }
 
     /**
      * Adds a delay to a [RelayInfo] and populate its fields from [TableRecloseDelays].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the delay fields from.
      * @param resultSet The record in the database table containing the fields for this delay.
      * @param setIdentifier A callback to register the mRID of this delay for logging purposes.
@@ -620,7 +637,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableRecloseDelays, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableRecloseDelays, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         // Note TableRecloseDelays.selectSql ensures we process ratings in the correct order.
         val relayInfoMRID = resultSet.getString(table.RELAY_INFO_MRID.queryIndex)
         val recloseDelay = resultSet.getDouble(table.RECLOSE_DELAY.queryIndex)
@@ -635,6 +652,7 @@ class NetworkCimReader(
     /**
      * Create a [CurrentTransformerInfo] and populate its fields from [TableCurrentTransformerInfo].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [CurrentTransformerInfo] fields from.
      * @param resultSet The record in the database table containing the fields for this [CurrentTransformerInfo].
      * @param setIdentifier A callback to register the mRID of this [CurrentTransformerInfo] for logging purposes.
@@ -643,7 +661,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCurrentTransformerInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableCurrentTransformerInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val currentTransformerInfo = CurrentTransformerInfo(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             accuracyClass = resultSet.getNullableString(table.ACCURACY_CLASS.queryIndex)
             accuracyLimit = resultSet.getNullableDouble(table.ACCURACY_LIMIT.queryIndex)
@@ -659,12 +677,13 @@ class NetworkCimReader(
             usage = resultSet.getNullableString(table.USAGE.queryIndex)
         }
 
-        return loadAssetInfo(currentTransformerInfo, table, resultSet) && service.addOrThrow(currentTransformerInfo)
+        return readAssetInfo(currentTransformerInfo, table, resultSet) && service.addOrThrow(currentTransformerInfo)
     }
 
     /**
      * Create a [PotentialTransformerInfo] and populate its fields from [TablePotentialTransformerInfo].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PotentialTransformerInfo] fields from.
      * @param resultSet The record in the database table containing the fields for this [PotentialTransformerInfo].
      * @param setIdentifier A callback to register the mRID of this [PotentialTransformerInfo] for logging purposes.
@@ -673,7 +692,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePotentialTransformerInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePotentialTransformerInfo, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val potentialTransformerInfo = PotentialTransformerInfo(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             accuracyClass = resultSet.getNullableString(table.ACCURACY_CLASS.queryIndex)
             nominalRatio = resultSet.getNullableRatio(table.NOMINAL_RATIO_NUMERATOR.queryIndex, table.NOMINAL_RATIO_DENOMINATOR.queryIndex)
@@ -683,7 +702,7 @@ class NetworkCimReader(
             secondaryRatio = resultSet.getNullableDouble(table.SECONDARY_RATIO.queryIndex)
         }
 
-        return loadAssetInfo(potentialTransformerInfo, table, resultSet) && service.addOrThrow(potentialTransformerInfo)
+        return readAssetInfo(potentialTransformerInfo, table, resultSet) && service.addOrThrow(potentialTransformerInfo)
     }
 
     // #####################
@@ -691,7 +710,7 @@ class NetworkCimReader(
     // #####################
 
     @Throws(SQLException::class)
-    private fun loadEndDevice(endDevice: EndDevice, table: TableEndDevices, resultSet: ResultSet): Boolean {
+    private fun readEndDevice(service: NetworkService, endDevice: EndDevice, table: TableEndDevices, resultSet: ResultSet): Boolean {
         endDevice.apply {
             customerMRID = resultSet.getNullableString(table.CUSTOMER_MRID.queryIndex)
             serviceLocation = service.ensureGet(
@@ -700,21 +719,22 @@ class NetworkCimReader(
             )
         }
 
-        return loadAssetContainer(endDevice, table, resultSet)
+        return readAssetContainer(service, endDevice, table, resultSet)
     }
 
     @Throws(SQLException::class)
-    private fun loadEndDeviceFunction(endDeviceFunction: EndDeviceFunction, table: TableEndDeviceFunctions, resultSet: ResultSet): Boolean {
+    private fun readEndDeviceFunction(endDeviceFunction: EndDeviceFunction, table: TableEndDeviceFunctions, resultSet: ResultSet): Boolean {
         endDeviceFunction.apply {
             enabled = resultSet.getNullableBoolean(table.ENABLED.queryIndex)
         }
 
-        return loadAssetFunction(endDeviceFunction, table, resultSet)
+        return readAssetFunction(endDeviceFunction, table, resultSet)
     }
 
     /**
      * Create a [Meter] and populate its fields from [TableMeters].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Meter] fields from.
      * @param resultSet The record in the database table containing the fields for this [Meter].
      * @param setIdentifier A callback to register the mRID of this [Meter] for logging purposes.
@@ -723,15 +743,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableMeters, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableMeters, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val meter = Meter(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadEndDevice(meter, table, resultSet) && service.addOrThrow(meter)
+        return readEndDevice(service, meter, table, resultSet) && service.addOrThrow(meter)
     }
 
     /**
      * Create a [UsagePoint] and populate its fields from [TableUsagePoints].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [UsagePoint] fields from.
      * @param resultSet The record in the database table containing the fields for this [UsagePoint].
      * @param setIdentifier A callback to register the mRID of this [UsagePoint] for logging purposes.
@@ -740,7 +761,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableUsagePoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableUsagePoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val usagePoint = UsagePoint(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             usagePointLocation = service.ensureGet(resultSet.getNullableString(table.LOCATION_MRID.queryIndex), typeNameAndMRID())
             isVirtual = resultSet.getBoolean(table.IS_VIRTUAL.queryIndex)
@@ -750,7 +771,7 @@ class NetworkCimReader(
             phaseCode = resultSet.getString(table.PHASE_CODE.queryIndex).let { PhaseCode.valueOf(it) }
         }
 
-        return loadIdentifiedObject(usagePoint, table, resultSet) && service.addOrThrow(usagePoint)
+        return readIdentifiedObject(usagePoint, table, resultSet) && service.addOrThrow(usagePoint)
     }
 
     // #######################
@@ -760,6 +781,7 @@ class NetworkCimReader(
     /**
      * Create an [OperationalRestriction] and populate its fields from [TableOperationalRestrictions].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [OperationalRestriction] fields from.
      * @param resultSet The record in the database table containing the fields for this [OperationalRestriction].
      * @param setIdentifier A callback to register the mRID of this [OperationalRestriction] for logging purposes.
@@ -768,10 +790,10 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableOperationalRestrictions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableOperationalRestrictions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val operationalRestriction = OperationalRestriction(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadDocument(operationalRestriction, table, resultSet) && service.addOrThrow(operationalRestriction)
+        return readDocument(operationalRestriction, table, resultSet) && service.addOrThrow(operationalRestriction)
     }
 
     // #####################################
@@ -779,7 +801,8 @@ class NetworkCimReader(
     // #####################################
 
     @Throws(SQLException::class)
-    private fun loadAuxiliaryEquipment(
+    private fun readAuxiliaryEquipment(
+        service: NetworkService,
         auxiliaryEquipment: AuxiliaryEquipment,
         table: TableAuxiliaryEquipment,
         resultSet: ResultSet
@@ -789,12 +812,13 @@ class NetworkCimReader(
                 service.ensureGet(resultSet.getNullableString(table.TERMINAL_MRID.queryIndex), typeNameAndMRID())
         }
 
-        return loadEquipment(auxiliaryEquipment, table, resultSet)
+        return readEquipment(service, auxiliaryEquipment, table, resultSet)
     }
 
     /**
      * Create a [CurrentTransformer] and populate its fields from [TableCurrentTransformers].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [CurrentTransformer] fields from.
      * @param resultSet The record in the database table containing the fields for this [CurrentTransformer].
      * @param setIdentifier A callback to register the mRID of this [CurrentTransformer] for logging purposes.
@@ -803,18 +827,19 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCurrentTransformers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableCurrentTransformers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val currentTransformer = CurrentTransformer(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             assetInfo = service.ensureGet(resultSet.getNullableString(table.CURRENT_TRANSFORMER_INFO_MRID.queryIndex), typeNameAndMRID())
             coreBurden = resultSet.getNullableInt(table.CORE_BURDEN.queryIndex)
         }
 
-        return loadSensor(currentTransformer, table, resultSet) && service.addOrThrow(currentTransformer)
+        return readSensor(service, currentTransformer, table, resultSet) && service.addOrThrow(currentTransformer)
     }
 
     /**
      * Create a [FaultIndicator] and populate its fields from [TableFaultIndicators].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [FaultIndicator] fields from.
      * @param resultSet The record in the database table containing the fields for this [FaultIndicator].
      * @param setIdentifier A callback to register the mRID of this [FaultIndicator] for logging purposes.
@@ -823,15 +848,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableFaultIndicators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableFaultIndicators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val faultIndicator = FaultIndicator(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadAuxiliaryEquipment(faultIndicator, table, resultSet) && service.addOrThrow(faultIndicator)
+        return readAuxiliaryEquipment(service, faultIndicator, table, resultSet) && service.addOrThrow(faultIndicator)
     }
 
     /**
      * Create a [PotentialTransformer] and populate its fields from [TablePotentialTransformers].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PotentialTransformer] fields from.
      * @param resultSet The record in the database table containing the fields for this [PotentialTransformer].
      * @param setIdentifier A callback to register the mRID of this [PotentialTransformer] for logging purposes.
@@ -840,30 +866,31 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePotentialTransformers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePotentialTransformers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val potentialTransformer = PotentialTransformer(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             assetInfo = service.ensureGet(resultSet.getNullableString(table.POTENTIAL_TRANSFORMER_INFO_MRID.queryIndex), typeNameAndMRID())
             type = PotentialTransformerKind.valueOf(resultSet.getString(table.TYPE.queryIndex))
         }
 
-        return loadSensor(potentialTransformer, table, resultSet) && service.addOrThrow(potentialTransformer)
+        return readSensor(service, potentialTransformer, table, resultSet) && service.addOrThrow(potentialTransformer)
     }
 
     @Throws(SQLException::class)
-    private fun loadSensor(sensor: Sensor, table: TableSensors, resultSet: ResultSet): Boolean =
-        loadAuxiliaryEquipment(sensor, table, resultSet)
+    private fun readSensor(service: NetworkService, sensor: Sensor, table: TableSensors, resultSet: ResultSet): Boolean =
+        readAuxiliaryEquipment(service, sensor, table, resultSet)
 
     // ######################
     // # IEC61970 Base Core #
     // ######################
 
     @Throws(SQLException::class)
-    private fun loadAcDcTerminal(acDcTerminal: AcDcTerminal, table: TableAcDcTerminals, resultSet: ResultSet): Boolean =
-        loadIdentifiedObject(acDcTerminal, table, resultSet)
+    private fun readAcDcTerminal(acDcTerminal: AcDcTerminal, table: TableAcDcTerminals, resultSet: ResultSet): Boolean =
+        readIdentifiedObject(acDcTerminal, table, resultSet)
 
     /**
      * Create a [BaseVoltage] and populate its fields from [TableBaseVoltages].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [BaseVoltage] fields from.
      * @param resultSet The record in the database table containing the fields for this [BaseVoltage].
      * @param setIdentifier A callback to register the mRID of this [BaseVoltage] for logging purposes.
@@ -872,16 +899,17 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableBaseVoltages, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableBaseVoltages, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val baseVoltage = BaseVoltage(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             nominalVoltage = resultSet.getInt(table.NOMINAL_VOLTAGE.queryIndex)
         }
 
-        return loadIdentifiedObject(baseVoltage, table, resultSet) && service.addOrThrow(baseVoltage)
+        return readIdentifiedObject(baseVoltage, table, resultSet) && service.addOrThrow(baseVoltage)
     }
 
     @Throws(SQLException::class)
-    private fun loadConductingEquipment(
+    private fun readConductingEquipment(
+        service: NetworkService,
         conductingEquipment: ConductingEquipment,
         table: TableConductingEquipment,
         resultSet: ResultSet
@@ -893,12 +921,13 @@ class NetworkCimReader(
             )
         }
 
-        return loadEquipment(conductingEquipment, table, resultSet)
+        return readEquipment(service, conductingEquipment, table, resultSet)
     }
 
     /**
      * Create a [ConnectivityNode] and populate its fields from [TableConnectivityNodes].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [ConnectivityNode] fields from.
      * @param resultSet The record in the database table containing the fields for this [ConnectivityNode].
      * @param setIdentifier A callback to register the mRID of this [ConnectivityNode] for logging purposes.
@@ -907,27 +936,29 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableConnectivityNodes, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableConnectivityNodes, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val connectivityNode = ConnectivityNode(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadIdentifiedObject(connectivityNode, table, resultSet) && service.addOrThrow(connectivityNode)
+        return readIdentifiedObject(connectivityNode, table, resultSet) && service.addOrThrow(connectivityNode)
     }
 
     @Throws(SQLException::class)
-    private fun loadConnectivityNodeContainer(
+    private fun readConnectivityNodeContainer(
+        service: NetworkService,
         connectivityNodeContainer: ConnectivityNodeContainer,
         table: TableConnectivityNodeContainers,
         resultSet: ResultSet
     ): Boolean =
-        loadPowerSystemResource(connectivityNodeContainer, table, resultSet)
+        readPowerSystemResource(service, connectivityNodeContainer, table, resultSet)
 
     @Throws(SQLException::class)
-    private fun loadCurve(curve: Curve, table: TableCurves, resultSet: ResultSet): Boolean =
-        loadIdentifiedObject(curve, table, resultSet)
+    private fun readCurve(curve: Curve, table: TableCurves, resultSet: ResultSet): Boolean =
+        readIdentifiedObject(curve, table, resultSet)
 
     /**
      * Create a [CurveData] and populate its fields from [TableCurveData] then add it to associated [Curve].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [CurveData] fields from.
      * @param resultSet The record in the database table containing the fields for this [CurveData].
      * @param setIdentifier A callback to register the mRID of this [CurveData] and its associated [Curve] for logging purposes.
@@ -936,7 +967,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCurveData, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableCurveData, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val curveMRID = setIdentifier(resultSet.getString(table.CURVE_MRID.queryIndex))
         val xValue = resultSet.getFloat(table.X_VALUE.queryIndex)
         val id = setIdentifier("$curveMRID-x-$xValue")
@@ -954,23 +985,29 @@ class NetworkCimReader(
     }
 
     @Throws(SQLException::class)
-    private fun loadEquipment(equipment: Equipment, table: TableEquipment, resultSet: ResultSet): Boolean {
+    private fun readEquipment(service: NetworkService, equipment: Equipment, table: TableEquipment, resultSet: ResultSet): Boolean {
         equipment.apply {
             normallyInService = resultSet.getBoolean(table.NORMALLY_IN_SERVICE.queryIndex)
             inService = resultSet.getBoolean(table.IN_SERVICE.queryIndex)
             commissionedDate = resultSet.getInstant(table.COMMISSIONED_DATE.queryIndex)
         }
 
-        return loadPowerSystemResource(equipment, table, resultSet)
+        return readPowerSystemResource(service, equipment, table, resultSet)
     }
 
     @Throws(SQLException::class)
-    private fun loadEquipmentContainer(equipmentContainer: EquipmentContainer, table: TableEquipmentContainers, resultSet: ResultSet): Boolean =
-        loadConnectivityNodeContainer(equipmentContainer, table, resultSet)
+    private fun readEquipmentContainer(
+        service: NetworkService,
+        equipmentContainer: EquipmentContainer,
+        table: TableEquipmentContainers,
+        resultSet: ResultSet
+    ): Boolean =
+        readConnectivityNodeContainer(service, equipmentContainer, table, resultSet)
 
     /**
      * Create a [Feeder] and populate its fields from [TableFeeders].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Feeder] fields from.
      * @param resultSet The record in the database table containing the fields for this [Feeder].
      * @param setIdentifier A callback to register the mRID of this [Feeder] for logging purposes.
@@ -979,7 +1016,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableFeeders, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableFeeders, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val feeder = Feeder(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             normalHeadTerminal = service.ensureGet(
                 resultSet.getNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex),
@@ -993,12 +1030,13 @@ class NetworkCimReader(
             normalEnergizingSubstation?.addFeeder(this)
         }
 
-        return loadEquipmentContainer(feeder, table, resultSet) && service.addOrThrow(feeder)
+        return readEquipmentContainer(service, feeder, table, resultSet) && service.addOrThrow(feeder)
     }
 
     /**
      * Create a [GeographicalRegion] and populate its fields from [TableGeographicalRegions].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [GeographicalRegion] fields from.
      * @param resultSet The record in the database table containing the fields for this [GeographicalRegion].
      * @param setIdentifier A callback to register the mRID of this [GeographicalRegion] for logging purposes.
@@ -1007,14 +1045,15 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableGeographicalRegions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableGeographicalRegions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val geographicalRegion = GeographicalRegion(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadIdentifiedObject(geographicalRegion, table, resultSet) && service.addOrThrow(geographicalRegion)
+        return readIdentifiedObject(geographicalRegion, table, resultSet) && service.addOrThrow(geographicalRegion)
     }
 
     @Throws(SQLException::class)
-    private fun loadPowerSystemResource(
+    private fun readPowerSystemResource(
+        service: NetworkService,
         powerSystemResource: PowerSystemResource,
         table: TablePowerSystemResources,
         resultSet: ResultSet
@@ -1025,12 +1064,13 @@ class NetworkCimReader(
             numControls = resultSet.getInt(table.NUM_CONTROLS.queryIndex)
         }
 
-        return loadIdentifiedObject(powerSystemResource, table, resultSet)
+        return readIdentifiedObject(powerSystemResource, table, resultSet)
     }
 
     /**
      * Create a [Site] and populate its fields from [TableSites].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Site] fields from.
      * @param resultSet The record in the database table containing the fields for this [Site].
      * @param setIdentifier A callback to register the mRID of this [Site] for logging purposes.
@@ -1039,15 +1079,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableSites, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableSites, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val site = Site(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadEquipmentContainer(site, table, resultSet) && service.addOrThrow(site)
+        return readEquipmentContainer(service, site, table, resultSet) && service.addOrThrow(site)
     }
 
     /**
      * Create a [SubGeographicalRegion] and populate its fields from [TableSubGeographicalRegions].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [SubGeographicalRegion] fields from.
      * @param resultSet The record in the database table containing the fields for this [SubGeographicalRegion].
      * @param setIdentifier A callback to register the mRID of this [SubGeographicalRegion] for logging purposes.
@@ -1056,7 +1097,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableSubGeographicalRegions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableSubGeographicalRegions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val subGeographicalRegion =
             SubGeographicalRegion(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
                 geographicalRegion = service.ensureGet(
@@ -1066,14 +1107,13 @@ class NetworkCimReader(
                 geographicalRegion?.addSubGeographicalRegion(this)
             }
 
-        return loadIdentifiedObject(subGeographicalRegion, table, resultSet) && service.addOrThrow(
-            subGeographicalRegion
-        )
+        return readIdentifiedObject(subGeographicalRegion, table, resultSet) && service.addOrThrow(subGeographicalRegion)
     }
 
     /**
      * Create a [Substation] and populate its fields from [TableSubstations].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Substation] fields from.
      * @param resultSet The record in the database table containing the fields for this [Substation].
      * @param setIdentifier A callback to register the mRID of this [Substation] for logging purposes.
@@ -1082,7 +1122,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableSubstations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableSubstations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val substation = Substation(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             subGeographicalRegion = service.ensureGet(
                 resultSet.getNullableString(table.SUB_GEOGRAPHICAL_REGION_MRID.queryIndex),
@@ -1091,12 +1131,13 @@ class NetworkCimReader(
             subGeographicalRegion?.addSubstation(this)
         }
 
-        return loadEquipmentContainer(substation, table, resultSet) && service.addOrThrow(substation)
+        return readEquipmentContainer(service, substation, table, resultSet) && service.addOrThrow(substation)
     }
 
     /**
      * Create a [Terminal] and populate its fields from [TableTerminals].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Terminal] fields from.
      * @param resultSet The record in the database table containing the fields for this [Terminal].
      * @param setIdentifier A callback to register the mRID of this [Terminal] for logging purposes.
@@ -1105,7 +1146,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableTerminals, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableTerminals, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val terminal = Terminal(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             sequenceNumber = resultSet.getInt(table.SEQUENCE_NUMBER.queryIndex)
             conductingEquipment = service.ensureGet(
@@ -1118,7 +1159,7 @@ class NetworkCimReader(
 
         service.connect(terminal, resultSet.getNullableString(table.CONNECTIVITY_NODE_MRID.queryIndex))
 
-        return loadAcDcTerminal(terminal, table, resultSet) && service.addOrThrow(terminal)
+        return readAcDcTerminal(terminal, table, resultSet) && service.addOrThrow(terminal)
     }
 
     // #############################
@@ -1128,6 +1169,7 @@ class NetworkCimReader(
     /**
      * Create an [EquivalentBranch] and populate its fields from [TableEquivalentBranches].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [EquivalentBranch] fields from.
      * @param resultSet The record in the database table containing the fields for this [EquivalentBranch].
      * @param setIdentifier A callback to register the mRID of this [EquivalentBranch] for logging purposes.
@@ -1136,7 +1178,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableEquivalentBranches, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableEquivalentBranches, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val equivalentBranch = EquivalentBranch(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             negativeR12 = resultSet.getNullableDouble(table.NEGATIVE_R12.queryIndex)
             negativeR21 = resultSet.getNullableDouble(table.NEGATIVE_R21.queryIndex)
@@ -1156,12 +1198,17 @@ class NetworkCimReader(
             zeroX21 = resultSet.getNullableDouble(table.ZERO_X21.queryIndex)
         }
 
-        return loadEquivalentEquipment(equivalentBranch, table, resultSet) && service.addOrThrow(equivalentBranch)
+        return readEquivalentEquipment(service, equivalentBranch, table, resultSet) && service.addOrThrow(equivalentBranch)
     }
 
     @Throws(SQLException::class)
-    private fun loadEquivalentEquipment(equivalentEquipment: EquivalentEquipment, table: TableEquivalentEquipment, resultSet: ResultSet): Boolean =
-        loadConductingEquipment(equivalentEquipment, table, resultSet)
+    private fun readEquivalentEquipment(
+        service: NetworkService,
+        equivalentEquipment: EquivalentEquipment,
+        table: TableEquivalentEquipment,
+        resultSet: ResultSet
+    ): Boolean =
+        readConductingEquipment(service, equivalentEquipment, table, resultSet)
 
     // ######################
     // # IEC61970 Base Meas #
@@ -1170,6 +1217,7 @@ class NetworkCimReader(
     /**
      * Create an [Accumulator] and populate its fields from [TableAccumulators].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Accumulator] fields from.
      * @param resultSet The record in the database table containing the fields for this [Accumulator].
      * @param setIdentifier A callback to register the mRID of this [Accumulator] for logging purposes.
@@ -1178,15 +1226,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableAccumulators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableAccumulators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val meas = Accumulator(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadMeasurement(meas, table, resultSet) && service.addOrThrow(meas)
+        return readMeasurement(service, meas, table, resultSet) && service.addOrThrow(meas)
     }
 
     /**
      * Create an [Analog] and populate its fields from [TableAnalogs].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Analog] fields from.
      * @param resultSet The record in the database table containing the fields for this [Analog].
      * @param setIdentifier A callback to register the mRID of this [Analog] for logging purposes.
@@ -1195,17 +1244,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableAnalogs, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableAnalogs, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val meas = Analog(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             positiveFlowIn = resultSet.getBoolean(table.POSITIVE_FLOW_IN.queryIndex)
         }
 
-        return loadMeasurement(meas, table, resultSet) && service.addOrThrow(meas)
+        return readMeasurement(service, meas, table, resultSet) && service.addOrThrow(meas)
     }
 
     /**
      * Create a [Control] and populate its fields from [TableControls].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Control] fields from.
      * @param resultSet The record in the database table containing the fields for this [Control].
      * @param setIdentifier A callback to register the mRID of this [Control] for logging purposes.
@@ -1214,17 +1264,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val control = Control(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             powerSystemResourceMRID = resultSet.getNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex)
         }
 
-        return loadIoPoint(control, table, resultSet) && service.addOrThrow(control)
+        return readIoPoint(control, table, resultSet) && service.addOrThrow(control)
     }
 
     /**
      * Create a [Discrete] and populate its fields from [TableDiscretes].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Discrete] fields from.
      * @param resultSet The record in the database table containing the fields for this [Discrete].
      * @param setIdentifier A callback to register the mRID of this [Discrete] for logging purposes.
@@ -1233,18 +1284,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableDiscretes, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableDiscretes, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val meas = Discrete(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadMeasurement(meas, table, resultSet) && service.addOrThrow(meas)
+        return readMeasurement(service, meas, table, resultSet) && service.addOrThrow(meas)
     }
 
     @Throws(SQLException::class)
-    private fun loadIoPoint(ioPoint: IoPoint, table: TableIoPoints, resultSet: ResultSet): Boolean =
-        loadIdentifiedObject(ioPoint, table, resultSet)
+    private fun readIoPoint(ioPoint: IoPoint, table: TableIoPoints, resultSet: ResultSet): Boolean =
+        readIdentifiedObject(ioPoint, table, resultSet)
 
     @Throws(SQLException::class)
-    private fun loadMeasurement(measurement: Measurement, table: TableMeasurements, resultSet: ResultSet): Boolean {
+    private fun readMeasurement(service: NetworkService, measurement: Measurement, table: TableMeasurements, resultSet: ResultSet): Boolean {
         measurement.apply {
             powerSystemResourceMRID = resultSet.getNullableString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex)
             remoteSource = service.ensureGet(
@@ -1256,7 +1307,7 @@ class NetworkCimReader(
             phases = PhaseCode.valueOf(resultSet.getString(table.PHASES.queryIndex))
             unitSymbol = UnitSymbol.valueOf(resultSet.getString(table.UNIT_SYMBOL.queryIndex))
         }
-        return loadIdentifiedObject(measurement, table, resultSet)
+        return readIdentifiedObject(measurement, table, resultSet)
     }
 
     // ############################
@@ -1266,6 +1317,7 @@ class NetworkCimReader(
     /**
      * Create a [CurrentRelay] and populate its fields from [TableCurrentRelays].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [CurrentRelay] fields from.
      * @param resultSet The record in the database table containing the fields for this [CurrentRelay].
      * @param setIdentifier A callback to register the mRID of this [CurrentRelay] for logging purposes.
@@ -1274,19 +1326,20 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCurrentRelays, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableCurrentRelays, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val currentRelay = CurrentRelay(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             currentLimit1 = resultSet.getNullableDouble(table.CURRENT_LIMIT_1.queryIndex)
             inverseTimeFlag = resultSet.getNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex)
             timeDelay1 = resultSet.getNullableDouble(table.TIME_DELAY_1.queryIndex)
         }
 
-        return loadProtectionRelayFunction(currentRelay, table, resultSet) && service.addOrThrow(currentRelay)
+        return readProtectionRelayFunction(service, currentRelay, table, resultSet) && service.addOrThrow(currentRelay)
     }
 
     /**
      * Create a [DistanceRelay] and populate its fields from [TableDistanceRelays].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [DistanceRelay] fields from.
      * @param resultSet The record in the database table containing the fields for this [DistanceRelay].
      * @param setIdentifier A callback to register the mRID of this [DistanceRelay] for logging purposes.
@@ -1295,7 +1348,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableDistanceRelays, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableDistanceRelays, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val distanceRelay = DistanceRelay(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             backwardBlind = resultSet.getNullableDouble(table.BACKWARD_BLIND.queryIndex)
             backwardReach = resultSet.getNullableDouble(table.BACKWARD_REACH.queryIndex)
@@ -1308,11 +1361,12 @@ class NetworkCimReader(
             operationPhaseAngle3 = resultSet.getNullableDouble(table.OPERATION_PHASE_ANGLE3.queryIndex)
         }
 
-        return loadProtectionRelayFunction(distanceRelay, table, resultSet) && service.addOrThrow(distanceRelay)
+        return readProtectionRelayFunction(service, distanceRelay, table, resultSet) && service.addOrThrow(distanceRelay)
     }
 
     @Throws(SQLException::class)
-    private fun loadProtectionRelayFunction(
+    private fun readProtectionRelayFunction(
+        service: NetworkService,
         protectionRelayFunction: ProtectionRelayFunction,
         table: TableProtectionRelayFunctions,
         resultSet: ResultSet
@@ -1330,12 +1384,13 @@ class NetworkCimReader(
             powerDirection = PowerDirectionKind.valueOf(resultSet.getString(table.POWER_DIRECTION.queryIndex))
         }
 
-        return loadPowerSystemResource(protectionRelayFunction, table, resultSet)
+        return readPowerSystemResource(service, protectionRelayFunction, table, resultSet)
     }
 
     /**
      * Create a [setIdentifier] and populate its fields from [TableProtectionRelayFunctionThresholds].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [setIdentifier] fields from.
      * @param resultSet The record in the database table containing the fields for this [setIdentifier].
      * @param setIdentifier A callback to register the mRID of this [setIdentifier] for logging purposes.
@@ -1344,7 +1399,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableProtectionRelayFunctionThresholds, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableProtectionRelayFunctionThresholds, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val protectionRelayFunctionMRID = setIdentifier(resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex))
         val sequenceNumber = resultSet.getInt(table.SEQUENCE_NUMBER.queryIndex)
 
@@ -1369,6 +1424,7 @@ class NetworkCimReader(
     /**
      * Adds a time limit to a [ProtectionRelayFunction] and populate its fields from [TableProtectionRelayFunctionTimeLimits].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the time limit fields from.
      * @param resultSet The record in the database table containing the fields for this time limit.
      * @param setIdentifier A callback to register the mRID of this time limit for logging purposes.
@@ -1377,7 +1433,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableProtectionRelayFunctionTimeLimits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableProtectionRelayFunctionTimeLimits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         // Note TableProtectionRelayFunctionTimeLimits.selectSql ensures we process ratings in the correct order.
         val protectionRelayFunctionMRID = setIdentifier(resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex))
         val sequenceNumber = resultSet.getInt(table.SEQUENCE_NUMBER.queryIndex)
@@ -1396,6 +1452,7 @@ class NetworkCimReader(
     /**
      * Create a [ProtectionRelayScheme] and populate its fields from [TableProtectionRelaySchemes].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [ProtectionRelayScheme] fields from.
      * @param resultSet The record in the database table containing the fields for this [ProtectionRelayScheme].
      * @param setIdentifier A callback to register the mRID of this [ProtectionRelayScheme] for logging purposes.
@@ -1404,18 +1461,19 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableProtectionRelaySchemes, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableProtectionRelaySchemes, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val protectionRelayScheme = ProtectionRelayScheme(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             system = service.ensureGet(resultSet.getString(table.SYSTEM_MRID.queryIndex), typeNameAndMRID())
             system?.addScheme(this)
         }
 
-        return loadIdentifiedObject(protectionRelayScheme, table, resultSet) && service.addOrThrow(protectionRelayScheme)
+        return readIdentifiedObject(protectionRelayScheme, table, resultSet) && service.addOrThrow(protectionRelayScheme)
     }
 
     /**
      * Create a [ProtectionRelaySystem] and populate its fields from [TableProtectionRelaySystems].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [ProtectionRelaySystem] fields from.
      * @param resultSet The record in the database table containing the fields for this [ProtectionRelaySystem].
      * @param setIdentifier A callback to register the mRID of this [ProtectionRelaySystem] for logging purposes.
@@ -1424,17 +1482,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableProtectionRelaySystems, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableProtectionRelaySystems, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val protectionRelaySystem = ProtectionRelaySystem(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             protectionKind = ProtectionKind.valueOf(resultSet.getString(table.PROTECTION_KIND.queryIndex))
         }
 
-        return loadEquipment(protectionRelaySystem, table, resultSet) && service.addOrThrow(protectionRelaySystem)
+        return readEquipment(service, protectionRelaySystem, table, resultSet) && service.addOrThrow(protectionRelaySystem)
     }
 
     /**
      * Create a [VoltageRelay] and populate its fields from [TableVoltageRelays].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [VoltageRelay] fields from.
      * @param resultSet The record in the database table containing the fields for this [VoltageRelay].
      * @param setIdentifier A callback to register the mRID of this [VoltageRelay] for logging purposes.
@@ -1443,10 +1502,10 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableVoltageRelays, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableVoltageRelays, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val voltageRelay = VoltageRelay(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadProtectionRelayFunction(voltageRelay, table, resultSet) && service.addOrThrow(voltageRelay)
+        return readProtectionRelayFunction(service, voltageRelay, table, resultSet) && service.addOrThrow(voltageRelay)
     }
 
     // #######################
@@ -1456,6 +1515,7 @@ class NetworkCimReader(
     /**
      * Create a [RemoteControl] and populate its fields from [TableRemoteControls].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [RemoteControl] fields from.
      * @param resultSet The record in the database table containing the fields for this [RemoteControl].
      * @param setIdentifier A callback to register the mRID of this [RemoteControl] for logging purposes.
@@ -1464,23 +1524,24 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableRemoteControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableRemoteControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val remoteControl = RemoteControl(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             control =
                 service.ensureGet(resultSet.getNullableString(table.CONTROL_MRID.queryIndex), typeNameAndMRID())
             control?.remoteControl = this
         }
 
-        return loadRemotePoint(remoteControl, table, resultSet) && service.addOrThrow(remoteControl)
+        return readRemotePoint(remoteControl, table, resultSet) && service.addOrThrow(remoteControl)
     }
 
     @Throws(SQLException::class)
-    private fun loadRemotePoint(remotePoint: RemotePoint, table: TableRemotePoints, resultSet: ResultSet): Boolean =
-        loadIdentifiedObject(remotePoint, table, resultSet)
+    private fun readRemotePoint(remotePoint: RemotePoint, table: TableRemotePoints, resultSet: ResultSet): Boolean =
+        readIdentifiedObject(remotePoint, table, resultSet)
 
     /**
      * Create a [RemoteSource] and populate its fields from [TableRemoteSources].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [RemoteSource] fields from.
      * @param resultSet The record in the database table containing the fields for this [RemoteSource].
      * @param setIdentifier A callback to register the mRID of this [RemoteSource] for logging purposes.
@@ -1489,10 +1550,10 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableRemoteSources, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableRemoteSources, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val remoteSource = RemoteSource(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadRemotePoint(remoteSource, table, resultSet) && service.addOrThrow(remoteSource)
+        return readRemotePoint(remoteSource, table, resultSet) && service.addOrThrow(remoteSource)
     }
 
     // #############################################
@@ -1502,6 +1563,7 @@ class NetworkCimReader(
     /**
      * Create a [BatteryUnit] and populate its fields from [TableBatteryUnits].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [BatteryUnit] fields from.
      * @param resultSet The record in the database table containing the fields for this [BatteryUnit].
      * @param setIdentifier A callback to register the mRID of this [BatteryUnit] for logging purposes.
@@ -1510,19 +1572,20 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableBatteryUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableBatteryUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val batteryUnit = BatteryUnit(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             batteryState = BatteryStateKind.valueOf(resultSet.getString(table.BATTERY_STATE.queryIndex))
             ratedE = resultSet.getNullableLong(table.RATED_E.queryIndex)
             storedE = resultSet.getNullableLong(table.STORED_E.queryIndex)
         }
 
-        return loadPowerElectronicsUnit(batteryUnit, table, resultSet) && service.addOrThrow(batteryUnit)
+        return readPowerElectronicsUnit(service, batteryUnit, table, resultSet) && service.addOrThrow(batteryUnit)
     }
 
     /**
      * Create a [PhotoVoltaicUnit] and populate its fields from [TablePhotoVoltaicUnits].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PhotoVoltaicUnit] fields from.
      * @param resultSet The record in the database table containing the fields for this [PhotoVoltaicUnit].
      * @param setIdentifier A callback to register the mRID of this [PhotoVoltaicUnit] for logging purposes.
@@ -1531,14 +1594,19 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePhotoVoltaicUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePhotoVoltaicUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val photoVoltaicUnit = PhotoVoltaicUnit(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadPowerElectronicsUnit(photoVoltaicUnit, table, resultSet) && service.addOrThrow(photoVoltaicUnit)
+        return readPowerElectronicsUnit(service, photoVoltaicUnit, table, resultSet) && service.addOrThrow(photoVoltaicUnit)
     }
 
     @Throws(SQLException::class)
-    private fun loadPowerElectronicsUnit(powerElectronicsUnit: PowerElectronicsUnit, table: TablePowerElectronicsUnits, resultSet: ResultSet): Boolean {
+    private fun readPowerElectronicsUnit(
+        service: NetworkService,
+        powerElectronicsUnit: PowerElectronicsUnit,
+        table: TablePowerElectronicsUnits,
+        resultSet: ResultSet
+    ): Boolean {
         powerElectronicsUnit.apply {
             powerElectronicsConnection = service.ensureGet(
                 resultSet.getNullableString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex),
@@ -1550,12 +1618,13 @@ class NetworkCimReader(
             minP = resultSet.getNullableInt(table.MIN_P.queryIndex)
         }
 
-        return loadEquipment(powerElectronicsUnit, table, resultSet)
+        return readEquipment(service, powerElectronicsUnit, table, resultSet)
     }
 
     /**
      * Create a [PowerElectronicsWindUnit] and populate its fields from [TablePowerElectronicsWindUnits].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PowerElectronicsWindUnit] fields from.
      * @param resultSet The record in the database table containing the fields for this [PowerElectronicsWindUnit].
      * @param setIdentifier A callback to register the mRID of this [PowerElectronicsWindUnit] for logging purposes.
@@ -1564,10 +1633,10 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePowerElectronicsWindUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePowerElectronicsWindUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val powerElectronicsWindUnit = PowerElectronicsWindUnit(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadPowerElectronicsUnit(powerElectronicsWindUnit, table, resultSet) && service.addOrThrow(powerElectronicsWindUnit)
+        return readPowerElectronicsUnit(service, powerElectronicsWindUnit, table, resultSet) && service.addOrThrow(powerElectronicsWindUnit)
     }
 
     // #######################
@@ -1577,6 +1646,7 @@ class NetworkCimReader(
     /**
      * Create an [AcLineSegment] and populate its fields from [TableAcLineSegments].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [AcLineSegment] fields from.
      * @param resultSet The record in the database table containing the fields for this [AcLineSegment].
      * @param setIdentifier A callback to register the mRID of this [AcLineSegment] for logging purposes.
@@ -1585,17 +1655,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableAcLineSegments, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableAcLineSegments, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val acLineSegment = AcLineSegment(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             perLengthImpedance = service.ensureGet(resultSet.getNullableString(table.PER_LENGTH_IMPEDANCE_MRID.queryIndex), typeNameAndMRID())
         }
 
-        return loadConductor(acLineSegment, table, resultSet) && service.addOrThrow(acLineSegment)
+        return readConductor(service, acLineSegment, table, resultSet) && service.addOrThrow(acLineSegment)
     }
 
     /**
      * Create a [Breaker] and populate its fields from [TableBreakers].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Breaker] fields from.
      * @param resultSet The record in the database table containing the fields for this [Breaker].
      * @param setIdentifier A callback to register the mRID of this [Breaker] for logging purposes.
@@ -1604,17 +1675,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableBreakers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableBreakers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val breaker = Breaker(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             inTransitTime = resultSet.getNullableDouble(table.IN_TRANSIT_TIME.queryIndex)
         }
 
-        return loadProtectedSwitch(breaker, table, resultSet) && service.addOrThrow(breaker)
+        return readProtectedSwitch(service, breaker, table, resultSet) && service.addOrThrow(breaker)
     }
 
     /**
      * Create a [BusbarSection] and populate its fields from [TableBusbarSections].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [BusbarSection] fields from.
      * @param resultSet The record in the database table containing the fields for this [BusbarSection].
      * @param setIdentifier A callback to register the mRID of this [BusbarSection] for logging purposes.
@@ -1623,15 +1695,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableBusbarSections, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableBusbarSections, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val busbarSection = BusbarSection(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadConnector(busbarSection, table, resultSet) && service.addOrThrow(busbarSection)
+        return readConnector(service, busbarSection, table, resultSet) && service.addOrThrow(busbarSection)
     }
 
     /**
      * Create a [Clamp] and populate its fields from [TableClamps].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Clamp] fields from.
      * @param resultSet The record in the database table containing the fields for this [Clamp].
      * @param setIdentifier A callback to register the mRID of this [Clamp] for logging purposes.
@@ -1640,18 +1713,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableClamps, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableClamps, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val clamp = Clamp(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             lengthFromTerminal1 = resultSet.getNullableDouble(table.LENGTH_FROM_TERMINAL_1.queryIndex)
             acLineSegment = service.ensureGet(resultSet.getString(table.AC_LINE_SEGMENT_MRID.queryIndex), typeNameAndMRID())
             acLineSegment?.addClamp(this)
         }
 
-        return loadConductingEquipment(clamp, table, resultSet) && service.addOrThrow(clamp)
+        return readConductingEquipment(service, clamp, table, resultSet) && service.addOrThrow(clamp)
     }
 
     @Throws(SQLException::class)
-    private fun loadConductor(conductor: Conductor, table: TableConductors, resultSet: ResultSet): Boolean {
+    private fun readConductor(service: NetworkService, conductor: Conductor, table: TableConductors, resultSet: ResultSet): Boolean {
         conductor.apply {
             length = resultSet.getNullableDouble(table.LENGTH.queryIndex)
             designTemperature = resultSet.getNullableInt(table.DESIGN_TEMPERATURE.queryIndex)
@@ -1662,16 +1735,17 @@ class NetworkCimReader(
             )
         }
 
-        return loadConductingEquipment(conductor, table, resultSet)
+        return readConductingEquipment(service, conductor, table, resultSet)
     }
 
     @Throws(SQLException::class)
-    private fun loadConnector(connector: Connector, table: TableConnectors, resultSet: ResultSet): Boolean =
-        loadConductingEquipment(connector, table, resultSet)
+    private fun readConnector(service: NetworkService, connector: Connector, table: TableConnectors, resultSet: ResultSet): Boolean =
+        readConductingEquipment(service, connector, table, resultSet)
 
     /**
      * Create a [Cut] and populate its fields from [TableCuts].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Cut] fields from.
      * @param resultSet The record in the database table containing the fields for this [Cut].
      * @param setIdentifier A callback to register the mRID of this [Cut] for logging purposes.
@@ -1680,19 +1754,20 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCuts, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableCuts, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val cut = Cut(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             lengthFromTerminal1 = resultSet.getNullableDouble(table.LENGTH_FROM_TERMINAL_1.queryIndex)
             acLineSegment = service.ensureGet(resultSet.getString(table.AC_LINE_SEGMENT_MRID.queryIndex), typeNameAndMRID())
             acLineSegment?.addCut(this)
         }
 
-        return loadSwitch(cut, table, resultSet) && service.addOrThrow(cut)
+        return readSwitch(service, cut, table, resultSet) && service.addOrThrow(cut)
     }
 
     /**
      * Create a [Disconnector] and populate its fields from [TableDisconnectors].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Disconnector] fields from.
      * @param resultSet The record in the database table containing the fields for this [Disconnector].
      * @param setIdentifier A callback to register the mRID of this [Disconnector] for logging purposes.
@@ -1701,14 +1776,15 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableDisconnectors, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableDisconnectors, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val disconnector = Disconnector(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadSwitch(disconnector, table, resultSet) && service.addOrThrow(disconnector)
+        return readSwitch(service, disconnector, table, resultSet) && service.addOrThrow(disconnector)
     }
 
     @Throws(SQLException::class)
-    private fun loadEarthFaultCompensator(
+    private fun readEarthFaultCompensator(
+        service: NetworkService,
         earthFaultCompensator: EarthFaultCompensator,
         table: TableEarthFaultCompensators,
         resultSet: ResultSet
@@ -1717,20 +1793,22 @@ class NetworkCimReader(
             r = resultSet.getNullableDouble(table.R.queryIndex)
         }
 
-        return loadConductingEquipment(earthFaultCompensator, table, resultSet)
+        return readConductingEquipment(service, earthFaultCompensator, table, resultSet)
     }
 
     @Throws(SQLException::class)
-    private fun loadEnergyConnection(
+    private fun readEnergyConnection(
+        service: NetworkService,
         energyConnection: EnergyConnection,
         table: TableEnergyConnections,
         resultSet: ResultSet
     ): Boolean =
-        loadConductingEquipment(energyConnection, table, resultSet)
+        readConductingEquipment(service, energyConnection, table, resultSet)
 
     /**
      * Create an [EnergyConsumer] and populate its fields from [TableEnergyConsumers].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [EnergyConsumer] fields from.
      * @param resultSet The record in the database table containing the fields for this [EnergyConsumer].
      * @param setIdentifier A callback to register the mRID of this [EnergyConsumer] for logging purposes.
@@ -1739,7 +1817,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableEnergyConsumers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableEnergyConsumers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val energyConsumer = EnergyConsumer(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             customerCount = resultSet.getNullableInt(table.CUSTOMER_COUNT.queryIndex)
             grounded = resultSet.getBoolean(table.GROUNDED.queryIndex)
@@ -1750,12 +1828,13 @@ class NetworkCimReader(
             phaseConnection = PhaseShuntConnectionKind.valueOf(resultSet.getString(table.PHASE_CONNECTION.queryIndex))
         }
 
-        return loadEnergyConnection(energyConsumer, table, resultSet) && service.addOrThrow(energyConsumer)
+        return readEnergyConnection(service, energyConsumer, table, resultSet) && service.addOrThrow(energyConsumer)
     }
 
     /**
      * Create an [EnergyConsumerPhase] and populate its fields from [TableEnergyConsumerPhases].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [EnergyConsumerPhase] fields from.
      * @param resultSet The record in the database table containing the fields for this [EnergyConsumerPhase].
      * @param setIdentifier A callback to register the mRID of this [EnergyConsumerPhase] for logging purposes.
@@ -1764,7 +1843,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableEnergyConsumerPhases, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableEnergyConsumerPhases, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val energyConsumerPhase = EnergyConsumerPhase(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             energyConsumer =
                 service.ensureGet(resultSet.getString(table.ENERGY_CONSUMER_MRID.queryIndex), typeNameAndMRID())
@@ -1777,14 +1856,13 @@ class NetworkCimReader(
             qFixed = resultSet.getNullableDouble(table.Q_FIXED.queryIndex)
         }
 
-        return loadPowerSystemResource(energyConsumerPhase, table, resultSet) && service.addOrThrow(
-            energyConsumerPhase
-        )
+        return readPowerSystemResource(service, energyConsumerPhase, table, resultSet) && service.addOrThrow(energyConsumerPhase)
     }
 
     /**
      * Create an [EnergySource] and populate its fields from [TableEnergySources].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [EnergySource] fields from.
      * @param resultSet The record in the database table containing the fields for this [EnergySource].
      * @param setIdentifier A callback to register the mRID of this [EnergySource] for logging purposes.
@@ -1793,7 +1871,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableEnergySources, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableEnergySources, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val energySource = EnergySource(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             activePower = resultSet.getNullableDouble(table.ACTIVE_POWER.queryIndex)
             reactivePower = resultSet.getNullableDouble(table.REACTIVE_POWER.queryIndex)
@@ -1822,12 +1900,13 @@ class NetworkCimReader(
             x0Max = resultSet.getNullableDouble(table.X0_MAX.queryIndex)
         }
 
-        return loadEnergyConnection(energySource, table, resultSet) && service.addOrThrow(energySource)
+        return readEnergyConnection(service, energySource, table, resultSet) && service.addOrThrow(energySource)
     }
 
     /**
      * Create an [EnergySourcePhase] and populate its fields from [TableEnergySourcePhases].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [EnergySourcePhase] fields from.
      * @param resultSet The record in the database table containing the fields for this [EnergySourcePhase].
      * @param setIdentifier A callback to register the mRID of this [EnergySourcePhase] for logging purposes.
@@ -1836,7 +1915,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableEnergySourcePhases, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableEnergySourcePhases, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val energySourcePhase = EnergySourcePhase(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             energySource =
                 service.ensureGet(resultSet.getString(table.ENERGY_SOURCE_MRID.queryIndex), typeNameAndMRID())
@@ -1845,14 +1924,13 @@ class NetworkCimReader(
             phase = SinglePhaseKind.valueOf(resultSet.getString(table.PHASE.queryIndex))
         }
 
-        return loadPowerSystemResource(energySourcePhase, table, resultSet) && service.addOrThrow(
-            energySourcePhase
-        )
+        return readPowerSystemResource(service, energySourcePhase, table, resultSet) && service.addOrThrow(energySourcePhase)
     }
 
     /**
      * Create a [Fuse] and populate its fields from [TableFuses].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Fuse] fields from.
      * @param resultSet The record in the database table containing the fields for this [Fuse].
      * @param setIdentifier A callback to register the mRID of this [Fuse] for logging purposes.
@@ -1861,17 +1939,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableFuses, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableFuses, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val fuse = Fuse(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             function = service.ensureGet(resultSet.getString(table.FUNCTION_MRID.queryIndex), typeNameAndMRID())
         }
 
-        return loadSwitch(fuse, table, resultSet) && service.addOrThrow(fuse)
+        return readSwitch(service, fuse, table, resultSet) && service.addOrThrow(fuse)
     }
 
     /**
      * Create a [Ground] and populate its fields from [TableGrounds].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Ground] fields from.
      * @param resultSet The record in the database table containing the fields for this [Ground].
      * @param setIdentifier A callback to register the mRID of this [Ground] for logging purposes.
@@ -1880,15 +1959,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableGrounds, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableGrounds, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val ground = Ground(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadConductingEquipment(ground, table, resultSet) && service.addOrThrow(ground)
+        return readConductingEquipment(service, ground, table, resultSet) && service.addOrThrow(ground)
     }
 
     /**
      * Create a [GroundDisconnector] and populate its fields from [TableGroundDisconnectors].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [GroundDisconnector] fields from.
      * @param resultSet The record in the database table containing the fields for this [GroundDisconnector].
      * @param setIdentifier A callback to register the mRID of this [GroundDisconnector] for logging purposes.
@@ -1897,15 +1977,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableGroundDisconnectors, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableGroundDisconnectors, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val groundDisconnector = GroundDisconnector(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadSwitch(groundDisconnector, table, resultSet) && service.addOrThrow(groundDisconnector)
+        return readSwitch(service, groundDisconnector, table, resultSet) && service.addOrThrow(groundDisconnector)
     }
 
     /**
      * Create a [GroundingImpedance] and populate its fields from [TableGroundingImpedances].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [GroundingImpedance] fields from.
      * @param resultSet The record in the database table containing the fields for this [GroundingImpedance].
      * @param setIdentifier A callback to register the mRID of this [GroundingImpedance] for logging purposes.
@@ -1914,17 +1995,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableGroundingImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableGroundingImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val groundingImpedance = GroundingImpedance(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             x = resultSet.getNullableDouble(table.X.queryIndex)
         }
 
-        return loadEarthFaultCompensator(groundingImpedance, table, resultSet) && service.addOrThrow(groundingImpedance)
+        return readEarthFaultCompensator(service, groundingImpedance, table, resultSet) && service.addOrThrow(groundingImpedance)
     }
 
     /**
      * Create a [Jumper] and populate its fields from [TableJumpers].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Jumper] fields from.
      * @param resultSet The record in the database table containing the fields for this [Jumper].
      * @param setIdentifier A callback to register the mRID of this [Jumper] for logging purposes.
@@ -1933,15 +2015,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableJumpers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableJumpers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val jumper = Jumper(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadSwitch(jumper, table, resultSet) && service.addOrThrow(jumper)
+        return readSwitch(service, jumper, table, resultSet) && service.addOrThrow(jumper)
     }
 
     /**
      * Create a [Junction] and populate its fields from [TableJunctions].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Junction] fields from.
      * @param resultSet The record in the database table containing the fields for this [Junction].
      * @param setIdentifier A callback to register the mRID of this [Junction] for logging purposes.
@@ -1950,19 +2033,20 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableJunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableJunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val junction = Junction(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadConnector(junction, table, resultSet) && service.addOrThrow(junction)
+        return readConnector(service, junction, table, resultSet) && service.addOrThrow(junction)
     }
 
     @Throws(SQLException::class)
-    private fun loadLine(line: Line, table: TableLines, resultSet: ResultSet): Boolean =
-        loadEquipmentContainer(line, table, resultSet)
+    private fun readLine(service: NetworkService, line: Line, table: TableLines, resultSet: ResultSet): Boolean =
+        readEquipmentContainer(service, line, table, resultSet)
 
     /**
      * Create a [LinearShuntCompensator] and populate its fields from [TableLinearShuntCompensators].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [LinearShuntCompensator] fields from.
      * @param resultSet The record in the database table containing the fields for this [LinearShuntCompensator].
      * @param setIdentifier A callback to register the mRID of this [LinearShuntCompensator] for logging purposes.
@@ -1971,7 +2055,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableLinearShuntCompensators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableLinearShuntCompensators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val linearShuntCompensator =
             LinearShuntCompensator(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
                 b0PerSection = resultSet.getNullableDouble(table.B0_PER_SECTION.queryIndex)
@@ -1980,14 +2064,13 @@ class NetworkCimReader(
                 gPerSection = resultSet.getNullableDouble(table.G_PER_SECTION.queryIndex)
             }
 
-        return loadShuntCompensator(linearShuntCompensator, table, resultSet) && service.addOrThrow(
-            linearShuntCompensator
-        )
+        return readShuntCompensator(service, linearShuntCompensator, table, resultSet) && service.addOrThrow(linearShuntCompensator)
     }
 
     /**
      * Create a [LoadBreakSwitch] and populate its fields from [TableLoadBreakSwitches].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [LoadBreakSwitch] fields from.
      * @param resultSet The record in the database table containing the fields for this [LoadBreakSwitch].
      * @param setIdentifier A callback to register the mRID of this [LoadBreakSwitch] for logging purposes.
@@ -1996,23 +2079,24 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableLoadBreakSwitches, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableLoadBreakSwitches, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val loadBreakSwitch = LoadBreakSwitch(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadProtectedSwitch(loadBreakSwitch, table, resultSet) && service.addOrThrow(loadBreakSwitch)
+        return readProtectedSwitch(service, loadBreakSwitch, table, resultSet) && service.addOrThrow(loadBreakSwitch)
     }
 
     @Throws(SQLException::class)
-    private fun loadPerLengthImpedance(perLengthImpedance: PerLengthImpedance, table: TablePerLengthImpedances, resultSet: ResultSet): Boolean =
-        loadPerLengthLineParameter(perLengthImpedance, table, resultSet)
+    private fun readPerLengthImpedance(perLengthImpedance: PerLengthImpedance, table: TablePerLengthImpedances, resultSet: ResultSet): Boolean =
+        readPerLengthLineParameter(perLengthImpedance, table, resultSet)
 
     @Throws(SQLException::class)
-    private fun loadPerLengthLineParameter(perLengthLineParameter: PerLengthLineParameter, table: TablePerLengthLineParameters, resultSet: ResultSet): Boolean =
-        loadIdentifiedObject(perLengthLineParameter, table, resultSet)
+    private fun readPerLengthLineParameter(perLengthLineParameter: PerLengthLineParameter, table: TablePerLengthLineParameters, resultSet: ResultSet): Boolean =
+        readIdentifiedObject(perLengthLineParameter, table, resultSet)
 
     /**
      * Create a [PerLengthPhaseImpedance] and populate its fields from [TablePerLengthPhaseImpedances].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PerLengthPhaseImpedance] fields from.
      * @param resultSet The record in the database table containing the fields for this [PerLengthPhaseImpedance].
      * @param setIdentifier A callback to register the mRID of this [PerLengthPhaseImpedance] for logging purposes.
@@ -2021,15 +2105,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePerLengthPhaseImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePerLengthPhaseImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val perLengthPhaseImpedance = PerLengthPhaseImpedance(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadPerLengthImpedance(perLengthPhaseImpedance, table, resultSet) && service.addOrThrow(perLengthPhaseImpedance)
+        return readPerLengthImpedance(perLengthPhaseImpedance, table, resultSet) && service.addOrThrow(perLengthPhaseImpedance)
     }
 
     /**
      * Create a [PhaseImpedanceData] and populate its fields from [TablePhaseImpedanceData] then add it to associated [PerLengthPhaseImpedance].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PhaseImpedanceData] fields from.
      * @param resultSet The record in the database table containing the fields for this [PhaseImpedanceData].
      * @param setIdentifier A callback to register the mRID of this [PhaseImpedanceData] and its associated [PerLengthPhaseImpedance] for logging purposes.
@@ -2038,7 +2123,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePhaseImpedanceData, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePhaseImpedanceData, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val perLengthPhaseImpedanceMRID = setIdentifier(resultSet.getString(table.PER_LENGTH_PHASE_IMPEDANCE_MRID.queryIndex))
         val id = setIdentifier(perLengthPhaseImpedanceMRID)
 
@@ -2062,6 +2147,7 @@ class NetworkCimReader(
     /**
      * Create a [PerLengthSequenceImpedance] and populate its fields from [TablePerLengthSequenceImpedances].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PerLengthSequenceImpedance] fields from.
      * @param resultSet The record in the database table containing the fields for this [PerLengthSequenceImpedance].
      * @param setIdentifier A callback to register the mRID of this [PerLengthSequenceImpedance] for logging purposes.
@@ -2070,7 +2156,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePerLengthSequenceImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePerLengthSequenceImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val perLengthSequenceImpedance =
             PerLengthSequenceImpedance(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
                 r = resultSet.getNullableDouble(table.R.queryIndex)
@@ -2083,14 +2169,13 @@ class NetworkCimReader(
                 g0ch = resultSet.getNullableDouble(table.G0CH.queryIndex)
             }
 
-        return loadPerLengthImpedance(perLengthSequenceImpedance, table, resultSet) && service.addOrThrow(
-            perLengthSequenceImpedance
-        )
+        return readPerLengthImpedance(perLengthSequenceImpedance, table, resultSet) && service.addOrThrow(perLengthSequenceImpedance)
     }
 
     /**
      * Create a [PetersenCoil] and populate its fields from [TablePetersenCoils].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PetersenCoil] fields from.
      * @param resultSet The record in the database table containing the fields for this [PetersenCoil].
      * @param setIdentifier A callback to register the mRID of this [PetersenCoil] for logging purposes.
@@ -2099,17 +2184,18 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePetersenCoils, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val petersencoil = PetersenCoil(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+    fun read(service: NetworkService, table: TablePetersenCoils, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val petersenCoil = PetersenCoil(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             xGroundNominal = resultSet.getNullableDouble(table.X_GROUND_NOMINAL.queryIndex)
         }
 
-        return loadEarthFaultCompensator(petersencoil, table, resultSet) && service.addOrThrow(petersencoil)
+        return readEarthFaultCompensator(service, petersenCoil, table, resultSet) && service.addOrThrow(petersenCoil)
     }
 
     /**
      * Create a [PowerElectronicsConnection] and populate its fields from [TablePowerElectronicsConnections].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PowerElectronicsConnection] fields from.
      * @param resultSet The record in the database table containing the fields for this [PowerElectronicsConnection].
      * @param setIdentifier A callback to register the mRID of this [PowerElectronicsConnection] for logging purposes.
@@ -2118,7 +2204,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePowerElectronicsConnections, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePowerElectronicsConnections, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val powerElectronicsConnection = PowerElectronicsConnection(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             maxIFault = resultSet.getNullableInt(table.MAX_I_FAULT.queryIndex)
             maxQ = resultSet.getNullableDouble(table.MAX_Q.queryIndex)
@@ -2153,12 +2239,13 @@ class NetworkCimReader(
             invFixReactivePower = resultSet.getNullableFloat(table.INV_FIX_REACTIVE_POWER.queryIndex)
         }
 
-        return loadRegulatingCondEq(powerElectronicsConnection, table, resultSet) && service.addOrThrow(powerElectronicsConnection)
+        return readRegulatingCondEq(service, powerElectronicsConnection, table, resultSet) && service.addOrThrow(powerElectronicsConnection)
     }
 
     /**
      * Create a [PowerElectronicsConnectionPhase] and populate its fields from [TablePowerElectronicsConnectionPhases].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PowerElectronicsConnectionPhase] fields from.
      * @param resultSet The record in the database table containing the fields for this [PowerElectronicsConnectionPhase].
      * @param setIdentifier A callback to register the mRID of this [PowerElectronicsConnectionPhase] for logging purposes.
@@ -2167,7 +2254,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePowerElectronicsConnectionPhases, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePowerElectronicsConnectionPhases, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val powerElectronicsConnectionPhase = PowerElectronicsConnectionPhase(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             powerElectronicsConnection =
                 service.ensureGet(resultSet.getString(table.POWER_ELECTRONICS_CONNECTION_MRID.queryIndex), typeNameAndMRID())
@@ -2179,12 +2266,13 @@ class NetworkCimReader(
             q = resultSet.getNullableDouble(table.Q.queryIndex)
         }
 
-        return loadPowerSystemResource(powerElectronicsConnectionPhase, table, resultSet) && service.addOrThrow(powerElectronicsConnectionPhase)
+        return readPowerSystemResource(service, powerElectronicsConnectionPhase, table, resultSet) && service.addOrThrow(powerElectronicsConnectionPhase)
     }
 
     /**
      * Create a [PowerTransformer] and populate its fields from [TablePowerTransformers].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PowerTransformer] fields from.
      * @param resultSet The record in the database table containing the fields for this [PowerTransformer].
      * @param setIdentifier A callback to register the mRID of this [PowerTransformer] for logging purposes.
@@ -2193,7 +2281,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePowerTransformers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePowerTransformers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val powerTransformer = PowerTransformer(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             vectorGroup = VectorGroup.valueOf(resultSet.getString(table.VECTOR_GROUP.queryIndex))
             transformerUtilisation = resultSet.getNullableDouble(table.TRANSFORMER_UTILISATION.queryIndex)
@@ -2205,16 +2293,13 @@ class NetworkCimReader(
             )
         }
 
-        return loadConductingEquipment(
-            powerTransformer,
-            table,
-            resultSet
-        ) && service.addOrThrow(powerTransformer)
+        return readConductingEquipment(service, powerTransformer, table, resultSet) && service.addOrThrow(powerTransformer)
     }
 
     /**
      * Create a [PowerTransformerEnd] and populate its fields from [TablePowerTransformerEnds].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [PowerTransformerEnd] fields from.
      * @param resultSet The record in the database table containing the fields for this [PowerTransformerEnd].
      * @param setIdentifier A callback to register the mRID of this [PowerTransformerEnd] for logging purposes.
@@ -2223,7 +2308,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePowerTransformerEnds, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePowerTransformerEnds, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val powerTransformerEnd = PowerTransformerEnd(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             endNumber = resultSet.getInt(table.END_NUMBER.queryIndex)
             powerTransformer = service.ensureGet(resultSet.getString(table.POWER_TRANSFORMER_MRID.queryIndex), typeNameAndMRID())
@@ -2242,12 +2327,13 @@ class NetworkCimReader(
             x0 = resultSet.getNullableDouble(table.X0.queryIndex)
         }
 
-        return loadTransformerEnd(powerTransformerEnd, table, resultSet) && service.addOrThrow(powerTransformerEnd)
+        return readTransformerEnd(service, powerTransformerEnd, table, resultSet) && service.addOrThrow(powerTransformerEnd)
     }
 
     /**
      * Adds a rating to a [PowerTransformerEnd] from [TablePowerTransformerEndRatings].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the rating fields from.
      * @param resultSet The record in the database table containing the fields for this rating.
      * @param setIdentifier A callback to register the mRID of this rating for logging purposes.
@@ -2256,7 +2342,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePowerTransformerEndRatings, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TablePowerTransformerEndRatings, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         // Note TablePowerTransformerEndRatings.selectSql ensures we process ratings in the correct order.
         val powerTransformerEndMRID = resultSet.getString(table.POWER_TRANSFORMER_END_MRID.queryIndex)
         val ratedS = resultSet.getInt(table.RATED_S.queryIndex)
@@ -2270,17 +2356,18 @@ class NetworkCimReader(
     }
 
     @Throws(SQLException::class)
-    private fun loadProtectedSwitch(protectedSwitch: ProtectedSwitch, table: TableProtectedSwitches, resultSet: ResultSet): Boolean {
+    private fun readProtectedSwitch(service: NetworkService, protectedSwitch: ProtectedSwitch, table: TableProtectedSwitches, resultSet: ResultSet): Boolean {
         protectedSwitch.apply {
             breakingCapacity = resultSet.getNullableInt(table.BREAKING_CAPACITY.queryIndex)
         }
 
-        return loadSwitch(protectedSwitch, table, resultSet)
+        return readSwitch(service, protectedSwitch, table, resultSet)
     }
 
     /**
      * Create a [RatioTapChanger] and populate its fields from [TableRatioTapChangers].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [RatioTapChanger] fields from.
      * @param resultSet The record in the database table containing the fields for this [RatioTapChanger].
      * @param setIdentifier A callback to register the mRID of this [RatioTapChanger] for logging purposes.
@@ -2289,7 +2376,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableRatioTapChangers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableRatioTapChangers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val ratioTapChanger = RatioTapChanger(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             transformerEnd = service.ensureGet(
                 resultSet.getNullableString(table.TRANSFORMER_END_MRID.queryIndex),
@@ -2300,12 +2387,13 @@ class NetworkCimReader(
             stepVoltageIncrement = resultSet.getNullableDouble(table.STEP_VOLTAGE_INCREMENT.queryIndex)
         }
 
-        return loadTapChanger(ratioTapChanger, table, resultSet) && service.addOrThrow(ratioTapChanger)
+        return readTapChanger(service, ratioTapChanger, table, resultSet) && service.addOrThrow(ratioTapChanger)
     }
 
     /**
      * Create a [ReactiveCapabilityCurve] and populate its fields from [TableReactiveCapabilityCurves].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [ReactiveCapabilityCurve] fields from.
      * @param resultSet The record in the database table containing the fields for this [ReactiveCapabilityCurve].
      * @param setIdentifier A callback to register the mRID of this [ReactiveCapabilityCurve] for logging purposes.
@@ -2314,15 +2402,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableReactiveCapabilityCurves, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableReactiveCapabilityCurves, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val reactiveCapabilityCurve = ReactiveCapabilityCurve(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadCurve(reactiveCapabilityCurve, table, resultSet) && service.addOrThrow(reactiveCapabilityCurve)
+        return readCurve(reactiveCapabilityCurve, table, resultSet) && service.addOrThrow(reactiveCapabilityCurve)
     }
 
     /**
      * Create a [Recloser] and populate its fields from [TableReclosers].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Recloser] fields from.
      * @param resultSet The record in the database table containing the fields for this [Recloser].
      * @param setIdentifier A callback to register the mRID of this [Recloser] for logging purposes.
@@ -2331,14 +2420,15 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableReclosers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableReclosers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val recloser = Recloser(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadProtectedSwitch(recloser, table, resultSet) && service.addOrThrow(recloser)
+        return readProtectedSwitch(service, recloser, table, resultSet) && service.addOrThrow(recloser)
     }
 
     @Throws(SQLException::class)
-    private fun loadRegulatingCondEq(
+    private fun readRegulatingCondEq(
+        service: NetworkService,
         regulatingCondEq: RegulatingCondEq,
         table: TableRegulatingCondEq,
         resultSet: ResultSet
@@ -2346,15 +2436,16 @@ class NetworkCimReader(
         regulatingCondEq.apply {
             controlEnabled = resultSet.getBoolean(table.CONTROL_ENABLED.queryIndex)
             // We use a resolver here because there is an ordering conflict between terminals, RegulatingCondEq, and RegulatingControls
-            // We check this resolver has actually been resolved in the postLoad of the database read and throw there if it hasn't.
+            // We check this resolver has actually been resolved in the afterServiceRead of the database read and throw there if it hasn't.
             service.resolveOrDeferReference(Resolvers.regulatingControl(this), resultSet.getNullableString(table.REGULATING_CONTROL_MRID.queryIndex))
         }
 
-        return loadEnergyConnection(regulatingCondEq, table, resultSet)
+        return readEnergyConnection(service, regulatingCondEq, table, resultSet)
     }
 
     @Throws(SQLException::class)
-    private fun loadRegulatingControl(
+    private fun readRegulatingControl(
+        service: NetworkService,
         regulatingControl: RegulatingControl,
         table: TableRegulatingControls,
         resultSet: ResultSet
@@ -2374,11 +2465,12 @@ class NetworkCimReader(
             minTargetDeadband = resultSet.getNullableDouble(table.MIN_TARGET_DEADBAND.queryIndex)
         }
 
-        return loadPowerSystemResource(regulatingControl, table, resultSet)
+        return readPowerSystemResource(service, regulatingControl, table, resultSet)
     }
 
     @Throws(SQLException::class)
-    private fun loadRotatingMachine(
+    private fun readRotatingMachine(
+        service: NetworkService,
         rotatingMachine: RotatingMachine,
         table: TableRotatingMachines,
         resultSet: ResultSet
@@ -2390,12 +2482,13 @@ class NetworkCimReader(
             p = resultSet.getNullableDouble(table.P.queryIndex)
             q = resultSet.getNullableDouble(table.Q.queryIndex)
         }
-        return loadRegulatingCondEq(rotatingMachine, table, resultSet)
+        return readRegulatingCondEq(service, rotatingMachine, table, resultSet)
     }
 
     /**
      * Create a [SeriesCompensator] and populate its fields from [TableSeriesCompensators].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [SeriesCompensator] fields from.
      * @param resultSet The record in the database table containing the fields for this [SeriesCompensator].
      * @param setIdentifier A callback to register the mRID of this [SeriesCompensator] for logging purposes.
@@ -2404,7 +2497,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableSeriesCompensators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableSeriesCompensators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val seriesCompensator = SeriesCompensator(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             r = resultSet.getNullableDouble(table.R.queryIndex)
             r0 = resultSet.getNullableDouble(table.R0.queryIndex)
@@ -2414,11 +2507,12 @@ class NetworkCimReader(
             varistorVoltageThreshold = resultSet.getNullableInt(table.VARISTOR_VOLTAGE_THRESHOLD.queryIndex)
         }
 
-        return loadConductingEquipment(seriesCompensator, table, resultSet) && service.addOrThrow(seriesCompensator)
+        return readConductingEquipment(service, seriesCompensator, table, resultSet) && service.addOrThrow(seriesCompensator)
     }
 
     @Throws(SQLException::class)
-    private fun loadShuntCompensator(
+    private fun readShuntCompensator(
+        service: NetworkService,
         shuntCompensator: ShuntCompensator,
         table: TableShuntCompensators,
         resultSet: ResultSet
@@ -2435,12 +2529,13 @@ class NetworkCimReader(
             sections = resultSet.getNullableDouble(table.SECTIONS.queryIndex)
         }
 
-        return loadRegulatingCondEq(shuntCompensator, table, resultSet)
+        return readRegulatingCondEq(service, shuntCompensator, table, resultSet)
     }
 
     /**
      * Create a [StaticVarCompensator] and populate its fields from [TableStaticVarCompensators].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [StaticVarCompensator] fields from.
      * @param resultSet The record in the database table containing the fields for this [StaticVarCompensator].
      * @param setIdentifier A callback to register the mRID of this [StaticVarCompensator] for logging purposes.
@@ -2449,7 +2544,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableStaticVarCompensators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableStaticVarCompensators, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val staticVarCompensator = StaticVarCompensator(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             capacitiveRating = resultSet.getNullableDouble(table.CAPACITIVE_RATING.queryIndex)
             inductiveRating = resultSet.getNullableDouble(table.INDUCTIVE_RATING.queryIndex)
@@ -2458,11 +2553,11 @@ class NetworkCimReader(
             voltageSetPoint = resultSet.getNullableInt(table.VOLTAGE_SET_POINT.queryIndex)
         }
 
-        return loadRegulatingCondEq(staticVarCompensator, table, resultSet) && service.addOrThrow(staticVarCompensator)
+        return readRegulatingCondEq(service, staticVarCompensator, table, resultSet) && service.addOrThrow(staticVarCompensator)
     }
 
     @Throws(SQLException::class)
-    private fun loadSwitch(switch: Switch, table: TableSwitches, resultSet: ResultSet): Boolean {
+    private fun readSwitch(service: NetworkService, switch: Switch, table: TableSwitches, resultSet: ResultSet): Boolean {
         switch.apply {
             assetInfo = service.ensureGet(resultSet.getNullableString(table.SWITCH_INFO_MRID.queryIndex), typeNameAndMRID())
             ratedCurrent = resultSet.getNullableDouble(table.RATED_CURRENT.queryIndex)
@@ -2470,11 +2565,11 @@ class NetworkCimReader(
             open = resultSet.getInt(table.OPEN.queryIndex)
         }
 
-        return loadConductingEquipment(switch, table, resultSet)
+        return readConductingEquipment(service, switch, table, resultSet)
     }
 
     @Throws(SQLException::class)
-    private fun loadTapChanger(tapChanger: TapChanger, table: TableTapChangers, resultSet: ResultSet): Boolean {
+    private fun readTapChanger(service: NetworkService, tapChanger: TapChanger, table: TableTapChangers, resultSet: ResultSet): Boolean {
         tapChanger.apply {
             controlEnabled = resultSet.getBoolean(table.CONTROL_ENABLED.queryIndex)
             highStep = resultSet.getNullableInt(table.HIGH_STEP.queryIndex)
@@ -2486,12 +2581,13 @@ class NetworkCimReader(
             tapChangerControl = service.ensureGet(resultSet.getNullableString(table.TAP_CHANGER_CONTROL_MRID.queryIndex), typeNameAndMRID())
         }
 
-        return loadPowerSystemResource(tapChanger, table, resultSet)
+        return readPowerSystemResource(service, tapChanger, table, resultSet)
     }
 
     /**
      * Create a [SynchronousMachine] and populate its fields from [TableSynchronousMachines].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [SynchronousMachine] fields from.
      * @param resultSet The record in the database table containing the fields for this [SynchronousMachine].
      * @param setIdentifier A callback to register the mRID of this [SynchronousMachine] for logging purposes.
@@ -2500,8 +2596,8 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableSynchronousMachines, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
-        val synschronousMachine = SynchronousMachine(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+    fun read(service: NetworkService, table: TableSynchronousMachines, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val synchronousMachine = SynchronousMachine(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             baseQ = resultSet.getNullableDouble(table.BASE_Q.queryIndex)
             condenserP = resultSet.getNullableInt(table.CONDENSER_P.queryIndex)
             earthing = resultSet.getBoolean(table.EARTHING.queryIndex)
@@ -2525,12 +2621,13 @@ class NetworkCimReader(
             operatingMode = SynchronousMachineKind.valueOf(resultSet.getString(table.OPERATING_MODE.queryIndex))
         }
 
-        return loadRotatingMachine(synschronousMachine, table, resultSet) && service.addOrThrow(synschronousMachine)
+        return readRotatingMachine(service, synchronousMachine, table, resultSet) && service.addOrThrow(synchronousMachine)
     }
 
     /**
      * Create a [TapChangerControl] and populate its fields from [TableTapChangerControls].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [TapChangerControl] fields from.
      * @param resultSet The record in the database table containing the fields for this [TapChangerControl].
      * @param setIdentifier A callback to register the mRID of this [TapChangerControl] for logging purposes.
@@ -2539,7 +2636,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableTapChangerControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableTapChangerControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val tapChangerControl = TapChangerControl(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             limitVoltage = resultSet.getNullableInt(table.LIMIT_VOLTAGE.queryIndex)
             lineDropCompensation = resultSet.getNullableBoolean(table.LINE_DROP_COMPENSATION.queryIndex)
@@ -2552,11 +2649,11 @@ class NetworkCimReader(
             coGenerationEnabled = resultSet.getNullableBoolean(table.CO_GENERATION_ENABLED.queryIndex)
         }
 
-        return loadRegulatingControl(tapChangerControl, table, resultSet) && service.addOrThrow(tapChangerControl)
+        return readRegulatingControl(service, tapChangerControl, table, resultSet) && service.addOrThrow(tapChangerControl)
     }
 
     @Throws(SQLException::class)
-    private fun loadTransformerEnd(transformerEnd: TransformerEnd, table: TableTransformerEnds, resultSet: ResultSet): Boolean {
+    private fun readTransformerEnd(service: NetworkService, transformerEnd: TransformerEnd, table: TableTransformerEnds, resultSet: ResultSet): Boolean {
         transformerEnd.apply {
             terminal = service.ensureGet(resultSet.getNullableString(table.TERMINAL_MRID.queryIndex), typeNameAndMRID())
             baseVoltage = service.ensureGet(resultSet.getNullableString(table.BASE_VOLTAGE_MRID.queryIndex), typeNameAndMRID())
@@ -2566,12 +2663,13 @@ class NetworkCimReader(
             starImpedance = service.ensureGet(resultSet.getNullableString(table.STAR_IMPEDANCE_MRID.queryIndex), typeNameAndMRID())
         }
 
-        return loadIdentifiedObject(transformerEnd, table, resultSet)
+        return readIdentifiedObject(transformerEnd, table, resultSet)
     }
 
     /**
      * Create a [TransformerStarImpedance] and populate its fields from [TableTransformerStarImpedances].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [TransformerStarImpedance] fields from.
      * @param resultSet The record in the database table containing the fields for this [TransformerStarImpedance].
      * @param setIdentifier A callback to register the mRID of this [TransformerStarImpedance] for logging purposes.
@@ -2580,7 +2678,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableTransformerStarImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableTransformerStarImpedances, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val transformerStarImpedance = TransformerStarImpedance(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             r = resultSet.getNullableDouble(table.R.queryIndex)
             r0 = resultSet.getNullableDouble(table.R0.queryIndex)
@@ -2591,7 +2689,7 @@ class NetworkCimReader(
             transformerEndInfo?.transformerStarImpedance = this
         }
 
-        return loadIdentifiedObject(transformerStarImpedance, table, resultSet) && service.addOrThrow(transformerStarImpedance)
+        return readIdentifiedObject(transformerStarImpedance, table, resultSet) && service.addOrThrow(transformerStarImpedance)
     }
 
     // ###############################
@@ -2601,6 +2699,7 @@ class NetworkCimReader(
     /**
      * Create a [Circuit] and populate its fields from [TableCircuits].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Circuit] fields from.
      * @param resultSet The record in the database table containing the fields for this [Circuit].
      * @param setIdentifier A callback to register the mRID of this [Circuit] for logging purposes.
@@ -2609,18 +2708,19 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCircuits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableCircuits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val circuit = Circuit(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             loop = service.ensureGet(resultSet.getNullableString(table.LOOP_MRID.queryIndex), typeNameAndMRID())
             loop?.addCircuit(this)
         }
 
-        return loadLine(circuit, table, resultSet) && service.addOrThrow(circuit)
+        return readLine(service, circuit, table, resultSet) && service.addOrThrow(circuit)
     }
 
     /**
      * Create a [Loop] and populate its fields from [TableLoops].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [Loop] fields from.
      * @param resultSet The record in the database table containing the fields for this [Loop].
      * @param setIdentifier A callback to register the mRID of this [Loop] for logging purposes.
@@ -2629,15 +2729,16 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableLoops, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableLoops, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val loop = Loop(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadIdentifiedObject(loop, table, resultSet) && service.addOrThrow(loop)
+        return readIdentifiedObject(loop, table, resultSet) && service.addOrThrow(loop)
     }
 
     /**
      * Create a [LvFeeder] and populate its fields from [TableLvFeeders].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [LvFeeder] fields from.
      * @param resultSet The record in the database table containing the fields for this [LvFeeder].
      * @param setIdentifier A callback to register the mRID of this [LvFeeder] for logging purposes.
@@ -2646,7 +2747,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableLvFeeders, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableLvFeeders, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val lvFeeder = LvFeeder(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             normalHeadTerminal = service.ensureGet(
                 resultSet.getNullableString(table.NORMAL_HEAD_TERMINAL_MRID.queryIndex),
@@ -2654,7 +2755,7 @@ class NetworkCimReader(
             )
         }
 
-        return loadEquipmentContainer(lvFeeder, table, resultSet) && service.addOrThrow(lvFeeder)
+        return readEquipmentContainer(service, lvFeeder, table, resultSet) && service.addOrThrow(lvFeeder)
     }
 
     // ####################################################
@@ -2664,6 +2765,7 @@ class NetworkCimReader(
     /**
      * Create an [EvChargingUnit] and populate its fields from [TableEvChargingUnits].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the [EvChargingUnit] fields from.
      * @param resultSet The record in the database table containing the fields for this [EvChargingUnit].
      * @param setIdentifier A callback to register the mRID of this [EvChargingUnit] for logging purposes.
@@ -2672,10 +2774,10 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableEvChargingUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableEvChargingUnits, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val evChargingUnit = EvChargingUnit(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadPowerElectronicsUnit(evChargingUnit, table, resultSet) && service.addOrThrow(evChargingUnit)
+        return readPowerElectronicsUnit(service, evChargingUnit, table, resultSet) && service.addOrThrow(evChargingUnit)
     }
 
     // ################
@@ -2685,6 +2787,7 @@ class NetworkCimReader(
     /**
      * Create a [AssetOrganisationRole] to [Asset] association from [TableAssetOrganisationRolesAssets].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2693,7 +2796,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableAssetOrganisationRolesAssets, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableAssetOrganisationRolesAssets, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val assetOrganisationRoleMRID = resultSet.getString(table.ASSET_ORGANISATION_ROLE_MRID.queryIndex)
         setIdentifier("${assetOrganisationRoleMRID}-to-UNKNOWN")
 
@@ -2712,6 +2815,7 @@ class NetworkCimReader(
     /**
      * Create a [BatteryUnit] to [BatteryControl] association from [TableBatteryUnitsBatteryControls].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2720,7 +2824,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableBatteryUnitsBatteryControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableBatteryUnitsBatteryControls, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val batteryUnitMRID = resultSet.getString(table.BATTERY_UNIT_MRID.queryIndex)
         setIdentifier("${batteryUnitMRID}-to-UNKNOWN")
 
@@ -2739,6 +2843,7 @@ class NetworkCimReader(
     /**
      * Create a [Circuit] to [Substation] association from [TableCircuitsSubstations].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2747,7 +2852,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCircuitsSubstations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableCircuitsSubstations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val circuitMRID = resultSet.getString(table.CIRCUIT_MRID.queryIndex)
         setIdentifier("${circuitMRID}-to-UNKNOWN")
 
@@ -2767,6 +2872,7 @@ class NetworkCimReader(
     /**
      * Create a [Circuit] to [Terminal] association from [TableCircuitsTerminals].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2775,7 +2881,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCircuitsTerminals, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableCircuitsTerminals, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val circuitMRID = resultSet.getString(table.CIRCUIT_MRID.queryIndex)
         setIdentifier("${circuitMRID}-to-UNKNOWN")
 
@@ -2794,6 +2900,7 @@ class NetworkCimReader(
     /**
      * Create a [EndDevice] to [EndDeviceFunction] association from [TableEndDevicesEndDeviceFunctions].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2802,7 +2909,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableEndDevicesEndDeviceFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableEndDevicesEndDeviceFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val endDeviceMRID = resultSet.getString(table.END_DEVICE_MRID.queryIndex)
         setIdentifier("${endDeviceMRID}-to-UNKNOWN")
 
@@ -2821,6 +2928,7 @@ class NetworkCimReader(
     /**
      * Create a [Equipment] to [EquipmentContainer] association from [TableEquipmentEquipmentContainers].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2829,7 +2937,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableEquipmentEquipmentContainers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableEquipmentEquipmentContainers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val equipmentMRID = resultSet.getString(table.EQUIPMENT_MRID.queryIndex)
         setIdentifier("${equipmentMRID}-to-UNKNOWN")
 
@@ -2849,6 +2957,7 @@ class NetworkCimReader(
     /**
      * Create a [Equipment] to [OperationalRestriction] association from [TableEquipmentOperationalRestrictions].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2857,7 +2966,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableEquipmentOperationalRestrictions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableEquipmentOperationalRestrictions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val equipmentMRID = resultSet.getString(table.EQUIPMENT_MRID.queryIndex)
         setIdentifier("${equipmentMRID}-to-UNKNOWN")
 
@@ -2877,6 +2986,7 @@ class NetworkCimReader(
     /**
      * Create a [Equipment] to [UsagePoint] association from [TableEquipmentUsagePoints].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2885,7 +2995,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableEquipmentUsagePoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableEquipmentUsagePoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val equipmentMRID = resultSet.getString(table.EQUIPMENT_MRID.queryIndex)
         setIdentifier("${equipmentMRID}-to-UNKNOWN")
 
@@ -2905,6 +3015,7 @@ class NetworkCimReader(
     /**
      * Create a [Loop] to [Substation] association from [TableLoopsSubstations].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2913,7 +3024,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableLoopsSubstations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableLoopsSubstations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val assetOrganisationRoleMRID = resultSet.getString(table.LOOP_MRID.queryIndex)
         setIdentifier("${assetOrganisationRoleMRID}-to-UNKNOWN")
 
@@ -2942,6 +3053,7 @@ class NetworkCimReader(
     /**
      * Create a [ProtectionRelayFunction] to [ProtectedSwitch] association from [TableProtectionRelayFunctionsProtectedSwitches].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2950,7 +3062,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableProtectionRelayFunctionsProtectedSwitches, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableProtectionRelayFunctionsProtectedSwitches, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val protectionRelayFunctionMRID = resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex)
         setIdentifier("${protectionRelayFunctionMRID}-to-UNKNOWN")
 
@@ -2970,6 +3082,7 @@ class NetworkCimReader(
     /**
      * Create a [ProtectionRelayFunction] to [Sensor] association from [TableProtectionRelayFunctionsSensors].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -2978,7 +3091,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableProtectionRelayFunctionsSensors, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableProtectionRelayFunctionsSensors, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val protectionRelayFunctionMRID = resultSet.getString(table.PROTECTION_RELAY_FUNCTION_MRID.queryIndex)
         setIdentifier("${protectionRelayFunctionMRID}-to-UNKNOWN")
 
@@ -2998,6 +3111,7 @@ class NetworkCimReader(
     /**
      * Create a [ProtectionRelayScheme] to [ProtectionRelayFunction] association from [TableProtectionRelaySchemesProtectionRelayFunctions].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -3006,7 +3120,12 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableProtectionRelaySchemesProtectionRelayFunctions, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(
+        service: NetworkService,
+        table: TableProtectionRelaySchemesProtectionRelayFunctions,
+        resultSet: ResultSet,
+        setIdentifier: (String) -> String
+    ): Boolean {
         val protectionRelaySchemeMRID = resultSet.getString(table.PROTECTION_RELAY_SCHEME_MRID.queryIndex)
         setIdentifier("${protectionRelaySchemeMRID}-to-UNKNOWN")
 
@@ -3026,6 +3145,7 @@ class NetworkCimReader(
     /**
      * Create a [SynchronousMachine] to [ReactiveCapabilityCurve] association from [TableSynchronousMachinesReactiveCapabilityCurves].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -3034,7 +3154,12 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableSynchronousMachinesReactiveCapabilityCurves, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(
+        service: NetworkService,
+        table: TableSynchronousMachinesReactiveCapabilityCurves,
+        resultSet: ResultSet,
+        setIdentifier: (String) -> String
+    ): Boolean {
         val synchronousMachineMRID = resultSet.getString(table.SYNCHRONOUS_MACHINE_MRID.queryIndex)
         setIdentifier("${synchronousMachineMRID}-to-UNKNOWN")
 
@@ -3053,6 +3178,7 @@ class NetworkCimReader(
     /**
      * Create a [UsagePoint] to [EndDevice] association from [TableUsagePointsEndDevices].
      *
+     * @param service The [NetworkService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -3061,7 +3187,7 @@ class NetworkCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableUsagePointsEndDevices, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: NetworkService, table: TableUsagePointsEndDevices, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val usagePointMRID = resultSet.getString(table.USAGE_POINT_MRID.queryIndex)
         setIdentifier("${usagePointMRID}-to-UNKNOWN")
 

@@ -34,45 +34,45 @@ internal class MetricsWriterTest {
         networkMetrics[TotalNetworkContainer]
     }
     private val metricsEntryWriter = mockk<MetricsEntryWriter> {
-        every { save(any<IngestionMetadata>()) } returns true
-        every { saveSource(any<JobSource>()) } returns true
-        every { saveMetric(any<NetworkMetric>()) } returns true
+        every { write(any(), any<IngestionMetadata>()) } returns true
+        every { writeSource(any(), any<JobSource>()) } returns true
+        every { writeMetric(any(), any<NetworkMetric>()) } returns true
     }
-    private val metricsWriter = MetricsWriter(job, mockk(), metricsEntryWriter)
+    private val metricsWriter = MetricsWriter(mockk(), metricsEntryWriter)
 
     @Test
     internal fun `passes objects through to the metrics entry writer`() {
-        metricsWriter.save()
+        metricsWriter.write(job)
 
         verify(exactly = 1) {
-            metricsEntryWriter.save(metadata)
-            metricsEntryWriter.saveSource(job.sources.entries.first())
-            metricsEntryWriter.saveMetric(job.networkMetrics.entries.first())
+            metricsEntryWriter.write(job.id, metadata)
+            metricsEntryWriter.writeSource(job.id, job.sources.entries.first())
+            metricsEntryWriter.writeMetric(job.id, job.networkMetrics.entries.first())
         }
     }
 
     @Test
     internal fun `source failure message`() {
-        every { metricsEntryWriter.saveSource(any<JobSource>()) } throws SQLiteException("message", SQLiteErrorCode.SQLITE_ERROR)
-        metricsWriter.save()
+        every { metricsEntryWriter.writeSource(any(), any<JobSource>()) } throws SQLiteException("message", SQLiteErrorCode.SQLITE_ERROR)
+        metricsWriter.write(job)
 
-        assertThat(systemErr.log, containsString("Failed to save job source"))
+        assertThat(systemErr.log, containsString("Failed to write job source"))
         assertThat(systemErr.log, containsString("message"))
     }
 
     @Test
     internal fun `metric failure message`() {
-        every { metricsEntryWriter.saveMetric(any<NetworkMetric>()) } throws SQLiteException("message", SQLiteErrorCode.SQLITE_ERROR)
-        metricsWriter.save()
+        every { metricsEntryWriter.writeMetric(any(), any<NetworkMetric>()) } throws SQLiteException("message", SQLiteErrorCode.SQLITE_ERROR)
+        metricsWriter.write(job)
 
-        assertThat(systemErr.log, containsString("Failed to save metric"))
+        assertThat(systemErr.log, containsString("Failed to write metric"))
         assertThat(systemErr.log, containsString("message"))
     }
 
     @Test
-    internal fun `save returns false if missing job metadata`() {
-        every { metricsEntryWriter.save(any<IngestionMetadata>()) } returns false
-        assertThat("Ingestion job without metadata should not save", !metricsWriter.save())
+    internal fun `write returns false if missing job metadata`() {
+        every { metricsEntryWriter.write(any(), any<IngestionMetadata>()) } returns false
+        assertThat("Ingestion job without metadata should not write", !metricsWriter.write(job))
     }
 
 }

@@ -35,12 +35,9 @@ import java.sql.SQLException
 /**
  * A base class for reading CIM objects from a database.
  *
- * @param service The [BaseService] used to store any items read from the database.
  * @property logger The [Logger] to use for this reader.
  */
-abstract class CimReader(
-    protected open val service: BaseService
-) {
+internal abstract class CimReader<TService : BaseService> {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -59,7 +56,7 @@ abstract class CimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    protected fun loadDocument(document: Document, table: TableDocuments, resultSet: ResultSet): Boolean {
+    protected fun readDocument(document: Document, table: TableDocuments, resultSet: ResultSet): Boolean {
         document.apply {
             title = resultSet.getString(table.TITLE.queryIndex).emptyIfNull().internEmpty()
             createdDateTime = resultSet.getInstant(table.CREATED_DATE_TIME.queryIndex)
@@ -69,12 +66,13 @@ abstract class CimReader(
             comment = resultSet.getString(table.COMMENT.queryIndex).emptyIfNull().internEmpty()
         }
 
-        return loadIdentifiedObject(document, table, resultSet)
+        return readIdentifiedObject(document, table, resultSet)
     }
 
     /**
      * Create an [Organisation] and populate its fields from [TableOrganisations].
      *
+     * @param service The [TService] used to store any items read from the database.
      * @param table The database table to read the [Organisation] fields from.
      * @param resultSet The record in the database table containing the fields for this [Organisation].
      * @param setIdentifier A callback to register the mRID of this [Organisation] for logging purposes.
@@ -83,15 +81,16 @@ abstract class CimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableOrganisations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: TService, table: TableOrganisations, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val organisation = Organisation(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadIdentifiedObject(organisation, table, resultSet) && service.addOrThrow(organisation)
+        return readIdentifiedObject(organisation, table, resultSet) && service.addOrThrow(organisation)
     }
 
     /**
      * Create a [NameType] and populate its fields from [TableNameTypes].
      *
+     * @param service The [TService] used to store any items read from the database.
      * @param table The database table to read the [NameType] fields from.
      * @param resultSet The record in the database table containing the fields for this [NameType].
      * @param setLastNameType A callback to register the name of this [NameType] for logging purposes.
@@ -100,7 +99,7 @@ abstract class CimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableNameTypes, resultSet: ResultSet, setLastNameType: (String) -> String): Boolean {
+    fun read(service: TService, table: TableNameTypes, resultSet: ResultSet, setLastNameType: (String) -> String): Boolean {
         val nameType = NameType(setLastNameType(resultSet.getString(table.NAME.queryIndex))).apply {
             description = resultSet.getString(table.DESCRIPTION.queryIndex)
         }
@@ -111,6 +110,7 @@ abstract class CimReader(
     /**
      * Create a [Name] and populate its fields from [TableNames].
      *
+     * @param service The [TService] used to store any items read from the database.
      * @param table The database table to read the [Name] fields from.
      * @param resultSet The record in the database table containing the fields for this [Name].
      * @param setLastName A callback to register the name of this [Name] for logging purposes.
@@ -119,7 +119,7 @@ abstract class CimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableNames, resultSet: ResultSet, setLastName: (String) -> String): Boolean {
+    fun read(service: TService, table: TableNames, resultSet: ResultSet, setLastName: (String) -> String): Boolean {
         val nameTypeName = resultSet.getString(table.NAME_TYPE_NAME.queryIndex)
         val nameName = resultSet.getString(table.NAME.queryIndex)
         setLastName("$nameTypeName:$nameName")
@@ -134,6 +134,7 @@ abstract class CimReader(
     /**
      * Populate the [OrganisationRole] fields from [TableOrganisationRoles].
      *
+     * @param service The [TService] used to store any items read from the database.
      * @param organisationRole The [OrganisationRole] instance to populate.
      * @param table The database table to read the [OrganisationRole] fields from.
      * @param resultSet The record in the database table containing the fields for this [OrganisationRole].
@@ -142,7 +143,7 @@ abstract class CimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    protected fun loadOrganisationRole(organisationRole: OrganisationRole, table: TableOrganisationRoles, resultSet: ResultSet): Boolean {
+    protected fun readOrganisationRole(service: TService, organisationRole: OrganisationRole, table: TableOrganisationRoles, resultSet: ResultSet): Boolean {
         organisationRole.apply {
             organisation = service.ensureGet(
                 resultSet.getNullableString(table.ORGANISATION_MRID.queryIndex),
@@ -150,7 +151,7 @@ abstract class CimReader(
             )
         }
 
-        return loadIdentifiedObject(organisationRole, table, resultSet)
+        return readIdentifiedObject(organisationRole, table, resultSet)
     }
 
     // ######################
@@ -168,7 +169,7 @@ abstract class CimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    protected fun loadIdentifiedObject(identifiedObject: IdentifiedObject, table: TableIdentifiedObjects, resultSet: ResultSet): Boolean {
+    protected fun readIdentifiedObject(identifiedObject: IdentifiedObject, table: TableIdentifiedObjects, resultSet: ResultSet): Boolean {
         identifiedObject.apply {
             name = resultSet.getString(table.NAME.queryIndex).emptyIfNull().internEmpty()
             description = resultSet.getString(table.DESCRIPTION.queryIndex).emptyIfNull().internEmpty()
@@ -179,13 +180,14 @@ abstract class CimReader(
     }
 
     /**
-     * Try and add the [identifiedObject] to the [service], and throw an [Exception] if unsuccessful.
+     * Try and add the [identifiedObject] to the [BaseService], and throw an [Exception] if unsuccessful.
      *
-     * @param identifiedObject The [IdentifiedObject] to add to the [service].
+     * @receiver The [BaseService] to search.
+     * @param identifiedObject The [IdentifiedObject] to add to the [BaseService].
      *
      * @return true in all instances, otherwise it throws.
      * @throws DuplicateMRIDException If the [IdentifiedObject.mRID] has already been used.
-     * @throws UnsupportedIdentifiedObjectException If the [IdentifiedObject] is not supported by the [service]. This is an indication of an internal coding
+     * @throws UnsupportedIdentifiedObjectException If the [IdentifiedObject] is not supported by the [BaseService]. This is an indication of an internal coding
      *   issue, rather than a problem with the data being read, and in a correctly configured system will never occur.
      */
     @Throws(DuplicateMRIDException::class, UnsupportedIdentifiedObjectException::class)
@@ -195,7 +197,7 @@ abstract class CimReader(
         } else {
             val duplicate = get<IdentifiedObject>(identifiedObject.mRID)
             throw DuplicateMRIDException(
-                "Failed to load ${identifiedObject.typeNameAndMRID()}. Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})"
+                "Failed to read ${identifiedObject.typeNameAndMRID()}. Unable to add to service '$name': duplicate MRID (${duplicate?.typeNameAndMRID()})"
             )
         }
     }
@@ -204,7 +206,7 @@ abstract class CimReader(
         return if (addNameType(nameType))
             true
         else
-            throw DuplicateNameTypeException("Failed to load NameType ${nameType.name}. Unable to add to service '$name': duplicate NameType")
+            throw DuplicateNameTypeException("Failed to read NameType ${nameType.name}. Unable to add to service '$name': duplicate NameType")
     }
 
 }

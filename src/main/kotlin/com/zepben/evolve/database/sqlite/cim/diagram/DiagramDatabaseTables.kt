@@ -17,7 +17,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.diagramlayout.
 /**
  * The collection of tables for our diagram databases.
  */
-class DiagramDatabaseTables : CimDatabaseTables() {
+class DiagramDatabaseTables internal constructor() : CimDatabaseTables() {
 
     override val includedTables: Sequence<SqliteTable> =
         super.includedTables + sequenceOf(

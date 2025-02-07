@@ -11,11 +11,10 @@ package com.zepben.evolve.database.sqlite.cim.network
 import com.zepben.evolve.cim.iec61970.base.core.Equipment
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
+import com.zepben.evolve.database.sqlite.cim.BaseServiceReader
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseReader
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionReader
-import com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion
 import com.zepben.evolve.database.sqlite.cim.upgrade.UpgradeRunner
-import com.zepben.evolve.database.sqlite.common.TableVersion
 import com.zepben.evolve.services.common.extensions.nameAndMRID
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
@@ -33,46 +32,55 @@ import java.util.*
 /**
  * A class for reading the [NetworkService] objects and [MetadataCollection] from our network database.
  *
- * NOTE: The network database must be loaded first if you are using a pre-split database you wish to upgrade as it was the only database at the time
+ * NOTE: The network database must be read first if you are using a pre-split database you wish to upgrade as it was the only database at the time
  *   and will create the other databases as part of the upgrade. This warning can be removed once we set a new minimum version of the database and
  *   remove the split database logic - Check [UpgradeRunner] to see if this is still required.
  *
  * @param connection The connection to the database.
- * @param service The [NetworkService] to populate with CIM objects from the database.
  * @param databaseDescription The description of the database for logging (e.g. filename).
+ * @param inferPhases Indicates if phases should be inferred on partially energised network.
  */
 class NetworkDatabaseReader internal constructor(
     connection: Connection,
-    override val service: NetworkService,
     databaseDescription: String,
+    databaseTables: NetworkDatabaseTables,
+    createMetadataReader: (NetworkDatabaseTables, Connection) -> MetadataCollectionReader,
+    createServiceReader: (NetworkDatabaseTables, Connection) -> BaseServiceReader<NetworkService>,
     private val inferPhases: Boolean,
-    metadataReader: MetadataCollectionReader,
-    serviceReader: NetworkServiceReader,
-    tableVersion: TableVersion = tableCimVersion,
-    private val setFeederDirection: SetDirection = Tracing.setDirection(),
-    private val setPhases: SetPhases = Tracing.setPhases(),
-    private val phaseInferrer: PhaseInferrer = Tracing.phaseInferrer(),
-    private val assignToFeeders: AssignToFeeders = Tracing.assignEquipmentToFeeders(),
-    private val assignToLvFeeders: AssignToLvFeeders = Tracing.assignEquipmentToLvFeeders(),
-) : CimDatabaseReader(connection, metadataReader, serviceReader, service, databaseDescription, tableVersion) {
+    private val setFeederDirection: SetDirection,
+    private val setPhases: SetPhases,
+    private val phaseInferrer: PhaseInferrer,
+    private val assignToFeeders: AssignToFeeders,
+    private val assignToLvFeeders: AssignToLvFeeders,
+) : CimDatabaseReader<NetworkDatabaseTables, NetworkService>(
+    connection,
+    databaseDescription,
+    databaseTables,
+    createMetadataReader,
+    createServiceReader
+) {
 
     @JvmOverloads
     constructor(
         connection: Connection,
-        service: NetworkService,
         databaseDescription: String,
-        inferPhases: Boolean = true
+        inferPhases: Boolean = true,
     ) : this(
         connection,
-        service,
         databaseDescription,
-        inferPhases,
-        MetadataCollectionReader(service, NetworkDatabaseTables(), connection),
-        NetworkServiceReader(service, NetworkDatabaseTables(), connection),
+        NetworkDatabaseTables(),
+        ::MetadataCollectionReader,
+        ::NetworkServiceReader,
+        inferPhases = inferPhases,
+        Tracing.setDirection(),
+        Tracing.setPhases(),
+        Tracing.phaseInferrer(),
+        Tracing.assignEquipmentToFeeders(),
+        Tracing.assignEquipmentToLvFeeders(),
     )
 
-    override fun postLoad(): Boolean =
-        super.postLoad().also {
+    override fun afterServiceRead(service: NetworkService): Boolean =
+        super.afterServiceRead(service).also {
             logger.info("Applying feeder direction to network...")
             setFeederDirection.run(service, NetworkStateOperators.NORMAL)
             setFeederDirection.run(service, NetworkStateOperators.CURRENT)

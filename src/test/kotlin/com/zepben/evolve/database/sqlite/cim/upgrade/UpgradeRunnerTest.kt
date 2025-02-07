@@ -11,7 +11,7 @@ package com.zepben.evolve.database.sqlite.cim.upgrade
 import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sql.Column
 import com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion
-import com.zepben.evolve.database.sqlite.common.TableVersion
+import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import com.zepben.testutils.junit.SystemLogExtension
@@ -86,7 +86,7 @@ internal class UpgradeRunnerTest {
     private val postSplitChangeSets = listOf(firstPostSplitChangeSet, postSplitChangeSet, maxChangeSet)
 
     private val versionColumn = mockk<Column> { every { queryIndex } returns 1 }
-    private val tableVersion = mockk<TableVersion> {
+    private val tableVersion = mockk<SqliteTableVersion> {
         every { this@mockk.supportedVersion } returns maxSupportedVersion
         every { VERSION } returns versionColumn
         every { selectSql } returns "select version"
@@ -101,21 +101,21 @@ internal class UpgradeRunnerTest {
     @Disabled
     @Test
     internal fun `upgrade real customer file`() {
-        // Put the name of the database you want to load in src/test/resources/test-customer-database.txt
+        // Put the name of the database you want to read in src/test/resources/test-customer-database.txt
         upgradeRealFile("test-customer-database.txt", DatabaseType.CUSTOMER)
     }
 
     @Disabled
     @Test
     internal fun `upgrade real diagram file`() {
-        // Put the name of the database you want to load in src/test/resources/test-diagram-database.txt
+        // Put the name of the database you want to read in src/test/resources/test-diagram-database.txt
         upgradeRealFile("test-diagram-database.txt", DatabaseType.DIAGRAM)
     }
 
     @Disabled
     @Test
     internal fun `upgrade real network file`() {
-        // Put the name of the database you want to load in src/test/resources/test-network-database.txt
+        // Put the name of the database you want to read in src/test/resources/test-network-database.txt
         upgradeRealFile("test-network-database.txt", DatabaseType.NETWORK_MODEL)
     }
 

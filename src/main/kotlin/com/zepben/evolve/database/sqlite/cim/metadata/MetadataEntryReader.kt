@@ -10,7 +10,6 @@ package com.zepben.evolve.database.sqlite.cim.metadata
 
 import com.zepben.evolve.database.sqlite.cim.tables.TableMetadataDataSources
 import com.zepben.evolve.database.sqlite.extensions.getInstant
-import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.meta.DataSource
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import java.sql.ResultSet
@@ -18,31 +17,28 @@ import java.time.Instant
 
 /**
  * A class for reading the [MetadataCollection] entries from the database.
- *
- * @param service The [BaseService] containing the [MetadataCollection] to populate from the database.
  */
-class MetadataEntryReader(
-    private val service: BaseService
-) {
+internal class MetadataEntryReader {
 
     /**
      * Populate the [DataSource] fields from [TableMetadataDataSources].
      *
+     * @param metadata The [MetadataCollection] to populate from the database.
      * @param table The database table to read the [DataSource] fields from.
      * @param resultSet The record in the database table containing the fields for this [DataSource].
      * @param setIdentifier A callback to set the identifier of the current row for logging purposes, which returns a copy of the provided string for
      *   fluent use.
      *
-     * @return true if the [DataSource] is successfully loaded from the database, otherwise false.
+     * @return true if the [DataSource] is successfully read from the database, otherwise false.
      */
-    fun load(table: TableMetadataDataSources, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(metadata: MetadataCollection, table: TableMetadataDataSources, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val dataSource = DataSource(
             setIdentifier(resultSet.getString(table.SOURCE.queryIndex)),
             resultSet.getString(table.VERSION.queryIndex),
             resultSet.getInstant(table.TIMESTAMP.queryIndex) ?: Instant.EPOCH
         )
 
-        return service.metadata.add(dataSource)
+        return metadata.add(dataSource)
     }
 
 }

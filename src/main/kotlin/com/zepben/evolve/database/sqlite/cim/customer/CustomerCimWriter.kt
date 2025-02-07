@@ -32,7 +32,7 @@ import java.sql.SQLException
  *
  * @property databaseTables The tables available in the database.
  */
-class CustomerCimWriter(
+internal class CustomerCimWriter(
     override val databaseTables: CustomerDatabaseTables
 ) : CimWriter(databaseTables) {
 
@@ -42,8 +42,8 @@ class CustomerCimWriter(
 
     @Suppress("SameParameterValue")
     @Throws(SQLException::class)
-    private fun saveAgreement(table: TableAgreements, insert: PreparedStatement, agreement: Agreement, description: String): Boolean {
-        return saveDocument(table, insert, agreement, description)
+    private fun writeAgreement(table: TableAgreements, insert: PreparedStatement, agreement: Agreement, description: String): Boolean {
+        return writeDocument(table, insert, agreement, description)
     }
 
     // ######################
@@ -51,7 +51,7 @@ class CustomerCimWriter(
     // ######################
 
     /**
-     * Save the [Customer] fields to [TableCustomers].
+     * Write the [Customer] fields to [TableCustomers].
      *
      * @param customer The [Customer] instance to write to the database.
      *
@@ -59,7 +59,7 @@ class CustomerCimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(customer: Customer): Boolean {
+    fun write(customer: Customer): Boolean {
         val table = databaseTables.getTable<TableCustomers>()
         val insert = databaseTables.getInsert<TableCustomers>()
 
@@ -67,11 +67,11 @@ class CustomerCimWriter(
         insert.setNullableInt(table.NUM_END_DEVICES.queryIndex, customer.numEndDevices)
         insert.setNullableString(table.SPECIAL_NEED.queryIndex, customer.specialNeed)
 
-        return saveOrganisationRole(table, insert, customer, "customer")
+        return writeOrganisationRole(table, insert, customer, "customer")
     }
 
     /**
-     * Save the [CustomerAgreement] fields to [TableCustomerAgreements].
+     * Write the [CustomerAgreement] fields to [TableCustomerAgreements].
      *
      * @param customerAgreement The [CustomerAgreement] instance to write to the database.
      *
@@ -79,20 +79,20 @@ class CustomerCimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(customerAgreement: CustomerAgreement): Boolean {
+    fun write(customerAgreement: CustomerAgreement): Boolean {
         val table = databaseTables.getTable<TableCustomerAgreements>()
         val insert = databaseTables.getInsert<TableCustomerAgreements>()
 
         var status = true
-        customerAgreement.pricingStructures.forEach { status = status and saveAssociation(customerAgreement, it) }
+        customerAgreement.pricingStructures.forEach { status = status and writeAssociation(customerAgreement, it) }
 
         insert.setNullableString(table.CUSTOMER_MRID.queryIndex, customerAgreement.customer?.mRID)
 
-        return status and saveAgreement(table, insert, customerAgreement, "customer agreement")
+        return status and writeAgreement(table, insert, customerAgreement, "customer agreement")
     }
 
     /**
-     * Save the [PricingStructure] fields to [TablePricingStructures].
+     * Write the [PricingStructure] fields to [TablePricingStructures].
      *
      * @param pricingStructure The [PricingStructure] instance to write to the database.
      *
@@ -100,18 +100,18 @@ class CustomerCimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(pricingStructure: PricingStructure): Boolean {
+    fun write(pricingStructure: PricingStructure): Boolean {
         val table = databaseTables.getTable<TablePricingStructures>()
         val insert = databaseTables.getInsert<TablePricingStructures>()
 
         var status = true
-        pricingStructure.tariffs.forEach { status = status and saveAssociation(pricingStructure, it) }
+        pricingStructure.tariffs.forEach { status = status and writeAssociation(pricingStructure, it) }
 
-        return status and saveDocument(table, insert, pricingStructure, "pricing structure")
+        return status and writeDocument(table, insert, pricingStructure, "pricing structure")
     }
 
     /**
-     * Save the [Tariff] fields to [TableTariffs].
+     * Write the [Tariff] fields to [TableTariffs].
      *
      * @param tariff The [Tariff] instance to write to the database.
      *
@@ -119,11 +119,11 @@ class CustomerCimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(tariff: Tariff): Boolean {
+    fun write(tariff: Tariff): Boolean {
         val table = databaseTables.getTable<TableTariffs>()
         val insert = databaseTables.getInsert<TableTariffs>()
 
-        return saveDocument(table, insert, tariff, "tariff")
+        return writeDocument(table, insert, tariff, "tariff")
     }
 
     // ################
@@ -131,7 +131,7 @@ class CustomerCimWriter(
     // ################
 
     @Throws(SQLException::class)
-    private fun saveAssociation(customerAgreement: CustomerAgreement, pricingStructure: PricingStructure): Boolean {
+    private fun writeAssociation(customerAgreement: CustomerAgreement, pricingStructure: PricingStructure): Boolean {
         val table = databaseTables.getTable<TableCustomerAgreementsPricingStructures>()
         val insert = databaseTables.getInsert<TableCustomerAgreementsPricingStructures>()
 
@@ -142,7 +142,7 @@ class CustomerCimWriter(
     }
 
     @Throws(SQLException::class)
-    private fun saveAssociation(pricingStructure: PricingStructure, tariff: Tariff): Boolean {
+    private fun writeAssociation(pricingStructure: PricingStructure, tariff: Tariff): Boolean {
         val table = databaseTables.getTable<TablePricingStructuresTariffs>()
         val insert = databaseTables.getInsert<TablePricingStructuresTariffs>()
 

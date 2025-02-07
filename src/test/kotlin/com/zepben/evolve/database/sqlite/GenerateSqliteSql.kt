@@ -8,10 +8,10 @@
 
 package com.zepben.evolve.database.sqlite
 
+import com.zepben.evolve.database.sql.SqlTable
 import com.zepben.evolve.database.sqlite.cim.customer.CustomerDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.diagram.DiagramDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.network.NetworkDatabaseTables
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -56,7 +56,7 @@ class GenerateSqliteSql {
         }
     }
 
-    private fun printStatements(action: (SqliteTable) -> Unit) {
+    private fun printStatements(action: (SqlTable) -> Unit) {
         println("******** Customer Database ********")
         println("")
         CustomerDatabaseTables().forEachTable(action)

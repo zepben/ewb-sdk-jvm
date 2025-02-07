@@ -189,6 +189,8 @@ internal class ChangeSetTest {
         expectedTables?.tables?.forEach {
             conn.prepareStatement(it.value.preparedInsertSql)
         }
+
+        conn.close()
     }
 
 }

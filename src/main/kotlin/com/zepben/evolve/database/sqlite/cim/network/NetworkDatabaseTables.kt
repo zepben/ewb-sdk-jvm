@@ -52,7 +52,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.infiec61970.wires.g
 /**
  * The collection of tables for our network databases.
  */
-class NetworkDatabaseTables : CimDatabaseTables() {
+class NetworkDatabaseTables internal constructor() : CimDatabaseTables() {
 
     override val includedTables: Sequence<SqliteTable> =
         super.includedTables + sequenceOf(

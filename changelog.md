@@ -21,6 +21,13 @@
 * The following change have been made to `Column`:
   * Its package has changed from `com.zepben.evolve.database.sqlite.cim.tables` to `com.zepben.evolve.database.sql`.
   * Its constructor is now internal.
+* All references to the following have been renamed in `com.zepben.evolve.database`. This includes full or partial copies in the names of functions,
+  parameters and descriptions/documentation:
+  * `save` has been renamed to `write`, so the writers now write, rather than save.
+  * `load` has been renamed to `read`, so the readers now read, rather than load.
+* Database readers and writers no longer have the container of the data they will read/write passed to the constructor. They now have this passed to the `read`
+  or `write` method.
+* Removed `Class.getFieldExt` extension function.
 
 ### New Features
 * Added `ClearDirection` that clears feeder directions.

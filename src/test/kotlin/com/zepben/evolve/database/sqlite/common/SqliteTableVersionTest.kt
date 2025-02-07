@@ -21,7 +21,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 
-class TableVersionTest {
+class SqliteTableVersionTest {
 
     private val resultSet = mockk<ResultSet> {
         every { isClosed } returns false
@@ -36,7 +36,7 @@ class TableVersionTest {
         justRun { it.close() }
         every { it.executeQuery() } returns resultSet
     }
-    private val table = TableVersion(123)
+    private val table = SqliteTableVersion(123)
     private val connection = mockk<Connection> {
         every { prepareStatement(table.selectSql) } returns preparedStatement
     }

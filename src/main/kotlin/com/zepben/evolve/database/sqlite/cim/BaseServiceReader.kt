@@ -20,24 +20,24 @@ import java.sql.Connection
  * @param databaseTables The tables available in the database.
  * @param connection A connection to the database.
  *
- * @property reader The [CimReader] used to load the objects from the database.
+ * @property reader The [CimReader] used to read the objects from the database.
  */
-abstract class BaseServiceReader(
+internal abstract class BaseServiceReader<TService : BaseService>(
     databaseTables: CimDatabaseTables,
     connection: Connection,
-    protected open val reader: CimReader,
-) : BaseCollectionReader(databaseTables, connection) {
+    protected open val reader: CimReader<TService>,
+) : BaseCollectionReader<TService>(databaseTables, connection) {
 
-    final override fun load(): Boolean =
-        doLoad()
-            .andLoadEach<TableNameTypes>(reader::load)
-            .andLoadEach<TableNames>(reader::load)
+    final override fun read(data: TService): Boolean =
+        readService(data) and
+            readEach<TableNameTypes>(data, reader::read) and
+            readEach<TableNames>(data, reader::read)
 
     /**
-     * Load the service specific objects from the database.
+     * Read the service specific objects from the database.
      *
-     * @return true if the objects were successfully loaded from the database, otherwise false
+     * @return true if the objects were successfully read from the database, otherwise false
      */
-    abstract fun doLoad(): Boolean
+    abstract fun readService(service: TService): Boolean
 
 }

@@ -20,7 +20,7 @@ import java.util.*
  */
 data class IngestionJob @JvmOverloads constructor(
     val id: UUID,
-    var metadata: IngestionMetadata? = null,
+    var metadata: IngestionMetadata,
     val sources: JobSources = JobSources(),
     val networkMetrics: NetworkMetrics = NetworkMetrics()
 )

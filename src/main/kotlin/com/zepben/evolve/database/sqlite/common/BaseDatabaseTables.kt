@@ -8,12 +8,9 @@
 
 package com.zepben.evolve.database.sqlite.common
 
+import com.zepben.evolve.database.sql.SqlTable
 import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
-import com.zepben.evolve.database.sqlite.cim.tables.associations.*
-import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assetinfo.*
-import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.*
-import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires.*
 import java.sql.Connection
 import java.sql.PreparedStatement
 import kotlin.reflect.KClass
@@ -26,13 +23,13 @@ import kotlin.reflect.KClass
  * @property includedTables A sequence of [SqliteTable] indicating which tables are included in this database, which will be consumed to build the [tables]
  *   collection. NOTE: You should always append your tables to super.includedTables when overriding.
  */
-open class BaseDatabaseTables : AutoCloseable {
+open class BaseDatabaseTables internal constructor() : AutoCloseable {
 
-    val tables: Map<KClass<out SqliteTable>, SqliteTable> by lazy { includedTables.associateBy { it::class } }
-    var insertStatements: Map<KClass<out SqliteTable>, PreparedStatement> = mapOf()
+    val tables: Map<KClass<out SqlTable>, SqlTable> by lazy { includedTables.associateBy { it::class } }
+    var insertStatements: Map<KClass<out SqlTable>, PreparedStatement> = mapOf()
         private set
 
-    protected open val includedTables: Sequence<SqliteTable> = sequenceOf()
+    protected open val includedTables: Sequence<SqlTable> = sequenceOf()
 
     /**
      * Helper function for getting the table of the specified type.
@@ -42,7 +39,7 @@ open class BaseDatabaseTables : AutoCloseable {
      * @throws MissingTableConfigException If the requested table doesn't belong to this database.
      */
     @Throws(MissingTableConfigException::class)
-    inline fun <reified T : SqliteTable> getTable(): T {
+    inline fun <reified T : SqlTable> getTable(): T {
         val table = tables[T::class]
             ?: throw MissingTableConfigException("INTERNAL ERROR: No table has been registered for ${T::class.simpleName}. You might want to consider fixing that.")
 
@@ -57,7 +54,7 @@ open class BaseDatabaseTables : AutoCloseable {
      * @throws MissingTableConfigException If the requested table doesn't belong to this database.
      */
     @Throws(MissingTableConfigException::class)
-    inline fun <reified T : SqliteTable> getInsert(): PreparedStatement {
+    inline fun <reified T : SqlTable> getInsert(): PreparedStatement {
         return insertStatements[T::class]
             ?: throw MissingTableConfigException("INTERNAL ERROR: No prepared statement has been registered for ${T::class.simpleName}. You might want to consider fixing that.")
     }
@@ -67,7 +64,7 @@ open class BaseDatabaseTables : AutoCloseable {
      *
      * @param action A callback invoked on each table.
      */
-    fun forEachTable(action: (SqliteTable) -> Unit) {
+    fun forEachTable(action: (SqlTable) -> Unit) {
         tables.values.forEach(action)
     }
 

@@ -22,26 +22,22 @@ import java.sql.Connection
 /**
  * A class for reading a [CustomerService] from the database.
  *
- * @param service The [CustomerService] to populate from the database.
  * @param databaseTables The tables available in the database.
  * @param connection A connection to the database.
- *
- * @property reader The [CustomerCimReader] used to load the objects from the database.
  */
-class CustomerServiceReader @JvmOverloads constructor(
-    service: CustomerService,
+internal class CustomerServiceReader(
     databaseTables: CustomerDatabaseTables,
     connection: Connection,
-    override val reader: CustomerCimReader = CustomerCimReader(service)
-) : BaseServiceReader(databaseTables, connection, reader) {
+    override val reader: CustomerCimReader = CustomerCimReader()
+) : BaseServiceReader<CustomerService>(databaseTables, connection, reader) {
 
-    override fun doLoad(): Boolean =
-        loadEach<TableOrganisations>(reader::load)
-            .andLoadEach<TableCustomers>(reader::load)
-            .andLoadEach<TableCustomerAgreements>(reader::load)
-            .andLoadEach<TablePricingStructures>(reader::load)
-            .andLoadEach<TableTariffs>(reader::load)
-            .andLoadEach<TableCustomerAgreementsPricingStructures>(reader::load)
-            .andLoadEach<TablePricingStructuresTariffs>(reader::load)
+    override fun readService(service: CustomerService): Boolean =
+        readEach<TableOrganisations>(service, reader::read) and
+            readEach<TableCustomers>(service, reader::read) and
+            readEach<TableCustomerAgreements>(service, reader::read) and
+            readEach<TablePricingStructures>(service, reader::read) and
+            readEach<TableTariffs>(service, reader::read) and
+            readEach<TableCustomerAgreementsPricingStructures>(service, reader::read) and
+            readEach<TablePricingStructuresTariffs>(service, reader::read)
 
 }

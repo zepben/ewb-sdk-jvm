@@ -8,141 +8,125 @@
 
 package com.zepben.evolve.database.sqlite.common
 
+import com.zepben.evolve.database.sql.TableVersion
 import com.zepben.evolve.database.sqlite.cim.BaseServiceWriter
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionWriter
 import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
-import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.sql.Connection
 import java.sql.SQLException
 
 /**
  * A base class for writing objects to one of our databases.
  *
- * @param databaseFile The filename of the database to write.
  * @param databaseTables The tables to create in the database.
  * @param getConnection Provider of the connection to the specified database.
  *
  * @property logger The logger to use for this database writer.
  */
-abstract class BaseDatabaseWriter(
-    private val databaseFile: String,
-    private val databaseTables: BaseDatabaseTables,
-    private val getConnection: (String) -> Connection,
-    private val persistFile: Boolean = false
+abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables, T> internal constructor(
+    protected val databaseTables: TTables,
+    private val getConnection: () -> Connection
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    private val databaseDescriptor: String = "jdbc:sqlite:$databaseFile"
-    private lateinit var saveConnection: Connection
-    private var hasBeenUsed: Boolean = false
-    private var writingToExistingFile = false
-
     /**
-     * Save the database using the [MetadataCollectionWriter] and [BaseServiceWriter].
+     * Write the database using the [MetadataCollectionWriter] and [BaseServiceWriter].
      *
-     * @return true if the database was successfully saved, otherwise false.
+     * @param data The data to write to the database.
+     *
+     * @return true if the database was successfully writen, otherwise false.
      */
-    fun save(): Boolean {
-        if (hasBeenUsed) {
-            logger.error("You can only use the database writer once.")
-            return false
-        }
-        hasBeenUsed = true
+    fun write(data: T): Boolean {
+        try {
+            if (!beforeConnect())
+                return false
 
-        if (!preSave()) {
-            closeConnection()
-            return false
-        }
+            return connect().use { connection ->
+                afterConnectBeforePrepare(connection)
+                    && versionMatches(connection)
+                    && prepareInsertStatements(connection)
+                    && writeData(data)
+                    && afterWriteBeforeCommit(connection)
+                    && commit(connection)
+            }
+        } catch (e: Exception) {
+            when (e) {
+                is SQLException, is MissingTableConfigException -> {
+                    logger.error("Failed to write the database: " + e.message)
+                    return false
+                }
 
-        val status = try {
-            saveSchema()
-        } catch (e: MissingTableConfigException) {
-            logger.error("Unable to save database: " + e.message, e)
-            false
+                else -> throw e
+            }
         }
-
-        return status and postSave()
     }
 
-    abstract fun saveSchema(): Boolean
+    /**
+     * Code to execute before a connection is made to the database.
+     *
+     * This is the ideal time to be doing things such as taking backups of files, or removing existing files if they should be replaced.
+     *
+     * @return true if the processing was successful, otherwise false.
+     */
+    protected abstract fun beforeConnect(): Boolean
 
-    private fun preSave(): Boolean =
-        if (persistFile && Files.exists(Paths.get(databaseFile))) {
-            writingToExistingFile = true
-            logger.info("Connecting to existing database $databaseFile...")
-            connect() && versionMatches() && prepareInsertStatements()
-        } else {
-            removeExisting()
-                && connect()
-                && create()
-                && prepareInsertStatements()
+    /**
+     * Code to execute after the connection has been made to the database, but before any statements are prepared.
+     *
+     * This is the ideal time to do any schema creation.
+     *
+     * @param connection A [Connection] to the database.
+     * @return true if the processing was successful, otherwise false.
+     */
+    protected abstract fun afterConnectBeforePrepare(connection: Connection): Boolean
+
+    /**
+     * Write the actual data to the database.
+     *
+     * @param data The data to write.
+     * @return true if the processing was successful, otherwise false.
+     */
+    protected abstract fun writeData(data: T): Boolean
+
+    /**
+     * Code to execute after the data has been written to the database, but before the transaction is commited.
+     *
+     * This is the ideal time enable any indexes left out in the schema creation for performance reasons.
+     *
+     * @param connection A [Connection] to the database.
+     * @return true if the processing was successful, otherwise false.
+     */
+    protected abstract fun afterWriteBeforeCommit(connection: Connection): Boolean
+
+    private fun connect(): Connection {
+        logger.info("Connecting to database...")
+
+        return getConnection().also {
+            logger.info("Connected.")
         }
+    }
 
-    private fun removeExisting(): Boolean =
-        try {
-            Files.deleteIfExists(Paths.get(databaseFile))
-            true
-        } catch (e: IOException) {
-            logger.error("Unable to save database, failed to remove previous instance: " + e.message)
-            false
-        }
+    private fun prepareInsertStatements(connection: Connection): Boolean {
+        logger.info("Preparing insert statements...")
 
-    private fun connect(): Boolean =
-        try {
-            saveConnection = getConnection(databaseDescriptor).configureBatch()
-            true
-        } catch (e: SQLException) {
-            logger.error("Failed to connect to the database for saving: " + e.message)
-            closeConnection()
-            false
-        }
+        databaseTables.prepareInsertStatements(connection)
 
-    private fun prepareInsertStatements(): Boolean =
-        try {
-            databaseTables.prepareInsertStatements(saveConnection)
-            true
-        } catch (e: SQLException) {
-            logger.error("Failed to prepare insert statements: " + e.message, e)
-            closeConnection()
-            false
-        }
+        logger.info("Insert statements prepared.")
+        return true
+    }
 
-    private fun create(): Boolean =
-        try {
-            val versionTable = databaseTables.getTable<TableVersion>()
-            logger.info("Creating database schema v${versionTable.supportedVersion}...")
 
-            saveConnection.createStatement().use { statement ->
-                statement.queryTimeout = 2
-
-                databaseTables.forEachTable {
-                    statement.executeUpdate(it.createTableSql)
-                }
-
-                // Add the version number to the database.
-                saveConnection.prepareStatement(versionTable.preparedInsertSql).use { insert ->
-                    insert.setInt(versionTable.VERSION.queryIndex, versionTable.supportedVersion)
-                    insert.executeUpdate()
-                }
-
-                saveConnection.commit()
-                logger.info("Schema created.")
+    private fun versionMatches(connection: Connection): Boolean {
+        connection.createStatement().use { statement ->
+            val tableVersion = databaseTables.tables.values.filterIsInstance<TableVersion>().firstOrNull()
+            if (tableVersion == null) {
+                logger.error("INTERNAL ERROR: No version table defined, please make sure you add a version table to your database tables collection.")
+                return false
             }
-            true
-        } catch (e: SQLException) {
-            logger.error("Failed to create database schema: " + e.message)
-            false
-        }
 
-    private fun versionMatches(): Boolean {
-        saveConnection.createStatement().use { statement ->
-            val tableVersion = databaseTables.getTable<TableVersion>()
             statement.executeQuery(tableVersion.selectSql).use { rs ->
                 if (rs.next()) {
                     val version = rs.getInt(tableVersion.VERSION.queryIndex)
@@ -159,42 +143,14 @@ abstract class BaseDatabaseWriter(
         }
     }
 
-    private fun closeConnection() {
-        try {
-            if (::saveConnection.isInitialized)
-                saveConnection.close()
-        } catch (e: SQLException) {
-            logger.error("Failed to close connection to database: " + e.message)
-        }
+    private fun commit(connection: Connection): Boolean {
+        logger.info("Committing...")
+
+        connection.commit()
+
+        logger.info("Done.")
+
+        return true
     }
 
-    private fun postSave(): Boolean =
-        try {
-            if (!writingToExistingFile) {
-                logger.info("Adding indexes...")
-
-                saveConnection.createStatement().use { statement ->
-                    databaseTables.forEachTable { table ->
-                        table.createIndexesSql.forEach { sql ->
-                            statement.execute(sql)
-                        }
-                    }
-                }
-
-                logger.info("Indexes added.")
-            }
-            logger.info("Committing...")
-
-            saveConnection.commit()
-
-            logger.info("Done.")
-            true
-        } catch (e: SQLException) {
-            logger.error("Failed to finalise the database: " + e.message)
-            false
-        } finally {
-            closeConnection()
-        }
-
 }
-

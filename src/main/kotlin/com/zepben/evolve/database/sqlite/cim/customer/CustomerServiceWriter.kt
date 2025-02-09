@@ -19,20 +19,18 @@ import com.zepben.evolve.services.customer.CustomerService
 /**
  * A class for writing a [CustomerService] into the database.
  *
- * @param service The [CustomerService] to save to the database.
  * @param databaseTables The [CustomerDatabaseTables] to add to the database.
  */
-class CustomerServiceWriter @JvmOverloads constructor(
-    override val service: CustomerService,
+internal class CustomerServiceWriter(
     databaseTables: CustomerDatabaseTables,
     override val writer: CustomerCimWriter = CustomerCimWriter(databaseTables)
-) : BaseServiceWriter(service, writer) {
+) : BaseServiceWriter<CustomerService>(writer) {
 
-    override fun doSave(): Boolean =
-        saveEach<Organisation>(writer::save)
-            .andSaveEach<Customer>(writer::save)
-            .andSaveEach<CustomerAgreement>(writer::save)
-            .andSaveEach<PricingStructure>(writer::save)
-            .andSaveEach<Tariff>(writer::save)
+    override fun CustomerService.writeService(): Boolean =
+        writeEach<Organisation>(writer::write) and
+            writeEach<Customer>(writer::write) and
+            writeEach<CustomerAgreement>(writer::write) and
+            writeEach<PricingStructure>(writer::write) and
+            writeEach<Tariff>(writer::write)
 
 }

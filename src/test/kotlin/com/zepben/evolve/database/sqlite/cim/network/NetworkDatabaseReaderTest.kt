@@ -14,7 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.wires.EnergySource
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionReader
-import com.zepben.evolve.database.sqlite.common.TableVersion
+import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.feeder.AssignToFeeders
 import com.zepben.evolve.services.network.tracing.feeder.AssignToLvFeeders
@@ -37,18 +37,18 @@ internal class NetworkDatabaseReaderTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val databaseFile = "databaseFile"
-    private val service = mockk<NetworkService>(relaxed = true)
+    private val service = spyk(NetworkService())
 
-    private val metadataReader = mockk<MetadataCollectionReader>().also { every { it.load() } returns true }
-    private val networkServiceReader = mockk<NetworkServiceReader>().also { every { it.load() } returns true }
+    private val metadataReader = mockk<MetadataCollectionReader>().also { every { it.read(service.metadata) } returns true }
+    private val networkServiceReader = mockk<NetworkServiceReader>().also { every { it.read(service) } returns true }
 
     private val connection = mockk<Connection> {
         justRun { close() }
     }
 
-    private val tableVersion = mockk<TableVersion> {
+    private val tableVersion = mockk<SqliteTableVersion> {
         every { getVersion(any()) } returns 1
-        every { this@mockk.supportedVersion } returns 1
+        every { supportedVersion } returns 1
     }
 
     private val setFeederDirections = mockk<SetDirection> {
@@ -71,12 +71,13 @@ internal class NetworkDatabaseReaderTest {
 
     private fun reader(inferPhases: Boolean) = NetworkDatabaseReader(
         connection,
-        service,
         databaseFile,
-        inferPhases,
-        metadataReader,
-        networkServiceReader,
-        tableVersion,
+        mockk<NetworkDatabaseTables>().also {
+            every { it.tables } returns mapOf(SqliteTableVersion::class to tableVersion)
+        },
+        { _, _ -> metadataReader },
+        { _, _ -> networkServiceReader },
+        inferPhases = inferPhases,
         setFeederDirections,
         setPhases,
         phaseInferrer,
@@ -93,7 +94,7 @@ internal class NetworkDatabaseReaderTest {
         every { phaseInferrer.run(service, NetworkStateOperators.NORMAL) } returns emptyList()
         every { phaseInferrer.run(service, NetworkStateOperators.CURRENT) } returns emptyList()
 
-        assertThat("Should have loaded", reader(true).load())
+        assertThat("Should have read", reader(true).read(service))
 
         assertThat(systemErr.log, containsString("Applying feeder direction to network..."))
         assertThat(systemErr.log, containsString("Feeder direction applied to network."))
@@ -117,8 +118,8 @@ internal class NetworkDatabaseReaderTest {
             tableVersion.supportedVersion
             tableVersion.getVersion(connection)
 
-            metadataReader.load()
-            networkServiceReader.load()
+            metadataReader.read(service.metadata)
+            networkServiceReader.read(service)
             service.unresolvedReferences()
 
             setFeederDirections.run(service, NetworkStateOperators.NORMAL)
@@ -136,8 +137,9 @@ internal class NetworkDatabaseReaderTest {
             assignToLvFeeders.run(service, NetworkStateOperators.NORMAL)
             assignToLvFeeders.run(service, NetworkStateOperators.CURRENT)
 
-            // calls for _validate_equipment_containers()
+            // calls for _validate_equipment_containers(), including the sequenceOf which is called inside listOf.
             service.listOf<Equipment>(any<(Equipment) -> Boolean>())
+            service.sequenceOf<Equipment>()
 
             // calls for _validate_sources()
             service.sequenceOf<Feeder>()
@@ -159,7 +161,7 @@ internal class NetworkDatabaseReaderTest {
             PhaseInferrer.InferredPhase(j3, true)
         )
 
-        reader(true).load()
+        reader(true).read(service)
 
         fun correctMessage(idObj: IdentifiedObject) =
             "*** Action Required *** Inferred missing phase for '${idObj.name}' [${idObj.mRID}] which should be correct. The phase was inferred due to a disconnected nominal phase because of an upstream error in the source data. Phasing information for the upstream equipment should be fixed in the source system."
@@ -174,9 +176,10 @@ internal class NetworkDatabaseReaderTest {
 
     @Test
     fun `does not infer phases when inferPhases is false`() {
-        reader(false).load()
+        reader(false).read(service)
 
         verify { phaseInferrer wasNot called }
         verify { phaseInferrer wasNot called }
     }
+
 }

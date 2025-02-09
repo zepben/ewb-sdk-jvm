@@ -31,7 +31,7 @@ import java.sql.SQLException
  *
  * @property databaseTables The tables that are available in the database.
  */
-abstract class CimWriter(
+internal abstract class CimWriter(
     protected open val databaseTables: CimDatabaseTables
 ) : BaseEntryWriter() {
 
@@ -40,7 +40,7 @@ abstract class CimWriter(
     // ###################
 
     /**
-     * Save the [Document] fields to [TableDocuments].
+     * Write the [Document] fields to [TableDocuments].
      *
      * @param table The database table to write the [Document] fields to.
      * @param insert The [PreparedStatement] to bind the field values to.
@@ -51,7 +51,7 @@ abstract class CimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    protected fun saveDocument(table: TableDocuments, insert: PreparedStatement, document: Document, description: String): Boolean {
+    protected fun writeDocument(table: TableDocuments, insert: PreparedStatement, document: Document, description: String): Boolean {
         insert.setNullableString(table.TITLE.queryIndex, document.title)
         insert.setInstant(table.CREATED_DATE_TIME.queryIndex, document.createdDateTime)
         insert.setNullableString(table.AUTHOR_NAME.queryIndex, document.authorName)
@@ -59,11 +59,11 @@ abstract class CimWriter(
         insert.setNullableString(table.STATUS.queryIndex, document.status)
         insert.setNullableString(table.COMMENT.queryIndex, document.comment)
 
-        return saveIdentifiedObject(table, insert, document, description)
+        return writeIdentifiedObject(table, insert, document, description)
     }
 
     /**
-     * Save the [Organisation] fields to [TableOrganisations].
+     * Write the [Organisation] fields to [TableOrganisations].
      *
      * @param organisation The [Organisation] instance to write to the database.
      *
@@ -71,15 +71,15 @@ abstract class CimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(organisation: Organisation): Boolean {
+    fun write(organisation: Organisation): Boolean {
         val table = databaseTables.getTable<TableOrganisations>()
         val insert = databaseTables.getInsert<TableOrganisations>()
 
-        return saveIdentifiedObject(table, insert, organisation, "organisation")
+        return writeIdentifiedObject(table, insert, organisation, "organisation")
     }
 
     /**
-     * Save the [NameType] fields to [TableNameTypes].
+     * Write the [NameType] fields to [TableNameTypes].
      *
      * @param nameType The [NameType] instance to write to the database.
      *
@@ -87,15 +87,15 @@ abstract class CimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(nameType: NameType): Boolean {
+    fun write(nameType: NameType): Boolean {
         val table = databaseTables.getTable<TableNameTypes>()
         val insert = databaseTables.getInsert<TableNameTypes>()
 
-        return saveNameType(table, insert, nameType)
+        return writeNameType(table, insert, nameType)
     }
 
     /**
-     * Save the [Name] fields to [TableNames].
+     * Write the [Name] fields to [TableNames].
      *
      * @param name The [Name] instance to write to the database.
      *
@@ -103,15 +103,15 @@ abstract class CimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(name: Name): Boolean {
+    fun write(name: Name): Boolean {
         val table = databaseTables.getTable<TableNames>()
         val insert = databaseTables.getInsert<TableNames>()
 
-        return saveName(table, insert, name)
+        return writeName(table, insert, name)
     }
 
     /**
-     * Save the [OrganisationRole] fields to [TableOrganisationRoles].
+     * Write the [OrganisationRole] fields to [TableOrganisationRoles].
      *
      * @param table The database table to write the [OrganisationRole] fields to.
      * @param insert The [PreparedStatement] to bind the field values to.
@@ -122,7 +122,7 @@ abstract class CimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    protected fun saveOrganisationRole(
+    protected fun writeOrganisationRole(
         table: TableOrganisationRoles,
         insert: PreparedStatement,
         organisationRole: OrganisationRole,
@@ -130,7 +130,7 @@ abstract class CimWriter(
     ): Boolean {
         insert.setNullableString(table.ORGANISATION_MRID.queryIndex, organisationRole.organisation?.mRID)
 
-        return saveIdentifiedObject(table, insert, organisationRole, description)
+        return writeIdentifiedObject(table, insert, organisationRole, description)
     }
 
     // ######################
@@ -138,7 +138,7 @@ abstract class CimWriter(
     // ######################
 
     /**
-     * Save the [IdentifiedObject] fields to [TableIdentifiedObjects].
+     * Write the [IdentifiedObject] fields to [TableIdentifiedObjects].
      *
      * @param table The database table to write the [IdentifiedObject] fields to.
      * @param insert The [PreparedStatement] to bind the field values to.
@@ -149,7 +149,7 @@ abstract class CimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    protected fun saveIdentifiedObject(
+    protected fun writeIdentifiedObject(
         table: TableIdentifiedObjects,
         insert: PreparedStatement,
         identifiedObject: IdentifiedObject,
@@ -164,7 +164,7 @@ abstract class CimWriter(
     }
 
     @Throws(SQLException::class)
-    private fun saveNameType(table: TableNameTypes, insert: PreparedStatement, nameType: NameType): Boolean {
+    private fun writeNameType(table: TableNameTypes, insert: PreparedStatement, nameType: NameType): Boolean {
         insert.setString(table.NAME.queryIndex, nameType.name)
         insert.setNullableString(table.DESCRIPTION.queryIndex, nameType.description)
 
@@ -172,7 +172,7 @@ abstract class CimWriter(
     }
 
     @Throws(SQLException::class)
-    private fun saveName(table: TableNames, insert: PreparedStatement, name: Name): Boolean {
+    private fun writeName(table: TableNames, insert: PreparedStatement, name: Name): Boolean {
         insert.setString(table.NAME.queryIndex, name.name)
         insert.setString(table.NAME_TYPE_NAME.queryIndex, name.type.name)
         insert.setString(table.IDENTIFIED_OBJECT_MRID.queryIndex, name.identifiedObject.mRID)

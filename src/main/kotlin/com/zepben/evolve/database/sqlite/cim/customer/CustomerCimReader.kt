@@ -28,20 +28,16 @@ import java.sql.SQLException
 
 /**
  * A class for reading the [CustomerService] tables from the database.
- *
- * @property service The [CustomerService] to populate from the database.
  */
-class CustomerCimReader(
-    override val service: CustomerService
-) : CimReader(service) {
+internal class CustomerCimReader : CimReader<CustomerService>() {
 
     // ###################
     // # IEC61968 Common #
     // ###################
 
     @Throws(SQLException::class)
-    private fun loadAgreement(agreement: Agreement, table: TableAgreements, resultSet: ResultSet): Boolean {
-        return loadDocument(agreement, table, resultSet)
+    private fun readAgreement(agreement: Agreement, table: TableAgreements, resultSet: ResultSet): Boolean {
+        return readDocument(agreement, table, resultSet)
     }
 
     // ######################
@@ -51,6 +47,7 @@ class CustomerCimReader(
     /**
      * Create a [Customer] and populate its fields from [TableCustomers].
      *
+     * @param service The [CustomerService] used to store any items read from the database.
      * @param table The database table to read the [Customer] fields from.
      * @param resultSet The record in the database table containing the fields for this [Customer].
      * @param setIdentifier A callback to register the mRID of this [Customer] for logging purposes.
@@ -59,19 +56,20 @@ class CustomerCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCustomers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: CustomerService, table: TableCustomers, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val customer = Customer(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             kind = CustomerKind.valueOf(resultSet.getString(table.KIND.queryIndex))
             numEndDevices = resultSet.getNullableInt(table.NUM_END_DEVICES.queryIndex)
             specialNeed = resultSet.getNullableString(table.SPECIAL_NEED.queryIndex)
         }
 
-        return loadOrganisationRole(customer, table, resultSet) && service.addOrThrow(customer)
+        return readOrganisationRole(service, customer, table, resultSet) && service.addOrThrow(customer)
     }
 
     /**
      * Create a [CustomerAgreement] and populate its fields from [TableCustomerAgreements].
      *
+     * @param service The [CustomerService] used to store any items read from the database.
      * @param table The database table to read the [CustomerAgreement] fields from.
      * @param resultSet The record in the database table containing the fields for this [CustomerAgreement].
      * @param setIdentifier A callback to register the mRID of this [CustomerAgreement] for logging purposes.
@@ -80,18 +78,19 @@ class CustomerCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCustomerAgreements, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: CustomerService, table: TableCustomerAgreements, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val customerAgreement = CustomerAgreement(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             customer = service.ensureGet(resultSet.getString(table.CUSTOMER_MRID.queryIndex), typeNameAndMRID())
             customer?.addAgreement(this)
         }
 
-        return loadAgreement(customerAgreement, table, resultSet) && service.addOrThrow(customerAgreement)
+        return readAgreement(customerAgreement, table, resultSet) && service.addOrThrow(customerAgreement)
     }
 
     /**
      * Create a [PricingStructure] and populate its fields from [TablePricingStructures].
      *
+     * @param service The [CustomerService] used to store any items read from the database.
      * @param table The database table to read the [PricingStructure] fields from.
      * @param resultSet The record in the database table containing the fields for this [PricingStructure].
      * @param setIdentifier A callback to register the mRID of this [PricingStructure] for logging purposes.
@@ -100,15 +99,16 @@ class CustomerCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePricingStructures, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: CustomerService, table: TablePricingStructures, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val pricingStructure = PricingStructure(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadDocument(pricingStructure, table, resultSet) && service.addOrThrow(pricingStructure)
+        return readDocument(pricingStructure, table, resultSet) && service.addOrThrow(pricingStructure)
     }
 
     /**
      * Create a [Tariff] and populate its fields from [TableTariffs].
      *
+     * @param service The [CustomerService] used to store any items read from the database.
      * @param table The database table to read the [Tariff] fields from.
      * @param resultSet The record in the database table containing the fields for this [Tariff].
      * @param setIdentifier A callback to register the mRID of this [Tariff] for logging purposes.
@@ -117,10 +117,10 @@ class CustomerCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableTariffs, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: CustomerService, table: TableTariffs, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val tariff = Tariff(setIdentifier(resultSet.getString(table.MRID.queryIndex)))
 
-        return loadDocument(tariff, table, resultSet) && service.addOrThrow(tariff)
+        return readDocument(tariff, table, resultSet) && service.addOrThrow(tariff)
     }
 
     // ################
@@ -130,6 +130,7 @@ class CustomerCimReader(
     /**
      * Create a [CustomerAgreement] to [PricingStructure] association from [TableCustomerAgreementsPricingStructures].
      *
+     * @param service The [CustomerService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -138,7 +139,7 @@ class CustomerCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableCustomerAgreementsPricingStructures, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: CustomerService, table: TableCustomerAgreementsPricingStructures, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val customerAgreementMRID = setIdentifier(resultSet.getString(table.CUSTOMER_AGREEMENT_MRID.queryIndex))
         setIdentifier("${customerAgreementMRID}-to-UNKNOWN")
 
@@ -157,6 +158,7 @@ class CustomerCimReader(
     /**
      * Create a [PricingStructure] to [Tariff] association from [TablePricingStructuresTariffs].
      *
+     * @param service The [CustomerService] used to store any items read from the database.
      * @param table The database table to read the association from.
      * @param resultSet The record in the database table containing the fields for this association.
      * @param setIdentifier A callback to register the identifier of this association for logging purposes.
@@ -165,7 +167,7 @@ class CustomerCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TablePricingStructuresTariffs, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: CustomerService, table: TablePricingStructuresTariffs, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val pricingStructureMRID = setIdentifier(resultSet.getString(table.PRICING_STRUCTURE_MRID.queryIndex))
         setIdentifier("${pricingStructureMRID}-to-UNKNOWN")
 

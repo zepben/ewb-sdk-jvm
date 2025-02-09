@@ -14,18 +14,21 @@ import com.zepben.evolve.metrics.IngestionJob
 /**
  * Class for writing an ingestion job (and associated metadata, metrics, and sources) to the tables in a metrics database.
  *
- * @param job The ingestion job to write.
  * @param databaseTables The tables in the database. Insert statements should be prepared for each table.
  * @param writer the [MetricsEntryWriter] to use for writing each entry.
  */
-class MetricsWriter(
-    private val job: IngestionJob,
+internal class MetricsWriter(
     databaseTables: MetricsDatabaseTables,
-    private val writer: MetricsEntryWriter = MetricsEntryWriter(databaseTables, job.id)
-): BaseCollectionWriter() {
+    private val writer: MetricsEntryWriter = MetricsEntryWriter(databaseTables)
+) : BaseCollectionWriter<IngestionJob>() {
 
-    override fun save(): Boolean = (job.metadata?.let { writer.save(it) } ?: false)
-        .andSaveEach(job.sources.entries, writer::saveSource) { jobSource, e -> logger.error("Failed to save job source $jobSource: ${e.message}") }
-        .andSaveEach(job.networkMetrics.entries, writer::saveMetric) { metric, e -> logger.error("Failed to save metric $metric: ${e.message}") }
+    override fun write(data: IngestionJob): Boolean =
+        writer.write(data.id, data.metadata) and
+            writeEach(data.sources.entries, { writer.writeSource(data.id, it) }) { jobSource, e ->
+                logger.error("Failed to write job source $jobSource: ${e.message}")
+            } and
+            writeEach(data.networkMetrics.entries, { writer.writeMetric(data.id, it) }) { metric, e ->
+                logger.error("Failed to write metric $metric: ${e.message}")
+            }
 
 }

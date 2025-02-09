@@ -18,7 +18,7 @@ import com.zepben.evolve.database.sqlite.common.BaseDatabaseTables
 /**
  * The base collection of tables for all our CIM databases.
  */
-open class CimDatabaseTables : BaseDatabaseTables() {
+open class CimDatabaseTables internal constructor() : BaseDatabaseTables() {
 
     override val includedTables: Sequence<SqliteTable> = sequenceOf(
         tableCimVersion,

@@ -18,94 +18,82 @@ import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 /**
  * A base class for writing object from a [BaseService] into the database.
  *
- * @property service The [BaseService] to save to the database.
  * @property writer The [BaseServiceWriter] used to actually write the objects to the database.
  */
-abstract class BaseServiceWriter(
-    protected open val service: BaseService,
+internal abstract class BaseServiceWriter<TService : BaseService>(
     protected open val writer: CimWriter
-) : BaseCollectionWriter() {
+) : BaseCollectionWriter<TService>() {
 
-    final override fun save(): Boolean =
-        saveNameTypes()
-            .andDoSave()
-
-    /**
-     * Save the service specific objects to the database.
-     *
-     * @return true if the objects were successfully saved to the database, otherwise false
-     */
-    protected abstract fun doSave(): Boolean
+    final override fun write(data: TService): Boolean =
+        data.writeNameTypes() and
+            data.writeService()
 
     /**
-     * Helper function for chaining [saveEach] calls using the [and] operator in a more readable manner.
+     * Write the service specific objects to the database.
      *
-     * @param T The type of object to save to the database.
-     * @param saver The callback used to save the objects to the database. Will be called once for each object and should return true if the object is
-     *   successfully saved to the database.
-     *
-     * @return true if all objects are successfully saved to the database, otherwise false.
+     * @receiver The [BaseService] to write to the database.
+     * @return true if the objects were successfully writen to the database, otherwise false
      */
-    protected inline fun <reified T : IdentifiedObject> Boolean.andSaveEach(noinline saver: (T) -> Boolean): Boolean =
-        this and saveEach(saver)
+    protected abstract fun TService.writeService(): Boolean
 
     /**
-     * Save each object of the specified type using the provided [saver].
+     * Write each object of the specified type using the provided [writer].
      *
-     * @param T The type of object to save to the database.
-     * @param saver The callback used to save the objects to the database. Will be called once for each object and should return true if the object is
-     *   successfully saved to the database.
+     * @receiver The [BaseService] to write to the database.
+     * @param T The type of object to write to the database.
+     * @param writer The callback used to write the objects to the database. Will be called once for each object and should return true if the object is
+     *   successfully writen to the database.
      *
-     * @return true if all objects are successfully saved to the database, otherwise false.
+     * @return true if all objects are successfully writen to the database, otherwise false.
      */
-    protected inline fun <reified T : IdentifiedObject> saveEach(noinline saver: (T) -> Boolean): Boolean {
+    protected inline fun <reified T : IdentifiedObject> TService.writeEach(noinline writer: (T) -> Boolean): Boolean {
         var status = true
-        service.sequenceOf<T>().forEach { status = status && validateSave(it, saver) }
+        sequenceOf<T>().forEach { status = status && validateWrite(it, writer) }
         return status
     }
 
     /**
-     * Validate that an object is actually saved to the database, logging an error if anything goes wrong.
+     * Validate that an object is actually writen to the database, logging an error if anything goes wrong.
      *
-     * @param T The type of object being saved.
-     * @param it The object being saved.
-     * @param saver The callback actually saving the object to the database.
+     * @param T The type of object being writen.
+     * @param it The object being writen.
+     * @param writer The callback actually saving the object to the database.
      *
-     * @return true if the object is successfully saved to the database, otherwise false.
+     * @return true if the object is successfully writen to the database, otherwise false.
      */
-    protected inline fun <reified T : IdentifiedObject> validateSave(it: T, noinline saver: (T) -> Boolean): Boolean {
-        return validateSave(it, saver) { e ->
-            logger.error("Failed to save ${it.typeNameAndMRID()}: ${e.message}")
+    protected inline fun <reified T : IdentifiedObject> validateWrite(it: T, noinline writer: (T) -> Boolean): Boolean {
+        return validateWrite(it, writer) { e ->
+            logger.error("Failed to write ${it.typeNameAndMRID()}: ${e.message}")
         }
     }
 
-    private fun saveNameTypes(): Boolean {
+    private fun TService.writeNameTypes(): Boolean {
         var status = true
 
-        service.nameTypes.forEach {
-            status = status and validateSave(it, writer::save)
+        nameTypes.forEach {
+            status = status and validateWrite(it, writer::write)
 
             it.names.forEach { name ->
-                status = status and validateSave(name, writer::save)
+                status = status and validateWrite(name, writer::write)
             }
         }
 
         return status
     }
 
-    private fun validateSave(nameType: NameType, saver: (nameType: NameType) -> Boolean): Boolean {
-        return validateSave(nameType, saver) { e ->
-            logger.error("Failed to save ${nameType.javaClass.simpleName} ${nameType.name}: ${e.message}")
+    private fun validateWrite(nameType: NameType, writer: (nameType: NameType) -> Boolean): Boolean {
+        return validateWrite(nameType, writer) { e ->
+            logValidationError(nameType, nameType.name, e)
         }
     }
 
-    private fun validateSave(name: Name, saver: (name: Name) -> Boolean): Boolean {
-        return validateSave(name, saver) { e ->
-            logger.error("Failed to save ${name.javaClass.simpleName} ${name.name}: ${e.message}")
+    private fun validateWrite(name: Name, writer: (name: Name) -> Boolean): Boolean {
+        return validateWrite(name, writer) { e ->
+            logValidationError(name, name.name, e)
         }
     }
 
-    private fun Boolean.andDoSave(): Boolean =
-        this and doSave()
+    fun logValidationError(obj: Any, desc: String, e: Exception) =
+        logger.error("Failed to write ${obj.javaClass.simpleName} $desc: ${e.message}")
 
 }

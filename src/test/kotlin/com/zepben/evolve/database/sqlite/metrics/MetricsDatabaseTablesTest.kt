@@ -11,7 +11,7 @@ package com.zepben.evolve.database.sqlite.metrics
 import com.google.common.reflect.ClassPath
 import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
-import com.zepben.evolve.database.sqlite.common.TableVersion
+import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
 import com.zepben.testutils.exception.ExpectException.Companion.expect
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -34,7 +34,7 @@ internal class MetricsDatabaseTablesTest {
             .toSet()
 
         val usedTables = tables.tables.keys
-            .filter { it != TableVersion::class }
+            .filter { it != SqliteTableVersion::class }
             .map { it.simpleName!! }
             .toSet()
 

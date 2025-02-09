@@ -20,20 +20,19 @@ import java.util.*
  * Class for writing entries to the metrics database.
  *
  * @param databaseTables The tables in the metrics database.
- * @param jobId The ID of the job to write entries for.
  */
-class MetricsEntryWriter(
-    private val databaseTables: MetricsDatabaseTables,
-    private val jobId: UUID
+internal class MetricsEntryWriter(
+    private val databaseTables: MetricsDatabaseTables
 ) : BaseEntryWriter() {
 
     /**
-     * Save an [IngestionMetadata] to the `jobs` table.
+     * Write an [IngestionMetadata] to the `jobs` table.
      *
-     * @param metadata the [IngestionMetadata] to save.
-     * @return true if the [metadata] saved successfully.
+     * @param jobId The ID of the job being writen.
+     * @param metadata the [IngestionMetadata] to write.
+     * @return true if the [metadata] writen successfully.
      */
-    fun save(metadata: IngestionMetadata): Boolean {
+    fun write(jobId: UUID, metadata: IngestionMetadata): Boolean {
         val table = databaseTables.getTable<TableJobs>()
         val insert = databaseTables.getInsert<TableJobs>()
 
@@ -47,12 +46,13 @@ class MetricsEntryWriter(
     }
 
     /**
-     * Save a [JobSource] to the `job_sources` table.
+     * Write a [JobSource] to the `job_sources` table.
      *
-     * @param jobSource The [JobSource] to save.
-     * @return true if the [jobSource] was saved successfully.
+     * @param jobId The ID of the job being writen.
+     * @param jobSource The [JobSource] to write.
+     * @return true if the [jobSource] was writen successfully.
      */
-    fun saveSource(jobSource: JobSource): Boolean {
+    fun writeSource(jobId: UUID, jobSource: JobSource): Boolean {
         val table = databaseTables.getTable<TableJobSources>()
         val insert = databaseTables.getInsert<TableJobSources>()
         val (sourceName, sourceMetadata) = jobSource
@@ -66,12 +66,13 @@ class MetricsEntryWriter(
     }
 
     /**
-     * Save a [NetworkMetric] to the `job_sources` table.
+     * Write a [NetworkMetric] to the `job_sources` table.
      *
-     * @param networkMetric The [NetworkMetric] to save.
-     * @return true if the [networkMetric] was saved successfully.
+     * @param jobId The ID of the job being writen.
+     * @param networkMetric The [NetworkMetric] to write.
+     * @return true if the [networkMetric] was writen successfully.
      */
-    fun saveMetric(networkMetric: NetworkMetric): Boolean {
+    fun writeMetric(jobId: UUID, networkMetric: NetworkMetric): Boolean {
         val table = databaseTables.getTable<TableNetworkContainerMetrics>()
         val insert = databaseTables.getInsert<TableNetworkContainerMetrics>()
         val (container, containerMetric) = networkMetric
@@ -83,6 +84,7 @@ class MetricsEntryWriter(
                 insert.setString(table.HIERARCHY_NAME.queryIndex, "")
                 insert.setString(table.CONTAINER_TYPE.queryIndex, "TOTAL")
             }
+
             is PartialNetworkContainer -> {
                 insert.setString(table.HIERARCHY_ID.queryIndex, container.mRID)
                 insert.setString(table.HIERARCHY_NAME.queryIndex, container.name)

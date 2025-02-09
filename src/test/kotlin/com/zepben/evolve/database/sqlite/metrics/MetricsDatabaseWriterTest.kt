@@ -13,9 +13,13 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
@@ -26,60 +30,70 @@ internal class MetricsDatabaseWriterTest {
     @TempDir
     lateinit var modelPath: Path
 
+    private val databaseFile = "databaseFile"
+    private val uuid = UUID.randomUUID()
+    private val job = IngestionJob(uuid, mockk())
+
     private val writer = mockk<MetricsWriter> {
-        every { save() } returns true
+        every { write(any()) } returns true
+    }
+
+    @BeforeEach
+    internal fun beforeEach() {
+        Files.deleteIfExists(Paths.get(databaseFile))
+    }
+
+    @AfterEach
+    internal fun afterEach() {
+        Files.deleteIfExists(Paths.get(databaseFile))
     }
 
     @Test
     internal fun callsWriter() {
         val result = MetricsDatabaseWriter(
-            "databaseFile",
-            mockk(), // ingestion job isn't actually used to create the MetricsWriter
-            metricsWriter = writer
-        ).saveSchema()
+            databaseFile,
+            modelPath = null,
+            createMetricsWriter = { writer }
+        ).write(job)
 
-        assertThat("Should have saved successfully", result)
+        assertThat("Should have writen successfully", result)
+        assertThat("Job ID file shouldn't exist with no path", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").notExists())
 
-        verify { writer.save() }
+        verify { writer.write(job) }
     }
 
     @Test
     internal fun createsJobIdFile() {
-        val uuid = UUID.randomUUID()
-
         MetricsDatabaseWriter(
-            "databaseFile",
-            IngestionJob(uuid),
+            databaseFile,
             modelPath = modelPath,
-            metricsWriter = writer
-        ).saveSchema()
+            createMetricsWriter = { writer }
+        ).write(job)
 
         assertThat("Job ID file should exist", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").exists())
 
-        verify { writer.save() }
+        verify { writer.write(job) }
     }
 
     @Test
     internal fun deletesExistingJobIdFiles() {
-        val uuid1 = UUID.randomUUID()
         val uuid2 = UUID.randomUUID()
         val uuid3 = UUID.randomUUID()
 
-        modelPath.resolve("$uuid1.$JOB_ID_FILE_EXTENSION").createFile()
         modelPath.resolve("$uuid2.$JOB_ID_FILE_EXTENSION").createFile()
+        modelPath.resolve("$uuid3.$JOB_ID_FILE_EXTENSION").createFile()
 
         MetricsDatabaseWriter(
-            "databaseFile",
-            IngestionJob(uuid3),
+            databaseFile,
             modelPath = modelPath,
-            metricsWriter = writer
-        ).saveSchema()
+            createMetricsWriter = { writer }
+        ).write(job)
 
-        assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid1.$JOB_ID_FILE_EXTENSION").notExists())
         assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid2.$JOB_ID_FILE_EXTENSION").notExists())
-        assertThat("New job ID file should exist", modelPath.resolve("$uuid3.$JOB_ID_FILE_EXTENSION").exists())
+        assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid3.$JOB_ID_FILE_EXTENSION").notExists())
+        assertThat("New job ID file should exist", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").exists())
 
-        verify { writer.save() }
+        verify { writer.write(job) }
     }
 
 }

@@ -64,11 +64,11 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
 
     override fun createService(): NetworkService = NetworkService()
 
-    override fun createWriter(filename: String, service: NetworkService): NetworkDatabaseWriter =
-        NetworkDatabaseWriter(filename, service)
+    override fun createWriter(filename: String): NetworkDatabaseWriter =
+        NetworkDatabaseWriter(filename)
 
-    override fun createReader(connection: Connection, service: NetworkService, databaseDescription: String): NetworkDatabaseReader =
-        NetworkDatabaseReader(connection, service, databaseDescription)
+    override fun createReader(connection: Connection, databaseDescription: String): NetworkDatabaseReader =
+        NetworkDatabaseReader(connection, databaseDescription)
 
     override fun createComparator(): NetworkServiceComparator = NetworkServiceComparator()
 
@@ -76,10 +76,10 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
 
     @Test
     @Disabled
-    fun loadRealFile() {
+    fun readRealFile() {
         systemErr.unmute()
 
-        // Put the name of the database you want to load in src/test/resources/test-network-database.txt
+        // Put the name of the database you want to read in src/test/resources/test-network-database.txt
         val databaseFile = Files.readString(Path.of("src", "test", "resources", "test-network-database.txt")).trim().trim('"')
 
         assertThat("database must exist", Files.exists(Paths.get(databaseFile)))
@@ -87,7 +87,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         val networkService = NetworkService()
 
         DriverManager.getConnection("jdbc:sqlite:$databaseFile").use { connection ->
-            assertThat("Database should have loaded", NetworkDatabaseReader(connection, networkService, databaseFile).load())
+            assertThat("Database should have read", NetworkDatabaseReader(connection, databaseFile).read(networkService))
         }
 
         logger.info("Sleeping...")
@@ -251,15 +251,15 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
     }
 
     @Test
-    internal fun `only loads street address fields if required`() {
-        // This test is here to make sure the database reading correctly removes the parts of loaded street addresses that are not filled out.
+    internal fun `only reads street address fields if required`() {
+        // This test is here to make sure the database reading correctly removes the parts of street addresses that are not filled out.
         val writeService = NetworkService().apply {
             add(Location(mRID = "loc1").apply { mainAddress = StreetAddress(townDetail = TownDetail(), streetDetail = StreetDetail()) })
         }
 
         validateWriteRead(writeService) { readService ->
             assertThat(
-                "Expected a default street address as blank parts should have been removed during teh database read",
+                "Expected a default street address as blank parts should have been removed during the database read",
                 readService.get<Location>("loc1")!!.mainAddress,
                 equalTo(StreetAddress())
             )

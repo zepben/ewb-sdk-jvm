@@ -12,7 +12,7 @@ import com.zepben.evolve.database.sqlite.metrics.tables.tableMetricsVersion
 import com.zepben.evolve.metrics.*
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
+import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -35,12 +35,12 @@ internal class MetricsSchemaTest {
     private val uuid = UUID.fromString(uuidString)
 
     @BeforeEach
-    private fun beforeEach() {
+    fun beforeEach() {
         Files.deleteIfExists(Paths.get(schemaTestFile))
     }
 
     @AfterEach
-    private fun afterEach() {
+    fun afterEach() {
         Files.deleteIfExists(Paths.get(schemaTestFile))
     }
 
@@ -100,9 +100,9 @@ internal class MetricsSchemaTest {
     private fun validateJob(expectedJob: IngestionJob, tableName: String, vararg rows: List<Any>) {
         systemErr.clearCapturedLog()
 
-        assertThat("Database should have been saved", MetricsDatabaseWriter(schemaTestFile, expectedJob).save())
+        assertThat("Database should have been writen", MetricsDatabaseWriter(schemaTestFile).write(expectedJob))
 
-        assertThat(systemErr.log, Matchers.containsString("Creating database schema v${tableMetricsVersion.supportedVersion}"))
+        assertThat(systemErr.log, containsString("Creating database schema v${tableMetricsVersion.supportedVersion}"))
         assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
 
         DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->

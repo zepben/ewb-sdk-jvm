@@ -1,33 +1,32 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.common
+package com.zepben.evolve.database.sql
 
-import com.zepben.evolve.database.sql.Column
-import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
 import java.sql.Connection
 import java.sql.SQLException
 
 /**
- * Code representation of the `version` table.
- *
- * @property supportedVersion The supported schema version.
+ * Interface representing a `version` table that should be implemented by DBMS specific version tables.
+ * This allows for common operations between DBMSs, primarily checking the version in the version table.
  *
  * @property VERSION Column definition.
+ * @property selectSql The select statement to read the version number.
+ * @property supportedVersion The version number of the schema supported by the code.
  */
 @Suppress("PropertyName")
-class TableVersion(val supportedVersion: Int) : SqliteTable() {
+interface TableVersion {
 
-    val VERSION: Column = Column(++columnIndex, "version", "TEXT", NOT_NULL)
+    val VERSION: Column
 
-    override val name: String = "version"
+    val selectSql: String
+    val supportedVersion: Int
 
     /**
      * Helper function to read the version from the database.

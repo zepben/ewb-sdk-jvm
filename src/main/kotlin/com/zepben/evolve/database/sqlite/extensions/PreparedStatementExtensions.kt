@@ -17,6 +17,8 @@ import java.sql.PreparedStatement
 import java.sql.SQLException
 import java.sql.Types.*
 import java.time.Instant
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 @Throws(SQLException::class)
 fun PreparedStatement.tryExecuteSingleUpdate(onError: () -> Unit): Boolean {
@@ -30,7 +32,7 @@ fun PreparedStatement.tryExecuteSingleUpdate(onError: () -> Unit): Boolean {
 
 fun PreparedStatement.logFailure(logger: Logger, description: String) {
     logger.warn(
-        "Failed to save $description.\n" +
+        "Failed to write $description.\n" +
             "SQL: ${sql()}\n" +
             "Fields: ${parameters()}"
     )
@@ -103,11 +105,7 @@ fun PreparedStatement.executeSingleUpdate(): Boolean {
 
 fun PreparedStatement.sql(): String {
     return try {
-        AccessController.doPrivileged(PrivilegedExceptionAction {
-            val field = javaClass.getFieldExt("sql")
-            field.isAccessible = true
-            field[this].toString()
-        } as PrivilegedExceptionAction<String>)
+        accessProtectedProperty<String>("sql")
     } catch (e: PrivilegedActionException) {
         "Failed to extract SQL - " + e.message
     }
@@ -115,12 +113,15 @@ fun PreparedStatement.sql(): String {
 
 fun PreparedStatement.parameters(): String {
     return try {
-        AccessController.doPrivileged(PrivilegedExceptionAction {
-            val field = javaClass.getFieldExt("batch")
-            field.isAccessible = true
-            (field[this] as Array<*>).contentToString()
-        } as PrivilegedExceptionAction<String>)
+        accessProtectedProperty<Array<*>>("batch").contentToString()
     } catch (e: Exception) {
         "Failed to extract parameters - " + e.message
     }
 }
+
+private inline fun <reified T : Any> PreparedStatement.accessProtectedProperty(propertyName: String): T =
+    AccessController.doPrivileged(PrivilegedExceptionAction {
+        val prop = this::class.memberProperties.first { it.name == propertyName }
+        prop.isAccessible = true
+        prop.getter.call(this)
+    }) as T

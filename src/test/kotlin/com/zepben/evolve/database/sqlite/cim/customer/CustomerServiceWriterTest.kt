@@ -24,8 +24,8 @@ internal class CustomerServiceWriterTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val customerService = CustomerService()
-    private val cimWriter = mockk<CustomerCimWriter> { every { save(any<Customer>()) } returns true }
-    private val customerServiceWriter = CustomerServiceWriter(customerService, mockk(), cimWriter)
+    private val cimWriter = mockk<CustomerCimWriter> { every { write(any<Customer>()) } returns true }
+    private val customerServiceWriter = CustomerServiceWriter(mockk(), cimWriter)
 
     //
     // NOTE: We don't do an exhaustive test of saving objects as this is done via the schema test.
@@ -35,11 +35,11 @@ internal class CustomerServiceWriterTest {
     internal fun `passes objects through to the cim writer`() {
         val customer = Customer().also { customerService.add(it) }
 
-        // NOTE: the save method will fail due to the relaxed mock returning false for all save operations,
-        //       but a save should still be attempted on every object
-        customerServiceWriter.save()
+        // NOTE: the write method will fail due to the relaxed mock returning false for all write operations,
+        //       but a `write` should still be attempted on every object
+        customerServiceWriter.write(customerService)
 
-        verify(exactly = 1) { cimWriter.save(customer) }
+        verify(exactly = 1) { cimWriter.write(customer) }
     }
 
 }

@@ -30,11 +30,11 @@ class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<DiagramService, DiagramD
 
     override fun createService(): DiagramService = DiagramService()
 
-    override fun createWriter(filename: String, service: DiagramService): DiagramDatabaseWriter =
-        DiagramDatabaseWriter(filename, service)
+    override fun createWriter(filename: String): DiagramDatabaseWriter =
+        DiagramDatabaseWriter(filename)
 
-    override fun createReader(connection: Connection, service: DiagramService, databaseDescription: String): DiagramDatabaseReader =
-        DiagramDatabaseReader(connection, service, databaseDescription)
+    override fun createReader(connection: Connection, databaseDescription: String): DiagramDatabaseReader =
+        DiagramDatabaseReader(connection, databaseDescription)
 
     override fun createComparator(): DiagramServiceComparator = DiagramServiceComparator()
 
@@ -42,10 +42,10 @@ class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<DiagramService, DiagramD
 
     @Test
     @Disabled
-    fun loadRealFile() {
+    fun readRealFile() {
         systemErr.unmute()
 
-        // Put the name of the database you want to load in src/test/resources/test-diagram-database.txt
+        // Put the name of the database you want to read in src/test/resources/test-diagram-database.txt
         val databaseFile = Files.readString(Path.of("src", "test", "resources", "test-diagram-database.txt")).trim().trim('"')
 
         assertThat("database must exist", Files.exists(Paths.get(databaseFile)))
@@ -53,7 +53,7 @@ class DiagramDatabaseSchemaTest : CimDatabaseSchemaTest<DiagramService, DiagramD
         val diagramService = DiagramService()
 
         DriverManager.getConnection("jdbc:sqlite:$databaseFile").use { connection ->
-            assertThat("Database should have loaded", DiagramDatabaseReader(connection, diagramService, databaseFile).load())
+            assertThat("Database should have read", DiagramDatabaseReader(connection, databaseFile).read(diagramService))
         }
 
         logger.info("Sleeping...")

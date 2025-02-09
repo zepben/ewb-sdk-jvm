@@ -9,7 +9,7 @@
 package com.zepben.evolve.database.sqlite.cim
 
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionReader
-import com.zepben.evolve.database.sqlite.common.TableVersion
+import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
@@ -21,69 +21,68 @@ import java.sql.Connection
  * A base class for reading objects from one of our CIM databases.
  *
  * @property connection The connection to the database.
- * @property metadataReader The reader for the [MetadataCollection] included in the database.
- * @property serviceReader The reader for the [BaseService] supported by the database.
- * @property service The [BaseService] that will be populated by the [BaseServiceReader]. Used for post-processing.
  * @property databaseDescription The description of the database for logging (e.g. filename).
- * @property tableVersion The version table object for checking the database version number.
+ * @property databaseTables The collection of tables that will be read by this reader.
+ * @property createMetadataReader Factory for the reader of the [MetadataCollection] included in the database.
+ * @property createServiceReader Factory for the reader of the [BaseService] supported by the database.
  *
  * @property logger The [Logger] to use for this reader.
  */
-abstract class CimDatabaseReader(
+abstract class CimDatabaseReader<TTables : CimDatabaseTables, TService : BaseService> internal constructor(
     private val connection: Connection,
-    private val metadataReader: MetadataCollectionReader,
-    private val serviceReader: BaseServiceReader,
-    protected open val service: BaseService,
     private val databaseDescription: String,
-    private val tableVersion: TableVersion
+    private val databaseTables: TTables,
+    private val createMetadataReader: (TTables, Connection) -> MetadataCollectionReader,
+    private val createServiceReader: (TTables, Connection) -> BaseServiceReader<TService>,
 ) {
 
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     private var hasBeenUsed: Boolean = false
 
-    private val supportedVersion = tableVersion.supportedVersion
-
     /**
-     * Customisable function for performing actions after the database has been loaded.
+     * Customisable function for performing actions after the database has been read.
      */
-    protected open fun postLoad(): Boolean {
+    protected open fun afterServiceRead(service: TService): Boolean {
         logger.info("Ensuring all references resolved...")
         service.unresolvedReferences().forEach {
             throw IllegalStateException(
-                "Unresolved references were found in ${service.name} service after load - this should not occur. Failing reference was from " +
+                "Unresolved references were found in ${service.name} service after read - this should not occur. Failing reference was from " +
                     "${it.from.typeNameAndMRID()} resolving ${it.resolver.toClass.simpleName} ${it.toMrid}"
             )
         }
-        logger.info("Unresolved references were all resolved during load.")
+        logger.info("Unresolved references were all resolved during read.")
 
         return true
     }
 
     /**
-     * Load the database.
+     * Read the database.
      */
-    fun load(): Boolean =
+    fun read(service: TService): Boolean =
         try {
             require(!hasBeenUsed) { "You can only use the database reader once." }
             hasBeenUsed = true
 
-            preLoad()
-                && loadFromReaders()
-                && postLoad()
+            beforeRead()
+                && readService(service)
+                && afterServiceRead(service)
         } catch (e: Exception) {
-            logger.error("Unable to load database: " + e.message)
+            logger.error("Unable to read database: " + e.message)
             false
         }
 
-    private fun preLoad(): Boolean =
+    private fun beforeRead(): Boolean =
         try {
-            val version = tableVersion.getVersion(connection)
+            val versionTable = databaseTables.getTable<SqliteTableVersion>()
+            val supportedVersion = versionTable.supportedVersion
+            val version = versionTable.getVersion(connection)
+
             if (version == supportedVersion) {
-                logger.info("Loading from database version v$version")
+                logger.info("Reading from database version v$version")
                 true
             } else {
-                logger.error(formatVersionError(version))
+                logger.error(formatVersionError(version, supportedVersion))
                 false
             }
         } catch (e: Exception) {
@@ -91,19 +90,19 @@ abstract class CimDatabaseReader(
             false
         }
 
-    private fun loadFromReaders() =
-        metadataReader.load() and
-            serviceReader.load()
+    private fun readService(service: TService) =
+        createMetadataReader(databaseTables, connection).read(service.metadata) and
+            createServiceReader(databaseTables, connection).read(service)
 
-    private fun formatVersionError(version: Int?): String =
+    private fun formatVersionError(version: Int?, supportedVersion: Int): String =
         when {
             version == null -> "Failed to read the version number from the selected database. Are you sure it is a EWB database?"
-            version < supportedVersion -> unexpectedVersion(version, "Consider using the UpgradeRunner if you wish to support this database.")
-            else -> unexpectedVersion(version, "You need to use a newer version of the SDK to load this database.")
+            version < supportedVersion -> unexpectedVersion(version, supportedVersion, "Consider using the UpgradeRunner if you wish to support this database.")
+            else -> unexpectedVersion(version, supportedVersion, "You need to use a newer version of the SDK to read this database.")
         }
 
 
-    private fun unexpectedVersion(version: Int?, action: String) =
-        "Unable to load from database $databaseDescription [found v$version, expected v$supportedVersion]. $action"
+    private fun unexpectedVersion(version: Int?, supportedVersion: Int, action: String) =
+        "Unable to read from database $databaseDescription [found v$version, expected v$supportedVersion]. $action"
 
 }

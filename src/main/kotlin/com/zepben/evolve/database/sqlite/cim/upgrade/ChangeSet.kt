@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite.cim.upgrade
 
-import com.zepben.evolve.database.sqlite.common.TableVersion
+import com.zepben.evolve.database.sql.TableVersion
 
 /**
  * A base class for all change sets used to upgrade the schema in our databases.

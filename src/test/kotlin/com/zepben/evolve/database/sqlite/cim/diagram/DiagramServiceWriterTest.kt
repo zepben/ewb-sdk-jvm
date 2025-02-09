@@ -24,8 +24,8 @@ internal class DiagramServiceWriterTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val diagramService = DiagramService()
-    private val cimWriter = mockk<DiagramCimWriter> { every { save(any<Diagram>()) } returns true }
-    private val diagramServiceWriter = DiagramServiceWriter(diagramService, mockk(), cimWriter)
+    private val cimWriter = mockk<DiagramCimWriter> { every { write(any<Diagram>()) } returns true }
+    private val diagramServiceWriter = DiagramServiceWriter(mockk(), cimWriter)
 
     //
     // NOTE: We don't do an exhaustive test of saving objects as this is done via the schema test.
@@ -35,11 +35,11 @@ internal class DiagramServiceWriterTest {
     internal fun `passes objects through to the cim writer`() {
         val diagram = Diagram().also { diagramService.add(it) }
 
-        // NOTE: the save method will fail due to the relaxed mock returning false for all save operations,
-        //       but a save should still be attempted on every object
-        diagramServiceWriter.save()
+        // NOTE: the write method will fail due to the relaxed mock returning false for all write operations,
+        //       but a `write` should still be attempted on every object
+        diagramServiceWriter.write(diagramService)
 
-        verify(exactly = 1) { cimWriter.save(diagram) }
+        verify(exactly = 1) { cimWriter.write(diagram) }
     }
 
 }

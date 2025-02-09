@@ -11,14 +11,13 @@ package com.zepben.evolve.database.sqlite.cim.upgrade
 import com.zepben.evolve.database.paths.DatabaseType
 import com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.*
-import com.zepben.evolve.database.sqlite.common.TableVersion
+import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.*
 import java.sql.*
-import kotlin.Throws
 
 /**
  * Upgrade the schema in one of our databases to the latest version.
@@ -46,7 +45,7 @@ class UpgradeRunner @JvmOverloads constructor(
         changeSet57(),
         changeSet58()
     ),
-    private val tableVersion: TableVersion = tableCimVersion
+    private val tableVersion: SqliteTableVersion = tableCimVersion
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)

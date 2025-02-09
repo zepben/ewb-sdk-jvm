@@ -20,12 +20,13 @@ import java.sql.SQLException
 /**
  * A base class for reading collections of object collections from a database.
  *
- * @property databaseTables The tables that are available in the database
+ * @property T The type of collection used by this reader.
+ * @property databaseTables The tables that are available in the database.
  * @property logger The logger to use for this collection reader.
 
  * @param connection The connection to the database to read.
  */
-abstract class BaseCollectionReader(
+internal abstract class BaseCollectionReader<T>(
     val databaseTables: BaseDatabaseTables,
     protected val connection: Connection
 ) {
@@ -33,64 +34,54 @@ abstract class BaseCollectionReader(
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     /**
-     * Load all the objects for the available collections.
+     * Read all the objects for the available collections.
      *
-     * @return true if the load was successful, otherwise false.
+     * @param data The data to be populated with the read objects.
+     *
+     * @return true if the read was successful, otherwise false.
      */
-    abstract fun load(): Boolean
+    abstract fun read(data: T): Boolean
 
     /**
-     * Helper function for chaining [loadEach] calls using the [and] operator in a more readable manner.
+     * Read each row of a table.
      *
-     * @param T The [SqliteTable] to read the objects from.
+     * @param TTable The [SqliteTable] to read the objects from.
      * @param processRow A callback for processing each row in the table. The callback will be provided with the table, the results for the row and a callback
      *   to set the identifier for the row, which returns the same value, so it can be used fluently.
      */
-    protected inline fun <reified T : SqliteTable> Boolean.andLoadEach(
-        crossinline processRow: (T, ResultSet, setIdentifier: (String) -> String) -> Boolean,
-        crossinline prepareSelectStatement: Connection.(T) -> PreparedStatement = { table -> prepareStatement(table.selectSql) }
-    ): Boolean =
-        this and loadEach(processRow, prepareSelectStatement)
-
-    /**
-     * Load each row of a table.
-     *
-     * @param T The [SqliteTable] to read the objects from.
-     * @param processRow A callback for processing each row in the table. The callback will be provided with the table, the results for the row and a callback
-     *   to set the identifier for the row, which returns the same value, so it can be used fluently.
-     */
-    protected inline fun <reified T : SqliteTable> loadEach(
-        crossinline processRow: (T, ResultSet, setIdentifier: (String) -> String) -> Boolean,
-        crossinline prepareSelectStatement: Connection.(T) -> PreparedStatement = { table -> prepareStatement(table.selectSql) }
+    protected inline fun <reified TTable : SqliteTable> readEach(
+        data: T,
+        crossinline processRow: (T, TTable, ResultSet, setIdentifier: (String) -> String) -> Boolean,
+        crossinline prepareSelectStatement: Connection.(TTable) -> PreparedStatement = { prepareStatement(it.selectSql) }
     ): Boolean {
-        val table = databaseTables.getTable<T>()
-        return table.loadAll(connection.prepareSelectStatement(table)) { results ->
+        val table = databaseTables.getTable<TTable>()
+        return table.readAll(connection.prepareSelectStatement(table)) { results ->
             var lastIdentifier: String? = null
             val setIdentifier = { identifier: String -> lastIdentifier = identifier; identifier }
 
             try {
                 var count = 0
                 while (results.next()) {
-                    if (processRow(this, results, setIdentifier)) {
+                    if (processRow(data, this, results, setIdentifier)) {
                         ++count
                     }
                 }
 
-                return@loadAll count
+                count
             } catch (e: SQLException) {
-                logger.error("Failed to load '$lastIdentifier' from '$name': ${e.message}")
+                logger.error("Failed to read '$lastIdentifier' from '$name': ${e.message}")
                 throw e
             }
         }
     }
 
     /**
-     * You really shouldn't need to use this function directly, use [loadEach] instead.
+     * You really shouldn't need to use this function directly, use [readEach] instead.
      *
      * NOTE: This is marked protected rather than private to allow the inline reified functions above to work.
      */
-    protected fun <T : SqliteTable> T.loadAll(selectStatement: PreparedStatement, processRows: T.(ResultSet) -> Int): Boolean {
-        logger.info("Loading $description...")
+    protected fun <TTable : SqliteTable> TTable.readAll(selectStatement: PreparedStatement, processRows: TTable.(ResultSet) -> Int): Boolean {
+        logger.info("Reading $description...")
 
         val thrown = try {
             val count = selectStatement.use {
@@ -98,7 +89,7 @@ abstract class BaseCollectionReader(
                     processRows(results)
                 }
             }
-            logger.info("Successfully loaded $count $description.")
+            logger.info("Successfully read $count $description.")
             return true
         } catch (t: Throwable) {
             when (t) {

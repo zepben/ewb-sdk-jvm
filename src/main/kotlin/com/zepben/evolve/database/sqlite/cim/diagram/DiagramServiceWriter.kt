@@ -16,17 +16,15 @@ import com.zepben.evolve.services.diagram.DiagramService
 /**
  * A class for writing a [DiagramService] into the database.
  *
- * @param service The [DiagramService] to save to the database.
  * @param databaseTables The [DiagramDatabaseTables] to add to the database.
  */
-class DiagramServiceWriter @JvmOverloads constructor(
-    override val service: DiagramService,
+internal class DiagramServiceWriter(
     databaseTables: DiagramDatabaseTables,
     override val writer: DiagramCimWriter = DiagramCimWriter(databaseTables)
-) : BaseServiceWriter(service, writer) {
+) : BaseServiceWriter<DiagramService>(writer) {
 
-    override fun doSave(): Boolean =
-        saveEach<DiagramObject>(writer::save)
-            .andSaveEach<Diagram>(writer::save)
+    override fun DiagramService.writeService(): Boolean =
+        writeEach<DiagramObject>(writer::write) and
+            writeEach<Diagram>(writer::write)
 
 }

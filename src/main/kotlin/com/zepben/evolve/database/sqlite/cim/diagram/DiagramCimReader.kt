@@ -23,12 +23,8 @@ import java.sql.SQLException
 
 /**
  * A class for reading the [DiagramService] tables from the database.
- *
- * @property service The [DiagramService] to populate from the database.
  */
-class DiagramCimReader(
-    override val service: DiagramService
-) : CimReader(service) {
+internal class DiagramCimReader : CimReader<DiagramService>() {
 
     // ###########################
     // # IEC61970 Diagram Layout #
@@ -37,6 +33,7 @@ class DiagramCimReader(
     /**
      * Create a [Diagram] and populate its fields from [TableDiagrams].
      *
+     * @param service The [DiagramService] used to store any items read from the database.
      * @param table The database table to read the [Diagram] fields from.
      * @param resultSet The record in the database table containing the fields for this [Diagram].
      * @param setIdentifier A callback to register the mRID of this [Diagram] for logging purposes.
@@ -45,18 +42,19 @@ class DiagramCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableDiagrams, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: DiagramService, table: TableDiagrams, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val diagram = Diagram(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             diagramStyle = DiagramStyle.valueOf(resultSet.getString(table.DIAGRAM_STYLE.queryIndex))
             orientationKind = OrientationKind.valueOf(resultSet.getString(table.ORIENTATION_KIND.queryIndex))
         }
 
-        return loadIdentifiedObject(diagram, table, resultSet) && service.addOrThrow(diagram)
+        return readIdentifiedObject(diagram, table, resultSet) && service.addOrThrow(diagram)
     }
 
     /**
      * Create a [DiagramObject] and populate its fields from [TableDiagramObjects].
      *
+     * @param service The [DiagramService] used to store any items read from the database.
      * @param table The database table to read the [DiagramObject] fields from.
      * @param resultSet The record in the database table containing the fields for this [DiagramObject].
      * @param setIdentifier A callback to register the mRID of this [DiagramObject] for logging purposes.
@@ -65,7 +63,7 @@ class DiagramCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableDiagramObjects, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: DiagramService, table: TableDiagramObjects, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val diagramObject = DiagramObject(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
             diagram = service.ensureGet(resultSet.getString(table.DIAGRAM_MRID.queryIndex), typeNameAndMRID())
             diagram?.addDiagramObject(this)
@@ -75,12 +73,13 @@ class DiagramCimReader(
             rotation = resultSet.getDouble(table.ROTATION.queryIndex)
         }
 
-        return loadIdentifiedObject(diagramObject, table, resultSet) && service.addOrThrow(diagramObject)
+        return readIdentifiedObject(diagramObject, table, resultSet) && service.addOrThrow(diagramObject)
     }
 
     /**
      * Create a [DiagramObjectPoint] and populate its fields from [TableDiagramObjectPoints].
      *
+     * @param service The [DiagramService] used to store any items read from the database.
      * @param table The database table to read the [DiagramObjectPoint] fields from.
      * @param resultSet The record in the database table containing the fields for this [DiagramObjectPoint].
      * @param setIdentifier A callback to register the mRID of this [DiagramObjectPoint] for logging purposes.
@@ -89,7 +88,7 @@ class DiagramCimReader(
      * @throws SQLException For any errors encountered reading from the database.
      */
     @Throws(SQLException::class)
-    fun load(table: TableDiagramObjectPoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+    fun read(service: DiagramService, table: TableDiagramObjectPoints, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
         val diagramObjectMRID = setIdentifier(resultSet.getString(table.DIAGRAM_OBJECT_MRID.queryIndex))
         val sequenceNumber = resultSet.getInt(table.SEQUENCE_NUMBER.queryIndex)
 

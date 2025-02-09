@@ -12,26 +12,17 @@ import com.zepben.evolve.database.sqlite.cim.CimDatabaseWriter
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionWriter
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.network.NetworkService
-import java.sql.Connection
-import java.sql.DriverManager
 
 /**
  * A class for writing the [NetworkService] objects and [MetadataCollection] to our network database.
  *
  * @param databaseFile the filename of the database to write.
- * @param service The [NetworkService] to save to the database.
  */
-class NetworkDatabaseWriter @JvmOverloads constructor(
-    databaseFile: String,
-    service: NetworkService,
-    databaseTables: NetworkDatabaseTables = NetworkDatabaseTables(),
-    metadataWriter: MetadataCollectionWriter = MetadataCollectionWriter(service, databaseTables),
-    serviceWriter: NetworkServiceWriter = NetworkServiceWriter(service, databaseTables),
-    getConnection: (String) -> Connection = DriverManager::getConnection
-) : CimDatabaseWriter(
+class NetworkDatabaseWriter(
+    databaseFile: String
+) : CimDatabaseWriter<NetworkDatabaseTables, NetworkService>(
     databaseFile,
-    databaseTables,
-    getConnection,
-    metadataWriter,
-    serviceWriter
+    NetworkDatabaseTables(),
+    ::MetadataCollectionWriter,
+    ::NetworkServiceWriter
 )

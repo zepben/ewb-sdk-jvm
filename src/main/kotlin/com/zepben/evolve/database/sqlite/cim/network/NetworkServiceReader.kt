@@ -54,127 +54,125 @@ import java.sql.Connection
 /**
  * A class for reading a [NetworkService] from the database.
  *
- * @param service The [NetworkService] to populate from the database.
  * @param databaseTables The tables available in the database.
  * @param connection A connection to the database.
  *
- * @property reader The [CimReader] used to load the objects from the database.
+ * @property reader The [CimReader] used to read the objects from the database.
  */
-class NetworkServiceReader @JvmOverloads constructor(
-    service: NetworkService,
+internal class NetworkServiceReader(
     databaseTables: NetworkDatabaseTables,
     connection: Connection,
-    override val reader: NetworkCimReader = NetworkCimReader(service)
-) : BaseServiceReader(databaseTables, connection, reader) {
+    override val reader: NetworkCimReader = NetworkCimReader()
+) : BaseServiceReader<NetworkService>(databaseTables, connection, reader) {
 
-    override fun doLoad(): Boolean =
-        loadEach<TableCableInfo>(reader::load)
-            .andLoadEach<TableOverheadWireInfo>(reader::load)
-            .andLoadEach<TablePowerTransformerInfo>(reader::load)
-            .andLoadEach<TableTransformerTankInfo>(reader::load)
-            .andLoadEach<TableNoLoadTests>(reader::load)
-            .andLoadEach<TableOpenCircuitTests>(reader::load)
-            .andLoadEach<TableShortCircuitTests>(reader::load)
-            .andLoadEach<TableShuntCompensatorInfo>(reader::load)
-            .andLoadEach<TableSwitchInfo>(reader::load)
-            .andLoadEach<TableTransformerEndInfo>(reader::load)
-            .andLoadEach<TableCurrentTransformerInfo>(reader::load)
-            .andLoadEach<TablePotentialTransformerInfo>(reader::load)
-            .andLoadEach<TableRelayInfo>(reader::load)
-            .andLoadEach<TableRecloseDelays>(reader::load)
-            .andLoadEach<TableLocations>(reader::load)
-            .andLoadEach<TableOrganisations>(reader::load)
-            .andLoadEach<TableAssetOwners>(reader::load)
-            .andLoadEach<TablePoles>(reader::load)
-            .andLoadEach<TableStreetlights>(reader::load)
-            .andLoadEach<TablePanDemandResponseFunctions>(reader::load)
-            .andLoadEach<TableMeters>(reader::load)
-            .andLoadEach<TableEndDevicesEndDeviceFunctions>(reader::load)
-            .andLoadEach<TableUsagePoints>(reader::load)
-            .andLoadEach<TableOperationalRestrictions>(reader::load)
-            .andLoadEach<TableBaseVoltages>(reader::load)
-            .andLoadEach<TableConnectivityNodes>(reader::load)
-            .andLoadEach<TableGeographicalRegions>(reader::load)
-            .andLoadEach<TableSubGeographicalRegions>(reader::load)
-            .andLoadEach<TableSubstations>(reader::load)
-            .andLoadEach<TableSites>(reader::load)
-            .andLoadEach<TablePerLengthPhaseImpedances>(reader::load)
-            .andLoadEach<TablePhaseImpedanceData>(reader::load)
-            .andLoadEach<TablePerLengthSequenceImpedances>(reader::load)
-            .andLoadEach<TableEquivalentBranches>(reader::load)
-            .andLoadEach<TableAcLineSegments>(reader::load)
-            .andLoadEach<TableBreakers>(reader::load)
-            .andLoadEach<TableLoadBreakSwitches>(reader::load)
-            .andLoadEach<TableBusbarSections>(reader::load)
-            .andLoadEach<TableClamps>(reader::load)
-            .andLoadEach<TableCuts>(reader::load)
-            .andLoadEach<TableCurrentRelays>(reader::load)
-            .andLoadEach<TableDistanceRelays>(reader::load)
-            .andLoadEach<TableVoltageRelays>(reader::load)
-            .andLoadEach<TableProtectionRelayFunctionThresholds>(reader::load)
-            .andLoadEach<TableProtectionRelayFunctionTimeLimits>(reader::load)
-            .andLoadEach<TableProtectionRelaySystems>(reader::load)
-            .andLoadEach<TableProtectionRelaySchemes>(reader::load)
-            .andLoadEach<TableDisconnectors>(reader::load)
-            .andLoadEach<TableEnergyConsumers>(reader::load)
-            .andLoadEach<TableEnergyConsumerPhases>(reader::load)
-            .andLoadEach<TableEnergySources>(reader::load)
-            .andLoadEach<TableEnergySourcePhases>(reader::load)
-            .andLoadEach<TableFuses>(reader::load)
-            .andLoadEach<TableJumpers>(reader::load)
-            .andLoadEach<TableJunctions>(reader::load)
-            .andLoadEach<TableGrounds>(reader::load)
-            .andLoadEach<TableGroundDisconnectors>(reader::load)
-            .andLoadEach<TableSeriesCompensators>(reader::load)
-            .andLoadEach<TableStaticVarCompensators>(reader::load)
-            .andLoadEach<TableLinearShuntCompensators>(reader::load)
-            .andLoadEach<TablePowerTransformers>(reader::load)
-            .andLoadEach<TableReclosers>(reader::load)
-            .andLoadEach<TablePowerElectronicsConnections>(reader::load)
-            .andLoadEach<TableReactiveCapabilityCurves>(reader::load)
-            .andLoadEach<TableCurveData>(reader::load)
-            .andLoadEach<TablePetersenCoils>(reader::load)
-            .andLoadEach<TableGroundingImpedances>(reader::load)
-            .andLoadEach<TableSynchronousMachines>(reader::load)
-            .andLoadEach<TableTerminals>(reader::load)
-            .andLoadEach<TableTapChangerControls>(reader::load)
-            .andLoadEach<TablePowerElectronicsConnectionPhases>(reader::load)
-            .andLoadEach<TableBatteryControls>(reader::load)
-            .andLoadEach<TableBatteryUnits>(reader::load)
-            .andLoadEach<TableBatteryUnitsBatteryControls>(reader::load)
-            .andLoadEach<TablePhotoVoltaicUnits>(reader::load)
-            .andLoadEach<TablePowerElectronicsWindUnits>(reader::load)
-            .andLoadEach<TableEvChargingUnits>(reader::load)
-            .andLoadEach<TableTransformerStarImpedances>(reader::load)
-            .andLoadEach<TablePowerTransformerEnds>(reader::load)
-            .andLoadEach<TablePowerTransformerEndRatings>(reader::load)
-            .andLoadEach<TableRatioTapChangers>(reader::load)
-            .andLoadEach<TableCurrentTransformers>(reader::load)
-            .andLoadEach<TableFaultIndicators>(reader::load)
-            .andLoadEach<TablePotentialTransformers>(reader::load)
-            .andLoadEach<TableFeeders>(reader::load)
-            .andLoadEach<TableLoops>(reader::load)
-            .andLoadEach<TableLvFeeders>(reader::load)
-            .andLoadEach<TableCircuits>(reader::load)
-            .andLoadEach<TablePositionPoints>(reader::load)
-            .andLoadEach<TableLocationStreetAddresses>(reader::load)
-            .andLoadEach<TableAssetOrganisationRolesAssets>(reader::load)
-            .andLoadEach<TableUsagePointsEndDevices>(reader::load)
-            .andLoadEach<TableEquipmentUsagePoints>(reader::load)
-            .andLoadEach<TableEquipmentOperationalRestrictions>(reader::load)
-            .andLoadEach<TableEquipmentEquipmentContainers>(reader::load)
-            .andLoadEach<TableCircuitsSubstations>(reader::load)
-            .andLoadEach<TableCircuitsTerminals>(reader::load)
-            .andLoadEach<TableLoopsSubstations>(reader::load)
-            .andLoadEach<TableProtectionRelayFunctionsProtectedSwitches>(reader::load)
-            .andLoadEach<TableProtectionRelayFunctionsSensors>(reader::load)
-            .andLoadEach<TableProtectionRelaySchemesProtectionRelayFunctions>(reader::load)
-            .andLoadEach<TableSynchronousMachinesReactiveCapabilityCurves>(reader::load)
-            .andLoadEach<TableControls>(reader::load)
-            .andLoadEach<TableRemoteControls>(reader::load)
-            .andLoadEach<TableRemoteSources>(reader::load)
-            .andLoadEach<TableAnalogs>(reader::load)
-            .andLoadEach<TableAccumulators>(reader::load)
-            .andLoadEach<TableDiscretes>(reader::load)
+    override fun readService(service: NetworkService): Boolean =
+        readEach<TableCableInfo>(service, reader::read) and
+            readEach<TableOverheadWireInfo>(service, reader::read) and
+            readEach<TablePowerTransformerInfo>(service, reader::read) and
+            readEach<TableTransformerTankInfo>(service, reader::read) and
+            readEach<TableNoLoadTests>(service, reader::read) and
+            readEach<TableOpenCircuitTests>(service, reader::read) and
+            readEach<TableShortCircuitTests>(service, reader::read) and
+            readEach<TableShuntCompensatorInfo>(service, reader::read) and
+            readEach<TableSwitchInfo>(service, reader::read) and
+            readEach<TableTransformerEndInfo>(service, reader::read) and
+            readEach<TableCurrentTransformerInfo>(service, reader::read) and
+            readEach<TablePotentialTransformerInfo>(service, reader::read) and
+            readEach<TableRelayInfo>(service, reader::read) and
+            readEach<TableRecloseDelays>(service, reader::read) and
+            readEach<TableLocations>(service, reader::read) and
+            readEach<TableOrganisations>(service, reader::read) and
+            readEach<TableAssetOwners>(service, reader::read) and
+            readEach<TablePoles>(service, reader::read) and
+            readEach<TableStreetlights>(service, reader::read) and
+            readEach<TablePanDemandResponseFunctions>(service, reader::read) and
+            readEach<TableMeters>(service, reader::read) and
+            readEach<TableEndDevicesEndDeviceFunctions>(service, reader::read) and
+            readEach<TableUsagePoints>(service, reader::read) and
+            readEach<TableOperationalRestrictions>(service, reader::read) and
+            readEach<TableBaseVoltages>(service, reader::read) and
+            readEach<TableConnectivityNodes>(service, reader::read) and
+            readEach<TableGeographicalRegions>(service, reader::read) and
+            readEach<TableSubGeographicalRegions>(service, reader::read) and
+            readEach<TableSubstations>(service, reader::read) and
+            readEach<TableSites>(service, reader::read) and
+            readEach<TablePerLengthPhaseImpedances>(service, reader::read) and
+            readEach<TablePhaseImpedanceData>(service, reader::read) and
+            readEach<TablePerLengthSequenceImpedances>(service, reader::read) and
+            readEach<TableEquivalentBranches>(service, reader::read) and
+            readEach<TableAcLineSegments>(service, reader::read) and
+            readEach<TableBreakers>(service, reader::read) and
+            readEach<TableLoadBreakSwitches>(service, reader::read) and
+            readEach<TableBusbarSections>(service, reader::read) and
+            readEach<TableClamps>(service, reader::read) and
+            readEach<TableCuts>(service, reader::read) and
+            readEach<TableCurrentRelays>(service, reader::read) and
+            readEach<TableDistanceRelays>(service, reader::read) and
+            readEach<TableVoltageRelays>(service, reader::read) and
+            readEach<TableProtectionRelayFunctionThresholds>(service, reader::read) and
+            readEach<TableProtectionRelayFunctionTimeLimits>(service, reader::read) and
+            readEach<TableProtectionRelaySystems>(service, reader::read) and
+            readEach<TableProtectionRelaySchemes>(service, reader::read) and
+            readEach<TableDisconnectors>(service, reader::read) and
+            readEach<TableEnergyConsumers>(service, reader::read) and
+            readEach<TableEnergyConsumerPhases>(service, reader::read) and
+            readEach<TableEnergySources>(service, reader::read) and
+            readEach<TableEnergySourcePhases>(service, reader::read) and
+            readEach<TableFuses>(service, reader::read) and
+            readEach<TableJumpers>(service, reader::read) and
+            readEach<TableJunctions>(service, reader::read) and
+            readEach<TableGrounds>(service, reader::read) and
+            readEach<TableGroundDisconnectors>(service, reader::read) and
+            readEach<TableSeriesCompensators>(service, reader::read) and
+            readEach<TableStaticVarCompensators>(service, reader::read) and
+            readEach<TableLinearShuntCompensators>(service, reader::read) and
+            readEach<TablePowerTransformers>(service, reader::read) and
+            readEach<TableReclosers>(service, reader::read) and
+            readEach<TablePowerElectronicsConnections>(service, reader::read) and
+            readEach<TableReactiveCapabilityCurves>(service, reader::read) and
+            readEach<TableCurveData>(service, reader::read) and
+            readEach<TablePetersenCoils>(service, reader::read) and
+            readEach<TableGroundingImpedances>(service, reader::read) and
+            readEach<TableSynchronousMachines>(service, reader::read) and
+            readEach<TableTerminals>(service, reader::read) and
+            readEach<TableTapChangerControls>(service, reader::read) and
+            readEach<TablePowerElectronicsConnectionPhases>(service, reader::read) and
+            readEach<TableBatteryControls>(service, reader::read) and
+            readEach<TableBatteryUnits>(service, reader::read) and
+            readEach<TableBatteryUnitsBatteryControls>(service, reader::read) and
+            readEach<TablePhotoVoltaicUnits>(service, reader::read) and
+            readEach<TablePowerElectronicsWindUnits>(service, reader::read) and
+            readEach<TableEvChargingUnits>(service, reader::read) and
+            readEach<TableTransformerStarImpedances>(service, reader::read) and
+            readEach<TablePowerTransformerEnds>(service, reader::read) and
+            readEach<TablePowerTransformerEndRatings>(service, reader::read) and
+            readEach<TableRatioTapChangers>(service, reader::read) and
+            readEach<TableCurrentTransformers>(service, reader::read) and
+            readEach<TableFaultIndicators>(service, reader::read) and
+            readEach<TablePotentialTransformers>(service, reader::read) and
+            readEach<TableFeeders>(service, reader::read) and
+            readEach<TableLoops>(service, reader::read) and
+            readEach<TableLvFeeders>(service, reader::read) and
+            readEach<TableCircuits>(service, reader::read) and
+            readEach<TablePositionPoints>(service, reader::read) and
+            readEach<TableLocationStreetAddresses>(service, reader::read) and
+            readEach<TableAssetOrganisationRolesAssets>(service, reader::read) and
+            readEach<TableUsagePointsEndDevices>(service, reader::read) and
+            readEach<TableEquipmentUsagePoints>(service, reader::read) and
+            readEach<TableEquipmentOperationalRestrictions>(service, reader::read) and
+            readEach<TableEquipmentEquipmentContainers>(service, reader::read) and
+            readEach<TableCircuitsSubstations>(service, reader::read) and
+            readEach<TableCircuitsTerminals>(service, reader::read) and
+            readEach<TableLoopsSubstations>(service, reader::read) and
+            readEach<TableProtectionRelayFunctionsProtectedSwitches>(service, reader::read) and
+            readEach<TableProtectionRelayFunctionsSensors>(service, reader::read) and
+            readEach<TableProtectionRelaySchemesProtectionRelayFunctions>(service, reader::read) and
+            readEach<TableSynchronousMachinesReactiveCapabilityCurves>(service, reader::read) and
+            readEach<TableControls>(service, reader::read) and
+            readEach<TableRemoteControls>(service, reader::read) and
+            readEach<TableRemoteSources>(service, reader::read) and
+            readEach<TableAnalogs>(service, reader::read) and
+            readEach<TableAccumulators>(service, reader::read) and
+            readEach<TableDiscretes>(service, reader::read)
 
 }

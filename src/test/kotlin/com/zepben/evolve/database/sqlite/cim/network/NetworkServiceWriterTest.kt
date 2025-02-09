@@ -24,8 +24,8 @@ internal class NetworkServiceWriterTest {
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
     private val networkService = NetworkService()
-    private val cimWriter = mockk<NetworkCimWriter> { every { save(any<Circuit>()) } returns true }
-    private val networkServiceWriter = NetworkServiceWriter(networkService, mockk(), cimWriter)
+    private val cimWriter = mockk<NetworkCimWriter> { every { write(any<Circuit>()) } returns true }
+    private val networkServiceWriter = NetworkServiceWriter(mockk(), cimWriter)
 
     //
     // NOTE: We don't do an exhaustive test of saving objects as this is done via the schema test.
@@ -35,11 +35,11 @@ internal class NetworkServiceWriterTest {
     internal fun `passes objects through to the cim writer`() {
         val circuit = Circuit().also { networkService.add(it) }
 
-        // NOTE: the save method will fail due to the relaxed mock returning false for all save operations,
-        //       but a save should still be attempted on every object
-        networkServiceWriter.save()
+        // NOTE: the write method will fail due to the relaxed mock returning false for all write operations,
+        //       but a `write` should still be attempted on every object
+        networkServiceWriter.write(networkService)
 
-        verify(exactly = 1) { cimWriter.save(circuit) }
+        verify(exactly = 1) { cimWriter.write(circuit) }
     }
 
 }

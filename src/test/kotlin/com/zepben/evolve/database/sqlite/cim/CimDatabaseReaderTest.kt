@@ -10,7 +10,9 @@ package com.zepben.evolve.database.sqlite.cim
 
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionReader
 import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
-import com.zepben.evolve.database.sqlite.common.TableVersion
+import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
+import com.zepben.evolve.services.common.BaseService
+import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
@@ -25,48 +27,50 @@ internal class CimDatabaseReaderTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
+    private val metadata = MetadataCollection()
+    private val service = object : BaseService("service name", metadata) {}
+
     private val databaseFile = "databaseFile"
-    private val metadataReader = mockk<MetadataCollectionReader>().also { every { it.load() } returns true }
-    private val serviceReader = mockk<BaseServiceReader>().also { every { it.load() } returns true }
+    private val metadataReader = mockk<MetadataCollectionReader>().also { every { it.read(metadata) } returns true }
+    private val serviceReader = mockk<BaseServiceReader<BaseService>>().also { every { it.read(service) } returns true }
 
     private val connection = mockk<Connection> {
         justRun { close() }
     }
 
-    private val tableVersion = mockk<TableVersion> {
+    private val tableVersion = mockk<SqliteTableVersion> {
         every { getVersion(any()) } returns 1
-        every { this@mockk.supportedVersion } returns 1
+        every { supportedVersion } returns 1
     }
 
-    private var postLoadResult = true
-    private var postLoadCalled = false
+    private var afterServiceReadResult = true
+    private var afterServiceReadCalled = false
 
-    private val reader = object : CimDatabaseReader(
+    private val reader = object : CimDatabaseReader<CimDatabaseTables, BaseService>(
         connection,
-        metadataReader,
-        serviceReader,
-        mockk(), // Services won't be used as we have replaced the postLoad implementation. The real function is tested by each descendant class.
         databaseFile,
-        tableVersion
+        mockk<CimDatabaseTables> { every { tables } returns mapOf(SqliteTableVersion::class to tableVersion) },
+        { _, _ -> metadataReader },
+        { _, _ -> serviceReader },
     ) {
-        override fun postLoad(): Boolean {
-            postLoadCalled = true
-            return postLoadResult
+        override fun afterServiceRead(service: BaseService): Boolean {
+            afterServiceReadCalled = true
+            return afterServiceReadResult
         }
     }
 
     @Test
-    internal fun `can load from valid database`() {
-        assertThat("Should have loaded", reader.load())
+    internal fun `can read from valid database`() {
+        assertThat("Should have read", reader.read(service))
 
         verifyReadersCalled()
-        assertThat("postLoad should have been called", postLoadCalled)
+        assertThat("afterServiceRead should have been called", afterServiceReadCalled)
     }
 
     @Test
     internal fun `can only run once`() {
-        assertThat("Should have loaded the first time", reader.load())
-        assertThat("Shouldn't have loaded a second time", !reader.load())
+        assertThat("Should have read the first time", reader.read(service))
+        assertThat("Shouldn't have read a second time", !reader.read(service))
 
         assertThat(systemErr.log, containsString("You can only use the database reader once."))
     }
@@ -77,22 +81,22 @@ internal class CimDatabaseReaderTest {
         every { tableVersion.selectSql } returns "SELECT"
         every { connection.prepareStatement(any()) } throws Exception("Test Error")
 
-        assertThat("Should not have loaded", !reader.load())
+        assertThat("Should not have read", !reader.read(service))
         assertThat(systemErr.log, containsString("Failed to connect to the database for reading: Test Error"))
 
         verify { connection.prepareStatement(any()) }
         confirmVerified(connection, metadataReader, serviceReader)
-        assertThat("postLoad shouldn't have been called", !postLoadCalled)
+        assertThat("afterServiceRead shouldn't have been called", !afterServiceReadCalled)
     }
 
     @Test
     internal fun `detect old databases`() {
         every { tableVersion.getVersion(any()) } returns 0
 
-        assertThat("Should not have loaded", !reader.load())
+        assertThat("Should not have read", !reader.read(service))
         assertThat(
             systemErr.log,
-            containsString("Unable to load from database $databaseFile [found v0, expected v1]. Consider using the UpgradeRunner if you wish to support this database.")
+            containsString("Unable to read from database $databaseFile [found v0, expected v1]. Consider using the UpgradeRunner if you wish to support this database.")
         )
 
         verifyInvalidVersionCalls()
@@ -102,10 +106,10 @@ internal class CimDatabaseReaderTest {
     internal fun `detect future databases`() {
         every { tableVersion.getVersion(any()) } returns 2
 
-        assertThat("Should not have loaded", !reader.load())
+        assertThat("Should not have read", !reader.read(service))
         assertThat(
             systemErr.log,
-            containsString("Unable to load from database $databaseFile [found v2, expected v1]. You need to use a newer version of the SDK to load this database.")
+            containsString("Unable to read from database $databaseFile [found v2, expected v1]. You need to use a newer version of the SDK to read this database.")
         )
 
         verifyInvalidVersionCalls()
@@ -115,7 +119,7 @@ internal class CimDatabaseReaderTest {
     internal fun `detect invalid databases`() {
         every { tableVersion.getVersion(any()) } returns null
 
-        assertThat("Should not have loaded", !reader.load())
+        assertThat("Should not have read", !reader.read(service))
         assertThat(systemErr.log, containsString("Failed to read the version number from the selected database. Are you sure it is a EWB database?"))
 
         verifyInvalidVersionCalls()
@@ -123,41 +127,41 @@ internal class CimDatabaseReaderTest {
 
     @Test
     internal fun `detect metadata failure`() {
-        every { metadataReader.load() } returns false
+        every { metadataReader.read(metadata) } returns false
 
-        assertThat("Should not have loaded", !reader.load())
+        assertThat("Should not have read", !reader.read(service))
 
         verifyReadersCalled()
-        assertThat("postLoad shouldn't have been called", !postLoadCalled)
+        assertThat("afterServiceRead shouldn't have been called", !afterServiceReadCalled)
     }
 
     @Test
     internal fun `detect reader failure`() {
-        every { serviceReader.load() } returns false
+        every { serviceReader.read(service) } returns false
 
-        assertThat("Should not have loaded", !reader.load())
+        assertThat("Should not have read", !reader.read(service))
 
         verifyReadersCalled()
-        assertThat("postLoad shouldn't have been called", !postLoadCalled)
+        assertThat("afterServiceRead shouldn't have been called", !afterServiceReadCalled)
     }
 
     @Test
-    internal fun `detect postLoad failure`() {
-        postLoadResult = false
+    internal fun `detect afterServiceRead failure`() {
+        afterServiceReadResult = false
 
-        assertThat("Should not have loaded", !reader.load())
+        assertThat("Should not have read", !reader.read(service))
 
         verifyReadersCalled()
-        assertThat("postLoad should have been called", postLoadCalled)
+        assertThat("afterServiceRead should have been called", afterServiceReadCalled)
     }
 
     @Test
     internal fun `detect missing tables`() {
-        every { serviceReader.load() } throws MissingTableConfigException("Test Error")
+        every { serviceReader.read(service) } throws MissingTableConfigException("Test Error")
 
-        assertThat("Should not have loaded", !reader.load())
+        assertThat("Should not have read", !reader.read(service))
 
-        assertThat(systemErr.log, containsString("Unable to load database: Test Error"))
+        assertThat(systemErr.log, containsString("Unable to read database: Test Error"))
     }
 
     private fun verifyReadersCalled() {
@@ -165,8 +169,8 @@ internal class CimDatabaseReaderTest {
             tableVersion.supportedVersion
             tableVersion.getVersion(connection)
 
-            metadataReader.load()
-            serviceReader.load()
+            metadataReader.read(metadata)
+            serviceReader.read(service)
         }
     }
 
@@ -177,7 +181,7 @@ internal class CimDatabaseReaderTest {
         }
 
         confirmVerified(metadataReader, serviceReader)
-        assertThat("postLoad shouldn't have been called", !postLoadCalled)
+        assertThat("afterServiceRead shouldn't have been called", !afterServiceReadCalled)
     }
 
 }

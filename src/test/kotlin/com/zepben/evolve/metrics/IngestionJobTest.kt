@@ -10,7 +10,8 @@ package com.zepben.evolve.metrics
 
 import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.empty
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -20,19 +21,12 @@ internal class IngestionJobTest {
 
     @Test
     internal fun constructorCoverage() {
-        val job = IngestionJob(uuid)
+        val metadata = mockk<IngestionMetadata>()
+        val job = IngestionJob(uuid, metadata)
         assertThat(job.id, equalTo(uuid))
-        assertThat(job.metadata, nullValue())
+        assertThat(job.metadata, equalTo(metadata))
         assertThat(job.sources.entries, empty())
         assertThat(job.networkMetrics.entries, empty())
-    }
-
-    @Test
-    internal fun metadata() {
-        val job = IngestionJob(uuid)
-        val metadata = mockk<IngestionMetadata>()
-        job.metadata = metadata
-        assertThat(job.metadata, equalTo(metadata))
     }
 
 }

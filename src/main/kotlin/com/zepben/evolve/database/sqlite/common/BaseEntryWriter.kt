@@ -18,7 +18,7 @@ import java.sql.SQLException
 /**
  * A base class for writing entries into tables of the database.
  */
-abstract class BaseEntryWriter {
+internal abstract class BaseEntryWriter {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 

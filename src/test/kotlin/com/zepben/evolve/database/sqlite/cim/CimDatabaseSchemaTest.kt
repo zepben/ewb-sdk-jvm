@@ -32,7 +32,7 @@ import java.sql.DriverManager
 /**
  * Base class for CIM service database schema tests
  */
-abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDatabaseWriter, TReader : CimDatabaseReader, TComparator : BaseServiceComparator> {
+abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDatabaseWriter<*, TService>, TReader : CimDatabaseReader<*, TService>, TComparator : BaseServiceComparator> {
 
     @JvmField
     @RegisterExtension
@@ -42,8 +42,8 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
     private val schemaTestFile = "src/test/data/schemaTest.sqlite"
 
     abstract fun createService(): TService
-    abstract fun createWriter(filename: String, service: TService): TWriter
-    abstract fun createReader(connection: Connection, service: TService, databaseDescription: String): TReader
+    abstract fun createWriter(filename: String): TWriter
+    abstract fun createReader(connection: Connection, databaseDescription: String): TReader
     abstract fun createComparator(): TComparator
     abstract fun createIdentifiedObject(): IdentifiedObject
 
@@ -80,7 +80,7 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
 
         assertThat(
             systemErr.log,
-            containsString("Failed to load ${identifiedObject.typeNameAndMRID()}. Unable to add to service '${readService.name}': duplicate MRID")
+            containsString("Failed to read ${identifiedObject.typeNameAndMRID()}. Unable to add to service '${readService.name}': duplicate MRID")
         )
     }
 
@@ -96,14 +96,14 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
         readService: TService = createService(),
         validateRead: ((TService) -> Unit)? = null
     ) {
-        assertThat("Database should have been saved", createWriter(schemaTestFile, writeService).save())
+        assertThat("Database should have been writen", createWriter(schemaTestFile).write(writeService))
 
         assertThat(systemErr.log, containsString("Creating database schema v${tableCimVersion.supportedVersion}"))
         assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
 
         systemErr.clearCapturedLog()
         val status = DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
-            createReader(connection, readService, schemaTestFile).load()
+            createReader(connection, schemaTestFile).read(readService)
         }
 
         if (validateRead != null) {
@@ -114,7 +114,7 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
     }
 
     protected fun validateUnresolvedFailure(expectedSource: String, expectedTarget: String, addDeferredReference: TService.() -> Unit) {
-        // Add an unresolved reference that should trigger the post load check.
+        // Add an unresolved reference that should trigger the after read check.
         val service = createService().apply { addDeferredReference() }
 
         validateWriteRead(readService = service)
@@ -122,7 +122,7 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
         assertThat(
             systemErr.log,
             containsString(
-                "Unresolved references were found in ${service.name} service after load - this should not occur. " +
+                "Unresolved references were found in ${service.name} service after read - this should not occur. " +
                     "Failing reference was from $expectedSource resolving $expectedTarget"
             )
         )
@@ -138,9 +138,9 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
         if (differences.modifications().isNotEmpty())
             System.err.println(differences.toString())
 
-        assertThat("unexpected objects found in loaded service", differences.missingFromTarget(), empty())
+        assertThat("unexpected objects found in read service", differences.missingFromTarget(), empty())
         assertThat("unexpected modifications", differences.modifications(), anEmptyMap())
-        assertThat("objects missing from loaded service", differences.missingFromSource(), empty())
+        assertThat("objects missing from read service", differences.missingFromSource(), empty())
     }
 
 }

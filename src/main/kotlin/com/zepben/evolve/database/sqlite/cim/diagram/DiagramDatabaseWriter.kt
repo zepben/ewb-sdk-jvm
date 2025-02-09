@@ -12,26 +12,17 @@ import com.zepben.evolve.database.sqlite.cim.CimDatabaseWriter
 import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionWriter
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import com.zepben.evolve.services.diagram.DiagramService
-import java.sql.Connection
-import java.sql.DriverManager
 
 /**
  * A class for writing the [DiagramService] objects and [MetadataCollection] to our diagram database.
  *
  * @param databaseFile the filename of the database to write.
- * @param service The [DiagramService] to save to the database.
  */
-class DiagramDatabaseWriter @JvmOverloads constructor(
-    databaseFile: String,
-    service: DiagramService,
-    databaseTables: DiagramDatabaseTables = DiagramDatabaseTables(),
-    metadataWriter: MetadataCollectionWriter = MetadataCollectionWriter(service, databaseTables),
-    serviceWriter: DiagramServiceWriter = DiagramServiceWriter(service, databaseTables),
-    getConnection: (String) -> Connection = DriverManager::getConnection
-) : CimDatabaseWriter(
+class DiagramDatabaseWriter(
+    databaseFile: String
+) : CimDatabaseWriter<DiagramDatabaseTables, DiagramService>(
     databaseFile,
-    databaseTables,
-    getConnection,
-    metadataWriter,
-    serviceWriter
+    DiagramDatabaseTables(),
+    ::MetadataCollectionWriter,
+    ::DiagramServiceWriter
 )

@@ -16,7 +16,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 import com.zepben.evolve.database.sqlite.cim.tables.TableMetadataDataSources
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableNameTypes
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableNames
-import com.zepben.evolve.database.sqlite.common.TableVersion
+import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.BaseServiceComparator
 import com.zepben.testutils.junit.SystemLogExtension
@@ -59,7 +59,7 @@ internal abstract class TranslatorTestBase<S : BaseService>(
      * You should add any tables for each specific database type via an appropriate override calling this base method.
      */
     protected open val excludedTables: Set<KClass<out SqliteTable>> = setOf(
-        TableVersion::class,
+        SqliteTableVersion::class,
         TableMetadataDataSources::class,
         TableNameTypes::class,
         TableNames::class

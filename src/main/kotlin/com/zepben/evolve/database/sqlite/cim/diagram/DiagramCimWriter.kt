@@ -24,7 +24,7 @@ import java.sql.SQLException
  *
  * @property databaseTables The tables available in the database.
  */
-class DiagramCimWriter(
+internal class DiagramCimWriter(
     override val databaseTables: DiagramDatabaseTables
 ) : CimWriter(databaseTables) {
 
@@ -33,7 +33,7 @@ class DiagramCimWriter(
     // ###########################
 
     /**
-     * Save the [Diagram] fields to [TableDiagrams].
+     * Write the [Diagram] fields to [TableDiagrams].
      *
      * @param diagram The [Diagram] instance to write to the database.
      *
@@ -41,18 +41,18 @@ class DiagramCimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(diagram: Diagram): Boolean {
+    fun write(diagram: Diagram): Boolean {
         val table = databaseTables.getTable<TableDiagrams>()
         val insert = databaseTables.getInsert<TableDiagrams>()
 
         insert.setNullableString(table.DIAGRAM_STYLE.queryIndex, diagram.diagramStyle.name)
         insert.setNullableString(table.ORIENTATION_KIND.queryIndex, diagram.orientationKind.name)
 
-        return saveIdentifiedObject(table, insert, diagram, "diagram")
+        return writeIdentifiedObject(table, insert, diagram, "diagram")
     }
 
     /**
-     * Save the [DiagramObject] fields to [TableDiagramObjects].
+     * Write the [DiagramObject] fields to [TableDiagramObjects].
      *
      * @param diagramObject The [DiagramObject] instance to write to the database.
      *
@@ -60,13 +60,13 @@ class DiagramCimWriter(
      * @throws SQLException For any errors encountered writing to the database.
      */
     @Throws(SQLException::class)
-    fun save(diagramObject: DiagramObject): Boolean {
+    fun write(diagramObject: DiagramObject): Boolean {
         val table = databaseTables.getTable<TableDiagramObjects>()
         val insert = databaseTables.getInsert<TableDiagramObjects>()
 
         var status = true
         diagramObject.points.forEachIndexed { sequence, point ->
-            status = status and saveDiagramObjectPoint(diagramObject, point, sequence)
+            status = status and writeDiagramObjectPoint(diagramObject, point, sequence)
         }
 
         insert.setNullableString(table.IDENTIFIED_OBJECT_MRID.queryIndex, diagramObject.identifiedObjectMRID)
@@ -74,11 +74,11 @@ class DiagramCimWriter(
         insert.setNullableString(table.STYLE.queryIndex, diagramObject.style)
         insert.setDouble(table.ROTATION.queryIndex, diagramObject.rotation)
 
-        return status and saveIdentifiedObject(table, insert, diagramObject, "diagram object")
+        return status and writeIdentifiedObject(table, insert, diagramObject, "diagram object")
     }
 
     @Throws(SQLException::class)
-    private fun saveDiagramObjectPoint(diagramObject: DiagramObject, diagramObjectPoint: DiagramObjectPoint, sequenceNumber: Int): Boolean {
+    private fun writeDiagramObjectPoint(diagramObject: DiagramObject, diagramObjectPoint: DiagramObjectPoint, sequenceNumber: Int): Boolean {
         val table = databaseTables.getTable<TableDiagramObjectPoints>()
         val insert = databaseTables.getInsert<TableDiagramObjectPoints>()
 

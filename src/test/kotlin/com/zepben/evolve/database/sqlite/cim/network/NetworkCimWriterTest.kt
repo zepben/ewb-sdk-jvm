@@ -76,7 +76,7 @@ class NetworkCimWriterTest {
             shouldIgnore.forEach { addContainer(it) }
         }
 
-        writer.save(junction)
+        writer.write(junction)
 
         shouldExport.forEach {
             println("Check collection entry for ${it::class.simpleName} was exported...")

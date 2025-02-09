@@ -34,11 +34,11 @@ class CustomerDatabaseSchemaTest : CimDatabaseSchemaTest<CustomerService, Custom
 
     override fun createService(): CustomerService = CustomerService()
 
-    override fun createWriter(filename: String, service: CustomerService): CustomerDatabaseWriter =
-        CustomerDatabaseWriter(filename, service)
+    override fun createWriter(filename: String): CustomerDatabaseWriter =
+        CustomerDatabaseWriter(filename)
 
-    override fun createReader(connection: Connection, service: CustomerService, databaseDescription: String): CustomerDatabaseReader =
-        CustomerDatabaseReader(connection, service, databaseDescription)
+    override fun createReader(connection: Connection, databaseDescription: String): CustomerDatabaseReader =
+        CustomerDatabaseReader(connection, databaseDescription)
 
     override fun createComparator(): CustomerServiceComparator = CustomerServiceComparator()
 
@@ -46,10 +46,10 @@ class CustomerDatabaseSchemaTest : CimDatabaseSchemaTest<CustomerService, Custom
 
     @Test
     @Disabled
-    fun loadRealFile() {
+    fun readRealFile() {
         systemErr.unmute()
 
-        // Put the name of the database you want to load in src/test/resources/test-customer-database.txt
+        // Put the name of the database you want to read in src/test/resources/test-customer-database.txt
         val databaseFile = Files.readString(Path.of("src", "test", "resources", "test-customer-database.txt")).trim().trim('"')
 
         assertThat("database must exist", Files.exists(Paths.get(databaseFile)))
@@ -57,7 +57,7 @@ class CustomerDatabaseSchemaTest : CimDatabaseSchemaTest<CustomerService, Custom
         val customerService = CustomerService()
 
         DriverManager.getConnection("jdbc:sqlite:$databaseFile").use { connection ->
-            assertThat("Database should have loaded", CustomerDatabaseReader(connection, customerService, databaseFile).load())
+            assertThat("Database should have read", CustomerDatabaseReader(connection, databaseFile).read(customerService))
         }
 
         logger.info("Sleeping...")

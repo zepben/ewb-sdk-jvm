@@ -18,23 +18,18 @@ import java.sql.Connection
 /**
  * A class for reading a [DiagramService] from the database.
  *
- * @param service The [DiagramService] to populate from the database.
  * @param databaseTables The tables available in the database.
  * @param connection A connection to the database.
- *
- * @property reader The [DiagramCimReader] used to load the objects from the database.
  */
-class DiagramServiceReader @JvmOverloads constructor(
-    service: DiagramService,
+internal class DiagramServiceReader(
     databaseTables: DiagramDatabaseTables,
     connection: Connection,
-    override val reader: DiagramCimReader = DiagramCimReader(service)
-) : BaseServiceReader(databaseTables, connection, reader) {
+    override val reader: DiagramCimReader = DiagramCimReader()
+) : BaseServiceReader<DiagramService>(databaseTables, connection, reader) {
 
-    override fun doLoad(): Boolean =
-
-        loadEach<TableDiagrams>(reader::load)
-            .andLoadEach<TableDiagramObjects>(reader::load)
-            .andLoadEach<TableDiagramObjectPoints>(reader::load)
+    override fun readService(service: DiagramService): Boolean =
+        readEach<TableDiagrams>(service, reader::read) and
+            readEach<TableDiagramObjects>(service, reader::read) and
+            readEach<TableDiagramObjectPoints>(service, reader::read)
 
 }

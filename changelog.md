@@ -27,7 +27,19 @@
   * `load` has been renamed to `read`, so the readers now read, rather than load.
 * Database readers and writers no longer have the container of the data they will read/write passed to the constructor. They now have this passed to the `read`
   or `write` method.
+* The following classes are now internal:
+  * `BaseServiceReader`, `BaseServiceWriter`, `BaseCollectionReader`, `BaseCollectionWriter`, `BaseEntryWriter`, 
+  * `CimReader`, `CimWriter`,
+  * `CustomerCimReader`, `CustomerCimWriter`, `CustomerServiceReader`, `CustomerServiceWriter`, 
+  * `DiagramCimReader`, `DiagramCimWriter`, `DiagramServiceReader`, `DiagramServiceWriter`, 
+  * `MetadataCollectionReader`, `MetadataCollectionWriter`, `MetadataEntryReader`, `MetadataEntryWriter`, 
+  * `MetricsEntryWriter`, `MetricsWriter`
+  * `NetworkServiceReader`, `NetworkServiceWriter`,
+* The following classes now have internal constructors:
+  * `BaseDatabaseWriter`, `CimDatabaseReader`, `CimDatabaseWriter`,
+  * `CimDatabaseTables`, `BaseDatabaseTables`, `CustomerDatabaseTables`, `DiagramDatabaseTables`, `NetworkDatabaseTables`, `MetricsDatabaseTables`
 * Removed `Class.getFieldExt` extension function.
+* `InjectionJob.metadata` property is no longer a nullable type and is now a readonly val.
 
 ### New Features
 * Added `ClearDirection` that clears feeder directions.

@@ -62,9 +62,9 @@ internal abstract class NetworkTraceQueueNext(private val pathProvider: NetworkT
         computeData: ComputeData<T>,
     ): Sequence<NetworkTraceStep<T>> {
         val nextNumTerminalSteps = currentStep.nextNumTerminalSteps()
-        val nextNumEquipmentSteps = currentStep.nextNumEquipmentSteps()
         return pathProvider.nextPaths(currentStep.path).map {
-            NetworkTraceStep(it, nextNumTerminalSteps, nextNumEquipmentSteps, computeData.computeNext(currentStep, currentContext, it))
+            val data = computeData.computeNext(currentStep, currentContext, it)
+            NetworkTraceStep(it, nextNumTerminalSteps, it.nextNumEquipmentSteps(currentStep.numEquipmentSteps), data)
         }
     }
 
@@ -75,14 +75,14 @@ internal abstract class NetworkTraceQueueNext(private val pathProvider: NetworkT
         computeNextT: ComputeDataWithPaths<T>,
     ): List<NetworkTraceStep<T>> {
         val nextNumTerminalSteps = currentStep.nextNumTerminalSteps()
-        val nextNumEquipmentSteps = currentStep.nextNumEquipmentSteps()
         val nextPaths = pathProvider.nextPaths(currentStep.path).toList()
         return nextPaths.map {
-            NetworkTraceStep(it, nextNumTerminalSteps, nextNumEquipmentSteps, computeNextT.computeNext(currentStep, currentContext, it, nextPaths))
+            val data = computeNextT.computeNext(currentStep, currentContext, it, nextPaths)
+            NetworkTraceStep(it, nextNumTerminalSteps, it.nextNumEquipmentSteps(currentStep.numEquipmentSteps), data)
         }
     }
 
     private fun NetworkTraceStep<*>.nextNumTerminalSteps() = numTerminalSteps + 1
-    private fun NetworkTraceStep<*>.nextNumEquipmentSteps() = if (path.tracedInternally) numEquipmentSteps + 1 else numEquipmentSteps
+    private fun NetworkTraceStep.Path.nextNumEquipmentSteps(currentNum: Int) = if (tracedExternally) currentNum + 1 else currentNum
 
 }

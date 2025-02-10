@@ -43,6 +43,8 @@
 * `AcLineSegment` now only supports adding 2 terminals by default. Mid-span terminals are now considered deprecated and models should migrate to using `Clamp`.
    If you need to enable the old behaviour you can set `AcLineSegment.midSpanTerminalsEnabled` to `true`, however this will cause adding  a `Cut` or 
    a `Clamp` to the `AcLineSegment` to fail.
+* `Clamp` can now only have a single terminal added.
+* `Cut` can now only have a maximum of 2 terminals added.
 
 ### New Features
 * Added `ClearDirection` that clears feeder directions.

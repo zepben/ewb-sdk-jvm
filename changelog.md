@@ -40,6 +40,9 @@
   * `CimDatabaseTables`, `BaseDatabaseTables`, `CustomerDatabaseTables`, `DiagramDatabaseTables`, `NetworkDatabaseTables`, `MetricsDatabaseTables`
 * Removed `Class.getFieldExt` extension function.
 * `InjectionJob.metadata` property is no longer a nullable type and is now a readonly val.
+* `AcLineSegment` now only supports adding 2 terminals by default. Mid-span terminals are now considered deprecated and models should migrate to using `Clamp`.
+   If you need to enable the old behaviour you can set `AcLineSegment.midSpanTerminalsEnabled` to `true`, however this will cause adding  a `Cut` or 
+   a `Clamp` to the `AcLineSegment` to fail.
 
 ### New Features
 * Added `ClearDirection` that clears feeder directions.
@@ -60,6 +63,7 @@
   only effects the gRPC threads.
 * `QueryNetworkStateClient.reportBatchStatus` can be used to send status responses for batches returned from the service via
   `QueryNetworkStateClient.getCurrentStates`.
+* Tracing models with `Cut` and `Clamp` are now supported via the new tracing API.
 
 ### Fixes
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart.
@@ -91,7 +95,7 @@
 * RemoveJumperEvent now uses correct protobuf classes when converting
 
 ### Notes
-* Tracing models with `Cut` and `Clamp` are now supported via the new tracing API.
+* None.
 
 ## [0.24.0] - 2025-01-21
 ### Breaking Changes

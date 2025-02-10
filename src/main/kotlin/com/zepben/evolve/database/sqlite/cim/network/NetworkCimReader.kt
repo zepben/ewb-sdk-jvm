@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -1153,6 +1153,17 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
                 resultSet.getNullableString(table.CONDUCTING_EQUIPMENT_MRID.queryIndex),
                 typeNameAndMRID()
             )
+
+            when (val casted = conductingEquipment) {
+                is AcLineSegment -> {
+                    if (casted.terminals.size == 2) {
+                        logger.warn("Enabling mid-span terminals for ${casted.typeNameAndMRID()}. Mid-span terminals are deprecated and models should migrate to using Clamps.")
+                        @Suppress("DEPRECATION")
+                        casted.midSpanTerminalsEnabled = true
+                    }
+                }
+            }
+
             conductingEquipment?.addTerminal(this)
             phases = PhaseCode.valueOf(resultSet.getString(table.PHASES.queryIndex))
         }

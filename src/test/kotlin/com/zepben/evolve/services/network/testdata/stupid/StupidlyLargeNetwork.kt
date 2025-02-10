@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -224,8 +224,10 @@ object StupidlyLargeNetwork {
         networkService.connect(createTerminal(networkService, node1, PhaseCode.C, 1), "cn_2")
         networkService.connect(createTerminal(networkService, node1, PhaseCode.B, 2), "cn_2")
 
-        val multiTerminalAcLineSegment1 = AcLineSegment("multiTerminalAcLineSegment1").apply { name = "multiTerminalAcLineSegment1"; assetInfo = oh2 }
-        val multiTerminalAcLineSegment2 = AcLineSegment("multiTerminalAcLineSegment2").apply { assetInfo = oh2; length = Double.NaN }
+        @Suppress("DEPRECATION") val multiTerminalAcLineSegment1 =
+            AcLineSegment("multiTerminalAcLineSegment1").apply { name = "multiTerminalAcLineSegment1"; assetInfo = oh2; midSpanTerminalsEnabled = true }
+        @Suppress("DEPRECATION") val multiTerminalAcLineSegment2 =
+            AcLineSegment("multiTerminalAcLineSegment2").apply { assetInfo = oh2; length = Double.NaN; midSpanTerminalsEnabled = true }
         val multiTerminalNode1 = Junction("multiTerminalNode1").apply { name = "multiTerminalNode1" }
         val multiTerminalNode2 = Junction("multiTerminalNode2").apply { name = "multiTerminalNode2" }
         val multiTerminalNode3 = Junction("multiTerminalNode3").apply { name = "multiTerminalNode3" }

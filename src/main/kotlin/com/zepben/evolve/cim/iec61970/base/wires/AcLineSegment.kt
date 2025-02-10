@@ -39,6 +39,7 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
             field = value
         }
 
+    @Suppress("DEPRECATION")
     override val maxTerminals: Int
         get() = if (midSpanTerminalsEnabled) super.maxTerminals else 2
 
@@ -162,7 +163,10 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
         return this
     }
 
+    @Suppress("DEPRECATION")
     private fun validateCut(cut: Cut): Boolean {
+        check(!midSpanTerminalsEnabled) { "Cannot add cuts to AcLineSegment with midSpanTerminalsEnabled set to true"}
+
         if (validateReference(cut, ::getCut, "A Cut"))
             return true
 
@@ -175,7 +179,10 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
         return false
     }
 
+    @Suppress("DEPRECATION")
     private fun validateClamp(clamp: Clamp): Boolean {
+        check(!midSpanTerminalsEnabled) { "Cannot add clamps to AcLineSegment with midSpanTerminalsEnabled set to true"}
+
         if (validateReference(clamp, ::getClamp, "A Clamp"))
             return true
 

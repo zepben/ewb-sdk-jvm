@@ -30,6 +30,11 @@ class NetworkTraceStepPathProviderTest {
 
     @Test
     fun `current external path steps internally`() {
+        //
+        //             2
+        //  1--c0--2 1 j1
+        //             3
+        //
         val network = TestNetworkBuilder()
             .fromAcls() // c0
             .toJunction(numTerminals = 3) // j1
@@ -46,6 +51,12 @@ class NetworkTraceStepPathProviderTest {
 
     @Test
     fun `current internal path steps externally`() {
+        //
+        //  1 j0 21--c1--2
+        //       1
+        //       c2
+        //       2
+        //
         val network = TestNetworkBuilder()
             .fromJunction() // j0
             .toAcls() // c1
@@ -65,6 +76,12 @@ class NetworkTraceStepPathProviderTest {
 
     @Test
     fun `only steps to in service equipment`() {
+        //
+        //  1 j0 21--c1--2
+        //       1
+        //       c2 (not in service)
+        //       2
+        //
         val network = TestNetworkBuilder()
             .fromJunction() // j0
             .toAcls() // c1
@@ -84,6 +101,11 @@ class NetworkTraceStepPathProviderTest {
 
     @Test
     fun `only includes followed phases`() {
+        //
+        //            2 (A)
+        //  1--c0--21 tx1 3 (B)
+        //            4 (C)
+        //
         val network = TestNetworkBuilder()
             .fromAcls() // c0
             .toPowerTransformer(listOf(PhaseCode.ABC, PhaseCode.A, PhaseCode.B, PhaseCode.C)) // tx1
@@ -100,6 +122,7 @@ class NetworkTraceStepPathProviderTest {
             containsInAnyOrder(
                 NetworkTraceStep.Path(tx1.t1, tx1.t2, listOf(NominalPhasePath(SPK.A, SPK.A))),
                 NetworkTraceStep.Path(tx1.t1, tx1.t3, listOf(NominalPhasePath(SPK.B, SPK.B)))
+                // Should not contain tx1 terminal 4 because it's not in the phase paths
             )
         )
     }
@@ -352,6 +375,10 @@ class NetworkTraceStepPathProviderTest {
     @Suppress("DEPRECATION")
     @Test
     fun `supports legacy AcLineSegment with multiple terminals`() {
+        //
+        //              3
+        //  1 b0 21--c1-*-2
+        //
         val network = TestNetworkBuilder()
             .fromBreaker() // b0
             .toAcls() // c1
@@ -408,9 +435,9 @@ class NetworkTraceStepPathProviderTest {
     private fun aclsWithClampsNetwork(): NetworkService {
         //
         //           clamp1
-        //           |
+        //           1
         // 1 b0 21---*--c1--*---21 b2 2
-        //                  |
+        //                  1
         //                  clamp2
         //
         val network = TestNetworkBuilder()
@@ -500,5 +527,8 @@ class NetworkTraceStepPathProviderTest {
         return cut
     }
 
+    /**
+     * Allows for shorthand notation to create a NetworkTraceStep.Path between 2 terminals. E.g. `j0.t2..c1.t1`
+     */
     private operator fun Terminal.rangeTo(other: Terminal): NetworkTraceStep.Path = NetworkTraceStep.Path(this, other)
 }

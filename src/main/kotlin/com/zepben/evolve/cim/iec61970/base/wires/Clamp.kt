@@ -23,6 +23,5 @@ class Clamp @JvmOverloads constructor(mRID: String = "") : ConductingEquipment(m
     var lengthFromTerminal1: Double? = null
     var acLineSegment: AcLineSegment? = null
 
-    override val maxTerminals: Int
-        get() = 1
+    override val maxTerminals: Int get() = 1
 }

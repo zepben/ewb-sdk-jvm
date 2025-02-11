@@ -151,7 +151,7 @@ class NetworkTrace<T> private constructor(
      * @param phases Phases to trace; `null` to ignore phases.
      */
     fun addStartItem(start: Terminal, data: T, phases: PhaseCode? = null): NetworkTrace<T> {
-        val startPath = NetworkTraceStep.Path(start, start, startNominalPhasePath(phases))
+        val startPath = NetworkTraceStep.Path(start, start, null, startNominalPhasePath(phases))
         addStartItem(NetworkTraceStep(startPath, 0, 0, data))
         return this
     }

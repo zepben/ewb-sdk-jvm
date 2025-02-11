@@ -114,14 +114,14 @@ class NetworkTraceStepPathProviderTest {
         val c0: ConductingEquipment = network["c0"]!!
         val tx1: ConductingEquipment = network["tx1"]!!
 
-        val currentPath = NetworkTraceStep.Path(c0.t2, tx1.t1, listOf(NominalPhasePath(SPK.A, SPK.A), NominalPhasePath(SPK.B, SPK.B)))
+        val currentPath = NetworkTraceStep.Path(c0.t2, tx1.t1, null, listOf(NominalPhasePath(SPK.A, SPK.A), NominalPhasePath(SPK.B, SPK.B)))
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
 
         assertThat(
             nextPaths,
             containsInAnyOrder(
-                NetworkTraceStep.Path(tx1.t1, tx1.t2, listOf(NominalPhasePath(SPK.A, SPK.A))),
-                NetworkTraceStep.Path(tx1.t1, tx1.t3, listOf(NominalPhasePath(SPK.B, SPK.B)))
+                NetworkTraceStep.Path(tx1.t1, tx1.t2, null, listOf(NominalPhasePath(SPK.A, SPK.A))),
+                NetworkTraceStep.Path(tx1.t1, tx1.t3, null, listOf(NominalPhasePath(SPK.B, SPK.B)))
                 // Should not contain tx1 terminal 4 because it's not in the phase paths
             )
         )
@@ -171,7 +171,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = breaker.t2..segment.t1
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(segment.t1..clamp1.t1, segment.t1..clamp2.t1, segment.t1..segment.t2))
+        assertThat(nextPaths, containsInAnyOrder(segment.t1..<clamp1.t1, segment.t1..<clamp2.t1, segment.t1..<segment.t2))
     }
 
     @Test
@@ -185,7 +185,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = breaker.t1..segment.t2
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(segment.t2..clamp2.t1, segment.t2..clamp1.t1, segment.t2..segment.t1))
+        assertThat(nextPaths, containsInAnyOrder(segment.t2..<clamp2.t1, segment.t2..<clamp1.t1, segment.t2..<segment.t1))
     }
 
     @Test
@@ -199,7 +199,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = b0.t2..segment.t1
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(segment.t1..clamp1.t1, segment.t1..cut1.t1))
+        assertThat(nextPaths, containsInAnyOrder(segment.t1..<clamp1.t1, segment.t1..<cut1.t1))
     }
 
     @Test
@@ -213,7 +213,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = b2.t1..segment.t2
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(segment.t2..clamp4.t1, segment.t2..cut2.t2))
+        assertThat(nextPaths, containsInAnyOrder(segment.t2..<clamp4.t1, segment.t2..<cut2.t2))
     }
 
     @Test
@@ -224,7 +224,7 @@ class NetworkTraceStepPathProviderTest {
         val cut1: Cut = network["cut1"]!!
         val c4: AcLineSegment = network["c4"]!!
 
-        val currentPath = segment.t1..cut1.t1
+        val currentPath = segment.t1..<cut1.t1
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
         assertThat(nextPaths, containsInAnyOrder(cut1.t1..cut1.t2, cut1.t1..c4.t1))
     }
@@ -237,7 +237,7 @@ class NetworkTraceStepPathProviderTest {
         val cut2: Cut = network["cut2"]!!
         val c9: AcLineSegment = network["c9"]!!
 
-        val currentPath = segment.t2..cut2.t2
+        val currentPath = segment.t2..<cut2.t2
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
         assertThat(nextPaths, containsInAnyOrder(cut2.t2..cut2.t1, cut2.t2..c9.t1))
     }
@@ -253,7 +253,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = c4.t1..cut1.t1
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(cut1.t1..clamp1.t1, cut1.t1..segment.t1, cut1.t1..cut1.t2))
+        assertThat(nextPaths, containsInAnyOrder(cut1.t1..<clamp1.t1, cut1.t1..<segment.t1, cut1.t1..cut1.t2))
     }
 
     @Test
@@ -267,7 +267,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = c9.t1..cut2.t2
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(cut2.t2..clamp4.t1, cut2.t2..segment.t2, cut2.t2..cut2.t1))
+        assertThat(nextPaths, containsInAnyOrder(cut2.t2..<clamp4.t1, cut2.t2..<segment.t2, cut2.t2..cut2.t1))
     }
 
     @Test
@@ -281,7 +281,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = c3.t1..clamp1.t1
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(clamp1.t1..segment.t1, clamp1.t1..cut1.t1))
+        assertThat(nextPaths, containsInAnyOrder(clamp1.t1..<segment.t1, clamp1.t1..<cut1.t1))
     }
 
     @Test
@@ -292,7 +292,7 @@ class NetworkTraceStepPathProviderTest {
         val clamp1: Clamp = network["clamp1"]!!
         val c3: AcLineSegment = network["c3"]!!
 
-        val currentPath = segment.t1..clamp1.t1
+        val currentPath = segment.t1..<clamp1.t1
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
         assertThat(nextPaths, containsInAnyOrder(clamp1.t1..c3.t1))
     }
@@ -309,7 +309,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = c6.t1..clamp2.t1
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(clamp2.t1..cut1.t2, clamp2.t1..clamp3.t1, clamp2.t1..cut2.t1))
+        assertThat(nextPaths, containsInAnyOrder(clamp2.t1..<cut1.t2, clamp2.t1..<clamp3.t1, clamp2.t1..<cut2.t1))
     }
 
     @Test
@@ -324,7 +324,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = c5.t1..cut1.t2
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(cut1.t2..clamp2.t1, cut1.t2..clamp3.t1, cut1.t2..cut2.t1, cut1.t2..cut1.t1))
+        assertThat(nextPaths, containsInAnyOrder(cut1.t2..<clamp2.t1, cut1.t2..<clamp3.t1, cut1.t2..<cut2.t1, cut1.t2..cut1.t1))
     }
 
     @Test
@@ -339,7 +339,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = c8.t1..cut2.t1
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(cut2.t1..clamp3.t1, cut2.t1..clamp2.t1, cut2.t1..cut1.t2, cut2.t1..cut2.t2))
+        assertThat(nextPaths, containsInAnyOrder(cut2.t1..<clamp3.t1, cut2.t1..<clamp2.t1, cut2.t1..<cut1.t2, cut2.t1..cut2.t2))
     }
 
     @Test
@@ -354,7 +354,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = cut1.t1..cut1.t2
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(cut1.t2..clamp2.t1, cut1.t2..clamp3.t1, cut1.t2..cut2.t1, cut1.t2..c5.t1))
+        assertThat(nextPaths, containsInAnyOrder(cut1.t2..<clamp2.t1, cut1.t2..<clamp3.t1, cut1.t2..<cut2.t1, cut1.t2..c5.t1))
     }
 
     @Test
@@ -369,7 +369,7 @@ class NetworkTraceStepPathProviderTest {
 
         val currentPath = cut2.t2..cut2.t1
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
-        assertThat(nextPaths, containsInAnyOrder(cut2.t1..clamp2.t1, cut2.t1..clamp3.t1, cut2.t1..cut1.t2, cut2.t1..c8.t1))
+        assertThat(nextPaths, containsInAnyOrder(cut2.t1..<clamp2.t1, cut2.t1..<clamp3.t1, cut2.t1..<cut1.t2, cut2.t1..c8.t1))
     }
 
     @Suppress("DEPRECATION")
@@ -392,7 +392,7 @@ class NetworkTraceStepPathProviderTest {
         val currentPath = b0.t2..c1.t1
         val nextPaths = pathProvider.nextPaths(currentPath).toList()
 
-        assertThat(nextPaths, containsInAnyOrder(c1.t1..c1.t2, c1.t1..c1.t3))
+        assertThat(nextPaths, containsInAnyOrder(c1.t1..<c1.t2, c1.t1..<c1.t3))
     }
 
     private fun busbarNetwork(): NetworkService {
@@ -530,5 +530,21 @@ class NetworkTraceStepPathProviderTest {
     /**
      * Allows for shorthand notation to create a NetworkTraceStep.Path between 2 terminals. E.g. `j0.t2..c1.t1`
      */
-    private operator fun Terminal.rangeTo(other: Terminal): NetworkTraceStep.Path = NetworkTraceStep.Path(this, other)
+    private operator fun Terminal.rangeTo(other: Terminal): NetworkTraceStep.Path = NetworkTraceStep.Path(this, other, null)
+
+    /**
+     * Allows for shorthand notation to create a NetworkTraceStep.Path that traversed an AcLineSegment between 2 terminals . E.g. `c1.t1..<clamp1.t1`
+     */
+    private operator fun Terminal.rangeUntil(other: Terminal): NetworkTraceStep.Path =
+        NetworkTraceStep.Path(
+            this,
+            other,
+            when (val ce = this.conductingEquipment) {
+                is AcLineSegment -> ce
+                is Clamp -> ce.acLineSegment
+                is Cut -> ce.acLineSegment
+                else -> error("Did not traverse")
+            }
+        )
+
 }

@@ -1,12 +1,12 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.metrics.tables
+package com.zepben.evolve.database.postgres.metrics.tables
 
 import com.zepben.evolve.database.sql.Column
 import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
@@ -17,7 +17,7 @@ class TableJobSources : MultiJobTable() {
 
     val DATA_SOURCE: Column = Column(++columnIndex, "data_source", "TEXT", NOT_NULL)
     val SOURCE_TIME: Column = Column(++columnIndex, "source_time", "TEXT", NULL)
-    val FILE_SHA: Column = Column(++columnIndex, "file_sha", "BLOB", NULL)
+    val FILE_SHA: Column = Column(++columnIndex, "file_sha", "BYTEA", NULL)
 
     override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
         listOf(JOB_ID, DATA_SOURCE)

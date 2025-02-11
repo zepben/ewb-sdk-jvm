@@ -8,6 +8,9 @@
 
 package com.zepben.evolve.database.sqlite.metrics
 
+import com.zepben.evolve.database.postgres.metrics.JOB_ID_FILE_EXTENSION
+import com.zepben.evolve.database.postgres.metrics.MetricsDatabaseWriter
+import com.zepben.evolve.database.postgres.metrics.MetricsWriter
 import com.zepben.evolve.metrics.IngestionJob
 import io.mockk.every
 import io.mockk.mockk

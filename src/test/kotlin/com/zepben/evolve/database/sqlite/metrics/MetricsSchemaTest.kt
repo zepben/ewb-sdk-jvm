@@ -8,7 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.metrics
 
-import com.zepben.evolve.database.sqlite.metrics.tables.tableMetricsVersion
+import com.zepben.evolve.database.postgres.metrics.MetricsDatabaseWriter
+import com.zepben.evolve.database.postgres.metrics.tables.tableMetricsVersion
 import com.zepben.evolve.metrics.*
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat

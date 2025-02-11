@@ -1,18 +1,18 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.metrics
+package com.zepben.evolve.database.postgres.metrics
 
 import com.zepben.evolve.database.sqlite.common.BaseEntryWriter
 import com.zepben.evolve.database.sqlite.extensions.setInstant
-import com.zepben.evolve.database.sqlite.metrics.tables.TableJobSources
-import com.zepben.evolve.database.sqlite.metrics.tables.TableJobs
-import com.zepben.evolve.database.sqlite.metrics.tables.TableNetworkContainerMetrics
+import com.zepben.evolve.database.postgres.metrics.tables.TableJobSources
+import com.zepben.evolve.database.postgres.metrics.tables.TableJobs
+import com.zepben.evolve.database.postgres.metrics.tables.TableNetworkContainerMetrics
 import com.zepben.evolve.metrics.*
 import java.util.*
 

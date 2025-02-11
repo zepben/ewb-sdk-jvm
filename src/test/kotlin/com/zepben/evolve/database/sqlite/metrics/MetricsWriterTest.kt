@@ -8,6 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.metrics
 
+import com.zepben.evolve.database.postgres.metrics.MetricsEntryWriter
+import com.zepben.evolve.database.postgres.metrics.MetricsWriter
 import com.zepben.evolve.metrics.*
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every

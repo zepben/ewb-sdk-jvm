@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.metrics.tables
+package com.zepben.evolve.database.postgres.metrics.tables
 
 import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
 

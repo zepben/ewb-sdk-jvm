@@ -9,6 +9,7 @@
 package com.zepben.evolve.database.sqlite.metrics
 
 import com.google.common.reflect.ClassPath
+import com.zepben.evolve.database.postgres.metrics.MetricsDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
 import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 import com.zepben.evolve.database.sqlite.common.SqliteTableVersion

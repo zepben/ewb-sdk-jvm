@@ -1,12 +1,12 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.metrics
+package com.zepben.evolve.database.postgres.metrics
 
 import com.zepben.evolve.database.sqlite.common.BaseDatabaseWriter
 import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
@@ -36,19 +36,19 @@ internal const val JOB_ID_FILE_EXTENSION = "zjid"
  * @param createMetricsWriter Factory for the metrics writer to use.
  */
 class MetricsDatabaseWriter internal constructor(
-    private val databaseFile: String,
+    getConnection: () -> Connection,
     private val modelPath: Path?,
     private val createMetricsWriter: (MetricsDatabaseTables) -> MetricsWriter
 ) : BaseDatabaseWriter<MetricsDatabaseTables, IngestionJob>(
     MetricsDatabaseTables(),
-    { DriverManager.getConnection("jdbc:sqlite:$databaseFile").configureBatch() }
+    getConnection
 ) {
 
     @JvmOverloads
     constructor(
-        databaseFile: String,
+        getConnection: () -> Connection,
         modelPath: Path? = null
-    ) : this(databaseFile, modelPath, { MetricsWriter(it) })
+    ) : this(getConnection, modelPath, { MetricsWriter(it) })
 
     private var fileExists = false
 

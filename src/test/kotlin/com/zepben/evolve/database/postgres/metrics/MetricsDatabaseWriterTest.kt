@@ -8,19 +8,17 @@
 
 package com.zepben.evolve.database.postgres.metrics
 
+import com.zepben.evolve.database.postgres.common.PostgresTableVersion
 import com.zepben.evolve.metrics.IngestionJob
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.MatcherAssert
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
-import java.sql.DriverManager
+import java.sql.Connection
 import java.util.*
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
@@ -31,7 +29,18 @@ internal class MetricsDatabaseWriterTest {
     @TempDir
     lateinit var modelPath: Path
 
-    private val databaseFile = "databaseFile"
+    private val connection = mockk<Connection> {
+        justRun { commit() }
+        justRun { close() }
+    }
+    private val tables = mockk<MetricsDatabaseTables> {
+        every { tables } returns mapOf(PostgresTableVersion::class to mockk<PostgresTableVersion> {
+            every { supportedVersion } returns 1
+            every { getVersion(connection) } returns 1
+        })
+        justRun { prepareInsertStatements(connection) }
+    }
+
     private val uuid = UUID.randomUUID()
     private val job = IngestionJob(uuid, mockk())
 
@@ -39,20 +48,11 @@ internal class MetricsDatabaseWriterTest {
         every { write(any()) } returns true
     }
 
-    @BeforeEach
-    internal fun beforeEach() {
-        Files.deleteIfExists(Paths.get(databaseFile))
-    }
-
-    @AfterEach
-    internal fun afterEach() {
-        Files.deleteIfExists(Paths.get(databaseFile))
-    }
-
     @Test
     internal fun callsWriter() {
         val result = MetricsDatabaseWriter(
-            { DriverManager.getConnection("jdbc:sqlite:$databaseFile") },
+            { connection },
+            tables,
             modelPath = null,
             createMetricsWriter = { writer }
         ).write(job)
@@ -66,7 +66,8 @@ internal class MetricsDatabaseWriterTest {
     @Test
     internal fun createsJobIdFile() {
         MetricsDatabaseWriter(
-            { DriverManager.getConnection("jdbc:sqlite:$databaseFile") },
+            { connection },
+            tables,
             modelPath = modelPath,
             createMetricsWriter = { writer }
         ).write(job)
@@ -85,7 +86,8 @@ internal class MetricsDatabaseWriterTest {
         modelPath.resolve("$uuid3.$JOB_ID_FILE_EXTENSION").createFile()
 
         MetricsDatabaseWriter(
-            { DriverManager.getConnection("jdbc:sqlite:$databaseFile") },
+            { connection },
+            tables,
             modelPath = modelPath,
             createMetricsWriter = { writer }
         ).write(job)

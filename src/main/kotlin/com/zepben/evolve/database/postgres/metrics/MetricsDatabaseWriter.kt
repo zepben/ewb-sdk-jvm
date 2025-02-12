@@ -8,13 +8,11 @@
 
 package com.zepben.evolve.database.postgres.metrics
 
-import com.zepben.evolve.database.postgres.common.PostgresTableVersion
 import com.zepben.evolve.database.sql.BaseDatabaseWriter
 import com.zepben.evolve.metrics.IngestionJob
 import java.io.IOException
 import java.nio.file.Path
 import java.sql.Connection
-import java.sql.SQLException
 import kotlin.io.path.absolute
 import kotlin.io.path.createFile
 import kotlin.io.path.deleteIfExists
@@ -24,77 +22,32 @@ internal const val JOB_ID_FILE_EXTENSION = "zjid"
 
 /**
  * Class for writing an ingestion job (and associated metadata, metrics, and sources) to a metrics database.
- *
- * @param databaseFile The filename of the metrics database.
- * @param modelPath The directory containing the output model files for the ingestion job. If specified, a file will be created in this directory and
- *                  named using the UUID of the ingestion job.
- * @param databaseTables The tables in the database.
- * @param createMetricsWriter Factory for the metrics writer to use.
  */
 class MetricsDatabaseWriter internal constructor(
     getConnection: () -> Connection,
+    databaseTables: MetricsDatabaseTables,
     private val modelPath: Path?,
     private val createMetricsWriter: (MetricsDatabaseTables) -> MetricsWriter
 ) : BaseDatabaseWriter<MetricsDatabaseTables, IngestionJob>(
-    MetricsDatabaseTables(),
+    databaseTables,
     getConnection
 ) {
 
+    /**
+     * @param getConnection Provider of the connection to the metrics database.
+     * @param modelPath The directory containing the output model files for the ingestion job. If specified, a file will be created in this directory and
+     *                  named using the UUID of the ingestion job.
+     */
     @JvmOverloads
     constructor(
         getConnection: () -> Connection,
         modelPath: Path? = null
-    ) : this(getConnection, modelPath, { MetricsWriter(it) })
+    ) : this(getConnection, MetricsDatabaseTables(), modelPath, { MetricsWriter(it) })
 
-    private var fileExists = false
+    override fun beforeConnect(): Boolean = true
 
-    override fun beforeConnect(): Boolean {
-        return true
-    }
-
-    override fun afterConnectBeforePrepare(connection: Connection): Boolean {
-        if (fileExists)
-            return true
-
-        //
-        // NOTE: Duplicated from the CIM database writer as it is expected to be short-lived, so not going through the hassle of moving it to a common area.
-        //
-        return try {
-            val versionTable = databaseTables.getTable<PostgresTableVersion>()
-            logger.info("Creating database schema v${versionTable.supportedVersion}...")
-
-            connection.createStatement().use { statement ->
-                statement.queryTimeout = 2
-
-                databaseTables.forEachTable {
-                    statement.executeUpdate(it.createTableSql)
-                }
-
-                // Add the version number to the database.
-                connection.prepareStatement(versionTable.preparedInsertSql).use { insert ->
-                    insert.setInt(versionTable.VERSION.queryIndex, versionTable.supportedVersion)
-                    insert.executeUpdate()
-                }
-
-                logger.info("Adding indexes...")
-
-                databaseTables.forEachTable { table ->
-                    table.createIndexesSql.forEach { sql ->
-                        statement.execute(sql)
-                    }
-                }
-
-                logger.info("Indexes added.")
-
-                connection.commit()
-                logger.info("Schema created.")
-            }
-            true
-        } catch (e: SQLException) {
-            logger.error("Failed to create database schema: " + e.message)
-            false
-        }
-    }
+    // Schema will be created by EAS using Liquibase, instead of creating it on-demand here.
+    override fun afterConnectBeforePrepare(connection: Connection): Boolean = true
 
     /**
      * Write the ingestion job (and associated data).

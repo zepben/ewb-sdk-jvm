@@ -168,6 +168,23 @@ internal class TestNetworkBuilderTest {
     }
 
     @Test
+    internal fun sampleNetworkStartingWithBusbarSections() {
+        //
+        // bbs0 11--c1--21 bbs2
+        //
+        TestNetworkBuilder()
+            .fromBusbarSection(PhaseCode.ABC) // bbs0
+            .toAcls(PhaseCode.ABC) // c1
+            .toBusbarSection(PhaseCode.ABC) // bbs2
+            .build()
+            .apply {
+                validateConnections("bbs0", listOf("c1-t1"))
+                validateConnections("c1", listOf("bbs0-t1"), listOf("bbs2-t1"))
+                validateConnections("bbs2", listOf("c1-t2"))
+            }
+    }
+
+    @Test
     internal fun `can override ids`() {
         TestNetworkBuilder()
             .fromSource(mRID = "my source 1")
@@ -205,6 +222,17 @@ internal class TestNetworkBuilderTest {
                         "my other 2"
                     )
                 )
+            }
+    }
+
+    @Test
+    internal fun `can override other prefix`() {
+        TestNetworkBuilder()
+            .fromOther(::Fuse, defaultMridPrefix = "abc")
+            .toOther(::Fuse, defaultMridPrefix = "def")
+            .build()
+            .apply {
+                assertThat(listOf<ConductingEquipment>().map { it.mRID }, containsInAnyOrder("abc0", "def1"))
             }
     }
 

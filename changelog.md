@@ -50,7 +50,11 @@
 * Created a new `SqlTable` that doesn't support creating schema creation statements by default.
 
 ### Enhancements
-* You can now add sites to the `TestNetworkBuilder` via `addSite`.
+* The following enhancements have been made to the `TestNetworkBuilder`:
+  * You can now add sites via `addSite`.
+  * You can now add busbar sections natively with `fromBusbarSection` and `toBusbarSection`.
+  * The prefix for generated mRIDs for "other" equipment can be specified with the `defaultMridPrefix` argument in `fromOther` and `toOther`.
+  * The action block for `fromOther` now has a receiver of the created type, rather than the generic `ConductingEquipment`.
 * You can now start the `AssignToFeeder` trace from a specified `Terminal` rather than all feeder heads.
 * When processing feeder assignments, all LV feeders belonging to a dist substation site will now be considered energized when the site is energized by a
   feeder.

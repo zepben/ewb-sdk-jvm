@@ -224,37 +224,6 @@ object StupidlyLargeNetwork {
         networkService.connect(createTerminal(networkService, node1, PhaseCode.C, 1), "cn_2")
         networkService.connect(createTerminal(networkService, node1, PhaseCode.B, 2), "cn_2")
 
-        @Suppress("DEPRECATION") val multiTerminalAcLineSegment1 =
-            AcLineSegment("multiTerminalAcLineSegment1").apply { name = "multiTerminalAcLineSegment1"; assetInfo = oh2; midSpanTerminalsEnabled = true }
-        @Suppress("DEPRECATION") val multiTerminalAcLineSegment2 =
-            AcLineSegment("multiTerminalAcLineSegment2").apply { assetInfo = oh2; length = Double.NaN; midSpanTerminalsEnabled = true }
-        val multiTerminalNode1 = Junction("multiTerminalNode1").apply { name = "multiTerminalNode1" }
-        val multiTerminalNode2 = Junction("multiTerminalNode2").apply { name = "multiTerminalNode2" }
-        val multiTerminalNode3 = Junction("multiTerminalNode3").apply { name = "multiTerminalNode3" }
-
-        networkService.connect(
-            createTerminal(networkService, multiTerminalAcLineSegment1, PhaseCode.A, 1),
-            createTerminal(networkService, multiTerminalAcLineSegment2, PhaseCode.A, 1)
-        )
-        networkService.connect(
-            createTerminal(networkService, multiTerminalAcLineSegment1, PhaseCode.A, 2),
-            createTerminal(networkService, multiTerminalNode1, PhaseCode.A, 1)
-        )
-        networkService.connect(
-            createTerminal(networkService, multiTerminalAcLineSegment1, PhaseCode.A, 3),
-            createTerminal(networkService, multiTerminalNode2, PhaseCode.A, 1)
-        )
-        networkService.connect(
-            createTerminal(networkService, multiTerminalAcLineSegment1, PhaseCode.A, 4),
-            createTerminal(networkService, multiTerminalNode3, PhaseCode.A, 1)
-        )
-
-        networkService.add(multiTerminalAcLineSegment1)
-        networkService.add(multiTerminalAcLineSegment2)
-        networkService.add(multiTerminalNode1)
-        networkService.add(multiTerminalNode2)
-        networkService.add(multiTerminalNode3)
-
         val transformerWithTypeNone = PowerTransformer("transformerWithTypeNone")
         val transformerWithTypeDist = PowerTransformer("transformerWithTypeDist")
         val transformerWithTypeIso = PowerTransformer("transformerWithTypeIso")

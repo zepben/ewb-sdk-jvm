@@ -40,11 +40,9 @@
   * `CimDatabaseTables`, `BaseDatabaseTables`, `CustomerDatabaseTables`, `DiagramDatabaseTables`, `NetworkDatabaseTables`, `MetricsDatabaseTables`
 * Removed `Class.getFieldExt` extension function.
 * `InjectionJob.metadata` property is no longer a nullable type and is now a readonly val.
-* `AcLineSegment` now only supports adding 2 terminals by default. Mid-span terminals are now considered deprecated and models should migrate to using `Clamp`.
-   If you need to enable the old behaviour you can set `AcLineSegment.midSpanTerminalsEnabled` to `true`, however this will cause adding  a `Cut` or 
-   a `Clamp` to the `AcLineSegment` to fail.
-* `Clamp` can now only have a single terminal added.
-* `Cut` can now only have a maximum of 2 terminals added.
+* `AcLineSegment` supports adding a maximum of 2 terminals. Mid-span terminals are no longer supported and models should migrate to using `Clamp`.
+* `Clamp` supports only adding a single terminal.
+* `Cut` supports adding a maximum of 2 terminals.
 
 ### New Features
 * Added `ClearDirection` that clears feeder directions.

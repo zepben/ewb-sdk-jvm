@@ -28,20 +28,7 @@ import com.zepben.evolve.services.common.extensions.*
  */
 class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRID) {
 
-    @Deprecated("Mid-span terminals are deprecated. Use Clamps instead.")
-    var midSpanTerminalsEnabled: Boolean = false
-        set(value) {
-            if (value) {
-                check(cuts.isEmpty() && clamps.isEmpty()) { "Cannot enable mid-span terminals when cuts or clamps are present"}
-            } else {
-                check(terminals.size == 2) { "Cannot disable mid-span terminals on segments with more than 2 terminals"}
-            }
-            field = value
-        }
-
-    @Suppress("DEPRECATION")
-    override val maxTerminals: Int
-        get() = if (midSpanTerminalsEnabled) super.maxTerminals else 2
+    override val maxTerminals: Int get() = 2
 
     var perLengthImpedance: PerLengthImpedance? = null
     private var _cuts: MutableList<Cut>? = null
@@ -163,10 +150,7 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
         return this
     }
 
-    @Suppress("DEPRECATION")
     private fun validateCut(cut: Cut): Boolean {
-        check(!midSpanTerminalsEnabled) { "Cannot add cuts to AcLineSegment with midSpanTerminalsEnabled set to true"}
-
         if (validateReference(cut, ::getCut, "A Cut"))
             return true
 
@@ -179,10 +163,7 @@ class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRI
         return false
     }
 
-    @Suppress("DEPRECATION")
     private fun validateClamp(clamp: Clamp): Boolean {
-        check(!midSpanTerminalsEnabled) { "Cannot add clamps to AcLineSegment with midSpanTerminalsEnabled set to true"}
-
         if (validateReference(clamp, ::getClamp, "A Clamp"))
             return true
 

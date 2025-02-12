@@ -9,7 +9,7 @@
 package com.zepben.evolve.database.sqlite.cim.upgrade
 
 import com.zepben.evolve.database.paths.DatabaseType
-import com.zepben.evolve.database.sql.Column
+import com.zepben.evolve.database.sql.tables.Column
 import com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion
 import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
@@ -241,7 +241,7 @@ internal class UpgradeRunnerTest {
 
     @Test
     internal fun `reports obsolete database version`() {
-        mockkStatic("com.zepben.evolve.database.sqlite.extensions.StatementExtensionsKt") {
+        mockkStatic("com.zepben.evolve.database.sql.extensions.StatementExtensionsKt") {
             currentVersion = minSupportedVersion - 2
 
             expect {
@@ -259,7 +259,7 @@ internal class UpgradeRunnerTest {
 
     @Test
     internal fun `reports futuristic database version`() {
-        mockkStatic("com.zepben.evolve.database.sqlite.extensions.StatementExtensionsKt") {
+        mockkStatic("com.zepben.evolve.database.sql.extensions.StatementExtensionsKt") {
             currentVersion = maxSupportedVersion + 1
 
             expect {
@@ -276,7 +276,7 @@ internal class UpgradeRunnerTest {
 
     @Test
     internal fun `reports missing version numbers`() {
-        mockkStatic("com.zepben.evolve.database.sqlite.extensions.StatementExtensionsKt") {
+        mockkStatic("com.zepben.evolve.database.sql.extensions.StatementExtensionsKt") {
             every { tableVersion.getVersion(any()) } returns null
 
             expect {

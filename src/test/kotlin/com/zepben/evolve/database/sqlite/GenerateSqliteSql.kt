@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sqlite
 
-import com.zepben.evolve.database.sql.SqlTable
+import com.zepben.evolve.database.sql.tables.SqlTable
 import com.zepben.evolve.database.sqlite.cim.customer.CustomerDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.diagram.DiagramDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.network.NetworkDatabaseTables

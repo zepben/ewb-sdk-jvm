@@ -12,8 +12,8 @@ import com.zepben.evolve.database.postgres.metrics.tables.TableJobSources
 import com.zepben.evolve.database.postgres.metrics.tables.TableJobs
 import com.zepben.evolve.database.postgres.metrics.tables.TableNetworkContainerMetrics
 import com.zepben.evolve.database.postgres.metrics.tables.tableMetricsVersion
-import com.zepben.evolve.database.sql.SqlTable
-import com.zepben.evolve.database.sqlite.common.BaseDatabaseTables
+import com.zepben.evolve.database.sql.tables.SqlTable
+import com.zepben.evolve.database.sql.BaseDatabaseTables
 
 /**
  * The collection of tables for our metrics databases.

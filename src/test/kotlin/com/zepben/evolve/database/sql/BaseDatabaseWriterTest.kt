@@ -1,21 +1,21 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.common
+package com.zepben.evolve.database.sql
 
-import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
-import com.zepben.testutils.exception.ExpectException.Companion.expect
+import com.zepben.evolve.database.sqlite.common.SqliteTable
+import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
+import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
-import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.MatcherAssert
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.containsString
-import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.sql.Connection
@@ -92,7 +92,7 @@ internal class BaseDatabaseWriterTest {
         versionTable = spyk(SqliteTableVersion(0))
         writer.write(data)
 
-        assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 0)"))
+        MatcherAssert.assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 0)"))
     }
 
     @Test
@@ -100,7 +100,7 @@ internal class BaseDatabaseWriterTest {
         versionTable = spyk(SqliteTableVersion(2))
         writer.write(data)
 
-        assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 2)"))
+        MatcherAssert.assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 2)"))
     }
 
     @Test
@@ -108,7 +108,7 @@ internal class BaseDatabaseWriterTest {
         every { resultSet.next() } returns false
         writer.write(data)
 
-        assertThat(systemErr.log, containsString("Missing version table in database file, cannot check compatibility"))
+        MatcherAssert.assertThat(systemErr.log, containsString("Missing version table in database file, cannot check compatibility"))
     }
 
     @Test
@@ -116,17 +116,17 @@ internal class BaseDatabaseWriterTest {
         every { writerCalls.beforeConnect() } throws SQLException("SQL error message")
         writer.write(data)
 
-        assertThat(systemErr.log, containsString("Failed to write the database: SQL error message"))
+        MatcherAssert.assertThat(systemErr.log, containsString("Failed to write the database: SQL error message"))
         systemErr.clearCapturedLog()
 
         every { writerCalls.beforeConnect() } throws MissingTableConfigException("tables error message")
         writer.write(data)
 
-        assertThat(systemErr.log, containsString("Failed to write the database: tables error message"))
+        MatcherAssert.assertThat(systemErr.log, containsString("Failed to write the database: tables error message"))
         systemErr.clearCapturedLog()
 
         every { writerCalls.beforeConnect() } throws Exception("unhandled error message")
-        expect { writer.write(data) }
+        ExpectException.expect { writer.write(data) }
             .toThrow<Exception>()
             .withMessage("unhandled error message")
     }
@@ -150,7 +150,7 @@ internal class BaseDatabaseWriterTest {
         expectedResult: Boolean = expectCommit
     ) {
         clearMocks(writerCalls, getConnection, connection, tables, statement, resultSet, answers = false)
-        assertThat(writer.write(data), equalTo(expectedResult))
+        MatcherAssert.assertThat(writer.write(data), Matchers.equalTo(expectedResult))
 
         verifySequence {
             writerCalls.beforeConnect()

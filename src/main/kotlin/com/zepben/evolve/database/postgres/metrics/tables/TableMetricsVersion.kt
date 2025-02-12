@@ -8,9 +8,9 @@
 
 package com.zepben.evolve.database.postgres.metrics.tables
 
-import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
+import com.zepben.evolve.database.postgres.common.PostgresTableVersion
 
 /**
  * The `version` table in the metrics database.
  */
-val tableMetricsVersion: SqliteTableVersion = SqliteTableVersion(1)
+val tableMetricsVersion: PostgresTableVersion = PostgresTableVersion(1)

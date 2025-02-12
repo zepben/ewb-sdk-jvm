@@ -20,9 +20,9 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableOrganis
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableIdentifiedObjects
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableNameTypes
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableNames
-import com.zepben.evolve.database.sqlite.common.BaseEntryWriter
-import com.zepben.evolve.database.sqlite.extensions.setInstant
-import com.zepben.evolve.database.sqlite.extensions.setNullableString
+import com.zepben.evolve.database.sql.BaseEntryWriter
+import com.zepben.evolve.database.sql.extensions.setInstant
+import com.zepben.evolve.database.sql.extensions.setNullableString
 import java.sql.PreparedStatement
 import java.sql.SQLException
 

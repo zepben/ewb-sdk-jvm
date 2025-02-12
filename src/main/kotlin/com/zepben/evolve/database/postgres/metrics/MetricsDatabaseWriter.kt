@@ -8,16 +8,12 @@
 
 package com.zepben.evolve.database.postgres.metrics
 
-import com.zepben.evolve.database.sqlite.common.BaseDatabaseWriter
-import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
-import com.zepben.evolve.database.sqlite.extensions.configureBatch
+import com.zepben.evolve.database.postgres.common.PostgresTableVersion
+import com.zepben.evolve.database.sql.BaseDatabaseWriter
 import com.zepben.evolve.metrics.IngestionJob
 import java.io.IOException
-import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.sql.Connection
-import java.sql.DriverManager
 import java.sql.SQLException
 import kotlin.io.path.absolute
 import kotlin.io.path.createFile
@@ -53,7 +49,6 @@ class MetricsDatabaseWriter internal constructor(
     private var fileExists = false
 
     override fun beforeConnect(): Boolean {
-        fileExists = Files.exists(Paths.get(databaseFile))
         return true
     }
 
@@ -65,7 +60,7 @@ class MetricsDatabaseWriter internal constructor(
         // NOTE: Duplicated from the CIM database writer as it is expected to be short-lived, so not going through the hassle of moving it to a common area.
         //
         return try {
-            val versionTable = databaseTables.getTable<SqliteTableVersion>()
+            val versionTable = databaseTables.getTable<PostgresTableVersion>()
             logger.info("Creating database schema v${versionTable.supportedVersion}...")
 
             connection.createStatement().use { statement ->

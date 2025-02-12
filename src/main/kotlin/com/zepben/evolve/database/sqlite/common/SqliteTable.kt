@@ -1,17 +1,15 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.cim.tables
+package com.zepben.evolve.database.sqlite.common
 
-import com.zepben.evolve.database.sql.Column
-import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
-import com.zepben.evolve.database.sql.Column.Nullable.NULL
-import com.zepben.evolve.database.sql.SqlTable
+import com.zepben.evolve.database.sql.tables.Column
+import com.zepben.evolve.database.sql.tables.SqlTable
 
 /**
  * Represents a table in a Sqlite Database
@@ -30,6 +28,6 @@ abstract class SqliteTable internal constructor() : SqlTable() {
         }
 
     private fun Column.sqlString(): String = (name + " " + type + " " + nullable.sqlString()).trim { it <= ' ' }
-    private fun Column.Nullable.sqlString(): String = if (this == NULL) "NULL" else if (this == NOT_NULL) "NOT NULL" else ""
+    private fun Column.Nullable.sqlString(): String = if (this == Column.Nullable.NULL) "NULL" else if (this == Column.Nullable.NOT_NULL) "NOT NULL" else ""
 
 }

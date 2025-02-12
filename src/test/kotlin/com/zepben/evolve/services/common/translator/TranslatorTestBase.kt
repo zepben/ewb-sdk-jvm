@@ -12,7 +12,7 @@ import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
 import com.zepben.evolve.cim.iec61970.base.core.*
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseTables
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.common.SqliteTable
 import com.zepben.evolve.database.sqlite.cim.tables.TableMetadataDataSources
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableNameTypes
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableNames

@@ -8,9 +8,9 @@
 
 package com.zepben.evolve.database.sqlite.cim.tables.associations
 
-import com.zepben.evolve.database.sql.Column
-import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
+import com.zepben.evolve.database.sql.tables.Column
+import com.zepben.evolve.database.sql.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.common.SqliteTable
 
 /**
  * A class representing the association between Loops and Substations.

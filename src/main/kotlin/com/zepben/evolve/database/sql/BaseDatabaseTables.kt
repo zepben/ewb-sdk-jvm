@@ -1,16 +1,14 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.common
+package com.zepben.evolve.database.sql
 
-import com.zepben.evolve.database.sql.SqlTable
-import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
+import com.zepben.evolve.database.sql.tables.SqlTable
 import java.sql.Connection
 import java.sql.PreparedStatement
 import kotlin.reflect.KClass
@@ -20,7 +18,7 @@ import kotlin.reflect.KClass
  *
  * @property tables The tables that are available in this database, keyed on the table class. You should use [getTable] to access individual tables.
  * @property insertStatements A collection of [PreparedStatement] for each table, keyed on the table class. You should use [getInsert] to access individual inserts.
- * @property includedTables A sequence of [SqliteTable] indicating which tables are included in this database, which will be consumed to build the [tables]
+ * @property includedTables A sequence of [SqlTable] indicating which tables are included in this database, which will be consumed to build the [tables]
  *   collection. NOTE: You should always append your tables to super.includedTables when overriding.
  */
 open class BaseDatabaseTables internal constructor() : AutoCloseable {

@@ -22,8 +22,8 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableName
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableNames
 import com.zepben.evolve.database.sqlite.common.DuplicateMRIDException
 import com.zepben.evolve.database.sqlite.common.DuplicateNameTypeException
-import com.zepben.evolve.database.sqlite.extensions.getInstant
-import com.zepben.evolve.database.sqlite.extensions.getNullableString
+import com.zepben.evolve.database.sql.extensions.getInstant
+import com.zepben.evolve.database.sql.extensions.getNullableString
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.evolve.services.common.extensions.*

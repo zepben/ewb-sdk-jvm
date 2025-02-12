@@ -1,17 +1,14 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.common
+package com.zepben.evolve.database.sql
 
-import com.zepben.evolve.database.sql.TableVersion
-import com.zepben.evolve.database.sqlite.cim.BaseServiceWriter
-import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionWriter
-import com.zepben.evolve.database.sqlite.cim.tables.MissingTableConfigException
+import com.zepben.evolve.database.sql.tables.TableVersion
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection
@@ -33,7 +30,7 @@ abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables, T> internal cons
     protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     /**
-     * Write the database using the [MetadataCollectionWriter] and [BaseServiceWriter].
+     * Write to the database.
      *
      * @param data The data to write to the database.
      *

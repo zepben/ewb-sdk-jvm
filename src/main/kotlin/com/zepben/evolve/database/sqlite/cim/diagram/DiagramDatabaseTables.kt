@@ -9,7 +9,7 @@
 package com.zepben.evolve.database.sqlite.cim.diagram
 
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseTables
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.common.SqliteTable
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.diagramlayout.TableDiagramObjects
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.diagramlayout.TableDiagrams

@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.postgres.metrics
 
-import com.zepben.evolve.database.sqlite.common.BaseEntryWriter
-import com.zepben.evolve.database.sqlite.extensions.setInstant
+import com.zepben.evolve.database.sql.BaseEntryWriter
+import com.zepben.evolve.database.sql.extensions.setInstant
 import com.zepben.evolve.database.postgres.metrics.tables.TableJobSources
 import com.zepben.evolve.database.postgres.metrics.tables.TableJobs
 import com.zepben.evolve.database.postgres.metrics.tables.TableNetworkContainerMetrics

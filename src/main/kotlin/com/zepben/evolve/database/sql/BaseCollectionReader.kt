@@ -1,15 +1,15 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.common
+package com.zepben.evolve.database.sql
 
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
-import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
+import com.zepben.evolve.database.sql.extensions.executeConfiguredQuery
+import com.zepben.evolve.database.sql.tables.SqlTable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection
@@ -45,11 +45,12 @@ internal abstract class BaseCollectionReader<T>(
     /**
      * Read each row of a table.
      *
-     * @param TTable The [SqliteTable] to read the objects from.
+     * @param TTable The [SqlTable] to read the objects from.
      * @param processRow A callback for processing each row in the table. The callback will be provided with the table, the results for the row and a callback
-     *   to set the identifier for the row, which returns the same value, so it can be used fluently.
+     *   to set the identifier for the row, which returns the same value, so it can be used fluently. If a [ReaderException] is thrown within the callback,
+     *   this method returns false.
      */
-    protected inline fun <reified TTable : SqliteTable> readEach(
+    protected inline fun <reified TTable : SqlTable> readEach(
         data: T,
         crossinline processRow: (T, TTable, ResultSet, setIdentifier: (String) -> String) -> Boolean,
         crossinline prepareSelectStatement: Connection.(TTable) -> PreparedStatement = { prepareStatement(it.selectSql) }
@@ -80,7 +81,7 @@ internal abstract class BaseCollectionReader<T>(
      *
      * NOTE: This is marked protected rather than private to allow the inline reified functions above to work.
      */
-    protected fun <TTable : SqliteTable> TTable.readAll(selectStatement: PreparedStatement, processRows: TTable.(ResultSet) -> Int): Boolean {
+    protected fun <TTable : SqlTable> TTable.readAll(selectStatement: PreparedStatement, processRows: TTable.(ResultSet) -> Int): Boolean {
         logger.info("Reading $description...")
 
         val thrown = try {
@@ -95,8 +96,7 @@ internal abstract class BaseCollectionReader<T>(
             when (t) {
                 is SQLException,
                 is IllegalArgumentException,
-                is MRIDLookupException,
-                is DuplicateMRIDException -> t
+                is ReaderException -> t
 
                 else -> throw t
             }

@@ -11,7 +11,7 @@ package com.zepben.evolve.database.sqlite.cim
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
 import com.zepben.evolve.cim.iec61970.base.core.Name
 import com.zepben.evolve.cim.iec61970.base.core.NameType
-import com.zepben.evolve.database.sqlite.common.BaseCollectionWriter
+import com.zepben.evolve.database.sql.BaseCollectionWriter
 import com.zepben.evolve.services.common.BaseService
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 

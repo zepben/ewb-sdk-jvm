@@ -18,8 +18,8 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableCust
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableCustomers
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TablePricingStructures
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableTariffs
-import com.zepben.evolve.database.sqlite.extensions.getNullableInt
-import com.zepben.evolve.database.sqlite.extensions.getNullableString
+import com.zepben.evolve.database.sql.extensions.getNullableInt
+import com.zepben.evolve.database.sql.extensions.getNullableString
 import com.zepben.evolve.services.common.extensions.ensureGet
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.customer.CustomerService

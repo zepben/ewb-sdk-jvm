@@ -6,9 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sql
+package com.zepben.evolve.database.sql.tables
 
-import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
+import com.zepben.evolve.database.sql.extensions.executeConfiguredQuery
 import java.sql.Connection
 import java.sql.SQLException
 

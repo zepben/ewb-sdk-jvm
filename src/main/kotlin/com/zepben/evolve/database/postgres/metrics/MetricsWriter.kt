@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.postgres.metrics
 
-import com.zepben.evolve.database.sqlite.common.BaseCollectionWriter
+import com.zepben.evolve.database.sql.BaseCollectionWriter
 import com.zepben.evolve.metrics.IngestionJob
 
 /**

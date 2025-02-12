@@ -1,18 +1,17 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.metrics
+package com.zepben.evolve.database.postgres.metrics
 
-import com.zepben.evolve.database.postgres.metrics.MetricsDatabaseWriter
 import com.zepben.evolve.database.postgres.metrics.tables.tableMetricsVersion
 import com.zepben.evolve.metrics.*
 import com.zepben.testutils.junit.SystemLogExtension
-import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.AfterEach
@@ -101,18 +100,21 @@ internal class MetricsSchemaTest {
     private fun validateJob(expectedJob: IngestionJob, tableName: String, vararg rows: List<Any>) {
         systemErr.clearCapturedLog()
 
-        assertThat("Database should have been writen", MetricsDatabaseWriter(schemaTestFile).write(expectedJob))
+        MatcherAssert.assertThat(
+            "Database should have been writen",
+            MetricsDatabaseWriter({ DriverManager.getConnection("jdbc:sqlite:$schemaTestFile") }).write(expectedJob)
+        )
 
-        assertThat(systemErr.log, containsString("Creating database schema v${tableMetricsVersion.supportedVersion}"))
-        assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
+        MatcherAssert.assertThat(systemErr.log, containsString("Creating database schema v${tableMetricsVersion.supportedVersion}"))
+        MatcherAssert.assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))
 
         DriverManager.getConnection("jdbc:sqlite:$schemaTestFile").use { connection ->
             connection.createStatement().use { statement ->
                 statement.executeQuery("SELECT * FROM $tableName").use { rs ->
                     rows.forEachIndexed { i, values ->
-                        assertThat("Row no. ${i + 1} should exist for $tableName", rs.next())
+                        MatcherAssert.assertThat("Row no. ${i + 1} should exist for $tableName", rs.next())
                         values.forEachIndexed { j, value ->
-                            assertThat(rs.getObject(j + 1), equalTo(value))
+                            MatcherAssert.assertThat(rs.getObject(j + 1), equalTo(value))
                         }
                     }
                 }

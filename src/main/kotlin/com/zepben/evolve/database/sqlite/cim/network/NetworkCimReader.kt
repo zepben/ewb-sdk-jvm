@@ -35,6 +35,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.PowerDirectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
+import com.zepben.evolve.database.sql.extensions.*
 import com.zepben.evolve.database.sqlite.cim.CimReader
 import com.zepben.evolve.database.sqlite.cim.tables.associations.*
 import com.zepben.evolve.database.sqlite.cim.tables.extensions.iec61968.metering.TablePanDemandResponseFunctions

@@ -8,8 +8,9 @@
 
 package com.zepben.evolve.database.postgres.metrics.tables
 
-import com.zepben.evolve.database.sql.Column
-import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.postgres.common.PostgresTable
+import com.zepben.evolve.database.sql.tables.Column
+import com.zepben.evolve.database.sql.tables.Column.Nullable.NOT_NULL
 
 /**
  * Table that has ingestion job ID as its primary key or part of its composite key.

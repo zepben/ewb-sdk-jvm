@@ -6,9 +6,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.extensions
+package com.zepben.evolve.database.sql
 
-import org.hamcrest.MatcherAssert.assertThat
+import com.zepben.evolve.database.sql.extensions.parameters
+import com.zepben.evolve.database.sql.extensions.sql
+import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import java.sql.DriverManager
@@ -24,8 +26,8 @@ class PreparedStatementExtensionsKtTest {
                 statement.setInt(1, 1)
                 statement.setString(2, "2")
 
-                assertThat(statement.sql(), equalTo(sql))
-                assertThat(statement.parameters(), equalTo("[1, 2, null, null]"))
+                MatcherAssert.assertThat(statement.sql(), equalTo(sql))
+                MatcherAssert.assertThat(statement.parameters(), equalTo("[1, 2, null, null]"))
             }
         }
     }

@@ -9,7 +9,7 @@
 package com.zepben.evolve.database.sqlite.cim.metadata
 
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseTables
-import com.zepben.evolve.database.sqlite.common.BaseCollectionWriter
+import com.zepben.evolve.database.sql.BaseCollectionWriter
 import com.zepben.evolve.services.common.meta.MetadataCollection
 
 /**

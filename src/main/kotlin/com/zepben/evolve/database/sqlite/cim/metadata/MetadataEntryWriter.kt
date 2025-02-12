@@ -10,8 +10,8 @@ package com.zepben.evolve.database.sqlite.cim.metadata
 
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.tables.TableMetadataDataSources
-import com.zepben.evolve.database.sqlite.common.BaseEntryWriter
-import com.zepben.evolve.database.sqlite.extensions.setInstant
+import com.zepben.evolve.database.sql.BaseEntryWriter
+import com.zepben.evolve.database.sql.extensions.setInstant
 import com.zepben.evolve.services.common.meta.DataSource
 import com.zepben.evolve.services.common.meta.MetadataCollection
 

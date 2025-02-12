@@ -13,7 +13,7 @@ import com.zepben.evolve.database.sqlite.cim.CimReader
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.diagramlayout.TableDiagramObjectPoints
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.diagramlayout.TableDiagramObjects
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.diagramlayout.TableDiagrams
-import com.zepben.evolve.database.sqlite.extensions.getNullableString
+import com.zepben.evolve.database.sql.extensions.getNullableString
 import com.zepben.evolve.services.common.extensions.ensureGet
 import com.zepben.evolve.services.common.extensions.getOrThrow
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID

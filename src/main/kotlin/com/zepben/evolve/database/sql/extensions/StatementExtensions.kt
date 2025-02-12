@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.extensions
+package com.zepben.evolve.database.sql.extensions
 
 import java.sql.PreparedStatement
 import java.sql.ResultSet

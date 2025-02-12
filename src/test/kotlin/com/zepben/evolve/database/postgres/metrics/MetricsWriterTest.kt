@@ -1,22 +1,20 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sqlite.metrics
+package com.zepben.evolve.database.postgres.metrics
 
-import com.zepben.evolve.database.postgres.metrics.MetricsEntryWriter
-import com.zepben.evolve.database.postgres.metrics.MetricsWriter
 import com.zepben.evolve.metrics.*
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsString
+import org.hamcrest.MatcherAssert
+import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.sqlite.SQLiteErrorCode
@@ -58,8 +56,8 @@ internal class MetricsWriterTest {
         every { metricsEntryWriter.writeSource(any(), any<JobSource>()) } throws SQLiteException("message", SQLiteErrorCode.SQLITE_ERROR)
         metricsWriter.write(job)
 
-        assertThat(systemErr.log, containsString("Failed to write job source"))
-        assertThat(systemErr.log, containsString("message"))
+        MatcherAssert.assertThat(systemErr.log, Matchers.containsString("Failed to write job source"))
+        MatcherAssert.assertThat(systemErr.log, Matchers.containsString("message"))
     }
 
     @Test
@@ -67,14 +65,14 @@ internal class MetricsWriterTest {
         every { metricsEntryWriter.writeMetric(any(), any<NetworkMetric>()) } throws SQLiteException("message", SQLiteErrorCode.SQLITE_ERROR)
         metricsWriter.write(job)
 
-        assertThat(systemErr.log, containsString("Failed to write metric"))
-        assertThat(systemErr.log, containsString("message"))
+        MatcherAssert.assertThat(systemErr.log, Matchers.containsString("Failed to write metric"))
+        MatcherAssert.assertThat(systemErr.log, Matchers.containsString("message"))
     }
 
     @Test
     internal fun `write returns false if missing job metadata`() {
         every { metricsEntryWriter.write(any(), any<IngestionMetadata>()) } returns false
-        assertThat("Ingestion job without metadata should not write", !metricsWriter.write(job))
+        MatcherAssert.assertThat("Ingestion job without metadata should not write", !metricsWriter.write(job))
     }
 
 }

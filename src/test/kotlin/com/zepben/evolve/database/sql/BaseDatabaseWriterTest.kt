@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.sql
 
-import com.zepben.evolve.database.sqlite.common.SqliteTable
-import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
+import com.zepben.evolve.database.sql.tables.SqlTable
+import com.zepben.evolve.database.sql.tables.TableVersion
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
@@ -47,9 +47,12 @@ internal class BaseDatabaseWriterTest {
     private val getConnection = spyk({ connection })
     private val data = mockk<Any>()
 
-    private var versionTable = spyk(SqliteTableVersion(1))
+    private val versionTable = mockk<GenericTableVersion> {
+        every { supportedVersion } returns 1
+        every { getVersion(connection) } returns 1
+    }
     private val tables = spyk(object : BaseDatabaseTables() {
-        override val includedTables: Sequence<SqliteTable> get() = sequenceOf(versionTable)
+        override val includedTables: Sequence<SqlTable> get() = sequenceOf(versionTable)
     }) { justRun { prepareInsertStatements(connection) } }
 
     private val writerCalls = spyk<ProtectedWriteCalls>()
@@ -74,7 +77,7 @@ internal class BaseDatabaseWriterTest {
         every { tables.prepareInsertStatements(any()) } throws SQLException()
         validateCalls(expectWriteData = false)
 
-        every { resultSet.getInt(1) } returns 2
+        every { versionTable.getVersion(connection) } returns 2
         validateCalls(expectPrepareInsertStatements = false)
 
         every { writerCalls.afterConnectBeforePrepare(any()) } returns false
@@ -89,7 +92,7 @@ internal class BaseDatabaseWriterTest {
 
     @Test
     internal fun `detects older version mismatches`() {
-        versionTable = spyk(SqliteTableVersion(0))
+        every { versionTable.supportedVersion } returns 0
         writer.write(data)
 
         MatcherAssert.assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 0)"))
@@ -97,7 +100,7 @@ internal class BaseDatabaseWriterTest {
 
     @Test
     internal fun `detects newer version mismatches`() {
-        versionTable = spyk(SqliteTableVersion(2))
+        every { versionTable.supportedVersion } returns 2
         writer.write(data)
 
         MatcherAssert.assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 2)"))
@@ -105,7 +108,7 @@ internal class BaseDatabaseWriterTest {
 
     @Test
     internal fun `detects missing version mismatches`() {
-        every { resultSet.next() } returns false
+        every { versionTable.getVersion(connection) } returns null
         writer.write(data)
 
         MatcherAssert.assertThat(systemErr.log, containsString("Missing version table in database file, cannot check compatibility"))
@@ -149,7 +152,7 @@ internal class BaseDatabaseWriterTest {
         expectCommit: Boolean = expectAfterWriteBeforeCommit,
         expectedResult: Boolean = expectCommit
     ) {
-        clearMocks(writerCalls, getConnection, connection, tables, statement, resultSet, answers = false)
+        clearMocks(writerCalls, getConnection, connection, tables, statement, resultSet, versionTable, answers = false)
         MatcherAssert.assertThat(writer.write(data), Matchers.equalTo(expectedResult))
 
         verifySequence {
@@ -162,13 +165,9 @@ internal class BaseDatabaseWriterTest {
                 writerCalls.afterConnectBeforePrepare(connection)
 
             if (expectVersionMatches) {
-                connection.createStatement()
                 tables.tables
-                statement.executeQuery("SELECT version FROM version")
-                resultSet.next()
-                resultSet.getInt(1)
-                resultSet.close()
-                statement.close()
+                versionTable.supportedVersion
+                versionTable.getVersion(connection)
             }
 
             if (expectPrepareInsertStatements)
@@ -189,7 +188,7 @@ internal class BaseDatabaseWriterTest {
                 connection.close()
         }
 
-        confirmVerified(writerCalls, getConnection, connection, tables, statement, resultSet)
+        confirmVerified(writerCalls, getConnection, connection, tables, statement, resultSet, versionTable)
     }
 
     // A class that is used to capture the calls to the private methods of the writer.
@@ -199,5 +198,7 @@ internal class BaseDatabaseWriterTest {
         fun writeData(@Suppress("unused") data: Any): Boolean = true
         fun afterWriteBeforeCommit(@Suppress("unused") connection: Connection): Boolean = true
     }
+
+    private abstract class GenericTableVersion : TableVersion, SqlTable()
 
 }

@@ -117,25 +117,22 @@ abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables, T> internal cons
 
 
     private fun versionMatches(connection: Connection): Boolean {
-        connection.createStatement().use { statement ->
-            val tableVersion = databaseTables.tables.values.filterIsInstance<TableVersion>().firstOrNull()
-            if (tableVersion == null) {
-                logger.error("INTERNAL ERROR: No version table defined, please make sure you add a version table to your database tables collection.")
-                return false
-            }
+        val tableVersion = databaseTables.tables.values.filterIsInstance<TableVersion>().firstOrNull()
+        if (tableVersion == null) {
+            logger.error("INTERNAL ERROR: No version table defined, please make sure you add a version table to your database tables collection.")
+            return false
+        }
+        val supportedVersion = tableVersion.supportedVersion
 
-            statement.executeQuery(tableVersion.selectSql).use { rs ->
-                if (rs.next()) {
-                    val version = rs.getInt(tableVersion.VERSION.queryIndex)
-                    return if (version == tableVersion.supportedVersion) true
-                    else {
-                        logger.error("Unsupported version in database file (got $version, expected ${tableVersion.supportedVersion}).")
-                        false
-                    }
-                } else {
-                    logger.error("Missing version table in database file, cannot check compatibility")
-                    return false
-                }
+        return when (val version = tableVersion.getVersion(connection)) {
+            null -> {
+                logger.error("Missing version table in database file, cannot check compatibility")
+                false
+            }
+            supportedVersion -> true
+            else -> {
+                logger.error("Unsupported version in database file (got $version, expected $supportedVersion).")
+                false
             }
         }
     }

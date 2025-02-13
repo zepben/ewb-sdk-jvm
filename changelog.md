@@ -72,11 +72,6 @@
 ### Fixes
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart.
 * `AssignToFeeder` and `AssignToLvFeeder` will no longer trace from start terminals that belong to open switches.
-* GrpcChannelBuilder's initial connectivity test no longer fails due to a lack of permissions on a subset of services.
-* Updated to latest SDK:
-  - AddJumperEvent from and to changed to fromConnection and toConnection
-* AddJumperEvent now uses correct protobuf classes when converting
-* RemoveJumperEvent now uses correct protobuf classes when converting
 * When finding `LvFeeders` in the `Site` we will now exclude `LvFeeders` that start with an open `Switch`
 
 ## [0.24.1] - 2025-01-23

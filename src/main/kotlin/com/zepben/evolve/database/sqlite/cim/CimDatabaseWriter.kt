@@ -28,7 +28,6 @@ import java.sql.SQLException
  *
  * @param databaseFile The filename of the database to write.
  * @param databaseTables The tables to create in the database.
- * @param getConnection Provider of the connection to the specified database.
  * @param createMetadataWriter Factory for creating the [MetadataCollectionWriter] to use.
  * @param createServiceWriter Factory for creating the [BaseServiceWriter] to use.
  *

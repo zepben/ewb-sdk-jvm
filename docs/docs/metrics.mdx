@@ -30,7 +30,7 @@ The above information is captured in an in-memory model named `IngestionJob`. an
 
 ## Ingestion Job Model
 
-The following is an example of creating, populating, and saving an `IngestionJob` object to a metrics database file, `metrics.sqlite`.
+The following is an example of creating, populating, and saving an `IngestionJob` object to a metrics database.
 
 <Tabs
     groupId="code-example"
@@ -44,13 +44,17 @@ The following is an example of creating, populating, and saving an `IngestionJob
 
 ```java
 import com.zepben.evolve.cim.iec61970.base.core.Feeder;
-import com.zepben.evolve.database.sqlite.metrics.MetricsDatabaseWriter;
+import com.zepben.evolve.database.postgres.metrics.MetricsDatabaseWriter;
 import com.zepben.evolve.metrics.IngestionJob;
 import com.zepben.evolve.metrics.IngestionMetadata;
 import com.zepben.evolve.metrics.TotalNetworkContainer;
 
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -82,14 +86,21 @@ public class IngestionJobExample {
         ingestionJob.getNetworkMetrics().get(networkContainer(feeder, true)).put("total cable length", 123.45);
 
         MetricsDatabaseWriter metricsDatabaseWriter = new MetricsDatabaseWriter(
-            "metrics.sqlite", // Database file to create/update
-            ingestionJob, // Ingestion job to write
+            IngestionJobExample::getMetricsConnection, // Database file to create/update
             Path.of("path/to/model") // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
         );
-        if (metricsDatabaseWriter.save()) {
+        if (metricsDatabaseWriter.write(ingestionJob)) {
             System.out.println("Ingestion job saved successfully");
         } else {
             System.out.println("Ingestion job could not be saved successfully");
+        }
+    }
+
+    private static Connection getMetricsConnection() {
+        try {
+            return DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }
@@ -100,26 +111,29 @@ public class IngestionJobExample {
 
 ```kotlin
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
-import com.zepben.evolve.database.sqlite.metrics.MetricsDatabaseWriter
+import com.zepben.evolve.database.postgres.metrics.MetricsDatabaseWriter
 import com.zepben.evolve.metrics.IngestionJob
 import com.zepben.evolve.metrics.IngestionMetadata
 import com.zepben.evolve.metrics.TotalNetworkContainer
 import com.zepben.evolve.metrics.toNetworkContainer
+import java.nio.file.Path
 import java.security.MessageDigest
+import java.sql.DriverManager
 import java.time.Instant
 import java.util.*
 
 // This would normally be inside a NetworkService, but it is created here for this example.
 val feeder = Feeder("abc-feeder").apply { name = "ABC Feeder" }
 
-val ingestionJob = IngestionJob(UUID.randomUUID()).apply {
-    metadata = IngestionMetadata(
+val ingestionJob = IngestionJob(
+    UUID.randomUUID(),
+    IngestionMetadata(
         startTime = Instant.now(),
         source = "ExampleEnergy full HV/LV 2024-01-02 cut",
         application = "example-energy-ingestor",
         applicationVersion = "0.12.0"
     )
-
+).apply {
     // Sources and network metrics are "automaps", which populate default values for new keys as they are accessed.
     sources["ABC_feeder.xml"].timestamp = Instant.parse("2020-01-02T10:30:00.00Z")
     sources["ABC_feeder.xml"].fileHash = MessageDigest.getInstance("SHA-256").digest("file contents".toByteArray())
@@ -130,11 +144,10 @@ val ingestionJob = IngestionJob(UUID.randomUUID()).apply {
 
 fun main() {
     val metricsDatabaseWriter = MetricsDatabaseWriter(
-        "metrics.sqlite", // Database file to create/update
-        ingestionJob, // Ingestion job to write
+        { DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics") }, // Database to write to
         Path.of("path/to/model") // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
     )
-    if (metricsDatabaseWriter.save()) {
+    if (metricsDatabaseWriter.write(ingestionJob)) {
         println("Ingestion job saved successfully")
     } else {
         println("Ingestion job could not be saved successfully")

@@ -9,6 +9,7 @@
 package com.zepben.evolve.database.sql.tables
 
 import org.slf4j.LoggerFactory
+import java.sql.PreparedStatement
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.memberProperties

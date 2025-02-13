@@ -56,6 +56,8 @@
 * Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests.
 * Updated to ewb-grpc 0.34.1:
   * Changed AddJumperEvent to not use reserved words.
+* `UpdateNetworkStateService.setCurrentStates` no longer blocks while waiting for `onSetCurrentStates` callbacks when handling the `onCompleted` request. This
+  only effects the gRPC threads.
 
 ### Fixes
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart.

@@ -10,7 +10,7 @@ package com.zepben.evolve.database.sql
 
 import com.zepben.evolve.database.sql.extensions.parameters
 import com.zepben.evolve.database.sql.extensions.sql
-import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import java.sql.DriverManager
@@ -26,8 +26,8 @@ class PreparedStatementExtensionsKtTest {
                 statement.setInt(1, 1)
                 statement.setString(2, "2")
 
-                MatcherAssert.assertThat(statement.sql(), equalTo(sql))
-                MatcherAssert.assertThat(statement.parameters(), equalTo("[1, 2, null, null]"))
+                assertThat(statement.sql(), equalTo(sql))
+                assertThat(statement.parameters(), equalTo("[1, 2, null, null]"))
             }
         }
     }

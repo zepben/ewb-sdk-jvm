@@ -10,7 +10,7 @@ package com.zepben.evolve.database.sql.extensions
 
 import com.zepben.evolve.utils.createMockResultSet
 import io.mockk.every
-import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
@@ -24,7 +24,7 @@ internal class ResultSetExtensionsTest {
             every { it.getBoolean(any<Int>()) } returns true
         }
 
-        MatcherAssert.assertThat(rs.getNullableBoolean(1), equalTo(true))
+        assertThat(rs.getNullableBoolean(1), equalTo(true))
     }
 
     @Test
@@ -33,7 +33,7 @@ internal class ResultSetExtensionsTest {
             every { it.getBoolean(any<Int>()) } returns true
         }
 
-        MatcherAssert.assertThat(rs.getNullableBoolean(1), nullValue())
+        assertThat(rs.getNullableBoolean(1), nullValue())
     }
 
     @Test
@@ -42,7 +42,7 @@ internal class ResultSetExtensionsTest {
             every { it.getDouble(any<Int>()) } returns 1.0
         }
 
-        MatcherAssert.assertThat(rs.getNullableDouble(1), equalTo(1.0))
+        assertThat(rs.getNullableDouble(1), equalTo(1.0))
     }
 
     @Test
@@ -51,7 +51,7 @@ internal class ResultSetExtensionsTest {
             every { it.getDouble(any<Int>()) } returns 0.0
         }
 
-        MatcherAssert.assertThat(rs.getNullableDouble(1), nullValue())
+        assertThat(rs.getNullableDouble(1), nullValue())
     }
 
     @Test
@@ -61,7 +61,7 @@ internal class ResultSetExtensionsTest {
             every { it.getString(any<Int>()) } returns "nan"
         }
 
-        MatcherAssert.assertThat(rs.getNullableDouble(1), equalTo(Double.NaN))
+        assertThat(rs.getNullableDouble(1), equalTo(Double.NaN))
     }
 
     @Test
@@ -71,7 +71,7 @@ internal class ResultSetExtensionsTest {
             every { it.getString(any<Int>()) } returns "0.0"
         }
 
-        MatcherAssert.assertThat(rs.getNullableDouble(1), equalTo(0.0))
+        assertThat(rs.getNullableDouble(1), equalTo(0.0))
     }
 
     @Test
@@ -80,7 +80,7 @@ internal class ResultSetExtensionsTest {
             every { it.getFloat(any<Int>()) } returns 1.0f
         }
 
-        MatcherAssert.assertThat(rs.getNullableFloat(1), equalTo(1.0f))
+        assertThat(rs.getNullableFloat(1), equalTo(1.0f))
     }
 
     @Test
@@ -89,7 +89,7 @@ internal class ResultSetExtensionsTest {
             every { it.getFloat(any<Int>()) } returns 0.0f
         }
 
-        MatcherAssert.assertThat(rs.getNullableFloat(1), nullValue())
+        assertThat(rs.getNullableFloat(1), nullValue())
     }
 
     @Test
@@ -99,7 +99,7 @@ internal class ResultSetExtensionsTest {
             every { it.getString(any<Int>()) } returns "nan"
         }
 
-        MatcherAssert.assertThat(rs.getNullableFloat(1), equalTo(Float.NaN))
+        assertThat(rs.getNullableFloat(1), equalTo(Float.NaN))
     }
 
     @Test
@@ -109,7 +109,7 @@ internal class ResultSetExtensionsTest {
             every { it.getString(any<Int>()) } returns "0.0"
         }
 
-        MatcherAssert.assertThat(rs.getNullableFloat(1), equalTo(0.0f))
+        assertThat(rs.getNullableFloat(1), equalTo(0.0f))
     }
 
 
@@ -119,7 +119,7 @@ internal class ResultSetExtensionsTest {
             every { it.getInt(any<Int>()) } returns 1
         }
 
-        MatcherAssert.assertThat(rs.getNullableInt(1), equalTo(1))
+        assertThat(rs.getNullableInt(1), equalTo(1))
     }
 
     @Test
@@ -128,7 +128,7 @@ internal class ResultSetExtensionsTest {
             every { it.getInt(any<Int>()) } returns 0
         }
 
-        MatcherAssert.assertThat(rs.getNullableInt(1), nullValue())
+        assertThat(rs.getNullableInt(1), nullValue())
     }
 
     @Test
@@ -137,7 +137,7 @@ internal class ResultSetExtensionsTest {
             every { it.getString(any<Int>()) } returns "string"
         }
 
-        MatcherAssert.assertThat(rs.getNullableString(1), equalTo("string"))
+        assertThat(rs.getNullableString(1), equalTo("string"))
     }
 
     @Test
@@ -146,7 +146,7 @@ internal class ResultSetExtensionsTest {
             every { it.getString(any<Int>()) } returns null
         }
 
-        MatcherAssert.assertThat(rs.getNullableString(1), nullValue())
+        assertThat(rs.getNullableString(1), nullValue())
     }
 
     @Test
@@ -155,7 +155,7 @@ internal class ResultSetExtensionsTest {
             every { it.getLong(any<Int>()) } returns 1L
         }
 
-        MatcherAssert.assertThat(rs.getNullableLong(1), equalTo(1L))
+        assertThat(rs.getNullableLong(1), equalTo(1L))
     }
 
     @Test
@@ -164,7 +164,7 @@ internal class ResultSetExtensionsTest {
             every { it.getLong(any<Int>()) } returns 0L
         }
 
-        MatcherAssert.assertThat(rs.getNullableLong(1), nullValue())
+        assertThat(rs.getNullableLong(1), nullValue())
     }
 
     @Test
@@ -173,7 +173,7 @@ internal class ResultSetExtensionsTest {
             every { it.getString(any<Int>()) } returns "2020-01-01T00:00:00.000Z"
         }
 
-        MatcherAssert.assertThat(rs.getInstant(1), equalTo(Instant.parse("2020-01-01T00:00:00.000Z")))
+        assertThat(rs.getInstant(1), equalTo(Instant.parse("2020-01-01T00:00:00.000Z")))
     }
 
     @Test
@@ -182,7 +182,7 @@ internal class ResultSetExtensionsTest {
             every { it.getString(any<Int>()) } returns ""
         }
 
-        MatcherAssert.assertThat(rs.getInstant(1), nullValue())
+        assertThat(rs.getInstant(1), nullValue())
     }
 
 }

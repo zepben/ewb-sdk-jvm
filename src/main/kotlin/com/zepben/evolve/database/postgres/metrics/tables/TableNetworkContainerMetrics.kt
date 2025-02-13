@@ -18,7 +18,7 @@ class TableNetworkContainerMetrics : MultiJobTable() {
     val HIERARCHY_NAME: Column = Column(++columnIndex, "hierarchy_name", "TEXT", NOT_NULL)
     val CONTAINER_TYPE: Column = Column(++columnIndex, "container_type", "TEXT", NOT_NULL)
     val METRIC_NAME: Column = Column(++columnIndex, "metric_name", "TEXT", NOT_NULL)
-    val METRIC_VALUE: Column = Column(++columnIndex, "metric_value", "NUMBER", NOT_NULL)
+    val METRIC_VALUE: Column = Column(++columnIndex, "metric_value", "DOUBLE PRECISION", NOT_NULL)
 
     override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(
         listOf(JOB_ID, HIERARCHY_ID, CONTAINER_TYPE, METRIC_NAME)

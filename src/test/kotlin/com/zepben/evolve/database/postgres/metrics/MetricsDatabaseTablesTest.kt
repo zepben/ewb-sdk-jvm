@@ -13,7 +13,7 @@ import com.zepben.evolve.database.postgres.common.PostgresTable
 import com.zepben.evolve.database.postgres.common.PostgresTableVersion
 import com.zepben.evolve.database.sql.MissingTableConfigException
 import com.zepben.testutils.exception.ExpectException
-import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import java.lang.reflect.Modifier
@@ -38,7 +38,7 @@ internal class MetricsDatabaseTablesTest {
             .map { it.simpleName!! }
             .toSet()
 
-        MatcherAssert.assertThat(usedTables, equalTo(allFinalTables))
+        assertThat(usedTables, equalTo(allFinalTables))
     }
 
     @Test

@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.cim
 
-import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionWriter
 import com.zepben.evolve.database.sql.BaseDatabaseWriter
+import com.zepben.evolve.database.sqlite.cim.metadata.MetadataCollectionWriter
 import com.zepben.evolve.database.sqlite.common.SqliteTableVersion
 import com.zepben.evolve.database.sqlite.extensions.configureBatch
 import com.zepben.evolve.services.common.BaseService

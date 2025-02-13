@@ -13,8 +13,9 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.Test
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -43,7 +44,7 @@ internal abstract class SqlTableVersionTest<TTable: TableVersion>(constructor: (
 
     @Test
     internal fun `getVersion helper returns version from query`() {
-        MatcherAssert.assertThat(table.getVersion(connection), Matchers.equalTo(1))
+        assertThat(table.getVersion(connection), equalTo(1))
 
         verify {
             preparedStatement.executeQuery()
@@ -55,7 +56,7 @@ internal abstract class SqlTableVersionTest<TTable: TableVersion>(constructor: (
     internal fun `getVersion helper detects failures`() {
         every { preparedStatement.executeQuery() } throws SQLException("test")
 
-        MatcherAssert.assertThat(table.getVersion(connection), Matchers.nullValue())
+        assertThat(table.getVersion(connection), nullValue())
 
         verify {
             preparedStatement.executeQuery()

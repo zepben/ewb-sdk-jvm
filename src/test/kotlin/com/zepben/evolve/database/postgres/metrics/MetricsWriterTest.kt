@@ -13,8 +13,8 @@ import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.sqlite.SQLiteErrorCode
@@ -56,8 +56,8 @@ internal class MetricsWriterTest {
         every { metricsEntryWriter.writeSource(any(), any<JobSource>()) } throws SQLiteException("message", SQLiteErrorCode.SQLITE_ERROR)
         metricsWriter.write(job)
 
-        MatcherAssert.assertThat(systemErr.log, Matchers.containsString("Failed to write job source"))
-        MatcherAssert.assertThat(systemErr.log, Matchers.containsString("message"))
+        assertThat(systemErr.log, containsString("Failed to write job source"))
+        assertThat(systemErr.log, containsString("message"))
     }
 
     @Test
@@ -65,14 +65,14 @@ internal class MetricsWriterTest {
         every { metricsEntryWriter.writeMetric(any(), any<NetworkMetric>()) } throws SQLiteException("message", SQLiteErrorCode.SQLITE_ERROR)
         metricsWriter.write(job)
 
-        MatcherAssert.assertThat(systemErr.log, Matchers.containsString("Failed to write metric"))
-        MatcherAssert.assertThat(systemErr.log, Matchers.containsString("message"))
+        assertThat(systemErr.log, containsString("Failed to write metric"))
+        assertThat(systemErr.log, containsString("message"))
     }
 
     @Test
     internal fun `write returns false if missing job metadata`() {
         every { metricsEntryWriter.write(any(), any<IngestionMetadata>()) } returns false
-        MatcherAssert.assertThat("Ingestion job without metadata should not write", !metricsWriter.write(job))
+        assertThat("Ingestion job without metadata should not write", !metricsWriter.write(job))
     }
 
 }

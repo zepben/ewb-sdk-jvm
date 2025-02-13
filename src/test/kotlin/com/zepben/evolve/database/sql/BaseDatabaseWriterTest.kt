@@ -13,9 +13,9 @@ import com.zepben.evolve.database.sql.tables.TableVersion
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
-import org.hamcrest.MatcherAssert
-import org.hamcrest.Matchers
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsString
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.sql.Connection
@@ -95,7 +95,7 @@ internal class BaseDatabaseWriterTest {
         every { versionTable.supportedVersion } returns 0
         writer.write(data)
 
-        MatcherAssert.assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 0)"))
+        assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 0)"))
     }
 
     @Test
@@ -103,7 +103,7 @@ internal class BaseDatabaseWriterTest {
         every { versionTable.supportedVersion } returns 2
         writer.write(data)
 
-        MatcherAssert.assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 2)"))
+        assertThat(systemErr.log, containsString("Unsupported version in database file (got 1, expected 2)"))
     }
 
     @Test
@@ -111,7 +111,7 @@ internal class BaseDatabaseWriterTest {
         every { versionTable.getVersion(connection) } returns null
         writer.write(data)
 
-        MatcherAssert.assertThat(systemErr.log, containsString("Missing version table in database file, cannot check compatibility"))
+        assertThat(systemErr.log, containsString("Missing version table in database file, cannot check compatibility"))
     }
 
     @Test
@@ -119,13 +119,13 @@ internal class BaseDatabaseWriterTest {
         every { writerCalls.beforeConnect() } throws SQLException("SQL error message")
         writer.write(data)
 
-        MatcherAssert.assertThat(systemErr.log, containsString("Failed to write the database: SQL error message"))
+        assertThat(systemErr.log, containsString("Failed to write the database: SQL error message"))
         systemErr.clearCapturedLog()
 
         every { writerCalls.beforeConnect() } throws MissingTableConfigException("tables error message")
         writer.write(data)
 
-        MatcherAssert.assertThat(systemErr.log, containsString("Failed to write the database: tables error message"))
+        assertThat(systemErr.log, containsString("Failed to write the database: tables error message"))
         systemErr.clearCapturedLog()
 
         every { writerCalls.beforeConnect() } throws Exception("unhandled error message")
@@ -153,7 +153,7 @@ internal class BaseDatabaseWriterTest {
         expectedResult: Boolean = expectCommit
     ) {
         clearMocks(writerCalls, getConnection, connection, tables, statement, resultSet, versionTable, answers = false)
-        MatcherAssert.assertThat(writer.write(data), Matchers.equalTo(expectedResult))
+        assertThat(writer.write(data), equalTo(expectedResult))
 
         verifySequence {
             writerCalls.beforeConnect()

@@ -14,7 +14,7 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
-import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
@@ -57,8 +57,8 @@ internal class MetricsDatabaseWriterTest {
             createMetricsWriter = { writer }
         ).write(job)
 
-        MatcherAssert.assertThat("Should have writen successfully", result)
-        MatcherAssert.assertThat("Job ID file shouldn't exist with no path", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").notExists())
+        assertThat("Should have writen successfully", result)
+        assertThat("Job ID file shouldn't exist with no path", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").notExists())
 
         verify { writer.write(job) }
     }
@@ -72,7 +72,7 @@ internal class MetricsDatabaseWriterTest {
             createMetricsWriter = { writer }
         ).write(job)
 
-        MatcherAssert.assertThat("Job ID file should exist", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").exists())
+        assertThat("Job ID file should exist", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").exists())
 
         verify { writer.write(job) }
     }
@@ -92,9 +92,9 @@ internal class MetricsDatabaseWriterTest {
             createMetricsWriter = { writer }
         ).write(job)
 
-        MatcherAssert.assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid2.$JOB_ID_FILE_EXTENSION").notExists())
-        MatcherAssert.assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid3.$JOB_ID_FILE_EXTENSION").notExists())
-        MatcherAssert.assertThat("New job ID file should exist", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").exists())
+        assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid2.$JOB_ID_FILE_EXTENSION").notExists())
+        assertThat("Old job ID file should be deleted", modelPath.resolve("$uuid3.$JOB_ID_FILE_EXTENSION").notExists())
+        assertThat("New job ID file should exist", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").exists())
 
         verify { writer.write(job) }
     }

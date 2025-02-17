@@ -66,9 +66,24 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
             nextExternalPaths(path, pathFactory)
         } else {
             if (path.toTerminal.sequenceNumber == 1)
-                segment.traverseFromTerminalTowardsT2(path.toTerminal, 0.0, pathFactory)
-            else
-                segment.traverseFromTerminalTowardsT1(path.toTerminal, Double.MAX_VALUE, pathFactory)
+                segment.traverseFromTerminal(
+                    path.toTerminal,
+                    lengthFromT1 = 0.0,
+                    towardsSegmentT2 = true,
+                    canStopAtCutsAtSamePosition = true,
+                    cutAtSamePositionTerminalNumber = 1,
+                    pathFactory = pathFactory
+                )
+            else {
+                segment.traverseFromTerminal(
+                    path.toTerminal,
+                    lengthFromT1 = segment.lengthOrMax,
+                    towardsSegmentT2 = false,
+                    canStopAtCutsAtSamePosition = true,
+                    cutAtSamePositionTerminalNumber = 2,
+                    pathFactory = pathFactory
+                )
+            }
         }
     }
 
@@ -87,7 +102,27 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
         return if (path.didTraverseAcLineSegment) {
             nextExternalPaths(path, pathFactory)
         } else {
-            clamp.acLineSegment?.traverseFromTerminalBothWays(path.toTerminal, clamp.lengthFromT1Or0, pathFactory).orEmpty()
+            // Because we consider clamps at the same position as a cut on the terminal 1 side, we do not stop at cuts at the same position when
+            // traversing towards t1, but we do when traversing towards t2.
+            val nextPathsTowardsT1 = clamp.acLineSegment?.traverseFromTerminal(
+                path.toTerminal,
+                lengthFromT1 = clamp.lengthFromT1Or0,
+                towardsSegmentT2 = false,
+                canStopAtCutsAtSamePosition = false,
+                cutAtSamePositionTerminalNumber = 1,
+                pathFactory = pathFactory
+            ).orEmpty()
+
+            val nextPathsTowardsT2 = clamp.acLineSegment?.traverseFromTerminal(
+                path.toTerminal,
+                lengthFromT1 = clamp.lengthFromT1Or0,
+                towardsSegmentT2 = true,
+                canStopAtCutsAtSamePosition = true,
+                cutAtSamePositionTerminalNumber = 1,
+                pathFactory = pathFactory
+            ).orEmpty()
+
+            (nextPathsTowardsT1 + nextPathsTowardsT2).distinctBy { it.toEquipment }
         }
     }
 
@@ -97,8 +132,14 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
         val nextTerminals = if (path.didTraverseAcLineSegment) {
             nextExternalPaths(path, pathFactory)
         } else {
-            val towardsT2: Boolean = path.toTerminal.sequenceNumber != 1
-            cut.acLineSegment?.traverseFromTerminal(path.toTerminal, cut.lengthFromT1Or0, towardsT2, pathFactory).orEmpty()
+            cut.acLineSegment?.traverseFromTerminal(
+                path.toTerminal,
+                lengthFromT1 = cut.lengthFromT1Or0,
+                towardsSegmentT2 = path.toTerminal.sequenceNumber != 1,
+                canStopAtCutsAtSamePosition = false,
+                cutAtSamePositionTerminalNumber = path.toTerminal.sequenceNumber,
+                pathFactory = pathFactory
+            ).orEmpty()
         }
 
         // If the current path traced internally, we need to also return the external terminals
@@ -119,19 +160,13 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
         // If there are no busbars we can just step to all other connected terminals.
         return when {
             path.toEquipment is BusbarSection -> nextPathsFromBusbar(path, pathFactory)
-            path.toTerminal.hasConnectedBusbars() -> path.toTerminal.connectedTerminals().filter { it.conductingEquipment is BusbarSection }.mapToPath(pathFactory)
+            path.toTerminal.hasConnectedBusbars() -> path.toTerminal.connectedTerminals()
+                .filter { it.conductingEquipment is BusbarSection }
+                .mapToPath(pathFactory)
+
             else -> path.toTerminal.connectedTerminals().mapToPath(pathFactory)
         }
     }
-
-    private fun AcLineSegment.traverseFromTerminalTowardsT1(fromTerminal: Terminal, lengthFromT1: Double, pathFactory: PathFactory): Sequence<NetworkTraceStep.Path> =
-        traverseFromTerminal(fromTerminal, lengthFromT1, false, pathFactory)
-
-    private fun AcLineSegment.traverseFromTerminalTowardsT2(fromTerminal: Terminal, lengthFromT1: Double, pathFactory: PathFactory): Sequence<NetworkTraceStep.Path> =
-        traverseFromTerminal(fromTerminal, lengthFromT1, true, pathFactory)
-
-    private fun AcLineSegment.traverseFromTerminalBothWays(fromTerminal: Terminal, lengthFromT1: Double, pathFactory: PathFactory): Sequence<NetworkTraceStep.Path> =
-        traverseFromTerminalTowardsT1(fromTerminal, lengthFromT1, pathFactory) + traverseFromTerminalTowardsT2(fromTerminal, lengthFromT1, pathFactory)
 
     /**
      * This returns terminals found traversing along an AcLineSegment from any terminal "on" the segment. Terminals considered on the segment are any clamp
@@ -139,12 +174,15 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
      * at and returns the next cut terminal found along the segment plus any clamp terminals it found between the fromTerminal and the cut terminal.
      * If there are no cuts on the segment the terminal, the other end of the segment is returned along with all clamp terminals.
      * To determine order of terminals on the segment, `lengthFromTerminal1` is used for cuts and clamps. When this property is null a default value of 0.0 is
-     * assumed, effectively placing it at the start of the segment. Terminal 1 on the segment is deemed at 0.0 and Terminal 2 is deemed at Double.MAX_VALUE.
+     * assumed, effectively placing it at the start of the segment. Terminal 1 on the segment is deemed at 0.0 and Terminal 2 is deemed at
+     * [AcLineSegment.length] or [Double.MAX_VALUE] if the length or the segment is `null`.
      *
      * This algorithm assumes AcLineSegments have exactly 2 terminals, cuts have exactly 2 terminals and clamps have exactly 1 terminal.
-     * However, if you are using the legacy model where there were multiple terminals on a segment, this function will still return all the
-     * terminals on the segment as long as there are no clamps or cuts on the segment. Basically, segments with cuts and clamps are mutually exclusive
-     * to segments with multiple terminals (the data model should enforce this anyway).
+     *
+     * If there is a cut and a clamp at the exact same length on the segment, it is assumed the clamp is on the terminal 1 side of the cut. This is so you do not
+     * get the clamp twice when traversing a segment from one end to the other. As a clamp can't technically be in the exact same spot as a cut, you should
+     * realistically model this either attaching the equipment attached by the clamp to the appropriate cut terminal, or, place a clamp at a length that is
+     * not exactly the same as the cut. This would yield more accurate and deterministic behaviour.
      *
      * @param fromTerminal The terminal on the segment to traverse from. This could either be a segment terminal, or a terminal from any cut or clamp on the segment.
      * @param lengthFromT1 The length from terminal 1 the fromTerminal is.
@@ -154,6 +192,8 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
         fromTerminal: Terminal,
         lengthFromT1: Double,
         towardsSegmentT2: Boolean,
+        canStopAtCutsAtSamePosition: Boolean,
+        cutAtSamePositionTerminalNumber: Int,
         pathFactory: PathFactory
     ): Sequence<NetworkTraceStep.Path> {
         // We need to ignore cuts that are not "in service" because that means they do not exist!
@@ -165,28 +205,41 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
         if (cuts.isEmpty() && clamps.isEmpty())
             return fromTerminal.otherTerminals().mapToPath(pathFactory, this)
 
-        val nextCut = when {
-            towardsSegmentT2 -> cuts.filter { it.lengthFromT1Or0 > lengthFromT1 }.minByOrNull { it.lengthFromT1Or0 }
-            else -> cuts.filter { it.lengthFromT1Or0 < lengthFromT1 }.maxByOrNull { it.lengthFromT1Or0 }
+        val cutsAtSamePosition = cuts.filter { it.lengthFromT1Or0 == lengthFromT1 }
+        val stopAtCutsAtSamePosition: Boolean = canStopAtCutsAtSamePosition && cutsAtSamePosition.isNotEmpty()
+
+        val nextCutLengthFromTerminal1 = when {
+            stopAtCutsAtSamePosition -> lengthFromT1
+            towardsSegmentT2 -> cuts.filter { it.lengthFromT1Or0 > lengthFromT1 }.minOfOrNull { it.lengthFromT1Or0 }
+            else -> cuts.filter { it.lengthFromT1Or0 < lengthFromT1 }.maxOfOrNull { it.lengthFromT1Or0 }
         }
+
+        val nextCuts = nextCutLengthFromTerminal1?.let { cuts.filter { it.lengthFromT1Or0 == nextCutLengthFromTerminal1 } }.orEmpty()
 
         val nextTerminalLengthFromTerminal1: Double = when {
-            towardsSegmentT2 -> nextCut?.lengthFromTerminal1 ?: Double.MAX_VALUE
-            else -> nextCut?.lengthFromTerminal1 ?: 0.0
+            nextCutLengthFromTerminal1 != null -> nextCutLengthFromTerminal1
+            towardsSegmentT2 -> lengthOrMax
+            else -> 0.0
         }
 
-        val clampsBeforeNextTerminal = when {
-            towardsSegmentT2 -> clamps.asSequence().filter { it.lengthFromT1Or0 in lengthFromT1..nextTerminalLengthFromTerminal1 }
-            else -> clamps.asSequence().filter { it.lengthFromT1Or0 in nextTerminalLengthFromTerminal1..lengthFromT1 }
+        val clampsBeforeNextTerminal = clamps.asSequence().filter(when {
+            fromTerminal.conductingEquipment is AcLineSegment && towardsSegmentT2 -> { it: Clamp -> it.lengthFromT1Or0 in lengthFromT1..nextTerminalLengthFromTerminal1 }
+            towardsSegmentT2 -> { it: Clamp -> it.lengthFromT1Or0 > lengthFromT1 && it.lengthFromT1Or0 <= nextTerminalLengthFromTerminal1 }
+            nextTerminalLengthFromTerminal1 == 0.0 && nextCuts.isEmpty() -> { it: Clamp -> it.lengthFromT1Or0 in nextTerminalLengthFromTerminal1..lengthFromT1 }
+            else -> { it: Clamp -> it.lengthFromT1Or0 <= lengthFromT1 && it.lengthFromT1Or0 > nextTerminalLengthFromTerminal1 }
+        })
+
+        val nextStopTerminals = when {
+            stopAtCutsAtSamePosition -> sequenceOf()
+            nextCuts.isNotEmpty() -> nextCuts.asSequence().mapNotNull { it.getTerminal(if (towardsSegmentT2) 1 else 2) }
+            else -> getTerminal(if (towardsSegmentT2) 2 else 1)?.let { sequenceOf(it) }.orEmpty()
         }
 
-        val nextTerminal = when {
-            nextCut == null -> getTerminal(if (towardsSegmentT2) 2 else 1)
-            else -> nextCut.getTerminal(if (towardsSegmentT2) 1 else 2)
-        }
+        val nextTerminals = cutsAtSamePosition.asSequence().mapNotNull { it.getTerminal(cutAtSamePositionTerminalNumber) } +
+            clampsBeforeNextTerminal.mapNotNull { it.getTerminal(1) } +
+            nextStopTerminals
 
-        return clampsBeforeNextTerminal.mapNotNull { it.getTerminal(1) }.mapToPath(pathFactory, this) +
-            nextTerminal.mapToPath(pathFactory, this)
+        return nextTerminals.mapToPath(pathFactory, this)
     }
 
     private fun Terminal.hasConnectedBusbars(): Boolean =
@@ -195,11 +248,13 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
 
     private val Cut.lengthFromT1Or0: Double get() = lengthFromTerminal1 ?: 0.0
     private val Clamp.lengthFromT1Or0: Double get() = lengthFromTerminal1 ?: 0.0
+    private val AcLineSegment.lengthOrMax: Double get() = length ?: Double.MAX_VALUE
 
     private fun Terminal?.mapToPath(pathFactory: PathFactory, traversedAcLineSegment: AcLineSegment? = null): Sequence<NetworkTraceStep.Path> =
         if (this != null) sequenceOf(this).mapToPath(pathFactory, traversedAcLineSegment) else emptySequence()
 
-    private fun Sequence<Terminal>.mapToPath(pathFactory: PathFactory, traversedAcLineSegment: AcLineSegment? = null): Sequence<NetworkTraceStep.Path> = mapNotNull { pathFactory(it, traversedAcLineSegment) }
+    private fun Sequence<Terminal>.mapToPath(pathFactory: PathFactory, traversedAcLineSegment: AcLineSegment? = null): Sequence<NetworkTraceStep.Path> =
+        mapNotNull { pathFactory(it, traversedAcLineSegment) }
 
     private fun InServiceStateOperators.isInService(equipment: Equipment?): Boolean = if (equipment != null) isInService(equipment) else false
 }

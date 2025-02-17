@@ -112,7 +112,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
-Stream<List<CurrentStateEventBatch>> response = client.getCurrentStatesStream(1, LocalDateTime.now().plusDays(-1), LocalDateTime.now());
+Stream<CurrentStateEventBatch> response = client.getCurrentStatesStream(1, LocalDateTime.now().plusDays(-1), LocalDateTime.now());
 
 response.forEach(events -> {
     // process the list of events here.
@@ -151,7 +151,6 @@ When applying the current state of the network, you should send a status respons
 
 ```java
 import com.zepben.evolve.streaming.data.BatchSuccessful;
-import com.zepben.evolve.streaming.data.CurrentStateEventBatch;
 
 client.reportBatchStatus(new BatchSuccessful(1));
 ```

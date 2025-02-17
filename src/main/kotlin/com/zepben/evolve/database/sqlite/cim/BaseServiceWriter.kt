@@ -93,7 +93,7 @@ internal abstract class BaseServiceWriter<TService : BaseService>(
         }
     }
 
-    fun logValidationError(obj: Any, desc: String, e: Exception) =
+    private fun logValidationError(obj: Any, desc: String, e: Exception) =
         logger.error("Failed to write ${obj.javaClass.simpleName} $desc: ${e.message}")
 
 }

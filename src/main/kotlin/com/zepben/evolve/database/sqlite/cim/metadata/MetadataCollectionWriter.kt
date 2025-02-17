@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.cim.metadata
 
-import com.zepben.evolve.database.sqlite.cim.CimDatabaseTables
 import com.zepben.evolve.database.sql.BaseCollectionWriter
+import com.zepben.evolve.database.sqlite.cim.CimDatabaseTables
 import com.zepben.evolve.services.common.meta.MetadataCollection
 
 /**
@@ -23,7 +23,8 @@ internal class MetadataCollectionWriter(
 ) : BaseCollectionWriter<MetadataCollection>() {
 
     override fun write(data: MetadataCollection): Boolean = data.run {
-        writeEach(dataSources, writer::write) { it, e -> logger.error("Failed to write DataSource '${it.source}': ${e.message}") }
+        @Suppress("Destructure")
+        writeEach(dataSources, writer::write) { ds, e -> logger.error("Failed to write DataSource '${ds.source}': ${e.message}") }
     }
 
 }

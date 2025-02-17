@@ -68,8 +68,15 @@ abstract class SqlTable internal constructor() {
      */
     protected open val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf()
 
+    /**
+     * The columns in this table, sorted by their index. Reflection is used to generate this collection.
+     */
     protected val columnSet: SortedSet<Column> by lazy { createColumnSet(this::class, this) }
-    protected val columnNames: List<String> by lazy { columnSet.map { it.name } }
+
+    /**
+     * The names of the columns in this table, sorted by their index.
+     */
+    private val columnNames: List<String> by lazy { columnSet.map { it.name } }
 
     private val logger = LoggerFactory.getLogger(javaClass)
 

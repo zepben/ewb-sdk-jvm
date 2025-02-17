@@ -100,7 +100,9 @@ abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables, T> internal cons
     private fun connect(): Connection {
         logger.info("Connecting to database...")
 
-        return getConnection().also {
+        return getConnection().apply {
+            autoCommit = false
+        }.also {
             logger.info("Connected.")
         }
     }

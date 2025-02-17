@@ -16,7 +16,7 @@ import com.zepben.evolve.database.sql.Column.Nullable.NULL
 class TableJobSources : MultiJobTable() {
 
     val DATA_SOURCE: Column = Column(++columnIndex, "data_source", "TEXT", NOT_NULL)
-    val SOURCE_TIME: Column = Column(++columnIndex, "source_time", "TEXT", NULL)
+    val SOURCE_TIME: Column = Column(++columnIndex, "source_time", "TIMESTAMP", NULL)
     val FILE_SHA: Column = Column(++columnIndex, "file_sha", "BYTEA", NULL)
 
     override val uniqueIndexColumns: MutableList<List<Column>> = mutableListOf(

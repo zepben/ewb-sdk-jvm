@@ -8,12 +8,12 @@
 
 package com.zepben.evolve.database.postgres.metrics
 
-import com.zepben.evolve.database.sql.BaseEntryWriter
-import com.zepben.evolve.database.sql.extensions.setInstant
 import com.zepben.evolve.database.postgres.metrics.tables.TableJobSources
 import com.zepben.evolve.database.postgres.metrics.tables.TableJobs
 import com.zepben.evolve.database.postgres.metrics.tables.TableNetworkContainerMetrics
+import com.zepben.evolve.database.sql.BaseEntryWriter
 import com.zepben.evolve.metrics.*
+import java.sql.Timestamp
 import java.util.*
 
 /**
@@ -36,8 +36,8 @@ internal class MetricsEntryWriter(
         val table = databaseTables.getTable<TableJobs>()
         val insert = databaseTables.getInsert<TableJobs>()
 
-        insert.setString(table.JOB_ID.queryIndex, jobId.toString())
-        insert.setInstant(table.INGEST_TIME.queryIndex, metadata.startTime)
+        insert.setObject(table.JOB_ID.queryIndex, jobId)
+        insert.setTimestamp(table.INGEST_TIME.queryIndex, Timestamp.from(metadata.startTime))
         insert.setString(table.SOURCE.queryIndex, metadata.source)
         insert.setString(table.APPLICATION.queryIndex, metadata.application)
         insert.setString(table.APPLICATION_VERSION.queryIndex, metadata.applicationVersion)
@@ -57,9 +57,9 @@ internal class MetricsEntryWriter(
         val insert = databaseTables.getInsert<TableJobSources>()
         val (sourceName, sourceMetadata) = jobSource
 
-        insert.setString(table.JOB_ID.queryIndex, jobId.toString())
+        insert.setObject(table.JOB_ID.queryIndex, jobId)
         insert.setString(table.DATA_SOURCE.queryIndex, sourceName)
-        insert.setInstant(table.SOURCE_TIME.queryIndex, sourceMetadata.timestamp)
+        insert.setTimestamp(table.SOURCE_TIME.queryIndex, Timestamp.from(sourceMetadata.timestamp))
         insert.setObject(table.FILE_SHA.queryIndex, sourceMetadata.fileHash)
 
         return insert.tryExecuteSingleUpdate("job source")
@@ -77,7 +77,7 @@ internal class MetricsEntryWriter(
         val insert = databaseTables.getInsert<TableNetworkContainerMetrics>()
         val (container, containerMetric) = networkMetric
 
-        insert.setString(table.JOB_ID.queryIndex, jobId.toString())
+        insert.setObject(table.JOB_ID.queryIndex, jobId)
         when (container) {
             is TotalNetworkContainer -> {
                 insert.setString(table.HIERARCHY_ID.queryIndex, "GLOBAL")

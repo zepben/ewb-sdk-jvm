@@ -13,7 +13,7 @@ import java.sql.ResultSet
 import java.sql.SQLException
 
 @Throws(SQLException::class)
-fun PreparedStatement.executeConfiguredQuery(): ResultSet {
+internal fun PreparedStatement.executeConfiguredQuery(): ResultSet {
     this.queryTimeout = 30
     this.fetchSize = 10000
 

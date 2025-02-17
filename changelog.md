@@ -40,6 +40,12 @@
   * `CimDatabaseTables`, `BaseDatabaseTables`, `CustomerDatabaseTables`, `DiagramDatabaseTables`, `NetworkDatabaseTables`, `MetricsDatabaseTables`
 * Removed `Class.getFieldExt` extension function.
 * `InjectionJob.metadata` property is no longer a nullable type and is now a readonly val.
+* Moved the following classes and methods from `com.zepben.evolve.database.sqlite.common` to `com.zepben.evolve.database.sql`:
+  * `BaseDatabaseTables`
+  * `BaseDatabaseWriter`
+  * `BaseEntryWriter`
+  * `MissingTableConfigException`
+  * `ReaderException`
 * `AcLineSegment` supports adding a maximum of 2 terminals. Mid-span terminals are no longer supported and models should migrate to using `Clamp`.
 * `Clamp` supports only adding a single terminal.
 * `Cut` supports adding a maximum of 2 terminals.
@@ -48,6 +54,7 @@
 * Added `ClearDirection` that clears feeder directions.
 * Added new `FeederDirection.CONNECTOR` value for `Connector` equipment that are modelled only with a single terminal.
 * Created a new `SqlTable` that doesn't support creating schema creation statements by default.
+  * Created a new `PostgresTable` to model tables in Postgres.
 
 ### Enhancements
 * The following enhancements have been made to the `TestNetworkBuilder`:

@@ -20,6 +20,5 @@ enum class DatabaseType(val perDate: Boolean, val fileDescriptor: String)
     ENERGY_READINGS_INDEX(perDate = false, fileDescriptor="load-readings-index"),
     LOAD_AGGREGATOR_METERS_BY_DATE(perDate = false, fileDescriptor="load-aggregator-mbd"),
     WEATHER_READING(perDate = false, fileDescriptor="weather-readings"),
-    RESULTS_CACHE(perDate = false, fileDescriptor="results-cache"),
-    METRICS(perDate = false, fileDescriptor = "metrics")
+    RESULTS_CACHE(perDate = false, fileDescriptor="results-cache")
 }

@@ -86,7 +86,8 @@ public class IngestionJobExample {
         ingestionJob.getNetworkMetrics().get(networkContainer(feeder, true)).put("total cable length", 123.45);
 
         MetricsDatabaseWriter metricsDatabaseWriter = new MetricsDatabaseWriter(
-            IngestionJobExample::getMetricsConnection, // Database file to create/update
+            // Factory function for connections to the database to write to.
+            IngestionJobExample::getMetricsConnection,
             Path.of("path/to/model") // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
         );
         if (metricsDatabaseWriter.write(ingestionJob)) {
@@ -98,7 +99,8 @@ public class IngestionJobExample {
 
     private static Connection getMetricsConnection() {
         try {
-            return DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics");
+            // Change JDBC URL, username, and password as needed.
+            return DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics", "username", "password");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -144,7 +146,8 @@ val ingestionJob = IngestionJob(
 
 fun main() {
     val metricsDatabaseWriter = MetricsDatabaseWriter(
-        { DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics") }, // Database to write to
+        // Factory function for connections to the database to write to. Change JDBC URL, username, and password as needed.
+        { DriverManager.getConnection("jdbc:postgresql://localhost:5432/metrics", "username", "password") },
         Path.of("path/to/model") // Optional: Folder containing files for the model exported by the ingestion job. The network, customer, and diagram databases should be located here.
     )
     if (metricsDatabaseWriter.write(ingestionJob)) {

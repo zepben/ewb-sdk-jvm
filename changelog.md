@@ -58,6 +58,8 @@
   * Changed AddJumperEvent to not use reserved words.
 * `UpdateNetworkStateService.setCurrentStates` no longer blocks while waiting for `onSetCurrentStates` callbacks when handling the `onCompleted` request. This
   only effects the gRPC threads.
+* `QueryNetworkStateClient.reportBatchStatus` can be used to send status responses for batches returned from the service via
+  `QueryNetworkStateClient.getCurrentStates`.
 
 ### Fixes
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart.

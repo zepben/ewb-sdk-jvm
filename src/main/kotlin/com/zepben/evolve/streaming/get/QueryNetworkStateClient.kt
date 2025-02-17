@@ -8,9 +8,11 @@
 
 package com.zepben.evolve.streaming.get
 
+import com.google.protobuf.Empty
 import com.zepben.evolve.services.common.translator.toTimestamp
 import com.zepben.evolve.streaming.data.CurrentStateEvent
 import com.zepben.evolve.streaming.data.CurrentStateEventBatch
+import com.zepben.evolve.streaming.data.SetCurrentStatesStatus
 import com.zepben.evolve.streaming.grpc.GrpcChannel
 import com.zepben.evolve.streaming.grpc.GrpcClient
 import com.zepben.protobuf.ns.GetCurrentStatesRequest
@@ -74,7 +76,7 @@ class QueryNetworkStateClient(
      */
     fun getCurrentStates(queryId: Long, from: LocalDateTime, to: LocalDateTime): Sequence<CurrentStateEventBatch> {
         val results = mutableListOf<CurrentStateEventBatch>()
-        val responseObserver = AwaitableStreamObserver<GetCurrentStatesResponse>{ response ->
+        val responseObserver = AwaitableStreamObserver<GetCurrentStatesResponse> { response ->
             results.add(CurrentStateEventBatch(response.messageId, response.eventList.map { CurrentStateEvent.fromPb(it) }))
         }
         val request = GetCurrentStatesRequest.newBuilder().also {
@@ -88,6 +90,25 @@ class QueryNetworkStateClient(
         responseObserver.await()
 
         return results.asSequence()
+    }
+
+    /**
+     * Send a response to a previous [getCurrentStates] request to let the server know how we handled its response.
+     *
+     * @param status The batch status to report.
+     */
+    fun reportBatchStatus(status: SetCurrentStatesStatus) {
+        //
+        // NOTE: We could make this reuse the same observers and close them when the client is shut down, but we expect
+        //       this will only be called once, so we have just inlined it for code simplicity.
+        //
+        val statusResponseObserver = AwaitableStreamObserver<Empty> {}
+        val statusRequestObserver = stub.reportBatchStatus(statusResponseObserver)
+
+        statusRequestObserver.onNext(status.toPb())
+        statusRequestObserver.onCompleted()
+
+        statusResponseObserver.await()
     }
 
     /**

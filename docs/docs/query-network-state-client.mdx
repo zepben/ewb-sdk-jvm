@@ -10,8 +10,9 @@ The `QueryNetworkStateClient` will allow you to interact with a server running t
 wrapper for the gRPC library, with the ability to retrieve information about the state of the network. This is done with the following 3 steps:
 
 1. Create a gRPC connection to the server.
-1. Create an instance of the `QueryNetworkStateClient` using your gRPC connection.
-2. Use your `QueryNetworkStateClient` to retrieve the state of the network.
+2. Create an instance of the `QueryNetworkStateClient` using your gRPC connection.
+3. Use your `QueryNetworkStateClient` to retrieve the state of the network.
+4. Use your `QueryNetworkStateClient` to report the status of applying the state of the network.
 
 ## Creating a gRPC channel
 
@@ -105,13 +106,13 @@ For Java interoperability, prefer using the `getCurrentStatesStream` function, a
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.data.CurrentStateEvent;
+import com.zepben.evolve.streaming.data.CurrentStateEventBatch;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
-Stream<List<CurrentStateEvent>> response = client.getCurrentStatesStream(1, LocalDateTime.now().plusDays(-1), LocalDateTime.now());
+Stream<CurrentStateEventBatch> response = client.getCurrentStatesStream(1, LocalDateTime.now().plusDays(-1), LocalDateTime.now());
 
 response.forEach(events -> {
     // process the list of events here.
@@ -129,6 +130,38 @@ val response = client.getCurrentStatesS(1, LocalDateTime.now().plusDays(-1), Loc
 response.forEach { events ->
     // process the list of events here.
 }
+```
+
+</TabItem>
+</Tabs>
+
+### Sending current network state statuses
+
+When applying the current state of the network, you should send a status response to report how the update went.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+import com.zepben.evolve.streaming.data.BatchSuccessful;
+
+client.reportBatchStatus(new BatchSuccessful(1));
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+import java.time.LocalDateTime
+
+client.reportBatchStatus(BatchSuccessful(1))
 ```
 
 </TabItem>

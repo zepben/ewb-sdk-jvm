@@ -47,6 +47,9 @@
   * `BaseDatabaseWriter`
   * `BaseEntryWriter`
   * `MissingTableConfigException`
+* Moved `MetricsDatabaseTables` and `MetricsDatabaseWriter` to `com.zepben.evolve.database.postgres.metrics`.
+* `MetricsDatabaseWriter` now only supports connections to existing Postgres databases with a metrics schema already in-place. Evolve App Server will be
+  responsible to create and update this schema.
 * `AcLineSegment` supports adding a maximum of 2 terminals. Mid-span terminals are no longer supported and models should migrate to using `Clamp`.
 * `Clamp` supports only adding a single terminal.
 * `Cut` supports adding a maximum of 2 terminals.

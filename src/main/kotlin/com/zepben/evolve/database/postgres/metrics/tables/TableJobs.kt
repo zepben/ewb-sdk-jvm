@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.postgres.metrics.tables
 
-import com.zepben.evolve.database.sql.tables.Column
-import com.zepben.evolve.database.sql.tables.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sql.Column
+import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
 
 @Suppress("PropertyName")
 class TableJobs : MultiJobTable() {

@@ -9,7 +9,6 @@
 package com.zepben.evolve.database.sql
 
 import com.zepben.evolve.database.sql.extensions.executeConfiguredQuery
-import com.zepben.evolve.database.sql.tables.SqlTable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection

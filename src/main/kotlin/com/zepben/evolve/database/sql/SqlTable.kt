@@ -6,10 +6,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sql.tables
+package com.zepben.evolve.database.sql
 
 import org.slf4j.LoggerFactory
-import java.sql.PreparedStatement
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.memberProperties

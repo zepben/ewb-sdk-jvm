@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.cim.tables.iec61968.metering
 
-import com.zepben.evolve.database.sql.tables.Column
-import com.zepben.evolve.database.sql.tables.Column.Nullable.NULL
+import com.zepben.evolve.database.sql.Column
+import com.zepben.evolve.database.sql.Column.Nullable.NULL
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.assets.TableAssetFunctions
 
 @Suppress("PropertyName")

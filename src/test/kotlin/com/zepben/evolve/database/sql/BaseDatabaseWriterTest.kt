@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.sql
 
-import com.zepben.evolve.database.sql.tables.SqlTable
-import com.zepben.evolve.database.sql.tables.TableVersion
+import com.zepben.evolve.database.sql.SqlTable
+import com.zepben.evolve.database.sql.TableVersion
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*

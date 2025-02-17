@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.postgres.common
 
-import com.zepben.evolve.database.sql.tables.TableVersion
+import com.zepben.evolve.database.sql.TableVersion
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk

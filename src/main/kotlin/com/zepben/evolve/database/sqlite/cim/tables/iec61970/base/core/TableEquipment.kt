@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core
 
-import com.zepben.evolve.database.sql.tables.Column
-import com.zepben.evolve.database.sql.tables.Column.Nullable.NULL
+import com.zepben.evolve.database.sql.Column
+import com.zepben.evolve.database.sql.Column.Nullable.NULL
 
 @Suppress("PropertyName")
 abstract class TableEquipment : TablePowerSystemResources() {

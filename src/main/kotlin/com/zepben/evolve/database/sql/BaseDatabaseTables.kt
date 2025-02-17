@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sql
 
-import com.zepben.evolve.database.sql.tables.SqlTable
+import com.zepben.evolve.database.sql.SqlTable
 import java.sql.Connection
 import java.sql.PreparedStatement
 import kotlin.reflect.KClass

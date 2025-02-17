@@ -18,6 +18,7 @@
   * It will only find columns defined in Kotlin classes, Java is no longer supported.
   * Its constructor is now internal.
   * It now inherits from the new `SqlTable`.
+  * It is now in module `com.zepben.evolve.database.sqlite.common`.
 * The following change have been made to `Column`:
   * Its package has changed from `com.zepben.evolve.database.sqlite.cim.tables` to `com.zepben.evolve.database.sql`.
   * Its constructor is now internal.
@@ -46,7 +47,6 @@
   * `BaseDatabaseWriter`
   * `BaseEntryWriter`
   * `MissingTableConfigException`
-  * `ReaderException`
 * `AcLineSegment` supports adding a maximum of 2 terminals. Mid-span terminals are no longer supported and models should migrate to using `Clamp`.
 * `Clamp` supports only adding a single terminal.
 * `Cut` supports adding a maximum of 2 terminals.

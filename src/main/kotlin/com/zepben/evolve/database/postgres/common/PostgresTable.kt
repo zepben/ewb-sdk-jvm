@@ -8,8 +8,8 @@
 
 package com.zepben.evolve.database.postgres.common
 
-import com.zepben.evolve.database.sql.tables.Column
-import com.zepben.evolve.database.sql.tables.SqlTable
+import com.zepben.evolve.database.sql.Column
+import com.zepben.evolve.database.sql.SqlTable
 
 /**
  * Represents a table in a Postgres Database

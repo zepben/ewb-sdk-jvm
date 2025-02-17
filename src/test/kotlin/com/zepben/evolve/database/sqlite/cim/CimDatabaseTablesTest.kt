@@ -9,7 +9,7 @@
 package com.zepben.evolve.database.sqlite.cim
 
 import com.google.common.reflect.ClassPath
-import com.zepben.evolve.database.sql.tables.TableVersion
+import com.zepben.evolve.database.sql.TableVersion
 import com.zepben.evolve.database.sqlite.cim.customer.CustomerDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.diagram.DiagramDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.network.NetworkDatabaseTables

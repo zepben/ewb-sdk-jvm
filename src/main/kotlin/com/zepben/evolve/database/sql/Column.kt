@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.zepben.evolve.database.sql.tables
+package com.zepben.evolve.database.sql
 
 /**
  * Represents a column in a database table.

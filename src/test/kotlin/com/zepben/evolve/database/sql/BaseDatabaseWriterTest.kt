@@ -8,8 +8,6 @@
 
 package com.zepben.evolve.database.sql
 
-import com.zepben.evolve.database.sql.SqlTable
-import com.zepben.evolve.database.sql.TableVersion
 import com.zepben.testutils.exception.ExpectException
 import com.zepben.testutils.junit.SystemLogExtension
 import io.mockk.*
@@ -194,9 +192,12 @@ internal class BaseDatabaseWriterTest {
     // A class that is used to capture the calls to the private methods of the writer.
     private class ProtectedWriteCalls {
         fun beforeConnect(): Boolean = true
-        fun afterConnectBeforePrepare(@Suppress("unused") connection: Connection): Boolean = true
-        fun writeData(@Suppress("unused") data: Any): Boolean = true
-        fun afterWriteBeforeCommit(@Suppress("unused") connection: Connection): Boolean = true
+        @Suppress("UNUSED_PARAMETER")
+        fun afterConnectBeforePrepare(connection: Connection): Boolean = true
+        @Suppress("UNUSED_PARAMETER")
+        fun writeData(data: Any): Boolean = true
+        @Suppress("UNUSED_PARAMETER")
+        fun afterWriteBeforeCommit(connection: Connection): Boolean = true
     }
 
     private abstract class GenericTableVersion : TableVersion, SqlTable()

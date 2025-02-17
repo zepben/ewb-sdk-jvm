@@ -8,17 +8,21 @@
 
 package com.zepben.evolve.streaming.get.testservices
 
+import com.google.protobuf.Empty
 import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.streaming.data.CurrentStateEventBatch
+import com.zepben.evolve.streaming.data.SetCurrentStatesStatus
 import com.zepben.protobuf.ns.GetCurrentStatesRequest
 import com.zepben.protobuf.ns.GetCurrentStatesResponse
 import com.zepben.protobuf.ns.QueryNetworkStateServiceGrpc
+import com.zepben.protobuf.ns.SetCurrentStatesResponse
 import io.grpc.stub.StreamObserver
 import java.time.LocalDateTime
 
 internal class TestQueryNetworkStateService : QueryNetworkStateServiceGrpc.QueryNetworkStateServiceImplBase() {
 
     lateinit var onGetCurrentStates: (from: LocalDateTime?, to: LocalDateTime?) -> Sequence<CurrentStateEventBatch>
+    lateinit var onBatchStatus: (status: SetCurrentStatesStatus) -> Unit
 
     override fun getCurrentStates(request: GetCurrentStatesRequest, responseObserver: StreamObserver<GetCurrentStatesResponse>) {
         onGetCurrentStates(request.fromTimestamp.toLocalDateTime(), request.toTimestamp.toLocalDateTime()).forEach { batch ->
@@ -31,6 +35,22 @@ internal class TestQueryNetworkStateService : QueryNetworkStateServiceGrpc.Query
         }
 
         responseObserver.onCompleted()
+    }
+
+    // NOTE: This is a crummy implementation that just passes the decoded status to a callback so you can make sure it was sent...
+    override fun reportBatchStatus(responseObserver: StreamObserver<Empty>): StreamObserver<SetCurrentStatesResponse> {
+        return object : StreamObserver<SetCurrentStatesResponse> {
+            override fun onNext(value: SetCurrentStatesResponse) {
+                onBatchStatus(SetCurrentStatesStatus.fromPb(value)!!)
+                responseObserver.onNext(Empty.newBuilder().build())
+            }
+
+            override fun onError(t: Throwable) = throw NotImplementedError("If you want to test it, you better implement it.")
+
+            override fun onCompleted() {
+                responseObserver.onCompleted()
+            }
+        }
     }
 
 }

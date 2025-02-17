@@ -96,7 +96,7 @@ abstract class CimDatabaseSchemaTest<TService : BaseService, TWriter : CimDataba
         readService: TService = createService(),
         validateRead: ((TService) -> Unit)? = null
     ) {
-        assertThat("Database should have been writen", createWriter(schemaTestFile).write(writeService))
+        assertThat("Database should have been written", createWriter(schemaTestFile).write(writeService))
 
         assertThat(systemErr.log, containsString("Creating database schema v${tableCimVersion.supportedVersion}"))
         assertThat("Database should now exist", Files.exists(Paths.get(schemaTestFile)))

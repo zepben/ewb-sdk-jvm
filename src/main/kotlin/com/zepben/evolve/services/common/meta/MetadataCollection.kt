@@ -11,7 +11,7 @@ package com.zepben.evolve.services.common.meta
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 
 /***
- * Class containing metadata for the services writen to a database.
+ * Class containing metadata for the services written to a database.
  *
  * @property dataSources a [List] of [DataSource]s used to create the services.
  */

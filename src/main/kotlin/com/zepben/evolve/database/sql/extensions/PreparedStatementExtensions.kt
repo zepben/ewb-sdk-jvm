@@ -20,7 +20,7 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
 @Throws(SQLException::class)
-fun PreparedStatement.tryExecuteSingleUpdate(onError: () -> Unit): Boolean {
+internal fun PreparedStatement.tryExecuteSingleUpdate(onError: () -> Unit): Boolean {
     if (executeSingleUpdate())
         return true
 
@@ -29,7 +29,7 @@ fun PreparedStatement.tryExecuteSingleUpdate(onError: () -> Unit): Boolean {
     return false
 }
 
-fun PreparedStatement.logFailure(logger: Logger, description: String) {
+internal fun PreparedStatement.logFailure(logger: Logger, description: String) {
     logger.warn(
         "Failed to write $description.\n" +
             "SQL: ${sql()}\n" +
@@ -37,21 +37,21 @@ fun PreparedStatement.logFailure(logger: Logger, description: String) {
     )
 }
 
-fun PreparedStatement.setNullableBoolean(queryIndex: Int, value: Boolean?) {
+internal fun PreparedStatement.setNullableBoolean(queryIndex: Int, value: Boolean?) {
     if (value == null)
         setNull(queryIndex, BOOLEAN)
     else
         setBoolean(queryIndex, value)
 }
 
-fun PreparedStatement.setNullableString(queryIndex: Int, value: String?) {
+internal fun PreparedStatement.setNullableString(queryIndex: Int, value: String?) {
     when (value) {
         null -> setNull(queryIndex, VARCHAR)
         else -> setString(queryIndex, value)
     }
 }
 
-fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?) {
+internal fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?) {
     when {
         value == null -> this.setNull(queryIndex, DOUBLE)
         value.isNaN() -> this.setString(queryIndex, "NaN")
@@ -59,7 +59,7 @@ fun PreparedStatement.setNullableDouble(queryIndex: Int, value: Double?) {
     }
 }
 
-fun PreparedStatement.setNullableFloat(queryIndex: Int, value: Float?) {
+internal fun PreparedStatement.setNullableFloat(queryIndex: Int, value: Float?) {
     when {
         value == null -> this.setNull(queryIndex, FLOAT)
         value.isNaN() -> this.setString(queryIndex, "NaN")
@@ -67,32 +67,32 @@ fun PreparedStatement.setNullableFloat(queryIndex: Int, value: Float?) {
     }
 }
 
-fun PreparedStatement.setNullableInt(queryIndex: Int, value: Int?) {
+internal fun PreparedStatement.setNullableInt(queryIndex: Int, value: Int?) {
     if (value == null)
         this.setNull(queryIndex, INTEGER)
     else
         this.setInt(queryIndex, value)
 }
 
-fun PreparedStatement.setNullableLong(queryIndex: Int, value: Long?) {
+internal fun PreparedStatement.setNullableLong(queryIndex: Int, value: Long?) {
     if (value == null)
         this.setNull(queryIndex, INTEGER)
     else
         this.setLong(queryIndex, value)
 }
 
-fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
+internal fun PreparedStatement.setInstant(queryIndex: Int, value: Instant?) {
     when (value) {
         null -> setNull(queryIndex, VARCHAR)
         else -> setString(queryIndex, value.toString())
     }
 }
 
-fun PreparedStatement.executeSingleUpdate(): Boolean {
+internal fun PreparedStatement.executeSingleUpdate(): Boolean {
     return executeUpdate() == 1
 }
 
-fun PreparedStatement.sql(): String {
+internal fun PreparedStatement.sql(): String {
     return try {
         accessProtectedProperty<String>("sql")
     } catch (e: PrivilegedActionException) {
@@ -100,7 +100,7 @@ fun PreparedStatement.sql(): String {
     }
 }
 
-fun PreparedStatement.parameters(): String {
+internal fun PreparedStatement.parameters(): String {
     return try {
         accessProtectedProperty<Array<*>>("batch").contentToString()
     } catch (e: Exception) {

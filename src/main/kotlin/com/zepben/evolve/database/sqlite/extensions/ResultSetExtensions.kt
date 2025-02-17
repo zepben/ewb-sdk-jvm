@@ -12,7 +12,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import com.zepben.evolve.database.sql.extensions.getNullableDouble
 import java.sql.ResultSet
 
-fun ResultSet.getNullableRatio(numeratorIndex: Int, denominatorIndex: Int): Ratio? =
+internal fun ResultSet.getNullableRatio(numeratorIndex: Int, denominatorIndex: Int): Ratio? =
     getNullableDouble(denominatorIndex)?.let { denominator ->
         getNullableDouble(numeratorIndex)?.let { numerator -> Ratio(numerator, denominator) }
     }

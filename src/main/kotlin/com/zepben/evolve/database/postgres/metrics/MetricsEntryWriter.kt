@@ -28,9 +28,9 @@ internal class MetricsEntryWriter(
     /**
      * Write an [IngestionMetadata] to the `jobs` table.
      *
-     * @param jobId The ID of the job being writen.
+     * @param jobId The ID of the job being written.
      * @param metadata the [IngestionMetadata] to write.
-     * @return true if the [metadata] writen successfully.
+     * @return true if the [metadata] written successfully.
      */
     fun write(jobId: UUID, metadata: IngestionMetadata): Boolean {
         val table = databaseTables.getTable<TableJobs>()
@@ -48,9 +48,9 @@ internal class MetricsEntryWriter(
     /**
      * Write a [JobSource] to the `job_sources` table.
      *
-     * @param jobId The ID of the job being writen.
+     * @param jobId The ID of the job being written.
      * @param jobSource The [JobSource] to write.
-     * @return true if the [jobSource] was writen successfully.
+     * @return true if the [jobSource] was written successfully.
      */
     fun writeSource(jobId: UUID, jobSource: JobSource): Boolean {
         val table = databaseTables.getTable<TableJobSources>()
@@ -68,9 +68,9 @@ internal class MetricsEntryWriter(
     /**
      * Write a [NetworkMetric] to the `job_sources` table.
      *
-     * @param jobId The ID of the job being writen.
+     * @param jobId The ID of the job being written.
      * @param networkMetric The [NetworkMetric] to write.
-     * @return true if the [networkMetric] was writen successfully.
+     * @return true if the [networkMetric] was written successfully.
      */
     fun writeMetric(jobId: UUID, networkMetric: NetworkMetric): Boolean {
         val table = databaseTables.getTable<TableNetworkContainerMetrics>()

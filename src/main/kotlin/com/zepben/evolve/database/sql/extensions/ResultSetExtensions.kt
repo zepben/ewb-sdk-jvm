@@ -11,22 +11,13 @@ package com.zepben.evolve.database.sql.extensions
 import java.sql.ResultSet
 import java.time.Instant
 
-/**
- * Get Boolean at column [queryIndex], or null, if it is NULL in the result set.
- */
-fun ResultSet.getNullableBoolean(queryIndex: Int): Boolean? =
+internal fun ResultSet.getNullableBoolean(queryIndex: Int): Boolean? =
     getBoolean(queryIndex).takeUnless { wasNull() }
 
-/**
- * Get String at column [queryIndex], or null, if it is NULL in the result set.
- */
-fun ResultSet.getNullableString(queryIndex: Int): String? =
+internal fun ResultSet.getNullableString(queryIndex: Int): String? =
     getString(queryIndex).takeUnless { wasNull() }
 
-/**
- * Get Double at column [queryIndex], or null, if it is NULL in the result set.
- */
-fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
+internal fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
     // Annoyingly getDouble will return 0.0 for string values, so we need to check all 0.0's for NaN.
     val dbl = getDouble(queryIndex).takeUnless { wasNull() }
     return if (dbl == 0.0) {
@@ -38,10 +29,7 @@ fun ResultSet.getNullableDouble(queryIndex: Int): Double? {
         dbl
 }
 
-/**
- * Get Float at column [queryIndex], or null, if it is NULL in the result set.
- */
-fun ResultSet.getNullableFloat(queryIndex: Int): Float? {
+internal fun ResultSet.getNullableFloat(queryIndex: Int): Float? {
     // Annoyingly getFloat will return 0.0 for string values, so we need to check all 0.0's for NaN.
     val float = getFloat(queryIndex).takeUnless { wasNull() }
     return if (float == 0.0f) {
@@ -53,20 +41,11 @@ fun ResultSet.getNullableFloat(queryIndex: Int): Float? {
         float
 }
 
-/**
- * Get Int at column [queryIndex], or null, if it is NULL in the result set.
- */
-fun ResultSet.getNullableInt(queryIndex: Int): Int? =
+internal fun ResultSet.getNullableInt(queryIndex: Int): Int? =
     getInt(queryIndex).takeUnless { wasNull() }
 
-/**
- * Get Long at column [queryIndex], or null, if it is NULL in the result set.
- */
-fun ResultSet.getNullableLong(queryIndex: Int): Long? =
+internal fun ResultSet.getNullableLong(queryIndex: Int): Long? =
     getLong(queryIndex).takeUnless { wasNull() }
 
-/**
- * Get Instant at column [queryIndex], or null, if it is NULL in the result set.
- */
-fun ResultSet.getInstant(queryIndex: Int): Instant? =
+internal fun ResultSet.getInstant(queryIndex: Int): Instant? =
     getString(queryIndex).takeUnless { wasNull() }?.let { Instant.parse(it) }

@@ -34,7 +34,7 @@ abstract class BaseDatabaseWriter<TTables : BaseDatabaseTables, T> internal cons
      *
      * @param data The data to write to the database.
      *
-     * @return true if the database was successfully writen, otherwise false.
+     * @return true if the database was successfully written, otherwise false.
      */
     fun write(data: T): Boolean {
         try {

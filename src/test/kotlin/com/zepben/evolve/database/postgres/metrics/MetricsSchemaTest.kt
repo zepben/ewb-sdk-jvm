@@ -114,7 +114,7 @@ internal class MetricsSchemaTest {
 
     private fun validateJob(expectedJob: IngestionJob, tableName: String, vararg rows: List<Any>) {
         val result = MetricsDatabaseWriter(::getConnection).write(expectedJob)
-        assertThat("Database should have been writen", result)
+        assertThat("Database should have been written", result)
 
         getConnection().use { connection ->
             connection.createStatement().use { statement ->

@@ -12,7 +12,7 @@ import com.zepben.evolve.cim.iec61968.infiec61968.infcommon.Ratio
 import java.sql.PreparedStatement
 import java.sql.Types
 
-fun PreparedStatement.setNullableRatio(numeratorIndex: Int, denominatorIndex: Int, value: Ratio?) {
+internal fun PreparedStatement.setNullableRatio(numeratorIndex: Int, denominatorIndex: Int, value: Ratio?) {
     if (value == null) {
         this.setNull(denominatorIndex, Types.DOUBLE)
         this.setNull(numeratorIndex, Types.DOUBLE)

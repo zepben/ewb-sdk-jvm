@@ -38,10 +38,10 @@ internal abstract class BaseCollectionWriter<T> {
      * @param T The type of object to write.
      * @param items The collection of items to write.
      * @param writer A callback for saving each object to the database.
-     * @param onWriteFailure A callback that should be used to indicate there was a failure in the [writer]. You should pass the object that was being writen, and
+     * @param onWriteFailure A callback that should be used to indicate there was a failure in the [writer]. You should pass the object that was being written, and
      *   the exception that caused the failure.
      *
-     * @return true if all [items] were successfully writen, otherwise false.
+     * @return true if all [items] were successfully written, otherwise false.
      */
     protected fun <T> writeEach(items: Iterable<T>, writer: (T) -> Boolean, onWriteFailure: (T, Exception) -> Unit): Boolean {
         var status = true
@@ -61,7 +61,7 @@ internal abstract class BaseCollectionWriter<T> {
      * @param writer The callback that will write the object to the database.
      * @param onWriteFailure A callback if an exception was thrown by the [writer].
      *
-     * @return true if the writer successfully writen the object to the database, otherwise false.
+     * @return true if the writer successfully written the object to the database, otherwise false.
      */
     protected fun <T> validateWrite(it: T, writer: (T) -> Boolean, onWriteFailure: (Exception) -> Unit): Boolean {
         return try {

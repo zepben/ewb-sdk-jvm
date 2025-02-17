@@ -57,7 +57,7 @@ internal class MetricsDatabaseWriterTest {
             createMetricsWriter = { writer }
         ).write(job)
 
-        assertThat("Should have writen successfully", result)
+        assertThat("Should have written successfully", result)
         assertThat("Job ID file shouldn't exist with no path", modelPath.resolve("$uuid.$JOB_ID_FILE_EXTENSION").notExists())
 
         verify { writer.write(job) }

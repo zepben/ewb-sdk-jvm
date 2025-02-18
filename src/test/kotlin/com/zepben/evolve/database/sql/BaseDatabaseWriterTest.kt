@@ -39,6 +39,7 @@ internal class BaseDatabaseWriterTest {
     }
     private val connection = mockk<Connection> {
         every { createStatement() } returns statement
+        justRun { autoCommit = false }
         justRun { commit() }
         justRun { close() }
     }
@@ -159,8 +160,10 @@ internal class BaseDatabaseWriterTest {
             if (expectConnect)
                 getConnection()
 
-            if (expectAfterConnectBeforePrepare)
+            if (expectAfterConnectBeforePrepare) {
+                connection.autoCommit = false
                 writerCalls.afterConnectBeforePrepare(connection)
+            }
 
             if (expectVersionMatches) {
                 tables.tables

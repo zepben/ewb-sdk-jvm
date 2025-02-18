@@ -66,7 +66,7 @@ class UpgradeRunner @JvmOverloads constructor(
      */
     @Throws(UpgradeException::class)
     fun connectAndUpgrade(databaseDescriptor: String, databaseFile: Path, type: DatabaseType): ConnectionResult {
-        val connection = runCatching { getConnection(databaseDescriptor).configureBatch() }
+        val connection = runCatching { getConnection(databaseDescriptor).configureBatch().apply { autoCommit = false } }
             .getOrElse { throw UpgradeException(it.message, it) }
 
         return try {
@@ -189,7 +189,7 @@ class UpgradeRunner @JvmOverloads constructor(
             throw UpgradeException("Failed to split database. ${e.message}", e)
         }
 
-        runCatching { getConnection("jdbc:sqlite:$targetDatabaseFile").configureBatch() }
+        runCatching { getConnection("jdbc:sqlite:$targetDatabaseFile").configureBatch().apply { autoCommit = false } }
             .getOrElse { throw UpgradeException(it.message, it) }
             .use { connection ->
                 upgrade(targetDatabaseFile, connection, targetType, postSplitChangeSets, false)

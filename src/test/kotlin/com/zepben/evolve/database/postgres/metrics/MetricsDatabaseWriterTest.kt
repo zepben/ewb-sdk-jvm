@@ -30,6 +30,7 @@ internal class MetricsDatabaseWriterTest {
     lateinit var modelPath: Path
 
     private val connection = mockk<Connection> {
+        justRun { autoCommit = false }
         justRun { commit() }
         justRun { close() }
     }

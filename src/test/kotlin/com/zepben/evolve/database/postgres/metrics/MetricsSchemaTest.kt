@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.sql.DriverManager
+import java.sql.Timestamp
 import java.time.Instant
 import java.util.*
 
@@ -28,7 +29,6 @@ internal class MetricsSchemaTest {
     val systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
     private val uuid = UUID.randomUUID()
-    private val uuidString = uuid.toString()
 
     private val connection = getConnection()
 
@@ -57,7 +57,7 @@ internal class MetricsSchemaTest {
     internal fun `writes job metadata`() = validateJob(
         baseJob(),
         "jobs",
-        listOf(uuidString, Instant.EPOCH.toString(), "source", "application", "applicationVersion")
+        listOf(uuid, Timestamp.from(Instant.EPOCH), "source", "application", "applicationVersion")
     )
 
     @Test
@@ -67,7 +67,7 @@ internal class MetricsSchemaTest {
             sources["abc"].fileHash = "xyz".toByteArray()
         },
         "job_sources",
-        listOf(uuidString, "abc", Instant.EPOCH.toString(), "xyz".toByteArray())
+        listOf(uuid, "abc", Timestamp.from(Instant.EPOCH), "xyz".toByteArray())
     )
 
     @Test
@@ -76,7 +76,7 @@ internal class MetricsSchemaTest {
             networkMetrics[TotalNetworkContainer]["abc"] = 1.2
         },
         "network_container_metrics",
-        listOf(uuidString, "GLOBAL", "", "TOTAL", "abc", 1.2)
+        listOf(uuid, "GLOBAL", "", "TOTAL", "abc", 1.2)
     )
 
     @Test
@@ -85,7 +85,7 @@ internal class MetricsSchemaTest {
             networkMetrics[PartialNetworkContainer(NetworkLevel.Feeder, "fdr", "feeder")]["abc"] = 1.2
         },
         "network_container_metrics",
-        listOf(uuidString, "fdr", "feeder", "Feeder", "abc", 1.2)
+        listOf(uuid, "fdr", "feeder", "Feeder", "abc", 1.2)
     )
 
     @Test
@@ -95,8 +95,8 @@ internal class MetricsSchemaTest {
             networkMetrics[PartialNetworkContainer(NetworkLevel.FeederTotal, "fdr", "feeder")]["abc"] = 1.3
         },
         "network_container_metrics",
-        listOf(uuidString, "fdr", "feeder", "Feeder", "abc", 1.2),
-        listOf(uuidString, "fdr", "feeder", "FeederTotal", "abc", 1.3)
+        listOf(uuid, "fdr", "feeder", "Feeder", "abc", 1.2),
+        listOf(uuid, "fdr", "feeder", "FeederTotal", "abc", 1.3)
     )
 
     @Test
@@ -106,8 +106,8 @@ internal class MetricsSchemaTest {
             networkMetrics[PartialNetworkContainer(NetworkLevel.SubstationTotal, "sub", "substation")]["abc"] = 1.3
         },
         "network_container_metrics",
-        listOf(uuidString, "sub", "substation", "Substation", "abc", 1.2),
-        listOf(uuidString, "sub", "substation", "SubstationTotal", "abc", 1.3),
+        listOf(uuid, "sub", "substation", "Substation", "abc", 1.2),
+        listOf(uuid, "sub", "substation", "SubstationTotal", "abc", 1.3),
     )
 
     private fun baseJob() = IngestionJob(uuid, metadata = IngestionMetadata(Instant.EPOCH, "source", "application", "applicationVersion"))

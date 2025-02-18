@@ -40,6 +40,9 @@
   * `CimDatabaseTables`, `BaseDatabaseTables`, `CustomerDatabaseTables`, `DiagramDatabaseTables`, `NetworkDatabaseTables`, `MetricsDatabaseTables`
 * Removed `Class.getFieldExt` extension function.
 * `InjectionJob.metadata` property is no longer a nullable type and is now a readonly val.
+* `AcLineSegment` supports adding a maximum of 2 terminals. Mid-span terminals are no longer supported and models should migrate to using `Clamp`.
+* `Clamp` supports only adding a single terminal.
+* `Cut` supports adding a maximum of 2 terminals.
 
 ### New Features
 * Added `ClearDirection` that clears feeder directions.
@@ -47,7 +50,11 @@
 * Created a new `SqlTable` that doesn't support creating schema creation statements by default.
 
 ### Enhancements
-* You can now add sites to the `TestNetworkBuilder` via `addSite`.
+* The following enhancements have been made to the `TestNetworkBuilder`:
+  * You can now add sites via `addSite`.
+  * You can now add busbar sections natively with `fromBusbarSection` and `toBusbarSection`.
+  * The prefix for generated mRIDs for "other" equipment can be specified with the `defaultMridPrefix` argument in `fromOther` and `toOther`.
+  * The action block for `fromOther` now has a receiver of the created type, rather than the generic `ConductingEquipment`.
 * You can now start the `AssignToFeeder` trace from a specified `Terminal` rather than all feeder heads.
 * When processing feeder assignments, all LV feeders belonging to a dist substation site will now be considered energized when the site is energized by a
   feeder.
@@ -60,15 +67,11 @@
   only effects the gRPC threads.
 * `QueryNetworkStateClient.reportBatchStatus` can be used to send status responses for batches returned from the service via
   `QueryNetworkStateClient.getCurrentStates`.
+* Tracing models with `Cut` and `Clamp` are now supported via the new tracing API.
 
 ### Fixes
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart.
 * `AssignToFeeder` and `AssignToLvFeeder` will no longer trace from start terminals that belong to open switches.
-* GrpcChannelBuilder's initial connectivity test no longer fails due to a lack of permissions on a subset of services.
-* Updated to latest SDK:
-  - AddJumperEvent from and to changed to fromConnection and toConnection
-* AddJumperEvent now uses correct protobuf classes when converting
-* RemoveJumperEvent now uses correct protobuf classes when converting
 * When finding `LvFeeders` in the `Site` we will now exclude `LvFeeders` that start with an open `Switch`
 
 ## [0.24.1] - 2025-01-23

@@ -84,7 +84,7 @@ class NetworkTrace<T> private constructor(
         computeData: ComputeData<T>,
     ) : this(
         networkStateOperators,
-        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeData.withActionType(actionType)), queue),
+        BasicQueueType(NetworkTraceQueueNext.Basic(NetworkTraceStepPathProvider(networkStateOperators), computeData.withActionType(actionType)), queue),
         null,
         actionType,
     )
@@ -98,7 +98,7 @@ class NetworkTrace<T> private constructor(
         computeNextT: ComputeDataWithPaths<T>,
     ) : this(
         networkStateOperators,
-        BasicQueueType(NetworkTraceQueueNext.basic(networkStateOperators::isInService, computeNextT.withActionType(actionType)), queue),
+        BasicQueueType(NetworkTraceQueueNext.Basic(NetworkTraceStepPathProvider(networkStateOperators), computeNextT.withActionType(actionType)), queue),
         null,
         actionType,
     )
@@ -114,7 +114,7 @@ class NetworkTrace<T> private constructor(
     ) : this(
         networkStateOperators,
         BranchingQueueType(
-            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeData.withActionType(actionType)),
+            NetworkTraceQueueNext.Branching(NetworkTraceStepPathProvider(networkStateOperators), computeData.withActionType(actionType)),
             queueFactory,
             branchQueueFactory
         ),
@@ -134,7 +134,7 @@ class NetworkTrace<T> private constructor(
     ) : this(
         networkStateOperators,
         BranchingQueueType(
-            NetworkTraceQueueNext.branching(networkStateOperators::isInService, computeNextT.withActionType(actionType)),
+            NetworkTraceQueueNext.Branching(NetworkTraceStepPathProvider(networkStateOperators), computeNextT.withActionType(actionType)),
             queueFactory,
             branchQueueFactory
         ),
@@ -151,7 +151,7 @@ class NetworkTrace<T> private constructor(
      * @param phases Phases to trace; `null` to ignore phases.
      */
     fun addStartItem(start: Terminal, data: T, phases: PhaseCode? = null): NetworkTrace<T> {
-        val startPath = NetworkTraceStep.Path(start, start, startNominalPhasePath(phases))
+        val startPath = NetworkTraceStep.Path(start, start, null, startNominalPhasePath(phases))
         addStartItem(NetworkTraceStep(startPath, 0, 0, data))
         return this
     }

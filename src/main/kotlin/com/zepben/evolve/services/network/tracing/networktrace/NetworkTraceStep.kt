@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,6 +10,7 @@ package com.zepben.evolve.services.network.tracing.networktrace
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep.Type
 
@@ -47,26 +48,24 @@ class NetworkTraceStep<out T>(
      * A limitation of the network trace is that all terminals must have associated conducting equipment. This means that if the [fromTerminal]
      * or [toTerminal] have `null` conducting equipment an [IllegalStateException] will be thrown.
      *
+     * No validation is done on the [traversedAcLineSegment] against the [fromTerminal] and [toTerminal]. It assumes the creator knows what they are doing
+     * and thus avoids the overhead of validation as this class will have lots if instances created as part of a [NetworkTrace].
+     *
      * @property fromTerminal The terminal that was stepped from.
      * @property toTerminal The terminal that was stepped to.
+     * @property traversedAcLineSegment If the fromTerminal and toTerminal path was via an AcLineSegment, this is the segment that was traversed.
      * @property nominalPhasePaths A list of nominal phase paths traced in this step. If this is empty, phases have been ignored.
      * @property fromEquipment The conducting equipment associated with the [fromTerminal].
      * @property toEquipment The conducting equipment associated with the [toTerminal].
      * @property tracedInternally `true` if the from and to terminals belong to the same equipment; `false` otherwise.
      * @property tracedExternally `true` if the from and to terminals belong to different equipment; `false` otherwise.
+     * @property didTraverseAcLineSegment `true` if [traversedAcLineSegment] is not null; `false` otherwise.
      */
     data class Path(
         val fromTerminal: Terminal,
         val toTerminal: Terminal,
+        val traversedAcLineSegment: AcLineSegment? = null,
         val nominalPhasePaths: List<NominalPhasePath> = emptyList(),
-
-        // This will need to be added when we add clamps to the model. The proposed idea is that if an AcLineSegment has multiple clamps and your current
-        // path is one of the clamps, one of the next step paths will be another clamp on the AcLineSegment, essentially jumping over the AcLineSegment for the Path.
-        // If there is a cut on the AcLineSegment, you may need to know about it, primarily because the cut could create an open point between the clamps that needs
-        // to prevent queuing as part of an "open test".
-        // NOTE: Not sure if we will actually need this in the constructor as you could technically pull it back off the Cut or Clamp from / to equipment.
-        //       There is just a performance hit to compute that vs if you already have it when constructing the object.
-        // abstract val viaSegment: AcLineSegment? = null,
     ) {
         val fromEquipment: ConductingEquipment =
             fromTerminal.conductingEquipment ?: error("Network trace does not support terminals that do not have conducting equipment")
@@ -77,6 +76,8 @@ class NetworkTraceStep<out T>(
         val tracedInternally: Boolean get() = fromEquipment == toEquipment
 
         val tracedExternally: Boolean get() = !tracedInternally
+
+        val didTraverseAcLineSegment: Boolean get() = traversedAcLineSegment != null
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -27,6 +27,8 @@ import com.zepben.evolve.services.common.extensions.*
  * @property clamps The clamps connected to the line segment.
  */
 class AcLineSegment @JvmOverloads constructor(mRID: String = "") : Conductor(mRID) {
+
+    override val maxTerminals: Int get() = 2
 
     var perLengthImpedance: PerLengthImpedance? = null
     private var _cuts: MutableList<Cut>? = null

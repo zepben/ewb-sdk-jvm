@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,6 +21,8 @@ package com.zepben.evolve.cim.iec61970.base.wires
  * @property acLineSegment The line segment to which the cut is applied.
  */
 class Cut @JvmOverloads constructor(mRID: String = "") : Switch(mRID) {
+
+    override val maxTerminals: Int get() = 2
 
     var lengthFromTerminal1: Double? = null
     var acLineSegment: AcLineSegment? = null

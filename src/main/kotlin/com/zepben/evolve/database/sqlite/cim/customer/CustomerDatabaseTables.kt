@@ -9,7 +9,7 @@
 package com.zepben.evolve.database.sqlite.cim.customer
 
 import com.zepben.evolve.database.sqlite.cim.CimDatabaseTables
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.common.SqliteTable
 import com.zepben.evolve.database.sqlite.cim.tables.associations.TableCustomerAgreementsPricingStructures
 import com.zepben.evolve.database.sqlite.cim.tables.associations.TablePricingStructuresTariffs
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.common.TableOrganisations

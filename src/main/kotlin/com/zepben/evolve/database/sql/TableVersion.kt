@@ -8,7 +8,7 @@
 
 package com.zepben.evolve.database.sql
 
-import com.zepben.evolve.database.sqlite.extensions.executeConfiguredQuery
+import com.zepben.evolve.database.sql.extensions.executeConfiguredQuery
 import java.sql.Connection
 import java.sql.SQLException
 

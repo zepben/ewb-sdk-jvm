@@ -9,24 +9,25 @@
 package com.zepben.evolve.database.sqlite.common
 
 import com.zepben.evolve.cim.iec61970.base.core.NameType
+import com.zepben.evolve.database.sql.ReaderException
 import com.zepben.evolve.services.common.BaseService
 
 /**
  * An exception indicating that an mRID could not be found in a [BaseService].
  */
-class MRIDLookupException(message: String) : Exception(message)
+class MRIDLookupException(message: String) : ReaderException(message)
 
 /**
  * An exception indicating that a [NameType] could not be found in a [BaseService].
  */
-class NameTypeLookupException(message: String) : Exception(message)
+class NameTypeLookupException(message: String) : ReaderException(message)
 
 /**
  * An exception indicating that an mRID has already been used by a different objects in a [BaseService].
  */
-class DuplicateMRIDException(message: String) : Exception(message)
+class DuplicateMRIDException(message: String) : ReaderException(message)
 
 /**
  * An exception indicating that an [NameType] has already been used in a [BaseService].
  */
-class DuplicateNameTypeException(message: String) : Exception(message)
+class DuplicateNameTypeException(message: String) : ReaderException(message)

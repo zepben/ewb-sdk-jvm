@@ -11,7 +11,7 @@ package com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.protection
 import com.zepben.evolve.database.sql.Column
 import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sql.Column.Nullable.NULL
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.common.SqliteTable
 
 @Suppress("PropertyName")
 class TableProtectionRelayFunctionThresholds : SqliteTable() {

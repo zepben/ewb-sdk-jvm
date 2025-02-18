@@ -10,13 +10,9 @@ package com.zepben.evolve.database.sqlite.extensions
 
 import java.sql.Connection
 
-fun Connection.configureBatch(): Connection {
+internal fun Connection.configureBatch(): Connection = apply {
     createStatement().use { statement ->
         statement.executeUpdate("PRAGMA journal_mode = OFF")
         statement.executeUpdate("PRAGMA synchronous = OFF")
     }
-
-    autoCommit = false
-
-    return this
 }

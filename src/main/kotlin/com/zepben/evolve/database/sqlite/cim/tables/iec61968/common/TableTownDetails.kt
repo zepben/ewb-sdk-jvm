@@ -10,7 +10,7 @@ package com.zepben.evolve.database.sqlite.cim.tables.iec61968.common
 
 import com.zepben.evolve.database.sql.Column
 import com.zepben.evolve.database.sql.Column.Nullable.NULL
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.common.SqliteTable
 
 @Suppress("PropertyName")
 abstract class TableTownDetails : SqliteTable() {

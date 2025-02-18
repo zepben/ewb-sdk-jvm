@@ -21,8 +21,8 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableCust
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableCustomers
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TablePricingStructures
 import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableTariffs
-import com.zepben.evolve.database.sqlite.extensions.setNullableInt
-import com.zepben.evolve.database.sqlite.extensions.setNullableString
+import com.zepben.evolve.database.sql.extensions.setNullableInt
+import com.zepben.evolve.database.sql.extensions.setNullableString
 import com.zepben.evolve.services.customer.CustomerService
 import java.sql.PreparedStatement
 import java.sql.SQLException

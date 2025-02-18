@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -68,8 +68,15 @@ abstract class SqlTable internal constructor() {
      */
     protected open val nonUniqueIndexColumns: MutableList<List<Column>> = mutableListOf()
 
+    /**
+     * The columns in this table, sorted by their index. Reflection is used to generate this collection.
+     */
     protected val columnSet: SortedSet<Column> by lazy { createColumnSet(this::class, this) }
-    protected val columnNames: List<String> by lazy { columnSet.map { it.name } }
+
+    /**
+     * The names of the columns in this table, sorted by their index.
+     */
+    private val columnNames: List<String> by lazy { columnSet.map { it.name } }
 
     private val logger = LoggerFactory.getLogger(javaClass)
 

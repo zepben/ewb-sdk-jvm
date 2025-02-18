@@ -8,9 +8,9 @@
 
 package com.zepben.evolve.database.sqlite.cim
 
+import com.zepben.evolve.database.sql.BaseCollectionReader
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableNameTypes
 import com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core.TableNames
-import com.zepben.evolve.database.sqlite.common.BaseCollectionReader
 import com.zepben.evolve.services.common.BaseService
 import java.sql.Connection
 

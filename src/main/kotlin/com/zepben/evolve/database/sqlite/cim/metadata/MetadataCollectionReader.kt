@@ -9,8 +9,8 @@
 package com.zepben.evolve.database.sqlite.cim.metadata
 
 import com.zepben.evolve.database.sqlite.cim.tables.TableMetadataDataSources
-import com.zepben.evolve.database.sqlite.common.BaseCollectionReader
-import com.zepben.evolve.database.sqlite.common.BaseDatabaseTables
+import com.zepben.evolve.database.sql.BaseCollectionReader
+import com.zepben.evolve.database.sql.BaseDatabaseTables
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import java.sql.Connection
 

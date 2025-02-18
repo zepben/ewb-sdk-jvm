@@ -10,7 +10,7 @@ package com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.wires
 
 import com.zepben.evolve.database.sql.Column
 import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.common.SqliteTable
 
 @Suppress("PropertyName")
 class TablePowerTransformerEndRatings : SqliteTable() {

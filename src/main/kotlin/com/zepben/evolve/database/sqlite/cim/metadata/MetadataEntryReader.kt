@@ -9,7 +9,7 @@
 package com.zepben.evolve.database.sqlite.cim.metadata
 
 import com.zepben.evolve.database.sqlite.cim.tables.TableMetadataDataSources
-import com.zepben.evolve.database.sqlite.extensions.getInstant
+import com.zepben.evolve.database.sql.extensions.getInstant
 import com.zepben.evolve.services.common.meta.DataSource
 import com.zepben.evolve.services.common.meta.MetadataCollection
 import java.sql.ResultSet

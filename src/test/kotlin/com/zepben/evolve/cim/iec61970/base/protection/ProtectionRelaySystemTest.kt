@@ -12,7 +12,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.protection.ProtectionKind
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.fillFields
 import com.zepben.evolve.utils.PrivateCollectionValidator
-import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
@@ -21,19 +21,19 @@ internal class ProtectionRelaySystemTest {
 
     @Test
     internal fun constructorCoverage() {
-        MatcherAssert.assertThat(ProtectionRelaySystem().mRID, not(equalTo("")))
-        MatcherAssert.assertThat(ProtectionRelaySystem("id").mRID, equalTo("id"))
+        assertThat(ProtectionRelaySystem().mRID, not(equalTo("")))
+        assertThat(ProtectionRelaySystem("id").mRID, equalTo("id"))
     }
 
     @Test
     internal fun accessorCoverage() {
         val protectionRelaySystem = ProtectionRelaySystem()
 
-        MatcherAssert.assertThat(protectionRelaySystem.protectionKind, equalTo(ProtectionKind.UNKNOWN))
+        assertThat(protectionRelaySystem.protectionKind, equalTo(ProtectionKind.UNKNOWN))
 
         protectionRelaySystem.fillFields(NetworkService())
 
-        MatcherAssert.assertThat(protectionRelaySystem.protectionKind, equalTo(ProtectionKind.DISTANCE))
+        assertThat(protectionRelaySystem.protectionKind, equalTo(ProtectionKind.DISTANCE))
     }
 
     @Test

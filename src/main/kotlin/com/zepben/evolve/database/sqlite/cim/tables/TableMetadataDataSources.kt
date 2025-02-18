@@ -10,6 +10,7 @@ package com.zepben.evolve.database.sqlite.cim.tables
 
 import com.zepben.evolve.database.sql.Column
 import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
+import com.zepben.evolve.database.sqlite.common.SqliteTable
 
 @Suppress("PropertyName")
 class TableMetadataDataSources : SqliteTable() {

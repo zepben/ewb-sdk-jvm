@@ -11,7 +11,6 @@ package com.zepben.evolve.database.sqlite.common
 import com.zepben.evolve.database.sql.Column
 import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sql.TableVersion
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
 
 /**
  * Code representation of the `version` table in an SQLite database.

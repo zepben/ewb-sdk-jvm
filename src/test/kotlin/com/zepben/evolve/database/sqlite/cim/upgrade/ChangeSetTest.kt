@@ -21,7 +21,7 @@ import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeS
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet50DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet52DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.*
-import com.zepben.evolve.database.sqlite.common.BaseDatabaseTables
+import com.zepben.evolve.database.sql.BaseDatabaseTables
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension

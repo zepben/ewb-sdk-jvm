@@ -18,6 +18,7 @@
   * It will only find columns defined in Kotlin classes, Java is no longer supported.
   * Its constructor is now internal.
   * It now inherits from the new `SqlTable`.
+  * It is now in module `com.zepben.evolve.database.sqlite.common`.
 * The following change have been made to `Column`:
   * Its package has changed from `com.zepben.evolve.database.sqlite.cim.tables` to `com.zepben.evolve.database.sql`.
   * Its constructor is now internal.
@@ -27,19 +28,29 @@
   * `load` has been renamed to `read`, so the readers now read, rather than load.
 * Database readers and writers no longer have the container of the data they will read/write passed to the constructor. They now have this passed to the `read`
   or `write` method.
-* The following classes are now internal:
+* The following classes and methods are now internal:
   * `BaseServiceReader`, `BaseServiceWriter`, `BaseCollectionReader`, `BaseCollectionWriter`, `BaseEntryWriter`, 
   * `CimReader`, `CimWriter`,
   * `CustomerCimReader`, `CustomerCimWriter`, `CustomerServiceReader`, `CustomerServiceWriter`, 
   * `DiagramCimReader`, `DiagramCimWriter`, `DiagramServiceReader`, `DiagramServiceWriter`, 
   * `MetadataCollectionReader`, `MetadataCollectionWriter`, `MetadataEntryReader`, `MetadataEntryWriter`, 
-  * `MetricsEntryWriter`, `MetricsWriter`
+  * `MetricsEntryWriter`, `MetricsWriter`,
   * `NetworkServiceReader`, `NetworkServiceWriter`,
+  * Extension methods in `com.zepben.evolve.database.sqlite.extensions` (e.g. `ResultSet.getNullableDouble`)
 * The following classes now have internal constructors:
   * `BaseDatabaseWriter`, `CimDatabaseReader`, `CimDatabaseWriter`,
   * `CimDatabaseTables`, `BaseDatabaseTables`, `CustomerDatabaseTables`, `DiagramDatabaseTables`, `NetworkDatabaseTables`, `MetricsDatabaseTables`
 * Removed `Class.getFieldExt` extension function.
 * `InjectionJob.metadata` property is no longer a nullable type and is now a readonly val.
+* Moved the following classes and methods from `com.zepben.evolve.database.sqlite.common` to `com.zepben.evolve.database.sql`:
+  * `BaseDatabaseTables`
+  * `BaseDatabaseWriter`
+  * `BaseEntryWriter`
+  * `MissingTableConfigException`
+* Moved `MetricsDatabaseTables` and `MetricsDatabaseWriter` to `com.zepben.evolve.database.postgres.metrics`.
+* `MetricsDatabaseWriter` now only supports connections to existing Postgres databases with a metrics schema already in-place. Evolve App Server will be
+  responsible to create and update this schema.
+  * For this reason, `METRICS` has been removed from the enum `com.zepben.evolve.database.paths.DatabaseType`.
 * `AcLineSegment` supports adding a maximum of 2 terminals. Mid-span terminals are no longer supported and models should migrate to using `Clamp`.
 * `Clamp` supports only adding a single terminal.
 * `Cut` supports adding a maximum of 2 terminals.
@@ -48,6 +59,7 @@
 * Added `ClearDirection` that clears feeder directions.
 * Added new `FeederDirection.CONNECTOR` value for `Connector` equipment that are modelled only with a single terminal.
 * Created a new `SqlTable` that doesn't support creating schema creation statements by default.
+  * Created a new `PostgresTable` to model tables in Postgres.
 
 ### Enhancements
 * The following enhancements have been made to the `TestNetworkBuilder`:

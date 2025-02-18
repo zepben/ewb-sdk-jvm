@@ -11,7 +11,7 @@ package com.zepben.evolve.database.sqlite.cim.tables.iec61970.base.core
 import com.zepben.evolve.database.sql.Column
 import com.zepben.evolve.database.sql.Column.Nullable.NOT_NULL
 import com.zepben.evolve.database.sql.Column.Nullable.NULL
-import com.zepben.evolve.database.sqlite.cim.tables.SqliteTable
+import com.zepben.evolve.database.sqlite.common.SqliteTable
 
 /**
  * A class representing the CurveData columns required for the database table.

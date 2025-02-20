@@ -9,13 +9,14 @@
 package com.zepben.evolve.services.network.tracing.networktrace.conditions
 
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.limitEquipmentSteps
 import com.zepben.evolve.services.network.tracing.networktrace.operators.FeederDirectionStateOperations
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.networktrace.operators.OpenStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.QueueCondition
 import com.zepben.evolve.services.network.tracing.traversal.StopCondition
@@ -31,16 +32,6 @@ object Conditions {
 
     /**
      * Creates a [NetworkTrace] condition that will cause tracing a feeder upstream (towards the head terminal).
-     *
-     * @param getDirection A function that retrieves the [FeederDirection] of a given [Terminal].
-     * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
-     */
-    @JvmStatic
-    fun <T> upstream(getDirection: (Terminal) -> FeederDirection): NetworkTraceQueueCondition<T> =
-        withDirection(FeederDirection.UPSTREAM, getDirection)
-
-    /**
-     * Creates a [NetworkTrace] condition that will cause tracing a feeder upstream (towards the head terminal).
      * This uses [FeederDirectionStateOperations.getDirection] receiver instance method within the condition.
      *
      * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
@@ -51,43 +42,8 @@ object Conditions {
      * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
      */
     @JvmStatic
-    fun <T> FeederDirectionStateOperations.upstream(): NetworkTraceQueueCondition<T> =
-        upstream(this::getDirection)
-
-    /**
-     * Creates a [NetworkTrace] condition that will cause tracing a feeder downstream (away from the head terminal).
-     *
-     * @param getDirection A function that retrieves the [FeederDirection] of a given [Terminal].
-     * @return A [NetworkTraceQueueCondition] that results in downstream tracing.
-     */
-    @JvmStatic
-    fun <T> downstream(getDirection: (Terminal) -> FeederDirection): NetworkTraceQueueCondition<T> =
-        withDirection(FeederDirection.DOWNSTREAM, getDirection)
-
-    /**
-     * Creates a [NetworkTrace] condition that will cause tracing only terminals with directions that match [direction].
-     *
-     * @param getDirection A function that retrieves the [FeederDirection] of a given [Terminal].
-     * @return A [NetworkTraceQueueCondition] that results in tracing terminals with the matching direction.
-     */
-    @JvmStatic
-    fun <T> withDirection(direction: FeederDirection, getDirection: (Terminal) -> FeederDirection): NetworkTraceQueueCondition<T> =
-        DirectionCondition(direction, getDirection)
-
-    /**
-     * Creates a [NetworkTrace] condition that will cause tracing only terminals with directions that match [direction].
-     * This uses [FeederDirectionStateOperations.getDirection] receiver instance method within the condition.
-     *
-     * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
-     * ```
-     * trace.addCondition { withDirection(FeederDirection.BOTH) }
-     * ```
-     *
-     * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
-     */
-    @JvmStatic
-    fun <T> FeederDirectionStateOperations.withDirection(direction: FeederDirection): NetworkTraceQueueCondition<T> =
-        withDirection(direction, this::getDirection)
+    fun <T> NetworkStateOperators.upstream(): NetworkTraceQueueCondition<T> =
+        withDirection(FeederDirection.UPSTREAM)
 
     /**
      * Creates a [NetworkTrace] condition that will cause tracing a feeder downstream (away from the head terminal).
@@ -101,8 +57,23 @@ object Conditions {
      * @return A [NetworkTraceQueueCondition] that results in downstream tracing.
      */
     @JvmStatic
-    fun <T> FeederDirectionStateOperations.downstream(): NetworkTraceQueueCondition<T> =
-        downstream(this::getDirection)
+    fun <T> NetworkStateOperators.downstream(): NetworkTraceQueueCondition<T> =
+        withDirection(FeederDirection.DOWNSTREAM)
+
+    /**
+     * Creates a [NetworkTrace] condition that will cause tracing only terminals with directions that match [direction].
+     * This uses [FeederDirectionStateOperations.getDirection] receiver instance method within the condition.
+     *
+     * This variant is used to enable a DSL style syntax when setting up a [NetworkTrace].
+     * ```
+     * trace.addCondition { withDirection(FeederDirection.BOTH) }
+     * ```
+     *
+     * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
+     */
+    @JvmStatic
+    fun <T> NetworkStateOperators.withDirection(direction: FeederDirection): NetworkTraceQueueCondition<T> =
+        DirectionCondition(direction, this)
 
     /**
      * Creates a [NetworkTrace] condition that will cause a trace to not queue through open equipment.

@@ -11,6 +11,8 @@ package com.zepben.evolve.services.network.tracing.feeder
 import com.zepben.evolve.cim.iec61970.base.core.Feeder
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
+import com.zepben.evolve.cim.iec61970.base.wires.Clamp
+import com.zepben.evolve.cim.iec61970.base.wires.Cut
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
@@ -36,11 +38,14 @@ class SetDirection {
             return FeederDirection.CONNECTOR
         }
 
-        val directionApplied = step.data
-        val nextDirection = when (directionApplied) {
-            FeederDirection.UPSTREAM -> FeederDirection.DOWNSTREAM
-            FeederDirection.DOWNSTREAM, FeederDirection.CONNECTOR -> FeederDirection.UPSTREAM
-            else -> FeederDirection.NONE
+        fun NetworkTraceStep.Path.traversedWithClamp() = didTraverseAcLineSegment && (toEquipment is Clamp || fromEquipment is Clamp)
+
+        val nextDirection = when {
+            step.data == FeederDirection.NONE -> FeederDirection.NONE
+            nextPath.tracedInternally -> FeederDirection.DOWNSTREAM
+            nextPath.toEquipment is Cut -> FeederDirection.UPSTREAM
+            nextPath.traversedWithClamp() -> FeederDirection.DOWNSTREAM
+            else -> FeederDirection.UPSTREAM
         }
 
         //

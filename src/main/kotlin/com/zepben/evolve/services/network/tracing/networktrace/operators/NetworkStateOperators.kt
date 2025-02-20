@@ -9,6 +9,8 @@
 package com.zepben.evolve.services.network.tracing.networktrace.operators
 
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTrace
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStepPathProvider
 
 /**
  * Interface providing access to and operations on specific network state properties and functions for items within a network.
@@ -28,7 +30,8 @@ interface NetworkStateOperators :
     FeederDirectionStateOperations,
     EquipmentContainerStateOperators,
     InServiceStateOperators,
-    PhaseStateOperators {
+    PhaseStateOperators,
+    ConnectivityStateOperators {
 
     companion object {
         /**
@@ -50,11 +53,23 @@ private class NormalNetworkStateOperators : NetworkStateOperators,
     FeederDirectionStateOperations by FeederDirectionStateOperations.NORMAL,
     EquipmentContainerStateOperators by EquipmentContainerStateOperators.NORMAL,
     InServiceStateOperators by InServiceStateOperators.NORMAL,
-    PhaseStateOperators by PhaseStateOperators.NORMAL
+    PhaseStateOperators by PhaseStateOperators.NORMAL {
+
+    private val networkTraceStepPathProvider = NetworkTraceStepPathProvider(this)
+
+    override fun nextPaths(path: NetworkTraceStep.Path): Sequence<NetworkTraceStep.Path> =
+        networkTraceStepPathProvider.nextPaths(path)
+}
 
 private class CurrentNetworkStateOperators : NetworkStateOperators,
     OpenStateOperators by OpenStateOperators.CURRENT,
     FeederDirectionStateOperations by FeederDirectionStateOperations.CURRENT,
     EquipmentContainerStateOperators by EquipmentContainerStateOperators.CURRENT,
     InServiceStateOperators by InServiceStateOperators.CURRENT,
-    PhaseStateOperators by PhaseStateOperators.CURRENT {}
+    PhaseStateOperators by PhaseStateOperators.CURRENT {
+
+    private val networkTraceStepPathProvider = NetworkTraceStepPathProvider(this)
+
+    override fun nextPaths(path: NetworkTraceStep.Path): Sequence<NetworkTraceStep.Path> =
+        networkTraceStepPathProvider.nextPaths(path)
+}

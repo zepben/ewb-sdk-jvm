@@ -84,7 +84,7 @@ class NetworkTrace<T> private constructor(
         computeData: ComputeData<T>,
     ) : this(
         networkStateOperators,
-        BasicQueueType(NetworkTraceQueueNext.Basic(NetworkTraceStepPathProvider(networkStateOperators), computeData.withActionType(actionType)), queue),
+        BasicQueueType(NetworkTraceQueueNext.Basic(networkStateOperators, computeData.withActionType(actionType)), queue),
         null,
         actionType,
     )
@@ -98,7 +98,7 @@ class NetworkTrace<T> private constructor(
         computeNextT: ComputeDataWithPaths<T>,
     ) : this(
         networkStateOperators,
-        BasicQueueType(NetworkTraceQueueNext.Basic(NetworkTraceStepPathProvider(networkStateOperators), computeNextT.withActionType(actionType)), queue),
+        BasicQueueType(NetworkTraceQueueNext.Basic(networkStateOperators, computeNextT.withActionType(actionType)), queue),
         null,
         actionType,
     )
@@ -114,7 +114,7 @@ class NetworkTrace<T> private constructor(
     ) : this(
         networkStateOperators,
         BranchingQueueType(
-            NetworkTraceQueueNext.Branching(NetworkTraceStepPathProvider(networkStateOperators), computeData.withActionType(actionType)),
+            NetworkTraceQueueNext.Branching(networkStateOperators, computeData.withActionType(actionType)),
             queueFactory,
             branchQueueFactory
         ),
@@ -134,7 +134,7 @@ class NetworkTrace<T> private constructor(
     ) : this(
         networkStateOperators,
         BranchingQueueType(
-            NetworkTraceQueueNext.Branching(NetworkTraceStepPathProvider(networkStateOperators), computeNextT.withActionType(actionType)),
+            NetworkTraceQueueNext.Branching(networkStateOperators, computeNextT.withActionType(actionType)),
             queueFactory,
             branchQueueFactory
         ),

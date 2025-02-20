@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 import io.mockk.every
 import io.mockk.mockk
@@ -18,14 +19,14 @@ import org.junit.jupiter.api.Test
 
 class NetworkTraceQueueNextTest {
 
-    private val pathProvider = mockk<NetworkTraceStepPathProvider>()
+    private val stateOperators = mockk<NetworkStateOperators>()
     private val dataComputer = mockk<ComputeData<String>>()
     private val queuer = TestQueuer<String>()
     private val branchingQueuer = TestQueuer<String>()
 
     @Test
     fun `queues next basic`() {
-        val queueNext = NetworkTraceQueueNext.Basic(pathProvider, dataComputer)
+        val queueNext = NetworkTraceQueueNext.Basic(stateOperators, dataComputer)
 
         val seedPath = mockk<NetworkTraceStep.Path>()
         val seedStep = mockk<NetworkTraceStep<String>> {
@@ -37,7 +38,7 @@ class NetworkTraceQueueNextTest {
 
         val nextPath1 = mockk<NetworkTraceStep.Path> { every { tracedExternally } returns true }
         val nextPath2 = mockk<NetworkTraceStep.Path> { every { tracedExternally } returns false }
-        every { pathProvider.nextPaths(seedPath) } returns sequenceOf(nextPath1, nextPath2)
+        every { stateOperators.nextPaths(seedPath) } returns sequenceOf(nextPath1, nextPath2)
 
         every { dataComputer.computeNext(seedStep, seedContext, nextPath1) } returns "Foo"
         every { dataComputer.computeNext(seedStep, seedContext, nextPath2) } returns "Bar"
@@ -61,7 +62,7 @@ class NetworkTraceQueueNextTest {
 
     @Test
     fun `calls branching queuer when queuing more than 1 path on branching queue next`() {
-        val queueNext = NetworkTraceQueueNext.Branching(pathProvider, dataComputer)
+        val queueNext = NetworkTraceQueueNext.Branching(stateOperators, dataComputer)
 
         val seedPath = mockk<NetworkTraceStep.Path>()
         val seedStep = mockk<NetworkTraceStep<String>> {
@@ -73,7 +74,7 @@ class NetworkTraceQueueNextTest {
 
         val nextPath1 = mockk<NetworkTraceStep.Path> { every { tracedExternally } returns true }
         val nextPath2 = mockk<NetworkTraceStep.Path> { every { tracedExternally } returns false }
-        every { pathProvider.nextPaths(seedPath) } returns sequenceOf(nextPath1, nextPath2)
+        every { stateOperators.nextPaths(seedPath) } returns sequenceOf(nextPath1, nextPath2)
 
         every { dataComputer.computeNext(seedStep, seedContext, nextPath1) } returns "Foo"
         every { dataComputer.computeNext(seedStep, seedContext, nextPath2) } returns "Bar"
@@ -98,7 +99,7 @@ class NetworkTraceQueueNextTest {
 
     @Test
     fun `calls straight queuer when queuing a single path on branching queue next`() {
-        val queueNext = NetworkTraceQueueNext.Branching(pathProvider, dataComputer)
+        val queueNext = NetworkTraceQueueNext.Branching(stateOperators, dataComputer)
 
         val seedPath = mockk<NetworkTraceStep.Path>()
         val seedStep = mockk<NetworkTraceStep<String>> {
@@ -109,7 +110,7 @@ class NetworkTraceQueueNextTest {
         val seedContext = mockk<StepContext>()
 
         val nextPath1 = mockk<NetworkTraceStep.Path> { every { tracedExternally } returns true }
-        every { pathProvider.nextPaths(seedPath) } returns sequenceOf(nextPath1)
+        every { stateOperators.nextPaths(seedPath) } returns sequenceOf(nextPath1)
 
         every { dataComputer.computeNext(seedStep, seedContext, nextPath1) } returns "Foo"
 

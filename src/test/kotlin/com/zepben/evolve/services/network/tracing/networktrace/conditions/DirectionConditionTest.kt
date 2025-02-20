@@ -9,9 +9,11 @@
 package com.zepben.evolve.services.network.tracing.networktrace.conditions
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection.*
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
+import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
@@ -103,9 +105,12 @@ class DirectionConditionTest {
         val nextPath = mockk<NetworkTraceStep.Path>()
         every { nextPath.tracedInternally } returns tracedInternally
         every { nextPath.toTerminal } returns Terminal()
+        every { nextPath.toEquipment } returns Junction()
+        every { nextPath.didTraverseAcLineSegment } returns false
         val nextItem = NetworkTraceStep(nextPath, 0, 0, Unit)
 
-        val result = DirectionCondition<Unit>(direction) { toDirection }.shouldQueue(nextItem, mockk(), mockk(), mockk())
+        val stateOperators = mockk<NetworkStateOperators> { every { getDirection(nextPath.toTerminal) } returns toDirection }
+        val result = DirectionCondition<Unit>(direction, stateOperators).shouldQueue(nextItem, mockk(), mockk(), mockk())
 
         assertThat(result, equalTo(expected))
     }
@@ -114,9 +119,12 @@ class DirectionConditionTest {
         val (direction, toDirection) = this
         val nextPath = mockk<NetworkTraceStep.Path>()
         every { nextPath.toTerminal } returns Terminal()
+        every { nextPath.toEquipment } returns Junction()
+        every { nextPath.didTraverseAcLineSegment } returns false
         val nextItem = NetworkTraceStep(nextPath, 0, 0, Unit)
 
-        val result = DirectionCondition<Unit>(direction) { toDirection }.shouldQueueStartItem(nextItem)
+        val stateOperators = mockk<NetworkStateOperators> { every { getDirection(nextPath.toTerminal) } returns toDirection }
+        val result = DirectionCondition<Unit>(direction, stateOperators).shouldQueueStartItem(nextItem)
 
         assertThat(result, equalTo(expected))
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -57,6 +57,8 @@ private class NormalNetworkStateOperators : NetworkStateOperators,
 
     private val networkTraceStepPathProvider = NetworkTraceStepPathProvider(this)
 
+    // This is not implemented in the same NORMAL/CURRENT single instance pattern as all the other
+    // StateOperator interfaces because the implementation of next paths has a dependency on other state operators.
     override fun nextPaths(path: NetworkTraceStep.Path): Sequence<NetworkTraceStep.Path> =
         networkTraceStepPathProvider.nextPaths(path)
 }
@@ -70,6 +72,8 @@ private class CurrentNetworkStateOperators : NetworkStateOperators,
 
     private val networkTraceStepPathProvider = NetworkTraceStepPathProvider(this)
 
+    // This is not implemented in the same NORMAL/CURRENT single instance pattern as all the other
+    // StateOperator interfaces because the implementation of next paths has a dependency on other state operators.
     override fun nextPaths(path: NetworkTraceStep.Path): Sequence<NetworkTraceStep.Path> =
         networkTraceStepPathProvider.nextPaths(path)
 }

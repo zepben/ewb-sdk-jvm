@@ -12,6 +12,7 @@ import com.zepben.evolve.annotations.ZepbenExperimental
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
 import com.zepben.evolve.cim.iec61970.base.wires.Clamp
 import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
@@ -151,8 +152,14 @@ class NetworkTrace<T> private constructor(
      * @param phases Phases to trace; `null` to ignore phases.
      */
     fun addStartItem(start: Terminal, data: T, phases: PhaseCode? = null): NetworkTrace<T> {
-        val startPath = NetworkTraceStep.Path(start, start, null, startNominalPhasePath(phases))
-        addStartItem(NetworkTraceStep(startPath, 0, 0, data))
+        // We have a special case when starting specifically on a clamp terminal that we mark it as having traversed the segment such that it
+        // will only trace externally from the clamp terminal. This behaves differently to when the whole Clamp is added as a start item.
+        val traversedAcLineSegment = when (val ce = start.conductingEquipment) {
+            is Clamp -> ce.acLineSegment
+            else -> null
+        }
+
+        addStartItem(start, data, phases, traversedAcLineSegment)
         return this
     }
 
@@ -165,8 +172,28 @@ class NetworkTrace<T> private constructor(
      * @param phases Phases to trace; `null` to ignore phases.
      */
     fun addStartItem(start: ConductingEquipment, data: T, phases: PhaseCode? = null): NetworkTrace<T> {
-        start.terminals.forEach { addStartItem(it, data, phases) }
+        when (start) {
+            // If we start on an AcLineSegment, we queue the segments terminals, and all its Cut and Clamp terminals as if we have traversed the segment,
+            // so the next steps will be external from all the terminals "belonging" to the segment.
+            is AcLineSegment -> {
+                val startTerminals = start.terminals + start.clamps.mapNotNull { it.terminals.firstOrNull() } + start.cuts.flatMap { it.terminals }
+                startTerminals.forEach { addStartItem(it, data, phases, start) }
+            }
+
+            // We don't have a special case for Clamp here because we say if you start from the whole Clamp rather than its terminal specifically,
+            // we want to trace externally from it and traverse its segment.
+            else -> {
+                start.terminals.forEach { addStartItem(it, data, phases, null) }
+            }
+        }
+
         return this
+    }
+
+    private fun addStartItem(start: Terminal?, data: T, phases: PhaseCode? = null, traversedAcLineSegment: AcLineSegment?) {
+        start ?: return
+        val startPath = NetworkTraceStep.Path(start, start, traversedAcLineSegment, startNominalPhasePath(phases))
+        addStartItem(NetworkTraceStep(startPath, 0, 0, data))
     }
 
     /**

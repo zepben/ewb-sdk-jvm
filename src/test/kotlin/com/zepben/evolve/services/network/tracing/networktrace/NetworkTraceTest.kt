@@ -8,13 +8,86 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.evolve.cim.iec61970.base.wires.Clamp
+import com.zepben.evolve.cim.iec61970.base.wires.Cut
 import com.zepben.evolve.services.network.getT
 import com.zepben.evolve.testing.TestNetworkBuilder
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertTimeoutPreemptively
 import java.time.Duration
 
 class NetworkTraceTest {
+
+    @Test
+    fun `adds start clamp terminal as traversed segment path`() {
+        val trace = Tracing.networkTrace()
+        val segment = AcLineSegment()
+        val clamp = Clamp().apply { addTerminal(Terminal()) }
+        segment.addClamp(clamp)
+
+        trace.addStartItem(clamp.t1)
+        assertThat(trace.startItems().first().path, equalTo(NetworkTraceStep.Path(clamp.t1, clamp.t1, segment)))
+    }
+
+    @Test
+    fun `adds start whole clamp as not traversed segment path`() {
+        val trace = Tracing.networkTrace()
+        val segment = AcLineSegment()
+        val clamp = Clamp().apply {
+            addTerminal(Terminal())
+            segment.addClamp(this)
+        }
+
+        trace.addStartItem(clamp)
+        assertThat(trace.startItems().first().path, equalTo(NetworkTraceStep.Path(clamp.t1, clamp.t1, null)))
+    }
+
+    @Test
+    fun `adds start AcLineSegment terminals, cut terminals and clamp terminals as traversed segment`() {
+        val trace = Tracing.networkTrace()
+        val segment = AcLineSegment().apply {
+            addTerminal(Terminal())
+            addTerminal(Terminal())
+        }
+        val clamp1 = Clamp().apply {
+            addTerminal(Terminal())
+            segment.addClamp(this)
+        }
+        val clamp2 = Clamp().apply {
+            addTerminal(Terminal())
+            segment.addClamp(this)
+        }
+        val cut1 = Cut().apply {
+            addTerminal(Terminal())
+            addTerminal(Terminal())
+            segment.addCut(this)
+        }
+        val cut2 = Cut().apply {
+            addTerminal(Terminal())
+            addTerminal(Terminal())
+            segment.addCut(this)
+        }
+
+        trace.addStartItem(segment)
+        assertThat(
+            trace.startItems().map { it.path },
+            containsInAnyOrder(
+                NetworkTraceStep.Path(segment.t1, segment.t1, segment),
+                NetworkTraceStep.Path(segment.t2, segment.t2, segment),
+                NetworkTraceStep.Path(clamp1.t1, clamp1.t1, segment),
+                NetworkTraceStep.Path(clamp2.t1, clamp2.t1, segment),
+                NetworkTraceStep.Path(cut1.t1, cut1.t1, segment),
+                NetworkTraceStep.Path(cut1.t2, cut1.t2, segment),
+                NetworkTraceStep.Path(cut2.t1, cut2.t1, segment),
+                NetworkTraceStep.Path(cut2.t2, cut2.t2, segment),
+            )
+        )
+    }
 
     @Test
     internal fun `Can run large branching traces`() {

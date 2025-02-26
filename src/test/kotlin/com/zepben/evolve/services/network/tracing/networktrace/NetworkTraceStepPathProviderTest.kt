@@ -373,6 +373,30 @@ class NetworkTraceStepPathProviderTest {
     }
 
     @Test
+    fun `starting on clamp terminal flagged as traversed segment only steps externally`() {
+        val network = aclsWithClampsAndCutsNetwork()
+
+        val c3: AcLineSegment = network["c3"]!!
+        val clamp1: Clamp = network["clamp1"]!!
+
+        val nextPaths = pathProvider.nextPaths(clamp1.t1..<clamp1.t1).toList()
+        assertThat(nextPaths, containsInAnyOrder(clamp1.t1..c3.t1))
+    }
+
+    @Test
+    fun `starting on clamp terminal that flagged as not traversed segment steps externally and traverses`() {
+        val network = aclsWithClampsAndCutsNetwork()
+
+        val c3: AcLineSegment = network["c3"]!!
+        val clamp1: Clamp = network["clamp1"]!!
+        val cut1: Cut = network["cut1"]!!
+        val c1: AcLineSegment = network["c1"]!!
+
+        val nextPaths = pathProvider.nextPaths(clamp1.t1..clamp1.t1).toList()
+        assertThat(nextPaths, containsInAnyOrder(clamp1.t1..c3.t1, clamp1.t1..<c1.t1, clamp1.t1..<cut1.t1))
+    }
+
+    @Test
     fun `traverse with cut with unknown length from t1 does not return clamp with known length from t1`() {
         //
         //  (Cut with null length is treated as at 0.0)

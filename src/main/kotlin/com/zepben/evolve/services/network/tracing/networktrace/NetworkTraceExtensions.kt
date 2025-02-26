@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -31,7 +31,7 @@ fun NetworkTrace<Unit>.addStartItem(start: Terminal, phases: PhaseCode? = null):
  * @param phases Phases to trace; `null` to ignore phases.
  */
 fun NetworkTrace<Unit>.addStartItem(start: ConductingEquipment, phases: PhaseCode? = null): NetworkTrace<Unit> {
-    start.terminals.forEach { addStartItem(it, Unit, phases) }
+    addStartItem(start, Unit, phases)
     return this
 }
 

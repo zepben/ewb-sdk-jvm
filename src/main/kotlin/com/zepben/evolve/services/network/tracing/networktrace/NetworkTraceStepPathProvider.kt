@@ -97,33 +97,42 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
     }
 
     private fun nextPathsFromClamp(clamp: Clamp, path: NetworkTraceStep.Path, pathFactory: PathFactory): Sequence<NetworkTraceStep.Path> {
-        // If the current path was from traversing an AcLineSegment, we need to step externally to other equipment.
-        // Otherwise, we need to traverse the segment both ways.
-        return if (path.didTraverseAcLineSegment) {
-            nextExternalPaths(path, pathFactory)
-        } else {
-            // Because we consider clamps at the same position as a cut on the terminal 1 side, we do not stop at cuts at the same position when
-            // traversing towards t1, but we do when traversing towards t2.
-            val nextPathsTowardsT1 = clamp.acLineSegment?.traverseFromTerminal(
-                path.toTerminal,
-                lengthFromT1 = clamp.lengthFromT1Or0,
-                towardsSegmentT2 = false,
-                canStopAtCutsAtSamePosition = false,
-                cutAtSamePositionTerminalNumber = 1,
-                pathFactory = pathFactory
-            ).orEmpty()
-
-            val nextPathsTowardsT2 = clamp.acLineSegment?.traverseFromTerminal(
-                path.toTerminal,
-                lengthFromT1 = clamp.lengthFromT1Or0,
-                towardsSegmentT2 = true,
-                canStopAtCutsAtSamePosition = true,
-                cutAtSamePositionTerminalNumber = 1,
-                pathFactory = pathFactory
-            ).orEmpty()
-
-            (nextPathsTowardsT1 + nextPathsTowardsT2).distinctBy { it.toEquipment }
+        return when {
+            // If we traversed the AcLineSegment, we go to external paths only, even if this path is the "start" (tracedInternally) item
+            path.didTraverseAcLineSegment -> nextExternalPaths(path, pathFactory)
+            // If this is the start item (the only way a clamp can have tracedInternally) we go externally and traverse the segment
+            path.tracedInternally -> nextExternalPaths(path, pathFactory) + traverseAcLineSegmentFromClamp(clamp, path, pathFactory)
+            // Otherwise we externally stepped to the clamp so just traverse the segment
+            else -> traverseAcLineSegmentFromClamp(clamp, path, pathFactory)
         }
+    }
+
+    private fun traverseAcLineSegmentFromClamp(
+        clamp: Clamp,
+        path: NetworkTraceStep.Path,
+        pathFactory: PathFactory
+    ): Sequence<NetworkTraceStep.Path> {
+        // Because we consider clamps at the same position as a cut on the terminal 1 side of the cut, we do not stop at cuts at the same position when
+        // traversing towards t1, but we do when traversing towards t2.
+        val nextPathsTowardsT1 = clamp.acLineSegment?.traverseFromTerminal(
+            path.toTerminal,
+            lengthFromT1 = clamp.lengthFromT1Or0,
+            towardsSegmentT2 = false,
+            canStopAtCutsAtSamePosition = false,
+            cutAtSamePositionTerminalNumber = 1,
+            pathFactory = pathFactory
+        ).orEmpty()
+
+        val nextPathsTowardsT2 = clamp.acLineSegment?.traverseFromTerminal(
+            path.toTerminal,
+            lengthFromT1 = clamp.lengthFromT1Or0,
+            towardsSegmentT2 = true,
+            canStopAtCutsAtSamePosition = true,
+            cutAtSamePositionTerminalNumber = 1,
+            pathFactory = pathFactory
+        ).orEmpty()
+
+        return (nextPathsTowardsT1 + nextPathsTowardsT2).distinctBy { it.toEquipment }
     }
 
     private fun nextPathsFromCut(cut: Cut, path: NetworkTraceStep.Path, pathFactory: PathFactory): Sequence<NetworkTraceStep.Path> {
@@ -145,7 +154,7 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
         // If the current path traced internally, we need to also return the external terminals
         // Else we need to step internally to the Cut's other terminal.
         return if (path.tracedInternally) {
-            // traversedAcLineSegment and tracedInternally should never both be true, so we should never get external terminals twice
+            // traversedAcLineSegment and tracedInternally should never both be true from a cut, so we should never get external terminals twice.
             nextTerminals + nextExternalPaths(path, pathFactory)
         } else {
             val cutOtherTerminal = cut.getTerminal(if (path.toTerminal.sequenceNumber == 1) 2 else 1)

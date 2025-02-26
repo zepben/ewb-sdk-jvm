@@ -54,6 +54,9 @@
 * `AcLineSegment` supports adding a maximum of 2 terminals. Mid-span terminals are no longer supported and models should migrate to using `Clamp`.
 * `Clamp` supports only adding a single terminal.
 * `Cut` supports adding a maximum of 2 terminals.
+* Direction aware helpers in `Condition` that didn't use the `FeederDirectionStateOperations` have been removed, with the remaining helpers now taking
+  `NetworkStateOperators` as a receiver.
+* `NetworkStateOperators` implements a new sub-interface `ConnectivityStateOperators`.
 
 ### New Features
 * Added `ClearDirection` that clears feeder directions.

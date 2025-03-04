@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.25.0](#v0250)| `04 March 2025` |
 |[0.24.1](#v0241)| `23 January 2025` |
 |[0.24.0](#v0240)| `21 January 2025` |
 |[0.23.0](#v0230)| `18 October 2024` |
@@ -33,6 +34,100 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.25.0]
+
+### Breaking Changes
+* Traversal / Tracing API has been completely rewritten. `Traversal` has a different public API and `BranchRecursiveTraversal` no longer exists.
+  All traces that used to be used via the `Tracing.*` factory functions should be migrated to use the new `NetworkTrace` class instantiated from the factory
+  functions in `com.zepben.evolve.services.network.tracing.networktrace.Tracing`. The `NetworkTrace` should cover all existing use cases while being easier to
+  use and read. See the documentation for usage details.
+* `SetDirection` now correctly applies the `BOTH` direction on all parts of the loop again, so if you were relying on the broken intermediate state, you will
+  need to update your code.
+* `RemovePhases` now stops at open points like the `SetPhases` counterpart. If you were relying on the bug to remove phases through open points you will now
+  need to start additional traces from the other side of the open points to maintain this behaviour.
+* `SetDirection` now correctly sets directions for networks with `BusbarSection`.
+* `RemoveDirection` has been removed. It did not work reliably with dual fed networks with loops. You now need to clear direction using the new
+  `ClearDirection` and reapply directions where appropriate using `SetDirection`.
+* `FindWithUsagePoints` was deemed too use-case specific for the SDK and has been removed.
+* Removal of deprecated `Terminal.tracedPhases` property. Use `Terminal.normalPhases` and `Terminal.currentPhases` instead.
+* The following change have been made to `SqliteTable`:
+  * It will only find columns defined in Kotlin classes, Java is no longer supported.
+  * Its constructor is now internal.
+  * It now inherits from the new `SqlTable`.
+  * It is now in module `com.zepben.evolve.database.sqlite.common`.
+* The following change have been made to `Column`:
+  * Its package has changed from `com.zepben.evolve.database.sqlite.cim.tables` to `com.zepben.evolve.database.sql`.
+  * Its constructor is now internal.
+* All references to the following have been renamed in `com.zepben.evolve.database`. This includes full or partial copies in the names of functions,
+  parameters and descriptions/documentation:
+  * `save` has been renamed to `write`, so the writers now write, rather than save.
+  * `load` has been renamed to `read`, so the readers now read, rather than load.
+* Database readers and writers no longer have the container of the data they will read/write passed to the constructor. They now have this passed to the `read`
+  or `write` method.
+* The following classes and methods are now internal:
+  * `BaseServiceReader`, `BaseServiceWriter`, `BaseCollectionReader`, `BaseCollectionWriter`, `BaseEntryWriter`, 
+  * `CimReader`, `CimWriter`,
+  * `CustomerCimReader`, `CustomerCimWriter`, `CustomerServiceReader`, `CustomerServiceWriter`, 
+  * `DiagramCimReader`, `DiagramCimWriter`, `DiagramServiceReader`, `DiagramServiceWriter`, 
+  * `MetadataCollectionReader`, `MetadataCollectionWriter`, `MetadataEntryReader`, `MetadataEntryWriter`, 
+  * `MetricsEntryWriter`, `MetricsWriter`,
+  * `NetworkServiceReader`, `NetworkServiceWriter`,
+  * Extension methods in `com.zepben.evolve.database.sqlite.extensions` (e.g. `ResultSet.getNullableDouble`)
+* The following classes now have internal constructors:
+  * `BaseDatabaseWriter`, `CimDatabaseReader`, `CimDatabaseWriter`,
+  * `CimDatabaseTables`, `BaseDatabaseTables`, `CustomerDatabaseTables`, `DiagramDatabaseTables`, `NetworkDatabaseTables`, `MetricsDatabaseTables`
+* Removed `Class.getFieldExt` extension function.
+* `InjectionJob.metadata` property is no longer a nullable type and is now a readonly val.
+* Moved the following classes and methods from `com.zepben.evolve.database.sqlite.common` to `com.zepben.evolve.database.sql`:
+  * `BaseDatabaseTables`
+  * `BaseDatabaseWriter`
+  * `BaseEntryWriter`
+  * `MissingTableConfigException`
+* Moved `MetricsDatabaseTables` and `MetricsDatabaseWriter` to `com.zepben.evolve.database.postgres.metrics`.
+* `MetricsDatabaseWriter` now only supports connections to existing Postgres databases with a metrics schema already in-place. Evolve App Server will be
+  responsible to create and update this schema.
+  * For this reason, `METRICS` has been removed from the enum `com.zepben.evolve.database.paths.DatabaseType`.
+* `AcLineSegment` supports adding a maximum of 2 terminals. Mid-span terminals are no longer supported and models should migrate to using `Clamp`.
+* `Clamp` supports only adding a single terminal.
+* `Cut` supports adding a maximum of 2 terminals.
+* Direction aware helpers in `Condition` that didn't use the `FeederDirectionStateOperations` have been removed, with the remaining helpers now taking
+  `NetworkStateOperators` as a receiver.
+* `NetworkStateOperators` implements a new sub-interface `ConnectivityStateOperators`.
+
+### New Features
+* Added `ClearDirection` that clears feeder directions.
+* Added new `FeederDirection.CONNECTOR` value for `Connector` equipment that are modelled only with a single terminal.
+* Created a new `SqlTable` that doesn't support creating schema creation statements by default.
+  * Created a new `PostgresTable` to model tables in Postgres.
+
+### Enhancements
+* The following enhancements have been made to the `TestNetworkBuilder`:
+  * You can now add sites via `addSite`.
+  * You can now add busbar sections natively with `fromBusbarSection` and `toBusbarSection`.
+  * The prefix for generated mRIDs for "other" equipment can be specified with the `defaultMridPrefix` argument in `fromOther` and `toOther`.
+  * The action block for `fromOther` now has a receiver of the created type, rather than the generic `ConductingEquipment`.
+* You can now start the `AssignToFeeder` trace from a specified `Terminal` rather than all feeder heads.
+* When processing feeder assignments, all LV feeders belonging to a dist substation site will now be considered energized when the site is energized by a
+  feeder.
+* Major speed improvements have been made for `RemovePhases` when dealing with large networks with many nested loops.
+* `SetDirection` now supports networks with `BusbarSection` and will apply the `FeederDirection.CONNECTOR` value to their terminals.
+* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests.
+* Updated to ewb-grpc 0.34.1:
+  * Changed AddJumperEvent to not use reserved words.
+* `UpdateNetworkStateService.setCurrentStates` no longer blocks while waiting for `onSetCurrentStates` callbacks when handling the `onCompleted` request. This
+  only effects the gRPC threads.
+* `QueryNetworkStateClient.reportBatchStatus` can be used to send status responses for batches returned from the service via
+  `QueryNetworkStateClient.getCurrentStates`.
+* Tracing models with `Cut` and `Clamp` are now supported via the new tracing API.
+
+### Fixes
+* `RemovePhases` now stops at open points like the `SetPhases` counterpart.
+* `AssignToFeeder` and `AssignToLvFeeder` will no longer trace from start terminals that belong to open switches.
+* When finding `LvFeeders` in the `Site` we will now exclude `LvFeeders` that start with an open `Switch`
+* You can now pass GrpcBuildArgs to the `connect*` helper functions when connecting to EWB. See `GrpcBuildArgs` for options.
 
 ---
 

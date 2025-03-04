@@ -235,6 +235,67 @@ GrpcChannelBuilder().forAddress("example.zepben.com", 443).makeSecure("ca.cert",
 </TabItem>
 </Tabs>
 
+### Specifying gRPC build args
+
+The `connect` functions listed above also allow passing `GrpcBuildArgs`, which provides some options for managing the underlying connection:
+
+1. `skipConnectionTest`: Will skip the initial connection test on the channel. Instead the connection will be lazily established upon the first query.1
+2. `debugConnectionTest`: If set to true will provide all errors found during the connection test. A lot of this may be noise, as it's only expected that at least one test succeeds.
+3. `connectionTestTimeoutMs`: The time in milliseconds to wait for the connection test to complete. Conservatively defaults to 10 seconds.
+4. `maxInboundMessageSize`: The maximum size of a protobuf message that can be received via gRPC calls. Conservatively defaults to 20 megabytes.
+
+You can specify these settings like so:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// With a personal access token and SSL
+try (GrpcChannel channel = Connect.connectWithAccessToken(
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9.",  // personal access token generated from EAS
+    "path/to/ca.cert",     // set to null to use system CAs for server cert verification
+    new GrpcBuildArgs(true, false, 0, 1024 * 1024 * 40)   // Specify to skip connection tests, change connection test timeout to 0, and increase max message size to 40mb.
+    )
+) {
+    NetworkConsumerClient client = new NetworkConsumerClient(channel);
+    GrpcResult result = client.getEquipmentContainer("container_mrid").throwOnError();
+    NetworkService ns = client.getService();
+}
+
+
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+Connect.connectWithAccessToken(
+    "example.zepben.com", // rpc hostname
+    443,                  // rpc port
+    "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9.",  // personal access token generated from EAS
+    "path/to/ca.cert",     // Do not pass if you intend to use system CAs for server cert verification
+    GrpcBuildArgs(skipConnectionTest=true, debugConnectionTest=false, connectionTestTimeoutMs=5000, maxInboundMessageSize=1024 * 1024 * 40)  // Specify to skip connection tests, change connection test timeout to 0, and increase max message size to 40mb.
+).use { channel ->
+     val client = NetworkConsumerClient(channel)
+     val result = client.getEquipmentContainer("container_mrid").throwOnError()
+     val ns = client.service
+}
+
+```
+
+</TabItem>
+</Tabs>
+
+
 ## Network Hierarchy
 
 The network can be built with a hierarchy as discussed earlier [here](datamodel.mdx#network-hierarchy). This allows you

@@ -51,11 +51,11 @@ internal class ConnectTest {
         every { gcbWithAddress.makeInsecure() } returns gcbWithOutTls
         every { gcbWithOutTls.withAccessToken("accessToken") } returns gcbWithToken
 
-        every { gcbWithAddress.build() } returns grpcChannel
-        every { gcbWithTls.build() } returns grpcChannelWithTls
-        every { gcbWithTlsWithToken.build() } returns grpcChannelWithTlsWithToken
-        every { gcbWithToken.build() } returns grpcChannelWithToken
-        every { gcbWithAuth.build() } returns grpcChannelWithAuth
+        every { gcbWithAddress.build(any()) } returns grpcChannel
+        every { gcbWithTls.build(any()) } returns grpcChannelWithTls
+        every { gcbWithTlsWithToken.build(any()) } returns grpcChannelWithTlsWithToken
+        every { gcbWithToken.build(any()) } returns grpcChannelWithToken
+        every { gcbWithAuth.build(any()) } returns grpcChannelWithAuth
 
         every { tokenFetcher.tokenRequestData } returns tokenRequestData
 

@@ -88,6 +88,7 @@
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart.
 * `AssignToFeeder` and `AssignToLvFeeder` will no longer trace from start terminals that belong to open switches.
 * When finding `LvFeeders` in the `Site` we will now exclude `LvFeeders` that start with an open `Switch`
+* You can now pass GrpcBuildArgs to the `connect*` helper functions when connecting to EWB. See `GrpcBuildArgs` for options.
 
 ## [0.24.1] - 2025-01-23
 ### Breaking Changes

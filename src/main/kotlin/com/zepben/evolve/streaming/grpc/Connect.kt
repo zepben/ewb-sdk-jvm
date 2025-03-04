@@ -31,9 +31,10 @@ object Connect {
     @JvmOverloads
     fun connectInsecure(
         host: String = "localhost",
-        rpcPort: Int = 50051
+        rpcPort: Int = 50051,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel =
-        GrpcChannelBuilder().forAddress(host, rpcPort).build()
+        GrpcChannelBuilder().forAddress(host, rpcPort).build(buildArgs)
 
     /**
      * Create a `GrpcChannel` that communicates with the gRPC service using SSL/TLS transport security.
@@ -49,9 +50,10 @@ object Connect {
     fun connectTls(
         host: String = "localhost",
         rpcPort: Int = 50051,
-        caFilename: String? = null
+        caFilename: String? = null,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel =
-        GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).build()
+        GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).build(buildArgs)
 
 
     /**
@@ -70,9 +72,10 @@ object Connect {
         host: String = "localhost",
         rpcPort: Int = 50051,
         personalAccessToken: String,
-        caFilename: String? = null
+        caFilename: String? = null,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel {
-        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withAccessToken(personalAccessToken).build()
+        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withAccessToken(personalAccessToken).build(buildArgs)
     }
 
     /**
@@ -88,9 +91,10 @@ object Connect {
     fun connectWithAccessTokenInsecure(
         host: String = "localhost",
         rpcPort: Int = 50051,
-        personalAccessToken: String
+        personalAccessToken: String,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel {
-        return GrpcChannelBuilder().forAddress(host, rpcPort).makeInsecure().withAccessToken(personalAccessToken).build()
+        return GrpcChannelBuilder().forAddress(host, rpcPort).makeInsecure().withAccessToken(personalAccessToken).build(buildArgs)
     }
 
     /**
@@ -122,7 +126,8 @@ object Connect {
         confCAFilename: String? = null,
         authCAFilename: String? = null,
         caFilename: String? = null,
-        verifyCertificates: Boolean = true
+        verifyCertificates: Boolean = true,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel {
         val tokenFetcher = createTokenFetcher(
             confAddress ?: "https://$host/ewb/auth",
@@ -131,7 +136,7 @@ object Connect {
             verifyCertificates = verifyCertificates
         )
 
-        return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, caFilename)
+        return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, caFilename, buildArgs)
     }
 
     /**
@@ -161,14 +166,15 @@ object Connect {
         rpcPort: Int = 50051,
         authMethod: AuthMethod,
         authCAFilename: String? = null,
-        caFilename: String? = null
+        caFilename: String? = null,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel {
 
         val authClient = authCAFilename?.let {
             HttpClient.newBuilder().sslContext(SSLContextUtils.singleCACertSSLContext(it)).build()
         } ?: HttpClient.newBuilder().build()
         val tokenFetcher = createTokenFetcher(authMethod = authMethod, audience = audience, issuer = issuer, authClient = authClient, verifyCertificates = false)
-        return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, caFilename)
+        return connectWithSecretUsingTokenFetcher(tokenFetcher, clientId, clientSecret, host, rpcPort, caFilename, buildArgs)
     }
 
     /**
@@ -200,11 +206,12 @@ object Connect {
         confAddress: String? = null,
         confCAFilename: String? = null,
         authCAFilename: String? = null,
-        caFilename: String? = null
+        caFilename: String? = null,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel {
         val tokenFetcher = createTokenFetcher(confAddress ?: "https://$host/ewb/auth", confCAFilename = confCAFilename, authCAFilename = authCAFilename)
 
-        return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, caFilename)
+        return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, caFilename, buildArgs)
     }
 
     /**
@@ -236,14 +243,15 @@ object Connect {
         rpcPort: Int = 50051,
         authMethod: AuthMethod,
         authCAFilename: String? = null,
-        caFilename: String? = null
+        caFilename: String? = null,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel {
         val authClient = authCAFilename?.let {
             HttpClient.newBuilder().sslContext(SSLContextUtils.singleCACertSSLContext(it)).build()
         } ?: HttpClient.newBuilder().build()
         val tokenFetcher = createTokenFetcher(authMethod = authMethod, audience = audience, issuer = issuer, authClient = authClient, verifyCertificates = false)
 
-        return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, caFilename)
+        return connectWithPasswordUsingTokenFetcher(tokenFetcher, clientId, username, password, host, rpcPort, caFilename, buildArgs)
     }
 
     /**
@@ -263,9 +271,10 @@ object Connect {
         host: String = "localhost",
         rpcPort: Int = 50051,
         caFilename: String? = null,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel {
         val tokenFetcher = createTokenFetcherManagedIdentity(identityUrl)
-        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build()
+        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build(buildArgs)
     }
 
     private fun connectWithSecretUsingTokenFetcher(
@@ -274,13 +283,14 @@ object Connect {
         clientSecret: String,
         host: String,
         rpcPort: Int,
-        caFilename: String?
+        caFilename: String?,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel {
         tokenFetcher.tokenRequestData.put("client_id", clientId)
         tokenFetcher.tokenRequestData.put("client_secret", clientSecret)
         tokenFetcher.tokenRequestData.put("grant_type", "client_credentials")
 
-        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build()
+        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build(buildArgs)
     }
 
     private fun connectWithPasswordUsingTokenFetcher(
@@ -290,7 +300,8 @@ object Connect {
         password: String,
         host: String,
         rpcPort: Int,
-        caFilename: String?
+        caFilename: String?,
+        buildArgs: GrpcBuildArgs = GrpcBuildArgs()
     ): GrpcChannel {
         tokenFetcher.tokenRequestData.put("client_id", clientId)
         tokenFetcher.tokenRequestData.put("username", username)
@@ -298,6 +309,6 @@ object Connect {
         tokenFetcher.tokenRequestData.put("grant_type", "password")
         tokenFetcher.tokenRequestData.put("scope", "offline_access")
 
-        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build()
+        return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build(buildArgs)
     }
 }

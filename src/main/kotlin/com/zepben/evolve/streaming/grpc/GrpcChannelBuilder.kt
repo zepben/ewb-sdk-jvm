@@ -27,11 +27,17 @@ import java.util.concurrent.TimeUnit
 
 private const val TWENTY_MEGABYTES = 1024 * 1024 * 20
 
+/**
+ * @param skipConnectionTest Whether to skip the connection test when establishing the channel.
+ * @param debugConnectionTest Set to true to save and log all errors from the connection test. Note this will be verbose and is for advanced use only.
+ * @param connectionTestTimeoutMs The amount of time to wait for the connection test to complete.
+ * @param maxInboundMessageSize The amount of data that can be received in a single message over the gRPC connection.
+ */
 data class GrpcBuildArgs(
-    val skipConnectionTest: Boolean,
-    val debugConnectionTest: Boolean,
-    val connectionTestTimeoutMs: Long,
-    val maxInboundMessageSize: Int
+    val skipConnectionTest: Boolean = false,
+    val debugConnectionTest: Boolean = false,
+    val connectionTestTimeoutMs: Long = 10000,
+    val maxInboundMessageSize: Int = TWENTY_MEGABYTES
 )
 
 val DEFAULT_BUILD_ARGS = GrpcBuildArgs(skipConnectionTest = false, debugConnectionTest = true, connectionTestTimeoutMs = 5000, maxInboundMessageSize = TWENTY_MEGABYTES)

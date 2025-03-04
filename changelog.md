@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [0.26.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [0.25.0] - 2025-03-05
 ### Breaking Changes
 * Traversal / Tracing API has been completely rewritten. `Traversal` has a different public API and `BranchRecursiveTraversal` no longer exists.

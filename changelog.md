@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [0.25.0] - UNRELEASED
+## [0.25.0] - 2025-03-05
 ### Breaking Changes
 * Traversal / Tracing API has been completely rewritten. `Traversal` has a different public API and `BranchRecursiveTraversal` no longer exists.
   All traces that used to be used via the `Tracing.*` factory functions should be migrated to use the new `NetworkTrace` class instantiated from the factory

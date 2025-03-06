@@ -54,8 +54,6 @@ class TraversalTest {
 
     private fun createBranchingTraversal(): TestTraversal<Int> {
         val queueType = Traversal.BranchingQueueType<Int, TestTraversal<Int>>(
-            // Note: This is pretty simple and probably doesn't capture testing branching thoroughly. E.g it doesn't queue multiple branches at once...
-            //  Consider making a more thorough test.
             queueNext = { item, _, queueItem, queueBranch ->
                   if (item == 0) {
                       queueBranch(-10)

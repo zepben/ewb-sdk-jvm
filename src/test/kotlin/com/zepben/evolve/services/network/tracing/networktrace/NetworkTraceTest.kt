@@ -13,7 +13,9 @@ import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.Clamp
 import com.zepben.evolve.cim.iec61970.base.wires.Cut
+import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.services.network.getT
+import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
 import com.zepben.evolve.testing.TestNetworkBuilder
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
@@ -115,6 +117,43 @@ class NetworkTraceTest {
             .run(ns.get<ConductingEquipment>("c0")!!)
 
         assertThat(steppedOn, containsInAnyOrder("c0", "c1", "j2", "c4"))
+    }
+
+    @Test
+    internal fun `breadth first queue supports multiple start items`() {
+        //
+        // 1--c1--21--c2--2
+        // 2              1
+        // j0             j3
+        // 1              2
+        // 2--c5--12--c4--1
+        //
+        val ns = TestNetworkBuilder()
+            .fromJunction() // j0
+            .toAcls() // c1
+            .toAcls() // c2
+            .toJunction() // j3
+            .toAcls() // c4
+            .toAcls() // c5
+            .connect("c5", "j0", 2, 1)
+            .network
+
+        val steps = mutableSetOf<NetworkTraceStep<Unit>>()
+        Tracing.networkTrace(queue = TraversalQueue.breadthFirst())
+            .addStepAction { step, _ -> steps.add(step) }
+            .run(ns.get<Junction>("j0")!!)
+
+        assertThat(
+            steps.map { it.numEquipmentSteps to it.path.toEquipment.mRID }.toSet(),
+            containsInAnyOrder(
+                0 to "j0",
+                1 to "c1",
+                1 to "c5",
+                2 to "c2",
+                2 to "c4",
+                3 to "j3"
+            )
+        )
     }
 
     @Test

@@ -36,7 +36,8 @@ class TraversalTest {
     private fun createTraversal(
         canVisitItem: (Int, StepContext) -> Boolean = { _, _ -> true },
         canActionItem: (Int, StepContext) -> Boolean = { _, _ -> true },
-        onReset: () -> Unit = {}
+        onReset: () -> Unit = {},
+        queue: TraversalQueue<Int> = TraversalQueue.depthFirst()
     ): TestTraversal<Int> {
         val queueType = Traversal.BasicQueueType<Int, TestTraversal<Int>>(
             queueNext = { item, _, queueItem ->
@@ -45,7 +46,7 @@ class TraversalTest {
                 else
                     queueItem(item + 1)
             },
-            queue = TraversalQueue.depthFirst()
+            queue = queue
         )
 
         return TestTraversal(queueType, null, canVisitItem, canActionItem, onReset)
@@ -56,10 +57,6 @@ class TraversalTest {
             // Note: This is pretty simple and probably doesn't capture testing branching thoroughly. E.g it doesn't queue multiple branches at once...
             //  Consider making a more thorough test.
             queueNext = { item, _, queueItem, queueBranch ->
-//                if (item == 100) queueBranch(-100)
-//                if (item % 10 == 0) queueBranch(item + 1)
-//                else queueItem(item + 1)
-
                   if (item == 0) {
                       queueBranch(-10)
                       queueBranch(10)
@@ -328,5 +325,18 @@ class TraversalTest {
             .run(canStopOnStartItem = false)
 
         assertThat(stopConditionTriggered, equalTo(true))
+    }
+
+    @Test
+    fun `start items are queued before traversal starts so queue type is honoured for start items`() {
+        val steps = mutableListOf<Int>()
+        createTraversal(queue = TraversalQueue.breadthFirst())
+            .addStopCondition { item, _ -> item >= 2 || item <= -2 }
+            .addStepAction { item, _ -> steps.add(item) }
+            .addStartItem(-1)
+            .addStartItem(1)
+            .run()
+
+        assertThat(steps, contains(-1, 1, -2, 2))
     }
 }

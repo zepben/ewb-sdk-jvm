@@ -9,7 +9,11 @@
 package com.zepben.evolve.services.network.tracing.networktrace.conditions
 
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
+import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.evolve.cim.iec61970.base.wires.Clamp
+import com.zepben.evolve.cim.iec61970.base.wires.Cut
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
+import com.zepben.evolve.services.network.testdata.CutsAndClampsNetwork
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection.*
 import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep
@@ -19,11 +23,12 @@ import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class DirectionConditionTest {
 
     @Test
-    fun shouldQueue() {
+    fun `shouldQueue for non cut or clamp path`() {
         NONE conditionInternallySteppingTo NONE terminalShouldQueue true
         NONE conditionInternallySteppingTo UPSTREAM terminalShouldQueue false
         NONE conditionInternallySteppingTo DOWNSTREAM terminalShouldQueue false
@@ -74,7 +79,7 @@ class DirectionConditionTest {
     }
 
     @Test
-    fun shouldQueueStartItem() {
+    fun `shouldQueueStartItem for non cut or clamp`() {
         NONE conditionWith NONE startTerminalShouldQueue true
         NONE conditionWith UPSTREAM startTerminalShouldQueue false
         NONE conditionWith DOWNSTREAM startTerminalShouldQueue false
@@ -98,6 +103,79 @@ class DirectionConditionTest {
         BOTH conditionWith DOWNSTREAM startTerminalShouldQueue false
         BOTH conditionWith BOTH startTerminalShouldQueue true
         BOTH conditionWith CONNECTOR startTerminalShouldQueue true
+    }
+
+    @Test
+    fun `cuts queue when direction set from segment end`() {
+        val network = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+            .addFeeder("b0", 2)
+            .build()
+
+        val c1: AcLineSegment = network["c1"]!!
+        val cut1: Cut = network["cut1"]!!
+        val c4: AcLineSegment = network["c4"]!!
+        val c5: AcLineSegment = network["c5"]!!
+
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t1, cut1.t2) shouldQueue true
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t1, cut1.t1) shouldQueue true
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t2, cut1.t2) shouldQueue true
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(c1.t1, cut1.t1, c1) shouldQueue true
+
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t1, cut1.t1) shouldQueue true
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t2, cut1.t2) shouldQueue false
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t2, cut1.t1) shouldQueue true
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(c4.t1, cut1.t1) shouldQueue true
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(c5.t1, cut1.t2) shouldQueue true
+    }
+
+    @Test
+    fun `cuts queue when direction set from clamp`() {
+        val network = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+            .addFeeder("c3", 1)
+            .build()
+
+        val c1: AcLineSegment = network["c1"]!!
+        val clamp1: Clamp = network["clamp1"]!!
+        val cut1: Cut = network["cut1"]!!
+        val c4: AcLineSegment = network["c4"]!!
+        val c5: AcLineSegment = network["c5"]!!
+
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t1, cut1.t1) shouldQueue true
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t2, cut1.t2) shouldQueue true
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t1, cut1.t2) shouldQueue true
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(clamp1.t1, cut1.t1, c1) shouldQueue true
+
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t1, cut1.t1) shouldQueue true
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t2, cut1.t2) shouldQueue false
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t2, cut1.t1) shouldQueue true
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(c5.t1, cut1.t2) shouldQueue true
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(c4.t1, cut1.t1) shouldQueue true
+    }
+
+    @Test
+    fun `cuts queue when direction set from cut`() {
+        val network = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+            .addFeeder("c4", 1)
+            .build()
+
+        val cut1: Cut = network["cut1"]!!
+        val c4: AcLineSegment = network["c4"]!!
+        val c5: AcLineSegment = network["c5"]!!
+
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t1, cut1.t1) shouldQueue true
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t2, cut1.t2) shouldQueue true
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t1, cut1.t2) shouldQueue true
+        DOWNSTREAM conditionSteppingTo NetworkTraceStep.Path(c4.t1, cut1.t1) shouldQueue true
+
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t1, cut1.t1) shouldQueue true
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t2, cut1.t2) shouldQueue false
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(cut1.t2, cut1.t1) shouldQueue true
+        UPSTREAM conditionSteppingTo NetworkTraceStep.Path(c5.t1, cut1.t2) shouldQueue true
+    }
+
+    @Test
+    fun `does not support connector conditions`() {
+        assertThrows<IllegalArgumentException> { DirectionCondition<Unit>(CONNECTOR, NetworkStateOperators.NORMAL) }
     }
 
     private infix fun Triple<FeederDirection, FeederDirection, Boolean>.terminalShouldQueue(expected: Boolean) {
@@ -136,6 +214,16 @@ class DirectionConditionTest {
         Triple(this, toDirection, false)
 
     private infix fun FeederDirection.conditionWith(toDirection: FeederDirection): Pair<FeederDirection, FeederDirection> = this to toDirection
+
+    private infix fun FeederDirection.conditionSteppingTo(path: NetworkTraceStep.Path): Pair<FeederDirection, NetworkTraceStep.Path> =
+        this to path
+
+    private infix fun Pair<FeederDirection, NetworkTraceStep.Path>.shouldQueue(expected: Boolean) {
+        val nextStep = mockk<NetworkTraceStep<Unit>>()
+        every { nextStep.path } returns this.second
+        val shouldQueue = DirectionCondition<Unit>(this.first, NetworkStateOperators.NORMAL).shouldQueue(nextStep, mockk(), mockk(), mockk())
+        assertThat(shouldQueue, equalTo(expected))
+    }
 
 
 }

@@ -25,7 +25,7 @@
   need to update your code.
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart. If you were relying on the bug to remove phases through open points you will now
   need to start additional traces from the other side of the open points to maintain this behaviour.
-* `SetDirection` now correctly sets directions for networks with `BusbarSection`.
+* `SetDirection` now correctly sets directions for networks with `BusbarSection`, `Cut` and `Clamp`.
 * `RemoveDirection` has been removed. It did not work reliably with dual fed networks with loops. You now need to clear direction using the new
   `ClearDirection` and reapply directions where appropriate using `SetDirection`.
 * `FindWithUsagePoints` was deemed too use-case specific for the SDK and has been removed.

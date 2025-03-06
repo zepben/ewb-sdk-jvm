@@ -8,6 +8,7 @@
 
 package com.zepben.evolve.services.network.tracing.networktrace
 
+import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.Clamp
@@ -87,6 +88,33 @@ class NetworkTraceTest {
                 NetworkTraceStep.Path(cut2.t2, cut2.t2, segment),
             )
         )
+    }
+
+    @Test
+    internal fun `doesn't bypass stop conditions with multiple branches in equipment traces loop`() {
+        //
+        // /--21--c1--21
+        // c0          j2 21--c3--2
+        // \--12--c4--13
+        //
+        val ns = TestNetworkBuilder()
+            .fromAcls() // c0
+            .toAcls() // c1
+            .toJunction(numTerminals = 3) // j2
+            .branchFrom("j2", 2)
+            .toAcls() // c3
+            .branchFrom("j2", 3)
+            .toAcls() // c4
+            .connect("c4", "c0", 2, 1)
+            .network
+
+        val steppedOn = mutableSetOf<String>()
+        Tracing.networkTrace()
+            .addStopCondition { step, _ -> step.path.toEquipment.mRID == "j2" }
+            .addStepAction { step, _ -> steppedOn.add(step.path.toEquipment.mRID) }
+            .run(ns.get<ConductingEquipment>("c0")!!)
+
+        assertThat(steppedOn, containsInAnyOrder("c0", "c1", "j2", "c4"))
     }
 
     @Test

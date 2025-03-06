@@ -265,7 +265,6 @@ class TraversalTest {
     fun `only actions items that can be actioned`() {
         val steps = mutableListOf<Int>()
         createTraversal(canActionItem = { item, _ -> item % 2 == 1 })
-            .addStopCondition { item, _ -> item == 2 } // stop conditions should not be called for items that are not actionable
             .addStopCondition { item, _ -> item == 3 }
             .addStepAction { item, _ -> steps.add(item) }
             .run(1)

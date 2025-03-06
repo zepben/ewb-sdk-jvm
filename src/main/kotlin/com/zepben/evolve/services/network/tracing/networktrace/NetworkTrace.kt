@@ -19,6 +19,8 @@ import com.zepben.evolve.cim.iec61970.base.wires.SinglePhaseKind
 import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.NetworkTraceQueueCondition
+import com.zepben.evolve.services.network.tracing.networktrace.conditions.NetworkTraceStopCondition
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.*
 
@@ -242,8 +244,6 @@ class NetworkTrace<T> private constructor(
         return this
     }
 
-    // NOTE: This override feels a little dirty - it's the only condition / step adder that needs it.
-    //       But... I couldn't come up with a cleaner design with the time I had... - GMC
     /**
      * Adds a [QueueCondition] to the traversal. However, before registering it with the traversal, it will make sure that the queue condition
      * is only checked on step types relevant to the [NetworkTraceActionType] assigned to this instance. That is when:
@@ -257,7 +257,7 @@ class NetworkTrace<T> private constructor(
      * @return The current traversal instance.
      */
     override fun addQueueCondition(condition: QueueCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
-        return super.addQueueCondition(condition.toNetworkTraceQueueCondition(actionType.defaultQueueConditionStepType(), false))
+        return super.addQueueCondition(condition.toNetworkTraceQueueCondition(actionType.defaultConditionStepType(), false))
     }
 
     /**
@@ -272,6 +272,36 @@ class NetworkTrace<T> private constructor(
      */
     fun addQueueCondition(stepType: NetworkTraceStep.Type, condition: QueueCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
         return addQueueCondition(condition.toNetworkTraceQueueCondition(stepType, true))
+    }
+
+    /**
+     * Adds a [StopCondition] to the traversal. However, before registering it with the traversal, it will make sure that the stop condition
+     * is only checked on step types relevant to the [NetworkTraceActionType] assigned to this instance. That is when:
+     *
+     * - [actionType] is [NetworkTraceActionType.ALL_STEPS] the condition will be checked on all steps.
+     * - [actionType] is [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT] the condition will be checked on external steps.
+     *
+     * However, if the [condition] is an instance of [NetworkTraceStopCondition] the [NetworkTraceStopCondition.stepType] will be honoured.
+     *
+     * @param condition The stop condition to add.
+     * @return The current traversal instance.
+     */
+    override fun addStopCondition(condition: StopCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
+        return super.addStopCondition(condition.toNetworkTraceStopCondition(actionType.defaultConditionStepType(), false))
+    }
+
+    /**
+     * Adds a [StopCondition] to the traversal that will only check steps that match the given [stepType].
+     *
+     * If the [condition] is a [NetworkTraceStopCondition] the [NetworkTraceStopCondition.stepType] will be ignored and the type passed into
+     * this function will be used instead.
+     *
+     * @param condition The stop condition to add.
+     * @param stepType The step type where the stop condition is checked.
+     * @return The current traversal instance.
+     */
+    fun addStopCondition(stepType: NetworkTraceStep.Type, condition: StopCondition<NetworkTraceStep<T>>): NetworkTrace<T> {
+        return addStopCondition(condition.toNetworkTraceStopCondition(stepType, true))
     }
 
     override fun canActionItem(item: NetworkTraceStep<T>, context: StepContext): Boolean {
@@ -331,7 +361,13 @@ class NetworkTrace<T> private constructor(
             else -> NetworkTraceQueueCondition.delegateTo(stepType, this@toNetworkTraceQueueCondition)
         }
 
-    private fun NetworkTraceActionType.defaultQueueConditionStepType() = when (this) {
+    private fun StopCondition<NetworkTraceStep<T>>.toNetworkTraceStopCondition(stepType: NetworkTraceStep.Type, overrideStepType: Boolean) =
+        when {
+            this is NetworkTraceStopCondition<T> && !overrideStepType -> this
+            else -> NetworkTraceStopCondition.delegateTo(stepType, this@toNetworkTraceStopCondition)
+        }
+
+    private fun NetworkTraceActionType.defaultConditionStepType() = when (this) {
         NetworkTraceActionType.ALL_STEPS -> NetworkTraceStep.Type.ALL
         NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT -> NetworkTraceStep.Type.EXTERNAL
     }

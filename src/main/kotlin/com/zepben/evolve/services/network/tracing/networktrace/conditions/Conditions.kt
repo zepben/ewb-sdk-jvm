@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -22,9 +22,6 @@ import com.zepben.evolve.services.network.tracing.traversal.QueueCondition
 import com.zepben.evolve.services.network.tracing.traversal.StopCondition
 import kotlin.reflect.KClass
 
-private typealias NetworkTraceQueueCondition<T> = QueueCondition<NetworkTraceStep<T>>
-private typealias NetworkTraceStopCondition<T> = StopCondition<NetworkTraceStep<T>>
-
 /**
  * Provides a collection of predefined conditions for use in network traces.
  */
@@ -42,7 +39,7 @@ object Conditions {
      * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
      */
     @JvmStatic
-    fun <T> NetworkStateOperators.upstream(): NetworkTraceQueueCondition<T> =
+    fun <T> NetworkStateOperators.upstream(): QueueCondition<NetworkTraceStep<T>> =
         withDirection(FeederDirection.UPSTREAM)
 
     /**
@@ -57,7 +54,7 @@ object Conditions {
      * @return A [NetworkTraceQueueCondition] that results in downstream tracing.
      */
     @JvmStatic
-    fun <T> NetworkStateOperators.downstream(): NetworkTraceQueueCondition<T> =
+    fun <T> NetworkStateOperators.downstream(): QueueCondition<NetworkTraceStep<T>> =
         withDirection(FeederDirection.DOWNSTREAM)
 
     /**
@@ -72,7 +69,7 @@ object Conditions {
      * @return A [NetworkTraceQueueCondition] that results in upstream tracing.
      */
     @JvmStatic
-    fun <T> NetworkStateOperators.withDirection(direction: FeederDirection): NetworkTraceQueueCondition<T> =
+    fun <T> NetworkStateOperators.withDirection(direction: FeederDirection): QueueCondition<NetworkTraceStep<T>> =
         DirectionCondition(direction, this)
 
     /**
@@ -83,7 +80,7 @@ object Conditions {
      * @return A [NetworkTraceQueueCondition] that results in not tracing through open equipment.
      */
     @JvmStatic
-    fun <T> stopAtOpen(openTest: (Switch, SinglePhaseKind?) -> Boolean, phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =
+    fun <T> stopAtOpen(openTest: (Switch, SinglePhaseKind?) -> Boolean, phase: SinglePhaseKind? = null): QueueCondition<NetworkTraceStep<T>> =
         OpenCondition(openTest, phase)
 
     /**
@@ -99,7 +96,7 @@ object Conditions {
      * @return A [NetworkTraceQueueCondition] that results in not queueing through open equipment.
      */
     @JvmStatic
-    fun <T> OpenStateOperators.stopAtOpen(phase: SinglePhaseKind? = null): NetworkTraceQueueCondition<T> =
+    fun <T> OpenStateOperators.stopAtOpen(phase: SinglePhaseKind? = null): QueueCondition<NetworkTraceStep<T>> =
         stopAtOpen(this::isOpen, phase)
 
     /**
@@ -109,7 +106,7 @@ object Conditions {
      * @return A [NetworkTraceStopCondition] that stops tracing the path once the step limit is reached.
      */
     @JvmStatic
-    fun <T> limitEquipmentSteps(limit: Int): NetworkTraceStopCondition<T> =
+    fun <T> limitEquipmentSteps(limit: Int): StopCondition<NetworkTraceStep<T>> =
         EquipmentStepLimitCondition(limit)
 
     /**
@@ -121,7 +118,7 @@ object Conditions {
      * @return A [NetworkTraceStopCondition] that stops the trace when the step limit is reached for the specified equipment type.
      */
     @JvmStatic
-    fun <T> limitEquipmentSteps(limit: Int, equipmentType: KClass<out ConductingEquipment>): NetworkTraceStopCondition<T> =
+    fun <T> limitEquipmentSteps(limit: Int, equipmentType: KClass<out ConductingEquipment>): StopCondition<NetworkTraceStep<T>> =
         EquipmentTypeStepLimitCondition(limit, equipmentType)
 
     /**
@@ -132,7 +129,7 @@ object Conditions {
      * @return A [NetworkTraceStopCondition] that stops the trace when the step limit is reached for the specified equipment type.
      */
     @JvmStatic
-    fun <T> limitEquipmentSteps(limit: Int, equipmentType: Class<out ConductingEquipment>): NetworkTraceStopCondition<T> =
+    fun <T> limitEquipmentSteps(limit: Int, equipmentType: Class<out ConductingEquipment>): StopCondition<NetworkTraceStep<T>> =
         limitEquipmentSteps(limit, equipmentType.kotlin)
 
 }

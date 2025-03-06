@@ -149,7 +149,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @param condition The stop condition to add.
      * @return this traversal instance.
      */
-    fun addStopCondition(condition: StopCondition<T>): D {
+    open fun addStopCondition(condition: StopCondition<T>): D {
         stopConditions.add(condition)
         if (condition is StopConditionWithContextValue<T, *>) {
             computeNextContextFuns[condition.key] = condition
@@ -414,10 +414,10 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
                 queue.next()?.let { current ->
                     val context = getStepContext(current)
                     if (canVisitItem(current, context)) {
-                        context.isActionableItem = canActionItem(current, context)
+                        context.isStopping = canStop && matchesAnyStopCondition(current, context)
 
+                        context.isActionableItem = canActionItem(current, context)
                         if (context.isActionableItem) {
-                            context.isStopping = canStop && matchesAnyStopCondition(current, context)
                             applyStepActions(current, context)
                         }
 

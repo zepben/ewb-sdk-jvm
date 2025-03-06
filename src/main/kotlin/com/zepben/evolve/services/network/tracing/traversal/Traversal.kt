@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -348,11 +348,14 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
 
         if (parent == null && queueType is BranchingQueueType && startItems.size > 1) {
             branchStartItems()
+            // Because we don't traverse anything at the top level parent, we need to pass canStopAtStart item
+            // to the child branch only in this case because they are actually start items.
+            traverseBranches(canStopOnStartItem)
         } else {
             traverse(canStopOnStartItem)
+            // Child branches should never stop at start items because a branch start item is not a whole trace start item.
+            traverseBranches(true)
         }
-
-        traverseBranches(canStopOnStartItem)
 
         running = false
     }

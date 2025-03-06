@@ -9,7 +9,8 @@
 package com.zepben.evolve.services.network.tracing.traversal
 
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import kotlin.math.abs
 
@@ -55,9 +56,19 @@ class TraversalTest {
             // Note: This is pretty simple and probably doesn't capture testing branching thoroughly. E.g it doesn't queue multiple branches at once...
             //  Consider making a more thorough test.
             queueNext = { item, _, queueItem, queueBranch ->
-                if (item == 100) queueBranch(-100)
-                if (item % 10 == 0) queueBranch(item + 1)
-                else queueItem(item + 1)
+//                if (item == 100) queueBranch(-100)
+//                if (item % 10 == 0) queueBranch(item + 1)
+//                else queueItem(item + 1)
+
+                  if (item == 0) {
+                      queueBranch(-10)
+                      queueBranch(10)
+                  } else if (item < 0) {
+                      queueItem(item + 1)
+                  } else {
+                      queueItem(item - 1)
+                  }
+
             },
             queueFactory = { TraversalQueue.depthFirst() },
             branchQueueFactory = { TraversalQueue.depthFirst() },
@@ -281,31 +292,42 @@ class TraversalTest {
     fun `supports branching traversals`() {
         val steps = mutableMapOf<Int, StepContext>()
         createBranchingTraversal()
-            .addQueueCondition { item, ctx, _, _ -> ctx.branchDepth <= 2 }
+            .addQueueCondition { item, ctx, _, _ -> ctx.branchDepth <= 1 && item != 0 }
             .addStepAction { item, ctx -> steps[item] = ctx }
-            .run(1)
+            .run(0, canStopOnStartItem = false)
+
+        assertThat(steps[0]?.isBranchStartItem, equalTo(false))
+        assertThat(steps[0]?.isStartItem, equalTo(true))
+        assertThat(steps[0]?.branchDepth, equalTo(0))
+
+        assertThat(steps[10]?.isBranchStartItem, equalTo(true))
+        assertThat(steps[10]?.branchDepth, equalTo(1))
 
         assertThat(steps[1]?.isBranchStartItem, equalTo(false))
-        assertThat(steps[1]?.isStartItem, equalTo(true))
-        assertThat(steps[1]?.branchDepth, equalTo(0))
+        assertThat(steps[1]?.isStartItem, equalTo(false))
+        assertThat(steps[1]?.branchDepth, equalTo(1))
 
-        assertThat(steps[10]?.isBranchStartItem, equalTo(false))
-        assertThat(steps[10]?.branchDepth, equalTo(0))
+        assertThat(steps[-10]?.isBranchStartItem, equalTo(true))
+        assertThat(steps[-10]?.branchDepth, equalTo(1))
 
-        assertThat(steps[11]?.isBranchStartItem, equalTo(true))
-        assertThat(steps[11]?.isStartItem, equalTo(false))
-        assertThat(steps[11]?.branchDepth, equalTo(1))
+        assertThat(steps[-1]?.isBranchStartItem, equalTo(false))
+        assertThat(steps[-1]?.isStartItem, equalTo(false))
+        assertThat(steps[-1]?.branchDepth, equalTo(1))
+    }
 
-        assertThat(steps[20]?.isBranchStartItem, equalTo(false))
-        assertThat(steps[20]?.branchDepth, equalTo(1))
+    @Test
+    fun `canStopOnStartItem is not assessed on branch start items`() {
+        var stopConditionTriggered = false
+        createBranchingTraversal()
+            .addStopCondition { item, _ ->
+                stopConditionTriggered = abs(item) == 10
+                stopConditionTriggered
+            }
+            .addQueueCondition { _, ctx, _, _ -> ctx.branchDepth < 2 }
+            .addStartItem(1)
+            .addStartItem(-1)
+            .run(canStopOnStartItem = false)
 
-        assertThat(steps[21]?.isBranchStartItem, equalTo(true))
-        assertThat(steps[21]?.isStartItem, equalTo(false))
-        assertThat(steps[21]?.branchDepth, equalTo(2))
-
-        assertThat(steps[30]?.isBranchStartItem, equalTo(false))
-        assertThat(steps[30]?.branchDepth, equalTo(2))
-
-        assertThat(steps[31], nullValue())
+        assertThat(stopConditionTriggered, equalTo(true))
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -16,8 +16,10 @@ import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Substation
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.BusbarSection
+import com.zepben.evolve.cim.iec61970.base.wires.Cut
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.getT
+import com.zepben.evolve.services.network.testdata.CutsAndClampsNetwork
 import com.zepben.evolve.services.network.testdata.PhaseSwapLoopNetwork
 import com.zepben.evolve.services.network.tracing.feeder.DirectionValidator.validateDirection
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection.*
@@ -520,6 +522,224 @@ internal class SetDirectionTest {
         n.getT("b4", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
         n.getT("c5", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
         n.getT("c5", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+    }
+
+    @Test
+    internal fun setsDirectionOnAclsWithCutsAndClampsFromAclsEndTerminal() {
+        val n = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+            .addFeeder("b0", 2)
+            .network
+
+        n.get<Cut>("cut1")?.setNormallyOpen(false)
+        n.get<Cut>("cut2")?.setNormallyOpen(true)
+
+        doSetDirectionTrace(n.getT("b0", 2))
+
+        n.getT("b0", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp1", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c5", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp2", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp3", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+    }
+
+    @Test
+    internal fun setsDirectionOnAclsWithCutsAndClampsFedFromClamp() {
+        val n = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+            .addFeeder("c6", 1)
+            .network
+
+        n.get<Cut>("cut1")?.setNormallyOpen(false)
+        n.get<Cut>("cut2")?.setNormallyOpen(true)
+
+        doSetDirectionTrace(n.getT("c6", 1))
+
+        n.getT("c6", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c6", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("clamp2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp3", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c5", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 2).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp1", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b0", 2).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b0", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+    }
+
+    @Test
+    internal fun setsDirectionOnAclsWithCutsAndClampsFedFromCut() {
+        val n = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+            .addFeeder("c5", 1)
+            .network
+
+        n.get<Cut>("cut1")?.setNormallyOpen(false)
+        n.get<Cut>("cut2")?.setNormallyOpen(true)
+
+        doSetDirectionTrace(n.getT("c5", 1))
+
+        n.getT("c5", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 2).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp1", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b0", 2).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b0", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp2", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c6", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c6", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp3", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+    }
+
+    @Test
+    internal fun setsDirectionOnAclsWithCutsAndClampsFedFromBothAclsEnds() {
+        val n = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+            .addFeeder("b0", 2)
+            .addFeeder("b2", 1)
+            .network
+
+        n.get<Cut>("cut1")?.setNormallyOpen(false)
+        n.get<Cut>("cut2")?.setNormallyOpen(false)
+
+        doSetDirectionTrace(n.getT("b0", 2))
+        doSetDirectionTrace(n.getT("b2", 1))
+
+        n.getT("b0", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("b0", 1).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("clamp1", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp2", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c6", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c6", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp3", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c9", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c9", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp4", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c10", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c10", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b2", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("b2", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+    }
+
+    @Test
+    internal fun setsDirectionOnAclsWithCutsAndClampsFedFromAclsEndAndClamp() {
+        val n = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+            .addFeeder("b0", 2)
+            .addFeeder("c6", 1)
+            .network
+
+        n.get<Cut>("cut1")?.setNormallyOpen(false)
+        n.get<Cut>("cut2")?.setNormallyOpen(true)
+
+        doSetDirectionTrace(n.getT("b0", 2))
+        doSetDirectionTrace(n.getT("c6", 1))
+
+        n.getT("b0", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("b0", 1).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("clamp1", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp2", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c6", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c6", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("clamp3", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+    }
+
+    @Test
+    internal fun setsDirectionOnAclsWithCutsAndClampsFedFromAclsClampAndCut() {
+        val n = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+            .addFeeder("c3", 1)
+            .addFeeder("c5", 1)
+            .network
+
+        n.get<Cut>("cut1")?.setNormallyOpen(false)
+        n.get<Cut>("cut2")?.setNormallyOpen(true)
+
+        doSetDirectionTrace(n.getT("c3", 1))
+        doSetDirectionTrace(n.getT("c5", 1))
+
+        n.getT("b0", 2).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("b0", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c1", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp1", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c3", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c3", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("c4", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c4", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 2).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("cut1", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 1).validateDirection(BOTH, NetworkStateOperators.NORMAL)
+        n.getT("c5", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
+        n.getT("clamp2", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c6", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c6", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("clamp3", 1).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c7", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("c8", 2).validateDirection(DOWNSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 1).validateDirection(UPSTREAM, NetworkStateOperators.NORMAL)
+        n.getT("cut2", 2).validateDirection(NONE, NetworkStateOperators.NORMAL)
     }
 
     private fun doSetDirectionTrace(terminal: Terminal) {

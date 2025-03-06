@@ -9,7 +9,8 @@
 package com.zepben.evolve.services.network.tracing.traversal
 
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import kotlin.math.abs
 
@@ -35,7 +36,8 @@ class TraversalTest {
     private fun createTraversal(
         canVisitItem: (Int, StepContext) -> Boolean = { _, _ -> true },
         canActionItem: (Int, StepContext) -> Boolean = { _, _ -> true },
-        onReset: () -> Unit = {}
+        onReset: () -> Unit = {},
+        queue: TraversalQueue<Int> = TraversalQueue.depthFirst()
     ): TestTraversal<Int> {
         val queueType = Traversal.BasicQueueType<Int, TestTraversal<Int>>(
             queueNext = { item, _, queueItem ->
@@ -44,7 +46,7 @@ class TraversalTest {
                 else
                     queueItem(item + 1)
             },
-            queue = TraversalQueue.depthFirst()
+            queue = queue
         )
 
         return TestTraversal(queueType, null, canVisitItem, canActionItem, onReset)
@@ -52,12 +54,16 @@ class TraversalTest {
 
     private fun createBranchingTraversal(): TestTraversal<Int> {
         val queueType = Traversal.BranchingQueueType<Int, TestTraversal<Int>>(
-            // Note: This is pretty simple and probably doesn't capture testing branching thoroughly. E.g it doesn't queue multiple branches at once...
-            //  Consider making a more thorough test.
             queueNext = { item, _, queueItem, queueBranch ->
-                if (item == 100) queueBranch(-100)
-                if (item % 10 == 0) queueBranch(item + 1)
-                else queueItem(item + 1)
+                  if (item == 0) {
+                      queueBranch(-10)
+                      queueBranch(10)
+                  } else if (item < 0) {
+                      queueItem(item + 1)
+                  } else {
+                      queueItem(item - 1)
+                  }
+
             },
             queueFactory = { TraversalQueue.depthFirst() },
             branchQueueFactory = { TraversalQueue.depthFirst() },
@@ -254,7 +260,6 @@ class TraversalTest {
     fun `only actions items that can be actioned`() {
         val steps = mutableListOf<Int>()
         createTraversal(canActionItem = { item, _ -> item % 2 == 1 })
-            .addStopCondition { item, _ -> item == 2 } // stop conditions should not be called for items that are not actionable
             .addStopCondition { item, _ -> item == 3 }
             .addStepAction { item, _ -> steps.add(item) }
             .run(1)
@@ -281,31 +286,55 @@ class TraversalTest {
     fun `supports branching traversals`() {
         val steps = mutableMapOf<Int, StepContext>()
         createBranchingTraversal()
-            .addQueueCondition { item, ctx, _, _ -> ctx.branchDepth <= 2 }
+            .addQueueCondition { item, ctx, _, _ -> ctx.branchDepth <= 1 && item != 0 }
             .addStepAction { item, ctx -> steps[item] = ctx }
-            .run(1)
+            .run(0, canStopOnStartItem = false)
+
+        assertThat(steps[0]?.isBranchStartItem, equalTo(false))
+        assertThat(steps[0]?.isStartItem, equalTo(true))
+        assertThat(steps[0]?.branchDepth, equalTo(0))
+
+        assertThat(steps[10]?.isBranchStartItem, equalTo(true))
+        assertThat(steps[10]?.branchDepth, equalTo(1))
 
         assertThat(steps[1]?.isBranchStartItem, equalTo(false))
-        assertThat(steps[1]?.isStartItem, equalTo(true))
-        assertThat(steps[1]?.branchDepth, equalTo(0))
+        assertThat(steps[1]?.isStartItem, equalTo(false))
+        assertThat(steps[1]?.branchDepth, equalTo(1))
 
-        assertThat(steps[10]?.isBranchStartItem, equalTo(false))
-        assertThat(steps[10]?.branchDepth, equalTo(0))
+        assertThat(steps[-10]?.isBranchStartItem, equalTo(true))
+        assertThat(steps[-10]?.branchDepth, equalTo(1))
 
-        assertThat(steps[11]?.isBranchStartItem, equalTo(true))
-        assertThat(steps[11]?.isStartItem, equalTo(false))
-        assertThat(steps[11]?.branchDepth, equalTo(1))
+        assertThat(steps[-1]?.isBranchStartItem, equalTo(false))
+        assertThat(steps[-1]?.isStartItem, equalTo(false))
+        assertThat(steps[-1]?.branchDepth, equalTo(1))
+    }
 
-        assertThat(steps[20]?.isBranchStartItem, equalTo(false))
-        assertThat(steps[20]?.branchDepth, equalTo(1))
+    @Test
+    fun `canStopOnStartItem is not assessed on branch start items`() {
+        var stopConditionTriggered = false
+        createBranchingTraversal()
+            .addStopCondition { item, _ ->
+                stopConditionTriggered = abs(item) == 10
+                stopConditionTriggered
+            }
+            .addQueueCondition { _, ctx, _, _ -> ctx.branchDepth < 2 }
+            .addStartItem(1)
+            .addStartItem(-1)
+            .run(canStopOnStartItem = false)
 
-        assertThat(steps[21]?.isBranchStartItem, equalTo(true))
-        assertThat(steps[21]?.isStartItem, equalTo(false))
-        assertThat(steps[21]?.branchDepth, equalTo(2))
+        assertThat(stopConditionTriggered, equalTo(true))
+    }
 
-        assertThat(steps[30]?.isBranchStartItem, equalTo(false))
-        assertThat(steps[30]?.branchDepth, equalTo(2))
+    @Test
+    fun `start items are queued before traversal starts so queue type is honoured for start items`() {
+        val steps = mutableListOf<Int>()
+        createTraversal(queue = TraversalQueue.breadthFirst())
+            .addStopCondition { item, _ -> item >= 2 || item <= -2 }
+            .addStepAction { item, _ -> steps.add(item) }
+            .addStartItem(-1)
+            .addStartItem(1)
+            .run()
 
-        assertThat(steps[31], nullValue())
+        assertThat(steps, contains(-1, 1, -2, 2))
     }
 }

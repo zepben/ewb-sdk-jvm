@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -149,7 +149,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @param condition The stop condition to add.
      * @return this traversal instance.
      */
-    fun addStopCondition(condition: StopCondition<T>): D {
+    open fun addStopCondition(condition: StopCondition<T>): D {
         stopConditions.add(condition)
         if (condition is StopConditionWithContextValue<T, *>) {
             computeNextContextFuns[condition.key] = condition
@@ -348,11 +348,14 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
 
         if (parent == null && queueType is BranchingQueueType && startItems.size > 1) {
             branchStartItems()
+            // Because we don't traverse anything at the top level parent, we need to pass canStopAtStart item
+            // to the child branch only in this case because they are actually start items.
+            traverseBranches(canStopOnStartItem)
         } else {
             traverse(canStopOnStartItem)
+            // Child branches should never stop at start items because a branch start item is not a whole trace start item.
+            traverseBranches(true)
         }
-
-        traverseBranches(canStopOnStartItem)
 
         running = false
     }
@@ -405,25 +408,25 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
             } else {
                 queue.add(startItem)
             }
+        }
 
-            var canStop = canStopOnStartItem
-            while (queue.hasNext()) {
-                queue.next()?.let { current ->
-                    val context = getStepContext(current)
-                    if (canVisitItem(current, context)) {
-                        context.isActionableItem = canActionItem(current, context)
+        var canStop = canStopOnStartItem
+        while (queue.hasNext()) {
+            queue.next()?.let { current ->
+                val context = getStepContext(current)
+                if (canVisitItem(current, context)) {
+                    context.isStopping = canStop && matchesAnyStopCondition(current, context)
 
-                        if (context.isActionableItem) {
-                            context.isStopping = canStop && matchesAnyStopCondition(current, context)
-                            applyStepActions(current, context)
-                        }
-
-                        if (!context.isStopping) {
-                            queueNext(current, context)
-                        }
-
-                        canStop = true
+                    context.isActionableItem = canActionItem(current, context)
+                    if (context.isActionableItem) {
+                        applyStepActions(current, context)
                     }
+
+                    if (!context.isStopping) {
+                        queueNext(current, context)
+                    }
+
+                    canStop = true
                 }
             }
         }

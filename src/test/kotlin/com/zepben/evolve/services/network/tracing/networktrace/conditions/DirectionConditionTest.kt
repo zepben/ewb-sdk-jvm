@@ -107,12 +107,12 @@ class DirectionConditionTest {
 
     @Test
     fun `cuts queue when direction set from segment end`() {
-        val network = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+        val network = CutsAndClampsNetwork.multiCutAndClampNetwork()
             .addFeeder("b0", 2)
             .build()
 
         val c1: AcLineSegment = network["c1"]!!
-        val cut1: Cut = network["cut1"]!!
+        val cut1: Cut = network["c1-cut1"]!!
         val c4: AcLineSegment = network["c4"]!!
         val c5: AcLineSegment = network["c5"]!!
 
@@ -130,13 +130,13 @@ class DirectionConditionTest {
 
     @Test
     fun `cuts queue when direction set from clamp`() {
-        val network = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+        val network = CutsAndClampsNetwork.multiCutAndClampNetwork()
             .addFeeder("c3", 1)
             .build()
 
         val c1: AcLineSegment = network["c1"]!!
-        val clamp1: Clamp = network["clamp1"]!!
-        val cut1: Cut = network["cut1"]!!
+        val clamp1: Clamp = network["c1-clamp1"]!!
+        val cut1: Cut = network["c1-cut1"]!!
         val c4: AcLineSegment = network["c4"]!!
         val c5: AcLineSegment = network["c5"]!!
 
@@ -154,11 +154,11 @@ class DirectionConditionTest {
 
     @Test
     fun `cuts queue when direction set from cut`() {
-        val network = CutsAndClampsNetwork.mulitiCutAndClampNetwork()
+        val network = CutsAndClampsNetwork.multiCutAndClampNetwork()
             .addFeeder("c4", 1)
             .build()
 
-        val cut1: Cut = network["cut1"]!!
+        val cut1: Cut = network["c1-cut1"]!!
         val c4: AcLineSegment = network["c4"]!!
         val c5: AcLineSegment = network["c5"]!!
 

@@ -7,10 +7,19 @@
 * None.
 
 ### Enhancements
-* None.
+* Added support to `TestNetworkBuilder` for:
+  * `withClamp` - Adds a clamp to the previously added `AcLineSegment`
+  * `withCut` - Adds a cut to the previously added `AcLineSegment`
+  * `connectTo` - Connects the previously added item, rather than having to specify it again in `connect`.
 
 ### Fixes
-* None.
+* The follow fixes were added to Traversal and NetworkTrace:
+  * `canStopAtStartItem` now works for branching traversals.
+  * Traversal start items are added to the queue before traversal starts, so that the start items honour the queue type order.
+  * Stop conditions on the `NetworkTrace` now are checked based on a step type, like `QueueCondition` does, rather than by checking `canActionItem`.
+  * `Cut` and `Clamp` are now correctly supported in `SetDirection` and `DirectionCondition`.
+  * `NetworkTrace` now handles starting on `Cut` , `Clamp`, and `AcLineSegment` and their terminals in a explicit / sensible way.
+  * `NetworkTracePathProvider` now correctly handles next paths when starting on a `Clamp` terminal.
 
 ### Notes
 * None.
@@ -25,7 +34,7 @@
   need to update your code.
 * `RemovePhases` now stops at open points like the `SetPhases` counterpart. If you were relying on the bug to remove phases through open points you will now
   need to start additional traces from the other side of the open points to maintain this behaviour.
-* `SetDirection` now correctly sets directions for networks with `BusbarSection`, `Cut` and `Clamp`.
+* `SetDirection` now correctly sets directions for networks with `BusbarSection`.
 * `RemoveDirection` has been removed. It did not work reliably with dual fed networks with loops. You now need to clear direction using the new
   `ClearDirection` and reapply directions where appropriate using `SetDirection`.
 * `FindWithUsagePoints` was deemed too use-case specific for the SDK and has been removed.

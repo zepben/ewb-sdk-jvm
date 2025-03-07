@@ -472,6 +472,53 @@ open class TestNetworkBuilder {
         toOther({ T::class.primaryConstructor!!.call(it) }, nominalPhases, numTerminals, mRID, defaultMridPrefix, connectivityNodeMrid, action)
 
     /**
+     * Create a clamp on the current network pointer (must be an [AcLineSegment]) without moving the current network pointer.
+     *
+     * @param mRID Optional mRID for the new [Clamp].
+     * @param lengthFromTerminal1 The length from terminal 1 of the [AcLineSegment] being clamped.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    fun withClamp(mRID: String? = null, lengthFromTerminal1: Double? = null): TestNetworkBuilder = apply {
+        val acls = current
+        check(acls is AcLineSegment) {
+            "`withClamp` can oly be called when the last added items was an AcLieSegment."
+        }
+
+        network.withClamp(acls, mRID ?: "${acls.mRID}-clamp${acls.numClamps() + 1}", lengthFromTerminal1)
+    }
+
+    /**
+     * Create a cut on the current network pointer (must be an [AcLineSegment]) without moving the current network pointer.
+     *
+     * @param mRID Optional mRID for the new [Cut].
+     * @param lengthFromTerminal1 The length from terminal 1 of the [AcLineSegment] being cut.
+     * @param isNormallyOpen The normal state of the switch. Defaults to true.
+     * @param isOpen The current state of the switch. Defaults to [isNormallyOpen].
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    fun withCut(
+        mRID: String? = null,
+        lengthFromTerminal1: Double? = null,
+        isNormallyOpen: Boolean = true,
+        isOpen: Boolean? = null,
+    ): TestNetworkBuilder = apply {
+        val acls = current
+        check(acls is AcLineSegment) {
+            "`withCut` can oly be called when the last added items was an AcLieSegment."
+        }
+
+        network.withCut(
+            acls,
+            mRID ?: "${acls.mRID}-cut${acls.numCuts() + 1}",
+            lengthFromTerminal1,
+            isNormallyOpen = isNormallyOpen,
+            isOpen = isOpen ?: isNormallyOpen
+        )
+    }
+
+    /**
      * Move the current network pointer to the specified [from] allowing branching of the network. This has the effect of changing the current network pointer.
      *
      * @param from The mRID of the [ConductingEquipment] to branch from.
@@ -482,6 +529,25 @@ open class TestNetworkBuilder {
     fun branchFrom(from: String, terminal: Int? = null): TestNetworkBuilder {
         current = network[from]!!
         currentTerminal = terminal
+        return this
+    }
+
+    /**
+     * Connect the current network pointer to the specified [to] without moving the current network pointer.
+     *
+     * @param to The mRID of the second [ConductingEquipment] to be connected.
+     * @param toTerminal The sequence number of the terminal on [to] which will be connected.
+     * @param fromTerminal Optional sequence number of the terminal on the current network pointer which will be connected.
+     *
+     * @return This [TestNetworkBuilder] to allow for fluent use.
+     */
+    fun connectTo(
+        to: String,
+        toTerminal: Int? = null,
+        fromTerminal: Int? = null,
+        connectivityNodeMrid: String? = null
+    ): TestNetworkBuilder {
+        connect(current!!, network[to]!!, connectivityNodeMrid, fromTerminal ?: currentTerminal, toTerminal)
         return this
     }
 
@@ -698,6 +764,32 @@ open class TestNetworkBuilder {
 
                 add(site)
             }
+        }
+
+    private fun NetworkService.withClamp(
+        acls: AcLineSegment,
+        mRID: String? = null,
+        lengthFromTerminal1: Double?
+    ): Clamp =
+        createObject(mRID, "clamp", ::Clamp, acls.terminals.first().phases, 1).apply {
+            this.lengthFromTerminal1 = lengthFromTerminal1
+        }.also {
+            acls.addClamp(it)
+        }
+
+    private fun NetworkService.withCut(
+        acls: AcLineSegment,
+        mRID: String?,
+        lengthFromTerminal1: Double?,
+        isNormallyOpen: Boolean,
+        isOpen: Boolean,
+    ): Cut =
+        createObject(mRID, "cut", ::Cut, acls.terminals.first().phases, 2).apply {
+            this.lengthFromTerminal1 = lengthFromTerminal1
+            setNormallyOpen(isNormallyOpen)
+            setOpen(isOpen)
+        }.also {
+            acls.addCut(it)
         }
 
 }

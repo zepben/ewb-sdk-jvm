@@ -476,16 +476,22 @@ open class TestNetworkBuilder {
      *
      * @param mRID Optional mRID for the new [Clamp].
      * @param lengthFromTerminal1 The length from terminal 1 of the [AcLineSegment] being clamped.
+     * @param action An action that accepts the new [EnergySource] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
-    fun withClamp(mRID: String? = null, lengthFromTerminal1: Double? = null): TestNetworkBuilder = apply {
+    fun withClamp(
+        mRID: String? = null,
+        lengthFromTerminal1: Double? = null,
+        action: Clamp.() -> Unit = {}
+    ): TestNetworkBuilder = apply {
         val acls = current
         check(acls is AcLineSegment) {
             "`withClamp` can oly be called when the last added items was an AcLieSegment."
         }
 
-        network.withClamp(acls, mRID ?: "${acls.mRID}-clamp${acls.numClamps() + 1}", lengthFromTerminal1)
+        val clampMrid = mRID ?: "${acls.mRID}-clamp${acls.numClamps() + 1}"
+        network.withClamp(acls, clampMrid, lengthFromTerminal1).also(action)
     }
 
     /**
@@ -495,6 +501,7 @@ open class TestNetworkBuilder {
      * @param lengthFromTerminal1 The length from terminal 1 of the [AcLineSegment] being cut.
      * @param isNormallyOpen The normal state of the switch. Defaults to true.
      * @param isOpen The current state of the switch. Defaults to [isNormallyOpen].
+     * @param action An action that accepts the new [EnergySource] to allow for additional initialisation.
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
@@ -503,19 +510,14 @@ open class TestNetworkBuilder {
         lengthFromTerminal1: Double? = null,
         isNormallyOpen: Boolean = true,
         isOpen: Boolean? = null,
+        action: Cut.() -> Unit = {}
     ): TestNetworkBuilder = apply {
         val acls = current
         check(acls is AcLineSegment) {
             "`withCut` can oly be called when the last added items was an AcLieSegment."
         }
-
-        network.withCut(
-            acls,
-            mRID ?: "${acls.mRID}-cut${acls.numCuts() + 1}",
-            lengthFromTerminal1,
-            isNormallyOpen = isNormallyOpen,
-            isOpen = isOpen ?: isNormallyOpen
-        )
+        val cutMrid = mRID ?: "${acls.mRID}-cut${acls.numCuts() + 1}"
+        network.withCut(acls, cutMrid, lengthFromTerminal1, isNormallyOpen = isNormallyOpen, isOpen = isOpen ?: isNormallyOpen).also(action)
     }
 
     /**
@@ -766,24 +768,14 @@ open class TestNetworkBuilder {
             }
         }
 
-    private fun NetworkService.withClamp(
-        acls: AcLineSegment,
-        mRID: String? = null,
-        lengthFromTerminal1: Double?
-    ): Clamp =
+    private fun NetworkService.withClamp(acls: AcLineSegment, mRID: String? = null, lengthFromTerminal1: Double?): Clamp =
         createObject(mRID, "clamp", ::Clamp, acls.terminals.first().phases, 1).apply {
             this.lengthFromTerminal1 = lengthFromTerminal1
         }.also {
             acls.addClamp(it)
         }
 
-    private fun NetworkService.withCut(
-        acls: AcLineSegment,
-        mRID: String?,
-        lengthFromTerminal1: Double?,
-        isNormallyOpen: Boolean,
-        isOpen: Boolean,
-    ): Cut =
+    private fun NetworkService.withCut(acls: AcLineSegment, mRID: String?, lengthFromTerminal1: Double?, isNormallyOpen: Boolean, isOpen: Boolean): Cut =
         createObject(mRID, "cut", ::Cut, acls.terminals.first().phases, 2).apply {
             this.lengthFromTerminal1 = lengthFromTerminal1
             setNormallyOpen(isNormallyOpen)

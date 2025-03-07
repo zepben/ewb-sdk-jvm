@@ -52,7 +52,8 @@ abstract class NetworkTraceStopCondition<T>(val stepType: NetworkTraceStep.Type)
         item: NetworkTraceStep<T>,
         context: StepContext
     ): Boolean =
-        if (item.type == NetworkTraceStep.Type.EXTERNAL) shouldStopMatchedStep(item, context) else false
+        // We also need to check start items as they are always marked as internal, but we still want to be able to stop on them.
+        if ((item.type == NetworkTraceStep.Type.EXTERNAL) || context.isStartItem) shouldStopMatchedStep(item, context) else false
 
     companion object {
         /**

@@ -157,6 +157,48 @@ class NetworkTraceTest {
     }
 
     @Test
+    internal fun `can stop on start item when running from conducting equipment`() {
+        //
+        // 1 b0 21--c1--2
+        //
+        val ns = TestNetworkBuilder()
+            .fromBreaker() // j0
+            .toAcls() // c1
+            .network
+
+        val steps = mutableSetOf<NetworkTraceStep<Unit>>()
+        Tracing.networkTrace()
+            .addStepAction { step, _ -> steps.add(step) }
+            .addStopCondition { step, _ -> true }
+            .run(ns.get<ConductingEquipment>("b0")!!)
+
+        assertThat(steps.map { it.numEquipmentSteps to it.path.toEquipment.mRID }.toSet(), containsInAnyOrder(0 to "b0"))
+    }
+
+    @Test
+    internal fun `can stop on start item when running from conducting equipment branching`() {
+        //
+        // 1 b0 21--c1--2
+        //      1
+        //       \--c2--2
+        //
+        val ns = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .toAcls() // c1
+            .branchFrom("b0")
+            .toAcls() // c2
+            .network
+
+        val steps = mutableSetOf<NetworkTraceStep<Unit>>()
+        Tracing.networkTraceBranching()
+            .addStepAction { step, _ -> steps.add(step) }
+            .addStopCondition { step, _ -> true }
+            .run(ns.get<ConductingEquipment>("b0")!!)
+
+        assertThat(steps.map { it.numEquipmentSteps to it.path.toEquipment.mRID }.toSet(), containsInAnyOrder(0 to "b0"))
+    }
+
+    @Test
     internal fun `Can run large branching traces`() {
         //
         // NOTE: This test was added when investigating an exponential run time on real world networks. It revealed an issue in the

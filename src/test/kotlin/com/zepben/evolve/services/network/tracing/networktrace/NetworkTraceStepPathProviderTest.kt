@@ -11,10 +11,7 @@ package com.zepben.evolve.services.network.tracing.networktrace
 import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.PhaseCode
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
-import com.zepben.evolve.cim.iec61970.base.wires.Breaker
-import com.zepben.evolve.cim.iec61970.base.wires.Clamp
-import com.zepben.evolve.cim.iec61970.base.wires.Cut
+import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.testdata.CutsAndClampsNetwork
 import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
@@ -700,6 +697,53 @@ class NetworkTraceStepPathProviderTest {
             containsInAnyOrder(c1.t2..<cut5.t2, c1.t2..<cut6.t2)
         )
     }
+
+    @Test
+    fun `traverses from single clamp on a segment`() {
+        val network = TestNetworkBuilder()
+            .fromAcls() // c0
+            .withClamp() // c0-clamp1
+            .branchFrom("c0-clamp1", 1)
+            .toSource() // s1
+            .network
+
+        val source: EnergySource = network["s1"]!!
+        val clamp1: Clamp = network["c0-clamp1"]!!
+        val c0: AcLineSegment = network["c0"]!!
+
+        "gets both segment terminals when going from clamp".validatePaths(
+            source.t1..clamp1.t1,
+            containsInAnyOrder(clamp1.t1..<c0.t1, clamp1.t1..<c0.t2)
+        )
+    }
+
+    @Test
+    fun `traverses from both sides of a single cut`() {
+        val network = TestNetworkBuilder()
+            .fromAcls() // c0
+            .withCut() // c0-cut1
+            .branchFrom("c0-cut1", 1)
+            .toSource() // s1
+            .branchFrom("c0-cut1", 2)
+            .toSource() // s2
+            .network
+
+        val source1: EnergySource = network["s1"]!!
+        val source2: EnergySource = network["s2"]!!
+        val cut1: Cut = network["c0-cut1"]!!
+        val c0: AcLineSegment = network["c0"]!!
+
+        "goes from t1 side of cut and finds t1 side of segment".validatePaths(
+            source1.t1..cut1.t1,
+            containsInAnyOrder(cut1.t1..<c0.t1, cut1.t1..cut1.t2)
+        )
+
+        "goes from t2 side of cut and finds t2 side of segment".validatePaths(
+            source2.t1..cut1.t2,
+            containsInAnyOrder(cut1.t2..<c0.t2, cut1.t2..cut1.t1)
+        )
+    }
+
 
     private fun busbarNetwork(): NetworkService {
         //         1

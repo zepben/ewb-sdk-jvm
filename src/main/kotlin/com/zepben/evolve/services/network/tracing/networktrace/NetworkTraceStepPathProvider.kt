@@ -132,7 +132,7 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
             pathFactory = pathFactory
         ).orEmpty()
 
-        return (nextPathsTowardsT1 + nextPathsTowardsT2).distinctBy { it.toEquipment }
+        return (nextPathsTowardsT1 + nextPathsTowardsT2).distinctBy { it.toTerminal }
     }
 
     private fun nextPathsFromCut(cut: Cut, path: NetworkTraceStep.Path, pathFactory: PathFactory): Sequence<NetworkTraceStep.Path> {
@@ -205,14 +205,14 @@ internal class NetworkTraceStepPathProvider(val stateOperators: InServiceStateOp
         cutAtSamePositionTerminalNumber: Int,
         pathFactory: PathFactory
     ): Sequence<NetworkTraceStep.Path> {
+        // Can do a simple return if we don't need to do any special cuts/clamps processing
+        if (cuts.isEmpty() && clamps.isEmpty())
+            return fromTerminal.otherTerminals().mapToPath(pathFactory, this)
+
         // We need to ignore cuts that are not "in service" because that means they do not exist!
         // We also make sure we filter out the cut or the clamp we are starting at, so we don't compare it in our checks
         val cuts = cuts.filter { it != fromTerminal.conductingEquipment && stateOperators.isInService(it) }
         val clamps = clamps.filter { it != fromTerminal.conductingEquipment && stateOperators.isInService(it) }
-
-        // Can do a simple return if we don't need to do any special cuts/clamps processing
-        if (cuts.isEmpty() && clamps.isEmpty())
-            return fromTerminal.otherTerminals().mapToPath(pathFactory, this)
 
         val cutsAtSamePosition = cuts.filter { it.lengthFromT1Or0 == lengthFromT1 }
         val stopAtCutsAtSamePosition: Boolean = canStopAtCutsAtSamePosition && cutsAtSamePosition.isNotEmpty()

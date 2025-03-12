@@ -19,7 +19,9 @@
   * Stop conditions on the `NetworkTrace` now are checked based on a step type, like `QueueCondition` does, rather than by checking `canActionItem`.
   * `Cut` and `Clamp` are now correctly supported in `SetDirection` and `DirectionCondition`.
   * `NetworkTrace` now handles starting on `Cut` , `Clamp`, and `AcLineSegment` and their terminals in a explicit / sensible way.
-  * `NetworkTracePathProvider` now correctly handles next paths when starting on a `Clamp` terminal.
+  * `NetworkTraceStepPathProvider` now correctly handles:
+    * Next paths when starting on a `Clamp` terminal.
+    * Traversing AcLineSegments with single cuts or clamps.
 
 ### Notes
 * None.

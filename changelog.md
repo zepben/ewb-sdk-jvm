@@ -24,7 +24,9 @@
 * None.
 
 ### New Features
-* None.
+* Added relationships between `Asset` and `PowerSystemResource` which enables linking `Equipment` to `Pole`:
+  * `Asset.powerSystemResources`
+  * `PowerSystemResource.assets`
 
 ### Enhancements
 * Added support to `TestNetworkBuilder` for:

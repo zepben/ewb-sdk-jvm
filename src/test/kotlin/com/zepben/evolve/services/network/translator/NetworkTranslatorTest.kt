@@ -11,10 +11,7 @@ package com.zepben.evolve.services.network.translator
 import com.zepben.evolve.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.evolve.cim.extensions.iec61970.base.wires.BatteryControl
 import com.zepben.evolve.cim.iec61968.assetinfo.*
-import com.zepben.evolve.cim.iec61968.assets.AssetOrganisationRole
-import com.zepben.evolve.cim.iec61968.assets.AssetOwner
-import com.zepben.evolve.cim.iec61968.assets.Pole
-import com.zepben.evolve.cim.iec61968.assets.Streetlight
+import com.zepben.evolve.cim.iec61968.assets.*
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61968.common.Organisation
 import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
@@ -195,6 +192,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
 
     override val abstractCreators = mapOf<Class<*>, (String) -> IdentifiedObject>(
         AssetOrganisationRole::class.java to { AssetOwner(it) },
+        Asset::class.java to { Pole(it) },
         ConductingEquipment::class.java to { Junction(it) },
         Curve::class.java to { ReactiveCapabilityCurve(it) },
         EarthFaultCompensator::class.java to { GroundingImpedance(it) },
@@ -204,6 +202,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         EquipmentContainer::class.java to { Site(it) },
         Measurement::class.java to { Discrete(it) },
         PerLengthImpedance::class.java to { PerLengthSequenceImpedance(it) },
+        PowerSystemResource::class.java to { Junction(it) },
         ProtectionRelayFunction::class.java to { CurrentRelay(it) },
         ProtectedSwitch::class.java to { Breaker(it) },
         RegulatingControl::class.java to { TapChangerControl(it) },
@@ -218,6 +217,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         super.excludedTables + setOf(
             // Excluded associations
             TableAssetOrganisationRolesAssets::class,
+            TableAssetsPowerSystemResources::class,
             TableBatteryUnitsBatteryControls::class,
             TableCircuitsSubstations::class,
             TableCircuitsTerminals::class,

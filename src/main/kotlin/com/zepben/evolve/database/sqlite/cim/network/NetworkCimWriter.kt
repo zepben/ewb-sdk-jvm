@@ -375,6 +375,7 @@ class NetworkCimWriter(
 
         insert.setNullableString(table.LOCATION_MRID.queryIndex, asset.location?.mRID)
         asset.organisationRoles.forEach { status = status and writeAssociation(it, asset) }
+        asset.powerSystemResources.forEach { status = status and writeAssociation(it, asset) }
 
         return status and writeIdentifiedObject(table, insert, asset, description)
     }
@@ -2477,6 +2478,17 @@ class NetworkCimWriter(
         insert.setString(table.ASSET_MRID.queryIndex, asset.mRID)
 
         return insert.tryExecuteSingleUpdate("asset organisation role to asset association")
+    }
+
+    @Throws(SQLException::class)
+    private fun writeAssociation(powerSystemResource: PowerSystemResource, asset: Asset): Boolean {
+        val table = databaseTables.getTable<TableAssetsPowerSystemResources>()
+        val insert = databaseTables.getInsert<TableAssetsPowerSystemResources>()
+
+        insert.setString(table.ASSET_MRID.queryIndex, asset.mRID)
+        insert.setString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex, powerSystemResource.mRID)
+
+        return insert.tryExecuteSingleUpdate("asset to power system resource association")
     }
 
     @Throws(SQLException::class)

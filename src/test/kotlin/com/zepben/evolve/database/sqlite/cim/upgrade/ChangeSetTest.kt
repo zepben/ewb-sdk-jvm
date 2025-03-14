@@ -9,6 +9,7 @@
 package com.zepben.evolve.database.sqlite.cim.upgrade
 
 import com.zepben.evolve.database.paths.DatabaseType
+import com.zepben.evolve.database.sql.BaseDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.customer.CustomerDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.diagram.DiagramDatabaseTables
 import com.zepben.evolve.database.sqlite.cim.network.NetworkDatabaseTables
@@ -21,7 +22,6 @@ import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.customer.ChangeS
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet50DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.diagram.ChangeSet52DiagramValidator
 import com.zepben.evolve.database.sqlite.cim.upgrade.changesets.network.*
-import com.zepben.evolve.database.sql.BaseDatabaseTables
 import com.zepben.testutils.junit.SystemLogExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -58,7 +58,8 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.CUSTOMER, 55),
         NoChanges(DatabaseType.CUSTOMER, 56),
         NoChanges(DatabaseType.CUSTOMER, 57),
-        NoChanges(DatabaseType.CUSTOMER, 58)
+        NoChanges(DatabaseType.CUSTOMER, 58),
+        NoChanges(DatabaseType.CUSTOMER, 59)
     ).associateBy { it.version }
 
     private val diagramChangeSetValidators = listOf(
@@ -70,7 +71,8 @@ internal class ChangeSetTest {
         NoChanges(DatabaseType.DIAGRAM, 55),
         NoChanges(DatabaseType.DIAGRAM, 56),
         NoChanges(DatabaseType.DIAGRAM, 57),
-        NoChanges(DatabaseType.DIAGRAM, 58)
+        NoChanges(DatabaseType.DIAGRAM, 58),
+        NoChanges(DatabaseType.DIAGRAM, 59),
     ).associateBy { it.version }
 
     private val networkChangeSetValidators = listOf(
@@ -82,7 +84,8 @@ internal class ChangeSetTest {
         ChangeSet55NetworkValidator,
         ChangeSet56NetworkValidator,
         ChangeSet57NetworkValidator,
-        ChangeSet58NetworkValidator
+        ChangeSet58NetworkValidator,
+        ChangeSet59NetworkValidator
     ).associateBy { it.version }
 
     @Test

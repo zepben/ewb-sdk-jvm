@@ -60,6 +60,7 @@ class NetworkDatabaseTables internal constructor() : CimDatabaseTables() {
             TableAccumulators(),
             TableAnalogs(),
             TableAssetOrganisationRolesAssets(),
+            TableAssetsPowerSystemResources(),
             TableAssetOwners(),
             TableBaseVoltages(),
             TableBatteryControls(),

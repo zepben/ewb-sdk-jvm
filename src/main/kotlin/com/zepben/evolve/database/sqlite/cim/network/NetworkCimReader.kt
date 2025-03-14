@@ -1060,8 +1060,7 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
         resultSet: ResultSet
     ): Boolean {
         powerSystemResource.apply {
-            location =
-                service.ensureGet(resultSet.getNullableString(table.LOCATION_MRID.queryIndex), typeNameAndMRID())
+            location = service.ensureGet(resultSet.getNullableString(table.LOCATION_MRID.queryIndex), typeNameAndMRID())
             numControls = resultSet.getInt(table.NUM_CONTROLS.queryIndex)
         }
 
@@ -2809,6 +2808,35 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
         val asset = service.getOrThrow<Asset>(assetMRID, typeNameAndMRID)
 
         asset.addOrganisationRole(assetOrganisationRole)
+
+        return true
+    }
+
+    /**
+     * Create a [Asset] to [PowerSystemResource] association from [TableAssetsPowerSystemResources].
+     *
+     * @param service The [NetworkService] used to store any items read from the database.
+     * @param table The database table to read the association from.
+     * @param resultSet The record in the database table containing the fields for this association.
+     * @param setIdentifier A callback to register the identifier of this association for logging purposes.
+     *
+     * @return true if the association was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun read(service: NetworkService, table: TableAssetsPowerSystemResources, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val assetMRID = resultSet.getString(table.ASSET_MRID.queryIndex)
+        setIdentifier("${assetMRID}-to-UNKNOWN")
+
+        val powerSystemResourceMRID = resultSet.getString(table.POWER_SYSTEM_RESOURCE_MRID.queryIndex)
+        val id = setIdentifier("${assetMRID}-to-${powerSystemResourceMRID}")
+
+        val typeNameAndMRID = "Asset to PowerSystemResource association $id"
+        val asset = service.getOrThrow<Asset>(assetMRID, typeNameAndMRID)
+        val powerSystemResource = service.getOrThrow<PowerSystemResource>(powerSystemResourceMRID, typeNameAndMRID)
+
+        asset.addPowerSystemResource(powerSystemResource)
+        powerSystemResource.addAsset(asset)
 
         return true
     }

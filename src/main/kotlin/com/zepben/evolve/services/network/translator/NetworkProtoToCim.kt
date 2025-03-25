@@ -503,6 +503,10 @@ fun toCim(pb: PBAsset, cim: Asset, networkService: NetworkService): Asset =
         pb.organisationRoleMRIDsList.forEach {
             networkService.resolveOrDeferReference(Resolvers.organisationRoles(this), it)
         }
+        pb.powerSystemResourceMRIDsList.forEach {
+            networkService.resolveOrDeferReference(Resolvers.powerSystemResources(this), it)
+        }
+
         toCim(pb.io, this, networkService)
     }
 
@@ -1179,6 +1183,9 @@ fun toCim(pb: PBPowerSystemResource, cim: PowerSystemResource, networkService: N
         // NOTE: assetInfoMRID will be handled by classes that use it with specific types.
 
         networkService.resolveOrDeferReference(Resolvers.location(this), pb.locationMRID)
+        pb.assetMRIDsList.forEach { assetMRID ->
+            networkService.resolveOrDeferReference(Resolvers.assets(this), assetMRID)
+        }
         numControls = pb.numControls
         toCim(pb.io, this, networkService)
     }

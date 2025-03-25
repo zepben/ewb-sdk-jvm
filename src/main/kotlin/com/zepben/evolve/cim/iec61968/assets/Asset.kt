@@ -10,6 +10,7 @@ package com.zepben.evolve.cim.iec61968.assets
 
 import com.zepben.evolve.cim.iec61968.common.Location
 import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
+import com.zepben.evolve.cim.iec61970.base.core.PowerSystemResource
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.getByMRID
 import com.zepben.evolve.services.common.extensions.safeRemove
@@ -24,6 +25,7 @@ import com.zepben.evolve.services.common.extensions.validateReference
 abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
 
     private var _organisationRoles: MutableList<AssetOrganisationRole>? = null
+    private var _powerSystemResources: MutableList<PowerSystemResource>? = null
 
     /**
      * Location of this asset.
@@ -34,6 +36,12 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
      * All roles an organisation plays for this asset. The returned collection is read only.
      */
     val organisationRoles: Collection<AssetOrganisationRole> get() = _organisationRoles.asUnmodifiable()
+
+    /**
+     * All power system resources used to electrically model this asset. For example, transformer asset is electrically modelled with a transformer and its
+     * windings and tap changer.
+     */
+    val powerSystemResources: Collection<PowerSystemResource> get() = _powerSystemResources.asUnmodifiable()
 
     /**
      * Get the number of entries in the [AssetOrganisationRole] collection.
@@ -76,4 +84,53 @@ abstract class Asset(mRID: String = "") : IdentifiedObject(mRID) {
         _organisationRoles = null
         return this
     }
+
+    /**
+     * Get the number of entries in the [PowerSystemResource] collection.
+     */
+    fun numPowerSystemResources(): Int = _powerSystemResources?.size ?: 0
+
+    /**
+     * Get a [PowerSystemResource]s associated with this [Asset]
+     *
+     * @param mRID the mRID of the required [PowerSystemResource]
+     * @return The [PowerSystemResource] with the specified [mRID] if it exists, otherwise null
+     */
+    fun getPowerSystemResource(mRID: String): PowerSystemResource? = _powerSystemResources.getByMRID(mRID)
+
+    /**
+     * Add a [PowerSystemResource] to this [Asset]
+     *
+     * @param powerSystemResource the [PowerSystemResource] to associate with this [Asset].
+     * @return A reference to this [Asset] to allow fluent use.
+     */
+    fun addPowerSystemResource(powerSystemResource: PowerSystemResource): Asset {
+        if (validateReference(powerSystemResource, ::getPowerSystemResource, "A PowerSystemResource"))
+            return this
+
+        _powerSystemResources = _powerSystemResources ?: mutableListOf()
+        _powerSystemResources!!.add(powerSystemResource)
+
+        return this
+    }
+
+    /**
+     * @param powerSystemResource the [PowerSystemResource] to disassociate from this [Asset].
+     * @return true if the [PowerSystemResource] is disassociated.
+     */
+    fun removePowerSystemResource(powerSystemResource: PowerSystemResource): Boolean {
+        val ret = _powerSystemResources.safeRemove(powerSystemResource)
+        if (_powerSystemResources.isNullOrEmpty()) _powerSystemResources = null
+        return ret
+    }
+
+    /**
+     * Remove all [PowerSystemResource]s from this [Asset]
+     * @return A reference to this [Asset] to allow fluent use.
+     */
+    fun clearPowerSystemResources(): Asset {
+        _powerSystemResources = null
+        return this
+    }
+
 }

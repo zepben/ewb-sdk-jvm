@@ -8,7 +8,9 @@
 
 package com.zepben.evolve.cim.iec61970.base.core
 
+import com.zepben.evolve.cim.iec61968.assets.Asset
 import com.zepben.evolve.cim.iec61968.common.Location
+import com.zepben.evolve.utils.PrivateCollectionValidator
 import com.zepben.testutils.junit.SystemLogExtension
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -45,5 +47,19 @@ internal class PowerSystemResourceTest {
         assertThat(powerSystemResource.location, equalTo(location))
         assertThat(powerSystemResource.numControls, equalTo(4))
         assertThat(powerSystemResource.hasControls(), equalTo(true))
+    }
+
+    @Test
+    internal fun assets() {
+        PrivateCollectionValidator.validateUnordered(
+            { object : PowerSystemResource() {} },
+            { id -> object : Asset(id) {} },
+            PowerSystemResource::assets,
+            PowerSystemResource::numAssets,
+            PowerSystemResource::getAsset,
+            PowerSystemResource::addAsset,
+            PowerSystemResource::removeAsset,
+            PowerSystemResource::clearAssets
+        )
     }
 }

@@ -22,6 +22,7 @@
   * `NetworkTraceStepPathProvider` now correctly handles:
     * Next paths when starting on a `Clamp` terminal.
     * Traversing AcLineSegments with single cuts or clamps.
+* Added missing `@JvmOverloads` annotations to the `TestNetworkBuilder`.
 
 ### Notes
 * None.

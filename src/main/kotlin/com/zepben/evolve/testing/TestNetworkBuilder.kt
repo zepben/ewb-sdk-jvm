@@ -480,6 +480,7 @@ open class TestNetworkBuilder {
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
+    @JvmOverloads
     fun withClamp(
         mRID: String? = null,
         lengthFromTerminal1: Double? = null,
@@ -505,6 +506,7 @@ open class TestNetworkBuilder {
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
+    @JvmOverloads
     fun withCut(
         mRID: String? = null,
         lengthFromTerminal1: Double? = null,
@@ -528,6 +530,7 @@ open class TestNetworkBuilder {
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
+    @JvmOverloads
     fun branchFrom(from: String, terminal: Int? = null): TestNetworkBuilder {
         current = network[from]!!
         currentTerminal = terminal
@@ -543,6 +546,7 @@ open class TestNetworkBuilder {
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
+    @JvmOverloads
     fun connectTo(
         to: String,
         toTerminal: Int? = null,
@@ -565,6 +569,7 @@ open class TestNetworkBuilder {
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
+    @JvmOverloads
     fun connect(
         from: String,
         to: String,
@@ -600,6 +605,7 @@ open class TestNetworkBuilder {
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
+    @JvmOverloads
     fun addLvFeeder(headMrid: String, sequenceNumber: Int? = null, mRID: String? = null): TestNetworkBuilder {
         network.createLvFeeder(mRID, network[headMrid]!!, sequenceNumber)
         return this
@@ -613,6 +619,7 @@ open class TestNetworkBuilder {
      *
      * @return This [TestNetworkBuilder] to allow for fluent use.
      */
+    @JvmOverloads
     fun addSite(vararg equipmentMrids: String, mRID: String? = null): TestNetworkBuilder {
         network.createSite(mRID, equipmentMrids)
         return this
@@ -628,6 +635,7 @@ open class TestNetworkBuilder {
      *
      * @return The [NetworkService] created by this [TestNetworkBuilder]
      */
+    @JvmOverloads
     fun build(applyDirectionsFromSources: Boolean = true): NetworkService {
         Tracing.setDirection().run(network, NetworkStateOperators.NORMAL)
         Tracing.setDirection().run(network, NetworkStateOperators.CURRENT)

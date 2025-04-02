@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.26.0](#v0260)| `02 April 2025` |
 |[0.25.0](#v0250)| `04 March 2025` |
 |[0.24.1](#v0241)| `23 January 2025` |
 |[0.24.0](#v0240)| `21 January 2025` |
@@ -34,6 +35,41 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.26.0]
+
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* Added support to `TestNetworkBuilder` for:
+  * `withClamp` - Adds a clamp to the previously added `AcLineSegment`
+  * `withCut` - Adds a cut to the previously added `AcLineSegment`
+  * `connectTo` - Connects the previously added item, rather than having to specify it again in `connect`.
+
+### Fixes
+* The follow fixes were added to Traversal and NetworkTrace:
+  * `canStopAtStartItem` now works for branching traversals.
+  * Traversal start items are added to the queue before traversal starts, so that the start items honour the queue type order.
+  * Stop conditions on the `NetworkTrace` now are checked based on a step type, like `QueueCondition` does, rather than by checking `canActionItem`.
+  * `Cut` and `Clamp` are now correctly supported in `SetDirection` and `DirectionCondition`.
+  * `NetworkTrace` now handles starting on `Cut` , `Clamp`, and `AcLineSegment` and their terminals in a explicit / sensible way.
+  * `NetworkTraceStepPathProvider` now correctly handles:
+    * Next paths when starting on a `Clamp` terminal.
+    * Traversing AcLineSegments with single cuts or clamps.
+* Added missing `@JvmOverloads` annotations to the `TestNetworkBuilder`.
+* Fixes from ewb-conn-jvm 0.12.1:
+  * JWTAuthenticator will now handle JwkExceptions and return 403 Unauthenticated responses.
+  * JWTAuthenticator will now pass through unhandled exceptions to the caller rather than wrapping them in 500 errors.
+    Exceptions now need to be handled by the caller of `authenticate()`.
+
+### Notes
+* None.
 
 ---
 

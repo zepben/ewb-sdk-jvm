@@ -23,6 +23,10 @@
     * Next paths when starting on a `Clamp` terminal.
     * Traversing AcLineSegments with single cuts or clamps.
 * Added missing `@JvmOverloads` annotations to the `TestNetworkBuilder`.
+* Fixes from ewb-conn-jvm 0.12.1:
+  * JWTAuthenticator will now handle JwkExceptions and return 403 Unauthenticated responses.
+  * JWTAuthenticator will now pass through unhandled exceptions to the caller rather than wrapping them in 500 errors.
+    Exceptions now need to be handled by the caller of `authenticate()`.
 
 ### Notes
 * None.

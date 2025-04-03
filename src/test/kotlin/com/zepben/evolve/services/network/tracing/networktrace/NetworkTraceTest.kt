@@ -18,8 +18,7 @@ import com.zepben.evolve.services.network.getT
 import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
 import com.zepben.evolve.testing.TestNetworkBuilder
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertTimeoutPreemptively
 import java.time.Duration
@@ -27,7 +26,7 @@ import java.time.Duration
 class NetworkTraceTest {
 
     @Test
-    fun `adds start clamp terminal as traversed segment path`() {
+    internal fun `adds start clamp terminal as traversed segment path`() {
         val trace = Tracing.networkTrace()
         val segment = AcLineSegment()
         val clamp = Clamp().apply { addTerminal(Terminal()) }
@@ -38,7 +37,7 @@ class NetworkTraceTest {
     }
 
     @Test
-    fun `adds start whole clamp as not traversed segment path`() {
+    internal fun `adds start whole clamp as not traversed segment path`() {
         val trace = Tracing.networkTrace()
         val segment = AcLineSegment()
         val clamp = Clamp().apply {
@@ -51,7 +50,7 @@ class NetworkTraceTest {
     }
 
     @Test
-    fun `adds start AcLineSegment terminals, cut terminals and clamp terminals as traversed segment`() {
+    internal fun `adds start AcLineSegment terminals, cut terminals and clamp terminals as traversed segment`() {
         val trace = Tracing.networkTrace()
         val segment = AcLineSegment().apply {
             addTerminal(Terminal())
@@ -223,6 +222,35 @@ class NetworkTraceTest {
         ) {
             Tracing.networkTraceBranching().run(network.getT("j0", 1))
         }
+    }
+
+
+    @Test
+    internal fun `multiple start items canStopOnStart doesn't prevent stop checks when visiting via loop`() {
+        val ns = TestNetworkBuilder()
+            .fromAcls() // c0
+            .toAcls() // c1
+            .toAcls() // c2
+            .connectTo("c0")
+            .network
+
+        val stopChecks = mutableListOf<String>()
+        val steps = mutableListOf<String>()
+
+        Tracing.networkTrace(actionStepType = NetworkTraceActionType.ALL_STEPS)
+            .addStopCondition { (path), _ ->
+                stopChecks.add(path.toTerminal.mRID)
+                path.toEquipment.mRID == "c1"
+            }
+            .ifNotStopping { (path), _ -> steps.add(path.toTerminal.mRID) }
+            .run(ns.get<ConductingEquipment>("c1")!!, canStopOnStartItem = false)
+
+        // Should loop out of t2 back to t1 which should be checked (depth first trace).
+        // * c1-t2 shouldn't be checked as the start item, but should be actioned.
+        // * c1-t1 on the trace loop should be checked, but not actioned if it stopped.
+        // * c1-t1 as the start item should be ignored as it has already been visited.
+        assertThat(stopChecks, contains("c2-t1", "c2-t2", "c0-t1", "c0-t2", "c1-t1"))
+        assertThat(steps, contains("c1-t2", "c2-t1", "c2-t2", "c0-t1", "c0-t2"))
     }
 
 }

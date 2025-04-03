@@ -29,7 +29,10 @@ class TraversalTest {
         override fun getDerivedThis(): TestTraversal<T> = this
         override fun createNewThis(): TestTraversal<T> = TestTraversal(queueType, this, canVisitItemImpl, canActionItemImpl, onResetImpl)
 
+        @Suppress("RedundantVisibilityModifier")
         public override fun addStartItem(item: T): TestTraversal<T> = super.addStartItem(item)
+
+        @Suppress("RedundantVisibilityModifier")
         public override fun run(startItem: T, canStopOnStartItem: Boolean): TestTraversal<T> = super.run(startItem, canStopOnStartItem)
     }
 
@@ -73,7 +76,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `addCondition with stop condition`() {
+    internal fun `addCondition with stop condition`() {
         var lastNum: Int? = null
         createTraversal()
             .addCondition(StopCondition { item, _ -> item == 2 })
@@ -84,7 +87,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `addCondition with queue condition`() {
+    internal fun `addCondition with queue condition`() {
         var lastNum: Int? = null
         createTraversal()
             .addCondition(QueueCondition { item, _, _, _ -> item < 3 })
@@ -95,7 +98,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `stop conditions`() {
+    internal fun `stop conditions`() {
         val steps = mutableListOf<Pair<Int, StepContext>>()
         createTraversal()
             .addStopCondition { item, _ -> item == 3 }
@@ -111,7 +114,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `stops when matching any stop condition`() {
+    internal fun `stops when matching any stop condition`() {
         var lastNum: Int? = null
         createTraversal()
             .addStopCondition { item, _ -> item == 3 }
@@ -123,7 +126,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `can stop on start item true`() {
+    internal fun `can stop on start item true`() {
         var lastNum: Int? = null
         createTraversal()
             .addStopCondition { item, _ -> item == 1 }
@@ -135,7 +138,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `can stop on start item false`() {
+    internal fun `can stop on start item false`() {
         var lastNum: Int? = null
         createTraversal()
             .addStopCondition { item, _ -> item == 1 }
@@ -147,7 +150,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `checks queue condition`() {
+    internal fun `checks queue condition`() {
         var lastNum: Int? = null
         createTraversal()
             .addQueueCondition { nextItem, _, _, _ -> nextItem < 3 }
@@ -158,7 +161,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `queues when matching all queue conditions`() {
+    internal fun `queues when matching all queue conditions`() {
         var lastNum: Int? = null
         createTraversal()
             .addQueueCondition { nextItem, _, _, _ -> nextItem < 3 }
@@ -170,7 +173,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `calls all registered step actions`() {
+    internal fun `calls all registered step actions`() {
         var called1 = false
         var called2 = false
         createTraversal()
@@ -184,7 +187,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `ifNotStopping helper only calls when not stopping`() {
+    internal fun `ifNotStopping helper only calls when not stopping`() {
         val steps = mutableListOf<Int>()
         createTraversal()
             .addStopCondition { item, _ -> item == 3 }
@@ -195,7 +198,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `ifStopping helper only calls when stopping`() {
+    internal fun `ifStopping helper only calls when stopping`() {
         val steps = mutableListOf<Int>()
         createTraversal()
             .addStopCondition { item, _ -> item == 3 }
@@ -206,7 +209,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `contextValueComputer adds value to context`() {
+    internal fun `contextValueComputer adds value to context`() {
         val dataCapture = mutableMapOf<Int, String?>()
         createTraversal()
             .addContextValueComputer(object : ContextValueComputer<Int> {
@@ -226,7 +229,7 @@ class TraversalTest {
     }
 
     @Test
-    fun startItems() {
+    internal fun startItems() {
         val steps = mutableMapOf<Int, StepContext>()
         val traversal = createTraversal()
             .addStartItem(1)
@@ -244,7 +247,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `only visits items that can be visited`() {
+    internal fun `only visits items that can be visited`() {
         val steps = mutableListOf<Int>()
         createTraversal(canVisitItem = { item, _ -> item < 0 })
             .addStopCondition { item, _ -> item == -2 }
@@ -257,7 +260,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `only actions items that can be actioned`() {
+    internal fun `only actions items that can be actioned`() {
         val steps = mutableListOf<Int>()
         createTraversal(canActionItem = { item, _ -> item % 2 == 1 })
             .addStopCondition { item, _ -> item == 3 }
@@ -268,7 +271,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `can be rerun`() {
+    internal fun `can be rerun`() {
         var resetCalled = false
         val stepVisitCount = mutableMapOf<Int, Int>()
         createTraversal(onReset = { resetCalled = true })
@@ -283,7 +286,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `supports branching traversals`() {
+    internal fun `supports branching traversals`() {
         val steps = mutableMapOf<Int, StepContext>()
         createBranchingTraversal()
             .addQueueCondition { item, ctx, _, _ -> ctx.branchDepth <= 1 && item != 0 }
@@ -310,7 +313,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `canStopOnStartItem is not assessed on branch start items`() {
+    internal fun `canStopOnStartItem is not assessed on branch start items`() {
         var stopConditionTriggered = false
         createBranchingTraversal()
             .addStopCondition { item, _ ->
@@ -326,7 +329,7 @@ class TraversalTest {
     }
 
     @Test
-    fun `start items are queued before traversal starts so queue type is honoured for start items`() {
+    internal fun `start items are queued before traversal starts so queue type is honoured for start items`() {
         val steps = mutableListOf<Int>()
         createTraversal(queue = TraversalQueue.breadthFirst())
             .addStopCondition { item, _ -> item >= 2 || item <= -2 }
@@ -337,4 +340,18 @@ class TraversalTest {
 
         assertThat(steps, contains(-1, 1, -2, 2))
     }
+
+    @Test
+    internal fun `multiple start items respect canStopOnStart`() {
+        val steps = mutableListOf<Int>()
+        createTraversal(queue = TraversalQueue.breadthFirst())
+            .addStopCondition { _, _ -> true }
+            .addStepAction { item, _ -> steps.add(item) }
+            .addStartItem(1)
+            .addStartItem(11)
+            .run(canStopOnStartItem = false)
+
+        assertThat(steps, contains(1, 11, 2, 12))
+    }
+
 }

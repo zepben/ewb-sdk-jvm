@@ -410,10 +410,10 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
             }
         }
 
-        var canStop = canStopOnStartItem
         while (queue.hasNext()) {
             queue.next()?.let { current ->
                 val context = getStepContext(current)
+                val canStop = canStopOnStartItem || !context.isStartItem
                 if (canVisitItem(current, context)) {
                     context.isStopping = canStop && matchesAnyStopCondition(current, context)
 
@@ -425,8 +425,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
                     if (!context.isStopping) {
                         queueNext(current, context)
                     }
-
-                    canStop = true
                 }
             }
         }

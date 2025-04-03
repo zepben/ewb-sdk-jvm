@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.26.1](#v0261)| `03 April 2025` |
 |[0.26.0](#v0260)| `02 April 2025` |
 |[0.25.0](#v0250)| `04 March 2025` |
 |[0.24.1](#v0241)| `23 January 2025` |
@@ -35,6 +36,13 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.26.1]
+
+### Fixes
+* `NetworkTrace`/`Traversal` now correctly respects `canStopOStart` when providing multiple start items.
 
 ---
 

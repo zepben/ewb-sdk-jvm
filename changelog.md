@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [0.26.1] - UNRELEASED
+## [0.26.1] - 2025-04-03
 ### Fixes
 * `NetworkTrace`/`Traversal` now correctly respects `canStopOStart` when providing multiple start items.
 

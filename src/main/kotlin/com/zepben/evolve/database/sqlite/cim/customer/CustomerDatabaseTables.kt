@@ -21,7 +21,7 @@ import com.zepben.evolve.database.sqlite.cim.tables.iec61968.customers.TableTari
 /**
  * The collection of tables for our customer databases.
  */
-class CustomerDatabaseTables internal constructor() : CimDatabaseTables() {
+class CustomerDatabaseTables: CimDatabaseTables() {
 
     override val includedTables: Sequence<SqliteTable> =
         super.includedTables + sequenceOf(

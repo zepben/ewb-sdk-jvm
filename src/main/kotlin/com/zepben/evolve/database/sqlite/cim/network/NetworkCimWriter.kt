@@ -85,7 +85,7 @@ import java.sql.SQLException
  * @property databaseTables The tables available in the database.
  */
 @Suppress("SameParameterValue")
-internal class NetworkCimWriter(
+class NetworkCimWriter(
     override val databaseTables: NetworkDatabaseTables
 ) : CimWriter(databaseTables) {
 

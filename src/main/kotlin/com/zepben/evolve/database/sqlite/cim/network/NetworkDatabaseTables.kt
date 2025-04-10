@@ -60,6 +60,7 @@ class NetworkDatabaseTables: CimDatabaseTables() {
             TableAccumulators(),
             TableAnalogs(),
             TableAssetOrganisationRolesAssets(),
+            TableAssetsPowerSystemResources(),
             TableAssetOwners(),
             TableBaseVoltages(),
             TableBatteryControls(),

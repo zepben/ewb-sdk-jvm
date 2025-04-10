@@ -24,7 +24,9 @@
 * None.
 
 ### New Features
-* None.
+* Added relationships between `Asset` and `PowerSystemResource` which enables linking `Equipment` to `Pole`:
+  * `Asset.powerSystemResources`
+  * `PowerSystemResource.assets`
 
 ### Enhancements
 * Added support to `TestNetworkBuilder` for:
@@ -43,6 +45,7 @@
     * Next paths when starting on a `Clamp` terminal.
     * Traversing AcLineSegments with single cuts or clamps.
 * Added missing `@JvmOverloads` annotations to the `TestNetworkBuilder`.
+* `AssignToFeeders` and `AssignToLvFeeders` will now associate `PowerElectronicUnits` with their `powerElectronicsConnection` `Feeder`/`LvFeeder`.
 * Fixes from ewb-conn-jvm 0.12.1:
   * JWTAuthenticator will now handle JwkExceptions and return 403 Unauthenticated responses.
   * JWTAuthenticator will now pass through unhandled exceptions to the caller rather than wrapping them in 500 errors.

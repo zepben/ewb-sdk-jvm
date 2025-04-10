@@ -10,7 +10,7 @@
 * None.
 
 ### Fixes
-* None.
+* NetworkCimWriter, DiagramCimWriter, and CustomerCimWriter are now public so can be used downstream.
 
 ### Notes
 * None.

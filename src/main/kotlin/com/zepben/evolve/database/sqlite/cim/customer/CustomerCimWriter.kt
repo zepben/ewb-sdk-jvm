@@ -32,7 +32,7 @@ import java.sql.SQLException
  *
  * @property databaseTables The tables available in the database.
  */
-internal class CustomerCimWriter(
+class CustomerCimWriter(
     override val databaseTables: CustomerDatabaseTables
 ) : CimWriter(databaseTables) {
 

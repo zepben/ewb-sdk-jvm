@@ -241,6 +241,12 @@ fun Asset.fillFields(service: NetworkService, includeRuntime: Boolean = true): A
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     addOrganisationRole(AssetOwner().also { service.add(it) })
+    for (i in 0..1)
+        addPowerSystemResource(Junction().also {
+            it.addAsset(this)
+            service.add(it)
+        })
+
     location = Location().also { service.add(it) }
 
     return this
@@ -654,6 +660,12 @@ fun PowerSystemResource.fillFields(service: NetworkService, includeRuntime: Bool
 
     location = Location().apply { addPoint(PositionPoint(3.3, 4.4)) }.also { service.add(it) }
     numControls = 5
+
+    for (i in 0..1)
+        addAsset(Pole().also {
+            it.addPowerSystemResource(this)
+            service.add(it)
+        })
 
     return this
 }

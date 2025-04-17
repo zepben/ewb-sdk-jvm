@@ -217,6 +217,7 @@ class NetworkServiceComparator @JvmOverloads constructor(
 
             compareIdReferences(Asset::location)
             compareIdReferenceCollections(Asset::organisationRoles)
+            compareIdReferenceCollections(Asset::powerSystemResources)
         }
 
     private fun ObjectDifference<out AssetContainer>.compareAssetContainer(): ObjectDifference<out AssetContainer> =
@@ -491,6 +492,8 @@ class NetworkServiceComparator @JvmOverloads constructor(
             compareIdentifiedObject()
 
             compareIdReferences(PowerSystemResource::assetInfo, PowerSystemResource::location)
+            compareIdReferenceCollections(PowerSystemResource::assets)
+
             compareValues(PowerSystemResource::numControls)
         }
 

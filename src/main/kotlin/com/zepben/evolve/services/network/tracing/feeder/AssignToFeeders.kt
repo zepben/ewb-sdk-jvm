@@ -10,6 +10,7 @@ package com.zepben.evolve.services.network.tracing.feeder
 
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.wires.PowerElectronicsConnection
 import com.zepben.evolve.cim.iec61970.base.wires.PowerTransformer
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.base.wires.Switch
@@ -135,6 +136,7 @@ class AssignToFeeders {
             when (stepPath.toEquipment) {
                 is PowerTransformer -> feedersToAssign.tryEnergizeLvFeeders(stepPath.toEquipment, lvFeederStartPoints)
                 is ProtectedSwitch -> feedersToAssign.associateRelaySystems(stepPath.toEquipment)
+                is PowerElectronicsConnection -> feedersToAssign.associatePowerElectronicUnits(stepPath.toEquipment)
             }
         }
 
@@ -151,6 +153,10 @@ class AssignToFeeders {
 
         private fun Iterable<EquipmentContainer>.associateRelaySystems(toEquipment: ProtectedSwitch) {
             associateEquipment(toEquipment.relayFunctions.flatMap { it.schemes }.mapNotNull { it.system })
+        }
+
+        private fun Iterable<EquipmentContainer>.associatePowerElectronicUnits(toEquipment: PowerElectronicsConnection) {
+            associateEquipment(toEquipment.units)
         }
 
         private fun Iterable<Feeder>.tryEnergizeLvFeeders(toEquipment: PowerTransformer, lvFeederStartPoints: Set<ConductingEquipment>) {

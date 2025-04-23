@@ -503,6 +503,14 @@ internal object EndDeviceToEndDeviceFunctionResolver : ReferenceResolver<EndDevi
     EndDevice::class, EndDeviceFunction::class, EndDevice::addFunction
 )
 
+internal object AssetToPowerSystemResourceResolver: ReferenceResolver<Asset, PowerSystemResource> by KReferenceResolver(
+    Asset::class, PowerSystemResource::class, Asset::addPowerSystemResource
+)
+
+internal object PowerSystemResourceToAssetResolver: ReferenceResolver<PowerSystemResource, Asset> by KReferenceResolver(
+    PowerSystemResource::class, Asset::class, PowerSystemResource::addAsset
+)
+
 //-------------------------------------------//
 
 class KReferenceResolver<T : IdentifiedObject, R : IdentifiedObject>(

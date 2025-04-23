@@ -157,6 +157,7 @@ internal class NetworkServiceReader(
             readEach<TablePositionPoints>(service, reader::read) and
             readEach<TableLocationStreetAddresses>(service, reader::read) and
             readEach<TableAssetOrganisationRolesAssets>(service, reader::read) and
+            readEach<TableAssetsPowerSystemResources>(service, reader::read) and
             readEach<TableUsagePointsEndDevices>(service, reader::read) and
             readEach<TableEquipmentUsagePoints>(service, reader::read) and
             readEach<TableEquipmentOperationalRestrictions>(service, reader::read) and

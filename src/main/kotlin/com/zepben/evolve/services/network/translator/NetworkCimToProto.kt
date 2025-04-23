@@ -656,6 +656,7 @@ fun toPb(cim: Asset, pb: PBAsset.Builder): PBAsset.Builder =
         cim.location?.let { locationMRID = it.mRID } ?: clearLocationMRID()
         clearOrganisationRoleMRIDs()
         cim.organisationRoles.forEach { addOrganisationRoleMRIDs(it.mRID) }
+        cim.powerSystemResources.forEach { addPowerSystemResourceMRIDs(it.mRID) }
         toPb(cim, ioBuilder)
     }
 
@@ -1294,6 +1295,8 @@ fun toPb(cim: PowerSystemResource, pb: PBPowerSystemResource.Builder): PBPowerSy
     pb.apply {
         cim.location?.let { locationMRID = it.mRID } ?: clearLocationMRID()
         cim.assetInfo?.let { assetInfoMRID = it.mRID } ?: clearAssetInfoMRID()
+        cim.assets.forEach { addAssetMRIDs(it.mRID) }
+
         numControls = cim.numControls
         toPb(cim, ioBuilder)
     }

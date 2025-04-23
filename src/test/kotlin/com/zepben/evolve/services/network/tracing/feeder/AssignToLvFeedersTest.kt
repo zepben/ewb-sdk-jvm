@@ -18,6 +18,7 @@ import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.wires.Breaker
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.getT
 import com.zepben.evolve.services.network.lvFeederStartPoints
@@ -259,6 +260,25 @@ internal class AssignToLvFeedersTest {
         assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         validateEquipment(lvFeeder.equipment, "b0", "prsys3")
+    }
+
+    @Test
+    internal fun `assigns PowerElectronicUnits to Feeder`() {
+        val peu1 = PhotoVoltaicUnit("peu1")
+
+        val network = TestNetworkBuilder()
+            .fromBreaker() // b0
+            .toPowerElectronicsConnection { addUnit(peu1); peu1.powerElectronicsConnection = this }  // pec1
+            .addLvFeeder("b0")
+            .network
+
+        network.add(peu1)
+
+        val feeder: LvFeeder = network["lvf2"]!!
+
+        assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
+
+        validateEquipment(feeder.equipment, "b0", "pec1", "peu1")
     }
 
     @Test

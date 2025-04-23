@@ -546,4 +546,12 @@ object Resolvers {
     fun endDeviceFunctions(endDevice: EndDevice): BoundReferenceResolver<EndDevice, EndDeviceFunction> =
         BoundReferenceResolver(endDevice, EndDeviceToEndDeviceFunctionResolver, null)
 
+    @JvmStatic
+    fun powerSystemResources(asset: Asset): BoundReferenceResolver<Asset, PowerSystemResource> =
+        BoundReferenceResolver(asset, AssetToPowerSystemResourceResolver, PowerSystemResourceToAssetResolver)
+
+    @JvmStatic
+    fun assets(powerSystemResource: PowerSystemResource): BoundReferenceResolver<PowerSystemResource, Asset> =
+        BoundReferenceResolver(powerSystemResource, PowerSystemResourceToAssetResolver, AssetToPowerSystemResourceResolver)
+
 }

@@ -204,6 +204,7 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
         compareIdentifiedObject(createAsset)
 
         comparatorValidator.validateCollection(Asset::organisationRoles, Asset::addOrganisationRole, createAsset, { AssetOwner("a1") }, { AssetOwner("a2") })
+        comparatorValidator.validateCollection(Asset::powerSystemResources, Asset::addPowerSystemResource, createAsset, { Junction("j1") }, { Junction("j2") })
         comparatorValidator.validateProperty(Asset::location, createAsset, { Location("l1") }, { Location("l2") })
     }
 
@@ -589,6 +590,8 @@ internal class NetworkServiceComparatorTest : BaseServiceComparatorTest() {
 
         comparatorValidator.validateProperty(PowerSystemResource::location, createPowerSystemResource, { Location("l1") }, { Location("l2") })
         comparatorValidator.validateProperty(PowerSystemResource::numControls, createPowerSystemResource, { 1 }, { 2 })
+        comparatorValidator.validateCollection(PowerSystemResource::assets, PowerSystemResource::addAsset, { Junction(it) }, { Pole("p1") }, { Pole("p2") })
+
     }
 
     @Test

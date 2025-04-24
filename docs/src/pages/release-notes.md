@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.27.0](#v0270)| `24 April 2025` |
 |[0.26.1](#v0261)| `03 April 2025` |
 |[0.26.0](#v0260)| `02 April 2025` |
 |[0.25.0](#v0250)| `04 March 2025` |
@@ -36,6 +37,46 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.27.0]
+
+### Breaking Changes
+* None.
+
+### New Features
+* Added relationships between `Asset` and `PowerSystemResource` which enables linking `Equipment` to `Pole`:
+  * `Asset.powerSystemResources`
+  * `PowerSystemResource.assets`
+
+### Enhancements
+* Updated to ewb-grpc 0.35.0. This brings with it upgrades to the latest protobuf (4.30.2) and gRPC (1.71.0) versions.
+
+### Fixes
+* NetworkCimWriter, DiagramCimWriter, and CustomerCimWriter are now public so can be used downstream.
+* `AssignToFeeders` and `AssignToLvFeeders` will now associate `PowerElectronicUnits` with their `powerElectronicsConnection` `Feeder`/`LvFeeder`.
+
+### Notes
+* None.
+
+* Updated to evolve-grpc 0.27.0.
+* Updated super-pom to version 0.33.0
+* Added `connectWithIdentity()` for connecting using Azure Managed Identities.
+* Added `getMetadata` to `CustomerConsumerClient`, `DiagramConsumerClient`, and `NetworkConsumerClient`. This returns a `ServiceInfo` containing `DataSource`
+  and version information of the connected service.
+
+### Enhancements
+
+* Update docusaurus version and the configuration.
+
+### Fixes
+
+* None.
+
+### Notes
+
+* None.
 
 ---
 

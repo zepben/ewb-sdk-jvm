@@ -19,9 +19,15 @@ import io.mockk.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import java.util.concurrent.Executors
 import com.zepben.protobuf.metadata.ServiceInfo as PBServiceInfo
 
 internal class TestCimConsumerClient {
+
+    init {
+        unmockkAll()
+        clearAllMocks()
+    }
 
     private val baseConsumerClient = mockk<CimConsumerClient<BaseService, BaseProtoToCim>>()
 
@@ -87,8 +93,24 @@ internal class TestCimConsumerClient {
     }
 
     @Test
-    internal fun `getMetadata returns cached response`() {
-        val uncachedServiceInfo = mockk<ServiceInfo>()
+    internal fun `getMetadata concrete returns cached response`() {
+        val uncachedServiceInfo = ServiceInfo("test1", "test2", emptyList())
+        val baseConsumerClient = object: CimConsumerClient<BaseService, BaseProtoToCim>(Executors.newSingleThreadExecutor()) {
+
+            override val service: BaseService
+                get() = TODO("Not yet implemented")
+            override val protoToCim: BaseProtoToCim
+                get() = TODO("Not yet implemented")
+
+            override fun processIdentifiedObjects(mRIDs: Sequence<String>): Sequence<ExtractResult> {
+                TODO("Not yet implemented")
+            }
+
+            override fun runGetMetadata(getMetadataRequest: GetMetadataRequest, streamObserver: AwaitableStreamObserver<GetMetadataResponse>) {
+                TODO("Not yet implemented")
+            }
+
+        }
 
         val cachedResponse = PBServiceInfo.newBuilder().apply {
             title = "cached title"
@@ -103,13 +125,60 @@ internal class TestCimConsumerClient {
             }
         }.build().fromPb()
 
-        every { baseConsumerClient.serviceInfo } returns cachedResponse
+        baseConsumerClient.serviceInfo = cachedResponse
 
-        every { baseConsumerClient.getMetadata() } answers { callOriginal() }
-        every { baseConsumerClient.tryRpc(any<() -> ServiceInfo>()) } answers {
-            GrpcResult.of(firstArg<() -> ServiceInfo>().invoke())
-        }
+        val result = baseConsumerClient.getMetadata()
+        assertThat(result.value, equalTo(cachedResponse))
+//        mockkStatic(PBServiceInfo::fromPb) {
+//            every { baseConsumerClient.serviceInfo } returns cachedResponse
+//            every { baseConsumerClient.getMetadata() } answers { callOriginal() }
+//            every { baseConsumerClient.tryRpc(any<() -> ServiceInfo>()) } answers {
+//                GrpcResult.of(firstArg<() -> ServiceInfo>().invoke())
+//            }
+//
+//            every { any<PBServiceInfo>().fromPb() } returns uncachedServiceInfo
+//            val result = baseConsumerClient.getMetadata()
+//
+//            verifySequence {
+//                baseConsumerClient.getMetadata()
+//                baseConsumerClient.tryRpc<GrpcResult<ServiceInfo>>(any())
+//                baseConsumerClient.serviceInfo
+//                baseConsumerClient.serviceInfo
+//            }
+//            verify {
+//                any<PBServiceInfo>().fromPb() wasNot called
+//                uncachedServiceInfo wasNot called
+//            }
+//            assertThat(result.value, equalTo(cachedResponse))
+//        }
+    }
+
+    @Test
+    internal fun `getMetadata returns cached response`() {
+        val uncachedServiceInfo = mockk<ServiceInfo>()
+        val baseConsumerClient = mockk<CimConsumerClient<BaseService, BaseProtoToCim>>()
+
+        val cachedResponse = PBServiceInfo.newBuilder().apply {
+            title = "cached title"
+            version = "cached version"
+            addDataSourcesBuilder().apply {
+                source = "source cached"
+                version = "source cached"
+                timestamp = timestampBuilder.apply {
+                    seconds = 123L
+                    nanos = 456
+                }.build()
+            }
+        }.build().fromPb()
+
+
         mockkStatic(PBServiceInfo::fromPb) {
+            every { baseConsumerClient.serviceInfo } returns cachedResponse
+            every { baseConsumerClient.getMetadata() } answers { callOriginal() }
+            every { baseConsumerClient.tryRpc(any<() -> ServiceInfo>()) } answers {
+                GrpcResult.of(firstArg<() -> ServiceInfo>().invoke())
+            }
+
             every { any<PBServiceInfo>().fromPb() } returns uncachedServiceInfo
             val result = baseConsumerClient.getMetadata()
 

@@ -64,6 +64,7 @@ internal class UpgradeRunnerTest {
         //
         every { close() } answers { currentVersion = splitVersion }
     }
+
     private val connectionProvider = spyk<(String) -> Connection>({ connection })
     private val copyFile = spyk<(Path, Path, CopyOption) -> Unit>({ _, _, _ -> })
 

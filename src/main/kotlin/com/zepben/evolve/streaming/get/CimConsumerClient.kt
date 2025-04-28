@@ -138,6 +138,8 @@ abstract class CimConsumerClient<T : BaseService, U : BaseProtoToCim>(executor: 
 
     internal abstract fun runGetMetadata(getMetadataRequest: GetMetadataRequest, streamObserver: AwaitableStreamObserver<GetMetadataResponse>)
 
+    fun getServiceInfo2(): ServiceInfo? = serviceInfo
+
     fun getMetadata(): GrpcResult<ServiceInfo> =
         tryRpc {
             if (serviceInfo == null) {

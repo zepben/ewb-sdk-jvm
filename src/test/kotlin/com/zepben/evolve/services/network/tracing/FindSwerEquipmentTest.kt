@@ -161,7 +161,10 @@ internal class FindSwerEquipmentTest {
         assertThat(findSwerEquipment.find(ns, stateOperators), ns.createContainsInAnyOrder("c2", "tx3", "c4", "tx5", "c6"))
     }
 
-    private fun NetworkService.createContainsInAnyOrder(vararg mRIDs: String): Matcher<Iterable<ConductingEquipment>?>? =
-        containsInAnyOrder(*mRIDs.map { get<ConductingEquipment>(it) }.toTypedArray())
+    @Suppress("UNCHECKED_CAST")
+    private fun NetworkService.createContainsInAnyOrder(vararg mRIDs: String): Matcher<Iterable<ConductingEquipment>?>? {
+        return containsInAnyOrder(*mRIDs.map { get<ConductingEquipment>(it) }.toTypedArray()) as Matcher<Iterable<ConductingEquipment>?>?
+
+    }
 
 }

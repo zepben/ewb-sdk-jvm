@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [0.29.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [0.28.0] - 2025-04-28
 ### Enhancements
 * Upgrade ewb-grpc to 0.36.0 to provide mapbox vector tile proto.

@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.28.0](#v0280)| `28 April 2025` |
 |[0.27.0](#v0270)| `24 April 2025` |
 |[0.26.1](#v0261)| `03 April 2025` |
 |[0.26.0](#v0260)| `02 April 2025` |
@@ -37,6 +38,13 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.28.0]
+
+### Enhancements
+* Upgrade ewb-grpc to 0.36.0 to provide mapbox vector tile proto.
 
 ---
 

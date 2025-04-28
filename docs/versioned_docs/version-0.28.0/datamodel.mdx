@@ -1,0 +1,540 @@
+---
+id: sdk-data-model
+title: Data Model
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+The EWB SDK provides the building blocks you need to interface with the rest of the platform. It can also be used to
+build your own solutions from scratch that will be compatible with other things built with the SDK.
+
+## CIM Model
+
+The EWB platform is composed around a domain model based on the 'Common Information Model' (CIM). The CIM is a very
+large standard that covers a huge amount of use cases. To make things more digestible, Zepben publishes its own CIM
+profile. CIM profiles are subsets of the whole CIM standard that dictates which parts of the model are in use. EWB
+publishes its model at <https://zepben.github.io/evolve/docs/cim/evolve/>.
+
+If the EWB profile doesn't contain a part of CIM that you require for your use case, you can request or propose a change to the model
+by starting a discussion at the [GitHub discussions](https://github.com/zepben/evolve/discussions) or by contacting Zepben directly at <https://www.zepben.com/contact>.
+
+## Getting Started With The Model
+
+:::tip
+All things that have an ID in the CIM model inherit from
+[IdentifiedObject](https://zepben.github.io/evolve/docs/cim/cim100/TC57CIM/IEC61970/Base/Core/IdentifiedObject). This provides common
+attributes such as mRID (master resource identifier), name, description, etc.
+:::
+
+Let's get started with the data model by building the following contrived electrical circuit.
+
+![](./assets/contrived-circuit.png)
+
+Here we simply have an AC energy source ([EnergySource](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Wires/EnergySource/))
+connected to a conductor ([ACLineSegment](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Wires/ACLineSegment/))
+connected to a circuit breaker ([Breaker](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Wires/Breaker/)).
+In CIM all these things are a subtype of 
+[ConductingEquipment](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/ConductingEquipment/).
+
+Let's see how we create them:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// Create the energy source. Providing no ID will generate a UUID.
+EnergySource source = new EnergySource();
+
+// Create the conductor providing a specific ID.
+AcLineSegment acLine = new AcLineSegment("aclineseg1");
+
+// Create a circuit breaker.
+// A UUID will be generated but we can give it a descriptive name.
+Breaker breaker = new Breaker();
+breaker.setName("my circuit breaker");
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+// Create the energy source. Providing no ID will generate a UUID.
+val source = EnergySource()
+
+// Create the conductor providing a specific ID.
+val acLine = AcLineSegment("aclineseg1")
+
+// Create a circuit breaker.
+// A UUID will be generated but we can give it a descriptive name.
+val breaker = Breaker().apply { name = "my circuit breaker" }
+```
+
+</TabItem>
+</Tabs>
+
+
+## Creating Connectivity
+
+In CIM, all conducting equipment can have any number of [Terminals](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Terminal/), 
+and terminals connect to other terminals using a [ConnectivityNode](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/ConnectivityNode/). 
+If we redraw the above diagram with all the required items from CIM it would look like:
+
+![](./assets/contrived-circuit-cim.png)
+
+Where the back dots represent the terminals and the black diamonds represent connectivity nodes.
+
+Now, lets redo the above code sample this time also creating connectivity between the objects.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// Create the energy source
+EnergySource source = new EnergySource();
+
+// Create the terminal for the energy source and associate it with the source
+Terminal sourceT1 = new Terminal();
+sourceT1.setConductingEquipment(source);
+source.addTerminal(sourceT1);
+
+// Create the conductor
+AcLineSegment acLine = new AcLineSegment();
+
+// Create a terminal for each end of the conductor
+// and associate them with the conductor
+Terminal acLineT1 = new Terminal();
+acLineT1.setConductingEquipment(acline);
+acLine.addTerminal(acLineT1);
+
+Terminal acLineT2 = new Terminal();
+acLineT2.setConductingEquipment(acline);
+acLine.addTerminal(acLineT2);
+
+// Create a circuit breaker
+Breaker breaker = new Breaker();
+
+// Create a terminal for the breaker
+Terminal breakerT1 = new Terminal();
+breakerT1.setConductingEquipment(breaker);
+
+// Now create a connectivity node to connect the source terminal
+// to the conductor's first terminal
+ConnectivityNode cn1 = new ConnectivityNode();
+
+// Now associate the connectivity nodes to the terminals
+cn1.addTerminal(sourceT1);
+sourceT1.setConnectivityNode(cn1);
+cn1.addTerminal(acLineT1);
+acLineT1.setConnectivityNode(cn1);
+
+// Now create a connectivity node to connect the source terminal
+// to the conductor's first terminal
+ConnectivityNode cn2 = new ConnectivityNode();
+
+// Now associate the connectivity nodes to the terminals
+cn2.addTerminal(acLineT2);
+acLineT2.setConnectivityNode(cn2);
+cn2.addTerminal(breakerT1);
+breakerT1.setConnectivityNode(cn2);
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+// Create the energy source
+val source = EnergySource()
+
+// Create the terminal for the energy source and associate it with the source
+val sourceT1 = Terminal().apply { conductingEquipment = source }
+source.addTerminal(sourceT1)
+
+// Create the conductor
+val acLine = AcLineSegment()
+
+// Create a terminal for each end of the conductor
+// and associate them with the conductor
+val acLineT1 = Terminal().apply { conductingEquipment = acLine }
+val acLineT2 = Terminal().apply { conductingEquipment = acLine }
+acLine.addTerminal(acLineT1)
+acLine.addTerminal(acLineT2)
+
+// Create a circuit breaker
+val breaker = Breaker()
+
+// Create a terminal for the breaker
+val breakerT1 = Terminal().apply { conductingEquipment = breaker }
+
+// Now create a connectivity node to connect the source terminal
+// to the conductor's first terminal
+val cn1 = ConnectivityNode()
+
+// Now associate the connectivity nodes to the terminals
+cn1.addTerminal(sourceT1)
+sourceT1.connectivityNode = cn1
+cn1.addTerminal(acLineT1)
+acLineT1.connectivityNode = cn1
+
+// Now create a connectivity node to connect the source terminal
+// to the conductor's first terminal
+val cn2 = ConnectivityNode()
+
+// Now associate the connectivity nodes to the terminals
+cn2.addTerminal(acLineT2)
+acLineT2.connectivityNode = cn2
+cn2.addTerminal(breakerT1)
+breakerT1.connectivityNode = cn2
+```
+
+</TabItem>
+</Tabs>
+
+## Normal and Current states
+
+As the network is a dynamic model (that is things like switches can be open and closed), many things in the model support 
+the notion of 'normal' and 'current'. For example, a switch has a normally open state and a currently open state. 
+This allows you to perform analysis on the model considering the normal or current state of the network, and allows you 
+to tell if the network is currently in the normal state or not. This can be important when making decisions based on 
+analytics you may be running when using the model.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// Example of setting normal and current switch states
+Breaker switch = new Breaker();
+switch.setNormallyOpen(true);
+switch.setOpen(false);
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+// Example of setting normal and current switch states
+val switch = Breaker()
+switch.setNormallyOpen(true)
+switch.setOpen(false)
+```
+
+</TabItem>
+</Tabs>
+
+## Phases 
+
+Phases in CIM are set on a [Terminal](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Terminal). The `phases`
+property on the terminal should be considered as the terminal's 'nominal' phases. The vast majority of the time, this will
+be the actual active phases at that terminal. However, due to the dynamic nature of the network, it's possible that when
+tracing connectivity that the active phase at the terminal is different. The phase can be tracked using the `normalPhases`
+and `currentPhases` properties on the terminal.
+
+:::tip
+There are a number of helpful functions for tracing phases based on connectivity. See [tracing](./sdk-tracing) for more details.
+:::
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+// Example of setting nominal phases on a terminal
+Terminal terminal = new Terminal();
+terminal.setPhases(PhaseCode.ABC);
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+// Example of setting nominal phases on a terminal
+Terminal terminal = Terminal().apply { phases = PhaseCode.ABC };
+```
+
+</TabItem>
+</Tabs>
+
+## Grouping equipment
+
+In electricity distribution networks, a model is typically made up of groups of equipment that represent different
+sections of the network. For example things like: feeder, zone (substation), transmission line etc. The terminology 
+differs within the industry, however CIM provides types of 
+[EquipmentContainer](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/EquipmentContainer) to allow you to
+group equipment into the above types of categories. You can refer to the EWB CIM profile for all supported equipment
+container types in the model, however the most common ones are:
+
+- [Line](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Wires/Line/)
+- [Substation](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Substation/)
+- [Feeder](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Feeder/)
+
+We also extend CIM to provide an extension of the hierarchy to an `LvFeeder`, representing LV equipment underneath
+a distribution transformer.
+
+### Network Hierarchy
+
+When creating a `Substation` you will see that it can belong to a 
+[SubGeographicalRegion](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/SubGeographicalRegion) and a 
+`SubGeogrpahicalRegion` can belong to a 
+[GeographicalRegion](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/GeographicalRegion). 
+
+When using various parts of the EWB platform, it will refer to the concept of a network hierarchy. This is the
+mechanism used to chunk up the network and provides an overview of what makes up the model. The network hierarchy looks
+as follows:
+
+* GeographicalRegion
+  * SubGeographicalRegion
+    * Substation
+      * Feeder
+        * LvFeeder
+
+When working with the EWB Platform, it is important to make sure equipment and equipment containers are correctly
+populated as there are assumptions built around the network being structured in this pattern.
+
+### Feeders
+
+A feeder is generally a chain of equipment from a nominated starting point in a `Substation` to all open points when 
+tracing along the equipment. The starting point can be defined by setting a 
+[Feeder's](https://zepben.github.io/evolve/docs/cim/evolve/IEC61970/Base/Core/Feeder/) `normalHeadTerminal`. This means if you
+have a correctly connected model, setting the feeder equipment container on any equipment can be calculated dynamically. 
+This has the benefit of making sure that an equipment's feeder is always correct (because it has been set by checking
+connectivity). A function to do this is provided as part of the [tracing](./sdk-tracing#useful-traces) package.
+
+### Example
+
+The following example shows how you can build a network hierarchy and assign equipment to their appropriate equipment
+containers.
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+GeographicalRegion region = new GeographicalRegion();
+SubGeographicalRegion subRegion = new SubGeographicalRegion();
+subRegion.setGeographicalRegion(region);
+region.addSubGeographicalRegion(subRegion);
+
+Substation substation = new Substation();
+substation.setSubGeographicalRegion(subRegion);
+
+PowerTransformer subTx = new PowerTransformer();
+subTx.addContainer(substation);
+substation.addEquipment(subTx);
+
+Feeder feeder = new Feeder();
+feeder.setNormalEnergizingSubstation(substation);
+
+Breaker feederCb = new Breaker();
+feederCb.addContainer(feeder);
+feeder.addEquipment(feederCb);)
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val region = GeographicalRegion()
+val subRegion = SubGeographicalRegion().apply {
+    geographicalRegion = region
+    region.addSubGeographicalRegion(this)
+}
+
+val substation = Substation().apply { subGeographicalRegion = subRegion }
+
+val subTx = PowerTransformer().apply {
+    addContainer(substation)
+    substation.addEquipment(this)
+}
+
+val feeder = Feeder().apply { normalEnergizingSubstation = substation }
+
+val feederCb = Breaker().apply {
+    addContainer(feeder)
+    feeder.addEquipment(this)
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Names and IDs
+
+As everything in our model is ultimately an IdentifiedObject, it can have one or many "names" associated with it.
+The `IdentifiedObject.name` property is typically treated as a user-friendly name for a particular object. It is not a required field, and will
+default to an empty string if left unset. If set, it should be considered a presentation field for displaying in UI's or for providing context
+for an object. It should be avoided for storing any sort of information or metadata about an object beyond a human readable name.
+
+Sometimes a need will arise to store extra IDs or metadata about a specific object alongside it's existing `mRID` and `name`. For example these could be IDs
+for separate systems (e.g GIS, DMS), or NMI's associated with the object.
+To store this information we recommend storing additional "names" via the `IdentifiedObject.names` field utilising `NameType`s. Extra names are not
+considered presentation fields, and thus can have more structured string data within them.
+
+To add extra names to an IdentifiedObject, utilise the `addName` function:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+NameType gisNameType = NameType("GIS_ID");
+subTx.addName(substation);
+
+// Same as above but via the NameType
+gisNameType.getOrAddName("123456789", subTx)
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val gisNameType = NameType("GIS_ID")
+subTx.addName(gisNameType, "123456789")
+
+// Same as above but via the NameType
+gisNameType.getOrAddName("123456789", subTx)
+```
+
+</TabItem>
+</Tabs>
+
+This will add a name to `subTx` that can be retrieved off the transformer or the `NameType` itself:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+ArrayList<Name> names = gisNameType.getNames(subTx);
+names = subTx.getNames("GIS_ID");     // Same result as above.
+names = subTx.getNames(gisNameType);  // Same result as above.
+
+for (Name name : names) {
+    System.out.println(subTx.mRID + ": " + name.type.name + " - " + name.name);  // <UUID>: GIS_ID - 123456789
+}
+
+// Get an individual Name.
+Name name = subTx.getName("GIS_ID", "123456789");
+Name name = subTx.getName(gisNameType, "123456789");
+
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+var names = gisNameType.getNames(subTx)
+names = subTx.getNames("GIS_ID")     // Same result as above.
+names = subTx.getNames(gisNameType)  // Same result as above.
+
+names.forEach { name ->
+    println("${subTx.mRID}: ${name.type.name} - ${name.name}")  // <UUID>: GIS_ID - 123456789
+}
+
+// Get an individual Name.
+var name: Name = subTx.getName("GIS_ID", "123456789")
+name: Name = subTx.getName(gisNameType, "123456789")
+```
+
+</TabItem>
+</Tabs>
+
+Names can also be removed or cleared from an `IdentifiedObject` or a `NameType`:
+
+<Tabs
+    groupId="code-example"
+    defaultValue="java"
+    values={[
+        { label: "Java", value: "java", },
+        { label: "Kotlin", value: "kotlin", },
+    ]
+}>
+<TabItem value="java">
+
+```java
+Name name = subTx.getName(gisNameType, "123456789");
+subTx.removeName(name);
+
+// Or clear all names
+subTx.clearNames();
+
+// Remove names from a NameType
+gisNameType.removeName(name);
+
+// Remove all names from the NameType with the matching name
+// This will also remove it from the corresponding IdentifiedObject
+gisNameType.removeNames("1123456789");
+
+// Clear all names from a NameType
+gisNameType.clearNames();
+```
+
+</TabItem>
+<TabItem  value="kotlin">
+
+```kotlin
+val name: Name = subTx.getName(gisNameType, "123456789")
+subTx.removeName(name)
+
+// Or clear all names
+subTx.clearNames()
+
+// Remove names from a NameType
+gisNameType.removeName(name)
+
+// Remove all names from the NameType with the matching name
+// This will also remove it from the corresponding IdentifiedObject
+gisNameType.removeNames("1123456789")
+
+// Clear all names from a NameType
+gisNameType.clearNames()
+```
+
+</TabItem>
+</Tabs>
+
+---

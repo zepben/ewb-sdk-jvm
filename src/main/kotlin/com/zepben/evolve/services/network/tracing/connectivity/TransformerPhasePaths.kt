@@ -17,7 +17,7 @@ object TransformerPhasePaths {
     private fun path(from: SPK, to: SPK) = NominalPhasePath(from, to)
 
     // This is used to indicate that a transformer adds a neutral, and it should be energised from the transformer.
-    private val addNeutral = path(SPK.NONE, SPK.N)
+    val addNeutral: NominalPhasePath = path(SPK.NONE, SPK.N)
 
     /**
      * A lookup of the valid phase paths through a [PowerTransformer]. The first index of the lookup is the "from terminal" phases, the second is the

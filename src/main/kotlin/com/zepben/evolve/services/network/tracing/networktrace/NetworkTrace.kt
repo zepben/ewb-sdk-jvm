@@ -23,6 +23,7 @@ import com.zepben.evolve.services.network.tracing.networktrace.conditions.Networ
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.NetworkTraceStopCondition
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.*
+import org.slf4j.Logger
 
 /**
  * A [Traversal] implementation specifically designed to trace connected [Terminal]s of [ConductingEquipment] in a network.
@@ -68,7 +69,9 @@ class NetworkTrace<T> private constructor(
     queueType: QueueType<NetworkTraceStep<T>, NetworkTrace<T>>,
     parent: NetworkTrace<T>? = null,
     private val actionType: NetworkTraceActionType,
-) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, parent) {
+    debugLogger: Logger?,
+    override val name: String
+) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, parent, debugLogger) {
 
     // Setting initial capacity greater than default of 16 for non-branching traces as we suspect a majority of network traces will step on more than 12
     // terminals (load factor is 0.75). Not sure what a sensible initial capacity actually is, but 16 just felt too small.
@@ -84,12 +87,16 @@ class NetworkTrace<T> private constructor(
         networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
         actionType: NetworkTraceActionType,
+        debugLogger: Logger?,
+        name: String,
         computeData: ComputeData<T>,
     ) : this(
         networkStateOperators,
         BasicQueueType(NetworkTraceQueueNext.Basic(networkStateOperators, computeData.withActionType(actionType)), queue),
         null,
         actionType,
+        debugLogger,
+        name,
     )
 
     // Non-branching instance that takes a compute data requiring all next step paths.
@@ -98,12 +105,16 @@ class NetworkTrace<T> private constructor(
         networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
         actionType: NetworkTraceActionType,
+        debugLogger: Logger?,
+        name: String,
         computeNextT: ComputeDataWithPaths<T>,
     ) : this(
         networkStateOperators,
         BasicQueueType(NetworkTraceQueueNext.Basic(networkStateOperators, computeNextT.withActionType(actionType)), queue),
         null,
         actionType,
+        debugLogger,
+        name,
     )
 
     // Branching instance that takes a regular compute data.
@@ -112,6 +123,8 @@ class NetworkTrace<T> private constructor(
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
         actionType: NetworkTraceActionType,
+        debugLogger: Logger?,
+        name: String,
         parent: NetworkTrace<T>?,
         computeData: ComputeData<T>,
     ) : this(
@@ -123,6 +136,8 @@ class NetworkTrace<T> private constructor(
         ),
         parent,
         actionType,
+        debugLogger,
+        name,
     )
 
     // Branching instance that takes a compute data requiring all next step paths.
@@ -132,6 +147,8 @@ class NetworkTrace<T> private constructor(
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
         actionType: NetworkTraceActionType,
+        debugLogger: Logger?,
+        name: String,
         parent: NetworkTrace<T>?,
         computeNextT: ComputeDataWithPaths<T>,
     ) : this(
@@ -143,6 +160,8 @@ class NetworkTrace<T> private constructor(
         ),
         parent,
         actionType,
+        debugLogger,
+        name,
     )
 
     /**
@@ -317,7 +336,7 @@ class NetworkTrace<T> private constructor(
     }
 
     override fun getDerivedThis(): NetworkTrace<T> = this
-    override fun createNewThis(): NetworkTrace<T> = NetworkTrace(networkStateOperators, queueType, this, actionType)
+    override fun createNewThis(): NetworkTrace<T> = NetworkTrace(networkStateOperators, queueType, this, actionType, debugLogger = null, name)
 
     private fun startNominalPhasePath(phases: PhaseCode?): List<NominalPhasePath> =
         phases?.singlePhases?.map { NominalPhasePath(it, it) } ?: emptyList()

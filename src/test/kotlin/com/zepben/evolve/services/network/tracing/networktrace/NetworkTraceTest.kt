@@ -168,7 +168,7 @@ class NetworkTraceTest {
         val steps = mutableSetOf<NetworkTraceStep<Unit>>()
         Tracing.networkTrace()
             .addStepAction { step, _ -> steps.add(step) }
-            .addStopCondition { step, _ -> true }
+            .addStopCondition { _, _ -> true }
             .run(ns.get<ConductingEquipment>("b0")!!)
 
         assertThat(steps.map { it.numEquipmentSteps to it.path.toEquipment.mRID }.toSet(), containsInAnyOrder(0 to "b0"))
@@ -191,7 +191,7 @@ class NetworkTraceTest {
         val steps = mutableSetOf<NetworkTraceStep<Unit>>()
         Tracing.networkTraceBranching()
             .addStepAction { step, _ -> steps.add(step) }
-            .addStopCondition { step, _ -> true }
+            .addStopCondition { _, _ -> true }
             .run(ns.get<ConductingEquipment>("b0")!!)
 
         assertThat(steps.map { it.numEquipmentSteps to it.path.toEquipment.mRID }.toSet(), containsInAnyOrder(0 to "b0"))

@@ -20,14 +20,20 @@ import com.zepben.evolve.services.network.tracing.connectivity.TerminalConnectiv
 import com.zepben.evolve.services.network.tracing.networktrace.*
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
+import org.slf4j.Logger
 
 /**
  * Convenience class that provides methods for setting phases on a [NetworkService]
  * This class is backed by a [NetworkTrace].
  */
-class SetPhases {
+class SetPhases(
+    private val debugLogger: Logger?
+) {
 
-    private class PhasesToFlow(val nominalPhasePaths: List<NominalPhasePath>, var stepFlowedPhases: Boolean = false)
+    private class PhasesToFlow(val nominalPhasePaths: List<NominalPhasePath>, var stepFlowedPhases: Boolean = false) {
+        override fun toString(): String =
+            "PhasesToFlow(nominalPhasePaths=$nominalPhasePaths, stepFlowedPhases=$stepFlowedPhases)"
+    }
 
     /**
      * Apply phases and flow from all energy sources in the network.
@@ -160,6 +166,8 @@ class SetPhases {
     private fun createNetworkTrace(stateOperators: NetworkStateOperators): NetworkTrace<PhasesToFlow> = Tracing.networkTraceBranching(
         networkStateOperators = stateOperators,
         actionStepType = NetworkTraceActionType.ALL_STEPS,
+        debugLogger,
+        name = "SetPhases(${stateOperators.description})",
         queueFactory = { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
         branchQueueFactory = { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
         computeData = computeNextPhasesToFlow(stateOperators)

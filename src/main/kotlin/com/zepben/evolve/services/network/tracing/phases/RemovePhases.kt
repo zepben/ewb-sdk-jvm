@@ -20,12 +20,15 @@ import com.zepben.evolve.services.network.tracing.networktrace.conditions.Condit
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
 import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue.Companion.processQueue
+import org.slf4j.Logger
 
 /**
  * Convenience class that provides methods for removing phases on a [NetworkService]
  * This class is backed by a [NetworkTrace].
  */
-class RemovePhases {
+class RemovePhases(
+    private val debugLogger: Logger?
+) {
 
     /**
      * Remove all traced phases from the specified network.
@@ -78,6 +81,8 @@ class RemovePhases {
         Tracing.networkTrace(
             networkStateOperators = stateOperators,
             actionStepType = NetworkTraceActionType.ALL_STEPS,
+            debugLogger,
+            name = "RemovePhases(${stateOperators.description})",
             processQueue { it.data.phasesToEbb.size },
             computeData = ::computeNextEbbPhases
         )

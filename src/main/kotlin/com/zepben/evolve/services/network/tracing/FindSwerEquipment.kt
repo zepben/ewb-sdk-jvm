@@ -18,13 +18,17 @@ import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.networktrace.run
+import org.slf4j.Logger
 
 /**
  * A class which can be used for finding the SWER equipment in a [NetworkService] or [Feeder].
  */
-class FindSwerEquipment {
+class FindSwerEquipment(
+    private val debugLogger: Logger?
+) {
 
-    private fun createTrace(stateOperators: NetworkStateOperators) = Tracing.networkTrace(stateOperators).addCondition { stopAtOpen() }
+    private fun createTrace(stateOperators: NetworkStateOperators) =
+        Tracing.networkTrace(stateOperators, debugLogger = debugLogger, name = "FindSwerEquipment(${stateOperators.description})").addCondition { stopAtOpen() }
 
     /**
      * Find the [ConductingEquipment] on any [Feeder] in a [NetworkService] which is SWER. This will include any equipment on the LV network that is energised

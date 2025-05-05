@@ -31,7 +31,7 @@ internal class PhaseInferrerTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val phaseInferrer = PhaseInferrer()
+    private val phaseInferrer = PhaseInferrer(debugLogger = null)
 
     //
     // nominal

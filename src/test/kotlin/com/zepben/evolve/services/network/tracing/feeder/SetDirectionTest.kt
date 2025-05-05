@@ -743,7 +743,7 @@ internal class SetDirectionTest {
     }
 
     private fun doSetDirectionTrace(terminal: Terminal) {
-        SetDirection().apply {
+        SetDirection(debugLogger = null).apply {
             run(terminal, NetworkStateOperators.NORMAL)
             run(terminal, NetworkStateOperators.CURRENT)
         }
@@ -751,7 +751,7 @@ internal class SetDirectionTest {
     }
 
     private fun doSetDirectionTrace(n: NetworkService) {
-        val setDirection = SetDirection()
+        val setDirection = SetDirection(debugLogger = null)
         n.sequenceOf<Feeder>().forEach {
             setDirection.run(it.normalHeadTerminal!!, NetworkStateOperators.NORMAL)
             setDirection.run(it.normalHeadTerminal!!, NetworkStateOperators.CURRENT)

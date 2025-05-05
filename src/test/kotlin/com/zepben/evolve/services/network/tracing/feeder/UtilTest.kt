@@ -37,7 +37,7 @@ class UtilTest {
             .addLvFeeder("b1") // lvf5
             .addLvFeeder("b3") // lvf6
             .network
-        val assignToLvFeeders = AssignToLvFeeders()
+        val assignToLvFeeders = AssignToLvFeeders(debugLogger = null)
 
         assignToLvFeeders.run(network, NetworkStateOperators.NORMAL, network.getT("b1", 2))
         assignToLvFeeders.run(network, NetworkStateOperators.NORMAL, network.getT("b3", 2))
@@ -53,8 +53,8 @@ class UtilTest {
     }
 
     private fun Equipment.addToSite(site: Site) {
-        site.addEquipment(this);
-        addContainer(site);
+        site.addEquipment(this)
+        addContainer(site)
         site.addCurrentEquipment(this)
         addCurrentContainer(site)
     }

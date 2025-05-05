@@ -24,13 +24,16 @@ import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
+import org.slf4j.Logger
 
 /**
  * Convenience class that provides methods for assigning LV feeders on a [NetworkService].
  * Requires that a Feeder have a normalHeadTerminal with associated ConductingEquipment.
  * This class is backed by a [NetworkTrace].
  */
-class AssignToLvFeeders {
+class AssignToLvFeeders(
+    private val debugLogger: Logger?
+) {
 
     /**
      * Assign equipment to LV feeders in the specified network, given an optional start terminal.
@@ -47,7 +50,8 @@ class AssignToLvFeeders {
         network: NetworkService,
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         startTerminal: Terminal? = null
-    ): Unit = AssignToLvFeedersInternal(networkStateOperators).run(network, startTerminal)
+    ): Unit = AssignToLvFeedersInternal(networkStateOperators, debugLogger)
+        .run(network, startTerminal)
 
     /**
      * Assign equipment to LV feeders tracing out from the supplied terminal.
@@ -65,10 +69,12 @@ class AssignToLvFeeders {
         terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
         lvFeedersToAssign: List<LvFeeder>,
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
-    ): Unit = AssignToLvFeedersInternal(networkStateOperators).run(terminal, lvFeederStartPoints, terminalToAuxEquipment, lvFeedersToAssign)
+    ): Unit = AssignToLvFeedersInternal(networkStateOperators, debugLogger)
+        .run(terminal, lvFeederStartPoints, terminalToAuxEquipment, lvFeedersToAssign)
 
     private class AssignToLvFeedersInternal(
-        val stateOperators: NetworkStateOperators
+        val stateOperators: NetworkStateOperators,
+        private val debugLogger: Logger?
     ) {
 
         fun run(network: NetworkService, startTerminal: Terminal?) {
@@ -120,10 +126,15 @@ class AssignToLvFeeders {
         ): NetworkTrace<Boolean> {
             fun reachedHv(ce: ConductingEquipment) = ce.baseVoltage?.let { it.nominalVoltage >= 1000 } == true
 
-            return Tracing.networkTrace(stateOperators, NetworkTraceActionType.ALL_STEPS, computeData = { _, _, nextPath ->
+            return Tracing.networkTrace(
+                stateOperators,
+                NetworkTraceActionType.ALL_STEPS,
+                debugLogger,
+                name = "AssignToLvFeeders(${stateOperators.description})"
+            ) { _, _, nextPath ->
                 // Store if we found an LV feeder head in the `data` to prevent looking this up multiple times on each iteration.
                 lvFeederStartPoints.contains(nextPath.toEquipment)
-            })
+            }
                 .addCondition { stopAtOpen() }
                 .addStopCondition { (_, foundLvFeeder), _ -> foundLvFeeder }
                 // If we have found an LV feeder head, we want to step on it regardless of if it is HV or not. Sometime people configure their transformers with

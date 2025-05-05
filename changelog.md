@@ -1,10 +1,23 @@
 # Zepben EWB SDK changelog
 ## [0.29.0] - UNRELEASED
 ### Breaking Changes
-* None.
+* You can no longer register a `StepActionWithContextValue` with `Traversal.ifStopping` or `Traversal.ifNotStopping`, you must use `Traversal.addStepCondition`
+  instead.
+* Added a new `debugLogging` and `name` parameters to the constructor of the following traces. The helper functions in `Tracing` also have these parameters,
+  which defaults to `null` and `networkTrace`, meaning anyone using these wrappers will be unaffected by the change:
+  * `AssignToFeeders`
+  * `AssignToLvFeeders`
+  * `ClearDirection`
+  * `FindSwerEquipment`
+  * `PhaseInferrer`
+  * `RemovePhases`
+  * `SetDirection`
+  * `SetPhases`
+* `NetworkStateOperators` has a new abstract `description`. If you are creating custom operators you will need to add it.
 
 ### New Features
-* None.
+* You can now pass a logger to all `Tracing` methods and `TestNetworkBuilder.build` to enable debug logging for the traces it runs. The debug logging will
+  include the results of all queue and stop condition checks, and each item that is stepped on.
 
 ### Enhancements
 * None.
@@ -104,11 +117,11 @@
 * Database readers and writers no longer have the container of the data they will read/write passed to the constructor. They now have this passed to the `read`
   or `write` method.
 * The following classes and methods are now internal:
-  * `BaseServiceReader`, `BaseServiceWriter`, `BaseCollectionReader`, `BaseCollectionWriter`, `BaseEntryWriter`, 
+  * `BaseServiceReader`, `BaseServiceWriter`, `BaseCollectionReader`, `BaseCollectionWriter`, `BaseEntryWriter`,
   * `CimReader`, `CimWriter`,
-  * `CustomerCimReader`, `CustomerCimWriter`, `CustomerServiceReader`, `CustomerServiceWriter`, 
-  * `DiagramCimReader`, `DiagramCimWriter`, `DiagramServiceReader`, `DiagramServiceWriter`, 
-  * `MetadataCollectionReader`, `MetadataCollectionWriter`, `MetadataEntryReader`, `MetadataEntryWriter`, 
+  * `CustomerCimReader`, `CustomerCimWriter`, `CustomerServiceReader`, `CustomerServiceWriter`,
+  * `DiagramCimReader`, `DiagramCimWriter`, `DiagramServiceReader`, `DiagramServiceWriter`,
+  * `MetadataCollectionReader`, `MetadataCollectionWriter`, `MetadataEntryReader`, `MetadataEntryWriter`,
   * `MetricsEntryWriter`, `MetricsWriter`,
   * `NetworkServiceReader`, `NetworkServiceWriter`,
   * Extension methods in `com.zepben.evolve.database.sqlite.extensions` (e.g. `ResultSet.getNullableDouble`)
@@ -150,7 +163,8 @@
   feeder.
 * Major speed improvements have been made for `RemovePhases` when dealing with large networks with many nested loops.
 * `SetDirection` now supports networks with `BusbarSection` and will apply the `FeederDirection.CONNECTOR` value to their terminals.
-* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests.
+* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial
+  connection tests.
 * Updated to ewb-grpc 0.34.1:
   * Changed AddJumperEvent to not use reserved words.
 * `UpdateNetworkStateService.setCurrentStates` no longer blocks while waiting for `onSetCurrentStates` callbacks when handling the `onCompleted` request. This
@@ -173,7 +187,8 @@
 * None.
 
 ### Enhancements
-* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial connection tests.
+* Added `connectionTestTimeoutMs` field to `GrpcBuildArgs` with a default value of `5000`. This timeout is only applied to requests made in the initial
+  connection tests.
 * Updated to ewb-grpc 0.34.1:
   * Changed AddJumperEvent to not use reserved words.
 

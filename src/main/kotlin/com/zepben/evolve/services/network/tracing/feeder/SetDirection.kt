@@ -21,11 +21,14 @@ import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
+import org.slf4j.Logger
 
 /**
  * Convenience class that provides methods for setting feeder direction on a [NetworkService]
  */
-class SetDirection {
+class SetDirection(
+    private val debugLogger: Logger?
+) {
 
     private fun computeData(
         reprocessedLoopTerminals: MutableSet<Terminal>,
@@ -70,10 +73,13 @@ class SetDirection {
         return Tracing.networkTraceBranching(
             networkStateOperators = stateOperators,
             actionStepType = NetworkTraceActionType.ALL_STEPS,
+            debugLogger,
+            name = "SetDirection(${stateOperators.description})",
             { WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() } },
-            { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } },
-            computeData = { step: NetworkTraceStep<FeederDirection>, _, nextPath -> computeData(reprocessedLoopTerminals, stateOperators, step, nextPath) }
-        )
+            { WeightedPriorityQueue.branchQueue { it.path.toTerminal.phases.numPhases() } }
+        ) { step: NetworkTraceStep<FeederDirection>, _, nextPath ->
+            computeData(reprocessedLoopTerminals, stateOperators, step, nextPath)
+        }
             .addCondition { stopAtOpen() }
             .addStopCondition { (path), _ ->
                 path.toTerminal.isFeederHeadTerminal() || reachedSubstationTransformer(path.toTerminal)

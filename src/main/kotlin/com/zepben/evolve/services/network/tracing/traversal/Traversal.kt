@@ -7,6 +7,7 @@
  */
 package com.zepben.evolve.services.network.tracing.traversal
 
+import org.slf4j.Logger
 import java.util.*
 import kotlin.collections.ArrayDeque
 
@@ -28,8 +29,14 @@ import kotlin.collections.ArrayDeque
  */
 abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     internal val queueType: QueueType<T, D>,
-    protected val parent: D? = null
+    protected val parent: D? = null,
+    private val debugLogger: Logger?
 ) {
+
+    /**
+     * The name of the traversal. Can be used for logging purposes and will be included in all debug logging.
+     */
+    abstract val name: String
 
     /**
      * Functional interface for queuing items in a non-branching traversal.
@@ -124,6 +131,9 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     /**
      * Creates a new instance of the traversal for branching purposes.
      *
+     * NOTE: Do NOT add the debug logger to this call, as all traces created for branching will already have their actions wrapped, and passing
+     *       the debug logger through means you get duplicate wrappers that double, triple etc. log the debug messages.
+     *
      * @return A new traversal instance.
      */
     protected abstract fun createNewThis(): D
@@ -150,7 +160,12 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return this traversal instance.
      */
     open fun addStopCondition(condition: StopCondition<T>): D {
-        stopConditions.add(condition)
+        if (debugLogger == null) {
+            stopConditions.add(condition)
+        } else {
+            stopConditions.add(DebugLoggingWrappers.wrapStopCondition(name, condition, debugLogger, stopConditions.size))
+        }
+
         if (condition is StopConditionWithContextValue<T, *>) {
             computeNextContextFuns[condition.key] = condition
         }
@@ -171,7 +186,6 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     private fun matchesAnyStopCondition(item: T, context: StepContext): Boolean =
         stopConditions.fold(false) { stop, condition -> stop or condition.shouldStop(item, context) }
 
-
     /**
      * Adds a queue condition to the traversal. Queue conditions determine whether an item should be queued for traversal.
      * All registered queue conditions must return true for an item to be queued.
@@ -180,7 +194,12 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return The current traversal instance.
      */
     open fun addQueueCondition(condition: QueueCondition<T>): D {
-        queueConditions.add(condition)
+        if (debugLogger == null) {
+            queueConditions.add(condition)
+        } else {
+            queueConditions.add(DebugLoggingWrappers.wrapQueueCondition(name, condition, debugLogger, queueConditions.size))
+        }
+
         if (condition is QueueConditionWithContextValue<T, *>) {
             computeNextContextFuns[condition.key] = condition
         }
@@ -205,7 +224,11 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return The current traversal instance.
      */
     fun addStepAction(action: StepAction<T>): D {
-        stepActions.add(action)
+        if (debugLogger == null)
+            stepActions.add(action)
+        else
+            stepActions.add(DebugLoggingWrappers.wrapStepAction(name, action, debugLogger, stepActions.size))
+
         if (action is StepActionWithContextValue<T, *>) {
             computeNextContextFuns[action.key] = action
         }
@@ -219,7 +242,14 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return The current traversal instance.
      */
     fun ifNotStopping(action: StepAction<T>): D {
-        stepActions.add { it, context -> if (!context.isStopping) action.apply(it, context) }
+        require(action !is StepActionWithContextValue<T, *>) { "`action` must not be a StepActionWithContextValue. Use `addStepCondition` to add step actions that also compute context values" }
+
+        val wrappedAction = if (debugLogger == null)
+            action
+        else
+            DebugLoggingWrappers.wrapStepAction(name, action, debugLogger, stepActions.size)
+
+        stepActions.add { it, context -> if (!context.isStopping) wrappedAction.apply(it, context) }
         return getDerivedThis()
     }
 
@@ -230,7 +260,14 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return The current traversal instance.
      */
     fun ifStopping(action: StepAction<T>): D {
-        stepActions.add { it, context -> if (context.isStopping) action.apply(it, context) }
+        require(action !is StepActionWithContextValue<T, *>) { "`action` must not be a StepActionWithContextValue. Use `addStepCondition` to add step actions that also compute context values" }
+
+        val wrappedAction = if (debugLogger == null)
+            action
+        else
+            DebugLoggingWrappers.wrapStepAction(name, action, debugLogger, stepActions.size)
+
+        stepActions.add { it, context -> if (context.isStopping) wrappedAction.apply(it, context) }
         return getDerivedThis()
     }
 

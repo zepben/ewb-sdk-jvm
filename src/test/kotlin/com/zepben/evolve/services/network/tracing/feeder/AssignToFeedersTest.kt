@@ -19,7 +19,6 @@ import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
 import com.zepben.evolve.cim.iec61970.base.wires.ProtectedSwitch
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
-import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.services.network.getT
 import com.zepben.evolve.services.network.testdata.*
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
@@ -39,7 +38,7 @@ internal class AssignToFeedersTest {
     val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
     val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
-    private val assignToFeeders = AssignToFeeders()
+    private val assignToFeeders = AssignToFeeders(debugLogger = null)
 
     @Test
     internal fun appliesToEquipmentOnHeadTerminalSide() {

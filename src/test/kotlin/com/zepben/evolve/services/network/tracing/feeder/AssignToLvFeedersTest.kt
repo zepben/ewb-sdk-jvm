@@ -44,7 +44,7 @@ internal class AssignToLvFeedersTest {
     val hvBaseVoltage = BaseVoltage().apply { nominalVoltage = 11000 }
     val lvBaseVoltage = BaseVoltage().apply { nominalVoltage = 400 }
 
-    private val assignToLvFeeders = AssignToLvFeeders()
+    private val assignToLvFeeders = AssignToLvFeeders(debugLogger = null)
 
     @Test
     internal fun appliesToEquipmentOnHeadTerminalSide() {
@@ -164,7 +164,7 @@ internal class AssignToLvFeedersTest {
         val feeder: Feeder = network["fdr4"]!!
         val lvFeeder: LvFeeder = network["lvf5"]!!
 
-        AssignToFeeders().run(network, NetworkStateOperators.NORMAL)
+        AssignToFeeders(debugLogger = null).run(network, NetworkStateOperators.NORMAL)
         assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         assertThat(feeder.normalEnergizedLvFeeders, empty())
@@ -184,7 +184,7 @@ internal class AssignToLvFeedersTest {
         val lvFeeder1: LvFeeder = network["lvf2"]!!
         val lvFeeder2: LvFeeder = network["lvf3"]!!
 
-        AssignToFeeders().run(network, NetworkStateOperators.NORMAL)
+        AssignToFeeders(debugLogger = null).run(network, NetworkStateOperators.NORMAL)
         assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         assertThat(feeder.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder1, lvFeeder2))
@@ -205,7 +205,7 @@ internal class AssignToLvFeedersTest {
         val feeder2: Feeder = network["fdr2"]!!
         val lvFeeder: LvFeeder = network["lvf3"]!!
 
-        AssignToFeeders().run(network, NetworkStateOperators.NORMAL)
+        AssignToFeeders(debugLogger = null).run(network, NetworkStateOperators.NORMAL)
         assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         assertThat(feeder1.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder))
@@ -306,7 +306,7 @@ internal class AssignToLvFeedersTest {
         val lvFeeder7: LvFeeder = network["lvf7"]!!
         val lvFeeder8: LvFeeder = network["lvf8"]!!
 
-        AssignToFeeders().run(network, NetworkStateOperators.NORMAL)
+        AssignToFeeders(debugLogger = null).run(network, NetworkStateOperators.NORMAL)
         assignToLvFeeders.run(network, NetworkStateOperators.NORMAL)
 
         assertThat(feeder6.normalEnergizedLvFeeders, containsInAnyOrder(lvFeeder7, lvFeeder8))

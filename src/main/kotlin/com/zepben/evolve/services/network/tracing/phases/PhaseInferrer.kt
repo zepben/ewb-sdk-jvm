@@ -17,8 +17,11 @@ import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhaseP
 import com.zepben.evolve.services.network.tracing.connectivity.XyCandidatePhasePaths.Companion.isBefore
 import com.zepben.evolve.services.network.tracing.feeder.FeederDirection
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import org.slf4j.Logger
 
-class PhaseInferrer {
+class PhaseInferrer(
+    private val debugLogger: Logger?
+) {
 
     data class InferredPhase(val conductingEquipment: ConductingEquipment, val suspect: Boolean) {
         fun description(): String = if (suspect) {
@@ -32,12 +35,15 @@ class PhaseInferrer {
     fun run(network: NetworkService, networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL): Collection<InferredPhase> {
         val tracking = mutableMapOf<ConductingEquipment, Boolean>()
 
-        PhaseInferrerInternal(networkStateOperators).inferMissingPhases(network, tracking)
+        PhaseInferrerInternal(networkStateOperators, debugLogger).inferMissingPhases(network, tracking)
 
         return tracking.map { InferredPhase(it.key, it.value) }
     }
 
-    private class PhaseInferrerInternal(val stateOperators: NetworkStateOperators) {
+    private class PhaseInferrerInternal(
+        val stateOperators: NetworkStateOperators,
+        private val debugLogger: Logger?
+    ) {
         fun inferMissingPhases(network: NetworkService, tracking: MutableMap<ConductingEquipment, Boolean>) {
             do {
                 val terminalsMissingPhases = network.listOf<Terminal> { ((it.connectivityNode?.terminals?.size ?: 0) > 1) && hasNonePhase(it) }
@@ -168,7 +174,7 @@ class PhaseInferrer {
         }
 
         private fun continuePhases(terminal: Terminal) {
-            val setPhasesTrace = SetPhases()
+            val setPhasesTrace = SetPhases(debugLogger)
             terminal.otherTerminals().forEach { other ->
                 setPhasesTrace.run(terminal, other, terminal.phases.singlePhases, stateOperators)
             }

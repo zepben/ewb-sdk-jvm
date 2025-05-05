@@ -31,7 +31,7 @@ internal class FindSwerEquipmentTest {
     var systemOut: SystemLogExtension = SystemLogExtension.SYSTEM_OUT.captureLog().muteOnSuccess()
 
     private val stateOperators = spy(NetworkStateOperators.NORMAL)
-    private val findSwerEquipment = FindSwerEquipment()
+    private val findSwerEquipment = FindSwerEquipment(debugLogger = null)
 
     @Test
     internal fun `processes all feeders in a network`() {
@@ -162,6 +162,6 @@ internal class FindSwerEquipmentTest {
     }
 
     private fun NetworkService.createContainsInAnyOrder(vararg mRIDs: String): Matcher<Iterable<ConductingEquipment>?>? =
-        containsInAnyOrder(*mRIDs.map { get<ConductingEquipment>(it) }.toTypedArray())
+        containsInAnyOrder(*mRIDs.map { get<ConductingEquipment>(it)!! }.toTypedArray())
 
 }

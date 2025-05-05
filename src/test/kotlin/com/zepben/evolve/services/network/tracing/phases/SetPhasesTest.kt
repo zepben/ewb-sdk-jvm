@@ -33,7 +33,7 @@ internal class SetPhasesTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val setPhases = SetPhases()
+    private val setPhases = SetPhases(debugLogger = null)
 
     @Test
     internal fun setPhasesTest() {

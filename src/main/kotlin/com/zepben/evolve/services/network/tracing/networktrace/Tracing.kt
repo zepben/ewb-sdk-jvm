@@ -24,6 +24,7 @@ import com.zepben.evolve.services.network.tracing.phases.PhaseInferrer
 import com.zepben.evolve.services.network.tracing.phases.RemovePhases
 import com.zepben.evolve.services.network.tracing.phases.SetPhases
 import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
+import org.slf4j.Logger
 
 /**
  * Provides factory functions to easily create instances of [NetworkTrace] and other tracing based utility classes.
@@ -36,6 +37,8 @@ object Tracing {
      * @param networkStateOperators The state operators to make the NetworkTrace state aware. Defaults to [NetworkStateOperators.NORMAL].
      * @param actionStepType The action step type to be applied when the trace steps. Defaults to [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT].
      * @param queue The traversal queue the trace is backed by. Defaults to a depth first queue.
+     * @param debugLogger An optional logger to add information about how the trace is processing items.
+     * @param name An optional name for your trace that can be used for logging purposes.
      * @param computeData The computer that provides the [NetworkTraceStep.data] contextual step data for each step in the trace.
      *
      * @return a new NetworkTrace
@@ -45,10 +48,12 @@ object Tracing {
     fun <T> networkTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
+        debugLogger: Logger? = null,
+        name: String = "networkTrace",
         queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
         computeData: ComputeData<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queue, actionStepType, computeData)
+        return NetworkTrace(networkStateOperators, queue, actionStepType, debugLogger, name, computeData)
     }
 
     /**
@@ -60,6 +65,8 @@ object Tracing {
      *
      * @param networkStateOperators The state operators to make the NetworkTrace state aware. Defaults to [NetworkStateOperators.NORMAL].
      * @param actionStepType The action step type to be applied when the trace steps. Defaults to [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT].
+     * @param debugLogger An optional logger to add information about how the trace is processing items.
+     * @param name An optional name for your trace that can be used for logging purposes.
      * @param queue The traversal queue the trace is backed by. Defaults to a depth first queue.
      * @param computeData The computer that provides the [NetworkTraceStep.data] contextual step data for each step in the trace.
      *
@@ -71,10 +78,12 @@ object Tracing {
     fun <T> networkTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
+        debugLogger: Logger? = null,
+        name: String = "networkTrace",
         queue: TraversalQueue<NetworkTraceStep<T>> = TraversalQueue.depthFirst(),
         computeData: ComputeDataWithPaths<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queue, actionStepType, computeData)
+        return NetworkTrace(networkStateOperators, queue, actionStepType, debugLogger, name, computeData)
     }
 
     /**
@@ -84,6 +93,8 @@ object Tracing {
      *
      * @param networkStateOperators The state operators to make the NetworkTrace state aware. Defaults to [NetworkStateOperators.NORMAL].
      * @param actionStepType The action step type to be applied when the trace steps. Defaults to [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT].
+     * @param debugLogger An optional logger to add information about how the trace is processing items.
+     * @param name An optional name for your trace that can be used for logging purposes.
      * @param queue The traversal queue the trace is backed by. Defaults to a depth first queue.
      *
      * @return a new NetworkTrace
@@ -93,9 +104,11 @@ object Tracing {
     fun networkTrace(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
+        debugLogger: Logger? = null,
+        name: String = "networkTrace",
         queue: TraversalQueue<NetworkTraceStep<Unit>> = TraversalQueue.depthFirst(),
     ): NetworkTrace<Unit> {
-        return networkTrace(networkStateOperators, actionStepType, queue) { _, _, _ -> }
+        return networkTrace(networkStateOperators, actionStepType, debugLogger, name, queue) { _, _, _ -> }
     }
 
     /**
@@ -104,6 +117,8 @@ object Tracing {
      *
      * @param networkStateOperators The state operators to make the NetworkTrace state aware. Defaults to [NetworkStateOperators.NORMAL].
      * @param actionStepType The action step type to be applied when the trace steps. Defaults to [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT].
+     * @param debugLogger An optional logger to add information about how the trace is processing items.
+     * @param name An optional name for your trace that can be used for logging purposes.
      * @param queueFactory A factory that will produce [TraversalQueue]s used by each branch in the trace to queue steps. Defaults to a factory the creates depth first queues.
      * @param branchQueueFactory A factory that will produce [TraversalQueue]s used by each branch in the trace to queue branches. Defaults to a factory the creates breadth first queues.
      * @param computeData The computer that provides the [NetworkTraceStep.data] contextual step data for each step in the trace.
@@ -115,11 +130,13 @@ object Tracing {
     fun <T> networkTraceBranching(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
+        debugLogger: Logger? = null,
+        name: String = "networkTrace",
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
         computeData: ComputeData<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, actionStepType, null, computeData)
+        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, actionStepType, debugLogger, name, parent = null, computeData)
     }
 
     /**
@@ -132,6 +149,8 @@ object Tracing {
      *
      * @param networkStateOperators The state operators to make the NetworkTrace state aware. Defaults to [NetworkStateOperators.NORMAL].
      * @param actionStepType The action step type to be applied when the trace steps. Defaults to [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT].
+     * @param debugLogger An optional logger to add information about how the trace is processing items.
+     * @param name An optional name for your trace that can be used for logging purposes.
      * @param queueFactory A factory that will produce [TraversalQueue]s used by each branch in the trace to queue steps. Defaults to a factory the creates depth first queues.
      * @param branchQueueFactory A factory that will produce [TraversalQueue]s used by each branch in the trace to queue branches. Defaults to a factory the creates breadth first queues.
 
@@ -145,11 +164,13 @@ object Tracing {
     fun <T> networkTraceBranching(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
+        debugLogger: Logger? = null,
+        name: String = "networkTrace",
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>> = { TraversalQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>> = { TraversalQueue.breadthFirst() },
         computeData: ComputeDataWithPaths<T>,
     ): NetworkTrace<T> {
-        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, actionStepType, null, computeData)
+        return NetworkTrace(networkStateOperators, queueFactory, branchQueueFactory, actionStepType, debugLogger, name, parent = null, computeData)
     }
 
     /**
@@ -160,6 +181,8 @@ object Tracing {
      *
      * @param networkStateOperators The state operators to make the NetworkTrace state aware. Defaults to [NetworkStateOperators.NORMAL].
      * @param actionStepType The action step type to be applied when the trace steps. Defaults to [NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT].
+     * @param debugLogger An optional logger to add information about how the trace is processing items.
+     * @param name An optional name for your trace that can be used for logging purposes.
      * @param queueFactory A factory that will produce [TraversalQueue]s used by each branch in the trace to queue steps. Defaults to a factory the creates depth first queues.
      * @param branchQueueFactory A factory that will produce [TraversalQueue]s used by each branch in the trace to queue branches. Defaults to a factory the creates breadth first queues.
      *
@@ -170,10 +193,12 @@ object Tracing {
     fun networkTraceBranching(
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         actionStepType: NetworkTraceActionType = FIRST_STEP_ON_EQUIPMENT,
+        debugLogger: Logger? = null,
+        name: String = "networkTrace",
         queueFactory: () -> TraversalQueue<NetworkTraceStep<Unit>> = { TraversalQueue.depthFirst() },
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<Unit>> = { TraversalQueue.breadthFirst() },
     ): NetworkTrace<Unit> {
-        return networkTraceBranching(networkStateOperators, actionStepType, queueFactory, branchQueueFactory) { _, _, _ -> }
+        return networkTraceBranching(networkStateOperators, actionStepType, debugLogger, name, queueFactory, branchQueueFactory) { _, _, _ -> }
     }
 
     /**
@@ -181,55 +206,63 @@ object Tracing {
      * @return a new SetDirection instance.
      */
     @JvmStatic
-    fun setDirection(): SetDirection = SetDirection()
+    @JvmOverloads
+    fun setDirection(debugLogger: Logger? = null): SetDirection = SetDirection(debugLogger)
 
     /**
      * Returns a class that can be used to clear feeder directions from items in a [NetworkService].
      * @return a new ClearDirection instance.
      */
     @JvmStatic
-    fun clearDirection(): ClearDirection = ClearDirection()
+    @JvmOverloads
+    fun clearDirection(debugLogger: Logger? = null): ClearDirection = ClearDirection(debugLogger)
 
     /**
      * Returns a class that can be used to assign [Equipment] to [Feeder]s of items in a [NetworkService].
      * @return a new AssignToFeeders instance.
      */
     @JvmStatic
-    fun assignEquipmentToFeeders(): AssignToFeeders = AssignToFeeders()
+    @JvmOverloads
+    fun assignEquipmentToFeeders(debugLogger: Logger? = null): AssignToFeeders = AssignToFeeders(debugLogger)
 
     /**
      * Returns a class that can be used to assign [Equipment] to [LvFeeder]s of items in a [NetworkService].
      * @return a new AssignToLvFeeders instance.
      */
     @JvmStatic
-    fun assignEquipmentToLvFeeders(): AssignToLvFeeders = AssignToLvFeeders()
+    @JvmOverloads
+    fun assignEquipmentToLvFeeders(debugLogger: Logger? = null): AssignToLvFeeders = AssignToLvFeeders(debugLogger)
 
     /**
      * Returns a class that can be used to assign traced phases to terminals in a [NetworkService].
      * @return a new SetPhases instance.
      */
     @JvmStatic
-    fun setPhases(): SetPhases = SetPhases()
+    @JvmOverloads
+    fun setPhases(debugLogger: Logger? = null): SetPhases = SetPhases(debugLogger)
 
     /**
      * Returns a class that can be used to removed traced phases from terminals in a [NetworkService].
      * @return a new RemovePhases instance.
      */
     @JvmStatic
-    fun removePhases(): RemovePhases = RemovePhases()
+    @JvmOverloads
+    fun removePhases(debugLogger: Logger? = null): RemovePhases = RemovePhases(debugLogger)
 
     /**
      * Returns a class that can be used to attempt to infer traced phases of terminals in a [NetworkService] when phasing information is unreliable.
      * @return a new PhaseInferrer instance.
      */
     @JvmStatic
-    fun phaseInferrer(): PhaseInferrer = PhaseInferrer()
+    @JvmOverloads
+    fun phaseInferrer(debugLogger: Logger? = null): PhaseInferrer = PhaseInferrer(debugLogger)
 
     /**
      * Returns a class that can be used to find SWER equipment from [Equipment] in a [NetworkService].
      * @return a new FindSwerEquipment instance.
      */
     @JvmStatic
-    fun findSwerEquipment(): FindSwerEquipment = FindSwerEquipment()
+    @JvmOverloads
+    fun findSwerEquipment(debugLogger: Logger? = null): FindSwerEquipment = FindSwerEquipment(debugLogger)
 
 }

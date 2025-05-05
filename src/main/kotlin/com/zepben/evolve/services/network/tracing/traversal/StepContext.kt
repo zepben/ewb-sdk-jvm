@@ -29,11 +29,11 @@ class StepContext(
 ) {
     var isStopping: Boolean = false
         // This is internal because it needs to be set after all stop conditions are called, however stop conditions take a context.
-        // It's a chicken and egg problem...
+        // It's a chicken-and-egg problem...
         internal set
 
     var isActionableItem: Boolean = false
-        // Once again it's a chicken and egg problem as this because it needs to be set after calling canActionItem, however it takes a context.
+        // Once again it's a chicken-and-egg problem as this because it needs to be set after calling canActionItem, however it takes a context.
         internal set
 
     /**
@@ -58,4 +58,16 @@ class StepContext(
     fun <T> getValue(key: String): T? {
         return values?.get(key) as? T?
     }
+
+    override fun toString(): String =
+        "StepContext(" +
+            "isStartItem=$isStartItem, " +
+            "isBranchStartItem=$isBranchStartItem, " +
+            "stepNumber=$stepNumber, " +
+            "branchDepth=$branchDepth, " +
+            "values=$values, " +
+            "isStopping=$isStopping, " +
+            "isActionableItem=$isActionableItem" +
+            ")"
+
 }

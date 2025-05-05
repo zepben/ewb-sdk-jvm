@@ -8,10 +8,13 @@
 
 package com.zepben.evolve.services.network.tracing.traversal
 
+import com.zepben.testutils.exception.ExpectException.Companion.expect
+import io.mockk.mockk
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
+import org.slf4j.Logger
 import kotlin.math.abs
 
 class TraversalTest {
@@ -22,12 +25,15 @@ class TraversalTest {
         private val canVisitItemImpl: (T, StepContext) -> Boolean,
         private val canActionItemImpl: (T, StepContext) -> Boolean,
         private val onResetImpl: () -> Unit,
-    ) : Traversal<T, TestTraversal<T>>(queueType, parent) {
+        debugLogger: Logger?
+    ) : Traversal<T, TestTraversal<T>>(queueType, parent, debugLogger) {
         override fun canVisitItem(item: T, context: StepContext): Boolean = canVisitItemImpl(item, context)
+        override val name: String = "TestTraversal"
+
         override fun canActionItem(item: T, context: StepContext): Boolean = canActionItemImpl(item, context)
         override fun onReset() = onResetImpl()
         override fun getDerivedThis(): TestTraversal<T> = this
-        override fun createNewThis(): TestTraversal<T> = TestTraversal(queueType, this, canVisitItemImpl, canActionItemImpl, onResetImpl)
+        override fun createNewThis(): TestTraversal<T> = TestTraversal(queueType, this, canVisitItemImpl, canActionItemImpl, onResetImpl, debugLogger = null)
 
         @Suppress("RedundantVisibilityModifier")
         public override fun addStartItem(item: T): TestTraversal<T> = super.addStartItem(item)
@@ -52,27 +58,27 @@ class TraversalTest {
             queue = queue
         )
 
-        return TestTraversal(queueType, null, canVisitItem, canActionItem, onReset)
+        return TestTraversal(queueType, null, canVisitItem, canActionItem, onReset, debugLogger = null)
     }
 
     private fun createBranchingTraversal(): TestTraversal<Int> {
         val queueType = Traversal.BranchingQueueType<Int, TestTraversal<Int>>(
             queueNext = { item, _, queueItem, queueBranch ->
-                  if (item == 0) {
-                      queueBranch(-10)
-                      queueBranch(10)
-                  } else if (item < 0) {
-                      queueItem(item + 1)
-                  } else {
-                      queueItem(item - 1)
-                  }
+                if (item == 0) {
+                    queueBranch(-10)
+                    queueBranch(10)
+                } else if (item < 0) {
+                    queueItem(item + 1)
+                } else {
+                    queueItem(item - 1)
+                }
 
             },
             queueFactory = { TraversalQueue.depthFirst() },
             branchQueueFactory = { TraversalQueue.depthFirst() },
         )
 
-        return TestTraversal(queueType, null, { _, _ -> true }, { _, _ -> true }, {})
+        return TestTraversal(queueType, null, { _, _ -> true }, { _, _ -> true }, {}, debugLogger = null)
     }
 
     @Test
@@ -352,6 +358,21 @@ class TraversalTest {
             .run(canStopOnStartItem = false)
 
         assertThat(steps, contains(1, 11, 2, 12))
+    }
+
+    @Test
+    internal fun `must use addStepAction for context aware actions`() {
+        val action = mockk<StepActionWithContextValue<Int, *>>(relaxed = true)
+
+        // We don't do anything with this, just running it proves the point.
+        createTraversal().addStepAction(action)
+
+        expect { createTraversal().ifStopping(action) }
+            .toThrow<IllegalArgumentException>()
+            .withMessage("`action` must not be a StepActionWithContextValue. Use `addStepCondition` to add step actions that also compute context values")
+        expect { createTraversal().ifNotStopping(action) }
+            .toThrow<IllegalArgumentException>()
+            .withMessage("`action` must not be a StepActionWithContextValue. Use `addStepCondition` to add step actions that also compute context values")
     }
 
 }

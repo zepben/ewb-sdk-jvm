@@ -23,13 +23,16 @@ import com.zepben.evolve.services.network.tracing.networktrace.*
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.Conditions.stopAtOpen
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.StepContext
+import org.slf4j.Logger
 
 /**
  * Convenience class that provides methods for assigning HV/MV feeders on a [NetworkService].
  * Requires that a Feeder have a normalHeadTerminal with associated ConductingEquipment.
  * This class is backed by a [NetworkTrace].
  */
-class AssignToFeeders {
+class AssignToFeeders(
+    private val debugLogger: Logger?
+) {
 
     /**
      * Assign equipment to feeders in the specified network, given an optional start terminal.
@@ -44,7 +47,8 @@ class AssignToFeeders {
         network: NetworkService,
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL,
         startTerminal: Terminal? = null
-    ): Unit = AssignToFeedersInternal(networkStateOperators).run(network, startTerminal)
+    ): Unit = AssignToFeedersInternal(networkStateOperators, debugLogger)
+        .run(network, startTerminal)
 
     /**
      * Assign equipment to feeders tracing out from the supplied terminal.
@@ -65,9 +69,13 @@ class AssignToFeeders {
         terminalToAuxEquipment: Map<Terminal, List<AuxiliaryEquipment>>,
         feedersToAssign: List<Feeder>,
         networkStateOperators: NetworkStateOperators = NetworkStateOperators.NORMAL
-    ): Unit = AssignToFeedersInternal(networkStateOperators).run(terminal, feederStartPoints, lvFeederStartPoints, terminalToAuxEquipment, feedersToAssign)
+    ): Unit = AssignToFeedersInternal(networkStateOperators, debugLogger)
+        .run(terminal, feederStartPoints, lvFeederStartPoints, terminalToAuxEquipment, feedersToAssign)
 
-    private class AssignToFeedersInternal(val stateOperators: NetworkStateOperators) {
+    private class AssignToFeedersInternal(
+        private val stateOperators: NetworkStateOperators,
+        private val debugLogger: Logger?
+    ) {
 
         fun run(network: NetworkService, startTerminal: Terminal?) {
             val feederStartPoints = network.feederStartPoints
@@ -112,7 +120,7 @@ class AssignToFeeders {
             fun reachedSubstationTransformer(ce: ConductingEquipment) = ce is PowerTransformer && ce.substations.isNotEmpty()
             fun reachedLv(ce: ConductingEquipment) = ce.baseVoltage?.let { it.nominalVoltage < 1000 } == true
 
-            return Tracing.networkTrace(stateOperators, NetworkTraceActionType.ALL_STEPS)
+            return Tracing.networkTrace(stateOperators, NetworkTraceActionType.ALL_STEPS, debugLogger, name = "AssignToFeeders(${stateOperators.description})")
                 .addCondition { stopAtOpen() }
                 .addStopCondition { (path), _ -> feederStartPoints.contains(path.toEquipment) }
                 .addQueueCondition { (path), _, _, _ -> !reachedSubstationTransformer(path.toEquipment) }

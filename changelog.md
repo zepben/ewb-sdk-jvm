@@ -20,7 +20,8 @@
   include the results of all queue and stop condition checks, and each item that is stepped on.
 
 ### Enhancements
-* None.
+* `NetworkTrace` now supports starting from a known `NetworkTraceStep.Path`. This allows you to force a trace to start in a particular direction, or to continue
+  a follow-up trace from a detected stop point.
 
 ### Fixes
 * `QueryNetworkStateService.reportBatchStatus` now correctly sends the `Empty` response.

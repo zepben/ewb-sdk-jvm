@@ -26,6 +26,9 @@ import kotlin.collections.ArrayDeque
  *
  * @param T The type of object to be traversed.
  * @param D The specific type of traversal, extending [Traversal].
+ * @param queueType The type of queue to use for processing this traversal.
+ * @param parent The parent traversal, or null if this is a root level traversal. Primarily used to track branching traversals.
+ * @param debugLogger An optional logger to add information about how the trace is processing items.
  */
 abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
     internal val queueType: QueueType<T, D>,
@@ -119,6 +122,13 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      */
     protected open fun canActionItem(item: T, context: StepContext): Boolean = true
 
+    /**
+     * Check to see if the given item can be visited.
+     *
+     * @param item The item to check.
+     * @param context The context of the current traversal step.
+     * @return `true` if the item can be visited; `false` otherwise.
+     */
     protected abstract fun canVisitItem(item: T, context: StepContext): Boolean
 
     /**
@@ -319,7 +329,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
             newContextData[key] = computer.computeInitialValue(nextStep)
         }
 
-        return StepContext(true, false, 0, 0, newContextData)
+        return StepContext(isStartItem = true, isBranchStartItem = false, stepNumber = 0, branchDepth = 0, values = newContextData)
     }
 
 

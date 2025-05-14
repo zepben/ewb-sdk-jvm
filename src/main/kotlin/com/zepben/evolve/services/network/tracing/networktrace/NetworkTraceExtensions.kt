@@ -36,6 +36,16 @@ fun NetworkTrace<Unit>.addStartItem(start: ConductingEquipment, phases: PhaseCod
 }
 
 /**
+ * Convenience extension function for [NetworkTrace.addStartItem] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
+ *
+ * @param startPath The path to start the trace from.
+ */
+fun NetworkTrace<Unit>.addStartItem(startPath: NetworkTraceStep.Path): NetworkTrace<Unit> {
+    addStartItem(startPath, Unit)
+    return this
+}
+
+/**
  * Convenience extension function for [NetworkTrace.run] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
  *
  * @param start The starting terminal for the trace.
@@ -54,5 +64,15 @@ fun NetworkTrace<Unit>.run(start: Terminal, phases: PhaseCode? = null, canStopOn
  */
 fun NetworkTrace<Unit>.run(start: ConductingEquipment, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true): NetworkTrace<Unit> {
     this.run(start, Unit, phases, canStopOnStartItem)
+    return this
+}
+
+/**
+ * Convenience extension function for [NetworkTrace.run] allowing you not to have to pass in `Unit` as the data when the [NetworkTrace] `T` is of type [Unit]
+ *
+ * @param startPath The path to start the trace from.
+ */
+fun NetworkTrace<Unit>.run(startPath: NetworkTraceStep.Path, canStopOnStartItem: Boolean = true): NetworkTrace<Unit> {
+    this.run(startPath, Unit, canStopOnStartItem)
     return this
 }

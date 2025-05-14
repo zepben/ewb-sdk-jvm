@@ -14,6 +14,7 @@ import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.cim.iec61970.base.wires.Clamp
 import com.zepben.evolve.cim.iec61970.base.wires.Cut
 import com.zepben.evolve.cim.iec61970.base.wires.Junction
+import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.getT
 import com.zepben.evolve.services.network.tracing.traversal.TraversalQueue
 import com.zepben.evolve.testing.TestNetworkBuilder
@@ -251,6 +252,66 @@ class NetworkTraceTest {
         // * c1-t1 as the start item should be ignored as it has already been visited.
         assertThat(stopChecks, contains("c2-t1", "c2-t2", "c0-t1", "c0-t2", "c1-t1"))
         assertThat(steps, contains("c1-t2", "c2-t1", "c2-t2", "c0-t1", "c0-t2"))
+    }
+
+    @Test
+    internal fun `can provide a path to force the trace to traverse in a given direction`() {
+        //
+        // 1--c0--21--c1-*-21--c2--2
+        //               1
+        //               1--c3--2
+        //
+        val ns = TestNetworkBuilder()
+            .fromAcls() // c0
+            .toAcls() // c1
+            .withClamp() // c1-clamp1
+            .toAcls() // c2
+            .branchFrom("c1-clamp1")
+            .toAcls() // c3
+            .network
+
+        fun validate(start: Pair<String, String>, actionStepType: NetworkTraceActionType, vararg expected: String) {
+            val steppedOn = mutableListOf<NetworkTraceStep<*>>()
+
+            Tracing.networkTrace(actionStepType = actionStepType)
+                .addStepAction { item, _ -> steppedOn.add(item) }
+                .run(ns.createStartPath(start))
+
+            assertThat(steppedOn.map { it.path.toTerminal.mRID }, contains(*expected))
+        }
+
+        validate("c0-t1" to "c0-t2", NetworkTraceActionType.ALL_STEPS, "c0-t2", "c1-t1", "c1-t2", "c2-t1", "c2-t2", "c1-clamp1-t1", "c3-t1", "c3-t2")
+        validate("c0-t2" to "c0-t1", NetworkTraceActionType.ALL_STEPS, "c0-t1")
+        validate("c1-t2" to "c2-t1", NetworkTraceActionType.ALL_STEPS, "c2-t1", "c2-t2")
+        validate("c1-t1" to "c1-clamp1-t1", NetworkTraceActionType.ALL_STEPS, "c1-clamp1-t1", "c3-t1", "c3-t2")
+        validate("c1-clamp1-t1" to "c1-t2", NetworkTraceActionType.ALL_STEPS, "c1-t2", "c2-t1", "c2-t2")
+
+        validate("c0-t1" to "c0-t2", NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT, "c0-t2", "c1-t1", "c2-t1", "c1-clamp1-t1", "c3-t1")
+        validate("c0-t2" to "c0-t1", NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT, "c0-t1")
+        validate("c1-t2" to "c2-t1", NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT, "c2-t1")
+        validate("c1-t1" to "c1-clamp1-t1", NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT, "c1-clamp1-t1", "c3-t1")
+        validate("c1-clamp1-t1" to "c1-t2", NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT, "c1-t2", "c2-t1")
+
+        // Can even use bizarre paths, they are just the same as any other external path.
+        validate("c0-t1" to "c2-t1", NetworkTraceActionType.ALL_STEPS, "c2-t1", "c2-t2")
+        validate("c0-t1" to "c2-t1", NetworkTraceActionType.FIRST_STEP_ON_EQUIPMENT, "c2-t1")
+    }
+
+    private fun NetworkService.createStartPath(start: Pair<String, String>): NetworkTraceStep.Path {
+        val from = get<Terminal>(start.first)!!
+        val to = get<Terminal>(start.second)!!
+
+        val fromCe = from.conductingEquipment
+        val toCe = to.conductingEquipment
+
+        val traversed = when {
+            toCe == fromCe -> toCe as? AcLineSegment
+            (toCe is Clamp) && (toCe.acLineSegment == fromCe) -> toCe.acLineSegment
+            (fromCe is Clamp) && (fromCe.acLineSegment == toCe) -> fromCe.acLineSegment
+            else -> null
+        }
+
+        return NetworkTraceStep.Path(from, to, traversed)
     }
 
 }

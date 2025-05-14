@@ -20,7 +20,8 @@
   include the results of all queue and stop condition checks, and each item that is stepped on.
 
 ### Enhancements
-* None.
+* `NetworkTrace` now supports starting from a known `NetworkTraceStep.Path`. This allows you to force a trace to start in a particular direction, or to continue
+  a follow-up trace from a detected stop point.
 
 ### Fixes
 * Phases are now correctly assigned to the LV side of an LV2 transformer that is in parallel with a previously energised LV1 transformer.

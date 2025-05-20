@@ -10,7 +10,7 @@
 * None.
 
 ### Fixes
-* None.
+* `QueryNetworkStateService.reportBatchStatus` now correctly sends the `Empty` response.
 
 ### Notes
 * None.

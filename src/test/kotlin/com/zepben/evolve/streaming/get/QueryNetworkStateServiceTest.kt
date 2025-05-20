@@ -97,7 +97,10 @@ internal class QueryNetworkStateServiceTest {
 
     @Test
     internal fun `can receive status responses`() {
-        val responseObserver = mockk<StreamObserver<Empty>> { justRun { onCompleted() } }
+        val responseObserver = mockk<StreamObserver<Empty>> {
+            justRun { onCompleted() }
+            justRun { onNext(any()) }
+        }
         val requestObserver = service.reportBatchStatus(responseObserver)
 
         requestObserver.onNext(BatchNotProcessed(1L).toPb())
@@ -111,6 +114,7 @@ internal class QueryNetworkStateServiceTest {
         verifySequence {
             onCurrentStatesStatus(capture(statuses))
             onCurrentStatesStatus(capture(statuses))
+            responseObserver.onNext(any())
             responseObserver.onCompleted()
         }
 
@@ -120,7 +124,10 @@ internal class QueryNetworkStateServiceTest {
 
     @Test
     internal fun `calls process error handler with unknown status responses`() {
-        val responseObserver = mockk<StreamObserver<Empty>> { justRun { onCompleted() } }
+        val responseObserver = mockk<StreamObserver<Empty>> {
+            justRun { onCompleted() }
+            justRun { onNext(any()) }
+        }
         val requestObserver = service.reportBatchStatus(responseObserver)
 
         // Not sure if/how we can set this to something not supported like you would get from a future version, so just leave it blank.
@@ -130,6 +137,7 @@ internal class QueryNetworkStateServiceTest {
         val error = slot<GrpcException>()
         verifySequence {
             onProcessingError(capture(error))
+            responseObserver.onNext(any())
             responseObserver.onCompleted()
         }
 

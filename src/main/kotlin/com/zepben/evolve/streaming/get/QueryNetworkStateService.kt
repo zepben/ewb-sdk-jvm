@@ -14,6 +14,7 @@ import com.zepben.evolve.services.common.translator.toLocalDateTime
 import com.zepben.evolve.streaming.data.CurrentStateEvent
 import com.zepben.evolve.streaming.data.CurrentStateEventBatch
 import com.zepben.evolve.streaming.data.SetCurrentStatesStatus
+import com.zepben.evolve.streaming.get.QueryNetworkStateService.ProcessingErrorHandler
 import com.zepben.protobuf.connection.CheckConnectionRequest
 import com.zepben.protobuf.ns.GetCurrentStatesRequest
 import com.zepben.protobuf.ns.GetCurrentStatesResponse
@@ -166,7 +167,10 @@ class QueryNetworkStateService(
 
             override fun onError(e: Throwable) = throw e
 
-            override fun onCompleted() = responseObserver.onCompleted()
+            override fun onCompleted() {
+                responseObserver.onNext(Empty.getDefaultInstance())
+                responseObserver.onCompleted()
+            }
 
         }
 

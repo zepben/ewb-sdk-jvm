@@ -30,12 +30,14 @@ internal class ConnectTest {
     private val gcbWithToken = mockk<GrpcChannelBuilder>()
     private val gcbWithTlsWithToken = mockk<GrpcChannelBuilder>()
     private val gcbWithAuth = mockk<GrpcChannelBuilder>()
+    private val gcbWithTlsWithoutCertVerify = mockk<GrpcChannelBuilder>()
 
     private val grpcChannel = mockk<GrpcChannel>()
     private val grpcChannelWithTls = mockk<GrpcChannel>()
     private val grpcChannelWithTlsWithToken = mockk<GrpcChannel>()
     private val grpcChannelWithToken = mockk<GrpcChannel>()
     private val grpcChannelWithAuth = mockk<GrpcChannel>()
+    private val grpcChannelWithTlsWithoutCertVerify = mockk<GrpcChannel>()
 
     private val tokenFetcher = mockk<ZepbenTokenFetcher>()
     private val tokenRequestData = JsonObject()
@@ -45,6 +47,8 @@ internal class ConnectTest {
         tokenRequestData.clear()
 
         every { gcbWithAddress.makeSecure("caFilename") } returns gcbWithTls
+        every { gcbWithAddress.makeSecure(verifyCertificates = false) } returns gcbWithTlsWithoutCertVerify
+
         every { gcbWithTls.withTokenFetcher(tokenFetcher) } returns gcbWithAuth
         every { gcbWithTls.withAccessToken("accessToken") } returns gcbWithTlsWithToken
 
@@ -56,6 +60,7 @@ internal class ConnectTest {
         every { gcbWithTlsWithToken.build(any()) } returns grpcChannelWithTlsWithToken
         every { gcbWithToken.build(any()) } returns grpcChannelWithToken
         every { gcbWithAuth.build(any()) } returns grpcChannelWithAuth
+        every { gcbWithTlsWithoutCertVerify.build(any()) } returns grpcChannelWithTlsWithoutCertVerify
 
         every { tokenFetcher.tokenRequestData } returns tokenRequestData
 
@@ -86,6 +91,11 @@ internal class ConnectTest {
     @Test
     internal fun connectTls() {
         assertThat(Connect.connectTls("hostname", 1234, "caFilename"), equalTo(grpcChannelWithTls))
+    }
+
+    @Test
+    internal fun connectTlsCertVerifyDisable() {
+        assertThat(Connect.connectTls("hostname", 1234, verifyCertificates = false), equalTo(grpcChannelWithTlsWithoutCertVerify))
     }
 
     @Test

@@ -91,7 +91,8 @@ try (GrpcChannel channel = Connect.connectWithAccessToken(
     "example.zepben.com", // rpc hostname
     443,                  // rpc port
     "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJhdWQiOiJzZGtfZXhhbXBsZV9hdWRpZW5jZSJ9.",  // personal access token generated from EAS
-    "path/to/ca.cert"     // set to null to use system CAs for server cert verification
+    "path/to/ca.cert",    // set to null to use system CAs for server cert verification
+    true                  // set to false to disable cert verification, true by default
     )
 ) {
     NetworkConsumerClient client = new NetworkConsumerClient(channel);
@@ -150,7 +151,12 @@ Connect.connectInsecure("example.zepben.com", 443).use { channel ->
 }
 
 // With just SSL
-Connect.connectTls("example.zepben.com", 443, "path/to/ca.cert").use { channel ->
+Connect.connectTls(
+    "example.zepben.com",
+    443,
+    "path/to/ca.cert",
+    true                  // set to false to disable cert verification, true by default
+).use { channel ->
     val client = NetworkConsumerClient(channel)
     val result = client.getEquipmentContainer("container_mrid").throwOnError()
     val ns = client.service

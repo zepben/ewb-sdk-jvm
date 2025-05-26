@@ -316,19 +316,3 @@ object Connect {
         return GrpcChannelBuilder().forAddress(host, rpcPort).makeSecure(rootCertificates = caFilename).withTokenFetcher(tokenFetcher).build(buildArgs)
     }
 }
-
-fun main() {
-    try {
-        val foo = Connect.connectTls("localhost", 50051, verifyCertificates = true)
-    } catch (e: GrpcConnectionException) {
-        println("shits fucked ${e.message}")
-    }
-
-    try {
-        val foo = Connect.connectTls("localhost", 50051, verifyCertificates = false)
-    } catch (e: GrpcConnectionException) {
-        println("you fucked")
-    }
-
-    println("it worked")
-}

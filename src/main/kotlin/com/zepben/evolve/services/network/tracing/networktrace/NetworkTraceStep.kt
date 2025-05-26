@@ -12,7 +12,6 @@ import com.zepben.evolve.cim.iec61970.base.core.ConductingEquipment
 import com.zepben.evolve.cim.iec61970.base.core.Terminal
 import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
 import com.zepben.evolve.services.network.tracing.connectivity.NominalPhasePath
-import com.zepben.evolve.services.network.tracing.networktrace.NetworkTraceStep.Type
 
 /**
  * Represents a single step in a network trace, containing information about the path taken and associated data.
@@ -41,6 +40,10 @@ class NetworkTraceStep<out T>(
 
     operator fun component1(): Path = path
     operator fun component2(): T = data
+
+    override fun toString(): String {
+        return "NetworkTraceStep(path=$path, numTerminalSteps=$numTerminalSteps, numEquipmentSteps=$numEquipmentSteps, data=$data)"
+    }
 
     /**
      * Represents the path taken in a network trace step, detailing the transition from one terminal to another.

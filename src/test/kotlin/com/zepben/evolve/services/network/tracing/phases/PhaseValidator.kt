@@ -62,13 +62,13 @@ object PhaseValidator {
     private fun doPhaseValidation(terminal: Terminal, phaseStatus: PhaseStatus, expectedPhases: List<SinglePhaseKind>) {
         if ((expectedPhases.size == 1) && (expectedPhases[0] == SinglePhaseKind.NONE)) {
             terminal.phases.singlePhases.forEach { nominalPhase ->
-                assertThat("nominal phase $nominalPhase", phaseStatus[nominalPhase], equalTo(SinglePhaseKind.NONE))
+                assertThat("${terminal.mRID}: nominal phase $nominalPhase", phaseStatus[nominalPhase], equalTo(SinglePhaseKind.NONE))
             }
         } else {
-            assertThat(terminal.phases.numPhases(), equalTo(expectedPhases.size))
+            assertThat("${terminal.mRID}: expected phases should have correct number of phases", terminal.phases.numPhases(), equalTo(expectedPhases.size))
 
             terminal.phases.singlePhases.forEachIndexed { index, nominalPhase ->
-                assertThat("nominal phase $nominalPhase", phaseStatus[nominalPhase], equalTo(expectedPhases[index]))
+                assertThat("${terminal.mRID}: nominal phase $nominalPhase", phaseStatus[nominalPhase], equalTo(expectedPhases[index]))
             }
         }
     }

@@ -33,6 +33,8 @@ interface NetworkStateOperators :
     PhaseStateOperators,
     ConnectivityStateOperators {
 
+    val description: String
+
     companion object {
         /**
          * Instance that operates on the normal state of network objects.
@@ -61,6 +63,9 @@ private class NormalNetworkStateOperators : NetworkStateOperators,
     // StateOperator interfaces because the implementation of next paths has a dependency on other state operators.
     override fun nextPaths(path: NetworkTraceStep.Path): Sequence<NetworkTraceStep.Path> =
         networkTraceStepPathProvider.nextPaths(path)
+
+    override val description: String = "normal"
+
 }
 
 private class CurrentNetworkStateOperators : NetworkStateOperators,
@@ -76,4 +81,7 @@ private class CurrentNetworkStateOperators : NetworkStateOperators,
     // StateOperator interfaces because the implementation of next paths has a dependency on other state operators.
     override fun nextPaths(path: NetworkTraceStep.Path): Sequence<NetworkTraceStep.Path> =
         networkTraceStepPathProvider.nextPaths(path)
+
+    override val description: String = "current"
+
 }

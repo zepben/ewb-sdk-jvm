@@ -23,6 +23,7 @@ import com.zepben.evolve.services.network.tracing.networktrace.conditions.Networ
 import com.zepben.evolve.services.network.tracing.networktrace.conditions.NetworkTraceStopCondition
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.traversal.*
+import org.slf4j.Logger
 
 /**
  * A [Traversal] implementation specifically designed to trace connected [Terminal]s of [ConductingEquipment] in a network.
@@ -68,7 +69,9 @@ class NetworkTrace<T> private constructor(
     queueType: QueueType<NetworkTraceStep<T>, NetworkTrace<T>>,
     parent: NetworkTrace<T>? = null,
     private val actionType: NetworkTraceActionType,
-) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, parent) {
+    debugLogger: Logger?,
+    override val name: String
+) : Traversal<NetworkTraceStep<T>, NetworkTrace<T>>(queueType, parent, debugLogger) {
 
     // Setting initial capacity greater than default of 16 for non-branching traces as we suspect a majority of network traces will step on more than 12
     // terminals (load factor is 0.75). Not sure what a sensible initial capacity actually is, but 16 just felt too small.
@@ -84,12 +87,16 @@ class NetworkTrace<T> private constructor(
         networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
         actionType: NetworkTraceActionType,
+        debugLogger: Logger?,
+        name: String,
         computeData: ComputeData<T>,
     ) : this(
         networkStateOperators,
         BasicQueueType(NetworkTraceQueueNext.Basic(networkStateOperators, computeData.withActionType(actionType)), queue),
         null,
         actionType,
+        debugLogger,
+        name,
     )
 
     // Non-branching instance that takes a compute data requiring all next step paths.
@@ -98,12 +105,16 @@ class NetworkTrace<T> private constructor(
         networkStateOperators: NetworkStateOperators,
         queue: TraversalQueue<NetworkTraceStep<T>>,
         actionType: NetworkTraceActionType,
+        debugLogger: Logger?,
+        name: String,
         computeNextT: ComputeDataWithPaths<T>,
     ) : this(
         networkStateOperators,
         BasicQueueType(NetworkTraceQueueNext.Basic(networkStateOperators, computeNextT.withActionType(actionType)), queue),
         null,
         actionType,
+        debugLogger,
+        name,
     )
 
     // Branching instance that takes a regular compute data.
@@ -112,6 +123,8 @@ class NetworkTrace<T> private constructor(
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
         actionType: NetworkTraceActionType,
+        debugLogger: Logger?,
+        name: String,
         parent: NetworkTrace<T>?,
         computeData: ComputeData<T>,
     ) : this(
@@ -123,6 +136,8 @@ class NetworkTrace<T> private constructor(
         ),
         parent,
         actionType,
+        debugLogger,
+        name,
     )
 
     // Branching instance that takes a compute data requiring all next step paths.
@@ -132,6 +147,8 @@ class NetworkTrace<T> private constructor(
         queueFactory: () -> TraversalQueue<NetworkTraceStep<T>>,
         branchQueueFactory: () -> TraversalQueue<NetworkTrace<T>>,
         actionType: NetworkTraceActionType,
+        debugLogger: Logger?,
+        name: String,
         parent: NetworkTrace<T>?,
         computeNextT: ComputeDataWithPaths<T>,
     ) : this(
@@ -143,6 +160,8 @@ class NetworkTrace<T> private constructor(
         ),
         parent,
         actionType,
+        debugLogger,
+        name,
     )
 
     /**
@@ -192,14 +211,26 @@ class NetworkTrace<T> private constructor(
         return this
     }
 
-    private fun addStartItem(start: Terminal?, data: T, phases: PhaseCode? = null, traversedAcLineSegment: AcLineSegment?) {
-        start ?: return
-        val startPath = NetworkTraceStep.Path(start, start, traversedAcLineSegment, startNominalPhasePath(phases))
+    /**
+     * Adds the given [NetworkTraceStep.Path] as starting points in the trace, with the associated data.
+     * Tracing will continue from the path externally or internally depending on the path provided.
+     *
+     * NOTE: The given path will be stepped on, but that may mean the `fromTerminal` is skipped from your trace, so
+     *       take care to handle this use case.
+     *
+     * @param startPath The path to start the trace from.
+     * @param data The data associated with each terminal start step.
+     */
+    fun addStartItem(startPath: NetworkTraceStep.Path, data: T) {
         addStartItem(NetworkTraceStep(startPath, 0, 0, data))
     }
 
+    private fun addStartItem(start: Terminal, data: T, phases: PhaseCode? = null, traversedAcLineSegment: AcLineSegment?) {
+        addStartItem(NetworkTraceStep.Path(start, start, traversedAcLineSegment, startNominalPhasePath(phases)), data)
+    }
+
     /**
-     * Runs the network trace starting adding the given [Terminal] to the start items.
+     * Runs the network trace adding the given [Terminal] to the start items.
      *
      * @param start The starting terminal for the trace.
      * @param data The data associated with the start step.
@@ -213,7 +244,7 @@ class NetworkTrace<T> private constructor(
     }
 
     /**
-     * Runs the network trace starting adding all terminals [Terminal]s of the start equipment to the start items.
+     * Runs the network trace adding all terminals [Terminal]s of the start equipment to the start items.
      *
      * @param start The starting equipment whose terminals will be used as start items for the trace.
      * @param data The data associated with the start step.
@@ -222,6 +253,19 @@ class NetworkTrace<T> private constructor(
      */
     fun run(start: ConductingEquipment, data: T, phases: PhaseCode? = null, canStopOnStartItem: Boolean = true): NetworkTrace<T> {
         addStartItem(start, data, phases)
+        run(canStopOnStartItem)
+        return this
+    }
+
+    /**
+     * Runs the network trace adding the [startPath] to the start items.
+     *
+     * @param startPath The path to start the trace from.
+     * @param data The data associated with the start step.
+     * @param canStopOnStartItem Indicates whether the trace should check stop conditions on start items.
+     */
+    fun run(startPath: NetworkTraceStep.Path, data: T, canStopOnStartItem: Boolean = true): NetworkTrace<T> {
+        addStartItem(startPath, data)
         run(canStopOnStartItem)
         return this
     }
@@ -317,7 +361,7 @@ class NetworkTrace<T> private constructor(
     }
 
     override fun getDerivedThis(): NetworkTrace<T> = this
-    override fun createNewThis(): NetworkTrace<T> = NetworkTrace(networkStateOperators, queueType, this, actionType)
+    override fun createNewThis(): NetworkTrace<T> = NetworkTrace(networkStateOperators, queueType, this, actionType, debugLogger = null, name)
 
     private fun startNominalPhasePath(phases: PhaseCode?): List<NominalPhasePath> =
         phases?.singlePhases?.map { NominalPhasePath(it, it) } ?: emptyList()

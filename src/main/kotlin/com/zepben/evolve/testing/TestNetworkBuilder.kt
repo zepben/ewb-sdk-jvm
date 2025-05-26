@@ -14,6 +14,7 @@ import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
 import com.zepben.evolve.services.network.NetworkService
 import com.zepben.evolve.services.network.tracing.networktrace.Tracing
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
+import org.slf4j.Logger
 import kotlin.reflect.full.primaryConstructor
 
 /**
@@ -636,22 +637,22 @@ open class TestNetworkBuilder {
      * @return The [NetworkService] created by this [TestNetworkBuilder]
      */
     @JvmOverloads
-    fun build(applyDirectionsFromSources: Boolean = true): NetworkService {
-        Tracing.setDirection().run(network, NetworkStateOperators.NORMAL)
-        Tracing.setDirection().run(network, NetworkStateOperators.CURRENT)
-        Tracing.setPhases().run(network, NetworkStateOperators.NORMAL)
-        Tracing.setPhases().run(network, NetworkStateOperators.CURRENT)
+    fun build(applyDirectionsFromSources: Boolean = true, debugLogger: Logger? = null): NetworkService {
+        Tracing.setDirection(debugLogger).run(network, NetworkStateOperators.NORMAL)
+        Tracing.setDirection(debugLogger).run(network, NetworkStateOperators.CURRENT)
+        Tracing.setPhases(debugLogger).run(network, NetworkStateOperators.NORMAL)
+        Tracing.setPhases(debugLogger).run(network, NetworkStateOperators.CURRENT)
 
         if (applyDirectionsFromSources)
             network.sequenceOf<EnergySource>().flatMap { it.terminals }.forEach {
-                Tracing.setDirection().run(it, NetworkStateOperators.NORMAL)
-                Tracing.setDirection().run(it, NetworkStateOperators.CURRENT)
+                Tracing.setDirection(debugLogger).run(it, NetworkStateOperators.NORMAL)
+                Tracing.setDirection(debugLogger).run(it, NetworkStateOperators.CURRENT)
             }
 
-        Tracing.assignEquipmentToFeeders().run(network, NetworkStateOperators.NORMAL)
-        Tracing.assignEquipmentToFeeders().run(network, NetworkStateOperators.CURRENT)
-        Tracing.assignEquipmentToLvFeeders().run(network, NetworkStateOperators.NORMAL)
-        Tracing.assignEquipmentToLvFeeders().run(network, NetworkStateOperators.CURRENT)
+        Tracing.assignEquipmentToFeeders(debugLogger).run(network, NetworkStateOperators.NORMAL)
+        Tracing.assignEquipmentToFeeders(debugLogger).run(network, NetworkStateOperators.CURRENT)
+        Tracing.assignEquipmentToLvFeeders(debugLogger).run(network, NetworkStateOperators.NORMAL)
+        Tracing.assignEquipmentToLvFeeders(debugLogger).run(network, NetworkStateOperators.CURRENT)
 
         return network
     }

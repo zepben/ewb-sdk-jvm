@@ -29,7 +29,7 @@ class ClearDirectionTest {
     @RegisterExtension
     var systemErr: SystemLogExtension = SystemLogExtension.SYSTEM_ERR.captureLog().muteOnSuccess()
 
-    private val clearDirection = ClearDirection()
+    private val clearDirection = ClearDirection(debugLogger = null)
     private val stateOperators = NetworkStateOperators.NORMAL
 
     @Test

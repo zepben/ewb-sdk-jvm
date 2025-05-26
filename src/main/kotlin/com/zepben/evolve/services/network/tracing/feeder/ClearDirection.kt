@@ -17,11 +17,14 @@ import com.zepben.evolve.services.network.tracing.networktrace.conditions.Condit
 import com.zepben.evolve.services.network.tracing.networktrace.operators.NetworkStateOperators
 import com.zepben.evolve.services.network.tracing.networktrace.run
 import com.zepben.evolve.services.network.tracing.traversal.WeightedPriorityQueue
+import org.slf4j.Logger
 
 /**
  * Convenience class that provides methods for clearing feeder direction on a [NetworkService]
  */
-class ClearDirection {
+class ClearDirection(
+    private val debugLogger: Logger?
+) {
 
     /*
      * NOTE: We used to try and remove directions in a single pass rather than clearing (and the reapplying where needed) to be more efficient.
@@ -49,6 +52,8 @@ class ClearDirection {
     private fun createTrace(stateOperators: NetworkStateOperators, visitedFeederHeadTerminals: MutableSet<Terminal>): NetworkTrace<Unit> = Tracing.networkTrace(
         networkStateOperators = stateOperators,
         actionStepType = NetworkTraceActionType.ALL_STEPS,
+        debugLogger = debugLogger,
+        name = "ClearDirection(${stateOperators.description})",
         queue = WeightedPriorityQueue.processQueue { it.path.toTerminal.phases.numPhases() },
     )
         .addCondition { stopAtOpen() }

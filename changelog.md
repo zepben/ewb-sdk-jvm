@@ -22,6 +22,7 @@
 ### Enhancements
 * `NetworkTrace` now supports starting from a known `NetworkTraceStep.Path`. This allows you to force a trace to start in a particular direction, or to continue
   a follow-up trace from a detected stop point.
+* Support disabling certificate verification in SDK connection helpers
 
 ### Fixes
 * `QueryNetworkStateService.reportBatchStatus` now correctly sends the `Empty` response.

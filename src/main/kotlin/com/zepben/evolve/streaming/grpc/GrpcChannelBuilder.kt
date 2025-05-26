@@ -20,9 +20,11 @@ import com.zepben.protobuf.ns.UpdateNetworkStateServiceGrpc
 import io.grpc.*
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import io.grpc.stub.ClientCalls
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
 
 private const val TWENTY_MEGABYTES = 1024 * 1024 * 20
@@ -119,15 +121,24 @@ class GrpcChannelBuilder {
     }
 
     fun makeSecure(
-        rootCertificates: File
+        rootCertificates: File,
+        verifyCertificates: Boolean = true
     ): GrpcChannelBuilder = apply {
-        _channelCredentials = TlsChannelCredentials.newBuilder().trustManager(rootCertificates).build()
+        _channelCredentials = if (!verifyCertificates) {
+            TlsChannelCredentials.newBuilder().trustManager(*InsecureTrustManagerFactory.INSTANCE.trustManagers).build()
+        } else {
+            TlsChannelCredentials.newBuilder().trustManager(rootCertificates).build()
+        }
     }
 
-    fun makeSecure(rootCertificates: String? = null): GrpcChannelBuilder = rootCertificates?.let {
-        makeSecure(File(rootCertificates))
+    fun makeSecure(rootCertificates: String? = null, verifyCertificates: Boolean = true): GrpcChannelBuilder = rootCertificates?.let {
+        makeSecure(File(rootCertificates), verifyCertificates)
     } ?: apply {
-        _channelCredentials = TlsChannelCredentials.create()
+        _channelCredentials = if (verifyCertificates) {
+            TlsChannelCredentials.create()
+        } else {
+            TlsChannelCredentials.newBuilder().trustManager(*InsecureTrustManagerFactory.INSTANCE.trustManagers).build()
+        }
     }
 
     fun makeSecure(

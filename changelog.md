@@ -1,7 +1,7 @@
 # Zepben EWB SDK changelog
 ## [0.29.0] - UNRELEASED
 ### Breaking Changes
-* You can no longer register a `StepActionWithContextValue` with `Traversal.ifStopping` or `Traversal.ifNotStopping`, you must use `Traversal.addStepCondition`
+* You can no longer register a `StepActionWithContextValue` with `Traversal.ifStopping` or `Traversal.ifNotStopping`, you must use `Traversal.addStepAction`
   instead.
 * Added a new `debugLogging` and `name` parameters to the constructor of the following traces. The helper functions in `Tracing` also have these parameters,
   which defaults to `null` and `networkTrace`, meaning anyone using these wrappers will be unaffected by the change:

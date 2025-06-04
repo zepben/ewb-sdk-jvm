@@ -252,7 +252,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return The current traversal instance.
      */
     fun ifNotStopping(action: StepAction<T>): D {
-        require(action !is StepActionWithContextValue<T, *>) { "`action` must not be a StepActionWithContextValue. Use `addStepCondition` to add step actions that also compute context values" }
+        require(action !is StepActionWithContextValue<T, *>) { "`action` must not be a StepActionWithContextValue. Use `addStepAction` to add step actions that also compute context values" }
 
         val wrappedAction = if (debugLogger == null)
             action
@@ -270,7 +270,7 @@ abstract class Traversal<T, D : Traversal<T, D>> internal constructor(
      * @return The current traversal instance.
      */
     fun ifStopping(action: StepAction<T>): D {
-        require(action !is StepActionWithContextValue<T, *>) { "`action` must not be a StepActionWithContextValue. Use `addStepCondition` to add step actions that also compute context values" }
+        require(action !is StepActionWithContextValue<T, *>) { "`action` must not be a StepActionWithContextValue. Use `addStepAction` to add step actions that also compute context values" }
 
         val wrappedAction = if (debugLogger == null)
             action

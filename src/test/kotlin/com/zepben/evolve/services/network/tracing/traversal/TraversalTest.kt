@@ -369,10 +369,10 @@ class TraversalTest {
 
         expect { createTraversal().ifStopping(action) }
             .toThrow<IllegalArgumentException>()
-            .withMessage("`action` must not be a StepActionWithContextValue. Use `addStepCondition` to add step actions that also compute context values")
+            .withMessage("`action` must not be a StepActionWithContextValue. Use `addStepAction` to add step actions that also compute context values")
         expect { createTraversal().ifNotStopping(action) }
             .toThrow<IllegalArgumentException>()
-            .withMessage("`action` must not be a StepActionWithContextValue. Use `addStepCondition` to add step actions that also compute context values")
+            .withMessage("`action` must not be a StepActionWithContextValue. Use `addStepAction` to add step actions that also compute context values")
     }
 
 }

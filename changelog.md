@@ -1,4 +1,20 @@
 # Zepben EWB SDK changelog
+## [0.30.0] - UNRELEASED
+### Breaking Changes
+* None.
+
+### New Features
+* None.
+
+### Enhancements
+* None.
+
+### Fixes
+* None.
+
+### Notes
+* None.
+
 ## [0.29.0] - 2025-06-05
 ### Breaking Changes
 * You can no longer register a `StepActionWithContextValue` with `Traversal.ifStopping` or `Traversal.ifNotStopping`, you must use `Traversal.addStepAction`

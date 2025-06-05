@@ -2,6 +2,7 @@
 
 | Version                | Released            |
 |------------------------|---------------------|
+|[0.29.0](#v0290)| `05 June 2025` |
 |[0.28.0](#v0280)| `28 April 2025` |
 |[0.27.0](#v0270)| `24 April 2025` |
 |[0.26.1](#v0261)| `03 April 2025` |
@@ -38,6 +39,41 @@
 ---
 
 NOTE: This library is not yet stable, and breaking changes should be expected until a 1.0.0 release.
+
+---
+
+## [0.29.0]
+
+### Breaking Changes
+* You can no longer register a `StepActionWithContextValue` with `Traversal.ifStopping` or `Traversal.ifNotStopping`, you must use `Traversal.addStepAction`
+  instead.
+* Added a new `debugLogging` and `name` parameters to the constructor of the following traces. The helper functions in `Tracing` also have these parameters,
+  which defaults to `null` and `networkTrace`, meaning anyone using these wrappers will be unaffected by the change:
+  * `AssignToFeeders`
+  * `AssignToLvFeeders`
+  * `ClearDirection`
+  * `FindSwerEquipment`
+  * `PhaseInferrer`
+  * `RemovePhases`
+  * `SetDirection`
+  * `SetPhases`
+* `NetworkStateOperators` has a new abstract `description`. If you are creating custom operators you will need to add it.
+
+### New Features
+* You can now pass a logger to all `Tracing` methods and `TestNetworkBuilder.build` to enable debug logging for the traces it runs. The debug logging will
+  include the results of all queue and stop condition checks, and each item that is stepped on.
+
+### Enhancements
+* `NetworkTrace` now supports starting from a known `NetworkTraceStep.Path`. This allows you to force a trace to start in a particular direction, or to continue
+  a follow-up trace from a detected stop point.
+* Support disabling certificate verification in SDK connection helpers
+
+### Fixes
+* `QueryNetworkStateService.reportBatchStatus` now correctly sends the `Empty` response.
+* Phases are now correctly assigned to the LV side of an LV2 transformer that is in parallel with a previously energised LV1 transformer.
+
+### Notes
+* None.
 
 ---
 

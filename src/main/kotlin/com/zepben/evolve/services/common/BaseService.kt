@@ -8,8 +8,18 @@
 
 package com.zepben.evolve.services.common
 
-import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject
-import com.zepben.evolve.cim.iec61970.base.core.NameType
+import com.zepben.evolve.cim.iec61968.assets.Asset
+import com.zepben.evolve.cim.iec61968.assets.AssetContainer
+import com.zepben.evolve.cim.iec61968.assets.Structure
+import com.zepben.evolve.cim.iec61968.metering.EndDevice
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
+import com.zepben.evolve.cim.iec61970.base.core.*
+import com.zepben.evolve.cim.iec61970.base.wires.Conductor
+import com.zepben.evolve.cim.iec61970.base.wires.EnergyConnection
+import com.zepben.evolve.cim.iec61970.base.wires.RegulatingCondEq
+import com.zepben.evolve.cim.iec61970.base.wires.RotatingMachine
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.services.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.nameAndMRID
@@ -169,10 +179,11 @@ abstract class BaseService(
         if (clazz != IdentifiedObject::class)
             objectsByType[clazz]?.let { return it[mRID] as T? }
 
-        return clazz.java.cast(objectsByType.values
-            .asSequence()
-            .mapNotNull { it[mRID] }
-            .firstOrNull()
+        return clazz.java.cast(
+            objectsByType.values
+                .asSequence()
+                .mapNotNull { it[mRID] }
+                .firstOrNull()
         )
     }
 
@@ -448,6 +459,84 @@ abstract class BaseService(
      * @return true if the object is disassociated from this service.
      */
     protected fun remove(identifiedObject: IdentifiedObject): Boolean = objectsByType[identifiedObject::class]?.remove(identifiedObject.mRID) != null
+
+
+    protected fun remove(powerSystemResource: PowerSystemResource): Boolean {
+        powerSystemResource.assets.forEach { asset -> asset.removePowerSystemResource(powerSystemResource) }
+
+        return remove(powerSystemResource as IdentifiedObject)
+    }
+
+    protected fun remove(equipment: Equipment): Boolean {
+        equipment.containers.forEach { container -> container.removeEquipment(equipment) }
+        equipment.currentContainers.forEach { container -> container.removeEquipment(equipment) }
+        equipment.usagePoints.forEach { up -> up.removeEquipment(equipment) }
+
+        return remove(equipment as PowerSystemResource)
+    }
+
+    protected fun remove(auxiliaryEquipment: AuxiliaryEquipment): Boolean {
+        // Don't clean up terminal here because the terminal belongs to another conducting equipment.
+
+        return remove(auxiliaryEquipment as Equipment)
+    }
+
+    protected fun remove(sensor: Sensor): Boolean {
+
+        return remove(sensor as Equipment)
+    }
+
+    protected fun remove(conductingEquipment: ConductingEquipment, cascade: Boolean): Boolean {
+        if (cascade) {
+            conductingEquipment.terminals.forEach { t ->
+                conductingEquipment.removeTerminal(t)
+                remove(t)
+            }
+        }
+
+        return remove(conductingEquipment as Equipment)
+    }
+
+    protected fun remove(conductor: Conductor, cascade: Boolean): Boolean {
+        return remove(conductor as ConductingEquipment, cascade)
+    }
+
+    protected fun remove(powerElectronicsUnit: PowerElectronicsUnit): Boolean {
+        powerElectronicsUnit.powerElectronicsConnection?.removeUnit(powerElectronicsUnit)
+
+        return remove(powerElectronicsUnit as Equipment)
+    }
+
+    protected fun remove(asset: Asset): Boolean {
+        asset.powerSystemResources.forEach { psr -> psr.removeAsset(asset) }
+
+        return remove(asset as IdentifiedObject)
+    }
+
+    protected fun remove(assetContainer: AssetContainer): Boolean = remove(assetContainer as Asset)
+
+    protected fun remove(structure: Structure): Boolean = remove(structure as AssetContainer)
+
+    protected fun remove(endDevice: EndDevice): Boolean {
+        endDevice.usagePoints.forEach { up ->
+            up.removeEndDevice(endDevice)
+        }
+
+        return remove(endDevice as AssetContainer)
+    }
+
+    protected fun remove(energyConnection: EnergyConnection, cascade: Boolean): Boolean = remove(energyConnection as ConductingEquipment, cascade)
+
+    protected fun remove(regulatingCondEq: RegulatingCondEq, cascade: Boolean): Boolean {
+        regulatingCondEq.regulatingControl?.removeRegulatingCondEq(regulatingCondEq)
+
+        return remove(regulatingCondEq as EnergyConnection, cascade)
+    }
+
+    protected fun remove(rotatingMachine: RotatingMachine, cascade: Boolean): Boolean {
+        return remove(rotatingMachine as RegulatingCondEq, cascade)
+    }
+
 
     /**
      * Create a sequence of all instances of the specified type.

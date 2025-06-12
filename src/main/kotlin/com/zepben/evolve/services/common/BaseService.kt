@@ -22,7 +22,10 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteControl
 import com.zepben.evolve.cim.iec61970.base.scada.RemotePoint
 import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
+import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
@@ -513,7 +516,8 @@ abstract class BaseService(
         return removeInternal(connectivityNode as IdentifiedObject)
     }
 
-    protected fun removeInternal(connectivityNodeContainer: ConnectivityNodeContainer, cascade: Boolean = false): Boolean = removeInternal(connectivityNodeContainer as PowerSystemResource)
+    protected fun removeInternal(connectivityNodeContainer: ConnectivityNodeContainer, cascade: Boolean = false): Boolean =
+        removeInternal(connectivityNodeContainer as PowerSystemResource)
 
     protected fun removeInternal(curve: Curve, cascade: Boolean = false): Boolean = removeInternal(curve as IdentifiedObject)
 
@@ -588,7 +592,7 @@ abstract class BaseService(
      *
      * @return true if the object is disassociated from this service.
      */
-    protected fun removeInternal(identifiedObject: IdentifiedObject): Boolean = objectsByType[identifiedObject::class]?.remove(identifiedObject.mRID) != null
+    private fun removeInternal(identifiedObject: IdentifiedObject): Boolean = objectsByType[identifiedObject::class]?.remove(identifiedObject.mRID) != null
 
     protected fun removeInternal(powerSystemResource: PowerSystemResource, cascade: Boolean = false): Boolean {
         powerSystemResource.assets.forEach { asset -> asset.removePowerSystemResource(powerSystemResource) }
@@ -654,9 +658,11 @@ abstract class BaseService(
     /**
      * IEC61970 base equivalents
      */
-    protected fun removeInternal(equivalentBranch: EquivalentBranch, cascade: Boolean): Boolean = removeInternal(equivalentBranch as EquivalentEquipment, cascade)
+    protected fun removeInternal(equivalentBranch: EquivalentBranch, cascade: Boolean): Boolean =
+        removeInternal(equivalentBranch as EquivalentEquipment, cascade)
 
-    protected fun removeInternal(equivalentEquipment: EquivalentEquipment, cascade: Boolean): Boolean = removeInternal(equivalentEquipment as ConductingEquipment, cascade)
+    protected fun removeInternal(equivalentEquipment: EquivalentEquipment, cascade: Boolean): Boolean =
+        removeInternal(equivalentEquipment as ConductingEquipment, cascade)
 
 
     /**
@@ -725,6 +731,214 @@ abstract class BaseService(
 
 
     /**
+     * IEC61970 base wires
+     */
+    protected fun removeInternal(acLineSegment: AcLineSegment, cascade: Boolean): Boolean {
+        if (cascade) {
+            acLineSegment.cuts.forEach { cut ->
+                removeInternal(cut)
+            }
+            acLineSegment.clamps.forEach { clamp ->
+                removeInternal(clamp)
+            }
+        }
+        acLineSegment.cuts.forEach { cut ->
+            cut.acLineSegment = null
+        }
+        acLineSegment.clamps.forEach { clamp ->
+            clamp.acLineSegment = null
+        }
+
+        return removeInternal(acLineSegment as Conductor, cascade)
+    }
+
+    protected fun removeInternal(breaker: Breaker, cascade: Boolean): Boolean = removeInternal(breaker as ProtectedSwitch, cascade)
+
+    protected fun removeInternal(busbarSection: BusbarSection, cascade: Boolean): Boolean = removeInternal(busbarSection as Connector, cascade)
+
+    protected fun removeInternal(clamp: Clamp, cascade: Boolean): Boolean {
+        clamp.acLineSegment?.removeClamp(clamp)
+
+        return removeInternal(clamp as ConductingEquipment, cascade)
+    }
+
+    protected fun removeInternal(conductor: Conductor, cascade: Boolean): Boolean {
+        return removeInternal(conductor as ConductingEquipment, cascade)
+    }
+
+    protected fun removeInternal(connector: Connector, cascade: Boolean): Boolean = removeInternal(connector as ConductingEquipment, cascade)
+
+    protected fun removeInternal(cut: Cut, cascade: Boolean): Boolean {
+        cut.acLineSegment?.removeCut(cut)
+
+        return removeInternal(cut as Switch, cascade)
+    }
+
+    protected fun removeInternal(disconnector: Disconnector, cascade: Boolean): Boolean = removeInternal(disconnector as Switch, cascade)
+
+    protected fun removeInternal(earthFaultCompensator: EarthFaultCompensator, cascade: Boolean): Boolean =
+        removeInternal(earthFaultCompensator as ConductingEquipment, cascade)
+
+    protected fun removeInternal(energyConnection: EnergyConnection, cascade: Boolean): Boolean =
+        removeInternal(energyConnection as ConductingEquipment, cascade)
+
+    protected fun removeInternal(energyConsumer: EnergyConsumer, cascade: Boolean): Boolean {
+        energyConsumer.phases.forEach { phase ->
+            removeInternal(phase)
+        }
+        return removeInternal(energyConsumer as EnergyConnection, cascade)
+    }
+
+    protected fun removeInternal(energyConsumerPhase: EnergyConsumerPhase, cascade: Boolean): Boolean {
+        energyConsumerPhase.energyConsumer?.removePhase(energyConsumerPhase)
+
+        return removeInternal(energyConsumerPhase as PowerSystemResource, cascade)
+    }
+
+    protected fun removeInternal(energySource: EnergySource, cascade: Boolean): Boolean {
+        energySource.phases.forEach { phase ->
+            removeInternal(phase)
+        }
+        return removeInternal(energySource as EnergyConnection, cascade)
+    }
+
+    protected fun removeInternal(energySourcePhase: EnergySourcePhase, cascade: Boolean): Boolean {
+        energySourcePhase.energySource?.removePhase(energySourcePhase)
+
+        return removeInternal(energySourcePhase as PowerSystemResource, cascade)
+    }
+
+    protected fun removeInternal(fuse: Fuse, cascade: Boolean): Boolean = removeInternal(fuse as Switch, cascade)
+
+    protected fun removeInternal(ground: Ground, cascade: Boolean): Boolean =
+        removeInternal(ground as ConductingEquipment, cascade)
+
+    protected fun removeInternal(groundDisconnector: GroundDisconnector, cascade: Boolean): Boolean = removeInternal(groundDisconnector as Switch, cascade)
+
+    protected fun removeInternal(groundingImpedance: GroundingImpedance, cascade: Boolean): Boolean =
+        removeInternal(groundingImpedance as EarthFaultCompensator, cascade)
+
+    protected fun removeInternal(jumper: Jumper, cascade: Boolean): Boolean = removeInternal(jumper as Switch, cascade)
+
+    protected fun removeInternal(junction: Junction, cascade: Boolean): Boolean = removeInternal(junction as Connector, cascade)
+
+    protected fun removeInternal(line: Line, cascade: Boolean): Boolean = removeInternal(line as EquipmentContainer, cascade)
+
+    protected fun removeInternal(linearShuntCompensator: LinearShuntCompensator, cascade: Boolean): Boolean =
+        removeInternal(linearShuntCompensator as ShuntCompensator, cascade)
+
+    protected fun removeInternal(loadBreakSwitch: LoadBreakSwitch, cascade: Boolean): Boolean =
+        removeInternal(loadBreakSwitch as ProtectedSwitch, cascade)
+
+    protected fun removeInternal(perLengthImpedance: PerLengthImpedance, cascade: Boolean): Boolean =
+        removeInternal(perLengthImpedance as PerLengthLineParameter, cascade)
+
+    protected fun removeInternal(perLengthLineParameter: PerLengthLineParameter, cascade: Boolean): Boolean =
+        removeInternal(perLengthLineParameter as IdentifiedObject)
+
+    protected fun removeInternal(perLengthPhaseImpedance: PerLengthPhaseImpedance, cascade: Boolean): Boolean =
+        removeInternal(perLengthPhaseImpedance as PerLengthImpedance, cascade)
+
+    protected fun removeInternal(perLengthSequenceImpedance: PerLengthSequenceImpedance, cascade: Boolean): Boolean =
+        removeInternal(perLengthSequenceImpedance as PerLengthImpedance, cascade)
+
+    protected fun removeInternal(petersenCoil: PetersenCoil, cascade: Boolean): Boolean =
+        removeInternal(petersenCoil as EarthFaultCompensator, cascade)
+
+    protected fun removeInternal(powerElectronicsConnection: PowerElectronicsConnection, cascade: Boolean): Boolean {
+        powerElectronicsConnection.units.forEach { unit -> removeInternal(unit) }
+        powerElectronicsConnection.phases.forEach { phase -> removeInternal(phase) }
+
+        return removeInternal(powerElectronicsConnection as RegulatingCondEq, cascade)
+    }
+
+    protected fun removeInternal(powerTransformer: PowerTransformer, cascade: Boolean): Boolean {
+        powerTransformer.ends.forEach { end ->
+            removeInternal(end, cascade)
+        }
+
+        return removeInternal(powerTransformer as ConductingEquipment, cascade)
+    }
+
+    protected fun removeInternal(powerTransformerEnd: PowerTransformerEnd, cascade: Boolean): Boolean =
+        removeInternal(powerTransformerEnd as TransformerEnd, cascade)
+
+    protected fun removeInternal(protectedSwitch: ProtectedSwitch, cascade: Boolean): Boolean {
+        protectedSwitch.relayFunctions.forEach { rf ->
+            rf.removeProtectedSwitch(protectedSwitch)
+        }
+
+        return removeInternal(protectedSwitch as Switch, cascade)
+    }
+
+    protected fun removeInternal(ratioTapChanger: RatioTapChanger, cascade: Boolean): Boolean {
+        ratioTapChanger.transformerEnd?.ratioTapChanger = null
+
+        return removeInternal(ratioTapChanger as TapChanger, cascade)
+    }
+
+    protected fun removeInternal(reactiveCapabilityCurve: ReactiveCapabilityCurve, cascade: Boolean): Boolean =
+        removeInternal(reactiveCapabilityCurve as Curve, cascade)
+
+    protected fun removeInternal(recloser: Recloser, cascade: Boolean): Boolean =
+        removeInternal(recloser as ProtectedSwitch, cascade)
+
+    protected fun removeInternal(regulatingCondEq: RegulatingCondEq, cascade: Boolean): Boolean {
+        regulatingCondEq.regulatingControl?.removeRegulatingCondEq(regulatingCondEq)
+
+        return removeInternal(regulatingCondEq as EnergyConnection, cascade)
+    }
+
+    protected fun removeInternal(regulatingControl: RegulatingControl, cascade: Boolean): Boolean =
+        removeInternal(regulatingControl as PowerSystemResource, cascade)
+
+    protected fun removeInternal(rotatingMachine: RotatingMachine, cascade: Boolean): Boolean {
+        return removeInternal(rotatingMachine as RegulatingCondEq, cascade)
+    }
+
+    protected fun removeInternal(seriesCompensator: SeriesCompensator, cascade: Boolean): Boolean {
+        return removeInternal(seriesCompensator as ConductingEquipment, cascade)
+    }
+
+    protected fun removeInternal(shuntCompensator: ShuntCompensator, cascade: Boolean): Boolean {
+        return removeInternal(shuntCompensator as RegulatingCondEq, cascade)
+    }
+
+    protected fun removeInternal(staticVarCompensator: StaticVarCompensator, cascade: Boolean): Boolean {
+        return removeInternal(staticVarCompensator as RegulatingCondEq, cascade)
+    }
+
+    protected fun removeInternal(switch: Switch, cascade: Boolean): Boolean {
+        return removeInternal(switch as ConductingEquipment, cascade)
+    }
+
+    protected fun removeInternal(synchronousMachine: SynchronousMachine, cascade: Boolean): Boolean =
+        removeInternal(synchronousMachine as RotatingMachine, cascade)
+
+    protected fun removeInternal(tapChanger: TapChanger, cascade: Boolean): Boolean {
+        if (cascade) {
+            tapChanger.tapChangerControl?.let { removeInternal(it) }
+        }
+
+        return removeInternal(tapChanger as PowerSystemResource, cascade)
+    }
+
+    protected fun removeInternal(tapChangerControl: TapChangerControl, cascade: Boolean): Boolean =
+        removeInternal(tapChangerControl as RegulatingControl, cascade)
+
+    protected fun removeInternal(transformerEnd: TransformerEnd, cascade: Boolean): Boolean {
+        if (cascade) {
+            transformerEnd.ratioTapChanger?.let { removeInternal(it) }
+        }
+
+        return removeInternal(transformerEnd as IdentifiedObject)
+    }
+
+    protected fun removeInternal(transformerStarImpedance: TransformerStarImpedance, cascade: Boolean): Boolean =
+        removeInternal(transformerStarImpedance as IdentifiedObject)
+
+
+    /**
      * IEC61970 feeder
      */
     protected fun removeInternal(lvFeeder: LvFeeder, cascade: Boolean): Boolean {
@@ -742,53 +956,7 @@ abstract class BaseService(
         return removeInternal(lvFeeder as EquipmentContainer)
     }
 
-    protected fun removeInternal(conductor: Conductor, cascade: Boolean): Boolean {
-        return removeInternal(conductor as ConductingEquipment, cascade)
-    }
-
-    protected fun removeInternal(powerElectronicsUnit: PowerElectronicsUnit, cascade: Boolean = false): Boolean {
-        powerElectronicsUnit.powerElectronicsConnection?.removeUnit(powerElectronicsUnit)
-
-        return removeInternal(powerElectronicsUnit as Equipment)
-    }
-
-    protected fun removeInternal(asset: Asset, cascade: Boolean = false): Boolean {
-        asset.powerSystemResources.forEach { psr -> psr.removeAsset(asset) }
-
-        return removeInternal(asset as IdentifiedObject)
-    }
-
-    protected fun removeInternal(assetContainer: AssetContainer, cascade: Boolean = false): Boolean = removeInternal(assetContainer as Asset)
-
-    protected fun removeInternal(structure: Structure, cascade: Boolean = false): Boolean = removeInternal(structure as AssetContainer)
-
-    protected fun removeInternal(endDevice: EndDevice, cascade: Boolean = false): Boolean {
-        endDevice.usagePoints.forEach { up ->
-            up.removeEndDevice(endDevice)
-        }
-
-        return removeInternal(endDevice as AssetContainer)
-    }
-
-    protected fun removeInternal(energyConnection: EnergyConnection, cascade: Boolean): Boolean = removeInternal(energyConnection as ConductingEquipment, cascade)
-
-    protected fun removeInternal(regulatingCondEq: RegulatingCondEq, cascade: Boolean): Boolean {
-        regulatingCondEq.regulatingControl?.removeRegulatingCondEq(regulatingCondEq)
-
-        return removeInternal(regulatingCondEq as EnergyConnection, cascade)
-    }
-
-    protected fun removeInternal(rotatingMachine: RotatingMachine, cascade: Boolean): Boolean {
-        return removeInternal(rotatingMachine as RegulatingCondEq, cascade)
-    }
-
-    protected  fun remove(cascade: Boolean): Boolean {
-        return remove(cascade)
-    }
-
-    // INFIEC61970 - feeder
-
-    protected  fun removeInternal(circuit: Circuit, cascade: Boolean): Boolean {
+    protected fun removeInternal(circuit: Circuit, cascade: Boolean): Boolean {
         circuit.loop?.removeCircuit(circuit)
         circuit.endSubstations.forEach { substation ->
             substation.removeCircuit(circuit)
@@ -811,9 +979,47 @@ abstract class BaseService(
         return removeInternal(loop as IdentifiedObject)
     }
 
-    // INFIEC61970 - wires.generation.production
-    protected fun removeInternal(evChargingUnit: EvChargingUnit, cascade: Boolean): Boolean {
-        return removeInternal(evChargingUnit as PowerElectronicsUnit, cascade)
+    /**
+     * IEC61970 base wires.generation.production
+     */
+    protected fun removeInternal(batteryUnit: BatteryUnit, cascade: Boolean): Boolean = removeInternal(batteryUnit as PowerElectronicsUnit, cascade)
+
+    protected fun removeInternal(photoVoltaicUnit: PhotoVoltaicUnit, cascade: Boolean): Boolean = removeInternal(photoVoltaicUnit as PowerElectronicsUnit, cascade)
+
+    protected fun removeInternal(powerElectronicsUnit: PowerElectronicsUnit, cascade: Boolean = false): Boolean {
+        powerElectronicsUnit.powerElectronicsConnection?.removeUnit(powerElectronicsUnit)
+
+        return removeInternal(powerElectronicsUnit as Equipment)
+    }
+
+    protected fun removeInternal(powerElectronicsWindUnit: PowerElectronicsWindUnit, cascade: Boolean): Boolean = removeInternal(powerElectronicsWindUnit as PowerElectronicsUnit, cascade)
+
+
+    /**
+     * INFIEC61970 - wires.generation.production
+     */
+    protected fun removeInternal(evChargingUnit: EvChargingUnit, cascade: Boolean): Boolean =
+        removeInternal(evChargingUnit as PowerElectronicsUnit, cascade)
+
+
+
+
+    protected fun removeInternal(asset: Asset, cascade: Boolean = false): Boolean {
+        asset.powerSystemResources.forEach { psr -> psr.removeAsset(asset) }
+
+        return removeInternal(asset as IdentifiedObject)
+    }
+
+    protected fun removeInternal(assetContainer: AssetContainer, cascade: Boolean = false): Boolean = removeInternal(assetContainer as Asset)
+
+    protected fun removeInternal(structure: Structure, cascade: Boolean = false): Boolean = removeInternal(structure as AssetContainer)
+
+    protected fun removeInternal(endDevice: EndDevice, cascade: Boolean = false): Boolean {
+        endDevice.usagePoints.forEach { up ->
+            up.removeEndDevice(endDevice)
+        }
+
+        return removeInternal(endDevice as AssetContainer)
     }
 
     /**

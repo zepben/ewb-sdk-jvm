@@ -80,7 +80,7 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // ################################
 
     fun add(panDemandResponseFunction: PanDemandResponseFunction): Boolean = super.add(panDemandResponseFunction)
-    fun remove(panDemandResponseFunction: PanDemandResponseFunction, cascade: Boolean = false): Boolean = super.remove(panDemandResponseFunction, cascade)
+    fun remove(panDemandResponseFunction: PanDemandResponseFunction, cascade: Boolean = false): Boolean = super.removeInternal(panDemandResponseFunction, cascade)
 
     // #################################
     // # Extensions IEC61970 Base Core #
@@ -127,77 +127,77 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // ##################################
 
     fun add(batteryControl: BatteryControl): Boolean = super.add(batteryControl)
-    fun remove(batteryControl: BatteryControl, cascade: Boolean = false): Boolean = super.remove(batteryControl, cascade)
+    fun remove(batteryControl: BatteryControl, cascade: Boolean = false): Boolean = super.removeInternal(batteryControl, cascade)
 
     // #######################
     // # IEC61968 Asset Info #
     // #######################
 
     fun add(cableInfo: CableInfo): Boolean = super.add(cableInfo)
-    fun remove(cableInfo: CableInfo, cascade: Boolean = false): Boolean = super.remove(cableInfo, cascade)
+    fun remove(cableInfo: CableInfo, cascade: Boolean = false): Boolean = super.removeInternal(cableInfo, cascade)
 
     fun add(noLoadTest: NoLoadTest): Boolean = super.add(noLoadTest)
-    fun remove(noLoadTest: NoLoadTest, cascade: Boolean = false): Boolean = super.remove(noLoadTest, cascade)
+    fun remove(noLoadTest: NoLoadTest, cascade: Boolean = false): Boolean = super.removeInternal(noLoadTest, cascade)
 
     fun add(openCircuitTest: OpenCircuitTest): Boolean = super.add(openCircuitTest)
-    fun remove(openCircuitTest: OpenCircuitTest, cascade: Boolean = false): Boolean = super.remove(openCircuitTest, cascade)
+    fun remove(openCircuitTest: OpenCircuitTest, cascade: Boolean = false): Boolean = super.removeInternal(openCircuitTest, cascade)
 
     fun add(overheadWireInfo: OverheadWireInfo): Boolean = super.add(overheadWireInfo)
-    fun remove(overheadWireInfo: OverheadWireInfo, cascade: Boolean = false): Boolean = super.remove(overheadWireInfo, cascade)
+    fun remove(overheadWireInfo: OverheadWireInfo, cascade: Boolean = false): Boolean = super.removeInternal(overheadWireInfo, cascade)
 
     fun add(powerTransformerInfo: PowerTransformerInfo): Boolean = super.add(powerTransformerInfo)
-    fun remove(powerTransformerInfo: PowerTransformerInfo, cascade: Boolean = false): Boolean = super.remove(powerTransformerInfo, cascade)
+    fun remove(powerTransformerInfo: PowerTransformerInfo, cascade: Boolean = false): Boolean = super.removeInternal(powerTransformerInfo, cascade)
 
     fun add(shortCircuitTest: ShortCircuitTest): Boolean = super.add(shortCircuitTest)
-    fun remove(shortCircuitTest: ShortCircuitTest, cascade: Boolean = false): Boolean = super.remove(shortCircuitTest, cascade)
+    fun remove(shortCircuitTest: ShortCircuitTest, cascade: Boolean = false): Boolean = super.removeInternal(shortCircuitTest, cascade)
 
     fun add(shuntCompensatorInfo: ShuntCompensatorInfo): Boolean = super.add(shuntCompensatorInfo)
-    fun remove(shuntCompensatorInfo: ShuntCompensatorInfo, cascade: Boolean = false): Boolean = super.remove(shuntCompensatorInfo, cascade)
+    fun remove(shuntCompensatorInfo: ShuntCompensatorInfo, cascade: Boolean = false): Boolean = super.removeInternal(shuntCompensatorInfo, cascade)
 
     fun add(switchInfo: SwitchInfo): Boolean = super.add(switchInfo)
-    fun remove(switchInfo: SwitchInfo, cascade: Boolean = false): Boolean = super.remove(switchInfo, cascade)
+    fun remove(switchInfo: SwitchInfo, cascade: Boolean = false): Boolean = super.removeInternal(switchInfo, cascade)
 
     fun add(transformerEndInfo: TransformerEndInfo): Boolean = super.add(transformerEndInfo)
-    fun remove(transformerEndInfo: TransformerEndInfo, cascade: Boolean = false): Boolean = super.remove(transformerEndInfo, cascade)
+    fun remove(transformerEndInfo: TransformerEndInfo, cascade: Boolean = false): Boolean = super.removeInternal(transformerEndInfo, cascade)
 
     fun add(transformerTankInfo: TransformerTankInfo): Boolean = super.add(transformerTankInfo)
-    fun remove(transformerTankInfo: TransformerTankInfo, cascade: Boolean = false): Boolean = super.remove(transformerTankInfo, cascade)
+    fun remove(transformerTankInfo: TransformerTankInfo, cascade: Boolean = false): Boolean = super.removeInternal(transformerTankInfo, cascade)
 
     // ###################
     // # IEC61968 Assets #
     // ###################
 
     fun add(assetOwner: AssetOwner): Boolean = super.add(assetOwner)
-    fun remove(assetOwner: AssetOwner, cascade: Boolean = false): Boolean = super.remove(assetOwner, cascade)
+    fun remove(assetOwner: AssetOwner, cascade: Boolean = false): Boolean = super.removeInternal(assetOwner, cascade)
 
     fun add(pole: Pole): Boolean = super.add(pole)
-    fun remove(pole: Pole, cascade: Boolean = false): Boolean = super.remove(pole, cascade)
+    fun remove(pole: Pole, cascade: Boolean = false): Boolean = super.removeInternal(pole, cascade)
 
     fun add(streetlight: Streetlight): Boolean = super.add(streetlight)
-    fun remove(streetlight: Streetlight, cascade: Boolean = false): Boolean = super.remove(streetlight, cascade)
+    fun remove(streetlight: Streetlight, cascade: Boolean = false): Boolean = super.removeInternal(streetlight, cascade)
 
     // ###################
     // # IEC61968 Common #
     // ###################
 
     fun add(location: Location): Boolean = super.add(location)
-    fun remove(location: Location, cascade: Boolean = false): Boolean = super.remove(location, cascade)
+    fun remove(location: Location, cascade: Boolean = false): Boolean = super.removeInternal(location, cascade)
 
     fun add(organisation: Organisation): Boolean = super.add(organisation)
-    fun remove(organisation: Organisation, cascade: Boolean = false): Boolean = super.remove(organisation, cascade)
+    fun remove(organisation: Organisation, cascade: Boolean = false): Boolean = super.removeInternal(organisation, cascade)
 
     // #####################################
     // # IEC61968 infIEC61968 InfAssetInfo #
     // #####################################
 
     fun add(relayInfo: RelayInfo): Boolean = super.add(relayInfo)
-    fun remove(relayInfo: RelayInfo, cascade: Boolean = false): Boolean = super.remove(relayInfo, cascade)
+    fun remove(relayInfo: RelayInfo, cascade: Boolean = false): Boolean = super.removeInternal(relayInfo, cascade)
 
     fun add(currentTransformerInfo: CurrentTransformerInfo): Boolean = super.add(currentTransformerInfo)
-    fun remove(currentTransformerInfo: CurrentTransformerInfo, cascade: Boolean = false): Boolean = super.remove(currentTransformerInfo, cascade)
+    fun remove(currentTransformerInfo: CurrentTransformerInfo, cascade: Boolean = false): Boolean = super.removeInternal(currentTransformerInfo, cascade)
 
     fun add(potentialTransformerInfo: PotentialTransformerInfo): Boolean = super.add(potentialTransformerInfo)
-    fun remove(potentialTransformerInfo: PotentialTransformerInfo, cascade: Boolean = false): Boolean = super.remove(potentialTransformerInfo, cascade)
+    fun remove(potentialTransformerInfo: PotentialTransformerInfo, cascade: Boolean = false): Boolean = super.removeInternal(potentialTransformerInfo, cascade)
 
     // ##################################
     // # IEC61968 infIEC61968 InfAssets #
@@ -211,65 +211,65 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // #####################
 
     fun add(meter: Meter): Boolean = super.add(meter)
-    fun remove(meter: Meter, cascade: Boolean = false): Boolean = super.remove(meter, cascade)
+    fun remove(meter: Meter, cascade: Boolean = false): Boolean = super.removeInternal(meter, cascade)
 
     fun add(usagePoint: UsagePoint): Boolean = super.add(usagePoint)
-    fun remove(usagePoint: UsagePoint, cascade: Boolean = false): Boolean = super.remove(usagePoint, cascade)
+    fun remove(usagePoint: UsagePoint, cascade: Boolean = false): Boolean = super.removeInternal(usagePoint, cascade)
 
     // #######################
     // # IEC61968 Operations #
     // #######################
 
     fun add(operationalRestriction: OperationalRestriction): Boolean = super.add(operationalRestriction)
-    fun remove(operationalRestriction: OperationalRestriction, cascade: Boolean = false): Boolean = super.remove(operationalRestriction, cascade)
+    fun remove(operationalRestriction: OperationalRestriction, cascade: Boolean = false): Boolean = super.removeInternal(operationalRestriction, cascade)
 
     // #####################################
     // # IEC61970 Base Auxiliary Equipment #
     // #####################################
 
     fun add(currentTransformer: CurrentTransformer): Boolean = super.add(currentTransformer)
-    fun remove(currentTransformer: CurrentTransformer, cascade: Boolean = false): Boolean = super.remove(currentTransformer, cascade)
+    fun remove(currentTransformer: CurrentTransformer, cascade: Boolean = false): Boolean = super.removeInternal(currentTransformer, cascade)
 
     fun add(faultIndicator: FaultIndicator): Boolean = super.add(faultIndicator)
-    fun remove(faultIndicator: FaultIndicator, cascade: Boolean = false): Boolean = super.remove(faultIndicator, cascade)
+    fun remove(faultIndicator: FaultIndicator, cascade: Boolean = false): Boolean = super.removeInternal(faultIndicator, cascade)
 
     fun add(potentialTransformer: PotentialTransformer): Boolean = super.add(potentialTransformer)
-    fun remove(potentialTransformer: PotentialTransformer, cascade: Boolean = false): Boolean = super.remove(potentialTransformer, cascade)
+    fun remove(potentialTransformer: PotentialTransformer, cascade: Boolean = false): Boolean = super.removeInternal(potentialTransformer, cascade)
 
     // ######################
     // # IEC61970 Base Core #
     // ######################
 
     fun add(baseVoltage: BaseVoltage): Boolean = super.add(baseVoltage)
-    fun remove(baseVoltage: BaseVoltage, cascade: Boolean = false): Boolean = super.remove(baseVoltage, cascade)
+    fun remove(baseVoltage: BaseVoltage, cascade: Boolean = false): Boolean = super.removeInternal(baseVoltage, cascade)
 
     fun add(connectivityNode: ConnectivityNode): Boolean = super.add(connectivityNode)
-    fun remove(connectivityNode: ConnectivityNode, cascade: Boolean = false): Boolean = super.remove(connectivityNode, cascade)
+    fun remove(connectivityNode: ConnectivityNode, cascade: Boolean = false): Boolean = super.removeInternal(connectivityNode, cascade)
 
     fun add(feeder: Feeder): Boolean = super.add(feeder)
-    fun remove(feeder: Feeder, cascade: Boolean = false): Boolean = super.remove(feeder, cascade)
+    fun remove(feeder: Feeder, cascade: Boolean = false): Boolean = super.removeInternal(feeder, cascade)
 
     fun add(geographicalRegion: GeographicalRegion): Boolean = super.add(geographicalRegion)
-    fun remove(geographicalRegion: GeographicalRegion, cascade: Boolean = false): Boolean = super.remove(geographicalRegion, cascade)
+    fun remove(geographicalRegion: GeographicalRegion, cascade: Boolean = false): Boolean = super.removeInternal(geographicalRegion, cascade)
 
     fun add(site: Site): Boolean = super.add(site)
-    fun remove(site: Site, cascade: Boolean = false): Boolean = super.remove(site, cascade)
+    fun remove(site: Site, cascade: Boolean = false): Boolean = super.removeInternal(site, cascade)
 
     fun add(subGeographicalRegion: SubGeographicalRegion): Boolean = super.add(subGeographicalRegion)
-    fun remove(subGeographicalRegion: SubGeographicalRegion, cascade: Boolean = false): Boolean = super.remove(subGeographicalRegion, cascade)
+    fun remove(subGeographicalRegion: SubGeographicalRegion, cascade: Boolean = false): Boolean = super.removeInternal(subGeographicalRegion, cascade)
 
     fun add(substation: Substation): Boolean = super.add(substation)
-    fun remove(substation: Substation, cascade: Boolean = false): Boolean = super.remove(substation, cascade)
+    fun remove(substation: Substation, cascade: Boolean = false): Boolean = super.removeInternal(substation, cascade)
 
     fun add(terminal: Terminal): Boolean = super.add(terminal)
-    fun remove(terminal: Terminal, cascade: Boolean = false): Boolean = super.remove(terminal, cascade)
+    fun remove(terminal: Terminal, cascade: Boolean = false): Boolean = super.removeInternal(terminal, cascade)
 
     // #############################
     // # IEC61970 Base Equivalents #
     // #############################
 
     fun add(equivalentBranch: EquivalentBranch): Boolean = super.add(equivalentBranch)
-    fun remove(equivalentBranch: EquivalentBranch, cascade: Boolean = false): Boolean = super.remove(equivalentBranch, cascade)
+    fun remove(equivalentBranch: EquivalentBranch, cascade: Boolean = false): Boolean = super.removeInternal(equivalentBranch, cascade)
 
     // ######################
     // # IEC61970 Base Meas #
@@ -277,23 +277,23 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
 
     fun add(accumulator: Accumulator): Boolean = indexMeasurement(accumulator) && super.add(accumulator)
     fun remove(accumulator: Accumulator, cascade: Boolean = false): Boolean {
-        removeMeasurementIndex(accumulator), cascade
-        return super.remove(accumulator)
+        removeMeasurementIndex(accumulator)
+        return super.removeInternal(accumulator, cascade)
     }
 
     fun add(analog: Analog): Boolean = indexMeasurement(analog) && super.add(analog)
     fun remove(analog: Analog, cascade: Boolean = false): Boolean {
-        removeMeasurementIndex(analog), cascade
-        return super.remove(analog)
+        removeMeasurementIndex(analog)
+        return super.removeInternal(analog, cascade)
     }
 
     fun add(control: Control): Boolean = super.add(control)
-    fun remove(control: Control, cascade: Boolean = false): Boolean = super.remove(control, cascade)
+    fun remove(control: Control, cascade: Boolean = false): Boolean = super.removeInternal(control, cascade)
 
     fun add(discrete: Discrete): Boolean = indexMeasurement(discrete) && super.add(discrete)
     fun remove(discrete: Discrete, cascade: Boolean = false): Boolean {
-        removeMeasurementIndex(discrete), cascade
-        return super.remove(discrete)
+        removeMeasurementIndex(discrete)
+        return super.removeInternal(discrete, cascade)
     }
 
     // ############################
@@ -301,165 +301,165 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // ############################
 
     fun add(currentRelay: CurrentRelay): Boolean = super.add(currentRelay)
-    fun remove(currentRelay: CurrentRelay, cascade: Boolean = false): Boolean = super.remove(currentRelay, cascade)
+    fun remove(currentRelay: CurrentRelay, cascade: Boolean = false): Boolean = super.removeInternal(currentRelay, cascade)
 
     fun add(distanceRelay: DistanceRelay): Boolean = super.add(distanceRelay)
-    fun remove(distanceRelay: DistanceRelay, cascade: Boolean = false): Boolean = super.remove(distanceRelay, cascade)
+    fun remove(distanceRelay: DistanceRelay, cascade: Boolean = false): Boolean = super.removeInternal(distanceRelay, cascade)
 
     fun add(protectionRelayScheme: ProtectionRelayScheme): Boolean = super.add(protectionRelayScheme)
-    fun remove(protectionRelayScheme: ProtectionRelayScheme, cascade: Boolean = false): Boolean = super.remove(protectionRelayScheme, cascade)
+    fun remove(protectionRelayScheme: ProtectionRelayScheme, cascade: Boolean = false): Boolean = super.removeInternal(protectionRelayScheme, cascade)
 
     fun add(protectionRelaySystem: ProtectionRelaySystem): Boolean = super.add(protectionRelaySystem)
-    fun remove(protectionRelaySystem: ProtectionRelaySystem, cascade: Boolean = false): Boolean = super.remove(protectionRelaySystem, cascade)
+    fun remove(protectionRelaySystem: ProtectionRelaySystem, cascade: Boolean = false): Boolean = super.removeInternal(protectionRelaySystem, cascade)
 
     fun add(voltageRelay: VoltageRelay): Boolean = super.add(voltageRelay)
-    fun remove(voltageRelay: VoltageRelay, cascade: Boolean = false): Boolean = super.remove(voltageRelay, cascade)
+    fun remove(voltageRelay: VoltageRelay, cascade: Boolean = false): Boolean = super.removeInternal(voltageRelay, cascade)
 
     // #######################
     // # IEC61970 Base Scada #
     // #######################
 
     fun add(remoteControl: RemoteControl): Boolean = super.add(remoteControl)
-    fun remove(remoteControl: RemoteControl, cascade: Boolean = false): Boolean = super.remove(remoteControl, cascade)
+    fun remove(remoteControl: RemoteControl, cascade: Boolean = false): Boolean = super.removeInternal(remoteControl, cascade)
 
     fun add(remoteSource: RemoteSource): Boolean = super.add(remoteSource)
-    fun remove(remoteSource: RemoteSource, cascade: Boolean = false): Boolean = super.remove(remoteSource, cascade)
+    fun remove(remoteSource: RemoteSource, cascade: Boolean = false): Boolean = super.removeInternal(remoteSource, cascade)
 
     // #######################################
     // # IEC61970 Base Generation Production #
     // #######################################
 
     fun add(batteryUnit: BatteryUnit): Boolean = super.add(batteryUnit)
-    fun remove(batteryUnit: BatteryUnit, cascade: Boolean = false): Boolean = super.remove(batteryUnit, cascade)
+    fun remove(batteryUnit: BatteryUnit, cascade: Boolean = false): Boolean = super.removeInternal(batteryUnit, cascade)
 
     fun add(photoVoltaicUnit: PhotoVoltaicUnit): Boolean = super.add(photoVoltaicUnit)
-    fun remove(photoVoltaicUnit: PhotoVoltaicUnit, cascade: Boolean = false): Boolean = super.remove(photoVoltaicUnit, cascade)
+    fun remove(photoVoltaicUnit: PhotoVoltaicUnit, cascade: Boolean = false): Boolean = super.removeInternal(photoVoltaicUnit, cascade)
 
     fun add(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.add(powerElectronicsWindUnit)
-    fun remove(powerElectronicsWindUnit: PowerElectronicsWindUnit, cascade: Boolean = false): Boolean = super.remove(powerElectronicsWindUnit, cascade)
+    fun remove(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.removeInternal(powerElectronicsWindUnit)
 
     // #######################
     // # IEC61970 Base Wires #
     // #######################
 
     fun add(acLineSegment: AcLineSegment): Boolean = super.add(acLineSegment)
-    fun remove(acLineSegment: AcLineSegment, cascade: Boolean = false): Boolean = super.remove(acLineSegment, cascade, cascade)
+    fun remove(acLineSegment: AcLineSegment, cascade: Boolean = false): Boolean = super.removeInternal(acLineSegment, cascade)
 
     fun add(breaker: Breaker): Boolean = super.add(breaker)
-    fun remove(breaker: Breaker, cascade: Boolean = false): Boolean = super.remove(breaker, cascade, cascade)
+    fun remove(breaker: Breaker, cascade: Boolean = false): Boolean = super.removeInternal(breaker, cascade)
 
     fun add(busbarSection: BusbarSection): Boolean = super.add(busbarSection)
-    fun remove(busbarSection: BusbarSection, cascade: Boolean = false): Boolean = super.remove(busbarSection, cascade)
+    fun remove(busbarSection: BusbarSection, cascade: Boolean = false): Boolean = super.removeInternal(busbarSection, cascade)
 
     fun add(disconnector: Disconnector): Boolean = super.add(disconnector)
-    fun remove(disconnector: Disconnector, cascade: Boolean = false): Boolean = super.remove(disconnector, cascade)
+    fun remove(disconnector: Disconnector, cascade: Boolean = false): Boolean = super.removeInternal(disconnector, cascade)
 
     fun add(clamp: Clamp): Boolean = super.add(clamp)
-    fun remove(clamp: Clamp, cascade: Boolean = false): Boolean = super.remove(clamp, cascade)
+    fun remove(clamp: Clamp, cascade: Boolean = false): Boolean = super.removeInternal(clamp, cascade)
 
     fun add(cut: Cut): Boolean = super.add(cut)
-    fun remove(cut: Cut, cascade: Boolean = false): Boolean = super.remove(cut, cascade)
+    fun remove(cut: Cut, cascade: Boolean = false): Boolean = super.removeInternal(cut, cascade)
 
     fun add(energyConsumer: EnergyConsumer): Boolean = super.add(energyConsumer)
-    fun remove(energyConsumer: EnergyConsumer, cascade: Boolean = false): Boolean = super.remove(energyConsumer, cascade)
+    fun remove(energyConsumer: EnergyConsumer, cascade: Boolean = false): Boolean = super.removeInternal(energyConsumer, cascade)
 
     fun add(energyConsumerPhase: EnergyConsumerPhase): Boolean = super.add(energyConsumerPhase)
-    fun remove(energyConsumerPhase: EnergyConsumerPhase, cascade: Boolean = false): Boolean = super.remove(energyConsumerPhase, cascade)
+    fun remove(energyConsumerPhase: EnergyConsumerPhase, cascade: Boolean = false): Boolean = super.removeInternal(energyConsumerPhase, cascade)
 
     fun add(energySource: EnergySource): Boolean = super.add(energySource)
-    fun remove(energySource: EnergySource, cascade: Boolean = false): Boolean = super.remove(energySource, cascade)
+    fun remove(energySource: EnergySource, cascade: Boolean = false): Boolean = super.removeInternal(energySource, cascade)
 
     fun add(energySourcePhase: EnergySourcePhase): Boolean = super.add(energySourcePhase)
-    fun remove(energySourcePhase: EnergySourcePhase, cascade: Boolean = false): Boolean = super.remove(energySourcePhase, cascade)
+    fun remove(energySourcePhase: EnergySourcePhase, cascade: Boolean = false): Boolean = super.removeInternal(energySourcePhase, cascade)
 
     fun add(fuse: Fuse): Boolean = super.add(fuse)
-    fun remove(fuse: Fuse, cascade: Boolean = false): Boolean = super.remove(fuse, cascade)
+    fun remove(fuse: Fuse, cascade: Boolean = false): Boolean = super.removeInternal(fuse, cascade)
 
     fun add(ground: Ground): Boolean = super.add(ground)
-    fun remove(ground: Ground, cascade: Boolean = false): Boolean = super.remove(ground, cascade)
+    fun remove(ground: Ground, cascade: Boolean = false): Boolean = super.removeInternal(ground, cascade)
 
     fun add(groundDisconnector: GroundDisconnector): Boolean = super.add(groundDisconnector)
-    fun remove(groundDisconnector: GroundDisconnector, cascade: Boolean = false): Boolean = super.remove(groundDisconnector, cascade)
+    fun remove(groundDisconnector: GroundDisconnector, cascade: Boolean = false): Boolean = super.removeInternal(groundDisconnector, cascade)
 
     fun add(groundingImpedance: GroundingImpedance): Boolean = super.add(groundingImpedance)
-    fun remove(groundingImpedance: GroundingImpedance, cascade: Boolean = false): Boolean = super.remove(groundingImpedance, cascade)
+    fun remove(groundingImpedance: GroundingImpedance, cascade: Boolean = false): Boolean = super.removeInternal(groundingImpedance, cascade)
 
     fun add(jumper: Jumper): Boolean = super.add(jumper)
-    fun remove(jumper: Jumper, cascade: Boolean = false): Boolean = super.remove(jumper, cascade)
+    fun remove(jumper: Jumper, cascade: Boolean = false): Boolean = super.removeInternal(jumper, cascade)
 
     fun add(junction: Junction): Boolean = super.add(junction)
-    fun remove(junction: Junction, cascade: Boolean = false): Boolean = super.remove(junction, cascade)
+    fun remove(junction: Junction, cascade: Boolean = false): Boolean = super.removeInternal(junction, cascade)
 
     fun add(linearShuntCompensator: LinearShuntCompensator): Boolean = super.add(linearShuntCompensator)
-    fun remove(linearShuntCompensator: LinearShuntCompensator, cascade: Boolean = false): Boolean = super.remove(linearShuntCompensator, cascade)
+    fun remove(linearShuntCompensator: LinearShuntCompensator, cascade: Boolean = false): Boolean = super.removeInternal(linearShuntCompensator, cascade)
 
     fun add(loadBreakSwitch: LoadBreakSwitch): Boolean = super.add(loadBreakSwitch)
-    fun remove(loadBreakSwitch: LoadBreakSwitch, cascade: Boolean = false): Boolean = super.remove(loadBreakSwitch, cascade)
+    fun remove(loadBreakSwitch: LoadBreakSwitch, cascade: Boolean = false): Boolean = super.removeInternal(loadBreakSwitch, cascade)
 
     fun add(perLengthPhaseImpedance: PerLengthPhaseImpedance): Boolean = super.add(perLengthPhaseImpedance)
-    fun remove(perLengthPhaseImpedance: PerLengthPhaseImpedance, cascade: Boolean = false): Boolean = super.remove(perLengthPhaseImpedance, cascade)
+    fun remove(perLengthPhaseImpedance: PerLengthPhaseImpedance, cascade: Boolean = false): Boolean = super.removeInternal(perLengthPhaseImpedance, cascade)
 
     fun add(perLengthSequenceImpedance: PerLengthSequenceImpedance): Boolean = super.add(perLengthSequenceImpedance)
-    fun remove(perLengthSequenceImpedance: PerLengthSequenceImpedance, cascade: Boolean = false): Boolean = super.remove(perLengthSequenceImpedance, cascade)
+    fun remove(perLengthSequenceImpedance: PerLengthSequenceImpedance, cascade: Boolean = false): Boolean = super.removeInternal(perLengthSequenceImpedance, cascade)
 
     fun add(petersenCoil: PetersenCoil): Boolean = super.add(petersenCoil)
-    fun remove(petersenCoil: PetersenCoil, cascade: Boolean = false): Boolean = super.remove(petersenCoil, cascade)
+    fun remove(petersenCoil: PetersenCoil, cascade: Boolean = false): Boolean = super.removeInternal(petersenCoil, cascade)
 
     fun add(powerElectronicsConnection: PowerElectronicsConnection): Boolean = super.add(powerElectronicsConnection)
-    fun remove(powerElectronicsConnection: PowerElectronicsConnection, cascade: Boolean = false): Boolean = super.remove(powerElectronicsConnection, cascade)
+    fun remove(powerElectronicsConnection: PowerElectronicsConnection, cascade: Boolean = false): Boolean = super.removeInternal(powerElectronicsConnection, cascade)
 
     fun add(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase): Boolean = super.add(powerElectronicsConnectionPhase)
-    fun remove(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase, cascade: Boolean = false): Boolean = super.remove(powerElectronicsConnectionPhase, cascade)
+    fun remove(powerElectronicsConnectionPhase: PowerElectronicsConnectionPhase, cascade: Boolean = false): Boolean = super.removeInternal(powerElectronicsConnectionPhase, cascade)
 
     fun add(powerTransformer: PowerTransformer): Boolean = super.add(powerTransformer)
-    fun remove(powerTransformer: PowerTransformer, cascade: Boolean = false): Boolean = super.remove(powerTransformer, cascade)
+    fun remove(powerTransformer: PowerTransformer, cascade: Boolean = false): Boolean = super.removeInternal(powerTransformer, cascade)
 
     fun add(powerTransformerEnd: PowerTransformerEnd): Boolean = super.add(powerTransformerEnd)
-    fun remove(powerTransformerEnd: PowerTransformerEnd, cascade: Boolean = false): Boolean = super.remove(powerTransformerEnd, cascade)
+    fun remove(powerTransformerEnd: PowerTransformerEnd, cascade: Boolean = false): Boolean = super.removeInternal(powerTransformerEnd, cascade)
 
     fun add(ratioTapChanger: RatioTapChanger): Boolean = super.add(ratioTapChanger)
-    fun remove(ratioTapChanger: RatioTapChanger, cascade: Boolean = false): Boolean = super.remove(ratioTapChanger, cascade)
+    fun remove(ratioTapChanger: RatioTapChanger, cascade: Boolean = false): Boolean = super.removeInternal(ratioTapChanger, cascade)
 
     fun add(reactiveCapabilityCurve: ReactiveCapabilityCurve): Boolean = super.add(reactiveCapabilityCurve)
-    fun remove(reactiveCapabilityCurve: ReactiveCapabilityCurve, cascade: Boolean = false): Boolean = super.remove(reactiveCapabilityCurve, cascade)
+    fun remove(reactiveCapabilityCurve: ReactiveCapabilityCurve, cascade: Boolean = false): Boolean = super.removeInternal(reactiveCapabilityCurve, cascade)
 
     fun add(recloser: Recloser): Boolean = super.add(recloser)
-    fun remove(recloser: Recloser, cascade: Boolean = false): Boolean = super.remove(recloser, cascade)
+    fun remove(recloser: Recloser, cascade: Boolean = false): Boolean = super.removeInternal(recloser, cascade)
 
     fun add(seriesCompensator: SeriesCompensator): Boolean = super.add(seriesCompensator)
-    fun remove(seriesCompensator: SeriesCompensator, cascade: Boolean = false): Boolean = super.remove(seriesCompensator, cascade)
+    fun remove(seriesCompensator: SeriesCompensator, cascade: Boolean = false): Boolean = super.removeInternal(seriesCompensator, cascade)
 
     fun add(staticVarCompensator: StaticVarCompensator): Boolean = super.add(staticVarCompensator)
-    fun remove(staticVarCompensator: StaticVarCompensator, cascade: Boolean = false): Boolean = super.remove(staticVarCompensator, cascade)
+    fun remove(staticVarCompensator: StaticVarCompensator, cascade: Boolean = false): Boolean = super.removeInternal(staticVarCompensator, cascade)
 
     fun add(synchronousMachine: SynchronousMachine): Boolean = super.add(synchronousMachine)
-    fun remove(synchronousMachine: SynchronousMachine, cascade: Boolean = false): Boolean = super.remove(synchronousMachine, cascade)
+    fun remove(synchronousMachine: SynchronousMachine, cascade: Boolean = false): Boolean = super.removeInternal(synchronousMachine, cascade)
 
     fun add(tapChangerControl: TapChangerControl): Boolean = super.add(tapChangerControl)
-    fun remove(tapChangerControl: TapChangerControl, cascade: Boolean = false): Boolean = super.remove(tapChangerControl, cascade)
+    fun remove(tapChangerControl: TapChangerControl, cascade: Boolean = false): Boolean = super.removeInternal(tapChangerControl, cascade)
 
     fun add(transformerStarImpedance: TransformerStarImpedance): Boolean = super.add(transformerStarImpedance)
-    fun remove(transformerStarImpedance: TransformerStarImpedance, cascade: Boolean = false): Boolean = super.remove(transformerStarImpedance, cascade)
+    fun remove(transformerStarImpedance: TransformerStarImpedance, cascade: Boolean = false): Boolean = super.removeInternal(transformerStarImpedance, cascade)
 
     // ###############################
     // # IEC61970 InfIEC61970 Feeder #
     // ###############################
 
     fun add(circuit: Circuit): Boolean = super.add(circuit)
-    fun remove(circuit: Circuit, cascade: Boolean = false): Boolean = super.remove(circuit, cascade)
+    fun remove(circuit: Circuit, cascade: Boolean = false): Boolean = super.removeInternal(circuit, cascade)
 
     fun add(loop: Loop): Boolean = super.add(loop)
-    fun remove(loop: Loop, cascade: Boolean = false): Boolean = super.remove(loop, cascade)
+    fun remove(loop: Loop, cascade: Boolean = false): Boolean = super.removeInternal(loop, cascade)
 
     fun add(lvFeeder: LvFeeder): Boolean = super.add(lvFeeder)
-    fun remove(lvFeeder: LvFeeder, cascade: Boolean = false): Boolean = super.remove(lvFeeder, cascade)
+    fun remove(lvFeeder: LvFeeder, cascade: Boolean = false): Boolean = super.removeInternal(lvFeeder, cascade)
 
     // ###############################
     // # IEC61970 InfIEC61970 WIRES.GENERATION.PRODUCTION #
     // ###############################
 
     fun add(evChargingUnit: EvChargingUnit): Boolean = super.add(evChargingUnit)
-    fun remove(evChargingUnit: EvChargingUnit, cascade: Boolean = false): Boolean = super.remove(evChargingUnit, cascade)
+    fun remove(evChargingUnit: EvChargingUnit, cascade: Boolean = false): Boolean = super.removeInternal(evChargingUnit, cascade)
 
     /**
      * Get all measurements of type [T] associated with the given [mRID].

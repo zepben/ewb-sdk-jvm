@@ -15,16 +15,19 @@ import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
 import com.zepben.evolve.cim.iec61970.base.core.*
-import com.zepben.evolve.cim.iec61970.base.wires.Conductor
-import com.zepben.evolve.cim.iec61970.base.wires.EnergyConnection
-import com.zepben.evolve.cim.iec61970.base.wires.RegulatingCondEq
-import com.zepben.evolve.cim.iec61970.base.wires.RotatingMachine
+import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Loop
+import com.zepben.evolve.cim.iec61970.infiec61970.feeder.LvFeeder
+import com.zepben.evolve.cim.iec61970.infiec61970.wires.generation.production.EvChargingUnit
 import com.zepben.evolve.services.common.exceptions.UnsupportedIdentifiedObjectException
 import com.zepben.evolve.services.common.extensions.asUnmodifiable
 import com.zepben.evolve.services.common.extensions.nameAndMRID
 import com.zepben.evolve.services.common.extensions.typeNameAndMRID
 import com.zepben.evolve.services.common.meta.MetadataCollection
+import com.zepben.protobuf.cim.iec61970.infiec61970.protection.PowerDirectionKind
+import com.zepben.protobuf.cim.iec61970.infiec61970.protection.ProtectionKind
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Stream
@@ -537,6 +540,41 @@ abstract class BaseService(
         return remove(rotatingMachine as RegulatingCondEq, cascade)
     }
 
+    protected  fun remove(cascade: Boolean): Boolean {
+        return remove(cascade)
+    }
+
+    // INFIEC61970 - feeder
+
+    protected  fun remove(circuit: Circuit, cascade: Boolean): Boolean {
+        circuit.loop?.removeCircuit(circuit)
+        circuit.endSubstations?.forEach { substation ->
+            substation.removeCircuit(circuit)
+        }
+
+        return remove(circuit as Line, cascade)
+    }
+
+    protected fun remove(loop: Loop, cascade: Boolean): Boolean {
+        loop.circuits.forEach { circuit ->
+            circuit.loop = null
+        }
+        loop.substations.forEach { substation ->
+            substation.removeLoop(loop)
+        }
+        loop.energizingSubstations.forEach { substation ->
+            substation.removeLoop(loop)
+        }
+
+        return remove(loop as IdentifiedObject, cascade)
+    }
+
+    // INFIEC61970 - protection
+
+    // INFIEC61970 - wires.generation.production
+    protected fun remove(evChargingUnit: EvChargingUnit, cascade: Boolean): Boolean {
+        return remove(evChargingUnit as PowerElectronicsUnit, cascade)
+    }
 
     /**
      * Create a sequence of all instances of the specified type.

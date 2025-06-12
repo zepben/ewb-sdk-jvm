@@ -336,7 +336,7 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     fun remove(photoVoltaicUnit: PhotoVoltaicUnit, cascade: Boolean = false): Boolean = super.removeInternal(photoVoltaicUnit, cascade)
 
     fun add(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.add(powerElectronicsWindUnit)
-    fun remove(powerElectronicsWindUnit: PowerElectronicsWindUnit): Boolean = super.removeInternal(powerElectronicsWindUnit)
+    fun remove(powerElectronicsWindUnit: PowerElectronicsWindUnit, cascade: Boolean = false): Boolean = super.removeInternal(powerElectronicsWindUnit, cascade)
 
     // #######################
     // # IEC61970 Base Wires #

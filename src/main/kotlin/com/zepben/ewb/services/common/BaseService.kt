@@ -8,9 +8,16 @@
 
 package com.zepben.ewb.services.common
 
-import com.zepben.evolve.cim.iec61968.assets.Asset
-import com.zepben.evolve.cim.iec61968.assets.AssetContainer
-import com.zepben.evolve.cim.iec61968.assets.Structure
+import com.zepben.evolve.cim.iec61968.assetinfo.*
+import com.zepben.evolve.cim.iec61968.assets.*
+import com.zepben.evolve.cim.iec61968.common.*
+import com.zepben.evolve.cim.iec61968.customers.Customer
+import com.zepben.evolve.cim.iec61968.customers.CustomerAgreement
+import com.zepben.evolve.cim.iec61968.customers.PricingStructure
+import com.zepben.evolve.cim.iec61968.customers.Tariff
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.CurrentTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.PotentialTransformerInfo
+import com.zepben.evolve.cim.iec61968.infiec61968.infassetinfo.RelayInfo
 import com.zepben.evolve.cim.iec61968.metering.EndDevice
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.*
 import com.zepben.evolve.cim.iec61970.base.core.*
@@ -24,6 +31,15 @@ import com.zepben.evolve.cim.iec61970.base.scada.RemoteSource
 import com.zepben.evolve.cim.iec61970.base.wires.*
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.BatteryUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PhotoVoltaicUnit
+import com.zepben.evolve.cim.iec61968.metering.EndDeviceFunction
+import com.zepben.evolve.cim.iec61968.metering.Meter
+import com.zepben.evolve.cim.iec61968.metering.UsagePoint
+import com.zepben.evolve.cim.iec61968.operations.OperationalRestriction
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
+import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
+import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
 import com.zepben.evolve.cim.iec61970.infiec61970.feeder.Circuit
@@ -779,9 +795,6 @@ abstract class BaseService(
     protected fun removeInternal(earthFaultCompensator: EarthFaultCompensator, cascade: Boolean): Boolean =
         removeInternal(earthFaultCompensator as ConductingEquipment, cascade)
 
-    protected fun removeInternal(energyConnection: EnergyConnection, cascade: Boolean): Boolean =
-        removeInternal(energyConnection as ConductingEquipment, cascade)
-
     protected fun removeInternal(energyConsumer: EnergyConsumer, cascade: Boolean): Boolean {
         energyConsumer.phases.forEach { phase ->
             removeInternal(phase)
@@ -883,18 +896,8 @@ abstract class BaseService(
     protected fun removeInternal(recloser: Recloser, cascade: Boolean): Boolean =
         removeInternal(recloser as ProtectedSwitch, cascade)
 
-    protected fun removeInternal(regulatingCondEq: RegulatingCondEq, cascade: Boolean): Boolean {
-        regulatingCondEq.regulatingControl?.removeRegulatingCondEq(regulatingCondEq)
-
-        return removeInternal(regulatingCondEq as EnergyConnection, cascade)
-    }
-
     protected fun removeInternal(regulatingControl: RegulatingControl, cascade: Boolean): Boolean =
         removeInternal(regulatingControl as PowerSystemResource, cascade)
-
-    protected fun removeInternal(rotatingMachine: RotatingMachine, cascade: Boolean): Boolean {
-        return removeInternal(rotatingMachine as RegulatingCondEq, cascade)
-    }
 
     protected fun removeInternal(seriesCompensator: SeriesCompensator, cascade: Boolean): Boolean {
         return removeInternal(seriesCompensator as ConductingEquipment, cascade)
@@ -993,8 +996,7 @@ abstract class BaseService(
     }
 
     protected fun removeInternal(powerElectronicsWindUnit: PowerElectronicsWindUnit, cascade: Boolean): Boolean = removeInternal(powerElectronicsWindUnit as PowerElectronicsUnit, cascade)
-
-
+    
     /**
      * INFIEC61970 - wires.generation.production
      */
@@ -1014,12 +1016,271 @@ abstract class BaseService(
 
     protected fun removeInternal(structure: Structure, cascade: Boolean = false): Boolean = removeInternal(structure as AssetContainer)
 
+    protected fun removeInternal(streetlight: Streetlight, cascade: Boolean): Boolean {
+        return removeInternal(streetlight as Asset, cascade)
+    }
+
+    protected fun removeInternal(pole: Pole, cascade: Boolean): Boolean {
+        if (cascade) {
+            pole.streetlights.forEach { removeInternal(it, true) }
+        }
+        pole.streetlights.forEach {
+            it.pole = null
+        }
+        return removeInternal(pole as Structure)
+    }
+
     protected fun removeInternal(endDevice: EndDevice, cascade: Boolean = false): Boolean {
         endDevice.usagePoints.forEach { up ->
             up.removeEndDevice(endDevice)
         }
 
         return removeInternal(endDevice as AssetContainer)
+    }
+
+    protected fun removeInternal(energyConnection: EnergyConnection, cascade: Boolean): Boolean = removeInternal(energyConnection as ConductingEquipment, cascade)
+
+    protected fun removeInternal(regulatingCondEq: RegulatingCondEq, cascade: Boolean): Boolean {
+        regulatingCondEq.regulatingControl?.removeRegulatingCondEq(regulatingCondEq)
+
+        return removeInternal(regulatingCondEq as EnergyConnection, cascade)
+    }
+
+    protected fun removeInternal(rotatingMachine: RotatingMachine, cascade: Boolean): Boolean {
+        return removeInternal(rotatingMachine as RegulatingCondEq, cascade)
+    }
+
+    protected fun removeInternal(document: Document, cascade: Boolean): Boolean {
+        return removeInternal(document as IdentifiedObject)
+    }
+
+    protected fun removeInternal(assetFunction: AssetFunction, cascade: Boolean): Boolean {
+        return removeInternal(assetFunction as IdentifiedObject)
+    }
+
+    protected fun removeInternal(endDeviceFunction: EndDeviceFunction, cascade: Boolean): Boolean {
+        return removeInternal(endDeviceFunction as AssetFunction, cascade)
+    }
+
+    //Concrete
+    protected fun removeInternal(meter: Meter, cascade: Boolean): Boolean {
+        return removeInternal(meter as EndDevice)
+    }
+
+    //Concrete
+    protected fun removeInternal(usagePoint: UsagePoint, cascade: Boolean): Boolean {
+        if (cascade) {
+            ;//don't remove location
+        }
+
+        usagePoint.equipment.forEach {
+            it.removeUsagePoint(usagePoint)
+        }
+        usagePoint.endDevices.forEach {
+            it.removeUsagePoint(usagePoint)
+        }
+        // TODO: do any of these equipment or endDevices have attributes tied to this usage point?
+        return removeInternal(usagePoint as IdentifiedObject)
+    }
+
+    //Concrete
+    protected fun removeInternal(operationalRestriction: OperationalRestriction, cascade: Boolean): Boolean {
+        operationalRestriction.equipment.forEach {
+            it.removeOperationalRestriction(operationalRestriction)
+        }
+        return removeInternal(operationalRestriction as Document, cascade)
+    }
+
+    protected fun removeInternal(assetInfo: AssetInfo, cascade: Boolean): Boolean {
+        return removeInternal(assetInfo as IdentifiedObject)
+    }
+
+    //Concrete
+    protected fun removeInternal(currentTransformerInfo: CurrentTransformerInfo, cascade: Boolean): Boolean {
+        sequenceOf<CurrentTransformer>().filter { it.assetInfo == currentTransformerInfo }.forEach {
+            it.assetInfo = null
+        } //can this be more generic?
+        return removeInternal(currentTransformerInfo as AssetInfo, cascade)
+    }
+
+    //Concrete
+    protected fun removeInternal(potentialTransformerInfo: PotentialTransformerInfo, cascade: Boolean): Boolean {
+        sequenceOf<PotentialTransformer>().filter { it.assetInfo == potentialTransformerInfo }.forEach {
+            it.assetInfo = null
+        } //can this be more generic?
+        return removeInternal(potentialTransformerInfo as AssetInfo, cascade)
+    }
+
+    //Concrete
+    protected fun removeInternal(relayInfo: RelayInfo, cascade: Boolean): Boolean {
+        sequenceOf<ProtectionRelayFunction>().filter { it.assetInfo == relayInfo }.forEach {
+            it.assetInfo = null
+        } //can this be more generic?
+        return removeInternal(relayInfo as AssetInfo, cascade)
+    }
+
+    //Concrete
+    protected fun removeInternal(organisation: Organisation, cascade: Boolean): Boolean {
+        sequenceOf<OrganisationRole>().filter { it.organisation == organisation }.forEach {
+            it.organisation = null
+        } //can this be more generic?
+        return removeInternal(organisation as IdentifiedObject)
+    }
+
+    protected fun removeInternal(organisationRole: OrganisationRole, cascade: Boolean): Boolean {
+        organisationRole.organisation = null
+        return removeInternal(organisationRole as IdentifiedObject)
+    }
+
+    protected fun removeInternal(assetOrganisationRole: AssetOrganisationRole, cascade: Boolean): Boolean {
+        sequenceOf<Asset>().forEach { it.removeOrganisationRole(assetOrganisationRole) }
+        return removeInternal(assetOrganisationRole as OrganisationRole, cascade)
+    }
+
+    protected fun removeInternal(assetOwner: AssetOwner, cascade: Boolean): Boolean {
+        return removeInternal(assetOwner as AssetOrganisationRole, cascade)
+    }
+
+    //Concrete
+    protected fun removeInternal(customer: Customer, cascade: Boolean): Boolean {
+        sequenceOf<CustomerAgreement>().filter { it.customer == customer }.forEach {
+            it.customer = null
+        } //can this be more generic?
+        return removeInternal(customer as OrganisationRole, cascade)
+    }
+
+    //Concrete
+    protected fun removeInternal(tariff: Tariff, cascade: Boolean): Boolean {
+        sequenceOf<PricingStructure>().forEach { it.removeTariff(tariff) }
+        return removeInternal(tariff as Document, cascade)
+    }
+
+    protected fun removeInternal(agreement: Agreement, cascade: Boolean): Boolean {
+        return removeInternal(agreement as Document, cascade)
+    }
+
+    //Concrete
+    protected fun removeInternal(customerAgreement: CustomerAgreement, cascade: Boolean): Boolean {
+        sequenceOf<Customer>().forEach { it.removeAgreement(customerAgreement) }
+        return removeInternal(customerAgreement as Agreement, cascade)
+    }
+
+    //Concrete
+    protected fun removeInternal(pricingStructure: PricingStructure, cascade: Boolean): Boolean {
+        sequenceOf<CustomerAgreement>().forEach {
+            it.removePricingStructure(pricingStructure)
+        } //can this be more generic?
+        return removeInternal(pricingStructure as Document, cascade)
+    }
+
+    //Concrete
+    protected fun removeInternal(location: Location, cascade: Boolean): Boolean {
+        sequenceOf<Asset>().filter { it.location == location }.forEach {
+            it.location = null
+        }
+        sequenceOf<EndDevice>().filter { it.serviceLocation == location }.forEach {
+            it.serviceLocation = null
+        }
+        sequenceOf<UsagePoint>().filter { it.usagePointLocation == location }.forEach {
+            it.usagePointLocation = null
+        }
+        sequenceOf<PowerSystemResource>().filter { it.location == location }.forEach {
+            it.location = null
+        }
+        return removeInternal(location as IdentifiedObject)
+    }
+
+    //Concrete
+    protected fun removeInternal(wireInfo: WireInfo, cascade: Boolean): Boolean {
+        sequenceOf<Conductor>().filter { it.assetInfo == wireInfo }.forEach {
+            it.assetInfo = null
+        }
+        return removeInternal(wireInfo as AssetInfo, cascade)
+    }
+
+    //Concrete
+    protected fun removeInternal(cableInfo: CableInfo, cascade: Boolean): Boolean {
+        return removeInternal(cableInfo as WireInfo, cascade)
+    }
+
+    protected fun removeInternal(overheadWireInfo: OverheadWireInfo, cascade: Boolean): Boolean {
+        return removeInternal(overheadWireInfo as WireInfo, cascade)
+    }
+
+
+    protected fun removeInternal(transformerTest: TransformerTest, cascade: Boolean): Boolean {
+        return removeInternal(transformerTest as IdentifiedObject)
+    }
+
+    protected fun removeInternal(noLoadTest: NoLoadTest, cascade: Boolean): Boolean {
+        sequenceOf<TransformerEndInfo>().filter { it.energisedEndNoLoadTests == noLoadTest }.forEach {
+            it.energisedEndNoLoadTests = null
+        }
+        return removeInternal(noLoadTest as TransformerTest, cascade)
+    }
+
+    protected fun removeInternal(openCircuitTest: OpenCircuitTest, cascade: Boolean): Boolean {
+        sequenceOf<TransformerEndInfo>().filter { it.openEndOpenCircuitTests == openCircuitTest }.forEach {
+            it.openEndOpenCircuitTests = null
+        }
+        sequenceOf<TransformerEndInfo>().filter { it.energisedEndOpenCircuitTests == openCircuitTest }.forEach {
+            it.energisedEndOpenCircuitTests = null
+        }
+        return removeInternal(openCircuitTest as TransformerTest, cascade)
+    }
+
+    protected fun removeInternal(shortCircuitTest: ShortCircuitTest, cascade: Boolean): Boolean {
+        sequenceOf<TransformerEndInfo>().filter { it.energisedEndShortCircuitTests == shortCircuitTest }.forEach {
+            it.energisedEndShortCircuitTests = null
+        }
+        sequenceOf<TransformerEndInfo>().filter { it.groundedEndShortCircuitTests == shortCircuitTest }.forEach {
+            it.groundedEndShortCircuitTests = null
+        }
+        return removeInternal(shortCircuitTest as TransformerTest, cascade)
+    }
+
+    protected fun removeInternal(powerTransformerInfo: PowerTransformerInfo, cascade: Boolean): Boolean {
+        sequenceOf<TransformerTankInfo>().filter { it.powerTransformerInfo == powerTransformerInfo }.forEach {
+            it.powerTransformerInfo = null
+        }
+        sequenceOf<PowerTransformer>().filter { it.assetInfo == powerTransformerInfo }.forEach {
+            it.assetInfo = null
+        }
+        return removeInternal(powerTransformerInfo as AssetInfo, cascade)
+    }
+
+    protected fun removeInternal(shuntCompensatorInfo: ShuntCompensatorInfo, cascade: Boolean): Boolean {
+        sequenceOf<ShuntCompensator>().filter { it.assetInfo == shuntCompensatorInfo }.forEach {
+            it.assetInfo = null
+        }
+        return removeInternal(shuntCompensatorInfo as AssetInfo, cascade)
+    }
+
+    protected fun removeInternal(switchInfo: SwitchInfo, cascade: Boolean): Boolean {
+        sequenceOf<Switch>().filter { it.assetInfo == switchInfo }.forEach {
+            it.assetInfo = null
+        }
+        return removeInternal(switchInfo as AssetInfo, cascade)
+    }
+
+    protected fun removeInternal(transformerEndInfo: TransformerEndInfo, cascade: Boolean): Boolean {
+        sequenceOf<TransformerTankInfo>().forEach {
+            it.removeTransformerEndInfo(transformerEndInfo)
+        }
+        sequenceOf<TransformerStarImpedance>().filter { it.transformerEndInfo == transformerEndInfo }.forEach {
+            it.transformerEndInfo = null
+        }
+        return removeInternal(transformerEndInfo as AssetInfo, cascade)
+    }
+
+    protected fun removeInternal(transformerTankInfo: TransformerTankInfo, cascade: Boolean): Boolean {
+        sequenceOf<PowerTransformerInfo>().forEach {
+            it.removeTransformerTankInfo(transformerTankInfo)
+        }
+        sequenceOf<TransformerEndInfo>().filter { it.transformerTankInfo == transformerTankInfo }.forEach {
+            it.transformerTankInfo = null
+        }
+        return removeInternal(transformerTankInfo as AssetInfo, cascade)
     }
 
     /**

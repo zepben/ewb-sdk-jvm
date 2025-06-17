@@ -97,7 +97,7 @@
 * None.
 
 ### Enhancements
-* None.
+* Upgrade ewb-grpc to 0.36.0 to support customer level load results.
 
 ### Fixes
 * Fixed bug that would cause a null pointer exception when processing metrics job sources with a null metadata timestamp

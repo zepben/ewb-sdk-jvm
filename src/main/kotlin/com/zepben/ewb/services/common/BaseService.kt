@@ -518,7 +518,7 @@ abstract class BaseService(
     protected fun removeInternal(baseVoltage: BaseVoltage, cascade: Boolean = false): Boolean = removeInternal(baseVoltage as IdentifiedObject)
 
     protected fun removeInternal(conductingEquipment: ConductingEquipment, cascade: Boolean): Boolean {
-        if (cascade) {
+        if (cascade || true) { // TODO: should be always right?
             conductingEquipment.terminals.forEach { t ->
                 conductingEquipment.removeTerminal(t)
                 removeInternal(t)
@@ -752,7 +752,7 @@ abstract class BaseService(
      * IEC61970 base wires
      */
     protected fun removeInternal(acLineSegment: AcLineSegment, cascade: Boolean): Boolean {
-        if (cascade) {
+        if (cascade) { // TODO: this should be always probably
             acLineSegment.cuts.forEach { cut ->
                 removeInternal(cut)
             }

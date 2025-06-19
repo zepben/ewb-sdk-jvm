@@ -39,17 +39,17 @@ internal class BaseServiceTest {
 
     internal class TestBaseService : BaseService("test", MetadataCollection()) {
         fun add(obj: Junction) = super.add(obj)
-        fun remove(obj: Junction) = super.remove(obj)
+        fun remove(obj: Junction, cascade: Boolean = false) = super.removeInternal(obj, cascade)
         fun add(obj: Breaker) = super.add(obj)
-        fun remove(obj: Breaker) = super.remove(obj)
+        fun remove(obj: Breaker, cascade: Boolean = false) = super.removeInternal(obj, cascade)
         fun add(obj: AcLineSegment) = super.add(obj)
-        fun remove(obj: AcLineSegment) = super.remove(obj)
+        fun remove(obj: AcLineSegment, cascade: Boolean = false) = super.removeInternal(obj, cascade)
         fun add(obj: Terminal) = super.add(obj)
-        fun remove(obj: Terminal) = super.remove(obj)
+        fun remove(obj: Terminal, cascade: Boolean = false) = super.removeInternal(obj, cascade)
         fun add(obj: Location) = super.add(obj)
-        fun remove(obj: Location) = super.remove(obj)
+        fun remove(obj: Location, cascade: Boolean = false) = super.removeInternal(obj, cascade)
         fun add(obj: BaseVoltage) = super.add(obj)
-        fun remove(obj: BaseVoltage) = super.remove(obj)
+        fun remove(obj: BaseVoltage, cascade: Boolean = false) = super.removeInternal(obj, cascade)
     }
 
     private val service = TestBaseService()
@@ -314,7 +314,7 @@ internal class BaseServiceTest {
 
         // required, since BaseService checks that each add method has a matching remove method
         @Suppress("Unused")
-        fun remove(cableInfo: MyIdentifiedObject): Boolean = super.remove(cableInfo)
+        fun remove(cableInfo: MyIdentifiedObject, cascade: Boolean = false): Boolean = super.removeInternal(cableInfo) //ignoring in hack branch
     }
 
 }

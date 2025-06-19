@@ -26,22 +26,22 @@ class CustomerService(metadata: MetadataCollection = MetadataCollection()) : Bas
     // ###################
 
     fun add(organisation: Organisation): Boolean = super.add(organisation)
-    fun remove(organisation: Organisation): Boolean = super.remove(organisation)
+    fun remove(organisation: Organisation, cascade: Boolean = false): Boolean = super.removeInternal(organisation, cascade)
 
     // ######################
     // # IEC61968 CUSTOMERS #
     // ######################
 
     fun add(customer: Customer): Boolean = super.add(customer)
-    fun remove(customer: Customer): Boolean = super.remove(customer)
+    fun remove(customer: Customer, cascade: Boolean = false): Boolean = super.removeInternal(customer, cascade)
 
     fun add(customerAgreement: CustomerAgreement): Boolean = super.add(customerAgreement)
-    fun remove(customerAgreement: CustomerAgreement): Boolean = super.remove(customerAgreement)
+    fun remove(customerAgreement: CustomerAgreement, cascade: Boolean = false): Boolean = super.removeInternal(customerAgreement, cascade)
 
     fun add(pricingStructure: PricingStructure): Boolean = super.add(pricingStructure)
-    fun remove(pricingStructure: PricingStructure): Boolean = super.remove(pricingStructure)
+    fun remove(pricingStructure: PricingStructure, cascade: Boolean = false): Boolean = super.removeInternal(pricingStructure, cascade)
 
     fun add(tariff: Tariff): Boolean = super.add(tariff)
-    fun remove(tariff: Tariff): Boolean = super.remove(tariff)
+    fun remove(tariff: Tariff, cascade: Boolean = false): Boolean = super.removeInternal(tariff, cascade)
 
 }

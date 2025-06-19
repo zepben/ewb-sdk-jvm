@@ -39,6 +39,8 @@ import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.AuxiliaryEquipment
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.PotentialTransformer
 import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.Sensor
+import com.zepben.evolve.cim.iec61970.base.diagramlayout.Diagram
+import com.zepben.evolve.cim.iec61970.base.diagramlayout.DiagramObject
 import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayFunction
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsUnit
 import com.zepben.evolve.cim.iec61970.base.wires.generation.production.PowerElectronicsWindUnit
@@ -295,11 +297,11 @@ abstract class BaseService(
      * @throws [UnsupportedIdentifiedObjectException] if the service does not support the [identifiedObject].
      * @return the return value of the underlying remove function.
      */
-    fun tryRemove(identifiedObject: IdentifiedObject): Boolean {
+    fun tryRemove(identifiedObject: IdentifiedObject, cascade: Boolean = false): Boolean {
         val func = removeFunctions[identifiedObject::class]
             ?: throw UnsupportedIdentifiedObjectException("$name service does not support removing ${identifiedObject::class}")
 
-        return func.call(this, identifiedObject) as Boolean
+        return func.call(this, identifiedObject, cascade) as Boolean
     }
 
     /**
@@ -608,7 +610,7 @@ abstract class BaseService(
      *
      * @return true if the object is disassociated from this service.
      */
-    private fun removeInternal(identifiedObject: IdentifiedObject): Boolean = objectsByType[identifiedObject::class]?.remove(identifiedObject.mRID) != null
+    fun removeInternal(identifiedObject: IdentifiedObject): Boolean = objectsByType[identifiedObject::class]?.remove(identifiedObject.mRID) != null
 
     protected fun removeInternal(powerSystemResource: PowerSystemResource, cascade: Boolean = false): Boolean {
         powerSystemResource.assets.forEach { asset -> asset.removePowerSystemResource(powerSystemResource) }
@@ -1283,6 +1285,17 @@ abstract class BaseService(
         return removeInternal(transformerTankInfo as AssetInfo, cascade)
     }
 
+    protected fun removeInternal(diagram: Diagram, cascade: Boolean = false): Boolean {
+        diagram.diagramObjects.forEach { //diagram object cant be moved between diagrams so remove/cleanup here
+            removeInternal(it, cascade)
+        }
+        return removeInternal(diagram as IdentifiedObject)
+    }
+
+    protected fun removeInternal(diagramObject: DiagramObject, cascade: Boolean = false): Boolean {
+        diagramObject.diagram?.removeDiagramObject(diagramObject) //remove from diagram, not checking if diagram is empty
+        return removeInternal(diagramObject as IdentifiedObject)
+    }
     /**
      * Create a sequence of all instances of the specified type.
      *
@@ -1441,7 +1454,7 @@ abstract class BaseService(
         val idObjType = IdentifiedObject::class.createType()
         return this::class.declaredMemberFunctions.asSequence()
             .filter { it.name == name }
-            .filter { it.parameters.size == 2 }
+            //.filter { it.parameters.size == 2 }
             .filter { it.visibility == KVisibility.PUBLIC }
             .filter { it.parameters[1].type.isSubtypeOf(idObjType) }
             .map { (it.parameters[1].type.classifier as KClass<out IdentifiedObject>) to it }

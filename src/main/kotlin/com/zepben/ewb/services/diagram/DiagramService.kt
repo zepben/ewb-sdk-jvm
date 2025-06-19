@@ -46,7 +46,7 @@ class DiagramService(metadata: MetadataCollection = MetadataCollection()) : Base
     }
 
     fun add(diagram: Diagram): Boolean = super.add(diagram)
-    fun remove(diagram: Diagram): Boolean = super.remove(diagram)
+    fun remove(diagram: Diagram, cascade: Boolean = false): Boolean = super.removeInternal(diagram, cascade)
 
     /**
      * Associate a [DiagramObject] with this service.
@@ -66,7 +66,7 @@ class DiagramService(metadata: MetadataCollection = MetadataCollection()) : Base
      * @param diagramObject The [DiagramObject] to disassociate with this service.
      * @return true if the [DiagramObject] was removed successfully.
      */
-    fun remove(diagramObject: DiagramObject): Boolean = super.remove(diagramObject) && removeIndex(diagramObject)
+    fun remove(diagramObject: DiagramObject, cascade: Boolean = false): Boolean = super.removeInternal(diagramObject, cascade) && removeIndex(diagramObject)
 
     /**
      * Index a [DiagramObject] against its associated [Diagram] and [IdentifiedObject].

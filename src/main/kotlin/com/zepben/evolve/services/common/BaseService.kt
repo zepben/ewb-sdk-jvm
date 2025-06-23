@@ -519,8 +519,8 @@ abstract class BaseService(
 
     protected fun removeInternal(conductingEquipment: ConductingEquipment, cascade: Boolean): Boolean {
         if (cascade || true) { // TODO: should be always right?
-            conductingEquipment.terminals.forEach { t ->
-                conductingEquipment.removeTerminal(t)
+            conductingEquipment.terminals.map { it }.forEach { t ->
+                conductingEquipment.removeTerminal(t) //this should be handled by removeInternal(Terminal)
                 removeInternal(t)
             }
         }
@@ -668,6 +668,9 @@ abstract class BaseService(
     protected fun removeInternal(terminal: Terminal, cascade: Boolean = false): Boolean {
         terminal.conductingEquipment?.removeTerminal(terminal)
         terminal.connectivityNode?.removeTerminal(terminal)
+        this.sequenceOf<Circuit>().forEach {
+            it.removeEndTerminal(terminal) // don't know what this is lol error handling nope
+        }
 
         return removeInternal(terminal as AcDcTerminal)
     }

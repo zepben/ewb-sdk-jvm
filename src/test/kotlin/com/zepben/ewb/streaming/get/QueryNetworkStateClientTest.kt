@@ -8,6 +8,8 @@
 
 package com.zepben.ewb.streaming.get
 
+import com.zepben.evolve.streaming.get.NetworkStateIssues
+import com.zepben.ewb.metrics.NetworkMetrics
 import com.zepben.ewb.streaming.data.*
 import com.zepben.ewb.streaming.get.testservices.TestQueryNetworkStateService
 import com.zepben.ewb.streaming.grpc.GrpcChannel
@@ -25,6 +27,7 @@ import org.hamcrest.Matchers.instanceOf
 import org.junit.Rule
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertTimeoutPreemptively
+import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.streams.toList
@@ -38,7 +41,8 @@ internal class QueryNetworkStateClientTest {
     private val serverName = InProcessServerBuilder.generateName()
     private val channel = grpcCleanup.register(InProcessChannelBuilder.forName(serverName).directExecutor().build())
     private val stub = spyk(QueryNetworkStateServiceGrpc.newStub(channel))
-    private val client = QueryNetworkStateClient(stub, null)
+    private val issues = NetworkStateIssues(LoggerFactory.getLogger("test"), NetworkMetrics())
+    private val client = QueryNetworkStateClient(stub, issues, null)
     private val service = TestQueryNetworkStateService()
 
     init {
@@ -47,8 +51,8 @@ internal class QueryNetworkStateClientTest {
 
     @Test
     internal fun `constructor coverage`() {
-        QueryNetworkStateClient(GrpcChannel(channel), TokenCallCredentials { "auth-token" })
-        QueryNetworkStateClient(channel, TokenCallCredentials { "auth-token" })
+        QueryNetworkStateClient(GrpcChannel(channel), issues, TokenCallCredentials { "auth-token" })
+        QueryNetworkStateClient(channel, issues, TokenCallCredentials { "auth-token" })
     }
 
     @Test

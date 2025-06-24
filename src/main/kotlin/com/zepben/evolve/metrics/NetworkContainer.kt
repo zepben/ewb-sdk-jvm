@@ -25,6 +25,9 @@ data class PartialNetworkContainer(
     val name: String
 ) : NetworkContainer
 
+/**
+ * The container for recording metrics across the entire network.
+ */
 data object TotalNetworkContainer : NetworkContainer
 
 enum class NetworkLevel {

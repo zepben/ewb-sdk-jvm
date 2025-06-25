@@ -7,7 +7,7 @@
 * None.
 
 ### Enhancements
-* None.
+* Upgrade ewb-grpc to 0.36.0 to support customer level load results.
 
 ### Fixes
 * None.

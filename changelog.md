@@ -10,7 +10,7 @@
 * None.
 
 ### Fixes
-* None.
+* QueryNetworkStateService will now correctly report processing errors in responses.
 
 ### Notes
 * None.

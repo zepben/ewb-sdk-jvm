@@ -9,8 +9,8 @@
     </parent>
 
     <groupId>com.zepben</groupId>
-    <artifactId>evolve-sdk</artifactId>
-    <version>0.30.0-SNAPSHOT1</version>
+    <artifactId>ewb-sdk</artifactId>
+    <version>1.0.0-SNAPSHOT1</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>SDK for interaction with the evolve platform</description>
@@ -66,15 +66,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.zepben</groupId>
-            <artifactId>zepben-utils</artifactId>
-            <version>1.4.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.zepben.protobuf</groupId>
             <artifactId>evolve-grpc</artifactId>
-            <version>0.36.0</version>
+            <version>0.38.0-SNAPSHOT1-LOCAL</version>
         </dependency>
 
         <dependency>

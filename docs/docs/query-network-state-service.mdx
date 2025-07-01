@@ -33,8 +33,8 @@ The classes you need for performing these actions can be imported from the SDK:
 
 ```java
 import com.zepben.evolve.conn.grpc.GrpcServer;
-import com.zepben.evolve.streaming.data.CurrentStateEvent;
-import com.zepben.evolve.streaming.get.QueryNetworkStateService;
+import com.zepben.ewb.streaming.data.CurrentStateEvent;
+import com.zepben.ewb.streaming.get.QueryNetworkStateService;
 ```
 
 </TabItem>
@@ -42,8 +42,8 @@ import com.zepben.evolve.streaming.get.QueryNetworkStateService;
 
 ```kotlin
 import com.zepben.evolve.conn.grpc.GrpcServer
-import com.zepben.evolve.streaming.data.CurrentStateEvent
-import com.zepben.evolve.streaming.get.QueryNetworkStateService
+import com.zepben.ewb.streaming.data.CurrentStateEvent
+import com.zepben.ewb.streaming.get.QueryNetworkStateService
 ```
 
 </TabItem>
@@ -336,8 +336,8 @@ Putting each of the steps above together, you can build the scaffold of a workin
 
 `Main.java`:
 ```java
-import com.zepben.evolve.streaming.get.QueryNetworkStateService;
-import com.zepben.evolve.streaming.data.CurrentStateEvent;
+import com.zepben.ewb.streaming.get.QueryNetworkStateService;
+import com.zepben.ewb.streaming.data.CurrentStateEvent;
 
 import java.util.stream.Stream;
 
@@ -366,7 +366,7 @@ class Main {
 `GrpcServerImpl.java`:
 ```java
 import com.zepben.evolve.conn.grpc.GrpcServer;
-import com.zepben.evolve.streaming.get.QueryNetworkStateService;
+import com.zepben.ewb.streaming.get.QueryNetworkStateService;
 
 import java.util.List;
 
@@ -399,7 +399,7 @@ class Main {
 `GrpcServerImpl.java`:
 ```java
 import com.zepben.evolve.conn.grpc.GrpcServer;
-import com.zepben.evolve.streaming.get.QueryNetworkStateService;
+import com.zepben.ewb.streaming.get.QueryNetworkStateService;
 
 import java.util.List;
 
@@ -415,8 +415,8 @@ class GrpcServerImpl extends GrpcServer {
 
 `QueryNetworkStateServiceImpl.java`:
 ```java
-import com.zepben.evolve.streaming.data.CurrentStateEvent;
-import com.zepben.evolve.streaming.get.QueryNetworkStateService;
+import com.zepben.ewb.streaming.data.CurrentStateEvent;
+import com.zepben.ewb.streaming.get.QueryNetworkStateService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -451,8 +451,8 @@ class QueryNetworkStateServiceImpl {
 
 ```kotlin
 import com.zepben.evolve.conn.grpc.GrpcServer
-import com.zepben.evolve.streaming.data.CurrentStateEvent
-import com.zepben.evolve.streaming.get.QueryNetworkStateService
+import com.zepben.ewb.streaming.data.CurrentStateEvent
+import com.zepben.ewb.streaming.get.QueryNetworkStateService
 
 fun main() {
     val service = QueryNetworkStateService(
@@ -483,8 +483,8 @@ fun main() {
 
 ```kotlin
 import com.zepben.evolve.conn.grpc.GrpcServer
-import com.zepben.evolve.streaming.data.CurrentStateEvent
-import com.zepben.evolve.streaming.get.QueryNetworkStateService
+import com.zepben.ewb.streaming.data.CurrentStateEvent
+import com.zepben.ewb.streaming.get.QueryNetworkStateService
 
 import java.time.LocalDateTime
 

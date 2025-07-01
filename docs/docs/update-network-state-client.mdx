@@ -29,7 +29,7 @@ and performs shutdown operations for you. At its most basic, this can be achieve
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.grpc.GrpcChannel;
+import com.zepben.ewb.streaming.grpc.GrpcChannel;
 import io.grpc.ManagedChannelBuilder;
 
 var channel = new GrpcChannel(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build());
@@ -39,7 +39,7 @@ var channel = new GrpcChannel(ManagedChannelBuilder.forAddress(host, port).usePl
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.streaming.grpc.GrpcChannel
+import com.zepben.ewb.streaming.grpc.GrpcChannel
 import io.grpc.ManagedChannelBuilder
 
 val channel = GrpcChannel(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build())
@@ -65,7 +65,7 @@ Using your gRPC channel with the `UpdateNetworkStateClient` is as simple as pass
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient;
 
 var client = new UpdateNetworkStateClient(channel);
 ```
@@ -74,7 +74,7 @@ var client = new UpdateNetworkStateClient(channel);
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient
 
 val client = UpdateNetworkStateClient(channel)
 ```
@@ -110,8 +110,8 @@ The current state of switches can be updating by passing a `SwitchStateEvent` to
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.data.SwitchStateEvent;
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+import com.zepben.ewb.streaming.data.SwitchStateEvent;
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -124,8 +124,8 @@ var response = client.setCurrentStates(1, List.of(event1));
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.streaming.data.SwitchStateEvent
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+import com.zepben.ewb.streaming.data.SwitchStateEvent
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient
 
 val event1 = SwitchStateEvent("event1", LocalDateTime.now(), "switch_id_1", SwitchAction.OPEN)
 val response = client.setCurrentStates(1, listOf(event1))
@@ -147,8 +147,8 @@ If you have multiple batches to send, you can pass a stream/sequence of them rat
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.data.SwitchStateEvent;
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+import com.zepben.ewb.streaming.data.SwitchStateEvent;
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -170,8 +170,8 @@ client.setCurrentStates(batches).forEach(response ->
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.streaming.data.SwitchStateEvent
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+import com.zepben.ewb.streaming.data.SwitchStateEvent
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient
 
 import java.time.LocalDateTime
 
@@ -206,8 +206,8 @@ batches of events as shown above.
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.data.AddCutEvent;
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+import com.zepben.ewb.streaming.data.AddCutEvent;
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -220,8 +220,8 @@ var response = client.setCurrentStates(1, List.of(event1));
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.streaming.data.AddCutEvent
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+import com.zepben.ewb.streaming.data.AddCutEvent
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient
 
 val event1 = AddCutEvent("event1", LocalDateTime.now(), "cut_id_1", "acls_id_1")
 val response = client.setCurrentStates(1, listOf(event1))
@@ -246,8 +246,8 @@ of events as shown above.
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.data.RemoveCutEvent;
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+import com.zepben.ewb.streaming.data.RemoveCutEvent;
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -260,8 +260,8 @@ var response = client.setCurrentStates(1, List.of(event1));
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.streaming.data.RemoveCutEvent
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+import com.zepben.ewb.streaming.data.RemoveCutEvent
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient
 
 val event1 = RemoveCutEvent("event1", LocalDateTime.now(), "cut_id_1")
 val response = client.setCurrentStates(1, listOf(event1))
@@ -286,9 +286,9 @@ events, and batches of events as shown above.
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.data.AddJumperEvent;
-import com.zepben.evolve.streaming.data.JumperConnection;
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+import com.zepben.ewb.streaming.data.AddJumperEvent;
+import com.zepben.ewb.streaming.data.JumperConnection;
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -301,8 +301,8 @@ var response = client.setCurrentStates(1, List.of(event1));
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.streaming.data.AddJumperEvent
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+import com.zepben.ewb.streaming.data.AddJumperEvent
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient
 
 val event1 = AddJumperEvent("event1", LocalDateTime.now(), "jumper_id_1", JumperConnection("acls_id_1"), JumperConnection("acls_id_2"))
 val response = client.setCurrentStates(1, listOf(event1))
@@ -327,8 +327,8 @@ batches of events as shown above.
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.data.RemoveJumperEvent;
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient;
+import com.zepben.ewb.streaming.data.RemoveJumperEvent;
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -341,8 +341,8 @@ var response = client.setCurrentStates(1, List.of(event1));
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.streaming.data.RemoveJumperEvent
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateClient
+import com.zepben.ewb.streaming.data.RemoveJumperEvent
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateClient
 
 val event1 = RemoveJumperEvent("event1", LocalDateTime.now(), "jumper_id_1")
 val response = client.setCurrentStates(1, listOf(event1))
@@ -369,7 +369,7 @@ Each batch will receive its own response, which will be one of the following:
 
 * `BatchNotProcessed` - Indicates the entire batch was ignored because the message ID of the batch was prior to the last processed batch.
 
-You can check the type of response or failure by check against the types from `com.zepben.evolve.streaming.data.*`
+You can check the type of response or failure by check against the types from `com.zepben.ewb.streaming.data.*`
 <Tabs
     groupId="code-example"
     defaultValue="java"
@@ -381,8 +381,8 @@ You can check the type of response or failure by check against the types from `c
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.data.BatchFailure;
-import com.zepben.evolve.streaming.data.StateEventUnknownMrid;
+import com.zepben.ewb.streaming.data.BatchFailure;
+import com.zepben.ewb.streaming.data.StateEventUnknownMrid;
 
 if (response instanceof BatchFailure) {
     var batchFailure = (BatchFailure) response;

@@ -27,13 +27,13 @@ Here is a contrived example of such a system modelled using the Evolve SDK:
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer;
-import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol;
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay;
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme;
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem;
-import com.zepben.evolve.cim.iec61970.base.protection.RelaySetting;
-import com.zepben.evolve.cim.iec61970.base.wires.Breaker;
+import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.CurrentTransformer;
+import com.zepben.ewb.cim.iec61970.base.domain.UnitSymbol;
+import com.zepben.ewb.cim.iec61970.base.protection.CurrentRelay;
+import com.zepben.ewb.cim.iec61970.base.protection.ProtectionRelayScheme;
+import com.zepben.ewb.cim.iec61970.base.protection.ProtectionRelaySystem;
+import com.zepben.ewb.cim.iec61970.base.protection.RelaySetting;
+import com.zepben.ewb.cim.iec61970.base.wires.Breaker;
 
 class ProtectionExample {
     public static void main(String[] args) {
@@ -107,13 +107,13 @@ class ProtectionExample {
 <TabItem value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
-import com.zepben.evolve.cim.iec61970.base.domain.UnitSymbol
-import com.zepben.evolve.cim.iec61970.base.protection.CurrentRelay
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelayScheme
-import com.zepben.evolve.cim.iec61970.base.protection.ProtectionRelaySystem
-import com.zepben.evolve.cim.iec61970.base.protection.RelaySetting
-import com.zepben.evolve.cim.iec61970.base.wires.Breaker
+import com.zepben.ewb.cim.iec61970.base.auxiliaryequipment.CurrentTransformer
+import com.zepben.ewb.cim.iec61970.base.domain.UnitSymbol
+import com.zepben.ewb.cim.iec61970.base.protection.CurrentRelay
+import com.zepben.ewb.cim.iec61970.base.protection.ProtectionRelayScheme
+import com.zepben.ewb.cim.iec61970.base.protection.ProtectionRelaySystem
+import com.zepben.ewb.cim.iec61970.base.protection.RelaySetting
+import com.zepben.ewb.cim.iec61970.base.wires.Breaker
 
 fun main() {
     // Breakers for stove, bathroom, and washer are for individual outlets,
@@ -214,12 +214,12 @@ To aid in modelling protection systems, our network data model also supports exp
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject;
-import com.zepben.evolve.cim.iec61970.base.core.Terminal;
-import com.zepben.evolve.cim.iec61970.base.wires.Ground;
-import com.zepben.evolve.cim.iec61970.base.wires.GroundDisconnector;
-import com.zepben.evolve.cim.iec61970.base.wires.Junction;
-import com.zepben.evolve.services.network.NetworkService;
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject;
+import com.zepben.ewb.cim.iec61970.base.core.Terminal;
+import com.zepben.ewb.cim.iec61970.base.wires.Ground;
+import com.zepben.ewb.cim.iec61970.base.wires.GroundDisconnector;
+import com.zepben.ewb.cim.iec61970.base.wires.Junction;
+import com.zepben.ewb.services.network.NetworkService;
 
 class GroundExample {
     public static void main(String[] args) {
@@ -255,11 +255,11 @@ class GroundExample {
 <TabItem value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.Ground
-import com.zepben.evolve.cim.iec61970.base.wires.GroundDisconnector
-import com.zepben.evolve.cim.iec61970.base.wires.Junction
-import com.zepben.evolve.services.network.NetworkService
+import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.cim.iec61970.base.wires.Ground
+import com.zepben.ewb.cim.iec61970.base.wires.GroundDisconnector
+import com.zepben.ewb.cim.iec61970.base.wires.Junction
+import com.zepben.ewb.services.network.NetworkService
 
 fun main() {
     // junction --- ground disconnector --- ground
@@ -300,11 +300,11 @@ The Evolve SDK also supports modelling series compensators, which are series cap
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.cim.iec61970.base.core.IdentifiedObject;
-import com.zepben.evolve.cim.iec61970.base.core.Terminal;
-import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment;
-import com.zepben.evolve.cim.iec61970.base.wires.SeriesCompensator;
-import com.zepben.evolve.services.network.NetworkService;
+import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject;
+import com.zepben.ewb.cim.iec61970.base.core.Terminal;
+import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment;
+import com.zepben.ewb.cim.iec61970.base.wires.SeriesCompensator;
+import com.zepben.ewb.services.network.NetworkService;
 
 class SeriesCompensatorExample {
     public static void main(String[] args) {
@@ -353,10 +353,10 @@ class SeriesCompensatorExample {
 <TabItem value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.cim.iec61970.base.core.Terminal
-import com.zepben.evolve.cim.iec61970.base.wires.AcLineSegment
-import com.zepben.evolve.cim.iec61970.base.wires.SeriesCompensator
-import com.zepben.evolve.services.network.NetworkService
+import com.zepben.ewb.cim.iec61970.base.core.Terminal
+import com.zepben.ewb.cim.iec61970.base.wires.AcLineSegment
+import com.zepben.ewb.cim.iec61970.base.wires.SeriesCompensator
+import com.zepben.ewb.services.network.NetworkService
 
 fun main() {
     // AC line 1 --- series compensator -- AC line 2

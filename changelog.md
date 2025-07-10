@@ -1,6 +1,14 @@
 # Zepben EWB SDK changelog
 ## [0.30.0] - UNRELEASED
 ### Breaking Changes
+* Renamed the package to `com.zepben.ewb`. You will need to update all your imports `com.zepben.evolve.*` -> `com.zepben.ewb.*`. This also updates the maven
+  artifact:
+  ```xml
+  <dependency>
+      <groupId>com.zepben</groupId>
+      <artifactId>ewb-sdk</artifactId>
+  </dependency>
+  ```
 * Relocated the following classes into the Zepben extensions area, marking them as [ZBEX]:
   * `DistanceRelay`: `cim.iec61970.base.protection` -> `cim.extensions.iec61970.base.protection`.
   * `EvChargingUnit`: `cim.iec61970.infiec61970.wires.generation.production` -> `cim.extensions.iec61970.base.generation.production`.
@@ -83,7 +91,7 @@
     * `CURRENT_NETWORK_STATE` -> `CURRENT`.
 * The `evolve-conn` dependency has been incorporated into the SDK with the following package changes:
   * `com.zepben.auth` -> `com.zepben.ewb.auth`
-  * `com.zepben.ewb.conn` -> `com.zepben.ewb.conn`
+  * `com.zepben.evolve.conn` -> `com.zepben.ewb.conn`
 
 ### New Features
 * None.

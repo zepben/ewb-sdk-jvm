@@ -19,4 +19,3 @@ Requirements to build
 To build:
 
     mvn package
-

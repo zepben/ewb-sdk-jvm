@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.streaming.grpc
 
-import com.zepben.auth.common.AuthException
+import com.zepben.ewb.auth.common.AuthException
 import io.grpc.CallCredentials.MetadataApplier
 import io.grpc.CallCredentials.RequestInfo
 import io.grpc.Metadata
@@ -84,7 +84,7 @@ internal class TokenCallCredentialsTest {
             assertThat(grpcStatusException.captured.code, equalTo(Status.UNAVAILABLE.code))
             assertThat(
                 grpcStatusException.captured.description,
-                equalTo("Getting authorization data from token fetcher failed with error: com.zepben.auth.common.AuthException: test message $it")
+                equalTo("Getting authorization data from token fetcher failed with error: com.zepben.ewb.auth.common.AuthException: test message $it")
             )
             assertThat(grpcStatusException.captured.cause, equalTo(e))
         }
@@ -100,7 +100,7 @@ internal class TokenCallCredentialsTest {
             assertThat(grpcStatusException.captured.code, equalTo(Status.UNAUTHENTICATED.code))
             assertThat(
                 grpcStatusException.captured.description,
-                equalTo("Getting authorization data from token fetcher failed with error: com.zepben.auth.common.AuthException: test message $it")
+                equalTo("Getting authorization data from token fetcher failed with error: com.zepben.ewb.auth.common.AuthException: test message $it")
             )
             assertThat(grpcStatusException.captured.cause, equalTo(e))
         }

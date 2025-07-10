@@ -9,7 +9,7 @@
 package com.zepben.ewb.streaming.grpc
 
 import com.google.protobuf.Empty
-import com.zepben.auth.client.ZepbenTokenFetcher
+import com.zepben.ewb.auth.client.ZepbenTokenFetcher
 import com.zepben.protobuf.cc.CustomerConsumerGrpc
 import com.zepben.protobuf.connection.CheckConnectionRequest
 import com.zepben.protobuf.dc.DiagramConsumerGrpc

@@ -8,7 +8,7 @@
 
 package com.zepben.ewb.streaming.grpc
 
-import com.zepben.auth.common.AuthException
+import com.zepben.ewb.auth.common.AuthException
 import io.grpc.CallCredentials
 import io.grpc.Metadata
 import io.grpc.Metadata.ASCII_STRING_MARSHALLER

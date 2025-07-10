@@ -8,11 +8,11 @@
 
 package com.zepben.ewb.streaming.grpc
 
-import com.zepben.auth.client.SSLContextUtils
-import com.zepben.auth.client.ZepbenTokenFetcher
-import com.zepben.auth.client.createTokenFetcher
-import com.zepben.auth.client.createTokenFetcherManagedIdentity
-import com.zepben.auth.common.AuthMethod
+import com.zepben.ewb.auth.client.SSLContextUtils
+import com.zepben.ewb.auth.client.ZepbenTokenFetcher
+import com.zepben.ewb.auth.client.createTokenFetcher
+import com.zepben.ewb.auth.client.createTokenFetcherManagedIdentity
+import com.zepben.ewb.auth.common.AuthMethod
 import java.net.http.HttpClient
 
 /**

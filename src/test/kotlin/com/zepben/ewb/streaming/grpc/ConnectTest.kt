@@ -8,12 +8,12 @@
 
 package com.zepben.ewb.streaming.grpc
 
-import com.zepben.auth.client.SSLContextUtils
-import com.zepben.auth.client.ZepbenTokenFetcher
-import com.zepben.auth.client.createTokenFetcher
-import com.zepben.auth.client.createTokenFetcherManagedIdentity
-import com.zepben.auth.common.AuthException
-import com.zepben.auth.common.AuthMethod
+import com.zepben.ewb.auth.client.SSLContextUtils
+import com.zepben.ewb.auth.client.ZepbenTokenFetcher
+import com.zepben.ewb.auth.client.createTokenFetcher
+import com.zepben.ewb.auth.client.createTokenFetcherManagedIdentity
+import com.zepben.ewb.auth.common.AuthException
+import com.zepben.ewb.auth.common.AuthMethod
 import com.zepben.testutils.exception.ExpectException
 import io.mockk.*
 import io.vertx.core.json.JsonObject
@@ -103,7 +103,7 @@ internal class ConnectTest {
 
     @Test
     internal fun connectWithSecret() {
-        mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
+        mockkStatic("com.zepben.ewb.auth.client.ZepbenTokenFetcherKt")
         every {
             createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
         } returns tokenFetcher
@@ -137,7 +137,7 @@ internal class ConnectTest {
 
     @Test
     internal fun connectWithSecretFailsIfNoAuth() {
-        mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
+        mockkStatic("com.zepben.ewb.auth.client.ZepbenTokenFetcherKt")
 
         every {
             createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), true)
@@ -162,7 +162,7 @@ internal class ConnectTest {
             every { it.build() } returns httpClient
         }
 
-        mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
+        mockkStatic("com.zepben.ewb.auth.client.ZepbenTokenFetcherKt")
         every {
             createTokenFetcher(AuthMethod.ENTRAID, "https://logi/contoso.onmicrosoft.not.real/v2.0", "audience2", httpClient, false)
         } returns tokenFetcher
@@ -214,7 +214,7 @@ internal class ConnectTest {
 
     @Test
     internal fun connectWithPassword() {
-        mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
+        mockkStatic("com.zepben.ewb.auth.client.ZepbenTokenFetcherKt")
         every {
             createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), any())
         } returns tokenFetcher
@@ -251,7 +251,7 @@ internal class ConnectTest {
 
     @Test
     internal fun connectWithPasswordConnectsFailsIfNoAuth() {
-        mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
+        mockkStatic("com.zepben.ewb.auth.client.ZepbenTokenFetcherKt")
 
         every {
             createTokenFetcher("confAddress", "confCAFilename", "authCAFilename", any(), any(), true)
@@ -281,7 +281,7 @@ internal class ConnectTest {
             every { it.build() } returns httpClient
         }
 
-        mockkStatic("com.zepben.auth.client.ZepbenTokenFetcherKt")
+        mockkStatic("com.zepben.ewb.auth.client.ZepbenTokenFetcherKt")
         every {
             createTokenFetcher(AuthMethod.ENTRAID, "httpz://offline_test", "audience", httpClient, false)
         } returns tokenFetcher

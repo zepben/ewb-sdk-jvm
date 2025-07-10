@@ -10,8 +10,8 @@ package com.zepben.ewb.streaming.get
 
 import com.google.protobuf.Empty
 import com.google.protobuf.Timestamp
-import com.zepben.evolve.conn.grpc.GrpcException
 import com.zepben.ewb.cim.iec61970.base.core.PhaseCode
+import com.zepben.ewb.conn.grpc.GrpcException
 import com.zepben.ewb.services.common.translator.toLocalDateTime
 import com.zepben.ewb.services.common.translator.toTimestamp
 import com.zepben.ewb.streaming.data.*

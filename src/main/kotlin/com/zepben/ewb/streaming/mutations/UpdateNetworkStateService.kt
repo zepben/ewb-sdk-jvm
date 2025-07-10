@@ -9,7 +9,7 @@
 package com.zepben.ewb.streaming.mutations
 
 import com.google.protobuf.Empty
-import com.zepben.evolve.conn.grpc.GrpcException
+import com.zepben.ewb.conn.grpc.GrpcException
 import com.zepben.ewb.streaming.data.BatchFailure
 import com.zepben.ewb.streaming.data.CurrentStateEvent
 import com.zepben.ewb.streaming.data.SetCurrentStatesStatus

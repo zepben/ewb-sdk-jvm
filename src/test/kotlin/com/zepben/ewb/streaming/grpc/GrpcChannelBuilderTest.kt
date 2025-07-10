@@ -10,8 +10,8 @@ package com.zepben.ewb.streaming.grpc
 
 import com.google.common.reflect.ClassPath
 import com.google.protobuf.Empty
-import com.zepben.auth.client.ZepbenTokenFetcher
-import com.zepben.auth.common.AuthMethod
+import com.zepben.ewb.auth.client.ZepbenTokenFetcher
+import com.zepben.ewb.auth.common.AuthMethod
 import com.zepben.ewb.streaming.get.CustomerConsumerClient
 import com.zepben.ewb.streaming.get.DiagramConsumerClient
 import com.zepben.ewb.streaming.get.NetworkConsumerClient

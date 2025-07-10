@@ -81,6 +81,9 @@
     * `ALL_NETWORK_STATE` -> `ALL`.
     * `NORMAL_NETWORK_STATE` -> `NORMAL`.
     * `CURRENT_NETWORK_STATE` -> `CURRENT`.
+* The `evolve-conn` dependency has been incorporated into the SDK with the following package changes:
+  * `com.zepben.auth` -> `com.zepben.ewb.auth`
+  * `com.zepben.ewb.conn` -> `com.zepben.ewb.conn`
 
 ### New Features
 * None.

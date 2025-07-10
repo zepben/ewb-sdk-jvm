@@ -13,4 +13,4 @@ import com.zepben.ewb.database.sqlite.common.SqliteTableVersion
 /**
  * The `version` table in the CIM databases. Increment this when doing a schema update.
  */
-val tableCimVersion: SqliteTableVersion = SqliteTableVersion(59)
+val tableCimVersion: SqliteTableVersion = SqliteTableVersion(60)

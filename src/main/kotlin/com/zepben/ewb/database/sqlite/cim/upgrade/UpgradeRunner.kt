@@ -45,6 +45,7 @@ class UpgradeRunner @JvmOverloads constructor(
         changeSet57(),
         changeSet58(),
         changeSet59(),
+        changeSet60(),
     ),
     private val tableVersion: SqliteTableVersion = tableCimVersion
 ) {

@@ -132,6 +132,21 @@ class NetworkServiceComparator @JvmOverloads constructor(
     // # Extensions IEC61970 Base Protection #
     // #######################################
 
+    private fun compareDirectionalCurrentRelay(source: DirectionalCurrentRelay, target: DirectionalCurrentRelay): ObjectDifference<DirectionalCurrentRelay> =
+        ObjectDifference(source, target).apply {
+            compareProtectionRelayFunction()
+
+            compareValues(
+                DirectionalCurrentRelay::directionalCharacteristicAngle,
+                DirectionalCurrentRelay::polarizingQuantityType,
+                DirectionalCurrentRelay::relayElementPhase,
+                DirectionalCurrentRelay::minimumPickupCurrent,
+                DirectionalCurrentRelay::currentLimit1,
+                DirectionalCurrentRelay::inverseTimeFlag,
+                DirectionalCurrentRelay::timeDelay1,
+            )
+        }
+
     private fun compareDistanceRelay(source: DistanceRelay, target: DistanceRelay): ObjectDifference<DistanceRelay> =
         ObjectDifference(source, target).apply {
             compareProtectionRelayFunction()

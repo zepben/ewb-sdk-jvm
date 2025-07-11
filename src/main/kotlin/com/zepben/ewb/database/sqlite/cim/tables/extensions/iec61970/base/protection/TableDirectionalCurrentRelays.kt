@@ -22,5 +22,5 @@ class TableDirectionalCurrentRelays : TableProtectionRelayFunctions() {
     val INVERSE_TIME_FLAG: Column = Column(++columnIndex, "inverse_time_flag", "NUMBER", NULL)
     val TIME_DELAY_1: Column = Column(++columnIndex, "time_delay_1", "NUMBER", NULL)
 
-    override val name: String = "directional_current_relay"
+    override val name: String = "directional_current_relays"
 }

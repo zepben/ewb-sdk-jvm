@@ -14,7 +14,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import java.sql.Statement
 
-object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 60) {
+object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MODEL, 61) {
 
     //
     // NOTE: In the validators we are only checking the columns that were actually changed.
@@ -25,6 +25,9 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
 
     override fun populateStatements(): List<String> = listOf(
         """INSERT INTO directional_current_relays (
+            mrid,
+            name,
+            description,
             directional_characteristic_angle,
             polarizing_quantity_type,
             relay_element_phase,
@@ -33,6 +36,9 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
             inverse_time_flag,
             time_delay_1
         ) VALUES (
+            'mrid',
+            'name',
+            'description',
             '123.2', 
             'UNKNOWN',
             'ABCN',
@@ -47,6 +53,9 @@ object ChangeSet61NetworkValidator : ChangeSetValidator(DatabaseType.NETWORK_MOD
         validateRows(
             statement, "SELECT * FROM directional_current_relays",
             { rs ->
+                assertThat(rs.getString("mrid"), equalTo("mrid"))
+                assertThat(rs.getString("name"), equalTo("name"))
+                assertThat(rs.getString("description"), equalTo("description"))
                 assertThat(rs.getString("directional_characteristic_angle"), equalTo("123.2"))
                 assertThat(rs.getString("polarizing_quantity_type"), equalTo("UNKNOWN"))
                 assertThat(rs.getString("relay_element_phase"), equalTo("ABCN"))

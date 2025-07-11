@@ -64,21 +64,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!--
-    This <dependencyManagement> block is to change the scope of the transitive dependency from
-    com.auth0.java-jwt that we are using in the code ported from `evolve.conn`. This is being
-    done rather than importing it directly so the version is kept in sync.
-    -->
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <scope>compile</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>com.zepben</groupId>
@@ -120,6 +105,20 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-auth-common</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <!--
+        We were using this as a transitive dependency from `com.auth0.java-jwt` below, but it uses the wrong scope
+        now it is being imported directly into this project (used to be in `evolve-conn`).
+
+        At time of writing, this version was what `com.auth0.java-jwt` was using. At some stage this should be
+        moved to the super pom.
+        -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.14.2</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Auth0 -->

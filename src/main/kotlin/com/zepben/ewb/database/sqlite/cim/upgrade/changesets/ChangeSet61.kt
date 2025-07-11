@@ -12,7 +12,7 @@ import com.zepben.ewb.database.paths.DatabaseType
 import com.zepben.ewb.database.sqlite.cim.upgrade.Change
 import com.zepben.ewb.database.sqlite.cim.upgrade.ChangeSet
 
-internal fun changeSet60() = ChangeSet(
+internal fun changeSet61() = ChangeSet(
     60,
     listOf(
         // Network Change

@@ -29,42 +29,42 @@ Make sure you double (or triple) check the ones listed in the "most important" l
 1. Update `pom.xml` to import the correct version of `evolve-grpc`.
 2. Model updated and tested. Pay attention to:
    1. Ensure descriptions are copied from CIM and added as doc comments.
-   2. All extension classes/enums are under the `com.zepben.evolve.cim.extensions` package in their appropriate sub-package.
+   2. All extension classes/enums are under the `com.zepben.ewb.cim.extensions` package in their appropriate sub-package.
    3. Mark all extensions (classes, enums and properties) with `@ZBEX` and documented with `[ZBEX]`
 3. Add/remove methods added to *Service class if any new classes were added.
 4. `FillFields.kt` updated to populate data for tests. Utilise `includeRuntime` if required.
 5. Database:
-   1. Table class(es) updated. - `com.zepben.evolve.database.sqlite.cim.tables`
+   1. Table class(es) updated. - `com.zepben.ewb.database.sqlite.cim.tables`
    2. New tables added to appropriate database table collections:
-      * `com.zepben.evolve.database.sqlite.cim.customer.CustomerDatabaseTables`
-      * `com.zepben.evolve.database.sqlite.cim.diagram.DiagramDatabaseTables`
-      * `com.zepben.evolve.database.sqlite.cim.network.NetworkDatabaseTables`
+      * `com.zepben.ewb.database.sqlite.cim.customer.CustomerDatabaseTables`
+      * `com.zepben.ewb.database.sqlite.cim.diagram.DiagramDatabaseTables`
+      * `com.zepben.ewb.database.sqlite.cim.network.NetworkDatabaseTables`
    3. Appropriate CIM writer updated:
-      * `com.zepben.evolve.database.sqlite.cim.customer.CustomerCimWriter`
-      * `com.zepben.evolve.database.sqlite.cim.diagram.DiagramCimWriter`
-      * `com.zepben.evolve.database.sqlite.cim.network.NetworkCimWriter`
+      * `com.zepben.ewb.database.sqlite.cim.customer.CustomerCimWriter`
+      * `com.zepben.ewb.database.sqlite.cim.diagram.DiagramCimWriter`
+      * `com.zepben.ewb.database.sqlite.cim.network.NetworkCimWriter`
    4. Appropriate CIM reader updated:
-      * `com.zepben.evolve.database.sqlite.cim.customer.CustomerCimReader`
-      * `com.zepben.evolve.database.sqlite.cim.diagram.DiagramCimReader`
-      * `com.zepben.evolve.database.sqlite.cim.network.NetworkCimReader`
+      * `com.zepben.ewb.database.sqlite.cim.customer.CustomerCimReader`
+      * `com.zepben.ewb.database.sqlite.cim.diagram.DiagramCimReader`
+      * `com.zepben.ewb.database.sqlite.cim.network.NetworkCimReader`
    5. Appropriate service writer updated if a new class was added:
-      * `com.zepben.evolve.database.sqlite.cim.customer.CustomerServiceWriter`
-      * `com.zepben.evolve.database.sqlite.cim.diagram.DiagramServiceWriter`
-      * `com.zepben.evolve.database.sqlite.cim.network.NetworkServiceWriter`
+      * `com.zepben.ewb.database.sqlite.cim.customer.CustomerServiceWriter`
+      * `com.zepben.ewb.database.sqlite.cim.diagram.DiagramServiceWriter`
+      * `com.zepben.ewb.database.sqlite.cim.network.NetworkServiceWriter`
    6. Appropriate service reader updated if a new class was added:
-      * `com.zepben.evolve.database.sqlite.cim.customer.CustomerServiceReader`
-      * `com.zepben.evolve.database.sqlite.cim.diagram.DiagramServiceReader`
-      * `com.zepben.evolve.database.sqlite.cim.network.NetworkServiceReader`
-   7. DB version updated. - `com.zepben.evolve.database.sqlite.cim.tables.tableCimVersion`
-   8. Migration written. - `com.zepben.evolve.database.sqlite.cim.upgrade`
-      1. ChangeSet written. - `com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSet*`
-      2. ChangeSet added to UpgradeRunner. - `com.zepben.evolve.database.sqlite.cim.upgrade.UpgradeRunner`
-      3. ChangeSetValidator written for ChangeSet. - `com.zepben.evolve.database.sqlite.cim.upgrade.changesets.ChangeSet*Validator`
-      4. ChangeSetValidator added to changeSetValidators. - `com.zepben.evolve.database.sqlite.cim.upgrade.ChangeSetTest`
+      * `com.zepben.ewb.database.sqlite.cim.customer.CustomerServiceReader`
+      * `com.zepben.ewb.database.sqlite.cim.diagram.DiagramServiceReader`
+      * `com.zepben.ewb.database.sqlite.cim.network.NetworkServiceReader`
+   7. DB version updated. - `com.zepben.ewb.database.sqlite.cim.tables.tableCimVersion`
+   8. Migration written. - `com.zepben.ewb.database.sqlite.cim.upgrade`
+      1. ChangeSet written. - `com.zepben.ewb.database.sqlite.cim.upgrade.changesets.ChangeSet*`
+      2. ChangeSet added to UpgradeRunner. - `com.zepben.ewb.database.sqlite.cim.upgrade.UpgradeRunner`
+      3. ChangeSetValidator written for ChangeSet. - `com.zepben.ewb.database.sqlite.cim.upgrade.changesets.ChangeSet*Validator`
+      4. ChangeSetValidator added to changeSetValidators. - `com.zepben.ewb.database.sqlite.cim.upgrade.ChangeSetTest`
    9. Add schema tests:
-      * `com.zepben.evolve.database.sqlite.cim.customer.CustomerDatabaseSchemaTest`
-      * `com.zepben.evolve.database.sqlite.cim.diagram.DiagramDatabaseSchemaTest`
-      * `com.zepben.evolve.database.sqlite.cim.network.NetworkDatabaseSchemaTest`
+      * `com.zepben.ewb.database.sqlite.cim.customer.CustomerDatabaseSchemaTest`
+      * `com.zepben.ewb.database.sqlite.cim.diagram.DiagramDatabaseSchemaTest`
+      * `com.zepben.ewb.database.sqlite.cim.network.NetworkDatabaseSchemaTest`
 6. Reference resolver(s) added (if new associations).
 7. Protobuf/gRPC
    1. *CimToProto(s) updated (including java wrapper).

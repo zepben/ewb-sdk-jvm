@@ -30,7 +30,7 @@ and performs shutdown operations for you. At its most basic, this can be achieve
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.grpc.GrpcChannel;
+import com.zepben.ewb.streaming.grpc.GrpcChannel;
 import io.grpc.ManagedChannelBuilder;
 
 var channel = new GrpcChannel(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build());
@@ -40,7 +40,7 @@ var channel = new GrpcChannel(ManagedChannelBuilder.forAddress(host, port).usePl
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.streaming.grpc.GrpcChannel
+import com.zepben.ewb.streaming.grpc.GrpcChannel
 import io.grpc.ManagedChannelBuilder
 
 val channel = GrpcChannel(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build())
@@ -66,7 +66,7 @@ Using your gRPC channel with the `QueryNetworkStateClient` is as simple as passi
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.get.QueryNetworkStateClient;
+import com.zepben.ewb.streaming.get.QueryNetworkStateClient;
 
 var client = new QueryNetworkStateClient(channel);
 ```
@@ -75,7 +75,7 @@ var client = new QueryNetworkStateClient(channel);
 <TabItem  value="kotlin">
 
 ```kotlin
-import com.zepben.evolve.streaming.get.QueryNetworkStateClient
+import com.zepben.ewb.streaming.get.QueryNetworkStateClient
 
 val client = QueryNetworkStateClient(channel)
 ```
@@ -106,7 +106,7 @@ For Java interoperability, prefer using the `getCurrentStatesStream` function, a
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.data.CurrentStateEventBatch;
+import com.zepben.ewb.streaming.data.CurrentStateEventBatch;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -150,7 +150,7 @@ When applying the current state of the network, you should send a status respons
 <TabItem value="java">
 
 ```java
-import com.zepben.evolve.streaming.data.BatchSuccessful;
+import com.zepben.ewb.streaming.data.BatchSuccessful;
 
 client.reportBatchStatus(new BatchSuccessful(1));
 ```

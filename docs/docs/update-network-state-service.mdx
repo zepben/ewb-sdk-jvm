@@ -22,10 +22,10 @@ You do _**NOT**_ have to do this, you can register the services directly with a 
 The classes you need for performing these actions can be imported from the SDK:
 
 ```kotlin
-import com.zepben.evolve.conn.grpc.GrpcServer
-import com.zepben.evolve.streaming.data.CurrentStateEvent
-import com.zepben.evolve.streaming.data.SetCurrentStatesStatus
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService
+import com.zepben.ewb.conn.grpc.GrpcServer
+import com.zepben.ewb.streaming.data.CurrentStateEvent
+import com.zepben.ewb.streaming.data.SetCurrentStatesStatus
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateService
 ```
 
 ## Creating callbacks
@@ -102,9 +102,9 @@ Putting each of the steps above together, you can build the scaffold of a workin
 <TabItem  value="kotlin-lambda">
 
 ```kotlin
-import com.zepben.evolve.conn.grpc.GrpcServer
-import com.zepben.evolve.streaming.data.CurrentStateEvent
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService
+import com.zepben.ewb.conn.grpc.GrpcServer
+import com.zepben.ewb.streaming.data.CurrentStateEvent
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateService
 
 fun main() {
     val service = UpdateNetworkStateService(onSetCurrentStates = { batchId: Long, events: List<CurrentStateEvent> ->
@@ -124,10 +124,10 @@ fun main() {
 <TabItem  value="kotlin-method">
 
 ```kotlin
-import com.zepben.evolve.conn.grpc.GrpcServer
-import com.zepben.evolve.streaming.data.CurrentStateEvent
-import com.zepben.evolve.streaming.data.SetCurrentStatesStatus
-import com.zepben.evolve.streaming.mutations.UpdateNetworkStateService
+import com.zepben.ewb.conn.grpc.GrpcServer
+import com.zepben.ewb.streaming.data.CurrentStateEvent
+import com.zepben.ewb.streaming.data.SetCurrentStatesStatus
+import com.zepben.ewb.streaming.mutations.UpdateNetworkStateService
 
 class UpdateNetworkStateServiceImpl {
 

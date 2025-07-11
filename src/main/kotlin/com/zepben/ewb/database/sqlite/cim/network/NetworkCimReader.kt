@@ -259,6 +259,33 @@ internal class NetworkCimReader : CimReader<NetworkService>() {
     // #######################################
 
     /**
+     * Create a [DirectionalCurrentRelay] and populate its fields from [TableDirectionalCurrentRelays].
+     *
+     * @param service The [NetworkService] used to store any items read from the database.
+     * @param table The database table to read the [DirectionalCurrentRelay] fields from.
+     * @param resultSet The record in the database table containing the fields for this [DirectionalCurrentRelay].
+     * @param setIdentifier A callback to register the mRID of this [DirectionalCurrentRelay] for logging purposes.
+     *
+     * @return true if the [DirectionalCurrentRelay] was successfully read from the database and added to the service.
+     * @throws SQLException For any errors encountered reading from the database.
+     */
+    @Throws(SQLException::class)
+    fun read(service: NetworkService, table: TableDirectionalCurrentRelays, resultSet: ResultSet, setIdentifier: (String) -> String): Boolean {
+        val directionalCurrentRelay = DirectionalCurrentRelay(setIdentifier(resultSet.getString(table.MRID.queryIndex))).apply {
+            directionalCharacteristicAngle = resultSet.getNullableDouble(table.DIRECTIONAL_CHARACTERISTIC_ANGLE.queryIndex)
+            polarizingQuantityType = PolarizingQuantityType.valueOf(resultSet.getString(table.POLARIZING_QUANTITY_TYPE.queryIndex))
+            relayElementPhase = PhaseCode.valueOf(resultSet.getString(table.RELAY_ELEMENT_PHASE.queryIndex))
+            minimumPickupCurrent = resultSet.getNullableDouble(table.MINIMUM_PICKUP_CURRENT.queryIndex)
+            currentLimit1 = resultSet.getNullableDouble(table.CURRENT_LIMIT_1.queryIndex)
+            inverseTimeFlag = resultSet.getNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex)
+            timeDelay1 = resultSet.getNullableDouble(table.TIME_DELAY_1.queryIndex)
+        }
+
+        return readProtectionRelayFunction(service, directionalCurrentRelay, table, resultSet) && service.addOrThrow(directionalCurrentRelay)
+
+    }
+
+    /**
      * Create a [DistanceRelay] and populate its fields from [TableDistanceRelays].
      *
      * @param service The [NetworkService] used to store any items read from the database.

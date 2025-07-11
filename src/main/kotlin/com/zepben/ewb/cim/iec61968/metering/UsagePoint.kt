@@ -9,6 +9,7 @@
 package com.zepben.ewb.cim.iec61968.metering
 
 import com.zepben.ewb.cim.extensions.ZBEX
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
 import com.zepben.ewb.cim.iec61968.common.Location
 import com.zepben.ewb.cim.iec61970.base.core.Equipment
 import com.zepben.ewb.cim.iec61970.base.core.IdentifiedObject
@@ -32,6 +33,7 @@ import com.zepben.ewb.services.common.extensions.validateReference
  * @property approvedInverterCapacity [ZBEX] ]The approved inverter capacity at this UsagePoint in volt-amperes.
  * @property phaseCode Phase code. Number of wires and specific nominal phases can be deduced from enumeration literal values. For example, ABCN is three-phase,
  *                     four-wire, s12n (splitSecondary12N) is single-phase, three-wire, and s1n and s2n are single-phase, two-wire.
+ * @property contacts [ZBEX] All contact details for this UsagePoint.
  */
 class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject(mRID) {
 
@@ -43,6 +45,8 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
     @ZBEX
     var approvedInverterCapacity: Int? = null
     var phaseCode: PhaseCode = PhaseCode.NONE
+    @ZBEX
+    var contacts: MutableList<ContactDetails>? = null
 
     private var _equipment: MutableList<Equipment>? = null
     private var _endDevices: MutableList<EndDevice>? = null
@@ -124,4 +128,17 @@ class UsagePoint @JvmOverloads constructor(mRID: String = "") : IdentifiedObject
         _endDevices = null
         return this
     }
+
+    fun addContact(contact: ContactDetails): UsagePoint {
+        contacts = contacts ?: mutableListOf()
+        contacts!!.add(contact)
+        return this
+    }
+
+    fun removeContact(contact: ContactDetails): Boolean {
+        val ret = contacts?.remove(contact) == true
+        if (contacts.isNullOrEmpty()) contacts = null
+        return ret
+    }
+
 }

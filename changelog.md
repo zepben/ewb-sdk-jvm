@@ -1,5 +1,5 @@
 # Zepben EWB SDK changelog
-## [0.30.0] - UNRELEASED
+## [1.0.0] - UNRELEASED
 ### Breaking Changes
 * Renamed the package to `com.zepben.ewb`. You will need to update all your imports `com.zepben.evolve.*` -> `com.zepben.ewb.*`. This also updates the maven
   artifact:

@@ -13,7 +13,7 @@ import com.zepben.ewb.database.sqlite.cim.upgrade.Change
 import com.zepben.ewb.database.sqlite.cim.upgrade.ChangeSet
 
 internal fun changeSet61() = ChangeSet(
-    60,
+    61,
     listOf(
         // Network Change
         `Create directional current relay table`
@@ -28,14 +28,16 @@ internal fun changeSet61() = ChangeSet(
 private val `Create directional current relay table` = Change(
     listOf(
         """CREATE TABLE directional_current_relays (
-        directional_characteristic_angle NUMBER,
-        polarizing_quantity_type TEXT,
-        relay_element_phase TEXT,
-        minimum_pickup_current NUMBER,
-        current_limit_1 NUMBER,
-        inverse_time_flaG BOOLEAN,
-        time_delay_1 NUMBER,
-            
+            mrid TEXT,
+            name TEXT,
+            description TEXT,
+            directional_characteristic_angle NUMBER,
+            polarizing_quantity_type TEXT,
+            relay_element_phase TEXT,
+            minimum_pickup_current NUMBER,
+            current_limit_1 NUMBER,
+            inverse_time_flaG BOOLEAN,
+            time_delay_1 NUMBER
         );""".trimIndent(),
     ),
     targetDatabases = setOf(DatabaseType.NETWORK_MODEL)

@@ -62,6 +62,12 @@ fun RelayInfo.mRID(): String = ai.mRID()
  */
 fun PanDemandResponseFunction.mRID(): String = edf.mRID()
 
+// ################################
+// # EXTENSION IEC61970 BASE PROTECTION #
+// ################################
+
+fun DirectionalCurrentRelay.mRID(): String = prf.mRID()
+
 // #################################
 // # Extensions IEC61970 Base Core #
 // #################################

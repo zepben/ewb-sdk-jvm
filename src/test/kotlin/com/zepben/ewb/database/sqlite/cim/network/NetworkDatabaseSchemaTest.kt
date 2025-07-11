@@ -14,6 +14,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
+import com.zepben.ewb.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.DistanceRelay
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
@@ -152,6 +153,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         // # Extensions IEC61970 Base Protection #
         // #######################################
 
+        validateSchema(SchemaServices.networkServicesOf(::DirectionalCurrentRelay, DirectionalCurrentRelay::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::DistanceRelay, DistanceRelay::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::ProtectionRelayScheme, ProtectionRelayScheme::fillFields))
         validateSchema(SchemaServices.networkServicesOf(::ProtectionRelaySystem, ProtectionRelaySystem::fillFields))
@@ -269,6 +271,7 @@ class NetworkDatabaseSchemaTest : CimDatabaseSchemaTest<NetworkService, NetworkD
         // ############################
 
         validateSchema(SchemaServices.networkServicesOf(::CurrentRelay, CurrentRelay::fillFields))
+        validateSchema(SchemaServices.networkServicesOf(::DirectionalCurrentRelay, DirectionalCurrentRelay::fillFields))
 
         // #######################
         // # IEC61970 Base Scada #

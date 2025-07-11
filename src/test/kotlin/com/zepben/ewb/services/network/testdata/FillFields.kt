@@ -9,6 +9,8 @@
 package com.zepben.ewb.services.network.testdata
 
 import com.zepben.ewb.cim.extensions.iec61968.assetinfo.RelayInfo
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactDetails
+import com.zepben.ewb.cim.extensions.iec61968.common.ContactMethodType
 import com.zepben.ewb.cim.extensions.iec61968.metering.PanDemandResponseFunction
 import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
@@ -47,6 +49,7 @@ import com.zepben.ewb.cim.iec61970.infiec61970.feeder.Circuit
 import com.zepben.ewb.services.common.testdata.fillFieldsCommon
 import com.zepben.ewb.services.network.NetworkService
 import com.zepben.ewb.services.network.tracing.feeder.FeederDirection
+import org.apache.commons.collections4.functors.TruePredicate
 import java.time.Instant
 import java.util.*
 
@@ -167,6 +170,20 @@ fun EvChargingUnit.fillFields(service: NetworkService, includeRuntime: Boolean =
 // ######################################
 // # Extension IEC61970 Base Protection #
 // ######################################
+
+fun DirectionalCurrentRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): DirectionalCurrentRelay {
+    (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
+
+    directionalCharacteristicAngle = 1.1
+    polarizingQuantityType = PolarizingQuantityType.NEGATIVE_SEQUENCE_VOLTAGE
+    relayElementPhase = PhaseCode.ABCN
+    minimumPickupCurrent = 2.2
+    currentLimit1 = 3.3
+    inverseTimeFlag = true
+    timeDelay1 = 4.4
+
+    return this
+}
 
 fun DistanceRelay.fillFields(service: NetworkService, includeRuntime: Boolean = true): DistanceRelay {
     (this as ProtectionRelayFunction).fillFields(service, includeRuntime)
@@ -613,6 +630,44 @@ fun UsagePoint.fillFields(service: NetworkService, includeRuntime: Boolean = tru
             it.addUsagePoint(this)
             service.add(it)
         })
+
+        addContact(ContactDetails().apply {
+            phoneNumbers = mutableListOf(
+                    TelephoneNumber(
+                        "01",
+                        "02",
+                        "03",
+                        "04",
+                        "05",
+                        "10",
+                        "12345678",
+                        false,
+                        "Telephone Number"
+                    )
+            )
+
+            contactAddress = StreetAddress(
+                "1234",
+                TownDetail("town", "state"),
+                "5678",
+                StreetDetail("a", "b", "c", "d", "e", "f", "g")
+            )
+
+            electronicAddresses = mutableListOf(
+                ElectronicAddress(
+                    "foo@zepben.com",
+                    true,
+                    "Contact foo from Zepben via this email."
+                )
+            )
+
+            contactType = "contact type"
+            firstName = "first"
+            lastName = "last"
+            preferredContactMethod = ContactMethodType.CALL
+            isPrimary = false
+            businessName = "business name"
+        })
     }
 
     return this
@@ -843,7 +898,7 @@ fun GeographicalRegion.fillFields(service: NetworkService, includeRuntime: Boole
     return this
 }
 
-fun PowerSystemResource.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerSystemResource {
+private fun PowerSystemResource.fillFields(service: NetworkService, includeRuntime: Boolean = true): PowerSystemResource {
     (this as IdentifiedObject).fillFieldsCommon(service, includeRuntime)
 
     location = Location().apply { addPoint(PositionPoint(3.3, 4.4)) }.also { service.add(it) }

@@ -17,6 +17,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
+import com.zepben.ewb.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.DistanceRelay
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
@@ -153,6 +154,7 @@ import com.zepben.ewb.services.customer.CustomerService
  * @param isPerLengthPhaseImpedance Handler when the [identifiedObject] is a [PerLengthPhaseImpedance]
  * @param isCut Handler when the [identifiedObject] is a [Cut]
  * @param isClamp Handler when the [identifiedObject] is a [Clamp]
+ * @param DirectionalCurrentRelay Handler when the [identifiedObject] is a [DirectionalCurrentRelay]
  * @param isOther Handler when the [identifiedObject] is not supported by the [CustomerService].
  */
 @JvmOverloads
@@ -244,6 +246,7 @@ inline fun <R> whenNetworkServiceObject(
     isPerLengthPhaseImpedance: (PerLengthPhaseImpedance) -> R,
     isCut: (Cut) -> R,
     isClamp: (Clamp) -> R,
+    isDirectionalCurrentRelay: (DirectionalCurrentRelay) -> R,
     isOther: (IdentifiedObject) -> R = { idObj: IdentifiedObject ->
         throw IllegalArgumentException("Identified object type ${idObj::class} is not supported by the network service")
     }
@@ -334,6 +337,7 @@ inline fun <R> whenNetworkServiceObject(
     is PerLengthPhaseImpedance -> isPerLengthPhaseImpedance(identifiedObject)
     is Cut -> isCut(identifiedObject)
     is Clamp -> isClamp(identifiedObject)
+    is DirectionalCurrentRelay -> isDirectionalCurrentRelay(identifiedObject)
     else -> isOther(identifiedObject)
 }
 

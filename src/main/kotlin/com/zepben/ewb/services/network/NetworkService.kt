@@ -14,6 +14,7 @@ import com.zepben.ewb.cim.extensions.iec61970.base.core.Site
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.Loop
 import com.zepben.ewb.cim.extensions.iec61970.base.feeder.LvFeeder
 import com.zepben.ewb.cim.extensions.iec61970.base.generation.production.EvChargingUnit
+import com.zepben.ewb.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.DistanceRelay
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelayScheme
 import com.zepben.ewb.cim.extensions.iec61970.base.protection.ProtectionRelaySystem
@@ -187,6 +188,9 @@ class NetworkService(metadata: MetadataCollection = MetadataCollection()) : Base
     // #######################################
     // # Extensions IEC61970 Base Protection #
     // #######################################
+
+    fun add(directionalCurrentRelay: DirectionalCurrentRelay): Boolean = super.add(directionalCurrentRelay)
+    fun remove(directionalCurrentRelay: DirectionalCurrentRelay): Boolean = super.remove(directionalCurrentRelay)
 
     /**
      * Add the [DistanceRelay] to this service.

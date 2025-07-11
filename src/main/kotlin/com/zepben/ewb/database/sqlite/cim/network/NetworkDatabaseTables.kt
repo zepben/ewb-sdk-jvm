@@ -83,6 +83,7 @@ class NetworkDatabaseTables : CimDatabaseTables() {
             TableCurrentTransformers(),
             TableCurveData(),
             TableCuts(),
+            TableDirectionalCurrentRelays(),
             TableDisconnectors(),
             TableDiscretes(),
             TableDistanceRelays(),

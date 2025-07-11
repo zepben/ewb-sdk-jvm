@@ -238,6 +238,30 @@ class NetworkCimWriter(
     // #######################################
 
     /**
+     * Write the [DirectionalCurrentRelay] fields to [TableDirectionalCurrentRelays].
+     *
+     * @param directionalCurrentRelay The [DirectionalCurrentRelay] instance to write to the database.
+     *
+     * @return true if the [DirectionalCurrentRelay] was successfully written to the database, otherwise false.
+     * @throws SQLException For any errors encountered writing to the database.
+     */
+    @Throws(SQLException::class)
+    fun write(directionalCurrentRelay: DirectionalCurrentRelay): Boolean {
+        val table = databaseTables.getTable<TableDirectionalCurrentRelays>()
+        val insert = databaseTables.getInsert<TableDirectionalCurrentRelays>()
+
+        insert.setNullableDouble(table.DIRECTIONAL_CHARACTERISTIC_ANGLE.queryIndex, directionalCurrentRelay.directionalCharacteristicAngle)
+        insert.setNullableString(table.POLARIZING_QUANTITY_TYPE.queryIndex, directionalCurrentRelay.polarizingQuantityType.name)
+        insert.setNullableString(table.RELAY_ELEMENT_PHASE.queryIndex, directionalCurrentRelay.relayElementPhase.name)
+        insert.setNullableDouble(table.MINIMUM_PICKUP_CURRENT.queryIndex, directionalCurrentRelay.minimumPickupCurrent)
+        insert.setNullableDouble(table.CURRENT_LIMIT_1.queryIndex, directionalCurrentRelay.currentLimit1)
+        insert.setNullableBoolean(table.INVERSE_TIME_FLAG.queryIndex, directionalCurrentRelay.inverseTimeFlag)
+        insert.setNullableDouble(table.TIME_DELAY_1.queryIndex, directionalCurrentRelay.timeDelay1)
+
+        return writeProtectionRelayFunction(table, insert, directionalCurrentRelay, "directional current relay")
+    }
+
+    /**
      * Write the [DistanceRelay] fields to [TableDistanceRelays].
      *
      * @param distanceRelay The [DistanceRelay] instance to write to the database.

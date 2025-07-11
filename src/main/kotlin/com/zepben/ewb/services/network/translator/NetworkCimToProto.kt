@@ -55,6 +55,7 @@ import com.zepben.protobuf.cim.extensions.iec61970.base.core.Site as PBSite
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.Loop as PBLoop
 import com.zepben.protobuf.cim.extensions.iec61970.base.feeder.LvFeeder as PBLvFeeder
 import com.zepben.protobuf.cim.extensions.iec61970.base.generation.production.EvChargingUnit as PBEvChargingUnit
+import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DirectionalCurrentRelay as PBDirectionalCurrentRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.DistanceRelay as PBDistanceRelay
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.ProtectionRelayFunction as PBProtectionRelayFunction
 import com.zepben.protobuf.cim.extensions.iec61970.base.protection.ProtectionRelayScheme as PBProtectionRelayScheme
@@ -277,6 +278,7 @@ fun networkIdentifiedObject(identifiedObject: IdentifiedObject): NetworkIdentifi
             isPerLengthPhaseImpedance = { perLengthPhaseImpedance = it.toPb() },
             isCut = { cut = it.toPb() },
             isClamp = { clamp = it.toPb() },
+            isDirectionalCurrentRelay = { directionalCurrentRelay = it.toPb() },
         )
     }.build()
 
@@ -426,6 +428,25 @@ fun EvChargingUnit.toPb(): PBEvChargingUnit = toPb(this, PBEvChargingUnit.newBui
 // #######################################
 
 /**
+ * Convert the [DirectionalCurrentRelay] into its protobuf counterpart.
+ *
+ * @param cim The [DirectionalCurrentRelay] to convert.
+ * @param pb The protobuf builder to populate.
+ * @return [pb] for fluent use.
+ */
+fun toPb(cim: DirectionalCurrentRelay, pb: PBDirectionalCurrentRelay.Builder): PBDirectionalCurrentRelay.Builder =
+    pb.apply {
+        directionalCharacteristicAngle = cim.directionalCharacteristicAngle ?: UNKNOWN_DOUBLE
+        polarizingQuantityType = mapPolarizingQuantityType.toPb(cim.polarizingQuantityType)
+        relayElementPhase = mapPhaseCode.toPb(cim.relayElementPhase)
+        minimumPickupCurrent = cim.minimumPickupCurrent ?: UNKNOWN_DOUBLE
+        currentLimit1 = cim.currentLimit1 ?: UNKNOWN_DOUBLE
+        cim.inverseTimeFlag?.also { inverseTimeFlagSet = it } ?: run { inverseTimeFlagNull = NullValue.NULL_VALUE }
+        timeDelay1 = cim.timeDelay1 ?: UNKNOWN_DOUBLE
+        toPb(cim, prfBuilder)
+    }
+
+/**
  * Convert the [DistanceRelay] into its protobuf counterpart.
  *
  * @param cim The [DistanceRelay] to convert.
@@ -521,6 +542,11 @@ fun toPb(cim: VoltageRelay, pb: PBVoltageRelay.Builder): PBVoltageRelay.Builder 
     pb.apply {
         toPb(cim, prfBuilder)
     }
+
+/**
+ * An extension for converting any DirectionalCurrentRelay into its protobuf counterpart.
+ */
+fun DirectionalCurrentRelay.toPb(): PBDirectionalCurrentRelay = toPb(this, PBDirectionalCurrentRelay.newBuilder()).build()
 
 /**
  * An extension for converting any DistanceRelay into its protobuf counterpart.
@@ -2943,6 +2969,14 @@ class NetworkCimToProto : BaseCimToProto() {
     // #######################################
     // # Extensions IEC61970 Base Protection #
     // #######################################
+
+    /**
+     * Convert the [DirectionalCurrentRelay] into its protobuf counterpart.
+     *
+     * @param cim The [DirectionalCurrentRelay] to convert.
+     * @return The protobuf form of [cim].
+     */
+    fun toPb(cim: DirectionalCurrentRelay): PBDirectionalCurrentRelay = cim.toPb()
 
     /**
      * Convert the [DistanceRelay] into its protobuf counterpart.

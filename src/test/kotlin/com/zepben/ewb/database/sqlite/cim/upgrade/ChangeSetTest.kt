@@ -89,6 +89,7 @@ internal class ChangeSetTest {
         ChangeSet58NetworkValidator,
         ChangeSet59NetworkValidator,
         ChangeSet60NetworkValidator,
+        ChangeSet61NetworkValidator
     ).associateBy { it.version }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Zeppelin Bend Pty Ltd
+ * Copyright 2025 Zeppelin Bend Pty Ltd
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,6 +19,7 @@ package com.zepben.ewb.cim.iec61968.common
  * @property suiteNumber Number of the apartment or suite.
  * @property type Type of street. Examples include: street, circle, boulevard, avenue, road, drive, etc.
  * @property displayAddress The address as it should be displayed to a user.
+ * @property buildingNumber [ZBEX] The number of the building.
  */
 data class StreetDetail(
     val buildingName: String = "",
@@ -27,7 +28,8 @@ data class StreetDetail(
     val number: String = "",
     val suiteNumber: String = "",
     val type: String = "",
-    val displayAddress: String = ""
+    val displayAddress: String = "",
+    val buildingNumber: Int? = null
 ) {
 
     /**

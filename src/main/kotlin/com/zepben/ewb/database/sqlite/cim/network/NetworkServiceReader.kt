@@ -110,6 +110,7 @@ internal class NetworkServiceReader(
             readEach<TableClamps>(service, reader::read) and
             readEach<TableCuts>(service, reader::read) and
             readEach<TableCurrentRelays>(service, reader::read) and
+            readEach<TableDirectionalCurrentRelays>(service, reader::read) and
             readEach<TableDistanceRelays>(service, reader::read) and
             readEach<TableVoltageRelays>(service, reader::read) and
             readEach<TableProtectionRelayFunctionThresholds>(service, reader::read) and

@@ -108,6 +108,7 @@ internal class NetworkTranslatorTest : TranslatorTestBase<NetworkService>(
         // # Extensions IEC61970 Base Protection #
         // #######################################
 
+        ValidationInfo(DirectionalCurrentRelay(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(DistanceRelay(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(ProtectionRelayScheme(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
         ValidationInfo(ProtectionRelaySystem(), { fillFields(it) }, { addFromPb(nsToPb.toPb(it)) }),
